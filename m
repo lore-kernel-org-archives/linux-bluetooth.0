@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Rainer Jochem <rainer@graphics.cs.uni-sb.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20030927113717.GA23865@graphics.cs.uni-sb.de>
+Subject: Re: [Bluez-users] siemens lifebook 6120
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Gabor Halaszvari <fire@3hacker.hu>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200309142035.30749.fire@3hacker.hu>
+References: <200309132053.40178.fire@3hacker.hu>
+	<1063546262.28890.467.camel@pegasus>  <200309142035.30749.fire@3hacker.hu>
+Content-Type: multipart/mixed; boundary="=-UO2yWL8xfeDbtqa+O2mX"
+Message-Id: <1064253356.5641.123.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gBBFr7Ir9EOA20Yy"
-Subject: [Bluez-users] snd-bluez-sco
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -16,110 +19,74 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 27 Sep 2003 13:37:17 +0200
+Date: 22 Sep 2003 19:55:50 +0200
 
 
---gBBFr7Ir9EOA20Yy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--=-UO2yWL8xfeDbtqa+O2mX
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+Hi Gabor,
+
+> T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+> P:  Vendor=044e ProdID=3001 Rev= 3.36
+> S:  Manufacturer=ALPS
+> S:  Product=USB BT
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=250mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+the problem is, that the USB Bluetooth class is not set correctly. Try
+this patch. How old is your notebook?
+
+Regards
+
+Marcel
+
+
+--=-UO2yWL8xfeDbtqa+O2mX
+Content-Disposition: attachment; filename=patch-hci-usb-alps-fix
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/x-patch; name=patch-hci-usb-alps-fix; charset=ISO-8859-15
 
+diff -urN linux-2.4.22/drivers/bluetooth/hci_usb.c linux-2.4.22-mh/drivers/=
+bluetooth/hci_usb.c
+--- linux-2.4.22/drivers/bluetooth/hci_usb.c	Mon Aug 25 13:44:41 2003
++++ linux-2.4.22-mh/drivers/bluetooth/hci_usb.c	Mon Sep 22 19:53:05 2003
+@@ -76,6 +76,9 @@
+ 	/* Ericsson with non-standard id */
+ 	{ USB_DEVICE(0x0bdb, 0x1002) },
+=20
++	/* ALPS Module with non-standard id */
++	{ USB_DEVICE(0x044e, 0x3002) },
++
+ 	/* Bluetooth Ultraport Module from IBM */
+ 	{ USB_DEVICE(0x04bf, 0x030a) },
+=20
 
-Hi,
+--=-UO2yWL8xfeDbtqa+O2mX--
 
-I'm absolutely new to this whole bluetooth-stuff, so it might
-be that I just did some stupid mistake, but well...
-
-=20
-This is what I have:
-Kernel 2.4.22 (with all stuff in bluetooth enabled)
-alsa 0.9.7 (driver & libs) both patched with the
- 	   patches from J. Paisley (I had to manually
- 	   adjust some of the files, because the patch
- 	   is for 0.9.6, but this is no major problem I
- 	   think - perhaps I'll do a patch for 0.9.7 later)
-Anycom AHS-10 Headset
-Anycom USB 100 Bluetooth-adapter
-All the packages/libs... from the bluez Homepage installed
-
- The following modules are loaded:
- rfcomm                 31200   1  (autoclean)
- l2cap                  17280   2  (autoclean) [rfcomm]
- snd-bluez-sco           7904   0=20
- sco                     9408   0  (unused)
- bfusb                 425600   0  (unused)
- hci_usb                 8928   1=20
- bluez
-=20
-the bluetooth subsystem is started and the USB-stick is found.
-=20
-=20
-=20
-That's what I want:
-Getting the alsa-driver working with my headset in order
-to do VoIP.
-=20
-=20
-=20
-=2E..and the following doesn't work:
-doing a "sdptool search HSET" finds the headset:
-=20
- Inquiring ...
- Searching for HSET on xx:xx:xx:xx:xx:xx ...
- Service Name: Headset
- Service RecHandle: 0x20000
- Service Class ID List:
-   "Headset" (0x1108)
-   "Generic Audio" (0x1203)
- Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 6
- Language Base Attr List:
-   code_ISO639: 0x656e
-   encoding:    0x6a
-   base_offset: 0x100
-=20
-=20
-=20
-then I do:
-root@marvin:# bluezsco  xx:xx:xx:xx:xx:xx 6
- Error: control open (hw:2): No such device
- Error: Can't find device. Bail
-=20
-=20
-Humm.... and now I'm stuck. Any hints?
-=20
-=20
-Are there perhaps other ways to get an audio
-device I can use with other linux-apps?
-(Although I prefer the idea of having an=20
-alsa-device I can play with :)
-=20
-=20
- Cheers
-=20
-   Rainer
-=20
-=20
---=20
-http://graphics.cs.uni-sb.de/~rainer/
-
-
-
---gBBFr7Ir9EOA20Yy
-Content-Type: application/pgp-signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-
-iD8DBQE/dXZtH/5+6U9F1qYRAnyYAKCabKk4WKpN5KPevbDlkI/NuvQZMQCdF9jb
-4kZkcmECke1XMf0fP7rB7fw=
-=z0qq
------END PGP SIGNATURE-----
-
---gBBFr7Ir9EOA20Yy--
 
 
 -------------------------------------------------------
