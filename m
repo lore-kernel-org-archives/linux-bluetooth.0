@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] System Freeze....
+Subject: Re: [Bluez-users] missing include-files with debian
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
+To: R.Schade@tu-braunschweig.de
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <200409081101.59870.cijoml@volny.cz>
-References: <1aef6225040907130365c31e4c@mail.gmail.com>
-	 <1094627398.5384.0.camel@notepaq>
-	 <1aef6225040908015847961a8e@mail.gmail.com>
-	 <200409081101.59870.cijoml@volny.cz>
+In-Reply-To: <517CF7F08A05D4118C380000E869BFA4BDED83@emg_ntserv2>
+References: <517CF7F08A05D4118C380000E869BFA4BDED83@emg_ntserv2>
 Content-Type: text/plain
-Message-Id: <1094636440.5384.16.camel@notepaq>
+Message-Id: <1094636377.5384.14.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,13 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 08 Sep 2004 11:40:40 +0200
+Date: Wed, 08 Sep 2004 11:39:37 +0200
 
-Hi David,
+Hi Ralf,
 
-> It looks like USB host driver problem - try ask usb guys
+> I had installed Debian-stable (2.4.20) with the bluez-debian-packages (I did
+> not compile the bluez-sources myself). My USB-bluetooth-dongle works fine.
+> Now, I want code some little application. So I have include the
+> bluetooth-headerfiles:
+> 
+> #include <bluetooth/bluetooth.h>
+> #include <bluetooth/rfcomm.h>
+> #include <bluetooth/hci.h>
+> #include <bluetooth/hci_lib.h> 
+> 
+> The standard include-directory is /usr/include. Directory "bluetooth" exists
+> there, but contains only one headerfile (bnep.h). Why are missing the other
+> bluez-headerfiles there? 
+> Is this a debian-"problem" with the package and I have to install/copy/link
+> the files manually? I had found the missing files at the kernel-sources and
+> at the bluez-sources.
 
-I agree with Michal and you maybe should give a 2.6 kernel a chance ;)
+install the libbluetooth-dev package, but these Debian Woody packages
+are very old. Maybe you wanna at least update to Sarge.
 
 Regards
 
