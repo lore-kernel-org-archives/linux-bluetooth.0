@@ -1,13 +1,13 @@
 Return-Path: <linux-usb-users-admin@lists.sourceforge.net>
-Message-ID: <4031455F.6040406@yahoo.com>
+Message-ID: <403144AB.9040504@yahoo.com>
 From: "Todd E. Johnson" <tejohnson@yahoo.com>
 MIME-Version: 1.0
 To: "Todd E. Johnson" <tejohnson@yahoo.com>
 Cc: bluez-users@lists.sourceforge.net, linux-usb-users@lists.sourceforge.net,
    maxk@qualcomm.com
-References: <402E2E29.7040207@yahoo.com> <1076769794.14758.2.camel@pegasus>	 <402E4E02.9020600@yahoo.com> <1076851622.14758.22.camel@pegasus> <402F99AC.7020500@yahoo.com> <403137F9.1050108@yahoo.com> <403144AB.9040504@yahoo.com>
-In-Reply-To: <403144AB.9040504@yahoo.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+References: <402E2E29.7040207@yahoo.com> <1076769794.14758.2.camel@pegasus>	 <402E4E02.9020600@yahoo.com> <1076851622.14758.22.camel@pegasus> <402F99AC.7020500@yahoo.com> <403137F9.1050108@yahoo.com>
+In-Reply-To: <403137F9.1050108@yahoo.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Subject: [Linux-usb-users] Re: 2.6.2 errors with DBT-120 (B2)
 Sender: linux-usb-users-admin@lists.sourceforge.net
 Errors-To: linux-usb-users-admin@lists.sourceforge.net
@@ -18,19 +18,18 @@ List-Help: <mailto:linux-usb-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/linux-usb-users>,
 	<mailto:linux-usb-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=linux-usb-users>
-Date: Mon, 16 Feb 2004 17:34:07 -0500
+Date: Mon, 16 Feb 2004 17:31:07 -0500
 List-ID: <bluez-users.lists.sourceforge.net>
 
 Todd E. Johnson wrote:
 
 >
-> Sorry, I meant to say patch-2.2.2-mh2... Sorry about any confusion 
-> this may have caused...
->
-I must be on Acid.... patch-2.2.2-mh2...  2.2.2 must be the mark of the 
-Penguin or something...  No really, I mean patch-2.6.2-mh2
+> The attached patch includes patch-2.4.24-mh2, a fix for the error, and 
+> a few minor fixes so the kernel can build when debugging is enabled...
 
-Two-Six-Two...
+1,$s/patch-2.4.24-mh2/patch-2.2.2-mh2/
+
+Sorry, I meant to say patch-2.2.2-mh2... Sorry about any confusion this may have caused...
 
 -- 
 
