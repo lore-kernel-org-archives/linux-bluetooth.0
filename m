@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41E9B60E.2010509@dark-reality.de>
+Message-ID: <41E9B834.4060809@dark-reality.de>
 From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] btsco crash without daemon
-References: <41E91B7A.1070303@egabriel.de> <41E925F4.3060907@dark-reality.de> <41E92C83.8010406@egabriel.de> <41E9349C.8060001@dark-reality.de> <41E96812.7030903@egabriel.de>
-In-Reply-To: <41E96812.7030903@egabriel.de>
+Subject: Re: [Bluez-devel] Re: scooped by pocketpc (a2dp)
+References: <41E93682.9040907@xmission.com>	 <pan.2005.01.15.16.35.03.165547@yahoo.com> <5256d0b0501151629332f7660@mail.gmail.com>
+In-Reply-To: <5256d0b0501151629332f7660@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,44 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 16 Jan 2005 01:32:14 +0100
+Date: Sun, 16 Jan 2005 01:41:24 +0100
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-ligi wrote:
+Peter Robinson wrote:
+| Yes I use gnomemeeting with alsa at the moment but I haven't had time
+| to get my headset working properly under Linux.
 |
-| I am using Gentoo and here alsa is an ebuild that wants alsa not to be
-| compiled in the kernel it has to be external( build from
-| alsa-driver-1.0.8rc2.tar.bz2 by that ebuild of portage ).
-| But snd_hwdep is loaded and there is no complaining of missing things
-| - this method just fails...
-| Has anyone some Hint ?
 
-Just wanted to note that you don't need the external alsa driver
-package, only alsalib (I'm using gentoo, too). Of course this only
-applies if your other soundcards are supported well by the kernel.
-
-Maybe you should try using the kernel alsa stuff and drop the external
-alsa stuff, it's not supposed to work this way. Especially because
-snd-bt-sco is linked against the KERNEL alsa stuff, not your external
-driver stuff, so I think this might very well be the source of the problem.
-
-Why do you want to use the external alsa-driver anyway?
-
-best regards,
-~  Lars
-
-- -------------------------------------------------------
-The SF.Net email is sponsored by: Beat the post-holiday blues
-Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
-It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
+Works very well with a Sony HBH-35 :)
+- - Lars
 
 - --
 Lars Grunewaldt
@@ -68,9 +42,9 @@ mail: lgw@dark-reality.de
 Version: GnuPG v1.2.3 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFB6bV+QWC6DTWkDAoRAsLqAKCwR/tq9OSqGfNzkx7nBgXG8OoxbACgsoIT
-je9e6N4HDQtRHUnfLlqyKX4=
-=4FnC
+iD8DBQFB6bgzQWC6DTWkDAoRAmYxAJ49vrQgq6YdX9ZKFzMvtF+rwfuuxwCgpp5J
+YvvCmOWlmiZtQe8D9yzYIDI=
+=kyMe
 -----END PGP SIGNATURE-----
 
 
