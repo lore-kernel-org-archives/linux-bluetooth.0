@@ -1,16 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41B47D96.2060304@csr.com>
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
+From: Fred Schaettgen <Sch@ttgen.net>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Test Mode
-References: <2de4657604113010234e4e3a3f@mail.gmail.com>
-    <1101882666.18840.23.camel@pegasus>
-    <200412011028.iB1ASZIk030820@news01.csr.com> <manjunath.mp@gmail.com>
-    <2de4657604120606361751793a@mail.gmail.com> <25262.1102344714@csr.com>
-    <2de4657604120607051de3580b@mail.gmail.com>
-In-Reply-To: <2de4657604120607051de3580b@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Subject: Re: [Bluez-users] how to detect if a device is up.
+Cc: wim delvaux <wim.delvaux@adaptiveplanet.com>
+References: <200412061608.48387.wim.delvaux@adaptiveplanet.com>
+In-Reply-To: <200412061608.48387.wim.delvaux@adaptiveplanet.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200412061623.29139.Sch@ttgen.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,62 +20,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 15:41:10 +0000
+Date: Mon, 6 Dec 2004 16:23:28 +0100
 
-Manjunath Prabhu wrote:
-> Status shows 11 which is "HCI unsupported feature". I am using  a
-> version 1.1 anycom-120 usb dongle.
+On Monday 06 December 2004 16:08, wim delvaux wrote:
+> suppose you manage a list of 'seen' but not necessarily paired devices.
+> How can you figure out if a certain device is UP or not ?
+> l2ping apparently not since you need to be paired with that device or else
+> you get permission denied
 
-Maybe the device doesn't support loopback.
+How about an inquiry? You can also use name requests for instance. We use this 
+in kdebluetooth for the device discovery service to poll undiscoverable 
+devices. But you can't do that frequently and for a lot of devices of course. 
+Apart from that, if you get "permission denied" with l2ping, then the device 
+*is* reachable, isn't it?
 
-It's not mandatory (in fact, nothing at HCI is mandatory - it's not a
-qualifiable stack layer). There's no features bit to tell you if it's
-supported as it's a test command.
+Fred
 
-The Anycom-120 dongle is a Silicon Wave dongle. I don't know if they put
-loopback support in all (any?) of their dongles. It's not really that
-useful for anything other than host code testing (which most people
-don't want to do).
-
-CSR devices support loopback (but we don't test it that thoroughly since
-hardly anybody ever uses it, and even when they do it's as a test so
-they don't care if it's not that robust).
-
-Use hciconfig -a to see if it's a 1.2 device. If it is, it might
-support the HCI_Read_Local_Supported_Commands command, which will give
-you a list of all the commands the dongle supports. Use the BT 1.2 spec
-to find out the OCF and OGF and to decode the result.
-
-Having said that, even it it's a 1.2 device it might not support the
-HCI_Read_Local_Supported_Commands command (in which case it should
-return error code 0x01).
-
-Even then, it might claim to support the loopback command as it may
-understand the command but be unable to enter loopback mode for some
-other reason (like, for example, the loopback command must be the first
-command after a reset for some manufacturer specific reasons, or the
-device must not be scanning).
-
-If you really need the feature then contact the manufacturer directly.
-However, most people have no use for the command, so don't be too
-surprised if it's not supported.
-
-	- Steven
-
-
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
-
+-- 
+Fred Schaettgen
+Sch@ttgen.net
 
 
 -------------------------------------------------------
