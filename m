@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Volker Fritzsch <kokor.hekkus@gmx.de>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200402211252.15735.kokor.hekkus@gmx.de>
-Subject: [Bluez-users] pairing on x86_64
+Subject: Re: [Bluez-users] MSI 6970 removing - kernel freeze
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pavel Ruzicka <pavouk@pavouk.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200402210038.59119.pavouk@pavouk.org>
+References: <200402210038.59119.pavouk@pavouk.org>
+Content-Type: text/plain
+Message-Id: <1077320992.1433.18.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,43 +18,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 21 Feb 2004 12:52:15 +0100
+Date: Sat, 21 Feb 2004 00:49:53 +0100
 
-Hi.
+Hi Pavel,
 
-I've got an athlon64, a pda and a bluetooth usb dongle.
-Pairing under debian unstable (32bit) works fine,
-but under suse 9.0 (amd64) or the debian pure64 port it doesn't work.
+> When I have hci0 up and I remove my USB MSI 6970 dongle, then kernel freezes.
+> 
+> This is copied from the screen:
+> ----------------------------------------------------------------------
+> kernel panic: fatal exception in interrupt
+> In interrupt handler - not syncing
+> EIP is at uhci_remove_pending_qhs+0x61/0xc0 [uhci_hcd]
+> ----------------------------------------------------------------------
 
-I've tried selfcompiled kernels (2.4's up to 2.6.3), suse's kernels;
-i've tried selfcompiled bluez libraries (and utils) as well as those shipped 
-with the above mentioned distributions.
+this is a known problem with UHCI USB host controllers, but not our
+problem. Alan Stern has patches and fixes for it and I think at least
+with 2.6.4 this problem should be gone. See the BlueZ and USB mailing
+list archives for more details.
 
-When working in 64bit mode, pairing always seems to 'time out'.
+> When I start computer, hci0 is down. I run hciconfig hci0 up.
+> After this I have in dmesg this:
+> -----------------------------------------------------------------------
+> drivers/usb/core/urb.c: usb_submit_urb: bogus endpoint 3-IN on 
+> usb-0000:00:07.3-1 (bad maxpacket 0)
+> hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb c71c1a14 err -90
+> drivers/usb/core/urb.c: usb_submit_urb: bogus endpoint 3-IN on 
+> usb-0000:00:07.3-1 (bad maxpacket 0)
+> hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb c71c1a14 err -90
+> -----------------------------------------------------------------------
 
-hcidump:
+This one is new and Todd E. Johnson looked at it, but I have no time to
+investigate on this problem. The only solution I can tell you is to
+disable CONFIG_BT_HCIUSB_SCO.
 
-HCIDump - HCI packet analyzer ver 1.5
-device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-> HCI Event: Connect Request(0x04) plen 10
-< HCI Command: Accept Connection Request(0x01|0x0009) plen 7
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Connect Complete(0x03) plen 11
-< HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
-> HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
-> HCI Event: Max Slots Change(0x1b) plen 3
-> HCI Event: Command Complete(0x0e) plen 6
-< HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Connection Packet Type Changed(0x1d) plen 5
-> HCI Event: PIN Code Request(0x16) plen 6
+> I have linux Mandrake 9.2 with vanilla kernel 2.6.2.
 
-and that's where it stops - and some time after that my pda aborts the 
-connection.
+Try 2.6.3. Maybe it is already fixed.
 
-has anyone managed to get pairing working under x86_64?
+> Is this kernel or hardware bug?
 
-thanks in advance, Volker
+It's a kernel problem.
+
+> Is this problem of USB or Bluetooth kernel module?
+
+I am quite sure that this is an USB problem.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
