@@ -1,75 +1,65 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Radu Maurer <a400@gmx.de>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Apple keyboard
-Message-ID: <20040211151146.GA19818@mail.gmx.de>
-References: <20040210175802.GA17705@mail.gmx.de> <1076451979.2777.21.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1076451979.2777.21.camel@pegasus>
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Feb 2004 16:11:46 +0100
+Return-Path: <thomas.chiverton@bluefinger.com>
+From: Thomas Chiverton <thomas.chiverton@bluefinger.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-users] Help id'ing USB bluetooth adapter
+Date: Wed, 11 Feb 2004 13:39:48 +0000
+References: <200402111236.34361.thomas.chiverton@bluefinger.com> <1076505074.2777.69.camel@pegasus>
+In-Reply-To: <1076505074.2777.69.camel@pegasus>
+Cc: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200402111339.48630.thomas.chiverton@bluefinger.com>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-On Di, 10 Feb, 2004 at 23:26:19 +0100, Marcel Holtmann wrote:
-> Hi Radu,
-> 
-> > What is the method of choice to get an Apple BT keyboard running with
-> > linux?
-> 
-> start here http://www.bueche.ch/comp/mx900/mx900.html
+On Wednesday 11 February 2004 13:11 pm, you said:
+> it is a CSR BlueCore02 with HCI 16.4 firmware and 56 bit encryption.
 
-thanks Marcel, I followed the instructions there.
-- recompiled the 2.4.24 kernel with your patch for uinput.
-- got libs2 and utils2 from bluez cvs and compiled them
-  (as debian packages).
+Ahh, good, should work :-)
 
-- made /dev/input/uinput device.
+> This looks like an USB problem. What kernel version is it? 
 
-- installed: 
-bluetooth-hci_0.1-1_i386.deb
-bluetooth-hid_0.1-1_i386.deb
-bluez-utils_0.1-1_i386.deb
-libbluetooth2-dev_0.1-1_i386.deb
-libbluetooth2_0.1-1_i386.deb
-libbluez1-dev_0.1-1_i386.deb
-libbluez1_0.1-1_i386.deb
+It's wherever RedHat9 is ... uname -a says
+Linux charles-compaq 2.4.20-28.9 #1 Thu Dec 18 13:45:22 EST 2003 i686 i686 
+i386 GNU/Linux
 
-- started bthid:
-	bthid --daemon
+>Do hciconfig
+> shows your Bluetooth adapter?
 
-/var/log/daemon.log sais:
-bthid[19500]: Bluetooth HID service started
+:goes off and gets that (I got bluez-lib and -utils from up2date).
+hci0:   Type: USB
+        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
+        DOWN
+        RX bytes:0 acl:0 sco:0 events:0 errors:0
+        TX bytes:0 acl:0 sco:0 commands:0 errors:0
+        Features: 0x00 0x00 0x00 0x00
+        Packet type: DM1 DH1 HV1
+        Link policy:
+        Link mode: SLAVE ACCEPT
 
-then I try to connect:
-	bthid -c <Apple Keyboard Address>
+I'm assuming that means despite the syslog error, things are mostly working, 
+though it seems to have failed to detect the address etc. for some reason - 
+any further ideas ?
 
-I switch on the keyboard, the green LED on the back side starts to blink.
+-- 
+Tom Chiverton 
+Advanced ColdFusion Programmer
 
-after a few seconds I get the message:
-bthid[19500]: Connection failed: Function not implemented (38)
-
-where do i go from here?
-
-thanks
-Radu
-
-
-
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Tel: +44(0)1749 834997
+email: tom.chiverton@bluefinger.com
+BlueFinger Limited
+Underwood Business Park
+Wookey Hole Road, WELLS. BA5 1AF
+Tel: +44 (0)1749 834900
+Fax: +44 (0)1749 834901
+web: www.bluefinger.com
+Company Reg No: 4209395 Registered Office: 2 Temple Back East, Temple
+Quay, BRISTOL. BS1 6EG.
+*** This E-mail contains confidential information for the addressee
+only. If you are not the intended recipient, please notify us
+immediately. You should not use, disclose, distribute or copy this
+communication if received in error. No binding contract will result from
+this e-mail until such time as a written document is signed on behalf of
+the company. BlueFinger Limited cannot accept responsibility for the
+completeness or accuracy of this message as it has been transmitted over
+public networks.***
