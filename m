@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+From: Fred Schaettgen <bluez-user@schaettgen.de>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] managing pairing
-References: <200412030025.02336.wim.delvaux@adaptiveplanet.com> <200412050159.55909.bluez-user@schaettgen.de>
-In-Reply-To: <200412050159.55909.bluez-user@schaettgen.de>
+References: <200412030025.02336.wim.delvaux@adaptiveplanet.com>
+In-Reply-To: <200412030025.02336.wim.delvaux@adaptiveplanet.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-1"
-Message-Id: <200412050236.17227.wim.delvaux@adaptiveplanet.com>
+Message-Id: <200412050159.55909.bluez-user@schaettgen.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,36 +19,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 5 Dec 2004 02:36:16 +0100
+Date: Sun, 5 Dec 2004 01:59:55 +0100
 
-On Sunday 05 December 2004 01:59, Fred Schaettgen wrote:
-> On Friday 03 December 2004 00:25, wim delvaux wrote:
-> > another question.  I suppose the link_key file can contain link keys to
-> > multiple remove BT devices (e.g a USB BT dongle and a BT Phone)
-> >
-> > I also presume that each link_key is associated to the bdaddress of the
-> > remote device it relates to.
-> >
-> > 1. can the link_key file be browsed to find all the devices a link_key
-> > exists for
-> >
-> > 2. can one 'remove' one such record from the link_key file and assume
-> > that the pairing will retry once removed (much like removing the link_key
-> > file completely)
+On Friday 03 December 2004 00:25, wim delvaux wrote:
+> another question.  I suppose the link_key file can contain link keys to
+> multiple remove BT devices (e.g a USB BT dongle and a BT Phone)
 >
-> Just for the record and for the KDE users out there:
-> The KDE Bluetooth Framework just got it's own link key management tool a
-> few minutes ago, so you can see and remove any paired device without using
-> a hex editor or deleting the whole link key file now. I just wonder why no
-> one seemed to miss something like that the whole time.
-
-opie has it now too ;-)
-
-However i think that for safety one should start/stop the hcid because it 
-'could' open the link_key file while one is rewriting it
+> I also presume that each link_key is associated to the bdaddress of the
+> remote device it relates to.
 >
-> regards
-> Fred
+> 1. can the link_key file be browsed to find all the devices a link_key
+> exists for
+>
+> 2. can one 'remove' one such record from the link_key file and assume that
+> the pairing will retry once removed (much like removing the link_key file
+> completely)
+
+Just for the record and for the KDE users out there: 
+The KDE Bluetooth Framework just got it's own link key management tool a few 
+minutes ago, so you can see and remove any paired device without using a hex 
+editor or deleting the whole link key file now. I just wonder why no one 
+seemed to miss something like that the whole time.
+
+regards
+Fred
+
+-- 
+Fred Schaettgen
+bluez-user@schaettgen.de
 
 
 -------------------------------------------------------
