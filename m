@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <4152D34C.4070306@c-s.fr>
+From: "GUILLON Gabriel" <gabriel.guillon@c-s.fr>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: Emmanuel Mendoza <emma_kev@hotmail.com>
-Message-ID: <loom.20040924T204722-566@post.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] hcidump supports real raw packets ??
+Subject: Re: [Bluez-users] automatic bnep0 configuration
+References: <opseq1blhheocfdv@debian> <200409230437.30844.tcpdevil@linuxlover.org> <41528C5F.70508@c-s.fr> <200409231444.27391.tcpdevil@linuxlover.org>
+In-Reply-To: <200409231444.27391.tcpdevil@linuxlover.org>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,20 +17,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 24 Sep 2004 19:12:12 +0000 (UTC)
+Date: Thu, 23 Sep 2004 15:44:44 +0200
 
-Hi, I'm using Bluez for programming a hcidump based sniffer, but I'm confused
-about the captured packets. Do packets have ACCESS_CODE + HEADER + BODY format??
-Can or would can hcidump has this support??. I probe this feature using -R
-command, but the packets has a different format.
+Okay, sorry: wrong mail client configuration :)
 
-Also I'd like to know if someone knows a Bluetooth Adaptor USB's firmware that
-support the monitor mode to achieve real sniff. I know that hcidump only sniff
-the local connections. If some firmware supports the monitor mode, would hcidump
-work fine in this case?
 
-Thanks, I'd be grateful for your help.
+Alberto Garcia Hierro a =E9crit :
+> El Jueves, 23 de Septiembre de 2004 10:42, escribi=F3:
+>=20
+---- beginning of my answer
+>>There is some pand howto, on the net. Basically, you should use bridgin=
+g
+>>so that all the peer to peer connections seem to come from the same
+>>interface.
 
+---- end of my answer
+
+>=20
+>=20
+>  Please, reply to the list, not to me. I'm not the person who asked for=
+ help.
+>=20
+> Regards,
+>  Alberto
+>=20
+
+--=20
+"http://www.gnu.org/philosophy/no-word-attachments.fr.html"
+
+Gab
+
+"Il faut agir en homme de pensee et
+penser en homme d'action."
+- Henri Bergson -
 
 
 -------------------------------------------------------
