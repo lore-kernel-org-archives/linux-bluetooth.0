@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Nokia 7610 phone & logitech DiNovo keyboard /
-	MX900 mouse
-From: Laurence Orchard <laurence@orchards.org.uk>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1102666379.11207.2.camel@pegasus>
-References: <1102035154.4258.14.camel@localhost>
-	 <1102042749.7350.33.camel@pegasus>  <1102291223.4219.3.camel@localhost>
-	 <1102315314.8510.57.camel@pegasus>  <1102639996.4112.10.camel@localhost>
-	 <1102666379.11207.2.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1102727487.6653.6.camel@localhost>
-Mime-Version: 1.0
+From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
+To: <bluez-users@lists.sourceforge.net>
+Subject: AW: [Bluez-users] BT unter SuSE 9.2
+Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAe5n9ZOsCok+R7CALunouowEAAAAA@t-online.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <1102679972.9481.1.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,59 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 11 Dec 2004 01:11:27 +0000
+Date: Fri, 10 Dec 2004 14:18:25 +0100
 
-On Fri, 2004-12-10 at 09:12 +0100, Marcel Holtmann wrote:
-> Hi Laurence,
-> 
-> > Yes hidd --server --search
-> 
-> no, only "hidd --server". The search option is only for the first
-> connection.
-> 
-> > run at boot S26hidd in rc5.d
-> > after S25bluetooth
-> 
-> There is a nice init script in bluez-utils that does this all for you
-> and with Fedore Core 3 this should be all in place and you only need to
-> activate it somewhere. Maybe /etc/default/ or so.
-> 
-I 
- I took out the --server option,but it still isn't working.
-it displays the following message during boot:-
-'Can't open RFCOMM console socket: address family not supported by
-protocol'
+Hi Marcel,
+at first, thanks a lot. Now there is no error-message any more.
 
-looking back through /var/log/messages I found the following error
-messages:- 
+I'm able to get a connection with the BT-accesspoint, but only for a =
+short
+time. The AP is identified as LAN/Bluetooth Network Device.
+With Connection Info I see the Device name, Address and Signal strength
+during connection. After a short time the connection goes down =
+(timeout?).
 
-Dec 10 23:49:04 localhost rpcidmapd: rpc.idmapd startup succeeded
-Dec 10 23:49:04 localhost hcid[2497]: Bluetooth HCI daemon
-Dec 10 23:49:04 localhost hcid[2497]: Can't open HCI socket. Address
-family not supported by protocol(97)
-Dec 10 23:49:04 localhost bluetooth: hcid startup succeeded
-Dec 10 23:49:04 localhost sdpd[2503]: init_server: opening L2CAP socket:
-Address family not supported by protocol
-Dec 10 23:49:04 localhost sdpd[2503]: main: Server initialization failed
-Dec 10 23:49:04 localhost bluetooth: sdpd startup succeeded
-Dec 10 23:49:05 localhost kernel: usb 1-1.2: new full speed USB device
-using address 5
+With YaST I configured bnepX and it is shown as network device bnep0. =
+The AP
+is plugged in a telephonesystem (DSL-System) which has also a router- =
+and a
+switch-function. I need the router-function in order to reach the =
+internet.
+But I'm not able to use bnep0 for the configuration of DSL with YaST =
+neither
+ISDN and Modem. I only find bnep0 in YaST at network device, like =
+ethppp0
+and so on. Have I to install additional systems to make bnep0 available =
+for
+DSL???
 
-then a little later:-
+Regards
+Peter
 
-Dec 10 23:49:06 localhost kernel: Bluetooth: Core ver 2.6
-Dec 10 23:49:06 localhost kernel: NET: Registered protocol family 31
-Dec 10 23:49:06 localhost kernel: Bluetooth: HCI device and connection
-manager initialized
-Dec 10 23:49:06 localhost kernel: Bluetooth: HCI socket layer
-initialized
-Dec 10 23:49:08 localhost kernel: Bluetooth: HCI USB driver ver 2.7
-Dec 10 23:49:08 localhost kernel: usbcore: registered new driver hci_usb
-
-
-any ideas?
-
--- 
 
 
 
