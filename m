@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] What's the best way to go about device detection?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Rob Raper <djrobx@hotmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY14-F2518CB70kFir00064ba8@hotmail.com>
-References: <BAY14-F2518CB70kFir00064ba8@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1085006674.4327.118.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: David Wuertele <dave-gnus@bfnet.com>
+Message-ID: <m3u0ycqbym.fsf@bfnet.com>
+References: <m3y8noqpc2.fsf@bfnet.com> <20040519195849.GB4698@evdebs.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: Are there ANY ultralight notebooks with built-in bluetooth?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +16,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 20 May 2004 00:44:35 +0200
+Date: Wed, 19 May 2004 15:38:41 -0700
 
-Hi Rob,
+Adam> Some ThinkPad X40 modules do come with internal bluetooth.  And
+Adam> it even works (without SCO support) in kernel 2.6.6!
 
-> Do you know of any manufacturers out there that make CSR BlueCore02 based 
-> dongles that have the 1.2 update available?  Or is there currently no 
-> solution that I can go out and buy that will give me 1.2 support?
-
-I don't know of any, but my AVM BlueFRITZ! USB v2.0 prototype supports
-Inquiry with RSSI and the Anycom USB-120 should be available in a 1.2
-version very soon. However you can of course buy a CSR Casira to check
-out their Bluetooth 1.2 support.
-
-Regards
-
-Marcel
-
+I scoured the IBM website for any info about X40 internal bluetooth.
+The only thing I found was an ultraport module.  Is that what you're
+talking about?  I thought that to connect an ultraport device to an
+X40 you have to use a USB adapter?
 
 
 
