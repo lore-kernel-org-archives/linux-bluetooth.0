@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4239A3FC.3080601@prim-time.fr>
-From: Xavier Garreau <x.garreau@prim-time.fr>
-MIME-Version: 1.0
+Message-ID: <20050317161431.45633.qmail@web26607.mail.ukl.yahoo.com>
+From: BZ Benny <bennybbz@yahoo.fr>
+Subject: Re: [Bluez-users] Adresse resolution in BlueZ
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] obex howto
-References: <423992C8.8000309@prim-time.fr> <4239A289.4080204@futurlink.com>
-In-Reply-To: <4239A289.4080204@futurlink.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: 6667
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,20 +17,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Mar 2005 16:36:28 +0100
+Date: Thu, 17 Mar 2005 17:14:31 +0100 (CET)
 
-> AFAIK, the only implementation running under Linux is OpenOBEX 
-> (http://openobex.sourceforge.net/). There is not much documentation in 
-> it, but, as with BlueZ, if you follow the applications, you can (more or 
-> less) understand how it works.
+
+Hi all.
+
+
+> Hi Benny,
 > 
-> If you want to send a file via OBEX over Bluetooth, I use KBluetooth, 
-> that works pretty well.
+> > > This BNEP virtual network card is as dumb as a
+> > normal 
+> > > Ethernet network card. The networklayer knows
+> our
+> > MAC
+> > > address (BD_ADDR) and 
+> > 
+> > Actually I'm talking about the peer MAC address.
+> 
+> you know that even BNEP is point-to-point and so you
+> know the MAC
+> address of the peer, because it is the remote
+> BD_ADDR of the underlaying
+> ACL link.
+>
+Am I not undertandbale ?
+Is there someone who can understand me? 
 
-Thank you for the hints, i'll check that !
+I know that BNEP know the BD_ADDR of the peer device.
+But BNEP need to make a coresspondance beteewn the
+peer BD_ADDR address and the peer IP adress. This
+corespondance is made by ARP? how did bnep ask it from
+ARP.
+If you read all my example in my last mail you will
+understand my question.
 
-Regards,
-Xavier
+regards,
+imad.
+
+
+
+	
+
+	
+		
+Découvrez nos promotions exclusives "destination de la Tunisie, du Maroc, des Baléares et la Rép. Dominicaine sur Yahoo! Voyages :
+http://fr.travel.yahoo.com/promotions/mar14.html
 
 
 -------------------------------------------------------
