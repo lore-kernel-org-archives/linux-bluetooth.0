@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Varat Chaikasetsin <varat_c@hotmail.com>
-Message-ID: <loom.20040212T074333-984@post.gmane.org>
-References: <loom.20040210T083307-660@post.gmane.org> <1076401392.32750.9.camel@pegasus>
+Subject: Re: [Bluez-users] rfcomm: permission denied
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Zbigniew Diaczyszyn (gmx)" <z.dia@gmx.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <000c01c3f0f6$e9a19e10$154db850@ULLA>
+References: <000101c3ee91$fa205f40$f84ab850@ULLA>
+	 <1076321608.6869.78.camel@pegasus>  <000c01c3f0f6$e9a19e10$154db850@ULLA>
+Content-Type: text/plain
+Message-Id: <1076542073.3041.40.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Limitation of emulator ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,54 +19,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 12 Feb 2004 07:01:45 +0000 (UTC)
+Date: Thu, 12 Feb 2004 00:27:54 +0100
 
-Hi Marcel
+Hi Zbigniew,
 
-> Hi Varat,
-> >    I'm doing  my final year project about routing in Scatternet.I need to 
-have 
-> > lots of BT devices for this project so I decided to use "hciemu" to 
-simulate 
-> > many BT devices instead of using the real ones.
-> >    Everthing seems to be allright with that emulator but now I'm facing a 
-big 
-> > problem. I can't simulate BT device more than 15 devices (hci0 - hci15).I  
-> > use "hciemu localhost:xx" command to simulated all devices. 
-> >    Moreover, when I've simulated 15 devices then pluged the USB device 
-in ,I 
-> > can't see or use that USB device by using "hciconfig" command.
-> >     What am I doing wrong? what should I do ? or it's a limitation of the 
-> > emulator ?
+> ----- Original Message ----- 
 > 
-> the kernel side has no limit of attached devices, but the userspace
-> tools like hciconfig etc. are limited to maximal 16 devices.
+> > > linux:~ # rfcomm connect 0 00:10:60:29:AC:2C
+> > > Can't connect RFCOMM socket: Permission denied
+> > 
+> > this can't work. If you bind the device you don't need an additional
+> > connect. You only have to open /dev/rfcomm0 with pppd or any other TTY
+> > related program.
+> --------------------------------------------------------
+> Well, having done this (suse 8.2, ppp1 is directed to /dev/rfcomm0) the kinternet protocol tells that there is <no route to host>:
 > 
-> Regards
+> SuSE Meta pppd (smpppd-ifcfg), Version 1.00 on linux.
+> trying to connect to smpppd
+> connect to smpppd
+> We are disconnected.
+> We are connecting.
+> pppd: Plugin passwordfd.so loaded.
+> pppd: Failed to open /dev/rfcomm0: No route to host
+> We are disconnected.
+> pppd died: Serial port open failed (exit code 7)
 > 
-> Marcel 
+> the proprietary mask tells: crw-rw----         root dialout         /dev/rfcomm0
 
-     I've tried to change the HCI_MAX_DEV parameter in " bluez-libs-
-2.4/include/hci.h " before reinstalling it as your suggestion.After that, I 
-intalled these utilities
+create a dump file with "hcidump -w <file>".
 
-bluez-utils-2.3
-bluez-pan-1.1
-bluez-sdp-1.5
-bluez-bluefw-1.0
-bluez-hcidump-1.5
-bluez-hciemu-1.0  
+Regards
 
-     first time that I changed it's max number to 8 it worked. I can simulate 
-only 8 device but later, when I try to change it to other value and reintall 
-all of libraries and uitilities the way I did before ,it doesn't work !.
-     What am I doing wrong ? or Do I have to install libraries and utilities in 
-order ?
- 
-Regards,
-Varat  
-
-
+Marcel
 
 
 
