@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
-Reply-To: tim@birdsnest.maths.tcd.ie
+From: Alex Holland <ah160@student.cs.york.ac.uk>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] File transfer
-References: <20040210093353.99692.qmail@web40701.mail.yahoo.com> <20040216100540.GA15985@intevation.de> <200402161104.58753.ah160@student.cs.york.ac.uk>
-In-Reply-To: <200402161104.58753.ah160@student.cs.york.ac.uk>
+References: <20040210093353.99692.qmail@web40701.mail.yahoo.com> <20040216100540.GA15985@intevation.de>
+In-Reply-To: <20040216100540.GA15985@intevation.de>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-1"
-Message-Id: <200402161238.36360.tim@birdsnest.maths.tcd.ie>
+Message-Id: <200402161104.58753.ah160@student.cs.york.ac.uk>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,29 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 16 Feb 2004 12:38:35 +0000
+Date: Mon, 16 Feb 2004 11:04:57 +0000
 
-On Monday 16 February 2004 11:04, Alex Holland wrote:
+On Monday 16 February 2004 10:05, Thomas Arendsen Hein wrote:
 
-> For a GUI based approach, try KDE Bluetooth or Gnome Bluetooth. KdeBT's
-> fairly new but maturing fast, and handles OBEX stuff excellently
-> through Konqueror. Gnome BT's an unknown area for me - perhaps someone
-> else could advise?
+> A short howto for sending files from the PC to a phone or palm:
+> http://www.klings.org/nowires/main.php/How-To/OBEX/
+> (Works fine for me)
+>
+> And from phone or palm to the PC:
+> http://oss.bdit.de/opd.html
+> (Doesn't work for me, but maybe I haven't tried hard enough)
 
-Does KDE Bluetooth use Bluez?
-I looked briefly at the kde-bluetooth archive but couldn't see that info.
+For a GUI based approach, try KDE Bluetooth or Gnome Bluetooth. KdeBT's 
+fairly new but maturing fast, and handles OBEX stuff excellently 
+through Konqueror. Gnome BT's an unknown area for me - perhaps someone 
+else could advise?
 
-Also, is it necessary to use Konqueror (which I don't)?
-
-Sadly, there does not appear to be a Fedora RPM.
-
-(Nb KdeBT is unknown to google - is it your abbreviation?)
-
--- 
-Timothy Murphy  
-e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
-tel: +353-86-2336090, +353-1-2842366
-s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
+Alex Holland
 
 
 -------------------------------------------------------
