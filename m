@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <423F5E1C.8030301@rz-zw.fh-kl.de>
+Message-ID: <423F5B7F.9060200@rz-zw.fh-kl.de>
 From: Timo Veith <tv@rz-zw.fh-kl.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Problem with BlueLogic WingKey Keyboard
-References: <200503202301.49376.tv@rz-zw.fh-kl.de> <1111408373.22872.54.camel@pegasus> <423F5B7F.9060200@rz-zw.fh-kl.de>
-In-Reply-To: <423F5B7F.9060200@rz-zw.fh-kl.de>
+References: <200503202301.49376.tv@rz-zw.fh-kl.de> <1111408373.22872.54.camel@pegasus>
+In-Reply-To: <1111408373.22872.54.camel@pegasus>
 Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,35 +18,87 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Mar 2005 00:51:56 +0100
+Date: Tue, 22 Mar 2005 00:40:47 +0100
 
-Hm if I try to patch the gentoo-dev-sources kernel I get this:
+Marcel Holtmann wrote:
+> can you try a 2.6.11-mh2 kernel first and see if that works. Otherwise I
+> need the "hcidump -X -V" for your connection.
 
-tristan linux # zcat /home/timo/tmp/patch-2.6.11-mh2.gz | patch -p1 
---dry-run
-patching file drivers/bluetooth/bluecard_cs.c
-patching file drivers/bluetooth/hci_bcsp.c
-patching file drivers/bluetooth/hci_usb.c
-patching file include/net/bluetooth/hci_core.h
-patching file MAINTAINERS
-patching file Makefile
-Hunk #1 FAILED at 1.
-1 out of 1 hunk FAILED -- saving rejects to file Makefile.rej
-patching file net/bluetooth/hci_conn.c
-patching file net/bluetooth/hci_event.c
-patching file net/bluetooth/hci_sysfs.c
-patching file net/bluetooth/hidp/core.c
-patching file net/bluetooth/hidp/hid.c
-patching file net/bluetooth/hidp/hid.h
-patching file net/bluetooth/hidp/hidp.h
-patching file net/bluetooth/hidp/Makefile
-patching file net/bluetooth/rfcomm/core.c
+I chose the hcidump alternative first :). -X and -V are no recognized 
+options with my hcidump version. So I only used -x assuming that you 
+meant that. I typed "1" , "2", and so on as you can see and after the 
+"6" the mentioned behaviour started.
 
-There is one failure. Should I use vanilla sources or is this ok? I 
-found a little HOWTO in the gentoo forums where a similar failure was 
-described as "normal".
+If this isn't enough I will get your patchset and try again.
 
-http://forums.gentoo.org/viewtopic-t-231506-highlight-devices+hci.html
+Here is the hcidump:
+
+tristan root # hcidump -x
+HCIDump - HCI packet analyzer ver 1.9
+device: hci0 snap_len: 1028 filter: 0xffffffff
+ > HCI Event: Mode Change (0x14) plen 6
+   00 29 00 00 00 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 1E 00 00 00 00
+1> ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 00 00 00 00 00
+ > HCI Event: Mode Change (0x14) plen 6
+   00 29 00 02 20 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 1F 00 00 00 00
+2> ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 00 00 00 00 00
+ > HCI Event: Mode Change (0x14) plen 6
+   00 29 00 00 00 00
+ > HCI Event: Mode Change (0x14) plen 6
+   00 29 00 02 A0 00
+ > HCI Event: Mode Change (0x14) plen 6
+   00 29 00 00 00 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 20 00 00 00 00
+3> ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 00 00 00 00 00
+ > HCI Event: Mode Change (0x14) plen 6
+   00 29 00 02 20 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 21 00 00 00 00
+4> ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 00 00 00 00 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 22 00 00 00 00
+5> ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 00 00 00 00 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 23 00 00 00 00
+6> ACL data: handle 0x0029 flags 0x02 dlen 13
+     L2CAP(d): cid 0x41 len 9 [psm 0]
+       A1 01 00 00 00 00 00 00 00
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm> HCI Event: Mode 
+Change (0x14) plen 6
+   00 29 00 00 00 00
+mm> HCI Event: Mode Change (0x14) plen 6
+   00 29 00 02 A0 00
+mmmmmmmm> HCI Event: Mode Change (0x14) plen 6
+   00 29 00 00 00 00
+ > HCI Event: Mode Change (0x14) plen 6
+   00 29 00 02 20 03
+
+Hmm, I don't know if this is of importance but I just noticed that if I 
+start bluetoothd I get an error for hid2hci. It says: No devices in HCI 
+mode found.
+
+Kind regards and TIA,
 
 Timo
 
