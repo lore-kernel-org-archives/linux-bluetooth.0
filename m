@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "blookk -" <blookk@hotmail.com>
-To: bluez-devel@lists.sf.net
-Subject: [Bluez-devel] LAN access server
+From: David Woodhouse <dwmw2@infradead.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1094482974.14552.38891.camel@hades.cambridge.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Message-ID: <BAY1-F38wr0qxO83cIO000af2e9@hotmail.com>
+Subject: [Bluez-devel] BNEP corruption.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,42 +15,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 08 Sep 2004 12:35:09 +0000
+Date: Mon, 06 Sep 2004 16:02:55 +0100
+
+Using a PCMCIA bluetooth card I see this frequently... 
+
+bcsp_recv: Error in BCSP hdr checksum
+bcsp_recv: Out-of-order packet arrived, got 2 expected 1
+bcsp_recv: Out-of-order packet arrived, got 3 expected 1
+bcsp_recv: Out-of-order packet arrived, got 4 expected 1
+bcsp_recv: Short BCSP packet
+bcsp_recv: Out-of-order packet arrived, got 7 expected 6
+bcsp_recv: Out-of-order packet arrived, got 0 expected 6
+bcsp_recv: Out-of-order packet arrived, got 1 expected 6
+bcsp_recv: Error in BCSP hdr checksum
+
+At some point I'll investigate -- I thought we were supposed to be using
+flow control so that really shouldn't happen. But more concerning is the
+fact that this leads to silent corruption in network traffic -- we seem
+to be bypassing checksums on packets received by BNEP. Let's not do
+that:
+
+--- net/bluetooth/bnep/core.c~	2004-08-14 06:37:26.000000000 +0100
++++ net/bluetooth/bnep/core.c	2004-09-06 15:28:05.749950320 +0100
+@@ -384,7 +384,7 @@
+ 	
+ 	s->stats.rx_packets++;
+ 	nskb->dev       = dev;
+-	nskb->ip_summed = CHECKSUM_UNNECESSARY;
++	nskb->ip_summed = CHECKSUM_NONE;
+ 	nskb->protocol  = eth_type_trans(nskb, dev);
+ 	netif_rx_ni(nskb);
+ 	return 0;
 
 
-
-Hello:
-
-I am trying to create a LAN access server with bluetooth.
-
-In server side I execute:
-insmod rfcomm
-insmod l2cap
-hcid -n &
-sdpd -n &
-sdptool add sp
-sdptool add  lan
-dund --listen --persist
-
-In client side:
-insmod rfcomm
-insmod l2cap
-hcid -n &
-sdpd -n &
-sdptool add sp
-sdptool add  lan
-dund --connect 00:11:22:33:44:55
-dund --search
-
-after I do these things in messages of kernel say that "connection refused"
-
-What happend?
-
-Regrads
-
-_________________________________________________________________
-Dale rienda suelta a tu tiempo libre. Encuentra mil ideas para exprimir tu 
-ocio con MSN Entretenimiento. http://entretenimiento.msn.es/
+-- 
+dwmw2
 
 
 
