@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Device Busy during "hcitool info" or
-	"sdptoolsearch"
+Subject: Re: [Bluez-devel] bandwidth when using serial cable
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Steven Singer <steven.singer@csr.com>
-Cc: ag@new-media-artists.de,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3FE0C1B9.5090504@csr.com>
-References: <FJENILNPNAGPJMMDOKDCKEKBDJAA.ag@new-media-artists.de>
-	 <3FE0C1B9.5090504@csr.com>
+To: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
+Cc: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <AFE91B59A185A5439840B43AB7919047093816@mchp997a.mch.sbs.de>
+References: <AFE91B59A185A5439840B43AB7919047093816@mchp997a.mch.sbs.de>
 Content-Type: text/plain
-Message-Id: <1071699104.21804.77.camel@pegasus>
+Message-Id: <1071698979.21800.74.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,20 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 17 Dec 2003 23:11:44 +0100
+Date: Wed, 17 Dec 2003 23:09:39 +0100
 
-Hi Steven,
+Hi Matthias,
 
-> The create_connection-inquiry restriction is there because both
-> procedures need to get as much radio bandwidth as possible to work. In
-> particular, taking bandwidth away from paging can cause spurious failed
-> connections. In this case, create_connection wins. If you issue a
-> create_connection while an inquiry is in progress, we will terminate
-> the inquiry with an inquiry_complete event and start paging
-> immediately.
+> I work with several Bluetooth Chips, but they have
+> one commonality: they all have to be connected via serial
+> cable. Am I right, that attaching with
+> 	hciattach /dev/ttyS0 any 115200 
+> limits the data rate to 115,2 Kbit/s, which is the
+> speed of serial cable? I am not talking about any 'baseband'
+> datarate or l2ping, I am talking about the user data rate, 
+> lets say for transfering a 10 MBit file.
 
-this is a nice thing/feature to know. Is it documented anywhere in the
-firmware release notes?
+I can't remeber that he was using a serial connection, but in case of a
+limited serial connection to the Bluetooth module, the data rate of the
+BNEP transmission is also limited.
+
+> Did anyone get higher throughput than this 115, 
+> when using serial cables? 
+
+You can use many chips with higher baud rates. Look at the source code
+of hciattach what kind of special setting we support.
 
 Regards
 
