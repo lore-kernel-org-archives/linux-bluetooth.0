@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT unter SuSE 9.2
+Subject: Re: [Bluez-users] Problem with using HCI_UART driver
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAe5n9ZOsCok+R7CALunouowEAAAAA@t-online.de>
-References: 
-	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAe5n9ZOsCok+R7CALunouowEAAAAA@t-online.de>
+In-Reply-To: <41B91658.2020103@avantwave.com>
+References: <41B91658.2020103@avantwave.com>
 Content-Type: text/plain
-Message-Id: <1102758152.19086.12.camel@pegasus>
+Message-Id: <1102756423.19086.8.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,29 +18,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 11 Dec 2004 10:42:32 +0100
+Date: Sat, 11 Dec 2004 10:13:43 +0100
 
-Hi Peter,
+Hi Mike,
 
-> at first, thanks a lot. Now there is no error-message any more.
-
-you are welcome.
-
-> I'm able to get a connection with the BT-accesspoint, but only for a short
-> time. The AP is identified as LAN/Bluetooth Network Device.
-> With Connection Info I see the Device name, Address and Signal strength
-> during connection. After a short time the connection goes down (timeout?).
+>     I have a strange problem with using hciattach to a uart bluetooth 
+> device . I use a script to attach the device , but i need to attach two 
+> times to get the build ID.
 > 
-> With YaST I configured bnepX and it is shown as network device bnep0. The AP
-> is plugged in a telephonesystem (DSL-System) which has also a router- and a
-> switch-function. I need the router-function in order to reach the internet.
-> But I'm not able to use bnep0 for the configuration of DSL with YaST neither
-> ISDN and Modem. I only find bnep0 in YaST at network device, like ethppp0
-> and so on. Have I to install additional systems to make bnep0 available for
-> DSL???
+> hciconfig -a :
+> hci0:   Type: UART
+>         BD Address: 00:08:E0:01:49:6A ACL MTU: 192:8  SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:189 acl:0 sco:0 events:21 errors:0
+>         TX bytes:351 acl:0 sco:0 commands:21 errors:0
+>         Features: 0xff 0xff 0x8b 0x78 0x18 0x18 0x00 0x80
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'mike'
+>         Class: 0x000100
+>         Service Classes: Unspecified
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x490 LMP Ver: 1.2 (0x2) LMP Subver: 
+> 0x490
+>         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> script :
+> hciattach -s 921600 /dev/ttyS1 csr 921600 flow
+> hciattach -s 921600 /dev/ttyS1 csr 921600 flow
 
-Why don't you try the easy way first? Use pand to connect and then use
-DHCP to configure your IP address. What kind of AP is this?
+I have no idea what that is so, but I am not the expert in the UART
+area. Maybe you have to change or add a sleep time to the CSR init
+routine or switch the module to BCSP.
 
 Regards
 
