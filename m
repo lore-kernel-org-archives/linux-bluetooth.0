@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de46576041118021674822573@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Which fedora core?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <cnhnd6$toe$1@sea.gmane.org>
+References: <cnhnd6$toe$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1100769119.7164.17.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] baseband characteristics
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 18 Nov 2004 15:46:06 +0530
+Date: Thu, 18 Nov 2004 10:11:59 +0100
 
-hi marcel,
-is it possible to study the frequency hopping pattern........i mean,
-if i could  some way dump the changing channel numbers into a log
-file.???
+Hi,
 
-i also want to understand the baseband throughput.....can i get the
-bit error rate before FEC is applied....is it possible????
+> I've been reading through your posts and I see people working with fedora. I
+> plan to install a Fedora distribution in order to bring bluetooth to life,
+> but my doubt is which core: core 3 or core 2. On the one hand I guess that
+> core 2 is already hardly tested by some of you, and you could help me easier
+> if I fall in a jam and ask for mercy. On the other, maybe core 3 is more
+> updated in terms of patches and so on.
+> So what is your advice for me? -don't have to convince me, just your
+> intuition would be wellcome.
 
-hope u can suggest something...
+use the Fedora Core 3. It is already outdated, but it is a way better
+than Core 2.
 
-also, what does a transmit power level of 4 mean??
+Regards
 
-regards,
-manjunath
+Marcel
+
+
 
 
 -------------------------------------------------------
