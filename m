@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+Message-ID: <41A41410.3040701@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] a2play and Toshiba SR-1 Bluetooth Headset
-Message-Id: <20041125112509.75347786.henryk@ploetzli.ch>
-In-Reply-To: <20041125091124.GA19805@snoopy.src.ricoh.co.jp>
-References: <20041125091124.GA19805@snoopy.src.ricoh.co.jp>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Thu__25_Nov_2004_11_25_09_+0100_cRnxBwLPUGuXxb4W"
+Subject: Re: [Bluez-devel] audio problems with a2play
+References: <41A22C0B.4050008@xmission.com>	<41A234FA.7020303@xmission.com>	<20041123033429.132bf84b.henryk@ploetzli.ch>	<41A2B331.4010001@xmission.com>	<20041123070621.50569968.henryk@ploetzli.ch>	<41A3471C.4000602@xmission.com>	<20041123203836.046fb4f4.henryk@ploetzli.ch>	<41A3ACE2.4030501@xmission.com> <20041124035850.4c086e3a.henryk@ploetzli.ch>
+In-Reply-To: <20041124035850.4c086e3a.henryk@ploetzli.ch>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,54 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Nov 2004 11:25:09 +0100
+Date: Tue, 23 Nov 2004 21:54:40 -0700
 
---Signature=_Thu__25_Nov_2004_11_25_09_+0100_cRnxBwLPUGuXxb4W
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Guys!
 
-Moin,
+Try out a2play.c! It's playing to my bluetake properly now, at least for 
+most streams... (woohoo)
 
-Am Thu, 25 Nov 2004 18:11:24 +0900 schrieb Alain Volmat:
+stream 5, 9 don't do anything, 7 is noise. 8 plays too fast.
 
-> Well, it didn't work well, it seems to fail during the
-> connection/configuration phase. Since I never heared you speaking
-> about this headset I think you might be interested in the several log
-> I took (just ask me if you want some other info).
+the rest sound great.
 
-Oh yes, we are. Seems your headset even is the first I've seen that
-supports more than only media transport plus sbc codec: It announces a
-Content Protection capability, namely SCMS-T (whatever that may be).
+What did it was putting frames up to the mtu length in every packet. 
+Maybe the certification doesn't test short packets of only one frame.
 
-> got capabilities response
-> sent set_config
-
-Try again now. a2play is still very crude with regards to the
-configuration setup and it seems you found a hard coded value: Your
-headset only supports a bitpool size between 0x04 and 0x40 while the
-others can do 0x02 to 0xFA and that was what a2play was trying to
-configure. I made a trivial modification to simply mirror the values the
-headsets sends back.=20
-
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
-
---Signature=_Thu__25_Nov_2004_11_25_09_+0100_cRnxBwLPUGuXxb4W
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQFBpbMIIjWgKE0OA2gRAheAAJ42t2MRcw9b6vnVVj/9tcuMs4dYcACfcWor
-goKIcflmkcFKNUPeIgMxxhI=
-=wW/4
------END PGP SIGNATURE-----
-
---Signature=_Thu__25_Nov_2004_11_25_09_+0100_cRnxBwLPUGuXxb4W--
+Brad
 
 
 -------------------------------------------------------
