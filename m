@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <200410190924.i9J9ObCI019724@news01.csr.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Various questions 
-In-reply-to: <opsf3esskzeocfdv@debian> 
-References: <opsf3esskzeocfdv@debian>
-From: Peter Stephenson <pws@csr.com>
+Subject: Re: [Bluez-users] Packages to Use For Zaurus SL-6000L
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: murat_bog@yahoo.com
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <20041018192925.18589.qmail@web60410.mail.yahoo.com>
+References: <20041018192925.18589.qmail@web60410.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1098176914.16324.107.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,63 +18,87 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Oct 2004 10:24:36 +0100
+Date: Tue, 19 Oct 2004 10:08:35 +0100
 
-"Christoph Torens" wrote:
-> At first, I believed ACL stands for 'Asynchronous Connection Less'
-> But I just read the BT_Core_v1_2 Specification that sais ACL is
-> Asynchronous Connection Oriented (page 118 of 1200 / Architecture page 42  
-> of 82)
-> So, what is it? I have read books and internet articles that said ACL is
-> connection less. Are they all wrong or am I totally messing up something?
+Hi,
 
-It's "connection-less", but I never heard anybody use the full form.
-(It's a slightly odd meaning of "connection", since of course the
-devices are connected.  It really means "without a reserved chunk of air
-time".)
+On Mon, 2004-10-18 at 20:29, Murat Bog wrote:
+> Before I sent my query, I had tried using the 
+> following combination of packages specified in your
+> readme file:
+> 
+> bluez-kernel-2.4.18-mh14_arm.ipk
+> bluez-libs-2.8_arm.ipk
+> bluez-utils-2.8_arm.ipk
+> 
+> They had installed without errors.  I initially got
+> the following message when I started the bluetooth
+> services
+> 
+> Starting Bluetooth subsystem: hcid sdpdCan't open
+> RFCOMM control socket: No such file or directory
+>  rfcomm.
 
-> PAN uses the bnep protocol layer. Is bnep based on rfcomm?
+You need to edit modules.conf:
 
-No, it's straight on top of L2CAP.
+alias net-pf-31 bluez
+alias bt-proto-0 l2cap
+alias bt-proto-1 hci
+alias bt-proto-2 sco
+alias bt-proto-3 rfcomm
+alias bt-proto-4 bnep
 
-> What about the three error connection modes. Is it right that they are
-> determined by packet type and so there is no way to turn it on / off ?
-> (using pand for example / which paket types does pand use?)
-> Because some papers speak about optionally error correction (ARQ)
+> It looked like the rfcomm bluez modules were not
+> installed by the kernel, so I did
+> 
+> insmod l2cap
+> insmod rfcomm
+> depmod -a
+> 
+> and restarted bluetooth successfully.
+> 
+> Next, I ran
+> 
+> hciattach /dev/ttyS3 bt2000c
+> 
+> which also  executed successfully and returned the
+> following response
+> 
+> CSR build ID 0x02-0x0D
+> 
+> The problem is when I tried running hciconfig after
+> this, I got
+> 
+> hci0:   Type: UART
+>         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 
+> SCO MTU: 0:0
+>         DOWN INIT RUNNING
+>         RX bytes:0 acl:0 sco:0 events:0 errors:0
+>         TX bytes:4 acl:0 sco:0 commands:1 errors:0
+> 
+> but after a short while the status changed to just
+> "DOWN".
+> 
+> If I tried to reset or bring up hci0 at this point, I
+> got the following error.
+> 
+> Can't init device hci0. Connection timed out(110)
+> 
+> I don't know if I'm missing something basic but I had
+> thought that perhaps there was a driver issue which
+> may have been fixed in the later versions of the bluez
+> packages under the zaurus download directory.
 
-I'm not quite sure what the question is, but I think you're asking if a
-higher level profile such as PAN is affected by the details of what goes
-over the air.  The answer is no, the baseband will use such packets as
-it thinks are appropriate whatever ACL data it is transferring.  It
-will, for example, pick packets with or without error correction (FEC,
-not ARQ; the ARQ scheme is mandatory for acknowledgements) depending on
-the quality of the radio link.
+This does indeed look like a driver issue. Try installing the -mh15
+package; however I don't know if it will help or not.
+ 
+> Regards,
+> Murat
 
-> Data rate:
-> Whats the data rate of a pand connection?
-> I measured a data rate of 60-65 kbyte/s one way
-> 30-35 kbyte/s the other way.
-
-It will vary depending on the devices, the connection to the host, and
-the host stack.  There's nothing in principle to stop you getting up to
-the full 721 kbps.  The device will adapt to the presence of data in
-both directions, limiting you to 433 kbps if the channel is full both
-ways.
-
-pws
-
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
+Steve
+-- 
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
 
 
