@@ -1,10 +1,33 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: "David Favro" <dfavro@users.sourceforge.net>
-Content-Type: multipart/mixed; boundary=----------fp6Z55lNQPDO7D32sdjIht
-MIME-Version: 1.0
-Message-ID: <opsj5ahvnzdfsa41@dfavro-3>
-Subject: [Bluez-users] Zoom 4312 PCMCIA Bluetooth freezes laptop
+Subject: Re: [Bluez-users] Source sample custom Bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <6653F70C-5ECD-11D9-8017-000D9348D4BE@magnifeye.com>
+References: <4dfd570904122402134ec2fd32@mail.gmail.com>
+	 <4dfd570904122509237f2a2f48@mail.gmail.com>
+	 <1103995727.8758.31.camel@pegasus>
+	 <4dfd570904122509451e811d7a@mail.gmail.com>
+	 <1103996976.8758.34.camel@pegasus>
+	 <4dfd5709041225095410f71a46@mail.gmail.com>
+	 <1103997529.8758.36.camel@pegasus>
+	 <4dfd570904122510081a9bfa7@mail.gmail.com>
+	 <4dfd570904122510085371c17b@mail.gmail.com>
+	 <4dfd57090412251011705f52be@mail.gmail.com>
+	 <4dfd5709041225103246f6934c@mail.gmail.com>
+	 <1104000494.8758.46.camel@pegasus> <002601c4ebb8$4de24200$020ba8c0@heejune>
+	 <1104125195.9393.12.camel@pegasus>
+	 <BEB39C04-5B6A-11D9-8017-000D9348D4BE@magnifeye.com>
+	 <1104604846.4253.1.camel@pegasus>
+	 <FA69107A-5DAA-11D9-8017-000D9348D4BE@magnifeye.com>
+	 <1104776407.8894.53.camel@pegasus>
+	 <AFDBF1EE-5DB6-11D9-8017-000D9348D4BE@magnifeye.com>
+	 <1104778613.8894.62.camel@pegasus>
+	 <C17DB8CE-5E1A-11D9-8017-000D9348D4BE@magnifeye.com>
+	 <1104839435.8894.86.camel@pegasus>
+	 <6653F70C-5ECD-11D9-8017-000D9348D4BE@magnifeye.com>
+Content-Type: text/plain
+Message-Id: <1104925461.4299.8.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,148 +39,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 Jan 2005 14:45:21 -0500
+Date: Wed, 05 Jan 2005 12:44:21 +0100
 
-------------fp6Z55lNQPDO7D32sdjIht
-Content-Type: text/plain; format=flowed; delsp=yes; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Hi Jonathan,
 
-Hello --
+> I have looked at the hcitool.c program and I am stuck by my lack of 
+> understanding. The cmd_cmd seems like what I want to do to read data 
+> from my custom device. What I want to do is given a device address, I 
+> want to read bytes from it and occasionally write to it.  Is there a 
+> code fragment that you can point me to?
 
-I recently acquired the Zoom model 4312 bluetooth PCMCIA adapter for my
-eMachines M5312 laptop running Fedora Core 2 (I want to use it for my
-bluetooth mouse).  The whole set-up works fine under Windows-XP, so
-apparently there is no hardware incompatibility, but it hangs the
-machine under Linux.
+the HCI raw socket uses H4 as protocol with one packet per read or write
+operation. The cmd_cmd() is not what you want, because you wanna send
+data packets and not a HCI command.
 
-Prior to the malfunction, everything seems to be OK with the exception
-of an error message when the PCMCIA card is initialized: "cs: warning:
-no high memory space available!" and "cs: unable to map card memory!"
-(full dmesg trace and much other system info included as an
-attachment).  The card seems to initialize and flashes its L.E.D.  I
-did no system configuration for the card beyond installing all of the
-bluez packages from the FC2 repositories.  I don't know how to resolve
-the memory-map problem or if it is relevant.
+>  From the person who wrote the stack on our device.
+> 
+> This is a connect device with a ACL DH5 packet type. The transfers are 
+> standard ACL L2CAP packets from the remote. The remote appears to the 
+> host as a master device, pushing down ACL packets when a button is 
+> pressed.
 
-The problem is that when I do "hciattach ttyS16 bcsp" (per
-http://sourceforge.net/mailarchive/message.php?msg_id=9958619), it
-stays up long enough to display the next shell prompt, and then the
-machine completely hangs.  The caps-lock L.E.D. starts _flashing_ (and
-continues to do so indefinitely -- strange, I don't know what that
-means) and the video display remains unchanged, but the machine is
-completely unresponsive to all input: the keyboard, the touch-pad and
-mouse-buttons, the connected ethernet interface... completely hung.
-Network-connected ssh's go dead, the machine will give no visible
-response to any keystrokes at all, the mouse-pointer will not move,
-etc.  The only way to get it restarted is to hold down the power button
-long enough that it turns off uncleanly.
+So do it uses L2CAP or not? However if not, why don't you get your
+device fixed to response to L2CAP. Relying on ACL data packets is not
+the best idea to get this working reliable.
 
-I'm no expert on PCMCIA nor Bluetooth, so I am clueless as to how to
-address this.  I don't know if this is the BT protocol driver or the
-PCMCIA config that is causing the problem, but it is hard to deal with
-due to the machine being so totally disabled.  I've retried many times
-and it is repeatable very consistently.  Should I try a PCMCIA mailing
-list?  Am I correct to do the hciattach command?  If I don't, the card
-seems not to be noticed by hciconfig (see attached logs).
+Regards
 
-Any help or advice is greatly appreciated -- thanks very much in advance.
+Marcel
 
-David Favro
-Meta-Dynamic Solutions, LLC
-dfavro@users.sourceforge.net
-------------fp6Z55lNQPDO7D32sdjIht
-Content-Disposition: attachment; filename=System-info.txt
-Content-Type: text/plain; name=System-info.txt
-Content-Transfer-Encoding: 8bit
-
-~ # uname -a
-Linux dfavro-3 2.6.9-1.11_FC2 #1 Sun Jan 2 15:49:30 EST 2005 i686 athlon i386 GNU/Linux
-
-
-RELEVANT PORTION OF DMESG LOG:
-==============================
-Yenta: CardBus bridge found at 0000:00:0a.0 [161f:2029]
-Yenta: Enabling burst memory read transactions
-Yenta: Using CSCINT to route CSC interrupts to PCI
-Yenta: Routing CardBus interrupts to PCI
-Yenta TI: socket 0000:00:0a.0, mfunc 0x01001c00, devctl 0x64
-Yenta: ISA IRQ mask 0x00f8, PCI irq 10
-Socket status: 30000010
-cs: warning: no high memory space available!
-cs: unable to map card memory!
-cs: unable to map card memory!
-cs: unable to map card memory!
-cs: unable to map card memory!
-cs: unable to map card memory!
-cs: unable to map card memory!
-cs: IO port probe 0x0c00-0x0cff: clean.
-cs: IO port probe 0x0100-0x04ff: excluding 0x200-0x207 0x378-0x37f 0x408-0x40f 0x480-0x48f 0x4d0-0x4d7
-cs: IO port probe 0x0a00-0x0aff: clean.
-ttyS16 at I/O 0x100 (irq = 3) is a 16C950/954
-Bluetooth: Core ver 2.6
-NET: Registered protocol family 31
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: L2CAP ver 2.4
-Bluetooth: L2CAP socket layer initialized
-Bluetooth: RFCOMM ver 1.3
-Bluetooth: RFCOMM socket layer initialized
-Bluetooth: RFCOMM TTY layer initialized
-
-
-~ # hciconfig -a
-~ #
-
-
-~ # cat /var/lib/pcmcia/stab
-Socket 0: Serial or Modem
-0       serial  serial_cs       0       ttyS16  4       80
-
-
-~ # dump_cis
-Socket 0:
-  dev_info
-    NULL 0ns, 512b
-  manfid 0x0279, 0x950b
-  funcid serial_port [post]
-  serial_interface
-    uart 16550 [space/mark/odd/even] [5/6/7/8] [1/1.5/2]
-  vers_1 7.1, "PCMCIA", "Bluetooth Card", "", ""
-  config base 0x00f8 mask 0x000f last_index 0x04
-  cftable_entry 0x01 [default]
-    [rdybsy]
-    Vcc Vnom 3300mV
-    io 0x03f8-0x0407 [lines=8] [8bit] [range]
-    irq mask 0xffff [level] [shared]
-  cftable_entry 0x02
-    io 0x0000-0x7fff [lines=15] [8bit]
-
-
-~ # cardctl config
-Socket 0:
-  Vcc 3.3V  Vpp1 0.0V  Vpp2 0.0V
-  interface type is "memory and I/O"
-  irq 3 [exclusive] [level]
-  speaker output is enabled
-  function 0:
-    config base 0x00f8
-      option 0x42 status 0x08 pin 0x00 copy 0x00
-    io 0x0100-0x010f [8bit]
-
-
-~ # cardctl status
-Socket 0:
-  3.3V 16-bit PC Card
-  function 0: [ready], [bat dead], [bat low]
-
-
-~ # cardctl ident
-Socket 0:
-  product info: "PCMCIA", "Bluetooth Card", "", ""
-  manfid: 0x0279, 0x950b
-  function: 2 (serial)
-
-------------fp6Z55lNQPDO7D32sdjIht--
 
 
 
