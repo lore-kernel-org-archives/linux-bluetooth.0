@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bt_inquiry
+Subject: Re: [Bluez-users] No more bluez.o in 2.6?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?S=E9rgio?= Alcides Fernandes <sergiofernandes@clix.pt>
+To: Gregoire Favre <Gregoire.Favre@freesurf.ch>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404072157.02734.sergiofernandes@clix.pt>
-References: <200404072157.02734.sergiofernandes@clix.pt>
+In-Reply-To: <20040407214322.GA14396@magma.epfl.ch>
+References: <20040407172325.GC9593@magma.epfl.ch>
+	 <20040407214322.GA14396@magma.epfl.ch>
 Content-Type: text/plain
-Message-Id: <1081417720.2970.2.camel@pegasus>
+Message-Id: <1081417632.2970.0.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +19,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Apr 2004 11:48:40 +0200
+Date: Thu, 08 Apr 2004 11:47:12 +0200
 
-Hi Sergio,
+Hi Gregoire,
 
-> When i try to compile utils2 from cvs i get the following error :
-> 
-> checking bluetooth/bluetooth.h usability... yes
-> checking bluetooth/bluetooth.h presence... yes
-> checking for bluetooth/bluetooth.h... yes
-> checking for bt_inquiry in -lbluetooth... no
-> configure: error: Bluetooth library not found
-> 
-> 
-> i installed/compiled libs2 (from cvs) in /opt/bluetooth and 
-> added /opt/bluetooth/lib to my /etc/ld.so.conf....
+> I compiled 2.6.5-mm2 again, with all blutooth in, and now I can see my
+> bluetooth device ;-) I can also scan my Palm device.
+> I try http://www-jcsu.jesus.cam.ac.uk/~ned21/tech/tungsten_linux.html
+> and after dund --listen --persist --msdun call dun
+> I got the following error when I try to connect:
+> dund[3647]: RFCOMM TTY creation failed. Operation not supported(95)
 
-you must run configure with --with-bluetooth=/opt/bluetooth
+this error is because you didn't set CONFIG_BT_RFCOMM_TTY in your kernel
+config.
 
 Regards
 
