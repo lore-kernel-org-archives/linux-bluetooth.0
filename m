@@ -1,43 +1,51 @@
-Return-Path: <gregoire.favre@freesurf.ch>
-Date: Mon, 12 Apr 2004 17:12:29 +0200
-From: Gregoire Favre <Gregoire.Favre@freesurf.ch>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Which is needed to have usb bluetooth? (kernels modules)
-Message-ID: <20040412151229.GA24706@magma.epfl.ch>
-References: <20040410155935.GA26618@magma.epfl.ch> <1081613259.5398.5.camel@pegasus> <20040410161909.GC26618@magma.epfl.ch> <1081701708.5398.58.camel@pegasus>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Pretec and Ambicom BT2000E driver
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Gene Imes <ebi7@ozob.net>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1081778308.8875.2.camel@go2>
+References: <200404100030.49916.pavouk@pavouk.org>
+	 <1081593241.3028.7.camel@pegasus>  <1081778308.8875.2.camel@go2>
+Content-Type: text/plain
+Message-Id: <1081782012.5398.141.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1081701708.5398.58.camel@pegasus>
-List-ID: <bluez-users.lists.sourceforge.net>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 12 Apr 2004 17:00:12 +0200
 
-On Sun, Apr 11, 2004 at 06:41:48PM +0200, Marcel Holtmann wrote:
+Hi Gene,
 
-Hello Marcel :-)
+> Marcel, is anyone making any progress toward "make it working through
+> serial_cs and hci_uart/hciattach"?
 
-> use it as modules, because it will be less complicated.
+I don't got any progress so far and from a first code review I also
+can't take the bt2000e driver into the kernel, because it would oops.
 
-OK, but then, is there anywhere an order on which I should load the
-modules?
+> I have some of these and would like them to work.
 
-> No USB Bluetooth adapter at the USB bus. Maybe you have to activate the
-> bus itself in your BIOS. Check if another USB device (for example a
-> mouse) will work in the same slot.
+Go ahead and try. Every patch to make this working is welcome.
 
-It did work with some kernel setup, but I have added some more options
-in the kernel (same kernel) and now I cannot find it back...
-I cannot test another unit on this "usb" because it is on the
-motherboard directly (and that way, it left me only 5 of the 6 usb bus).
+Regards
 
-Maybe it's a problem with the new bus speed option in the kernel?
-(Root Hub Transaction Translators (EXPERIMENTAL) ) I'll try without and
-if case of success I'll repport it here :-)
+Marcel
 
-There is a hack to huse it on a "true" usb under
-http://www.overclockers.com/tips1102/
 
-	Gr=E9goire
-_________________________________________________________________________=
-_
-http://algebra.epfl.ch/greg ICQ:16624071 mailto:Gregoire.Favre@freesurf.c=
-h
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
