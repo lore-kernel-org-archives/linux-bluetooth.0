@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] compatible firmwares?
+Subject: Re: [Bluez-users] extracted apple firmware
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200412271400.24208.cijoml@volny.cz>
-References: <200412271400.24208.cijoml@volny.cz>
+In-Reply-To: <200412271341.10149.cijoml@volny.cz>
+References: <200412271341.10149.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1104315646.6319.4.camel@notepaq>
+Message-Id: <1104315512.6319.1.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Dec 2004 11:20:46 +0100
+Date: Wed, 29 Dec 2004 11:18:32 +0100
 
 Hi Michal,
 
-> are these two firmwares compatible? One I found here:
-> http://www.dasgenie.com/scrap/archives/000057.html
+> I finally got Dlink DBT-120 rev B3, so I would like upgrade it. Can anybody 
+> send me extracted apple's firmware?
 
-you never know until you tried. It is still all vendor specific. Some
-are more lazy than others.
+I have a link to one somewhere on my page.
+
+> Marcel is this options for flash OK?
+> 
+> src/btdfu -d hci0 archive dlink.dfu
+> To backup existing FW,
+> src/btdfu -d hci0 upgrade dlink.dfu
+> To flash a new one?
+
+It is fine, but the -d option is not really supported. You will get a
+menu. And btw you should choose two different names.
 
 Regards
 
