@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Help Needed - Ritesh
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <45A1F95BB9D7D84FAB0A1EB4D67EEF9601665B5F@is01ex01.ittiam.com>
-References: <45A1F95BB9D7D84FAB0A1EB4D67EEF9601665B5F@is01ex01.ittiam.com>
-Content-Type: text/plain
-Message-Id: <1102332520.9644.15.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Message-ID: <45A1F95BB9D7D84FAB0A1EB4D67EEF9601665B5F@is01ex01.ittiam.com>
+From: "Ritesh Ramesh Parekh" <riteshramesh.parekh@ittiam.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Help Needed - Ritesh
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,19 +17,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 12:28:40 +0100
+Date: Mon, 6 Dec 2004 16:40:14 +0530
 
-Hi Ritesh,
+Hello,
 
-> I am implementing a Bluetooth application for portable players. My application uses ARM926EJ host processor interfaced to Bluetooth baseband processor. I am looking for linux profiles RFCOMM, L2CAP, SDP, HCI driver, file transfer profile and TCP/IP application on ARM9 processor. Can anyone throw some light and help me in this regard.
+I am implementing a Bluetooth application for portable players. My =
+application uses ARM926EJ host processor interfaced to Bluetooth =
+baseband processor. I am looking for linux profiles RFCOMM, L2CAP, SDP, =
+HCI driver, file transfer profile and TCP/IP application on ARM9 =
+processor. Can anyone throw some light and help me in this regard.
 
-if Linux works on your processor then also BlueZ will work.
-
-Regards
-
-Marcel
-
-
+Thanks & Regards,
+Ritesh
 
 
 -------------------------------------------------------
