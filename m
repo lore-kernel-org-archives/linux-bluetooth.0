@@ -1,166 +1,99 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Eugene Crosser <crosser@average.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Edd Dumbill <edd@usefulinc.com>
-In-Reply-To: <1073475736.6998.9.camel@pccross.average.org>
-References: <1073475736.6998.9.camel@pccross.average.org>
-Content-Type: multipart/mixed; boundary="=-TCaJ8M1x4bNI/YhzMX/6"
-Message-Id: <1073477754.2508.135.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: Reproducible kernel oops on PPP session start
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Jan 2004 13:15:54 +0100
-
-
---=-TCaJ8M1x4bNI/YhzMX/6
+Return-Path: <crosser@average.org>
+Subject: Reproducible kernel oops on PPP session start
+From: Eugene Crosser <crosser@average.org>
+To: bluez-devel@lists.sourceforge.net
+Cc: Marcel Holtmann <marcel@holtmann.org>
 Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Message-Id: <1073475736.6998.9.camel@pccross.average.org>
+Mime-Version: 1.0
+Date: Wed, 07 Jan 2004 14:42:16 +0300
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Eugene,
+Dear Marcel and guys,
 
-> I have stock 2.6.0 kernel, fairly recent Bluez utilities and MSI USB
-> Bluetooth dongle.  I have dund running, and if I try to start a PPP
-> session from a handheld shortly after the previous one has terminated, I
-> get kernel oops, pretty much every time.
-> 
-> Funny and probably unrelated thing is that the Palm (TT3) from which the
-> session was initiated often soft-resets itself in a minute after such
-> event...
-> 
-> Oops included (manually typed in from a photo of the screen).
-> Tell me if I can help in further investigation.
+I have stock 2.6.0 kernel, fairly recent Bluez utilities and MSI USB
+Bluetooth dongle.  I have dund running, and if I try to start a PPP
+session from a handheld shortly after the previous one has terminated, I
+get kernel oops, pretty much every time.
 
-to be sure that this is not a problem with the different proc code in
-2.6 apply the attached patch and try again.
+Funny and probably unrelated thing is that the Palm (TT3) from which the
+session was initiated often soft-resets itself in a minute after such
+event...
 
-Edd, try this too for your lockup.
+Oops included (manually typed in from a photo of the screen).
+Tell me if I can help in further investigation.
 
-Regards
+Eugene
+=================
+ksymoops 2.4.9 on i686 2.6.0.  Options used
+     -V (default)
+     -k /proc/kallsyms (specified)
+     -l /proc/modules (default)
+     -o /lib/modules/2.6.0/ (default)
+     -m /usr/src/linux-2.6/System.map (specified)
 
-Marcel
-
-
---=-TCaJ8M1x4bNI/YhzMX/6
-Content-Disposition: attachment; filename=patch-l2cap-no-proc
-Content-Type: text/x-patch; name=patch-l2cap-no-proc; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-
-diff -urN linux-2.6.0/net/bluetooth/l2cap.c linux-2.6.0-mh/net/bluetooth/l2cap.c
---- linux-2.6.0/net/bluetooth/l2cap.c	2003-12-18 03:59:05.000000000 +0100
-+++ linux-2.6.0-mh/net/bluetooth/l2cap.c	2004-01-07 13:10:42.000000000 +0100
-@@ -2027,83 +2027,6 @@
- }
- 
- /* ---- Proc fs support ---- */
--#ifdef CONFIG_PROC_FS
--static void *l2cap_seq_start(struct seq_file *seq, loff_t *pos)
--{
--	struct sock *sk;
--	struct hlist_node *node;
--	loff_t l = *pos;
--
--	read_lock_bh(&l2cap_sk_list.lock);
--
--	sk_for_each(sk, node, &l2cap_sk_list.head)
--		if (!l--)
--			goto found;
--	sk = NULL;
--found:
--	return sk;
--}
--
--static void *l2cap_seq_next(struct seq_file *seq, void *e, loff_t *pos)
--{
--	(*pos)++;
--	return sk_next(e);
--}
--
--static void l2cap_seq_stop(struct seq_file *seq, void *e)
--{
--	read_unlock_bh(&l2cap_sk_list.lock);
--}
--
--static int  l2cap_seq_show(struct seq_file *seq, void *e)
--{
--	struct sock *sk = e;
--	struct l2cap_pinfo *pi = l2cap_pi(sk);
--
--	seq_printf(seq, "%s %s %d %d 0x%4.4x 0x%4.4x %d %d 0x%x\n",
--			batostr(&bt_sk(sk)->src), batostr(&bt_sk(sk)->dst), 
--			sk->sk_state, pi->psm, pi->scid, pi->dcid, pi->imtu,
--			pi->omtu, pi->link_mode);
--	return 0;
--}
--
--static struct seq_operations l2cap_seq_ops = {
--	.start  = l2cap_seq_start,
--	.next   = l2cap_seq_next,
--	.stop   = l2cap_seq_stop,
--	.show   = l2cap_seq_show 
--};
--
--static int l2cap_seq_open(struct inode *inode, struct file *file)
--{
--	return seq_open(file, &l2cap_seq_ops);
--}
--
--static struct file_operations l2cap_seq_fops = {
--	.owner	 = THIS_MODULE,
--	.open    = l2cap_seq_open,
--	.read    = seq_read,
--	.llseek  = seq_lseek,
--	.release = seq_release,
--};
--
--static int  __init l2cap_proc_init(void)
--{
--        struct proc_dir_entry *p = create_proc_entry("l2cap", S_IRUGO, proc_bt);
--        if (!p)
--                return -ENOMEM;
--	p->owner     = THIS_MODULE;
--        p->proc_fops = &l2cap_seq_fops;
--        return 0;
--}
--
--static void __exit l2cap_proc_cleanup(void)
--{
--        remove_proc_entry("l2cap", proc_bt);
--}
--
--#else /* CONFIG_PROC_FS */
--
- static int  __init l2cap_proc_init(void)
- {
-         return 0;
-@@ -2113,7 +2036,6 @@
- {
-         return;
- }
--#endif /* CONFIG_PROC_FS */
- 
- static struct proto_ops l2cap_sock_ops = {
- 	.family  =      PF_BLUETOOTH,
-
---=-TCaJ8M1x4bNI/YhzMX/6--
+Warning (read_ksyms): no kernel symbols in ksyms, is /proc/kallsyms a valid ksyms file?
+No modules in ksyms, skipping objects
+No ksyms, skipping lsmod
+ds: 007b   es: 007b   ss: 0068
+Stack: d0b04b40 00000000 00000024 00000020 c0da4000 cefb3994 c0da5f00 d0b01f53
+       00000000 00000000 00000020 cf822ab0 00000001 00001000 0efb21c0 00000000
+       00000000 c0da5d65 ffffffff c030d580 00000000 cf7670f0 00000009 00000000
+Call trace:
+ [<d0b01f53>] l2cap_recv_frame+0x6d3/0xfb0 [l2cap]
+ [<c017cf7d>] proc_alloc_inode_0x4d/0x80
+ [<c0207128>] get_device+0x18/0x30
+ [<d0a58d64>] uhci_submit_common+0x214/0x2e0 [uhci_hcd]
+ [<c0258c1e>] hcd_submit_urb+0xfe/0x170
+ [<c0259685>] usb_submit_urb+0x1c5/0x240
+ [<c010f86a>] do_gettimeofday_0x2a/0xc0
+ [<d0a532b4>] hci_usb_rx_complete+0x1a4/0x690 [hci_usb]
+ [<d0b02da4>] l2cap_recv_acldata+0x184/0x350 [l2cap]
+ [<d0a856c6>] hci_rx_task+0x2d6/0x370 [bluetooth]
+ [<c0122d46>] tasklet_action+0x46/0x70
+ [<c0122b59>] do_softirq+0x99/0xa0
+ [<c010bb32>] do_IRQ+0x122/0x180
+ [<c0109e48>] common_interrupt+0x18/0x20
+Code: 0f 0b 28 01 89 32 b0 d0 eb 93 0f 0b cb 01 a0 32 b0 d0 e9 67
+Using defaults from ksymoops -t elf32-i386 -a i386
 
 
+Trace; d0b01f53 <_end+106e1ec3/3fbddf70>
+Trace; c017cf7d <proc_alloc_inode+4d/80>
+Trace; c0207128 <get_device+18/30>
+Trace; d0a58d64 <_end+10638cd4/3fbddf70>
+Trace; c0258c1e <hcd_submit_urb+fe/170>
+Trace; c0259685 <usb_submit_urb+1c5/240>
+Trace; c010f86a <do_gettimeofday+2a/c0>
+Trace; d0a532b4 <_end+10633224/3fbddf70>
+Trace; d0b02da4 <_end+106e2d14/3fbddf70>
+Trace; d0a856c6 <_end+10665636/3fbddf70>
+Trace; c0122d46 <tasklet_action+46/70>
+Trace; c0122b59 <do_softirq+99/a0>
+Trace; c010bb32 <do_IRQ+122/180>
+Trace; c0109e48 <common_interrupt+18/20>
 
--------------------------------------------------------
-This SF.net email is sponsored by: IBM Linux Tutorials.
-Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
-Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
-Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Code;  00000000 Before first symbol
+00000000 <_EIP>:
+Code;  00000000 Before first symbol
+   0:   0f 0b                     ud2a   
+Code;  00000002 Before first symbol
+   2:   28 01                     sub    %al,(%ecx)
+Code;  00000004 Before first symbol
+   4:   89 32                     mov    %esi,(%edx)
+Code;  00000006 Before first symbol
+   6:   b0 d0                     mov    $0xd0,%al
+Code;  00000008 Before first symbol
+   8:   eb 93                     jmp    ffffff9d <_EIP+0xffffff9d>
+Code;  0000000a Before first symbol
+   a:   0f 0b                     ud2a   
+Code;  0000000c Before first symbol
+   c:   cb                        lret   
+Code;  0000000d Before first symbol
+   d:   01 a0 32 b0 d0 e9         add    %esp,0xe9d0b032(%eax)
+Code;  00000013 Before first symbol
+  13:   67 00 00                  addr16 add %al,(%bx,%si)
+
+ <0>Kernel panic: Fatal exception in interrupt
+
+1 warning issued.  Results may not be reliable.
