@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Pretec and Ambicom BT2000E driver
+Subject: Re: [Bluez-users] Can't compile utils2
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Gene Imes <ebi7@ozob.net>
+To: =?ISO-8859-1?Q?S=E9rgio?= Fernandes <sergiofernandes@clix.pt>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1081778308.8875.2.camel@go2>
-References: <200404100030.49916.pavouk@pavouk.org>
-	 <1081593241.3028.7.camel@pegasus>  <1081778308.8875.2.camel@go2>
+In-Reply-To: <200404112025.35020.sergiofernandes@clix.pt>
+References: <200404112025.35020.sergiofernandes@clix.pt>
 Content-Type: text/plain
-Message-Id: <1081782012.5398.141.camel@pegasus>
+Message-Id: <1081777198.5398.119.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,19 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 12 Apr 2004 17:00:12 +0200
+Date: Mon, 12 Apr 2004 15:39:59 +0200
 
-Hi Gene,
+Hi Sergio,
 
-> Marcel, is anyone making any progress toward "make it working through
-> serial_cs and hci_uart/hciattach"?
+> I followed the directions in http://www.bueche.ch/comp/mx900/mx900.html but i 
+> get this error, after the ./configure. I created a new user account fetched 
+> all from cvs but ..... I think i'll give up for now ....
 
-I don't got any progress so far and from a first code review I also
-can't take the bt2000e driver into the kernel, because it would oops.
-
-> I have some of these and would like them to work.
-
-Go ahead and try. Every patch to make this working is welcome.
+I am going to repeat myself. The problem is that your make process tries
+to link against the old -lbluetooth in /usr/lib. I don't know why, but I
+also don't know anything about your system. Maybe this is a bug in the
+current build system. If yes, try to fix it and send me a patch.
 
 Regards
 
