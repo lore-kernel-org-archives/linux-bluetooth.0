@@ -1,43 +1,61 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1056930669.3eff7b6da605c@www.unrooted.net>
-From: reverend@unrooted.net
-To: bluez-users@lists.sourceforge.net
+Return-Path: <benlau@linux.org.hk>
+Message-ID: <3F28762C.2010409@linux.org.hk>
+Date: Thu, 31 Jul 2003 09:51:40 +0800
+From: Ben Lau <benlau@linux.org.hk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] ussp-push and obextool repackage
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 29 Jun 2003 18:51:09 -0500
+To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Basic Imaging  Profile support
+References: <3F2739C5.5040503@linux.org.hk>
+	<1059603308.1831.17.camel@pegasus>
+In-Reply-To: <1059603308.1831.17.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-I've gotten a bunch of messages over the last few days about ussp-push, a hack
-which I did a while ago to transfer files over rfcomm links.  So if people are
-still using it, I figured I would release a version updated to work with the
-latest openobex library.  I've also packaged up the obextool utility that Marcel
-used to have in CVS, hopefully he doesn't mind.  IMO, the obextool version is a
-much better tool, but both of them are in the package.  Use whichever you like.
- I've espanded the README quite a bit to hopefully answer the questions I hear
-most often.  My thanks to those of you who sent me patches for the updates to
-ussp-push.  -- Rev
+Hi Marcel,
 
-http://www.unrooted.net/openSource/bluez/ussp-push-0.2.tgz
+    Thanks you for answering me.
 
+    I just want to be able to transfer image between the iPAQ (or any
+linux device) , as I see it is getting move devices which is support BIP.
 
--------------------------------------------------------
-This SF.Net email sponsored by: Free pre-built ASP.NET sites including
-Data Reports, E-commerce, Portals, and Forums are available now.
-Download today and enter to win an XBOX or Visual Studio .NET.
-http://aspnet.click-url.com/go/psa00100006ave/direct;at.asp_061203_01/01
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+    How is the support of OBEX now?
+
+    I have not read though the BIP specification yet, i read from the
+Implementation Guide , it said :
+
+"In principle, it's relatively simple for a device that already supports
+one of the Generic
+Object Exchange-basedprofiles to support the Basic ImagingProfile as
+well. Indeed,
+the Basic Imaging profile utilises the same protocol stack as the other
+Generic
+Object Exchange-based profiles, thus limiting the extra development
+workrequired."
+
+    BTW, I  found a website
+
+http://oss.bdit.de/opd.html
+
+    Do somebody here tried with it?
+
+Marcel Holtmann wrote:
+> Hi Ben,
+> 
+> 
+>>    I need to do a project in a iPaq with bluetooth support. It required
+>>the BIP(basic imaging profile) support.
+>>Did bluez support this profile yet? Or any body are working on it? If it
+>>is not  , do it difficult to write the profile
+>>support for Bluez? I am interested to do so. Any documents in web can be
+>>used for reference?
+> 
+> 
+> the Basic Imaging Profile is very complex. What do you need? It exists
+> an initial BIP push daemon and we have obex code in CVS.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
