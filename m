@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Elimar Riesebieter <riesebie@lxtec.de>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-Message-ID: <20031230182456.GA3035@samweis.home.lxtec.de>
-References: <20031228012502.GA16798@samweis.home.lxtec.de> <20031228170349.GA1460@samweis.home.lxtec.de> <m3fzf47oa3.fsf@neo.loria>
+Subject: Re: [Bluez-users] Linux + Bluez problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Laszlo Sogor <shogy@shogy.ohsh.u-szeged.hu>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E1AaCHm-0004YL-00@shogy.ohsh.u-szeged.hu>
+References: <E1AaCHm-0004YL-00@shogy.ohsh.u-szeged.hu>
+Content-Type: text/plain
+Message-Id: <1072620213.27286.17.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="LQksG6bCIzRHxTLp"
-In-Reply-To: <m3fzf47oa3.fsf@neo.loria>
-Subject: [Bluez-users] Re: Apple bluetooth mouse
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,79 +18,76 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 30 Dec 2003 19:24:56 +0100
+Date: Sun, 28 Dec 2003 15:03:34 +0100
+
+Hi Laszlo,
+
+> I have a problem with the Bluetooth connection between my computer and
+> my phone. Sometimes it drops the Bluetooth connection, I could reproduce
+> it in two different ways:
+> 
+> case #1
+> I use GPRS with my phone, the phone is connected to my computer using
+> Bluetooth. When I try to retrieve a page with images, the Bluetooth
+> connection fails with high probability (90 %).
+> 
+> I use /dev/rfcomm2 to access DUN (channel 1) service of my phone.
+> I monitored the Bluetooth connection with l2ping:
+> 
+> # l2ping 00:60:57:2F:11:8C
+> ...
+> 0 bytes from 00:60:57:2F:11:8C id 215 time 94.99ms
+> 0 bytes from 00:60:57:2F:11:8C id 216 time 121.83ms
+> 0 bytes from 00:60:57:2F:11:8C id 217 time 26.51ms
+> no response from 00:60:57:2F:11:8C: id 218
+> no response from 00:60:57:2F:11:8C: id 219
+> no response from 00:60:57:2F:11:8C: id 220
+> no response from 00:60:57:2F:11:8C: id 221
+> Recv failed: Software caused connection abort
+> #
+
+don't use l2ping. Maybe your phone don't likes it. Run hcidump and look
+the packages on the HCI layer.
+
+> At this point, the pppd drops the connection and the Bluetooth subsystem
+> will be unusable until I remove and re-insert the USB dongle (for the sw 
+> and
+> hw specification, see the end of the mail).
+> 
+> Unfortunately I have only one Buetooth device, so I could not determine 
+> whether the error is in the device, the driver or anything else.
+> 
+> 
+> case #2
+> I use p3nfs package (5.12) to mount my phone (Symbian Series 60). I 
+> mounted the phone and did some tests:
+> - in a loop
+>  - copy a large (3MB) file to the phone
+>  - wait 20 seconds
+>  - delete the file
+> - monitor the Bluetooth connection
+> 
+> I found that the Bluetooth connection failed just like when I used GPRS.
+> 
+> Used SW:
+> - Linux kernels 2.4.22 and 2.4.23 (with and without -mh1 patch for both)
+> - Debian Woody and Sarge
+> - bluez-libs-2.4 with bluez-utils-2.3
+> - bluez-libs-2.5 with bluez-utils-2.4
+> 
+> Used HW:
+> - Nokia 3650 (sw ver 3.16)
+> - Epox BT-DG03 USB dongle
+
+what do "hciconfig -a" say? Do you have SCO support activated for the
+USB driver? If yes, try without it. Change from usb-uhci to uhci or vice
+versa.
+
+Regards
+
+Marcel
 
 
---LQksG6bCIzRHxTLp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi all,
-
-I try to get an Apple bt mouse to work with my 2.6.0 Debian system on
-powerpc G4 1Ghz laptop.
-
-I`ve=20
-download the deb sources,
-updated bluez-libs to 2.5 and bluez-utils to 2.4,
-and patched the kernel with
-http://www.holtmann.org/linux/kernel/patch-2.6.0-mh1.gz.
-
-I didn't found a bluez module so I changed bluez to bluetooth in
-/etc/modutils/bluez.
-
-After restarting the hid daemon there is no device hci0. create_dev
-fom Marcel Holtmann didn't help. Anyway the devices rfcomm* and vhci
-where still there. Following modules where loaded from the hid and
-sdp daemons:
-$ /sbin/lsmod | head -4
-Module                  Size  Used by
-rfcomm                 34200  0
-l2cap                  25028  5 rfcomm
-bluetooth              54912  6 rfcomm,l2cap
-
-$ hcitool inq
-Inquiry failed.: No such device
-Inquiring ...
-
-ls-pci -vv doesn't list me a something like bluetooth controller but
-unknown devices. Maybe the kernel does not recognize the responsible
-controller?
-
-$ lspci | grep -i unknown
-00:10.0 VGA compatible controller: ATI Technologies Inc: Unknown device 4e50
-01:0b.0 Host bridge: Apple Computer Inc.: Unknown device 0035
-01:17.0 Class ff00: Apple Computer Inc.: Unknown device 003e
-01:18.0 USB Controller: Apple Computer Inc.: Unknown device 003f
-01:19.0 USB Controller: Apple Computer Inc.: Unknown device 003f
-01:1a.0 USB Controller: Apple Computer Inc.: Unknown device 003f
-06:0b.0 Host bridge: Apple Computer Inc.: Unknown device 0036
-06:0d.0 Class ff00: Apple Computer Inc.: Unknown device 003b
-
-Thanks for hints
-
-Ciao
-
-Elimar
-
---=20
-  Numeric stability is probably not all that=20
-  important when you're guessing;-)
-
---LQksG6bCIzRHxTLp
-Content-Type: application/pgp-signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQE/8cL43Ig8bsVPf7ARAtE7AJ96Plu3LkruGwOULqxYyzyTePyUuACdGvoc
-aHaYaX37tY7Zs5UuNvleemQ=
-=2wE0
------END PGP SIGNATURE-----
-
---LQksG6bCIzRHxTLp--
 
 
 -------------------------------------------------------
