@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Linux-2.6, Zaapa USB Dongle - can't find near
-	devices
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200406042022.58589.cijoml@volny.cz>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Linux-2.6, Zaapa USB Dongle - can't find near devices
 References: <1086372047.8985.14.camel@castle.budism.pt>
-	 <200406042022.58589.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1086374092.4424.24.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <1086372047.8985.14.camel@castle.budism.pt>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200406042022.58589.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,28 +19,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Jun 2004 20:34:52 +0200
+Date: Fri, 4 Jun 2004 20:22:58 +0200
 
-Hi Michal,
+send 
+hciconfig -a
 
-> send 
-> hciconfig -a
+But Zeevo is shit. You better buy CSR based dongle.
 
-this won't help if you can't bring the device up. You must show us
-/proc/bus/usb/devices.
+Michal
 
-> But Zeevo is shit. You better buy CSR based dongle.
-
-Let me put into perspective. The TC2001 is not a Bluetooth chip that
-should ever been used in any end products. The upcoming ZV4002 is much
-better and it looks like that Zeevo had learned many things. However
-buying a CSR based device is the best decision at the moment.
-
-Regards
-
-Marcel
-
-
+On Friday 04 of June 2004 20:00, Filipe Veloza wrote:
+> Hi all,
+>
+> I'm trying to use Bluetooth, I've start by acquiring a Zaapa USB Dongle
+> ( I think it uses Zeevo Chipset ) here goes tech info :
+>
+> Distribution : Fedora 1
+> Kernel : 2.6 with bluetooth built as modules
+> Bluez rpm's:
+> bluez-utils-2.4-1
+> bluez-pan-1.1-2
+> bluez-sdp-1.5-1
+> bluez-hcidump-1.5-3
+> bluez-libs-2.5-1
+> bluez-bluefw-1.0-1
+>
+> Connecting the device dmesg returns :
+>
+> Bluetooth: Core ver 2.4
+> NET: Registered protocol family 31
+> Bluetooth: HCI device and connection manager initialized
+> Bluetooth: HCI socket layer initialized
+> Bluetooth: HCI USB driver ver 2.5
+> usbcore: registered new driver hci_usb
+>
+> hciconfig :
+>
+> hci0:   Type: USB
+>         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
+>         DOWN
+>         RX bytes:0 acl:0 sco:0 events:0 errors:0
+>         TX bytes:0 acl:0 sco:0 commands:0 errors:0
+>
+> ( I start to find strange that here returns null HW address )
+>
+> The problem I had was after this but I now cannot replicate , so now
+> lets start here ...
+>
+> Why can't I set the device up #hciconfig up hci0
+>
+> Thanxs
 
 
 -------------------------------------------------------
