@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <d1f423d305030804193af34558@mail.gmail.com>
+From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-From: soraberri <421246@posta.unizar.es>
-Message-ID: <d0ktcr$n2i$1@sea.gmane.org>
+Subject: Re: [Bluez-devel] Troubles cross-compiling utils... Resolved?
+In-Reply-To: <4208B84C00014D22@resmta04.ono.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] btsco and alsa driver interaction
+Content-Type: text/plain; charset=US-ASCII
+References: <4208B84C00014D22@resmta04.ono.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,57 +18,91 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 08 Mar 2005 20:11:31 +0100
+Date: Tue, 8 Mar 2005 07:19:29 -0500
+
+Hi,
 
 
+I had some problems too and in my case changing the makefile manually
+worked well. I sent a manual describing my expirience on
+crosscompiling Bluez for ARM using Scratchbox.
 
-I have studied btsco.c code (the userspace code part), but I'm scared of 
-the kernel part. It's my first match with a kernel driver and it has won 
-the game... so, I would like to ask you just to figure out how the big 
-black box is behaving.
-
-My impression is that in btsco daemon, once we get the descriptor for 
-the SOCK_STREAM socket we just need to hook it to the hwdep device, and 
-it seems that it is done this way -more or less-
-
-	sd=sco_connect(	&local,
-			&bdaddr,
-			&sco_handle,
-			&sco_mtu));
-
-	bt_sco_set_fd(handle, sd);
-
-where _handle_ represents the device. So I imagine that all what is 
-happening with the SCO channel is "carried" into the device. Is it right?
+Cheers,
 
 
-I also imagine that when we poll data from the hwdep interface, we are 
-not polling SCO data type (which I assume it is being drived 
-automatically); instead, we are polling for volume-control data type 
-which is enigmatically (for me) generated at the core of the driver. Is 
-it right?
+On Tue, 8 Mar 2005 02:08:38 +0100, kwyjibo@ono.com <kwyjibo@ono.com> wrote:
+> Hi, I found some troubles cross-compiling for Compulab ARM unit. First of
+> all, I tried to do  it with gcc 3.3.2, but there were many problems, so I
+> come back to 2.95.3, which it seems to be more kind...
+>=20
+> First, I use this command, in addition with enviroment variables to tell
+> where the crosscompiling chain is located (v.g CC=3D/usr/local/arm/2.95.3=
+/bin/arm-linux-gcc,
+> LD=3D/...)
+>=20
+> ./configure --prefix=3D/mnt/image --host=3Darm --with-bluez=3D/mnt/img/li=
+b
+>=20
+> The first problem I found is that it doesn't find the headers, but the co=
+nfigure's
+> help doesn't say nothing about that... I tried,  like in other releases:
+>=20
+> ./configure --prefix=3D/mnt/image --host=3Darm --with-bluez=3D/mnt/img/li=
+b --with-bluez-includes=3D/mnt/image/include
+>=20
+> But throws the same error. I tried this, as I did before.
+>=20
+> ./configure --prefix=3D/mnt/image --host=3Darm --with-bluez-libs=3D/mnt/i=
+mage/libs
+> --with-bluez-includes=3D/mnt/image/include
+>=20
+> And now I passed the configure with no errors...
+>=20
+> Next I tried to make, and compiling one of the tools it stopped:
+>=20
+> /usr/local/arm/2.95.3/bin/arm-linux-gcc -DHAVE_CONFIG_H -I. -I. -I..    -=
+I/mnt/image/include
+>  -I/mnt/image/include -Wall -O2 -c `test -f 'hcisecfilter.c' || echo './'=
+`hcisecfilter.c
+> /usr/local/arm/2.95.3/bin/arm-linux-gcc -I/mnt/image/include  -I/mnt/imag=
+e/include
+> -Wall -O2   -o hcisecfilter  hcisecfilter.o  -lbluetooth
+> /usr/local/arm/2.95.3/arm-linux/bin/ld: cannot find -lbluetooth
+>=20
+> I notice that the tool app compiled before that was
+>=20
+> /usr/local/arm/2.95.3/bin/arm-linux-gcc -DHAVE_CONFIG_H -I. -I. -I..    -=
+I/mnt/image/include
+>  -I/mnt/image/include -Wall -O2 -c `test -f 'ppporc.c' || echo './'`pppor=
+c.c
+> /usr/local/arm/2.95.3/bin/arm-linux-gcc -I/mnt/image/include  -I/mnt/imag=
+e/include
+> -Wall -O2   -o ppporc  ppporc.o -L/mnt/image/lib -lbluetooth -lbluetooth
+>=20
+> So I noticed that this one includes -L/mnt/image//lib, I edited the makef=
+ile
+> of the tool directory, adding that directory to the tools who needed, and
+> I managed to compile them...
+>=20
+> I haven't tested yet, so I don't know if this is right, but may be it be
+> useful to someone.
+>=20
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_ide95&alloc_id=14396&opclick
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>=20
 
-The question is, 'when does the following condition evaluate TRUE  ?
 
-if (!snd_hwdep_poll_descriptors_revents(handle, &pfds[nfds - 1], 1, 
-revents) && revents & POLLIN) {
-
-a) when we have used the write function some point before, like this:
-snd_hwdep_write(handle, volumes, sizeof(volumes));
-
-b) only when the driver is initialized at the begining
-
-c) or, periodically at some interval defined in the driver code...
-
-well, sorry if these answers are a bit obscure, they are just to give 
-you an idea of how poor is what I can imagine. I think what I wish to 
-know is 'when and why will the hwdep interface produce the events we are 
-listening for'?
-
-Thanks a lot in advance
-
-Luis Peiro
-
+--=20
+Anderson Clayton B. Rodrigues
+Eng. de Software
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
