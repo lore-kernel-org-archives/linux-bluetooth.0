@@ -1,62 +1,103 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] CSR Firmware upgrade?
-From: Nils Faerber <nils@kernelconcepts.de>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <Pine.GSO.4.44L0.0307311234210.11864-100000@ug7.ece.ubc.ca>
-References: <Pine.GSO.4.44L0.0307311234210.11864-100000@ug7.ece.ubc.ca>
-Content-Type: text/plain
-Message-Id: <1059732435.2098.289.camel@idoru.kc.de>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 01 Aug 2003 12:07:16 +0200
+Return-Path: <jjjessen@control.auc.dk>
+Date: Mon, 29 Sep 2003 12:58:45 +0200 (MEST)
+From: "Jan J. Jessen" <jjjessen@control.auc.dk>
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Digianswer USB driver
+In-Reply-To: <1064307381.26572.162.camel@pegasus>
+Message-ID: <Pine.GSO.4.40.0309291248010.923-100000@prosit.control.auc.dk>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Am Don, 2003-07-31 um 21.38 schrieb MUSSON MICHAEL JOHN:
-> I have 2 USB dongles with CSR chips.  The firmware on each is build
-> 14.3 and 14.7.  Is it possible to somehow obtain the most up-to-date
-> CSR firmware and upgrade these?
+Hi Marcel,
 
-Just to stress the need, I would be very interested in this too!
-I also have several CSR based dongles around here, some older some
-newer.
-And since there are obviously some imporant differences in the firmware
-it would be really good beein able to update them.
+On 23 Sep 2003, Marcel Holtmann wrote:
 
-So if anyone from CSR is listening (I think there is at least one :)
-please consider putting the firmware up for public donwload somewhere
-and support the Linux Bluetooth Firware USB Update project.
+> Hi Jan,
+>
+> these are good news. Your initial problem setting scan mode can only be
+> solved with a USB sniffer, I think.
 
-Thanks for your attention :)
+Well I've tried it a few times now, and it is a rare event.
 
-> Regards,
-> Michael
-CU
-  nils faerber
+>
+> Do you have any H:2 USB Bluetooth devices? If yes, please attach them
+> along with a Digianswer one to the same host and use them both. I want
+> to make sure that a Digianswer device works in conjunction with a H:2
+> device.
 
--- 
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          D1 : +49-170-2729106
---
+I've just tried it with a 3com device, and it works:-)
+
+>
+> Have you ever updated the firmware of the Digianswer device? I though
+> that Digianswer already had a USB device at the time they are not a
+> subsidiary of Motorola. So the manufacturer should be 12.
+
+I have no idea. I've never updated the firmware on their devices.
+Digianswer has - at least in the past - been very restrictive about
+getting access to the firmware and related issues. A few years ago, former
+students at Aalborg University wrote a linux driver for their first pcmcia
+cards, but a lot of NDA stuff has prevented the publishing of this driver.
+But that's a whole different story.
+
+> Please do my test above and send me "hciconfig -a" of a machine with two
+> different dongles. If this works I apply this patch to mainline and your
+> students can start working with BlueZ very easy ;)
+
+# lsmod
+Module                  Size  Used by    Not tainted
+hci_usb                 9212   0  (unused)
+bluez                  36452   0  [hci_usb]
+usb-uhci               24460   0  (unused)
+usbcore                66272   0  [hci_usb usb-uhci]
+
+# hciconfig hci0 up
+# hciconfig hci1 up
+# hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:0B:AC:E8:21:B1 ACL MTU: 192:8  SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:69 acl:0 sco:0 events:8 errors:0
+        TX bytes:27 acl:0 sco:0 commands:7 errors:0
+        Features: 0xff 0xff 0x0f 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy:
+        Link mode: SLAVE ACCEPT
+        Name: 'VIP'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20e LMP Ver: 1.1 (0x1) LMP Subver: 0x20e
+        Manufacturer: Cambridge Silicon Radio (10)
+
+hci1:   Type: USB
+        BD Address: 00:50:CD:00:42:2B ACL MTU: 384:6  SCO MTU: 32:7
+        UP RUNNING PSCAN ISCAN
+        RX bytes:42673 acl:0 sco:0 events:7 errors:0
+        TX bytes:27 acl:0 sco:0 commands:7 errors:0
+        Features: 0xff 0xfa 0x21 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy:
+        Link mode: SLAVE ACCEPT
+        Name: ''
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x0 LMP Ver: 1.1 (0x1) LMP Subver: 0x37
+        Manufacturer: Motorola (8)
 
 
+It seems to work perfectly now. Apply Your patch, and everyone is happy...
+regards,
+Jan Jakob
 
--------------------------------------------------------
-This SF.Net email sponsored by: Free pre-built ASP.NET sites including
-Data Reports, E-commerce, Portals, and Forums are available now.
-Download today and enter to win an XBOX or Visual Studio .NET.
-http://aspnet.click-url.com/go/psa00100003ave/direct;at.aspnet_072303_01/01
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+Best regards, Jan Jakob
+------------------------------------
+Jan Jakob Jessen
+Ph.D. Student, M.Sc.E.E.
+Center for Embedded Software Systems
+Aalborg University
+Fredrik Bajers Vej 7C, B2-212
+DK-9220 Aalborg East
