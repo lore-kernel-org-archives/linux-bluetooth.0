@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2e973d2e050320124175fa1f21@mail.gmail.com>
-From: WEI LI <mail.wli@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] help regarding cross compilation
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1439766405032010173a6649b8@mail.gmail.com>
+References: <1439766405032010173a6649b8@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1111343408.22872.1.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Do I need to install bluez-PAN package to set up PAN?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,15 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 20 Mar 2005 12:41:28 -0800
+Date: Sun, 20 Mar 2005 19:30:08 +0100
 
-Hi, I'm new to BlueZ. My linux kernerl is 2.6.10. I'v  installed the
-libs, utils, firmware, hcidump, hciemu packages.  If I wanna set up a
-PAN using my laptop and MP,  do I need to intall bluez-PAN package? If
-yes, where to download it? What do I need to install that package?
-Thank u very much!
+Hi Maha,
 
-WEI
+> I have to add bluetooth functionality to my MIPS based hardware
+> platform. Hardware has montavista linux kernel 2.4.20 without rfcomm
+> and bnep support. I need help regarding compilation of rfcomm,bnep and
+> BlueZ. For cross compilation whether i have to use cross compilers or
+> native gcc which is available in file system?
+
+I am not the right person to ask about cross-compiling stuff, but I
+think you need to rebuild your whole kernel. Apply patch-2.4.20-mh18 to
+get RFCOMM and BNEP support. However be aware of that most of the fixes
+and future enhancements are only present in the 2.6 kernel series.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
