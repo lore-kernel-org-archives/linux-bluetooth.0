@@ -1,226 +1,128 @@
-Return-Path: <Peter.K.Martin@t-online.de>
-From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-To: <bluez-users@lists.sourceforge.net>,
-   "'Marcel Holtmann'" <marcel@holtmann.org>
-Subject: Toshiba and BT (SuSE 9.2)
-Date: Mon, 13 Dec 2004 20:00:28 +0100
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAmw8F2L2GLkSuK/qWO0/qzgEAAAAA@t-online.de>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <51140.80.146.12.98.1102958276.squirrel@schrell.de>
+In-Reply-To: <1102851736.8750.34.camel@pegasus>
+References: <35275.80.146.4.18.1102802831.squirrel@schrell.de>
+    <1102804861.8750.2.camel@pegasus>
+    <50745.80.146.4.18.1102837718.squirrel@schrell.de>
+    <1102838764.8750.32.camel@pegasus>
+    <33016.80.146.4.18.1102847912.squirrel@schrell.de>
+    <1102851736.8750.34.camel@pegasus>
+Subject: Re: [Bluez-users] SOLVED: Dell Inspiron 8600 was: 'hciconfig -a'
+     ok, but 'hcitools scan' shows no devices
+From: "Andreas Schrell" <as@schrell.de>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0023_01C4E14E.68658980"
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain;charset=iso-8859-1
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 13 Dec 2004 18:17:56 +0100 (CET)
 
-This is a multi-part message in MIME format.
+Marcel,
 
-------=_NextPart_000_0023_01C4E14E.68658980
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+here is the actual dump from "hcitool scan":
 
-Hi Marcel,
-here I'm again, the story is still runing. Now I'm able to connect to =
-the
-BT-accesspoint with pand only a short time till timeout.
-I tried hcitool cc <baddr>
-At first I have to start dmabt
-Linux-Notebook:~ # dmabt
+delli:~# hcidump -a
+HCIDump - HCI packet analyzer ver 1.12
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+  3 . . . d
+> HCI Event: Command Status (0x0f) plen 4
+  . . . .
+> HCI Event: Inquiry Result (0x02) plen 15
+  . . . C . . . . . . . . r H .
+> HCI Event: Inquiry Complete (0x01) plen 1
+  .
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+  . . C . . . . . . .
+> HCI Event: Command Status (0x0f) plen 4
+  . . . .
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+  . . . C . . . A . S c h r e l l . S 6 5
+  . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . .
 
-then
+On Windows I used the preinstalled Windows XP with the Bluetooth
+applications from dell I think. Notebook is normally only used under
+Linux. But if you give me some instruction where to look under Windows - I
+can give you appnames and version info etc.
 
-Linux-Notebook:~ # hcitool scan
+Andreas
 
-Scanning ...
+> Hi Andreas,
+>
+>> thanks a lot for your help.
+>>
+>> SUMMARY:
+>>
+>> hciconfig -a         looked right
+>> hcitool scan         did not show any devices
+>>
+>> RESOLUTION:
+>>
+>> Bluetooth was diabled under Windows!
+>> There was no way to start it from Linux as far as I know.
+>>
+>> After booting Windows and activation Bluetooth (right click on icon in
+>> task bar, then activate) it works under Linux. Nothing to do with
+>> <FN-F2>.
+>> Now the blue Bluetooth LED is on even on Linux startup.
+>
+> do you still get vendor event with hcidump?
+>
+> Maybe they have a special VM application running on the Bluetooth chip
+> that can enable/disable the antenna or whatever. What Windows stack did
+> you used?
+>
+>> Thank You, Marcel, for your help!
+>
+> You are welcome.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
-        00:0B:CE:00:01:8F       Bluetooth-Modul
 
-the next step was
 
-Linux-Notebook:~ # hcitool cc 00:0B:CE:00:01:8F
 
-Linux-Notebook:~ # hcitool con
-
-Connections:
-
-        < ACL 00:0B:CE:00:01:8F handle 41 state 1 lm SLAVE
-
-Linux-Notebook:~ # ip link show
-
-1: lo: <LOOPBACK,UP> mtu 16436 qdisc noqueue
-
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-
-2: eth0: <BROADCAST,MULTICAST,NOTRAILERS,UP> mtu 1500 qdisc pfifo_fast =
-qlen
-1000
-
-    link/ether 00:08:0d:a9:18:53 brd ff:ff:ff:ff:ff:ff
-
-3: sit0: <NOARP> mtu 1480 qdisc noqueue
-
-    link/sit 0.0.0.0 brd 0.0.0.0
-
-Linux-Notebook:~ #                =20
-
-=20
-With YaST pand was set as pand --search --master
-and as networkdevice bnep0 was initialized, so I don't understand why it
-doesn't apear within the listing of ip link show.
-The setup of network accesses by YaST for DSL also doesn't give me the
-opportunity to use bnep0 as connection for DSL. There is only as =
-PPP-Modus
-PPP via Ethernet, etc. available, but not PPP via Bluetooth as I =
-expected.=20
-=20
-Please, what is to do in order to get this foolish bnep0 device availabe =
-for
-DSL? bnep0 only appears in the initialization-area for network devices.
-=20
-The everlasting reboot with Windows in order to get internet-access is =
-very
-boring and makes me not really happy!!!
-=20
-Regards
-Peter
-=20
-
-------=_NextPart_000_0023_01C4E14E.68658980
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<TITLE>Nachricht</TITLE>
-
-<META content=3D"MSHTML 6.00.2800.1479" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>Hi=20
-Marcel,</FONT></SPAN></DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>here I'm again, =
-the story=20
-is still runing. Now I'm able to connect to the BT-accesspoint with pand =
-only a=20
-short time till timeout.</FONT></SPAN></DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>I tried hcitool =
-cc=20
-&lt;baddr&gt;</FONT></SPAN></DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>At first I have =
-to start=20
-dmabt</FONT></SPAN></DIV>
-<DIV><SPAN class=3D436333918-13122004>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US>Linux-Notebook:~=20
-# dmabt</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US><SPAN=20
-class=3D436333918-13122004><FONT =
-face=3DArial>then</FONT></SPAN></SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US>Linux-Notebook:~=20
-# hcitool scan</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US>Scanning=20
-...</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US><SPAN=20
-style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
-</SPAN>00:0B:CE:00:01:8F<SPAN=20
-style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
-</SPAN>Bluetooth-Modul</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US></SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US><SPAN=20
-class=3D436333918-13122004><FONT face=3DArial>the next step=20
-was</FONT></SPAN></SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US>Linux-Notebook:~=20
-# hcitool cc 00:0B:CE:00:01:8F</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US>Linux-Notebook:~=20
-# hcitool con</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN=20
-lang=3DEN-US>Connections:</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US><SPAN=20
-style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
-</SPAN>&lt;=20
-ACL 00:0B:CE:00:01:8F handle 41 state 1 lm SLAVE</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US>Linux-Notebook:~=20
-# ip link show</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN lang=3DEN-US>1: =
-lo:=20
-&lt;LOOPBACK,UP&gt; mtu 16436 qdisc noqueue</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US><SPAN=20
-style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </SPAN>link/loopback=20
-00:00:00:00:00:00 brd 00:00:00:00:00:00</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN lang=3DEN-US>2: =
-eth0:=20
-&lt;BROADCAST,MULTICAST,NOTRAILERS,UP&gt; mtu 1500 qdisc pfifo_fast qlen =
-
-1000</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US><SPAN=20
-style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </SPAN>link/ether =
-00:08:0d:a9:18:53=20
-brd ff:ff:ff:ff:ff:ff</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN lang=3DEN-US>3: =
-sit0:=20
-&lt;NOARP&gt; mtu 1480 qdisc noqueue</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US><SPAN=20
-style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </SPAN>link/sit 0.0.0.0 =
-brd=20
-0.0.0.0</SPAN></P>
-<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
-lang=3DEN-US>Linux-Notebook:~=20
-#<SPAN=20
-style=3D"mso-spacerun: =
-yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
-</SPAN></SPAN></P></SPAN></DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT =
-face=3DArial></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>With YaST pand =
-was set as=20
-pand --search --master</FONT></SPAN></DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>and as =
-networkdevice bnep0=20
-was initialized, so I don't understand why it doesn't apear within the =
-listing=20
-of ip link show.</FONT></SPAN></DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>The setup of=20
-network&nbsp;accesses by YaST for DSL also doesn't give me the =
-opportunity to=20
-use bnep0 as connection for DSL. There is only as PPP-Modus PPP via =
-Ethernet,=20
-etc. available, but not PPP via Bluetooth as I expected. =
-</FONT></SPAN></DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT =
-face=3DArial></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>Please, what is =
-to do in=20
-order to get this foolish bnep0 device availabe for DSL? bnep0 only =
-appears in=20
-the initialization-area for network devices.</FONT></SPAN></DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT =
-face=3DArial></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>The everlasting =
-reboot with=20
-Windows in order to get internet-access is very boring and makes me not =
-really=20
-happy!!!</FONT></SPAN></DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT =
-face=3DArial></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT =
-face=3DArial>Regards</FONT></SPAN></DIV>
-<DIV><SPAN class=3D436333918-13122004><FONT =
-face=3DArial>Peter</FONT></SPAN></DIV>
-<DIV><FONT face=3DArial color=3D#173c66=20
-size=3D2><STRONG><EM></EM></STRONG></FONT>&nbsp;</DIV></BODY></HTML>
-
-------=_NextPart_000_0023_01C4E14E.68658980--
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now. 
+http://productguide.itmanagersjournal.com/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
