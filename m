@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1aef622504090807055a0749b8@mail.gmail.com>
-From: David Stennett <praefectus@gmail.com>
-Reply-To: David Stennett <praefectus@gmail.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <E1C52Te-0004M5-Qw@sc8-sf-list2.sourceforge.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <E1C52Te-0004M5-Qw@sc8-sf-list2.sourceforge.net>
-Subject: [Bluez-users] Re: Bluez-users digest, Vol 1 #1491 - 16 msgs
+Message-ID: <1375.146.164.98.1.1094649817.squirrel@webmail.cos.ufrj.br>
+From: <coser@cos.ufrj.br>
+To: <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] BT3030
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +15,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Sep 2004 16:05:23 +0200
+Date: Wed, 8 Sep 2004 10:23:37 -0300 (BRT)
 
-Of course we compiled after patching .... we're not that silly. ;-) 
-We'll give 2.6 a try -- if you guys come up with any other ideas in
-the meantime, I'm all ears ...
+ Hi folks,
+   I bought two Bluetooth usb dongle, model BT3030, FCC ID D6XBT3030 and
+tried to make them talk through two Slackware 10.0 in two desktop
+Pentium III 650Mhz machines. I`ve succed exchanged messages between
+them and mesure RSSI too, but I always get the same number from TPL
+read. I would like to know if this TPL function is already implemented
+at this bluetooth dongle model, so I doing something wrong at read TPL
+or to use this function I have to change my operating system or by
+another bluetooth usb dongle.
+  I've also used HCI from slackware package, bluez-libs-2.5-i386-1roc.tgz,
+bluez-utils-2.4-i386-1roc.tgz , bluez-bluefw-1.0-i686-1rmx.tgz.
 
-D. 
+ Can anyone help me to use this TPL function from HCI?
+
+Thank you,
+   Alexandre
 
 
-> Hi David,
-> 
-> > It looks like USB host driver problem - try ask usb guys
-> 
-> I agree with Michal and you maybe should give a 2.6 kernel a chance ;)
-> 
-> Regards
-> 
-> Marcel
+
 
 
 -------------------------------------------------------
