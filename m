@@ -1,25 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Logitech Bluetooth  Mx900+keyboard support.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Charles Bueche <charles@bueche.ch>
-Cc: Terence Rudkin <trexx@pobox.com>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1075405293.7036.7.camel@bluez.bueche.ch>
-References: <1074457244.3254.17.camel@localhost.localdomain>
-	 <1074458664.6070.73.camel@pegasus>
-	 <1074480891.2817.10.camel@localhost.localdomain>
-	 <1074514935.6070.80.camel@pegasus>
-	 <1074568150.7831.5.camel@localhost.localdomain>
-	 <20040120081245.GA1871@smartdata.ch>  <1074597908.7088.5.camel@pegasus>
-	 <1075234547.3064.13.camel@localhost.localdomain>
-	 <1075276833.12766.56.camel@pegasus>
-	 <1075306699.1793.38.camel@localhost.localdomain>
-	 <1075307541.26729.18.camel@pegasus>
-	 <1075346991.1793.65.camel@localhost.localdomain>
-	 <1075405293.7036.7.camel@bluez.bueche.ch>
-Content-Type: text/plain
-Message-Id: <1075405974.26729.97.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <40193837.1070605@jbc-computer.de>
+From: Jan Bandouch <news.jan@jbc-computer.de>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] sockets connect before accept()
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -30,20 +15,61 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 29 Jan 2004 20:52:54 +0100
+Date: Thu, 29 Jan 2004 17:43:35 +0100
 
-Hi Charles,
+Hello,
+I'm developing a Bluetooth Client/Server application with the client 
+being a Palm Handheld and the Server being a linux PC using BlueZ 
+(Debian Kernel 2.4.22, libbluetooth1-dev version 2.5-1).
 
-> I'm the maintainer of the MX900 page, so you can submit your changes
-> directly to me, I have some people waiting on my update.
-> 
-> Marcel, let me know when the CVS repo is updated.
+My client programm (PalmOS) does the following:
+1) Establish an Acl Link to the server (address and channel is hardcoded)
+2) Create and Connect an RfComm socket to the server (address/channel 
+still hardcoded)
 
-it is already there.
+The connection does get established all right.
+The funny thing is, that on the server side all I did was to create a 
+RfComm socket, bind that socket to BDADDR_ANY and channel 10, and 
+listen. Thats all. No accept(..) call, no select(..) etc.
+I can do a select(..), but I never get told of any connection requests.
+I believe that is because my connection request was already handled 
+before calling select(..).
+But why or by whom? I'm new to socket programming, but as far as I know 
+this is not the way it's supposed to work, or is it? And BlueZ 
+programming should work similar to socket programming, or not?
+And how am I supposed to get a socket handler for the data socket 
+without calling accept(..)?
 
-Regards
+Some more info:
+The rfcomm-module is not in use, before I start my server programm.
+After the client establishes the connection, "cat 
+/proc/bluetooth/rfcomm" shows the following information:
 
-Marcel
+dlc EF:30:04:72:02:00 94:A1:10:E0:07:00 1 20 127 40 1
+sk  EF:30:04:72:02:00 94:A1:10:E0:07:00 1 10
+sk  00:00:00:00:00:00 00:00:00:00:00:00 4 10
+
+the last line is my listening socket, the first two seem to be the 
+connection "initiated" by the Palm. Any infos on how to read the above 
+information? what does "dlc" stand for, and the numbers on the right?
+
+Any help appreciated. At first I thought that some other process accepts 
+the connection, but the connection gets only established after listening 
+on my socket.
+
+Thanks,
+
+Jan
+
+
+
+By the way, any documentation, links regarding BlueZ programming are 
+welcome! I know the site of Marcel Holtmann, but there's only one 
+article dealing with programming, and it's seems I could use some more :-)
+
+
+
+
 
 
 
