@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] 2.6.10 multimedia keys
-References: <20050103135443.5D28D129932@rrzmta1.rz.uni-regensburg.de>
-In-Reply-To: <20050103135443.5D28D129932@rrzmta1.rz.uni-regensburg.de>
+Subject: Re: [Bluez-users] BT-1.2 spec device
+References: <2de46576050103071248159461@mail.gmail.com> <200501032137.22606.cijoml@volny.cz> <1104785612.8894.68.camel@pegasus>
+In-Reply-To: <1104785612.8894.68.camel@pegasus>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200501032253.19805.cijoml@volny.cz>
+  charset="iso-8859-2"
+Message-Id: <200501032250.27339.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,22 +19,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 3 Jan 2005 22:53:19 +0100
+Date: Mon, 3 Jan 2005 22:50:27 +0100
 
-Dne po 3. ledna 2005 14:54 Michael Firsching napsal(a):
-> > Marcel you REALLY NEED IT :) If you write support, I'll send
-> > you my scripts :)
+Dne po 3. ledna 2005 21:53 Marcel Holtmann napsal(a):
+> Hi Michal,
 >
-> If it ever works, please post them through the group, I guess there will be
-> many happy coffee addicts ;)
+> > > you can update the D-Link DBT-120 Rev. B3.
+> >
+> > is B2 firmware supported too? Apple garantee it, but tried it anybody? My
+> > friend want me to flash it for him, but I worry about destroying dongle.
+>
+> in general yes, but I don't tested these ones. After I flashed a B4 it
+> seems that I destroyed some of the radio/baseband settings. The Linux
+> may still have some bugs and will not work with the timings of all flash
+> chips.
 
-Do you want tweak it little bit? :)
+And you flashed 1.1 or 1.2 firmware? If you want, I can send you original B4 
+firmware, if dongle is abble to go to DFU mode
 
 M.
 
 >
 > Regards
-> Michael
+>
+> Marcel
+>
 >
 >
 >
