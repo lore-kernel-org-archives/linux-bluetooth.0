@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Getting remote device address & name using obex
-	commands
-From: Marcel Holtmann <marcel@holtmann.org>
-To: jan d tux <janice@asti.dost.gov.ph>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1075194444.945.39.camel@Asgard>
-References: <1075194444.945.39.camel@Asgard>
+From: jan d tux <janice@asti.dost.gov.ph>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1075212081.12766.6.camel@pegasus>
+Message-Id: <1075194444.945.39.camel@Asgard>
 Mime-Version: 1.0
+Subject: [Bluez-users] Getting remote device address & name using obex commands
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,26 +15,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 27 Jan 2004 15:01:21 +0100
+Date: 27 Jan 2004 17:07:24 +0800
 
-Hi Jan,
+Hello to everyone.
 
-> Is there an obex command that I can use to get the bluetooth address and
-> name of a remote device? It is possible with hci commands but I would
-> like to use obex commands if it is possible.
+Is there an obex command that I can use to get the bluetooth address and
+name of a remote device? It is possible with hci commands but I would
+like to use obex commands if it is possible.
+What Im trying to do is run the obexserver (from frasunek) and get the
+sender's address and name. 
 
-there is not OBEX command for this.
+Any help would be appreciated.
 
-> What Im trying to do is run the obexserver (from frasunek) and get the
-> sender's address and name. 
-
-If you know the socket descriptor you can simply get the local and the
-remote address for that connection. Getting the name is a HCI command.
-
-Regards
-
-Marcel
-
+Thanks
+:)
 
 
 
