@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
-Reply-To: tim@birdsnest.maths.tcd.ie
-To: bluez-users@lists.sourceforge.net
-References: <412D99CA.5050209@nue.et-inf.uni-siegen.de> <412DD322.1080703@csr.com>
-In-Reply-To: <412DD322.1080703@csr.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200408261502.13690.tim@birdsnest.maths.tcd.ie>
-Subject: [Bluez-users] Confessions of an ignoramus - what is all this PIN stuff?
+Subject: Re: [Bluez-users] OBEX File-Transfer?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Detlef Grittner <detlef.grittner@t-online.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <412DE5E3.2010308@t-online.de>
+References: <412DE5E3.2010308@t-online.de>
+Content-Type: text/plain
+Message-Id: <1093528293.2581.25.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,28 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Aug 2004 15:02:13 +0100
+Date: Thu, 26 Aug 2004 15:51:33 +0200
 
-On Thursday 26 August 2004 13:10, Steven Singer wrote:
+Hi Detlef,
 
-> A strong BT PIN [1] should not be your main line of defence, it should
-> be merely your first line of defence.
+> I found this service on my Nokia 6320 and my HP 5550 Pocket PC.
+> Both have a separate OBEX push protocoll as well.
+> 
+> Now I can send data from my Linux client to the Nokia and the HP using 
+> Obex Push but not the other way round.
+> The Pocket PC 2003 doesn't even offer OBEX push as client protocoll but 
+> only OBEX file-transfer. The Nokia and the HP can communicate via OBEX 
+> in both directions.
+> 
+> So maybe, it has something to do with this OBEX file-transfer?
+> What is it and where can I get it for my Linux box?
 
-I find this PIN business very hard to follow.
-Is there a simple account somewhere?
-(Please don't refer me to the Bluetooth Spec
-which I find more or less unintelligble.)
+I started with the btftp application some time ago. It is not finished
+right now, but you can take a look at it in the obex CVS repostory. But
+maybe you should search for ObexFTP.
 
-I have two laptops, martha and william (my grandparents).
-I first linked to my Nokia 6310 with martha.
-For some reason the phone thinks william is also martha.
-Is this something to do with the fact that I always use the same PIN?
+Regards
 
--- 
-Timothy Murphy  
-e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
-tel: +353-86-2336090, +353-1-2842366
-s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
+Marcel
+
+
 
 
 -------------------------------------------------------
