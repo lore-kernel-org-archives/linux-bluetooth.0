@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] how to recognize whether the connected deviceisa
-	headset
-From: Marcel Holtmann <marcel@holtmann.org>
-To: binch@mobilesoft.com.cn
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041023160842.2C06A13E20@mail.mobilesoft.com.cn>
-References: <20041023160842.2C06A13E20@mail.mobilesoft.com.cn>
-Content-Type: text/plain
-Message-Id: <1098550768.4866.5.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <417A73C5.10907@paonline.com>
+From: Dave Sailer <dsailer@paonline.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] kernel bug?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,67 +15,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 23 Oct 2004 18:59:28 +0200
+Date: Sat, 23 Oct 2004 10:07:49 -0500
 
-Hi Chen,
+I have been getting a kernel bug in bluetooth startup. I'm running 
+gentoo 2.6.8-r7. I have tried a fresh kernel, including a 2.6.8.1 
+version.  Should this be reported as a kernel bug. How do I go about that?
 
-> >> I have tried hcitool inq command and find that at the last column there is a 
-> >> 'class: 0x200404', I refer to the BT spec then find that this can be used for
-> >> my purpose, am I right? But what do you mean that this task must be done in
-> >> the kernel?
-> >
-> >when you run you get a copy of the inquiry cache inside the kernel. The
-> >cache is per host device. If some creates a connection the COD value
-> >from the inquiry should be copied over to the hci_conn structure. For an
-> >incoming connection it must be copied from the connection request event,
-> >but there is still a connection creation without a previous inquiry that
-> >may don't have valid COD value. If this is changed then you have the COD
-> >along with the other information of your specific connection. You can
-> >workaround in userspace, but this is more complex then doing a patch for
-> >the kernel HCI layer.
-> >
-> Ok, I got your opioion.You mean that if I connect to a given bdaddr but without 
-> previous inquiry, I can't got the COD of the remote device, because the connection
-> complete event have not a COD parameter.but
-> 
-> >If this is changed then you have the COD along with the other information of your specific connection.
-> 
-> what does this mean? What is changed?How to workaround it in userspace?
-
-the hci_conn structure that is used for keeping track of every HCI
-connection (ACL or SCO) does not store any COD value at the moment and
-so can't retrieve this information easily from userspace.
-
-Do keep track of this from userspace you must hock a program on the raw
-HCI socket and look at inquiry result, connection requests and complete
-events. This is possible, but not easy and the kernel HCI core already
-does most of this for you. However so far nobody asked for the COD value
-and so we haven't cared about it.
-
-> Maybe after my project I can do sth. for BlueZ if I get the right answer.
-
-Every help is welcome. Bluetooth programming under Linux is os easy :)
-
-> >> Thanks. Actually, I am a driver engineer, my manager send me to do the driver for
-> >> our Bluetooth chip, after some investigate I find the driver is not needed if we 
-> >> don't use vendor-specific command, the BlueZ is really a very good stuff.
-> >
-> >and even specific vendor commands are possible. Take a look at the
-> >hciattach source code or the cmd_revision() part of hciconfig. Oh and
-> >btw what kind of Bluetooth chip are you using?
-> 
-> I use TI's BRF6100 chip, this can be done with 'hciattach ttyS0 texas'.Yes, bluez has
-> supported some specific command.But for mobile device,the commands about power management
-> is very important. I don't sure whether this kind of commands is supported in BlueZ.If so,
-> I think I will go to be unemployment,the BlueZ have done all the work:)
-
-Don't forget to send any patches back to the BlueZ mailing list, so I
-can include them and make your life easier.
-
-Regards
-
-Marcel
-
+------------[ cut here ]------------
+kernel BUG at mm/slab.c:1382!
+invalid operand: 0000 [#1]
+PREEMPT SMP
+Modules linked in: bluetooth nvidia snd_ens1370 snd_ak4531_codec
+CPU:    0
+EIP:    0060:[<c014473d>]    Tainted: P 
+EFLAGS: 00010202   (2.6.8.1)
+EIP is at kmem_cache_create+0x41d/0x5d0
+eax: 0000002b   ebx: dff9a370   ecx: c05e0978   edx: 00000286
+esi: c04c8b48   edi: e08f4664   ebp: dfdb3ce0   esp: df94bf4c
+ds: 007b   es: 007b   ss: 0068
+Process modprobe (pid: 6554, threadinfo=df94a000 task=df284250)
+Stack: c0490fe4 e08f465c 00000020 00002000 df94bf70 dfdb3d38 0000000a 
+c0000000
+       ffffffe0 000000c0 c04e69a0 df94a000 e08f7940 c04e6984 e08ca06f 
+e08f465c
+       00000174 00000020 00002000 00000000 00000000 c01391f8 c05e0828 
+00000001
+Call Trace:
+ [<e08ca06f>] bt_init+0x6f/0xc0 [bluetooth]
+ [<c01391f8>] sys_init_module+0x158/0x2b0
+ [<c010528b>] syscall_call+0x7/0xb
+Code: 0f 0b 66 05 f8 08 49 c0 8b 0b e9 5b ff ff ff 8b 47 50 c7 04
+ <6>agpgart: Found an AGP 3.0 compliant device at 0000:00:00.0.
+agpgart: Putting AGP V3 device at 0000:00:00.0 into 8x mode
 
 
 
