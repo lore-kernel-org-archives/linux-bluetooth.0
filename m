@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] USB adapters on devices
+Subject: RE: [Bluez-users] Talking to a digital camera
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Pablo Vieira <listas@loquecreas.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E1COBuN-0006J0-CF@sc8-sf-mx2.sourceforge.net>
-References: <E1COBuN-0006J0-CF@sc8-sf-mx2.sourceforge.net>
+In-Reply-To: <200410310819.i9V8J1vJ001802@mail.holtmann.net>
+References: <200410310819.i9V8J1vJ001802@mail.holtmann.net>
 Content-Type: text/plain
-Message-Id: <1099216441.16247.40.camel@pegasus>
+Message-Id: <1099216155.16247.36.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,14 +18,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 31 Oct 2004 10:54:01 +0100
+Date: Sun, 31 Oct 2004 10:49:15 +0100
 
 Hi Pablo,
 
-> Can a USB adapter be used in a device (not in a host)? (that's related to my
-> other post on controlling a digital camera, but not only to that)
+think about the "Reply to All" button ;)
 
-a normal Bluetooth USB dongle can't be used for this.
+> > > I want to talk wirelessly to a digicam (a Canon Powershot A75, but most
+> > use
+> > > similar protocols). These cameras use USB to talk to the host computer
+> > and
+> > > I'm wondering if I could use any Bluetooth device to serve as a wireless
+> > > bridge to the camera, in the same way there are Bluetooth printer
+> > adapters
+> > > that talk to printers. Actually, I was thinking: would it be possible to
+> > use
+> > > one of these adapters?
+> > >
+> > > I AM NOT TRYING TO DOWNLOAD OR UPLOAD PICTURES from or to the camera. I
+> > just
+> > > want the camera's shutter to be released remotely, as well as setting up
+> > > parameters such as shutter speed, aperture, etc.
+> > 
+> > I haven't heard of any adapter like this, but what you need sounds like
+> > PTP to BIP bridge.
+> > 
+> Thanks Marcel, do you know what would be the difference between a BT printer
+> adapter and the one I need? Wouldn't it be possible to use a printer adapter
+> to talk to the camera?
+
+this depends on if the USB descriptors are matching, but in general you
+don't have PTP or USB storage on the printer.
+
+> I'm trying to subscribe to the gphoto lists (I have some technical problems
+> that I'm trying to solve) but PTP seems to be geared towards downloading and
+> uploading pictures, not simple camera control. Don't know what BIP is, could
+> you please tell me?
+
+BIP means Basic Imaging Profile and the rest you should find out by
+yourself.
 
 Regards
 
