@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
-To: bluez-users mailing list <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] can't establish a connection
-Message-ID: <20040809214036.GB30443@gmx.net>
-References: <1091742606.6143.17.camel@localhost> <1091747064.6143.25.camel@localhost> <1091748133.20839.63.camel@pegasus> <200408060216.05030.cijoml@volny.cz> <1091810383.4570.14.camel@localhost>
+Subject: Re: [Bluez-users] Adpat PAN profile to Samba Server
+From: Marcel Holtmann <marcel@holtmann.org>
+To: taylor <taylor@ms.usi.com.tw>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <004a01c47dd4$45be1380$df0618ac@USI08844>
+References: <004a01c47dd4$45be1380$df0618ac@USI08844>
+Content-Type: text/plain
+Message-Id: <1092071688.4564.20.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1091810383.4570.14.camel@localhost>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,27 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 9 Aug 2004 23:40:36 +0200
+Date: Mon, 09 Aug 2004 19:14:48 +0200
 
-On  0, ben4fun <ben_4_fun@freenet.de> wrote:
-> It's done.
-> After a reboot, I did  "mount -t usbdevfs none /proc/bus/usb" from the
-> USB-howto . It confirmed me it was already mounted. But it is strange
-> that /proc/bus/usb/device file is still empty.
-> 
-> Then I did "hciconfig hci0 up"
-> and I still have "Can't init device hci0. Connection timed out(110)"
+Hi Taylor,
 
-Check if hcid is running. If it is, try a more recent kernel. 
+>    Yesterday, an idea come to my mind. I adpat the Bluez Profile to
+> Samba server. Really, it could work. User could share the file and
+> printer from Samba server. IT is a good solution for me. We doesn't
+> need the wire more at office.
 
-nicholas
+I don't get the point behind your email. Do you wanna say that using
+Samba services over BNEP is working fine for you or would you ask if
+such scenario is possible with BlueZ?
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
-SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
-100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
-Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
-http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+This SF.Net email is sponsored by OSTG. Have you noticed the changes on
+Linux.com, ITManagersJournal and NewsForge in the past few weeks? Now,
+one more big change to announce. We are now OSTG- Open Source Technology
+Group. Come see the changes on the new OSTG site. www.ostg.com
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
