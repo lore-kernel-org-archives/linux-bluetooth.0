@@ -1,72 +1,85 @@
-Return-Path: <daryl@wideray.com>
-Errors-To: <daryl@wideray.com>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Rfcomm Use Count
-Date: Wed, 22 Sep 2004 12:05:17 -0700
-Message-ID: <003301c4a0d7$1982c5b0$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1095876765.6223.85.camel@pegasus>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [2.6.8 ->] Problems, hci_usb dosn't work.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ian Kumlien <pomac@vapor.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1095878969.3211.23.camel@big>
+References: <1095807044.3211.9.camel@big> <1095842833.5762.27.camel@pegasus>
+	 <1095877600.3211.15.camel@big>  <1095877744.6223.88.camel@pegasus>
+	 <1095877955.3211.18.camel@big>  <1095878303.6223.93.camel@pegasus>
+	 <1095878969.3211.23.camel@big>
+Content-Type: text/plain
+Message-Id: <1095879167.6223.104.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 22 Sep 2004 20:52:47 +0200
 
-Hi Marcel,
+Hi Ian,
 
-> try to test your normal stuff to make sure that it doesn't break
-> anything else.
+> > > ohci_hcd 0000:00:02.1: nVidia Corporation nForce2 USB Controller (#2)
+> > > ohci_hcd 0000:00:02.1: irq 185, pci mem f8818000
+> > > ohci_hcd 0000:00:02.1: new USB bus registered, assigned bus number 3
+> > 
+> > your IRQ looks very weird. I have never seen an IO-APIC system assigning
+> > IRQ 185 to any device. Does any other USB device works in conjunction
+> > with this controller?
+> 
+> 2 joysticks, one 6in1 card reader and one muvodrive, it all works.
+> And, it registers the device correctly it just can't read from it.
 
-So far so good. I'm setting up some automated testers to pound on it for =
-a
-while.
+are these devices all USB 2.0 capable? If yes, then they are handled by
+the ehci_hcd host controller driver.
 
-> > Does this change make the "if (sk->state =3D=3D BT_CLOSED)" =
-statement in
-> > bluez_accept_dequeue() redundant?
->=20
-> I think so. Haven't thought about it so far.
->=20
-> > This is important because if somehow a socket is in=20
-> BT_CLOSED state and is
-> > in the accept queue during shutdown, then=20
-> rfcomm_cleanup_listen() can't
-> > clean it up (because bluez_accept_dequeue() won't return=20
-> it). I think your
-> > changes make it impossible for there to ever be an rfcomm=20
-> socket (or l2cap
-> > socket) in the BT_CLOSED state in the accept queue. If=20
-> that's true, then
-> > this isn't an issue. Thoughts?
->=20
-> Sorry, but I can't follow your point here. Please explain it again.
+> And yeah i know, it's part of the nvidia workaround:
+> cat /proc/interrupts
+>            CPU0
+>   0:   91522201          XT-PIC  timer
+>   1:      17141    IO-APIC-edge  i8042
+>   8:          4    IO-APIC-edge  rtc
+>   9:          0   IO-APIC-level  acpi
+>  14:     341508    IO-APIC-edge  ide0
+>  15:    1917703    IO-APIC-edge  ide1
+> 177:          0   IO-APIC-level  ohci_hcd
+> 185:          0   IO-APIC-level  ohci_hcd
+> 193:     347701   IO-APIC-level  ehci_hcd
+> 201:    4266340   IO-APIC-level  EMU10K1
+> 209:    3869397   IO-APIC-level  eth0
+> 217:   11455874   IO-APIC-level  nvidia
+> NMI:       8253
+> LOC:   91523920
+> ERR:          0
+> MIS:          0
+> 
+> hurrm ohci_hcd should have data... hurrrm, it might be LKML related
+> after all.. =P
+> (I might have left the experimental 'ohci' support in ehci on in this
+> kernel.)
 
-Bluez_accept_dequeue() won't return a socket if it is in the closed =
-state.
-So rfcomm_cleanup_listen() will never call close and kill on the socket
-because ...accept_dequeue() never returns it (it just unlinks it). And =
-then
-we would have the use count problem. But if there is no possibility of a
-socket being in the closed state on the accept queue (for rfcomm at =
-least),
-then this isn't an issue.
+Check that first and then report it to the Linux USB mailing list. It is
+more an USB issue then LKML related.
 
-I think this is fixed - so if I'm still talking nonsense, just ignore =
-it. ;)
+Regards
 
-> > Do you think we've covered the case where there are=20
-> incomming connections
-> > while things are at various stages of being shut down? I=20
-> think we're ok, but
-> > I wanted to bring it up.
->=20
-> Actually I don't know. In general we should be protected against that
-> with our locking.
+Marcel
 
-As far as I could see the locking protects against it. But I did not =
-spend
-enough time on it to fully understand how it works. If there is a =
-problem,
-my testing should eventually uncover it.
 
--Daryl.
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
+Project Admins to receive an Apple iPod Mini FREE for your judgement on
+who ports your project to Linux PPC the best. Sponsored by IBM.
+Deadline: Sept. 24. Go here: http://sf.net/ppc_contest.php
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
