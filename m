@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] RFCOMM connection loss on SCO disconnect
+Subject: Re: [Bluez-devel] Problem with BlueLogic WingKey Keyboard
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <C70061B183DE09419568AB2060C52A952465AC@arion.intra.local>
-References: <C70061B183DE09419568AB2060C52A952465AC@arion.intra.local>
+In-Reply-To: <423F5B7F.9060200@rz-zw.fh-kl.de>
+References: <200503202301.49376.tv@rz-zw.fh-kl.de>
+	 <1111408373.22872.54.camel@pegasus>  <423F5B7F.9060200@rz-zw.fh-kl.de>
 Content-Type: text/plain
-Message-Id: <1111481265.22872.96.camel@pegasus>
+Message-Id: <1111453341.22872.88.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,20 +19,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Mar 2005 09:47:45 +0100
+Date: Tue, 22 Mar 2005 02:02:21 +0100
 
-Hi Victor,
+Hi Timo,
 
-> In the attachment there is complete log (right from the establishment of
-> the very first connection), looks like the phone issues DISC for RFCOMM.
-> This happens only if SCO connection is there. Disabling SCO ( when we
-> ignore connect request) "fixes" the problem, but unfortunatelly this is
-> not acceptable. I'm going to check if it can be fixed in some way or
-> another...
+> > can you try a 2.6.11-mh2 kernel first and see if that works. Otherwise I
+> > need the "hcidump -X -V" for your connection.
+> 
+> I chose the hcidump alternative first :). -X and -V are no recognized 
+> options with my hcidump version. So I only used -x assuming that you 
+> meant that. I typed "1" , "2", and so on as you can see and after the 
+> "6" the mentioned behaviour started.
 
-if the phone says DISC we can't do anything. Maybe that is their way of
-interpreting the handsfree profile. I think you have to live with it and
-simply reconnect the RFCOMM channel after the disconnect.
+no, I actually meant "-X -V". Update your hcidump to the latest version
+and try to get everything. Especially the connection setup.
+
+> Hmm, I don't know if this is of importance but I just noticed that if I 
+> start bluetoothd I get an error for hid2hci. It says: No devices in HCI 
+> mode found.
+
+If you don't have a HID proxy dongle the hid2hci is not useful.
 
 Regards
 
