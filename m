@@ -1,63 +1,30 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Content-Type: text/plain; charset=ISO-8859-2
-From: =?iso-8859-2?Q?Super=20Smart?= <alwaysgone@seznam.cz>
-Reply-To: =?iso-8859-2?Q?Super=20Smart?= <alwaysgone@seznam.cz>
-To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Message-Id: <32124.50542-5451-1424036798-1053591000@seznam.cz>
-Cc: steve.crane@rococosoft.com, samlee@ptl.com.tw
-Subject: [Bluez-users]
-	=?iso-8859-2?Q?TDK=20Firmware=20Upgrade=20Procedure=2E=2E=2E=2E?=
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 May 2003 10:10:00 +0200 (CEST)
+Return-Path: <office@produktivIT.com>
+From: Krisztian Mark Szentes <office@produktivIT.com>
+To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+Subject: Re: [Bluez-users] bt3c_cs time out - no firmware loaded?
+Date: Fri, 16 May 2003 16:51:32 +0200
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>, Edd Dumbill <ejad@debian.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+References: 
+	<53B03DA73719D5119E6A0008C71E1D78030EA9A3@svr-mail1.corp.home.nl>
+	<200305161622.47728.office@produktivIT.com>
+	<1053095551.26552.146.camel@pegasus>
+In-Reply-To: <1053095551.26552.146.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-15"
+Message-Id: <200305161651.32053.office@produktivIT.com>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-This is from TDK's support:
------------------------
+On Friday 16 May 2003 16:32, Marcel Holtmann wrote:
+> I got a contact at Cebit this year, but I never found the time to write
+> an email to him according the firmware stuff and the new card Version
+> 3.0 (which is not working with this driver). You can contact him if you
+> like. His name is Brent Nixon (brent_nixon(at)3com.com).
 
-Thank you for your email. Our Bluetooth device supports
-Point-to-point and point-to-multipoint connections simultaneously.
-Ensure that you are using the latest stack version 1.3.2.19 available
-for download from our web site www.tdksystems.com. Assuming you are
-using the latest stack, please upgrade the firmware on your device.
-This utility is found on=20
+Thanks, I will draft a letter and sent a copy to you.
 
-C:\Program Files\TDK Systems\Bluetooth Software\Bin\Bluetooth Device
-Information.=20
+Mark
 
-Simply run this utility and follow the on-screen instructions.
-
------------------------
-
-Just need an internet connection.
-
-Best,
-
-G.
-
-______________________________________________________________________
-Reklama:
-"auto-plus". Ov=EC=F8en=E1 kvalita ojet=FDch voz=F9. Prov=EC=F8en=FD techni=
-ck=FD stav ka=BEd=E9ho vozu. http://ad2.seznam.cz/redir.cgi?instance=3D5364=
-6%26url=3Dhttp://www.auto-plus.cz=20
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: ObjectStore.
-If flattening out C++ or Java code to make your application fit in a
-relational database is painful, don't do it! Check out ObjectStore.
-Now part of Progress Software. http://www.objectstore.net/sourceforge
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+-- 
+produktivIT   -  Open-Source Solution Provider
+Siebenbrunnengasse 55/7
+A-1050 Wien
