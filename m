@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth Scatternet
+Subject: Re: [Bluez-users] Ipaq problem with kernel 2.4.19-rmk6-pxa1-hh36
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ronan Naughton <wadgienaughton@hotmail.com>
+To: Antoine Maisonneuve <antoine02@laposte.net>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY10-F83fB2prT8RHQ00011eaf@hotmail.com>
-References: <BAY10-F83fB2prT8RHQ00011eaf@hotmail.com>
+In-Reply-To: <HV4JYI$A76840F1DFBE95344225AA2AE2138988@laposte.net>
+References: <HV4JYI$A76840F1DFBE95344225AA2AE2138988@laposte.net>
 Content-Type: text/plain
-Message-Id: <1080257828.2283.37.camel@pegasus>
+Message-Id: <1080257607.2283.31.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Mar 2004 00:37:08 +0100
+Date: Fri, 26 Mar 2004 00:33:27 +0100
 
-Hi Ronan,
+Hi Antoine,
 
-> Has anyone ever implemented a bluetooth scatternet using pan over bnep.
-> I have two simple piconets running at the moment and want to join them.  How 
-> will I assign it so that a node can be a slave in both piconets. Do i need 
-> two bnep connections. Or should I have a node to be a master in one piconet 
-> and a slave in an other. How is this implemented?
+> I install the last revision 0.72 of familiar on my Ipaq 3970,
+> with no problem (kernel 2.4.19-rmk6-pxa1-hh30). And Bluetooth
+> works well, but I would like activate some networking options.
+> So I get the last kernel on familiar CVS server
+> 2.4.19-rmk6-pxa1-hh36 I use the file
+> arch/arm/def-configs/ipaqpxa to configure my kernel and add
+> networking options.
 
-you need a scatternet capable Bluetooth chip, which means a chip which
-can be master in one and slave in another or slave in two different
-piconets. Actually you form a scatternet if one of these two conditions
-are present and each connection will have its own BNEP connection.
+you don't need a new kernel for PAN support. The 0.72 should work out of
+the box with the 3970.
 
 Regards
 
