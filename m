@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] snd-bt-sco
+Subject: Re: [Bluez-devel] setting inquiry and inquiry_scan parameters
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200412091834.34528.michael_zanetti@gmx.net>
-References: <200412091834.34528.michael_zanetti@gmx.net>
+In-Reply-To: <5f30e26104120912237f20ea80@mail.gmail.com>
+References: <5f30e26104120912237f20ea80@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1102627711.7962.6.camel@pegasus>
+Message-Id: <1102624670.9988.243.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,25 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 09 Dec 2004 22:28:31 +0100
+Date: Thu, 09 Dec 2004 21:37:50 +0100
 
-Hi Michael,
+Hi Jeff,
 
-> I've got a Logitech HS01 Bluetooth Headset and it works with the Bluetooth 
-> Alsa drivers except the Mic produces a noise so that recording or Skypeing is 
-> nearly impossible.
-> 
-> I've installed kernel-2.6.9-gentoo-r9, patched it with the patch on the Bluez 
-> homepage and installed btsco-cvs-0.2.
-> 
-> Any ideas how to stop that noise?
+> I realize this post is over 9 months old, but I'm trying to write an
+> application that does these very kinds of things.  Can someone tell me
+> more about the specifics of how to tweak these numbers?  I'm guessing
+> it's related to HCI ... ?
 
-actually I have no idea and I don't have any of these headsets for
-testing.
-
-> Thank you all for your great job on this Bluetooth Project!!!
-
-You are welcome.
+nothing has changed since then. You can only tweak things you find an
+HCI command for.
 
 Regards
 
