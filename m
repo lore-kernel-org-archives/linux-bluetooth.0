@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Zaurus and PAN profile
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Mateo, Jose-Luis" <Jose-Luis.Mateo@t-systems.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <D971A27FCD3DE04689089E8A98D8AF710361C30C@G9JJ1.mgb01.telekom.de>
-References: 
-	 <D971A27FCD3DE04689089E8A98D8AF710361C30C@G9JJ1.mgb01.telekom.de>
-Content-Type: text/plain
-Message-Id: <1088007009.4209.114.camel@pegasus>
-Mime-Version: 1.0
+Message-Id: <200406231606.i5NG6gLM017727@news01.csr.com>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Slaves in Sniff mode 
+In-reply-to: "tOpSy TuRvY"'s message of "Wed, 23 Jun 2004 14:58:32 +0200."
+             <Pine.BSO.4.58.0406231451130.835@nemo.student.utwente.nl>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,19 +15,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Jun 2004 18:10:09 +0200
+Date: Wed, 23 Jun 2004 17:06:41 +0100
 
-Hi Jose,
+tOpSy TuRvY wrote:
+> Hi Marcel,
+> 
+> I'm wondering how the master can request an unsniff if the slave is not 
+> listening to the channel.
+> 
+> I suppose the master should delay transmission till the next sniff window 
+> starts (i.e. as Peter suggested). Of course I'm guessing that at this 
+> point it could request an unsniff if the packet to be transmitted will 
+> not fit the sniff window.
 
-> I'm trying to connect a Zaurus PDA with a Laptop using the PAN Profile. I can ping with l2ping and connect using hcitool, but not using pand. The message error is: Connection refused (111).
+It's designed so that data in sniff is pretty much transparent --- this
+is what HID devices use to achieve low power consumption with low
+latency.  (If I made that sound easy, you can take my word for it it
+isn't, particularly with multiple devices :-/)
 
-sounds like a PIN problem. Look with "hcidump -x" at it. What does
-"hciconfig -a" say?
+You can queue data for sending on the host just like normal.  You will
+simply find it arrives on the other side in globs.  The baseband
+fragments packets as necessary, so you don't have to worry about this at
+the L2CAP level or above.
 
-Regards
+If you need data to come across faster, you must issue
+HCI_exit_sniff_mode to the link.  You don't need to stop data while you
+do that, the link manager traffic will fit in automatically.
 
-Marcel
+pws
 
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
