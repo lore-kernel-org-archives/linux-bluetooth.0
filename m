@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Error downloading bluez-pin
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41BC66DC.2050909@supereva.it>
-References: <41BC66DC.2050909@supereva.it>
-Content-Type: text/plain
-Message-Id: <1102867833.8750.50.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41BC66DC.2050909@supereva.it>
+From: martellif@supereva.it
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] Error downloading bluez-pin
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +16,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 12 Dec 2004 17:10:33 +0100
+Date: Sun, 12 Dec 2004 16:42:20 +0100
 
-Hi Franco,
 
-> I'm unable to download bluez-pin024 from your sourceforge site, I get 
-> this error:
-> 
-> You don't have permission to access 
-> /pub/projects/gpe/source/bluez-pin-0.24.tar.gz on this server.
+I'm unable to download bluez-pin024 from your sourceforge site, I get 
+this error:
 
-this is the handhelds.org server and I can't do anything about it.
+You don't have permission to access 
+/pub/projects/gpe/source/bluez-pin-0.24.tar.gz on this server.
 
-Regards
+pls fix...
 
-Marcel
+-- 
+
+	Franco Martelli.
+
+ImoLUG Staff
+http://www.imolug.org - info@imolug.org
+IRC irc.azzurra.org /join #imolug 
 
 
 
