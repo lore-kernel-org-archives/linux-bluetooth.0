@@ -1,32 +1,50 @@
-Return-Path: <sjoerd@spring.luon.net>
-Date: Sat, 2 Oct 2004 11:13:43 +0200
-From: Sjoerd Simons <sjoerd@spring.luon.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Sending files from phone to ppc machine fails
-Message-ID: <20041002091343.GA16988@spring.luon.net>
-References: <20040930161652.GA10170@spring.luon.net> <1096563173.4371.5.camel@notepaq> <20040930170602.GA13427@spring.luon.net> <1096641358.4265.8.camel@notepaq> <20041001181143.GB4230@spring.luon.net> <1096701500.4809.2.camel@notepaq>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stephen Hemminger <shemminger@osdl.org>
+Cc: O Plameras <oscarp@acay.com.au>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1096655305.20029.22.camel@localhost.localdomain>
+References: <E1CA5Ze-0006Iu-R6@paris.servershost.net>
+	 <cjad82$qji$1@sea.gmane.org> <1096371695.4950.2.camel@notepaq>
+	 <cje512$kj5$1@sea.gmane.org> <1096494023.6380.0.camel@pegasus>
+	 <415C8B5B.3060400@acay.com.au>  <1096617235.5403.3.camel@notepaq>
+	 <1096655305.20029.22.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1096701740.4809.4.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1096701500.4809.2.camel@notepaq>
-List-ID: <bluez-users.lists.sourceforge.net>
+Subject: [Bluez-users] Re: pand freezes upon disconnect
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 02 Oct 2004 09:22:21 +0200
 
-On Sat, Oct 02, 2004 at 09:18:20AM +0200, Marcel Holtmann wrote:
-> > I've tested the cvs hidd version on my x86, but to no avail. When starting
-> > hidd --server --master sending files from the phone start failing :(.
-> 
-> Leave the --master option out. CSR based HID input devices will trigger
-> the role switch by themself. Only the Broadcom stuff (Apple) have a
-> problem there.
+Hi Stephen,
 
-Ah i misunderstood. I though that it should be forced to run as master to not
-roleswitch :) Need to learn somewhat more about bluetooth it seems.
+> Fixed in current 2.6 tree (on 7 Sep)
 
-Without master it works perfectly on my x86 box. On my powerbook it still
-sometimes fails. I will see if i can track down the difference between a
-succeeded connection and a failed one..
+thanks for looking at it. Folks, please retest your setups with
+2.6.9-rc3-bk1.
 
-Thanks for all the great work on bluez ;)
-  Sjoerd
--- 
-"If value corrupts then absolute value corrupts absolutely."
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
