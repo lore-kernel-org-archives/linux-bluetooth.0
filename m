@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Cc: Bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Socket BT GPS receiver
-Message-ID: <20031227153813.GA28832@air.luon.net>
-References: <200312271451.44472.cijoml@volny.cz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <200312271451.44472.cijoml@volny.cz>
-From: sjoerd@air.luon.net (Sjoerd Simons)
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: Bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200312271451.44472.cijoml@volny.cz>
+Subject: [Bluez-users] Socket BT GPS receiver
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +17,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 27 Dec 2003 16:38:14 +0100
+Date: Sat, 27 Dec 2003 14:51:44 +0100
 
-On Sat, Dec 27, 2003 at 02:51:44PM +0100, Michal Semler (volny.cz) wrote:
-> Hi,
-> 
-> has anybody tested Socket BT GPS receiver under Linux and BlueZ?
->  
-> http://www.bluetooth-shop.cz/pd1718066917.htm?categoryId=46
+Hi,
 
-  have a look at http://www.pygps.org/gpsd/bt.html :)
+has anybody tested Socket BT GPS receiver under Linux and BlueZ?
+ 
+http://www.bluetooth-shop.cz/pd1718066917.htm?categoryId=46
 
-  I'm using a globalsat bt-308 gps receiver which also works fine
+Thanks for reply
 
-  Sjoerd
--- 
-It's not an optical illusion, it just looks like one.
-		-- Phil White
+Michal
+
 
 
 -------------------------------------------------------
