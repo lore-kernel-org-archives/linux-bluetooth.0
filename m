@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41FF97A2.7080002@csr.com>
-From: Steven Singer <steven.singer@csr.com>
+Message-ID: <41FF4666.7020400@cmc.ca>
+From: Nathanael Morrison <nathanael@cmc.ca>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Hardware error
-References: <41FF6E2C.7040908@avantwave.com>
-In-Reply-To: <41FF6E2C.7040908@avantwave.com>
-Content-Type: text/plain; charset="us-ascii"
+Subject: Re: [Bluez-devel] btsco doesn't start
+References: <41FF7E71.3080206@clarinet.u-strasbg.fr> <41FF8412.50007@dark-reality.de>
+In-Reply-To: <41FF8412.50007@dark-reality.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,42 +18,89 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Feb 2005 14:52:18 +0000
+Date: Tue, 01 Feb 2005 09:05:42 +0000
 
-mike wrote:
->  > HCI Event: Hardware Error(0x10) plen 1
+Hi Nicolas,
 
-If you find out what the parameter was to the hardware error event, you
-might get a clue as to what was going on.
+I had similar problems getting the M2500 headset, it's not getting the 
+Pin # when first connecting.  I created a simple file pin_helper_simple:
 
-You can look up the hardware error codes for CSR chips in the document
-HQ Commands (bcore-sp-003Pc) on the CSR support web site if you have
-access (www.csrsupport.com).
+#----------------------
+#!/bin/sh
+echo "PIN:0000"
+#----------------------
 
-The most common hardware error emitted by CSR devices running the H4
-UART host transport is 0xfe. This indicates that the chip has lost HCI
-synchronisation with the host. This is caused either by the host sending
-invalid data or because of corruption of the UART traffic on the wire.
+Then I modified the hcid.conf under options{} and pointed to the new pin 
+helper:
 
-Unfortunately, the H4 UART protocol does not support a proper error
-recovery procedure. The only option, once this error has occurred, is
-to issue an HCI_Reset which will, of course, tear down all existing
-links.
+pin_helper /etc/bluetooth/pin_help_simple;
 
-	- Steven
+After that running btsco <address> worked. Also note, for the first 
+connection you might have to put the headset into pairing mode.
+
+Cheers,
+
+Nathanael
 
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
+Lars Grunewaldt wrote:
 
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+>
+> Nicolas Montavont wrote:
+> | Dear Developers,
+> |
+> | I just bought an Plantronics M2500 headset and I have problems to make
+> | it work in my linux box. I hope you can help me.
+> |
+> | The problem is I can not start btsco. Here is the output when I try to
+> | start btsco :
+> |
+> | Device is 2:0
+> | Error: btsco open (2-0): No such device or address
+> |
+>
+> looks like an alsa problem, because this device means the alsa device.
+> It detects that your snd-bt-sco is device 2 (third sound card) but it
+> seems to have a problem to connect. Maybe a problem with alsa-lib? Can
+> you connect to the snd-bt-sco by other programs, like alsamixer? In your
+> case it should be alsamixer -c2
+>
+> I'm no expert for this part though... (if I'm for any part at all, 
+> anyway).
+>
+> best regards,
+> ~  Lars
+>
+>
+> - --
+> Lars Grunewaldt
+> * software development
+> * multimedia design
+> skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+> web: http://www.dark-reality.de
+> mail: lgw@dark-reality.de
+> -----BEGIN PGP SIGNATURE-----
+> Version: GnuPG v1.2.3 (GNU/Linux)
+> Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+>
+> iD8DBQFB/4QRQWC6DTWkDAoRAnpdAKClq19p+Wyc1rU/JomO/HzxhbRUJACbBHWF
+> MY2O6Xn/5fJl3TuSr8r2lms=
+> =Jkho
+> -----END PGP SIGNATURE-----
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+> Tool for open source databases. Create drag-&-drop reports. Save time
+> by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+> Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 
 
