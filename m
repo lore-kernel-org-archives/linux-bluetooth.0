@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1109692593.422490b17bafe@mail.orbitel.bg>
-From: Todor Todorov <dr_doom@engineer.bg>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BNEP connection destroing :(
-References: <1109664374.42242276c644b@mail.orbitel.bg> <1109691651.42248d0394218@mail.orbitel.bg>
-In-Reply-To: <1109691651.42248d0394218@mail.orbitel.bg>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=windows-1251
+Subject: Re: [Bluez-users] EPOX BT-PM01B (new) and linux 2.4 ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4225D4B4.7050306@rcs.ei.tum.de>
+References: <4225D4B4.7050306@rcs.ei.tum.de>
+Content-Type: text/plain
+Message-Id: <1109779958.8284.30.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,14 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue,  1 Mar 2005 17:56:33 +0200
+Date: Wed, 02 Mar 2005 17:12:38 +0100
 
-I forgot to say that i sharing my internet connection on windows machine with proxy (CC Proxy 6.0).
-Also when i try to transfer one file up to 50MB, and connection was destroyed after nearly 20MB transfer, but when 
-i re-plug the dongle and reconnect again the whole 50MB file was transfered. I tried also to ping the desktop PC with 
-ping 60k and the connection whas imìediately destroyed. This i fix(i think so) with this "hcitool lst 00:10:60:A6:1C:
-30 0"
-This is tried also when i use windows on the laptop and desktop, and there isn't problem.
+Hi Reinald,
+
+> Are there different Versions of Epox Presenter BT-PM01B and can
+> the latest one be used with kernel 2.4  ?
+> 
+> The device I bought recently
+> 	- is hdi-based
+> 	- has to be brought to "pairing mode" by pressing 3 buttons
+> 	  after poweron in order to react to hcitool scan.
+> 
+> (Both facts are not mentioned in
+> http://www.holtmann.org/linux/bluetooth/epox.html)
+> 
+> epox-presenter:			"no devices in range"
+> epox-presenter <hw_addr>:	"socket:connection refused"
+> 
+> 
+> The BT-PM01B works great on linux 2.6.10 using hidd --server.
+> I have one 2.4.29 - System however I can not upgrade yet.
+
+apply one of my -mh patches for that kernel.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
