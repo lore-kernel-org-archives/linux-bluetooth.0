@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] General Debian bluez question
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1106956484.11673.213836256@webmail.messagingengine.com>
-References: <1106956484.11673.213836256@webmail.messagingengine.com>
-Content-Type: text/plain
-Message-Id: <1106962292.10580.10.camel@pegasus>
-Mime-Version: 1.0
+Message-Id: <200501290128.ALQ93612@ms12.netsolmail.com>
+From: Chris Taylor <cht@imipolex-g.com>
+Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,35 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 Jan 2005 02:31:32 +0100
+Date: Fri, 28 Jan 2005 17:28:25 -0800
 
-Hi Russell,
+Hmm, when I did a 'configure' in bluez-utils-2.14, I used the "--enable-
+bcm203x" option before I did a "make install". Where does the utility get 
+installed? Thanks.
 
-> I am hoping someone can answer a general Debian-bluez question.
-> 
-> I have installed Debian sarge and upgraded to the sid kernel so I can
-> apply the patch patch-2.6.10-mh2.gz.
-> 
-> When installing sarge I also choose the bluez-utils package, but there
-> is another package called kernel-patch-2.6-bluez. Should I also be
-> patching the 2.6.10 kernel with this patch, as well as the "mh2" one?
-
-I don't know what kernel-patch-2.6-bluez is, ask the maintainer. The
-only official patch is the -mh patch.
-
-> My Microsoft bluetooth mouse works fine without the debian patch - or at
-> least it seems to! I'm just curious about whether I need both patches. I
-> will continue to use the "mh2" patch do I can enjoy scroll-wheel
-> support.
-
-The -mh2 will give you report mode protocol support and this means the
-scroll wheel should be useable.
-
-Regards
-
-Marcel
-
-
+---- Original message ----
+>Date: Sat, 29 Jan 2005 02:13:35 +0100
+>From: Marcel Holtmann <marcel@holtmann.org>  
+>Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14  
+>To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+>
+>on a system with a 2.4 kernel you need the bcm203x utility. You must
+>enable when compiling bluez-utils.
+>
+------------------
+Chris Taylor
+cht@imipolex-g.com
+Los Angeles
 
 
 -------------------------------------------------------
