@@ -2,12 +2,11 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] testing Bleuz/SCO with hsplay
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Stefan de Konink <skinkie@xs4all.nl>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4159974B.4000602@xs4all.nl>
-References: <41597F43.9060208@xs4all.nl> <1096390088.4726.6.camel@notepaq>
-	 <4159974B.4000602@xs4all.nl>
+Cc: bluez devel <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41597F43.9060208@xs4all.nl>
+References: <41597F43.9060208@xs4all.nl>
 Content-Type: text/plain
-Message-Id: <1096496461.6380.6.camel@pegasus>
+Message-Id: <1096390088.4726.6.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,20 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 30 Sep 2004 00:21:02 +0200
+Date: Tue, 28 Sep 2004 18:48:08 +0200
 
 Hi Stefan,
 
-> > I think this is a thinko. Pair your headset with your PC and then use
-> > hstest or hsplay to get music on the headset.
+> For the Asterisk PABX I'm testing the Bluetooth functionality of a Nokia 
+> phone to be used as phone channel. Still in the basic stage I allready 
+> have a problem.
 > 
-> Probably I told it the wrong way, I want my pc to act as a headset for 
-> my phone. I know I'm odd.
-> 
-> Does this Harry Potter stuff require some magic to the code or is this 
-> not possible?
+> attest works, I get the complete list of the phonenumbers and names. So 
+> heading straight for hsplay. The phone is connected by bluetooth, the 
+> little headset icon is on the phone's display, but when I call out with 
+> the phone I still have no MP3 playing on my ear.
 
-you can't do that with hstest.
+I think this is a thinko. Pair your headset with your PC and then use
+hstest or hsplay to get music on the headset.
 
 Regards
 
@@ -42,10 +42,10 @@ Marcel
 
 
 -------------------------------------------------------
-This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
-Use IT products in your business? Tell us what you think of them. Give us
-Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
-http://productguide.itmanagersjournal.com/guidepromo.tmpl
+This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
+Project Admins to receive an Apple iPod Mini FREE for your judgement on
+who ports your project to Linux PPC the best. Sponsored by IBM.
+Deadline: Sept. 24. Go here: http://sf.net/ppc_contest.php
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
