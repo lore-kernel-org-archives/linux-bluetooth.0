@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BlueZ Newbie
+Subject: Re: [Bluez-users] can't establish a connection
 From: Marcel Holtmann <marcel@holtmann.org>
-To: mlists@tdbnetworks.org
+To: ben4fun <ben_4_fun@freenet.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <45811.212.183.131.161.1092733345.squirrel@sockthing.tdbnetworks.org>
-References: <1092718810.3163.76.camel@hellontoast>
-	 <1092726160.31651.4.camel@pegasus>
-	 <45811.212.183.131.161.1092733345.squirrel@sockthing.tdbnetworks.org>
+In-Reply-To: <1092776029.3475.27.camel@localhost>
+References: <1091742606.6143.17.camel@localhost>
+	 <1092727197.12606.1.camel@localhost> <1092728177.31651.6.camel@pegasus>
+	 <200408170949.50588.cijoml@volny.cz>  <1092776029.3475.27.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1092744170.10582.18.camel@notepaq>
+Message-Id: <1092778940.31651.39.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,17 +20,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Aug 2004 14:02:50 +0200
+Date: Tue, 17 Aug 2004 23:42:20 +0200
 
-Hi Richard,
+Hi Ben,
 
-> In a word, yes, It's a Sony Ericsson P900.
+> But the cheapest way was to follow the advice of Marcel. It's almost
+> done.
+
+so adding the broken ISOC quirk would be enough to make this dongle work
+again. Maybe the last time I tested it, I had the SCO support disabled.
+
+> this is the results of my new hciconfig -a 
 > 
-> Is that a major problem?
+> hci0:   Type: USB
+>         BD Address: 00:02:72:B3:43:18 ACL MTU: 377:10  SCO MTU: 16:0
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:102019 acl:4770 sco:0 events:292 errors:0
+>         TX bytes:5159 acl:258 sco:0 commands:48 errors:0
+>         Features: 0xff 0xff 0x0d 0x38 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'BlueZ (0)'
+>         Class: 0x000100
+>         Service Classes: Unspecified
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x3 LMP Ver: 1.1 (0x1) LMP Subver:
+> 0x800
+>         Manufacturer: Broadcom Corporation (15)
 
-the hcidump showed me a mRouter behaviour. Check with sdptool on what
-RFCOMM channel your phones has its DUN Profile and then try to use this
-one.
+What does "hciconfig hci0 revision" say? These versions look a little
+bit wrong.
 
 Regards
 
