@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Collin R. Mulliner" <collin@betaversion.net>
-To: bluez-devel@lists.sourceforge.net
-Message-Id: <20040601183206.7f99aacf@coredump>
+Subject: Re: [Bluez-devel] Problems while sending and receiving with rfcomm
+	sockects
+From: Marcel Holtmann <marcel@holtmann.org>
+To: dsas@mega.ist.utl.pt
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1086102474.40bc9bca939eb@webmail.rnl.ist.utl.pt>
+References: <1086088581.40bc65850efcf@webmail.rnl.ist.utl.pt>
+	 <1086094054.1978.26.camel@fischer>
+	 <1086102474.40bc9bca939eb@webmail.rnl.ist.utl.pt>
+Content-Type: text/plain
+Message-Id: <1086102999.4702.62.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] RFCOMM support for nonblocking sockets
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,26 +21,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 1 Jun 2004 18:32:06 +0200
+Date: Tue, 01 Jun 2004 17:16:39 +0200
 
-Hi,
+Hi Didier,
 
-does anybody know if O_NONBLOCK is supported for RFCOMM?
+> When I execute 2 servers on masters side (one only sending and the other only
+> receiving) using diferents rfcomm channels, I also receive corrupt data (very
+> rarely :-( ). If they're both sending or receiving, everything works fine... I
+> think it's possible to use semaphores to synchronize the 2 processes but I'd
+> like to use a simpler solution or at least understand where the problem is.
 
-I allways get "errno == 11" and 
-perror tells me "Resource temporarily unavailable"
+if you are using two different RFCOMM channels and this happens it looks
+like a bug in the kernel code. As I said, check the latest kernel and
+try to send us a simple program that triggers this effect.
 
-If I don't do: fcntl(sock, F_SETFL, O_NONBLOCK) the code works fine.
+Regards
+
+Marcel
 
 
-thanks ... Collin
-
--- 
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-USS Enterprise Bumperstricker: Our other starship separates into 3
-pieces! 
 
 
 -------------------------------------------------------
