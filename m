@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] how to get bluetooth to emulate comport?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050321091923.29784.qmail@web50701.mail.yahoo.com>
-References: <20050321091923.29784.qmail@web50701.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1111404610.22872.46.camel@pegasus>
+Message-ID: <14397664050321031963ce0576@mail.gmail.com>
+From: maha k <maha.cedt@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Help for cross compilation of BlueZ
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,37 +16,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 21 Mar 2005 12:30:10 +0100
+Date: Mon, 21 Mar 2005 16:49:52 +0530
 
-Hi John,
+ Hi,
+>I have to add bluetooth functionality to my MIPS based hardware
+> platform. Hardware has montavista linux kernel 2.4.20 without rfcomm
+> and bnep support. I need help regarding compilation of rfcomm,bnep and
+> BlueZ. For cross compilation whether i have to use cross compilers or
+> native gcc which is available in file system?
+>I am not the right person to ask about cross-compiling stuff, but I
+>think you need to rebuild your whole kernel. Apply patch-2.4.20-mh18 to
+>get RFCOMM and BNEP support. However be aware of that most of the fixes
+>and future enhancements are only present in the 2.6 kernel series.
 
->  Not been prompted to enter pin, keep getting 
->  
->  Can't connect RFCOMM socket: Connection refused
->  
->  despite scan finding the device.
->  
->  put those lm and lp entries in hcid.conf, and even
->  tried(afterward)putting the following in rfcomm.conf
->  
->  rfcomm0 {
->  bind no;
->  device    08:00:37:12:C4:B1;
->  channel   1;
->  comment   "PM325 by LG";
->  }
->  
-> 
->  any ideas?
-
-what about starting a new mailing list thread with a new posting to the
-correct mailing list with your problem?
-
+I am able to add RFCOMM support. Giving problem for BNEP and HIDP support.
+I can't upgrade kernel version since it is a montavista custom linux
+kernel for specific board.
+Can any one help me out in cross compilation of BlueZ utils and libs
+for MIPS flatform?
 Regards
-
-Marcel
-
-
+-- 
+Maha
 
 
 -------------------------------------------------------
