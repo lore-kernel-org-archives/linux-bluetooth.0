@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f54d86405030108254b6085b@mail.gmail.com>
-From: Benny <bennyvasanth@gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+From: Martin Trost <phobozz@sgies.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth PC Headset - SCO connection failed
-In-Reply-To: <4223466A.2010701@xmission.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <f54d86405022806312ab4142a@mail.gmail.com>
-	 <4223466A.2010701@xmission.com>
+Message-ID: <E1D6TKF-0005T0-Vl@sc8-sf-mx2.sourceforge.net>
+Subject: [Bluez-users] Getting bluetooth working using Belkin F8T003 v2
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,30 +16,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 1 Mar 2005 21:55:09 +0530
+Date: Wed, 02 Mar 2005 07:55:37 -0500
 
-Thanks Brad for your suggestion and now we got the Headset working
-after upgrading our linux kernel to 2.6.9 and using latest CVS file
-from the ALSA-Bluetooth project(btsco).
-
-We need to transfer additional data(full duplex between a linux PC and
-the Headset) parallely apart from the headset functionality. Is this
-possible?
-
-Please advice.
-
-Thanks & Regards,
-Benny
-
-
-On Mon, 28 Feb 2005 09:27:22 -0700, Brad Midgley <bmidgley@xmission.com> wrote:
-> Benny
-> 
-> > My linux kernel version is 2.4.29.
-> 
-> I just fixed the docs to make it clear you need a recent 2.6 kernel.
-> 
-> Brad
+Hey folks, i'm stuck with the following and have no clue what to do..=0D
+=0D
+Trying to follow that guide=0D
+http://gentoo-wiki.com/HOWTO_mobile_phone%2C_Bluetooth_and_GNOME=0D
+=0D
+i came upon the following error:=0D
+Code:=0D
+=0D
+drivers/usb/class/bluetty.c: Bluetooth converter now attached to ttyUB0 (or=
+=0D
+usb/ttub/0 for devfs)=0D
+drivers/usb/class/bluetty.c: usb_bluetooth_probe - improper number of endpo=
+ints.=0D
+Bluetooth driver not bound.=0D
+bluetty: probe of 3-3:1.1 failed with error -5=0D
+drivers/usb/class/bluetty.c: usb_bluetooth_probe - improper number of endpo=
+ints.=0D
+Bluetooth driver not bound.=0D
+bluetty: probe of 3-3:1.2 failed with error -5=0D
+=0D
+when typing "dmesg"... so it seems as if it doesn't recognize my Belkin Blu=
+etooth=0D
+stick, does it?=0D
+Tried also not using the Linux-Bluetooth but the HCI-USB bluetooth, but whe=
+n=0D
+trying that, it complaing that it can't register rfcomm tty driver.. which =
+shall=0D
+be normal since it ain't installed if not using the Linux Blueooth.. so wha=
+t=0D
+shall i do to get bluetooth (mostly OBEX) to work with my mobile?=0D
+Using kernel: 2.6.11-rc3-nitro0, Belkin Bluetooth Stick, gnome-bluetooth...=
+ thx=0D
+in advance for any help, i'd be really happy if you could help me :)=0D
+=0D
 
 
 -------------------------------------------------------
