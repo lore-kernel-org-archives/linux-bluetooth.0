@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Pairing a keyboard
-Message-ID: <20041125075755.GC2505@frostnet.net>
-References: <20041125064110.GA2505@frostnet.net> <1101367010.7538.78.camel@pegasus>
+Subject: Re: [Bluez-users] xtrememac dropped bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41A580FF.7040906@xmission.com>
+References: <41A580FF.7040906@xmission.com>
+Content-Type: text/plain
+Message-Id: <1101368008.7538.89.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1101367010.7538.78.camel@pegasus>
-From: Chris Frost <chris@frostnet.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,31 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 Nov 2004 23:57:55 -0800
+Date: Thu, 25 Nov 2004 08:33:27 +0100
 
-On Thu, Nov 25, 2004 at 08:16:49AM +0100, Marcel Holtmann wrote:
-> who said that pairing works by calling "hcitool cc ..."? You should use
-> the "hidd --connect ..." command instead.
+Hi Brad,
 
-No one did; I had tried hidd --connect but got the same errors. Sorry about
-this mistake, thanks for the correction.
+> I only noticed recently that these xtrememac.com guys were promising a 
+> class 1 device supporting a2dp (about a year ago!). They say they've 
+> shelved the product. Too bad... I don't think there are any class 1 
+> headsets (a2dp or no)
+> 
+> Class 1 headset(s) + asterisk pbx + voice-commands + streaming a2dp 
+> audio would be an extrememly slick setup...
+
+don't worry so much about the class 1 headphones, because even using a
+class 1 dongle will increase the range. However there will be others
+that will build a class 1 headphone. The Bluetooth devices with A2DP
+support are at their beginning. I expect more to come in the near future
+and then there is no longer any need for a sound card in your desktop or
+notebook. If for example Apple will include A2DP audio source support
+into their iPODs everything might change very quickly.
+
+Regards
+
+Marcel
 
 
-> The bluepin script must echo "PIN:0000".
-
-Aha, that gets it. Thank you.
-
-Do you know if I should I read about/look into putting the keyboard to
-sleep after inactivity? I have read in a couple places on the web that apple's
-devices do not go to sleep themselves, but perhaps what I read was old and
-bluez does this automatically now?
-
--- 
-Chris Frost  |  <http://www.frostnet.net/chris/>
--------------+----------------------------------
-Public PGP Key:
-   Email chris@frostnet.net with the subject "retrieve pgp key"
-   or visit <http://www.frostnet.net/chris/about/pgp_key.phtml>
 
 
 -------------------------------------------------------
