@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Theo Beisch <theo.beisch@gmx.de>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Message-Id: <200310062337.37090.root <>>
-Reply-To: theo.beisch@gmx.de
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Subject: [Bluez-users] help for bluez and bridge configuration needed
+Subject: Re: [Bluez-users] bluetooth and wireless lan horror
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Steven Singer <steven.singer@csr.com>
+Cc: Peter Bergmann <bergmann.peter@gmx.net>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3F7D5B72.1050900@csr.com>
+References: <1065171540.1734.97.camel@pegasus>
+	<28385.1065174121@www39.gmx.net> <1065174943.1734.101.camel@pegasus>
+	<3F7D5B72.1050900@csr.com>
+Content-Type: text/plain
+Message-Id: <1065443556.21958.39.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -17,55 +21,42 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 6 Oct 2003 23:37:57 +0200
+Date: 06 Oct 2003 14:32:30 +0200
 
-I am new to Linux and Bluez so maybe someone could give me a hand here? Thanx 
-ahead!
+Hi Steven,
 
-I am using a 2.4.2 kernel (SuSE 8.2) and the bridge within it to tie a 
-bluetooth PAN and my Laptop together under one IP address which must come 
-from a DHCP server as I am using the constellation in various networks.
+> A technique that might be useful for both BT 1.1 and 1.2 devices is
+> to use sniff. If you chose a relatively long sniff interval (several
+> hundred milliseconds) then when the link is idle the Bluetooth devices
+> will communicate only once per interval (as opposed to the default of
+> about once every 25 ms). If you also chose a fairly high timeout then
+> once data starts flowing it should be able to stream smoothly. The
+> only disadvantage of this technique is that when data flow stops you
+> may get a delay of up to the sniff interval before it can restart.
+> 
+> This should be relatively easy to test. Use the HCI command line tools
+> to put the link in sniff mode. I suggest parameters of min_interval =
+> 0x200, max_interval = 0x400, attempts = 4, timeout = 40.
+> 
+> In theory it would be possible for BlueZ to detect that the rfcomm
+> link has gone quiet (a simple timer from the last packet sent or
+> received) and then automatically switch into sniff mode. An advantage
+> of this technique is that BlueZ can gradually increase the sniff
+> interval the longer the link's been idle. The longer the sniff
+> interval, the longer the latency from when either host sends data
+> till it can be sent over the air. This would mean that if the link
+> was idle only briefly you'd get low latency but if you didn't use
+> the link for a while then it'd take a while for data to flow.
 
-The bridge is activated like this:
-brctl addbr pan0
-brctl addif pan0 eth0
-brctl setfd pan0 0
-brctl stp pan0 disable
-(got those settings from a bluetooth howto, activated by a init.d/rc5 script - 
-works fine)
+this idea is nice and it sounds like a useful feature. But it can't
+depend on the RFCOMM traffic. It must depend on the ACL traffic and the
+BlueZ core must handle it.
 
-ifconfig eth0 0.0.0.0 then disables the IP on my lan card for the bridge to 
-work, set by the ifcfg-eth0 init.d file. 
+Regards
 
-the ifctrl-pan0 calls the DHCP server for an IP adress and this is assigned - 
-works well.
+Marcel
 
-brctl addif pan0 bnep0   gets called from the bluetooth startup (hotplug)
 
-With the bluetooth pan added to the bridge heres the trouble I have:
-
-While before pings to the local machine work ok and I get constant periodic 
-reponses, after the bnep0 interface becomes part of the bridge, ping stops 
-about every 5 instances, no longer displays the ping'd machine's name and 
-goes down with response frequency (from normally one a second to one response 
-every 10 or so seconds). While the response frequency remains low, after 8-10 
-no-name resolution pings, the machine name comes back with each ping. and so 
-on....
-
-Pings directly to the IP address continue to work fine, also pings from 
-another machine in the network to both my local linux laptop and the 
-bluetooth attached PDA. Also DHCP is working fine for the PDA.
-
-Any ideas? Thanks ahead for your help!
-
-Theo
--- 
-Theo Beisch
-106 Ronheider Weg
-Aachen, Germany 52066
-Tel +49 (241) 13935 & +49 (9401) 6000283
-Mobil +49 (172) 2102211
-theo.beisch@gmx.de
 
 
 -------------------------------------------------------
