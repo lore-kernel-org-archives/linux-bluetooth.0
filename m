@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bluetooth, Mobile IPv6 and PAN profile
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Wang Haiguang <wanghg@i2r.a-star.edu.sg>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <LMEOKMJFKNFFHEAEDGDEGEDNCHAA.wanghg@i2r.a-star.edu.sg>
-References: <LMEOKMJFKNFFHEAEDGDEGEDNCHAA.wanghg@i2r.a-star.edu.sg>
-Content-Type: text/plain
-Message-Id: <1085407211.9779.22.camel@pegasus>
-Mime-Version: 1.0
+From: Mauro Tortonesi <mtortonesi@ing.unife.it>
+To: Julien Campana <juliencampana@yahoo.fr>,
+   BlueZ-devel List <bluez-devel@lists.sourceforge.net>,
+   ed.kay@appliancestudio.com, JavaBluetooth@Chris-Lorenz.com
+Subject: Re: [Bluez-devel] Announce : BlueZ-based implemantation of JSR82
+References: <1085393268.892.40.camel@fischer>
+In-Reply-To: <1085393268.892.40.camel@fischer>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Message-Id: <200405241255.21584.mtortonesi@ing.unife.it>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,25 +20,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 May 2004 16:00:11 +0200
+Date: Mon, 24 May 2004 12:55:21 +0200
 
-Hi Haiguang,
+On Monday 24 May 2004 12:07, Julien Campana wrote:
+> Hi,
+>
+> We have developped a JSR-82 implementation for Linux, which is based on
+> BlueZ and which is compatible with most USB-Dongle's.
+>
+> We've used parts of JavaBluetooth.org's works and parts of JBluez's
+> stuff.
+> The native C-Code of the project is entirely based on the BlueZ project
+> and I would like to thanks Marcel Holtmann for his answers to my
+> questions, which were all helpfull.
+>
+> We've decided to make the Linux version OpenSource.
+>
+> The JSR-82 specification is not yet fully implemented but the major part
+> of the work (let say 95%) is done.
+>
+> The package can be downloaded at the following address:
+> http://www.avetana-gmbh.de/avetana-gmbh/jsr82.xml
+>
+> The web site is in german but will be soon translated in english.
+>
+> JSR-82 is a Sun Microsystems specification for easily developping
+> bluetooth based application in Java.
+> Good tutorials can be found on the Java developper Center web site as
+> well as on manay other web sites.
+> For more information about JSR-82, please consult the site:
+> http://www.jcp.org/en/jsr/detail?id=82
 
-> Has anybody tried to test the Mobile IPv6 over bluetooth with PAN profile?
-> 
-> For example, two node work as NAP with bluetooth and one node as PANU.
-> 
-> If you did, please give me some hint?
-> 
-> Now I am trying on the stuffs. 
+hi julien and all,
 
-I've never done this nor have I tested IPv6 together with PAN, but the
-BNEP is only an ethernet emulation and so everything that's working over
-ethernet should work over BNEP, too.
+i am working on a similar project (also derived from javabluetooth), a jsr82 
+implementation based on bluez that supports also SCO and ASB logical 
+transports:
 
-Regards
+http://lia.deis.unibo.it/Research/ubiQoS/audioStreaming/
 
-Marcel
+perhaps we could cooperate somehow?
+
+-- 
+Aequam memento rebus in arduis servare mentem...
+
+Mauro Tortonesi                 mtortonesi@ing.unife.it
+                                mauro@deepspace6.net
+                                mauro@ferrara.linux.it
+Deep Space 6 - IPv6 with Linux  http://www.deepspace6.net
+Ferrara Linux User Group        http://www.ferrara.linux.it
 
 
 
