@@ -1,10 +1,26 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Fredrik Noring <noring@nocrew.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] D-Bus interfaces
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Fredrik Noring <noring@nocrew.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1076322129.5263.28.camel@kalkyl.roxen.com>
+References: <1076265358.2670.36.camel@pegasus>
+	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
+	 <1076267396.2670.58.camel@pegasus>
+	 <1076275689.14742.93.camel@akka.yeti.nocrew.org>
+	 <1076277250.6869.24.camel@pegasus>
+	 <1076278554.14742.112.camel@akka.yeti.nocrew.org>
+	 <1076279508.6869.54.camel@pegasus>
+	 <1076280612.14742.147.camel@akka.yeti.nocrew.org>
+	 <1076282343.6869.65.camel@pegasus>
+	 <1076284317.14742.179.camel@akka.yeti.nocrew.org>
+	 <1076287085.6869.70.camel@pegasus>
+	 <1076311376.14742.202.camel@akka.yeti.nocrew.org>
+	 <1076321200.6869.75.camel@pegasus>
+	 <1076322129.5263.28.camel@kalkyl.roxen.com>
 Content-Type: text/plain
-Message-Id: <1076323204.5263.34.camel@kalkyl.roxen.com>
+Message-Id: <1076323138.6869.93.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] hcid hotplug initialisation?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,18 +31,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 09 Feb 2004 11:40:04 +0100
+Date: Mon, 09 Feb 2004 11:38:59 +0100
 
-Hi
+Hi Fredrik,
 
-Regarding hcid initilisation, what about having the hotplug stuff
-starting hcid instead of /etc/init.d/hcid? 
+> > this actually depends on what you provide. The httpd provides the
+> > implementation of the HTTP. We will provide a general and extend
+> > interface to the HCI functions, so we call it "hci". The hcid is the
+> > implementation of these functions on the server side.
+> 
+> For example saving/loading the hcid configuration file (hcid.conf) isn't 
+> about HCI functions, is it? To include such out-of-HCI-scope functions, 
+> hcid should probably export interfaces beyond the HCI space:
 
-That way hcid can be installed without using cpu/memory resources
-and it will work automatically when a user inserts some Bluetooth
-device.
+I don't wanna support this. The hcid.conf file is a configuration file
+for a default configuration and don't needs to read or stored through
+the D-Bus interface. All modifications done through the D-Bus must be
+stored in another file/database.
 
-Fredrik
+The goal is to have an interface that can be used by Gnome, KDE etc.
+without any proper knowledge of the running implementations and its
+configuration files. So this is not about hcid, this is about what do
+the UI applications need.
+
+> Can I ask you to provide a list of all the standard HCI functions? Is
+> the syntax/parameters/semantics defined so that exactly one HCI interface
+> implementation makes sense?
+
+The HCI is well defined in the Bluetooth specification and you can of
+course look at libs2. The source contains all defined HCI commands and
+events for Bluetoth 1.2.
+
+Regards
+
+Marcel
 
 
 
