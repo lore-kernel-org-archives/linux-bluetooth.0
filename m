@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41A6F09C.5000801@parrot.fr>
-From: Sebastien HENRIO <sebastien.henrio@parrot.fr>
+Message-ID: <41A6EA08.7050904@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] a2play and Toshiba SR-1 Bluetooth Headset
-References: <20041125091124.GA19805@snoopy.src.ricoh.co.jp>	 <20041125112509.75347786.henryk@ploetzli.ch>	 <20041125105615.GA19821@snoopy.src.ricoh.co.jp>	 <1101440449.6465.64.camel@pegasus>	 <20041126045659.6a3291f5.henryk@ploetzli.ch> <1101442380.6465.77.camel@pegasus>
-In-Reply-To: <1101442380.6465.77.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+References: <20041125091124.GA19805@snoopy.src.ricoh.co.jp> <20041125112509.75347786.henryk@ploetzli.ch> <20041125105615.GA19821@snoopy.src.ricoh.co.jp> <1101440449.6465.64.camel@pegasus> <20041126041158.GF27879@snoopy.src.ricoh.co.jp>
+In-Reply-To: <20041126041158.GF27879@snoopy.src.ricoh.co.jp>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,42 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Nov 2004 10:00:12 +0100
+Date: Fri, 26 Nov 2004 01:32:08 -0700
 
-Hi,
+Alain
 
-Marcel Holtmann wrote:
-> Hi Henryk,
->=20
->=20
->>>For me it is not clear if we have to set them, ignore them or what to
->>>do with them. Do we have to insert the content protection header in
->>>the media payload if these capability is present?
->>
->>Obviously we may only insert the content protection header if we reques=
-t
->>content protection during set configuration. However, I don't remember
->>any document requiring us to do that. I think Content protection is
->>completely optional and we would only use that if we were a paranoid
->>Sony device that believed everybody else on the planet was after us to
->>steal our music.
->=20
->=20
-> actually for me it is not clear if we have to insert that header (even
-> with no content protection information) when the capabilities shows tha=
-t
-> record. Maybe I missed something in the specification.
+>>You can try to hack the a2play.c to use SEID 3 instead of 1 and see what
+>>the audio sink on SEID 3 offers you. Run the hcidump 1.15.
 
-In fact you have to insert the content protection header only if you=20
-want to use it.
+a2play.c from cvs should detect the additional seid values and skip 
+those that aren't audio media type and sbc codec type. i'm not sure if i 
+should be checking to make sure the seid is an audio sink but it is past 
+my bedtime... :)
 
-This capablity is optional, so you can skip it during the stream=20
-configuration process.
-
-Best Regards
-S=E9bastien
-
-
+brad
 
 
 -------------------------------------------------------
