@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Shell script during bluetooth connection
+Subject: Re: [Bluez-users] problems with rfcomm
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Lalith Chakravarthi <lalithvc@yahoo.com>
-Cc: bluez-users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040311045957.47445.qmail@web40703.mail.yahoo.com>
-References: <20040311045957.47445.qmail@web40703.mail.yahoo.com>
+To: Alvaro Navarro <anavarro@gsyc.escet.urjc.es>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <20040310171621.GB23570@gsyc.escet.urjc.es>
+References: <20040310171621.GB23570@gsyc.escet.urjc.es>
 Content-Type: text/plain
-Message-Id: <1079087680.738.15.camel@merlin>
+Message-Id: <1079087504.738.10.camel@merlin>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,17 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 12 Mar 2004 11:34:41 +0100
+Date: Fri, 12 Mar 2004 11:31:45 +0100
 
-Hi Lalith,
+Hi Alvaro,
 
-> When is the script /etc/hotplug/net.agent called? Is it when the USB
-> Dongle is plugged in??? Or is it when another USB device comes within
-> the range (I cant think of a way that this can happen without a
-> connexion)... or is it when a bluetooth connection is established??
+> When I try to use rfcomm utility I get:
+> 
+> Can't get device list: Operation not supported
 
-the net.agent is called when the new bnep0 (or any other network
-interface) is created or released.
+you have to compile in the RFCOMM TTY support.
 
 Regards
 
