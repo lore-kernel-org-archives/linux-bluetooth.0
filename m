@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] rfcomm socket and rfcomm tty
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41D3600B.8000702@avantwave.com>
-References: <41D12158.6020206@avantwave.com>
-	 <1104315958.6319.13.camel@notepaq>  <41D3600B.8000702@avantwave.com>
-Content-Type: text/plain
-Message-Id: <1104604967.4253.4.camel@pegasus>
+Message-ID: <BAY12-F23AB83A4A7F029ACE4AC76AB9E0@phx.gbl>
+From: "Pegasus ..." <uwpegasus@hotmail.com>
+To: bluez-devel@lists.sourceforge.net
+Cc: uwpegasus@hotmail.com
 Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Subject: [Bluez-devel] Continuous Inquiry
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,21 +17,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 01 Jan 2005 19:42:47 +0100
+Date: Sat, 01 Jan 2005 08:02:28 +0000
 
-Hi Mike,
+Hi All:
 
->     Here come to a question , i am wrting a socket rfcomm program and 
-> try to use it connect to a bluetooth rfcomm channel by bluez-util rfcomm 
-> listen from two different computer.
+My program is running a thread with continuos hci_inquiry(). I need to know 
+when a new device is discovered in the middle of the inquiry. How do I do 
+this?
 
-this makes no sense. Either you use rfcomm or you deal with the RFCOMM
-socket in your own program. Both things at the same time are not
-possible. Post more details about your program.
+The hcidump seems to show a lot of Inquiry Result event and the Remote Name 
+Request for the devices found at the end of the Inquiry.
 
-Regards
 
-Marcel
+Thanks a lot.... and have a Happy New Year.
+
+Keshav
 
 
 
