@@ -1,46 +1,47 @@
-Return-Path: <echtler@fs.tum.de>
-Date: Sun, 24 Oct 2004 18:34:26 +0200 (CEST)
-From: Florian Echtler <echtler@fs.tum.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Disabling HID Boot Protocol
-In-Reply-To: <1098618588.6465.5.camel@pegasus>
-Message-ID: <Pine.LNX.4.61.0410241829170.12604@block.bubble>
-References: <Pine.LNX.4.61.0410241307180.7693@block.bubble>
- <1098618588.6465.5.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1098629993.6465.37.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-users] Linux-Kernel for TomTom-Go
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sun, 24 Oct 2004 16:59:53 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Folks,
 
-> > I'm using a MS Bluetooth Optical Desktop and would like to
-> > use the hotkeys again. I have kernel 2.6.8.1-mh1 and bluez-utils
-> > 2.10.. According to the mailing list archives, this version of 
-> > hidp.ko should already support report mode, however, I couldn't
-> > find any description on how to enable it. I suppose it's necessary
-> > to pass the correct "-b <subclass>" parameter to hidd?
-> the subclass parameter is only for overriding the value if the SDP
-> records are wrong. Check with hidd and if it tells you something about
-> boot mode then you are in boot mode, otherwise it uses report mode
-> automaticly. So what does "hidd --show" say?
+as the German Heise newsticker reported today, the TomTom-Go device uses
+Linux and they put their modifications as required by GPL for download:
 
-[root@block:~][0] $ hidd --show
-00:50:F2:7E:DF:AE Microsoft Five Button Mouse [045e:007c] connected 
-00:50:F2:80:47:83 Microsoft Bluetooth keyboard [045e:007b] connected 
-[root@block:~][0] $ 
+	http://www.tomtom.com/page.php?Page=gpl
 
-However, still no reaction from the multimedia keys, at least none
-in hcidump. Perhaps I should try 2.6.9-mh1?
+If you look at the ttlinux194.patch.gz file you will find one of my -mh
+patches for 2.4.18 kernel in there. I think these devices don't have any
+Bluetooth chip in it, but it is somekind funny that they care about an
+up to date Bluetooth subsystem ;)
 
-Yours, Florian
-- -- 
-Homo homini lupus.
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
+Regards
 
-iD8DBQFBe9mW7CzyshGvatgRAsnvAKComCd+EGpK3YRTCAPsn5+sxkeqJwCgiLDE
-0hxcmtAPslHkYKjqF6vKS6I=
-=jXGa
------END PGP SIGNATURE-----
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
