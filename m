@@ -1,11 +1,25 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <004501c4749c$9958f280$5000005a@naxus>
-From: "Carlos AM" <Carlos@naxus.biz>
-To: "lista bluez" <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] modify RFCOMM_DISC_TIMEOUT
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0032_01C474AC.DED6EA00"
+Subject: Re: [Bluez-devel] HIDP backport for 2.4
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Michael Frey <mfrey@pepper.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <A9BDE398-DFDF-11D8-BE76-00039390D626@pepper.com>
+References: <1090054739.4558.2.camel@pegasus>
+	 <1090759952.4791.91.camel@pegasus>
+	 <9A44A69C-DF28-11D8-B83A-00039390D626@pepper.com>
+	 <1090864026.29589.1.camel@pegasus>
+	 <5F07F140-DF2E-11D8-B83A-00039390D626@pepper.com>
+	 <1090865790.29589.5.camel@pegasus>
+	 <76F28965-DF34-11D8-B83A-00039390D626@pepper.com>
+	 <1090875679.10807.1.camel@pegasus>
+	 <4B8C0D08-DF64-11D8-95A4-003065B218E0@pepper.com>
+	 <1090916301.4650.9.camel@pegasus>
+	 <ABD9E52C-DFDC-11D8-BE76-00039390D626@pepper.com>
+	 <1090940516.4845.19.camel@pegasus>
+	 <A9BDE398-DFDF-11D8-BE76-00039390D626@pepper.com>
+Content-Type: text/plain
+Message-Id: <1090941847.4845.29.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,192 +30,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 28 Jul 2004 14:12:09 +0200
+Date: Tue, 27 Jul 2004 17:24:07 +0200
 
-This is a multi-part message in MIME format.
+Hi Michael,
 
-------=_NextPart_000_0032_01C474AC.DED6EA00
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+> root@(none):/usr/bin# hcitool inq
+> Inquiring ...
+>          00:02:72:40:8A:97       clock offset: 0x4a58    class: 0x002540
 
-Hi Marcel
+the subclass value is 0x40 which means that this is only a keyboard. The
+problem can be that they really only support the keyboard in boot mode
+or that they simply set the subclass value wrong. If the kernel things
+that this is only a keyboard it don't creates a mouse device. Try this
+patch for the hidd to tell the kernel it is also a mouse:
 
-I think that i've finally found the origin of the errors. The kernel log
-shows:
+RCS file: /cvsroot/bluez/utils/hidd/sdp.c,v
+retrieving revision 1.4
+diff -u -r1.4 sdp.c
+--- hidd/sdp.c  4 Jul 2004 15:41:53 -0000       1.4
++++ hidd/sdp.c  27 Jul 2004 15:17:34 -0000
+@@ -126,6 +126,7 @@
+ 
+        pdlist = sdp_data_get(rec, 0x0202);
+        req->subclass = pdlist ? pdlist->val.uint8 : 0;
++       req->subclass = 0x40 | 0x80;
+ 
+        pdlist = sdp_data_get(rec, 0x0203);
+        req->country = pdlist ? pdlist->val.uint8 : 0;
 
-(...)
-<4> Unknown HCI packet type 01
-(...)
+To check what is really going on run "hcidump -x" as root and use the
+mouse.
 
+Do you ever checked if 2.6.7-mh2 is working for you?
 
-This message is dropped every five minutes (aproximately) and the packet
-type is not always 01. It seems that the serial communication (UART) =
-with
-the bluetooth module (EYMF2CAMM from TAIYO YUDEN) isn't very confiable. =
-Do
-you agree?
+> The website is http://www.bluelogic.co.kr/main_eng.php
 
-I used to attach the hci device using this command:
-/bluez/bluezmain hciattach -n /dev/tts/2 any 115200
-and always works.
+Will anyone buy one of these for me so I get one for testing?
 
-Then I configured the kernel with BCSP support and tried to attach the
-device using:
-/bluez/bluezmain hciattach -n /dev/tts/2 bcsp 115200
-/bluez/bluezmain hciattach -n /dev/tts/2 swave 115200
+Regards
 
-but none of them work at all. The error message is [hcid] Can't init =
-device
-hci0. Connection timed out(110)
+Marcel
 
-What do you think about it?
-
-
-Thanks for your interest.
-Best Regards
-CarlosAM
-
-
-
-
-
-
-
-
------ Original Message -----
-From: "Marcel Holtmann" <marcel@holtmann.org>
-To: "Carlos AM" <Carlos@naxus.biz>
-Cc: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-Sent: Friday, July 23, 2004 11:39 AM
-Subject: Re: [Bluez-devel] modify RFCOMM_DISC_TIMEOU
-
-> Hi Carlos,
->
-> > I run a rfcomm server built on top of bluez using sockets, the =
-client
-runs a
-> > different bluetooth protocol implementation that is very buggy and
-sometimes
-> > stops the rfcomm comunication without sending a DISC. So the rfcomm
-server
-> > waits for 20 seconds (RFCOMM_DISC_TIMEOUT) and then closes the
-connections
-> > and become available again. The sending loop of the server is:
-> >
-> > //using sockets
-> > //send until write returns -1
-> >  while(n>=3D0)
-> >  {
-> >     n=3Dwrite(client,s,strlen(s));
-> >     sleep(1);
-> >  }
-> > //go to listen again
-> >
-> >
-> > If the client simply stops the communication, not disconnect, the =
-server
-> > must be available as soon as possible. 20 seconds it's too long for =
-our
-> > application.
->
-> what you want is an idle timeout detection. The RFCOMM_DISC_TIMEOUT is
-> not meant for doing this. Show us the output of "hcidump -x -t" while
-> this happens.
->
-> Regards
->
-> Marcel
->
->
-
-Carlos AM
-Naxus Conectividad M=F3vil
-------=_NextPart_000_0032_01C474AC.DED6EA00
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1106" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2><FONT face=3D"Times New Roman" =
-size=3D3>Hi=20
-Marcel<BR><BR>I think that i've finally found the origin of the errors. =
-The=20
-kernel log<BR>shows:<BR><BR>(...)<BR>&lt;4&gt; Unknown HCI packet type=20
-01<BR>(...)<BR><BR><BR>This message is dropped every five minutes =
-(aproximately)=20
-and the packet<BR>type is not always 01. It seems that the serial =
-communication=20
-(UART) with<BR>the bluetooth module (EYMF2CAMM from TAIYO YUDEN) isn't =
-very=20
-confiable. Do<BR>you agree?<BR><BR>I used to attach the hci device using =
-this=20
-command:<BR>/bluez/bluezmain hciattach -n /dev/tts/2 any 115200<BR>and =
-always=20
-works.<BR><BR>Then I configured the kernel with BCSP support and tried =
-to attach=20
-the<BR>device using:<BR>/bluez/bluezmain hciattach -n /dev/tts/2 bcsp=20
-115200<BR>/bluez/bluezmain hciattach -n /dev/tts/2 swave =
-115200<BR><BR>but none=20
-of them work at all. The error message is [hcid] Can't init =
-device<BR>hci0.=20
-Connection timed out(110)<BR><BR>What do you think about =
-it?<BR><BR><BR>Thanks=20
-for your interest.<BR>Best=20
-Regards<BR>CarlosAM<BR><BR><BR><BR><BR><BR><BR><BR><BR>----- Original =
-Message=20
------<BR>From: "Marcel Holtmann" &lt;</FONT><A=20
-href=3D"mailto:marcel@holtmann.org"><FONT face=3D"Times New Roman"=20
-size=3D3>marcel@holtmann.org</FONT></A><FONT face=3D"Times New Roman"=20
-size=3D3>&gt;<BR>To: "Carlos AM" &lt;</FONT><A=20
-href=3D"mailto:Carlos@naxus.biz"><FONT face=3D"Times New Roman"=20
-size=3D3>Carlos@naxus.biz</FONT></A><FONT face=3D"Times New Roman"=20
-size=3D3>&gt;<BR>Cc: "BlueZ Mailing List" &lt;</FONT><A=20
-href=3D"mailto:bluez-devel@lists.sourceforge.net"><FONT face=3D"Times =
-New Roman"=20
-size=3D3>bluez-devel@lists.sourceforge.net</FONT></A><FONT face=3D"Times =
-New Roman"=20
-size=3D3>&gt;<BR>Sent: Friday, July 23, 2004 11:39 AM<BR>Subject: Re:=20
-[Bluez-devel] modify RFCOMM_DISC_TIMEOU<BR><BR>&gt; Hi =
-Carlos,<BR>&gt;<BR>&gt;=20
-&gt; I run a rfcomm server built on top of bluez using sockets, the=20
-client<BR>runs a<BR>&gt; &gt; different bluetooth protocol =
-implementation that=20
-is very buggy and<BR>sometimes<BR>&gt; &gt; stops the rfcomm =
-comunication=20
-without sending a DISC. So the rfcomm<BR>server<BR>&gt; &gt; waits for =
-20=20
-seconds (RFCOMM_DISC_TIMEOUT) and then closes the<BR>connections<BR>&gt; =
-&gt;=20
-and become available again. The sending loop of the server is:<BR>&gt;=20
-&gt;<BR>&gt; &gt; //using sockets<BR>&gt; &gt; //send until write =
-returns=20
--1<BR>&gt; &gt;&nbsp; while(n&gt;=3D0)<BR>&gt; &gt;&nbsp; {<BR>&gt;=20
-&gt;&nbsp;&nbsp;&nbsp;&nbsp; n=3Dwrite(client,s,strlen(s));<BR>&gt;=20
-&gt;&nbsp;&nbsp;&nbsp;&nbsp; sleep(1);<BR>&gt; &gt;&nbsp; }<BR>&gt; &gt; =
-//go to=20
-listen again<BR>&gt; &gt;<BR>&gt; &gt;<BR>&gt; &gt; If the client simply =
-stops=20
-the communication, not disconnect, the server<BR>&gt; &gt; must be =
-available as=20
-soon as possible. 20 seconds it's too long for our<BR>&gt; &gt;=20
-application.<BR>&gt;<BR>&gt; what you want is an idle timeout detection. =
-The=20
-RFCOMM_DISC_TIMEOUT is<BR>&gt; not meant for doing this. Show us the =
-output of=20
-"hcidump -x -t" while<BR>&gt; this happens.<BR>&gt;<BR>&gt;=20
-Regards<BR>&gt;<BR>&gt; Marcel<BR>&gt;<BR>&gt;</FONT><BR></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Carlos AM<BR>Naxus Conectividad=20
-M=F3vil</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0032_01C474AC.DED6EA00--
 
 
 
