@@ -1,13 +1,20 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <d1f423d3050329103355c4215a@mail.gmail.com>
-From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] HCIDump Usage
-In-Reply-To: <1112109452.9016.71.camel@pegasus>
+Subject: Re: [Bluez-users] bluez and billionton pcbtc1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <b5c638dc0503290934170df12@mail.gmail.com>
+References: <b5c638dc05032815321b2739c5@mail.gmail.com>
+	 <1112075117.9016.60.camel@pegasus>
+	 <b5c638dc05032907582bf771dc@mail.gmail.com>
+	 <1112114217.9016.92.camel@pegasus>
+	 <b5c638dc050329084145c6fecd@mail.gmail.com>
+	 <1112114986.9016.94.camel@pegasus>
+	 <b5c638dc05032908584e207be8@mail.gmail.com>
+	 <b5c638dc05032909155d940a3c@mail.gmail.com>
+	 <b5c638dc0503290934170df12@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1112117903.9016.103.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <d1f423d305032907072dc78400@mail.gmail.com>
-	 <1112109452.9016.71.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,54 +26,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Mar 2005 13:33:06 -0500
+Date: Tue, 29 Mar 2005 19:38:23 +0200
 
-Hi Marcel,
+Hi David,
 
-
-Well, I know that the standard has many error handlers between the
-layers, but of course error might occurr and I am really insterested
-to log when they happen. would you suggest a way that i could log them
-?
-
-My interest on it is only for academic reasons.
-
-
-Thanks for any help
-
-
-On Tue, 29 Mar 2005 17:17:32 +0200, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Anderson,
+> ok sorry for the update.. i ran this command
 > 
-> > I am really newbie on using HCIDump and I would like to know if it is
-> > possible that i could use to extract information like:
-> > 1) package losses
-> > 2) package errors
-> >
-> > Forgive me if this message is a little out of topic.
+> hciattach ttyS14 any 16550
 > 
-> the answer is a simple no, because the underlaying ACL link is reliable.
-> 
-> Regards
-> 
-> Marcel
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+> (From the above hints you gave me :) ) and something happenned in dmesg.. 
+
+the command can't be right, because 16550 is not a valid baud rate. It
+is the UART type. Use 115200 as baud rate. You have to play with it and
+see if it works.
+
+Start "hcid" as root and check with "hciconfig" if you see the Bluetooth
+device address. If yes, then your card is working.
+
+> i think it's working .. gnome-bluetooth manager still gives me the
+> gconf error . and gnome authentication error (no ideas.. and nobody
+> has been able to answer me on what that error is.. plus a google
+> search didn't pull anything up"
+
+This is the wrong mailing list for a Gnome-Bluetooth questions.
+
+Regards
+
+Marcel
 
 
--- 
-Anderson Clayton B. Rodrigues
-Eng. de Software
-Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
