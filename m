@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3F17E4EF.5060401@superbug.demon.co.uk>
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
-MIME-Version: 1.0
-To: bluez Dev <bluez-devel@lists.sourceforge.net>
-References: <E19a5DI-0002jL-00@sc8-sf-list2.sourceforge.net>
-	<3F1752C5.5020701@dsto.defence.gov.au>
-In-Reply-To: <3F1752C5.5020701@dsto.defence.gov.au>
-Subject: [Bluez-devel] Re: Bluetooth headset with Bluetooth usb dongle
-	status.
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Max Krasnyansky <maxk@qualcomm.com>
+Cc: Stephen Crane <steve.crane@rococosoft.com>, Philip Blundell <pb@nexus.co.uk>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <5.1.0.14.2.20030717163326.07385478@unixmail.qualcomm.com>
+References: <5.1.0.14.2.20030630170200.0e4c3e28@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030630170200.0e4c3e28@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030717163326.07385478@unixmail.qualcomm.com>
+Message-Id: <1058489472.31052.134.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: Version 3 libs/utils
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -20,133 +21,81 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 18 Jul 2003 13:15:43 +0100
-Content-Type: text/plain; CHARSET=us-ascii; FORMAT=flowed
+Date: 18 Jul 2003 02:51:05 +0200
+Content-Type: text/plain
 
-I would like to discuss possible changes in the sco to hci-usb layer 
-api. I would like people to agree the changes before I go ahead and code 
-them. I don't have exact function names etc. yet, but just a general 
-idea of what one needs to do in order to implement an alsa interface to 
-bluez.
+Hi Max,
 
-There are a number of problems with the current usb-hci.c driver.
-I have a dirty fix for sound recording, but playback will need a lot of 
-work.
-If you want recording to work, just put in a for loop round the
-"static int hci_usb_isoc_rx_submit(struct hci_usb *husb)" function to 
-make it execute twice. See "e.g." below.
+> >I already started to implement the missing HCI defines and functions.
+> >And we should clean this up and check the ordering. With Bluetooth 1.2
+> >we will get some more.
+> >
+> >The "timeout" parameter is not needed by many functions. Kill it and use
+> >some global timeout settings. But functions like the name resolv need a
+> >bigger timeout, so we must take care of this.
+> >
+> >The inquiry must be rewritten to take care of Bluetooth devices that
+> >report BDADDR more than once.
+> Sounds good. Let's keep timeout for hci_send_req().
 
-It is a very dirty fix, because I don't think that everything gets freed 
-when not in use, but at least it records sound at the correct speed.
+yes of course. The general functions should keep the timeout parameter.
 
-The playback problem is a scheduling problem.
-The "hci_usb_tx_complete" function uses the scheduler to kick off the 
-next transmission, but the scheduler is too slow, and the correct method 
-to use is getting the "hci_usb_tx_complete" function to retrieve the 
-next packet to send from a ring buffer, and send it immeadiately during 
-the "hci_usb_tx_complete" function. This is how the current usbaudio.c 
-does it, so it proves that this method will work.
-So, I will need to implement a ring buffer.
-At the same time I want to implement sound output via alsa, so I want to 
-make sure we have a good api to achieve that.
-alsa requires certain information from the sound card (ring buffer 
-position etc.), and I will have to make sure that the information alsa 
-needs in available, by maybe adding new api calls through the sco layer 
-to the usb-hci.c layer. I think it would be a good idea to completely 
-separate the isoc(sound) urb path from the int/bulk/control urb path.
-We also have the added complication that the alsa ring buffer is 
-composed of just sound samples, but the sco layer converts that to 
-packets with a header so the hci-usb.c layer has to deal with packets 
-instead of samples.
-For 8 bit mono sound, SCO creates packets with 3 header bytes, and 24 
-sound samples. hci-usb.c then has to take each 27 byte packet and cut it 
-down into 3 slices each 9 bytes in length. All packet sizes and slice 
-sizes vary depending on 8/16 bits samples, and mono/stereo etc.
+> >One clean /etc/init.d/bluetooth, because I don't like the current way of
+> >multiple init scripts which are used by the Debian packages.
+> /etc/init.d/bluetooth is not enough. We have to have /etc/hotplug/bluetooth.agent 
+> for hotplug. And it has to read configuration options like devices settings, etc.
+> That stuff will be stored in /etc/sysconfig/bluetooth.
 
-So, there is going to be quite a lot of manipulation of the sound 
-samples as they pass from alsa to the bluetooth device.
-The questions I am still trying to decide are: -
-1) When should the conversion from alsa ring buffer to packets take 
-place. So far the only workable solution I have come up with is that the
-"hci_usb_tx_complete" makes a callback all the way to the sco layer, and 
-the sco layer grabs 24 bytes form the alsa ring buffer, adds it's header 
-and returns from the callback.
-2) interface to alsa. I think this should happen just above the SCO 
-layer, but also ensuring that the SCO layer has enought api links with 
-the hci-usb.c layer to be able to service all the alsa-driver api 
-requirements.
-3) Once that all works, modify the other low level hardware drivers to 
-work with it. e.g. bluecard_cs.c etc.
+You are right with that, but this was not what I meant. There should be
+only one /etc/init.d/bluetooth startup script (not many like in the
+Debian packages). This script should read the basic options from
+/etc/sysconfig/bluetoth (RedHat) or /etc/default/bluetooth (Debian) and
+get some extra options from /etc/bluetooth/. This is for general
+startup. Each device specific stuff must be done with bluetooth.agent
+script.
 
-The final result will be: -
-1) a small tool that will link a particular paired bluetooth device to a 
-particular PCM device for alsa to work with. This tool will basically 
-just take destination BTADDR and channel number to use, because alsa 
-will have no knowledge of that sort of info. It will add a new sound 
-card instance for each bluetooth device.
-2) alsa will just think that the bluetooth headset is a normal soundcard.
-3) This would make integration with current audio applications simple, 
-because alsa supports the alsa-api as well as emulate the oss-api, so 
-current audio applications would need no changes.
-4) We could even implement headset "in the vicinity" detection, so that 
-when the headset transitioned from out of range to in range, your 
-computer could say hello!
+> >What about a Bluetooth daemon (for exmaple btmgr) which integrates the
+> >security manager and the sdpd. It can also store an userspace Bluetooth
+> >inquiry cache, name database and remote SDP cache. The local
+> >configuration (like local device name) for example can also modified
+> >through this daemon and restored on next boot, which is good for
+> >handheld devices. The access can be done through a defined protocol over
+> >unix sockets.
+> In general I don't like a 'kitchen sink' approach. Security manager, device names, etc
+> is fine. But SDP is unrelated service. I'd keep SDP separate. 
 
-Cheers
-James
+The SDP server is needed in most cases (see my other post). Why do not
+make it smart and integrate it. We need to keep track of different
+Bluetooth adapters attached to one host, so if we have one daemon, the
+SDP server can profite from a general approach.
 
-e.g.
-static int hci_usb_isoc_rx_submit(struct hci_usb *husb)
-{
-         struct _urb *_urb;
-         struct urb *urb;
-         int err, mtu, size;
-         void *buf;
-         int n;
-         for(n=0;n<2;n++) {
-         mtu  = husb->isoc_in_ep->wMaxPacketSize;
-         BT_INFO("isoc_rx_submit: mtu=%d", mtu);
-         size = mtu * HCI_MAX_ISOC_FRAMES;
+This idea is not completly designed, but it makes sense to me, because
+in the long term, we can't live without SDP.
 
-         buf = kmalloc(size, GFP_ATOMIC);
-         if (!buf)
-                 return -ENOMEM;
+> Also I don't see a need for user space inquiry cache. I guess you mean name database or
+> something.
 
-         _urb = _urb_alloc(HCI_MAX_ISOC_FRAMES, GFP_ATOMIC);
-         if (!_urb) {
-                 kfree(buf);
-                 return -ENOMEM;
-         }
-         _urb->type = HCI_SCODATA_PKT;
-         _urb_queue_tail(__pending_q(husb, _urb->type), _urb);
+I meant inquiry cache in a little bit wider range. It should store
+device specific information, but also the inquiry results. I think it is
+a good idea, that the library also have access to the inquiry results,
+because name resolves can be much faster if you fill in the paramters
+from an inquiry (even if the clock drifts).
 
-         urb = &_urb->urb;
+> >I think we should have one tool (for example btconfig) which is staticly
+> >linked with the Bluetooth library and can do all the configuration
+> >stuff. This includes HCI, RFCOMM, BNEP etc. and such a tool should be
+> >used by the bluetooth.agent and can be placed in an initrd.
+> NO NO NO :-). We're going to have separate tools. hciconfig for example
+> needs to be separate from rfcomm and pand. There is no questions about that. 
+> If you absolutely need a single binary we could use Busybox way of combining
+> things into a single binary.
 
-         urb->context  = husb;
-         urb->dev      = husb->udev;
-         urb->pipe     = usb_rcvisocpipe(husb->udev, 
-husb->isoc_in_ep->bEndpointAddress);
-         urb->complete = hci_usb_rx_sync_complete;
+We will never agree on this point :)
 
-         urb->transfer_buffer_length = size;
-         urb->transfer_buffer = buf;
-         urb->transfer_flags  = USB_ISO_ASAP;
+Regards
 
-         __fill_isoc_desc(urb, size, mtu);
-         BT_DBG("%s urb %p", husb->hdev.name, urb);
+Marcel
 
-         err = usb_submit_urb(urb);
-         if (err) {
-                 BT_ERR("%s isoc rx submit failed urb %p err %d",
-                                 husb->hdev.name, urb, err);
-                 _urb_unlink(_urb);
-                 _urb_free(_urb);
-                 kfree(buf);
-         }
-         } /* End for loop */
-         return err;
-}
-#endif
 
 
 
