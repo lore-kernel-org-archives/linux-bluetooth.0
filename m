@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] unresolved symbol __do_softirq
-From: Marcel Holtmann <marcel@holtmann.org>
-To: jens.carroll@carroll.de
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3FFD4845.3090206@carroll.de>
-References: <3FFD4845.3090206@carroll.de>
-Content-Type: text/plain
-Message-Id: <1073582997.2563.14.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <3FFD826F.5080808@hotmail.com>
+From: Christian Hennrich <tettokalle@hotmail.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] problems with connect()
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,29 +15,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 08 Jan 2004 18:29:57 +0100
+Date: Thu, 08 Jan 2004 17:16:47 +0100
 
-Hi Jens,
+Hi,
 
-> I have a problem integrating bluez into a cross complied kernel version
-> 2.4.20. The target is a arm7tdmi and I used the latest patch for that
-> kernel. The kernel compilation (bluez as modules) works fine and does
-> not report any errors. However when I want to insmod the bluez.o I get:
-> 
-> Using bluez.o
-> insmod: unresolved symbol __do_softirq
-> 
-> Well, I am not even sure it is a bluez or a kernel problem. The symbol
-> __do_softirq is not exported (checked with "cat ksyms | grep __do_softirq").
+I'm working on a programm which uses sdp to connect only to PANU, 
+creating l2cap and bnep connections. First i start the master, that 
+inquires and then connects to the discovered devices (using sdp), that 
+are started as slaves. 2 slaves are connected(with one L2cap and one 
+Bnep for each slave). this works very fine. then i want to connect the 
+third and so on... but there is the problem: the third one can't connect 
+   with sdp on or off. the connect(socket) command fails with the error:
 
-I am no ARM expert so I can't help you, but from a quick search through
-the kernel source I saw the __do_softirq is specific for the ARM arch.
-Try to post this on an ARM mailing list.
+Connect failed. Function not implemented(38).
 
-Regards
+on the slave machine is only one program started. i tried around with 
+different dongles, but they are not the problem. what is wrong? has 
+anybody some idea? i don't use fork. the sockets that are created(have 
+all different numbers(increasing)). is there any limitation of creating 
+sockets or something like this.
 
-Marcel
+i think the problem is the master, because on the clients there are only 
+2 sockets created. i only have one dongle per pc.
 
+regards Christian
 
 
 
