@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: James Cameron <james.cameron@hp.com>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Service level security for RFCOMM
-From: Marcel Holtmann <marcel@holtmann.org>
-To: James Cameron <james.cameron@hp.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20041029044627.GI7454@hp.com>
+Message-ID: <20041029044627.GI7454@hp.com>
 References: <1099024935.10164.11.camel@pegasus>
-	 <20041029044627.GI7454@hp.com>
-Content-Type: text/plain
-Message-Id: <1099025758.10164.16.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1099024935.10164.11.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,22 +17,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Oct 2004 06:55:58 +0200
+Date: Fri, 29 Oct 2004 14:46:27 +1000
 
-Hi James,
+I'm afraid I don't understand the issues enough to know if I need the
+feature.
 
-> I'm afraid I don't understand the issues enough to know if I need the
-> feature.
-
-at the moment you can trigger authentication and encryption for server
-sockets on a per PSM basis for the L2CAP. If you use RFCOMM you can't
-trigger this and especially not per RFCOMM channel.
-
-Regards
-
-Marcel
-
-
+-- 
+James Cameron                         http://quozl.netrek.org/
+HP Open Source, Volunteer             http://opensource.hp.com/
+PPTP Client Project, Release Engineer http://pptpclient.sourceforge.net/
 
 
 -------------------------------------------------------
