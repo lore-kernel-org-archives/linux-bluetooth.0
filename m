@@ -1,16 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?iso-8859-1?Q?S=E9bastien?= Delneste <seb@goodidea.be>
-To: =?iso-8859-1?Q?S=E9bastien?= Delneste <seb@goodidea.be>
-Cc: Thomas Chiverton <thomas.chiverton@bluefinger.com>,
-   bluez-users@lists.sourceforge.net, edd@usefulinc.com, clehman@aircell.com,
-   noli.sicad@csiro.au, s.contini@oltrelinux.com
-Subject: Re: [Bluez-users] problem with Dlink DBT-120b-ohci               16192   0  (unused)
-Message-ID: <20040310170446.GA19736@pong.be>
-Reply-To: =?iso-8859-1?Q?S=E9bastien?= Delneste <seb@goodidea.be>
-References: <200403101117.48316.thomas.chiverton@bluefinger.com> <20040310112757.GA15883@pong.be>
+From: Martin van Vliet <martin.van.vliet@quantiq.com>
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain
+Message-Id: <1078934232.26029.3.camel@rainier>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20040310112757.GA15883@pong.be>
+Subject: [Bluez-users] Connecting to MIDP using RFCOMM
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,85 +15,82 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 10 Mar 2004 18:04:46 +0100
+Date: Wed, 10 Mar 2004 16:57:12 +0100
 
-Has anyone any more info about the Dlink DBT120 ?
+Hello,
 
-On Wed, Mar 10, 2004 at 12:27:57PM +0100, Sébastien Delneste wrote:
-> On Wed, Mar 10, 2004 at 11:17:48AM +0000, Thomas Chiverton wrote:
-> > On Wednesday 10 Mar 2004 10:39 am, Sébastien Delneste wrote:
-> > > There is my problem :
-> > > hub.c: new USB device 00:03.2-2, assigned address 5
-> > > usb.c: USB device 5 (vend/prod 0xa5c/0x2033) is not claimed by any
-> > > active driver
-> > > But I have no idea how to make him understand which driver to use with
-> > > this device.
-> > 
-> > Does hciconfig show the device (I get your error message, but the device works 
-> > fine !) ?
-> Is your DBT120 a revision A1 ?
-> Which kernel do you run ?
-> No, hciconfig doesn't show any device...
-> > 
-> > You could also try insmod'ing each of the modules one by one.
-> 
-> I also have a mouse which uses hid and usb-ohci
-> 
-> Here is a list of the loaded drivers : 
-> Module                  Size  Used by 
-> hid                    13856   0  (unused)
-> usb-ohci               16192   0  (unused)
-> ehci-hcd               15072   0  (unused)
-> rfcomm                 27776   0 
-> l2cap                  14368   2  [rfcomm]
-> hci_usb                 6176   0  (unused)
-> sound                  53228   0  (unused)
-> bluez                  27392   2  [rfcomm l2cap hci_usb]
-> mousedev                3840   2 
-> input                   3296   0  [hid mousedev]
-> usbcore                55584   1  [hid usb-ohci ehci-hcd hci_usb]
-> 
-> Which modules are necessary to run this driver ?
-> 
-> Sébastien
-> 
-> 
-> > 
-> > -- 
-> > Tom Chiverton 
-> > Advanced ColdFusion Programmer
-> > 
-> > Tel: +44(0)1749 834997
-> > email: tom.chiverton@bluefinger.com
-> > BlueFinger Limited
-> > Underwood Business Park
-> > Wookey Hole Road, WELLS. BA5 1AF
-> > Tel: +44 (0)1749 834900
-> > Fax: +44 (0)1749 834901
-> > web: www.bluefinger.com
-> > Company Reg No: 4209395 Registered Office: 2 Temple Back East, Temple
-> > Quay, BRISTOL. BS1 6EG.
-> > *** This E-mail contains confidential information for the addressee
-> > only. If you are not the intended recipient, please notify us
-> > immediately. You should not use, disclose, distribute or copy this
-> > communication if received in error. No binding contract will result from
-> > this e-mail until such time as a written document is signed on behalf of
-> > the company. BlueFinger Limited cannot accept responsibility for the
-> > completeness or accuracy of this message as it has been transmitted over
-> > public networks.***
-> > 
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: IBM Linux Tutorials
-> Free Linux tutorial presented by Daniel Robbins, President and CEO of
-> GenToo technologies. Learn everything from fundamentals to system
-> administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+I am trying to get an application to work that communicates between a
+desktop
+and mobile phone using Bluetooth. The handheld is running a Java MIDP
+application that exposes a service. The desktop connects to the service
+to
+exchange data.
+
+I have this application working when using 2 mobile phones, but the part
+with
+the desktop is giving me problems. I am using a Fedora Core system and
+Bluez.
+The desktop is able to find the Java service on the mobile running on
+channel 4
+(but only when I specifically search for Serial Port services, ie.
+'sdptool
+search --bdaddr <address> SP'. If I browse the services on the phone it
+is not
+listed). To communicate I setup an RFCOMM connection to this channel and
+attempt
+to open it by doing a cat to the device. The following is the hcidump
+output of
+that process:
+
+$> rfcomm bind /dev/rfcomm0 <address> 4
+$> cat > /dev/rfcomm0
+
+< L2CAP(s): Connect req: psm 3 scid 0x0040
+> L2CAP(s): Connect rsp: dcid 0x0082 scid 0x0040 result 1 status 2
+> L2CAP(s): Connect rsp: dcid 0x0082 scid 0x0040 result 0 status 0
+< L2CAP(s): Config req: dcid 0x0082 flags 0x0000 clen 4
+  MTU 1024
+> L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 0
+< L2CAP(s): Config rsp: scid 0x0082 flags 0x0000 result 0 clen 0
+> L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 4
+  MTU 672
+< L2CAP(d): cid 0x82 len 4 [psm 3]
+    RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+> L2CAP(d): cid 0x40 len 4 [psm 3]
+    RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+< L2CAP(d): cid 0x82 len 14 [psm 3]
+    RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+    dlci 8 frame_type 0 credit_flow 15 pri 7 ack_timer 0 frame_size 667
+max_retrans 0 credits 7
+> L2CAP(d): cid 0x40 len 14 [psm 3]
+    RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+    dlci 8 frame_type 0 credit_flow 14 pri 7 ack_timer 0 frame_size 667
+max_retrans 0 credits 3
+< L2CAP(d): cid 0x82 len 4 [psm 3]
+    RFCOMM(s): SABM: cr 1 dlci 8 pf 1 ilen 0 fcs 0xc9
+> L2CAP(d): cid 0x40 len 4 [psm 3]
+    RFCOMM(s): DM: cr 1 dlci 8 pf 1 ilen 0 fcs 0xe3
+< L2CAP(d): cid 0x82 len 4 [psm 3]
+    RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< L2CAP(s): Disconn req: dcid 0x0082 scid 0x0040
+> L2CAP(d): cid 0x40 len 4 [psm 3]
+    RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> L2CAP(s): Disconn rsp: dcid 0x0082 scid 0x0040
+
+Somehow the mobile does not allow a connection on dlci 8. As I said, I
+am able
+to connect from another mobile. Also, using the above method to connect
+to
+channel 1 on the phone works -- I can give it AT commands using seyon.
+
+Has anyone tried this successfully before? Any ideas on what might be
+wrong?
+
+Thanks for any help!
+
+Martin van Vliet
+Amsterdam, the Netherlands
+
 
 
 -------------------------------------------------------
