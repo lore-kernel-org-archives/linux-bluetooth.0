@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Connection with
-	aphonestaysopenafterclosingRFCOMM channel
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1109952903.8058.72.camel@pegasus>
-References: <Pine.LNX.4.44.0503032110450.24841-100000@antilope>
-	 <1109952903.8058.72.camel@pegasus>
-Content-Type: multipart/mixed; boundary="=-UeLdBC2wVQgXcPuP1CR4"
-Message-Id: <1110390729.5462.21.camel@notepaq>
+From: soraberri <421246@posta.unizar.es>
+Message-ID: <d0meub$s51$1@sea.gmane.org>
+References: <d0ktcr$n2i$1@sea.gmane.org> <422E59A9.2040408@xmission.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <422E59A9.2040408@xmission.com>
+Subject: [Bluez-devel] Re: btsco and alsa driver interaction
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,59 +18,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 09 Mar 2005 18:52:09 +0100
+Date: Wed, 09 Mar 2005 10:17:15 +0100
+
+Hi
+
+many thanks Brad! I didn't think in the mixer before... now I think I 
+got it :O
+(by the way, I haven't forgotten about adding support in the audio 
+gateway as you suggested one day, in order to let the headset intiate an 
+audio connection. This would require the proper SDP record in the 
+database with the proper RFCOMM channel number, and a RFCOMM socket 
+listening in the application. I made some copy-paste for the first thing 
+in sdptool code, but I haven't find the rigth place for the listening 
+socket yet... I have much left to study I guess!)
+
+best regards
+
+Luis_Peiro
 
 
---=-UeLdBC2wVQgXcPuP1CR4
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
 
-Hi Victor,
-
-> > Hope that explains....
+Brad Midgley wrote:
+> Luis
 > 
-> it does not explain it, but this is what I expected. Another reference
-> counting problem. Maybe introduced at that time I fixed another one of
-> these crazy problems. Funny is that this does not result in an oops. The
-> easiest way to fix this is, if you send me one of these phones, because
-> otherwise it will take quite some time to reproduce it.
-
-try the attached patch. It fixes it for me when I tested this with a
-Nokia 6310.
-
-Regards
-
-Marcel
-
-
---=-UeLdBC2wVQgXcPuP1CR4
-Content-Disposition: attachment; filename=patch
-Content-Type: text/plain; name=patch; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-
-===== net/bluetooth/rfcomm/core.c 1.49 vs edited =====
---- 1.49/net/bluetooth/rfcomm/core.c	2005-01-23 19:59:56 +01:00
-+++ edited/net/bluetooth/rfcomm/core.c	2005-03-09 11:27:46 +01:00
-@@ -389,6 +389,8 @@
- 		rfcomm_dlc_unlock(d);
- 
- 		skb_queue_purge(&d->tx_queue);
-+		rfcomm_session_put(s);
-+
- 		rfcomm_dlc_unlink(d);
- 	}
- 
-@@ -597,6 +599,8 @@
- 		*err = -ENOMEM;
- 		goto failed;
- 	}
-+
-+	rfcomm_session_hold(s);
- 
- 	s->initiator = 1;
- 
-
---=-UeLdBC2wVQgXcPuP1CR4--
+> It's good to see your interest... I think you have the right ideas on 
+> how things work.
+> 
+>> I also imagine that when we poll data from the hwdep interface, we are 
+>> not polling SCO data type (which I assume it is being drived 
+>> automatically); instead, we are polling for volume-control data type 
+>> which is enigmatically (for me) generated at the core of the driver. 
+>> Is it right?
+> 
+> 
+> if the volume change is initiated through a generic mixer, then yes. 
+> Think of a mixer application running on your computer. Run any 
+> alsa-aware mixer and it will let you choose the alsa mixer device to be 
+> the headset.
+> 
+>> The question is, 'when does the following condition evaluate TRUE  ?
+>>
+>> if (!snd_hwdep_poll_descriptors_revents(handle, &pfds[nfds - 1], 1, 
+>> revents) && revents & POLLIN) {
+> 
+> 
+> It evaluates true when there are volume-change events to be examined 
+> that were initiated through a soft mixer.
+> 
+> Brad
+> 
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
 
 
 
