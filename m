@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <423A0877.1080704@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Fwd: alsa bluetooth module
-References: <e36f1e61ac13a554d52d2f7b8d7a5df4@freezone.co.uk>
+From: Fredrik Tolf <fredrik@dolda2000.com>
+To: bluez-devel@lists.sourceforge.net
+Cc: Antonio-Blasco Bonito <blasco.bonito@email.it>
 In-Reply-To: <e36f1e61ac13a554d52d2f7b8d7a5df4@freezone.co.uk>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+References: <e36f1e61ac13a554d52d2f7b8d7a5df4@freezone.co.uk>
+Content-Type: text/plain
+Message-Id: <1111098892.19889.88.camel@pc7.dolda2000.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,26 +19,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Mar 2005 15:45:11 -0700
+Date: Thu, 17 Mar 2005 23:34:52 +0100
 
-hi
-
-regarding the text on your page at 
-http://cgi.sfu.ca/~jdbates/moin/moin.cgi/Bluetooth&ALSA
-
-> A Bluetooth headset ALSA driver is apparently available - [WWW] http://www.dcs.gla.ac.uk/~jp/snd-bt-sco/
+On Thu, 2005-03-17 at 14:05 -0800, ms419@freezone.co.uk wrote:
+> Begin forwarded message:
 > 
-> The bluetooth-alsa project is now on SourceForge - [WWW] http://bluetooth-alsa.sourceforge.net/ - I don't know its relationship to the old link. 
+> > From: Antonio-Blasco Bonito <blasco.bonito@email.it>
+> > Date: March 17, 2005 4:02:35 AM PST
+> > To: ms419@freezone.co.uk
+> > Subject: Re: alsa bluetooth module
+[...]
+> > I get:
+> > # modprobe snd-bt-sco
+> > FATAL: Error inserting snd_bt_sco 
+> > (/lib/modules/2.6.8-2-686/extra/snd-bt-sco.ko): Unknown symbol in 
+> > module, or unknown parameter (see dmesg)
+> >
+> > # dmesg|tail
+> > ...
+> > snd_bt_sco: no version for "struct_module" found: kernel tainted.
+> > snd_bt_sco: Unknown symbol kcalloc
 
-the sourceforge project supercedes the jp version.
+Well, I'm not sure (especially since I don't use Debian and thus have no
+idea how they compile their kernels), but I would guess that this is a
+matter of symbol versioning. Is this module compiled against the same
+kernel (and with the same compilation options) that Blasco is using?
 
-> snd_bt_sco: Unknown symbol snd_hwdep_new
+Try to check the output of `grep kcalloc /proc/kallsyms' and compare
+that to the output of `nm /path/to/snd-bt-sco.ko | grep kcalloc'.
 
-select emu10k1 support and the kernel will pull in snd_hwdep_new. i 
-think the alsa folks are trying to deprecate snd_hwdep_new but i haven't 
-looked into what replaces it...
+> > I looked in alsa sources in the kernel and I only found 
+> > "snd_magic_kcalloc"
+> > Maybe kcalloc calls should be renamed as such?
 
-brad
+By no means. kcalloc() is a core kernel function, defined in mm/slab.c.
+It's not an ALSA-specific routine.
+
+
 
 
 -------------------------------------------------------
