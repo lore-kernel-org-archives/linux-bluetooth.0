@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] browsing non-public services?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Simon Vogl <vogl@soft.uni-linz.ac.at>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <403B1072.1020102@soft.uni-linz.ac.at>
-References: <403B1072.1020102@soft.uni-linz.ac.at>
-Content-Type: text/plain
-Message-Id: <1077624474.2880.37.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <403B1072.1020102@soft.uni-linz.ac.at>
+From: Simon Vogl <vogl@soft.uni-linz.ac.at>
+MIME-Version: 1.0
+To: bluez-devel <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [Bluez-devel] browsing non-public services?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,23 +15,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 Feb 2004 13:07:54 +0100
+Date: Tue, 24 Feb 2004 09:50:58 +0100
 
-Hi Simon,
+Hi,
+can I retrieve service information on non-public services? My nokia phone=
+s
+show an SDP-entry for service class 0x5555 that the phones also inquire w=
+hen
+connecting, now I'd like to see what is registered there...
 
-> can I retrieve service information on non-public services? My nokia phones
-> show an SDP-entry for service class 0x5555 that the phones also inquire when
-> connecting, now I'd like to see what is registered there...
+Cheers,
+Simon
 
-read the manpage or use "sdptool -h" ;)
 
-	sdptool search --bdaddr <bdaddr> --tree 0x5555
 
-Must be something vendor specific. Please show us the output.
+--=20
+_______________________________________________________________________
+Dr. Simon Vogl
+Institut f=C3=BCr Pervasive Computing, Johannes Kepler Universit=C3=A4t L=
+inz
+Altenberger Stra=C3=9Fe 69, A-4040 Linz, Austria
 
-Regards
+Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
+mailto: vogl@soft.uni-linz.ac.at,  http://www.soft.uni-linz.ac.at/
 
-Marcel
+
+
+
 
 
 
