@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] LAN access server
-From: Marcel Holtmann <marcel@holtmann.org>
-To: blookk - <blookk@hotmail.com>
-Cc: bluez-devel@lists.sf.net
-In-Reply-To: <BAY1-F38wr0qxO83cIO000af2e9@hotmail.com>
-References: <BAY1-F38wr0qxO83cIO000af2e9@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1094652818.5289.1.camel@notepaq>
+From: "blookk -" <blookk@hotmail.com>
+To: bluez-devel@lists.sf.net
+Subject: [Bluez-devel] LAN access server
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Message-ID: <BAY1-F38wr0qxO83cIO000af2e9@hotmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,42 +15,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 08 Sep 2004 16:13:38 +0200
+Date: Wed, 08 Sep 2004 12:35:09 +0000
 
-Hi,
 
-> I am trying to create a LAN access server with bluetooth.
-> 
-> In server side I execute:
-> insmod rfcomm
-> insmod l2cap
-> hcid -n &
-> sdpd -n &
-> sdptool add sp
-> sdptool add  lan
-> dund --listen --persist
-> 
-> In client side:
-> insmod rfcomm
-> insmod l2cap
-> hcid -n &
-> sdpd -n &
-> sdptool add sp
-> sdptool add  lan
-> dund --connect 00:11:22:33:44:55
-> dund --search
-> 
-> after I do these things in messages of kernel say that "connection refused"
-> 
-> What happend?
 
-you haven't checked the mailing list archive, because I already wrote
-sometimes that "sdptool add ..." is not necessary when using dund.
+Hello:
 
-Regards
+I am trying to create a LAN access server with bluetooth.
 
-Marcel
+In server side I execute:
+insmod rfcomm
+insmod l2cap
+hcid -n &
+sdpd -n &
+sdptool add sp
+sdptool add  lan
+dund --listen --persist
 
+In client side:
+insmod rfcomm
+insmod l2cap
+hcid -n &
+sdpd -n &
+sdptool add sp
+sdptool add  lan
+dund --connect 00:11:22:33:44:55
+dund --search
+
+after I do these things in messages of kernel say that "connection refused"
+
+What happend?
+
+Regrads
+
+_________________________________________________________________
+Dale rienda suelta a tu tiempo libre. Encuentra mil ideas para exprimir tu 
+ocio con MSN Entretenimiento. http://entretenimiento.msn.es/
 
 
 
