@@ -3,11 +3,10 @@ Subject: Re: [Bluez-users] bthid and standby button
 From: Marcel Holtmann <marcel@holtmann.org>
 To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403190110.11645.cijoml@volny.cz>
+In-Reply-To: <200403182352.18923.cijoml@volny.cz>
 References: <200403182352.18923.cijoml@volny.cz>
-	 <1079654699.3301.98.camel@pegasus>  <200403190110.11645.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1079655572.3301.121.camel@pegasus>
+Message-Id: <1079654699.3301.98.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,32 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 19 Mar 2004 01:19:32 +0100
+Date: Fri, 19 Mar 2004 01:04:59 +0100
 
 Hi Michal,
 
-> > actually this is a special key and it needs a special mapping. This
-> > means report id 03 with the value 02. I thought my Microsoft spits out a
-> > message in the syslog when I press the standby button, but I don't have
-> > it handy right now.
+> I looked through my keyboard because of hotkeys and find out, that 
 > 
-> Yes, you are right :)
+> StandBy button is not recognized well - xev doesn't return key code.
 > 
-> Mar 19 01:06:57 notas bthid[525]: Sleep button pressed (ignored)
-> 
-> So we have to wait till you'll find time :)
-> 
-> Marcel how do you map special multimedia keys? Via xmodmap? Or via XKB 
-> directly in xfree?
-> And can you share your mapping file for this keyboard?
-> I look for the best way how these keys export into KDE 3.2 hotkeys daemon.
+> Stand by
+> > ACL data: handle 0x0029 flags 0x02 dlen 7
+>     L2CAP(d): cid 0x41 len 3 [psm 0]
+>       A1 03 02
 
-I have no idea, because I never used any of the multimedia keys. I still
-use my ten years old Microsoft Natural Keyboard and the most cutting
-edge feature of it is the PS/2 adapter ;)
-
-Maybe you should play with the hotkeys program, or write a patch for
-bthid to create another input key code.
+actually this is a special key and it needs a special mapping. This
+means report id 03 with the value 02. I thought my Microsoft spits out a
+message in the syslog when I press the standby button, but I don't have
+it handy right now.
 
 Regards
 
