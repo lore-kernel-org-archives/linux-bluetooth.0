@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bd_addr question
+Subject: Re: [Bluez-devel] OGF and OCF
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jessica Huang <jessieh@MIT.EDU>
+To: paolo2278@freemail.it
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5.2.1.1.2.20040309150546.02e414a0@po14.mit.edu>
-References: <5.2.1.1.2.20040309150546.02e414a0@po14.mit.edu>
+In-Reply-To: <20040309181554.11682.qmail@mail.supereva.it>
+References: <20040309181554.11682.qmail@mail.supereva.it>
 Content-Type: text/plain
-Message-Id: <1078867451.10671.73.camel@pegasus>
+Message-Id: <1078867559.10671.76.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +18,13 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 09 Mar 2004 22:24:11 +0100
+Date: Tue, 09 Mar 2004 22:25:59 +0100
 
-Hi Jessica,
+Hi,
 
-> I'm not sure if this is the right place to ask, but I had a question about 
-> the Bluetooth Device Address.  From my understanding, the BD_ADDR is stored 
-> on the Bluetooth transmitter.  I was wondering if it is possible to 
-> intercept that address and provide some arbitrary one.  Could someone 
-> please explain how this address is accessed and by what modules?
+> I wuold like to extract the native clock from the chip, and I used the hcitool cmd as described in HCI Extention, in BCCMD basic Command and BCCMD Protocol, more over I read the hciconfig source code, where is reported an example of a vendor packet but only for the eicsson chip.
 
-what do you mean with intercept? I don't get any idea of what you are
-trying to achieve.
+look at CVS repository under utils/tools/csr.[ch]
 
 Regards
 
