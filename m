@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "João Santos" <jsantos_pt@hotmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] timeout after rfcomm or pan connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Christoph Torens <c.torens@web.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <opr4wj0bjgeocfdv@debian>
+References: <20040309161702.24407.qmail@web40713.mail.yahoo.com>
+	 <opr4mgbutyeocfdv@debian> <1078882388.30990.24.camel@pegasus>
+	 <opr4wj0bjgeocfdv@debian>
+Content-Type: text/plain
+Message-Id: <1079358305.3405.32.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <Sea2-F42TuLCBnwNLh1000006b9@hotmail.com>
-Subject: [Bluez-users] audio links problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,69 +20,127 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 15 Mar 2004 16:45:31 +0000
+Date: Mon, 15 Mar 2004 14:45:05 +0100
 
-Hi all,
-I'm working with sco links and i had found a strange problem, and i don't 
-have any idea who it appears and who to fix it.
-i'm using a Nokia 6310i phone, a casira module and the bluez stack.
-linux-kernel 2.4.25-mh1
-In the hcidump appears:
+Hi Christoph,
 
->##SCO data: handle 0x002b dlen 144
->##SCO data: handle 0x002b dlen 144
->##SCO data: handle 0x002b dlen 144
->HCI Event: Disconn Complete(0x05) plen 4
->##SCO data: handle 0x002b dlen 144
->##SCO data: handle 0x002b dlen 144
->##SCO data: handle 0x002b dlen 144
-< HCI Command: Reset(0x03|0x0003) plen 0
->>>Receive failed: Broken pipe
+> it's been a few days since my last mail, hope you remeber some facts from  
+> it.
+> I managed to get one Acer 500 BT-Dongle with CSR chipset.
+> I also upgraded to Kernel 2.4.21
+> this is the latest kernel i can get from the vendor
+> (this is "arcom" if anyone knows them
+> the embedded pc is a: "Viper Embedded Linux Development Kit")
 
-i think that the disconn appends because the phone enter in park mode, but 
-the reset command i don't have any idea why this appends.
+ask them if they use big or little endian with their Xscale. Show us the
+Bluetooth specific parts of the kernel config.
 
+> and now I have the following situation:
+> 
+> root@viper root# hciconfig -a
+> hci0:   Type: USB
+>          BD Address: 00:60:57:0C:88:1A ACL MTU: 192:8  SCO MTU: 64:8
+>          UP RUNNING PSCAN ISCAN
+>          RX bytes:1810 acl:0 sco:0 events:17 errors:0
+>          TX bytes:299 acl:0 sco:0 commands:13 errors:0
+>          Features: 0xff 0xff 0x0b 0x00
+>          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>          Link policy: HOLD SNIFF PARK
+>          Link mode: SLAVE ACCEPT
+>          Name: 'BlueZ (0) on viper'
+>          Class: 0x000100
+>          Service Classes: Unspecified
+>          Device Class: Computer, Uncategorized
+>          HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver:  
+> 0x175
+>          Manufacturer: Cambridge Silicon Radio (10)
+> 
+> root@viper root# pand --search -Q 20 --service NAP -n
+> pand[315]: PAN daemon ver 1.1
+> pand[315]: Inquiring
+> pand[315]: Searching for NAP on 00:04:3E:C0:9D:79
+> pand[315]: Connecting to 00:04:3E:C0:9D:79
+> pand[315]: bnep0 connected
+> root@viper root# hciconfig -a
+> hci0:   Type: USB
+>          BD Address: 00:60:57:0C:88:1A ACL MTU: 192:8  SCO MTU: 64:8
+>          UP RUNNING PSCAN ISCAN
+>          RX bytes:2380 acl:9 sco:0 events:37 errors:0
+>          TX bytes:495 acl:9 sco:0 commands:19 errors:0
+>          Features: 0xff 0xff 0x0b 0x00
+>          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>          Link policy: HOLD SNIFF PARK
+>          Link mode: SLAVE ACCEPT
+>          Name: 'BlueZ (0) on viper'
+>          Class: 0x000100
+>          Service Classes: Unspecified
+>          Device Class: Computer, Uncategorized
+>          HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver:  
+> 0x175
+>          Manufacturer: Cambridge Silicon Radio (10)
+> 
+> root@viper root# ifconfig -a
+> bnep0     Link encap:Ethernet  HWaddr 00:60:57:0C:88:1A
+>            BROADCAST MULTICAST  MTU:1500  Metric:1
+>            RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+>            TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+>            collisions:0 txqueuelen:100
+>            RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+> 
+> eth0      Link encap:Ethernet  HWaddr 00:80:66:10:04:40
+>            inet addr:192.168.0.50  Bcast:192.168.0.255  Mask:255.255.255.0
+>            UP BROADCAST NOTRAILERS RUNNING MULTICAST  MTU:1500  Metric:1
+>            RX packets:312 errors:1 dropped:0 overruns:1 frame:0
+>            TX packets:642 errors:0 dropped:0 overruns:0 carrier:0
+>            collisions:0 txqueuelen:100
+>            RX bytes:37644 (36.7 KiB)  TX bytes:316263 (308.8 KiB)
+>            Interrupt:1 Base address:0x9300
+> 
+> lo        Link encap:Local Loopback
+>            inet addr:127.0.0.1  Mask:255.0.0.0
+>            UP LOOPBACK RUNNING  MTU:16436  Metric:1
+>            RX packets:8 errors:0 dropped:0 overruns:0 frame:0
+>            TX packets:8 errors:0 dropped:0 overruns:0 carrier:0
+>            collisions:0 txqueuelen:0
+>            RX bytes:560 (560.0 B)  TX bytes:560 (560.0 B)
+> 
+> root@viper root# ifconfig bnep0 10.0.0.2
+> root@viper root# hciconfig -a
+> hci0:   Type: USB
+>          BD Address: 00:60:57:0C:88:1A ACL MTU: 192:8  SCO MTU: 64:8
+>          UP RUNNING PSCAN ISCAN
+>          RX bytes:2657 acl:9 sco:0 events:40 errors:0
+>          TX bytes:564 acl:12 sco:0 commands:22 errors:0
+>          Features: 0xff 0xff 0x0b 0x00
+>          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>          Link policy: HOLD SNIFF PARK
+>          Link mode: SLAVE ACCEPT
+> Can't read local name on hci0. Connection timed out(110)
+> root@viper root#
 
-[root@olivia jsantos]# hciconfig -a
-hci0: Type: USB
-BD Address: 00:02:5B:FF:05:AC ACL MTU: 192:8 SCO MTU: 64:8
-UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-RX bytes:2481 acl:0 sco:0 events:56 errors:0
-TX bytes:522 acl:0 sco:0 commands:33 errors:0
-Features: 0xff 0xff 0x0d 0x00 0x00 0x00 0x00 0x00
-Packet type: DM1 DH1 HV1
-Link policy: HOLD SNIFF PARK
-Link mode: MASTER
-Name: 'Olivia'
-Class: 0x200404
-Service Classes: Audio
-Device Class: Audio/Video, Device conforms to the Headset profile
-HCI Ver: 1.1 (0x1) HCI Rev: 0xbc LMP Ver: 1.1 (0x1) LMP Subver: 0xbc
-Manufacturer: Cambridge Silicon Radio (10)
+Run "hcidump -x" to see what is on the ACL link.
 
-[root@olivia jsantos]# hciconfig hci0 revision
-hci0: Type: USB
-BD Address: 00:02:5B:FF:05:AC ACL MTU: 192:8 SCO MTU: 64:8
-HCI 12.7
-Chip version: BlueCore01b (ES)
-SCO mapping: HCI
+> ###
+> 
+> as you can see... I get the bnep connection and the interface bnep0.
+> i try to set an ip adress and ...the hci device crashes.
+> 
+> any ideas?
+> 
+> ifconfig works on the other side at my debian-PC.
+> 
+> i have binary packages of bluez-libs provided by arcom
+> bluez-pan is not provided by arcom, so i had to cross-compile bluez-libs,  
+> bluez-sdp and finally bluez-pan
 
+The userspace programs should not be involved, because after the bnep0
+device shows up everything is handled by the kernel. Looks like a Xscale
+specific bug.
 
+Regards
 
-This is strange to append, i thing that the last command that should appears 
-in the hcidump was:
+Marcel
 
->HCI Event: Disconn Complete(0x05) plen 4
-
-But he continue receiving sco data and then he make a reset, that causes a 
-broken pipe.
-
-
-Thanks
-
-_________________________________________________________________
-Help STOP SPAM with the new MSN 8 and get 2 months FREE*  
-http://join.msn.com/?page=features/junkmail
 
 
 
