@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000e01c50bab$c6c6d600$0100a8c0@hppav>
-From: "Oliver" <urnenfel@tiscali.es>
-To: <bluez-devel@lists.sourceforge.net>
-References: <848611830@web.de> <1107618796.6921.156.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
-Subject: [Bluez-devel] struct usb_iso_packet_descriptor
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1107621942.6921.164.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Automatic switching to sniff mode
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,17 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 5 Feb 2005 18:54:40 +0100
+Date: Sat, 05 Feb 2005 17:45:42 +0100
 
-Actually just that:
+Hi folks,
 
-I found this definition into the hci_usb.c source and I don't know where 
-does it come from
+I like to get some parts from the todo list done. The switching into
+sniff mode when a connection is idle seems to be an interesting start,
+because this will reduce the power consumption of idle connections and
+thus should give us more battery life for our notebooks. Any ideas?
+Anyone who already played with the sniff mode? Any recommendations what
+we should pay attention to?
 
-struct usb_iso_packet_descriptor
+Regards
 
-thanks in advance
-
+Marcel
 
 
 
