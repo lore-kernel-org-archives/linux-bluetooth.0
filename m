@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] configuring bluetooth device
+Subject: Re: [Bluez-users] Kernel panic when unplugging USB dongle
 From: Marcel Holtmann <marcel@holtmann.org>
-To: arundeep Singh <arundeep78@yahoo.com>
-Cc: bluez users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040503184147.83583.qmail@web61102.mail.yahoo.com>
-References: <20040503184147.83583.qmail@web61102.mail.yahoo.com>
+To: Arthur Dent <tobili@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY18-F35upP0Xthjx700009162@hotmail.com>
+References: <BAY18-F35upP0Xthjx700009162@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1083686375.4666.36.camel@pegasus>
+Message-Id: <1083686269.4666.33.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 04 May 2004 17:59:35 +0200
+Date: Tue, 04 May 2004 17:57:49 +0200
 
-Hi Arundeep,
+Hi Arthur,
 
-> I am working on 2.6.4 kernel. I am trying to configure my bluetooth usb
-> dongle by widcomm on my PC. but remain unable to. 
+> I have been using the Bluez architecture for quite some
+> time now in combination with a bluetooth modem and
+> everything has been working nicely. Now I decided to
+> update my system: I have downloaded the 2.4.26 kernel
+> from kernel.org, patched the kernel (2.4.26-mh1) and
+> additionally installed: bluez-libs-2.6, bluez-utils-2.6
+> and bluez-pan-1.1
+> When I plugged in the USB dongle everything worked nicely
+> and "hcitool dev" reports the address so bluetooth should be
+> working. However, when I unplug the dongle the kernel freezes
+> instantly and I am also not able to obtain any hint from
+> /var/log/messages and stuff.
+> 
+> When I additionally install the outdated bluez-kernel-2.3
+> package the kernel does not freeze...
+> What did I do wrong, can anybody give me a hint? This is
+> beyond my capabilities.
+> I am using SuSE 9.0 on a Toshiba Satellite.
 
-actually nobody here cares ;)
-
-> bluez is there on the system. but i didn't find few of the config
-> files. and also the there is no such device name hci0 or so in /dev
-> directory.
-
-Do you have an /dev/eth0 ;)
-
-However what do /proc/bus/usb/devices say? Do you loaded the correct USB
-host controller driver? Is this a Broadcom based dongle or what?
+with the 2.4.26 this is a bad behaviour and I've never seen this problem
+before. Please check if it matters if CONFIG_BLUEZ_HCIUSB_SCO is enabled
+or not.
 
 Regards
 
