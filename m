@@ -1,16 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Nishanth Aravamudan <nacc@us.ibm.com>
-Cc: Max Krasnyansky <maxk@qualcomm.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Greg Kroah-Hartman <greg@kroah.com>
-In-Reply-To: <20050209063650.GU1419@us.ibm.com>
-References: <20050209063650.GU1419@us.ibm.com>
+Subject: Re: [Bluez-devel] L2CAP retransmission, flow control
+From: Imre Deak <imre.deak@nokia.com>
+To: Bluez-Devel <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1107957983.13863.37.camel@pegasus>
+References: <1107934854.9489.4.camel@mammoth.research.nokia.com>
+	 <1107938887.13863.4.camel@pegasus>
+	 <1107940961.9489.32.camel@mammoth.research.nokia.com>
+	 <1107944306.13863.15.camel@pegasus>
+	 <1107955473.9489.37.camel@mammoth.research.nokia.com>
+	 <1107957983.13863.37.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1107971878.13863.94.camel@pegasus>
+Message-Id: <1107968685.10764.3.camel@mammoth.research.nokia.com>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: [PATCH 50/63] bluetooth/bfusb: change parameters of
- usb_{control,bulk}_msg() to msecs
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,24 +23,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 09 Feb 2005 18:57:58 +0100
+Date: Wed, 09 Feb 2005 19:04:45 +0200
 
-Hi Greg,
-
-if you apply the USB core changes for this, then this patch is fine with
-me and I think you should apply them all at once.
-
-> Description: Change units of parameters being passed to
-> usb_{control,bulk}_msg() to milliseconds. Patch is compile-tested.
+On Wed, 2005-02-09 at 15:06 +0100, ext Marcel Holtmann wrote:
+> if you select SOCK_SEQPACKET and set the mode to flow control and
+> retransmission then this must be negotiated and on success this can be
+> used.
 > 
-> Signed-off-by: Nishanth Aravamudan <nacc@us.ibm.com>
+> For SOCK_STREAM only the flow control is really needed, but also having
+> retransmission whould be great.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Ok, thanks for elaborating this.
 
-Regards
-
-Marcel
-
+--Imre
 
 
 
