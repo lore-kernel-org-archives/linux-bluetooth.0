@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41ADB1C2.8070805@suche.org>
-From: "suche.org" <admin@suche.org>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] BTsco
-References: <200412010839.06669.mailsp@sebastian-eichner.de>	 <200412010943.33419.mail@sebastian-eichner.de>	 <1101894192.18840.44.camel@pegasus>	 <200412011224.29191.mail@sebastian-eichner.de>  <41ADAC67.10706@suche.org> <1101901302.18840.72.camel@pegasus>
-In-Reply-To: <1101901302.18840.72.camel@pegasus>
-Content-Type: text/html; charset=ISO-8859-15
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41ADAC67.10706@suche.org>
+References: <200412010839.06669.mailsp@sebastian-eichner.de>
+	 <200412010943.33419.mail@sebastian-eichner.de>
+	 <1101894192.18840.44.camel@pegasus>
+	 <200412011224.29191.mail@sebastian-eichner.de>  <41ADAC67.10706@suche.org>
+Content-Type: text/plain
+Message-Id: <1101901302.18840.72.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,34 +21,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 12:57:54 +0100
+Date: Wed, 01 Dec 2004 12:41:41 +0100
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content="text/html;charset=ISO-8859-15"
- http-equiv="Content-Type">
-  <title></title>
-</head>
-<body bgcolor="#ffffff" text="#000000">
-Marcel Holtmann wrote:
-<blockquote cite="mid1101901302.18840.72.camel@pegasus" type="cite">
-  <pre wrap="">Hi Thomas,
+Hi Thomas,
 
-  </pre>
-  <blockquote type="cite">
-    <pre wrap="">i hope this time it is better c style.
-    </pre>
-  </blockquote>
-  <pre wrap=""><!---->
+> i hope this time it is better c style.
+
 this looks a way better. I am going to check it in as btsco2.c
-  </pre>
-</blockquote>
-Uhps the S must be came in when is saved the source :-(<br>
-<br>
-Cu Thomas<br>
-</body>
-</html>
+
+However I got these with my first compilation run:
+
+btsco2.c: In function `main':
+btsco2.c:501: error: `S' undeclared (first use in this function)
+btsco2.c:501: error: (Each undeclared identifier is reported only once
+btsco2.c:501: error: for each function it appears in.)
+btsco2.c:501: error: parse error before "if"
+btsco2.c:481: warning: unused variable `rlen'
+
+And btw we use unified diffs.
+
+> Why  libm, libdl and libpthread are linked ?
+
+Needed by the ALSA library.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
