@@ -1,12 +1,22 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41A4E200.9000601@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] SBC packer done, kind of
-References: <20041123014732.3a03b10e.henryk@ploetzli.ch>	 <1101191260.26578.43.camel@pegasus>	 <20041123074829.7f978ce7.henryk@ploetzli.ch>	 <1101201897.26578.54.camel@pegasus>	 <20041123204901.776fe240.henryk@ploetzli.ch>	 <1101243809.27351.18.camel@pegasus>	 <20041124042114.5e1fee94.henryk@ploetzli.ch>	 <1101272477.27351.67.camel@pegasus>  <41A43E8A.8030602@xmission.com>	 <1101307146.27351.104.camel@pegasus>  <41A4C6A8.2080508@xmission.com> <1101318257.27351.138.camel@pegasus>
-In-Reply-To: <1101318257.27351.138.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Message-Id: <20041125060727.7b1bf533.henryk@ploetzli.ch>
+In-Reply-To: <1101278049.27351.98.camel@pegasus>
+References: <20041123014732.3a03b10e.henryk@ploetzli.ch>
+	<1101191260.26578.43.camel@pegasus>
+	<20041123074829.7f978ce7.henryk@ploetzli.ch>
+	<1101201897.26578.54.camel@pegasus>
+	<20041123204901.776fe240.henryk@ploetzli.ch>
+	<1101243809.27351.18.camel@pegasus>
+	<20041124042114.5e1fee94.henryk@ploetzli.ch>
+	<1101272477.27351.67.camel@pegasus>
+	<1101278049.27351.98.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="pgp-sha1";
+ boundary="Signature=_Thu__25_Nov_2004_06_07_27_+0100_kINKfXflmgcvFqA6"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,63 +28,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Nov 2004 12:33:20 -0700
+Date: Thu, 25 Nov 2004 06:07:27 +0100
 
-Marcel,
+--Signature=_Thu__25_Nov_2004_06_07_27_+0100_kINKfXflmgcvFqA6
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Too bad 0xff is an invalid media payload header or we could work out a 
-way to send it regardless of which headset is listening.
+Moin,
 
-You were saying there is a way to tell the aiptek is listening...
+Am Wed, 24 Nov 2004 07:34:09 +0100 schrieb Marcel Holtmann:
 
-The current rcplay works fine with this headset. Something must have 
-changed since the last time I tried. (Even streams like 5 which don't 
-work with a2play work with rcplay.) I just wish we knew that sbc over 
-rfcomm was an official part of the a2dp profile.
+> when using sbcenc in a pipe with rcplay I get a delay for the first
+> bits of music that should be played. This is only on the first call of
+> the program or after the kernel removed it from its cache. Do you have
+> any idea what might causes this?
 
-Brad
+Hmm, don't know exactly what you mean. I know that there is a delay of
+about 38 samples for 4 subbands (and I guess simply double that number
+for 8 subbands), but that is inherent in SBC and can be seen in the
+reference encoder/decoder, too.
 
-Marcel Holtmann wrote:
-> Hi Brad,
-> 
-> 
->>a2play in cvs w/NONSPECAUDIO should behave for you like it did when it 
->>was last working for you. i disabled all the new stuff (it didn't help 
->>or hurt the bluetake).
-> 
-> 
-> for the Aiptek headphone I only get the NONSPECAUDIO version working and
-> you must send 0xff 0xff for the first media payload. For all further
-> media payloads it seems that it doesn't matter anymore.
-> 
-> Setting the pt, timestamp and ssrc is working for me. Does it also work
-> for you? If yes, there is no need to uncomment it.
-> 
-> 
->>that's really too bad the framing didn't fix things for yours like it 
->>did the bluetake. they are totally out of spec. that doesn't bode well 
->>for interoperating with the other headsets out there.
-> 
-> 
-> This is very sad. So I can't help here with testing this until someone
-> sends me a Bluetake headphone.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now. 
-> http://productguide.itmanagersjournal.com/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--=20
+Henryk Pl=F6tz
+Gr=FC=DFe aus Berlin
+~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
+~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+
+--Signature=_Thu__25_Nov_2004_06_07_27_+0100_kINKfXflmgcvFqA6
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+
+iD8DBQFBpWiUIjWgKE0OA2gRAso/AKCurjfUV6PP2gSSwbtOJc8uT8ruzQCgkRSl
+DmvmjgUhYYiNUDQPtyG0SNI=
+=FyGG
+-----END PGP SIGNATURE-----
+
+--Signature=_Thu__25_Nov_2004_06_07_27_+0100_kINKfXflmgcvFqA6--
 
 
 -------------------------------------------------------
