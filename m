@@ -2,13 +2,13 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Michal Semler <cijoml@volny.cz>
 Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluez+2.6+Logitech bluetooth
-References: <20040515163903.CB06543F94@rekin8.go2.pl> <1084708456.4184.0.camel@pegasus> <20040516174923.5a5f58af@bluez.bueche.ch>
-In-Reply-To: <20040516174923.5a5f58af@bluez.bueche.ch>
+Subject: Re: [Bluez-users] BT3030
+References: <200405150903.23338.hedin@hiervard.ru> <1084611681.24119.24.camel@pegasus> <200405162253.38581.hedin@hiervard.ru>
+In-Reply-To: <200405162253.38581.hedin@hiervard.ru>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200405161825.27002.cijoml@volny.cz>
+  charset="koi8-r"
+Message-Id: <200405161807.38658.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,21 +19,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 May 2004 18:25:27 +0200
+Date: Sun, 16 May 2004 18:07:38 +0200
 
-On Sunday 16 of May 2004 17:49, Charles Bueche wrote:
-> Hi Marcel,
+On Sunday 16 of May 2004 17:53, =E8=C5=C4=C9=CE wrote:
+> Saturday 15 May 2004 16:01, Marcel Holtmann =D0=C9=DB=C5=D4:
+> > Hi Hedin,
+> >
+> > > Here is my `dmesg` log after I load my modules after connecting the
+> > > dongle:
+> > >
+> > > usb 1-1: new full speed USB device using address 3
+> > > Bluetooth: Core ver 2.4
+> > > NET: Registered protocol family 31
+> > > Bluetooth: HCI device and connection manager initialized
+> > > Bluetooth: HCI socket layer initialized
+> > > Bluetooth: L2CAP ver 2.1
+> > > Bluetooth: L2CAP socket layer initialized
+> > > Bluetooth: HCI USB driver ver 2.5
+> > > usbcore: registered new driver hci_usb
+> > > Bluetooth: Broadcom Blutonium firmware driver ver 1.0
+> > > bcm203x_probe: Mini driver request failed
+> > > bcm203x: probe of 1-1:1.0 failed with error -5
+> > > usbcore: registered new driver bcm203x
+> >
+> > this means that the request for the mini driver file BCM2033-MD.hex
+> > failed. You need /sys mounted, you need /etc/hotplug/firmware.agent and
+> > you must put the two firmware files from Broadcom in the firmware
+> > directory under /usr/lib/hotplug/firmware.
 >
-> yes, I know I'm a bit off the bleeding edge since some weeks, but I'm
-> not alone at fault : gentoo-dev-sources is still at 2.6.5, and I don't
-> want to switch to another kernel for now.
+> Sorry for dumb questions. I got these two filfes into
+> /usr/lib/hotplug/firware (I took them from bluez-blufw package).
+> The error still remains.
 >
-> When 2.6.6 is out, I will try your patch and the new user-space daemons.
-> Meanwhile, thank for your support to us all bluez users.
->
-> Charles
+> But how about another one? I can't find it and what is "/sys" ? (I'm not
+> really experienced with Linux, sorry).
 
-I can write it, coz I use it :)
+write:
+mkdir /sys
+
+edit /etc/fstab and add this line:
+sysfs           /sys            sysfs   defaults                0       0
+save it and write:
+mount -a as root
 
 Michal
 
