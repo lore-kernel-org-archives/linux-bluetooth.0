@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4050323B.1030307@ei.tum.de>
-From: Matthias Thomae <thomae@ei.tum.de>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Logitech MX900 oddities and solutions
+From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] crash on remove
-References: <20040310182158.GA9279@naginata.ccs.neu.edu> <404F84BC.4020406@xmission.com> <20040310223504.GA3398@omocha.vort.org> <404FB5D1.5030104@xmission.com> <20040311024720.GA3297@omocha.vort.org>
-In-Reply-To: <20040311024720.GA3297@omocha.vort.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <1078917101.2537.21.camel@pegasus>
+References: <1078912919.32148.356.camel@metal.cisco.com>
+	 <1078915401.2537.14.camel@pegasus>  <1078916559.6886.5.camel@pc-04.ycom.ch>
+	 <1078917101.2537.21.camel@pegasus>
+Content-Type: text/plain; charset=iso-8859-1
+Message-Id: <1078993556.24004.8.camel@pc-04.ycom.ch>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,25 +19,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 11 Mar 2004 10:32:43 +0100
+Date: Thu, 11 Mar 2004 09:25:56 +0100
 
-Hi all,
+Marcel,
 
-I also get a crash when unplugging my bt usb adapter (Acer BT-700, 
-CSR-based) on a VIA Chipset machine with 2.6.4-rc3 kernel. 
-CONFIG_BT_HCIUSB_SCO is *not* set, CONFIG_BT_SCO is.
+Le mer 10/03/2004 =E0 12:11, Marcel Holtmann a =E9crit :
+> Hi Alexandre,
+> > > If you start the hcid it will modifiy your link policy settings and=
+ it
+> > > is important that RSWITCH and SNIFF is on.
+> >=20
+> > Mine is working fine ... without any mod or blood :-)
+>=20
+> What does "hciconfig hci0 lp" say?
 
-Regards.
-Matthias
+hci0:   Type: USB
+        BD Address: 00:07:61:08:76:70 ACL MTU: 192:8  SCO MTU: 64:8
+        Link policy: HOLD SNIFF PARK
 
-Russell Neches wrote:
-> Now, by SCO support, do we mean the module (CONFIG_BT_SCO) or
-> CONFIG_BT_HCIUSB_SCO? I'm actually getting the crash without the sco
-> module loaded, and I have my kernel built with CONFIG_BT_HCIUSB_SCO not
-> set. I don't think SCO shows up anywhere else in the kernel. Sorry if
-> I'm beginning to sound pedantic. 
-> 
-> Maybe I should figure out how to use SysReq after all...
+And my hcid.conf:
+ 	lp hold,sniff,hold,park;
+
+
+So, what is the exact mean for RSWITCH ?
+
+> > Maybe the next thing to do is to have a correct encryption link, of
+> > course for the keyboard ( I don't think that mouse mouvements are ver=
+y
+> > important ...).
+>=20
+> If the HID device is a keyboard we must simply send and authentication
+> request and then activate the encryption. Patches are welcome.
+
+Huh, it's a good job for me, need some spare time ... :-(
+Maybe in same time that the modification of bthid parser to have
+function keys working for the keyboard.
+
+best regards,=20
+
+	--Alexandre
 
 
 
