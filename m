@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] L2CAP raw socket patch
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Collin R. Mulliner" <collin@betaversion.net>
-Cc: bluez-devel@lists.sf.net
-In-Reply-To: <20040210124942.393a6da0.collin@betaversion.net>
-References: <20040210124942.393a6da0.collin@betaversion.net>
-Content-Type: multipart/mixed; boundary="=-OdhMGfp2/4wIOATf7QEV"
-Message-Id: <1076451408.2777.13.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <OFFB852EAA.3DE1580F-ON87256E36.00730EA0-86256E36.00738AB6@us.ibm.com>
+From: Torez Smith <torez@us.ibm.com>
+MIME-Version: 1.0
+Content-type: multipart/alternative;
+	Boundary="0__=08BBE4A5DFE088308f9e8a93df938690918c08BBE4A5DFE08830"
+Subject: [Bluez-devel] usb to serial verification
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,70 +16,57 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Feb 2004 23:16:48 +0100
+Date: Tue, 10 Feb 2004 15:02:03 -0600
+
+--0__=08BBE4A5DFE088308f9e8a93df938690918c08BBE4A5DFE08830
+Content-type: text/plain; charset=US-ASCII
 
 
---=-OdhMGfp2/4wIOATf7QEV
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-Hi Collin,
-
-> I have written a small patch for l2cap.c to improve the capabilities of
-> L2CAP raw sockets. Currently only very few responses travel back to a
-> RAW socket (which is very bad if you need to see command responses).
-> The patch is very simple - it just puts all responses on the
-> Sig-Channel to all open RAW sockets. The owner of the raw socket just
-> needs to select his packets and in normal operation there shouldn't be
-> much use of RAW sockets so I don't think this is a performance issue.
-
-do anyone have comments about this patch?
-
-> I have attached the patch file to this email, hope this is ok.
-
-BTW this patch is wrong, because we must keep the case statements.
-Otherwise the kernel log will be filled with unneeded error messages.
-
-Regards
-
-Marcel
 
 
---=-OdhMGfp2/4wIOATf7QEV
-Content-Disposition: attachment; filename=patch
-Content-Type: text/x-patch; name=patch; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
 
-diff -urN linux-2.6.2/net/bluetooth/l2cap.c linux-2.6.2-mh/net/bluetooth/l2cap.c
---- linux-2.6.2/net/bluetooth/l2cap.c	2004-02-04 04:44:04.000000000 +0100
-+++ linux-2.6.2-mh/net/bluetooth/l2cap.c	2004-02-10 23:04:49.000000000 +0100
-@@ -1643,6 +1643,8 @@
- 			break;
- 		}
- 
-+		l2cap_raw_recv(conn, skb);
-+
- 		switch (cmd.code) {
- 		case L2CAP_CONN_REQ:
- 			err = l2cap_connect_req(conn, &cmd, data);
-@@ -1670,7 +1672,6 @@
- 
- 		case L2CAP_COMMAND_REJ:
- 			/* FIXME: We should process this */
--			l2cap_raw_recv(conn, skb);
- 			break;
- 
- 		case L2CAP_ECHO_REQ:
-@@ -1680,7 +1681,6 @@
- 		case L2CAP_ECHO_RSP:
- 		case L2CAP_INFO_REQ:
- 		case L2CAP_INFO_RSP:
--			l2cap_raw_recv(conn, skb);
- 			break;
- 
- 		default:
+Hello,
+is there a way to determine if your usb to serial profile is working?
 
---=-OdhMGfp2/4wIOATf7QEV--
+I have a usb bluetooth dongle on one machine and a serial dongle
+connected to comm1 on another machine. I am able to pair the two
+dongles and have connected the usb dongle to  /dev/rfcomm0.
+
+If expect that if I were to do ......   echo "hello world" > /dev/rfcomm0
+
+I should see that on the second machine while cat'ting /dev/ttyS0.
+
+No traffic comes across. The baud rate on the serial dongle is set
+to 115200 which is the same baud rate used at /dev/ttyS0.
+
+Any clues on how I might be able to echo into /dev/rfcomm0 and
+be able to read the information through /dev/ttyS0?
+
+thanks!
+--0__=08BBE4A5DFE088308f9e8a93df938690918c08BBE4A5DFE08830
+Content-type: text/html; charset=US-ASCII
+Content-Disposition: inline
+
+<html><body>
+<p>Hello,<br>
+is there a way to determine if your usb to serial profile is working?<br>
+<br>
+I have a usb bluetooth dongle on one machine and a serial dongle<br>
+connected to comm1 on another machine. I am able to pair the two<br>
+dongles and have connected the usb dongle to  /dev/rfcomm0.<br>
+<br>
+If expect that if I were to do ......   echo &quot;hello world&quot; &gt; /dev/rfcomm0<br>
+<br>
+I should see that on the second machine while cat'ting /dev/ttyS0.<br>
+<br>
+No traffic comes across. The baud rate on the serial dongle is set<br>
+to 115200 which is the same baud rate used at /dev/ttyS0.<br>
+<br>
+Any clues on how I might be able to echo into /dev/rfcomm0 and<br>
+be able to read the information through /dev/ttyS0?<br>
+<br>
+thanks!</body></html>
+--0__=08BBE4A5DFE088308f9e8a93df938690918c08BBE4A5DFE08830--
 
 
 
