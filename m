@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <200501301948.ALU26389@ms12.netsolmail.com>
-From: Chris Taylor <cht@imipolex-g.com>
-Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
-To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Stefan Bellon <sbellon@sbellon.de>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <4d3582e178sbellon@sbellon.de>
+In-Reply-To: <200501302025.41974.cijoml@volny.cz>
+References: <4d3382eb6csbellon@sbellon.de> <4d35427939sbellon@sbellon.de> <4d35810838sbellon@sbellon.de> <200501302025.41974.cijoml@volny.cz>
+Content-Type: text/plain
+Subject: [Bluez-users] Re: bluetooth-alsa and Jabra BT800
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 11:48:29 -0800
+Date: Sun, 30 Jan 2005 20:35:16 +0100
 
->
->> Hmm, when I did a 'configure' in bluez-utils-2.14, I used the "--
-enable-
->> bcm203x" option before I did a "make install". Where does the utility 
-get 
->> installed?
->
->it will be installed into /etc/hotplug/usb/ and you need a working and
->up-to-date hotplug to make this working.
+Michal Semler wrote:
+> I had the same problem with my headset. I always need to pres +/-
+> sound button directly on headset.
 
-When I did a 'make install', it completed with no errors but I don't see 
-anything installed in /etc/hotplug/usb at all. How do I check if the install 
-failed?
+Will try it later on (waiting for an urgent phone call at the moment,
+therefore the headset is connected to the phone rather than the
+computer).
+
+But I doubt this is the solution in my case. If it was, I suspect the
+aplay command should return after the time the WAV file takes to play.
+But the aplay command just hangs there forever.
+
+-- 
+Stefan Bellon
 
 
 -------------------------------------------------------
