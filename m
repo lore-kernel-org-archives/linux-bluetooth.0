@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41D12158.6020206@avantwave.com>
-From: mike <mikelee@avantwave.com>
-MIME-Version: 1.0
+Message-ID: <20041227215813.51276.qmail@web51902.mail.yahoo.com>
+From: Krishna Bhoutika <kkbhoutika@yahoo.ca>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] rfcomm socket and rfcomm tty
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-1361199905-1104184693=:50685"
+Subject: [Bluez-devel] Inquiry Scan Window
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,23 +16,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 28 Dec 2004 17:03:20 +0800
+Date: Mon, 27 Dec 2004 16:58:13 -0500 (EST)
 
-Dear all
+--0-1361199905-1104184693=:50685
+Content-Type: text/plain; charset=us-ascii
 
-    I have little knowledge on tty structure, so i want to clarify 
-something is that, if i want to connect to a rfcomm enabled phone. Are 
-there any difference when i sending raw data to the phone with tty 
-rfcomm and socket rfcomm? I ask this question because i see that from 
-bluez-util rfcomm source code, tty connection is built up from socket 
-first and then set the tty attr. So if i do not need tty functions, only 
-read/write from/to external device is needed, socket rfcomm will be more 
-simple. Am i right?
+How would increasing the inquiry scan window for a device ( say, x times 18 out of 2048 time slots, where x >1) affect other devices doing inquiry scan? Or, affect the response from the master?
+ 
+Thanks
+ 
+Krishna
 
-    If i make any thing wrong, please tell me.
-    Thanks
 
-Mike,Lee
+
+---------------------------------
+Post your free ad now! Yahoo! Canada Personals
+
+--0-1361199905-1104184693=:50685
+Content-Type: text/html; charset=us-ascii
+
+<DIV>How would increasing the inquiry scan window for a device ( say, x times 18 out of&nbsp;2048 time slots, where x &gt;1) affect other devices doing inquiry scan? Or, affect the response from the master?</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Thanks</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Krishna</DIV><p><br><hr size=1>Post your free ad now! <a href="http://ca.personals.yahoo.com/"><b>Yahoo! Canada Personals</b></a><br>
+--0-1361199905-1104184693=:50685--
 
 
 -------------------------------------------------------
