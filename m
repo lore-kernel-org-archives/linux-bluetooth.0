@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Dongles not working
+Subject: Re: [Bluez-users] disappointed with my MX900 battery life
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Raul Jimeno Mouzo <pichas23@hotmail.com>
+To: Charles Bueche <charles@bueche.ch>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <LAW11-F7reyCJ5COYbg00014369@hotmail.com>
-References: <LAW11-F7reyCJ5COYbg00014369@hotmail.com>
+In-Reply-To: <1073555620.5632.8.camel@bluez.bueche.ch>
+References: <1073555620.5632.8.camel@bluez.bueche.ch>
 Content-Type: text/plain
-Message-Id: <1073583971.2563.35.camel@pegasus>
+Message-Id: <1073583568.2563.29.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,33 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Jan 2004 18:46:11 +0100
+Date: Thu, 08 Jan 2004 18:39:28 +0100
 
-Hi Raul,
+Hi Charles,
 
-> PVI-Raul:/# hciconfig -a
-> hci0:   Type: USB
->         BD Address: 00:06:A2:05:A2:40 ACL MTU: 339:4  SCO MTU: 64:0
->         UP RUNNING PSCAN ISCAN
->         RX bytes:63 acl:0 sco:0 events:7 errors:0
->         TX bytes:27 acl:0 sco:0 commands:7 errors:0
->         Features: 0xff 0xff 0x3d 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy:
->         Link mode: SLAVE ACCEPT
->         Name: 'BlueZ (0'
->         Class: 0x000100
->         Service Classes: Unspecified
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x90 LMP Ver: 1.1 (0x1) LMP Subver: 0x90
->         Manufacturer: Transilica, Inc. (24)
+> I'm using the CVS version of libs2 and utils2, with my MX900. I have the
+> impression that the MX900 batteries don't last very long between two
+> charging cycles (2-3 days). Can other here confirm this ?
+> 
+> I must explain that I use my MX900 without the docking (with a laptop
+> underway), so I only dock the mouse to load it when it blink red.
+> 
+> And being with empty batteries underway leaves me with the poor
+> touchpad.
+> 
+> Any better experience under Window$ ? Is some optimization possible in
+> the code to better use the "standby" modes of the MX900 ?
 
-I don't have experiences with Transilica chips. Once I got a dongle with
-such a chip, but it seems that I lost it. If the SCO option of the HCI
-USB driver is enabled, disable it and try to switch the usb-uhci with
-the uhci USB host driver and vice versa. If none of that helped in your
-case, you should better try to get a CSR based USB dongle. They are more
-unproblematic than the others at the moment. 
+the HID specification is clear about that the HID device itself must
+take care about its power consumption. What is your link policy? Maybe
+the sniff mode is not enabled. On the other hand the Apple Bluetooth
+mouse never uses sniff mode to save power. Run a hcidump and check what
+your mouse is doing.
 
 Regards
 
