@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Piconet problems
+Subject: Re: [Bluez-users] device parking
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <IAMHAF$6F3EDB7D5CA418646EBF9DB16603762A@libero.it>
-References: <IAMHAF$6F3EDB7D5CA418646EBF9DB16603762A@libero.it>
+In-Reply-To: <41F049EA.7000307@gmx.ch>
+References: <41F049EA.7000307@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1106268153.7955.43.camel@pegasus>
+Message-Id: <1106266838.7955.33.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,19 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 21 Jan 2005 01:42:33 +0100
+Date: Fri, 21 Jan 2005 01:20:38 +0100
 
-Hi Jers,
+Hi Marco,
 
-> At the moment, my dongles seem to work better. I tried again 
-> to create a piconet (1 master,2 slaves) but I got the same problem of the early stage, i.e.,
-> I can only create the first connection and interface bnep.
-> Unlike before, now hcidump works and we can see the packets.
+> is it possible with bluez to use parking?
+> if yes, does that mean that 7 (6?) active connections and 248 parked 
+> connections can be handled at a time?
 
-you run into a page timeout (error code 0x04) with your second
-connection. Why don't you use hcid? It will bring up your devices with
-the correct settings. Make sure that the device with the newest firmware
-is your desired master device.
+BlueZ is able to handle it, but you won't find any Bluetoot chip that is
+able to do this. Normally they are limited to 7 slaves. No matter if
+they are parked or not.
 
 Regards
 
