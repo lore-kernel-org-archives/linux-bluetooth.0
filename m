@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Bc. Michal Semler" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200407251403.50608.cijoml@volny.cz>
-Subject: [Bluez-users] obexserver and t68i problem?
+From: Chris Searle <usenet@chrissearle.org>
+Message-ID: <87acxo48c4.fsf@alice.chrissearle.org>
+References: <lgk6wvgqax.fsf@montgomery.empolis.no>
+	<1090572097.21828.53.camel@pegasus>
+	<lg8ydbgliv.fsf@montgomery.empolis.no>
+	<1090572685.21828.58.camel@pegasus>
+	<lg4qnzgkuz.fsf@montgomery.empolis.no>
+	<1090573758.4791.1.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: hcid config
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,36 +21,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 25 Jul 2004 14:03:50 +0200
+Date: Sun, 25 Jul 2004 13:47:23 +0200
 
-Hi,
+>>>>> "Marcel" == Marcel Holtmann <marcel@holtmann.org> writes:
 
-after a long time I needed send photos from my phone to bluez box.
+    Marcel> these devices are not brought up by hcid. Activate
+    Marcel> "autoinit" in hcid.conf and restart the hcid.
 
-sdpd
-sdptool add --channel=10 OPUSH
-obexserver
+Still not getting any further. autoinit is already yes in the config
+file (see other post).
 
-Mobile finds bluez box, try send, but writes connection problem:
+Some more info: on hcitool inq that both devices are reporting class
+0x000000.
 
-here is output of hcidump
+Manually restarting hcid makes no difference (same result as using the
+/etc/init.d script). Stopping all other bluez things (sdp, dund etc)
+then just starting hcid - no change.
 
-# hcidump -x
-HCIDump - HCI packet analyzer ver 1.9
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request (0x04) plen 10
-  51 EC FC D9 0A 00 04 02 52 01
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  51 EC FC D9 0A 00 00
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04
-> HCI Event: Connect Complete (0x03) plen 11
-  1A 2F 00 51 EC FC D9 0A 00 01 00
+Not sure how to follow this further.
 
+-- 
+Chris Searle
 
-Thanks
-
-Michal
 
 
 -------------------------------------------------------
