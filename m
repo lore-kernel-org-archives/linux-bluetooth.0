@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Once again: Socket CF card and Kernel 2.6
+Subject: Re: [Bluez-users] adding a sdp service with a 128bit uuid
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <42294598.6010004@adamis.de>
-References: <20050226031901.GL11723@adamis.de>
-	 <1109578431.17256.9.camel@pegasus>  <20050228220209.GA8151@adamis.de>
-	 <1109665776.17256.122.camel@pegasus>  <42294598.6010004@adamis.de>
+In-Reply-To: <42291076.5040109@gmx.ch>
+References: <42291076.5040109@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1110021859.8058.111.camel@pegasus>
+Message-Id: <1110021688.8058.108.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,23 +18,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 05 Mar 2005 12:24:19 +0100
+Date: Sat, 05 Mar 2005 12:21:28 +0100
 
-Hi Mathias,
+Hi Marco,
 
-> I just got it working by doing a little change in the serial driver 
-> (8250.c). I tested it with 2.6.11 but I think it could work for any 2.6 
-> kernel.
+> by reading sdptool.c, I was able to write a little program that promotes my 
+> service. Realising this, 3 questions arised:
+> 
+> 1. general:
+> how to browse the local sdp services?
+> [sdptool browse dev] seems to be only for remote devices. I now always did 
+> it from another device to see the local seervices. how to [sdptool browse 
+> localhost]?
 
-please provide a patch for your change.
+sdptool browse local
 
-> One thing I discovered while debugging this: the hci_uart driver 
-> seems to initialize the actual UART with only 230400 baud. Is this 
-> really the case or are those UARTs clocked at nonstandard (higher) 
-> frequencies so that this setting does result in a higher real baud rate?
+> 2. from add_sp(...) in sdptool.c, changing:
+>   # sdp_uuid16_create(&sp_uuid, SERIAL_PORT_SVCLASS_ID);
+> into:
+>   # sdp_uuid128_create(&sp_uuid, a128bitUUID);
+> gives me (if I do [sdptool browse from the other device]):
+>   # Service Class ID List:
+>   #   "Error: This is uuid128" (0x0a333444-5556-6677-7888-9aa99000a1a1)
+> Actually it works well. But why is it saying "Error: ..."? I noticed that 
+> using the avetana jsr82 implementation (that uses bluez), and creating a 
+> sdp entry with a 128bit uuid, it shows the same error.
 
-The hci_uart is only a line discipline. Every initialization and baud
-rate settings are done with hciattach.
+This is because the friend display (without --tree) don't understand
+UUID 128 and don't knows how to translate it into a service.
+
+> 3. actually this is more a c then a bluez question, but i'd appreciate if 
+> someone could tell it nevertheless:
+>   # sdp_uuid32_create(uuid_t *uuid, uint32_t data);
+>   # sdp_uuid128_create(uuid_t *uuid, const void *data);
+> the second function takes the uuid as "const void *data". What is the 
+> appropriate way to give a uuid like 2c3ef0c843674369b1dfb7315e76332a to 
+> that function?
+
+Using "unsigned char uuid[16]" and then casting with "(void *)" worked
+for me.
 
 Regards
 
