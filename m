@@ -1,38 +1,79 @@
-Return-Path: <daryl@wideray.com>
-Errors-To: <daryl@wideray.com>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>, "'Max Krasnyansky'" <maxk@qualcomm.com>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Qualification Testing
-Date: Wed, 14 May 2003 09:02:18 -0700
-Message-ID: <000501c31a32$327c9be0$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <1052872215.4608.44.camel@pegasus.local>
-List-ID: <bluez-devel.lists.sourceforge.net>
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Max Krasnyansky <maxk@qualcomm.com>
+Cc: Daryl Van Vorst <daryl@wideray.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <5.1.0.14.2.20030513165931.0d377d88@unixmail.qualcomm.com>
+References: <5.1.0.14.2.20030513153902.0d3016d8@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030513095851.0d257510@unixmail.qualcomm.com>
+	<000201c31771$70577930$6400a8c0@baked>
+	<5.1.0.14.2.20030513095851.0d257510@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030513153902.0d3016d8@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030513165931.0d377d88@unixmail.qualcomm.com>
+Content-Type: text/plain
+Message-Id: <1052872215.4608.44.camel@pegasus.local>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 14 May 2003 02:30:08 +0200
 
-Hey Marcel,
+Hi Max,
 
-> > L2CAP_LM_RELIABLE
+> >But I don't like the name and your meaning of this options. It sounds
+> >like something that it is not and will never be. For the description of
+> >this option I think it should be something like
+> >
+> >        "Notify me when you detect an error in the ACL payload"
+> ACL is a lower lever. If baseband detects error in ACL payload it retransmits 
+> a packet :).
 
-L2CAP_LM_RETENTIVE? ;) (Not sure if the slang meaning of that word comes
-through in other countries. The real meaning may not be appropriate.) Some
-others: intolerant, cautious.
+ok, so "L2CAP frame" would be the better and correct description.
 
-> > Now we just need to add support for it in l2test.
->=20
-> Daryl, it is your test :)
+> >And the option name can be L2CAP_CHECKACL. This is not very good, I
+> >know, so any other proposals?
+> L2CAP_LM_RELIABLE
 
-Cool. :)
+I don't like it either, because we can't detect all errors which makes
+the connection unreliable. But I don't know a better name :(
 
-Another addition to l2test (and maybe rctest) that would be handy for
-testing is an option to specify how many packets to send. It would be nice
-to have the option of sending only a few packets rather than an infinite
-number. None of the tests that I've encountered so far require sending larg=
-e
-amounts of data... Just a packet or two. For rfcomm testing I could probabl=
-y
-just do an "rfcomm connect /dev/something etc.." and redirect something
-small to /dev/something if rctest is causing trouble.
+> Implementation is very very very simple and code for 2.4 is already in BK :).
+> http://linux-bt.bkbits.net:8080/bt-2.4/patch@1.1163?nav=index.html|ChangeSet@-1h|cset@1.1163
+> 
+> We didn't even need a new socket option. Just another LM (link mode) flag. And common case 
+> is not affected at all.
 
--Daryl.
+Very nice and small patch. I will delay the new -mh patches because of
+this and hopefully the SO_LINGER support. Can you please also take a
+look at the RFCOMM problem I posted to the list. My day is definitive
+over and I will take some sleep :)
+
+> Now we just need to add support for it in l2test.
+
+Daryl, it is your test :)
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+Enterprise Linux Forum Conference & Expo, June 4-6, 2003, Santa Clara
+The only event dedicated to issues related to Linux enterprise solutions
+www.enterpriselinuxforum.com
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
