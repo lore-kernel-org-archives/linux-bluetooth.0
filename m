@@ -1,20 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Nokia 7610 file transfer to computer
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1102611131.7584.1.camel@nephlim.homenet>
-References: <1102381335.13235.8.camel@nephlim.homenet>
-	 <1102406104.8447.15.camel@pegasus>
-	 <1102438800.21032.3.camel@nephlim.homenet>
-	 <1102478181.8447.52.camel@pegasus>
-	 <1102553068.22127.5.camel@nephlim.homenet>
-	 <1102577073.9988.92.camel@pegasus>
-	 <1102590679.24852.3.camel@nephlim.homenet>
-	 <1102591469.9988.128.camel@pegasus>
-	 <1102611131.7584.1.camel@nephlim.homenet>
-Content-Type: text/plain
-Message-Id: <1102620720.9988.241.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41B8A67C.3060608@paytec.com>
+From: Dave Sailer <dave.sailer@paytec.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Microsoft keyboad/mouse problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -26,31 +16,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 09 Dec 2004 20:32:00 +0100
+Date: Thu, 09 Dec 2004 14:24:44 -0500
 
-Hi Stefan,
+My mouse and keyboard sometimes loose their connection. I'm running 
+2.6.10_rc2 and hidd --server on boot. I also run a script I found around 
+the net that runs hidd --search and/or hidd --connect with retries and 
+delays to try to connect to the keyboard & mouse. When the connection is 
+lost, I typically run "hidd --show" to see that it is indeed not 
+connected then  "hidd --search" to reconnect and it USUALLY works 
+especially since I upgraded the kernel from 2.6.8. Thankfully it is 
+usually the mouse that is a problem, so I can do this from the same box. 
+When "hidd --search" fails I remove and replace the batteries. I've 
+noticed the mouse lights blinking at me, which I'm not sure is telling 
+me the batteries are low. I checked and they weren't really that low. It 
+sometimes seems as though the mouse desires batteries really well 
+charged. The few times the keyboard was a problem, I ssh from another 
+box and "hidd --search" and it works.
 
-> > Actually I meant its chip information (use "hcitool info ..."), because
-> > we need to figure out which Bluetooth chip is the bad one that makes
-> > sending out the ACL data packets before the connection complete event. I
-> > believe your dongle is the problematic part and if you exchange it with
-> > a CSR based one all troubles will be gone.
-> 
-> That was it! :)
+I'm new to this and I'm a bit confused on some things:
 
-I am still interested in the "hcitool info" output.
+1) when the devices sleep should "hidd --show" show the device? (And the 
+hidd server is waiting for a wakeup from the device?) I guess I should 
+check "hidd --show" sometime when they've been inactive.
 
-> With a new BT dongle it now works fine! So much trouble and such a easy
-> solution... :/
+2) what does the blinking mouse mean (I don't have any docs with these 
+devices).
 
-The more bad dongles or better Bluetooth chips/modules I see on the
-market, I think we really need some qualification testing for HCI.
-
-Regards
-
-Marcel
-
-
+3) Should I have to push the mouse and keyboard buttoms on every reboot 
+or just one time for the device? (should I need that second script I'm 
+running?)
 
 
 -------------------------------------------------------
