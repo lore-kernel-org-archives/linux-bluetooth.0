@@ -1,47 +1,38 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] problem using kernel 2.4.18
-From: Marcel Holtmann <marcel@holtmann.org>
-To: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <168c01518d.1518d168c0@estudiants.urv.es>
-References: <168c01518d.1518d168c0@estudiants.urv.es>
-Content-Type: text/plain
-Message-Id: <1078705218.15279.13.camel@pegasus>
+Return-Path: <mcq@cacr.caltech.edu>
+Date: Sun, 7 Mar 2004 16:21:00 -0800
+From: John McCorquodale <mcq@cacr.caltech.edu>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: John McCorquodale <mcq@cacr.caltech.edu>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Socket G card newbie Q
+Message-ID: <20040308002100.GA19049@viz.cacr.caltech.edu>
+References: <20040307214224.GB18481@viz.cacr.caltech.edu> <1078704901.15279.6.camel@pegasus>
 Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 08 Mar 2004 01:20:18 +0100
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1078704901.15279.6.camel@pegasus>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Albert,
+Marcel> you should use "hciattach ttyS0 bcsp 230400", because the Socket card
+Marcel> uses the BCSP transport protocol.
 
-> I know that bluez-kernel-2.3 is no longer supported, and my kernel is out of date (red hat valhalla 2.4.18) , but I can't change my kernel, because I'm working on a robot and my manager doesn't want to change anything from it, so is there any way I can make BlueZ working on that machine? I get this error on doing make install:
-> make: *** [install] Error 1
+The other day you said:
 
-the bluez-kernel-2.3 is out of date and contains many unfixed bugs. My
--mh patches are not meant for a RedHat kernel, so you are on your own if
-you don't wanna update your kernel to a newer vanilla one.
+Marcel> The Socket 2.5 generation (also know as revision G) is a CSR based
+Marcel> serial Bluetooth card. Look at the archives for more details.
 
-Regards
+And the list seems to indicate that the F card is BCSP and the G card is CSR.
+That said, using bcsp yields:
 
-Marcel
+  $ hciattach ttyS0 bcsp 230400
+  BCSP initialization timed out
 
+Am I mistaken about the F/G distinction?  Am I correct in using the normal
+serial_cs driver in the PCMCIA cardmgr?  Is there something I can run directly
+at the serial port that will give me a more verbose dialog than "initialization
+timed out", which might indicate some level of partial success?  Could it
+be that there's a new G card series out there -- these are brand spankin' new
+cards?
 
+Cheers, and thanks,
 
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+-mcq
