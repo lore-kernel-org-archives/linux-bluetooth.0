@@ -1,15 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: Version 3 libs/utils (was: Re: [Bluez-devel] patch for d-bus
 	support in hcid)
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+From: Stephen Crane <steve.crane@rococosoft.com>
 To: Max Krasnyansky <maxk@qualcomm.com>
-Cc: Stephen Crane <steve.crane@rococosoft.com>, Philip Blundell <pb@nexus.co.uk>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: Philip Blundell <pb@nexus.co.uk>, bluez-devel@lists.sourceforge.net
 In-Reply-To: <5.1.0.14.2.20030624102040.0de55858@unixmail.qualcomm.com>
 References: <5.1.0.14.2.20030620171218.0db953a8@unixmail.qualcomm.com>
 	<5.1.0.14.2.20030620171218.0db953a8@unixmail.qualcomm.com>
 	<5.1.0.14.2.20030624102040.0de55858@unixmail.qualcomm.com>
 Content-Type: text/plain
-Message-Id: <1056543354.10001.136.camel@pegasus>
+Message-Id: <1056532626.1645.162.camel@baroque.rococosoft.com>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -23,11 +23,21 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 25 Jun 2003 14:15:47 +0200
+Date: 25 Jun 2003 10:17:06 +0100
 
-Hi Max,
-Hi Stephen,
-
+On Tue, 2003-06-24 at 18:31, Max Krasnyansky wrote:
+> At 07:00 AM 6/24/2003, Stephen Crane wrote:
+> >How do you want to start version 3?  We'll need to keep the old utils
+> >and libs around for a while. However I'd like to merge SDP in early:
+> >there's a lot of duplicated effort (lists, etc.) which can be stripped
+> >out.
+> >
+> >I have the first-cut at this merge in my local tree. However I don't
+> >want to check it in on top of the old utils and libs --- unless you
+> >think that's OK.
+> >
+> >So maybe the best way to proceed is to start a new branch in CVS?
+> 
 > I think branch is CVS branch is probably a bad idea. Because we want
 > to change a lot of things like command names, etc. Which means lots 
 > of file renames, CVS does not handle that.
@@ -39,19 +49,12 @@ Hi Stephen,
 > We'll keep old ones around for a while but will only make minor fixes
 > to them.
 
-we have already discussed this and starting with new modules seemed to
-be the cleanest way. But we shouldn't name them libs2 and utils2,
-because we are already at version 2.x with the others. We should use
-libs3 and utils3 or maybe an unrelated to the version number suffix like
-"-ng".
+That works for me. You want to go first?
 
-If we agree on the new name, I will start to create the framework for
-the new modules.
-
-Regards
-
-Marcel
-
+Steve
+-- 
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
 
 
