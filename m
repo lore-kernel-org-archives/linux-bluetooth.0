@@ -1,58 +1,41 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <mtortonesi@ing.unife.it>
+From: Mauro Tortonesi <mtortonesi@ing.unife.it>
+To: Marcel Holtmann <marcel@holtmann.org>
 Subject: Re: [Bluez-devel] sco link help needed
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Nils Faerber <nils.faerber@kernelconcepts.de>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1077728432.6021.522.camel@localhost>
-References: <4034CA08.50500@soft.uni-linz.ac.at>
-	 <200402251359.00791.mtortonesi@ing.unife.it>
-	 <1077715546.2919.77.camel@pegasus>
-	 <200402251504.47809.mtortonesi@ing.unife.it>
-	 <1077719012.2919.94.camel@pegasus>  <1077728432.6021.522.camel@localhost>
-Content-Type: text/plain
-Message-Id: <1077729384.2919.120.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 25 Feb 2004 18:16:25 +0100
+Date: Wed, 25 Feb 2004 16:46:10 +0100
+Cc: James Courtier-Dutton <James@superbug.demon.co.uk>,
+   Fred =?iso-8859-15?q?Sch=E4ttgen?= <bluez-devel@schaettgen.de>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   Simon Vogl <vogl@soft.uni-linz.ac.at>
+References: <4034CA08.50500@soft.uni-linz.ac.at> <200402251635.13917.mtortonesi@ing.unife.it> <1077723452.2919.112.camel@pegasus>
+In-Reply-To: <1077723452.2919.112.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Message-Id: <200402251646.10544.mtortonesi@ing.unife.it>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Nils,
+On Wednesday 25 February 2004 16:37, Marcel Holtmann wrote:
 
-> > Is the PCM mapping of both dongles set to HCI? What kernel version do
-> > you use?
-> 
-> And if it isn't?
-> I searched the archive but could not find a way to change it.
-> Or is this fixed in the firmware? This would be a pity...
-> I have just got a Fujitsu-Siemens Lifebook with builtin Blueooth (CSR
-> chipset BlueCore01b, HCI 12.3) which reports SCOmapping to PCM...
+> > > Is the PCM mapping of both dongles set to HCI?
+> >
+> > how can i find this out? from the SCO MTU value?
+> >
+> > [mauro@giskard mauro]$ /sbin/hciconfig hci0 revision
+> > hci0:   Type: USB
+> >         BD Address: 00:0A:3A:51:13:1C ACL MTU: 192:8  SCO MTU: 64:8
+> >         HCI 16.4
+>
+> No. Use "hciconfig hci0 revision" (as root). It must be set to HCI.
 
-the SCO mapping is a PSKEY like everything else. It is the same as for
-the host transport or the UART setttings. You can change it if you know
-how. Actually I don't provide any source code that is capable of
-changing PSKEY's.
-
-Regards
-
-Marcel
+in fact, it is set to HCI.
 
 
+-- 
+Aequam memento rebus in arduis servare mentem...
 
-
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Mauro Tortonesi                 mtortonesi@ing.unife.it
+                                mauro@deepspace6.net
+                                mauro@ferrara.linux.it
+Deep Space 6 - IPv6 with Linux  http://www.deepspace6.net
+Ferrara Linux User Group        http://www.ferrara.linux.it
