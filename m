@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41375861.90004@conectiva.com.br>
-From: Luiz Fernando Capitulino <lcapitulino@conectiva.com.br>
-MIME-Version: 1.0
-To: gonzalo briceno <gonzalohbriceno@yahoo.com>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Key step in bluetonium setup, bcm203x does not
- load firmware
-References: <20040902141108.99034.qmail@web52807.mail.yahoo.com>
-In-Reply-To: <20040902141108.99034.qmail@web52807.mail.yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Message-Id: <6.1.2.0.2.20040902194629.053ab320@luna.tlmat.unican.es>
+To: bluez-users@lists.sourceforge.net
+From: George <george.news@gmx.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"; format=flowed
+Subject: [Bluez-users] Connect Error - Function not implemented
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,35 +15,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Sep 2004 14:29:05 -0300
+Date: Thu, 02 Sep 2004 19:54:03 +0200
 
+Hi all.
 
-  Hello Gonzalo,
+I'm developing under kernel 2.4.21 an application that involves dealing 
+with bluetooth devices.
+In order to make the application I have taken part of the code of the pand 
+(it's opensource great!!!). My application is very similar to that. It's a 
+daemon that firstly look for Bluetooth devices, if any found it tries to 
+establish a bnep connection and then it runs as a server in order to be 
+able to attend connection request. As you can see it's more or less all the 
+stuff in pand. I have also automate the bridge creation, ...
 
-gonzalo briceno wrote:
+Well I have been checking the correct behaviour by running my application 
+and then connecting using pand. This way everything works ok.
 
- > I installed bluez-firmware-1.0 and bluez-utils-2.9,
- > however, the problem is not fixed.  When I look at
- > /proc/bus/usb/devices the bluetonium chip is listed
- > but sure enough, it does not load the usb_hci module.
- >
- > Any help?
+However when running my application on two PC I get the following error 
+from the connect statement: Function not implemented (38)
+Then if I try again with pand I still get the error.
 
-  We had the some problem here (but the device is different).
+What is the reason for this error?
 
-  On our setup, we copied the firmware files to:
+Any help is really welcomed.
 
-/usr/lib/hotplug/firmware/
+TA
 
-  and reloaded the kernel module.
-
-  I'm not certain if it is the right thing to do, but
-it worked.
-
-  Hope it helps,
-
--- 
-Luiz Fernando N. Capitulino
 
 
 -------------------------------------------------------
