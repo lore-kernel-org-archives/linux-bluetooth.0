@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Matthias Albert <matthias@ma-c.de>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <1095082582.2191.35.camel@ringo.aicas.burg>
+Subject: Re: [Bluez-users] Bluetooth dongle
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ricky Soh <rickysoh@gmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <db972f4304091218256f88456a@mail.gmail.com>
+References: <db972f43040910000351e5b931@mail.gmail.com>
+	 <1094997330.5695.4.camel@pegasus>
+	 <db972f4304091218256f88456a@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1095079363.5695.48.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] bluetooth ipaq familiar
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,36 +20,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 13 Sep 2004 15:36:22 +0200
+Date: Mon, 13 Sep 2004 14:42:44 +0200
 
-Hello together,
+Hi Ricky,
 
-I have a iPAQ 5550 running with Familiar unstable 0.7.2 and Opie 1.1.4.
-I can establish a connection over pand between a pc and the ipaq.
+> I have tried service bluetooth restart and yet, hciconfig will not get
+> a respond. I have read that i may have to edit some config file to get
+> it working but i have no idea which file and how to edit them. Any
+> advise? Thanks
 
-After that I have a device called bnep0 which I can configure with
-ifconfig bnep0 and so on.
+you should do what I asked you to do. Look for any USB or Bluetooth
+related error messages in your logs or at the dmesg output.
 
-Now I would like to have a serial bluetooth connection between the pc
-and the ipaq.
-How can I do this?
+Regards
 
-Is it possible with a serial bluetooth connection, that I can go outside
-the frequency with my ipaq and go back and the connection is there? (I'm
-sorry for by bad english, I hope that's ok for reading).
+Marcel
 
-
-I'm happy about any experience with your ipaq and bluetooth.
-
-
-Many greets from Germany Karlsruhe,
-
-Matthias
-
-
--- 
-Matthias Albert <matthias@ma-c.de>
-ma-c
 
 
 
