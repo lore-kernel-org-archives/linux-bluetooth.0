@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] callback for L2CAP disconnection
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: Carmine Pirro <carrip@gmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <17ca747604072807081342839b@mail.gmail.com>
+References: <17ca74760407280608573db26d@mail.gmail.com>
+	 <1091021474.3673.29.camel@notepaq>
+	 <17ca747604072807081342839b@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1091127403.12651.130.camel@pegasus>
+Message-Id: <1091027744.4845.94.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Removing the RPM spec files
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,15 +20,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Jul 2004 20:56:43 +0200
+Date: Wed, 28 Jul 2004 17:15:45 +0200
 
-Hi Folks,
+Hi Carmine,
 
-with my announcement of the bluez-libs-2.9 and bluez-utils-2.9 I forgot
-to mention that I removed the RPM spec files from the source packages. I
-got sick of maintained them in a source distribution and so I created a
-CVS packages repository for that. Every package maintainer can put their
-specific files at that place in the CVS. Also build scripts are welcome.
+> The following is what i have to do:
+> a device A is connected to a device B.
+> When device A disconnects, a process on device B has to print the
+> device A bluetooth address on the screen with a appropriate message.
+
+this is all about socket programming. Take a look at functions like
+poll(), getsockname(), getpeername() etc.
 
 Regards
 
@@ -33,10 +40,10 @@ Marcel
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by OSTG. Have you noticed the changes on
-Linux.com, ITManagersJournal and NewsForge in the past few weeks? Now,
-one more big change to announce. We are now OSTG- Open Source Technology
-Group. Come see the changes on the new OSTG site. www.ostg.com
+This SF.Net email is sponsored by BEA Weblogic Workshop
+FREE Java Enterprise J2EE developer tools!
+Get your free copy of BEA WebLogic Workshop 8.1 today.
+http://ads.osdn.com/?ad_id=4721&alloc_id=10040&op=click
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
