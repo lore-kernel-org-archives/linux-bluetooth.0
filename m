@@ -1,55 +1,38 @@
-Return-Path: <jeffs@fairwayacademy.org>
-From: Jeff Sutherland <jeffs@fairwayacademy.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-users] Timeout message from kernel
-Date: Fri, 13 Feb 2004 09:17:46 -0500
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-References: <200402121636.02074.jeffs@fairwayacademy.org> <1076631244.2671.16.camel@pegasus>
-In-Reply-To: <1076631244.2671.16.camel@pegasus>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200402130917.46561.jeffs@fairwayacademy.org>
-List-ID: <bluez-users.lists.sourceforge.net>
+	charset="iso-8859-1"
+Message-ID: <4487C040D663894C961C8297CB8F62B81E6354@apl03.poli.usp.br>
+From: "Oswaldo Seiji Morelli Sakai" <oswaldo.sakai@poli.usp.br>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] easier way to program ?
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 13 Feb 2004 11:48:12 -0200
 
-On Thursday 12 February 2004 19:14, Marcel Holtmann wrote:
-> Hi Jeff,
-<snip>
+wich is the easier way to program hci commands?
+i have to student kits(ericson) and i want to program somethig simple(i =
+think):
+a automatic conection between them(inquire-create conection-accept =
+conection)=20
+does someone works with something similar in C or VB?=20
+=20
 
-> > /> hcitool info 00:0A:4F:00:09:5E
-> > Requesting information ...
-> > bcsp_timed_event: Timeout, retransmitting 1 pkts
-> > Can't create connection: Input/output error
->
-> This can mean many things. Try using l2ping or l2test. Can you run
-> hcidump on the ColdFire board?
 
-l2ping from either end works.  I didn't cross-compile hcidump for the ColdFire 
-board, need to do some makefile wizardry in the parser subdir first.  l2test 
-on both ends just sits there waiting for something, no doubt I'm not invoking 
-it properly.  hcidump on the pc end shows the ping packets arriving from 
-ColdFire.  I guess my connection is basically working.  On the ColdFire 
-board:
-/bin> hciconfig
-hci0:   Type: UART
-        BD Address: 00:0A:4F:00:13:5F ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:289 acl:0 sco:0 events:14 errors:0
-        TX bytes:554 acl:0 sco:0 commands:14 errors:0
-
-But invoking hcitool still yields:
-/bin> hcitool info 00:0A:4F:00:09:5E
-Requesting information ...
-bcsp_timed_event: Timeout, retransmitting 1 pkts
-Can't create connection: Input/output error
-pid 54: failed 256
-
-bcsp_timed_event: is a kernel error msg.  I should probably try to set up an 
-l2test session properly next.  Any advice?
-
-Thanks,
--Jeff
--- 
-Secure your email with Gnu Privacy Guard and Mozilla, the open source
-cross platform solution for Windows, Linux, and Mac OS X.
-See http://enigmail.mozdev.org/
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
