@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <001601c432ca$9964f710$fcca010a@firedrake>
-From: "zubiwat" <zubiwat@poczta.onet.pl>
-To: "bluez devel" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0013_01C432DB.5ACF2CD0"
-Subject: [Bluez-devel] UART speed
+Subject: Re: [Bluez-devel] Encryption, authentication with Bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Fred =?ISO-8859-1?Q?Sch=E4ttgen?= <Sch@ttgen.net>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   Julien Campana <juliencampana@yahoo.fr>
+In-Reply-To: <200405051604.51052.Sch@ttgen.net>
+References: <1083758037.1541.36.camel@fischer>
+	 <1083761997.4420.4.camel@pegasus>  <200405051604.51052.Sch@ttgen.net>
+Content-Type: text/plain
+Message-Id: <1083767141.4420.29.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,72 +20,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 5 May 2004 19:58:37 +0200
+Date: Wed, 05 May 2004 16:25:42 +0200
 
-This is a multi-part message in MIME format.
+Hi Fred,
 
-------=_NextPart_000_0013_01C432DB.5ACF2CD0
-Content-Type: text/plain;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+> Marcel, some time ago you said you were planning to add an ioctl to let 
+> regular users trigger an authentication request. Is this possible in the 
+> meantime? Or are there any reasons why this isn't a good idea?
 
-Hi=20
-I have red those posts about UART CSR speed and now I'm trying to do =
-some speed translator. I'm connected to BT UART with 921600 and at PC's =
-side it's 115200 but it didn't work so I can't understand why it is =
-happening like this. I also tierd to connect through 2 USB dongles and =
-it's the same - about 5kBps max. Ofcourse I'm talking about RFCOMM - =
-RS232.
-Where is the rest of speed???
-I don't understand this. Can anyone explain this to me??
+I think the idea is still good, but I am not sure how we really handle
+this inside the kernel. And right now I don't have enough time to think
+about it. However I am happy to look at any patch that supports this
+idea.
 
 Regards
 
-Maciej
+Marcel
 
-------=_NextPart_000_0013_01C432DB.5ACF2CD0
-Content-Type: text/html;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-2">
-<META content=3D"MSHTML 5.50.4134.600" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I have red those posts about UART CSR =
-speed and now=20
-I'm trying to do some speed translator. I'm connected to BT UART with =
-921600 and=20
-at PC's side it's 115200 but it didn't work so I can't understand why it =
-is=20
-happening like this. I also tierd to connect through 2 USB dongles and =
-it's the=20
-same - about 5kBps max. Ofcourse I'm talking about RFCOMM - =
-RS232.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Where is the rest of =
-speed???</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I don't understand this. Can anyone =
-explain this to=20
-me??</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Regards</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Maciej</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0013_01C432DB.5ACF2CD0--
 
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by Sleepycat Software
-Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to deliver
-higher performing products faster, at low TCO.
-http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
+This SF.Net email is sponsored by: Oracle 10g
+Get certified on the hottest thing ever to hit the market... Oracle 10g. 
+Take an Oracle 10g class now, and we'll give you the exam FREE.
+http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
