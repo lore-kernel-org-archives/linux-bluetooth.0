@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth Device(Headset(Audio)+Data transfer)
-	for a Linux PC
+Subject: Re: [Bluez-users] RFCOMM Device
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <f54d864050226004521c9a1a0@mail.gmail.com>
-References: <f54d864050226004521c9a1a0@mail.gmail.com>
+In-Reply-To: <d1f423d3050226200521a6d7a@mail.gmail.com>
+References: <d1f423d3050226200521a6d7a@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1109578343.17256.7.camel@pegasus>
+Message-Id: <1109578219.17256.5.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,40 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Feb 2005 09:12:23 +0100
+Date: Mon, 28 Feb 2005 09:10:19 +0100
 
-Hi Benny,
+Hi Anderson,
 
-> We are planning for a single bluetooth device(microcontroller based)
-> featuring a headset and our custom hardware device which sends status
-> to the PC and gets control information over bluetooth. We plan to use
-> a Bluetooth SoC with Headset Profile interfaced to the microcontroller
-> over UART which fetches the status/control data from our custom
-> hardware.
+> I am new with Bluez  and I trying to set up a rfcomm device but the
+> /dev/rfcomm0 is not being created or does not exist.
 > 
-> On the PC side(linux) we are going to use a standard USB Bluetooth
-> dongle. We are using the Bluez on the Linux PC side.
-> 
-> i) We need to send audio information(playing song using some MP3
-> player) from PC to the bluetooth device headset and also send data
-> from Mic to the PC for voice recording.
-> 
-> What setup we need to make for audio configuration in Linux PC to
-> route the audio information to the headset and a voice recording
-> setup?
+> # rfcomm bind 0 aa:aa:aa:aa:aa 1 (works)
+> #rfcomm
+> rfcomm0: aa:aa:aa:aa:aa clean (is it right?)
 
-look at the information at bluetooth-alsa.sf.net
+it must be "rfcomm0: aa:aa:aa:aa:aa channel 1 clean", but yes that is
+right.
 
-> ii) Parallely we want to recieve the status info from the bluetooth
-> device and need to send the appropriate control information from PC.
-> We have tested data transfer between 2 PCs using BT USB dongles at
-> L2CAP level. But our final target is we need to implement in firware
-> on our Microcontroller.
-> 
-> Is there a firmware level implementation of Bluez available?
+> but when i try to use pppd it does not work, it does not recognize the
+> /dev/rfcomm0
 
-No and we don't have any plans for it, until the firmware of your
-Microcontroller is Linux based.
+Check if /dev/rfcomm0 exists and if not install udev or create it by
+hand.
 
 Regards
 
