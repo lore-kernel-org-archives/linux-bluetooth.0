@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] IBM T41 internal bluetooth, HCI Rev. 0x222
-References: <406413FF.4070005@ei.tum.de>
-In-Reply-To: <406413FF.4070005@ei.tum.de>
+Message-ID: <00d401c4134b$5bb0b9c0$fcca010a@lysydziadek>
+From: "zubiwat" <zubiwat@poczta.onet.pl>
+To: "users bluetooth" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200403261835.46523.cijoml@volny.cz>
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_00CF_01C41353.B8038BF0"
+Subject: [Bluez-users] Specification
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,58 +16,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Mar 2004 18:35:46 +0100
+Date: Fri, 26 Mar 2004 16:59:36 +0100
 
-Hi,
+This is a multi-part message in MIME format.
 
-download latest bluez-libs and utils and try:
+------=_NextPart_000_00CF_01C41353.B8038BF0
+Content-Type: text/plain;
+	charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 
-hciconfig hci0 revision
+Hi
+If someone has Bluetooth specifications for the UART host transport and =
+for the HCI please send me because when I'm trying to download from =
+https://www.bluetooth.org/spec/ it tells me that I'm not logged in what =
+isn't true. I'm first logging in and then trying to download.
 
-Michal
+------=_NextPart_000_00CF_01C41353.B8038BF0
+Content-Type: text/html;
+	charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 
-Dne p=E1 26. b=F8ezna 2004 12:29 Matthias Thomae napsal(a):
-> Dear Bluez users,
->
-> I got this output of 'hciconfig -a' on an IBM Thinkpad T41 with built-in
-> bluetooth (from a kind person, I don't own one myself):
->
-> hci0:   Type: USB
->          BD Address: 00:20:E0:XX:XX:XX ACL MTU: 192:8  SCO MTU: 64:8
->          UP RUNNING PSCAN ISCAN
->          RX bytes:1964236 acl:94984 sco:0 events:4993 errors:0
->          TX bytes:405157 acl:5003 sco:0 commands:15 errors:0
->          Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->          Link policy: HOLD SNIFF PARK
->          Link mode: SLAVE ACCEPT
->          Name: 'ondrabook-0'
->          Class: 0x120104
->          Service Classes: Networking, Object Transfer
->          Device Class: Computer, Desktop workstation
->          HCI Ver: 1.1 (0x1) HCI Rev: 0x222 LMP Ver: 1.1 (0x1) LMP Subver:
-> 0x222
->          Manufacturer: Cambridge Silicon Radio (10)
->
-> What kind of CSR chip (or Firmware) with what features is this? I
-> couldn't find anything about HCI Rev. 0x222 on
-> http://www.holtmann.org/linux/bluetooth/csr.html.
->
-> Regards.
-> Matthias
->
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: IBM Linux Tutorials
-> Free Linux tutorial presented by Daniel Robbins, President and CEO of
-> GenToo technologies. Learn everything from fundamentals to system
-> administration.http://ads.osdn.com/?ad_id=3D1470&alloc_id=3D3638&op=3Dcli=
-ck
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-2">
+<META content=3D"MSHTML 5.50.4134.600" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>
+<DIV><FONT face=3DArial size=3D2>Hi</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>If someone has <FONT face=3D"Times New =
+Roman"=20
+size=3D3>Bluetooth specifications for the UART host transport and for =
+the HCI=20
+please send me because when I'm trying to download from <A=20
+href=3D"https://www.bluetooth.org/spec/">https://www.bluetooth.org/spec/<=
+/A>&nbsp;it=20
+tells me that I'm not logged in what isn't true. I'm first logging in =
+and then=20
+trying to download.</FONT></FONT></DIV></FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_00CF_01C41353.B8038BF0--
+
 
 
 -------------------------------------------------------
