@@ -1,72 +1,47 @@
-Return-Path: <erics_trip@hotmail.com>
-From: "Forever Again" <erics_trip@hotmail.com>
-To: marcel@holtmann.org
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] HCI not working after using usb_storage
-Date: Sat, 14 Feb 2004 00:11:24 +0000
-Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <Law12-F120WaL4Oftvg00010095@hotmail.com>
+Return-Path: <jeffs@fairwayacademy.org>
+From: Jeff Sutherland <jeffs@fairwayacademy.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-users] Timeout message from kernel
+Date: Fri, 13 Feb 2004 18:58:51 -0500
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <200402121636.02074.jeffs@fairwayacademy.org> <200402131819.10939.jeffs@fairwayacademy.org> <1076715629.18588.103.camel@pegasus>
+In-Reply-To: <1076715629.18588.103.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200402131858.51524.jeffs@fairwayacademy.org>
 List-ID: <bluez-users.lists.sourceforge.net>
 
-I apologize to everyone ... my first day on the list, and I wasted your 
-time. For some reason, after I had added the usb_storage, the power to my 
-bluetooth went off. Or maybe I turned it off by accident. I turned it back 
-on and hciconfig found my device. I'll try to be less hasty before posting 
-to the list about problems like that.
-Evan
+On Friday 13 February 2004 18:40, Marcel Holtmann wrote:
+> Hi Jeff,
 
+<snip>
 
+> Both look fine, but you should enable role switch support in hcid.conf
+> or set it by hand with hciconfig.
+>
+> > Other than that sequence problem it looks like the link mostly works,
+> > still issues with most of the commands of hcitool though, on Coldfire.
+>
+> Keep trying and look with hcidump at it, but we can also have a bug in
+> our tools if they are used on a ColdFire processor.
 
+I've tried the l2test -s from Coldfire several times, doing 'hciconfig hci0 
+reset' in between for good measure, always get the same results on the pc 
+end.  This looks suspiciously like an endian problem somewhere, but why would 
+receive work ok?
 
->From: Marcel Holtmann <marcel@holtmann.org>
->To: Forever Again <erics_trip@hotmail.com>
->CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
->Subject: Re: [Bluez-users] HCI not working after using usb_storage
->Date: Sat, 14 Feb 2004 00:42:31 +0100
->
->Hi Evan,
->
-> > I have a logitech mx900 mouse, which was working fine before. I'm 
->running
-> > the 2.6.2 kernel on Fedora. Using the bthid daemon it was working. Then 
->I
-> > tried to use a usb memory stick, and after using the usb_storage driver, 
->my
-> > mouse stopped working. I check to see what was up and I noticed that my 
->hci
-> > device was gone. When I try running hciconfig hci0 up, I get this:
-> >
-> > Can't open HCI socket.: Address family not supported by protocol.
-> >
-> > What do I need to do to get the mouse working again, and is it possible 
->to
-> > use the usb_storage as well. I'm more concerned about using the mouse, 
->but
-> > both would be nice.
->
->check your log files for a kernel oops or other specific messages from
->the USB bus. If you really think that this only happen in conjunction
->with the USB storage driver then you should post this to the USB mailing
->list.
->
->Regards
->
->Marcel
->
->
->
->
->-------------------------------------------------------
->SF.Net is sponsored by: Speed Start Your Linux Apps Now.
->Build and deploy apps & Web services for Linux with
->a free DVD software kit from IBM. Click Now!
->http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
->_______________________________________________
->Bluez-users mailing list
->Bluez-users@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-users
+2test[30524]: Receiving ...
+l2test[30524]: 672 bytes in 0.06 sec, 11.49 kB/s
+l2test[30524]: seq missmatch: 1 -> 4
+l2test[30524]: 672 bytes in 0.09 sec, 7.57 kB/s
+l2test[30524]: seq missmatch: 5 -> 8
 
-_________________________________________________________________
-Optimize your Internet experience to the max with the new MSN Premium 
-Internet Software. http://click.atdmt.com/AVE/go/onm00200359ave/direct/01/
+Thanks for all your help on this.  I was really hoping once I got the buggered 
+mcfserial.c driver working that I would be done...
+
+-Jeff
+-- 
+Secure your email with Gnu Privacy Guard and Mozilla, the open source
+cross platform solution for Windows, Linux, and Mac OS X.
+See http://enigmail.mozdev.org/
