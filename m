@@ -1,67 +1,48 @@
-Return-Path: <gnome-bluetooth-bounces@usefulinc.com>
+Return-Path: <noring@nocrew.org>
+Subject: Re: [gnome-bluetooth] What stuff in gnome-bluetooth does, and
+	ideas for its future
 From: Fredrik Noring <noring@nocrew.org>
-To: Fred =?ISO-8859-1?Q?Sch=E4ttgen?= <bluez-devel@schaettgen.de>
-In-Reply-To: <200401292119.45926.bluez-devel@schaettgen.de>
-References: <1064593223.12843.127.camel@saag>
-	<200401291230.00801.bluez-devel@schaettgen.de>
-	<1075401893.22564.51.camel@akka.yeti.nocrew.org>
-	<200401292119.45926.bluez-devel@schaettgen.de>
-Message-Id: <1075486241.14644.34.camel@akka.yeti.nocrew.org>
-Mime-Version: 1.0
-Date: Fri, 30 Jan 2004 19:10:42 +0100
-Content-Type: text/plain; charset=ISO-8859-1
+To: Edd Dumbill <edd@usefulinc.com>, Marcel Holtmann <marcel@holtmann.org>
 Cc: GNOME Bluetooth Mailing List <gnome-bluetooth@usefulinc.com>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: [gnome-bluetooth] Re: [Bluez-devel] What stuff in gnome-bluetooth
-	does, and ideas for its future
-List-Unsubscribe: <http://lists.usefulinc.com/mailman/listinfo/gnome-bluetooth>,
-	<mailto:gnome-bluetooth-request@usefulinc.com?subject=unsubscribe>
-List-Archive: <http://lists.usefulinc.com/pipermail/gnome-bluetooth>
-List-Post: <mailto:gnome-bluetooth@usefulinc.com>
-List-Help: <mailto:gnome-bluetooth-request@usefulinc.com?subject=help>
-List-Subscribe: <http://lists.usefulinc.com/mailman/listinfo/gnome-bluetooth>,
-	<mailto:gnome-bluetooth-request@usefulinc.com?subject=subscribe>
-Sender: gnome-bluetooth-bounces@usefulinc.com
-Errors-To: gnome-bluetooth-bounces@usefulinc.com
+In-Reply-To: <1075390320.1269.6.camel@nova>
+References: <1064593223.12843.127.camel@saag>
+	 <1067882864.15593.326.camel@dhcp-116.surrey.redhat.com>
+	 <1067906859.15607.48.camel@saag>
+	 <1075331039.553.80.camel@akka.yeti.nocrew.org>
+	 <1075337441.553.97.camel@akka.yeti.nocrew.org>
+	 <1075374586.29731.86.camel@saag>  <1075389771.26729.95.camel@pegasus>
+	 <1075390320.1269.6.camel@nova>
+Content-Type: text/plain
+Message-Id: <1075484759.14644.10.camel@akka.yeti.nocrew.org>
+Mime-Version: 1.0
+Date: Fri, 30 Jan 2004 18:45:59 +0100
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-tor 2004-01-29 klockan 21.19 skrev Fred Sch=E4ttgen:
-> I also think that wouldn't be misplaced in bluez. But since it can be e=
-asily=20
-> done with a gnome/kde service, this proposal will surely go to the bott=
-om=20
-> part of the wishlist if there is no demand from other unrelated project=
-s.=20
+Edd and Marcel,
 
-Here's a proposal:
+tor 2004-01-29 klockan 16.32 skrev Edd Dumbill:
+> Well, that, and the ability to delete a link key.
 
-Similar to the idea with /etc/bluetooth/keytab.socket, additional
-sockets can be created for other Bluetooth interface services such
-as name scans, lookups etc. Regular users have access to these
-capabilities based on socket file permissions.
+Here's a nice solution I think:
 
-Example:
+Make hcid create a socket in /etc/bluetooth/keytab.socket. Preferably,
+having the same group membership as the socket (for examle "bluetooth")
+enables a user to send commands like:
 
-   /etc/bluetooth/names          # The device name cache
-   /etc/bluetooth/names.conf     # The device name configuration file
-   /etc/bluetooth/names.socket   # The command socket
+    DELETE <sba> <dba>
 
-Command examples:
+This makes hcid delete the link and update /etc/bluetooth/keytab and
+/etc/bluetooth/keytab.shadow accordingly. These are ASCII files of
+course and can also be maintained with Emacs or whatever tool although
+this is not as safe because of race conditions.
 
-   SCAN            - Returns something similar to "hcitool scan"
-   LOOKUP <bdaddr> - Returns the name if available in the names file
-   DELETE <bdaddr> - Removes the name from the names file
-   LIST            - Lists all names in the names file
+Then we'll extend hcitool with the ability to connect to this socket
+and do this stuff too.
 
-The hcitool utility can be extended with these features too.
+The protocol can be extended in the future. Like for example initiating
+pairing procedures and so on.
 
-Would this make it?
+What do you think?
 
 Fredrik
-
-
-
-_______________________________________________
-gnome-bluetooth mailing list
-gnome-bluetooth@usefulinc.com
-http://lists.usefulinc.com/mailman/listinfo/gnome-bluetooth
