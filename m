@@ -1,35 +1,67 @@
-Return-Path: <postfix@gmx.com>
-Date: Fri, 13 Feb 2004 23:50:30 +0100
-From: Radu Maurer <a400@gmx.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Apple keyboard
-Message-ID: <20040213225030.GA10502@mail.gmx.de>
-References: <20040210175802.GA17705@mail.gmx.de> <1076451979.2777.21.camel@pegasus> <20040211151146.GA19818@mail.gmx.de> <1076515215.2696.36.camel@pegasus> <20040213105035.GA10464@mail.gmx.de> <1076669640.2671.27.camel@pegasus> <20040213113749.GA13481@mail.gmx.de> <1076673365.2671.30.camel@pegasus>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] apple wireless mouse on apple ibook (g4, builtin
+	usb)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Sunnan <sunnan@handgranat.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <402D4959.10704@handgranat.org>
+References: <402D07B8.8030504@handgranat.org>
+	 <1076694675.2671.191.camel@pegasus>  <402D1E8C.6020301@handgranat.org>
+	 <1076702197.18588.11.camel@pegasus>  <402D381D.1000306@handgranat.org>
+	 <1076709007.18588.39.camel@pegasus>  <402D4959.10704@handgranat.org>
+Content-Type: text/plain
+Message-Id: <1076711341.18588.57.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1076673365.2671.30.camel@pegasus>
-List-ID: <bluez-users.lists.sourceforge.net>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 13 Feb 2004 23:29:01 +0100
 
-> then you must make sure that the hcid PIN helper works perfect. To be
-> sure replace it with a simple executable shell script.
-> 
-> 	#!/bin/sh
-> 	echo "PIN:0000"
-> 
-> Try again and enter the PIN "0000" on your keyboard.
+Hi Sunnan,
 
-ok, it worked, thanks very much Marcel!!
- 
-Feb 13 23:20:49 localhost bthid[8705]: Connected: Apple Computer, Inc. Apple Wireless Keyboard (05ac:0209)
+> slowstorm/home/sunnan/.dl/mouseemu% sudo /sbin/hciconfig -a
+> hci0:   Type: USB
+>          BD Address: 00:0D:93:04:19:15 ACL MTU: 192:8  SCO MTU: 64:8
+>          UP RUNNING PSCAN ISCAN
+>          RX bytes:593 acl:2 sco:0 events:40 errors:0
+>          TX bytes:670 acl:2 sco:0 commands:28 errors:0
+>          Features: 0xff 0xff 0x0f 0x00 0x18 0x18 0x00 0x00
+>          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>          Link policy: RSWITCH HOLD SNIFF PARK
+>          Link mode: SLAVE ACCEPT
+>          Name: 'slowstorm-0'
+>          Class: 0x000100
+>          Service Classes: Unspecified
+>          Device Class: Computer, Uncategorized
+>          HCI Ver: 1.1 (0x1) HCI Rev: 0x385 LMP Ver: 1.1 (0x1) LMP 
+> Subver: 0x385
+>          Manufacturer: Cambridge Silicon Radio (10)
 
-hcidump prints this every time a press a key:
-> ACL data: handle 0x0029 flags 0x02 dlen 15
-    L2CAP(d): cid 0x41 len 11 [psm 19]
+this looks much better now. Your laptop contains a CSR chip with the
+Bluetooth 1.2 AFH feature. Very nice.
 
-now I wonder: how do I use the keyboard with X11 (and possibly at the
-console), i.e. which device do I have to enter in the "InputDevice"
-section of XFree86Config?
+Do you got your mouse working?
 
-thanks
-Radu
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
