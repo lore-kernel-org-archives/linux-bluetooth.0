@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: radoa <cat@pobox.sk>
-Message-ID: <loom.20041029T194010-621@post.gmane.org>
+Subject: RE: [Bluez-devel] Service level security for RFCOMM
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: Bhatt Abhi-ABHATT <ABHISHEK.BHATT@motorola.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1099065198.28599.57.camel@baroque.rococosoft.com>
+References: 
+	 <5987A7CB1694D811A04D0002B32C289601BF3C01@il93exb05.corp.mot.com>
+	 <1099065198.28599.57.camel@baroque.rococosoft.com>
+Content-Type: text/plain
+Message-Id: <1099069525.10164.78.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] hci event bug for Nokia 7650
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,30 +21,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Oct 2004 17:50:36 +0000 (UTC)
+Date: Fri, 29 Oct 2004 19:05:25 +0200
 
-Hi,
+Hi Steve,
 
-I was trying create L2CAP socket and make connection to Nokia 7650 phone, 
-but L2CAP always timeouted after about 40 seconds. I started debugging and I 
-discovered that bluez kernel during establishing L2CAP connection drops event 
-packet 0x1B (Max Slots Change) from 7650 phone, so then after timeout 7650 
-phone send Disconnection Complete (0x05) event. I debugged this in function 
-hci_event_packet(). Is this bug, or is it something wrong with phone stack, or 
-is somethig wrong with stack, if bug, what should I send for rejecting command, 
-or better how respond for command? I need establish connection using L2CAP 
-sockets.
-Thank you very mutch for every help
+> > Sorry for the confusion but I wasn't referring to user space at all. I was thinking of having the rfcomm service level security implemented in almost the same way as the l2cap service level security(incoming connection). The service level security options could be set using setsockopt(..) in rfcomm. This in turn could be used to set the service level settings for the l2cap socket it uses. I can draw a sequence diagram(function calls) to show how i
+> > picture the design. I'll do that.
+> 
+> I think that from the user-space's point of view, the interface should
+> be identical. (In fact I think this is already supported, just not
+> acted-upon: you do setsockopt(sock, SOL_RFCOMM, ...).)
 
-Best regards
+it is the same. I already committed the needed stuff to the CVS and
+changed rctest to set them. However without a correct kernel the call of
+setsockopt() will fail.
 
-radoa
+Regards
 
-
-
-
-
-
+Marcel
 
 
 
