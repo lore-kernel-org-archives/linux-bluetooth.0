@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] pand + socket filtering on zaurus
+Subject: Re: [Bluez-devel] Problems while sending and receiving with rfcomm
+	sockects
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
-Cc: "'Bluez-devel@lists.sourceforge.net'" <Bluez-devel@lists.sourceforge.net>
-In-Reply-To: <AFE91B59A185A5439840B43AB7919047093983@mchp997a.mch.sbs.de>
-References: <AFE91B59A185A5439840B43AB7919047093983@mchp997a.mch.sbs.de>
+To: dsas@mega.ist.utl.pt
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1086094626.40bc7d22eab66@webmail.rnl.ist.utl.pt>
+References: <1086088581.40bc65850efcf@webmail.rnl.ist.utl.pt>
+	 <1086093267.4702.20.camel@pegasus>
+	 <1086094626.40bc7d22eab66@webmail.rnl.ist.utl.pt>
 Content-Type: text/plain
-Message-Id: <1086101619.4702.51.camel@pegasus>
+Message-Id: <1086100358.4702.25.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,24 +21,13 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Jun 2004 16:53:39 +0200
+Date: Tue, 01 Jun 2004 16:32:38 +0200
 
-Hi Matthias,
+Hi Didier,
 
-> I found out, that the latest supported zaurus kernel for collie is 2.4.18 .
-> So I want to try this one. 
-> When I want to load l2cap.o after installing "bluez-zaurus_2.3b_arm.ipk",
-> it says: kernel-module version mismatch l2cap.o was compiled for kernel
-> 2.4.6...
-> while this kernel is 2.4.18...
+> I use RedHat 9.0 (2.4.20-8) with bluez RPM packages (libs 2.7.1, utils 2.7.1).
 
-but even 2.3b was bluez-kernel-2.3 and this is outdated and deprecated.
-
-> So, is there any   "bluez-zaurus....ipk" compiled for 2.4.18 
-> and where can I download it ?
-
-I don't know and I also don't know why they not include 2.4.18-mh17 to
-get an up-to-date Bluetooth subsystem.
+try the latest 2.4 or 2.6 kernel or change to one thread per socket.
 
 Regards
 
