@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] version
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <loom.20050122T171729-917@post.gmane.org>
-References: <loom.20050122T171729-917@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1106411503.7902.0.camel@pegasus>
+To: bluez-devel@lists.sourceforge.net
+From: radoa <shuttle@post.sk>
+Message-ID: <loom.20050122T171729-917@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] version
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,20 +16,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 22 Jan 2005 17:31:43 +0100
+Date: Sat, 22 Jan 2005 16:19:24 +0000 (UTC)
 
-Hi Radoa,
-
-> I have one question: What version of bluez-libs and bluez-utils was released 
-> with linux kernel 2.4.25? 
-
-there is no special version of the libs or utils for the 2.4.25 kernel.
-Using the latest is almost fine.
-
-Regards
-
-Marcel
-
+Hi, 
+ 
+I have one question: What version of bluez-libs and bluez-utils was released 
+with linux kernel 2.4.25? 
+ 
+thank you very much 
+ 
+radoa 
+ 
 
 
 
