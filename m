@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Nicholas A. Preyss" <nalp@gmx.net>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Problem with kernel-2.6.5
-From: Marcel Holtmann <marcel@holtmann.org>
-To: tim@birdsnest.maths.tcd.ie
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404210427.29406.tim@birdsnest.maths.tcd.ie>
+Message-ID: <20040421130948.GA15330@gmx.net>
 References: <200404210427.29406.tim@birdsnest.maths.tcd.ie>
-Content-Type: text/plain
-Message-Id: <1082550752.23959.34.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200404210427.29406.tim@birdsnest.maths.tcd.ie>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,10 +17,9 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Apr 2004 14:32:32 +0200
+Date: Wed, 21 Apr 2004 15:09:48 +0200
 
-Hi Timothy,
-
+On  0, Timothy Murphy <tim@birdsnest.maths.tcd.ie> wrote:
 > I wonder if anyone has had a problem with Bluetooth in linux-2.6.5?
 > I have a Sony C1VFK Picturebook with built-in bluetooth.
 > Everything works fine in 2.6.3,
@@ -33,14 +31,14 @@ Hi Timothy,
 > It is possible that this has nothing to do with bluetooth,
 > and is a USB problem.
 
-give 2.6.6-rc2 a shot, because it includes the outstanding Bluetooth and
-USB updates. If it still oopses report it on the USB mailing list.
+It is probably a bug in the USB Subsystem of 2.6.5, which appears when
+the module hci_usb is already loaded befor the USB BT dongle is
+connected to the USB bus. I don't know the way your internal BT is
+realized. You might try to unload the hci_usb driver, activate the bt
+subsystem and then load it again. Or you just compile your kernel
+without the SCO support for hci_usb.
 
-Regards
-
-Marcel
-
-
+nicholas
 
 
 -------------------------------------------------------
