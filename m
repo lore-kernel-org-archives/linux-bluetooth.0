@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41EA1B6E.3070303@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <41E9B60E.2010509@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] scooped by pocketpc (a2dp)
-References: <41E93682.9040907@xmission.com> <41E93B4F.1010600@dark-reality.de>
-In-Reply-To: <41E93B4F.1010600@dark-reality.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] btsco crash without daemon
+References: <41E91B7A.1070303@egabriel.de> <41E925F4.3060907@dark-reality.de> <41E92C83.8010406@egabriel.de> <41E9349C.8060001@dark-reality.de> <41E96812.7030903@egabriel.de>
+In-Reply-To: <41E96812.7030903@egabriel.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,40 +18,60 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 16 Jan 2005 00:44:46 -0700
+Date: Sun, 16 Jan 2005 01:32:14 +0100
 
-Lars,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> all programs that use openh323/pwlib (latter for hardware abstraction)
-> use alsalib, because pwlib can be compiled against alsalib or oss or both.
+ligi wrote:
+|
+| I am using Gentoo and here alsa is an ebuild that wants alsa not to be
+| compiled in the kernel it has to be external( build from
+| alsa-driver-1.0.8rc2.tar.bz2 by that ebuild of portage ).
+| But snd_hwdep is loaded and there is no complaining of missing things
+| - this method just fails...
+| Has anyone some Hint ?
 
-hmm. i see a menu for alsa devices but our userspace a2dp device 
-(currently stubbed out, but not implemented) doesn't show up. i set it 
-up as documented in btsco/bt/BUILD
+Just wanted to note that you don't need the external alsa driver
+package, only alsalib (I'm using gentoo, too). Of course this only
+applies if your other soundcards are supported well by the kernel.
 
-> That leads to - at least - gnomemeeting and openphone supporting alsa
-> directly :)
+Maybe you should try using the kernel alsa stuff and drop the external
+alsa stuff, it's not supposed to work this way. Especially because
+snd-bt-sco is linked against the KERNEL alsa stuff, not your external
+driver stuff, so I think this might very well be the source of the problem.
 
-that looks like a good option, esp when gm supports sip
+Why do you want to use the external alsa-driver anyway?
 
-> I'm not that interested because my headset only supports the mono
-> headset profile... ;)
+best regards,
+~  Lars
 
-a2dp does not address using a microphone, so if you use a2dp, you have 
-to choose a different device for audio in.
+- -------------------------------------------------------
+The SF.Net email is sponsored by: Beat the post-holiday blues
+Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-> writing the a2dp alsa driver should be similar to the btsco alsa part,
-> maybe we can build one thing for both purposes, or at least keep
-> structures similar so that both projects can support each other best!
 
-well i want to try putting a2dp in a userspace driver since that might 
-be the best way to go. (that's an issue that may not be totally worked 
-out but i think we decided that it looks attractive enough to at least 
-try writing alsa-lib drivers)
 
-if it works well, we might rewrite the sco driver to be in userspace.
+- --
+Lars Grunewaldt
+* software development
+* multimedia design
+skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+web: http://www.dark-reality.de
+mail: lgw@dark-reality.de
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-brad
+iD8DBQFB6bV+QWC6DTWkDAoRAsLqAKCwR/tq9OSqGfNzkx7nBgXG8OoxbACgsoIT
+je9e6N4HDQtRHUnfLlqyKX4=
+=4FnC
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
