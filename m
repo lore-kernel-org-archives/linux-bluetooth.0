@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: Leos Literak <leos.literak@systinet.com>
-Cc: Bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] phillips fisio 825
-References: <3F4F32E0.7050802@systinet.com>
-From: Olivier Berger <olberger@club-internet.fr>
-In-Reply-To: <3F4F32E0.7050802@systinet.com> (Leos Literak's message of
-	"Fri, 29 Aug 2003 13:02:56 +0200")
-Message-ID: <87smnbzk6i.fsf@club-internet.fr>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Belkin F8T002 PC Card problem with Bluez
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: "Alexandre Jousset@NL" <mid@gtmp.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3F50803C.607@gtmp.org>
+References: <3F4F6BF2.6080303@gtmp.org>
+	<1062170277.27784.138.camel@pegasus> <3F4F70B1.20200@gtmp.org>
+	<3F50803C.607@gtmp.org>
+Message-Id: <1062425807.13729.162.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -20,44 +21,66 @@ List-Unsubscribe:
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Sep 2003 10:57:57 +0200
-Content-Type: text/plain; CHARSET=iso-8859-1
+Date: 01 Sep 2003 16:16:41 +0200
+Content-Type: text/plain
 
-Leos Literak <leos.literak@systinet.com> writes:
+Hi Alexandre,
 
-> Hi,
->
-> I have mandrake 9.1 with latest kernel 2.4.21 and latest bluez
-> utilities. I try to connect phone $SUBJECT to my PC using
-> USB BT card. After some experimantation I succeeded.
-> But there are still some errors. So treat this as bugreport :-)
->
-> sdptool browse - > segfaults
->
-> rfcomm bind - it depends on order, in which I start BT / Receive
-> on phone and invoke rfcomm bind. I have to run command on PC
-> and then immediatelly start BT/Receive on phone. Usually it
-> takes me many attempts, before I catch correct timing and these
-> two devices become connected.
->
-> I attach log, as I invoke commands command with hcidump.
->
+> 	I tried with setserial to set ttyS4 to irq 3 (it gave me this value
+> once when doing setserial autoconfig) -> hang.
+> 
+> 	I tried with setserial to set port to 0x4010 (as listed as second I/O
+> ports region with lspci), no error but hciconfig hci0 up fails with timeout.
+> 
+> 	With the original setup (irq 11 and ports at 0x4000, as the serial
+> module set them and the config that put the lines h4_recv: Unknown HCI
+> packet type xx), I wrote a small C program to read ttyS4 and print the
+> numbers on stdout. I noticed some reccurrent value so I told the program
+> to put a newline before each value 18. The output is :
+> 
+> -----------------------------------------------------------
+> 18 20 e8 36 be f0
+> 18 20 e8 36 be f8
+> 18 20 e8 36 be f8
+> 18 20 e8 36 ef 0f
+> 18 24 e8 36 ef f0
+> 18 24 e8 36 ef f0
+> 18 20 e8 9b be f8
+> 18 20 e8 36 ef 0f ff
+> 18 20 e8 36 ef 0f ff
+> 18 20 e8 9b be f8
+> 18 24 e8 36 ef f0
+> 18 20 e8 36 ef 0f
+> 18 24 e8 36 ef d0
+> 18 20 e8 36 ef d0
+> 18 20 e8 9b be f8
+> 18 20 e8 9b be f8
+> 18 20 e8 9b be f8
+> 18 20 e8 36 ef 0f
+> 18 20 e8 36 ef 0f
+> 18 20 e8 36 ef 0f
+> 18 20 e8 9b be f8
+> 18 20 e8 36 ef 0f ff
+> 18 20 e8 9b be f8
+> 18 20 e8 36 ef 41
+> 18 20 e8 36 ef 0f
+> 18 20 e8 36 ef 0f
+> -----------------------------------------------------------
+> 
+> 	So that must mean something but I don't know what. The first octet is
+> always 18, the second is either 20 or 24, the third always e8, the
+> fourth either 36 or 9b, the fifth either be or ef, the sixth either 0f
+> or d0 or f8 and when it is 0f it is sometimes followed by ff...
 
-I used to have a Fisio 820 (probably similar) and had some trouble too
-sometimes.
+I think this is the BCSP protocol, but with wrong terminal settings or a
+wrong baud rate. Try to attach your device with BCSP and different baud
+rate settings and replug it every time to have a clean state.
 
-In cas it would be usefull, you may still be able to find usefull
-information in the docs I wrote (now updated for my new T68i) :
+Regards
 
-http://perso.club-internet.fr/olberger/btgprsfisio820orangefr.html
+Marcel
 
-Hope this helps.
 
-Regards,
--- 
-Olivier BERGER (OpenPGP: 1024D/B4C5F37F)
-APRIL (http://www.april.org) - Vive python (http://www.python.org)
-Pétition contre les brevets logiciels : http://petition.eurolinux.org
 
 
 -------------------------------------------------------
