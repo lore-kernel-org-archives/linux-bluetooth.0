@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <26AF0D77A98E09478A577B2248F72338413FF3@sintefxch1-netapp.sintef.no>
-From: Rognlien Dag Kristian <Dag.K.Rognlien@sintef.no>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Inquiry result with rssi in bluez libs 2.7
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] autoconf breaks portability. Film at 11.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1084369122.4426.106.camel@hades.cambridge.redhat.com>
+References: <1084268833.11301.0.camel@hades.cambridge.redhat.com>
+	 <1084368666.25099.38.camel@pegasus>
+	 <1084369122.4426.106.camel@hades.cambridge.redhat.com>
 Content-Type: text/plain
+Message-Id: <1084369703.25099.56.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,29 +20,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 May 2004 15:54:41 +0200
+Date: Wed, 12 May 2004 15:48:23 +0200
 
-Hi,
+Hi David,
 
-> -----Original Message-----
-> From: Marcel Holtmann [mailto:marcel@holtmann.org] 
+> > I heard of that problem, but I can't reproduce it. If you call
+> > "./bootstrap" every that is necessary should be created.
 > 
-> this was a stupid typo and fixed in CVS now. Thanks for finding it.
-> 
+> Still no substitute for proper makefiles. Do we _really_ need the system
+> to check for itself how to build Fortran shared libraries? Yes, that's
+> one of the things it does.
 
-While I have your attention on this subject...
+if you can tell me how to disable C++ and Fortran checking I am glad to
+include it ;)
 
-In the hci_event.c in net/bluetooth the hci_inquiry_result_with_rssi_evt
-function just ignores the rssi value, and files the values of a normal
-inquiry_info struct. Is there a plan for how the rssi values should be made
-available to the user mode application calling ioctl with HCIINQURY? As far
-as I can see there are now way for an application to get this value now.
+> Btw, swave() in hciattach still uses 10 characters of a 9-char array. 
 
-Regards,
-Dag K. W. Rognlien
-M.Sc. Computer Engineering
-SINTEF ICT
-Communication Systems
+Fixed in CVS now.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
