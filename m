@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] patch-2.6.7-mh
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200412011538.19225.gillan82@centrum.cz>
-References: <200412011538.19225.gillan82@centrum.cz>
-Content-Type: text/plain
-Message-Id: <1101912422.15615.8.camel@pegasus>
-Mime-Version: 1.0
+From: Gillan <gillan82@centrum.cz>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="windows-1250"
+Message-Id: <200412011538.19225.gillan82@centrum.cz>
+Subject: [Bluez-users] patch-2.6.7-mh
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,22 +17,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 01 Dec 2004 15:47:02 +0100
+Date: Wed, 1 Dec 2004 15:38:19 +0100
 
-Hi Gillan,
+Hi,
 
-> i'm looking for patch-2.6.7-mh for decent linux kernel. I found only 2.6.8, 
-> 2.6.8.1 and 2.6.9, but on this kernels i can't burn. Ther is some bug in 
-> cdrtools or something like that.
+i'm looking for patch-2.6.7-mh for decent linux kernel. I found only 2.6.8, 
+2.6.8.1 and 2.6.9, but on this kernels i can't burn. Ther is some bug in 
+cdrtools or something like that.
+Can anyone help me? 
 
-the -mh patches for the 2.6 kernel series are only provided for the
-latest stable version of it.
-
-Regards
-
-Marcel
+Thank you.
 
 
+Gillan
 
 
 -------------------------------------------------------
