@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4031E354.8010200@utia.cas.cz>
-From: Rudolf Matousek <matousek@utia.cas.cz>
+Message-ID: <000801c3f505$976e0f80$7b6b7b8c@guang>
+From: "Guang" <m9187@cn.ee.ccu.edu.tw>
+To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: Pavel Ruzicka <pavouk@pavouk.org>
-CC: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] pairing i-Tech BT USB dongle and Nokia 6310i
-References: <000e01c3f4d0$8128de60$4461daa0@radecek> <200402162247.13628.pavouk@pavouk.org>
-In-Reply-To: <200402162247.13628.pavouk@pavouk.org>
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0005_01C3F548.A5203E30"
+Subject: [Bluez-users] SCO module
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,54 +16,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Feb 2004 10:48:04 +0100
+Date: Tue, 17 Feb 2004 11:24:45 +0800
 
-Dear Pavel,
+This is a multi-part message in MIME format.
 
-what vendor ID and product ID have your i-Tech (i-Tec?) dongle?
+------=_NextPart_000_0005_01C3F548.A5203E30
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
+Hi all:
+We know that there is a modules "soc.o" and "hcitool.o"   in red hat  =
+linux8.0 , and we can type "hcitool" command to do we want to do ,for =
+example: hcitool  inq , and bluetooth device will inquire others =
+bluetooth devices. My question is that does soc have any command to =
+excute ? How do we to use this sco module? Does Bluez support sco ?
 
+ 
+------=_NextPart_000_0005_01C3F548.A5203E30
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
 
-Ruda Matousek
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dbig5">
+<META content=3D"MSHTML 6.00.2800.1400" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT size=3D2>Hi all:</FONT></DIV>
+<DIV><FONT size=3D2>We know that there is a modules "soc.o"&nbsp;and =
+"hcitool.o"=20
+&nbsp; in red hat&nbsp; linux8.0&nbsp;, and we can type "hcitool" =
+command to do=20
+we want to do ,for example: hcitool&nbsp; inq , and bluetooth device =
+will=20
+inquire others bluetooth devices. My question is that does soc have any =
+command=20
+to excute ? How do we to use this sco module? Does Bluez support sco=20
+?</FONT></DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2>&nbsp;</FONT></DIV></BODY></HTML>
 
---
-
-Pavel Ruzicka wrote:
-> Hello,
->=20
->=20
->>I can't paired i-Tech BT USB dongle and phone Nokia 6310i. When I want
->>connect to phone,  phone ask me for PIN. After enter PIN phone says "ba=
-d
->>PIN". PC do not ask me for PIN. When I  try run bluepin script from she=
-ll,
->>it return error. What do I bad?
->>OS Mandrake9.2 kernel 2.4.22
->>When I using Windows, i-Tech BT USB dongle and phone work correctly.
->=20
->=20
-> I was similar problem with Mandrake. You can try edit file /etc/bluetoo=
-th/pin
-> and change "BlueZ" to some numbers "1234". But I don't know, if I make =
-some
-> other actions. Maybe restart of init script...
->=20
-> Best regards,
->=20
-> Pavel R=F9=BEi=E8ka
->=20
->=20
->=20
-> -------------------------------------------------------
-> SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-> Build and deploy apps & Web services for Linux with
-> a free DVD software kit from IBM. Click Now!
-> http://ads.osdn.com/?ad_id=1356&alloc_id438&op=CCk
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+------=_NextPart_000_0005_01C3F548.A5203E30--
 
 
 
