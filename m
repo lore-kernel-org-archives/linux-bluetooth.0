@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040701105513.10755.qmail@web90102.mail.scd.yahoo.com>
-From: karthik bala guru <bluekarthik@yahoo.com>
-To: karthik bala guru <bluekarthik@yahoo.com>,
-   Charles Bueche <charles@bueche.ch>, cijoml@volny.cz
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <20040625080734.28606.qmail@web90108.mail.scd.yahoo.com>
-MIME-Version: 1.0
+From: "Nicholas A. Preyss" <nalp@gmx.net>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] headset$
+Message-ID: <20040701094518.GB4505@gmx.net>
+References: <amsbr1-glo.ln1@ID-90813.users.dfncis.de>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] XHTML Parser and Generator Tools
+In-Reply-To: <amsbr1-glo.ln1@ID-90813.users.dfncis.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,47 +17,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 1 Jul 2004 03:55:13 -0700 (PDT)
+Date: Thu, 1 Jul 2004 11:45:18 +0200
 
-Hi,
-Has anyone come across / used a XHTML Parser generator
-tool in Opensource community developed in C ?
-Do Kindly post the link / tool name .
+On  0, Steffen Schwientek <schwientek@web.de> wrote:
+> I want to use my plantronics M9000 headset. Since it?s my only bluetooth
+> part, I can?t figure out, if bluetooth works. Connecting the USB dongle,
+> the kernel (2.6.6) reports:
 
-I saw Amaya but it is big and will consume time
-to get just the XHTML Parser / Generator from it.
+Better use 2.6.7 or apply the latest -mh patch to 2.6.6. 
 
-1) GENX is XML Parser and No XHTML Parser / Generator
-tool
-developed using GENX by GENX till now.
+> An hcitool scan detects (if I put the headset in pairing mode)
+> 00:03:89:46:E2:0F       M3000 by Plantronics
+> 
+> So nice, so far. Unfortunately I don?t know what I need next (I tried the
+> kbluetooth daemon, but this doesn?t detect the headset at all, or failed
+> due to an timeout.
 
-2) EXPAT doesnt provide a opensource XHTML Parser /
-Generator till today.
+Did you pair Headset and Computer? Normally you have to switch the
+headset in pairing mode (-> Manual) and then insert the pin on the
+computer. (you can also specifiy pin in a file?) This should happen
+transparently, when  a program tries to connect to a remote device and
+their was no pairing before, then it tries to get the Pin from pinhelper
+application or from file. 
 
-3) X-Smiles is simple and good but Java Based .
+> Next I try an hcitool cc, but nothing happens. kdebluetooth shows me an
+> connection, but after a while it reports an error (0x22).
+> /var/log/messages shows no error.
+ 
+Try the syslog file, if your distribution offers one. hcitool cc is not
+recommend for users, it is more a development and debugging feature.
 
-4) LibXml is also a library and no XHTML parser /
-Generator Tool by them in opensource till today.
-
-Has Someone got a simple setup with just
-the XHTML Parser and Generator alone developed in C 
-available in OpenSource 
-or 
-Atleast a tool Develped Using the above library tools 
-available in Open source for XHTML Parsing and 
-Generation ?
-
-Kindly let me know And Do Give me your link.
-
-Thanks & Regards,
-karthik bala guru
-
-
-		
-__________________________________
-Do you Yahoo!?
-New and Improved Yahoo! Mail - Send 10MB messages!
-http://promotions.yahoo.com/new_mail 
+nicholas
 
 
 -------------------------------------------------------
