@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Adresse resolution in BlueZ
+Subject: Re: [Bluez-users] creation of Bnep0
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050309162812.75343.qmail@web26603.mail.ukl.yahoo.com>
-References: <20050309162812.75343.qmail@web26603.mail.ukl.yahoo.com>
+In-Reply-To: <20050308132455.92993.qmail@web26604.mail.ukl.yahoo.com>
+References: <20050308132455.92993.qmail@web26604.mail.ukl.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1110391204.5462.36.camel@notepaq>
+Message-Id: <1110391117.5462.32.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,19 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 09 Mar 2005 19:00:04 +0100
+Date: Wed, 09 Mar 2005 18:58:36 +0100
 
 Hi Benny,
 
-> The Adresse resolution in bluez is done in the BNEP
-> isn"t it?
+> I was reading the archive about the story of BNEP.
+> and I see that Max was more interested in an
+> implementation with TUN/TAP device.
+> a breif description of fabricio was a VTun support of
+> BNEP packet:
 > 
-> But I see in the specification of BNEP that the
-> adresse resolution may be handled by PAN layer. Is
-> BlueZ like that because it was the best solution for
-> implementing PAN on linux.
+> 
+> >>extending VTun so it implements BNEP
+> 
+> >One way would be to implement BNEP support in vtund.
+> >Packets would be sent to a TAP (virtual Ethernet) and
+> >vtund would format the Ethernet packet to BNEP. Only,
+> >all packets would have to go to user space before
+> >being sent to the Bluetooth socket.
+>  
+> My quetsion is : was there a Bluez release which use
+> TUN/TAP device? 
 
-since BNEP is a virtual network, it has nothing to do with DNS.
+not that I know of.
 
 Regards
 
