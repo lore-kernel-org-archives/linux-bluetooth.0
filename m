@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
-Reply-To: tim@birdsnest.maths.tcd.ie
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Confessions of an ignoramus - what is all this PIN stuff?
-References: <412D99CA.5050209@nue.et-inf.uni-siegen.de> <200408261502.13690.tim@birdsnest.maths.tcd.ie> <412E45FC.4070604@csr.com>
-In-Reply-To: <412E45FC.4070604@csr.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200408271059.06005.tim@birdsnest.maths.tcd.ie>
+Subject: Re: [Bluez-users] dual boot keyboard wont connect
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Walt <idunno2468@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <412E677C.1040807@hotmail.com>
+References: <412E57F2.6040303@hotmail.com>
+	 <1093558926.2581.72.camel@pegasus>  <412E677C.1040807@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1093563783.2581.78.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,45 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 27 Aug 2004 10:59:04 +0100
+Date: Fri, 27 Aug 2004 01:43:03 +0200
 
-On Thursday 26 August 2004 21:20, Steven Singer wrote:
+Hi Walter,
 
-> > I find this PIN business very hard to follow.
-> > Is there a simple account somewhere?
-> > (Please don't refer me to the Bluetooth Spec
-> > which I find more or less unintelligble.)
->
-> Every Bluetooth device has a unique address. As has been noted on this
-> mailing list, addresses can be faked.
+> No, should I?
 
-Thanks, I found that very helpful.
+No.
 
-> > I have two laptops, martha and william (my grandparents).
-> > I first linked to my Nokia 6310 with martha.
-> > For some reason the phone thinks william is also martha.
-> > Is this something to do with the fact that I always use the same PIN?
->
-> More likely it's to do with you using the same dongle for both PCs. The
-> phone probably read the name stored in the dongle once and has cached
-> it. On subsequent occasions when it sees the same device (that is, when
-> it has a connection from the same Bluetooth address), it's not bothering
-> to read the name, it's just displaying the cached name.
+>     # PIN helper
+>     #pin_helper /usr/bin/bluepin;
+>     /etc/bluetooth/pin;
+>     # D-Bus PIN helper
+>     #dbus_pin_helper;
 
-In fact, these are two almost identical laptops with built-in bluetooth.
-They have different BT addresses.
-I think what must have happened is that at some point in the past
-I copied /etc/bluetooth from one to the other.
-(I had to replace the hard disk on one.)
+But this part is wrong here. Use "pin_helper /usr/bin/mybluepin;" and
+make mybluepin a script that echos "PIN:1234" where 1234 is your actual
+PIN.
 
-Which raises one very minor point -
-how can one force two devices to re-pair?
+Regards
 
--- 
-Timothy Murphy  
-e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
-tel: +353-86-2336090, +353-1-2842366
-s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
+Marcel
+
 
 
 
