@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PICO Bluetooth Modem and PCMCIA Card
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Monika Hubrich <monikahubrich@aol.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <001c01c4b223$9875c130$752cb8ac@monika>
-References: <E1CHrun-0004K5-67@sc8-sf-list2.sourceforge.net>
-	 <001c01c4b223$9875c130$752cb8ac@monika>
-Content-Type: text/plain
-Message-Id: <1097927391.4911.2.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20041016065031.39199.qmail@web60406.mail.yahoo.com>
+From: Murat Bog <murat_bog@yahoo.com>
+Reply-To: murat_bog@yahoo.com
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Packages to Use For Zaurus SL-6000L
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,24 +16,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 16 Oct 2004 13:49:51 +0200
+Date: Fri, 15 Oct 2004 23:50:31 -0700 (PDT)
 
-Hi Monika,
+Hello,
 
-> I've only created bluepin in ./bin/
-> Can this be a problem, or have I to install bluez-pin.0.24 (how can I do
-> that?)
+I am wondering which combination of Bluez packages I
+should be installing on a Zaurus 6000L with factory
+configuration(2.4.18-rml7-pxa3-embedix with ROM
+version 1.12) to work with an AmbiCom BT2000CF card.
 
-this is a PIN helper problem. Check the mailing list archives for more
-details and send in the lines matching "hcid" from your syslog.
+The latest set of packages do not seem to be working
+together.  When I install bluez-utils-2.10_arm.ipk, it
+reports a dependency error when used with
+bluez-kernel-2.4.18-mh15_arm.ipk and
+bluez-libs-2.10_arm.ipk.
 
-BTW please fix up you mail client, because these extra empty lines and
-the removing of trailing whitespaces are annoying.
+I also see that when I run "/etc/rc.d/init.d/bluetooth
+start" command, I get the following message:
 
-Regards
+"Starting Bluetooth subsystem:/usr/sbin/hcid: error
+while loading shared libraries: libsdp.so.2: cannot
+load shared object file: No such file or directory"
 
-Marcel
+Thanks,
 
+Murat Bog
 
 
 
