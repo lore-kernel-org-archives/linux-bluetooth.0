@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] HCI Stops responding
-Reply-To: axs203dd@excite.com
-From: "mr" <axs203dd@excite.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Message-Id: <20041011112240.AEDA5B6D8@xprdmailfe14.nwk.excite.com>
+Subject: Re: [Bluez-users] bluez sdp and kernel
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jurgens du Toit <dutoitjj@yahoo.co.uk>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <416A35E4.209@yahoo.co.uk>
+References: <416A35E4.209@yahoo.co.uk>
+Content-Type: text/plain
+Message-Id: <1097488644.9474.5.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,52 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 11 Oct 2004 07:22:40 -0400 (EDT)
+Date: Mon, 11 Oct 2004 11:57:25 +0200
+
+Hi Jurgens,
+
+> I'm trying to compile a multisync plugin, but it complains that it can't 
+> find the bluez-kernel and bluez-sdp packages. I looked on bluez's site, 
+> but can't find any references to these packages there. I googled, but 
+> only found some debian packages.
+
+the bluez-sdp is merged into the bluez-libs and bluez-utils packages and
+you simply have to use the latest vanilla kernel. Check the mailing list
+archives for more details, because this problem was already dicussed
+some times.
+
+Regards
+
+Marcel
 
 
->send in more information. What does "hciconfig -a" say?
-
-
-
-hci0:   Type: USB
-
-        BD Address: 00:02:72:80:4A:F9 ACL MTU: 192:8  SCO MTU: 64:8
-
-        UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-
-        RX bytes:41034 acl:378 sco:0 events:777 errors:0
-
-        TX bytes:126303 acl:766 sco:0 commands:15 errors:0
-
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-
-        Packet type: DM1 DH1 HV1
-
-        Link policy: RSWITCH HOLD SNIFF PARK
-
-        Link mode: ACCEPT MASTER
-
-        Name: 'BlueZ (0)'
-
-        Class: 0x000100
-
-        Service Classes: Unspecified
-
-        Device Class: Computer, Uncategorized
-
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
-
-        Manufacturer: Cambridge Silicon Radio (10)
-
-
-
-
-
-I have tried different packets also but no result... Any idea?
-
-_______________________________________________
-Join Excite! - http://www.excite.com
-The most personalized portal on the Web!
 
 
 -------------------------------------------------------
