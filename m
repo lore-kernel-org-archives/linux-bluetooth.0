@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040305142714.44803.qmail@web40708.mail.yahoo.com>
-From: Lalith Chakravarthi <lalithvc@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] IP Forwarding
+Subject: Re: [Bluez-users] D-Link DBT-120]
+From: Gene Imes <gene@ozob.net>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1078495197.7338.1.camel@tr1a.ozob.net>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,25 +15,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 5 Mar 2004 06:27:14 -0800 (PST)
+Date: Fri, 05 Mar 2004 07:59:58 -0600
 
-Hi...
+On Fri, 2004-03-05 at 05:52, Marcel Holtmann wrote:
+> Hi Gene,
+> 
+> > Disregard my previous post. 2.6.4-rc1-mm2 has fixed this problem.
+> 
+> I had now the same problem with 2.6.4-rc2. Please try to find the patch
+> from 2.6.4-rc1-mm2 that fixes your problem, because this needs to be
+> send to Linus before he releases 2.6.4 (final).
+> 
+> Regards
+> 
+> Marcel
 
-I just connected my laptop to my Pc and now I want to connect to the
-internet using my PC as the gateway. I already have the bluetooth PAN
-network between my laptop and PC. I am working on a linux 2.4.20-8
-kernel on both the laptop and the PC.  Also, I use proxies to connect
-to the internet from my PC. So, could anyone please tell me the files
-that have to be modified to enable the successful completion of my
-internet connection thru my laptop.
 
-Reagrds
-Laltih
+Marcel, I am not sure which patch fixes this but I was rebooting once
+and pulled the DBT-120 out and got an oops or whatever. As much as I
+could see looked like it may be the USB stuff.
 
-__________________________________
-Do you Yahoo!?
-Yahoo! Search - Find what you’re looking for faster
-http://search.yahoo.com
+There is only one USB patch from rc1-mm1 to rc1-mm2 the URL is:
+
+http://kernel.org/pub/linux/kernel/people/akpm/patches/2.6/2.6.4-rc1/2.6.4-rc1-mm2/broken-out/bk-usb.patch
+
+I am not sure how to check the patch and see if it is the one. I hope
+this helps.
+
+Here is the URL for all of the patches:
+
+http://kernel.org/pub/linux/kernel/people/akpm/patches/2.6/2.6.4-rc1/2.6.4-rc1-mm2/
+
+
+Thanks,
+
+Gene
+
 
 
 -------------------------------------------------------
