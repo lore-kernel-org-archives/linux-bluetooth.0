@@ -1,40 +1,49 @@
-Return-Path: <steve.crane@rococosoft.com>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] SDP memory leak?
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stephen Crane <steve.crane@rococosoft.com>
 Cc: Stefan Mischke <StefanMischke@web.de>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
    "Stefan Mischke (E-Mail)" <survivor@upb.de>
-In-Reply-To: <1093613681.2581.135.camel@pegasus>
+In-Reply-To: <1093613489.5066.49.camel@baroque.rococosoft.com>
 References: <412F29D2.7000001@web.de>  <1093610969.2581.119.camel@pegasus>
 	 <1093613489.5066.49.camel@baroque.rococosoft.com>
-	 <1093613681.2581.135.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1093617635.5848.53.camel@baroque.rococosoft.com>
+Message-Id: <1093613681.2581.135.camel@pegasus>
 Mime-Version: 1.0
-Date: Fri, 27 Aug 2004 15:40:35 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 27 Aug 2004 15:34:41 +0200
 
-Hi Marcel, Stefan,
+Hi Steve,
 
-On Fri, 2004-08-27 at 14:34, Marcel Holtmann wrote:
-> Hi Steve,
-> 
-> > The sdp library is free (I think) of memory leaks, thanks to the wonders
-> > of valgrind: http://valgrind.kde.org.
-> 
-> would you also take care of the tools in bluez-utils that uses the SDP
-> library?
+> The sdp library is free (I think) of memory leaks, thanks to the wonders
+> of valgrind: http://valgrind.kde.org.
 
-I have just committed changes to pand's service registration. The CVS
-diff should show what is required to fix this in the other applications.
-(Note: sdptool also cleans up properly in its "add" subcommands.)
+would you also take care of the tools in bluez-utils that uses the SDP
+library?
 
-Unfortunately I haven't time to do the others at the moment but this
-should be a start for others. (Send in the patches!)
+Regards
 
-Regards,
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
