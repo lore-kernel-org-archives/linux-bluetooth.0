@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20040706103225.27303.qmail@web90006.mail.scd.yahoo.com>
-From: Onur Safak <linuxbluez@yahoo.com>
-To: Bluez-devel@lists.sourceforge.net
+From: Dick <dm@chello.nl>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-131843625-1089109945=:26361"
-Subject: [Bluez-devel] about the list
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200407061222.47729.dm@chello.nl>
+Subject: [Bluez-devel] missing keys from logitech dinovo keyboard
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,38 +16,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 6 Jul 2004 03:32:25 -0700 (PDT)
+Date: Tue, 6 Jul 2004 12:22:47 +0200
 
---0-131843625-1089109945=:26361
-Content-Type: text/plain; charset=us-ascii
+Hi,
 
-Hi There,
- 
-Bluetooth is a new area to me, which I need to make an application on. Currently, I don't have necessary hardware / software set up. I'm collecting information from documentations and articles, and so the lists are important to me.
- 
-First of all, I need to know one thing; is this list for 'developers who work with Bluez' or only for 'developers who develop the Bluez code'. I've read the archive, but the topics look similar with users' list.
- 
-Thanks,
-Onur
+I'm playing with showkey from kbd (http://freshmeat.net/projects/kbd/)
+All keys are shown except "New" (FnF1), "Reply" (FnF2), "Forward" (FnF3), 
+"Send" (FnF4), "Redo" (FnF6), "Print" (FnF7), "Save" (FnF8), "My 
+Doc" (FnF10), "My Pic" (FnF11) and "My Music" (FnF12) (you get those by 
+enabling F-Lock)
+Undo (FnF5) and MyComp (FnF9) work though, giving keycode 144 and 145
+I'm using 2.6.7-mh1 and bluez-(utils/libs)2.7
+Is this a bug or am I missing something?
 
-		
----------------------------------
-Do you Yahoo!?
-Read only the mail you want - Yahoo! Mail SpamGuard.
---0-131843625-1089109945=:26361
-Content-Type: text/html; charset=us-ascii
-
-<DIV>Hi There,</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Bluetooth is a new area to me, which I need to make an application on. Currently, I don't have necessary hardware / software set up. I'm collecting information from documentations and articles, and so the lists&nbsp;are important to me.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>First of all, I need to know one thing; is this list for 'developers who work with Bluez' or only for 'developers who develop the Bluez code'. I've read the archive, but the topics look similar with users' list.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Thanks,</DIV>
-<DIV>Onur</DIV><p>
-		<hr size=1>Do you Yahoo!?<br>
-Read only the mail you want - <a href="http://us.rd.yahoo.com/mail_us/taglines/spamguard/*http://promotions.yahoo.com/new_mail/static/protection.html">Yahoo! Mail SpamGuard</a>.
---0-131843625-1089109945=:26361--
+Thanks in advance,
+Dick
 
 
 -------------------------------------------------------
