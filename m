@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Simone Gotti <motaboy80@supereva.it>
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] crash on remove
-References: <20040310182158.GA9279@naginata.ccs.neu.edu> <20040311024720.GA3297@omocha.vort.org> <4050323B.1030307@ei.tum.de>
-In-Reply-To: <4050323B.1030307@ei.tum.de>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200403131626.07124.motaboy80@supereva.it>
+  charset="iso-8859-2"
+Message-Id: <200403131347.50697.cijoml@volny.cz>
+Subject: [Bluez-users] BlueZ on iPAQ 2200 ???
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,22 +17,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 13 Mar 2004 16:26:06 +0100
+Date: Sat, 13 Mar 2004 13:47:50 +0100
 
-On Thursday 11 March 2004 10:32, Matthias Thomae wrote:
+Hi Marcel,
 
-Hi,
-you were right.
-I've installed the 2.6.4 and I have the same problem too, this happens only 
-with 2.6.4 and not with 2.6.3.
+I would like to buy iPAQ 2200. I looked at handhelds.org and there is 
+bluetooth for this device marked as non-working. Is there any progress on 
+this device to get BT work?
 
-Someone wrote to the kernel mailing list too:
-http://www.ussg.iu.edu/hypermail/linux/kernel/0403.1/1519.html
-
-Bye!
--- 
-Simone Gotti
-<motaboy80@supereva.it>
+Michal
 
 
 -------------------------------------------------------
