@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?iso-8859-1?Q?J=E9r=F4me_Stadelmann?= <jerome.stadelmann@hta-bi.bfh.ch>
-To: <bluez-users@lists.sourceforge.net>
-Subject: RE : [Bluez-users] SuSE and Audio
-Message-ID: <007401c3e99b$5947db70$2d105793@N64101>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-In-Reply-To: <1075485702.26729.165.camel@pegasus>
+Subject: Re: [Bluez-users] bizzare result when getting the bluetooth address
+From: Marcel Holtmann <marcel@holtmann.org>
+To: jan d tux <janice@asti.dost.gov.ph>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1075714467.1546.49.camel@Asgard>
+References: <1075714467.1546.49.camel@Asgard>
+Content-Type: text/plain
+Message-Id: <1075722905.29899.10.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,59 +18,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 2 Feb 2004 15:46:32 +0100
+Date: Mon, 02 Feb 2004 12:55:05 +0100
 
-Hi Marcel
+Hi Jan,
 
-I just install the new 2.6.21 kernel and updated it with your patch (mh3 =
-I
-think) but the problem is the same.
-I can establish a contact with hsplay or hstest and I can hear some =
-noise in
-the headset, but nothing like the mp3 file I am sending to it.
+> Can anybody help me figure out why the bluetooth address I am getting is
+> not right?
+> 
+> What I am trying to do is get the bluetooth address of the sender/peer
+> to my obex server.
+> 
+> Here are the obex calls I made:
+> --------
+> 	handle = OBEX_Init(OBEX_TRANS_BLUETOOTH, obex_event, 0);
+> 
+> 	BtOBEX_ServerRegister(handle, NULL, OBEX_PUSH_HANDLE);
+> 
+> 	btobex_accept(handle);
+> 
+> 	OBEX_HandleInput(handle, 1);
+> 
+> 	//get addresss
+> 	
+> 	fd = OBEX_GetFD(handle);
+> 	if( fd < 0 )
+> 		return 0;
+> 
+> 	getpeername(fd,(struct sockaddr *)&sa,&len)
+> 		return 0;
+> 
+> 	baswap(&bdaddr, &sa.rc_bdaddr);
+> 	printf("\tADDRESS: %s\n", batostr(&bdaddr));
+> --------
+> 
+> 
+> when i run the program, i was able to get the following:
+>         channel: 10	
+>         family: 31
+>         ADDRESS 2: 00:0A:00:02:EE:69 -> this is not the bluetooth
+> address of the sender!!! Its address is 00:02:EE:69:E1:88. The last for
+> digits displayed are the 1st four digits of the device's real address. I
+> tried it with another device and the result is the same, from the
+> original address (00:E0:03:74:38:8E) to 00:0A:00:E0:03:74.
 
-Regards,
-
-Jerome
-
------Message d'origine-----
-De=A0: bluez-users-admin@lists.sourceforge.net
-[mailto:bluez-users-admin@lists.sourceforge.net] De la part de Marcel
-Holtmann
-Envoy=E9=A0: vendredi, 30. janvier 2004 19:02
-=C0=A0: BlueZ Mailing List
-Objet=A0: Re: [Bluez-users] SuSE and Audio
-
-Hi Jerome,
-
-> I'm actually a nb with linux, but I have to develop an application =
-with
-some
-> audio bluetooth transmission. Actually I have a SuSE 9.0 distribution.
-> Marcel (Holtmann) said that I have to patch my kernel, but his patch
-doesn't
-> work with the SuSE kernel source. And I don't know how to do it easily
-> without having to configure all my computer.
-
-SuSE uses its on kernel and I can't tell you if the needed patches are
-included or not. You must install a vanilla kernel.
+insert a "len = sizeof(sa)" before you call getpeername().
 
 Regards
 
 Marcel
-
-
-
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 
