@@ -1,84 +1,50 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Julien Campana <juliencampana@yahoo.fr>
-To: bluez-devel@lists.sourceforge.net
+Return-Path: <noring@nocrew.org>
+Subject: Re: [Bluez-devel] Documentation for hcid.conf ?
+From: Fredrik Noring <noring@nocrew.org>
+To: Edouard Lafargue <ELafargue@montrouge.sns.slb.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1080062945.2515.26.camel@pegasus>
+References: <1080053029.7507.40.camel@gryffindor>
+	 <1080054257.2515.23.camel@pegasus>  <1080059454.7507.85.camel@gryffindor>
+	 <1080062945.2515.26.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1080148571.939.67.camel@fischer>
+Message-Id: <1080166993.6986.13.camel@akka.yeti.nocrew.org>
 Mime-Version: 1.0
-Subject: [Bluez-devel] sdp_send_req_w4_rsp not accessible
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Mar 2004 18:16:12 +0100
+Date: Wed, 24 Mar 2004 23:23:13 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi everybody,
+Hi Edouard
 
-I'm trying to extend JBlueZ, which links BlueZ and java, in order to
-make it JSR82 compatible (Java Bluetooth Spetification). 
+>   Otherwise, I way that someone called Fredrik Noring is also working
+> on a hcid manpage, that looks fairly different from the current hcid
+> distributed on the bluez homepage: is this a code branch or something?
 
-BlueZ uses sdp_record_t structures to store the list of service
-attributes and I'm trying to modify it in order to get some Java Objects
-(with JNI) instead. 
-To do this, I have to re-implement the "sdp_service_search_attr_req"
-function. 
+Yes. My version of hcid (at http://noring.nocrew.org/bluetooth/) 
+is extended and backwards compatible with current hcid. Important
+improvements include:
 
-But the project do not compile because some sdp fucntions cannot not be
-linked. I'm getting the following error message:
-/tmp/ccvRmUPO.o(.text+0x158e): In function
-`my_sdp_service_search_attr_req(sdp_session_t*, _sdp_list const*,
-sdp_attrreq_type_t, _sdp_list const*, _sdp_list**)':
-: undefined reference to `sdp_send_req_w4_rsp(sdp_session_t*, char*,
-char*, int, int*)'
+  1. A hcid DBus interface for Bluetooth device management
+     as well as device configuration management, key pair
+     management etc.
 
-The function my_sdp_service_search_attr_req has exactly the same
-implementation as the official function sdp_service_search_attr_req (for
-the moment).
+  2. Plain text files for configuration storage. The current
+     hcid for example the binary file /etc/bluetooth/link_key 
+     for paired keys. This file is based on a binary dump of
+     a struct and as such will be difficult to move accross
+     different architectures, compilers etc. This binary file
+     is automatically converted to a plain text file located 
+     in /etc/bluetooth/keytab if this file does not already 
+     exists.
 
-I use the following gcc command (java headers for JNI +
-/home/julien/bluez/include to get the "sdp_internal.h" header):
+  3. A device name cache for paried devices, making it possible
+     to display the names of paired devices.
 
-gcc -I /home/java/include -I /home/java/include/linux
--I/home/julien/bluez/include BlueZ.cpp -o ../bin/jbluez -lsdp
--lbluetooth -lstdc++
+  4. Persistant storage of configurations, by saving changes in
+     /etc/bluetooth/hcid.conf, managed automatically by hcid.
 
-The function can be found into the installed bluetooth library:
-nm --dynamic /usr/lib/libsdp.so.2 | grep sdp_send
-00002080 T sdp_send_req
-000021c0 T sdp_send_req_w4_rsp
+  5. A man page (hcid.1).
 
-I use debian (Knoppix 3.1 with kernel 2.4.20: I know its an old one),
-libsdp 1-5-2, libbluetooth 2-5-1, gcc 3.3 (Debian), 
+This makes it easier to write Bluetooth tools for Gnome/KDE/etc.
 
-I've tried to compile the project on three different machines (2 Knoppix
-with different kernels and a Suse) and the problem remains.
-
-
-The same problem occurs with following sdp functions:
-sdp_extract_seqtype, sdp_extract_pdu, `sdp_gen_pdu.
-
-Does anybody have an idea?
-
-Thank you for your answers.
-
-Julien Campana
-
-
-
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Fredrik
