@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-Id: <848611830@web.de>
+MIME-Version: 1.0
+From: "Martin Mueller" <Ma.Mueller@tu-bs.de>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] cross compiling bluez-utils
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <848611830@web.de>
-References: <848611830@web.de>
-Content-Type: text/plain
-Message-Id: <1107618796.6921.156.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,26 +16,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 05 Feb 2005 16:53:16 +0100
+Date: Sat, 05 Feb 2005 07:48:51 +0100
 
-Hi Martin,
+Hi,
 
-> > I crosscompiled bluez-libs, bluez-utils and even hciemu for ARM platform 
-> > and they work fine. I am preparing a little how-to for those insterested 
-> > on doing the same thing.
-> 
-> They work perfectly here, too. Thanks for the hint! I just found it a little inconvenient to find the /etc/bluetooth/ directory in my ARM gcc directory. To be more specific:
-> 
-> The compiler, libs, include, ... directories reside under /usr/arm/arm-linux. That is set with 'prefix'. The executables then go to something like /home/mm/arm/ramdisk/mnt by setting 'exec_prefix' accordingly. I thought it to be funny to see /etc/bluetooth/ in the ramdisk rather than in the compiler area.
+> I crosscompiled bluez-libs, bluez-utils and even hciemu for ARM platform 
+> and they work fine. I am preparing a little how-to for those insterested 
+> on doing the same thing.
 
-are you sure that exec_prefix is meant for cross-compiling. From my
-knowledge it is for architecture dependent executables that will reside
-in the same filesystem. For example for NFS exports.
+They work perfectly here, too. Thanks for the hint! I just found it a little inconvenient to find the /etc/bluetooth/ directory in my ARM gcc directory. To be more specific:
 
-Regards
+The compiler, libs, include, ... directories reside under /usr/arm/arm-linux. That is set with 'prefix'. The executables then go to something like /home/mm/arm/ramdisk/mnt by setting 'exec_prefix' accordingly. I thought it to be funny to see /etc/bluetooth/ in the ramdisk rather than in the compiler area.
 
-Marcel
-
+Martin
+__________________________________________________________
+Mit WEB.DE FreePhone mit hoechster Qualitaet ab 0 Ct./Min.
+weltweit telefonieren! http://freephone.web.de/?mc=021201
 
 
 
