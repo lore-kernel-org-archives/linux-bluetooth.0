@@ -1,50 +1,37 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] epox-presenter
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Rob Davis <rob.davis@virgin.net>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4017F953.1090108@virgin.net>
-References: <4017F953.1090108@virgin.net>
+Return-Path: <trexx@pobox.com>
+Subject: Re: [Bluez-users] Logitech Bluetooth  Mx900+keyboard support.
+From: Terence Rudkin <trexx@pobox.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Olivier Bornet <Olivier.Bornet@puck.ch>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1075307541.26729.18.camel@pegasus>
+References: <1074457244.3254.17.camel@localhost.localdomain>
+	 <1074458664.6070.73.camel@pegasus>
+	 <1074480891.2817.10.camel@localhost.localdomain>
+	 <1074514935.6070.80.camel@pegasus>
+	 <1074568150.7831.5.camel@localhost.localdomain>
+	 <20040120081245.GA1871@smartdata.ch>  <1074597908.7088.5.camel@pegasus>
+	 <1075234547.3064.13.camel@localhost.localdomain>
+	 <1075276833.12766.56.camel@pegasus>
+	 <1075306699.1793.38.camel@localhost.localdomain>
+	 <1075307541.26729.18.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1075314868.26729.34.camel@pegasus>
+Message-Id: <1075315567.1793.44.camel@localhost.localdomain>
 Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jan 2004 19:34:28 +0100
+Date: Wed, 28 Jan 2004 11:46:07 -0700
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Rob,
+Hi Marcel,
 
-> I've just picked up one of these devices, and was quite happy to see it 
-> supported under linux, and even working with remote X windows..
+
+On Wed, 2004-01-28 at 09:32, Marcel Holtmann wrote:
+> I used the devfs path, because my Debian Sid has no default device node
+> for it. What is your system?
+The most recent is Fedora, with the 2.6.1 kernel  
+
+> Regards
 > 
-> However, I was wondering if there was a way of slowing or speeding up 
-> the speed of the mouse point, and getting the extra buttons working like 
-> a wheel mouse, like in windoze?
-
-the code is quite self-explanatory and very simple. So go ahead and send
-me a patch for your features.
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+> Marcel
+> 
+Thanks for all the help!
+-- 
