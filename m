@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PAN
-From: Marcel Holtmann <marcel@holtmann.org>
-To: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d6795d5190.d5190d6795@estudiants.urv.es>
-References: <d6795d5190.d5190d6795@estudiants.urv.es>
-Content-Type: text/plain
-Message-Id: <1082459219.23959.6.camel@pegasus>
-Mime-Version: 1.0
+From: Alex Holland <ah160@student.cs.york.ac.uk>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Compile bluez-bluefw-1.0 fails
+References: <200404182321.55431.dvornheder@t-online.de> <200404191952.11018.simone.gotti@email.it> <200404192121.31112.ah160@student.cs.york.ac.uk>
+In-Reply-To: <200404192121.31112.ah160@student.cs.york.ac.uk>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200404201028.08718.ah160@student.cs.york.ac.uk>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,30 +18,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 20 Apr 2004 13:07:00 +0200
+Date: Tue, 20 Apr 2004 10:28:08 +0100
 
-Hi Albert,
+Well, booted up today and it worked! To be honest though, I consider 
+this to be a bad thing; it means it'll probably do the works 
+sometimes/doesn't work sometimes thing that bluez-bluefw did too.
 
-> Well, I already solved the problem with rfcomm, and
-> now I'm trying to set up a PAN between two Belkin
-> USB dongles. The thing is, when I have both USB
-> plugged into my computer, I just can get one of them
-> UP RUNNING, the other one is not possible to
-> initialize, so it continues with DOWN, I want to
-> create the PAN but I only have one computer to test
-> it. Is this possible to do? 
+Conclusion? Don't go near USB dongles with Broadcomm chipsets. I wish I 
+had a CSR.
 
-getting both dongles running on the same computer is possible and you
-can use up to 16 dongles, PCMCIA cards or serial adapters at the same
-time. But it is not possible to create a PAN between two dongles on the
-same computer. You won't see any traffic between them, because
-everything goes over the loopback interface.
+Thanks for the help, anyway.
 
-Regards
+Alex Holland
 
-Marcel
+Here's bits of dmesg and lsmod/usb, just in case it reveals anything:
 
-
+---------------------------------------------------------------------
+...blah...
+Bluetooth: Broadcom Blutonium firmware driver ver 1.0
+drivers/usb/core/usb.c: registered new driver bcm203x
+Bluetooth: Core ver 2.4
+NET: Registered protocol family 31
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: HCI USB driver ver 2.5
+drivers/usb/core/usb.c: registered new driver hci_usb
+...blah...
+Bluetooth: L2CAP ver 2.1
+Bluetooth: L2CAP socket layer initialized
+...blah...
+Bluetooth: RFCOMM ver 1.2
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
+-----------------------------------------------------------------------
+Bus 001 Device 007: ID 0a5c:2001 Broadcom Corp.
+-----------------------------------------------------------------------
+rfcomm                 34780  2
+l2cap                  21380  5 rfcomm
+hci_usb                 9664  6
+bluetooth              43812  15 rfcomm,l2cap,hci_usb
+bcm203x                 4416  0
+firmware_class          7616  1 bcm203x
 
 
 -------------------------------------------------------
