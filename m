@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <004501c438e5$380cdd90$fd03a8c0@Perigee.Perigeellc.com>
-From: "Rob Taft" <rtaft@sensis.com>
-To: <bluez-users@lists.sourceforge.net>
-References: <004501c4383b$36b36950$80c8fea9@Perigee.Perigeellc.com> <200405122257.01637.pavouk@pavouk.org> <00e401c43867$ee3193f0$80c8fea9@Perigee.Perigeellc.com> <200405122347.25823.ach@mpe.mpg.de>
-Subject: Re: [Bluez-users] DHCPD and Bluetooth
+From: Mr Jie Liu <s4048156@student.uq.edu.au>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <1858c9181d18.181d181858c9@uq.edu.au>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] permission denied
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,133 +15,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 May 2004 08:24:15 -0400
+Date: Thu, 13 May 2004 19:59:08 +1000
 
-TY, up and running!
+I am trying to send audio files to my HBH-35 headset. But I found a problem with using bluez. When I try to send packets to the headset,like l2ping x:x:x:x, it works fine. After I use hciconfig or hcitool to do any operation about the headset,including just "hcitool info x:x:x:x", I can't connect with the headset again unless I restart my computer. I always got a error message:"permission denied". But I am running l2ping as root. Sometimes i
+f I restart the hci interface by "hcitool down" and "hcitool up", it works again. But sometimes it just refueses to work anymore. Here is the hcidump when it stopes to work:
+[root@tom cuanyu]# l2ping 00:0E:07:31:5C:5B
+Ping: 00:0E:07:31:5C:5B from 00:0B:0D:21:9E:81 (data size 20) ...
+Recv failed: Permission denied
+[root@tom sbin]# ./hcidump -r=bt.txt
+HCIDump - HCI packet analyzer ver 1.5
+< HCI Command: Create Connection(0x01|0x0005) plen 13
+> HCI Event: Command Status(0x0f) plen 4
+> HCI Event: Link Key Request(0x17) plen 6
+< HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
+> HCI Event: Command Complete(0x0e) plen 10
+> HCI Event: Connect Complete(0x03) plen 11
+< HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+< ACL data: handle 0x0001 flags 0x02 dlen 28
+    L2CAP(s): Echo req: dlen 20
+> HCI Event: Command Complete(0x0e) plen 6
+> HCI Event: Disconn Complete(0x05) plen 4
 
------ Original Message ----- 
-From: "Achim Bohnet" <ach@mpe.mpg.de>
-To: <bluez-users@lists.sourceforge.net>
-Sent: Wednesday, May 12, 2004 5:47 PM
-Subject: Re: [Bluez-users] DHCPD and Bluetooth
 
-
-> On Wednesday 12 May 2004 23:27, Rob Taft wrote:
-> > I think I'm almost there.
-> > I noticed that it is not HW based after I posted.  I saw in
-> > /var/log/messages a message that occurred ever connection:
-> >
-> > May 12 17:01:20 SMED /etc/hotplug/net.agent: invoke ifup bnep0
-> >
-> > So I went into the net.agent file and found this line that matched the
-> > output:
-> >
-> > debug_mesg invoke ifup $INTERFACE
-> >
-> > I added more lines to that so now it looks like this:
-> >
-> > if [ -x /sbin/ifup ]; then
-> >     debug_mesg invoke ifup $INTERFACE
-> >     debug_mesg LALALALALALALALALALA #ADDED THIS
-> >     exec /sbin/ifup $INTERFACE
->       ^^^^ remove this exec!
->
-> >     debug_message Attempting to restart dhcpd.    #ADDED THIS
-> >     exec /etc/init.d/dhcpd restart  #ADDED THIS
-> > else
-> >      mesg "how do I bring interfaces up on this distro?"
-> > fi
-> >
-> > I then restarted my entire system....and the 2nd 2 lines were never
-reached.
-> > I added the LALALA line after and that appears in the logs...so I'm
-guessing
-> > that "exec /sbin/ifup $INTERFACE" is causing the script to exit
->
-> see man bash-builtins
->
-> Achim
-> >
-> >
-> >
-> >
-> >
-> > ----- Original Message ----- 
-> > From: "Pavel Ruzicka" <pavouk@pavouk.org>
-> > To: <bluez-users@lists.sourceforge.net>
-> > Cc: "Rob Taft" <rtaft@sensis.com>
-> > Sent: Wednesday, May 12, 2004 4:57 PM
-> > Subject: Re: [Bluez-users] DHCPD and Bluetooth
-> >
-> >
-> > > Hello,
-> > >
-> > > > restart it.  I don't think hotplug is what I am looking for since it
-is
-> > > > hardware connection based.
-> > >
-> > > This is not only hardware connection based. When you try setup network
-> > from
-> > > remote device, that kernel call /sbin/hotplug with NET action.
-> > > You can edit script "/etc/hotplug.d/default/default.hotplug" or other
-in
-> > your
-> > > distribution and uncomment line "DEBUG=yes export DEBUG".
-> > > Later you can look in to log file for interesting messages ;-)
-> > > In this case will be probably interesting script
-/etc/hotplug/net.agent.
-> > >
-> > > Best regards,
-> > >
-> > > Pavel Ruzicka
-> > >
-> > >
-> > > -------------------------------------------------------
-> > > This SF.Net email is sponsored by Sleepycat Software
-> > > Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to
-> > deliver
-> > > higher performing products faster, at low TCO.
-> > > http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
-> > > _______________________________________________
-> > > Bluez-users mailing list
-> > > Bluez-users@lists.sourceforge.net
-> > > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> > >
-> >
-> >
-> >
-> > -------------------------------------------------------
-> > This SF.Net email is sponsored by Sleepycat Software
-> > Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to
-deliver
-> > higher performing products faster, at low TCO.
-> > http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >
-> >
-> >
->
-> -- 
->   To me vi is Zen.  To use vi is to practice zen. Every command is
->   a koan. Profound to the user, unintelligible to the uninitiated.
->   You discover truth everytime you use it.
->                                       -- reddy@lion.austin.ibm.com
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by Sleepycat Software
-> Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to
-deliver
-> higher performing products faster, at low TCO.
-> http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
 
 
 
