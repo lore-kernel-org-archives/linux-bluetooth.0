@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm confusion
+Subject: Re: [Bluez-users] Final sound support in BlueZ
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ken <a5a33956@telus.net>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40AB4D9F.7010307@telus.net>
-References: <40AB4D9F.7010307@telus.net>
+In-Reply-To: <200405191405.41365.cijoml@volny.cz>
+References: <200405191405.41365.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1084969555.4327.60.camel@pegasus>
+Message-Id: <1084969362.4327.56.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,34 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 May 2004 14:25:55 +0200
+Date: Wed, 19 May 2004 14:22:42 +0200
 
-Hi Ken,
+Hi Michal,
 
-> I am trying to create a bluetooth serial connection between my linux 
-> laptop and iPAQ pda.
+> do you work on sco support for BlueZ which will allow us finally talk to BT 
+> headsets? In our market are selled BT enabled repros too.
 
-is this a Windows or a Linux based iPAQ?
-
-> I'm using the command "rfcomm connect hci0 00:11:22:33 1" and it appears 
-> to work.
-
-The <dev> is not the HCI device. It is the RFCOMM device you wanna
-create. So use "rfcomm0" or "0" for short.
-
-> the connection shows up on the iPAQ and when I go to the status it 
-> displays 0 bytes transfered - 0 bytes received.
-
-Where do you see this?
-
-> so, now i'm trying to send some data over this connection. my 
-> expectation was that i could do something like:
-> echo "test" > /dev/rfcomm0
-> and then see 4 bytes received on the iPAQ interface, however the byte 
-> counts on the ipaq remain 0.
-
-Actually this depends on the program on the other side. If it is a
-Windows iPAQ I don't know how they count the bytes.
+I am not working on any SCO or eSCO support at the moment. There are
+many other parts that need my attention.
 
 Regards
 
