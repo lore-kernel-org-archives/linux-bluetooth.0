@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Can't understand
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Achim Bohnet <ach@mpe.mpg.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405122238.47202.ach@mpe.mpg.de>
-References: <200405121820.59166.andrewthegreat@mail.ru>
-	 <1084367829.25099.16.camel@pegasus>  <200405122238.47202.ach@mpe.mpg.de>
-Content-Type: text/plain
-Message-Id: <1084397961.25099.110.camel@pegasus>
+From: Edd Dumbill <edd@usefulinc.com>
+To: bluez-users@lists.sf.net
+In-Reply-To: <1084100350.9269.13.camel@pegasus>
+References: <1084100350.9269.13.camel@pegasus>
+Message-Id: <1084397995.15254.71.camel@saag>
 Mime-Version: 1.0
+Content-Type: text/plain
+Subject: [Bluez-users] Re: [BlueZ-Announce] Release of bluez-libs-2.7 and bluez-utils-2.7
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,22 +17,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 May 2004 23:39:21 +0200
+Date: Wed, 12 May 2004 22:39:55 +0100
 
-Hi Achim,
+On Sun, 2004-05-09 at 12:59 +0200, Marcel Holtmann wrote:
+> Hi Folks,
+> 
+> this is one of the bigger updates, because I included the dund and pand
+> programs into the BlueZ utilities. This means of course that the BlueZ
+> PAN package is now deprecated. The CUPS printing backend is also part of
+> this BlueZ utils package, but not installed by default.
 
-> FWIW: I had a short intermezzo with SuSE 9.1 (kernel 2.6.4) some
-> hours ago and I had to install bluez-bluefw pkg to get the AVM USB
-> stick working (the pkg contained blubase.frm)  Maybe SuSE
-> just added the firmware file, maybe they did more.
+Marcel,
 
-it is only the firmware file that matters. This is a relict from SuSE
-9.0 and they should actually fix it, because the bfusb driver never
-depended on bluez-bluefw.
+It would be great to include pkg-config .pc files in bluez-libs, to make
+it easier for people coding against BlueZ with auto* tools.  At the
+moment I'm relying on hacky .m4 stuff which doesn't work very well.
 
-Regards
-
-Marcel
+-- Edd
 
 
 
