@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Simone Gotti <simone.gotti@email.it>
-To: Detlef Grittner <detlef.grittner@t-online.de>
-Subject: Re: [Bluez-users] Pocket PC 2003 and Linux
-Cc: bluez-users@lists.sourceforge.net
-References: <412C5482.3010909@t-online.de> <200408251202.48482.simone.gotti@email.it> <412C9332.7010002@t-online.de>
-In-Reply-To: <412C9332.7010002@t-online.de>
+Message-Id: <1039977544@web.de>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200408251612.44110.simone.gotti@email.it>
+From: "Polina Tataeva" <polina.t@web.de>
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/html; charset="iso-8859-1"
+Subject: [Bluez-users] TAP/TUN with blueZ
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,30 +15,11 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Aug 2004 16:12:43 +0000
+Date: Wed, 25 Aug 2004 16:56:00 +0200
 
-On Wednesday 25 August 2004 13:25, Detlef Grittner wrote:
-> Yes, I have kbtobexsrv registered and the sdptool command output is as
-> expected.
->
-> The problem is I can send data from the Linux client to the Pocket PC
-> via Obex Push using the KDE tools.
-> But I can't send data from the Pocket PC to the Linux client.
+<html><style>p {margin: 0px}</style><body bgcolor='#ffffff' style='font-size:9pt; font-family:Verdana; font-family: Verdana' ><STYLE>p {margin: 0px}</STYLE><P>Hi,</P><P>do anybody know how can i run a tap device over bnep or ppp? </P><P>I&nbsp;can establish&nbsp;bnep connection or ppp/rfcomm connection and want to send the&nbsp;pakets to my own TCP/IP Stack.&nbsp; The TCP/IP Stack run in User space and blueZ in&nbsp;Kernel. I thout&nbsp;I could run a tap device over it and&nbsp;read the messages from tap divice, but i don't know how to do it?&nbsp;</P><P>Maybe somebody knows the other way to recieve and send messages from kernel space into the User space?</P><P>&nbsp;</P><P>Regards</P><P>&nbsp;</P><P>Polina</P><P>&nbsp;&nbsp;</P><br><br><table cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#000000"><img src="http://img.web.de/p.gif" width="1" height="1" border="0" alt="" /></td></tr><tr><td style="font-family:verdana; font-size:12px; line-height:17px;">Aufnehmen!
+ , abschicken, nah sein - So einfach ist &nbsp;&nbsp;<br>WEB.DE Video-Mail: <A HREF="http://freemail.web.de/?mc=021200"><B>http://freemail.web.de/?mc=021200</B></A>&nbsp;&nbsp;</td></tr></table></body></html>
 
-So the Obex Push service is right registered but the Pocket PC can't find it?
-you said that it can find only the kbtserialchat, can you confirm this?
-I can only think that probably there are registered more than one obexservice. 
-Can you post the full output of "sdptool browse local"?
-
-P.S. I don't know if this is the right place to talk about kdebluetooth. 
-Probably we should move our thread to the kdebluetooth mailing list (avoiding 
-any crossposting).
-
-Bye!
--- 
-Simone Gotti
-<simone.gotti@email.it>
-http://kde-bluetooth.sf.net
 
 
 -------------------------------------------------------
