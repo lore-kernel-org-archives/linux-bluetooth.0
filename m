@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Ronan Naughton" <wadgienaughton@hotmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] hcidump-1.6, Intellimouse, and HID Parser
+From: Marcel Holtmann <marcel@holtmann.org>
+To: mark <gress2k1@copper.net>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1078172702.2065.25.camel@localhost>
+References: <1078063562.2814.4.camel@localhost>
+	 <1078152704.1942.123.camel@pegasus>  <1078172702.2065.25.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1078215951.1942.177.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY10-F29zjmbgGHk7s000090c8@hotmail.com>
-Subject: [Bluez-users] Setting up a bluetooth network
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,41 +19,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 02 Mar 2004 12:11:22 +0000
+Date: Tue, 02 Mar 2004 09:25:51 +0100
 
-Hi,
-I am having some trouble. I want to set up a little bluetooth LAN say 
-between 4 computers with bluetooth dongles and a pda. I don't know which to 
-use PAN or LAN access profile and I am having trouble setting up both. 
-Someone told me that when your using pan, its not really the same as setting 
-up a network but more like a communication means for all your personal 
-devices.
+Hi Mark,
 
-Also is LAN acces profile just for say accesing a LAN rather than setting up 
-a LAN. All the LAN how-to's show how to set up a PPP connection between ur 
-pc and your phone, and that is even causing me trouble. It trys to make a 
-PPP over rfcomm but fails to connect.
+> Following that link, I read through it real quick, and that seems like
+> it's going to be what I need(straight forward and not necessarily
+> complex).  Thanks much.  But I don't have the uinput.o file that is
+> needed.  I followed the instructions here
+> http://www.bueche.ch/comp/mx900/bthid-msmouse_howto.txt which explain
+> specifically for the M$ mouse, and one line specifically I followed was
+> this
+> 
+> if you miss the device file, create it with
+> 	# mknod /dev/misc/uinput c 10 223
+> 
+> Which gave me the uinput device I was missing.  From there, I started
+> over, re-installed bluez, but I seem to be missing something.  Your
+> kernel patch worked fine on 2.4.22.(or seemed to)  when I get home
+> tomorrow, I'll give it a try again.  thanks for your reply.
 
-When I tried setting up a PAN between three computers ( I am using Red Hat9 
-and the blueZ package for this ) both computers can ping the master but 
-cannot ping each other and the master can only ping one pc, even though it 
-seems that the connection is there and the pc's are beside each other.
-I assigned the master by un-commenting the config file ( at lm accept, 
-master ).
+the uinput driver is part of my kernel patches, but you have to select
+and compile it. You can found the option under input subsystem.
 
-The thing is that I need to run an ad hoc network (AODV) accross this "LAN" 
-and some of the pc's will be out of range with other but have to communicate 
-using neighbouring nodes.
-I read some where that LAN access profile does not support ad-hoc networks.
+Regards
 
-If anyone can help at all it would be greatly appreciated as i am in dire 
-straits. All the how-to's don't seem to be helping.
-Thanks,
-Wadgie.
+Marcel
 
-_________________________________________________________________
-Protect your PC - get McAfee.com VirusScan Online 
-http://clinic.mcafee.com/clinic/ibuy/campaign.asp?cid=3963
 
 
 
