@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Christoph =?iso-8859-15?q?Sch=FCtz?= <ch.schuetz@addcom.de>
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] How to set up a PAN using my laptop and cellphone
+References: <2e973d2e05032514275d90da67@mail.gmail.com> <42449273.2030103@xmission.com>
+In-Reply-To: <42449273.2030103@xmission.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200503261218.00580.ch.schuetz@addcom.de>
-Subject: [Bluez-users] BlueFritz! AP-x working as a Bluetooth device?
+  charset="iso-8859-2"
+Message-Id: <200503252344.53258.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,31 +19,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 26 Mar 2005 12:18:00 +0100
+Date: Fri, 25 Mar 2005 23:44:52 +0100
 
- Hi !
- 
- I try to get a connection between two pc using bluetooth.
- My hardware: AVM Fritz AP-X ISDN and one AVM BlueFritz USB Stick.
-The AVM-Web-Page says that it is possible on Windows so perhaps it is possible 
-on linux as well?
+Worse problem probably is, that there is not any cell phone with PAN suppor=
+t=20
+on market ;-D
 
-I have Suse Linux 9.1. The USB Stick is working under linux. I get internet 
-connection and can see the access point with hcitool scan. 
-As I connect just the AP-x to my computer hcitool scan finds no device. 
+Michal
 
-Perhaps my question is answered in the feature page of holtmann.org but I 
-don't really understand it. The following information is given there:
+Dne p=E1 25. b=F8ezna 2005 23:36 Brad Midgley napsal(a):
+> It sounds like a very twisted idea but there's a flaw: most/all
+> cellphones have a bluetooth radio that can only deal with one connection
+> at a time. So your laptop can't be NATting the connection and the
+> cellphone certainly won't.
+>
+> WEI LI wrote:
+> > I have a laptop : linux 2.4.10,  with bluez-libs, bluez-utils
+> > installed, and internet access.
+> > and a cell phone: Nokia 6620.
+> > Can I set up a PAN  between this two devices  and enable the cellphone
+> > to browser webs sharing internet access with the laptop? How to do?
+> >
+> > Thank u very much!
+> >
+> > WEI
+> >
+> >
+> > -------------------------------------------------------
+> > SF email is sponsored by - The IT Product Guide
+> > Read honest & candid reviews on hundreds of IT Products from real users.
+> > Discover which products truly live up to the hype. Start reading now.
+> > http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-Vendor  	Model  			Type  	Features  			HCI Ver	LMP Version  	Manufacturer
-AVM  	BlueFRITZ! AP-X  	ISDN  	0x2f 0x06 0x04 0x00  	   	1.1  (0x0001)  	AVM
-AVM 	BlueFRITZ! AP-X 	ISDN 	0x2f 0xbe 0x05 0x00 	  		1.1  (0x0001) 	AVM
+=2D-=20
+S pozdravem
 
-What does the numbers for "Featrues" mean? And what is LMP?
-
-Perhaps someone can help me. Thanks
-
-Christoph Schuetz
+Michal Semler
 
 
 -------------------------------------------------------
