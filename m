@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Getting installed usb bluetooth adaptor into
-	linux system
+Subject: Re: [Bluez-users] ISSC USB Dongle does not work with current bluez?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Mezkiriz <dmezkiriz@yahoo.com>
+To: Andreas Krause <Andreas.Krause@web.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040722225534.57960.qmail@web41301.mail.yahoo.com>
-References: <20040722225534.57960.qmail@web41301.mail.yahoo.com>
+In-Reply-To: <200407230649.28305.Andreas.Krause@web.de>
+References: <200407222124.44032.Andreas.Krause@web.de>
+	 <1090529272.21828.41.camel@pegasus>
+	 <200407230649.28305.Andreas.Krause@web.de>
 Content-Type: text/plain
-Message-Id: <1090570624.21828.51.camel@pegasus>
+Message-Id: <1090570478.21828.47.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,38 +20,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jul 2004 10:17:05 +0200
+Date: Fri, 23 Jul 2004 10:14:39 +0200
 
-Hi David,
+Hi Andreas,
 
-> When I typed:
-> # hciconfig -a
+> > > I've got a Bluetooth USB Dongle, Vendor ID 0x1131 (ISSC, Integrated
+> > > System Solution Corp.), Product ID 0x1001, Revision 3.115. 
+> > where do you got these dongle?
 > 
-> This was the output:
+> http://cgi.ebay.de/ws/eBayISAPI.dll?ViewItem&item=5709740304
+
+is there anyone who will donate one of these?
+
+> hciconfig -a says the same as in my original posting.
 > 
-> hci0:   Type: USB
->         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 
-> SCO MTU: 0:0
->         DOWN
->         RX bytes:0 acl:0 sco:0 events:0 errors:0
->         TX bytes:0 acl:0 sco:0 commands:0 errors:0
->         Features: 0x00 0x00 0x00 0x00
->         Packet type: DM1 DH1 HV1
->         Link policy:
->         Link mode: SLAVE ACCEPT
-
-so your dongle is detected.
-
-> I looked at some hciconfig manuals and tried this
-> option,
+> > Run "hcidump -x" and show it to us while executing these commands.
 > 
-> # hciconfig up
+> The following dump is the output of 'hcidump -x' while running 'hciconfig -a'. 
+> Running 'hcitool inq' or 'hcitool scan' does not trigger any output from 
+> 'hcidump -x'!
 
-Try "hciconfig hci0 up" or start hcid at system boot.
+That is the problem here, because the kernel thinks that the dongle is
+already in inquiry mode and won't start another one. Please stop hcid
+and sdpd. Unplug your dongle and replug it. Run "hcidump -x" and then
+call "hciconfig hci0 up".
 
 Regards
 
 Marcel
+
 
 
 
