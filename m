@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1073308932.26243.1058.camel@baroque.rococosoft.com>
-Mime-Version: 1.0
-Subject: [Bluez-devel] non-blocking device discovery
+From: Alexander Holler <holler@ahsoftware.de>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Success: switching the Logitech-Hub
+Message-ID: <134020000.1073270547@[192.168.207.2]>
+In-Reply-To: <1073267036.3804.4.camel@pegasus>
+References: <9810000.1073197538@[192.168.207.2]>
+ <1073267036.3804.4.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,21 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 05 Jan 2004 13:22:15 +0000
+Date: Mon, 05 Jan 2004 03:42:27 +0100
 
-Hi,
-I seem to remember a posting to this list in which someone mentioned
-that they'd implemented non-blocking device-discovery by writing
-commands directly to the hci socket. The code was C++ which leads me to
-think that it was part of KDE but I can't find it on the net.
+Hello,
 
-Can someone refresh my memory?
+--On Montag, Januar 05, 2004 02:43:56 +0100 Marcel Holtmann 
+<marcel@holtmann.org> wrote:
 
-Thanks,
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+>> lsusb:
+>>
+>> Bus 001 Device 004: ID 046d:c707 Logitech, Inc.
+>> Bus 001 Device 003: ID 046d:c704 Logitech, Inc.
+
+> A little bit weird is that the HID device 046d:c704 is still present
+> after switching.
+
+This is something I doesn't understand too. Either the Linux-USB stack is 
+missing the disconnect, or a 'magic' report in the switch-sequence for 
+finally disabling the usb-hid-device is missing.
+Using Windows it seems the usb-hid-dev is removed after starting the 
+bluetooth-stack. I will check my win-logs if I could find another report 
+which could do this.
+
+Regards,
+
+Alexander
+
 
 
 
