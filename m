@@ -1,14 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Sandro Weiser <sandro.weiser@gmx.de>
-Reply-To: sandro.weiser@gmx.de
+From: Vesa Halttunen <vesuri@jormas.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BT mouse disconnect
-References: <200406201934.30037.sandro.weiser@gmx.de> <1087756769.4781.44.camel@pegasus>
-In-Reply-To: <1087756769.4781.44.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Message-Id: <200406210029.58265.sandro.weiser@gmx.de>
+In-Reply-To: <1087774058.4781.140.camel@pegasus>
+References: <1087757523.839.10.camel@pc.vesuri.net>
+	 <1087767604.4781.52.camel@pegasus>  <1087760721.1232.5.camel@pc.vesuri.net>
+	 <1087770579.4781.59.camel@pegasus> <1087763282.1232.17.camel@pc.vesuri.net>
+	 <1087765554.4781.67.camel@pegasus>  <1087764428.551.3.camel@pc.vesuri.net>
+	 <1087768641.4781.74.camel@pegasus>  <1087767270.860.4.camel@pc.vesuri.net>
+	 <1087774058.4781.140.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1087769891.524.2.camel@pc.vesuri.net>
+Mime-Version: 1.0
+Subject: [Bluez-users] Re: Jerky MX900 mouse movement with 2.6.7-mh1, hidp and hidd
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,33 +22,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 21 Jun 2004 00:29:56 +0200
+Date: Mon, 21 Jun 2004 01:18:11 +0300
 
-=2D----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On Mon, 2004-06-21 at 02:27, Marcel Holtmann wrote:
+> I recharged the batteries of my MX900 and I don't have any problem with
+> it. The mouse is working perfect with my setup.
 
-> May you wanna try to start hidd with the --timeout option and set your
-> own value that is shorter than the timeout value of the mouse. My list
-> says that it uses a timeout of 11 minutes. Maybe you wanna try eight
-> minutes. In the case we terminate the connection everything should work
-> fine.
-I already tried with -t 0 and -t 999999 but none of them solved the problem=
-=2E=20
-After your email I tried -t 8 and now it works as expected.
+Uhhuh. This is embarrassing.
 
-thx
-Sandro
+It turned out that I wasn't running hcid at all. I commented it out
+since I thought it isn't necessary with hidd. I was wrong.
 
-=2D --=20
-Sandro Weiser <Sandro.Weiser@gmx.de>
-=46ingerprint: 77E0 7C87 4DB2 6BBB 5419  343C 7995 1C67 25B9 CBF1
-=2D----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
+Everything works fine now - no need for bthid. Thanks again for help. :)
 
-iD8DBQFA1g/keZUcZyW5y/ERAmtHAJ9TNlPIvto1cErz0t3pcUeMtVRouACZARGL
-ubA0VjNEULwTGvKdHYUM3m8=3D
-=3Djaqd
-=2D----END PGP SIGNATURE-----
+-Vesa
+-- 
+            · Vesa Halttunen - http://www.jormas.com/~vesuri/ ·
+
 
 
 -------------------------------------------------------
