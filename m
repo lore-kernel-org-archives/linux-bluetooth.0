@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] unable to retrieve services
+Subject: Re: [Bluez-users] rfcomm problems
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?c=E9cile?= Ayr <tetilou2003@yahoo.fr>
+To: zubiwat@poczta.onet.pl
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040313093829.3814.qmail@web41713.mail.yahoo.com>
-References: <20040313093829.3814.qmail@web41713.mail.yahoo.com>
+In-Reply-To: <20040312160822Z2706732-18648+146257@kps3.test.onet.pl>
+References: <20040312160822Z2706732-18648+146257@kps3.test.onet.pl>
 Content-Type: text/plain
-Message-Id: <1079179762.1795.0.camel@pegasus>
+Message-Id: <1079179936.1795.5.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,21 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 13 Mar 2004 13:09:22 +0100
+Date: Sat, 13 Mar 2004 13:12:17 +0100
 
-Hi Cecile,
+Hi Maciej,
 
-> I have a laptop with a bluez environment and a USB
-> port. I tried to connect to my laptop with a PDA
-> running bluetooth. The PDA can locate my laptop but is
-> unabled to retrieve the services of my laptop. I set
-> the service/device class on my laptop, such as:
+> I have problems with rfcomm, because when i connect two pc's I don't know how to make them to transfer files or text between tty's. One komputer uses bluez and the other one USB dongle with WinXP.
 > 
-> hciconfig hci0 class 0x92010C 
-> 
-> Any idea why it doesn't work? 
+> Please help because the two compueters are paired and connected using rfcomm and Serial Port. But when I try to type sth on tty nothing happens.
 
-starting sdpd is a good idea and of course you must run some services ;)
+for file transfer you must put another protocol on top of RFCOMM. For
+example Obex, Kermit etc. or you can use PAN and get a TCP/IP connection
+between your machines.
 
 Regards
 
