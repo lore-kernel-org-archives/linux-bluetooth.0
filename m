@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: soraberri <421246@posta.unizar.es>
-Message-ID: <crtlh0$lg8$1@sea.gmane.org>
-References: <27251cb805010914064780a27a@mail.gmail.com> <200501092323.50090.cijoml@volny.cz>
+Subject: Re: [Bluez-users] Apple keyboard problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050109235803.GC5291@penguinhosting.net>
+References: <20050109212302.GB5291@penguinhosting.net>
+	 <1105324578.8637.8.camel@pegasus>
+	 <20050109235803.GC5291@penguinhosting.net>
+Content-Type: text/plain
+Message-Id: <1105329941.8637.11.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <200501092323.50090.cijoml@volny.cz>
-Subject: [Bluez-users] Re: rfcomm -> /dev/dsp? (phone as headset)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,47 +20,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 Jan 2005 11:30:13 +0100
+Date: Mon, 10 Jan 2005 05:05:41 +0100
 
-Michal Semler wrote:
-> Dne ne 9. ledna 2005 23:06 jago25_98 / ajpearce napsal(a):
-> 
->>How do I use my phone as a microphone input? It has the "Voice
->>gateway" bluetooth profile on channel 1, which is bound to
->>/dev/rfcomm1
->>
->>Maybe there's something in the kbluetoothd (KDE) that can help?
->>
->>hmm... I see there is the alsa-bluetooth project but I'm not sure how
->>to use it, and not sure if it will work with my phone.
-> 
-> 
-> Project you are looking for is:
-> 
-> http://www.crazygreek.co.uk/content/chan_bluetooth
-> 
-> Michal
-> 
->
+Hi Ian,
 
+> > > I never get a PIN entry request (as I did with the mouse) or any other
+> > > error.  There's a long pause between the "Connecting to device" and the
+> > > "Can't create".  According to lib.c in the kernel, ENOSYS is returned
+> > > on an unrecognized error code, but I don't know enough about the packet
+> > > formats to figure out what byte is the error code, or what else it might
+> > > mean.  Attached is an hcidump during the "hidd --search" run.
+> > 
+> > at that pause you should type a numeric PIN on your keyboard and then
+> > press return.
+> 
+> Sorry, wasn't clear enough.  When I'm running in X, the PIN dialog pops
+> up as expected for the mouse, and not for the keyboard.  The blocking
+> call for that pause from hidd, according to strace, is:
+> 
+> bind(4, {sa_family=AF_BLUETOOTH, sa_data="\0\0\212\323\4\241\16\0\0\0\0\0\0\0"}, 10) = 0
+> setsockopt(4, SOL_TCP, TCP_NODELAY, "0\0000\0\377\377", 6) = 0
+> connect(4, {sa_family=AF_BLUETOOTH, sa_data="\21\0\34N:\225\n\0\0\0\0\0\0\0"}, 10
+> 
+> (pause is here)
+> 
+> = -1 ENOSYS (Function not implemented)
+> 
+> Typing a PIN in that space simply causes the expected:
+> 
+> sheba% 0000
+> zsh: command not found: 0000
 
-The project you mention is about 'Bluetooth HandsFreeProfile support for 
-Asterisk'. Then, you can use the computer as a handsfree device: you 
-carry the phone in your briefcase and the laptop in the desk, so you can 
-  make/receive calls without speaking to the phone -you speak to the 
-laptop.
-A different thing is to use the phone as audio input: in this case you 
-want to speak to your phone, but you want the streaming audio to reach 
-the computer via bluetooth in order to use VoIP there (for example). So 
-you use the phone just like a headset, the difference is that you have 
-to hold it by hand instead of hook it in the ear. This way, all you need 
-in the Linux point is Bluez and btsco (bluetooth-alsa) in order to have 
-AudioGateway support. The problem is what you need in the phone end: I 
-think at least Symbian, and the possibility to "read/write" from/to the 
-phone audio device and implement the headset profile.
+you should type the PIN on the keypad of the Bluetooth keyboard. After
+that the PIN dialog should popup and you have to repeat the PIN.
 
-Do you think is it possible? Has it been managed anywhere?
-I guess many people wouldn't like the idea at all...
+Regards
+
+Marcel
+
 
 
 
