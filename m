@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jason Bell <jaseb@enigmastation.com>
+From: Zia Syed <zs@comp.rgu.ac.uk>
+Reply-To: zs@comp.rgu.ac.uk
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Belkin CF card (F8T020)
-Message-ID: <20040123171347.A11107@enigmastation.com>
+Content-Type: text/plain
+Message-Id: <1074894810.6320.16.camel@zs>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] PAN and Device Lookup Problem- Still no luck :(
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,29 +16,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jan 2004 17:13:47 -0500
+Date: Fri, 23 Jan 2004 21:53:30 +0000
 
-Marcel,
-Sorry it's taken a little while to get back to you.
+Well guys!, after whole day effort, i still couldn't manage to get PAND
+and device discovery to work together. I'm using Zaurus SL5500 with
+kernel 2.4.18-rmk7-pxa3-embedix. As i said before, stack works fine
+until when I connect to NAP, after that I can't do device lookup. Only
+after killing the PANU session, i can do the "hcitool scan". Otherwise
+it gives me error saying "Inquiry failed: Device or resource busy".
 
-modprobe lists the following of use.
+I'm really stuck now as my application which was working till last night
+but now with this problem I can't go any further. My application need
+both PAN (for fetching web-contents) and device lookup for discovering
+nearby devices. 
 
-alias net-pf-31 bluez
-alias bt-proto-0 l2cap
-alias bt-proto-2 scp
-alias bt-proto-3 rcomm
-alias bt-proto-4bnep
-alias tty-ldisc-15 hci_uart
-alias char-major-10-250 hci_vhc1
+What do you guys suggest I should do? I've tried installing different
+versions of bluez packages (from sf.net and from community.zaurus.com). 
 
-So as far as I can see it looks like it has loaded okay.
+I'm using Socket CF (G Series) Bluetooth card. Is there anyone out there
+using the same device settings with Bluez?
 
-The Zaurus powers down on its own accord now, I think the card is sapping power as it's fine in the cradle.
+Please advice!
 
-Any help would be great.
-
-Regards
-Jase Bell
+Thanks
+Zia
 
 
 
