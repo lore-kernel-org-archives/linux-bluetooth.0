@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <ICGZCE$7DF6A31DCAD3E31E3169B51A8859A4C6@bol.com.br>
-Subject: Re:[Bluez-devel] BlueZ on CSR ?
+Message-ID: <20050224231044.13234.qmail@web51608.mail.yahoo.com>
+From: Prasanna <prasannasbarve@yahoo.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-From: "ra002890" <ra002890@bol.com.br>
-To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/alternative; boundary="0-97461496-1109286643=:12854"
+Subject: [Bluez-devel] BlueZ on CSR ?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,52 +16,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Feb 2005 10:41:02 -0300
+Date: Thu, 24 Feb 2005 15:10:43 -0800 (PST)
 
-Can you configure your module(home made) or it is a shop-self module?!? I=
- worked with csr modules and Bluez worked very well with them. At first r=
-emember that common PCs serial port works only at 115200 bps or  less. Tr=
-y "hciattach ttyS0 any 115200", or
-"hciattach ttyS0 bcsp 115200". If you can change PSKEYS, and firmware, re=
-call me.
+--0-97461496-1109286643=:12854
+Content-Type: text/plain; charset=us-ascii
 
-                                                  Daniel Moraes, directly=
- from Brasil. 
+I am doing a project at Bournemouth University, UK. I am using Gennum corporations GR2320 bluetooth modules.  These modules have BlueCore HCI software stack embedded onto the module.
+ 
+I have installed BlueZ on linux (mandrake 10.0 official). My host PC is a laptop - HP NX9005. But i am not able to connect to the module via the RS232 interface (UART)..... Is it because blueZ does not yet support CSR?
+ 
+Please can any one answer my query, coz i am very desperate to demonstrate bluetooth connection between two bluetooth devices using the GR2320 Bluetooth module
+ 
+sincerely,
+prasanna
 
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
+--0-97461496-1109286643=:12854
+Content-Type: text/html; charset=us-ascii
 
-
----------- In=EDcio da mensagem original -----------
-
-      De: bluez-devel-admin@lists.sourceforge.net
-    Para: bluez-devel@lists.sourceforge.net
-      Cc: 
-    Data: Thu, 24 Feb 2005 15:10:43 -0800 (PST)
- Assunto: [Bluez-devel] BlueZ on CSR ?
-
-> I am doing a project at Bournemouth University, UK. I am using Gennum c=
-orporations GR2320 bluetooth modules.  These modules have BlueCore HCI so=
-ftware stack embedded onto the module.
->  
-> I have installed BlueZ on linux (mandrake 10.0 official). My host PC is=
- a laptop - HP NX9005. But i am not able to connect to the module via the=
- RS232 interface (UART)..... Is it because blueZ does not yet support CSR=
-?
->  
-> Please can any one answer my query, coz i am very desperate to demonstr=
-ate bluetooth connection between two bluetooth devices using the GR2320 B=
-luetooth module
->  
-> sincerely,
-> prasanna
-> 
-> __________________________________________________
-> Do You Yahoo!?
-> Tired of spam?  Yahoo! Mail has the best spam protection around 
-> http://mail.yahoo.com =0A =0A__________________________________________=
-________________________________=0AAcabe com aquelas janelinhas que pulam=
- na sua tela.=0AAntiPop-up UOL - =C9 gr=E1tis!=0Ahttp://antipopup.uol.com=
-.br/=0A=0A
-
+<DIV>I am doing a project at Bournemouth University, UK. I am using Gennum corporations GR2320 bluetooth modules.&nbsp; These modules have BlueCore HCI software stack embedded onto the module.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>I have installed BlueZ on linux (mandrake 10.0 official). My host PC is a laptop - HP NX9005. But i am not able to connect to the module via the RS232 interface (UART)..... Is it because blueZ does not yet support CSR?</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Please can any one answer my query, coz i am very desperate to demonstrate bluetooth connection between two bluetooth devices using the GR2320 Bluetooth module</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>sincerely,</DIV>
+<DIV>prasanna</DIV><p>__________________________________________________<br>Do You Yahoo!?<br>Tired of spam?  Yahoo! Mail has the best spam protection around <br>http://mail.yahoo.com 
+--0-97461496-1109286643=:12854--
 
 
 -------------------------------------------------------
