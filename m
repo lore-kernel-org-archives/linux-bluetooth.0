@@ -1,11 +1,20 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Microsoft keyboad/mouse problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41B8A67C.3060608@paytec.com>
-References: <41B8A67C.3060608@paytec.com>
+Subject: Re: [Bluez-users] Nokia 7610 file transfer to computer
+From: Stefan Torkel <nephlim@gmx.de>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1102620720.9988.241.camel@pegasus>
+References: <1102381335.13235.8.camel@nephlim.homenet>
+	 <1102406104.8447.15.camel@pegasus>
+	 <1102438800.21032.3.camel@nephlim.homenet>
+	 <1102478181.8447.52.camel@pegasus>
+	 <1102553068.22127.5.camel@nephlim.homenet>
+	 <1102577073.9988.92.camel@pegasus>
+	 <1102590679.24852.3.camel@nephlim.homenet>
+	 <1102591469.9988.128.camel@pegasus>
+	 <1102611131.7584.1.camel@nephlim.homenet>
+	 <1102620720.9988.241.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1102627652.7962.4.camel@pegasus>
+Message-Id: <1102626410.7584.4.camel@nephlim.homenet>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,54 +27,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 09 Dec 2004 22:27:32 +0100
+Date: Thu, 09 Dec 2004 22:06:50 +0100
 
-Hi Dave,
+Hi Marcel,
 
-> My mouse and keyboard sometimes loose their connection. I'm running 
-> 2.6.10_rc2 and hidd --server on boot. I also run a script I found around 
-> the net that runs hidd --search and/or hidd --connect with retries and 
-> delays to try to connect to the keyboard & mouse. When the connection is 
-> lost, I typically run "hidd --show" to see that it is indeed not 
-> connected then  "hidd --search" to reconnect and it USUALLY works 
-> especially since I upgraded the kernel from 2.6.8. Thankfully it is 
-> usually the mouse that is a problem, so I can do this from the same box. 
-> When "hidd --search" fails I remove and replace the batteries. I've 
-> noticed the mouse lights blinking at me, which I'm not sure is telling 
-> me the batteries are low. I checked and they weren't really that low. It 
-> sometimes seems as though the mouse desires batteries really well 
-> charged. The few times the keyboard was a problem, I ssh from another 
-> box and "hidd --search" and it works.
+> I am still interested in the "hcitool info" output.
 
-first questions is if this is the old Microsoft desktop or new 2.0
-version of it?
+okay here is the output:
 
-> 1) when the devices sleep should "hidd --show" show the device? (And the 
-> hidd server is waiting for a wakeup from the device?) I guess I should 
-> check "hidd --show" sometime when they've been inactive.
+BD Address:  XX:XX:XX:XX:XX:XX
+        Device Name: XXXXXXXXXX
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x382
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xbf 0xfe 0x0f 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot
+offset>
+                <timing accuracy> <role switch> <sniff mode> <RSSI>
+                <channel quality> <SCO link> <HV2 packets> <HV3 packets>
+                <u-law log> <A-law log> <CVSD> <paging scheme> <power
+control>
+                <transparent SCO>
 
-When the device sniff then the connection should still be shown, but
-after a while it disconnects and then it will not be shown anymore.
-However this doesn't matter, because it will reconnect on the next touch
-to your running "hidd --server" instance.
 
-> 2) what does the blinking mouse mean (I don't have any docs with these 
-> devices).
+Best regards
 
-How should I know? I don't work for Microsoft ;)
-
-> 3) Should I have to push the mouse and keyboard buttoms on every reboot 
-> or just one time for the device? (should I need that second script I'm 
-> running?)
-
-You need to push the connect button only for the initial setup and there
-is no need for another script. Only "hidd --server" must run. However
-you need to push a keyboard or mouse button to initiate the reconnect.
-
-Regards
-
-Marcel
-
+Stefan Torkel
 
 
 
