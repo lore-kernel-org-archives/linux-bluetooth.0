@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Russell Neches <russell@ccs.neu.edu>
-To: scott.meesseman@alpsautomotive.com, bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Any suggestions on good usb dongle?
-Message-ID: <20040314183633.GA1959@omocha.vort.org>
-References: <36738.192.168.1.248.1079199852.squirrel@legio.mine.nu> <OF86DDE20A.83777CB5-ON85256E57.0008A9CF-85256E57.0008E1AD@alps_aai.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <OF86DDE20A.83777CB5-ON85256E57.0008A9CF-85256E57.0008E1AD@alps_aai.com>
+Content-Type: text/html; charset="iso-8859-1"
+MIME-Version: 1.0
+From: "bart claeys" <bart.claeys@mail.com>
+To: bluez-users@lists.sourceforge.net
+Message-Id: <20040314130046.3C4F1232AE@ws1-10.us4.outblaze.com>
+Subject: [Bluez-users] broadcast/multicast and bluez?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,24 +15,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 14 Mar 2004 13:36:34 -0500
+Date: Sun, 14 Mar 2004 08:00:46 -0500
 
-On Sat, Mar 13, 2004 at 08:37:02PM -0500, scott.meesseman@alpsautomotive.com wrote:
-> Hello,
-> 
-> I use a D-Link DBT120 (available anywhere, Buy.com, CDW, Amazon, etc...) 
-> and an Alps UGZ that work flawlessly.  Both are CSR based...
-
-Note that not all DBT-120 dongles have CSR chipsets. Revisions A1 and A2
-use the Broadcom chipset, though they also work. If in doubt, consult
-Marcel's exceedingly handy hardware support list:
-
-	http://www.holtmann.org/linux/bluetooth/devices.html
-
-Russell
-
-Marcel: Thanks for compiling this. You probably saved me about a
-hundred dollars worth of trial and error.
+<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB">Hi,<?xml:namespace prefix = o ns = "urn:schemas-microsoft-com:office:office" /><o:p></o:p></SPAN></P>
+<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB"><o:p>&nbsp;</o:p></SPAN></P>
+<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB">I would like to send a broadcast or multicast audio stream over Bluetooth using Bluez. Does Bluez support broadcast /multicast? It has to be a “real” broadcast… So I want to send only ONE audiostream (from a master) to multiple devices. Am I right when I think a broadcast/multicast with the PAN profile is not a real broadcast on the lower layers?<o:p></o:p></SPAN></P>
+<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB">Is this possible with Bluez? Is it in general possible with Bluetooth? What’s the best method to implement broadcast/multicast?<o:p></o:p></SPAN></P>
+<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB"><o:p>&nbsp;</o:p></SPAN></P>
+<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB">Thanks in advance<o:p></o:p></SPAN></P><BR>
+-- 
+<p>___________________________________________________________<br>Sign-up for Ads Free at Mail.com<br>
+<a href="http://mail01.mail.com/scripts/payment/adtracking.cgi?bannercode=adsfreejump01" target="_blank">http://www.mail.com/?sr=signup</a></p>
 
 
 
