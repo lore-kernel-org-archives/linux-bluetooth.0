@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41F5C90D.90401@coriand.com>
-From: Franz Coriand <franz@coriand.com>
-MIME-Version: 1.0
+Message-ID: <20050125034251.95495.qmail@web54509.mail.yahoo.com>
+From: m r <captain512@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enigE10FD2946035BDFDE0BE434A"
-Subject: [Bluez-users] setup pairing?
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Help sending a file
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,75 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 24 Jan 2005 23:20:29 -0500
+Date: Mon, 24 Jan 2005 19:42:51 -0800 (PST)
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enigE10FD2946035BDFDE0BE434A
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
+Can anyone tell me the steps to send a file via
+bluetooth.  I have two desktops one with Fedora C2,
+and all bluez packages installed, the other windows
+and D-Link bluetooth software installed. I have two
+usb dongles D-Link 120's. Each device can see the
+other, and pair, but I can't seem to figure out how to
+do file transfers. I have looked everywhere on the web
+and can't seem to find any answers.  Any help would be
+greatly appreciated. Thanks in advance!
 
-Hi!
+Matt
 
-I'm new in this area and I've a problem with setting up a simple key
-pairing mechanism for bluetooth with BlueZ.
 
-I'd like to setup a bluetooth connection with tcp/ip between a
-Linux-Watch (kernel 2.4.18) and a Windows XP SP2.
-My problem is, I can access the Windows host only with the help of a key
-pairing, because with  my current windows bluetooth driver it's not
-possible to establish a "unsecure connection" without a keypairs.
+		
+__________________________________ 
+Do you Yahoo!? 
+Meet the all-new My Yahoo! - Try it today! 
+http://my.yahoo.com 
+ 
 
-With the Linux-Watch and the Windows computer I can search for devices
-and they find earch other, but the key pairing doesn't work.
-
-I wrote a /etc/bluetooth/hcid.conf-file:
-
-##########begin
-# HCI daemon configuration file.
-#
-#
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        pin_helper /etc/bluetooth/givepin;
-}
-###########end
-
-and loaded this file with "/usr/local/bin/hcid -f /etc/bluetooth/hcid.conf"!
-"/etc/bluetooth/givepin" rights are 710 and looks like:
-
-#####givepin######
-#!/bin/sh
-echo "PIN:0000"
-################
-
-But it still doesn't work - any idea?
-
-Software:
-bluez-libs-2.4.
-bluez-pan-1.1
-bluez-sdp-1.2
-bluez-utils-2.3
-
-Bye,
-Franz
-
---------------enigE10FD2946035BDFDE0BE434A
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.0 (MingW32)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFB9ckQRct14D3a7wsRAqbPAJ4xvFc7Jc6Suqini59IQDlwRqQJ1gCguJIJ
-h/L4iX48srPyew578ZQGBDk=
-=aoyE
------END PGP SIGNATURE-----
-
---------------enigE10FD2946035BDFDE0BE434A--
 
 
 -------------------------------------------------------
