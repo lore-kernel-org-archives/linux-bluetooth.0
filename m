@@ -1,56 +1,50 @@
-Return-Path: <yaboo@dodgyware.com>
-Message-ID: <40EAAC87.2080606@dodgyware.com>
-Date: Tue, 06 Jul 2004 23:43:35 +1000
-From: yaboo <yaboo@dodgyware.com>
-Reply-To: yaboo@dodgyware.com
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: karthik bala guru <bluekarthik@yahoo.com>,
-   Brad Midgley <bmidgley@xmission.com>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] gps software
-References: <20040706030302.34553.qmail@web90108.mail.scd.yahoo.com> <1089110772.4504.141.camel@pegasus>
-In-Reply-To: <1089110772.4504.141.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] sdptool - File descriptor in bad state
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Chris <usenet@chrissearle.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <lgpt7a931l.fsf@montgomery.empolis.no>
+References: <lgpt7a931l.fsf@montgomery.empolis.no>
+Content-Type: text/plain
+Message-Id: <1089110981.4504.145.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 06 Jul 2004 12:49:41 +0200
 
-Hi Macel
+Hi Chris,
 
-No just gps software in general. Just looking for good software.
+> Getting the following error when trying to use sdptool:
+> 
+> sdptool browse
+> Inquiring ...
+> Failed to connect to SDP server on <mybdaddr>: File descriptor in bad state
 
-regards
+it is "sdptool browse <mybdaddr>".
 
-Joseph
+If this doesn't fix it, run "hcidump -x" as root and show us the output.
 
-Marcel Holtmann wrote:
+Regards
 
->Hi Karthik,
->
->  
->
->>Do you mean to say the software with respect to Bluetooth? or
->>Just the best Software for maps or Any kind of GPS unit software ?
->>    
->>
->
->what is the difference between a serial port and a RFCOMM connection to
->a GPS unit? There is no difference, so choose the best software.
->
->Regards
->
->Marcel
->
->
->
->
->-------------------------------------------------------
->This SF.Net email sponsored by Black Hat Briefings & Training.
->Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
->digital self defense, top technical experts, no vendor pitches, 
->unmatched networking opportunities. Visit www.blackhat.com
->_______________________________________________
->Bluez-users mailing list
->Bluez-users@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-users
->  
->
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email sponsored by Black Hat Briefings & Training.
+Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
+digital self defense, top technical experts, no vendor pitches, 
+unmatched networking opportunities. Visit www.blackhat.com
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
