@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050214114707.9429.qmail@web41104.mail.yahoo.com>
-From: Sean Loh <blaze_wk@yahoo.com>
+From: Triona Ryan <triona.ryan@nuigalway.ie>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Higher throughput with larger UDP packet size
+Message-id: <01LKSFUD1WC0003PT2@beacon.nuigalway.ie>
+MIME-version: 1.0
+Content-type: text/plain
+Subject: [Bluez-users] Re: Can't connect.: Function not implemented
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,28 +16,63 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Feb 2005 03:47:07 -0800 (PST)
+Date: Mon, 14 Feb 2005 09:24:17 +0000
 
-Hi!!
+Ok now I can l2ping any module once I hcitool cc it. 
 
-I have established an IP network over the BlueZ stack
-and have transmitted UDP packets at varying sizes. I
-then  assessed the throughput using the different
-datagram packets sizes. Why is it that the larger UDP
-packets obtain higher throughputs than the smaller UDP
-packets (eg. 60,000 bytes vs 5000 bytes)? Shouldn't
-the smaller UDP packets obtain an overall higher
-througput since less time is spent for segmentation
-and reassembly?
+Ok, I think my problem is
+ to do with the sdp modules. I know they're supposed to be included in the bluez
+-utils package, and when I type sdpd, l2cap appears in lsmod. However, Between l
+inux modules, it seems as if sdpd is not present. 
 
-Thanks a million 
+I've been searching google, 
+and have seen the same error, always with, "sdpd is not installled" as a solutio
+n.  Is there any way I could have unsuitable packages installed?
+
+see the link b
+elow
+http://lists.freshrpms.net/pipermail/freshrpms-list/2004-September/010850.h
+tml
+
+I'm also using fedora core 2.
 
 
-		
-__________________________________ 
-Do you Yahoo!? 
-Yahoo! Mail - Helps protect you from nasty viruses. 
-http://promotions.yahoo.com/new_mail
+==============Original message text========
+=======
+On Sun, 13 Feb 2005 17:38:31 +0000 Triona Ryan wrote:
+
+Hi all,
+
+I'm new 
+to this mailing list, but have been experimenting with bluetooth over linux for 
+a few months now. I've had a look at the archive, and saw an entry very similar 
+to mine, which was unresolved. I'm hoping there are more recent insights to help
+ me!!
+
+I've bluez installed on Fedora Core 2, and until a few weeks ago, when I 
+started to try and get rfcomm to work, I could l2ping, pair to several devices a
+nd connect using hcitool with no problem. Recently however, I can no longer l2pi
+ng certain modules. I n
+ ow get 
+
+Can't connect.: Function not implemented
+
+As a
+n error. I can still l2ping select devices.
+
+I saw that encrypt and authenticati
+on must be commented out in /etc/bluetooth/hcid.conf which I have always had. 
+
+Can anyone recognise any problem there?
+
+Thanks very much,
+Triona
+
+===========En
+d of original message text===========
+
+
+
 
 
 -------------------------------------------------------
