@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Openweekend 2004 - poster section and BlueZ
-	poster
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200406021014.50910.cijoml@volny.cz>
-References: <200406021014.50910.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1086166903.7542.25.camel@pegasus>
-Mime-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200406021014.50910.cijoml@volny.cz>
+Subject: [Bluez-users] Openweekend 2004 - poster section and BlueZ poster
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,25 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 02 Jun 2004 11:01:43 +0200
+Date: Wed, 2 Jun 2004 10:14:50 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> I'll have a poster in poster section of OpenWeekend 2004 16.-17.10. 2004.
-> www.openweekend.cz
-> It will be about Bluetooth and Bluetooth security.
-> 
-> I would like use some of your slides on my poster.
-> Is it possible?
+I'll have a poster in poster section of OpenWeekend 2004 16.-17.10. 2004.
+www.openweekend.cz
+It will be about Bluetooth and Bluetooth security.
 
-so far no problem for me, but you must quote the origin of any text or
-graphic that comes from any of my slides.
+I would like use some of your slides on my poster.
+Is it possible?
 
-Regards
+Thanks
 
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
