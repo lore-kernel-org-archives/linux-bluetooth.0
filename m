@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: John McCorquodale <random-spam@viz.cacr.caltech.edu>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050125015049.GA1520@viz.cacr.caltech.edu>
+Subject: Re: [Bluez-devel] bluetooth socket + rfcomm tty
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.44.0501242148470.14852-100000@antilope>
+References: <Pine.LNX.4.44.0501242148470.14852-100000@antilope>
+Content-Type: text/plain
+Message-Id: <1106601891.8058.110.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] btsco/headset problems
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,30 +18,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Jan 2005 17:50:49 -0800
+Date: Mon, 24 Jan 2005 22:24:51 +0100
 
-Hi, y'all,
+Hi Victor,
 
-I just pulled the current btsco CVS, compiled against vanilla 2.6.10-rc3,
-trying to talk to a HBH-35.  I run btsco <addr> and it gets thru the
-"AT+" lines, but never says "opened hwdep" no matter what I do (yes, I
-push the button on the headset).  I can set the volume just fine with
-alsamixer.  aplay does nothing (hangs forever) and arecord prints the
-header and then hangs forever, which are consistent with btsco never
-having opened the SCO.
+> Could not find it through the archives... 
+> I create a bluetooth socket and then create TTY (/dev/rfcomm0) based on it (like it is done in dund from bluez-utils). 
+> Is it still allowed to use the descriptor of the open socket to send/receive data through the channel? 
+> Cause when I send data to the _socket_ it looks like it is sent (like 
+> ATD1234 command to the phone, I see the phone starting to dial, though it 
+> stops half way for no reason), but when I'm trying to read from the socket 
+> select() returns that there is data to be read, but then read() blocks.
 
-stracing btsco shows that no data ever comes in on the BT file descriptor;
-the poll just sits in its little one-second loop never rx'ing anything from
-anybody, even when I bang on the headset button like an undersexed chihuahua
-on speed.
+this is maybe possible, but it is not intended. When you converted a
+socket into a TTY the socket should be closed. Otherwise we must
+duplicate the incoming data and if one party is not reading the flow
+control will be brocken and both parties are blocked.
 
-Tried two HCIs, the socket CF G card (which, yes, works in 2.6 with suitable
-patch for the serial driver) and the tiny little dlink USB dongle.  Exact
-same behavior both cases.
+> P.S. Is there any way to check if read() is non-blocking (like ioctl() 
+> FIONREAD)?
 
-I hope this is obvious to somebody?
+Check the fcntl() manpage.
 
--mcq
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
