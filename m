@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <BAY104-F166D6D1C3CDFCFCACBAA63C19A0@phx.gbl>
-In-Reply-To: <BAY12-DAV9D18C724C8B6018A26075AB9A0@phx.gbl>
-From: "blookk -" <blookk@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: RE: [Bluez-devel] HCI Monitoring
-Mime-Version: 1.0
-Content-Type: text/html; charset=iso-8859-1; format=flowed
+Message-ID: <BAY12-DAV9D18C724C8B6018A26075AB9A0@phx.gbl>
+From: "Pegasus" <uwpegasus@hotmail.com>
+To: <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0018_01C4ECE4.3747AF80"
+Subject: [Bluez-devel] HCI Monitoring
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,27 +17,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 28 Dec 2004 20:24:29 +0000
+Date: Tue, 28 Dec 2004 13:50:39 -0500
 
-<html><div style='background-color:'><DIV class=RTE>
-<P>hello</P>
-<P>with hcidump command.<BR><BR></P></DIV>
-<DIV></DIV>&gt;From: "Pegasus" &lt;uwpegasus@hotmail.com&gt;
-<DIV></DIV>&gt;Reply-To: bluez-devel@lists.sourceforge.net
-<DIV></DIV>&gt;To: &lt;bluez-devel@lists.sourceforge.net&gt;
-<DIV></DIV>&gt;Subject: [Bluez-devel] HCI Monitoring
-<DIV></DIV>&gt;Date: Tue, 28 Dec 2004 13:50:39 -0500
-<DIV></DIV>&gt;
-<DIV></DIV>&gt;How can we monitor when a HCI connection is opened and closed?
-<DIV></DIV>&gt;
-<DIV></DIV>&gt;Which events I should look for?
-<DIV></DIV>&gt;
-<DIV></DIV>&gt;Sorry about these trivial questions and thanks for your time :-)
-<DIV></DIV>&gt;
-<DIV></DIV>&gt;
-<DIV></DIV>&gt;Keshav
-<DIV></DIV></div></html>
+This is a multi-part message in MIME format.
 
+------=_NextPart_000_0018_01C4ECE4.3747AF80
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+How can we monitor when a HCI connection is opened and closed?=20
+
+Which events I should look for?
+
+Sorry about these trivial questions and thanks for your time :-)
+
+
+Keshav
+------=_NextPart_000_0018_01C4ECE4.3747AF80
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2523" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>
+<DIV><FONT face=3DArial size=3D2>How can we monitor when a HCI =
+connection is opened=20
+and closed? </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Which events I should look =
+for?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Sorry about these trivial questions and =
+thanks for=20
+your time :-)</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial =
+size=3D2>Keshav</FONT></DIV></FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0018_01C4ECE4.3747AF80--
 
 
 -------------------------------------------------------
