@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] (no subject)
+Subject: Re: [Bluez-users] PAND and RFCOMM simultaneously
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Geert Geurts <geert@ebm.nl>
+To: Harald Meier <meh1@rts.at>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1080225769.3064.6.camel@geert.ebm.nl>
-References: <1080225769.3064.6.camel@geert.ebm.nl>
+In-Reply-To: <004b01c41268$7e8ee810$4000fe0a@rtsviec64>
+References: <004b01c41268$7e8ee810$4000fe0a@rtsviec64>
 Content-Type: text/plain
-Message-Id: <1080258046.2283.43.camel@pegasus>
+Message-Id: <1080257920.2283.40.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Mar 2004 00:40:46 +0100
+Date: Fri, 26 Mar 2004 00:38:40 +0100
 
-Hi Geert,
+Hi Harald,
 
-> Man your fanatic with your bluez driver! good work!
-> I've got some more for you :-)
-> I've done the stuff you told me to, rebuild kernel with patch applied
-> and it works better! but after half a minute or something the connection
-> breaks again... and after pinging over the ppp I get the same message...
-> uuuugh...
-> What to do next??
+> I have a NAP/PANU network with pand running and I need to
+> set up some (up to 4) rfcomm connection additionally.
+> 
+> Setting up the rfcomm devices when the pand is down works fine
+> but if pand is up, I get a "Function not implemented" when I try
+> to bring up a rfcomm connection.
+> 
+> If the rfcomm connection is up and I try to connect to the NAP
+> via pand, I get the "Function not implemented" from pand.
 
-I don't own a Palm so I don't know. Check the connection if it is a PPP
-error or a RFCOMM error. Question is why this stalls.
+tell us more details of your setup. Which devices are involved?
+Connections from what devices etc.
 
 Regards
 
