@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Help id'ing USB bluetooth adapter
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Thomas Chiverton <thomas.chiverton@bluefinger.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200402111236.34361.thomas.chiverton@bluefinger.com>
-References: <200402111236.34361.thomas.chiverton@bluefinger.com>
-Content-Type: text/plain
-Message-Id: <1076505074.2777.69.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Help id'ing USB bluetooth adapter 
+In-reply-to: "Thomas Chiverton"'s message of "Wed, 11 Feb 2004 12:36:34 GMT."
+             <200402111236.34361.thomas.chiverton@bluefinger.com>
+Message-ID: <8086.1076504464@csr.com>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,46 +15,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Feb 2004 14:11:15 +0100
+Date: Wed, 11 Feb 2004 13:01:04 +0000
 
-Hi Thomas,
+Thomas Chiverton wrote:
+> Windows (where, of course, it runs fine :-) reports it as 
+> "Cambridge Silicon Radio, Firmware Revision 525, HCI 1.1 020D, LMP 1.1 020D"
+> It is using drivers by WidComm, if that helps.
+> 
+> I understand from the website that CSR are a popular chip set provider, so
+> I'm hoping it is supported really :-)
 
-> Where do I start trying to figure out what chipset this 'ere adapter is, and 
-> so if it is supported ?
+It's also a popular version of the firmware (16.4).  Lots of dongles by
+lots of manufacturers use this.  You shouldn't have any problem unless
+someone has tweaked the settings in a weird way.
 
-it is a CSR BlueCore02 with HCI 16.4 firmware and 56 bit encryption.
+-- 
+Peter Stephenson <pws@csr.com>                  Software Engineer
+CSR Ltd., Science Park, Milton Road,
+Cambridge, CB4 0WH, UK                          Tel: +44 (0)1223 692070
 
-> syslog reports:
-> Feb 11 12:07:11 charles-compaq kernel: hub.c: new USB device 00:1f.2-1, 
-> assigned address 9
-> Feb 11 12:07:11 charles-compaq /sbin/hotplug: no 
-> runnable /etc/hotplug/bluetooth.agent is installed
-> Feb 11 12:07:14 charles-compaq /etc/hotplug/usb.agent: Setup hci_usb for USB 
-> product a12/1/525
-> Feb 11 12:07:14 charles-compaq kernel: usb-uhci.c: ENXIO 80000980, flags 0, 
-> urb dfa58700, burb dfa58a00
-> Feb 11 12:07:14 charles-compaq kernel: usb-uhci.c: ENXIO 80000980, flags 0, 
-> urb dc7b0300, burb dfa58a00
-> Feb 11 12:07:14 charles-compaq kernel: usb-uhci.c: ENXIO 80000980, flags 0, 
-> urb dfa58a00, burb dc7b0300
-> Feb 11 12:07:14 charles-compaq kernel: usb-uhci.c: ENXIO 80000980, flags 0, 
-> urb dfa58a00, burb dc7b0300
-> Feb 11 12:07:14 charles-compaq kernel: usb-uhci.c: ENXIO 80000980, flags 0, 
-> urb dc7b0300, burb dfa58a00
-> Feb 11 12:07:14 charles-compaq /etc/hotplug/usb.agent: ... no modules for USB 
-> product a12/1/525
-> Feb 11 12:07:14 charles-compaq kernel: usb-uhci.c: ENXIO 80000980, flags 0, 
-> urb dfa58a00, burb dfa58280
-> Feb 11 12:07:14 charles-compaq /etc/hotplug/usb.agent: ... no modules for USB 
-> product a12/1/525
 
-This looks like an USB problem. What kernel version is it? Do hciconfig
-shows your Bluetooth adapter?
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
 
-Regards
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
 
-Marcel
-
+www.mimesweeper.com
+**********************************************************************
 
 
 
