@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Documentation of Bluez
-Message-ID: <20040511184226.GA28581@gmx.net>
-References: <200405111342.i4BDgNkq030500@mail.estg.ipleiria.pt>
+Subject: Re: [Bluez-devel] Error while setting RFCOMM security options
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: Julien Campana <juliencampana@yahoo.fr>
+Cc: BlueZ-devel List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1084285384.893.17.camel@fischer>
+References: <1084285384.893.17.camel@fischer>
+Content-Type: text/plain
+Message-Id: <1084286129.3363.84.camel@baroque.rococosoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <200405111342.i4BDgNkq030500@mail.estg.ipleiria.pt>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,17 +18,72 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 May 2004 20:42:26 +0200
+Date: Tue, 11 May 2004 15:35:30 +0100
 
-On  0, Paulo Cordeiro <Cordeiro@estg.ipleiria.pt> wrote:
-> I'm trying to devellop my first application using bluetooth and BlueZ.
-> Does anyone knows where can i find documentation related with bluez
-> functions or procedures. I can't find nothing, just some how to's...
+BlueZ doesn't support these socket options for RFComm yet.
 
-In the bluez-utils package are some very simple programs in the test/
-subdirectory that demonstrate programming with bluez. 
+On Tue, 2004-05-11 at 15:27, Julien Campana wrote:
+> Hi!
+> 
+> I'm trying to connect to a device over RFCOMM using the flags
+> "authenticate", "encryption" and "master". Part of the code is: 
+> 
+> /******************************************/
+> if ((fd = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < 0)
+>      return fd;
+> 
+> memset(&local_addr, 0, sizeof(local_addr));
+> local_addr.rc_family = AF_BLUETOOTH;
+> bacpy(&local_addr.rc_bdaddr, BDADDR_ANY);
+> if ((err = bind(fd, (struct sockaddr *)&local_addr, sizeof(local_addr)))
+> < 0) {
+>      close(fd);
+>      return err;
+>    }
+> 
+> int opt = 0;
+> if (master) opt |= L2CAP_LM_MASTER;
+> if (auth) opt |= L2CAP_LM_AUTH;
+> if (encrypt) opt |= L2CAP_LM_ENCRYPT;
+> 
+> 
+> 
+> if (setsockopt(fd, SOL_RFCOMM, L2CAP_LM, &opt, sizeof(opt)) < 0) {
+>      printf("WARNING can't set link Mode (reason: %s)\n\n",
+> strerror(errno));
+>    }
+> /*******************************************/
+> 
+> This programm outputs the following message: 
+> WARNING can't set link Mode (reason: Protocol not available)
+> 
+> Why? The L2CAP protocol is available as well as the RFCOMM protocol on
+> my machine (l2ping actually works and my program exchanges data over
+> RFCOMM without any problem).
+> 
+> Am I wrong in the way of setting these security flags?
+> 
+> Thank you for your answers.
+> 
+> Julien Campana
+> 
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by Sleepycat Software
+> Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to deliver
+> higher performing products faster, at low TCO.
+> http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
-nicholas
 
 
 -------------------------------------------------------
