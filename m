@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth headsets
+Subject: Re: [Bluez-users] replicate hcitool scan using bluez libs
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <pan.2005.01.12.07.34.39.13819@yahoo.com>
-References: <pan.2005.01.12.07.34.39.13819@yahoo.com>
+In-Reply-To: <b8950797050111232241c3de8b@mail.gmail.com>
+References: <b8950797050111232241c3de8b@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1105532446.7961.61.camel@pegasus>
+Message-Id: <1105532304.7961.58.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 Jan 2005 13:20:46 +0100
+Date: Wed, 12 Jan 2005 13:18:24 +0100
 
-Hi Paul,
+Hi Weston,
 
-> Does anyone knows any studies regarding health dangers using bluetooth
-> headsets ?
-> Something like for mobile phones ?
-> I am planning to buy a BT headset and I want to know if is dangerous for
-> my brain to use something like this.
-> I know it uses much less power than a mobile phone, but the usage is also
-> different, while we use our phones only when speaking, we tend to keep the
-> headset on for longer periods, and if it used also for listening to music,
-> then it will be even longer periods.
+> I am a little new to the bluez libs etc, and am trying to essentiall
+> call functions in the bluez libs to simulate "scan" behaviour of
+> hcitool.
+> 
+> At first I thought it was inquiry in hci.h but after running the
+> tools, seems like they yeild different results. Also, device_id is id
+> of the bluetooth radio in the system?
 
-I am not an expert in any health questions or when it comes down to the
-Bluetooth radio and baseband stuff. However in general, if there is no
-low level ACL link (headset is not part of any piconet) then there is no
-active radio transmission.
+the "scan" combines the hci_inquiry() with hci_read_remote_name() and
+thats it. The source is in hcitool.c at cmd_scan(). And dev_id is the
+number of your local HCI device (see "hcitool dev").
 
 Regards
 
