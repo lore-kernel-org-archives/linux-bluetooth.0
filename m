@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] installing bluez in an access point
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050204145618.61753.qmail@web26402.mail.ukl.yahoo.com>
-References: <20050204145618.61753.qmail@web26402.mail.ukl.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1107529254.6921.38.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20050204145618.61753.qmail@web26402.mail.ukl.yahoo.com>
+From: benbouzid imad <imad_benb@yahoo.fr>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] installing bluez in an access point
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,36 +16,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Feb 2005 16:00:54 +0100
+Date: Fri, 4 Feb 2005 15:56:18 +0100 (CET)
 
-Hi,
+how can I install bluez in a new kernel.
+i want to build this application in my linux kernel in
+a dsl chip. the kenel of the chip is 2.6.
 
-> how can I install bluez in a new kernel.
-> i want to build this application in my linux kernel in
-> a dsl chip. the kenel of the chip is 2.6.
-> 
-> Is bluez a module of the kernel or just an application
-> in the user space? 
+Is bluez a module of the kernel or just an application
+in the user space? 
 
-the protocol part of BlueZ are mostly done as kernel modules. Also the
-host transport drivers are kernel drivers. The profiles are implemented
-as applications (library + utils).
-
-Use a 2.6.10 kernel with the -mh3 patch and you have a very good kernel
-with the latest Bluetooth subsystem. Install bluez-{libs|utils}-2.15.
-
-> and if someone can help me I had a small problem with
-> DNS.
-> How can I set a DNS IP-adress with a bash command for
-> my bnep0 interface??
-
-You must use a DNS or DNS-Proxy server for that.
-
-Regards
-
-Marcel
+and if someone can help me I had a small problem with
+DNS.
+How can I set a DNS IP-adress with a bash command for
+my bnep0 interface??
 
 
+	
+
+	
+		
+Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
+Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
