@@ -1,48 +1,37 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Paul Hedderly <bulkpaul@mjr.org>
-To: Max Krasnyansky <maxk@qualcomm.com>
-Cc: Stephen Crane <steve.crane@rococosoft.com>, Philip Blundell <pb@nexus.co.uk>, bluez-devel@lists.sourceforge.net
-Subject: Re: Version 3 libs/utils (was: Re: [Bluez-devel] patch for d-bus
-	support in hcid)
-Message-ID: <20030723081248.GM3580@wacka.mjr.org>
-References: <5.1.0.14.2.20030620171218.0db953a8@unixmail.qualcomm.com>
-	<5.1.0.14.2.20030620171218.0db953a8@unixmail.qualcomm.com>
-	<5.1.0.14.2.20030624102040.0de55858@unixmail.qualcomm.com>
+Return-Path: <maxk@qualcomm.com>
+Message-Id: <5.1.0.14.2.20030722172712.098034f8@unixmail.qualcomm.com>
+Date: Tue, 22 Jul 2003 17:33:15 -0700
+To: Stephen Crane <steve.crane@rococosoft.com>, bluez-devel@lists.sourceforge.net
+From: Max Krasnyansky <maxk@qualcomm.com>
+Subject: Re: [Bluez-devel] EBADFD on RFComm connect
+Cc: marcel@rvs.uni-bielefeld.de
+In-Reply-To: <1058880571.1670.425.camel@baroque.rococosoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <5.1.0.14.2.20030624102040.0de55858@unixmail.qualcomm.com>
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 23 Jul 2003 09:12:48 +0100
+Content-Type: text/plain; charset="us-ascii"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Tue, Jun 24, 2003 at 10:31:25AM -0700, Max Krasnyansky wrote:
-> 
-> I think branch is CVS branch is probably a bad idea. Because we want
-> to change a lot of things like command names, etc. Which means lots 
-> of file renames, CVS does not handle that.
+At 06:29 AM 7/22/2003, Stephen Crane wrote:
+>Hi Max, Marcel,
+>Under what circumstances can connect() return EBADFD?
+>
+>I have a couple of programs (attached) one of which opens a listening
+>socket and accepts 32 connections. The other loops attempting 32
+>connections to the same channel. On the second connection connect()
+>always fails with EBADFD. (If I leave in the 0.5 second delay it all
+>works fine.)
 
-Yea. Time to move to arch/tla from CVS.
+You can not do this
+        while (0 > connect(s, (struct sockaddr *)&addr, sizeof(addr)))
+               if (errno != EBUSY) {
+                   perror("connect");
+                   return -1;
+               }
 
---
-Paul
+If connect returns EBUSY error you have to close() the socket. And it does
+indeed return EBUSY in your case (I ran the progs) because close() is asynchronous
+and that channel still exist (two connections on the same channel are not allowed 
+in RFCOMM). What you can do to avoid that error is to enable SO_LINGER option on that
+socket, in which case close() will be synchronous. 
 
-
--------------------------------------------------------
-This SF.net email is sponsored by: VM Ware
-With VMware you can run multiple operating systems on a single machine.
-WITHOUT REBOOTING! Mix Linux / Windows / Novell virtual machines at the
-same time. Free trial click here: http://www.vmware.com/wl/offer/345/0
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Max
+ 
