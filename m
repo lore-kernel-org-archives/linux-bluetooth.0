@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <406C8B62.4000802@netpeople.ch>
-From: Thomas Lenherr <lenherr@netpeople.ch>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enigC6BD34895AF36B14F4BF4222"
-Subject: [Bluez-users] Once again some media-keys from logitech...
+Subject: Re: [Bluez-users] Can't read local name on hci0. Connection timed
+	out(110)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: filipe_abrantes <filipe_abrantes@netcabo.pt>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <5CD2BD8F1F23A943BAEBE96AB20C24980549DD5C@VS1.hdi.tvcabo>
+References: <5CD2BD8F1F23A943BAEBE96AB20C24980549DD5C@VS1.hdi.tvcabo>
+Content-Type: text/plain
+Message-Id: <1080854213.2774.18.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,60 +19,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 01 Apr 2004 23:36:34 +0200
+Date: Thu, 01 Apr 2004 23:16:53 +0200
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enigC6BD34895AF36B14F4BF4222
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Filipe,
 
-Hi,
-because quite all of my media-keys from my logitech elite keyboard did 
-not work,
-I started googling and found ... nothing (almost). So I started 
-searching the sources
-and came to parser.c where I found the producer of these nice "unknown 
-consumer"
-messages. As somebody else already told in this forum, the keyboard 
-seems to
-have all the codes wrong by 1 (or there's something wrong with the 
-source, but
-that doesn't matter), so I just decided to place a nice -1 at the right 
-place et voila,
-all these messages where gone in the log (except for FLock and the 
-change user-button,
-but that's something else). After that I lived happily ever after.
+> i'm sorry to be posting this again, ive posting this around but havent got any feedback yet, and as im kind of desperate with this, i would really appreciate your help even if it is to say that it isn't possible...
+> 
+> so:
+> 
+> #modprobe hci_uart
+> #hciattach /dev/tts/1 any 921600
+> 
+> # hciconfig -a
+> hci0:   Type: UART
+>         BD Address: 08:00:17:1F:C5:E4 ACL MTU: 339:4  SCO MTU: 60:9
+>         UP RUNNING PSCAN ISCAN AUTH
+>         RX bytes:98 acl:0 sco:0 events:10 errors:0
+>         TX bytes:315 acl:0 sco:0 commands:14 errors:0
+>         Features: 0xff 0x3b 0x05 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+> Can't read local name on hci0. Connection timed out(110)
+> 
+> 
+> also hcitool scan gives timeout as well as pand connections so i cant bring up the bnep interface...
+> 
+> im using an ipaq h5500, using kernel 2.4.19-rmk6-pxa1-hh30 
+> 
+> anyone has a clue of what could be wrong ??
 
-Not really... Well, the messages in the log were gone, but neither 
-"scankey -s" nor "xev"
-were somehow interested in my banging actions on my keyboard.
+the folks from HP don't uses CSR chips anymore and I think that this can
+be the problem. I don't own a iPAQ of the 5000 generation, so you should
+ask the Handheld guys if they got any improvements. For me this looks
+like an UART problem on the iPAQ side.
 
-So, once for short, here are my three questions:
-1) Why are these keys lost somewhere in the kernel? (At least I think 
-it's there)
-2) If I'd like a working FLock-LED, how should I do this?
-3) And why the hell is my key for the "anti-{" not working (although 
-this one IS
-generating an event, but "xev" tells me, this button is for printing...)
+Regards
 
-Thanks a lot and good night
-    Thomas Lenherr
+Marcel
 
---------------enigC6BD34895AF36B14F4BF4222
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iD8DBQFAbItz3E1pPHX30VoRAjXaAJ0ftjFISLIy5iBBTQBJvB3EDyZ6HgCePMcA
-SES1AlIOeaD4T8bEqnrKAd0=
-=xO55
------END PGP SIGNATURE-----
-
---------------enigC6BD34895AF36B14F4BF4222--
 
 
 -------------------------------------------------------
