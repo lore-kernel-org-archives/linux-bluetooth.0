@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <a0580c51050317055564fe7f55@mail.gmail.com>
-From: Eduardo Bezerra <edubezval@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] A PAN newbie
-In-Reply-To: <1111012139.11792.46.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <a0580c510503160953311ea8e2@mail.gmail.com>
-	 <1111012139.11792.46.camel@pegasus>
+From: "Han Hoekstra" <Han.Hoekstra@WirelessValue.nl>
+To: <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0000_01C52AFD.EEDADB20"
+Message-ID: <E1DBv62-0004qg-Ld@sc8-sf-mx1.sourceforge.net>
+Subject: [Bluez-users] Has anyone seen these problems with the CSR BlueCore and BlueZ before ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,122 +17,153 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Mar 2005 09:55:52 -0400
+Date: Thu, 17 Mar 2005 14:30:56 +0100
 
-Hi all,
+This is a multi-part message in MIME format.
 
-  Thanks for the quick response. It's truth that I get a second bnep
-in the GN, the bnep1. But
-I tried to continue the configuration with a "ifconfig bnep1 10.0.0.4"
-and the problem kept.
-I thinked that at this point (with the two PANU connected and
-configured), I could ping
-the bnep0 with the old PANU and ping the bnep1 with the new PANU, even
-without the
-bridge configuration in the GN.
-  Ok, and how can I do a bridge configuration in the master ??
-  Is it just creating statics routes between the two bnep's?
+------=_NextPart_000_0000_01C52AFD.EEDADB20
+Content-Type: text/plain;
+	charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
 
+Hey All,
+ 
+I'm developping an application on an ARM-7 based platform which is running
+Linux 2.4.18 with the latest BlueZ version for that platform. In this
+application there is a master device that can connect to up to 7 slaves
+(master and slave devices are all the same, the external controller
+determines which is master).
+ 
+The application does the following, the external controller on the master
+can send a single command to the Linux application, in the command is an
+address field identifying to which slaves the command must be passed on. A
+slave will pass the command on to its external controller, which will
+respond to the command by sending a reply back to the Linux slave, which in
+turn passes it on to the Linux master and is then handed over to the
+external controller again. As soon as all addressed slaves have responded,
+the sequence is repeated.
+ 
+Now to what I see happening, when I run this with 5 slaves, I don't see any
+problems for more than an hour, but when I run it with 6 or 7 slaves, I see
+that the BlueCore resets itself, with 6 slaves after about 40 minutes and
+with 7 slaves already after 5 to 10 minutes. When I eliminate the CRC check
+I can run the 7 slaves configuration for up to about 40 minutes after it
+crashes.
+ 
+What I think happens is that the BlueCore receives data to fast over the air
+and can not pass it on to the Linux CPU quick enough, so there is an
+internal overflow in the BlueCore.
+Communication between the BlueCore and the Linux CPU is done via BCSP at a
+speed of 921600 baud.
+ 
+Has anybody seen behaviour like this before and is there something I can do
+about it ???
+ 
+Greetings,
+   Han
+ 
+---
+Han Hoekstra
+Wireless Value B.V.
+Waanderweg 30a
+7812 HZ  Emmen
+Tel: +31-591-633200
+ 
 
-Thanks a lot,
+------=_NextPart_000_0000_01C52AFD.EEDADB20
+Content-Type: text/html;
+	charset="US-ASCII"
+Content-Transfer-Encoding: quoted-printable
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii">
+<META content=3D"MSHTML 6.00.2900.2604" name=3DGENERATOR></HEAD>
+<BODY>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial size=3D2>Hey=20
+All,</FONT></SPAN></DIV>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial=20
+size=3D2></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial size=3D2>I'm =
+developping an=20
+application on an ARM-7 based platform which is running Linux 2.4.18 =
+with the=20
+latest BlueZ version for that platform. In this application there is a =
+master=20
+device that can connect to up to 7 slaves (master and slave devices are =
+all the=20
+same, the external controller determines which is =
+master).</FONT></SPAN></DIV>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial=20
+size=3D2></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial size=3D2>The =
+application does=20
+the following, the external controller on the master can send a single =
+command=20
+to the Linux application, in the command is an address field identifying =
+to=20
+which slaves the command must be passed on. A slave will pass the =
+command on to=20
+its external controller, which will respond to the command by sending a =
+reply=20
+back to the Linux slave, which in turn passes it on to the Linux master =
+and is=20
+then handed over to the external controller again. As soon as all =
+addressed=20
+slaves have responded, the sequence is repeated.</FONT></SPAN></DIV>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial=20
+size=3D2></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial size=3D2>Now to =
+what I see=20
+happening, when I run this with 5 slaves, I don't see any problems for =
+more than=20
+an hour, but when I run it with 6 or 7 slaves, I see that the BlueCore =
+resets=20
+itself, with 6 slaves after about 40 minutes and with 7 slaves already =
+after 5=20
+to 10 minutes. When I eliminate the CRC check I can run the 7 slaves=20
+configuration for up to about 40 minutes after it =
+crashes.</FONT></SPAN></DIV>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial=20
+size=3D2></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial size=3D2>What I =
+think happens=20
+is that the BlueCore receives data to fast over the air and can not pass =
+it on=20
+to the Linux CPU quick enough, so there is an internal overflow in the=20
+BlueCore.</FONT></SPAN></DIV>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial =
+size=3D2>Communication=20
+between the BlueCore and the Linux CPU is done via BCSP at a speed of =
+921600=20
+baud.</FONT></SPAN></DIV>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial=20
+size=3D2></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial size=3D2>
+<DIV><SPAN class=3D156262013-17032005><FONT face=3DArial size=3D2>Has =
+anybody seen=20
+behaviour like this before and is there something I can do about it=20
+???</FONT></SPAN></DIV>
+<DIV><SPAN class=3D156262013-17032005></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D156262013-17032005>Greetings,</SPAN></DIV>
+<DIV><SPAN class=3D156262013-17032005>&nbsp;&nbsp;=20
+Han</SPAN></DIV></FONT></SPAN></DIV>
+<DIV>&nbsp;</DIV>
+<DIV align=3Dleft><FONT face=3DArial size=3D2>---</FONT></DIV>
+<DIV align=3Dleft><FONT face=3DArial size=3D2>Han Hoekstra</FONT></DIV>
+<DIV align=3Dleft><FONT face=3DArial size=3D2>Wireless Value =
+B.V.</FONT></DIV>
+<DIV align=3Dleft><FONT face=3DArial size=3D2>Waanderweg =
+30a</FONT></DIV>
+<DIV align=3Dleft><FONT face=3DArial size=3D2>7812 HZ&nbsp; =
+Emmen</FONT></DIV>
+<DIV align=3Dleft><FONT face=3DArial size=3D2>Tel: =
++31-591-633200</FONT></DIV>
+<DIV>&nbsp;</DIV></BODY></HTML>
 
+------=_NextPart_000_0000_01C52AFD.EEDADB20--
 
-Eduardo Bezerra Valentin
-
-On Wed, 16 Mar 2005 23:28:59 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Eduardo,
-> 
-> >    I'm starting to use Bluez to create a PAN. I'm using the 2.6.x linux kernel.
-> > I did the following:
-> >
-> > ####
-> > GN:
-> > ####
-> >
-> > Edited the file /etc/bluetooth/hci.conf and enabled the "lm accept,
-> > master" option.
-> >
-> > # hcid -f /etc/bluetooth/hci.conf
-> > # sdpd
-> > # sdptool add GN
-> > # modprobe bnep
-> > # pand --listen --role GN -n
-> >
-> >
-> > ####
-> > PANU:
-> > ####
-> >
-> > # hcid -f /etc/bluetooth/hci.conf
-> > # sdpd
-> > # modprobe bnep
-> > # pand --connect BT_ADDRESS
-> >
-> >
-> >   After the connection establishment I configured a LAN with the 10.0.0.0/24 IP
-> > configuration. So:
-> >
-> > ####
-> > GN:
-> > ####
-> >
-> > # ifconfig bnep0 10.0.0.1 netmask 255.255.255.0
-> >
-> > ####
-> > PANU:
-> > ####
-> >
-> > # ifconfig bnep0 10.0.0.2 netmask 255.255.255.0
-> >
-> >
-> >   At this point I could ping the two host:
-> >
-> > ####
-> > GN:
-> > ####
-> >
-> > # ping 10.0.0.2 # that's ok
-> >
-> > ####
-> > PANU:
-> > ####
-> >
-> > # ping 10.0.0.1 # that's ok
-> >
-> >       So, I tried to add a second PANU with:
-> >
-> > # hcid -f /etc/bluetooth/hci.conf
-> > # sdpd
-> > # modprobe bnep
-> > # pand --connect BT_ADDRESS
-> >
-> >       It connected with the GN, but when I tried:
-> > # ifconfig bnep0 10.0.0.3 netmask 255.255.255.0
-> > # ping 10.0.0.1
-> >
-> >       The ping could not reach the GN host even the other
-> > PANU (ping 10.0.0.2). I tried to do a ping from the GN to
-> > the new PANU and from the old PANU to the new PANU
-> > and the problem kept.
-> 
-> you will get a second (bnep1) interface on the master machine and thus a
-> bridge is needed to connect these.
-> 
-> Regards
-> 
-> Marcel
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
 
 
 -------------------------------------------------------
