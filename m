@@ -1,13 +1,20 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: tmp@nitwit.de
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Error connecting transport
-References: <200503271845.15263.tmp@nitwit.de>
-In-Reply-To: <200503271845.15263.tmp@nitwit.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200503271859.06756.tmp@nitwit.de>
+Subject: Re: [Bluez-users] bluetooth serial vs. audio connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.62.0503271813180.3135@ybpnyubfg.ybpnyqbznva>
+References: <Pine.LNX.4.62.0503271303450.3134@ybpnyubfg.ybpnyqbznva>
+	 <1111923433.9195.216.camel@pegasus>
+	 <Pine.LNX.4.62.0503271357080.3134@ybpnyubfg.ybpnyqbznva>
+	 <1111926923.9195.218.camel@pegasus>
+	 <Pine.LNX.4.62.0503271736360.3135@ybpnyubfg.ybpnyqbznva>
+	 <1111938339.9195.229.camel@pegasus>
+	 <Pine.LNX.4.62.0503271751420.3135@ybpnyubfg.ybpnyqbznva>
+	 <1111939568.9195.236.camel@pegasus>
+	 <Pine.LNX.4.62.0503271813180.3135@ybpnyubfg.ybpnyqbznva>
+Content-Type: text/plain
+Message-Id: <1111942691.9195.241.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,20 +26,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Mar 2005 18:59:06 +0200
+Date: Sun, 27 Mar 2005 18:58:11 +0200
 
-KbluetoothD:
+Hi Andreas,
 
-"Possible evice/Service class mismatch
+> >MH: > If I just run sdptool browse 00:xx, I don't get any output, I'm 
+> >MH: > not sure, this is the normal behavior. I see this as a problem, 
+> >MH: > as there are some supported services. But then, I didn't check 
+> >MH: > the code of this tool.
+> >MH: 
+> >MH: this does not answer my question. What kind of phone is this? Does 
+> >MH: adding "--tree" before the "--bdaddr" parameter helps?
+> 
+> Yes, I misread the question. This is a Samsung SGH-D500 (a nice phone 
+> but crappy windows software...)
+> 
+> No difference. With or without --tree, there is only one line of output 
+> "Browsing 00:xx ...", nothing else
 
-To use the kbtobexsrv service, some other devices might require a modified 
-class number for your bluetooth adapter in /etc/bluetooth/hcid.conf.
+I actually meant the "spdtool search" part to see if the segmentation
+fault is still present then. However, again the bad Samsung phone. I
+think I need one of these at home for fixing this thing.
 
-current the class is set to 0x0. We suggest you change this to somethign like 
-0x10000000 instead of restart BlueZ's hcid. The service will be activated 
-anyway."
+Regards
 
-Well, can somebody translate?
+Marcel
+
+
 
 
 -------------------------------------------------------
