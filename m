@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Sharing / redirecting a serial port
+Subject: Re: [Bluez-users] Limit to maximum UDP packet size
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Nigel Magnay <nigel.magnay@gmail.com>
+To: Sean Loh <blaze_wk@yahoo.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <320075ff04102014276d37a74a@mail.gmail.com>
-References: <320075ff04102014276d37a74a@mail.gmail.com>
+In-Reply-To: <20041021080034.18912.qmail@web41109.mail.yahoo.com>
+References: <20041021080034.18912.qmail@web41109.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1098380977.4885.30.camel@pegasus>
+Message-Id: <1098380809.4885.26.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 21 Oct 2004 19:49:37 +0200
+Date: Thu, 21 Oct 2004 19:46:49 +0200
 
-Hi Nigel,
+Hi Sean,
 
-> I have got the BlueZ stuff running nicely, and I can use the rfcomm
-> tools to connect a serial port over bluetooth and stuff, but I can't
-> figure out how I would do the following.
+> I have set up a PAN between two notebooks. I've
+> managed to stream data using udp packets from one
+> computer to another and it works fine. My problem
+> occurs when I send udp packet sizes larger than 55000
+> bytes. When I do an ifconfig, it seems that bytes are
+> being sent out from one computer to another but my
+> program refuses to read the data from the packets. 
 > 
-> I have a serial GPS connected to linuxbox on /dev/ttyS0 which has a
-> bluetooth adapter.
-> I would like to listen for bluetooth serial connections, and when they
-> connect, pipe the output to it. In most instances the connecting
-> device will be a bluetooth iPAQ.
-> 
-> I can't figure out how I can do this from existing tools - is it possible?
+> My program is just a simple program that sends data
+> fro one computer to another with no fancy code. Why
+> should udp behave like this?
 
-sounds like you have to write a small RFCOMM server program for doing
-this. Look at rctest and maybe dund for example code.
+try your program with a simple Ethernet cable between two Ethernet cards
+to verify that it is not a gernel Linux network problem.
 
 Regards
 
