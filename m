@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <200501290128.ALQ93612@ms12.netsolmail.com>
-From: Chris Taylor <cht@imipolex-g.com>
-Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Bluez-users] Anycom USB-240 & firmware
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <cteadv$tbe$1@sea.gmane.org>
+References: <cteadv$tbe$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1106961349.10580.7.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +18,69 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Jan 2005 17:28:25 -0800
+Date: Sat, 29 Jan 2005 02:15:49 +0100
 
-Hmm, when I did a 'configure' in bluez-utils-2.14, I used the "--enable-
-bcm203x" option before I did a "make install". Where does the utility get 
-installed? Thanks.
+Hi Jesse,
 
----- Original message ----
->Date: Sat, 29 Jan 2005 02:13:35 +0100
->From: Marcel Holtmann <marcel@holtmann.org>  
->Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14  
->To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
->
->on a system with a 2.4 kernel you need the bcm203x utility. You must
->enable when compiling bluez-utils.
->
-------------------
-Chris Taylor
-cht@imipolex-g.com
-Los Angeles
+> I recently bought an Anycom USB-240. It ships
+> with BT 1.1 firmware, as depicted below, but
+> it *should* be BT 1.2 capable hardware.
+> 
+> % hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:0B:0D:34:1F:E0 ACL MTU: 120:20  SCO MTU: 64:0
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:254 acl:0 sco:0 events:43 errors:0
+>         TX bytes:416 acl:0 sco:0 commands:30 errors:0
+>         Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'BlueZ (0)'
+>         Class: 0x100100
+>         Service Classes: Object Transfer
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x0 LMP Ver: 1.1 (0x1) LMP Subver: 0x757
+>         Manufacturer: Silicon Wave (11)
+> 
+> My interest in Bluetooth is primarily tied to
+> audio right now. I've been doing a lot of work
+> with SIP phones lately so I've ordered a BT 1.2
+> Logitech Mobile Freedom Headset to play with.
+> It should arrive in a week or two.
+> 
+> Anyway, the Logitech headset is BT 1.2 capable
+> so I'd like to upgrade my USB-240 firmware to
+> 1.2 also (freq hopping to avoid my 802.11b nets,
+> etc...), but this post on the Anycom website
+> claims that the USB-240's headset and handsfree
+> profiles don't work well under Linux with BT
+> 1.2 firmware:
+>     http://tinyurl.com/5pqnm
+> 
+> So in the interest of NOT frying my shiny new
+> USB-240, does anyone on this list currently use
+> a USB-240 with a headset or handsfree profile
+> device? Which firmware do you use?
+
+if you wanna play with audio then you should better buy a dongle with a
+CSR chip.
+
+> Also, if I *do* decide to upgrade the adapter's
+> firmware, am I likely to have better luck with
+> Anycom's firmware via a Win32 install? Or with
+> Bluez supplied firmware? Does the Bluez firmware
+> even work with my Silicon Wave chipset?
+
+As far as I know these Silicon Wave chips are ROM only version and so
+you can't update the firmware. However I don't even know of any firmware
+updates for Silicon Wave.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
