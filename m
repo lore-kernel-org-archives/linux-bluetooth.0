@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Announce : BlueZ-based implemantation of JSR82
+Subject: RE: [Bluez-devel] Flush timeout at Baseband
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Julien Campana <juliencampana@yahoo.fr>
+To: Wang Haiguang <wanghg@i2r.a-star.edu.sg>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1085496174.900.127.camel@fischer>
-References: <1085393268.892.40.camel@fischer>
-	 <1085487245.9779.89.camel@pegasus>  <1085489942.900.89.camel@fischer>
-	 <1085492205.9779.119.camel@pegasus>  <1085496174.900.127.camel@fischer>
+In-Reply-To: <LMEOKMJFKNFFHEAEDGDEGEEHCHAA.wanghg@i2r.a-star.edu.sg>
+References: <LMEOKMJFKNFFHEAEDGDEGEEHCHAA.wanghg@i2r.a-star.edu.sg>
 Content-Type: text/plain
-Message-Id: <1085497660.9779.139.camel@pegasus>
+Message-Id: <1085494294.9779.130.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,44 +18,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 25 May 2004 17:07:40 +0200
+Date: Tue, 25 May 2004 16:11:34 +0200
 
-Hi Julien,
+Hi Haiguang,
 
-> There are main reason why I rewrote some BlueZ functions is that:
-> - Functions like "sdp_service_search_attr_req" return a list of
-> sdp_record_t. If I had to parse these sdp_record_t  in order to
-> construct the requested Java Objects, this would have been an amazing
-> amount of switch or if statement. The best solution was therefore to
-> directly send the bytes to the java implementation.
-
-put this problem up in a seperate thread on the mailing list and tell
-how the Java Objects have to look like. We should find a better solution
-for that.
-
-> > What I also don't wanna use is somekind of "de.avetana.bluetooth" vendor
-> > extensions. If something is not possible in pure Java JSR-82, sorry not
-> > my bad ;)
+> Please refer to the following section in Bluetooth specification 1.2:
 > 
-> JSR-82 provides just the minimal amount of classes. It lets the
-> programmer use "background classes" but this is transparent for the
-> end-user (I will give some example of this transparency in the future
-> how-to). These de.avetana.bluetooth.* classes are really needed to fully
-> implement all javax.bluetooth.* classes.
-
-You must explain this to me in detail, because I don't understand why.
-Actually I think we should avoid this.
-
-> > The native interface should only be a wrapper. Let's talk about the
-> > stuff and put some of it back to the Bluetooth library where it should
-> > belong.
+> -- Volume 2: Core System Package
+>     -- Part E: Host Controller Interface Functional Specification
+>        -- Chapter 6: HCI Configuration Parameters
+>            -- Section 6.20: Flush Timeout.
 > 
-> I would say that 90% of the native interface is today a wrapper. Only
-> the service search uses home-made-functions derived from the BlueZ code.
+> It explains the use of flush timeout value for ACL data and default is
+> infinite.
+> 
+> In PART B: the baseband specification, section 7.6.3, it explains this
+> parameter
+> is designed for the delay sensitive traffic such as voice/video.
+> 
+> As in our project, we definitely need this parameter in configuration. So
+> asked for
+> the plan of including it in impelmentaion.
 
-As said already, lets fix this in the Bluetooth library itself. I know
-that SDP itself is a horrible mess of object oriented stuff, but I think
-we will find a solution for it.
+I checked the spec. by myself, because I don't asked for the explanation
+of flush timeout. I asked for the HCI command to read or write it. The
+commands are in 7.3.31 and 7.3.32 (read/write_automatic_flush_timeout).
+
+These commands take a connection handle as parameter and so they are
+connection specific and belong to hcitool. If they are not implemented
+and you need them, send me a patch for hcitool.c and its manpage.
 
 Regards
 
