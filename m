@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v619.2)
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Message-Id: <e36f1e61ac13a554d52d2f7b8d7a5df4@freezone.co.uk>
-Cc: Antonio-Blasco Bonito <blasco.bonito@email.it>
-From: ms419@freezone.co.uk
 To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Fwd: alsa bluetooth module
+From: Catalin Drula <catalin.drula@imag.fr>
+Message-ID: <loom.20050317T164923-411@post.gmane.org>
+References: <Pine.GSO.4.33.0503171103450.12042-100000@horus.imag.fr> <Pine.LNX.4.33.0503171141200.22782-100000@redbean.intranet.gw-instruments.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Re: Handling a Hardware Error event on iPAQ h5550
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,57 +17,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Mar 2005 14:05:17 -0800
+Date: Thu, 17 Mar 2005 15:59:06 +0000 (UTC)
 
-I maintain a Debian package of bluetooth-alsa - for my convenience -=20
-but bluetooth-alsa is so popular, some others use this package also -=20
-http://cgi.sfu.ca/~jdbates/moin/moin.cgi/Bluetooth&ALSA
+Peter Wippich <pewi <at> gw-instruments.de> writes:
+ 
+> It may be much simpler trying to find the cause of the data corruption.
+> Do you have hardware handshake enabled ??
+> Have you tried different baud rates ??
+> Do you get any errors from the UART driver (like FiFo overruns) ??
+> Have you tried to modify the UART FiFo settings ??
 
-Blasco contacted me with this problem, but truth is - I haven't got=20
-bluetooth-alsa working myself. Perhaps someone else can be more helpful=20=
+Well, I'm over 5 weeks into finding the cause of the data corruption. 
+At first there were indeed overruns when receving. It turns out that 
+on the processor of this device (Intel XScale PXA255) there's a HWUART 
+(a UART with HW flow control capabilities) connected to the same lines 
+as the "default" UART for communicating with the BT controller 
+(this default UART is called BTUART). Changing to the HWUART solved the 
+overruns problem. 
+ 
+The problems now occur on the sending direction (host to controller). 
+There is hardware flow control although the controller never deasserts 
+the RTS (never tells the host to stop sending). There are no FIFO 
+overruns, the FIFO does not overfill or anything like that. 
 
-to him?
+The speed of communication and the parameter appear to be hard coded in 
+the BT module as 921600, 8N1 so there's not much to do there.
 
-Many thanks!
+In fact even with an artificial slow-down of the sending stream (down to 
+a few K/sec) these corrupted bytes still show. I could not correlate them
+with anything else even after weeks of testing and instrumenting the 
+kernel. There's really not much else that I can think of that could be 
+wrong on the host side. I am unsure if the same problem occurs under 
+Windows CE on this device, but apparently it does not. 
 
-Jack
+Catalin
 
-Begin forwarded message:
 
-> From: Antonio-Blasco Bonito <blasco.bonito@email.it>
-> Date: March 17, 2005 4:02:35 AM PST
-> To: ms419@freezone.co.uk
-> Subject: Re: alsa bluetooth module
 
-[...]
 
-> I get:
-> # modprobe snd-bt-sco
-> FATAL: Error inserting snd_bt_sco=20
-> (/lib/modules/2.6.8-2-686/extra/snd-bt-sco.ko): Unknown symbol in=20
-> module, or unknown parameter (see dmesg)
->
-> # dmesg|tail
-> ...
-> snd_bt_sco: no version for "struct_module" found: kernel tainted.
-> snd_bt_sco: Unknown symbol kcalloc
->
-> I looked in alsa sources in the kernel and I only found=20
-> "snd_magic_kcalloc"
-> Maybe kcalloc calls should be renamed as such?
->
-> Cheers,
->             Blasco
-> --
-> Email.it, the professional e-mail, gratis per te: =
-http://www.email.it/f
-> Sponsor:
-> Bisogno di liquidit=E0? Non devi spiegare per cosa. Fino a 4.000 =80 a=20=
 
-> casa tua
-> Clicca qui: http://adv.email.it/cgi-bin/foclick.cgi?mid=3D2291&d=3D17-3
->
->
+
 
 
 
