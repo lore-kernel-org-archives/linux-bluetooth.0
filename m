@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY1-F3A6B25F16373653CE3514C1BF0@phx.gbl>
-From: "blookk -" <blookk@hotmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] patch-2.6.7-mh
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200412011553.16649.gillan82@centrum.cz>
+References: <200412011538.19225.gillan82@centrum.cz>
+	 <1101912422.15615.8.camel@pegasus> <200412011553.16649.gillan82@centrum.cz>
+Content-Type: text/plain
+Message-Id: <1101913242.15615.11.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Subject: [Bluez-users] OBEX: obex_test
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,53 +19,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 01 Dec 2004 16:20:47 +0000
+Date: Wed, 01 Dec 2004 16:00:42 +0100
 
-Hello!
+Hi Gillan,
 
-I have some problems with obex_test.
+> I know that. I hope anyone can have this patch on his local.
 
-I add the OPUSH with "sdptool add opush"  in server and client.
+go ahead and built it by your own. All changes are available.
 
-the channel of the Obex object push is 4.
+Regards
 
-In server side I write:
-obex_test -b 00:11:22:33:44:55 4
-s
+Marcel
 
-In the client side I write:
-obex_test -b 99:88:77:66:55:44 4
-c
-
-And then, in client side appears this message:
-"Transport connect error! (Bluetooth)"
-
-The Hcidump in the client show this:
-
->HCI Event: Command Status (0x0f) plen 4
->HCI Event: Connect Complete (0x03) plen 11
->HCI Event: Command Complete (0x0e) plen 6
->HCI Event: Command Status (0x0f) plen 4
->HCI Event: Disconn Complete (0x05) plen 4
-
-The Hcidump in the server show:
-
->HCI Event: Connect Request (0x04) plen 10
->HCI Event: Command Status (0x0f) plen 4
->HCI Event: Connect Complete (0x03) plen 11
->HCI Event: Command Complete (0x0e) plen 6
->HCI Event: Command Status (0x0f) plen 4
->HCI Event: Disconn Complete (0x05) plen 4
-
-
-why occurs this?
-
-thanks.
-Regards.
-
-_________________________________________________________________
-Descarga gratis la Barra de Herramientas de MSN 
-http://www.msn.es/usuario/busqueda/barra?XAPID=2031&DI=1055&SU=http%3A//www.hotmail.com&HL=LINKTAG1OPENINGTEXT_MSNBH
 
 
 
