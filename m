@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jan Sobek <honza@sis.vutbr.cz>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20040702105653.GF13439@sis.vutbr.cz>
+From: Steffen Schwientek <schwientek@web.de>
+Message-ID: <d0ler1-pah.ln1@ID-90813.users.dfncis.de>
+References: <amsbr1-glo.ln1@ID-90813.users.dfncis.de> <20040701094518.GB4505@gmx.net> <1r2er1-pr7.ln1@ID-90813.users.dfncis.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] bluetooth - 6310i - iBook
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Re: headset$
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,36 +16,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 2 Jul 2004 12:56:53 +0200
+Date: Fri, 02 Jul 2004 01:57:32 +0200
 
-Hello,
+Steffen Schwientek schrieb:
 
-I'm trying to connect ibook and nokia 6310 using bluetooth adapter by
-microcom.
+> Nicholas A. Preyss schrieb:
 
-same configuration works for me on my desktop, but on ibook works
-only.
-	hcitool scan
-	hcitool info xx.xx.xx.xx.xx.xx
+>> Did you pair Headset and Computer? Normally you have to switch the
+>> headset in pairing mode (-> Manual) and then insert the pin on the
+>> computer. (you can also specifiy pin in a file?) This should happen
+>> transparently, when  a program tries to connect to a remote device
+> 
+> Hmm, how can I tell kphone  to connect and use the remote device? I think,
+> kphone needs an an sounddriver for this task.But there is no sound-driver
+> in the
+> 
+> Steffen
 
-gnokii --monitor
-GNOKII 0.6.1
-Couldn't open PHONET device: No such file or directory
-Telephone interface init failed: Command failed.
-Quitting
+There is an (abandoned?) project.  http://www.dcs.gla.ac.uk/~jp/snd-bt-sco/.
 
-rfcomm connect rfcomm0 xx.xx.xx.xx.xx.xx
-Can't connect RFCOMM socket: Connection refused
+Unfortunately the website is currently down. The google cache tells, I´ll
+need an 2.6.4 kernel. 
+Are there any other audio drivers avaible (OSS or even a commercial one) for
+bluetooth?
 
-On phone is pin request.
+Steffen
 
-
-can you help me?
-
-thank you
-
--- 
-Honza
 
 
 -------------------------------------------------------
