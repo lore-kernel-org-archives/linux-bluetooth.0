@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050131134152.20060.qmail@web60903.mail.yahoo.com>
-From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
-Subject: Re: [Bluez-users] rfcomm question 1
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1107007411.10735.16.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=big5
+Subject: Re: [Bluez-users] TPL is not changing
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050131184526.1de2caf2.j0006@stu.matsue-ct.jp>
+References: <20050130174730.3a78367f.j0006@stu.matsue-ct.jp>
+	 <1107095863.24890.0.camel@pegasus>
+	 <20050131184526.1de2caf2.j0006@stu.matsue-ct.jp>
+Content-Type: text/plain
+Message-Id: <1107176016.7902.3.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,155 +20,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 Jan 2005 21:41:52 +0800 (CST)
+Date: Mon, 31 Jan 2005 13:53:36 +0100
 
-Hi Marcel,
-    Here is the content of /etc/bluetooth/hcid.conf
-#
-# HCI daemon configuration file.
-#
-# $Id: hcid.conf,v 1.7 2004/12/13 14:16:03 holtmann
-Exp $
-#
- 
-# HCId options
-options {
-        # Automatically initialize new devices
-        autoinit yes;
- 
-        # Security Manager mode
-        #   none - Security manager disabled
-        #   auto - Use local PIN for incoming
-connections
-        #   user - Always ask user for a PIN
-        #
-        security auto;
- 
-        # Pairing mode
-        #   none  - Pairing disabled
-        #   multi - Allow pairing with already paired
-devices
-        #   once  - Pair once and deny successive
-attempts
-        pairing multi;
- 
-        # PIN helper
-        pin_helper /usr/bin/bluepin;
- 
-        # D-Bus PIN helper
-        #dbus_pin_helper;
-}
- 
-# Default settings for HCI devices
-device {
-        # Local device name
-        #   %d - device id
-        #   %h - host name
-        #name "BlueZ (%d)";
-        name "cm218-253-8-120.hkcable.com.hk:%d"
-        # Local device class
-        class 0x3e0100;
- 
-        # Default packet type
-        #pkt_type DH1,DM1,HV1;
- 
-        # Inquiry and Page scan
-        iscan enable; pscan enable;
- 
-        # Default link mode
-        #   none   - no specific policy
-        #   accept - always accept incoming
-connections
-        #   master - become master on incoming
-connections,
-        #            deny role switch on outgoing
-connections
-        lm accept;
- 
-        # Default link policy
-        #   none    - no specific policy
-        #   rswitch - allow role switch
-        #   hold    - allow hold mode
-        #   sniff   - allow sniff mode
-        #   park    - allow park mode
-        lp rswitch,hold,sniff,park;
- 
-        # Authentication and Encryption (Security Mode
-3)
-        #auth enable;
-        #encrypt enable;
-}
-How can I modify the Security Mode?
-Also, how can I change the PIN of my Linux PC? 
-Thank you very much.
-Michael
+Hi Kazuhiro,
 
- --- Marcel Holtmann <marcel@holtmann.org> 內容：
-> Hi Michael,
+> Thank you for your response.
 > 
-> >     Of course, hcid is running. Then when I typed
-> > "hcidump -x", and then choose the computer in
-> mobile
-> > phone, after I entered the PIN, the following
-> occurs:
-> > [root@cm218-253-8-120 root]# hcidump -x
-> > HCIDump - HCI packet analyzer ver 1.16
-> > device: hci0 snap_len: 1028 filter: 0xffffffff
-> > > HCI Event: Connect Request (0x04) plen 10
-> >   A8 D8 DD D9 0A 00 04 02 52 01
-> > < HCI Command: Accept Connection Request
-> (0x01|0x0009)
-> > plen 7
-> >   A8 D8 DD D9 0A 00 01
-> > > HCI Event: Command Status (0x0f) plen 4
-> >   00 01 09 04
-> > > HCI Event: PIN Code Request (0x16) plen 6
-> >   A8 D8 DD D9 0A 00
-> > < HCI Command: PIN Code Request Reply
-> (0x01|0x000d)
-> > plen 23
-> >   A8 D8 DD D9 0A 00 05 42 6C 75 65 5A 00 00 00 00
-> 00
-> > 00 00 00
-> >   00 00 00
-> > > HCI Event: Command Complete (0x0e) plen 10
-> >   01 0D 04 00 A8 D8 DD D9 0A 00
-> > > HCI Event: Connect Complete (0x03) plen 11
-> >   05 29 00 A8 D8 DD D9 0A 00 01 00
-> > But the mobile shows "PIN not match". So how can I
-> do?
+> My "hciconfig -a" says as follows:
 > 
-> run "hcidump -X" and you might see your PIN. I guess
-> it is "BlueZ" and
-> why are you using security mode 3?
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
->
--------------------------------------------------------
-> This SF.Net email is sponsored by: IntelliVIEW --
-> Interactive Reporting
-> Tool for open source databases. Create drag-&-drop
-> reports. Save time
-> by over 75%! Publish reports on the web. Export to
-> DOC, XLS, RTF, etc.
-> Download a FREE copy at
-> http://www.intelliview.com/go/osdn_nl
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
->  
+> hci0:   Type: PCCARD
+>         BD Address: 00:90:02:05:15:79 ACL MTU: 672:8 SCO MTU: 64:0
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:1232 acl:0 sco:0 events:24 errors:0
+>         TX bytes:361 acl:0 sco:0 commands:24 errors:0
+>         Features: 0xff 0xfb 0x01 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'BlueZ (0)'
+>         Class: 0x000100
+>         Service Classes: Unspecified
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x8105 LMP Ver: 1.1 (0x1) LMP Subver: 0x8d40
+>         Manufacturer: Ericsson Technology Licensing (0)
 
-_______________________________________________________________________
-新年願望第一位 : 找到友緣人
-http://personals.yahoo.com.hk
+as Alain already mentioned, this chip lacks the support for power
+control. Compare it with a CSR chip:
+
+hci0:   Type: USB
+        BD Address: 00:0B:AC:xx:xx:xx ACL MTU: 192:8 SCO MTU: 64:8
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset> 
+                <timing accuracy> <role switch> <hold mode> <sniff mode> 
+                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets> 
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme> 
+                <power control> <transparent SCO> 
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20e LMP Ver: 1.1 (0x1) LMP Subver: 0x20e
+        Manufacturer: Cambridge Silicon Radio (10)
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
