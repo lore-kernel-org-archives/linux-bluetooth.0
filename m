@@ -5,32 +5,32 @@ From: Fredrik Noring <noring@nocrew.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
    Edd Dumbill <edd@usefulinc.com>
-In-Reply-To: <1075405154.22564.64.camel@akka.yeti.nocrew.org>
+In-Reply-To: <1075355567.26729.65.camel@pegasus>
 References: <1075316178.553.18.camel@akka.yeti.nocrew.org>
 	 <1075355567.26729.65.camel@pegasus>
-	 <1075405154.22564.64.camel@akka.yeti.nocrew.org>
-Content-Type: multipart/mixed; boundary="=-UZMZkPGxaWpv7ml+zwKS"
-Message-Id: <1075406315.22564.67.camel@akka.yeti.nocrew.org>
+Content-Type: multipart/mixed; boundary="=-L2Ldh407vPWEeHaUwYMZ"
+Message-Id: <1075405154.22564.64.camel@akka.yeti.nocrew.org>
 Mime-Version: 1.0
-Date: Thu, 29 Jan 2004 20:58:35 +0100
+Date: Thu, 29 Jan 2004 20:39:14 +0100
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 
---=-UZMZkPGxaWpv7ml+zwKS
+--=-L2Ldh407vPWEeHaUwYMZ
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-Hi
+Marcel,
 
-tor 2004-01-29 klockan 20.39 skrev Fredrik Noring:
-> Attached patch implements both.
+tor 2004-01-29 klockan 06.52 skrev Marcel Holtmann:
+> I like the idea (also the second one with hci0). Please send me a patch
+> that enables both possibilities.
 
-The new version of the patch fixes a small memory leak.
+Attached patch implements both.
 
 Fredrik
 
 
---=-UZMZkPGxaWpv7ml+zwKS
+--=-L2Ldh407vPWEeHaUwYMZ
 Content-Disposition: attachment; filename=hcid-device.patch
 Content-Type: text/x-patch; name=hcid-device.patch; charset=iso-8859-1
 Content-Transfer-Encoding: 7bit
@@ -96,7 +96,7 @@ diff -Naur bluez-utils-2.4.orig/hcid/lexer.l bluez-utils-2.4/hcid/lexer.l
  	return NUM;
 diff -Naur bluez-utils-2.4.orig/hcid/main.c bluez-utils-2.4/hcid/main.c
 --- bluez-utils-2.4.orig/hcid/main.c	2003-03-08 00:10:30.000000000 +0100
-+++ bluez-utils-2.4/hcid/main.c	2004-01-29 20:53:28.000000000 +0100
++++ bluez-utils-2.4/hcid/main.c	2004-01-29 20:30:42.000000000 +0100
 @@ -50,7 +50,9 @@
  #include "lib.h"
  
@@ -259,7 +259,7 @@ diff -Naur bluez-utils-2.4.orig/hcid/main.c bluez-utils-2.4/hcid/main.c
  		if (ioctl(s, HCISETLINKPOL, (unsigned long)&dr) < 0) {
  			syslog(LOG_ERR, "Can't set link policy on hci%d. %s(%d)\n", 
  				hdev, strerror(errno), errno);
-@@ -236,15 +287,64 @@
+@@ -236,15 +287,58 @@
  	free(dl);
  }
  
@@ -311,12 +311,6 @@ diff -Naur bluez-utils-2.4.orig/hcid/main.c bluez-utils-2.4/hcid/main.c
 +{
 +	struct device_list *device, *next;
 +
-+	if(default_device.name)
-+	{
-+		free(default_device.name);
-+		default_device.name = 0;
-+	}
-+	
 +	for (device = device_list; device; device = next) {
 +		free(device->ref);
 +		if(device->opts.name)
@@ -328,7 +322,7 @@ diff -Naur bluez-utils-2.4.orig/hcid/main.c bluez-utils-2.4/hcid/main.c
  }
  
  static void sig_usr1(int sig)
-@@ -467,6 +567,8 @@
+@@ -467,6 +561,8 @@
  	/* Start event processor */
  	g_main_run(event_loop);
  
@@ -473,4 +467,4 @@ diff -Naur bluez-utils-2.4.orig/hcid/parser.y bluez-utils-2.4/hcid/parser.y
  		syslog(LOG_ERR,"Can not open %s", file);
  		return -1;      
 
---=-UZMZkPGxaWpv7ml+zwKS--
+--=-L2Ldh407vPWEeHaUwYMZ--
