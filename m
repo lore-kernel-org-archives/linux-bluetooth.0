@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Pavel Ruzicka <pavouk@pavouk.org>
 To: bluez-users@lists.sourceforge.net
-From: Hannes Reiff <faster10@gmx.net>
-Message-ID: <loom.20041220T220523-61@post.gmane.org>
-References: <loom.20041220T180020-785@post.gmane.org> <41C71F9D.7000902@cc.gatech.edu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: File Transfer via Bluetooth
+Subject: Re: [Bluez-users] Socket version F not recognized on SL-6000
+Cc: "Bhaskar S. Manda" <bhaskar_manda@yahoo.com>
+References: <20041220180425.9191.qmail@web11601.mail.yahoo.com>
+In-Reply-To: <20041220180425.9191.qmail@web11601.mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200412202116.57743.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,29 +20,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 20 Dec 2004 21:07:34 +0000 (UTC)
-
-Hi!
-
-Jay Summet <summetj <at> cc.gatech.edu> writes:
-
-> 
-> If you have the network already working, the hard part is done.
-> 
-I used telnet and ssh to send files from one server to the other. I consider scp
-a another possibility.
-> 
-> If you want to mount a filesystem, NSF (or Samba/SMB) would work as 
-> well, but is a lot harder to setup/configure than scp.
-> 
-But it sounds interesting :) Could you please give me some more details?
-Thanks.
-
-Hannes
+Date: Mon, 20 Dec 2004 21:16:57 +0100
 
 
+> cardctl ident shows product info matching that in
+> /etc/pcmcia/bluetooth.conf, but doesn't load dtl1_cs.
+>
+> # cardctl ident
+> Socket 0:
+>   product info: "Socket", "CF+ Personal Network Card"
+>   manfid: 0x0104, 0x009f
+>   function: 254 ((null))
 
+I have identical card on SL-C860. I must make "hciconfig hci0 up" for
+functionality.
 
+Best regards,
+
+Pavel Ruzicka
 
 
 -------------------------------------------------------
