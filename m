@@ -1,62 +1,79 @@
-Return-Path: <matthias@ma-c.de>
-Subject: Re: [Bluez-users] rfcomm pppd
-From: Matthias Albert <matthias@ma-c.de>
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Socket CF adaptor, limited to 2-3KB/sec RFCOMM
+	PPP connection?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Jay W. Summet" <summetj@cc.gatech.edu>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1097927566.4911.7.camel@pegasus>
-References: <1097845922.12708.16.camel@ringo.aicas.burg>
-	 <1097927566.4911.7.camel@pegasus>
+In-Reply-To: <Pine.GSO.4.58.0410141051300.8280@gaia3.cc.gatech.edu>
+References: <Pine.GSO.4.58.0410121425040.24690@gaia3.cc.gatech.edu>
+	 <1097752969.4640.40.camel@notepaq>
+	 <Pine.GSO.4.58.0410141051300.8280@gaia3.cc.gatech.edu>
 Content-Type: text/plain
-Message-Id: <1097945209.20193.1.camel@fragger>
+Message-Id: <1097929292.4911.37.camel@pegasus>
 Mime-Version: 1.0
-Date: Sat, 16 Oct 2004 18:46:50 +0200
-List-ID: <bluez-users.lists.sourceforge.net>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 16 Oct 2004 14:21:33 +0200
 
-Hi Marcel,
-> Hi Matthias,
+Hi Jay,
+
+> I have a Socket Compact Flash bluetooth adaptor, which uses the dtl1_cs
+> kernel module. I have it configured, and everything works, but
+> I am getting very slow GPRS speeds with my Sony Ericsson T610 telephone.
 > 
->> now I'm able to establish a connection from my ipaq (running
-familiar)
->> to my notebook (linux, debian host).
->>
->> hcitool scan -> list of all available bluetooth devices
->>  -> select the one I need
->> sdptool browse <bluetoothadress> -> gives me list of all availble
->> profiles
->>
->> rfcomm connect  <bluetoothadress> 1 -> do a serial connection to my
-bt
->> device
->>
->> rfcomm show -> give me a list of established connections
->>
->> So everytime I do this, the pppd is starting. If nothing happens the
->> connection will be closed. Where can I define which program should be
->> started? I don't want that pppd is starting. I want to see with
-minicom
->> what happen on the device. Do you know what I mean?. So where can I
->> define this?
+> I first noticed it with my GPRS data transfer when I only got 1.9 to 2.2 KB
+> per second of throughput on downloads. When I use IrDA to connect to
+> my phone instead of bluetooth, I get the expected 5.0 to 5.6 KB per second
+> of throughput.
 > 
-> I don't understand what you mean. Do you establish the connection from
-> your iPAQ or from your notebook?
-Now I know how it works :). Im sorry for my not clear question.
-Everytime I started "rfcomm connect" from my ipaq to establish a
-connection to my notebook -> the ppp daemon on my notebook was starting
-and using the rfcomm device. So I was not able to use minicom for the
-rfcomm device. My question obtained how I can configure or choose the
-program that should be started on my client (in this case notebook =
-client).
+> I borrowed a friend's USB bluetooth adaptor (DBT-120 D-Link) and am able
+> to get the 5.0 to 5.6 KB/sec GPRS transfer while the Socket Compact Flash
+> (CF) adaptor got 2.0KB/sec. (Tested in the same location, with excellent
+> cellular signal strength, at the same time of day.)
+> 
+> I also tested both devices using the obextool to "push" an 84 KB jpeg
+> image to my telephone. I believe that this transfer was speed limited by
+> the phone's internal (flash?) memory, as with both the Socket CF and
+> D-Link USB adaptor I got about the same speeds, in the 24-30 second range
+> (best case, in a few cases I got much worth throughput). [That's about
+> 3.4KB/Sec, slower than the GPRS throughput (below) I was getting with the
+> USB adaptor or IrDA, even when I was using the USB adaptor for the obex
+> push.]
 
-But I learned that I can do "rfcomm bind" and after that I can use the
-device with any program I want. If so I had to establish a serial
-bluetooth  connection between the ipaq and a linux client and after that
-I have to run a little java program to test javax.com.  And it works
-perfectly :). Marcel thx a lot for your clear and excellent
-documentation at 
+what I assume is that the link manager on the Socket card is not doing a
+good job, because it should select a different packet type automaticly
+to get the best troughput as possible. However this card is very old and
+maybe you should simply ask Socket to get one of there newer cards with
+a CSR chip. There are some problems with a 2.6 kernel to get the serial
+part of them working, but maybe these are solved now. I don't have one
+of these newer cards, because I stopped spending money for buying them.
+People of companies have to donate them to me.
 
-http://www.holtmann.org/papers/bluetooth/uptimes2003.html
+In general it is a bad idea to play with the packet types from the HCI
+level, because the link manager knows best what type to select. In your
+case you may wanna change them with hciconfig and see if it helps.
 
-Have a nice time and a nice weekend.
+Regards
 
-Kind regards,
-Matthias
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
