@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] throughput query
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de4657604112307276221ff99@mail.gmail.com>
-References: <2de4657604112307276221ff99@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1101224463.27351.2.camel@pegasus>
+Message-ID: <2de4657604112307276221ff99@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] throughput query
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,37 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 23 Nov 2004 16:41:03 +0100
+Date: Tue, 23 Nov 2004 20:57:23 +0530
 
-Hi Manjunath,
+hi marcel,
+I am using anycom bt dongles. i set up a bt connection with pan/bnep.
+i use i-perf to measure the throughput ..and i get abt 620kbps. I then
+change to DH5 packet and measure the throughput.....and it is abt
+300kbps.  Is this because of asymmetric and symmetric channels
+respectively.
+logically,use of  DM packets gives a lower througput compared to DH packets. 
 
-> I am using anycom bt dongles. i set up a bt connection with pan/bnep.
-> i use i-perf to measure the throughput ..and i get abt 620kbps. I then
-> change to DH5 packet and measure the throughput.....and it is abt
-> 300kbps.  Is this because of asymmetric and symmetric channels
-> respectively.
-> logically,use of  DM packets gives a lower througput compared to DH packets. 
+How is that hcitool is able to set the packet type in a connection?
+Isn't there some sort of communication with the LM and baseband??
+Similarly, can't i change the transmit power level???
 
-how often must I say this? Don't change the packet types. Enable all of
-them and let the link manager select the best one.
-
-> How is that hcitool is able to set the packet type in a connection?
-
-See above.
-
-> Isn't there some sort of communication with the LM and baseband??
-
-What do you mean?
-
-> Similarly, can't i change the transmit power level???
-
-No, you can't change that.
-
-Regards
-
-Marcel
-
-
+thanks and regards,
+manjunath
 
 
 -------------------------------------------------------
