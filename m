@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41A6F456.5040005@prim-time.fr>
-From: Xavier Garreau <x.garreau@prim-time.fr>
+Message-ID: <41A6F09C.5000801@parrot.fr>
+From: Sebastien HENRIO <sebastien.henrio@parrot.fr>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Hi all !
-References: <41A6046D.30800@xgarreau.org> <1101423126.6465.19.camel@pegasus>
-In-Reply-To: <1101423126.6465.19.camel@pegasus>
+Subject: Re: [Bluez-devel] a2play and Toshiba SR-1 Bluetooth Headset
+References: <20041125091124.GA19805@snoopy.src.ricoh.co.jp>	 <20041125112509.75347786.henryk@ploetzli.ch>	 <20041125105615.GA19821@snoopy.src.ricoh.co.jp>	 <1101440449.6465.64.camel@pegasus>	 <20041126045659.6a3291f5.henryk@ploetzli.ch> <1101442380.6465.77.camel@pegasus>
+In-Reply-To: <1101442380.6465.77.camel@pegasus>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,32 +18,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Nov 2004 10:16:06 +0100
+Date: Fri, 26 Nov 2004 10:00:12 +0100
 
->>I never used sdp api, did any of you wrote some white paper about 
->>bluetooth programming involving sdp (i found 
->>http://www.holtmann.org/papers/bluetooth/wtc2003_slides.pdf but it's not 
->>dealing with sdp)
-> 
-> the programs dund and pand show you how to advertise a SDP record.
+Hi,
 
-Thank you very much Marcel, this was a useful answer, as usual !
+Marcel Holtmann wrote:
+> Hi Henryk,
+>=20
+>=20
+>>>For me it is not clear if we have to set them, ignore them or what to
+>>>do with them. Do we have to insert the content protection header in
+>>>the media payload if these capability is present?
+>>
+>>Obviously we may only insert the content protection header if we reques=
+t
+>>content protection during set configuration. However, I don't remember
+>>any document requiring us to do that. I think Content protection is
+>>completely optional and we would only use that if we were a paranoid
+>>Sony device that believed everybody else on the planet was after us to
+>>steal our music.
+>=20
+>=20
+> actually for me it is not clear if we have to insert that header (even
+> with no content protection information) when the capabilities shows tha=
+t
+> record. Maybe I missed something in the specification.
 
-I just have another (amybe silly) question ...
+In fact you have to insert the content protection header only if you=20
+want to use it.
 
-In bluez/pan/pand/sdp.c
-     function bnep_sdp_register
+This capablity is optional, so you can skip it during the stream=20
+configuration process.
 
-if sdp_record_register is succesful, the sdp_session is not closed 
-whereas it is evrywhere else (when something fails).
+Best Regards
+S=E9bastien
 
-Does it means that sdp_record_register closes the sdp_session when it is 
-successful ? That would mean we need to di sdp_connect foreach record we 
-have to add (I know, we usually only have only one to do at a time, but 
-that seems "strange" to me)
 
-Regards !
-Xavier Garreau
 
 
 -------------------------------------------------------
