@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Can only start Bluetooth once on my Sony
-	Picturebook
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405102257.57941.cijoml@volny.cz>
-References: <200405101325.18922.tim@birdsnest.maths.tcd.ie>
-	 <1084193820.4017.25.camel@pegasus>  <200405102257.57941.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1084223684.9639.109.camel@pegasus>
-Mime-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Can only start Bluetooth once on my Sony Picturebook
+References: <200405101325.18922.tim@birdsnest.maths.tcd.ie> <1084193820.4017.25.camel@pegasus>
+In-Reply-To: <1084193820.4017.25.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200405102257.57941.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +19,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 May 2004 23:14:44 +0200
+Date: Mon, 10 May 2004 22:57:57 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> Have you done some research in hcitool cc cc dc bug?
+>
+> you can keep every Bluetooth daemon running even if no device is
+> attached. They will re-init themself if you power-up your internal
+> Bluetooth device. What I think that happens is that the stopping with
+> spicctrl is the same as a physical unplug and this causes a kernel oops.
+> Check if you have CONFIG_BT_HCIUSB_SCO enabled, if yes, disable for now
+> or apply the attached patch.
+>
+> Regards
+>
+> Marcel
 
-I thought it was clear why this fails. If not, post it again with
-"hcidump -x" to show what happens, but in a seperate thread. It is not
-nice to ask off-topic questions in a complete independent thread.
+Have you done some research in hcitool cc cc dc bug?
 
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
