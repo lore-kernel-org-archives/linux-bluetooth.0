@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] What's the best way to go about device detection?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Rob Raper <djrobx@hotmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY14-F3781Np7vXee40004099a@hotmail.com>
-References: <BAY14-F3781Np7vXee40004099a@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1084738824.4184.47.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <008401c43b7c$54a74b90$0200a8c0@pc>
+From: "Piotr Skrzypek" <bluezet@interia.pl>
+To: <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-2"
+Subject: [Bluez-users] install/connection problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,35 +16,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 May 2004 22:20:24 +0200
+Date: Sun, 16 May 2004 21:31:03 +0200
 
-Hi Rob,
+Hello
+I`m new here and i`m new in linux. I`ve just installed BlueZ files in my
+machine with kernel 2.4.24 without any patches. I have installed everything
+in bluetooth section of the kernel. Now i don`t know, maybe i shoud install
+bnep as a module, because on most tutorials i see line modprobe bnep. Or
+maybe i don`t need to do it? just leave it installed in kernel? My next step
+was install everything from bluez. Of cource i couldn`t install kde
+bluetooth because of some problems, so i must work with command line. My
+point is to make network tcp/ip connection between server machine (debian)
+and windows xp. I realised, that i can see my server from the computer with
+windows. I see it as a "BlueZ" Device, and it has no protocols. Now: how can
+i create network connection, so i can share my internet connection with the
+other pc? And how can i make some simple security configuration, because i
+don`t want anyone to connect to my bluetooth device, except that machine
+with winXP. I hope U understood me. Pleas help me - i can`t find any
+tutorial that fits to my needs.  Maybe U have some expirience?
 
-> Thanks for your reply.   I'll have a look into RSSI.   Is it 
-> possible to use RSSI for detection, but then use RFCOMM to do the actual 
-> communications?    Once "linked" to a server they don't ever need to talk to 
-> multiple servers at the same time.  It's just that other servers need to 
-> determine signal strength in order to decide when to perform a hand off.
-
-this is what I said. The RSSI comes for free with an inquiry with RSSI
-command from the Bluetooth 1.2 specification. And while a connection is
-active you can retrieve it without any extra cost. Look at the hcitool
-info command and see how it finds the needed ACL handle of an existing
-connection.
-
-And btw check your devices that they really support inquiry while they
-maintain an open ACL connection.
-
-> Here's the block of code that I'm currently using to do a scan.  The old 
-> version which worked better was simply a verison of the "hcitool scan" 
-> routine modified to connect and check singal strength.
-
-Sorry, but I won't read that code. It is too much nested and actually
-code that needs more than 80 chars in a row is way too complex.
-
-Regards
-
-Marcel
+See You
 
 
 
