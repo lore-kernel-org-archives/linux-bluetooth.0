@@ -1,49 +1,53 @@
-Return-Path: <thomae@ei.tum.de>
-Message-ID: <3FDECECD.2050001@ei.tum.de>
-Date: Tue, 16 Dec 2003 10:22:21 +0100
-From: Matthias Thomae <thomae@ei.tum.de>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Stephen Crane <steve.crane@rococosoft.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] New Bluetooth kernel patches available
-References: <1071505820.6499.80.camel@pegasus>	 <1071507511.26243.452.camel@baroque.rococosoft.com> <1071528118.6526.126.camel@pegasus>
-In-Reply-To: <1071528118.6526.126.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1071507511.26243.452.camel@baroque.rococosoft.com>
+References: <1071505820.6499.80.camel@pegasus>
+	 <1071507511.26243.452.camel@baroque.rococosoft.com>
+Content-Type: text/plain
+Message-Id: <1071528118.6526.126.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Mon, 15 Dec 2003 23:41:59 +0100
 
-Hi Stephen, Marcel, all,
+Hi Stephen,
 
-Marcel Holtmann wrote:
->>2.4.18 is needed for the Sharp Zaurus (ROM 3.10) and actually using a BT
->>keyboard would be way cool :-)
+> 2.4.18 is needed for the Sharp Zaurus (ROM 3.10) and actually using a BT
+> keyboard would be way cool :-)
 
-I think so, too, especially when there are foldable keyboards available 
-:), see http://www.heise.de/newsticker/data/dal-11.12.03-000/
+do you know what Bluetooth stack is used by Sharp in their ROM?
 
-> do you know what Bluetooth stack is used by Sharp in their ROM?
+I hope that until CeBIT I get a demo with ISDN and HID running on my
+iPAQ and make some people google.
 
-AFAIK, they have no built-in bluetooth support, but there is a variant 
-of the Sharp ROM from theKompany 
-(http://www.thekompany.com/embedded/rom/) which has BlueZ support 
-(stemming from http://tumnus.zaurii.net/, please anyone correct me if I 
-am wrong).
+> I'd say maintain it and 2.4.23.
 
-Also, the current testing version of OpenZaurus (3.3.5) 
-(http://www.openzaurus.org/oz_website/content/news)
-uses a 2.4.18 kernel, and bluez seems to run with the packages from 
-tumnus and an Anycom CF card on my SL-5500.
+The 2.4.18 is the one that takes the most time :(
 
-However, the OZ developers see the 2.4.18 based OZ as an interim 
-solution until they have their own port of the 2.4.21 kernel, see 
-http://openzaurus.org/newsletters/2003.12/
+Regards
 
-So it would be nice if the 2.4.21 could also be maintained!
+Marcel
 
-But maybe Marcel would want to contact the OZ developers directly (e.g. 
-via openzaurus-devel@lists.sourceforge.net) to talk about their plans. I 
-am sure they are interested in BlueZ support for OZ, especially with the 
-coming Zaurus SL-6000 that has a built-in bluetooth module.
 
-Regards.
-Matthias
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: SF.net Giveback Program.
+Does SourceForge.net help you be more productive?  Does it
+help you create better code?  SHARE THE LOVE, and help us help
+YOU!  Click Here: http://sourceforge.net/donate/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
