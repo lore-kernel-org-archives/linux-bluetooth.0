@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <d1f423d305030110591e323551@mail.gmail.com>
-From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] RFCOMM Device
-In-Reply-To: <1109578219.17256.5.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <d1f423d3050226200521a6d7a@mail.gmail.com>
-	 <1109578219.17256.5.camel@pegasus>
+Message-ID: <20050302142837.62593.qmail@web26610.mail.ukl.yahoo.com>
+From: BZ Benny <bennybbz@yahoo.fr>
+To: Bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] creation of Bnep0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,50 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 1 Mar 2005 13:59:28 -0500
+Date: Wed, 2 Mar 2005 15:28:37 +0100 (CET)
 
-Thank you guys !!!
+Hi Marcel,
 
+I see how you create bnep0 with the netdev.c using
+linux/netdevice.c
 
-On Mon, 28 Feb 2005 09:10:19 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Anderson,
-> 
-> > I am new with Bluez  and I trying to set up a rfcomm device but the
-> > /dev/rfcomm0 is not being created or does not exist.
-> >
-> > # rfcomm bind 0 aa:aa:aa:aa:aa 1 (works)
-> > #rfcomm
-> > rfcomm0: aa:aa:aa:aa:aa clean (is it right?)
-> 
-> it must be "rfcomm0: aa:aa:aa:aa:aa channel 1 clean", but yes that is
-> right.
-> 
-> > but when i try to use pppd it does not work, it does not recognize the
-> > /dev/rfcomm0
-> 
-> Check if /dev/rfcomm0 exists and if not install udev or create it by
-> hand.
-> 
-> Regards
-> 
-> Marcel
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+Is it the only way for linking bnep with TCP/IP layers?
 
 
--- 
-Anderson Clayton B. Rodrigues
-Eng. de Software
-Instituto Nokia de Tecnologia - INdT
+	
+
+	
+		
+Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
+Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
