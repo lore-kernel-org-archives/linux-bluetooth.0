@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] cmtp, capidrv and kernel 2.6
+Subject: Re: RE : RE : RE : [Bluez-users] SuSE and Audio
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Matthias Thomae <thomae@ei.tum.de>
+To: =?ISO-8859-1?Q?J=E9r=F4me?= Stadelmann <jerome.stadelmann@hta-bi.bfh.ch>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <401F6549.2020400@ei.tum.de>
-References: <401A269C.7070104@ei.tum.de> <1075562378.2720.8.camel@pegasus>
-	 <401F6549.2020400@ei.tum.de>
+In-Reply-To: <004901c3ea3a$be48f140$2d105793@N64101>
+References: <004901c3ea3a$be48f140$2d105793@N64101>
 Content-Type: text/plain
-Message-Id: <1075808244.13285.10.camel@pegasus>
+Message-Id: <1075808304.13285.12.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,19 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 03 Feb 2004 12:37:25 +0100
+Date: Tue, 03 Feb 2004 12:38:24 +0100
 
-Hi Matthias,
+Hi Jerome,
 
-> > the I4L and CAPI ISDN subsystem of 2.6 must be resynced and I hope
-> > Karsten Keil is doing this very soon. For now apply the i4l-t9bk22 patch
-> > and try again.
+> > This is correct, but I never checked that it also works with 2.6.
 > 
-> Thank you for your hint, I tried again and it seems to work now :)))
+> So you think it's better for me to use an older kernel ?
 
-the full ISDN update for 2.6 is much bigger.
-
-	ftp://ftp.isdn4linux.de/pub/isdn4linux/kernel/v2.6
+I don't know, because I haven't yet played with SCO and 2.6.
 
 Regards
 
