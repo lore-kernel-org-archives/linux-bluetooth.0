@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-To: <bluez-users@lists.sourceforge.net>
-Subject: AW: [Bluez-users] BT unter SuSE 9.2
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAe5n9ZOsCok+R7CALunouowEAAAAA@t-online.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1102679972.9481.1.camel@pegasus>
+Subject: Re: [Bluez-users] BT unter SuSE 9.2
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAsfVFWzu3xEqf6jbMNBUU/QEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAsfVFWzu3xEqf6jbMNBUU/QEAAAAA@t-online.de>
+Content-Type: text/plain
+Message-Id: <1102679972.9481.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,34 +19,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Dec 2004 14:18:25 +0100
+Date: Fri, 10 Dec 2004 12:59:32 +0100
 
-Hi Marcel,
-at first, thanks a lot. Now there is no error-message any more.
+Hi Peter,
 
-I'm able to get a connection with the BT-accesspoint, but only for a =
-short
-time. The AP is identified as LAN/Bluetooth Network Device.
-With Connection Info I see the Device name, Address and Signal strength
-during connection. After a short time the connection goes down =
-(timeout?).
+> Linux-Notebook:~ # hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:03:7A:08:54:80 ACL MTU: 192:8  SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN AUTH
+>         RX bytes:1038 acl:0 sco:0 events:34 errors:0
+>         TX bytes:371 acl:0 sco:0 commands:22 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'BlueZ (0)'
+>         Class: 0x100100
+>         Service Classes:
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
+> 0x20d
+>         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> Linux-Notebook:~ #
+> 
+> and now hciconfig -x
+> I have to send the PIN to the bt-accesspoint, the PIN is set in
+> /etc/bluetooth/pin and in hcid.conf security is set to auto.
 
-With YaST I configured bnepX and it is shown as network device bnep0. =
-The AP
-is plugged in a telephonesystem (DSL-System) which has also a router- =
-and a
-switch-function. I need the router-function in order to reach the =
-internet.
-But I'm not able to use bnep0 for the configuration of DSL with YaST =
-neither
-ISDN and Modem. I only find bnep0 in YaST at network device, like =
-ethppp0
-and so on. Have I to install additional systems to make bnep0 available =
-for
-DSL???
+and you switched your device into security mode 3. This will always
+cause troubles. Deaktivate authentication and encryption with YaST.
 
 Regards
-Peter
+
+Marcel
 
 
 
