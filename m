@@ -1,20 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] travelmate c110
+Subject: Re: [Bluez-users] News: Stereo BT Headset from BlueTake
 From: Marcel Holtmann <marcel@holtmann.org>
-To: pokui@ucu.ac.ug
+To: wim delvaux <wim.delvaux@adaptiveplanet.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <33086.193.108.254.98.1098195967.squirrel@ucu.ac.ug>
-References: <34204.81.199.88.27.1098106921.squirrel@ucu.ac.ug>
-	 <1098107316.21553.8.camel@pegasus>
-	 <34318.81.199.88.27.1098107653.squirrel@ucu.ac.ug>
-	 <1098109156.21553.11.camel@pegasus>
-	 <32925.193.108.254.98.1098191310.squirrel@ucu.ac.ug>
-	 <1098191809.31395.1.camel@pegasus>
-	 <33017.193.108.254.98.1098192097.squirrel@ucu.ac.ug>
-	 <33070.193.108.254.98.1098195146.squirrel@ucu.ac.ug>
-	 <33086.193.108.254.98.1098195967.squirrel@ucu.ac.ug>
+In-Reply-To: <200410191620.29630.wim.delvaux@adaptiveplanet.com>
+References: <416D8520.5060102@thomae-privat.de>
+	 <200410141701.46958.wim.delvaux@adaptiveplanet.com>
+	 <1098192007.31395.6.camel@pegasus>
+	 <200410191620.29630.wim.delvaux@adaptiveplanet.com>
 Content-Type: text/plain
-Message-Id: <1098197685.3068.5.camel@pegasus>
+Message-Id: <1098197636.3068.3.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -26,35 +21,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Oct 2004 16:54:45 +0200
+Date: Tue, 19 Oct 2004 16:53:56 +0200
 
-Hi,
+Hi Wim,
 
-> never mind: figured out how to get the acpi module to behave "civily" :-)
-> 
-> # hciconfig -a
-> hci0:   Type: USB
->         BD Address: 00:02:8A:9E:8B:8A ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:107 acl:0 sco:0 events:14 errors:0
->         TX bytes:300 acl:0 sco:0 commands:13 errors:0
->         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'BlueZ (0)'
->         Class: 0xff0100
->         Service Classes: Positioning, Networking, Rendering, Capturing,
-> Object Transfer, Audio, Telephony, Information
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
-> 0x20d
->         Manufacturer: Cambridge Silicon Radio (10)
-> 
-> 
-> thanks all.. (maybe I should write an acer c110 howto ;-) )
+> I have found a source for windows program that claims support for SBC capable 
+> codecs.]
 
-please do so and post the URL. I will link it from my page.
+about what program are you talking?
+
+> Providing the author agrees,  I would be willing to rip out any codec you 
+> need, providing you can provide me with info about WHAT you need and HOW you 
+> need it.
+
+Hopefully it is in C and not in C++.
 
 Regards
 
