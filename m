@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40193837.1070605@jbc-computer.de>
-From: Jan Bandouch <news.jan@jbc-computer.de>
+Message-ID: <401A269C.7070104@ei.tum.de>
+From: Matthias Thomae <thomae@ei.tum.de>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
+To: bluez-users <bluez-users@lists.sourceforge.net>
 Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] sockets connect before accept()
+Subject: [Bluez-users] cmtp, capidrv and kernel 2.6
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,62 +15,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 29 Jan 2004 17:43:35 +0100
+Date: Fri, 30 Jan 2004 10:40:44 +0100
 
-Hello,
-I'm developing a Bluetooth Client/Server application with the client 
-being a Palm Handheld and the Server being a linux PC using BlueZ 
-(Debian Kernel 2.4.22, libbluetooth1-dev version 2.5-1).
+Hi Marcel et al,
 
-My client programm (PalmOS) does the following:
-1) Establish an Acl Link to the server (address and channel is hardcoded)
-2) Create and Connect an RfComm socket to the server (address/channel 
-still hardcoded)
+could anyone give a hint what changes are necessary from kernel 2.4.X to 
+2.6.X to get an isdn dialup setup via cmtp and capidrv (i4l)?
 
-The connection does get established all right.
-The funny thing is, that on the server side all I did was to create a 
-RfComm socket, bind that socket to BDADDR_ANY and channel 10, and 
-listen. Thats all. No accept(..) call, no select(..) etc.
-I can do a select(..), but I never get told of any connection requests.
-I believe that is because my connection request was already handled 
-before calling select(..).
-But why or by whom? I'm new to socket programming, but as far as I know 
-this is not the way it's supposed to work, or is it? And BlueZ 
-programming should work similar to socket programming, or not?
-And how am I supposed to get a socket handler for the data socket 
-without calling accept(..)?
+I have a very well working setup for 2.4.22-mh2, essentially following 
+Marcel's (BTW excellent :) instructions from 
+http://www.holtmann.org/linux/bluetooth/isdn.html and had a quick try 
+using the same setup on an unpatched 2.6.2-rc2 vanilla kernel, getting 
+the following symptoms:
 
-Some more info:
-The rfcomm-module is not in use, before I start my server programm.
-After the client establishes the connection, "cat 
-/proc/bluetooth/rfcomm" shows the following information:
+- cmtp and kernelcapi are loaded and connecting to an AP-X works
+- capiinfo and capiinit complain about not being able to load 
+kernelcapi, although it is already loaded
+- capidrv isn't loaded automatically any more
+- "/etc/init.d/isdnutils start" complains about /dev/isdnctrl (because 
+of missing capidrv?)
+- when modprobing capidrv the console is flooded with messages
 
-dlc EF:30:04:72:02:00 94:A1:10:E0:07:00 1 20 127 40 1
-sk  EF:30:04:72:02:00 94:A1:10:E0:07:00 1 10
-sk  00:00:00:00:00:00 00:00:00:00:00:00 4 10
+I use debian/unstable with the latest isdn and capi packages (3.3-7).
 
-the last line is my listening socket, the first two seem to be the 
-connection "initiated" by the Palm. Any infos on how to read the above 
-information? what does "dlc" stand for, and the numbers on the right?
+Do I need any kernel patches (e.g. the i4l patch from 
+http://rcum.uni-mb.si/~uvp00845b/)?
+Do I have to modify the module loading definitions in /etc/modutils?
+Does pppdcapiplugin work without additional kernel patches?
 
-Any help appreciated. At first I thought that some other process accepts 
-the connection, but the connection gets only established after listening 
-on my socket.
-
-Thanks,
-
-Jan
-
-
-
-By the way, any documentation, links regarding BlueZ programming are 
-welcome! I know the site of Marcel Holtmann, but there's only one 
-article dealing with programming, and it's seems I could use some more :-)
-
-
-
-
-
+Regards.
+Matthias
 
 
 
