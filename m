@@ -1,12 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Alignment issue
+Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Daryl Van Vorst <daryl@wideray.com>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001301c47f09$3900e650$1301010a@baked>
-References: <001301c47f09$3900e650$1301010a@baked>
+To: rtaylor@hcvwireless.com
+Cc: Jonathan Paisley <jp-www@dcs.gla.ac.uk>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1092214694.12197.14.camel@localhost>
+References: <4117AB9A.9010909@dark-reality.de>
+	 <1092071356.4564.12.camel@pegasus> <4117B098.5020805@dark-reality.de>
+	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>
+	 <1092090364.4564.46.camel@pegasus> <41180E64.1010007@dark-reality.de>
+	 <1092140041.4564.96.camel@pegasus> <4118C562.1050300@superbug.demon.co.uk>
+	 <Pine.LNX.4.59.9999.0408101435250.22497@brava.dcs.gla.ac.uk>
+	 <4118DAF9.2080204@csr.com>
+	 <Pine.LNX.4.59.9999.0408101615190.22497@brava.dcs.gla.ac.uk>
+	 <1092214694.12197.14.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1092208405.4564.227.camel@pegasus>
+Message-Id: <1092206422.4564.222.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,36 +27,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 Aug 2004 09:13:25 +0200
+Date: Wed, 11 Aug 2004 08:40:22 +0200
 
-Hi Daryl,
+Hi Roderick,
 
-> The attached patch should fix the problem (it does as far as I can tell).
-> The compiler probably thinks both arguments to memcpy() are aligned and so
-> makes an optimization which breaks the copy (because the destination is not
-> actually aligned). Perhaps this is a compiler bug... I'm using gcc 3.3.3.
-> After googling and reading some discussion on the topic it seems that it's
-> probably not a compiler bug. I'll leave that for someone else to decide. :)
+> > > I can't find anything in this thread that reveals whether you're
+> > > trying to send SCO traffic over USB or UART.  The data handling
+> > > for the two cases have subtle differences.
+> > 
+> > As far as I'm aware, we're dealing with USB only.
+> > 
+> 
+> I am researching BlueZ application in Embedded applcations.
+> 
+> Having UART support would be useful for embedded processors that don't
+> have USB host support.  Please don't disregard it completely
 
-after checking some more resources, you may be right and the compiler
-optimizes here where it should not. I found a comment about gcc and
-using its __builtin_memcpy. Try to replace the memcpy with memmove and
-see if this works.
-
---- bluetooth.h 2004/07/04 15:38:11     1.14
-+++ bluetooth.h 2004/08/11 07:07:12     1.15
-@@ -93,10 +93,10 @@ enum {
- #define bt_put_unaligned(val, ptr) ((void)( *(ptr) = (val) ))
- #else
- #define bt_get_unaligned(ptr) \
--       ({ __typeof__(*(ptr)) __tmp; memcpy(&__tmp, (ptr), sizeof(*(ptr))); __tmp; })
-+       ({ __typeof__(*(ptr)) __tmp; memmove(&__tmp, (ptr), sizeof(*(ptr))); __tmp; })
- #define bt_put_unaligned(val, ptr) \
-        ({ __typeof__(*(ptr)) __tmp = (val); \
--       memcpy((ptr), &__tmp, sizeof(*(ptr))); \
-+       memmove((ptr), &__tmp, sizeof(*(ptr))); \
-        (void)0; })
- #endif
+don't worry about it, because my plan is to use the standard HCI of the
+BlueZ core for SCO data. This means it will work with every driver we
+have written so far. I don't think that playing special driver tricks
+will help us in any way and unless somebody proves me otherwise I don't
+wanna do it.
 
 Regards
 
