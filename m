@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Max Krasnyansky <maxk@qualcomm.com>
-To: bluez-devel@lists.sourceforge.net
-Cc: Thor Egil Skaug <tskaug@eecs.wsu.edu>
-Content-Type: text/plain
-Message-Id: <1077562741.3445.17.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-devel] [Fwd: hci_sock.c problem]
+Message-ID: <403A4FEE.50909@superbug.demon.co.uk>
+From: James Courtier-Dutton <James@superbug.demon.co.uk>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/mixed;
+ boundary="------------090601070907060506020702"
+Subject: [Bluez-devel] Problems decoding SDP in hcidump.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,53 +16,78 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 23 Feb 2004 10:59:01 -0800
+Date: Mon, 23 Feb 2004 19:09:34 +0000
 
------Forwarded Message-----
-From: Thor Egil Skaug <tskaug@eecs.wsu.edu>
-To: maxk@qualcomm.com
-Subject: hci_sock.c problem
-Date: Sat, 21 Feb 2004 14:14:53 -0800
+This is a multi-part message in MIME format.
+--------------090601070907060506020702
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Maxim,
+I attach a captured file using "hcidump -whcidump.cap".
 
-Please reply to this message only if you have time.
+Can anyone decode this.
+hcidump -rhcidump.cap does not seem to like it.
 
-I am a graduate student at Washington State University, and I am doing
-some research on Bluetooth.
-What I am currently trying to do is use your hci_sock implementation
-with a Belkin USB device, sort of in the
-same way as the BlueZ-HCITool package uses it.
+The capture was done while running the following command: -
 
-This works fine, to some extent, but I have a few questions.
+sdptool search --bdaddr 00:02:EE:C3:43:61 0x0100
 
-I recently installed the linux 2.6.3 kernel, and it seems as though the
-version of hci_sock.c there is 1.4.
-However, I have found version 1.5 on the internet. Which is the latest
-release, and what kernel patch of BlueZ should I use
-to get this?
+That bdaddr is a Nokia 6310i mobile phone, so I assume that what it is 
+sending is valid.
 
-The problem occurs when I want to send some hci commands through the
-socket. The hci_sec_filter filters out a lot of them.
-What is the purpose of this? For example, it filters out the HCI_Reset
-command in 1.4, but not in 1.5, as far as I can read from the code.
+Cheers
+James
 
-Also, I noticed that the OGF_STATUS commands seem to be filtered out in
-version 1.5, but not 1.4. This means that HCI_Read_Link_Quality, and
-HCI_Read_RSSI are not possible anymore. Why? This is of importance to
-me, since my research area is on adaptation and compensation in wireless
-networks.
+--------------090601070907060506020702
+Content-Type: application/octet-stream;
+ name="hcidump.cap"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="hcidump.cap"
 
-The reason for this email is really to figure out which is the latest
-stable release of BlueZ, and if it does not include what I need, I will
-go and remove the security filter from it.
-
-Thanks,
-
-Thor Egil Skaug
-M.S. student, Washington State University
-
-
+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
+--------------090601070907060506020702--
 
 
 -------------------------------------------------------
