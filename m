@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
+Message-ID: <BAY12-F7DA5E202CE09ED8BA6E418AB80@phx.gbl>
+From: "salvatore olgato" <sal_olg@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200411241701.07891.cijoml@volny.cz>
-Subject: [Bluez-users] Keyboarch encryption howto?
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Subject: [Bluez-users] security mode 3
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,16 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 Nov 2004 17:01:07 +0100
+Date: Wed, 24 Nov 2004 15:56:32 +0000
 
-Hi Marcel,
+Thank you, Marcel.
+Does BlueZ support security mode 3 (link-level security) of Bluetooth ?
+Regards.
 
-is there any howto where described how to start encryption on BT keyboard?
-Is my MS keyboard (CSR based) supported?
+_________________________________________________________________
+Ricerche online più semplici e veloci con MSN Toolbar! 
+http://toolbar.msn.it/
 
-Thanks
-
-Michal
 
 
 -------------------------------------------------------
