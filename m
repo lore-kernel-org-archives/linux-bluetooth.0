@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41DA94BF.8000401@csr.com>
+Message-ID: <41DA93ED.6000901@csr.com>
 From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Continuous Inquiry
-References: <BAY12-F35563885BF49C62DF2513EAB9E0@phx.gbl>
-In-Reply-To: <BAY12-F35563885BF49C62DF2513EAB9E0@phx.gbl>
+Subject: Re: [Bluez-devel] Inquiry Scan Question
+References: <BAY12-DAV9F11C1DAD4F5A777DF8A5AB9D0@phx.gbl>
+In-Reply-To: <BAY12-DAV9F11C1DAD4F5A777DF8A5AB9D0@phx.gbl>
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,24 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 04 Jan 2005 13:06:07 +0000
+Date: Tue, 04 Jan 2005 13:02:37 +0000
 
-Pegasus ... wrote:
-> If I do Inquiry in batches of  1.28 seconds, will that affect Inquiry 
-> response from other devices? ...due to the Inquiry Scan Window traversing 
-> the same frequencies again !
-> 
-> I tested the batch approach with the two Socket CF+PCMCIA cards I have and 
-> seem to work fine... but maybe it wont work when there are more devices from 
-> different vendors ?
+Pegasus wrote:
+> Is it possible to set a inquiry scanning device to respond only to devices 
+> of certain Major Device Class(which is doing Inquiry) ?
 
-In general, this can't be guaranteed to work for the reason you stated.
+No. The inquiry scanning device gets no information about the inquiring
+device so it cannot tailor its responses based on some feature of the
+inquirer.
 
-The minimum time an inquiry can be performed for and have a good chance
-of picking up all devices is 10.24 seconds.
-
-I think the raw socket approach is best. Do the inquiry as normal but
-snoop on the inquiry response events by using a raw HCI socket.
+See the thread "passive inquiry" in the bluez-users mailing list for
+more information.
 
 	- Steven
 
