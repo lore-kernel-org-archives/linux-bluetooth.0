@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v618)
-Message-Id: <831E68FD-DB26-11D8-8EF4-00039390D626@pepper.com>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-From: Michael Frey <mfrey@pepper.com>
-Subject: [Bluez-devel] speed of obex file transfer...
+Subject: Re: [Bluez-devel] HIDP and HIDD ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Michael Frey <mfrey@pepper.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <9361AF90-DB1B-11D8-8EF4-00039390D626@pepper.com>
+References: <9361AF90-DB1B-11D8-8EF4-00039390D626@pepper.com>
+Content-Type: text/plain
+Message-Id: <1090419205.21683.107.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,17 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Jul 2004 10:59:06 -0400
+Date: Wed, 21 Jul 2004 16:13:25 +0200
 
-I was wondering if someone could help me increase the speed at which my 
-device receives files over obex?
+Hi Michael,
 
-The fastest I can seem to get is 6 KB/s.  Is this a setting somewhere.  
-My device is a UART device.  Do I need to configure the UART speed 
-somehow?
+> Is the purpose of HIDP and HIDD to replace bthid?  Should I be using 
+> HIDP instead?  What advantages does HIDD along with HIDP provide me 
+> over just using bthid?
 
-Thanks,
-Michael
+the HIDP kernel module and the hidd daemon is the final way of how BlueZ
+will support Bluetooth HID. The main advantage will be a lower latency
+and you don't have to install anything from CVS.
+
+Regards
+
+Marcel
+
 
 
 
