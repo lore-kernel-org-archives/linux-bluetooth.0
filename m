@@ -1,50 +1,48 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Return-Path: <charles@bueche.ch>
+Date: Wed, 18 Aug 2004 21:14:17 +0200
 From: Charles Bueche <charles@bueche.ch>
-To: Niklas Adolfsson <nikad767@student.liu.se>
-Cc: niklas adolfsson <niklas.adolfsson@home.se>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Update on sending from K700i
-Message-Id: <20040818215823.57d781c1@bluez.bueche.ch>
-In-Reply-To: <1279491264f2.1264f2127949@liu.se>
-References: <1279491264f2.1264f2127949@liu.se>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] OT: SonyEricsson K700i addressbook and OBEX over
+ Bluetooth
+Message-Id: <20040818211417.1d5da5d6@bluez.bueche.ch>
+In-Reply-To: <1092818433.31651.60.camel@pegasus>
+References: <20040817123228.2d896a07@bluez.bueche.ch>
+	<1092818433.31651.60.camel@pegasus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Aug 2004 21:58:23 +0200
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Niklas,
+Hi Marcel,
 
-Have you been able to get some more infos ? I'm fighting with similar
-problems with my K700i.
+On Wed, 18 Aug 2004 10:40:33 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
+> > 1. OBEX File Transfer (eg to get pictures from the pone) : in
+> > Konqueror, using kde-buetooth, the selection of "obex://[btaddr]:7/"
+> > brings up"Authentication Required". From my analysis of the source
+> > code, it might be caused by the transport layer (bluez), but not
+> > sure.
+> 
+> Check the hcidump and ask the KDE-Bluetooth developers.
 
-Regards,
+I will try to contact them directly. Sadly, their list server seem to be
+down.
+
+> > 2. UID field in VCARD's : if I send a single VCARD in a file for a
+> > record already present in the phone, it asks "overwrite y/n ?". If I
+> > send a file containing two or more VCARD's for records already
+> > present in the phone, it duplicate them. I added a UID fields as
+> > recommended by the Vcard spec, the phone seem to ignore it.
+> 
+> Sounds like a bug in the phone. Tell SE about it ;)
+
+I had the same idea, unfortunately, to get in touch with a developer,
+one need to pay a good amount of money. For $0, you only get access to
+user forums :-/
+
+Thanks anyway, best regards,
 Charles
 
-On Thu, 22 Jul 2004 09:41:31 +0200
-Niklas Adolfsson <nikad767@student.liu.se> wrote:
-> I will talk to the SonyEricsson service center to see if they have any
-> updates. If i get it to work or anything else changes i will get back
-> to you.
-> 
-> //niklas
-
-
-
--------------------------------------------------------
-SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
-100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
-Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
-http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+-- 
+Charles Bueche <charles@bueche.ch>
+sand, snow, wave, wind and net -surfer
