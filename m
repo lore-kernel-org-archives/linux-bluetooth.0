@@ -1,32 +1,81 @@
-Return-Path: <catalin@cs.toronto.edu>
-Date: Fri, 11 Feb 2005 02:54:23 -0500 (EST)
-From: Catalin Drula <catalin@cs.toronto.edu>
-To: marcel@holtmann.org
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: Re: Re: Lower granularity for INQUIRY interval   
-Message-ID: <Pine.GSO.4.58.0502110245280.20071@qew.cs>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Re: Lower granularity for INQUIRY interval
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: Steven Singer <steven.singer@csr.com>
+In-Reply-To: <Pine.GSO.4.58.0502101727190.7559@qew.cs>
+References: <Pine.GSO.4.58.0502101727190.7559@qew.cs>
+Content-Type: text/plain
+Message-Id: <1108080993.21620.36.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 11 Feb 2005 01:16:33 +0100
 
-Hi Marcel,
+Hi Catalin,
 
-> > Not necessarily a bad idea. In my case, I need to do symmetric
-> > Bluetooth discovery. There are no predefined roles (master-slave,
-> > server-client) for the devices which must continually scan their
-> > surroundings in order to discover other devices. Hence, each device
-> > must continously switch between the INQUIRY and INQUIRY SCAN states
->
-> I still don"t get why switching inquiry scan on and off should help in
-> any case. Since inquiry scan defines the discoverable mode and so you
-> switch devices to unvisible when they inquiry and back to visible when
-> they don"t.
+> > > Is there a way to perform INQUIRY for intervals with
+> > > a lower granularity than 1.28 seconds? I know the Bluetooth
+> > > specification says no.
+> 
+> > To inquire for less than 10.24 seconds is a bad idea. Unless you
+> > inquire for a single contiguous block lasting 10.24 seconds you do not
+> > have a good probability of picking up all devices.
+> >
+> > Note that, for example, 8 consecutive 1.28 second inquiries is not
+> > guaranteed to work.
+> 
+> Not necessarily a bad idea. In my case, I need to do symmetric Bluetooth
+> discovery. There are no predefined roles (master-slave, server-client) for
+> the devices which must continually scan their surroundings in order to
+> discover other devices. Hence, each device must continously switch between
+> the INQUIRY and INQUIRY SCAN states. Since in my setup, the devices will
+> be in range for 20-30 seconds (i.e. humans walking past each other), to
+> remain for 10.24 seconds in INQUIRY mode might just me too much. Imagine
+> that the "phases" of the devices are almost synchronized, then they will
+> both be in INQUIRY mode at the same time, then in INQUIRY SCAN mode at the
+> same time, and so on, and none of them will discover the other one.
+> 
+> The problem has been studied both theoretically and experimentally (for
+> example, see:
+> http://web.informatik.uni-bonn.de/IV/Mitarbeiter/scholz/10_Bohman.pdf
+> 
+> The conclusion of the authors of this study was that each a device should
+> stay in each of the two states for a random amount of time with a mean
+> around 2 to 3 seconds (more details, are in the above paper). Doing this
+> yields and average neighbor discovery delay of about 8 seconds.
+> 
+> Now obviously if we can only stay in INQUIRY state mode, for multiples of
+> 1.28 seconds, the above scenario will not work. So there are _legitimate_
+> uses (i.e. it is not necessarily a bad idea) for my request.
 
-I never switch inquiry scan off (the scan mode always stays PSCAN and
-ISCAN). But when an inquiry is initiated, the device switches into INQUIRY
-mode (or substate) from stops scanning (moves out of the INQUIRY SCAN
-substate for the duration of the inquiry). That is to say, during an
-inquiry a device is not discoverable (or visible). That is what I meant by
-switching between the two states.
+I still don't get why switching inquiry scan on and off should help in
+any case. Since inquiry scan defines the discoverable mode and so you
+switch devices to unvisible when they inquiry and back to visible when
+they don't.
 
-Catalin
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now.
+http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
