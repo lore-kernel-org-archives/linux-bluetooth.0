@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: Pavel Ruzicka <pavouk@pavouk.org>, bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] hotplug USB dongle problem
-References: <200402281424.55149.pavouk@pavouk.org>
-In-Reply-To: <200402281424.55149.pavouk@pavouk.org>
+Message-ID: <20040228140120.70051.qmail@web20727.mail.yahoo.com>
+From: Gigie Lertriniva <gigie_lertriniva@yahoo.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_8GKQA89/ue8tfzi"
-Message-Id: <200402281512.12029.wim.delvaux@adaptiveplanet.com>
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] hciemu pb: can't set scan mode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,60 +15,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 28 Feb 2004 15:12:12 +0100
+Date: Sat, 28 Feb 2004 06:01:20 -0800 (PST)
 
+Hi,
 
---Boundary-00=_8GKQA89/ue8tfzi
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I created a fake Bluetooth device on my PC using
+hciemu. I can see it with hciconfig, get its status to
+"UP and RUNNING" but I fail to put it to PSCAN:
 
-i 'think' that it is because hcid and sdpd are started too soon.  I have moved 
-the startup of these daemons to the bluetooth.agent script too (attached)
+bash-2.05b# hciconfig hci1 pscan
+Can't set scan mode on hci1. Invalid request code(56)
 
-W
+What could be a reason for this problem?
 
+Gigie
 
---Boundary-00=_8GKQA89/ue8tfzi
-Content-Type: application/x-shellscript;
-  name="bluetooth.agent"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="bluetooth.agent"
-
-#!/bin/bash
-exec 2>> /HCI_USB
-set >&2
-echo $* >&2
-
-cd /etc/hotplug
-. hotplug.functions
-
-case $ACTION in
-    add|register)
-        # start bluetooth daemons
-        sh -x /etc/init.d/bluez-utils start
-        sh -x /etc/init.d/bluez-sdp start
-        sh -x /etc/init.d/bluez-pan start
-
-        # install remover
-        #echo "set -x" > $REMOVER
-        #echo 'exec 2> /tmp/HCI_REMOVE' >> $REMOVER
-        #echo "/etc/init.d/bluez-pan stop" >> $REMOVER
-        #echo "/etc/init.d/bluez-sdp stop" >> $REMOVER
-        #echo "/etc/init.d/bluez-utils stop" >> $REMOVER
-        #chmod 700 $REMOVER
-     ;;
-     unregister)
-        /etc/init.d/bluez-pan stop
-        /etc/init.d/bluez-sdp stop
-        /etc/init.d/bluez-utils stop
-     ;;
-esac
-
---Boundary-00=_8GKQA89/ue8tfzi--
-
+__________________________________
+Do you Yahoo!?
+Get better spam protection with Yahoo! Mail.
+http://antispam.yahoo.com/tools
 
 
 -------------------------------------------------------
