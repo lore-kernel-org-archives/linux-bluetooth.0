@@ -1,40 +1,59 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: libo <libo@semit.com.cn>
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Multihop question
-Message-Id: <20040730104427.19ffd026.libo@semit.com.cn>
-In-Reply-To: <1091112872.12651.50.camel@pegasus>
-References: <41090B25.6090806@xmission.com>
-	<1091112872.12651.50.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Jul 2004 10:44:27 +0800
+Return-Path: <taylor@ms.usi.com.tw>
+Message-ID: <01cb01c475ce$2e737d90$df0618ac@USI08844>
+From: "taylor" <taylor@ms.usi.com.tw>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
+References: <019d01c47543$d6aa4c40$df0618ac@USI08844> <1091090204.12651.21.camel@pegasus>
+Subject: Re: [Bluez-users] How add correctly add SP service record to SDPdaemon
+Date: Fri, 30 Jul 2004 08:43:05 +0800
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="big5"
+List-ID: <bluez-users.lists.sourceforge.net>
 
-I need to implement multihop using bluetooth devices.
-The topology is as follows:
-[Ethernet]---A---B---C
-BT device C can visit Ethernet through B and A.
-I want to know if I can implement multihop using BlueZ and what I shall do.
-Thanks.
+Dear Holtmann,
+  Thanks your quick answer, it have worked now.
+
+----- Original Message ----- 
+From: "Marcel Holtmann" <marcel@holtmann.org>
+To: "taylor" <taylor@ms.usi.com.tw>
+Cc: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
+Sent: Thursday, July 29, 2004 4:36 PM
+Subject: Re: [Bluez-users] How add correctly add SP service record to
+SDPdaemon
 
 
+Hi Taylor,
 
--------------------------------------------------------
-This SF.Net email is sponsored by OSTG. Have you noticed the changes on
-Linux.com, ITManagersJournal and NewsForge in the past few weeks? Now,
-one more big change to announce. We are now OSTG- Open Source Technology
-Group. Come see the changes on the new OSTG site. www.ostg.com
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+>  I could use those step to connect the Linux SP to Windows Series
+> profile
+>
+> At the linux side:
+> step 1:rfcomm connect 0 <BD address> 1
+> setp 2:open minicom -s,
+>           set the device as /dev/rfcomm0
+>           set the baud rate as 19200 8N1, no flow control
+>           exit
+> At the windows site:
+> step 1: open the hyerpterminal,
+>            set up baud rate as 19200 8N1 , no flow control
+> step 2: sucessfuly transfer the data
+>
+> But I hope ass the SP profile service record into SDP daemon, I do
+> thoe step
+> At the linux side
+> step 1: rfcomm bind 0 <BD Addreess> 1
+> step 2: sdp add SP 1
+>
+> At the windows site:
+> step1: Obrowse the SP service
+> step 2: reject SP connect, the port is not correct.
+
+and your steps on the Linux side are wrong. Do you read the manpages?
+
+sdptool add --channel 1 SP
+rfcomm listen 0 1
+
+Regards
+
+Marcel
