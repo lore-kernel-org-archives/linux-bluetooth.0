@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm question 1
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050128140602.29279.qmail@web60907.mail.yahoo.com>
-References: <20050128140602.29279.qmail@web60907.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1106933775.9644.0.camel@pegasus>
-Mime-Version: 1.0
+Message-Id: <200501282151.ALQ50969@ms12.netsolmail.com>
+From: Chris Taylor <cht@imipolex-g.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +16,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Jan 2005 18:36:15 +0100
+Date: Fri, 28 Jan 2005 13:51:58 -0800
 
-Hi Michael,
+I installed bluez-libs-2.14 and bluez-utils-2.14 on a linux 2.4.26 system. I 
+also installed the BCM2033-FW.bin  and BCM2033-MD.hex files in both /
+lib/firmware and /usr/lib/hotplug/firmware. The bluez kernel module 
+loads, and I can see stuff like this in the messages log when I unplug and 
+plug in the device and start the hcid daemon:
 
-> I'm doing a project using bluetooth. But I have something to ask.
-> Now, I make the connection between Linux PC and Sony Ericsson T610 by
-> typing "rfcomm connect 0 <adress>", and it was success. Then, I wish
-> to make the connection in this way: let T610 be the client and PC be
-> the server. When T610 searched the PC, I wish to connect them by
-> selecting the PC in the mobile. But when I entered the PIN, the mobile
-> always showed "PIN not match". Why is that? And how can I do so that
-> the connection can be created by mobile phone?
+Jan 28 12:23:59 krank kernel: usb.c: deregistering driver hci_usb
+Jan 28 12:24:14 krank kernel: BlueZ Core ver 2.3 Copyright (C) 2000,2001 
+Qualcomm Inc
+Jan 28 12:24:14 krank kernel: Written 2000,2001 by Maxim Krasnyansky 
+<maxk@qualcomm.com>
+Jan 28 12:24:31 krank kernel: BlueZ HCI USB driver ver 2.5 Copyright 
+(C) 2000,2001 Qualcomm Inc
+Jan 28 12:24:31 krank kernel: Written 2000,2001 by Maxim Krasnyansky 
+<maxk@qualcomm.com>
+Jan 28 12:24:31 krank kernel: usb.c: registered new driver hci_usb
+Jan 28 12:25:13 krank kernel: usb.c: USB disconnect on device 00:04.2-2 
+address 2
+Jan 28 12:25:17 krank kernel: hub.c: new USB device 00:04.2-2, assigned 
+address 3
+Jan 28 12:36:49 krank -- MARK --
+Jan 28 12:39:06 krank hcid[1025]: Bluetooth HCI daemon
 
-do you have hcid running? What does "hcidump -x" as root shows when you
-connect from the mobile phone?
+However, when I do a 'hcitool dev' it doesn't see anything- it just says 
+"Devices:" and then nothing. If I run lsusb it says:
 
-Regards
+Bus 001 Device 001: ID 0000:0000  
+Bus 001 Device 003: ID 0a5c:2033 Broadcom Corp. BCM2033 Bluetooth
 
-Marcel
+What'd I do wrong?
 
-
+------------------
+Chris Taylor
+cht@imipolex-g.com
+Los Angeles
 
 
 -------------------------------------------------------
