@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Deepesh S Gujarathi" <d_gujarathi@hotmail.com>
-To: "Charles Bueche" <charles@bueche.ch>
-Cc: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-References: <LAW11-OE33GHeqXipAS00015cf1@hotmail.com> <1073314449.2508.1.camel@pegasus> <LAW11-OE14JMxg22Civ0001db81@hotmail.com> <1073394980.2508.59.camel@pegasus> <Law11-OE46C3SpmFZfs000064c7@hotmail.com> <1073481066.2508.150.camel@pegasus> <Law11-OE66zpDERHZWY00000fb1@hotmail.com> <1073563642.6616.14.camel@bluez.bueche.ch>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1252"
-Message-ID: <LAW11-OE26lq1GDXzlB00022935@hotmail.com>
-Subject: [Bluez-devel] Re:Re: blueZ-bthid testing
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1073660187.2532.2.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Bluetooth kernel patch for 2.6.1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,52 +15,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 10 Jan 2004 14:39:00 +0530
+Date: Fri, 09 Jan 2004 15:56:28 +0100
 
-Hi Charles,
+Hi Folks,
 
-I don't mind you hosting the bthid-howto document on your website, afterall
-I prepared it learning from what you people had written. So you may go ahead
-and host it right away.
+the first Bluetooth kernel patch for 2.6.1 is now available [1] and it
+is only a resync with the previous 2.6.0-mh2 patch. Here is the full
+changelog:
 
-thanks
-Deepesh S Gujarathi
+  o Convert interrupt handlers to use irqreturn_t
+  o Support for Broadcom Blutonium
+  o Improve blacklist handling
+  o Add missing maintainer entries for the Bluetooth subsystem
+  o Add CAPI message transport protocol support
+  o Update the Kconfig entry for the BlueFRITZ! USB driver
+  o Add module aliases for the Bluetooth protocols
+  o Support for AVM BlueFRITZ! USB
+  o Remove USB zero packet option
+  o Support inquiry results with RSSI
+  o Update HCI security filter
+  o Add support for an old ALPS module
+  o Add support for the Digianswer USB devices
+  o Always use two ISOC URB's
+  o Disable credit based flow control by default
 
------ Original Message -----
-From: "Charles Bueche" <charles@bueche.ch>
-To: "Deepesh S Gujarathi" <d_gujarathi@hotmail.com>
-Cc: "Marcel Holtmann" <marcel@holtmann.org>; "BlueZ Mailing List"
-<bluez-devel@lists.sourceforge.net>
-Sent: Thursday, January 08, 2004 5:37 PM
-Subject: Re: [Bluez-devel] Re: blueZ-bthid testing
+Regards
+
+Marcel
+
+[1] http://www.holtmann.org/linux/kernel/patch-2.6.1-mh1.gz
 
 
-> Hi,
->
-> looks OK to me. If you want, when you have a stable version, I can host
-> it beside mine on my web server.
->
-> Charles
->
-> On Thu, 2004-01-08 at 12:09, Deepesh S Gujarathi wrote:
-> > Hi all,
-> >
-> > Thanks to Marcel, finally the MS mouse is working effortlessly with the
-> > bthid program and I am a happy man.
-> >
-> > I had messed up two things,
-> > - had not loaded the mousedev.o module and
-> > - made a typo in the XF86Config-4 file.
-> >
-> > my two cents
-> > please find attached a howto document that details the steps involved in
-> > making the MS IntelliExplorer mouse working with Marcel's bthid utility.
-> >
-> > PS: maybe some one can just verify the howto document for any possible
-> > errors.
-> >
-> > thanks everyone for your patience.
-> > Deepesh S Gujarathi
 
 
 -------------------------------------------------------
