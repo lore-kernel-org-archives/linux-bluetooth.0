@@ -1,50 +1,57 @@
-Return-Path: <jt@bougret.hpl.hp.com>
-Date: Tue, 10 Aug 2004 16:37:01 -0700
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Michal Semler <cijoml@volny.cz>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [PATCH 2.6] link trigger for AODV and +
-Message-ID: <20040810233701.GB16435@bougret.hpl.hp.com>
-Reply-To: jt@hpl.hp.com
-References: <20040805013335.GA13608@bougret.hpl.hp.com> <1091976547.2773.29.camel@pegasus> <20040809185159.GA21899@bougret.hpl.hp.com> <1092078516.4564.40.camel@pegasus> <20040809195448.GA24140@bougret.hpl.hp.com> <1092125599.4564.76.camel@pegasus> <20040810163203.GA1963@bougret.hpl.hp.com> <1092178402.4564.204.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Alignment issue
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daryl Van Vorst <daryl@wideray.com>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <001301c47f09$3900e650$1301010a@baked>
+References: <001301c47f09$3900e650$1301010a@baked>
+Content-Type: text/plain
+Message-Id: <1092179574.4564.216.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1092178402.4564.204.camel@pegasus>
-From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 11 Aug 2004 01:12:54 +0200
 
-On Wed, Aug 11, 2004 at 12:53:23AM +0200, Marcel Holtmann wrote:
-> Hi Jean,
+Hi Daryl,
+
+> I ran into an alignment problem on our ARM platform. It showed up as corrupt
+> SDP responses. I traced it back to bt_put_unaligned() in bluetooth.h
 > 
-> you are right, but there are pros and cons on both sides and I like to
-> find the best solution. However I never looked at RtNetlink before. I
-> think that I should educate myself a little bit more.
+> The attached patch should fix the problem (it does as far as I can tell).
+> The compiler probably thinks both arguments to memcpy() are aligned and so
+> makes an optimization which breaks the copy (because the destination is not
+> actually aligned). Perhaps this is a compiler bug... I'm using gcc 3.3.3.
+> After googling and reading some discussion on the topic it seems that it's
+> probably not a compiler bug. I'll leave that for someone else to decide. :)
 
-	Netlink is a generic socket between the kernel and user space,
-RtNetlink is a API using Netlink to manipulate IP routes and a few
-other stuff.
-	Start with the iproute package, which is an user interface to
-RtNetlink (the command part). Then, look at iwevent, that make use of
-various RtNetlink events.
-	Note that you can't migrate the HCI events to RtNetlink,
-because RtNetlink expect a real netdev. You could migrate to Netlink,
-defining you own API over Netlink, but I don't see what would be the
-gain.
+I am not an expert in this area. I thought that this method of getting
+unaligned support was compatible accross the platforms. Looking at the
+kernel unaligned for ARM shows me that this is actually more different.
+I need verification of that patch with GCC 2.95 and from PowerPC and
+SPARC platforms. I would do it by myself for SPARC, but the harddrive of
+my Sun machine is dead.
 
-> > 	The bug is obvious, you forgot that in 2.4.X the list doesn't
-> > point to struct sock but to struct bluez_pinfo. Compare your patch to
-> > the version below.
-> 
-> What a stupid mistake. I must been blind at that time :(
+Regards
 
-	It happens to all of us ;-) I'm glad I started with my own
-backport and had my own separate patch, because otherwise I would not
-have find this bug...
+Marcel
 
-> Regards
-> 
-> Marcel
 
-	Have fun...
 
-	Jean
+
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
