@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050325002021.85942.qmail@web52801.mail.yahoo.com>
-From: Shawn Rutledge <e_cloud@yahoo.com>
-Subject: Re: [Bluez-devel] Hp bluetooth headset a2dp
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: 6667
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Bluez-devel] Need for Bluetooth A2DP sink
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <42430E8D.9030609@xmission.com>
+References: <20050324184727.51038.qmail@web52809.mail.yahoo.com>
+	 <42430E8D.9030609@xmission.com>
+Content-Type: text/plain
+Message-Id: <1111705540.9195.15.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,46 +19,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Mar 2005 16:20:21 -0800 (PST)
+Date: Fri, 25 Mar 2005 00:05:40 +0100
 
+Hi Brad,
 
---- Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Shawn,
+> As Marcel pointed out, Henryk's SBC implementation includes decoding.
 > 
-> > I have a pair of these headphones too, at work.  (My job involves a
-> > cellphone media player application which depends on being able to
-> > stream A2DP.)  There are a lot of them on ebay, going for 83.99USD,
-> > just search for "ipaq headphones".
-> 
-> they are more expensive here in Germany. The cheapest I found was for
-> around 112 EUR.
+> Implementing the AVDTP part of the sink would be very much like what 
+> we're doing in a2play.c, but it would require some coding. If you're 
+> familiar with the spec it could be done in a few days.
 
-Well some ebay sellers will export them, I think.
+for checking out the Toshiba Windows stack, I wrote something that could
+be extended to A2DP sink. However I can't find it anymore.
 
-> > I also have the Aiptek and Bluetake ones.  I just noticed that so
-> much
-> > activity with A2DP has been happening while I was not paying
-> attention,
-> > so I will try to do some testing.
-> 
-> The Aiptek is not conforming to the specification. However the SBC
-> over
-> RFCOMM is a nice feature.
+The Toshiba Windows stack also supports the A2DP profile, but only with
+their own SR-1 headphone. The details for that can be found at
 
-Is SBC over RFCOMM the only method they support?  Or is their "not
-conforming" just in small points?
+	http://www.holtmann.org/linux/bluetooth/audio.html
 
-I noticed that they don't work with either our phone or the BlueSoleil
-but wasn't sure why.  And they do say in the manual that they support
-A2DP, and explain how to bond them, enter pin "0000" etc.  I emailed
-tech support but haven't got a response yet.
+Regards
 
-Too bad - IMO those are the only ones so far that are actually
-comfortable.  The iPAQ ones aren't too bad either.
+Marcel
 
-. _______  Shawn T. Rutledge / KB7PWD ecloud@bigfoot.com
- (_  | |_)    http://ecloud.org/  kb7pwd@kb7pwd.ampr.org
- __) | | \______________________________________________
+
 
 
 -------------------------------------------------------
