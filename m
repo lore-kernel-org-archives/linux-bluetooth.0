@@ -1,44 +1,35 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <mtortonesi@ing.unife.it>
 From: Mauro Tortonesi <mtortonesi@ing.unife.it>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-devel] l2cap xfer fails
+Date: Wed, 28 Jan 2004 12:36:42 +0100
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+References: <200401281135.58062.mtortonesi@ing.unife.it> <200401281200.07012.mtortonesi@ing.unife.it> <1075288960.12766.66.camel@pegasus>
+In-Reply-To: <1075288960.12766.66.camel@pegasus>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200401281510.36476.mtortonesi@ing.unife.it>
-Subject: [Bluez-devel] bluez stability problems?
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 28 Jan 2004 15:10:36 +0100
+  charset="iso-8859-15"
+Message-Id: <200401281236.42748.mtortonesi@ing.unife.it>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
+On Wednesday 28 January 2004 12:22, Marcel Holtmann wrote:
+> Hi Mauro,
+>
+> > what i wanted to say is that i can transfer (over L2CAP) data from
+> > console, but transfer of files redirected to stdin always fails. perhaps
+> > i am doing something wrong? such as calling write(2) over L2CAP sockets
+> > with buffers larger that 762 bytes?
+>
+> I haven't checked the nc6 Bluetooth support so far, but the L2CAP is a
+> SOCK_SEQPACKET and it has an in and an out MTU. The default MTU is 672
+> and this means if you send data with a larger buffer, the write() will
+> fail.
 
-hi to everybody,
+you're right. in fact:
 
-sometimes when i start playing with bluez the bluetooth subsystem hangs:
+nc6 --mtu=672 -b address -p psm
 
-[mauro@daneel nc6]$ cat src/main.c | ./src/nc6 -vvv --mtu=672 -b 
-00:0D:88:8E:CA:07 10
-nc6: unable to connect to remote address bluez socket
-[mauro@daneel nc6]$ hcitool scan
-Scanning ...
-[mauro@daneel nc6]$
-[mauro@daneel nc6]$ l2ping 00:0D:88:8E:CA:07
-Can't create socket.: Operation not permitted
-[mauro@daneel audiotest2]$ ./oggread -f 
-/mnt/disk/mauro/art_blakey_and_the_jazz_messengers-impulse/01_alamode.ogg -d 
-00:0D:88:8E:CA:07 -p 10
-oggread[18536]: Can't connect. Operation already in progress(114)
-Cannot connect to Bluetooth device 00:0D:88:8E:CA:07
-
-i have experienced this problem with both recent 2.4 (2.4.25-pre7 included) 
-and 2.6 kernels.
+works perfectly.
 
 -- 
 Aequam memento rebus in arduis servare mentem...
@@ -48,17 +39,3 @@ Mauro Tortonesi                 mtortonesi@ing.unife.it
                                 mauro@ferrara.linux.it
 Deep Space 6 - IPv6 with Linux  http://www.deepspace6.net
 Ferrara Linux User Group        http://www.ferrara.linux.it
-
-
-
-
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
