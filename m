@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: CSR USB dongle w/BT 1.2 and headset/handsfree profiles?
-References: <ctriti$j66$1@sea.gmane.org> <200502022312.51283.cijoml@volny.cz> <cttelp$240$1@sea.gmane.org>
+Subject: Re: [Bluez-users] Re: CSR USB dongle w/BT 1.2 and
+	headset/handsfree profiles?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <cttelp$240$1@sea.gmane.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200502031818.37938.cijoml@volny.cz>
+References: <ctriti$j66$1@sea.gmane.org>
+	 <200502022312.51283.cijoml@volny.cz>  <cttelp$240$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1107451039.11944.92.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,22 +20,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 3 Feb 2005 18:18:37 +0100
+Date: Thu, 03 Feb 2005 18:17:19 +0100
 
-Apple sais it, but nobody tried it...You can be the first one :)
+Hi Jesse,
 
-Michal
-
-Dne =E8t 3. =FAnora 2005 16:07 Jesse Guardiani napsal(a):
-> Michal Semler wrote:
 > > D-Link DBT-120 rev B3 is your choice :)
->
+> 
 > Is the new B4 revision OK too?
 
-=2D-=20
-S pozdravem
+I had timing problems when flashing it with btdfu. Try it at your own
+risk.
 
-Michal Semler
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
