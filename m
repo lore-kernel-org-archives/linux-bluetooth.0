@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <404D8166.1060601@utia.cas.cz>
+From: Rudolf Matousek <matousek@utia.cas.cz>
+MIME-Version: 1.0
+To: cijoml@volny.cz
+CC: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] I-Tec Bluetooth USB -- Same Problem...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Rudolf Matousek <matousek@utia.cas.cz>
-Cc: cijoml@volny.cz, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <404D8166.1060601@utia.cas.cz>
-References: <10865.30319-12503-1360465066-1076449270@seznam.cz>
-	 <1076452227.2777.28.camel@pegasus> <404D69F5.50300@utia.cas.cz>
-	 <200403090851.20295.cijoml@volny.cz>  <404D8166.1060601@utia.cas.cz>
-Content-Type: text/plain
-Message-Id: <1078833918.10671.48.camel@pegasus>
-Mime-Version: 1.0
+References: <10865.30319-12503-1360465066-1076449270@seznam.cz> <1076452227.2777.28.camel@pegasus> <404D69F5.50300@utia.cas.cz> <200403090851.20295.cijoml@volny.cz>
+In-Reply-To: <200403090851.20295.cijoml@volny.cz>
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,36 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 09 Mar 2004 13:05:18 +0100
+Date: Tue, 09 Mar 2004 09:33:42 +0100
 
-Hi Rudolf,
+Michal,
 
-> thanks for your update. I'll test it as soon as I upgrade kernel (which 
-> will be soon).
-> 
-> BTW. are we talking about the same dongle :-D. Please could you provide 
-> the vendor and product IDs?
+thanks for your update. I'll test it as soon as I upgrade kernel (which=20
+will be soon).
 
-we are talking about the same dongle. I found the problem, why it
-doesn't work and of course I fixed it. Here is the mailing list thread
-about it
+BTW. are we talking about the same dongle :-D. Please could you provide=20
+the vendor and product IDs?
 
-	http://thread.gmane.org/gmane.linux.bluez.devel/1756
-
-However don't expect to get any information from Broadcom. They are not
-very helpful and actually some of there stuff is very ugly. For example
-it is impossible to get the Apple Bluetooth mouse (Broadcom based)
-working with the i-Tec dongle (also Broadcom based) in HID mode. All my
-other HID devices are working perfect with its HID mode. Mostly all
-Information about HID devices and HID proxy dongles can be found here
-
-	http://www.holtmann.org/linux/bluetooth/hid.html
-
-Regards
-
-Marcel
+Sincerely,
 
 
+Ruda Matousek
+
+--
+
+Michal Semler (volny.cz) wrote:
+> 05.03.2004
+> New Bluetooth kernel patch for 2.6.3 available
+> With this patch the RFCOMM TTY device are created on demand and this gi=
+ves a=20
+> nice integration with devfs and udev. Some more enhancements towards fu=
+ll SCO=20
+> audio support are made=20
+>=20
+> and the i-Tec dongle now works like a charm.
+>=20
+> Ruda, download a patch :)
+>=20
+> Michal
+>=20
+> Dne =FAt 9. b=F8ezna 2004 07:53 Rudolf Matousek napsal(a):
+>=20
 
 
 -------------------------------------------------------
