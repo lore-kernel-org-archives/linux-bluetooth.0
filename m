@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
+From: Achim Bohnet <ach@mpe.mpg.de>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] DHCPD and Bluetooth
-Cc: "Rob Taft" <rtaft@sensis.com>
-References: <004501c4383b$36b36950$80c8fea9@Perigee.Perigeellc.com> <200405122103.08265.cijoml@volny.cz> <00ac01c4385e$f6aed230$80c8fea9@Perigee.Perigeellc.com>
-In-Reply-To: <00ac01c4385e$f6aed230$80c8fea9@Perigee.Perigeellc.com>
+Subject: Re: [Bluez-users] Can't understand
+References: <200405121820.59166.andrewthegreat@mail.ru> <1084367829.25099.16.camel@pegasus>
+In-Reply-To: <1084367829.25099.16.camel@pegasus>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200405122257.01637.pavouk@pavouk.org>
+  charset="utf-8"
+Message-Id: <200405122238.47202.ach@mpe.mpg.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,23 +18,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 May 2004 22:57:01 +0200
+Date: Wed, 12 May 2004 22:38:47 +0200
 
-Hello,
+On Wednesday 12 May 2004 15:17, Marcel Holtmann wrote:
+> Hi Hedin,
+> 
+> > I have Redhat 9.0 with 2.6.6-mh1 patched kernel and all modules compiled.
+> > I have Tecom BT3030 Dongle.
+> > 
+> > I compiled bluez-libs-2.7 and bluez-utils-2.7. After some effort (big effort!) 
+> > I managed to compile bluez-pin (why is it needed - no word anywhere...).
+> > 
+> > I also installed all other modules without problems, except bluez-bluefw. It 
+> > gives following errors:
+> 
+> the bluez-bluefw was never ported to work on 2.6 systems. You can use
+> the bcm203x firmware loader driver instead. For some more information
+> take a look here http://www.bluez.org/drivers.html
 
-> restart it.  I don't think hotplug is what I am looking for since it is
-> hardware connection based.
+FWIW: I had a short intermezzo with SuSE 9.1 (kernel 2.6.4) some
+hours ago and I had to install bluez-bluefw pkg to get the AVM USB
+stick working (the pkg contained blubase.frm)  Maybe SuSE
+just added the firmware file, maybe they did more.
 
-This is not only hardware connection based. When you try setup network from
-remote device, that kernel call /sbin/hotplug with NET action.
-You can edit script "/etc/hotplug.d/default/default.hotplug" or other in your 
-distribution and uncomment line "DEBUG=yes export DEBUG".
-Later you can look in to log file for interesting messages ;-)
-In this case will be probably interesting script /etc/hotplug/net.agent.
+Achim
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by Sleepycat Software
+> Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to deliver
+> higher performing products faster, at low TCO.
+> http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+> 
+> 
 
-Best regards,
-
-Pavel Ruzicka
+-- 
+  To me vi is Zen.  To use vi is to practice zen. Every command is
+  a koan. Profound to the user, unintelligible to the uninitiated.
+  You discover truth everytime you use it.
+                                      -- reddy@lion.austin.ibm.com
 
 
 -------------------------------------------------------
