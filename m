@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <40E33BF2.7010705@mip.sdu.dk>
-From: Peter Favrholdt <pfavr@mip.sdu.dk>
+Message-ID: <000d01c45ebe$72d6e660$0264a8c0@haruo>
+From: "KeiHachi" <keihachi@swissinfo.org>
+To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+References: <003401c45c2b$b6eab240$0364a8c0@haruo> <1088359746.3774.20.camel@pegasus>  <000c01c45d2c$ed2e5f80$0364a8c0@haruo> <1088442828.6030.27.camel@pegasus>  <002801c45dfb$c533d760$0364a8c0@haruo> <1088530908.6030.310.camel@pegasus>
+Subject: Re: [Bluez-devel] Questions about BlueZ in  commercial use
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] snd-bt-sco
+Content-Type: text/plain;
+	charset="iso-2022-jp"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,113 +17,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 01 Jul 2004 00:17:22 +0200
+Date: Thu, 1 Jul 2004 01:22:29 +0900
 
-Hi bluez developers,
+Hi, Marcel
 
-I'm not sure if this is the right forum. I'm probably in-between alsa-user, 
-bluez-user, kernel-user? But here goes anyway:-)
+> in most cases this is a problem of a broken mailer. I use Evolution and
+> the only thing I do is hit the "Reply to All" button and write my
+> answer.
 
-I just tried getting the Logitech HS01 bluetooth headset working on kernel 
-2.6.6 (debian unstable), using the ALSA driver from 
-http://www.dcs.gla.ac.uk/~jp/snd-bt-sco/
-
-Anyone had success with getting a headset working?
-
-I know this driver is a hack, but it would be cool to have skype working using 
-a headset under linux.
-
-BR
-
-Peter
-
---- cut: long and windy story about my adventures ---
-
-I think I managed to patch my kernel-source-2.6.6 successfully. After 
-modprobing the modules dmesg says:
-
-Bluetooth: L2CAP ver 2.1
-Bluetooth: L2CAP socket layer initialized
-Bluetooth: RFCOMM ver 1.2
-Bluetooth: RFCOMM socket layer initialized
-Bluetooth: RFCOMM TTY layer initialized
-Bluetooth: SCO (Voice Link) ver 0.3
-Bluetooth: SCO socket layer initialized
-Bluetooth: HCI USB driver ver 2.5
-usbcore: registered new driver hci_usb
-snd-bt-sco revision ??$
-snd-bt-sco: snd-bt-scod thread starting
-
-so far so good.
-
-After a while I got this additional message:
-
-hci_acldata_packet: hci0 ACL packet for unknown connection handle 1
-
-here is a summary of what I did:
-
-modprobe hci_usb
-modprobe sco
-invoke-rc.d bluez-utils restart
-
-Here I turned on the headset in this special "reset/pairing mode" (don't know 
-the right name for it - but you hold down the button for 10 seconds).
-
-hcitool scan
-Scanning ...
-         00:0D:44:00:76:07       Logitech HS01
-
-hcitool cc 00:0D:44:00:76:07 (I think I had to enter pin here)
-
-hciconfig hci0 voice 0x0040
-
-modprobe snd-bt-sco
-sdptool search --bdaddr 00:0D:44:00:76:07 0x1108
-snd-bt-sco-2004-03-14/btsco-0.2/btsco 00:0D:44:00:76:07 1
-Error: control open (hw:0): No such file or directory
-Error: Can't find device. Bail
-
-So that was end of the game.
+Thank you.
+I use OutLook Express made by Microsoft.
+I reply by "Reply to All" functionality, too.
+But in my case, the reply is handled as another thread.
+It is strange... But I will forget it. Thank you.
 
 
-At this time hcitool con says:
-Connections:
-         > ACL 00:0D:44:00:76:07 handle 1 state 1 lm SLAVE
+> The problem is that they use multiple L2CAP connections with the same
+> PSM for different protocols. This is totally stupid, because you can
+> only differ between them on the order of their creation. However the
+> basic mode looks very simple. Right now it looks like that I will
+> support AVDTP as a sequential packet socket.
 
-But I've also had it say:
-         < ACL 00:0D:44:00:76:07 handle 1 state 1 lm MASTER
+Probably it can be realized as a socket.
+But some functionalities, like a SEP concept, should be considered in deeply.
 
-Using strace I get this:
 
-strace btsco-0.2/btsco 00:0D:44:00:76:07 1
+> No problem for me, because I don't like talking about theoretical stuff.
+> I prefer to talk about facts. If you know what you want, we can talk
+> about what is possible and what not. And I can help you with not driving
+> into a dead end.
 
-futex(0x400fbffc, FUTEX_WAKE, 2147483647) = 0
-access("/etc/asound.conf", R_OK)        = -1 ENOENT (No such file or directory)
-access("/root/.asoundrc", R_OK)         = -1 ENOENT (No such file or directory)
-open("/dev/snd/controlC0", O_RDONLY)    = -1 ENOENT (No such file or directory)
-open("/dev/aloadC0", O_RDONLY)          = -1 ENOENT (No such file or directory)
-open("/dev/snd/controlC0", O_RDWR)      = -1 ENOENT (No such file or directory)
-open("/dev/snd/controlC0", O_RDONLY)    = -1 ENOENT (No such file or directory)
-open("/dev/aloadC0", O_RDONLY)          = -1 ENOENT (No such file or directory)
-open("/dev/snd/controlC0", O_RDWR)      = -1 ENOENT (No such file or directory)
-write(2, "Error: ", 7Error: )                  = 7
-write(2, "control open (hw:0): No such fil"..., 46control open (hw:0): No such 
-file or directory) = 46
-write(2, "\n", 1
-)                       = 1
-write(2, "Error: ", 7Error: )                  = 7
-write(2, "Can\'t find device. Bail", 23Can't find device. Bail) = 23
-write(2, "\n", 1
-)                       = 1
-exit_group(1)                           = ?
+Thank you, availing of your kind offer, I have one more question.
 
-This could be caused by missing device files in /dev/ maybe?
+I know the product that uses BlueZ in it, as I found it on the BlueZ site before.
+http://www.bluez.org/qualification.html
 
-I have ALSA compiled statically into the kernel, here is what dmesg says:
-Advanced Linux Sound Architecture Driver Version 1.0.4rc2 (Tue Mar 30 08:19:30 
-2004 UTC).
-ALSA device list:
-   #0: C-Media PCI CMI8738 (model 37) at 0xc400, irq 10
+In that case, how did you or other guys help them to qualify?
+For example, did that company paid some fee, or donation?
+Were you or other guys under obligation to help them based on a contract?
+
+Of course if you have the obligation to keep its secrets, it is OK to say nothing.
+
+
+> No you didn't anything wrong. The smiley means for me that you should
+> take me comment too serious. In this case this applies to the Affix
+> stack, because I don't take this stack really serious.
+
+Yes, of course I had understood your intention then.
+Thank you for your concern again.
+
+Regards,
+KeiHachi.
+
+
+
+
 
 
 -------------------------------------------------------
