@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "pierre francois" <pierre_francois1981@hotmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] OSX reprogrammed my mouse!
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Douglas Russell <puggy@gentoo.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200408191425.39219.puggy@gentoo.org>
+References: <200408191339.21138.puggy@gentoo.org>
+	 <1092921451.18082.45.camel@pegasus>  <200408191425.39219.puggy@gentoo.org>
+Content-Type: text/plain
+Message-Id: <1092923386.18082.47.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/html
-Message-ID: <BAY12-F14EWmRj4fXIA0007c10e@hotmail.com>
-Subject: [Bluez-users] l2test help
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,19 +19,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Aug 2004 15:04:30 +0000
+Date: Thu, 19 Aug 2004 15:49:46 +0200
 
-<html><div style='background-color:'><DIV class=RTE>
-<P><BR><BR></P>Hi, </DIV>
-<DIV></DIV>I installed all the Bluez package. But when i tried to use the letest command i got the message: 
-<DIV></DIV>bash: l2test: command not found 
-<DIV></DIV>If anyone can help me i will apreciate lot. 
-<DIV></DIV>
-<DIV></DIV>Thanks a lot for your help. 
-<DIV></DIV>
-<DIV></DIV>Kind regards 
-<DIV></DIV>
-<DIV></DIV>Pierre</div><br clear=all><hr>What type of MSN user are you?  <a href="http://g.msn.com/8HMBENUK/2737??PS=47575">Take our quick quiz </a> and find out!</html>
+Hi Douglas,
+
+> Sorry, wasn't thinking of that because I don't think I've changed anything 
+> since it last worked. I could of course be wrong.
+> 
+> Thanks.
+> 
+> Kernel: vanilla 2.6.8.1
+> bluez-libs/utils: 2.7
+
+this is your problem. Use at least version 2.8 of the libs and utils for
+the 2.6.8 kernel or later.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
