@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Simone Gotti <motaboy80@supereva.it>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] plugging problems with a lot of kernels
-References: <200401031720.26273.motaboy80@supereva.it> <200401031827.51633.motaboy80@supereva.it> <1073151308.25261.124.camel@pegasus>
-In-Reply-To: <1073151308.25261.124.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200401171106.28990.motaboy80@supereva.it>
+Subject: Re: [Bluez-devel] broadcast and qos
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Max Krasnyansky <maxk@qualcomm.com>
+Cc: Mauro Tortonesi <mtortonesi@ing.unife.it>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1074288506.2559.438.camel@localhost>
+References: <200401131559.37742.mtortonesi@ing.unife.it>
+	 <1074288506.2559.438.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1074302495.2629.140.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,37 +20,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 17 Jan 2004 11:06:28 +0100
+Date: Sat, 17 Jan 2004 02:21:36 +0100
 
-On Saturday 03 January 2004 18:35, Marcel Holtmann wrote:
-> Hi Simone,
->
-> > > this is a known problem with some USB adapters. Unloading the USB host
-> > > adapter driver and loading it again helps here. You can also try to
-> > > compile the hci_usb driver without SCO audio support.
-> >
-> > Thanks, I'll try It (Now I've compiled it directly in the kernel but I'll
-> > make it a module).
-> > So this problem is not related with bluez but only with the usb_uhci
-> > drivers?
->
-> this can't be proven, but I think it is [usb-]uhci or uhci_hcd related.
+Hi Max,
 
-Hi Marcel,
-Listening your discussion on the usb-devel mailing list I've tried unmounting 
-the usbfs file system, then I've plugged my Bluetooth Adapter and it worked 
-well! I've tryed unpluggin and replugging it several times and it always 
-worked.
-So I think it's a real usbfs issues and the reason that the device worked when 
-it was plugged before the kernel init-scripts start was that in that moment 
-the usbfs wasn't already mounted.
+> > 	can i perform a broadcast transmission with qos using the bluez api?
+> There was a patch sent to this list about a 6-8 month ago. I felt that
+> it wasn't completely correct and was going to rewrite it a bit before
+> applying. I didn't have a chance (lack of time) to do that yet.
+> So if you're interested you could dig it up from archives and port to
+> 2.6 which will greatly increase its chances to be applied :)
 
-Thanks for your help! 
+do you have a link for this patch, because I can't remember that I read
+something like that.
 
-Bye!
--- 
-Simone Gotti
-<motaboy80@supereva.it>
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
