@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] tx submit failed urb c4c6b014 type 3 err -19
-From: Marcel Holtmann <marcel@holtmann.org>
+From: "Max M." <bluez-ml@maxim.comm2000.it>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.21.0503011838200.24750-100000@blomma.comm2000.it>
-References: <Pine.LNX.4.21.0503011838200.24750-100000@blomma.comm2000.it>
-Content-Type: text/plain
-Message-Id: <1109702721.17256.178.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] tx submit failed urb c4c6b014 type 3 err -19
+In-Reply-To: <1109578717.17256.15.camel@pegasus>
+Message-ID: <Pine.LNX.4.21.0503011838200.24750-100000@blomma.comm2000.it>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,29 +17,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Mar 2005 19:45:21 +0100
+Date: Tue, 1 Mar 2005 19:05:23 +0100 (MET)
 
-Hi Max,
-
-> > build your own 2.6.11-rc5 kernel and use netconsole to get the full
-> > oops.
+On Mon, 28 Feb 2005, Marcel Holtmann wrote:
+> > 
+> > My system is Debian with kernel package 2.6.10-1-686.
 > 
-> Thanks. I've been running my program under 2.6.11-rc5 now. I got three
-> 'oops' in a few hours of continuos running. They look different each time,
-> yet they only occurred right after some errors like the one mentioned in
-> the subject line, and those errors only occurred right before an oops. I
-> put the logs here: http://cassandra.comm2000.it/~maxim/pub/bluez-oops/.
+> build your own 2.6.11-rc5 kernel and use netconsole to get the full
+> oops.
 
-this is weird. The first one is related to sysfs and actually these
-should all be fixed by now. The others are also not quite clear.
+Thanks. I've been running my program under 2.6.11-rc5 now. I got three
+'oops' in a few hours of continuos running. They look different each time,
+yet they only occurred right after some errors like the one mentioned in
+the subject line, and those errors only occurred right before an oops. I
+put the logs here: http://cassandra.comm2000.it/~maxim/pub/bluez-oops/.
 
-How many dongles are you using at the same time? I saw hci2 and hci1 in
-the logs. What does "hciconfig -a" say about them?
+Max
 
-Regards
-
-Marcel
-
+ 
 
 
 
