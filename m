@@ -1,16 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: Stephen Crane <steve.crane@rococosoft.com>
 Subject: Re: [Bluez-users] Selection of PtP connection type
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Pavel Ruzicka <pavouk@pavouk.org>
-Cc: Simi Winiker <simi@winiker.ch>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200402240031.54845.pavouk@pavouk.org>
-References: <200402230026.24596.pavouk@pavouk.org>
-	 <1077521957.1788.7.camel@kant.winiker.ch>
-	 <200402240031.54845.pavouk@pavouk.org>
-Content-Type: text/plain
-Message-Id: <1077580666.2880.1.camel@pegasus>
-Mime-Version: 1.0
+Cc: bluez-users@lists.sourceforge.net
+References: <200402230026.24596.pavouk@pavouk.org> <1077531397.1949.33.camel@baroque.rococosoft.com>
+In-Reply-To: <1077531397.1949.33.camel@baroque.rococosoft.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200402240048.02096.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,30 +19,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 24 Feb 2004 00:57:46 +0100
+Date: Tue, 24 Feb 2004 00:48:02 +0100
 
-Hi Pavel,
+Hello,
 
-> I created /etc/sysconfig/network-scripts/ifcfg-bnep0
-> -------------------------
-> DEVICE=bnep0
-> BOOTPROTO=static
-> IPADDR=192.168.130.1
-> NETMASK=255.255.255.0
-> ONBOOT=no
-> -------------------------
-> When I want to connect, I must run on desktop  "pand -s -rNAP", next run
-> "connect" on Zaurus, and next "ifup bnep0" on desktop.
-> 
-> How can I automate process on desktop side?
+> Hi Pavel,
+> Check out this page http://my-zaurus.narod.ru/bluetooth.html
 
-you can start pand from an init script. The automatic ifup is specific
-to your distribution.
+Thanks,
+I am using network applet in Cacko.biz rom on Zaurus side, which works great.
 
-Regards
+Best regards,
 
-Marcel
-
+Pavouk
 
 
 
