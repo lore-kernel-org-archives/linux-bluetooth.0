@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] RE[2]: inquiry scan problems
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41AB96DF.4080405@zhwin.ch>
-References: <41AB96DF.4080405@zhwin.ch>
-Content-Type: text/plain
-Message-Id: <1101765045.7562.48.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41AB96DF.4080405@zhwin.ch>
+From: Marco Trudel <trudemar@zhwin.ch>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] RE[2]: inquiry scan problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,30 +16,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Nov 2004 22:50:45 +0100
+Date: Mon, 29 Nov 2004 22:38:39 +0100
 
-Hi Marco,
+ > > [my description of the inquiry problems with java (jsr82)]
+ > can your reproduce it without using any JSR-82 stuff?
 
-> yes. i tried the inquiries with "hcitool scan".
-> again, i do 5 and more inquiries in a row with one second sleep between 
-> inquiries single "hcitool scan"'s...
-> 
-> here what i noted:
-> - it needs in average 4 inquiries to get a new device after it's in 
-> rainge (4 single "hcitool scan" until it's visible).
-> - it needs in average 2 inquiries to see that a device is no longer in 
-> rainge (or has bluetooth disabled). the first new inquiry usually gives 
-> "n/a" as the friendlyName, the second one doesn't list it again.
-> does maybe bluez or my bluetooth dongle cache old inquiries or is there 
-> still radiation in the air :-) ?
+yes. i tried the inquiries with "hcitool scan".
+again, i do 5 and more inquiries in a row with one second sleep between 
+inquiries single "hcitool scan"'s...
 
-for me this sounds more like a job periodic inquiry.
+here what i noted:
+- it needs in average 4 inquiries to get a new device after it's in 
+rainge (4 single "hcitool scan" until it's visible).
+- it needs in average 2 inquiries to see that a device is no longer in 
+rainge (or has bluetooth disabled). the first new inquiry usually gives 
+"n/a" as the friendlyName, the second one doesn't list it again.
+does maybe bluez or my bluetooth dongle cache old inquiries or is there 
+still radiation in the air :-) ?
 
-Regards
+- during scans, if nothin changes (no new/disappeared devices), the 
+friendlyName changes to n/a for a single inquiry (very rare, but it happens)
 
-Marcel
+- if multiple new devices come in rainge, old devices migt have a n/a 
+friendlyName (the right one comes back in the next scan)
 
 
+thanks for your time...
+
+kind regards
+Marco
 
 
 -------------------------------------------------------
