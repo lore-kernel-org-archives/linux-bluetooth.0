@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Mauro Tortonesi <mtortonesi@ing.unife.it>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200401131559.37742.mtortonesi@ing.unife.it>
-Subject: [Bluez-devel] broadcast and qos
+Content-Type: text/plain
+Message-Id: <1073966368.7860.2.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Bluetooth kernel patch for 2.6.1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,22 +15,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 13 Jan 2004 15:59:37 +0100
+Date: Tue, 13 Jan 2004 04:59:28 +0100
 
+Hi Folks,
 
-hi to everybody,
+the second Bluetooth kernel patch for 2.6.1 is now available [1] and it
+includes some additional stuff. Here is the changelog:
 
-	can i perform a broadcast transmission with qos using the bluez api?
+  o Set disconnect timer for incoming ACL links
+  o Use R2 for default value of pscan_rep_mode
+  o Fix CMTP reference counting
 
--- 
-Aequam memento rebus in arduis servare mentem...
+Regards
 
-Mauro Tortonesi                 mtortonesi@ing.unife.it
-                                mauro@deepspace6.net
-                                mauro@ferrara.linux.it
-Deep Space 6 - IPv6 with Linux  http://www.deepspace6.net
-Ferrara Linux User Group        http://www.ferrara.linux.it
+Marcel
 
+[1] http://www.holtmann.org/linux/kernel/patch-2.6.1-mh2.gz
 
 
 
