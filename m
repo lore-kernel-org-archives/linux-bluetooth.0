@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] diNovo, once more
+Subject: Re: [Bluez-devel] Connect to mysql server thorugh SDP
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200502250934.35817.marcel@hilzinger.hu>
-References: <200502250934.35817.marcel@hilzinger.hu>
+In-Reply-To: <20050225194018.4684.qmail@web60401.mail.yahoo.com>
+References: <20050225194018.4684.qmail@web60401.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1109578789.17256.17.camel@pegasus>
+Message-Id: <1109578606.17256.11.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,20 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Feb 2005 09:19:49 +0100
+Date: Mon, 28 Feb 2005 09:16:46 +0100
 
-Hi Marcel,
+Hi Tanveer,
 
-> kernel 2.6.10 with patch -mh4:
-> if you switch from usb to bluetooth-mode, the special keys won't work any 
-> more. 
-> 
-> They nevertheless work with 2.6.9 and -mh4 for 2.6.9 out-of-the-box. 
-> 
-> Any idea, where the error is?
+> Me and my frined are doing a project here just to
+> learn where we have a db server(mysql) in Linux PC and
+> installed all necessary IDE & SDK in win2000 PC. Now
+> We want to design a program that can access that
+> database through LAN as we dont have a NOKIA 60 series
+> phone or USB dongles. Now asked baout SDP because how
+> to offer the mysqld service to my win2000 PC?
+> I can connect my emulator to internet and also to
+> another PC on LAN. But how to access the mysql server?
+> So that when I manage a compatible phone then I can
+> interact to database via BT on that phone.
+> Hope I made myself clear.
 
-I think parts of the input layer got changed. Do you see any messages in
-dmesg of unmapped keycodes?
+this has nothing to do with BlueZ. Use the DUN or PAN profile to get a
+TCP/IP connection and then use this.
 
 Regards
 
