@@ -1,13 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] BlueZ and the ALSA support
+Subject: Re: [Bluez-devel] AVDTP socket?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41A0D34C.8070400@dark-reality.de>
-References: <1100995285.7250.17.camel@pegasus>
-	 <41A027BD.5020401@xmission.com> <1101057242.7250.34.camel@pegasus>
-	 <41A0D34C.8070400@dark-reality.de>
+In-Reply-To: <20041121064655.0b04dd8a.henryk@ploetzli.ch>
+References: <418DB442.2050801@uen.org> <41925793.3050404@xmission.com>
+	 <1100113055.25879.73.camel@pegasus> <419543B3.8050601@xmission.com>
+	 <1100306337.7349.29.camel@pegasus> <41957BC1.507@xmission.com>
+	 <1100351199.7349.50.camel@pegasus> <41970F25.4020902@xmission.com>
+	 <1100446172.21403.16.camel@pegasus> <419B7292.9080706@xmission.com>
+	 <cbf0aec9041118052714481128@mail.gmail.com>
+	 <20041121064655.0b04dd8a.henryk@ploetzli.ch>
 Content-Type: text/plain
-Message-Id: <1101061573.7250.68.camel@pegasus>
+Message-Id: <1101059050.7250.39.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,33 +24,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 Nov 2004 19:26:12 +0100
+Date: Sun, 21 Nov 2004 18:44:10 +0100
 
-Hi Lars,
+Hi Henryk,
 
-> | Do anyone mind if we start using the kernel coding style? It will make
-> | later integration into the kernel or BlueZ so much easier.
+> > I have problems synthesizing the PCM audio samples but can parse all
+> > of the example SBC streams just fine.
 > 
-> I definitly won't mind, we'll have to migrate anyway, and sooner is
-> better than later.
+> Ok, catched it. I reimplemented the SBC analyzer and synthesizer  in
+> Octave which is easier to play around with and found that my C
+> synthesizer was working fine - on wrong subband samples. The bitstream
+> unpacker had a bug which made it shift the incoming bits once to often. 
+> 
+> So sbc-test from the CVS is now able to decode 4 and 8 subband mono SBC
+> files (there's something wrong with stereo, I'll look into that
+> shortly). 
 
-this is correct, but I won't integrate the current idea of the btsco
-kernel module. In the end it must work without the SCO socket in between
-for sending and receiving the SCO data packets from the HCI. And I like
-to have the eSCO support also. However even I don't have the right test
-hardware for that.
-
-> My problem how to change the usb_hci endpoint without killing the n.y.t.
-> urbs is still pending, did you have any new ideas on this?
-
-My problem is that I haven't written all of the hci_usb driver code and
-some parts are still so messy that I think a complete rewrite is the
-best that we can do. But what I will do is to add a module parameter for
-choosing the alternate setting that can be changed at runtime. To bring
-up a device with a new alternate setting you only have to unplug and
-then plug it in again. This is not the solution we should have, but it
-will help us with testing the SCO stuff without recompiling the kernel
-every time.
+I was only able to decode 01, 03, 07 and 09. All other mono test files
+are failing. However good work, because these four sound perfect.
 
 Regards
 
