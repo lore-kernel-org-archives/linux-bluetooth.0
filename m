@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] New pda
+Subject: Re: [Bluez-users] Timeout message from kernel
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?J=E9r=F4me?= Stadelmann <jerome.stadelmann@hta-bi.bfh.ch>
+To: Jeff Sutherland <jeffs@fairwayacademy.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <001301c3f21e$f8afb030$2d105793@N64101>
-References: <001301c3f21e$f8afb030$2d105793@N64101>
+In-Reply-To: <200402130917.46561.jeffs@fairwayacademy.org>
+References: <200402121636.02074.jeffs@fairwayacademy.org>
+	 <1076631244.2671.16.camel@pegasus>
+	 <200402130917.46561.jeffs@fairwayacademy.org>
 Content-Type: text/plain
-Message-Id: <1076683090.2671.56.camel@pegasus>
+Message-Id: <1076682121.2671.53.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +20,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 15:38:10 +0100
+Date: Fri, 13 Feb 2004 15:22:02 +0100
 
-Hi Jerome,
+Hi Jeff,
 
-> I would like to buy a pda that allow me to use a SCO connection as a
-> headset, to connect with my linux workstation.
-> Do somebody knows a bluetooth pda that has bluez and its voice capability ?
+> l2ping from either end works.  I didn't cross-compile hcidump for the ColdFire 
+> board, need to do some makefile wizardry in the parser subdir first.  l2test 
+> on both ends just sits there waiting for something, no doubt I'm not invoking 
+> it properly.  hcidump on the pc end shows the ping packets arriving from 
+> ColdFire.  I guess my connection is basically working.  On the ColdFire 
+> board:
+> /bin> hciconfig
+> hci0:   Type: UART
+>         BD Address: 00:0A:4F:00:13:5F ACL MTU: 192:8  SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:289 acl:0 sco:0 events:14 errors:0
+>         TX bytes:554 acl:0 sco:0 commands:14 errors:0
+> 
+> But invoking hcitool still yields:
+> /bin> hcitool info 00:0A:4F:00:09:5E
+> Requesting information ...
+> bcsp_timed_event: Timeout, retransmitting 1 pkts
+> Can't create connection: Input/output error
+> pid 54: failed 256
+> 
+> bcsp_timed_event: is a kernel error msg.  I should probably try to set up an 
+> l2test session properly next.  Any advice?
 
-what OS should run on the PDA?
+with the next update of the BCSP driver I will turn this into a debug
+message.
+
+Using l2test is easy and with -h you see all the options ;)
+
+	One side:	l2test -r	/* listen and receive */
+	Other side:	l2test -s	/* connect and send */
 
 Regards
 
