@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Sebastian Roth <sebastian.roth@esk.fhg.de>
-Message-ID: <cp3mkk$m7t$1@sea.gmane.org>
-References: <20041206225609.GA1177@zeus.galaxy.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] snd-bt-sco problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <20041206225609.GA1177@zeus.galaxy.org.uk>
-Subject: [Bluez-devel] Re: snd-bt-sco problem
+References: <20041206225609.GA1177@zeus.galaxy.org.uk>
+Content-Type: text/plain
+Message-Id: <1102406244.8447.19.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,29 +18,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 07 Dec 2004 08:37:56 +0100
+Date: Tue, 07 Dec 2004 08:57:23 +0100
 
 Hi Chris,
 
-I'm new to this bluetooth things so please don't mind if my suggestions 
-are not completely correct.
+> I can't get snd-bt-sco (bluetooth-alsa) to work and was told this
+> was the best place to ask for help:
+> 
+> The problem is, btsco starts up successfully, the device indicates a
+> connection has been made, but no audio can be read or written, and after
+> maybe a minute the device indicates the connection has been dropped.
+> There is no noticeable difference on the host side at this point, i.e.
+> audio apps directed at the headset still just hang, and btsco is still
+> there. The mixer produces output from btsco, but has no effect on the
+> device.
+> 
+> Driver version: bluetooth-alsa CVS checked out 02/12/2004
+> Kernel: 2.6.9 debian (presence / absence of hci_usb patch seems to make
+> no difference)
 
-I've had some problems with my bluetooth headsets too.
-The first problem was the dongle. I've used an usb-dongle from Anycom 
-(Transilica chip). Exchanging the dongle with a D-Link DBT-120 
-(Cambridge Silicon Radio chip) helped me because this chip routes the 
-SCO data over HCI.
-Please post the ouput of `hciconfig hci0 revision'
+why don't you try 2.6.9-mh5 or 2.6.10-rc3 ?
 
-The second issue was that all "sound-apps" were blocking (hanging) 
-without playing any sound. My headsets (both from Anycom) must be 
-activated with the switch to recieve the sound. Just like answer the 
-telephone.
+> Host bluetooth adapter: Trust BT180 USB
+> http://www.trust.com/home/default.htm?viewpage=service/sss/preview.htm%3Fartnr%3D13853
+> Headset: Logitech Mobile Bluetooth Headset
+> http://www.thinkgeek.com/computing/speakers/headsets/65ff/
+> Also tested: Nokia 6310i, various channels (this functionality works
+> under windows)
 
-Everone, please feel free to correct me if I'm wrong!
+what is the output of "hciconfig -a" and "hcitool info ..." for these
+devices. And include "/proc/bus/usb/devices".
 
-Best regards,
-Sebastian
+Regards
+
+Marcel
+
 
 
 
