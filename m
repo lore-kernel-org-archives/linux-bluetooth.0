@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Anthony Yulo" <strikewing16th@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] SDP problems
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: zubiwat <zubiwat@poczta.onet.pl>
+Cc: devel Bluetooth <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000c01c4246d$76617470$fcca010a@lysydziadek>
+References: <000c01c4246d$76617470$fcca010a@lysydziadek>
+Content-Type: text/plain
+Message-Id: <1082290521.31610.614.camel@baroque.rococosoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY16-F358WlSOBCCLj0001e0fe@hotmail.com>
-Subject: [Bluez-devel] Difference between rctest.c and main.c in /rfcomm directory
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,23 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 19 Apr 2004 15:37:30 +0000
+Date: Sun, 18 Apr 2004 13:15:21 +0100
 
-I am only familiar with rfcomm that uses plain sockets...
+hcidump should tell you what this means.
 
-I am only familiart with the rctest.c code that just setup the socket for 
-RFCOMM..
-
-but i noticed some additional constants i.e. RFCOMM_REUSE_DLC, 
-RFCOMM_RELEASE_ONHUP..  in main.c of the /rfcomm directory (src)
-
-Can someone explain to me briefly whats this for?
-
-tnx..
-
-_________________________________________________________________
-Add photos to your e-mail with MSN 8. Get 2 months FREE*. 
-http://join.msn.com/?page=features/featuredemail
+On Sat, 2004-04-17 at 12:16, zubiwat wrote:
+> Hi 
+> I have a problem with SDP. Where I can find examples howto interpret
+> SDP packets. I red Assigned Numbers but I don't know how to answer for
+> SDP_ServiceSearchRequest which looks like this:
+> 00 00 00 08 35 03 19 10 02 00 14 00
+>  
+> Where I can find what is this ServiceSearchPattern?
+> What these values mean??
+> I couldn't find this in assigned numbers! Where should I look for
+> this?
+>  
+> Regards
+>  
+> Maciej
+-- 
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
 
 
