@@ -1,78 +1,38 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] HCI_switch_role 
-In-reply-to: ""Thor Egil Skaug""'s message of "Wed, 03 Mar 2004 18:59:51 PST."
-             <000501c40194$c308add0$9349edc7@thores>
-Message-ID: <7130.1078397385@csr.com>
-From: Peter Stephenson <pws@csr.com>
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 04 Mar 2004 10:49:45 +0000
+Return-Path: <Bernd.Jucknischke@web.de>
+From: Bernd Jucknischke <Bernd.Jucknischke@web.de>
+Reply-To: Bernd.Jucknischke@web.de
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-users] AVM AP-X and DUN profile
+Date: Thu, 4 Mar 2004 09:24:58 +0100
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <200403030832.19665.Bernd.Jucknischke@web.de> <1078320979.2787.68.camel@pegasus>
+In-Reply-To: <1078320979.2787.68.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200403040924.58522.Bernd.Jucknischke@web.de>
+Sender: Bernd.Jucknischke@web.de
+List-ID: <bluez-users.lists.sourceforge.net>
 
-"Thor Egil Skaug" wrote:
-> Does anyone know why the HCI_switch_role command takes a BDADDR argument
-> instead of
-> a connectionhandle?
+On Mittwoch, 3. M=E4rz 2004 14:36, Marcel Holtmann wrote:
+> Hi Bernd,
+>
+> > original mail from me
+>
+> I never had real success with DUN and an AP-X device and actually I
+> don't know where the problem is. However you can use CMTP and the CIP
+> profile for dialin. Here are some details
+>
+> 	http://www.holtmann.org/linux/bluetooth/isdn.html
 
-It's not clear to me, either, but it may be for compatibility with the
-role-change event when generated during connection creation: in that
-case, the connection_complete event hasn't come up yet, so there's no
-valid ACL handle.  Hence it has to report the BD ADDR (as with
-the connection_request event).
+Thanks for the fast reply. I know that page already. I'm running the 2.6=20
+kernel series and haven't been able to find a working capi, yet. I guess I'=
+ll=20
+have to wait until it's (capi) supported for 2.6...
 
-> The role_change event should be sent from both devices to their
-> respective sw stacks after this.
-> 
-> I don't understand the following from the BT specification:
-> 
-> 1. Is the BDADDR the address of the remote device, or the local device
-> (to the caller)?
+> Regards
+>
+> Marcel
 
-The remote device.
-
-> 2. In the returned event, what bdaddr is returned to the
-> (HCI_switch_role) calling stack, and what bdaddr
->    is returned to the stack on the remote device?
-
-Each side reports the remote address (where it reports anything).
-
-> 3. What if there is more than one connection between two devices?
-
-There can't be, you can only have one ACL between any two devices.
-This a specific error code acl_connection_already_exists or something
-similar if you try and add another one.
-
-pws
-
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Cheers,
+Bernd
