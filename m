@@ -1,78 +1,76 @@
-Return-Path: <ashuang@gmail.com>
-Message-ID: <ef9938ec0408131032bc7d05f@mail.gmail.com>
-Date: Fri, 13 Aug 2004 13:32:49 -0400
-From: Albert Huang <ashuang@gmail.com>
-Reply-To: Albert Huang <ashuang@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: Re: [Bluez-devel] want duplicate inquiry results during a single device inquiry
+Return-Path: <mfrey@pepper.com>
+In-Reply-To: <1092262282.4564.256.camel@pegasus>
+References: <1090054739.4558.2.camel@pegasus> <1090759952.4791.91.camel@pegasus> <9A44A69C-DF28-11D8-B83A-00039390D626@pepper.com> <1090864026.29589.1.camel@pegasus> <5F07F140-DF2E-11D8-B83A-00039390D626@pepper.com> <1090865790.29589.5.camel@pegasus> <76F28965-DF34-11D8-B83A-00039390D626@pepper.com> <1090875679.10807.1.camel@pegasus> <4B8C0D08-DF64-11D8-95A4-003065B218E0@pepper.com> <1090916301.4650.9.camel@pegasus> <ABD9E52C-DFDC-11D8-BE76-00039390D626@pepper.com> <1090940516.4845.19.camel@pegasus> <A9BDE398-DFDF-11D8-BE76-00039390D626@pepper.com> <1090941847.4845.29.camel@pegasus> <86089F56-DFE5-11D8-BE76-00039390D626@pepper.com> <1091375871.27018.18.camel@pegasus> <225072EC-EBDC-11D8-B1A2-00039390D626@pepper.com> <1092262282.4564.256.camel@pegasus>
+Mime-Version: 1.0 (Apple Message framework v619)
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-Id: <0F5DF2CE-ED4E-11D8-ABB4-00039390D626@pepper.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092416317.28711.258.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <ef9938ec04081309406c2abae3@mail.gmail.com> <1092416317.28711.258.camel@pegasus>
+From: Michael Frey <mfrey@pepper.com>
+Subject: Re: [Bluez-devel] HIDP backport for 2.4
+Date: Fri, 13 Aug 2004 13:27:32 -0400
+To: Marcel Holtmann <marcel@holtmann.org>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-on the HP iPAQ h5550:
-# hciconfig -a
-hci0:   Type: UART
-        BD Address: 08:00:17:1B:0A:21 ACL MTU: 339:4  SCO MTU: 60:9
-        UP RUNNING PSCAN ISCAN
-        RX bytes:84 acl:0 sco:0 events:10 errors:1
-        TX bytes:298 acl:0 sco:0 commands:10 errors:0
-        Features: 0x00 0x00 0x00 0x00
-        Packet type: DM1 DH1 HV1
-        Link policy: HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'familiar (0)'
-        Class: 0x120112
-        Service Classes: Networking, Object Transfer
-        Device Class: Computer, Handheld
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x180 LMP Ver: 1.1 (0x1) LMP Subver: 0x180
-        Manufacturer: RTX Telecom A/S (21)
+Marcel,
 
-on the desktop (d-link DBT-120):
-# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:80:C8:35:19:C8 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN 
-        RX bytes:8308 acl:0 sco:0 events:450 errors:0
-        TX bytes:2202 acl:0 sco:0 commands:338 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: HOLD SNIFF PARK 
-        Link mode: SLAVE ACCEPT 
-        Name: 'OKN-32-G838'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x1bb LMP Ver: 1.1 (0x1) LMP Subver: 0x1bb
-        Manufacturer: Cambridge Silicon Radio (10)
+I now see what is going on.  I checked the system log and found these 
+messages when the problem occurs.
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
+bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
 
--albert
+What exactly does this mean?
 
-On Fri, 13 Aug 2004 18:58:37 +0200, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Albert,
-> 
-> 
-> 
-> > While experimenting with a hp ipaq running a 2.4.19 kernel, I noticed
-> > that during a since device inquiry, multiple EVT_INQUIRY_RESULT events
-> > could be generated from the same remote device.  The inquiry was done
-> > using a raw hci socket.  On x86 PCs running the same userland code but
-> > with more recent versions of bluez and the linux kernel, the duplicate
-> > events are no longer generated.  Instead, during a single inquiry, a
-> > response will be received from a remote device at most once.
-> >
-> > I'm assuming that sometime in the recent past, kernel level caching
-> > was implemented to prevent these duplicate inquiry results from
-> > propagating up to user land.  Is there a way to turn this off, so that
-> > all inquiry results are passed through?
-> 
-> this is device specific and can be controlled by a HCI command. Show us
-> the outputs of "hciconfig -a" for both devices.
-> 
-> Regards
-> 
-> Marcel
-> 
+Michael
+
+On Aug 11, 2004, at 6:11 PM, Marcel Holtmann wrote:
+
+> Hi Michael,
 >
+>> OK -- I am using the new patches and all is well except for one thing.
+>> My keyboard seems to not be able to re-connect after it goes to sleep
+>> about 5 times.  It is almost like connections are left open and the
+>> hidd server does not allow the keyboard to re-connect.
+>>
+>> The only way I get it back is to restart hidd.
+>
+> this sounds very weird. Please run "hcidump -x" as root and show it to
+> us. What is the content of /proc/bluetooth/l2cap at that time? Do
+> "hcitool con" show any connections?
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+> 100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+> Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+> http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
