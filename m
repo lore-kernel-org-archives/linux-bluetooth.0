@@ -1,12 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] (Newbie) Echo server and transferring raw data
+Subject: Re: [Bluez-devel] Alignment issue
 From: Marcel Holtmann <marcel@holtmann.org>
-To: john smith <roofass@hotmail.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY22-F14OIvmnGlToQ00029178@hotmail.com>
-References: <BAY22-F14OIvmnGlToQ00029178@hotmail.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Stephen Crane <steve.crane@rococosoft.com>,
+   Daryl Van Vorst <daryl@wideray.com>,
+   "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1092222502.15466.13.camel@hades.cambridge.redhat.com>
+References: <001301c47f09$3900e650$1301010a@baked>
+	 <1092179574.4564.216.camel@pegasus>
+	 <1092216034.25087.1122.camel@baroque.rococosoft.com>
+	 <1092222502.15466.13.camel@hades.cambridge.redhat.com>
 Content-Type: text/plain
-Message-Id: <1092252899.4564.244.camel@pegasus>
+Message-Id: <1092252827.4564.241.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,28 +23,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 Aug 2004 21:34:59 +0200
+Date: Wed, 11 Aug 2004 21:33:47 +0200
 
-Hi John,
+Hi David,
 
-> I'm pretty new to Bluez and network programming and I'd appreciate if I 
-> anybody could give me some pointers on passing raw data between two hosts.
+> > Why are these macros even here? ISTR Max having some reason not to use
+> > <asm/unaligned.h> but surely that's what it's there for...
 > 
-> I've been playing about with hcitools and l2ping and I've got a pand 
-> connection happening between two pc's.
-> 
-> As an exercise I'd just like to send some data between the server and client 
-> and maybe build up my own simple application protocol.
-> 
-> My question is ( and I applogise if this sounds dumb), is there an easy way 
-> to do this? I've been looking at the l2ping code and I'm thinking about 
-> experimenting with this. Or is it possible to take an Echo program written 
-> to use IP sockets and simply substitute in things like 'socket(PF_BLUETOOTH, 
-> SOCK_RAW, BTPROTO_L2CAP)'  where appropriate.
+> No, asm/unaligned.h is there for kernel code only.
 
-take a look at the source code of l2test and rctest. If you want to port
-a TCP application then use RFCOMM as layer, because you will need a
-stream socket.
+the rule is to not include headers from the kernel source code in any
+user space program or library. Even if some people try to bend this rule
+I will follow as much as I can.
 
 Regards
 
