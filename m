@@ -1,140 +1,50 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <53B03DA73719D5119E6A0008C71E1D7804BB0BFC@svr-mail1.corp.home.nl>
-From: Jason Williams <jwilliams@corp.home.nl>
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Mavin BT card and openzaurus 3.3.5
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C3C087.3ADF0C40"
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 12 Dec 2003 09:09:33 +0100
+Return-Path: <liste@jordet.nu>
+Subject: Re: [Bluez-users] Logitech diNovo/Desktop MX Bluetooth
+From: Stian Jordet <liste@jordet.nu>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1071171612.27255.65.camel@pegasus>
+References: <1071170463.763.10.camel@chevrolet.hybel>
+	 <1071171612.27255.65.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1071172456.763.35.camel@chevrolet.hybel>
+Mime-Version: 1.0
+Date: Thu, 11 Dec 2003 20:54:17 +0100
+List-ID: <bluez-users.lists.sourceforge.net>
 
-This message is in MIME format. Since your mail reader does not understand
-this format, some or all of this message may not be legible.
+tor, 11.12.2003 kl. 20.40 skrev Marcel Holtmann:
+> the diNovo Desktop is working fine with Linux, but the code is in an
+> early phase of development. We have two implementations at the moment,
+> the one from Peter Klausler and the other one from me which is based on
+> the new Bluetooth library I am working on. Peter's code need some
+> patches to make the keyboard and mouse working and for 2.6 it also needs
+> a patch to support the uinput kernel driver. My code includes already
+> all the needed stuff, but there is no official release available and the
+> code only exists in the BlueZ CVS repositories.
+> 
+> The Logitech Bluetooth HUB is a little bit problematic, because it is a
+> HID proxy capable device. This means it has a HID mode and a HCI mode.
+> In HID mode it presents you a USB HID mouse and keyboard and you don't
+> need a Bluetooth stack on your PC to have it working. And in this mode
+> you can also use your keyboard in the BIOS and for Grub. The HCI mode
+> converts this HUB into a simple USB Bluetooth dongle and your OS needs
+> to support Bluetooth HID devices. Actually at the moment nobody knows
+> how to switch this HUB from HID to HCI mode and back.
+> 
+> This all means that you can use the diNovo desktop always with the
+> Logitech Bluetooth HUB in HID mode under Linux, but you can't use the
+> HUB for phone connections at the same time. You need an extra Bluetooth
+> dongle for this until someone figured out how to switch the modes.
 
-------_=_NextPart_001_01C3C087.3ADF0C40
-Content-Type: text/plain;
-	charset="iso-8859-1"
+Thank you for your prompt answer (as always) :)
 
-cross posted on the openzaurus mailing list
+I already have a 3com BT dongle, so I will manage untill someone
+eventually (and hopefully) figures how to switch modes. The 3com is a
+bit picky as well [1], so it would have been good to get rid of it :)
 
-----8<--------------------------
+Thanks for your great work with BT in Linux :)
 
-all,
+Best regards,
+Stian
 
-after whinging a fair bit over my el cheap-o mavin bt card, I installed the
-bluez package for the 3.10 sharp rom and got it working!
-
-I had to modify the bluetooth.conf file to add in the mavin card and driver,
-and so far I've been able to scan, inq etc etc on my card without it
-hanging.  I've got communication happening with my 6310i (ie my phone
-recognises the incoming connection) but not further than that.
-
-ultimately I'm wanting to send sms's over bt with gnokii, and perhaps use my
-phone as a modem over bt, so I can take my Z anywhere with me and be
-oncall.. :-)
-
-
-fyi the package I am using is bluez-zaurus_2.3c-3.10_arm.ipk.
-
-regs
-Jason
-----8<--------------------------
-
-
---- 
-This message is confidential and may be privileged. Any review,
-retransmission, dissemination or other use of, or taking any action with
-reference to this information by persons other than the intended recipient
-is prohibited. If you received this message in error, please notify the
-sender by reply e-mail and delete this message from all computers. Please
-note that e-mails are susceptible to change. The sender will not accept
-liability for the improper or incomplete transmission of the information
-contained in this message.
-
-
-
-------_=_NextPart_001_01C3C087.3ADF0C40
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
-<HTML>
-<HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Diso-8859-1">
-<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
-5.5.2657.73">
-<TITLE>[Bluez-users] Mavin BT card and openzaurus 3.3.5</TITLE>
-</HEAD>
-<BODY>
-
-<P><FONT SIZE=3D2>cross posted on the openzaurus mailing list</FONT>
-</P>
-
-<P><FONT SIZE=3D2>----8&lt;--------------------------</FONT>
-</P>
-
-<P><FONT SIZE=3D2>all,</FONT>
-</P>
-
-<P><FONT SIZE=3D2>after whinging a fair bit over my el cheap-o mavin bt =
-card, I installed the bluez package for the 3.10 sharp rom and got it =
-working!</FONT></P>
-
-<P><FONT SIZE=3D2>I had to modify the bluetooth.conf file to add in the =
-mavin card and driver, and so far I've been able to scan, inq etc etc =
-on my card without it hanging.&nbsp; I've got communication happening =
-with my 6310i (ie my phone recognises the incoming connection) but not =
-further than that.</FONT></P>
-
-<P><FONT SIZE=3D2>ultimately I'm wanting to send sms's over bt with =
-gnokii, and perhaps use my phone as a modem over bt, so I can take my Z =
-anywhere with me and be oncall.. :-)</FONT></P>
-<BR>
-
-<P><FONT SIZE=3D2>fyi the package I am using is =
-bluez-zaurus_2.3c-3.10_arm.ipk.</FONT>
-</P>
-
-<P><FONT SIZE=3D2>regs</FONT>
-<BR><FONT SIZE=3D2>Jason</FONT>
-<BR><FONT SIZE=3D2>----8&lt;--------------------------</FONT>
-</P>
-<BR>
-
-<P>---=20
-<BR>This message is confidential and may be privileged. Any review, =
-retransmission, dissemination or other use of, or taking any action =
-with reference to this information by persons other than the intended =
-recipient is prohibited. If you received this message in error, please =
-notify the sender by reply e-mail and delete this message from all =
-computers. Please note that e-mails are susceptible to change. The =
-sender will not accept liability for the improper or incomplete =
-transmission of the information contained in this message.</P>
-<BR>
-
-</BODY>
-</HTML>
-------_=_NextPart_001_01C3C087.3ADF0C40--
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: SF.net Giveback Program.
-Does SourceForge.net help you be more productive?  Does it
-help you create better code?  SHARE THE LOVE, and help us help
-YOU!  Click Here: http://sourceforge.net/donate/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+[1] hci_usb: probe of 1-2:1.1 failed with error -5
