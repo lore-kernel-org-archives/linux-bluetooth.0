@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Collin R. Mulliner" <collin@betaversion.net>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Can you spoof/forge Bluetooth Devices/Address?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Mackie <d.mackie@ru.ac.za>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Message-Id: <20040606185024.7d7004d2@coredump>
 In-Reply-To: <20040606162154.GA94074@rucus.ru.ac.za>
 References: <20040606162154.GA94074@rucus.ru.ac.za>
-Content-Type: text/plain
-Message-Id: <1086556258.4765.163.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,35 +17,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 06 Jun 2004 23:10:58 +0200
+Date: Sun, 6 Jun 2004 18:50:24 +0200
 
-Hi David,
+Hi,
 
 > Does anyone know if you are able to spoof or forge a Bluetooth Device
-> Address? I am wanting to pick up Bluetooth comms at one point and forward it
-> on to another device but I am wanting the repeating devices to act like the
-> original sending devices. Eg. If I have a phone that wants to communicate
-> with my PC, I can have 2 repeaters, one spoofed as the PC and one as the
-> phone.
-> 
-> phone <-BT-> Repeater(spoof PC) <-Not BT-> Repeater(spoof phone) <-BT-> PC
-> 
-> More information on why I want to do this can be found at
-> http://www.cs.ru.ac.za/research/students/g99m0302/masters/
-> 
-> Any comment of suggestions will be greatly appreciated
+> Address? I am wanting to pick up Bluetooth comms at one point and
 
-I made a quick look through your documents. Spoofing of a BD_ADDR's is
-not what you really want and of course it is also not possible. You
-should think more of service forwarding. This means tunneling of the
-complete L2CAP layer or dedicated SDP service records/RFCOMM channel
-tunneling.
-
-Regards
-
-Marcel
+As far as I know you can't do this with standart (normal) bluetooth
+equipment. Maybe you can do this with special bluetooth devices, check
+out the CSR development information.
 
 
+... Collin
+
+-- 
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+According to my calculations the problem doesn't exist.
 
 
 -------------------------------------------------------
