@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] problems with rfcomm
+Subject: Re: [Bluez-users] FujitsuSiemens BT USB Adapter
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Alvaro Navarro <anavarro@gsyc.escet.urjc.es>
+To: cijoml@volny.cz
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <20040310171621.GB23570@gsyc.escet.urjc.es>
-References: <20040310171621.GB23570@gsyc.escet.urjc.es>
+In-Reply-To: <200403112106.31567.cijoml@volny.cz>
+References: <200403112106.31567.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1079087504.738.10.camel@merlin>
+Message-Id: <1079086957.740.7.camel@merlin>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 12 Mar 2004 11:31:45 +0100
+Date: Fri, 12 Mar 2004 11:22:37 +0100
 
-Hi Alvaro,
+Hi Michal,
 
-> When I try to use rfcomm utility I get:
-> 
-> Can't get device list: Operation not supported
+> is this dongle supported? If so, I'll buy it imeditially, coz its SO small!!
+> http://pcshop.pells.cz/img.asp?stiid=3483
 
-you have to compile in the RFCOMM TTY support.
+it looks like the Sony dongle and this is CSR based. So I think it
+should work. What is the price?
 
 Regards
 
