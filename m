@@ -1,77 +1,83 @@
-Return-Path: <survivor@uni-paderborn.de>
-Message-ID: <4144634E.4070404@uni-paderborn.de>
-Date: Sun, 12 Sep 2004 16:55:10 +0200
-From: Stefan Mischke <survivor@uni-paderborn.de>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sdp_search and l2cap concurrently
-References: <41430846.4010006@uni-paderborn.de> <1094997749.5695.13.camel@pegasus>
-In-Reply-To: <1094997749.5695.13.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Rfcomm use count
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daryl Van Vorst <daryl@wideray.com>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <001601c48fa7$38cce900$1a01010a@baked>
+References: <001601c48fa7$38cce900$1a01010a@baked>
+Content-Type: text/plain
+Message-Id: <1094998515.5695.28.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Sun, 12 Sep 2004 16:15:15 +0200
 
-Hi Marcel!
+Hi Daryl,
 
-Marcel Holtmann schrieb:
+> Any suggestions you have regarding the following would be greatly
+> appreciated.
+> 
+> I have a server program which does the following:
+> 
+> 1. Intializes and attaches two modules via serial port (CSR 18.1)
+> 2. Has SPP and OPP servers
+> 3. Does some HCI-level stuff to monitor connections and close connections to
+> misbehaving devices.
+> 
+> The program will initiate rfcomm connections to devices which do not allow
+> role switches.
+> 
+> If I kill the program while several devices are connected (or are in the
+> process of connecting/disconnecting), sometimes the rfcomm use count is left
+> above 0 (I've seen it as high as 4). Killing the program detaches the
+> modules (this is verified by hcid's log output). Killing sdpd and hcid
+> doesn't reduce the use count. No other bluetooth programs are running,
+> except a kernel thread krfcommd.
+> 
+> Re-starting the program produces the error "Address already in us(98)" when
+> trying to bind the SPP server socket. The only remedy I've found is to
+> reboot the device.
+> 
+> Could sending an hci_disconnect directly, rather than using close(), be
+> confusing the stack? I realize this isn't the ideal way of closing
+> connections... It only gets used if the normal process is taking longer than
+> is desired when a device is forcing the server to be a slave.
+> 
+> The kernel version is 2.4.21-mh10, with various ARM patches (which, as far
+> as I can tell, do not touch any bluetooth related code). I have a very
+> similar program running on 2.4.18-mh8 and have never noticed this problem.
+> 
+> This doesn't seem to be related, but just in case it is: I'm also seeing
+> "hci_cmd_task: hci0 command tx timeout" errors. I am able to get the above
+> situation to happen without a timeout error.
 
->what do you mean by cripple L2CAP and use it concurrently. Explain in
->more detail what your program is really doing 
->
-Ok, I'll explain it in Pseudo-Code:
+I haven't had time to look at your problem in the last two weeks and
+dealing with ARM related stuff still not fits into my left free time for
+the next weeks. Is this behaviour reproduceable on x86 machines and do
+you have a small text program to trigger this effect? And what I really
+care about, is this problem also available with a 2.6 kernel?
 
-DiscoveryThread does all the time {
-  InquiryInfo[] ii = do_inquiry();
-  DiscoveryInfo[] di = sdp_filter_for(my_l2cap_service, ii);
-  pass_to_UpdateThread(di):
-}
+Regards
 
-UpdateThread does all the time {
-  check_for_new_DiscoveryInfo_and_add_them_to(internal_di, di);
-  do_for_all(di_item = internal_di[i]) {
-    int sock = l2cap_connect(di_item);
-    di_item.name = l2cap_read_descriptive_name(sock);
-    di_item.content = l2cap_read_website_content(sock);
-    di_item.rssi = hci_readRSSI(l2cap_sock2hci_conn(sock));
-    di_item.lq = hci_getLinkQuality(l2cap_sock2hci_conn(sock));
-    l2cap_close(sock);
-    di_item.sum = evaluate(di_item.rssi, di_item.lq);
-  }
-  sort_by_sum(di_internal);
-  show_nearest_website_content(di_internal[0]);
-}
+Marcel
 
-By "cripple" I mean if one device is almost out of range (l2cap 
-connections would fail, but inquiry discovered it anyway) 
-"sdp_filter_for(my_service, ii)" takes quite long to fail by timeout. 
-And in this time, the UpdateThread doesn't seem to run eigther. The 
-whole thing hangs. I think that is because all Java-Threads belong to 
-only one Linux-Process which communicates with BlueZ. And this process 
-is blocked by SDP for up to SDP_RESPONSE_TIMEOUT (see 
-bluez-sdp/libs/utils.c, sdp_read_rsp(..)). I tried to lower this timeout 
-by applying smaller timeouts SO_SNDTIMEO and SO_RCVTIMEO to the 
-sdp_session's l2cap socket, but this doesn't seem to work because of the 
-use of select().
 
-In my opinion there are three ways to solve this:
-1. Make SDP_RESPONSE_TIMEOUT a settable parameter
-2. Don't use select(); instead put the socket to non-blocking state 
-("fcntl(sock, F_SETFL, flags | O_NONBLOCK)") while connecting.
-3. Don't use select(); instead let the user/programmer chose to put a 
-SO_SNDTIMEO and SO_RCVTIMEO on the socket.
 
-2. and 3. may be combined.
 
-But probably, it is something quite different or there's an easy 
-solution. I just wanted to ask for it :-). I'll test further...
-
->and check how many low
->level HCI connections are opened at the same time.
->  
->
-I think there can only be one low level (ACL) connection to each device 
-at a time. Unfortunately, I have only 3 devices for testing. So this 
-can't be the problem.
-
-Regards,
-Stefan
+-------------------------------------------------------
+This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
+Project Admins to receive an Apple iPod Mini FREE for your judgement on
+who ports your project to Linux PPC the best. Sponsored by IBM. 
+Deadline: Sept. 13. Go here: http://sf.net/ppc_contest.php
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
