@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Thor Egil Skaug" <paxtonrd@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Message-ID: <000301c3fe31$fdf2b460$46a57e40@thores>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: [Bluez-users] AUX1 packets
+Subject: RE: [Bluez-users] SCO question
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Thor Egil Skaug <paxtonrd@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <000201c3fe26$6f530530$46a57e40@thores>
+References: <000201c3fe26$6f530530$46a57e40@thores>
+Content-Type: text/plain
+Message-Id: <1077995792.2843.95.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,25 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 28 Feb 2004 11:35:16 -0800
+Date: Sat, 28 Feb 2004 20:16:32 +0100
 
-Is there any way of having an ACL connection use AUX1 packets?
+Hi Thor,
 
-The packet type is not defined in the Bluetooth specification for
-the HCI_create_connection command.
+> Thus meaning the device (and not Bluez) generates the continous stream
+> (of garbage), and then fills in my
+> SCO packets when I send them (encoded and all that)?
 
-I am using Belkin USB devices (CSR).
+it is not garbage, it would be silence ;) And your input must be a PCM
+stream according to the voice settings.
 
-Can this be done by setting one of the reserved packet types,
-or using a vendor specific command, or is it simply not possible?
+Regards
 
-The reason I want to do this is to measure the effect of having
-CRC, FEC and ARQ on the software side, also using proactive
-retransmits.
+Marcel
 
-Thanks,
 
-Thor E. Skaug
 
 
 -------------------------------------------------------
