@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-From: "Simi Manuel" <roses_3@operamail.com>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <20050108182223.0C92123CF7@ws5-3.us4.outblaze.com>
-Subject: [Bluez-users] LMP format
+Subject: Re: [Bluez-users] l2test-number of frames
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <2de46576050108064064adf3df@mail.gmail.com>
+References: <2de4657605010801137c118137@mail.gmail.com>
+	 <1105193094.8137.5.camel@pegasus>
+	 <2de4657605010806154c793575@mail.gmail.com>
+	 <1105194404.8137.7.camel@pegasus>
+	 <2de46576050108064064adf3df@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1105203974.8149.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,29 +22,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 08 Jan 2005 19:22:23 +0100
+Date: Sat, 08 Jan 2005 18:06:14 +0100
 
-i am confused!!!
+Hi Manjunath,
 
-i am trying to implement a link manager in C...
-i want to know whether LMP PDUs are generated and sent by the link manager =
-itself or is it a part of the message sent by the Host.
+> > check with 2.6.10 and bluez-{libs|utils}-2.13. What command lines do you
+> > use on each side?
+> 
+> on the tx, 
+> l2test -s -N 5000 dest_bdaddr
+> 
+> on the rx,
+> l2test -r
+> 
+> If i change N to 500, it works fine......but after packet 512, the
+> connection is reset...
+
+I just tested it with a 2.6.10-mh1 and the latest l2test from CVS. No
+problem to send 5000 packets. However this might be an endian bug
+somewhere. What is your host hardware?
+
+Regards
+
+Marcel
 
 
-what i know about the LMP format is that it has fields like opcode,tranacti=
-on id and a message.
-plz correct me if i am wrong...
-
-
-will the link manger respond to the layers above, if it gets any message, i=
-norder to take some actions???
-
---=20
-_____________________________________________________________
-Web-based SMS services available at http://www.operamail.com.
-=46rom your mailbox to local or overseas cell phones.
-
-Powered by Outblaze
 
 
 -------------------------------------------------------
