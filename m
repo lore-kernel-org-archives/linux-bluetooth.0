@@ -1,68 +1,36 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <002b01c43680$a4ba19b0$0500a8c0@pii350>
-From: "Marc Fouquet" <marc.fouquet@gmx.de>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] BlueZ Timing Resolution
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 May 2004 12:18:59 +0100
+Return-Path: <rfoster@mountainvisions.com.au>
+Subject: Re: [Bluez-users] bluez-utils 2.7 and bthid
+From: Robert Foster <rfoster@mountainvisions.com.au>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1084181881.9269.149.camel@pegasus>
+References: <1084160685.3287.2.camel@rover.mountainvisions.com.au>
+	 <1084177906.9269.129.camel@pegasus>
+	 <1084180461.3145.8.camel@rover.mountainvisions.com.au>
+	 <1084181881.9269.149.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1084184033.3139.3.camel@rover.mountainvisions.com.au>
+Mime-Version: 1.0
+Date: Mon, 10 May 2004 20:13:53 +1000
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hello!
-
-I am trying to do "Packet Pair" measurements with Bluetooth for an University
-Project. This means that I am sending two IP packets as quickly as possible at
-the sender and measure the difference between the arrival times of the packets at
-the receiver (with tcpdump for example).
-
-This inter-arrival time between two IP packets always appears to be a multiple of
-1 ms when using BlueZ, for example:
-0.026006 s between packet 0 and 1
-0.041003 s between packet 2 and 3
-0.025990 s between packet 4 and 5
-0.029987 s between packet 6 and 7
-0.029997 s between packet 8 and 8
-0.030001 s between packet 10 and 11
-
-With other networks - for example ethernet - I can measure inter-arrival times
-that are much shorter than 1 ms.
-
-I would need to know the exact reason for the limited timing resolution with
-Bluetooth. Does the BT hardware give packets to my Computer only once a ms? Or
-does the BlueZ module only give the packets to the kernel once a ms? Why 1 ms and
-not a multiple of the BT slot time of 625 microseconds?
-
-I am using
-Fedora Core 1 with Kernel 2.4.22,
-bluez-libs 2.5, bluez-utils 2.4 (the lastest versions that were available as
-rpms),
-a bnep (pand) connection,
-2 MSI Bluetooth USB Sticks.
-
-Thanks and greetings from Germany
-  Marc Fouquet
-
-
-
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by Sleepycat Software
-Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to deliver
-higher performing products faster, at low TCO.
-http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Okay, cool:) everything working now:)
+On Mon, 2004-05-10 at 19:38, Marcel Holtmann wrote:
+> as I said, don't enable auth and encrypt in hcid.conf, because this is
+> security mode 3. Make also sure that only one hcid is running.
+> 
+disabled these - for some reason I was under the impression that I
+needed them to connect to my Nokia 6600..  But I guess I was wrong :) 
+this was an overhang from the old laptop.
+> > I have also set up a rather simple script - /etc/init.d/bluetooth-hid to
+> > automatically connect to the mouse at startup, which gets it's options
+> > from a config file in /etc/bluetooth/hid.conf
+> 
+> Why do you need that? The mouse and keyboard reconnects after you've
+> pressed a key. The only thing you have to start is bthid in daemon mode.
+> 
+Ok, so I don't have to re-connect everytime I boot up?  Cool :)
+> Regards
+> 
+> Marcel
+Thanks Marcel.
