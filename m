@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] position of multiple bluetooth dongles
+Subject: Re: [Bluez-users] Re: Can't connect.: Function not implemented
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <421042D2.2040905@gmx.ch>
-References: <420B9635.6020701@gmx.ch>  <200502101825.15870.cijoml@volny.cz>
-	 <1108057316.15974.93.camel@pegasus>  <421042D2.2040905@gmx.ch>
+In-Reply-To: <01LKSFUD1WC0003PT2@beacon.nuigalway.ie>
+References: <01LKSFUD1WC0003PT2@beacon.nuigalway.ie>
 Content-Type: text/plain
-Message-Id: <1108409043.7780.12.camel@notepaq>
+Message-Id: <1108408616.7780.9.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,24 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Feb 2005 20:24:03 +0100
+Date: Mon, 14 Feb 2005 20:16:56 +0100
 
-Hi Marco,
+Hi Triona,
 
-> so it's no problem? no mather of the bluetooth version of the dongle? no 
-> interference, respectively maybe a couple if thousands in a second?
+> Ok now I can l2ping any module once I hcitool cc it. 
 
-ask an expert on the baseband level.
+you are doing something wrong. There is no problem like this.
 
-> corrected by rfcomm?
+> Ok, I think my problem is
+>  to do with the sdp modules. I know they're supposed to be included in the bluez
+> -utils package, and when I type sdpd, l2cap appears in lsmod. However, Between l
+> inux modules, it seems as if sdpd is not present. 
+> 
+> I've been searching google, 
+> and have seen the same error, always with, "sdpd is not installled" as a solutio
+> n.  Is there any way I could have unsuitable packages installed?
 
-The error correction is done at the chip level. The ACL link is
-reliable.
-
-> the distance of two dongles doesn't matter?
-
-If the distance is bigger, the chip must request more retransmission.
-You won't see that in any of the BlueZ layers.
+You only need to install bluez-libs and bluez-utils.
 
 Regards
 
