@@ -1,36 +1,45 @@
-Return-Path: <Bernd.Jucknischke@web.de>
-From: Bernd Jucknischke <Bernd.Jucknischke@web.de>
-Reply-To: Bernd.Jucknischke@web.de
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-users] AVM AP-X and DUN profile
-Date: Fri, 5 Mar 2004 08:34:00 +0100
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-References: <200403030832.19665.Bernd.Jucknischke@web.de> <200403040924.58522.Bernd.Jucknischke@web.de> <1078398559.5347.1.camel@pegasus>
-In-Reply-To: <1078398559.5347.1.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200403050834.01008.Bernd.Jucknischke@web.de>
-Sender: Bernd.Jucknischke@web.de
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: RE: [Bluez-users] HCI_switch_role
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Thor Egil Skaug <paxtonrd@hotmail.com>
+Cc: "'Peter Stephenson'" <pws@csr.com>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <000b01c4023c$a57de0c0$9349edc7@thores>
+References: <000b01c4023c$a57de0c0$9349edc7@thores>
+Content-Type: text/plain
+Message-Id: <1078447750.2762.45.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 05 Mar 2004 01:49:10 +0100
 
-On Donnerstag, 4. M=E4rz 2004 12:09, Marcel Holtmann wrote:
-> Hi Bernd,
->
-> > Thanks for the fast reply. I know that page already. I'm running the 2.6
-> > kernel series and haven't been able to find a working capi, yet. I guess
-> > I'll have to wait until it's (capi) supported for 2.6...
->
-> you can search for a patch named i4l-t9bk22 or use 2.6.4-rc1 which
-> already includes every ISDN update that is needed. However you must make
-> sure that the module capi.ko is loaded and that /dev/capi is mounted,
-> because capiinit sometimes forget about it.
+Hi Thor,
 
-Thanks again! That's info I didn't have and I'll try it immediately...
+> Is a slave allowed to switch role to master?
 
-> Regards
->
-> Marcel
+every side can switch the role.
 
-Later,
-Bernd
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
