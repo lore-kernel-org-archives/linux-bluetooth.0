@@ -1,36 +1,53 @@
-Return-Path: <mcq@cacr.caltech.edu>
-Date: Sun, 7 Mar 2004 16:48:11 -0800
-From: John McCorquodale <mcq@cacr.caltech.edu>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: John McCorquodale <mcq@cacr.caltech.edu>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Socket G card newbie Q
-Message-ID: <20040308004811.GA19145@viz.cacr.caltech.edu>
-References: <20040307214224.GB18481@viz.cacr.caltech.edu> <1078704901.15279.6.camel@pegasus> <20040308002100.GA19049@viz.cacr.caltech.edu> <1078705579.15279.18.camel@pegasus>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: wim delvaux <wim.delvaux@adaptiveplanet.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403071625.01627.wim.delvaux@adaptiveplanet.com>
+References: <200403071625.01627.wim.delvaux@adaptiveplanet.com>
+Content-Type: text/plain
+Message-Id: <1078705651.15279.20.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1078705579.15279.18.camel@pegasus>
-List-ID: <bluez-users.lists.sourceforge.net>
+Subject: [Bluez-users] Re: bnep and refcnt
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 08 Mar 2004 01:27:31 +0100
 
-> May this is the problem with some serial cards and 2.6. Try 2.4 instead.
+Hi Wim,
 
-Progress.  2.4.25 produces different behavior:
+> after browsing the Linux 2.6 code there is a remark in net/core/dev.c that 
+> state what the problem with the following message that I get is 
+> 
+> unregister_netdevice: waiting for bnep0 to become free. Usage count = 6
+> 
+> The comment with the function in dev.c states that this error is caused by 
+> buggy protocols that should unregister after receiving notification that the 
+> devices they are using has been unregistered.  They should call 
+> unregister_netdev which decreases the refcnt.
 
-First time loading it says:
-bcsp_recv: Out-of-order packet arrived, expected 1 got 0
+looks like we need a more detailed audit for the BNEP module and some of
+the 2.6 changes in the network device layer.
 
-Second time loading it says:
-Unknown device type or id
+Regards
 
-In 2.4.20, it always says "Unknown device type or id".
+Marcel
 
-So two questions:
 
-  1) Is there maybe a new G card device id out there, or should I be using
-     some other bluez than that which ships with 2.4.25?
 
-  2) Is there a patch for the 2.6 serial problem?
 
-Thanks,
-
--mcq
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
