@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] libs upgrading
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <cp9uj3$es1$1@sea.gmane.org>
-References: <cp9uj3$es1$1@sea.gmane.org>
-Content-Type: text/plain
-Message-Id: <1102610726.9988.235.camel@pegasus>
+To: bluez-devel@lists.sourceforge.net
+From: soraberri <421246@posta.unizar.es>
+Message-ID: <cp9uj3$es1$1@sea.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] libs upgrading
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +16,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 09 Dec 2004 17:45:26 +0100
+Date: Thu, 09 Dec 2004 17:29:36 +0100
 
 Hi,
+I've installed bluez-libs-2.12 and bluez-utils-2.12 on a kernel version 
+2.6.9 (bluez support) (fedora core3 distribution). I have seen that the 
+installation has placed .h files at /usr/include/bluetooth, but the 
+previous installation (fedora's default) had placed the tools, and 
+libraries all arround. So now I guess I have different versions of -for 
+example- bluetooth.h file, and maybe problems?
+So, do I have to uninstall before upgrading ?
 
-> I've installed bluez-libs-2.12 and bluez-utils-2.12 on a kernel version 
-> 2.6.9 (bluez support) (fedora core3 distribution). I have seen that the 
-> installation has placed .h files at /usr/include/bluetooth, but the 
-> previous installation (fedora's default) had placed the tools, and 
-> libraries all arround. So now I guess I have different versions of -for 
-> example- bluetooth.h file, and maybe problems?
-
-I never heard of any weird installations of the Bluetooth library and
-Fedora Core 3 should be clean, because their version should be 2.10 or
-so.
-
-> So, do I have to uninstall before upgrading ?
-
-Maybe that is a good idea. Or you try to find an already built RPM for
-bluez-{libs|utils}-2.12.
-
-Regards
-
-Marcel
-
+Thanks.
+Be sure I'm trying hard to stop doing these unclever questions..
 
 
 
