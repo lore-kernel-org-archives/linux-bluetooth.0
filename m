@@ -1,21 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <419E6AD8.7050104@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] AVDTP socket?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <419E6AD8.7050104@xmission.com>
-References: <418DB442.2050801@uen.org> <41925793.3050404@xmission.com>
-	 <1100113055.25879.73.camel@pegasus> <419543B3.8050601@xmission.com>
-	 <1100306337.7349.29.camel@pegasus> <41957BC1.507@xmission.com>
-	 <1100351199.7349.50.camel@pegasus> <41970F25.4020902@xmission.com>
-	 <1100446172.21403.16.camel@pegasus> <419B7292.9080706@xmission.com>
-	 <cbf0aec9041118052714481128@mail.gmail.com>
-	 <1100822368.7164.98.camel@pegasus>  <419DB6E1.8000203@xmission.com>
-	 <1100864484.7213.19.camel@pegasus>  <419E20C3.7@xmission.com>
-	 <1100883199.7213.27.camel@pegasus>  <1100885959.7213.31.camel@pegasus>
-	 <1100897144.7213.63.camel@pegasus>  <419E6AD8.7050104@xmission.com>
-Content-Type: text/plain
-Message-Id: <1100901846.7213.101.camel@pegasus>
-Mime-Version: 1.0
+References: <418DB442.2050801@uen.org> <41925793.3050404@xmission.com>	 <1100113055.25879.73.camel@pegasus> <419543B3.8050601@xmission.com>	 <1100306337.7349.29.camel@pegasus> <41957BC1.507@xmission.com>	 <1100351199.7349.50.camel@pegasus> <41970F25.4020902@xmission.com>	 <1100446172.21403.16.camel@pegasus> <419B7292.9080706@xmission.com>	 <cbf0aec9041118052714481128@mail.gmail.com>	 <1100822368.7164.98.camel@pegasus>  <419DB6E1.8000203@xmission.com>	 <1100864484.7213.19.camel@pegasus>  <419E20C3.7@xmission.com>	 <1100883199.7213.27.camel@pegasus>  <1100885959.7213.31.camel@pegasus> <1100897144.7213.63.camel@pegasus>
+In-Reply-To: <1100897144.7213.63.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -27,62 +18,173 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 Nov 2004 23:04:06 +0100
+Date: Fri, 19 Nov 2004 14:51:20 -0700
 
-Hi Brad,
+Marcel,
 
-> I added rcplay.c to cvs and made you a developer on bluetooth-alsa so 
-> you can tweak things if you see fit.
+I added rcplay.c to cvs and made you a developer on bluetooth-alsa so 
+you can tweak things if you see fit.
 
-thanks. I will do that.
+The bluetake sometimes works and sometimes doesn't when using a2play. 
+The same stream will work a couple of times and then it produces loud 
+white noise. There is probably something still not quite right.
 
-> The bluetake sometimes works and sometimes doesn't when using a2play. 
-> The same stream will work a couple of times and then it produces loud 
-> white noise. There is probably something still not quite right.
+I disabled this section in a2dp.c
+
+   memset(buf, 0, 12);
+   buf[0] = 0x80;
+   buf[2] = seq_num >> 8;
+   buf[3] = seq_num & 0xff;
+   buf[12] = 0x0ff;
+   buf[13] = 0x0ff;
+   memcpy(buf + 14, &sbc_info, sizeof(sbc_info));
+   size = read(fd, buf + 14 + sizeof(sbc_info), mtu - sizeof(sbc_info) - 
+14);
+   write(streamfd, buf, size + 14 + sizeof(sbc_info));
+   seq_num++;
+
+but it didn't help or hurt. I couldn't see why sbc_info was being 
+written to the stream since I thought it was just a file header. Does 
+your headset work with a2play as it is in cvs now?
+
+Brad
+
+Marcel Holtmann wrote:
+> Hi Brad,
 > 
-> I disabled this section in a2dp.c
 > 
->    memset(buf, 0, 12);
->    buf[0] = 0x80;
->    buf[2] = seq_num >> 8;
->    buf[3] = seq_num & 0xff;
->    buf[12] = 0x0ff;
->    buf[13] = 0x0ff;
->    memcpy(buf + 14, &sbc_info, sizeof(sbc_info));
->    size = read(fd, buf + 14 + sizeof(sbc_info), mtu - sizeof(sbc_info) - 
-> 14);
->    write(streamfd, buf, size + 14 + sizeof(sbc_info));
->    seq_num++;
+>>actually like with the attached patch. Most of the example *.sbc files
+>>are working. Some of them are not working and this is maybe because the
+>>frame header information don't matches the SBC configuration. Or maybe
+>>hcidump is decoding this wrong.
 > 
-> but it didn't help or hurt. I couldn't see why sbc_info was being 
-> written to the stream since I thought it was just a file header. Does 
-> your headset work with a2play as it is in cvs now?
-
-Yes, perfect. I tried it with an MP3 that I convert to a wave file and
-used the sbc_encoder.exe to create the SBC file. It also works fine with
-the rcplay tool.
-
-I think that GCT (the company that build the chips and wrote the
-software for both headphone types) added their own SBC media packet
-format. I read the A2DP specification again and as far as I understand
-it, we must read the SBC frame header from the first frame. Set the
-AVDTP configuration according to that header and then send the SBC frame
-with the SBC media packet header (with or without fragmenting). And then
-proceed with the other SBC frames in that file.
-
-I found nothing about 0xff 0xff and even playing with content protection
-and multiplexing bits and bytes, nothing resulted in these two bytes.
-
-What we need is an easy way to calculate the frame size from the frame
-header without decoding the frame data itself. And also scanning for the
-sync byte is not really an option. If we get this working, we need to
-check if these headphones also support real A2DP media packets.
-
-Regards
-
-Marcel
-
-
+> 
+> and I figured out what the extra RFCOMM channel 1 on my Aiptek headphone
+> does. You can simply stream the SBC files over it. The attached program
+> will do this for you, but actually it only works on streams with two
+> channels. I don't know what to change to support all test SBC files.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> ------------------------------------------------------------------------
+> 
+> /*
+>  *
+>  *  Stream SBC files over RFCOMM
+>  *
+>  *  Copyright (C) 2004  Marcel Holtmann <marcel@holtmann.org>
+>  *
+>  *
+>  *  This program is free software; you can redistribute it and/or modify
+>  *  it under the terms of the GNU General Public License version 2 as
+>  *  published by the Free Software Foundation;
+>  *
+>  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+>  *  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+>  *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
+>  *  IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
+>  *  CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES 
+>  *  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN 
+>  *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF 
+>  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+>  *
+>  *  ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS, 
+>  *  COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS 
+>  *  SOFTWARE IS DISCLAIMED.
+>  *
+>  */
+> 
+> #include <stdio.h>
+> #include <errno.h>
+> #include <fcntl.h>
+> #include <sys/socket.h>
+> 
+> #include <bluetooth/bluetooth.h>
+> #include <bluetooth/rfcomm.h>
+> 
+> static int rfcomm_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t channel)
+> {
+> 	struct sockaddr_rc addr;
+> 	int sk;
+> 
+> 	sk = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+> 	if (sk < 0)
+> 		return -1;
+> 
+> 	memset(&addr, 0, sizeof(addr));
+> 	addr.rc_family = AF_BLUETOOTH;
+> 	bacpy(&addr.rc_bdaddr, src);
+> 	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+> 		close(sk);
+> 		return -1;
+> 	}
+> 
+> 	memset(&addr, 0, sizeof(addr));
+> 	addr.rc_family = AF_BLUETOOTH;
+> 	bacpy(&addr.rc_bdaddr, dst);
+> 	addr.rc_channel = channel;
+> 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+> 		close(sk);
+> 		return -1;
+> 	}
+> 
+> 	return sk;
+> }
+> 
+> static int stream_sbc(fd, sk)
+> {
+> 	unsigned char buf[330];
+> 	int err, len;
+> 
+> 	while (1) {
+> 		len = read(fd, buf, sizeof(buf));
+> 		if (len <= 0)
+> 			break;
+> 
+> 		err = write(sk, buf, len);
+> 		if (err < 0)
+> 			break;
+> 	}
+> 
+> 	return 0;
+> }
+> 
+> int main(int argc, char *argv[])
+> {
+> 	bdaddr_t bdaddr;
+> 	int fd, sk;
+> 
+> 	if (argc < 3) {
+> 		fprintf(stderr, "Usage: rcplay <bdaddr> <filename>\n");
+> 		exit(1);
+> 	}
+> 
+> 	str2ba(argv[1], &bdaddr);
+> 
+> 	fd = open(argv[2], O_RDONLY);
+> 	if (fd < 0) {
+> 		perror("Can't open file");
+> 		exit(1);
+> 	}
+> 
+> 	sk = rfcomm_connect(BDADDR_ANY, &bdaddr, 1);
+> 	if (sk < 0) {
+> 		perror("Can't open connection");
+> 		close(fd);
+> 		exit(1);
+> 	}
+> 
+> 	stream_sbc(fd, sk);
+> 
+> 	close(sk);
+> 	close(fd);
+> 
+> 	return 0;
+> }
 
 
 -------------------------------------------------------
