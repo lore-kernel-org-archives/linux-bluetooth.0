@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: tmp@nitwit.de
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] No working Bluetooth adapter found
-References: <200503271708.10663.tmp@nitwit.de> <1111937018.9195.224.camel@pegasus>
-In-Reply-To: <1111937018.9195.224.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200503271732.30911.tmp@nitwit.de>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200503271708.10663.tmp@nitwit.de>
+References: <200503271708.10663.tmp@nitwit.de>
+Content-Type: text/plain
+Message-Id: <1111937018.9195.224.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,96 +18,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Mar 2005 17:32:30 +0200
+Date: Sun, 27 Mar 2005 17:23:38 +0200
 
-On Sunday 27 March 2005 17:23, Marcel Holtmann wrote:
-> what does "/proc/bus/usb/devices" contain?
+Hi Timo,
 
-Hmm, no bluetooth dongle, is there? BTW if I run suseplugger and plugin the 
-dongle (BTW same effect with another dongle) it hogs the CPU forever.
+> I currently run SuSE 9.2 and have a MSI PC2PC USB bluetooth dongle and it 
+> doesn't work: No working bluetooth adapter found. This is the log when I plug 
+> 
+> Mar 27 16:47:09 tcn kernel: usb 1-4: new full speed USB device using address 7
+> Mar 27 16:47:10 tcn hcid[24373]: HCI dev 0 registered
+> Mar 27 16:47:13 tcn kernel: hci_cmd_task: hci0 command tx timeout
+> Mar 27 16:47:18 tcn sdpd[24748]: init_server: binding L2CAP socket: Address 
+> already in use
+> Mar 27 16:47:18 tcn sdpd[24748]: main: Server initialization failed
+> Mar 27 16:47:18 tcn opd[24752]: OBEX Push Daemon - version 0.2 started
+> Mar 27 16:47:18 tcn opd[24752]: OBEX Object Push service registered with sdpd
+> Mar 27 16:47:18 tcn opd[24752]: Failed to register BtOBEX server on RFCOMM 
+> channel 10. (-1 / 98)
+> 
+> Hmm. So I switched to channel 9. 
+> 
+> Mar 27 17:05:43 tcn kernel: hci_cmd_task: hci0 command tx timeout
+> Mar 27 17:05:49 tcn kernel: usb 1-4: USB disconnect, address 7
+> Mar 27 17:05:49 tcn hcid[28768]: HCI dev 0 unregistered
+> Mar 27 17:05:49 tcn /sbin/hotplug[28997]: unknown command
+> Mar 27 17:05:49 tcn /sbin/hotplug[28999]: unknown command
+> Mar 27 17:05:49 tcn /sbin/hotplug[28996]: unknown command
+> Mar 27 17:05:49 tcn /sbin/hotplug[28998]: unknown command
+> Mar 27 17:05:57 tcn kernel: ohci_hcd 0000:00:02.1: wakeup
+> Mar 27 17:05:58 tcn kernel: usb 2-4: new full speed USB device using address 3
+> Mar 27 17:05:58 tcn hcid[28768]: HCI dev 0 registered
+> Mar 27 17:06:01 tcn kernel: hci_cmd_task: hci0 command tx timeout
+> Mar 27 17:06:06 tcn sdpd[29323]: init_server: binding L2CAP socket: Address 
+> already in use
+> Mar 27 17:06:06 tcn sdpd[29323]: main: Server initialization failed
+> Mar 27 17:06:06 tcn opd[29327]: OBEX Push Daemon - version 0.2 started
+> Mar 27 17:06:06 tcn opd[29327]: OBEX Object Push service registered with sdpd
+> Mar 27 17:06:06 tcn opd[29327]: Failed to register BtOBEX server on RFCOMM 
+> channel 9. (-1 / 98)
+> Mar 27 17:06:35 tcn kernel: hci_cmd_task: hci0 command tx timeout
+> 
+> Does somebody have a clue on this?
 
-T:  Bus=03 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480 MxCh= 8
-B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS= 8 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.8-24.13-default ehci_hcd
-S:  Product=EHCI Host Controller
-S:  SerialNumber=0000:00:02.2
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=256ms
+what does "/proc/bus/usb/devices" contain?
 
-T:  Bus=03 Lev=01 Prnt=01 Port=03 Cnt=01 Dev#=  3 Spd=480 MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=ff Prot=ff MxPS=64 #Cfgs=  1
-P:  Vendor=0ccd ProdID=0038 Rev= 1.06
-S:  Manufacturer=TerraTec GmbH
-S:  Product=Cinergy T2
-C:* #Ifs= 1 Cfg#= 1 Atr=80 MxPwr=476mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=00 Driver=(none)
-E:  Ad=01(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+Regards
 
-T:  Bus=02 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 4
-B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.8-24.13-default ohci_hcd
-S:  Product=OHCI Host Controller
-S:  SerialNumber=0000:00:02.1
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
+Marcel
 
-T:  Bus=02 Lev=01 Prnt=01 Port=03 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0db0 ProdID=1967 Rev= 5.25
-C:* #Ifs= 3 Cfg#= 1 Atr=80 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
 
-T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 4
-B:  Alloc= 28/900 us ( 3%), #Int=  2, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.8-24.13-default ohci_hcd
-S:  Product=OHCI Host Controller
-S:  SerialNumber=0000:00:02.0
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
-
-T:  Bus=01 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  6 Spd=1.5 MxCh= 0
-D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=0425 ProdID=0101 Rev= 0.20
-S:  Manufacturer=G-Tech CHINA
-S:  Product=   USB Wireless Mouse & KeyBoard V1.01
-C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
-E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
-I:  If#= 1 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=usbhid
-E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
 
 
 -------------------------------------------------------
