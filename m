@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] IOGear GBU311 support
+Subject: Re: [Bluez-users] Setting up an hotplug connection with USB dongles
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <m2ekhg51v9.fsf@tnuctip.rychter.com>
-References: <m2ekhg51v9.fsf@tnuctip.rychter.com>
+In-Reply-To: <200412232343.45609.rdorsch@web.de>
+References: <200411282132.37941.rdorsch@web.de>
+	 <200412192323.20579.rdorsch@web.de> <1103495289.29892.85.camel@pegasus>
+	 <200412232343.45609.rdorsch@web.de>
 Content-Type: text/plain
-Message-Id: <1103891971.20258.85.camel@pegasus>
+Message-Id: <1103889889.20258.82.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +20,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 24 Dec 2004 13:39:31 +0100
+Date: Fri, 24 Dec 2004 13:04:49 +0100
 
-Hi Jan,
+Hi Rainer,
 
-> I've just bought a rather nice USB bluetooth adapter, IOgear
-> GBU311. It's a class 1 device.
+> I used the Debian standard stuff (at least, as far as I am aware of it):
 > 
-> lsusb shows it as four devices:
-> 
-> Bus 001 Device 014: ID 0a5c:2009 Broadcom Corp. 
+> rd@topsi:~$ grep bnep0 /etc/network/interfaces
+> iface bnep0 inet dhcp
 
-this is the problematic one. The 0a5c:200a works fine. As long as nobody
-donates one of these to me I can't take a deeper look why this one makes
-so much problems.
+add a line with "auto bnep0" and it will bring up your interface when it
+is available.
+
+> rd@topsi:~$ cat /etc/bluetooth/pan/dev-up
+> #!/bin/sh
+> echo running dev-up
+> ifup bnep0
+
+Don't do it this way. Bad stuff.
 
 Regards
 
