@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <d1f423d3050324112028596655@mail.gmail.com>
-From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
+From: Surfkid19 Surfkid19 <surf-kid20@freemail.hu>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] HCIDump Problem
-In-Reply-To: <1111689618.9311.1.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <d1f423d3050324103340daebcc@mail.gmail.com>
-	 <1111689618.9311.1.camel@pegasus>
+Message-ID: <freemail.20050224201238.65123@fm1.freemail.hu>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; CHARSET=ISO-8859-2
+Subject: [Bluez-users] receiving files from the phone
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,48 +16,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Mar 2005 14:20:22 -0500
+Date: Thu, 24 Mar 2005 20:12:38 +0100 (CET)
 
-thanks Marcel
+Hi,
 
+I'd like to transfer files from a nokia phone to the PC. How
+can I achieve this?
+What are the transfer rates you've experienced?
 
-On Thu, 24 Mar 2005 19:40:18 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Anderson,
-> 
-> > I am trying to compile Bluez-HCIDump 2.18 but I am facing the following error:
-> >
-> > hci.c: In function `cmd_complete_dump':
-> > hci.c:998: error: `OCF_READ_LINK_QUALITY' undeclared (first use in
-> > this function)
-> > hci.c:998: error: (Each undeclared identifier is reported only once
-> > hci.c:998: error: for each function it appears in.)
-> > hci.c:1001: error: `OCF_READ_CLOCK' undeclared (first use in this function)
-> > make[1]: *** [hci.o] Error 1
-> >
-> > should I update hci.c ? any help will be welcome.
-> 
-> look at http://article.gmane.org/gmane.linux.bluez.devel/4400
-> 
-> Regards
-> 
-> Marcel
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+What I've already tried:
 
+linux 2.4.28 + affix bluetooth driver + btctl utility's OBEX
+FTP commands:
+it works, but only with 13-15kbyte/sec receiving speed
 
--- 
-Anderson Clayton B. Rodrigues
-Eng. de Software
-Instituto Nokia de Tecnologia - INdT
+liunx 2.6.10 + the kernels inbuilt bluez driver and the
+following programs:
+
+btftp from the bluez CVS (receiving speed about 25kbyte/sec)
+KDE's bluetooth utilities which have an obex FTP transfer
+utility it could receive
+at a rate of 20kbyte/sec.
+
+My question is how to debug what makes transfer so slow?
+What rates have you exprienced using obex ftp and object
+push? (I'm particularly interested in the phone>PC direction).
+Any other possibilities for file transfer apart from obex
+ftp and object push?
+
+I'd appreciate any help!
+
+Best Regards,
+Surfkid
+
+PS: the dongle I've used at the PC is a cambridge type USB
+dongle, with the standard hci_usb driver. 
+
 
 
 -------------------------------------------------------
