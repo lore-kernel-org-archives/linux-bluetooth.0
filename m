@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bthid and battery condition and syslog
+Subject: Re: [Bluez-users] bthid and 2.4.25-mh2
 From: Marcel Holtmann <marcel@holtmann.org>
 To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403171259.22015.cijoml@volny.cz>
-References: <200403171259.22015.cijoml@volny.cz>
+In-Reply-To: <200403171304.37863.cijoml@volny.cz>
+References: <200403171304.37863.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1079525750.3301.14.camel@pegasus>
+Message-Id: <1079525716.3301.12.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,18 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Mar 2004 13:15:50 +0100
+Date: Wed, 17 Mar 2004 13:15:16 +0100
 
 Hi Michal,
 
-> is there possible to switch off sysloging battery condition?
-> 
-> bthid generates 2KB/10minutes into syslog
-> 
-> Maybe there should be in bthid some kind of condition as in nut - UPS battery 
-> monitor and not to sysloging?
+> there is 100% problem in mh2 patch. I tried downgrade to simple 2.4.25 and 
+> keyboard started working imeditially. Then tried upgrade to 2.4.25-mh2 and 
+> keyboard stopped working.
 
-look at the source code and comment it out.
+please check 2.4.25-mh1.
 
 Regards
 
