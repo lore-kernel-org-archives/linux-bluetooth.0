@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040920154600.80460.qmail@web53002.mail.yahoo.com>
-From: Raken Silberchatz <raken123@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1066503047-1095695160=:78477"
-Subject: [Bluez-users] newbie
+Subject: Re: [Bluez-users] MS Optical Desktop for bluetooth - Stops working
+	after a time
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Paul Hedderly <bulkpaul@mjr.org>
+Cc: Daniel Scott <danieljamesscott@gmail.com>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040920104135.GU26469@wacka.mjr.org>
+References: <6835906b04091701465c5e3c7c@mail.gmail.com>
+	 <20040920104135.GU26469@wacka.mjr.org>
+Content-Type: text/plain
+Message-Id: <1095678031.5731.14.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,48 +21,69 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 20 Sep 2004 08:46:00 -0700 (PDT)
+Date: Mon, 20 Sep 2004 13:00:31 +0200
 
---0-1066503047-1095695160=:78477
-Content-Type: text/plain; charset=us-ascii
+Hi Paul,
 
-Peace Upon You 
- 
-iam very new to the bluetooth world and never worked in open source codes 
-any way if some one from you gentelmen would tell me any information or send files or web sites that talkes about the folowing:
- 
-1- every thing possible about the bluetooth & bluetooth stack
-2- every thing possible about the bluez
-3- implementation of  bluetooth stack layers or  the available source codes
-4- any information about making bluez work with windows 
- 
-sorry if there any thing wrong about what i mentioned above so if any one can help me and tell me what is right and guide me to the start     
- 
-Peace Upon You
+> I have an Ericsson K700i. In the bluetooth menu there is an option
+> "remote control" and when you sdptool brose the phone you get:
+> 
+> Service Name: Mouse & Keyboard
+> Service Description: K700
+> Service Provider: Sony Ericsson
+> Service RecHandle: 0x1001c
+> Service Class ID List:
+>   "Human Interface Device" (0x1124)
+> Protocol Descriptor List:
+>   "L2CAP" (0x0100)
+>     PSM: 17
+>   "HIDP" (0x0011)
+> Language Base Attr List:
+>   code_ISO639: 0x656e
+>   encoding:    0x6a
+>   base_offset: 0x100
+> Profile Descriptor List:
+>   "Human Interface Device" (0x1124)
+>     Version: 0x0100
 
-		
----------------------------------
-Do you Yahoo!?
-Yahoo! Mail is new and improved - Check it out!
---0-1066503047-1095695160=:78477
-Content-Type: text/html; charset=us-ascii
+please do a "hcitool info <k700i>" as root for me and use the sdptest
+program from the libs2 CVS repository to get me the full SDP records.
 
-<DIV>Peace Upon You </DIV>
-<DIV>&nbsp;</DIV>
-<DIV>iam very new to the bluetooth world and never worked in open source codes&nbsp;</DIV>
-<DIV>any way if some one from you gentelmen would tell me any <STRONG>information</STRONG> or send <STRONG>files</STRONG> or <STRONG>web sites</STRONG> that talkes about the folowing:</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>1- every thing possible about the bluetooth &amp; bluetooth stack</DIV>
-<DIV>2- every thing possible about the bluez</DIV>
-<DIV>3- implementation of&nbsp;&nbsp;bluetooth stack layers or&nbsp; the available source codes</DIV>
-<DIV>4- any information about making bluez work with windows </DIV>
-<DIV>&nbsp;</DIV>
-<DIV>sorry if there&nbsp;any thing wrong about&nbsp;what i mentioned above&nbsp;so if any&nbsp;one can help me and tell me what is right and guide me to the start &nbsp;&nbsp;&nbsp;&nbsp;</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Peace Upon You</DIV><p>
-		<hr size=1>Do you Yahoo!?<br>
-Yahoo! Mail is new and improved - <a href="http://us.rd.yahoo.com/mail_us/taglines/new/*http://promotions.yahoo.com/new_mail">Check it out!</a>
---0-1066503047-1095695160=:78477--
+You don't need to install the libs2 stuff. Only check it out and compile
+it with "./bootstrap && ./configure && make". After that you should call
+
+	./test/sdptest records k700i-bdaddr > sdp_records.txt
+
+and then send me the sdp_records.txt file. The output from "hcitool inq"
+will also be nice to see what kind of class of device they are using.
+
+> So I tried "hidd -c 00:..." with hidd --server runnning of course.
+> 
+> Now the phone wakes up and says "Start remote control? Yes/No" And I say
+> yes... it goes into remote control mode for a moment then quits saying
+> "No more files".
+> 
+> Anybody got their k700 to work as a mouse/keybd? What file is it
+> expecting?
+
+>>From the hcidump I see a problem with connecting to the SDP PSM. It
+seems that this is disabled when HID is in use and this phone has a
+stupid L2CAP implementation that reacts weird and we do the same. But
+for you it responds with "Connection refused - no resources available"
+and this is great. They offer HID support and can't have three L2CAP
+connections at the same time. That is totally stupid.
+
+I need such a phone to tweak around the L2CAP problem and get the hidd
+working without retrieving the SDP record. Any sponsor out there?
+
+And btw do you enabled auth and encrypt in hcid.conf? Don't do so unless
+you really wanna use security mode 3.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
