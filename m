@@ -1,64 +1,196 @@
-Return-Path: <James@superbug.demon.co.uk>
-Message-ID: <3F0B3BE8.10008@superbug.demon.co.uk>
-Date: Tue, 08 Jul 2003 22:47:20 +0100
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
+Return-Path: <daryl@wideray.com>
+Errors-To: <daryl@wideray.com>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
+Subject: Qualification testing - rfcomm
+Date: Tue, 8 Jul 2003 11:16:47 -0700
+Message-ID: <001501c3457d$18b63a10$1a01010a@baked>
 MIME-Version: 1.0
-To: Daryl Van Vorst <daryl@wideray.com>
-CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
-Subject: Re: [Bluez-devel] Qualification testing - rfcomm
-References: <001501c3457d$18b63a10$1a01010a@baked>
-In-Reply-To: <001501c3457d$18b63a10$1a01010a@baked>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: multipart/mixed; boundary="=-ihIsJLLdMiOW0yoJfQt/"
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Daryl Van Vorst wrote:
-> Marcel,
-> 
-> Finally got some results on those latest rfcomm changes for qualification.
-> Looks like there are a few more problems. :(  But we're close. :)
-> 
-> TP/RFC/BV-09-C:
-> "Verify that the IUT handles flow control correctly when the Tester, acting
-> as a device conforming to Bluetooth version 1.0B, controls the data flow
-> using the Modem Status Command. The IUT's device role is of no importance."
-> 
-> The command and console output:
-> 
-> root@jack-00000000:~>./rctest -s -P 1 -b 20 00:A0:96:1F:83:71
-> rctest[351]: Connected
-> rctest[351]: Sending ...
-> rctest[351]: Send failed. Resource temporarily unavailable(11)
-> 
-> The IUT sends data in 5 frames, then stops for aboue 20s, then sends 5 more,
-> then stops, etc. Technically, this test passed because we did stop sending
-> data after the tester send MSC stop to the IUT. But something's clearly not
-> right.
-> 
-> There is an hcidump of the session attached.
-> 
-> TP/RFC/BV-12-C:
-> "Verify that the IUT handles aggregate flow control correctly when the
-> Tester, acting as a device conforming to Bleutooth version 1.0B, controls
-> the data flow using the Flow Control on/off commands FCon and FCoff. The
-> IUT's device role is of no importance."
-> 
-> The command and console output:
-> 
-> root@jack-00000000:~>./rctest -s -P 1 -b 20 00:A0:96:1F:83:71
-> rctest[362]: Connected
-> rctest[362]: Sending ...
-> rfcomm_recv_mcc: Unknown control type 0x18
-> rfcomm_recv_mcc: Unknown control type 0x28
-> 
-> The IUT does not respond to FCoff with FCoff, and continues sending data. It
-> also does not respond to FCon with FCon. 
-> 
-> There is an hcidump of the session attached.
-> 
-> -Daryl.
 
-Any chance of doing some tests with SCO ?
-It might help us with some of the currently problems there are with SCO 
-and usb dongles.
-Cheers
-James
+--=-ihIsJLLdMiOW0yoJfQt/
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; CHARSET=us-ascii
+
+Marcel,
+
+Finally got some results on those latest rfcomm changes for qualification.
+Looks like there are a few more problems. :(  But we're close. :)
+
+TP/RFC/BV-09-C:
+"Verify that the IUT handles flow control correctly when the Tester, acting
+as a device conforming to Bluetooth version 1.0B, controls the data flow
+using the Modem Status Command. The IUT's device role is of no importance."
+
+The command and console output:
+
+root@jack-00000000:~>./rctest -s -P 1 -b 20 00:A0:96:1F:83:71
+rctest[351]: Connected
+rctest[351]: Sending ...
+rctest[351]: Send failed. Resource temporarily unavailable(11)
+
+The IUT sends data in 5 frames, then stops for aboue 20s, then sends 5 more=
+,
+then stops, etc. Technically, this test passed because we did stop sending
+data after the tester send MSC stop to the IUT. But something's clearly not
+right.
+
+There is an hcidump of the session attached.
+
+TP/RFC/BV-12-C:
+"Verify that the IUT handles aggregate flow control correctly when the
+Tester, acting as a device conforming to Bleutooth version 1.0B, controls
+the data flow using the Flow Control on/off commands FCon and FCoff. The
+IUT's device role is of no importance."
+
+The command and console output:
+
+root@jack-00000000:~>./rctest -s -P 1 -b 20 00:A0:96:1F:83:71
+rctest[362]: Connected
+rctest[362]: Sending ...
+rfcomm_recv_mcc: Unknown control type 0x18
+rfcomm_recv_mcc: Unknown control type 0x28
+
+The IUT does not respond to FCoff with FCoff, and continues sending data. I=
+t
+also does not respond to FCon with FCon.=20
+
+There is an hcidump of the session attached.
+
+-Daryl.
+
+--=-ihIsJLLdMiOW0yoJfQt/
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="RFC_BV_09_IUT_sends_5_frames_every_20s_hcidump"
+Content-Type: application/octet-stream;
+	NAME=RFC_BV_09_IUT_sends_5_frames_every_20s_hcidump
+
+EQAAABimigAdmwkAAQUEDXGDH5agABjMAQAAAAEHAAEAGKaKAJqzCQAEDwQABwUEDgABACqmigDg
+0QwABAMLEAAAcYMflqAAAQAHAAEAKqaKAMXTDAAEDwQACAAAEQAAAHGmigBtLg4AAQUEDXGDH5ag
+ABjMAQAAAAEHAAEAcaaKAIhGDgAEDwQABwUEDgABAHamigB8cAgABAMLAAEAcYMflqAAAQARAAAA
+dqaKAJhxCAACASAMAAgAAQACAQQAAwBAAAgAAAB2pooAaHIIAAENCAQBAA4ABwABAHamigAycggA
+BA8EAAgAAAkAAQB2pooAwN4IAAQOBggNCAABAAYAAQB2pooAVN8IAAQbAwEABQgAAQB2pooA0u0J
+AAQTBQEBAAEAFQABAHumigDMqAIAAgEgEAAMAAEAAwEIAEAAQAAAAAAAFQAAAHumigDWqQIAAgEg
+EAAMAAEABAIIAEAAAAABAgAECAABAHumigA68gIABBMFAQEAAQATAAEAe6aKAMWfBAACASAOAAoA
+AQAFAgYAQAAAAAAAEQABAHumigA/sQUAAgEgDAAIAAEABIwEAEAAAAATAAAAe6aKAMCxBQACASAO
+AAoAAQAFjAYAQAAAAAAADQAAAHumigARsgUAAgEgCAAEAEAAAz8BHAgAAQB7pooA+nEGAAQTBQEB
+AAEACAABAHumigCWhgYABBMFAQEAAQANAAEAfKaKACzfAgACASAIAAQAQAADcwHXFwAAAHymigCu
+3wIAAgEgEgAOAEAAA+8VgxEC8AcAmwIAB3AIAAEAfKaKAPI/AwAEEwUBAQABABcAAQB8pooAIpgN
+AAIBIBIADgBAAAHvFYERAgAHAAABAACqDQAAAHymigCbmA0AAgEgCAAEAEAACz8BWQgAAQB8pooA
+ztsNAAQTBQEBAAEADQABAH2migAeUg4AAgEgCAAEAEAAC3MBkhEAAAB9pooAplIOAAIBIAwACABA
+AAPvCeMFC41wCAABAH2migDz/w4ABBMFAQEAAQARAAEAf6aKABGNBQACASAMAAgAQAAB7wnhBQuN
+qhEAAQCApooAoHYCAAIBIAwACABAAAHvCeMFC42qEQAAAICmigApdwIAAgEgDAAIAEAAA+8J4QUL
+jXAhAAAAgKaKAIR3AgACASAcABgAQAAL7ykAAAAAFAB/f39/f39/f39/f39/f5ohAAAAgKaKALV3
+AgACASAcABgAQAAL7ykBAAAAFAB/f39/f39/f39/f39/f5ohAAAAgKaKANh3AgACASAcABgAQAAL
+7ykCAAAAFAB/f39/f39/f39/f39/f5ohAAAAgKaKAPl3AgACASAcABgAQAAL7ykDAAAAFAB/f39/
+f39/f39/f39/f5ohAAAAgKaKADt4AgACASAcABgAQAAL7ykEAAAAFAB/f39/f39/f39/f39/f5oI
+AAEAgKaKAAPFAgAEEwUBAQABAAgAAQCApooAiNQCAAQTBQEBAAEACAABAICmigDa/wIABBMFAQEA
+AQAIAAEAgKaKAPkVAwAEEwUBAQABAAgAAQCApooAIyQDAAQTBQEBAAEACAABAICmigC/LgMABBMF
+AQEAAQAhAAAAm6aKAAZtDgACASAcABgAQAAL7ykFAAAAFAB/f39/f39/f39/f39/f5ohAAAAm6aK
+AJFtDgACASAcABgAQAAL7ykGAAAAFAB/f39/f39/f39/f39/f5ohAAAAm6aKALJtDgACASAcABgA
+QAAL7ykHAAAAFAB/f39/f39/f39/f39/f5ohAAAAm6aKANFtDgACASAcABgAQAAL7ykIAAAAFAB/
+f39/f39/f39/f39/f5ohAAAAm6aKAPFtDgACASAcABgAQAAL7ykJAAAAFAB/f39/f39/f39/f39/
+f5oIAAEAm6aKAJrrDgAEEwUBAQABAAgAAQCbpooAkfUOAAQTBQEBAAEACAABAJumigA3BA8ABBMF
+AQEAAQAIAAEAm6aKACYSDwAEEwUBAQABAAgAAQCbpooAvyAPAAQTBQEBAAEAEQABALOmigAvsQgA
+AgEgDAAIAEAAAe8J4wULA6oRAAAAs6aKALKxCAACASAMAAgAQAAD7wnhBQsDcAgAAQCzpooACvoI
+AAQTBQEBAAEADQAAAP+migADdQ4AAgEgCAAEAEAAA1MB/REAAAD/pooAf3UOAAIBIAwACAABAAYD
+BABAAEAACAABAP+migBC1g4ABBMFAQEAAQAIAAEA/6aKANLkDgAEEwUBAQABAAcAAAApp4oAS2wO
+AAEGBAMBABMHAAEAKaeKAIx6DgAEDwQABwYEBwABACqnigDhnwAABAUEAAEAFgcAAQAqp4oA3qMA
+AAQPBAAIAAAaGhoaGhoaGhoaGhoaGhoaGg==
+
+--=-ihIsJLLdMiOW0yoJfQt/
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="RFC_BV_12_IUT_does_not_reply_with_FCoff_FCon_hcidump"
+Content-Type: application/octet-stream;
+	NAME=RFC_BV_12_IUT_does_not_reply_with_FCoff_FCon_hcidump
+
+EQAAAGeqigCURA0AAQUEDXGDH5agABjMAQAAAAEHAAEAZ6qKAA1dDQAEDwQABwUEDgABAG+qigDp
+DgMABAMLAAEAcYMflqAAAQARAAAAb6qKAAIQAwACASAMAAgAAQACAQQAAwBAAAgAAABvqooA0hAD
+AAENCAQBAA4ABwABAG+qigCdEAMABA8EAAgAAAkAAQBvqooAUD8DAAQOBggNCAABAAYAAQBvqooA
+70ADAAQbAwEABQgAAQBvqooAV2gEAAQTBQEBAAEAFQABAHOqigDQbA0AAgEgEAAMAAEAAwEIAEAA
+QAAAAAAAFQAAAHOqigDabQ0AAgEgEAAMAAEABAIIAEAAAAABAgAECAABAHOqigCVyA0ABBMFAQEA
+AQATAAEAdKqKAF1SAAACASAOAAoAAQAFAgYAQAAAAAAAEQABAHSqigCkKwEAAgEgDAAIAAEABIwE
+AEAAAAATAAAAdKqKACIsAQACASAOAAoAAQAFjAYAQAAAAAAADQAAAHSqigB0LAEAAgEgCAAEAEAA
+Az8BHAgAAQB0qooAT50BAAQTBQEBAAEACAABAHSqigBJqAEABBMFAQEAAQANAAEAdaqKAAX1AgAC
+ASAIAAQAQAADcwHXFwAAAHWqigCE9QIAAgEgEgAOAEAAA+8VgxEC8AcAmwIAB3AIAAEAdaqKAIZM
+AwAEEwUBAQABABcAAQB1qooAorwNAAIBIBIADgBAAAHvFYERAgAHAAABAACqDQAAAHWqigAevQ0A
+AgEgCAAEAEAACz8BWQgAAQB1qooAOiwOAAQTBQEBAAEADQABAHaqigCOBwsAAgEgCAAEAEAAC3MB
+khEAAAB2qooAHQgLAAIBIAwACABAAAPvCeMFC41wCAABAHaqigA3hgsABBMFAQEAAQARAAEAd6qK
+ACnFBwACASAMAAgAQAAB7wnhBQuNqhEAAQB4qooAg68GAAIBIAwACABAAAHvCeMFC42qEQAAAHiq
+igAEsAYAAgEgDAAIAEAAA+8J4QULjXAhAAAAeKqKAGKwBgACASAcABgAQAAL7ykAAAAAFAB/f39/
+f39/f39/f39/f5ohAAAAeKqKAJewBgACASAcABgAQAAL7ykBAAAAFAB/f39/f39/f39/f39/f5oh
+AAAAeKqKALmwBgACASAcABgAQAAL7ykCAAAAFAB/f39/f39/f39/f39/f5ohAAAAeKqKANiwBgAC
+ASAcABgAQAAL7ykDAAAAFAB/f39/f39/f39/f39/f5ohAAAAeKqKAB2xBgACASAcABgAQAAL7ykE
+AAAAFAB/f39/f39/f39/f39/f5oIAAEAeKqKAIMpBwAEEwUBAQABAAgAAQB4qooAqy4HAAQTBQEB
+AAEACAABAHiqigBkPQcABBMFAQEAAQAIAAEAeKqKAPdLBwAEEwUBAQABAAgAAQB4qooAHVsHAAQT
+BQEBAAEACAABAHiqigC1bwcABBMFAQEAAQAhAAAAlKqKAK8RCwACASAcABgAQAAL7ykFAAAAFAB/
+f39/f39/f39/f39/f5ohAAAAlKqKADkSCwACASAcABgAQAAL7ykGAAAAFAB/f39/f39/f39/f39/
+f5ohAAAAlKqKAFoSCwACASAcABgAQAAL7ykHAAAAFAB/f39/f39/f39/f39/f5ohAAAAlKqKAHgS
+CwACASAcABgAQAAL7ykIAAAAFAB/f39/f39/f39/f39/f5ohAAAAlKqKAJgSCwACASAcABgAQAAL
+7ykJAAAAFAB/f39/f39/f39/f39/f5oIAAEAlKqKAPVXCwAEEwUBAQABAAgAAQCUqooAL30LAAQT
+BQEBAAEACAABAJSqigDakQsABBMFAQEAAQAIAAEAlKqKAMmWCwAEEwUBAQABAAgAAQCUqooAfKUL
+AAQTBQEBAAEADwABAJeqigALnw0AAgEgCgAGAEAAAe8FYwGqEAAAAJeqigC2rg0AAgEgCwAHAEAA
+A+8HFQNlcCEAAACXqooAHK8NAAIBIBwAGABAAAvvKQoAAAAUAH9/f39/f39/f39/f39/miEAAACX
+qooATa8NAAIBIBwAGABAAAvvKQsAAAAUAH9/f39/f39/f39/f39/miEAAACXqooAb68NAAIBIBwA
+GABAAAvvKQwAAAAUAH9/f39/f39/f39/f39/miEAAACXqooArK8NAAIBIBwAGABAAAvvKQ0AAAAU
+AH9/f39/f39/f39/f39/miEAAACXqooAzq8NAAIBIBwAGABAAAvvKQ4AAAAUAH9/f39/f39/f39/
+f39/mggAAQCXqooAXhkOAAQTBQEBAAEACAABAJeqigDyJw4ABBMFAQEAAQAIAAEAl6qKADhADgAE
+EwUBAQABAAgAAQCXqooA2EoOAAQTBQEBAAEACAABAJeqigBgVQ4ABBMFAQEAAQAIAAEAl6qKAOZh
+DgAEEwUBAQABACEAAACyqooA9RELAAIBIBwAGABAAAvvKQ8AAAAUAH9/f39/f39/f39/f39/miEA
+AACyqooAhBILAAIBIBwAGABAAAvvKRAAAAAUAH9/f39/f39/f39/f39/miEAAACyqooApBILAAIB
+IBwAGABAAAvvKREAAAAUAH9/f39/f39/f39/f39/miEAAACyqooAxBILAAIBIBwAGABAAAvvKRIA
+AAAUAH9/f39/f39/f39/f39/miEAAACyqooA4RILAAIBIBwAGABAAAvvKRMAAAAUAH9/f39/f39/
+f39/f39/mggAAQCyqooAYj8LAAQTBQEBAAEACAABALKqigDTgQsABBMFAQEAAQAIAAEAsqqKAHGM
+CwAEEwUBAQABAAgAAQCyqooAyJgLAAQTBQEBAAEACAABALKqigCpqAsABBMFAQEAAQAPAAEAu6qK
+AGUpAgACASAKAAYAQAAB7wWjAaoQAAAAu6qKABE5AgACASALAAcAQAAD7wcVA6VwIQAAALuqigB0
+OQIAAgEgHAAYAEAAC+8pFAAAABQAf39/f39/f39/f39/f3+aIQAAALuqigCmOQIAAgEgHAAYAEAA
+C+8pFQAAABQAf39/f39/f39/f39/f3+aIQAAALuqigDGOQIAAgEgHAAYAEAAC+8pFgAAABQAf39/
+f39/f39/f39/f3+aIQAAALuqigADOgIAAgEgHAAYAEAAC+8pFwAAABQAf39/f39/f39/f39/f3+a
+IQAAALuqigAmOgIAAgEgHAAYAEAAC+8pGAAAABQAf39/f39/f39/f39/f3+aCAABALuqigChqAIA
+BBMFAQEAAQAIAAEAu6qKAEKzAgAEEwUBAQABAAgAAQC7qooAyL0CAAQTBQEBAAEACAABALuqigC/
+ygIABBMFAQEAAQAIAAEAu6qKAMbaAgAEEwUBAQABAAgAAQC7qooAbecCAAQTBQEBAAEAIQAAANCq
+igD1EQsAAgEgHAAYAEAAC+8pGQAAABQAf39/f39/f39/f39/f3+aIQAAANCqigCBEgsAAgEgHAAY
+AEAAC+8pGgAAABQAf39/f39/f39/f39/f3+aIQAAANCqigChEgsAAgEgHAAYAEAAC+8pGwAAABQA
+f39/f39/f39/f39/f3+aIQAAANCqigDAEgsAAgEgHAAYAEAAC+8pHAAAABQAf39/f39/f39/f39/
+f3+aIQAAANCqigDdEgsAAgEgHAAYAEAAC+8pHQAAABQAf39/f39/f39/f39/f3+aCAABANCqigAI
+XAsABBMFAQEAAQAIAAEA0KqKAMWRCwAEEwUBAQABAAgAAQDQqooAV5wLAAQTBQEBAAEACAABANCq
+igCyuQsABBMFAQEAAQAIAAEA0KqKAMzGCwAEEwUBAQABACEAAADuqooArxELAAIBIBwAGABAAAvv
+KR4AAAAUAH9/f39/f39/f39/f39/miEAAADuqooAOhILAAIBIBwAGABAAAvvKR8AAAAUAH9/f39/
+f39/f39/f39/miEAAADuqooAWxILAAIBIBwAGABAAAvvKSAAAAAUAH9/f39/f39/f39/f39/miEA
+AADuqooAexILAAIBIBwAGABAAAvvKSEAAAAUAH9/f39/f39/f39/f39/miEAAADuqooAmRILAAIB
+IBwAGABAAAvvKSIAAAAUAH9/f39/f39/f39/f39/mggAAQDuqooATIALAAQTBQEBAAEACAABAO6q
+igD4lAsABBMFAQEAAQAIAAEA7qqKAHOfCwAEEwUBAQABAAgAAQDuqooAlKsLAAQTBQEBAAEACAAB
+AO6qigDhyAsABBMFAQEAAQAhAAAADKuKAK8RCwACASAcABgAQAAL7ykjAAAAFAB/f39/f39/f39/
+f39/f5ohAAAADKuKADsSCwACASAcABgAQAAL7ykkAAAAFAB/f39/f39/f39/f39/f5ohAAAADKuK
+AFwSCwACASAcABgAQAAL7yklAAAAFAB/f39/f39/f39/f39/f5ohAAAADKuKAH4SCwACASAcABgA
+QAAL7ykmAAAAFAB/f39/f39/f39/f39/f5ohAAAADKuKAJsSCwACASAcABgAQAAL7yknAAAAFAB/
+f39/f39/f39/f39/f5oIAAEADKuKABFgCwAEEwUBAQABAAgAAQAMq4oAtKALAAQTBQEBAAEACAAB
+AAyrigCFywsABBMFAQEAAQAIAAEADKuKAHjZCwAEEwUBAQABAAgAAQAMq4oAE+gLAAQTBQEBAAEA
+IQAAACqrigCuEQsAAgEgHAAYAEAAC+8pKAAAABQAf39/f39/f39/f39/f3+aIQAAACqrigA4EgsA
+AgEgHAAYAEAAC+8pKQAAABQAf39/f39/f39/f39/f3+aIQAAACqrigBbEgsAAgEgHAAYAEAAC+8p
+KgAAABQAf39/f39/f39/f39/f3+aIQAAACqrigB7EgsAAgEgHAAYAEAAC+8pKwAAABQAf39/f39/
+f39/f39/f3+aIQAAACqrigCZEgsAAgEgHAAYAEAAC+8pLAAAABQAf39/f39/f39/f39/f3+aCAAB
+ACqrigCPjAsABBMFAQEAAQAIAAEAKquKAC+XCwAEEwUBAQABAAgAAQAqq4oAq6ELAAQTBQEBAAEA
+CAABACqrigCNrwsABBMFAQEAAQAIAAEAKquKANa/CwAEEwUBAQABACEAAABIq4oArhELAAIBIBwA
+GABAAAvvKS0AAAAUAH9/f39/f39/f39/f39/miEAAABIq4oAORILAAIBIBwAGABAAAvvKS4AAAAU
+AH9/f39/f39/f39/f39/miEAAABIq4oAWhILAAIBIBwAGABAAAvvKS8AAAAUAH9/f39/f39/f39/
+f39/miEAAABIq4oAexILAAIBIBwAGABAAAvvKTAAAAAUAH9/f39/f39/f39/f39/miEAAABIq4oA
+mxILAAIBIBwAGABAAAvvKTEAAAAUAH9/f39/f39/f39/f39/mggAAQBIq4oAy0YLAAQTBQEBAAEA
+CAABAEirigDViAsABBMFAQEAAQAIAAEASKuKAGadCwAEEwUBAQABAAgAAQBIq4oA4qcLAAQTBQEB
+AAEACAABAEirigCYsQsABBMFAQEAAQAhAAAAZquKAK4RCwACASAcABgAQAAL7ykyAAAAFAB/f39/
+f39/f39/f39/f5ohAAAAZquKADgSCwACASAcABgAQAAL7ykzAAAAFAB/f39/f39/f39/f39/f5oh
+AAAAZquKAFgSCwACASAcABgAQAAL7yk0AAAAFAB/f39/f39/f39/f39/f5ohAAAAZquKAHoSCwAC
+ASAcABgAQAAL7yk1AAAAFAB/f39/f39/f39/f39/f5ohAAAAZquKAJgSCwACASAcABgAQAAL7yk2
+AAAAFAB/f39/f39/f39/f39/f5oIAAEAZquKABaJCwAEEwUBAQABAAgAAQBmq4oAAZcLAAQTBQEB
+AAEACAABAGarigCMpQsABBMFAQEAAQAIAAEAZquKAK+zCwAEEwUBAQABAAgAAQBmq4oAH8wLAAQT
+BQEBAAEAIQAAAISrigAuXgQAAgEgHAAYAEAAC+8pNwAAABQAf39/f39/f39/f39/f3+aIQAAAISr
+igC3XgQAAgEgHAAYAEAAC+8pOAAAABQAf39/f39/f39/f39/f3+aIQAAAISrigDXXgQAAgEgHAAY
+AEAAC+8pOQAAABQAf39/f39/f39/f39/f3+aIQAAAISrigD1XgQAAgEgHAAYAEAAC+8pOgAAABQA
+f39/f39/f39/f39/f3+aIQAAAISrigARXwQAAgEgHAAYAEAAC+8pOwAAABQAf39/f39/f39/f39/
+f3+aCAABAISrigDOegQABBMFAQEAAQAIAAEAhKuKAITdBAAEEwUBAQABAAgAAQCEq4oA/ewEAAQT
+BQEBAAEACAABAISrigCqAQUABBMFAQEAAQAIAAEAhKuKACUMBQAEEwUBAQABABoaGhoaGhoaGhoa
+GhoaGhoaGhoaGhoaGhoaGhoaGg==
+
+--=-ihIsJLLdMiOW0yoJfQt/--
