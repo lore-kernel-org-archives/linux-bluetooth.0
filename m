@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Andreas Gaufer <Andreas.Gaufer@blue-cell-networks.com>
-To: Bluez Devel <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hcitool con list incomplete (was: Connect Complete with Status 09)
-Message-Id: <20040610121805.3121ca26.Andreas.Gaufer@blue-cell-networks.com>
-In-Reply-To: <20040609212529.6901de52.Andreas.Gaufer@blue-cell-networks.com>
+To: Steven Singer <steven.singer@csr.com>
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] HCI Event: Connect Complete with Status 09
+Message-Id: <20040609212529.6901de52.Andreas.Gaufer@blue-cell-networks.com>
+In-Reply-To: <40C74EDD.6060903@csr.com>
 References: <20040609185348.65a9f382.Andreas.Gaufer@blue-cell-networks.com>
 	<40C74EDD.6060903@csr.com>
-	<20040609212529.6901de52.Andreas.Gaufer@blue-cell-networks.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
@@ -19,26 +19,58 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 10 Jun 2004 12:18:05 +0200
+Date: Wed, 9 Jun 2004 21:25:29 +0200
 
-Hi,
+Hi Steven,
 
-I dug in a little bit deeper last night and i think its not a problem of the 
-chip. The list that is printed out by "hcitool con" is incomplete in certain 
-situations. This leads to various problems with many tools because they try to
-connect again witch fails.
+i hoped that you will jump on this ;)
 
-If a "create connection" is issiued while there is already a connection the chip
-returnes a Connect Complete with status 0x0B witch is absolutely right. The
-problem is that the hanlde of the "hcitool con" list is removed but the chip
-still keeps it, witch is good behaviour in my opinion. It can be disconected with 
-"hcitool cmd".
+On Wed, 09 Jun 2004 18:54:37 +0100
+Steven Singer <steven.singer@csr.com> wrote:
 
-Who or what is keeping this list?
+> Andreas Gaufer wrote:
+> > I get into situations where the chip returnes a "Connect Complete" event 
+> > with status MAX NUMBER OF CONNECTIONS (0X09) without having open handles.
+> 
+> How do you get in to this situation? Are you, for example, connecting
+> and disconnecting very rapidly (less than 1 second per connection) or
 
-Greetings
+Yes, indeed thats close to what im doing. Not within one secoud but very 
+frequently.
+
+> are you resetting the remote end of the link without using a proper
+> disconnect?
+
+I dont know the other side and i cant tell more than what im seeing through
+bluetooth. An what i see is indeed sometimes far from what the specs say.
+
+> Which CSR firmware version are you using?
+> 
+hci1:   Type: USB
+        BD Address: 00:04:61:81:DD:12 ACL MTU: 192:8  SCO MTU: 64:8
+        HCI 16.14
+        Chip version: BlueCore02
+        Max key size: 56 bit
+        SCO mapping:  HCI
+
+> You might want to grab an HCI log and move this discussion to the CSR
+> support newsgroup (access details at http://www.csr.com/forum.htm).
+> Read the FAQ for a description of suitable log formats.
+> 
+> A summary of the times of the commands and events associated with
+> creating and disconnecting any previous connections (including the
+> statuses and connection handles in all the events) might be shorter than
+> a full log.
+> 
+
+Ok, ill set up a test case to create the situation. Im happy to put the facts
+in the newsgroup. Witch group would be the best ? csr.public.bluecore.firmware ?
+
+Greetings 
 
 Andreas Gaufer
+
+
 
 
 -------------------------------------------------------
