@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] rfcomm connection as normal user
-References: <200405251646.29853.welpan@gmx.de>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alex <welpan@gmx.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <200405251646.29853.welpan@gmx.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200405251734.20781.cijoml@volny.cz>
+References: <200405251646.29853.welpan@gmx.de>
+Content-Type: text/plain
+Message-Id: <1085497339.9779.132.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,17 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 25 May 2004 17:34:20 +0200
+Date: Tue, 25 May 2004 17:02:19 +0200
 
-On Tuesday 25 of May 2004 16:46, Alex wrote:
+Hi Alex,
+
 > Hello, if i try to connect via rfcomm as normal user i get the message:
 > Cannot create device operation not Operation not permitted.
->
+> 
 > My question what can I do to give a standard user permission?
 
-check if users are allowed to rw your /dev/rfcommX devices
+you can connect through a RFCOMM socket and use "rfcomm connect", but
+what you can't use is "rfcomm bind".
 
-M.
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
