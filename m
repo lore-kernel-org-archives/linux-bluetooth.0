@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Cloudshang" <zhixiang_deng@yahoo.com.cn>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+From: Grzegorz <wolo@neostrada.pl>
+Message-ID: <loom.20041216T232049-49@post.gmane.org>
+References: <loom.20041216T200707-397@post.gmane.org> <1103227435.6325.17.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: text/plain;
-      charset="GB2312"
-Message-ID: <E1Cf95k-0000r1-SE@sc8-sf-mx1.sourceforge.net>
-Subject: [Bluez-users] PAN pboblems
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: PAN connection: palmtop -> linux -> internet
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,18 +17,11 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Dec 2004 11:38:2 +0800
+Date: Thu, 16 Dec 2004 22:24:11 +0000 (UTC)
 
- Hello,
-    I have several questions.
-    First ,a bluetooth device was expected to act as GN with the command "pand  --listen --role GN".But the GN could be connected by only two PANUs.The third PANU cannot conect to the GN any more. Why? And how to set the maximal user numbers of a GN?
-    Second ,I used some bluetooth devices to form a simple adhoc network based on BNEP protocol, which can be shown as the following figure:
-     PANU1--->GN<---PANU2
-    When GN was only conncted by PANU1,the data transmitting rate could reach about 50kbps.However ,when the GN is connected by both PANU1 and PANU2 ,the data rate reduced to about 8kbps.Why? What can I do to solve this problem?
-    Thanks a lot!
-                                                  													Cloudshang
-					
-
+Thank You for Your answer .. but my problem is how to create this bridge .. I
+tryed many variations of brctl command and other stuff but it not worked .. and
+i really dont know how to do it ..
 
 
 
