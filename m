@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Connect printer via bluetooth printer adaper
+Subject: Re: [Bluez-users] accessing info on paired devices
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Michael Klose <mk@pottklose.de>
+To: Pall Thayer <palli@pallit.lhi.is>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <loom.20040926T103741-961@post.gmane.org>
-References: <loom.20040926T103741-961@post.gmane.org>
+In-Reply-To: <41570BC9.6090109@pallit.lhi.is>
+References: <41570BC9.6090109@pallit.lhi.is>
 Content-Type: text/plain
-Message-Id: <1096359475.4684.31.camel@notepaq>
+Message-Id: <1096359364.4684.28.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Sep 2004 10:17:55 +0200
+Date: Tue, 28 Sep 2004 10:16:04 +0200
 
-Hi Michael,
+Hi Pall,
 
-> I use Debian 3.1. The connection between usb bt dongle and bt printer adapter
-> works. (hcitool scan delivers correct address of bt printer adapter, l2ping
-> works alls well).
-> 
-> How do I set up the printer (cups), so that bt connection will be used.
+> I'm working on a little project that would have to automatically scan 
+> for bluetooth devices (using a little perl script) and then attempt to 
+> connect to them. However, I would prefer if it would only attempt to 
+> connect to devices that have already been paired with the computer (via 
+> bluetooth usb-dongle) and ignore discovered devices that have not been 
+> paired. So, how can I find out which of the discovered devices have been 
+> paired?
 
-install the bluez-cups package and then setup a printer with your CUPS
-manager or whatever you use and type in the URI for that. For example to
-use a printer with BD_ADDR aa:bb:cc:dd:ee:ff the URI will be
-bluetooth://aabbccddeeff/
+if there exists a link key for this device then they are paired, but the
+problem is that security mode 1 not demands to pair two devices.
 
 Regards
 
