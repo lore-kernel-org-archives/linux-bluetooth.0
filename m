@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sdptool get <service record> output incomplete?
+Subject: RE: [Bluez-devel] Connection with a phone stays open
+	afterclosingRFCOMM channel
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <C70061B183DE09419568AB2060C52A9518EE80@arion.intra.local>
-References: <C70061B183DE09419568AB2060C52A9518EE80@arion.intra.local>
-Content-Type: text/plain; charset=iso-8859-13
-Message-Id: <1109772675.8284.5.camel@pegasus>
+To: Victor Shcherbatyuk <Victor.Shcherbatyuk@tomtom.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <C70061B183DE09419568AB2060C52A9518EE74@arion.intra.local>
+References: <C70061B183DE09419568AB2060C52A9518EE74@arion.intra.local>
+Content-Type: text/plain
+Message-Id: <1109773181.8284.16.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,35 +20,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 02 Mar 2005 15:11:15 +0100
+Date: Wed, 02 Mar 2005 15:19:41 +0100
 
 Hi Victor,
 
-> Is it the case that not all the attribute records are reported by
-> sdptool? Below are the outputs: first of hcidump for the request from
-> the phone for services supported (cut version showing only HF part)
-> and the second one of =B4spdtool get <HF service record>=A1, attribute
-> 0x311 is missing from sdptool output (marked unknown, but in reality
-> it is SUPPORTED_FEATURES )?
+> Don't know if I have to post it on the mailing list (with binary
+> files)...
 
-maybe this is simply unknown at the moment. Do you use the latest utils
-version? What about using the --tree option?
+if I ask for it, it is always fine ;)
 
-If it is missing, send in a patch for it.
+> I can not try 2.11 rc5 cause it is not an option for the current project
+> and I do not have time to try it at home at the moment.
 
-> hcidump gives:
->=20
-> =20
->=20
-> HCI sniffer - Bluetooth packet analyzer ver 1.18
->=20
-> device: hci0 snap_len: 1028 filter: 0xffffffff
->=20
-> > ACL data: handle 41 flags 0x02 dlen 17
+Using a 2.6.10-mh4 is also possible, but you should at least try it with
+my kernel patch.
 
-Please stop posting HTML emails to the mailing list. The newlines got
-messed up and it makes everything hard to read. Good old plain ASCII is
-just enough.
+> At the moment it is not clear from the protocol (at least for me) who is
+> responsible for terminating connection. It may be as well a bug in
+> SE630, cause Nokia 7650 for instance takes initiative to terminate the
+> connection after DISC on dlci6 (but from another side Nokias do not take
+> initiative to reconnect to HF device when call is received when
+> bluetooth connection is broken, as SE phones do...)
+
+You won't find any written words or hints inside the specification who
+is responsible for terminating a connection. I discussed this problem
+with a lot of people so far and there is no solution besides accepting
+bad implementations.
+
+Actually I asked you for the contents of
+
+	/proc/bluetooth/rfcomm/{dlc|sock}
+
+after you ran into the stalled connection. They are really needed,
+because it might be a bug with our code that we don't cleanup the mess
+of the SE 630.
 
 Regards
 
