@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] itec CF dongle and PCMCIA reduction
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200401252215.59732.cijoml@volny.cz>
-References: <200401252215.59732.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1075072311.18967.8.camel@pegasus>
-Mime-Version: 1.0
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: Bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200401252215.59732.cijoml@volny.cz>
+Subject: [Bluez-users] itec CF dongle and PCMCIA reduction
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,25 +17,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 26 Jan 2004 00:11:51 +0100
+Date: Sun, 25 Jan 2004 22:15:59 +0100
 
-Hi Michal,
+Hi,
 
-> in one shop in Czech Republic, there they have very cheap BT CF card from 
-> iTec.
-> This card has CF<->PCMCIA reduction.
-> 
-> Will this work with BlueZ?
+in one shop in Czech Republic, there they have very cheap BT CF card from 
+iTec.
+This card has CF<->PCMCIA reduction.
 
-in general all of these cards are serial PCMCIA cards with a specific
-UART and Bluetooth chip inside. First goal is to make these cards work
-with the serial_cs driver and then you must find the correct settings
-for the hciattach command. Baudrate, H4 or BCSP etc.
+Will this work with BlueZ?
 
-Regards
-
-Marcel
-
+Michal 
 
 
 
