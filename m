@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: digger vermont <dv_mlist@verizon.net>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1074566227.3670.24.camel@myrna>
+From: "Sean Barry" <sfelkes@hotmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
-Subject: [Bluez-users] Config for Socket CF card
+Content-Type: text/plain; format=flowed
+Message-ID: <BAY7-F59De03WTxKrbN00033084@hotmail.com>
+Subject: [Bluez-users] BlueZ on Linux iPAQ
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,71 +15,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 19 Jan 2004 21:37:08 -0500
+Date: Tue, 20 Jan 2004 02:48:11 +0000
 
-Hello All,
+Hi,
 
-I give up. Its time to look for help.  After too much time I discovered
-that I was trying to use the wrong module (dtl1_cs) and for all the
-threads in the mailing list archives I haven't been able to figure it
-out.  Also keep in mind that anything I've done are wild guesses due to
-desperation :)
+Could anyone help me get BlueZ installed and configured on any of Familiar 
+v0.7, 0.7.1 or 0.7.2.  Ideally the latter I have a 3970 iPAQ which is not 
+able to access the Internet.  Thus far I have installed the following: -
 
-Here's the card I have:
+bluez-modules-2.4.18-rmk3_2.1-1_arm.ipk
+task-bluez_1.3-hh1_arm.ipk
 
--------------------------------------------
-product info: "Socket", "CF+ Personal Network Card Rev 2.5"
-  manfid: 0x0104, 0x0096
-  function: 2 (serial)
------------------------------------------
+Task-bluez required some other ipkgs which I installed until task-bluez 
+install completed successfully.  However, when I install the Rococo 
+reference implementation of Java APIs in Bluetooth I get the following 
+error.
 
-I believe that means I have the infamous revision G.
+/mnt/hda # ipkg install impronto_1.1_arm.ipk
+ERROR: Cannot satisfy the following dependencies for impronto:
+         libbluetooth libsdp
 
-My laptop is a powerbook G4.  The kernel is 2.6.1-ben1 using devfs.
+bluez-libs-2.0_0.9-hh1_arm.ipk is installed as is bluez-sdp_0.7-hh7_arm.ipk.
 
-Cardmgr seems to starting correctly.  Pcmcia had no config for this card
-or for the hci_uart so I added an entry to /etc/pcmcia/config.opts.  I
-also changed  the port and memory settings for the powerbook.  Is this
-correct?
+Are these the right files? Where can I get the right files? I can switch the 
+BT radio on from GPE and perform hciconfig hci0, hcitool scan and hcitool 
+inquiry.  Do I need to install any BlueZ packages in Familiar v0.7.2.
 
-----------------------------------
-device "hci_uart"
-  class "bluetooth" module "hci_uart"
- 
-card "Socket Bluetooth Card"
-  version "Socket", "CF+ Personal Network Card Rev 2.5"
-  manfid 0x0104, 0x0096
-  bind "hci_uart"
+Please help me this problem is really bothering me.
 
-include port 0x100-0x4ff, port 0x800-0x8ff, port 0xc00-0xcff
-include memory 0x80080000-0x8008ffff
--------------------------------------
+Regards,
 
-When I insert the card this is what I get in the log:
+Sean
 
-----------------------------------------------------
-Jan 19 21:24:34 [cardmgr] initializing socket 0
-Jan 19 21:24:34 [cardmgr] socket 0: Socket Bluetooth Card
-Jan 19 21:24:34 [cardmgr] product info: "Socket", "CF+ Personal Network
-Card Rev 2.5"
-Jan 19 21:24:34 [cardmgr] manfid: 0x0104, 0x0096  function: 2 (serial)
-Jan 19 21:24:34 [cardmgr] executing: 'modprobe hci_uart'
-Jan 19 21:24:34 [kernel] Bluetooth: HCI UART driver ver 2.1
-Jan 19 21:24:34 [kernel] Bluetooth: HCI H4 protocol initialized
-Jan 19 21:24:34 [cardmgr] bind 'hci_uart' to socket 0 failed: Invalid
-argument
-------------------------------------------------------------
-
-
-Any help, or directions to where I can find it, would be greatly
-appreciated.
-
-Thanks,
-
-digger
-
-
-
+_________________________________________________________________
+Tired of 56k? Get a FREE BT Broadband connection 
+http://www.msn.co.uk/specials/btbroadband
 
 
 
