@@ -1,86 +1,59 @@
-Return-Path: <aklish1@urbana.css.mot.com>
-Date: Thu, 23 Oct 2003 17:08:21 -0500 (CDT)
-From: Aaron Klish <aklish1@urbana.css.mot.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: Aaron Klish <AKLISH1@motorola.com>,
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Date: Thu, 23 Oct 2003 08:03:46 +0200
+From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-devel] RFCOMM TTY data loss
+In-reply-to: <Pine.GSO.4.20.0310221044310.1278-100000@angel.urbana.css.mot.com>
+Sender: bluez-devel-admin@lists.sourceforge.net
+To: Aaron Klish <aklish1@urbana.css.mot.com>
+Cc: Aaron Klish <aklish1@wombat.urbana.css.mot.com>,
+   Aaron Klish <AKLISH1@motorola.com>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: setsockopt for RFCOMM
-In-Reply-To: <1066889032.18996.28.camel@pegasus>
-Message-ID: <Pine.GSO.4.20.0310231659530.15561-100000@wombat.urbana.css.mot.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Message-id: <1066889032.18996.28.camel@pegasus>
+MIME-version: 1.0
+Content-type: text/plain; CHARSET=US-ASCII
+References: <Pine.GSO.4.20.0310221044310.1278-100000@angel.urbana.css.mot.com>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Id: <bluez-devel.lists.sourceforge.net>
 
-Hi Marcel,
-  I didn't explain myself well.  The subject of my mail was also incorrect.  
-Suggesting exposing credit and RFCOMM frame size to user space has nothing to do
-with the Rfcomm TTY data loss I have observed.  Therefore, I'm changing the subject of 
-this thread to "setsockopt for RFCOMM".
+Hi Aaron,
 
-The MTU I was referring to in my email was not the L2CAP MTU that Rfcomm initializes for PSM 3.
+>   Are there any plans in the future to allow control of RFCOMM MTU and credits from user space?
+> I'm using 2.4.20 (mh9 patch) and these parameters are currently assigned default values in the kernel.
+> L2CAP already has an option to control MTU through setsockopt.  It seems like adding control
+> for parameters for RFCOMM would be a good feature - perhaps also through setsockopt?   Any thoughts
+> on this?  Thanks.
 
-I was referring to the "Maximum Frame Size" defined in GSM 7.10 specification in
-section 5.1.8.1.1.
+the Linux implementation of RFCOMM is a stream and so it don't have a
+MTU. You have the in and out MTU of the underlaying L2CAP PSM 3 and we
+try to set them to 1024 by default. We have talked about this some time
+ago (look at the archive) and there is no proof that having a different
+L2CAP MTU improves the performance of RFCOMM.
 
-This is the part of the PN negotiation in core.c:
+The credits are not for the user space, because they are only used for
+the flow control. These kind of stuff must be handled by the RFCOMM
+layer and nobody should have to worry about it. If there is a problem
+with it, we have to fix it in the RFCOMM layer itself.
 
-        pn->mtu = htobs(d->mtu);
+Regards
 
-in function rfcomm_send_pn.
-
-This Maximum Frame Size is separate than the L2CAP MTU negotiated.   The Maximum Frame
-Size cannot exceed the L2CAP MTU negotiated, but it can certainly be less.
-
-The reason we are interested in changing these values (credit and Max Frame Size)
-is not for performance but to limit memory.
-
-When RFCOMM sends a PN, it is advertising an abstract "buffer size" which equals
-the number of credits * the Maximum Frame Size.
-
-Currently, this abstract "buffer" is defined at compile time.  To customize it
-for a given product, requires modifying the kernel or modules.  Furthermore,
-this "buffer" is currently the same size for all services.  
-
-It would be nice to be able to configure this without having to recompile
-and to customize it on a per service basis.
-
-Aaron 
-
-------------
-Aaron Klish
-Bluetooth Software Engineer
-Motorola PCS
-PH# (217) 384-8598
-FX# (217) 384-8550
-
-[X]  Motorola General Business Information
-[ ]  Motorola Internal Use Only
-[ ]  Motorola Confidential Proprietary
-
-On 23 Oct 2003, Marcel Holtmann wrote:
+Marcel
 
 
-> Hi Aaron,
-> 
-> >   Are there any plans in the future to allow control of RFCOMM MTU and credits from user space?
-> > I'm using 2.4.20 (mh9 patch) and these parameters are currently assigned default values in the kernel.
-> > L2CAP already has an option to control MTU through setsockopt.  It seems like adding control
-> > for parameters for RFCOMM would be a good feature - perhaps also through setsockopt?   Any thoughts
-> > on this?  Thanks.
-> 
-> the Linux implementation of RFCOMM is a stream and so it don't have a
-> MTU. You have the in and out MTU of the underlaying L2CAP PSM 3 and we
-> try to set them to 1024 by default. We have talked about this some time
-> ago (look at the archive) and there is no proof that having a different
-> L2CAP MTU improves the performance of RFCOMM.
-> 
-> The credits are not for the user space, because they are only used for
-> the flow control. These kind of stuff must be handled by the RFCOMM
-> layer and nobody should have to worry about it. If there is a problem
-> with it, we have to fix it in the RFCOMM layer itself.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by OSDN developer relations
+Here's your chance to show off your extensive product knowledge
+We want to know what you know. Tell us and you have a chance to win $100
+http://www.zoomerang.com/survey.zgi?HRPT1X3RYQNC5V4MLNSV3E54
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
