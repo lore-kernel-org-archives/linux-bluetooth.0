@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Limitation of emulator ?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Varat Chaikasetsin <varat_c@hotmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20040210T083307-660@post.gmane.org>
-References: <loom.20040210T083307-660@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1076401392.32750.9.camel@pegasus>
+From: Radu Maurer <a400@gmx.de>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20040210175802.GA17705@mail.gmx.de>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Apple keyboard
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,27 +15,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Feb 2004 09:23:12 +0100
+Date: Tue, 10 Feb 2004 18:58:02 +0100
 
-Hi Varat,
+What is the method of choice to get an Apple BT keyboard running with
+linux?
 
->    I'm doing  my final year project about routing in Scatternet.I need to have 
-> lots of BT devices for this project so I decided to use "hciemu" to simulate 
-> many BT devices instead of using the real ones.
->    Everthing seems to be allright with that emulator but now I'm facing a big 
-> problem. I can't simulate BT device more than 15 devices (hci0 - hci15).I  
-> use "hciemu localhost:xx" command to simulated all devices. 
->    Moreover, when I've simulated 15 devices then pluged the USB device in ,I 
-> can't see or use that USB device by using "hciconfig" command.
->     What am I doing wrong? what should I do ? or it's a limitation of the 
-> emulator ?
+I am running kernel 2.4.24 and debian unstable. 
+I have a USB dongle Epox DG02A.
 
-the kernel side has no limit of attached devices, but the userspace
-tools like hciconfig etc. are limited to maximal 16 devices.
+Do I need to patch the kernel?
+Do I need to upgrade to the 2.6 kernel series?
+Do i need bluez from CVS?
 
-Regards
+thanks
+Radu
 
-Marcel
+hciconfig -a sais:
+hci0:   Type: USB
+        BD Address: 00:04:61:81:24:6F ACL MTU: 192:8  SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:99 acl:0 sco:0 events:13 errors:0
+        TX bytes:296 acl:0 sco:0 commands:12 errors:0
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'baerbel-0'
+        Class: 0x000100
+        Service Classes: Unspecified
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
+
+hcitool scan:
+Scanning ...
+        00:0A:95:3A:3F:CC       Apple Wireless Keyboard
+
+hcitool inq
+Inquiring ...
+        00:0A:95:3A:3F:CC       clock offset: 0x0ece    class: 0x002540
 
 
 
