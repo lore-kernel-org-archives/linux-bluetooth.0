@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 To: bluez-devel@lists.sourceforge.net
-From: Sebastian Roth <sebiroth@web.de>
-Message-ID: <csts46$p5n$1@sea.gmane.org>
+From: Paul Ionescu <i_p_a_u_l@yahoo.com>
+Message-ID: <pan.2005.01.22.15.35.18.929419@yahoo.com>
 References: <41F0EB0A.1020302@webstuhl.net> <41F0FE84.8030401@dark-reality.de> <41F128F4.2020006@webstuhl.net> <41F13638.1080207@dark-reality.de> <41F25C4B.6040709@webstuhl.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <41F25C4B.6040709@webstuhl.net>
+Content-Type: text/plain; charset=ISO-8859-1
 Subject: [Bluez-devel] Re: Again: Problems with Dongle, Headset or btsco
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,36 +17,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 22 Jan 2005 16:40:11 +0100
+Date: Sat, 22 Jan 2005 17:35:19 +0200
 
-Hi Ben,
+Hi,
 
-> ok. Is it possible that the SCO Part of this dongle is somehow broken?
-> Obviously the RFCOMM Part is working fine.
-I've had problems with a Anycom 220 dongle (also Silicon Wave chip) too. 
-RFCOMM seemed to work but no sound. hcidump showed a flow of sco packets 
-with handle 0. Can't get it working till now so I decided to use another 
-one.
+On Sat, 22 Jan 2005 14:59:39 +0100, Ben Pezzei wrote:
 
-> Question: when connected via btsco and trying to play
-> some sound with:
-> aplay -D plughw:Headset soundfile
-> Does soundfile need to have the correct samplerate,frequency,etc
-> as the Headset?
-IMHO, no.
+> Since the hwdep module is part of the alsa-libs it looks like the dongle
+> can't be re-initialized (as a soundcard) after a disconnect.
 
-> unfortunately
-> arecord -D plughw:Headset z1.out
-> Recording WAVE 'z1.out' : Unsigned 8 bit, Rate 8000 Hz, Mono
+How do you know the dongle can't be re-initialized ?
+What does it say when you launch again btsco ?
+
+> Last Question: Which are other methods to send/receive data from/to the
+> headset beside aplay / arecord?
 > 
-> only creates a 44 Byte big file z1.out with the header but
-> no content
-For older versions of arecord this is the usual behaviour. Update 
-alsa-tools or try the commandline switch '-d' (man arecord).
+> eg cat /dev/snd/pcmC1D0c > z1.out ? :)
 
-Best regards,
+I was able to use gnomemeeting, mplayer and other programs that use alsa
+or oss.
+For mplayer I used -ao alsa:device=hw=Headset -srate 8000 -channels 1
 
-Sebastian
+
 
 
 
