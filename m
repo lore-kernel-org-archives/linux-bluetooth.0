@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de4657604121705486b925ee0@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
+Subject: Re: [Bluez-users] how to identify power class
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1103280955.4097.172.camel@justakiss>
+References: <1103280955.4097.172.camel@justakiss>
+Content-Type: text/plain
+Message-Id: <1103281494.6317.0.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] l2cap retransmission
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Dec 2004 19:18:32 +0530
+Date: Fri, 17 Dec 2004 12:04:54 +0100
 
-Hi marcel,
-in l2test suppose a data mismatch or error occurs, are the packets
-retransmitted???? if yes, can we watch the packet retransmission in
-hcidump......
+Hi Erwin,
 
-i have been able to see some data and sequence mismatch packets  and
-the connection was not brought down....so i assume that retransmission
-must have taken place.....
+> is it possible to get the power class (1,2,3) of a bluetooth device by
+> software (hciconfig, ...)? 
 
-regards,
-manjunath
+not that I know of.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
