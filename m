@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Mauro Tortonesi <mtortonesi@ing.unife.it>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200401221042.53134.mtortonesi@ing.unife.it>
-Subject: [Bluez-devel] problems with nc6 with bluez support
+Subject: Re: [Bluez-devel] pand Connection refused(111) when connecting to
+	a Belkin NAP
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dave Henriksen <dhenriksen@optibrand.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1074719150.2980.9.camel@linux.local>
+References: <1074718139.2978.7.camel@linux.local>
+	 <1074715001.7263.19.camel@pegasus>  <1074719150.2980.9.camel@linux.local>
+Content-Type: text/plain
+Message-Id: <1074716061.7263.37.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,34 +20,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 22 Jan 2004 10:42:53 +0100
+Date: Wed, 21 Jan 2004 21:14:22 +0100
 
+Hi Dave,
 
-hi to everybody,
+> Here is the file from the hcidump.
 
-i have just modified nc6 (an advanced IPv6-enabled nc clone) to support 
-connections over bluetooth. normal connections over l2cap seem to work fine 
-(although i have not been able to tranfer audio data over l2cap yet) but when 
-i try to perform data tranfers over sco the 
+	> ACL data: handle 0x0029 flags 0x02 dlen 16
+	    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 2 status 0
 
-i am using kernel 2.4.25-pre6 and 2.4.22 on my test hosts. perhaps i should 
-switch to 2.6-series kernels? i am not sure about this, since l2test and 
-scotest from bluez-utils 2.3 seem to work fine on these kernel.
+The result code 2 means "Connection refused - PSM not supported". Are
+you sure this AP supports the PAN Profile. Try using dund instead.
 
+Regards
 
-P.S.: i have not officially released the bluez-enabled version of nc6 yet, but 
-      if you are interested you can find the latest cvs sources here:
-
-      http://cvs.deepspace6.net/view/nc6
-
--- 
-Aequam memento rebus in arduis servare mentem...
-
-Mauro Tortonesi                 mtortonesi@ing.unife.it
-                                mauro@deepspace6.net
-                                mauro@ferrara.linux.it
-Deep Space 6 - IPv6 with Linux  http://www.deepspace6.net
-Ferrara Linux User Group        http://www.ferrara.linux.it
+Marcel
 
 
 
