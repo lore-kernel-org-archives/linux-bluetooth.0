@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problem with l2test
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Zbyszek <dzidoz@poczta.fm>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040228173402.ECDBD1EC7AB@front.interia.pl>
-References: <20040228173402.ECDBD1EC7AB@front.interia.pl>
-Content-Type: text/plain
-Message-Id: <1077995657.2843.91.camel@pegasus>
-Mime-Version: 1.0
+From: Zbyszek <dzidoz@poczta.fm>
+To: mailing list <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: TEXT/plain; CHARSET=ISO-8859-2
+Message-Id: <20040228173402.ECDBD1EC7AB@front.interia.pl>
+Subject: [Bluez-users] Problem with l2test
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,50 +15,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 28 Feb 2004 20:14:17 +0100
+Date: 28 Feb 2004 18:34:02 +0100
 
-Hi Zbyszek,
+Hi all
 
-> I have problem. This is my part of the simple program.
->  
-> #include <netinet/in.h>
-> #include <arpa/inet.h>
-> #include <resolv.h>
-> #include <netdb.h>
-> #include <sys/socket.h>
-> 
-> #include <bluetooth/bluetooth.h>
-> #include <bluetooth/l2cap.h>
-> //Domyslne
-> bdaddr_t bdaddr;
-> int main()
-> {
->     struct sockaddr_l2 addr;
->     char buf[2048];
->     char str[18];
->     char *adres="00:10:60:A5:F4:4C";
->     int s,i;
->     uint8_t id;
-> 
->     if (( s=socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)) < 0)
->     {
-> 	perror("Can't create socket !!!");
-> 	exit(1);
->     }
-> }
-> 
-> Exactly at this moment error appears.
-> Even when I try start the program "l2test" I see communique
-> l2test[4045]: Can't create socket. No such file or directory(2)
-> So I'm asking you, could you tell me where did I make mistake?
+I have problem. This is my part of the simple program.
+=20
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <resolv.h>
+#include <netdb.h>
+#include <sys/socket.h>
 
-load the L2CAP kernel module.
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/l2cap.h>
+//Domyslne
+bdaddr_t bdaddr;
+int main()
+{
+    struct sockaddr_l2 addr;
+    char buf[2048];
+    char str[18];
+    char *adres=3D"00:10:60:A5:F4:4C";
+    int s,i;
+    uint8_t id;
 
-Regards
+    if (( s=3Dsocket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)) < 0)
+    {
+=09perror("Can't create socket !!!");
+=09exit(1);
+    }
+}
 
-Marcel
+Exactly at this moment error appears.
+Even when I try start the program "l2test" I see communique
+l2test[4045]: Can't create socket. No such file or directory(2)
+So I'm asking you, could you tell me where did I make mistake?
 
-
+regards
+Zbyszek
 
 
 -------------------------------------------------------
