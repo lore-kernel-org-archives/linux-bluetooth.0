@@ -1,13 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <40E02D93.8090305@conectiva.com.br>
-From: "Ademar de Souza Reis Jr." <ademar@conectiva.com.br>
-MIME-Version: 1.0
-To: "Nicholas A. Preyss" <nalp@gmx.net>
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Questions about BlueZ in  commercial use
-References: <003401c45c2b$b6eab240$0364a8c0@haruo> <20040627125235.GA15938@gmx.net>
-In-Reply-To: <20040627125235.GA15938@gmx.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] PAN and kernel 2.4.26
+From: Bastian Ballmann <Crazydj@chaostal.de>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1088427485.3774.203.camel@pegasus>
+References: <1088271695.29447.5.camel@espy.crazydj.de>
+	 <1088364052.3774.67.camel@pegasus>
+	 <1088372482.2430.4.camel@espy.crazydj.de>
+	 <1088406110.3774.91.camel@pegasus>
+	 <1088413956.2508.3.camel@espy.crazydj.de>
+	 <1088414347.3774.170.camel@pegasus>
+	 <1088418472.2513.6.camel@espy.crazydj.de>
+	 <1088419003.3774.179.camel@pegasus>
+	 <1088423529.2513.15.camel@espy.crazydj.de>
+	 <1088427485.3774.203.camel@pegasus>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-tR3To679jYaTk0A0RjZP"
+Message-Id: <1088428991.2513.23.camel@espy.crazydj.de>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,39 +26,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Jun 2004 10:39:15 -0400
+Date: Mon, 28 Jun 2004 15:23:11 +0200
 
-Nicholas A. Preyss wrote:
-> On  0, KeiHachi <keihachi@swissinfo.org> wrote:
-> 
->>I have some questions about BlueZ.
->>
->>Our company is investigating now about BlueZ,
->>to determine whether it is useful to use in our commercial product, or not.
-> 
-> 
-> If this is the first GPL software you are using, please read and 
-> understand the implications of this license. This is no offense, but i
-> think some DVD and Router manufacturer didn't do this before integrating
-> linux code in their products.
-> 
 
-Hello.
+--=-tR3To679jYaTk0A0RjZP
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-While we're at this topic: Is there a way to get a license to use the bluez 
-code in a comercial, closed-source, product? (I was thinking about something 
-like what QT/Trolltech does).
+Hi Marcel,
 
-I'm sorry if this has been asked before, but I haven't found it in the 
-archives and it's not in the FAQ.
+On Mon, 2004-06-28 at 14:58, Marcel Holtmann wrote:
 
-Thanks.
+> I don't think so, because I looked at the patch and this seems to
+> introducing the problem:
 
--- 
-Ademar de Souza Reis Jr. <ademar@conectiva.com.br>
-Conectiva S.A. - http://www.conectiva.com.br
+I thought it would be enough to disable all patches in my .config
+and recompile the kernel, but that seems to be wrong...
 
-^[:wq!
+> And here is the fix for pand to also work with the patch:
+
+Yes, that works. Thanks a lot! :P
+Greets
+
+Basti
+
+--=-tR3To679jYaTk0A0RjZP
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQBA4Bu+3rCd3KdGxg4RAh/kAKCSk4wD5RxpJqZBuju8YCwIsfgizQCeP2nX
+qWdk5a6yRIAJMLLJb4pcYnQ=
+=5upy
+-----END PGP SIGNATURE-----
+
+--=-tR3To679jYaTk0A0RjZP--
 
 
 
