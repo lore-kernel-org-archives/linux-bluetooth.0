@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Socket G card newbie Q
 From: Marcel Holtmann <marcel@holtmann.org>
-To: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: John McCorquodale <mcq@cacr.caltech.edu>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403071625.01627.wim.delvaux@adaptiveplanet.com>
-References: <200403071625.01627.wim.delvaux@adaptiveplanet.com>
+In-Reply-To: <20040308002100.GA19049@viz.cacr.caltech.edu>
+References: <20040307214224.GB18481@viz.cacr.caltech.edu>
+	 <1078704901.15279.6.camel@pegasus>
+	 <20040308002100.GA19049@viz.cacr.caltech.edu>
 Content-Type: text/plain
-Message-Id: <1078705651.15279.20.camel@pegasus>
+Message-Id: <1078705579.15279.18.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Re: bnep and refcnt
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,22 +20,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 08 Mar 2004 01:27:31 +0100
+Date: Mon, 08 Mar 2004 01:26:19 +0100
 
-Hi Wim,
+Hi John,
 
-> after browsing the Linux 2.6 code there is a remark in net/core/dev.c that 
-> state what the problem with the following message that I get is 
+> The other day you said:
 > 
-> unregister_netdevice: waiting for bnep0 to become free. Usage count = 6
-> 
-> The comment with the function in dev.c states that this error is caused by 
-> buggy protocols that should unregister after receiving notification that the 
-> devices they are using has been unregistered.  They should call 
-> unregister_netdev which decreases the refcnt.
+> Marcel> The Socket 2.5 generation (also know as revision G) is a CSR based
+> Marcel> serial Bluetooth card. Look at the archives for more details.
 
-looks like we need a more detailed audit for the BNEP module and some of
-the 2.6 changes in the network device layer.
+a CSR chip can also use BCSP ;)
+
+> And the list seems to indicate that the F card is BCSP and the G card is CSR.
+> That said, using bcsp yields:
+> 
+>   $ hciattach ttyS0 bcsp 230400
+>   BCSP initialization timed out
+
+May this is the problem with some serial cards and 2.6. Try 2.4 instead.
+
+> Am I mistaken about the F/G distinction?  Am I correct in using the normal
+> serial_cs driver in the PCMCIA cardmgr?  Is there something I can run directly
+> at the serial port that will give me a more verbose dialog than "initialization
+> timed out", which might indicate some level of partial success?  Could it
+> be that there's a new G card series out there -- these are brand spankin' new
+> cards?
+
+The revision E and F are Nokia based cards and they need the dtl1_cs
+driver. The revision G contains a CSR chip with BCSP.
 
 Regards
 
