@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <423C4DC3.6000409@uol.com.br>
-From: Anderson Clayton B Rodrigues <omap@uol.com.br>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Fwd: alsa bluetooth module
+From: Fredrik Tolf <fredrik@dolda2000.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] 'make' and 'make install' not working
-References: <20050317091358.63188.qmail@web52403.mail.yahoo.com>
-In-Reply-To: <20050317091358.63188.qmail@web52403.mail.yahoo.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Cc: ms419@freezone.co.uk, durtro@ginnungagap.de
+In-Reply-To: <423B6547.5040001@email.it>
+References: <e36f1e61ac13a554d52d2f7b8d7a5df4@freezone.co.uk>
+	 <1111098892.19889.88.camel@pc7.dolda2000.com>  <423B6547.5040001@email.it>
+Content-Type: text/plain
+Message-Id: <1111241935.11381.3.camel@pc7.dolda2000.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,64 +20,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 19 Mar 2005 11:05:23 -0500
+Date: Sat, 19 Mar 2005 15:18:55 +0100
 
-jose wrote:
+On Sat, 2005-03-19 at 00:33 +0100, Antonio-Blasco Bonito wrote:
+> Fredrik Tolf ha scritto:
+> >By no means. kcalloc() is a core kernel function, defined in mm/slab.c.
+> >It's not an ALSA-specific routine.
+> >  
+> >
+> No kcalloc in there... see the appended file from kernel-source-2.6.8
 
->Hi,
->
->After downloadin the bluez files, i did './configure',
->but iam unable to 'make' or 'make install'.
->
->this is what i got when i did ./configure
->
->
->jose:/home/jose/bluetooth/bluez-hcidump-1.18 #
->./configure --with-gcc --prefix=/usr
->--mandir=/usr/share/man
->checking for a BSD-compatible install...
->/usr/bin/install -c
->checking whether build environment is sane... yes
->checking for gawk... gawk
->checking whether make sets $(MAKE)... no
->checking whether to enable maintainer-specific
->portions of Makefiles... no
->checking for gcc... no
->checking for cc... no
->checking for cc... no
->checking for cl... no
->configure: error: no acceptable C compiler found in
->$PATH
->
->
->
->now, how do i set the path to gcc?
->
->Thanks in advance,
->Jose
->
->__________________________________________________
->Do You Yahoo!?
->Tired of spam?  Yahoo! Mail has the best spam protection around 
->http://mail.yahoo.com 
->
->
->-------------------------------------------------------
->SF email is sponsored by - The IT Product Guide
->Read honest & candid reviews on hundreds of IT Products from real users.
->Discover which products truly live up to the hype. Start reading now.
->http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-de
->  
->
-Jose,
+It does indeed seem that you're right. It seems the kcalloc was added in
+either 2.6.9 or 2.6.10 (which surprises me, because I believe that the
+snd-bt-sco module has been around longer than that). Now that I know
+that, the module should be changed to use kmalloc instead. I'll take
+care of that right now.
 
-There are some references about it in the list archives. Take a look there.
+Fredrik Tolf
 
-Regards,
+
 
 
 -------------------------------------------------------
