@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <422DAB03.1010402@prim-time.fr>
-From: Xavier Garreau <x.garreau@prim-time.fr>
-MIME-Version: 1.0
+Message-ID: <20050308132455.92993.qmail@web26604.mail.ukl.yahoo.com>
+From: BZ Benny <bennybbz@yahoo.fr>
+Subject: Re: [Bluez-users] creation of Bnep0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] adding a sdp service with a 128bit uuid
-References: <20050308123527.49819.qmail@web60910.mail.yahoo.com>
-In-Reply-To: <20050308123527.49819.qmail@web60910.mail.yahoo.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: 6667
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,38 +17,76 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 08 Mar 2005 14:39:15 +0100
+Date: Tue, 8 Mar 2005 14:24:54 +0100 (CET)
 
->     3. actually this is more a c then a bluez question, but i'd
->     appreciate if
->     someone could tell it nevertheless:
->     # sdp_uuid32_create(uuid_t *uuid, uint32_t data);
->     # sdp_uuid128_create(uuid_t *uuid, const void *data);
->     the second function takes the uuid as "const void *data". What is the
->     appropriate way to give a uuid like 2c3ef0c843674369b1dfb7315e76332a to
->     that function?
->     I asked google and he (she?) told me this:
->     http://www.xgarreau.org/aide/devel/bluetooth/timeserver.c
->     but it seems a little big for me...
+Hi Marcel,
 
-Whaou, nice, i love google :)
+I was reading the archive about the story of BNEP.
+and I see that Max was more interested in an
+implementation with TUN/TAP device.
+a breif description of fabricio was a VTun support of
+BNEP packet:
 
-Actually i wrote this sample for a presentation in a university. It's 
-not production quality code.
 
-But to give data as void* you can do something like this:
+>>extending VTun so it implements BNEP
 
-unsigned char uuid_data[16] = {0x2c, 0x3e, 0xf0, 0xc8, 0x43, 0x67, 0x43, 
-0x69, 0xb1, 0xdf, 0xb7, 0x31, 0x5e, 0x76, 0x33, 0x2a};
-...
-sdp_uuid128_create (&uuid, (void*)uuid_data);
+>One way would be to implement BNEP support in vtund.
+>Packets would be sent to a TAP (virtual Ethernet) and
+>vtund would format the Ethernet packet to BNEP. Only,
+>all packets would have to go to user space before
+>being sent to the Bluetooth socket.
+ 
+My quetsion is : was there a Bluez release which use
+TUN/TAP device? 
 
-Actually, in the code you mentionned i used the create_base_uuid 
-function from a bluez source ... But i don't remember from what file it 
-was ...
+regards,
+benny
 
-Regards,
-Xavier
+
+--- Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Benny,
+> 
+> > It's exactly wath I wanted to know.
+> > 
+> > I will see that in the archive. But i think that
+> you
+> > choose to create it in the kernel for better
+> > performance.
+> 
+> it is a matter of performance and a matter of a
+> better native
+> integration and thus making it easier to use.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+>
+-------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT
+> Products from real users.
+> Discover which products truly live up to the hype.
+> Start reading now.
+>
+http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+
+
+	
+
+	
+		
+Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
+Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
