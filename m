@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <419AE72F.3030307@patbert.com>
-From: Patrick <patbert@patbert.com>
-MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Using windows breaks bluetooth in linux? huh
+Message-ID: <2de4657604111621221753c870@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] bluetooth connection goes down
+In-Reply-To: <1100616835.7235.13.camel@notepaq>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <2de46576041116061851f9e35f@mail.gmail.com>
+	 <1100616835.7235.13.camel@notepaq>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,63 +19,68 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Nov 2004 00:52:47 -0500
+Date: Wed, 17 Nov 2004 10:52:06 +0530
 
-I have an Apple BT keyboard and a D-Link usb BT adaptor.
+hi,
+1> i am using the hcitool to get the rssi, lq and tpl
+values........hcitool gives me these values only after a "cc" to my
+neighbor BT device. Is there some other method to get these values????
+Also, are there any other performance parameters specific to BT i can
+measure, like delay??
 
-I have had it up and running in linux now for quite some time without 
-any trouble. I reboot, turn the pc off, whatever, the bluetooth always 
-works.
+2> I am using linux kernel 2.6.6 and currently available bluetooth
+debian packages.
 
-But today I booted my pc into windows (half life 2 lol) and thanks to 
-service pack 2 I can now use my BT adaptor in windows so I fiddled 
-around and got the apple keyboard connected.
+regards,
+manjunath
 
-So now I reboot back into linux and I cannot for the life of me get 
-bluetooth working again! I have had the pc/keyboard off for an extended 
-period of time, unplugged and plugged the adaptor back in, nothing will 
-get this keyboard connected again!
-
-
-Kawaii64 patrick # hidd --search
-Searching ...
-         Connecting to device 00:0A:95:3A:63:E4
-Can't create HID control channel: Permission denied
-
-
-And while this is happening hcidump says:
-
-
-Kawaii64 ~ # hcidump
-HCIDump - HCI packet analyzer ver 1.9
-device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-< HCI Command: Inquiry (0x01|0x0001) plen 5
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Complete (0x01) plen 1
-< HCI Command: Create Connection (0x01|0x0005) plen 13
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Link Key Request (0x17) plen 6
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
- > HCI Event: Command Complete (0x0e) plen 10
- > HCI Event: Connect Complete (0x03) plen 11
-
-
-I used the same passkey in windows as I do in linux (0000). I honestly 
-cannot see how running BT while in windows would have any affect on its 
-functioning in linux, especially after everything has been off for a 
-long time in between.
-
-The only reason I suspect there is a connection is that I had this crop 
-up in the past. For the longest time I stopped using the apple keyboard 
-because after I had it working in linux I rebooted into windows the same 
-day and then it never worked again in linux. I chalked it up to my 
-stupidty but here again it is happening.
-
-Any idea what is going on here? Is this all unrelated? Thank you for any 
-  insight.
-
-Patrick
+On Tue, 16 Nov 2004 15:53:55 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi,
+> 
+> > I have the following doubts
+> >
+> > 1> I use "hcitool cc <bt_addr> command " to connect to my neighboring
+> > BT device. The first few times this connects with no errors.  After
+> > sometime, the connection goes down for some reason and if I try yo
+> > coonect again, I get an error saying
+> >
+> > "Can't create connection: Input/output error"......can someone tell me
+> > as to why i am getting this error.
+> 
+> the "hcitool cc ..." command is only for testing. Don't use it.
+> 
+> 
+> 
+> > 2> I use bnep for tcp/ip communication and this connection also goes
+> > down after sometime. I try to connect using "pand --connect
+> > <bt_addr>"....and in /var/log/daemon.log in get the following lines
+> >
+> > Nov 16 19:42:29 edpc449 pand[2128]: Bluetooth PAN daemon
+> > Nov 16 19:42:29 edpc449 pand[2128]: Connecting to <bt_addr>
+> > Nov 16 19:42:29 edpc449 pand[2128]: Connect to <bt_addr> failed.
+> > Operation already in progress(114)
+> >
+> > I have tried killing the processes and connection(using pand --kill)
+> > on both sides....and then restarting them....but to no effect. Only a
+> > clean reboot seems to be the solution.
+> > Hope u can help me with this too.
+> 
+> What kernel version is this? Stop using "hcitool cc ...".
+> 
+> Regards
+> 
+> Marcel
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: InterSystems CACHE
+> FREE OODBMS DOWNLOAD - A multidimensional database that combines
+> robust object and relational technologies, making it a perfect match
+> for Java, C++,COM, XML, ODBC and JDBC. www.intersystems.com/match8
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
