@@ -1,16 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth dongle
+Subject: Re: [Bluez-users] running 2 rfcomm modules simultaneously
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ricky Soh <rickysoh@gmail.com>
+To: David Mackie <D.Mackie@ru.ac.za>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <db972f4304091403133100b53a@mail.gmail.com>
-References: <db972f43040910000351e5b931@mail.gmail.com>
-	 <1094997330.5695.4.camel@pegasus>
-	 <db972f4304091218256f88456a@mail.gmail.com>
-	 <1095079363.5695.48.camel@pegasus>
-	 <db972f4304091403133100b53a@mail.gmail.com>
+In-Reply-To: <20040914124718.GA76088@rucus.ru.ac.za>
+References: <20040901130123.GB31321@rucus.ru.ac.za>
+	 <1094998092.5695.19.camel@pegasus>  <20040914124718.GA76088@rucus.ru.ac.za>
 Content-Type: text/plain
-Message-Id: <1095186923.5695.195.camel@pegasus>
+Message-Id: <1095167315.5695.136.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -22,16 +19,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Sep 2004 20:35:24 +0200
+Date: Tue, 14 Sep 2004 15:08:35 +0200
 
-Hi Ricky,
+Hi David,
 
-> I have went through the messages and couldn find related messages.
-> Maybe i missed it. But i reformatted my comp and installed Redhat 9.
-> The problem doesn't exist. What is the problem with Fedora Core 2?
+> > this is not possible this way. It needs more changes to provide such a
+> > functionality and you must keep it inside the RFCOMM module. Why do you
+> > need it?
+> 
+> I had hoped to be able to "pick-up" data sent to the 2nd RFCOMM Module
+> (using a new PCM value to differentiate it from the "Original") and pass it to
+> another program to transport it across the network to another PC where it
+> would be "injected" into a modified module there. At the moment, I am only
+> loading the modified module, and it not absolutely necessary that both be
+> loaded at a time, but would be interesting to do.
 
-I don't know, but maybe parts of it are outdated. File a bug report for
-Fedore Core 2.
+I don't really understand what you are trying to achieve, but I think
+you should try it without putting RFCOMM on another PSM.
 
 Regards
 
@@ -41,10 +45,10 @@ Marcel
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by: thawte's Crypto Challenge Vl
-Crack the code and win a Sony DCRHC40 MiniDV Digital Handycam
-Camcorder. More prizes in the weekly Lunch Hour Challenge.
-Sign up NOW http://ad.doubleclick.net/clk;10740251;10262165;m
+This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
+Project Admins to receive an Apple iPod Mini FREE for your judgement on
+who ports your project to Linux PPC the best. Sponsored by IBM. 
+Deadline: Sept. 13. Go here: http://sf.net/ppc_contest.php
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
