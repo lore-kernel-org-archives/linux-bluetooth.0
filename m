@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] cannot connect to pm-325
+Subject: Re: [Bluez-users] PPP & Smartphones
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050325023814.19446.qmail@web50701.mail.yahoo.com>
-References: <20050325023814.19446.qmail@web50701.mail.yahoo.com>
+Cc: victor.shcherbatyuk@tomtom.com
+In-Reply-To: <Pine.LNX.4.44.0503250940070.12685-100000@antilope>
+References: <Pine.LNX.4.44.0503250940070.12685-100000@antilope>
 Content-Type: text/plain
-Message-Id: <1111751727.9195.69.camel@pegasus>
+Message-Id: <1111751518.9195.65.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,34 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 25 Mar 2005 12:55:27 +0100
+Date: Fri, 25 Mar 2005 12:51:58 +0100
 
-Hi John,
+Hi Victor,
 
-> Despite it saying connection refused, the phone, when
-> searching/pairing, finds laptop-0, but pair fails
-> after i tell it to use 0000 for pin.
+> Does anyone have experience running PPP through DUN profile of a Windows 
+> Mobile smartphone? The problem I encountered is that when PPP connection 
+> is up and running and the phone receives an incoming call it sends RING 
+> over the RFCOMM channel used by PPP and if you pick up and then hang up it 
+> also sends NO CARRIER over the same channel. I have feeling this $%^&s up 
+> PPP deamon, cause after this it does not work anymore, it also does not detect any problems, so you have to kill it. Worse than that, after 
+> killing pppd, the phone remains in some weird state where it ignores any AT's 
+> sent to it, so needs to be rebooted...
+> I had this with Qtek's and Motorola's, the problem with weird state after 
+> killing pppd was solved for motorola's by using modem and crtscts in 
+> ppp options, but it changed nothing for Qtek's.
+> 
+> Is sending RING and NO CARRIER over RFCOMM used by PPP (when ppp is 
+> active) is a part of protocol?
 
-for that you need some service running, I think.
-
-> < ACL data: handle 41 flags 0x02 dlen 18
->     L2CAP(d): cid 0x0041 len 14 [psm 3]
->       RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs
-> 0x70 mcc_len 8
->       dlci 2 frame_type 0 credit_flow 15 pri 7
-> ack_timer 0
->       frame_size 670 max_retrans 0 credits 7
-> > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 41
-> > ACL data: handle 41 flags 0x02 dlen 8
->     L2CAP(d): cid 0x0040 len 4 [psm 3]
->       RFCOMM(s): DM: cr 1 dlci 2 pf 0 ilen 0 fcs 0x66
-
-and here we go. You try to connect to RFCOMM channel 1, but your phone
-says that there is not service available on that channel.
-
-Run a "sdptool browse" or "sdptool search" to find out the correct
-channel number.
+I never looked at the Windows Smartphones, because I don't have one of
+these. Do these phones run the Windows Bluetooth stack or the stack from
+Widcomm?
 
 Regards
 
