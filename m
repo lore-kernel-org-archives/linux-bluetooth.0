@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Remote name cache ?
+Subject: Re: [Bluez-devel] support for CSR Bluecore4 chip
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <424D493C.7010609@palmsource.com>
-References: <424D493C.7010609@palmsource.com>
+In-Reply-To: <20050402141512.1882699599.durai@isofttech.com>
+References: <20050402141512.1882699599.durai@isofttech.com>
 Content-Type: text/plain
-Message-Id: <1112554905.8263.19.camel@pegasus>
+Message-Id: <1112554855.8263.17.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,14 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 03 Apr 2005 21:01:45 +0200
+Date: Sun, 03 Apr 2005 21:00:55 +0200
 
-Hi Fred,
+Hi Durai,
 
-> Is there any development for a "remote friendly name" cache planned in 
-> BlueZ ?
+> We are going to use Bluecore4 chip for our product. I wanted to know
+> whether the current bluez implementation
+> will support Bluecore4 chipset. 
 
-yes it is, but I was too busy lately to get it finally done.
+besides eSCO we fully support the BlueCore4 chips. So feel free to play
+with the EDR feature.
 
 Regards
 
