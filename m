@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BNEP connection destroing :(
+Subject: Re: [Bluez-users] how to get bluetooth to emulate comport?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1109664374.42242276c644b@mail.orbitel.bg>
-References: <1109664374.42242276c644b@mail.orbitel.bg>
+In-Reply-To: <20050301033641.87972.qmail@web50707.mail.yahoo.com>
+References: <20050301033641.87972.qmail@web50707.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1109666579.17256.126.camel@pegasus>
+Message-Id: <1109665822.17256.124.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,19 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Mar 2005 09:42:59 +0100
+Date: Tue, 01 Mar 2005 09:30:22 +0100
 
-Hi Todor,
+Hi John,
 
-> I successful make a bnep connection between my laptop (with Slackware 10.0, kernel 2.4.26 with openmosix 
-> patch and latest version of bluez libs and bluez pand, but i tryed also with other versions) and desktop PC with 
-> Windows XP Pro, after few minutes  (not measured), on linux system the bnep0 interface was destroyed.
+> hciconfig hci0 up
 > 
-> Attempting to reconnect with pand worked silently, but the bnep0 interface was not created. Workaround was to 
-> remove and re-insert the dongle on my laptop, then i recreate the bnep connection again.
+> works
+> 
+> 
+> rfcomm connect 0 08:00:37:0f:84:35
+> Can't connect RFCOMM socket: Connection refused
+> 
+> I told my lg pm-325 to be visible, and waiting for
+> pairing.
+> what's the deal?
 
-run "hcidump -X -V" as root while connecting and see what really
-happens.
+run "hcidump -X -V" as root and I think you will see a PIN code request
+that is never answered. Start hcid.
 
 Regards
 
