@@ -1,37 +1,53 @@
-Return-Path: <noring@nocrew.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] D-Bus interfaces
 From: Fredrik Noring <noring@nocrew.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Phil Blundell <pb@nexus.co.uk>,
-   Fred Sch??ttgen <bluez-devel@schaettgen.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1077058771.2665.134.camel@pegasus>
+To: Phil Blundell <pb@nexus.co.uk>
+Cc: Fred Sch??ttgen <bluez-devel@schaettgen.de>,
+   bluez-devel@lists.sourceforge.net
+In-Reply-To: <20040216144615.GA318@nexus.co.uk>
 References: <1076265358.2670.36.camel@pegasus>
 	 <1076278554.14742.112.camel@akka.yeti.nocrew.org>
 	 <1076279508.6869.54.camel@pegasus>
 	 <200402090015.24318.bluez-devel@schaettgen.de>
-	 <20040216144615.GA318@nexus.co.uk> <1076945776.17824.6.camel@merlin>
-	 <20040216154155.GB32285@nexus.co.uk>  <1077058771.2665.134.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1077206496.20897.164.camel@kalkyl.roxen.com>
+	 <20040216144615.GA318@nexus.co.uk>
+Content-Type: text/plain; charset=iso-8859-1
+Message-Id: <1077205947.20897.153.camel@kalkyl.roxen.com>
 Mime-Version: 1.0
-Date: Thu, 19 Feb 2004 17:01:36 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 19 Feb 2004 16:52:27 +0100
 
-Hi Marcel
+Hi Phil
 
-tis 2004-02-17 klockan 23.59 skrev Marcel Holtmann:
-> Any other outstanding stuff before I prepare a new release?
+mån 2004-02-16 klockan 15.46 skrev Phil Blundell:
+> Encoding it as an ASCII string would be another possibility, but this
+> would generally make the marshalling/unmarshalling process more expensive,
+> and doesn't really gain you anything.
 
-I have a bunch of patches that extends hcid with D-Bus interfaces
-and so on (see http://noring.nocrew.org/bluetooth/) which would be 
-very useful for the Gnome Bluetooth Configuration utility:
-
-   1. The "keytab" file for link keys
-   2. The "nametab" file for cached names
-   3. The D-Bus interface
-   4. The use of "hcid.conf" for configuration storage
-
-Everything except (4) is implemented. 
+Marshalling of text addresses is probably negligible in a DBus context.
+It can potentially make the interface more accessible to text based
+tools such as Perl as configurarions, user input etc. are based on text
+addresses.
 
 Fredrik
+
+
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
