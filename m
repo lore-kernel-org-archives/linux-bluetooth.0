@@ -1,9 +1,9 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <cbf0aec904111910383520ec7f@mail.gmail.com>
+Message-ID: <cbf0aec904111910327e0231f7@mail.gmail.com>
 From: =?ISO-8859-1?Q?Henryk_Pl=F6tz?= <ploetz@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] AVDTP socket?
-In-Reply-To: <1100822368.7164.98.camel@pegasus>
+In-Reply-To: <419CBF0A.2030201@xmission.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 References: <418DB442.2050801@uen.org> <419543B3.8050601@xmission.com>
@@ -11,7 +11,7 @@ References: <418DB442.2050801@uen.org> <419543B3.8050601@xmission.com>
 	 <1100351199.7349.50.camel@pegasus> <41970F25.4020902@xmission.com>
 	 <1100446172.21403.16.camel@pegasus> <419B7292.9080706@xmission.com>
 	 <cbf0aec9041118052714481128@mail.gmail.com>
-	 <1100822368.7164.98.camel@pegasus>
+	 <419CBF0A.2030201@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -23,31 +23,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 Nov 2004 19:38:44 +0100
+Date: Fri, 19 Nov 2004 19:32:54 +0100
 
 Moin,
 
-On Fri, 19 Nov 2004 00:59:28 +0100, Marcel Holtmann <marcel@holtmann.org> w=
-rote:
+On Thu, 18 Nov 2004 08:26:02 -0700, Brad Midgley <bmidgley@xmission.com> wr=
+ote:
 
-> I just tested it and the result so far is very great. Keep on working on
-> it.
+> Can I put what you've given us in a module in our bluetooth-alsa
+> sourceforge cvs and make you a developer?
 
-Thanks. I'm getting more and more confident in that my bitstream
-decoding is correct, but I can't seem to get the synthesis done. I got
-me some books on compression from the library and read the chapters
-about subband coding, but they basically said what I knew (or figured)
-anyways.
+Sure. My sourceforge username is henryk.
 
-> What format do you think is the easiest to encode/decode?
+> I think the structs you have should probably be marked as __attribute__
+> ((packed)) so they don't get realigned by gcc. I'm not sure if there's a
+> portable alternative.
 
-In what respect to?=20
-
-> And btw your file creation should be this command:
->         fh =3D open("bla_.au", O_WRONLY|O_CREAT|O_TRUNC, 0644);
-
-Ahh, thanks. I had wondered why it kept doing funny things, but didn't
-investigate further.
+Ok, will do that.
 
 --=20
 Henryk Pl=F6tz
