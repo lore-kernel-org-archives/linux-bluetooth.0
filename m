@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] baswap neccesity
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <cruhvs$fj5$1@sea.gmane.org>
-References: <cruhvs$fj5$1@sea.gmane.org>
-Content-Type: text/plain
-Message-Id: <1105388822.8652.53.camel@pegasus>
-Mime-Version: 1.0
+From: Colin Pinkney <bluez-devel@cpinkney.org.uk>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200501102004.11028.bluez-devel@cpinkney.org.uk>
+Subject: [Bluez-devel] sockfd_lookup missing from older kernel patches
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,36 +17,65 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Jan 2005 21:27:02 +0100
+Date: Mon, 10 Jan 2005 20:04:10 +0000
 
 Hi,
 
-> I'm reading rctest.c:
-> In do_connect function, a call to bswap is used just before the connect 
-> call:
-> 	baswap(&rem_addr.rc_bdaddr, strtoba(svr));
-> 
-> In the server, baswap is again called just after the accept call
-> 
-> Why is it neccesary? Why does the server listening at the other side 
-> expect addresses in such byte ordering?
+I was updating a BlueZ package for the Sharp Zaurus PDAs that use the 2.4.18 
+kernel. The previous package had been using BlueZ libs and utils v2.3 and 
+patch 2.4.18-mh8 and had been working ok.
 
-this is part of the specification. The textual representation and the
-over-air BD_ADDR is swapped.
+With the latest userspace source and patch 2.4.18-mh15 I noticed the function 
+sockfd_lookup had been removed from the sock.c files. This caused a 
+unresolved symbol error upon loading the bnep module on the Zaurus.
 
-However the code above has a memory leak. Where do you found it?
+I noticed in the comments on http://www.holtmann.org/linux/kernel/ that 
+sockfd_lookup was removed on Dec 15, 2003 from kernel patches for kernels 
+2.4.22 and later. I presume this function has been moved into more central 
+kernel code? Was this function supposed to be removed from the patches for 
+kernels 2.4.21 and earlier (or at least kernel 2.4.18)?
 
-> mmm, again thank you for your time (sometimes I feel like trying to slow 
-> down a bit your work would enable me to get up to date, but it's 
-> useless, the rate of events is dramatic and you always reemerge... ;-) )
+When I stuck the code below back into bnep/sock.c the module loaded properly 
+(although I need to test functionality a bit more as I got the code from the 
+patch 2.4.18-mh8).
 
-Sorry for that ;)
+<<<<<
+static inline struct socket *socki_lookup(struct inode *inode)
+{
+       return &inode->u.socket_i;
+}
 
-Regards
+static struct socket *sockfd_lookup(int fd, int *err)
+{
+       struct file *file;
+       struct inode *inode;
+       struct socket *sock;
 
-Marcel
+       if (!(file = fget(fd))) {
+               *err = -EBADF;
+               return NULL;
+       }
 
+       inode = file->f_dentry->d_inode;
+       if (!inode->i_sock || !(sock = socki_lookup(inode))) {
+               *err = -ENOTSOCK;
+               fput(file);
+               return NULL;
+       }
 
+       if (sock->file != file) {
+               printk(KERN_ERR "socki_lookup: socket file changed!\n");
+               sock->file = file;
+       }
+       return sock;
+}
+>>>>>
+
+Regards,
+
+-- 
+Colin Pinkney
+http://www.cpinkney.org.uk
 
 
 -------------------------------------------------------
