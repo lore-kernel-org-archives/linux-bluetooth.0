@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41EB8C5C.2090708@cc.hut.fi>
-From: Heikki Vuolteenaho <hvuoltee@cc.hut.fi>
+Message-ID: <41EB824B.9060803@tootai.net>
+From: administrator tootai <admin@tootai.net>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] btsco compile fail
+References: <41EA83D3.9060204@tootai.net> <41EB422B.3040603@xmission.com>
+In-Reply-To: <41EB422B.3040603@xmission.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Receiving multiple (>2) incoming rfcomm connections?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,39 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 17 Jan 2005 11:58:52 +0200
+Date: Mon, 17 Jan 2005 10:15:55 +0100
 
-Hi all,
+Brad Midgley a =E9crit :
 
-I'm trying to create a simple application that receives incoming rfcomm 
-connections from Nokia Series60 phones and listens for incoming data.
+> hi
 
-This is how I'm doing it currently:
+Hello Brad
 
-for (i = 1...n) {
-   Listen on channel 1, rfcomm port i (rfcomm listen i)
-   Wait until incoming connection received
-   Start a new thread that handles incoming data on /dev/rfcomm<i>
-}
+>
+> i don't know if this is the best answer, but you could try updating=20
+> automake, autoconf, etc from debian testing. it does look alsa=20
+> specific though, so check that you have -dev packages (try=20
+> libasound2-dev and maybe libalsaplayer-devm, libmikmod2-dev, liby-dev=20
+> to flush out whatever package you need)
 
+It was libasound2-dev who was missing. Thanks a lot.
 
-For one or two connections, it works ok. However, when I try to connect 
-a third device, nothing happens. Nothing shows up even on hcidump when I 
-try to connect the third phone. On the phone I receive error 
-EPageTimedOut(-6004), which according to my friend means that the phone 
-could not get any kind of connection.
-
-Any ideas why it's not working? Thanks in advance,
-
--Hege-
-
-
-
-Setup details:
--Compaq Evo laptop with Debian
--Conceptronic USB BT (CSR)
--Various Nokia phones (6630, 6600, Ngage, 3650)
--Python pyserial module for reading the serial port
+>
+> brad
+>
+> administrator tootai wrote:
+>
+>> Hi,
+>>
+>> I want co compile btsco from CVS and get following error:
+>>
+>> aclocal: configure.in: 21: macro `AM_PATH_ALSA' not found in library
+>> nomade:/usr/src/btsco#
+>> I'm running a Debian 2.6.8 kernel.
+>>
+>> Thanks for hint.
+>
+--=20
+Daniel
 
 
 
