@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <422E59A9.2040408@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] btsco and alsa driver interaction
-References: <d0ktcr$n2i$1@sea.gmane.org>
-In-Reply-To: <d0ktcr$n2i$1@sea.gmane.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: soraberri <421246@posta.unizar.es>
+Message-ID: <d0ktcr$n2i$1@sea.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] btsco and alsa driver interaction
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +16,57 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 08 Mar 2005 19:04:25 -0700
+Date: Tue, 08 Mar 2005 20:11:31 +0100
 
-Luis
 
-It's good to see your interest... I think you have the right ideas on 
-how things work.
 
-> I also imagine that when we poll data from the hwdep interface, we are 
-> not polling SCO data type (which I assume it is being drived 
-> automatically); instead, we are polling for volume-control data type 
-> which is enigmatically (for me) generated at the core of the driver. Is 
-> it right?
+I have studied btsco.c code (the userspace code part), but I'm scared of 
+the kernel part. It's my first match with a kernel driver and it has won 
+the game... so, I would like to ask you just to figure out how the big 
+black box is behaving.
 
-if the volume change is initiated through a generic mixer, then yes. 
-Think of a mixer application running on your computer. Run any 
-alsa-aware mixer and it will let you choose the alsa mixer device to be 
-the headset.
+My impression is that in btsco daemon, once we get the descriptor for 
+the SOCK_STREAM socket we just need to hook it to the hwdep device, and 
+it seems that it is done this way -more or less-
 
-> The question is, 'when does the following condition evaluate TRUE  ?
-> 
-> if (!snd_hwdep_poll_descriptors_revents(handle, &pfds[nfds - 1], 1, 
-> revents) && revents & POLLIN) {
+	sd=sco_connect(	&local,
+			&bdaddr,
+			&sco_handle,
+			&sco_mtu));
 
-It evaluates true when there are volume-change events to be examined 
-that were initiated through a soft mixer.
+	bt_sco_set_fd(handle, sd);
 
-Brad
+where _handle_ represents the device. So I imagine that all what is 
+happening with the SCO channel is "carried" into the device. Is it right?
+
+
+I also imagine that when we poll data from the hwdep interface, we are 
+not polling SCO data type (which I assume it is being drived 
+automatically); instead, we are polling for volume-control data type 
+which is enigmatically (for me) generated at the core of the driver. Is 
+it right?
+
+The question is, 'when does the following condition evaluate TRUE  ?
+
+if (!snd_hwdep_poll_descriptors_revents(handle, &pfds[nfds - 1], 1, 
+revents) && revents & POLLIN) {
+
+a) when we have used the write function some point before, like this:
+snd_hwdep_write(handle, volumes, sizeof(volumes));
+
+b) only when the driver is initialized at the begining
+
+c) or, periodically at some interval defined in the driver code...
+
+well, sorry if these answers are a bit obscure, they are just to give 
+you an idea of how poor is what I can imagine. I think what I wish to 
+know is 'when and why will the hwdep interface produce the events we are 
+listening for'?
+
+Thanks a lot in advance
+
+Luis Peiro
+
 
 
 -------------------------------------------------------
