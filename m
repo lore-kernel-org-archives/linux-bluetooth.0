@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] USB/Bluetooth dongle doesn't work in hub
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <qszekj3j47n.fsf@timepilot.gpcc.itd.umich.edu>
-References: <qszekj3j47n.fsf@timepilot.gpcc.itd.umich.edu>
-Content-Type: text/plain
-Message-Id: <1099959115.29330.40.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+From: Scott W Gifford <gifford@umich.edu>
+Message-ID: <qszactrj3c5.fsf@timepilot.gpcc.itd.umich.edu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Detecting RSSI without connecting
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,51 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 09 Nov 2004 01:11:55 +0100
+Date: Mon, 08 Nov 2004 19:03:38 -0500
 
-Hi Scott,
+Hello again,
 
-> I'm trying to connect a USB/Bluetooth dongle to my laptop running
-> Fedora Core 2 with a Linux 2.6.8-1.521 kernel, and these bluez RPMs
-> installed:
-> 
->     bluez-bluefw-1.0-2, bluez-libs-2.5-2.1, bluez-libs-devel-2.5-2.1,
->     bluez-pin-0.23-1, bluez-utils-2.4-3, bluez-sdp-devel-1.5-2.1,
->     bluez-hcidump-1.5-4, bluez-sdp-1.5-2.1, bluez-pan-1.1-4
+For a project I'm working on, I'd like to determine which of several
+(possibly many) Bluetooth devices is closest.  "Best RSSI" is a good
+enough approximation of "closest" for my purposes, and since there may
+be many devices and I don't have any other interest in them, I'd like
+to get the RSSI without establishing a connection with each device.
 
-these packages are a way out of data.
+It appears that "hcitool rssi <bdaddr>" requires that a connection is
+established.  Do any cards provide a way of getting RSSI that doesn't
+require establishing a connection?
 
-> I've got both a Belkin F8T001 version 2 dongle, and an AmbiCom
-> BT2000.C-USB dongle.  Both devices work great when I plug them
-> directly into the laptop, but fail when I connect them via a hub,
-> logging something like this:
-> 
->     Nov  8 18:29:24 localhost kernel: hci_usb_intr_rx_submit: hci0 intr rx submit failed urb 1f48cf94 err -28
->     Nov  8 18:29:24 localhost hcid[23855]: Can't init device hci0. Input/output error(5)
-> 
-> I get the same effect plugging in to the hub on my base station, my
-> keyboard, or a Belkin hub I just purchased.
+Thanks!
 
-This looks like an USB problem to me. Update your kernel to the latest
-Bitkeeper snapshot and try again.
-
-> I'd like to get this working for two reasons.  First, the USB ports on
-> my laptop aren't available when I'm in my docking station.  Second,
-> for the project I'm working on I'd like to connect several Bluetooth
-> adapters to my machine over a distance of 20 meters or so, which will
-> require hubs.
-> 
-> I've appended full logs of what happens on a working direct connection
-> and a failed connection through a hub, with the Belkin adapter; the
-> results with the AmbiCom are similar.
-
-What kind of dongles are these (hciconfig -a)?
-
-Regards
-
-Marcel
-
-
+----ScottG.
 
 
 -------------------------------------------------------
