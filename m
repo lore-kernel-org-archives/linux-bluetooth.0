@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41644DA5.5020704@telecos-malaga.com>
-From: Casimiro Serrano Caballero <casimiro@telecos-malaga.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Local Position Profile for Bluez
+Subject: Re: [Bluez-devel] Question about hciconfig...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Michael Frey <mfrey@pepper.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <721F30FA-17CA-11D9-8894-00039390D626@pepper.com>
+References: <721F30FA-17CA-11D9-8894-00039390D626@pepper.com>
+Content-Type: text/plain
+Message-Id: <1097091489.7325.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,36 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 06 Oct 2004 21:55:17 +0200
+Date: Wed, 06 Oct 2004 21:38:09 +0200
 
-Hi all,
+Hi Michael,
 
-My name is Casimiro Serrano, an Telecommunications student from the 
-University of Malaga (Spain).
-First of all, i would like to congratulate the development team, for 
-this great job. It has been very useful for me and now i want to 
-contribute with the project with the following:
+> After looking at the hciconfig code I notices that the Max speed for an 
+> ericsson uart module is maxed out at 115200.
+> 
+> 	{ "ericsson", 0x0000, 0x0000, HCI_UART_H4,   57600,  115200, FLOW_CTL, 
+> ericsson },
+> 
+> 
+> Am I interpreting this correct?  If so why the upper limit?
+> 
+> UARTS can go faster than 115200.
 
-I am preparing my final project based on the bluez stack, and an 
-implementation of the LPP (Local Positioning Profile) is needed. The 
-Profile is now a draft (v. 0.95) adopted by the Oficial Bluetooth 
-membership site (www.bluetooth.org). So, i want to contribute to the 
-bluez stack with an implementation of the profile, and create a single 
-instalable module for Linux, following the requeriments of the official 
-profile and according to the actual structure of the stack.
+this is the default value, because most serial ports on motherboards can
+only do 115200 max. If you own a high speed UART, you can overwrite this
+value from the command line.
 
-But before start with my work, and if my desinterested work is well 
-received, i need to know if there is an standard way to work in a 
-profile in your team. I have read the "coding style". ¿any rules to 
-write the documentation of the project while i advance? ¿any rules about 
-the IDE? i will just use Kdevelop.
+Regards
 
-for any questions, please contact me.
-
-thanks.
-
-Casimiro Serrano Caballero.
-casimiro@serrano-caballero.com
+Marcel
 
 
 
