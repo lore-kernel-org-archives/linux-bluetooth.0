@@ -1,167 +1,69 @@
-Return-Path: <nacc@us.ibm.com>
-Date: Thu, 20 Jan 2005 15:47:54 -0800
-From: Nishanth Aravamudan <nacc@us.ibm.com>
-To: marcel@holtmann.org, maxk@qualcomm.com
-Cc: bluez-devel@lists.sourceforge.net, kernel-janitors@lists.osdl.org
-Subject: [PATCH 17/39] net/capi: use wait_event_interruptible_timeout()
-Message-ID: <20050120234754.GE2600@us.ibm.com>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Alignment issue
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Daryl Van Vorst <daryl@wideray.com>,
+   "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1106233175.26551.597.camel@hades.cambridge.redhat.com>
+References: <001301c47f09$3900e650$1301010a@baked>
+	 <1092208405.4564.227.camel@pegasus>
+	 <1106231454.26551.582.camel@hades.cambridge.redhat.com>
+	 <1106232343.8190.187.camel@pegasus>
+	 <1106233175.26551.597.camel@hades.cambridge.redhat.com>
+Content-Type: text/plain
+Message-Id: <1106244883.13562.3.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 20 Jan 2005 19:14:43 +0100
 
-Hi,
+Hi David,
 
-Please consider applying.
+> > Will it also work with other compilers? 
+> 
+> Don't know; don't care. Remember, the existing code isn't guaranteed to
+> work even with gcc, let alone other compilers. Does the rest of the
+> BlueZ code compile with non-gcc compilers? Probably not... you have 122
+> other instances of '__attribute__((packed))' in the source. Including
+> the alignment stuff in include/sdp_internal.h which does it the way I'm
+> suggesting, albeit with a gratuitous '#ifdef __i386__'.
 
-Description: Use wait_event_interruptible_timeout() instead of custom
-wait-queue code. The first replacement is the most complicated as the various
-return conditions each indicate different things, apparently. The same effects
-are made after wait_event_interruptible_timeout() returns.
+oh yes, there is other stuff that must be cleaned up.
 
-Signed-off-by: Nishanth Aravamudan <nacc@us.ibm.com>
+> > What about performance? If a platform can do unaligned
+> > access by itself it should be faster than compiler tricks.
+> 
+> If the platform can do unaligned access by itself, then GCC knows that
+> and emits a direct load/store instruction. It's only if the platform
+> _can't_ do it by itself that GCC does anything different. That's why the
+> #ifdef __i386__ in include/sdp_internal.h is pointless -- GCC should
+> emit the same code even if the other version is used.
 
---- 2.6.11-rc1-kj-v/net/bluetooth/cmtp/capi.c	2005-01-15 16:55:44.000000000 -0800
-+++ 2.6.11-rc1-kj/net/bluetooth/cmtp/capi.c	2005-01-18 11:47:16.000000000 -0800
-@@ -35,6 +35,7 @@
- #include <linux/socket.h>
- #include <linux/ioctl.h>
- #include <linux/file.h>
-+#include <linux/wait.h>
- #include <net/sock.h>
- 
- #include <linux/isdn/capilli.h>
-@@ -373,12 +374,11 @@ static void cmtp_reset_ctr(struct capi_c
- 
- static void cmtp_register_appl(struct capi_ctr *ctrl, __u16 appl, capi_register_params *rp)
- {
--	DECLARE_WAITQUEUE(wait, current);
- 	struct cmtp_session *session = ctrl->driverdata;
- 	struct cmtp_application *application;
--	unsigned long timeo = CMTP_INTEROP_TIMEOUT;
- 	unsigned char buf[8];
- 	int err = 0, nconn, want = rp->level3cnt;
-+	long ret;
- 
- 	BT_DBG("ctrl %p appl %d level3cnt %d datablkcnt %d datablklen %d",
- 		ctrl, appl, rp->level3cnt, rp->datablkcnt, rp->datablklen);
-@@ -407,33 +407,15 @@ static void cmtp_register_appl(struct ca
- 	cmtp_send_interopmsg(session, CAPI_REQ, 0x0000, application->msgnum,
- 				CAPI_FUNCTION_REGISTER, buf, 6);
- 
--	add_wait_queue(&session->wait, &wait);
--	while (1) {
--		set_current_state(TASK_INTERRUPTIBLE);
--
--		if (!timeo) {
--			err = -EAGAIN;
--			break;
--		}
--
--		if (application->state == BT_CLOSED) {
--			err = -application->err;
--			break;
--		}
--
--		if (application->state == BT_CONNECTED)
--			break;
--
--		if (signal_pending(current)) {
--			err = -EINTR;
--			break;
--		}
--
--		timeo = schedule_timeout(timeo);
--	}
--	set_current_state(TASK_RUNNING);
--	remove_wait_queue(&session->wait, &wait);
--
-+	ret = wait_event_interruptible_timeout(session->wait,
-+		((application->state == BT_CLOSED) || (application->state == BT_CONNECTED)),
-+		CMTP_INTEROP_TIMEOUT);
-+	if (!ret)
-+		err = -EAGAIN;
-+	else if (application->state == BT_CLOSED)
-+		err = -application->err;
-+	else if (signal_pending(current))
-+		err = -EINTR;
- 	if (err) {
- 		cmtp_application_del(session, application);
- 		return;
-@@ -442,10 +424,8 @@ static void cmtp_register_appl(struct ca
- 
- static void cmtp_release_appl(struct capi_ctr *ctrl, __u16 appl)
- {
--	DECLARE_WAITQUEUE(wait, current);
- 	struct cmtp_session *session = ctrl->driverdata;
- 	struct cmtp_application *application;
--	unsigned long timeo = CMTP_INTEROP_TIMEOUT;
- 
- 	BT_DBG("ctrl %p appl %d", ctrl, appl);
- 
-@@ -460,20 +440,8 @@ static void cmtp_release_appl(struct cap
- 	cmtp_send_interopmsg(session, CAPI_REQ, application->mapping, application->msgnum,
- 				CAPI_FUNCTION_RELEASE, NULL, 0);
- 
--	add_wait_queue(&session->wait, &wait);
--	while (timeo) {
--		set_current_state(TASK_INTERRUPTIBLE);
--
--		if (application->state == BT_CLOSED)
--			break;
--
--		if (signal_pending(current))
--			break;
--
--		timeo = schedule_timeout(timeo);
--	}
--	set_current_state(TASK_RUNNING);
--	remove_wait_queue(&session->wait, &wait);
-+	wait_event_interruptible_timeout(session->wait, (application->state == BT_CLOSED),
-+			CMTP_INTEROP_TIMEOUT);
- 
- 	cmtp_application_del(session, application);
- }
-@@ -543,8 +511,7 @@ static int cmtp_ctr_read_proc(char *page
- 
- int cmtp_attach_device(struct cmtp_session *session)
- {
--	DECLARE_WAITQUEUE(wait, current);
--	unsigned long timeo = CMTP_INTEROP_TIMEOUT;
-+	long ret;
- 	unsigned char buf[4];
- 
- 	BT_DBG("session %p", session);
-@@ -554,30 +521,17 @@ int cmtp_attach_device(struct cmtp_sessi
- 	cmtp_send_interopmsg(session, CAPI_REQ, 0xffff, CMTP_INITIAL_MSGNUM,
- 				CAPI_FUNCTION_GET_PROFILE, buf, 4);
- 
--	add_wait_queue(&session->wait, &wait);
--	while (timeo) {
--		set_current_state(TASK_INTERRUPTIBLE);
--
--		if (session->ncontroller)
--			break;
--
--		if (signal_pending(current))
--			break;
--
--		timeo = schedule_timeout(timeo);
--	}
--	set_current_state(TASK_RUNNING);
--	remove_wait_queue(&session->wait, &wait);
-+	ret = wait_event_interruptible_timeout(session->wait, session->ncontroller,
-+			CMTP_INTEROP_TIMEOUT);
- 
- 	BT_INFO("Found %d CAPI controller(s) on device %s", session->ncontroller, session->name);
- 
--	if (!timeo)
-+	if (!ret)
- 		return -ETIMEDOUT;
- 
- 	if (!session->ncontroller)
- 		return -ENODEV;
- 
--
- 	if (session->ncontroller > 1)
- 		BT_INFO("Setting up only CAPI controller 1");
- 
+Your patch is now in (after I reworked the tab vs. space problem). And
+everyone should start testing these on various platforms.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+Tool for open source databases. Create drag-&-drop reports. Save time
+by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
