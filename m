@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problem Connecting to Logitech HS01-V14
+Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200501261244.47898.jschindele@arcor.de>
-References: <200501261244.47898.jschindele@arcor.de>
+In-Reply-To: <200501302046.ALU31339@ms12.netsolmail.com>
+References: <200501302046.ALU31339@ms12.netsolmail.com>
 Content-Type: text/plain
-Message-Id: <1107118940.8384.19.camel@pegasus>
+Message-Id: <1107118714.8384.15.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,84 +18,71 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 22:02:20 +0100
+Date: Sun, 30 Jan 2005 21:58:34 +0100
 
-Hi Juergen,
+Hi Chris,
 
-> I try in vain to connect btsco to this new nice headset.
-> It work only once and till the first try it don't work any more
+> >do a "make install DESTDIR=$PWD/x" and then check what it is in the
+> >directory "x". Show us the result of a "find x".
 > 
-> Here the details :
+> Okay so I did this:
+> ./configure --enable-bcm203x
+>  make install DESTDIR=$PWD/x
 > 
-> hciconfig -a
-> hci0:   Type: USB
->         BD Address: 00:0C:76:48:06:D8 ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN AUTH ENCRYPT
->         RX bytes:7762 acl:0 sco:0 events:325 errors:0
->         TX bytes:2930 acl:0 sco:0 commands:188 errors:0
->         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'BlueZ (0)'
->         Class: 0x7e0100
->         Service Classes: Networking, Rendering, Capturing
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
->         Manufacturer: Cambridge Silicon Radio (10)
+> here's what's in x:
+> 
+> x
+> x/usr
+> x/usr/sbin
+> x/usr/sbin/hcid
+> x/usr/sbin/hciattach
+> x/usr/sbin/hciconfig
+> x/usr/sbin/sdpd
+> x/usr/share
+> x/usr/share/man
+> x/usr/share/man/man5
+> x/usr/share/man/man5/hcid.conf.5
+> x/usr/share/man/man8
+> x/usr/share/man/man8/hcid.8
+> x/usr/share/man/man8/hciattach.8
+> x/usr/share/man/man8/hciconfig.8
+> x/usr/share/man/man8/sdpd.8
+> x/usr/share/man/man1
+> x/usr/share/man/man1/hcitool.1
+> x/usr/share/man/man1/l2ping.1
+> x/usr/share/man/man1/sdptool.1
+> x/usr/share/man/man1/ciptool.1
+> x/usr/share/man/man1/rfcomm.1
+> x/usr/share/man/man1/dund.1
+> x/usr/share/man/man1/pand.1
+> x/usr/share/man/man1/hidd.1
+> x/usr/bin
+> x/usr/bin/hcitool
+> x/usr/bin/l2ping
+> x/usr/bin/sdptool
+> x/usr/bin/ciptool
+> x/usr/bin/rfcomm
+> x/usr/bin/dund
+> x/usr/bin/pand
+> x/usr/bin/hidd
+> x/usr/bin/bluepin
+> x/etc
+> x/etc/bluetooth
+> x/etc/bluetooth/hcid.conf
+> x/etc/bluetooth/pin
+> x/etc/bluetooth/rfcomm.conf
+> 
+> That's it...? Thanks for your help.
 
-only use "auth" and "encrypt" (which means security mode 3) when you
-know what you are doing. It is off by default for a reason.
+this can only mean that the libusb developer package is not installed.
+Check when you call configure for something like:
 
-> After discovering i tried manually to do :
-> --------------------
-> hcitool name 00:0D:44:02:E5:B7
-> Logitech HS01-V14
-> 
-> hcitool cc 00:0D:44:02:E5:B7
-> Can't create connection: Input/output error
-> 
-> And here the coresponding hcidump -x is :
-> -----------------
-> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
->   B7 E5 02 44 0D 00 02 00 00 00
-> > HCI Event: Command Status (0x0f) plen 4
->   00 01 19 04
-> > HCI Event: Remote Name Req Complete (0x07) plen 255
->   00 B7 E5 02 44 0D 00 4C 6F 67 69 74 65 63 68 20 48 53 30 31
->   2D 56 31 34 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> < HCI Command: Create Connection (0x01|0x0005) plen 13
->   B7 E5 02 44 0D 00 18 CC 02 00 00 00 01
-> > HCI Event: Command Status (0x0f) plen 4
->   00 01 05 04
-> > HCI Event: Link Key Request (0x17) plen 6
->   B7 E5 02 44 0D 00
-> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
->   B7 E5 02 44 0D 00 E4 AC 30 9D 93 2A D5 64 09 2E 0E 2B 4A B1
->   85 9A
-> > HCI Event: Command Complete (0x0e) plen 10
->   01 0B 04 00 B7 E5 02 44 0D 00
-> > HCI Event: Connect Complete (0x03) plen 11
->   05 29 00 B7 E5 02 44 0D 00 01 00
-> 
-> Why i'am not even asked for the pin ??
-> (using "/bin/bluepincat")
-> What is goning wrong ??
-
-You provide a link key, but it seems that the link key is wrong or
-oudated (if you used it under Windows). The final result is then an
-authentication error. This can happen with security mode 3.
+checking usb.h usability... yes
+checking usb.h presence... yes
+checking for usb.h... yes
+checking for usb_open in -lusb... yes
+checking for usb_get_busses in -lusb... yes
+checking for usb_interrupt_read in -lusb... yes
 
 Regards
 
