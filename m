@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <420D00FE.1000008@csr.com>
-From: Steven Singer <steven.singer@csr.com>
+Message-ID: <420CFEAD.2000202@uni-paderborn.de>
+From: Matthias Schnelte <schnelte@uni-paderborn.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: Lower granularity for INQUIRY interval
-References: <20050211174824.GA5840@bougret.hpl.hp.com>
-In-Reply-To: <20050211174824.GA5840@bougret.hpl.hp.com>
-Content-Type: text/plain; charset="us-ascii"
+Subject: Re: [Bluez-devel] Several bluetooth dongles at time
+References: <50142.195.22.30.15.1108037990.squirrel@195.22.30.15> <1108039290.15974.33.camel@pegasus>
+In-Reply-To: <1108039290.15974.33.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,52 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 11 Feb 2005 19:01:18 +0000
+Date: Fri, 11 Feb 2005 18:51:25 +0000
 
-Jean Tourrilhes wrote:
-> Steven Singer <steven.singer <at> csr.com> wrote :
->> Note that, for example, 8 consecutive 1.28 second inquiries is not
->> guaranteed to work.
+>>2) Can i have multiple connections on the same rfcomm channel? So more
+>>than one mobile can connect to my server at time or only one device per
+>>channel and i have to open more than one channel?
 > 
-> 	Actually, if you look in the actual Inquiry response protocol,
-> you can see that it is guaranteed to not work at all, because of the
-> random backoff (10.7.4) you will never get any answer in 1.28 sec.
+> One connection per RFCOMM channel. On the RFCOMM level there is no
+> further multiplexing.
+So, if I have two phones that provide one service each, but both on the 
+same rfcomm channel i will not be able to connect to both of them, right?
+Why is that? I mean, it is all brought done to l2cap connections and 
+l2cap is not limited in that case.
+Hmm, so the only solution is to use l2cap instead of rfcomm, right?
 
-The random backoff is for 0 to 1023 slots - 0 to 0.64 seconds. The
-device may start scanning straight after the backoff. The spec says that
-the device must wait for at least the backoff, but doesn't state that it
-must wait until the next time it was scheduled to scan. In fact, the
-spec implies that the point of the random backoff is so that if two
-devices both hear the same inquiry transmission, they should respond at
-different times. Since most devices have the same inquiry scan interval,
-waiting for the next interval would be counter-productive as it would
-guarantee that the two devices would respond simultaneously. In
-addition, the inquiry scan interval doesn't have to be 1.28 seconds.
-In a scenario where you are trying to get fast connections, you could
-well imagine that devices will be using a shorter inquiry scan interval.
-
-Even then, your argument applies only to the first 1.28 second inquiry.
-After that any device that was hit during the first 1.28 seconds should
-be primed to answer in the second 1.28 second burst (note that I said
-that the 1.28 second bursts should be consecutive).
-
-For 1.2 devices this problem doesn't exist because 1.2 device respond
-before they back off. This means that every device on the right train
-(or in interlaced inquiry scan) should respond at least once (neglecting
-boundary conditions and collisions).
-
-	- Steven
--- 
-
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-**********************************************************************
-
+Matthias
 
 
 -------------------------------------------------------
