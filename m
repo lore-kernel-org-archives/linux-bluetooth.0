@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <420B9635.6020701@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] position of multiple bluetooth dongles
+Subject: Re: [Bluez-users] BT programming
+References: <E73D9A5BC4A2D711BBC600065BF3595F1C66CF8C@il06exm10>
+In-Reply-To: <E73D9A5BC4A2D711BBC600065BF3595F1C66CF8C@il06exm10>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200502101736.29094.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +19,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Feb 2005 18:13:25 +0100
+Date: Thu, 10 Feb 2005 17:36:28 +0100
 
-Hello everybody
+Hi,
 
-Maybe someone knows this:
-If two bluetooth dongles are used (a class1 and a class2), could it lead to 
-signal interfereces/problems if they're just above each other and both have 
-to send a lot of data at the same time?
+maybe this is your project :)
 
-With "right above each other", I mean this:
-http://www1.ch2.conrad.com/m/7000_7999/7100/7160/7162/716282_LB_00_FB.EPS.jpg
-(dongle cases are removed).
+http://www.mulliner.org/bluetooth/btchat/
 
+Michal
 
-kind regards
-Marco
+Dne =E8t 10. =FAnora 2005 0:17 Mandalia Hiren-AHM047 napsal(a):
+> hi there
+>
+> I'm a newbie to BT programming. I have successfully installed my BT
+> hardware device using BlueZ packages. As a next goal I need to write my o=
+wn
+> code for simple applications like Chat and/or PIM Item Transfer based
+> profile. Does blueZ have implemented profiles like OBEX, DUN, etc that I
+> can use?
+>
+> Also when I'm trying to connect to a particular remote BT device using
+> hcitool cc .. it does not work..no connection is established.. any idea w=
+hy
+> is that happening?
+>
+> Thanks
+> Hiren Mandalia
+>
+>
+>
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+=2D-=20
+S pozdravem
+
+Michal Semler
 
 
 -------------------------------------------------------
