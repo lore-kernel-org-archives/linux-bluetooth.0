@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de4657605011008282db8603b@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Kill l2test server
-In-Reply-To: <1105370509.8652.24.camel@pegasus>
+Subject: Re: [Bluez-users] RS232 Control Signals.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41E28802.8040703@conectiva.com.br>
+References: <41E28802.8040703@conectiva.com.br>
+Content-Type: text/plain
+Message-Id: <1105373995.8652.34.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <2de4657605011007106fbd81e8@mail.gmail.com>
-	 <1105370509.8652.24.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,46 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 Jan 2005 21:58:40 +0530
+Date: Mon, 10 Jan 2005 17:19:55 +0100
 
-Hi marcel,
-The active connection is killed once the client(sender) exits. I want
-to kill the listening socket....how can i do this?
+Hi Luiz,
 
-when i pump 5000 packets continously .....the connection
-closes down after some 2000 odd packets ...is this because of hci
-buffer getting full and some kind of queue or buffer overflow??
+>   I'd like to know if the RS232 Control Signals are available when
+> using Bluetooth through Serial Emulation whith the rfcomm program.
+> 
+>   I'm writing a program which should detect when a serial device
+> (which also suports bluetooth) is turned off. The program does its
+> job using an ioctl() call:
+> 
+> ioctl(fd, TIOCMGET, &status);
+> 
+>   and then checking for the DSR signal.
+> 
+>   It works as expected for the (true) serial port, but when I use
+> Bluetooth through Serial Emulation with the rfcomm program the signal 
+> doesn't change its state, and my program fails.
+> 
+>   Are the RS232 Control Signals available?
 
-thanx,
-Regards,
-Manjunath
+I think they are missing. However feel free to send a patch for the
+kernel that implements support for it.
+
+Regards
+
+Marcel
 
 
-On Mon, 10 Jan 2005 16:21:49 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Manjunath,
-> 
-> > For the l2test, is there a cleaner method to kill the listening
-> > receiver. I am using CTRL+C right now. I am trying to kill the active
-> > socket....using close(s1)...but it doesn't seem to be working.
-> > I want a clean exit.
-> 
-> what do you wanna kill? The active connection or the listening socket?
-> If you wanna separate them, then you need to add somekind of signal
-> handling.
-> 
-> Regards
-> 
-> Marcel
-> 
-> -------------------------------------------------------
-> The SF.Net email is sponsored by: Beat the post-holiday blues
-> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
-> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
 
 
 -------------------------------------------------------
