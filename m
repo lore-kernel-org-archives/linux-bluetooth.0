@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050309021836.11025.qmail@web20928.mail.yahoo.com>
-From: Arch Sayo <a12chi@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <422DAB03.1010402@prim-time.fr>
+From: Xavier Garreau <x.garreau@prim-time.fr>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1740055187-1110334716=:10798"
-Subject: [Bluez-users] Acquiring Bluetooth address of clients connecting to a server
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] adding a sdp service with a 128bit uuid
+References: <20050308123527.49819.qmail@web60910.mail.yahoo.com>
+In-Reply-To: <20050308123527.49819.qmail@web60910.mail.yahoo.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,34 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 8 Mar 2005 18:18:36 -0800 (PST)
+Date: Tue, 08 Mar 2005 14:39:15 +0100
 
---0-1740055187-1110334716=:10798
-Content-Type: text/plain; charset=us-ascii
+>     3. actually this is more a c then a bluez question, but i'd
+>     appreciate if
+>     someone could tell it nevertheless:
+>     # sdp_uuid32_create(uuid_t *uuid, uint32_t data);
+>     # sdp_uuid128_create(uuid_t *uuid, const void *data);
+>     the second function takes the uuid as "const void *data". What is the
+>     appropriate way to give a uuid like 2c3ef0c843674369b1dfb7315e76332a to
+>     that function?
+>     I asked google and he (she?) told me this:
+>     http://www.xgarreau.org/aide/devel/bluetooth/timeserver.c
+>     but it seems a little big for me...
 
-Hi,
- 
-I would like to ask if there is a way of acquiring the Bluetooth address of client devices connecting to a server.
- 
-Thanks,
-Arch
+Whaou, nice, i love google :)
 
-		
----------------------------------
-Celebrate Yahoo!'s 10th Birthday! 
- Yahoo! Netrospective: 100 Moments of the Web 
---0-1740055187-1110334716=:10798
-Content-Type: text/html; charset=us-ascii
+Actually i wrote this sample for a presentation in a university. It's 
+not production quality code.
 
-<DIV>Hi,</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>I would like to ask if there is a way of acquiring the Bluetooth address of client devices connecting to a server.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Thanks,</DIV>
-<DIV>Arch</DIV><p>
-		<hr size=1>Celebrate Yahoo!'s 10th Birthday! <br> 
-<a href="http://birthday.yahoo.com/netrospective/">Yahoo! Netrospective: 100 Moments of the Web</a> 
---0-1740055187-1110334716=:10798--
+But to give data as void* you can do something like this:
+
+unsigned char uuid_data[16] = {0x2c, 0x3e, 0xf0, 0xc8, 0x43, 0x67, 0x43, 
+0x69, 0xb1, 0xdf, 0xb7, 0x31, 0x5e, 0x76, 0x33, 0x2a};
+...
+sdp_uuid128_create (&uuid, (void*)uuid_data);
+
+Actually, in the code you mentionned i used the create_base_uuid 
+function from a bluez source ... But i don't remember from what file it 
+was ...
+
+Regards,
+Xavier
 
 
 -------------------------------------------------------
