@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm
-From: Marcel Holtmann <marcel@holtmann.org>
-To: mohalik@india.hp.com
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4100F85D.5080200@india.hp.com>
+Message-ID: <4100F85D.5080200@india.hp.com>
+From: Swarup Mohalik <mohalik@india.hp.com>
+Reply-To: mohalik@india.hp.com
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
 References: <200401302209.52396.raydar@nwlink.com>
-	 <4100F85D.5080200@india.hp.com>
-Content-Type: text/plain
-Message-Id: <1090583514.4791.42.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] rfcomm
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,30 +17,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jul 2004 13:51:54 +0200
+Date: Fri, 23 Jul 2004 17:07:01 +0530
 
-Hi Swarup,
+I have bluez with bluez-utils-2.7 on two RH 8.0 systems (lx1 and lx2).
 
-> I have bluez with bluez-utils-2.7 on two RH 8.0 systems (lx1 and lx2).
+When I start rctest -r on lx1 without starting rctest -s on lx2, lx2 hangs
+and I have to switch it off and on to restart. This happens EVERY TIME
+I try this.
 
-please upgrade to bluez-utils-2.8 first. What kernel do you use?
+This does not happen when I run l2test in any way. Does it prove that
+there is a problem with RFCOMM? I have not seen this problem in
+the mailing list. If I have missed it, please inform.
 
-> When I start rctest -r on lx1 without starting rctest -s on lx2, lx2 hangs
-> and I have to switch it off and on to restart. This happens EVERY TIME
-> I try this.
+I have not tried the rfcomm transfer the other way because I share lx1
+with others.
 
-I don't get the point how lx2 can hang when you listen at lx1. Are these
-two different machines or two dongles connected to the same machine?
+Thanks in anticipation,
+Swarup
 
-> This does not happen when I run l2test in any way. Does it prove that
-> there is a problem with RFCOMM? I have not seen this problem in
-> the mailing list. If I have missed it, please inform.
 
-Actually I don't know. Show us "hcidump -x" from both machines.
-
-Regards
-
-Marcel
 
 
 
