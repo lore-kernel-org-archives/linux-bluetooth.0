@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Keith Pemberton <kbpember@cox.net>
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1081067566.6478.3.camel@linuxcomp.gatep5.net>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Question about a previous post...
+Mime-Version: 1.0 (Apple Message framework v613)
+In-Reply-To: <747B350F-859B-11D8-ADA9-003065B218E0@pepper.com>
+References: <747B350F-859B-11D8-ADA9-003065B218E0@pepper.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-Id: <A73F1708-859C-11D8-ADA9-003065B218E0@pepper.com>
+From: Michael Frey <mfrey@pepper.com>
+Subject: Re: [Bluez-devel] Kernel modules?
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,16 +17,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 04 Apr 2004 03:32:46 -0500
+Date: Sat, 3 Apr 2004 13:28:07 -0500
 
-Someone a while back put up a message about keeping their apple keyboard
-alive (connected).  I was wondering first, how is the keyboard connected
-in the first place?  My impression has been that there has been only one
-attempt at making a bluetooth HID driver has been the BTHID.  I was just
-wondering if there was something I have missed.  I would love to use my
-MS Bluetooth mouse with linux if anyone has any suggestions.  Thanks!
+oops -- forget it.  I found them in the net/buetooth dir and not just 
+bluetooth
 
-Keith
+sorry,
+Michael
+
+On Apr 3, 2004, at 1:19 PM, Michael Frey wrote:
+
+> I am currently using 2.4.20 kernel from MontaVista and it has 
+> Bluetooth driver sub dir -- however I feel I am missing something.  
+> When I build the bluetooth modules I only get the following.
+>
+> hci_uart.o
+>
+> I thought there were other mods like bluez.o etc...
+>
+> Do I need some other source?
+>
+> Michael
+>
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: IBM Linux Tutorials
+> Free Linux tutorial presented by Daniel Robbins, President and CEO of
+> GenToo technologies. Learn everything from fundamentals to system
+> administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
