@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <409B756D.6000705@telefonica.net>
-From: Jose Angel Rodriguez <jrodriguezv@telefonica.net>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] /usr/include/bluetooth/bnep.h
+References: <1083857533.16650.25.camel@saag> <200405070028.06843.cijoml@volny.cz> <1083918493.4420.109.camel@pegasus>
+In-Reply-To: <1083918493.4420.109.camel@pegasus>
 MIME-Version: 1.0
-To: bluez-users@lists.sf.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] NAP problem
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200405071153.59387.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,52 +19,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 07 May 2004 13:39:25 +0200
+Date: Fri, 7 May 2004 11:53:58 +0200
 
-Hi all!!
+On Friday 07 of May 2004 10:28, Marcel Holtmann wrote:
+> Hi Michal,
+>
+> > can you write more info about this module? What will it take care of?
+> > Only Human Interface Device Protocol? And hidd will serve events to it to
+> > decode them instead of doing it by hidd?
+>
+> the hidp kernel module is designed to implement only HIDP. It works
+> mostly the same way as BNEP and CMTP, but it needs a lot more
+> information from the SDP database of the remote device. Thus the
+> structures had to evolve over time and now I think I found the perfect
+> match on what the kernel has to know and what not. You can look at the
+> hidp_connadd_req struct in libs/include/hidp.h and see what I mean. The
+> problem of hidd at the moment is that it only fills in the sockets and
+> the report descriptor data. Once hidd had given the connection to the
+> hidp module everything else is done inside the kernel. This means that
+> you can even stop and restart hidd without losing your input device.
 
-I hava a Debian Sarge PC as a NAP for a bluetooth network. The computer 
-is also connected to an ADSL.
+Great :) And now, do you plane to backport hidp kernel module from 2.6 to 2.4?
 
-This is my etc/network/interfaces file:
-# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
-
-# The loopback interface
-auto lo
-iface lo inet loopback
-
-# The first network card - this entry was created during the Debian 
-installation# (network, broadcast and gateway are optional)
-auto eth0
-iface eth0 inet static
-       address 192.168.0.2
-       netmask 255.255.255.0
-       network 192.168.0.0
-       broadcast 192.168.0.255
-       gateway 192.168.0.1
-
-# bluetooth network server
-iface bnep0 inet static
-       address 10.0.0.1
-       netmask 255.255.255.0
-
-eth0 is the ADSL connection an bnep0 is the bluetooth connection.
-
-My /etc/bluetooth/pan/dev-up file:
-#!/bin/sh
-ifup bnep0
-
-I think everytime a client connects it runs /etc/bluetooth/pan/dev-up. 
-Everything was working fine, but after updating packages with apt-get 
-everytime a client connects I have to configure bnep0 interface by hand 
-(ifup bnep0).
-
-¿Does anybody know why /etc/bluetooth/pan/dev-up does not work now? ¿How 
-can I configure bnep0 interface automaticaly?
-
-Thanks in advance!!
-
-JOSE
+Michal
 
 
 -------------------------------------------------------
