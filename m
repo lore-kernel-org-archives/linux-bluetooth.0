@@ -1,70 +1,80 @@
-Return-Path: <snd-bt-sco-return-49-marcel=holtmann.org@corinis.net>
-List-Post: <mailto:snd-bt-sco@corinis.net>
-List-Help: <mailto:snd-bt-sco-help@corinis.net>
-List-Unsubscribe: <mailto:snd-bt-sco-unsubscribe@corinis.net>
-List-Subscribe: <mailto:snd-bt-sco-subscribe@corinis.net>
-Reply-To: snd-bt-sco@corinis.net
-Message-ID: <41604792.8030309@xmission.com>
-Date: Sun, 03 Oct 2004 12:40:18 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net, tsw@johana.com
+Subject: Re: [Bluez-users] New bluetooth device.  Now what?
+References: <20041003100129.15441.qmail@web60805.mail.yahoo.com>
+In-Reply-To: <20041003100129.15441.qmail@web60805.mail.yahoo.com>
 MIME-Version: 1.0
-To: snd-bt-sco@corinis.net,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-References: <41603BF5.9030405@superbug.co.uk>
-In-Reply-To: <41603BF5.9030405@superbug.co.uk>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: Re: [snd-bt-sco] bluetooth headset profile with alsa in user space.
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200410031244.29938.cijoml@volny.cz>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sun, 3 Oct 2004 12:44:29 +0200
 
-James,
+edit /etc/bluetooth/rfcomm.conf
 
-I've looked at this too. I'm crossposting to see if Marcel wants to comment.
+and then rfcomm bind all and start communicate
 
-Some people think bluetooth-alsa should have a smaller kernel footprint 
-and some people think it's the userspace component that needs to be 
-eliminated. The bottom line is that it needs to go in a direction that 
-is acceptable to bluez and alsa but doesn't leave so much to be desired 
-by the bluez group that they feel like reimplementing/rejecting it.
+M.
 
-the less-kernel-space argument
+Dne ne 3. =F8=EDjna 2004 12:01 Tom Watson napsal(a):
+> OK, I've got the kernel stuff working to my USB dongle.  It is a D-Link
+> DBT-120, and up to that point it all is OK.
+>
+> Now I want to connect to a device.  It is an Earthmate Blue Logger GPS
+> (quite a nice little yellow box!).  My assumption is that eventually I wa=
+nt
+> the equivalent of a "serial" type connection that a program similar to
+> "minicom" can talk to.
+>
+> I've entered a few commands, and I'm a little frustrated.  How do I get
+> something like this to work?
+>
+> Some commands that DO work are:
+> [bluetooth]$ hcitool inq
+> Inquiring ...
+>         00:90:4B:2A:9D:9D       clock offset: 0x219e    class: 0x001f00
+> [bluetooth]$ hcitool scan
+> Scanning ...
+>         00:90:4B:2A:9D:9D       Earthmate Blue Logger GPS
+>
+> Some that DON'T are:
+> [bluetooth]$ rfcomm show rfcomm0
+> Get info failed: No such device
+> [bluetooth]$ rfcomm bind rfcomm0
+> Can't create device: Operation not permitted
+>
+> I think I have the configuration file OK, but I'm not exactly sure.
+>
+> Do I need to have some configuration file setup?  The documentation isn't
+> very clear here (as I can see).  Do I access this with RFCOMM??  How do I
+> connect to the device with 'minicom'??  Do I need to setup some device
+> files??
+>
+> I have half working, but not a full connection.  It is almost there, but
+> not quite.
+>
+> Help.....
+>
+> =3D=3D=3D=3D=3D
 
-- alsa would not be affected [much]
-- bluez would only be affected in that we may want hooks to go into 
-libbluetooth
-- userspace stuff is easier to debug and develop
-- supporting multiple headsets simultaneously should be more straightforward
-- kernel developers won't be questioning it
-- adding it to a linux distro that has bluez already would be easier
 
-The more-kernel-space argument:
-
-- alsa has said they would consider patches that don't have the 
-userspace entanglements
-- the bluez project leaders may decide that in-kernel is the way audio 
-has to be done
-- dbus/hotplug may play nicer with an in-kernel driver
-
-I think now the less-kernel-space is safer. Regardless of our approach, 
-apps that want bluetooth-alsa like asterisk will have to be linked with 
-a new library so there's not a disadvantage there with another build 
-requirement. There's probably just too much uncertainty with the 
-in-kernel approach.
-
-Brad
-
-James Courtier-Dutton wrote:
-> It is possible to implement an alsa device is user space, without 
-> requiring any kernel modules. An example of this the the pcm_jack.c file 
-> in:
-> ./alsa-lib/src/pcm/ext/pcm_jack.c
-> 
-> It basically makes jackd look like a sound card to any alsa application.
-> 
-> This should help, because the bluetooth profile code is in user space as 
-> well, so we could make the bluetooth profile look like an alsa sound card.
-> 
-> Any comments?
-> 
-> James
-> 
-> 
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
