@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] sample applications
-From: Marcel Holtmann <marcel@holtmann.org>
-To: am =?ISO-8859-1?Q?qui=F1ones?= <am_quinones@yahoo.com>
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: Eran <eran_l@over-here.org>
+Subject: Re: [Bluez-users] Ambicom BT2000E card, can't get hciattach to work
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <20040422055958.17526.qmail@web20416.mail.yahoo.com>
-References: <20040422055958.17526.qmail@web20416.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1082626013.1845.13.camel@merlin>
-Mime-Version: 1.0
+References: <4086DDFC.5000107@over-here.org> <200404220027.02236.pavouk@pavouk.org> <4086FFD9.50104@over-here.org>
+In-Reply-To: <4086FFD9.50104@over-here.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200404221124.34165.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,26 +19,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Apr 2004 11:26:54 +0200
+Date: Thu, 22 Apr 2004 11:24:33 +0200
 
-Hi Amabelle,
+Hello,
 
-> Hi! I'm a college student doing on-the-job training, and my project
-> right now is to make an application which sends data (specifically,
-> personal profiles) from the pc to a mobile phone or PDA upon request
-> of the cell phone or PDA, via bluetooth. Do you guys know where i can
-> find some related sample programs? Just so i can study them. Thanks in
-> advance! :)
+> Sorry I forgot to mention it - but hciconfig shows a fully 'up and
+> running' interface. I use the bt950_cs driver.
+> I further checked and most hcitool commands work except the link quality.
 
-you must be more specific, but in general this is simple client/server
-programming with sockets. The test directory of the bluez-utils package
-contains exmaple programs and some other exmaple can be found in the
-mailing list archive or in my presentation slides.
+I don't try link quality. It's possible, that this function doesn't work with 
+this driver or your BT devices doesn't have established connection.
 
-Regards
+> I Have tried removing the bluetooth.conf from my pcmcia/ directory and
+> use hciattach with /dev/ttyS03, but no success here as well (could not
+> find correct parameters). Why is it the preferred way?
 
-Marcel
+Because there are more BT cards with BT950 uart and ericsson chipset which
+supposedly works with serial_cs driver and hciattach.
+It's better to have for all these cards only one universal driver.
 
+It's possible, that BT2000E requires some special initialization which 
+hciattach doesn't know, but I'am not expert.
+
+Best regards,
+
+Pavel Ruzicka
 
 
 
