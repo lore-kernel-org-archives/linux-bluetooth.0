@@ -1,78 +1,80 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Bc. Michal Semler" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] obexserver and t68i problem?
-References: <200407251403.50608.cijoml@volny.cz> <200407251519.13544.cijoml@volny.cz> <1090772343.31693.9.camel@pegasus>
-In-Reply-To: <1090772343.31693.9.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200407251833.14161.cijoml@volny.cz>
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 25 Jul 2004 18:33:14 +0200
+Return-Path: <jungle@saphire.dk>
+Subject: Re: [Bluez-users] Logitech MX900 mouse not working.
+From: Kim Pedersen <jungle@saphire.dk>
+Reply-To: jungle@saphire.dk
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Cc: marcel@holtmann.org
+In-Reply-To: <1090771873.31693.6.camel@pegasus>
+References: <1090765201.983.13.camel@aquarius>
+	 <200407251632.32162.cijoml@volny.cz>  <1090769444.983.19.camel@aquarius>
+	 <1090770122.31693.2.camel@pegasus>  <1090770937.983.26.camel@aquarius>
+	 <1090771873.31693.6.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1090773233.2890.2.camel@aquarius>
+Mime-Version: 1.0
+Date: Sun, 25 Jul 2004 18:33:53 +0200
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Still looking for a newer firmware for my dongle. And still hope, that XP S=
-P2=20
-will include except builtin BT support upgrade of dongle firmware too...
+Hi Marcel,
 
-Michal
+On Sun, 2004-07-25 at 18:11, Marcel Holtmann wrote:
+> Hi Kim,
+> 
+> > > the error message is different, so I assume that you either don't
+> > > activated the hiddev support in your kernel or you use the dynamic USB
+> > > minor allocation. Check your kernel config for CONFIG_USB_DYNAMIC_MINORS
+> > > and CONFIG_USB_HIDDEV.
+> > 
+> > I checked my kernel configuration and found that
+> > CONFIG_USB_DYNAMIC_MINORS is nowhere to be found (not configured),
+> > however CONFIG_USB_HIDDEV is:
+> > 
+> > #
+> > # USB Human Interface Devices (HID)
+> > #
+> > CONFIG_USB_HID=m
+> > CONFIG_USB_HIDINPUT=y
+> > CONFIG_USB_HIDDEV=y
+> > 
+> > It is also loaded (usbhid,usbkbd,usbmouse).
+> 
+> don't load usbkbd and usbmouse. Actually I don't know how you get them
+> compiled at the same time. Read the help text for those modules and
+> check your kernel config again. Mine looks like this:
+> 
+> <snip>
+> 
+> CONFIG_USB=m
+> # CONFIG_USB_DEBUG is not set
+> CONFIG_USB_DEVICEFS=y
+> # CONFIG_USB_BANDWIDTH is not set
+> # CONFIG_USB_DYNAMIC_MINORS is not set
+> CONFIG_USB_EHCI_HCD=m
+> # CONFIG_USB_EHCI_SPLIT_ISO is not set
+> # CONFIG_USB_EHCI_ROOT_HUB_TT is not set
+> CONFIG_USB_OHCI_HCD=m
+> CONFIG_USB_UHCI_HCD=m
+> 
+> <snip>
+> 
+> CONFIG_USB_HID=m
+> CONFIG_USB_HIDINPUT=y
+> CONFIG_USB_HIDDEV=y
+> # CONFIG_USB_KBD is not set
+> # CONFIG_USB_MOUSE is not set
+> 
+> <snip>
+> 
 
-Dne ne 25. =E8ervence 2004 18:19 Marcel Holtmann napsal(a):
-> Hi Michal,
->
-> > > > CSR 16.1.1
-> > >
-> > > it is the Microsoft dongle and this is not HCI 16.4 even if it includ=
-es
-> > > many fixes that weren't in the HCI 16.1 firmware.
-> > >
-> > > > MS mouse and keyboard connected
-> > >
-> > > This is maybe the problem, because your PC is the master of a piconet
-> > > with two slaves and you are trying to connect from another master (yo=
-ur
-> > > mobile phone) into it. What kind of phone is it?
-> >
-> > Sony ericsson t68i
->
-> the Bluetooth chip of that phone is very old. Try to connect without the
-> mouse and the keyboard attached. Try another Bluetooth dongle with at
-> least HCI 16.4 firmware.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by BEA Weblogic Workshop
-> FREE Java Enterprise J2EE developer tools!
-> Get your free copy of BEA WebLogic Workshop 8.1 today.
-> http://ads.osdn.com/?ad_id=3D4721&alloc_id=3D10040&op=3Dclick
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+That did the trick!! THANKS!!
+
+I am now writing this with both the keyboard and the mouse running
+Bluetooth..
+
+Again, Thanks alot :)
 
 
--------------------------------------------------------
-This SF.Net email is sponsored by BEA Weblogic Workshop
-FREE Java Enterprise J2EE developer tools!
-Get your free copy of BEA WebLogic Workshop 8.1 today.
-http://ads.osdn.com/?ad_id=4721&alloc_id=10040&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Sincerely,
+
+// Kim Pedersen
+  -- Freedom Matters!
