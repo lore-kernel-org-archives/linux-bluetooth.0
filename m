@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Sebastian Roth <sebastian.roth@esk.fhg.de>
-Message-ID: <cttbgv$knk$1@sea.gmane.org>
-References: <41FA06A5.3010904@tootai.net> <ctdn6n$sqs$1@sea.gmane.org> <41FE4744.5010804@tootai.net> <ctob73$ph0$1@sea.gmane.org> <4200D3B6.1050708@tootai.net> <ctqulk$ce4$1@sea.gmane.org> <420105F0.5030407@tootai.net>
+Subject: Re: [Bluez-users] USING PAN: PANU(desktop1)
+	->NAP(desktop2)->internet
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050203171303.65603.qmail@web26405.mail.ukl.yahoo.com>
+References: <20050203171303.65603.qmail@web26405.mail.ukl.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1107451291.11944.96.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-In-Reply-To: <420105F0.5030407@tootai.net>
-Subject: [Bluez-users] Re: Connection issue with headset
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,90 +19,102 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 03 Feb 2005 15:13:23 +0100
+Date: Thu, 03 Feb 2005 18:21:30 +0100
 
-Hi Daniel,
+Hi,
 
-
->> are the other things build into the kernel or loaded? (bluetooth,
->> hci_usb, l2cap, rfcomm, sco)
+> I read Howto about PAN and I did :
+> for the NAP:
+> # pand --listen --role NAP
 > 
-> all in modules
-Have you really loaded all of them?
-
-Your posted output of dmesg:
-Bluetooth: L2CAP ver 2.6
-Bluetooth: L2CAP socket layer initialized
-Bluetooth: RFCOMM ver 1.3
-Bluetooth: RFCOMM socket layer initialized
-Bluetooth: RFCOMM TTY layer initialized
-# where is SCO?
-snd-bt-sco revision 1.4 $
-snd-bt-sco: snd-bt-scod thread starting
-
-My output:
-Bluetooth: L2CAP ver 2.7
-Bluetooth: L2CAP socket layer initialized
-Bluetooth: RFCOMM ver 1.5
-Bluetooth: RFCOMM socket layer initialized
-Bluetooth: RFCOMM TTY layer initialized
-Bluetooth: SCO (Voice Link) ver 0.4
-Bluetooth: SCO socket layer initialized
-snd-bt-sco revision 1.4 $
-snd-bt-sco: snd-bt-scod thread starting
-
-
-Btw. what kernel version do you use? Please update the kernel to
-2.6.10-mh3 and the libs/utils to 2.15!!
-
-
-
-# sdptool search --bdaddr <bdaddr> 0x1108
-Class 0x1108
-Searching for 0x1108 on <bdaddr> ...
-Service Name: Headset
-Service RecHandle: 0x10000
-Service Class ID List:
-   "Headset" (0x1108)
-   "Generic Audio" (0x1203)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 1
-Profile Descriptor List:
-   "Headset" (0x1108)
-     Version: 0x0100
-
-What does this command show to you? Is the Channel the same when
-connecting with btsco?
-
-
-
->> If you followed this and it does not work I have two ideas.
->> 1. Is it possible that your headset does not send any AT commands
->> over the connected RFCOMM channel? As far as I know btsco will never
->> try to establish an SCO connection without having recived the cmd
->> from your headset.
+> for the PANU:
+> # pand --nodetach --role PANU --search --service NAP
 > 
->  From what I check nowhere I saw any AT command. That exactly what I'm 
-> looking for!
+> pand[31712]: Bluetooth PAN daemon version 2.15
+> pand[31712]: Inquiring
+> pand[31712]: Searching for NAP on 00:02:C7:15:11:04 
+> "it's my NAP"
+> 
+> config of the NAP
+> # hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:02:C7:15:11:04 ACL MTU: 192:8
+> SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:28224 acl:459 sco:0 events:652
+> errors:0
+>         TX bytes:20479 acl:357 sco:0 commands:141
+> errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00
+> 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2
+> HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: ACCEPT MASTER
+>         Name: 'imad'
+>         Class: 0x3e0100
+>         Service Classes: Networking, Rendering,
+> Capturing
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x33c LMP Ver: 1.1
+> (0x1) LMP Subver: 0x33c
+>         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> 
+> config of the PANU
+> # hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:0B:0D:33:43:A5 ACL MTU: 120:20
+> SCO MTU: 64:0
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:14593 acl:192 sco:0 events:330
+> errors:0
+>         TX bytes:17841 acl:262 sco:0 commands:44
+> errors:0
+>         Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00
+> 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2
+> HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'thomas'
+>         Class: 0x3e0100
+>         Service Classes: Networking, Rendering,
+> Capturing
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2
+> (0x2) LMP Subver:
+> 0x757
+>         Manufacturer: Silicon Wave (11)
+> 
+> 
+> but MY PANU doesn't find the NAP service over my
+> NAP???
+> wath's the probleme can you help me?
 
-Try hcidump -X (upper case). This is the part of my output:
+then check with sdptool what is running on your NAP machine.
 
-...
- > ACL data: handle 0x0029 flags 0x01 dlen 3
-    L2CAP(d): cid 0x0041 len 16 [psm 3]
-     RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 12 fcs 0x40
-     0000: 41 54 2b 43 4b 50 44 3d  32 30 30 0d              AT+CKPD=200.
-< ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0087 len 10 [psm 3]
-     RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 6 fcs 0x9a
-     0000: 0d 0a 4f 4b 0d 0a                                 ..OK..
-...
+> and ohter thing wath that mean "nat" and
+> "masquerading"
+> I find that in http://quozl.netrek.org/bluetooth/
 
+Basic network technologies. This is nothing Bluetooth specific. Teach
+yourself about, because there are a lot of information resources
+available.
 
-Regards,
-hecatomb
+> after making bnep interface between my tow dongle i
+> have to write :
+> iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE 
+> echo 1 > /proc/sys/net/ipv4/ip_forward
+> 
+> what does it mean?
+
+Check the manual page of iptables and then Netfilter project.
+
+Regards
+
+Marcel
+
 
 
 
