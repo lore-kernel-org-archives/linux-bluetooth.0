@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20040821081408.GA4969@synapthein.org>
+Subject: Re: [Bluez-users] Newbie2
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ricky Soh <rickysoh@gmail.com>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <db972f430408202022423be30a@mail.gmail.com>
+References: <db972f4304081918374eb047c6@mail.gmail.com>
+	 <1092989927.18082.56.camel@pegasus>
+	 <db972f430408202022423be30a@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1093072891.3544.6.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-From: blanu@synapthein.org (Brandon Wiley)
-Subject: [Bluez-users] Headset Problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,16 +20,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 21 Aug 2004 03:14:09 -0500
+Date: Sat, 21 Aug 2004 09:21:32 +0200
 
-I'm trying to access my GN6110 headset using the hstest program on Linux
-2.6.2 with bluez-utils 2.1.0.
+Hi Ricky,
 
-It connects to my headset fine and it receives the AT commands from
-button presses on the headset. However, I get no audio using either
-record or play modes.
+> I do not understand what you mean my loopback connection. I just
+> trying to ping my bluetooth phone or pda using a laptop with bluetooth
+> dongle. When i did a hcitool info (PDA's add), i got "can't create
+> connection: Input/output error."
+> 
+> Sorry, i know this is a simple question but i really need some assistance here.
 
-Any suggestions?
+so don't use "hcitool cc ...", because this is for testing purpose only.
+Use the rfcomm tool. Read the manpage for it and follow the examples
+from the various howtos on the internet.
+
+Regards
+
+Marcel
+
 
 
 
