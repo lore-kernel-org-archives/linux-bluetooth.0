@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] creation of Bnep0
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050302152111.60949.qmail@web26605.mail.ukl.yahoo.com>
-References: <20050302152111.60949.qmail@web26605.mail.ukl.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1109779902.8284.28.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <1109692593.422490b17bafe@mail.orbitel.bg>
+From: Todor Todorov <dr_doom@engineer.bg>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] BNEP connection destroing :(
+References: <1109664374.42242276c644b@mail.orbitel.bg> <1109691651.42248d0394218@mail.orbitel.bg>
+In-Reply-To: <1109691651.42248d0394218@mail.orbitel.bg>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=windows-1251
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +18,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 02 Mar 2005 17:11:42 +0100
+Date: Tue,  1 Mar 2005 17:56:33 +0200
 
-Hi Benny,
-
-> It's exactly wath I wanted to know.
-> 
-> I will see that in the archive. But i think that you
-> choose to create it in the kernel for better
-> performance.
-
-it is a matter of performance and a matter of a better native
-integration and thus making it easier to use.
-
-Regards
-
-Marcel
-
-
+I forgot to say that i sharing my internet connection on windows machine with proxy (CC Proxy 6.0).
+Also when i try to transfer one file up to 50MB, and connection was destroyed after nearly 20MB transfer, but when 
+i re-plug the dongle and reconnect again the whole 50MB file was transfered. I tried also to ping the desktop PC with 
+ping 60k and the connection whas imìediately destroyed. This i fix(i think so) with this "hcitool lst 00:10:60:A6:1C:
+30 0"
+This is tried also when i use windows on the laptop and desktop, and there isn't problem.
 
 
 -------------------------------------------------------
