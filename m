@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] /usr/include/bluetooth/bnep.h
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405072351.32016.cijoml@volny.cz>
-References: <1083857533.16650.25.camel@saag>
-	 <200405071153.59387.cijoml@volny.cz> <1083946453.4420.122.camel@pegasus>
-	 <200405072351.32016.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1083967722.4420.144.camel@pegasus>
-Mime-Version: 1.0
+References: <1083857533.16650.25.camel@saag> <200405071153.59387.cijoml@volny.cz> <1083946453.4420.122.camel@pegasus>
+In-Reply-To: <1083946453.4420.122.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200405072351.32016.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,31 +19,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 08 May 2004 00:08:43 +0200
+Date: Fri, 7 May 2004 23:51:30 +0200
 
-Hi Michal,
-
-> > > Great :) And now, do you plane to backport hidp kernel module from 2.6 to
-> > > 2.4?
+On Friday 07 of May 2004 18:14, Marcel Holtmann wrote:
+> Hi Michal,
+>
+> > > the hidp kernel module is designed to implement only HIDP. It works
+> > > mostly the same way as BNEP and CMTP, but it needs a lot more
+> > > information from the SDP database of the remote device. Thus the
+> > > structures had to evolve over time and now I think I found the perfect
+> > > match on what the kernel has to know and what not. You can look at the
+> > > hidp_connadd_req struct in libs/include/hidp.h and see what I mean. The
+> > > problem of hidd at the moment is that it only fills in the sockets and
+> > > the report descriptor data. Once hidd had given the connection to the
+> > > hidp module everything else is done inside the kernel. This means that
+> > > you can even stop and restart hidd without losing your input device.
 > >
-> > I have no plans for doing this.
-> 
-> oh :( On my laptop bluez and few other drivers still oopses as I reported few 
-> days ago...
-> I still can't use 2.6...
-> 
-> Can you change your plans? ;-]
+> > Great :) And now, do you plane to backport hidp kernel module from 2.6 to
+> > 2.4?
+>
+> I have no plans for doing this.
 
-I don't really think so, because this is not an easy work and my focus
-is on 2.6. However I added some missing stuff to hidd and it will be
-enabled in bluez-utils-2.7 even if I haven't published a patch that
-includes the hidp kernel module so far.
+oh :( On my laptop bluez and few other drivers still oopses as I reported few 
+days ago...
+I still can't use 2.6...
 
-Regards
+Can you change your plans? ;-]
 
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
