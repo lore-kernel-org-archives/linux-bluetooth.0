@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20041013143813.89912.qmail@web40626.mail.yahoo.com>
-From: Paolino paperino <vonzoltan@yahoo.it>
-To: bluez-users@lists.sourceforge.net
+From: Diego Liziero <liziero.diego@unimore.it>
+Reply-To: diego.liziero@unimore.it
+To: Paolino paperino <vonzoltan@yahoo.it>
 Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1097675179.1075.40.camel@igno>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] Re: [Bluez-users] problems with bytestream + rfcomm socket problems
+In-Reply-To: <20041012162957.12307.qmail@web40614.mail.yahoo.com>
+References: <20041012162957.12307.qmail@web40614.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1097675179.1075.40.camel@igno>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: [Bluez-users] problems with bytestream
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,28 +19,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 13 Oct 2004 16:38:13 +0200 (CEST)
+Date: Wed, 13 Oct 2004 15:46:20 +0200
 
-Thanks Diego,
-Now i've tested the rctest (without the usleep that
-i've inserted) on a machine with kernel 2.4.18 and
-bluez libs/utils 2.2(USB dongle digicom), and the
-receive function doesn't give any prblems, work well,
-doesn't loose any byte...is this a bug in the kernel i
-use?!
+Hi Andrea,
+I took a look at l2test.c and I saw that
+at the beginning of each packet sent
+there is a small header.
 
-PS The USB dongle i use with the kernel 2.6 is a Trust
-BT180
+The first 32 bits are used for the sequence number
+and the following 16 for the packet size.
 
-Thanks 
-Andrea S.
+l2test[3491]: Recevied 18 bytes
+00000000: 01 00 00 00 12 00 7f 7f 7f 7f 7f 7f 7f 7f 7f 7f
+.........|seq-number | len | payload
+.........| (little endian) |
 
+However I tested it with smaller packet sizes and it seems
+to work here flawlessly.
 
+l2test -s -b 1 -N 1 XX:XX:XX:XX:XX:XX
 
-		
-___________________________________ 
-Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
-http://it.messenger.yahoo.it
+l2test -d
+l2test[3488]: Connect from XX:XX:XX:XX:XX:XX [imtu 672, omtu 672,
+flush_to 65535]
+l2test[3488]: Receiving ...
+l2test[3488]: Recevied 1 bytes
+00000000: 00                                               .
+l2test[3488]: Disconnect. Success
+
+I used csr based USB dongles with latest bluez libs & utils.
+
+Ciao,
+Diego Liziero.
+
 
 
 -------------------------------------------------------
