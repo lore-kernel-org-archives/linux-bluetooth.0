@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Question about dev/bluetooth/rfcomm/0
+Subject: Re: [Bluez-devel] Re: Bypass for L2CAP packets
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000a01c502eb$5e72f750$798815ac@stu.nus.edu.sg>
-References: <001601c50210$feedd960$2bc212ac@stu.nus.edu.sg>
-	 <1106570617.9269.81.camel@pegasus>
-	 <000a01c502eb$5e72f750$798815ac@stu.nus.edu.sg>
+In-Reply-To: <loom.20050125T171228-190@post.gmane.org>
+References: <loom.20050125T171228-190@post.gmane.org>
 Content-Type: text/plain
-Message-Id: <1106664988.8242.20.camel@pegasus>
+Message-Id: <1106672662.8242.30.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,42 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 25 Jan 2005 15:56:28 +0100
+Date: Tue, 25 Jan 2005 18:04:22 +0100
 
-Hi Teck,
+Hi Matthias,
 
-> Thank you for your help. I have a few more related questions:
+> I removed the the l2cap module by using:
+> 1. rmmod -w (-f) l2cap
+> 2. modprobe -r l2cap
 > 
-> 1. I issue the following commands with a Sony Ericsson 
-> T630(a1:b2:c3:d4:e5:f6) nearby
-> # rfcomm bind rfcomm0 a1:b2:c3:d4:e5:f6
-> # rfcomm connect rfcomm0 a1:b2:c3:d4:e5:f6
+> But after starting my program it is always reloaded.
+> Is there any other command that prevents this reloading permanently?
 
-you need only one of these commands. When using bind you must open the
-terminal device to initiate the connection.
-
-> The T630 asked for a pin. I have previously editted the pin file in 
-> /etc/bluetooth/pin to be 0000. I entered 0000 into the T630 and it rejected 
-> it with error passkey mismatch. May I know how to resolve this?
-
-This PIN file is only for incoming connection. You PIN helper program is
-not working in your case. Check the mailing list archive.
-
-> However, when I issued the following command
-> # hcitool cc a1:b2:c3:d4:e5:f6
-> The connection proceeded successfully immediately, without the phone asking 
-> for a pin.
-
-This is a low level connection and as long as none of the device is in
-security mode 3 you won't be asked for a PIN.
-
-> 2. I desire to use AT commands on my Fedora, via cu (call up). May I know 
-> how I can get cu installed? Can minicom be used for similar purpose?
-
-Ask the Fedora guys ;)
-
-However you can use any program to issue the AT commands. If you only
-wanna dial in then you should use a dialer program like wvdial.
+if you wanna use the L2CAP raw socket then this is not possible, because
+you need the kernel module for that socket. The only way is to do this
+directly over the HCI raw socket or to modify the L2CAP code to ignore
+messages with idents from the userspace.
 
 Regards
 
