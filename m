@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] NEC usb bluetooth support
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mitch <Mitch@0Bits.COM>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3FE029FA.6010204@0Bits.COM>
-References: <3FE029FA.6010204@0Bits.COM>
-Content-Type: text/plain
-Message-Id: <1071698841.21803.70.camel@pegasus>
+From: Charles Bueche <charles@bueche.ch>
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1071698686.6361.31.camel@bluez.bueche.ch>
 Mime-Version: 1.0
+Subject: [Bluez-users] HOWTO: Logitech MX900 Bluetooth Optical Mouse on Linux
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +15,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Dec 2003 23:07:21 +0100
+Date: Wed, 17 Dec 2003 23:04:46 +0100
 
-Hi Mitch,
+Hi,
 
-> Ok, thanx to Marcel, i looked again, and no patches/source code changes
-> are needed. The error
-> 
-> 	hci_usb: probe of 7-2:1.1 failed with error -5
-> 
-> is spurious, and the device still works just fine.
+With the help of Marcel, Olivier and a few other =FCbergeeks of the
+Bluez-devel mailing list, I have been able to get my Logitech MX900
+mouse working with my Dell Inspiron 8600 equiped with internal
+Bluetooth.
 
-these kind of errors sometimes happen. The USB folks should know more
-about them.
+I have made a small document to help other MX900 owners. It works for
+me, but be prepared to suffer a bit :
 
-> Another one to add to the list of working with linux bluetooth devices ;-)
+- it's probably buggy
+- it run CVS code
+- it run on Gentoo with 2.6test kernel
+- my english is ashaming
 
-Please send me "hciconfig -a" and do you have a full product name or
-weblink?
+http://www.bueche.ch/comp/mx900/mx900.html
 
-Regards
+Comments welcome. Regards,
+Charles
 
-Marcel
-
+--=20
+Charles Bueche <charles@bueche.ch>
+sand, snow, wave, wind and net -surfer
 
 
 
