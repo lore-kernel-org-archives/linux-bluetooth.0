@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Kazuhiro Ota <j0006@stu.matsue-ct.jp>
+Message-Id: <200501310806.ALV29436@ms12.netsolmail.com>
+From: Chris Taylor <cht@imipolex-g.com>
+Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] TPL is not changing
-Message-Id: <20050131184526.1de2caf2.j0006@stu.matsue-ct.jp>
-In-Reply-To: <1107095863.24890.0.camel@pegasus>
-References: <20050130174730.3a78367f.j0006@stu.matsue-ct.jp>
-	<1107095863.24890.0.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,39 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 Jan 2005 18:45:26 +0900
+Date: Mon, 31 Jan 2005 00:06:24 -0800
 
-Hi Marcel,
 
-Thank you for your response.
+>this can only mean that the libusb developer package is not installed.
+>Check when you call configure for something like:
+>
+>checking usb.h usability... yes
+>checking usb.h presence... yes
+>checking for usb.h... yes
+>checking for usb_open in -lusb... yes
+>checking for usb_get_busses in -lusb... yes
+>checking for usb_interrupt_read in -lusb... yes
 
-My "hciconfig -a" says as follows:
-
-hci0:   Type: PCCARD
-        BD Address: 00:90:02:05:15:79 ACL MTU: 672:8 SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:1232 acl:0 sco:0 events:24 errors:0
-        TX bytes:361 acl:0 sco:0 commands:24 errors:0
-        Features: 0xff 0xfb 0x01 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ (0)'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x8105 LMP Ver: 1.1 (0x1) LMP Subver: 0x8d40
-        Manufacturer: Ericsson Technology Licensing (0)
-
-Regards,
-
-Kazuhiro
-
--- 
-Kazuhiro Ota
-The department of information engineering,
-Matsue College of Technology
-j0006@stu.matsue-ct.jp
+Aha! I installed the libusb developer package and the firmware utility 
+installed and it work fine now! Thanks for your help.
 
 
 -------------------------------------------------------
