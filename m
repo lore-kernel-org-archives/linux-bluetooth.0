@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bluez on Axis DevBoard 82
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Tobias Sprafke <webmaster@baxter-net.de>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <DGELJAKAPGMFDACACGBEGEHNCCAA.webmaster@baxter-net.de>
-References: <DGELJAKAPGMFDACACGBEGEHNCCAA.webmaster@baxter-net.de>
-Content-Type: text/plain
-Message-Id: <1078323872.2787.105.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <4045E93F.4040900@soft.uni-linz.ac.at>
+From: Simon Vogl <vogl@soft.uni-linz.ac.at>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [Bluez-devel] sco links
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,34 +15,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 03 Mar 2004 15:24:32 +0100
+Date: Wed, 03 Mar 2004 15:18:39 +0100
 
-Hi Tobias,
+hi,
+can anyone help me with my sco link? in about 50% of cases, the audio dat=
+a
+has an offset of one byte, resulting in terrible noise. I think I saw a
+flag in a packet header somewhere that indicates the number of bytes to s=
+kip
+until the audio data starts -- I looked through the bt specs several time=
+s now
+but can't find it again. Anyone has a clue for this?
+Simon
 
-> we need help to compile and install Bluez on the Axis Devboard 82 with a
-> cross-compiler.
-> 
-> The DevBoard-Software is running on our computer and we flashed the new
-> kernel on the DevBoard successful.
-> 
-> We solved the kernel part of bluez as well, but we don't know, how to
-> configure and install the other parts.
+--=20
+_______________________________________________________________________
+Dr. Simon Vogl
+Institut f=C3=BCr Pervasive Computing, Johannes Kepler Universit=C3=A4t L=
+inz
+Altenberger Stra=C3=9Fe 69, A-4040 Linz, Austria
 
-what are you talking about? What do you have solved?
+Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
+mailto: vogl@soft.uni-linz.ac.at,  http://www.soft.uni-linz.ac.at/
 
-> We need the packages bluez-libs, -utils, -sdp and -pan on the DevBoard.
-> 
-> Can somebody give as an example for how to compile such a package with
-> cris-gcc?
 
-In general it should be enough to set some environment variables like CC
-and LD and then call configure with it.
 
-	env CC="cris-gcc" LD="cris-ld" ./configure
 
-Regards
-
-Marcel
 
 
 
