@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Audio & Bluetooth
+From: Martin List-Petersen <martin@list-petersen.net>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] USB/Bluetooth dongle doesn't work in hub
-References: <qszekj3j47n.fsf@timepilot.gpcc.itd.umich.edu>
-	<1099959115.29330.40.camel@pegasus>
-	<qszzn1rhnmh.fsf@timepilot.gpcc.itd.umich.edu>
-From: Scott W Gifford <gifford@umich.edu>
-In-Reply-To: <qszzn1rhnmh.fsf@timepilot.gpcc.itd.umich.edu> (Scott W.
- Gifford's message of "Mon, 08 Nov 2004 19:28:22 -0500")
-Message-ID: <qszr7n3lgkp.fsf@timepilot.gpcc.itd.umich.edu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1099956503.29330.35.camel@pegasus>
+References: <418FC205.7070102@tootai.net>
+	 <1099943857.29330.27.camel@pegasus>  <1099954588.6339.144.camel@loke>
+	 <1099956503.29330.35.camel@pegasus>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-CaAEfpjc+hu+2qx1RluZ"
+Message-Id: <1099965952.27159.7.camel@loke>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,62 +20,73 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 09 Nov 2004 00:47:02 -0500
+Date: Tue, 09 Nov 2004 02:05:52 +0000
 
-Scott W Gifford <gifford@umich.edu> writes:
 
-> Marcel Holtmann <marcel@holtmann.org> writes:
->
->> Hi Scott,
->>
->>> I'm trying to connect a USB/Bluetooth dongle to my laptop running
->>> Fedora Core 2 with a Linux 2.6.8-1.521 kernel, and these bluez RPMs
->>> installed:
->>> 
->>>     bluez-bluefw-1.0-2, bluez-libs-2.5-2.1, bluez-libs-devel-2.5-2.1,
->>>     bluez-pin-0.23-1, bluez-utils-2.4-3, bluez-sdp-devel-1.5-2.1,
->>>     bluez-hcidump-1.5-4, bluez-sdp-1.5-2.1, bluez-pan-1.1-4
->>
->> these packages are a way out of data.
->
-> Ah, OK; they're the ones supplied by Fedora.  I'll try newer ones from
-> the Bluez Web site.
+--=-CaAEfpjc+hu+2qx1RluZ
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-I removed all of Fedora's bluez stuff, and installed:
+On Mon, 2004-11-08 at 23:28, Marcel Holtmann wrote:
+> Hi Martin,
+>=20
+> > > > I have a question: for my mobile I use an HAMA Bluetooth headset. I=
+f I=20
+> > > > buy a bluetooth PCMCIA card for my notebook, will I be able to use =
+this=20
+> > > > headset with this card? recognized as a second soundcard? as a norm=
+al=20
+> > > > headset for my integrate soundcard? recognized by my software phone=
+=20
+> > > > clients? If I buy an USB bluetooth device, would it be the same? be=
+tter?
+> > >=20
+> > > actually this is not an easy to answer question. First thing is that =
+you
+> > > should get a Bluetooth device with a CSR chip and at least HCI 16.x
+> > > firmware on it. The second is that it must route the SCO traffic thro=
+ugh
+> > > the HCI and via a PCM. Then it should be possible.
+> >=20
+> > How to identify version 16.x or higher ? hciconfig -a only gives a
+> > hexadecimal value, that not really gives me get a clue on the firmware
+> > version.
+> >=20
+> > HCI Ver: 1.1 (0x1) HCI Rev: 0xbc LMP Ver: 1.1 (0x1) LMP Subver: 0xbc
+>=20
+> you are kidding me? Use "hciconfig hci0 revision" or look at my webpage
+> where most of the build ids are decoded.
 
-    bluez-firmware-1.0.tar.gz, bluez-hcidump-1.12.tar.gz,
-    bluez-libs-2.10.tar.gz, bluez-utils-2.10.tar.gz
+Must be blind. Anyhow, i guess this doesn't sound good for sound:
 
-> [...]
->
->>>     Nov  8 18:29:24 localhost kernel: hci_usb_intr_rx_submit: hci0 intr rx submit failed urb 1f48cf94 err -28
->>>     Nov  8 18:29:24 localhost hcid[23855]: Can't init device hci0. Input/output error(5)
->>> 
->>> I get the same effect plugging in to the hub on my base station, my
->>> keyboard, or a Belkin hub I just purchased.
->>
->> This looks like an USB problem to me. Update your kernel to the latest
->> Bitkeeper snapshot and try again.
+# hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:60:57:02:7F:E1 ACL MTU: 192:8  SCO MTU: 64:8
+        HCI 12.7
+        Chip version: BlueCore01b
+        SCO mapping:  PCM
 
-I downloaded a new kernel with:
+I have problems with no audio on this dongle. So i take it, that it
+might be the oldish firmware.
 
-    bk clone http://linux-mh.bkbits.net/bluetooth-2.6
+Kind regards,
+Martin List-Petersen
 
-, compiled and booted, and I still am getting roughly the same error:
 
-    Nov  9 00:36:06 localhost usb.agent[4258]: Setup hci_usb for USB product 50d/81/828
-    Nov  9 00:36:06 localhost hcid[3688]: HCI dev 1 registered
-    Nov  9 00:36:06 localhost kernel: hci_usb_intr_rx_submit: hci1 intr rx submit failed urb d0d01e94 err -28
-    Nov  9 00:36:06 localhost hcid[4281]: Can't init device hci1. Input/output error(5)
-    Nov  9 00:36:06 localhost usb.agent[4195]: Setup 0x00 0x00 for USB product 50d/81/828
-    Nov  9 00:36:07 localhost usb.agent[4231]: Setup 0x00 0x00 for USB product 50d/81/828
-    Nov  9 00:36:07 localhost usb.agent[4258]: Setup 0x00 0x00 for USB product 50d/81/828
+--=-CaAEfpjc+hu+2qx1RluZ
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
 
-As before, they work fine when plugged directly into the laptop.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
 
-Thanks!
+iD8DBQBBkCYAp8B84hoWbO4RAn/7AJ0W5CYAVHDT4P59js1NYTsd5NHQcACdE7kw
++d1uqn4FWVishWMFHL/wxe8=
+=Hdgw
+-----END PGP SIGNATURE-----
 
-----ScottG.
+--=-CaAEfpjc+hu+2qx1RluZ--
+
 
 
 -------------------------------------------------------
