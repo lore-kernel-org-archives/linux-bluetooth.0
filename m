@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Jouni.Lohikoski@iki.fi" <jlohikos@cc.hut.fi>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bluez-hciemu-1.0 install error- Glib Not found
-Message-ID: <20040929155222.GA131327@kosh.hut.fi>
-Reply-To: Jouni.Lohikoski@iki.fi
-References: <296459384.12087@bjut.edu.cn>
-Mime-Version: 1.0
+Message-ID: <20040929144703.69209.qmail@web53209.mail.yahoo.com>
+From: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
+Subject: Re: [Bluez-users] obexFTP ... does it works?
+To: gabriel.guillon@c-s.fr, Bluez-users@lists.sourceforge.net
+In-Reply-To: <415AA340.7030202@c-s.fr>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <296459384.12087@bjut.edu.cn>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,33 +16,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Sep 2004 18:52:22 +0300
+Date: Wed, 29 Sep 2004 07:47:03 -0700 (PDT)
 
-On Wed, Sep 29, 2004 at 08:15:46PM +0800, Jin Pu wrote:
->  checking for glib-config... not found
->  configure: error: GLib not found
->  ---then ./configure exit back to the shell---
->  
->  I know from the README, I need GLib package before
->  install the hciemu. But I suppose that the package is
->  already installed with RedHat 9.
 
-You need glib-devel package in RH9 or in Fedora. When developing
-something, you need many devel-packages.
+--- GUILLON Gabriel <gabriel.guillon@c-s.fr> wrote:
+> Try sdptool browse to find which channel is used by
+> the other peer.
+> Service Name: OBEX Object Push
+>    "RFCOMM" (0x0003)
+>      Channel: 4
 
-After error like this, you could try if you find yourself the missing
-file/program. One method here:
+In my phone (a N6600) OBEX Object Push is at channel
+10 (as say Marcel) and FTP is at channel 9
 
-# locate glib-config
-.....probably won't find it.
+but they doesn't works ... 
 
-Then to < http://rpm.pbone.net/ >
-and "Search for rpms which contain given file name": "glib-config"
 
-...you can guess from the results, you'll need glib-devel package.
-
-// jouni
-
+		
+__________________________________
+Do you Yahoo!?
+Yahoo! Mail is new and improved - Check it out!
+http://promotions.yahoo.com/new_mail
 
 
 -------------------------------------------------------
