@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200402230026.24596.pavouk@pavouk.org>
-Subject: [Bluez-users] Selection of PtP connection type
+Subject: Re: [Bluez-users] Re: MSI 6970 removing - kernel freeze
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pavel Ruzicka <pavouk@pavouk.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200402222357.46031.pavouk@pavouk.org>
+References: <200402222357.46031.pavouk@pavouk.org>
+Content-Type: text/plain
+Message-Id: <1077491054.2832.39.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,47 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 Feb 2004 00:26:24 +0100
+Date: Mon, 23 Feb 2004 00:04:14 +0100
 
-Hello,
+Hi Pavel,
 
-I want to connect my Desktop Mandrake linux with my Sharp Zaurus.
-On desktop side I want automatic solution. Only insert USB dongle.
+> But i found other problem.
+> 
+> When I make "hciconfig hci0 up"
+> Interface goes up.
+> next "hciconfig hci0 down".
+> Interface goes down.
+> next hciconfig hci0 up"
+> I get this error:
+> Can't init device hci0. Connection timed out(110)
+> 
+> I must reinsert dongle or rmmod/modprobe kernel module hci_usb.
 
-On Zaurus side I have network connector with PPP connection support,
-(it's works with my Nokia 6310i phone), and with PAN support.
-I want only click "connect" on Zaurus side.
+this problem only occurs on UHCI USB host contollers. The USB guys have
+a bunch of fixes and I hope this gets fixed some time.
 
-I read many FAQ, but many of them are outdated or not complete.
-I know, there are ppp over rfcomm, ppp over bnep, bridge over bnep, or 
-anything else? I'am a little confused about it.
+Regards
 
-What is the preferred way of connecting two devices today?
+Marcel
 
-----------------------------------------------------------------------
-Other problem is with automatic configuring. For autoloading
-of kernel modules I have in kernel 2.6.3 autoloader, and in /etc/modprobe.conf
-I have this:
-# bluetooth stuff
-alias net-pf-31 bluez
-alias bt-proto-0 l2cap
-alias bt-proto-2 sco
-alias bt-proto-3 rfcomm
-alias bt-proto-4 bnep
-alias tty-ldisc-11 hci_usb
-
-This works for me, but Is it the right way?
-
-I'am a little confused from hotplug. Must I start some daemon, or this makes 
-kernel?
-Where can I place configuration for automatic configuring and removing 
-interface?
-This will probably depends on first question about connection type.
-For example, on my Zaurus is cardctl daemon, which operates CF slot.
-
-Please give me some answers or links to documents.
-Best regards,
-Pavel Ruzicka
 
 
 
