@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] JSR-82 Implementation
-From: Erik Tews <erik@debian.franken.de>
-To: Stephen Crane <steve.crane@rococosoft.com>
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1092650525.19596.1222.camel@baroque.rococosoft.com>
-References: <1092427728.5708.1.camel@localhost.localdomain>
-	 <1092650525.19596.1222.camel@baroque.rococosoft.com>
+Subject: Re: [Bluez-devel] Alignment issue
+From: Marcel Holtmann <marcel@holtmann.org>
+To: john smith <roofass@hotmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY22-F42hUaRTpCkEW000285a5@hotmail.com>
+References: <BAY22-F42hUaRTpCkEW000285a5@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1092657726.3452.77.camel@localhost.localdomain>
+Message-Id: <1092651309.4375.119.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,26 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 16 Aug 2004 14:02:06 +0200
+Date: Mon, 16 Aug 2004 12:15:09 +0200
 
-Am Mo, den 16.08.2004 schrieb Stephen Crane um 12:02:
-> > Is there currently any implementation of the jsr-82 standard for linux,
-> > so that I can use bluetooth from my java-application? Or for any other
-> > (free) desktop-operating system? I have seen one for serial bluetooth
-> > dongels on linux (but I got only usb ones) and for Windows XP. Are there
-> > any other ones.
+Hi John,
+
+> >the rule is to not include headers from the kernel source code in any
+> >user space program or library. Even if some people try to bend this rule
+> >I will follow as much as I can.
 > 
-> You didn't mention whether it had to be free software or not (however
-> maybe your email address makes this unnecessary :-) 
+> Hi, I'm new to Linux prog. and I'm a bit confused. Does this mean there's a 
+> problem with bluez/utils/tools/l2ping.c which contains:
 > 
-> Anyway Rococo has one which is free (as in beer) for students and
-> hobbyists. Have a look here:
-> http://www.rococosoft.com/products/impronto.html
+>    #include <asm/types.h>
+>    #include <asm/byteorder.h>
+> 
+> 
+> Or are the above includes System kernel headers ( which as far as I 
+> understand are OK for user-space apps. to link to) rather than Kernel source 
+> headers.
 
-Well, free as in freedom would be better, but free beer is ok too.
+we don't include kernel headers and asm/* are kernel headers. So it
+seems that there are some leftovers and I hopefully now cleaned them up.
+Can someone doublecheck on little and big endian machines that I don't
+made any mistakes. Please also check the RFCOMM part of hcidump.
 
-I think the sdk is what I was looking for, because I would like to know
-if my java-application is able to talk to a real world device.
+Regards
+
+Marcel
+
 
 
 
