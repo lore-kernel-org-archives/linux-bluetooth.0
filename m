@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: O Plameras <oscarp@acay.com.au>
-Message-ID: <cjad82$qji$1@sea.gmane.org>
-References: <E1CA5Ze-0006Iu-R6@paris.servershost.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <E1CA5Ze-0006Iu-R6@paris.servershost.net>
-Subject: [Bluez-users] Re: pand freezes upon disconnect
+Message-ID: <20040927191505.32405.qmail@web53202.mail.yahoo.com>
+From: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
+To: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>,
+   bluez-users@lists.sourceforge.net
+In-Reply-To: <20040926113702.53408.qmail@web53210.mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] compiling bluez/obex (btobex)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,71 +17,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Sep 2004 11:02:18 +1000
+Date: Mon, 27 Sep 2004 12:15:05 -0700 (PDT)
 
-Bora wrote:
-> Hello
-> My bluetooth server is Slackware 9.1 and my client is WindowsXp.I 
-> perfectly share the internet connection between them.My pand command 
-> is 'pand -s -M --role NAP -z' , but when i close the connection from 
-> windows, i see that slackware freezes.Any comments?
-> 
+> the INSTALL document says to execute ./configure,
+> but
+> the file is not included.
+OK, reading some documentation about autoconf I have
+found that is needed to run aclocal before running
+autoconf.
+So now I have a file named configure obtained without
+any error message.
+Then I try to run it.
+the response is that "install.sh is missing"
+I can't find that file in the obex dir
+I controlled in the CVS, but the file isn't there.
+... In other dirs of bluez I can find several files
+named install.sh that seems equals ...
+So i copyed the file from the bluefw dir in the obex
+dir.
+Now I run again the ./configure and it writes several
+messages, then stops his execution saying that
+"config.h is missing"
 
-I have a similar problem but my clients are Linux FC2. When I close
-my connection from Linux clients the server has to be rebooted as it
-freezes. I also tried shutdown the the following in sequence and the
-server also freezes.
+... and now?
+how can I resolve these stopping points?
 
-ifconfig bnep0 down
-ifconfig bnep1 down
-brctl delif br0 bnep0
-brctl delif bro bnep1
-hciconfig hci0 down ................
+PS be patient with me, I am at the first packages
+compilation in linux
 
-My server is Fedora Core 2 with kernel-2.6.8.1-mm4. It is
-also a bridge-router-firewall (firewall = www.shorewall.net).
-I also tried patching my server with patch-2.6.8-mh2 with the
-same results. Can anyone help ?
+for jouni: thanks, I will try gnome-obex-send later
 
-[root@compaq src]#hci0:   Type: USB
-         BD Address: 00:10:60:A7:DD:45 ACL MTU: 192:8  SCO MTU: 64:8
-         UP RUNNING PSCAN ISCAN
-         RX bytes:1484873 acl:44063 sco:0 events:26226 errors:0
-         TX bytes:5589996 acl:32995 sco:0 commands:29 errors:0
-         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: ACCEPT MASTER
-         Name: 'compaq.noy.com.au'
-         Class: 0x000100
-         Service Classes: Unspecified
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP 
-Subver: 0x20d
-         Manufacturer: Cambridge Silicon Radio (10)
 
-[root@compaq src]#brctl show
-bridge name     bridge id               STP enabled     interfaces
-br0             8000.00105a67f2a1       yes             eth0
-                                                         eth1
-                                                         bnep0
-                                                         bnep1
-[root@compaq src]#
 
-My clients are Fedora Core 2 with kernel-2.6.8.1-mm4
-
-I have:
-bluez-sdp-1.5-1
-bluez-pan-1.1-1
-bluez-firmware-1.0
-bluez-hcidump-1.12
-bluez-hciemu-1.0
-bluez-libs-2.10
-bluez-pin-0.24
-bluez-utils-2.10
-
-in my server and clients.
-
+		
+_______________________________
+Do you Yahoo!?
+Declare Yourself - Register online to vote today!
+http://vote.yahoo.com
 
 
 -------------------------------------------------------
