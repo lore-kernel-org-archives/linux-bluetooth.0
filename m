@@ -1,12 +1,18 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4203B336.6080804@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: where can I find patch for 2.6.9?
-References: <c93f2a29050203210522694d38@mail.gmail.com>	 <ctv818$aa1$1@sea.gmane.org> <1107517953.6921.3.camel@pegasus>	 <4203A9C4.7040509@gmx.ch> <1107538283.6921.51.camel@pegasus>
-In-Reply-To: <1107538283.6921.51.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: cross-compilation howto  (was "Re: [Bluez-users] Trying to
+	compile for axis but Bluetooth library not found")
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4203B1BB.1070006@gmx.ch>
+References: <41FE85A0.2040709@ieee.org>
+	 <1107204712.15769.70.camel@justakiss>  <41FF54DA.40801@ul.ie>
+	 <1107254209.9652.0.camel@pegasus>  <41FF8FE0.8010204@gmx.ch>
+	 <1107268938.9652.34.camel@pegasus> <41FF9C42.1090604@gmx.ch>
+	 <41FF9EA2.8090605@gmx.ch> <1107273565.8819.38.camel@justakiss>
+	 <4203B1BB.1070006@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1107538710.6921.58.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,39 +24,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Feb 2005 18:39:02 +0100
+Date: Fri, 04 Feb 2005 18:38:30 +0100
 
->>So the 2.4.x patches are all up2date and have the same fixes as the most 
->>recent 2.6.x one?
+Hi Marco,
+
+> I learned a lot of configure and make flags I didn't knew before.
+> So, that's the state:
 > 
+> For crosscompiling, it's enought to:
+> ./configure --build=[buildArchitecture] --host=[targetArchitecture]
 > 
-> not quite right. All 2.4 patches provide the same level of the Bluetooth
-> subsystem, but this is out of date if you compare it with the stuff that
-> are in the 2.6 kernel and its patches.
- >
-> We are developing for 2.6 and I don't have time to do the backporting to
-> 2.4 and actually I see no reason to do this.
+> The cross-compiler has to be in path.
+> That's it. Everything else is like usual compiling.
+> 
+> I don't think this is worth a howto, do you?
+> Actually a bluetooth compilation howto with a little crosscompiling 
+> subsection that hints to the --build and --host switches should be more 
+> than enough.
 
-Well, there are reasons. But that would be a huge lot of work and would 
-only slow down the progress and development of bluez.
+please start writing a small howto about compiling/cross-compiling the
+BlueZ. I really want something like that on the webpage. This would help
+people to get a start into it.
 
- > People should start using
-> the new stable kernel series or pay someone to backport the stuff if
-> they wanna stick with an old kernel.
+Regards
 
-Right. That's the only way that makes sense (in my mind).
+Marcel
 
-I'm curious:
-what would a backport to a specific 2.4 kernel cost?
-What time would it need?
 
-Oh, I just see that you wrote "someone". So you wouldn't be available for 
-such a action?
-
-Is there a list of features that are not in the 2.4 series?
-
-regards
-Marco
 
 
 -------------------------------------------------------
