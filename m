@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] dtl1_cs suspend bug
-References: <200309220408.04569.justin-qt@affinix.com>
-In-Reply-To: <200309220408.04569.justin-qt@affinix.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200309230508.07932.justin-qt@affinix.com>
-From: Justin Karneges <justin-qt@affinix.com>
+Subject: Re: [Bluez-devel] Digianswer USB driver
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Jan J. Jessen" <jjjessen@control.auc.dk>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: 
+	<Pine.GSO.4.40.0309231002430.12164-100000@prosit.control.auc.dk>
+References: <Pine.GSO.4.40.0309231002430.12164-100000@prosit.control.auc.dk>
+Content-Type: text/plain
+Message-Id: <1064307381.26572.162.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -18,54 +19,63 @@ List-Id: <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Sep 2003 05:08:07 -0700
+Date: 23 Sep 2003 10:56:15 +0200
 
-Update...
+Hi Jan,
 
-I've spent way too many hours on this now, probably 12 in the last two days, 
-and still I have no solution.  This is after crashing my Zaurus an 
-uncountable number of times.  I'm about to give up, simply because I can't 
-waste away my time like this.  What I wanted was to make this thing clean, 
-but instead I spent probably more time in hacking then I'll ever do in 
-ejecting and inserting of my Bluetooth card.
+> Works perfect:-) At first hciconfig hci0 up gave an error saying that it
+> couldn't set scan mode. Working with these cards for more than a year, I
+> know that they sometimes don't reply with the event they are supposed to,
+> so I just tried again, and everything is OK Bluetooth:-)
 
-I don't think I want to see another info->link or mod_timer again in my life.
+these are good news. Your initial problem setting scan mode can only be
+solved with a USB sniffer, I think.
 
-I hereby commend anyone who manages to do kernel development.  Personally, I'd 
-like to start throwing things out the window.
+Do you have any H:2 USB Bluetooth devices? If yes, please attach them
+along with a Digianswer one to the same host and use them both. I want
+to make sure that a Digianswer device works in conjunction with a H:2
+device.
 
-Is it 5AM already?
+> # hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:50:CD:00:42:2B ACL MTU: 384:6  SCO MTU: 32:7
+>         UP RUNNING
+>         RX bytes:58747 acl:0 sco:0 events:6 errors:0
+>         TX bytes:27 acl:0 sco:0 commands:7 errors:0
+>         Features: 0xff 0xfa 0x21 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy:
+>         Link mode: SLAVE ACCEPT
+>         Name: ''
+>         Class: 0x000000
+>         Service Classes: Unspecified
+>         Device Class: Miscellaneous,
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x0 LMP Ver: 1.1 (0x1) LMP Subver: 0x37
+>         Manufacturer: Motorola (8)
 
--Justin
+Have you ever updated the firmware of the Digianswer device? I though
+that Digianswer already had a USB device at the time they are not a
+subsidiary of Motorola. So the manufacturer should be 12.
 
-On Monday 22 September 2003 04:08 am, Justin Karneges wrote:
-> Hi,
->
-> I've started to try solving this one, but it is not easy for me since I
-> know nothing about CardServices and what it does before/after issuing
-> CS_EVENT_* events.
->
-> I compared the dtl1_cs code to that of the orinoco_cs (wifi) driver, and I
-> guess the handling is about the same.  What could be wrong in dtl1_cs ?
->
-> The fact that 'cardctl suspend' breaks the driver and 'cardctl eject ;
-> cardctl insert' fixes it, I'm certain this can be solved in software. 
-> Surely there is a way that the driver can fully reset itself without it
-> having to be done externally by cardmgr.  I know that suspend/resume
-> actions are supposed to be optimized versions of eject/insert, but since
-> the current suspend/resume functions _don't_ work, we may as well do a full
-> and slow reset instead.  No sense in leaving it broken.  Once someone comes
-> along who understands how suspend/resume works, the driver can be
-> optimized.
->
-> Unfortunately, this isn't as easy as it appears on the surface.  I tried a
-> simple and dirty hack of making suspend perform the eject code and resume
-> to perform the insert code (a cut and paste of just a few lines), but was
-> unsuccessful.
->
-> Clues please!
->
-> -Justin
+> I hope this is all the information that you need. It shure will easy my
+> explanations to students here at the university that wants to use these
+> devices, that they can just use bluez from now on.
+
+Please do my test above and send me "hciconfig -a" of a machine with two
+different dongles. If this works I apply this patch to mainline and your
+students can start working with BlueZ very easy ;)
+
+> Since Digianswer is a subsidiary of Motorola one could imagine that if
+> Motorola once made a Bluetooth USB dongle, Bluez would work perfectly
+> with it - just a thouhgt.
+
+Do you have any contact to Motorola, so I can get one of these devices?
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
