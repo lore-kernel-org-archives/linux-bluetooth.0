@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] l2cap question
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Christoph Torens <c.torens@web.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <opsdbdbhfdeocfdv@debian>
-References: <opsda220m9eocfdv@debian> <1093469385.537.17.camel@pegasus>
-	 <opsdbdbhfdeocfdv@debian>
-Content-Type: text/plain
-Message-Id: <1093516424.2581.1.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <412DA511.9090309@lawatsch.at>
+From: Philip Lawatsch <philip@lawatsch.at>
+MIME-Version: 1.0
+To: Michael Schmidt <schmidt@nue.et-inf.uni-siegen.de>
+CC: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Limit communication to serveral devices
+References: <412D99CA.5050209@nue.et-inf.uni-siegen.de>
+In-Reply-To: <412D99CA.5050209@nue.et-inf.uni-siegen.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,27 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Aug 2004 12:33:44 +0200
+Date: Thu, 26 Aug 2004 10:53:37 +0200
 
-Hi Christoph,
-
-> >> Does a Bluetooth USB-Dongle use isochronus USB transfers?
-> > It uses it for SCO support.
+Michael Schmidt wrote:
+> Hi Philip,
 > 
-> I read SCO is only (or mainly?) for speech.
-> I don't use speech, but I guess it is somehow used when
-> SCO is enabled in the config?
-> Is it used by "hciconfig hci0 up", too?
-> (This is making problems with some, but not all dongles)
+>> Call me paranoid but I would like to know if there is any way to limit 
+>> all types of communication to just several devices by checking with 
+>> the hardware addresses.
 
-show me the "hciconfig -a" and "/proc/bus/usb/devices" for these dongles
-and I will mark them with broken SCO support.
+>> I do understand that even this is no guarantee for anything, but I'd 
+>> for sure feel better  :) 
 
-Regards
+> When assessing your level of security (and evaluating address 
+> filtering), keep in mind that it's not too difficult to masquerade BT 
+> device addresses. You only neeed to look up the Axis OpenBT stack source 
+> code to figure out how to adjust the device address of certain Ericsson 
+> and CSR-based modules.
+> 
+> Clearly, your main line of defense should be a strong BT PIN.
 
-Marcel
+Of course, I totally agree (and stated that in my previous mails).
+
+However, the last thing I want to see is some sort of warchalking (or 
+bluechalking?) outside my flat ...
+
+Next thing on the list is using vpn over ppp over bluetooth :)
 
 
+kind regards Philip
 
 
 -------------------------------------------------------
