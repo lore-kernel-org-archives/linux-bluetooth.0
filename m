@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Filipe Veloza <fmvel@rnl.ist.utl.pt>
 To: bluez-users@lists.sourceforge.net
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-YjPFYTPK0PbBsjUWZUg7"
-Message-Id: <1086372047.8985.14.camel@castle.budism.pt>
-Mime-Version: 1.0
-Subject: [Bluez-users] Linux-2.6, Zaapa USB Dongle - can't find near devices
+Subject: RE: [Bluez-users] Linux audio gateway and headset feature
+Reply-To: axs203dd@excite.com
+From: "mr" <axs203dd@excite.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Message-Id: <20040604172724.1BFDC394E@xprdmailfe9.nwk.excite.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,72 +16,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Jun 2004 19:00:47 +0100
+Date: Fri,  4 Jun 2004 13:27:24 -0400 (EDT)
 
 
---=-YjPFYTPK0PbBsjUWZUg7
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Hi all,
+>The question is: which is the right procedure to use the laptop 
+>multimedia subsystem as an headset for the phone ? On windows2000 this 
+>kind of setup worked fine....
 
-I'm trying to use Bluetooth, I've start by acquiring a Zaapa USB Dongle
-( I think it uses Zeevo Chipset ) here goes tech info :
+>I can obtain a connection with the command
 
-Distribution : Fedora 1
-Kernel : 2.6 with bluetooth built as modules
-Bluez rpm's:
-bluez-utils-2.4-1
-bluez-pan-1.1-2
-bluez-sdp-1.5-1
-bluez-hcidump-1.5-3
-bluez-libs-2.5-1
-bluez-bluefw-1.0-1
+>rfcomm conn 0 xx:xx:xx:xx:xx:xx 12
 
-Connecting the device dmesg returns :
+The command 'rfcomm con...' does not transfer any audio signal itself, so do not use it at all yet. From the laptop side you need to do:
 
-Bluetooth: Core ver 2.4
-NET: Registered protocol family 31
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: HCI USB driver ver 2.5
-usbcore: registered new driver hci_usb
+# hsmicro xx:xx:xx:xx:xx:xx 12
+  or
+# hsmicro xx:xx:xx:xx:xx:xx 13
 
-hciconfig :
+where xx:xx:xx:xx:xx:xx is the address of nokia. Then try to make a phonecall and you should be able to listen from the laptop speakers. I have try this and worked fine. I haven;t tried to send audio from the pc's microphone to the mobile yet, however I am quite convinced that this is a one-way audio transmission.
 
-hci0:   Type: USB
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
-        DOWN
-        RX bytes:0 acl:0 sco:0 events:0 errors:0
-        TX bytes:0 acl:0 sco:0 commands:0 errors:0
-
-( I start to find strange that here returns null HW address )
-
-The problem I had was after this but I now cannot replicate , so now
-lets start here ...
-
-Why can't I set the device up #hciconfig up hci0
-
-Thanxs
---=20
-Filipe Veloza <fmvel@rnl.ist.utl.pt>
-
-PGP ( ID:0xB8ED711C SERVER:pgp.mit.edu )
-
---=-YjPFYTPK0PbBsjUWZUg7
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-
-iD8DBQBAwLjPjygwsrjtcRwRAlzVAJ9gs/VYEA0hkXKCApQKHrd0NX9URQCgi92f
-2G4fWS3e0XlVujgGp9zL+4Y=
-=01MY
------END PGP SIGNATURE-----
-
---=-YjPFYTPK0PbBsjUWZUg7--
-
+_______________________________________________
+Join Excite! - http://www.excite.com
+The most personalized portal on the Web!
 
 
 -------------------------------------------------------
