@@ -1,18 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Vitaliy Pronkin <vit@mifki.ru>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1085360239.5329.19.camel@n-vit>
-References: <loom.20040523T164826-243@post.gmane.org>
-	 <1085324502.8309.19.camel@pegasus>
-	 <loom.20040523T170840-699@post.gmane.org>
-	 <1085326200.8309.22.camel@pegasus>  <1085327326.29252.169.camel@n-vit>
-	 <1085328263.8309.25.camel@pegasus>  <1085328722.23050.175.camel@n-vit>
-	 <1085351626.8309.91.camel@pegasus>  <1085360239.5329.19.camel@n-vit>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1085377686.9779.2.camel@pegasus>
+Message-Id: <1085352315.8309.98.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Re: help me
+Subject: [Bluez-users] Talk at LinuxTag 2004
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,22 +15,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 24 May 2004 07:48:07 +0200
+Date: Mon, 24 May 2004 00:45:15 +0200
 
-Hi,
+Hi Folks,
 
-> It seems that I found the problem. 
-> Don't know why, but select() in main loop of sdpd never returns, even if
-> there's some data in socket.
-> I implemented some temporary solution to test - I created two threads,
-> one for l2cap sockets and one for local. Each of them runs accept() in a
-> loop. And in main loop I left only check_active(). So now I don't use
-> select() function and it works - at least PDA can get list of services
-> from laptop.
-
-I read something about non working select() on LKML, but I thought this
-was 2.6. However you should update your kernel to the latest -pre from
-Marcelo and or use the latest stable with my -mh patch.
+for the German audience I want to announce my talk at the LinuxTag 2004
+in Karlsruhe. It will cover mostly Bluetooth and Linux basics, but I
+also plan to give a future prospect of new features. Take a look at the
+LinuxTag webpage (http://www.linuxtag.org/2004/talk.do?id=e026) for more
+information.
 
 Regards
 
