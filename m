@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: murdok <murdok@tiscali.it>
-To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] No more ptys!
+From: Marcel Holtmann <marcel@holtmann.org>
+To: GUILLON Gabriel <gabriel.guillon@c-s.fr>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <413587BB.9010206@c-s.fr>
+References: <4134B0AC.8030907@c-s.fr> <1093978822.2103.0.camel@pegasus>
+	 <413587BB.9010206@c-s.fr>
+Content-Type: text/plain
+Message-Id: <1094213861.6052.12.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="=_server-28613-1094230143-0001-2"
-Message-Id: <200409031858.24241.murdok@tiscali.it>
-Subject: [Bluez-devel] Fwd: reduce hci connect time
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,196 +19,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 3 Sep 2004 18:58:24 +0200
+Date: Fri, 03 Sep 2004 14:17:41 +0200
 
-This is a MIME-formatted message.  If you see this text it means that your
-E-mail software does not support MIME-formatted messages.
+Hi Gabriel,
 
---=_server-28613-1094230143-0001-2
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> >>I'm playing around with 2 bluetooth dongle, under linux (me:Debian and 
+> >>other:Mandrake), trying rfcomm, hciattach, things like that.
+> >>I do that using 'screen' commands.
+> >>After a will, I cannot create more screen: "no more pty", says screen!
+> >>I user kernel 2.6.8.1, bluez-utils 2.9-3
+> > 
+> > 
+> > this is actually not a Bluetooth problem.
+> 
+> This only append when I play with BT. It never appended before.
+> Few hours before, I played with about 10 screen session with no problem.
+> Then I reduced the number of screen sessions, played with BT, tried to 
+> open one more screen, then it failed!
+> I looked at /dev/pts: there were the number of opened screen session, no 
+> more, no less.
+> I closes everything but X, then it worked again.
+> I conclued with a memory problem (Mozilla, Thunderbird and OOo where 
+> open, and my computer is a small computer)
+> Day after, played again with BT, with not that much things opened (ie: 
+> no ram problems, a priori)
+> Same problem arrived: no more ttys.
+> Time to reboot...
 
-Hi to all
+check the kernel mailing list, because this can't be a Bluetooth
+problem. There was a memory related to PTYs so you may wanna check out a
+newer kernel.
 
-I'm trying to reduce the time of HCI connect using the clock offset in the
-hcitool create connection command.
-So I modified hcitool.c (present in attach) adding the clkoffset parameter
-on hci_create_connection:
+Regards
 
- if (hci_create_connection(dd, &bdaddr, htobs(ptype), clkoffset , role,
-&handle, 25000) < 0)
-                perror("Can't create connection");
-
-and change the code for insert that in the command with this syntax:
-
-hcitool cc --clkos <clkoffset-in-decimal> <BDADDR>;
-
-then I add a printf into hcitool inq for print the clkoffset in decimal
-and try to insert this in the connection command, b
-ut the time of connect do not change!
-
-Later, during other test I take a mistake using a wrong clockoffset in the
-connect command and the time of the connection w
-as redused under 100 ms (with the slave in continuos page scan mode).
-
-So I write a little bash script for test and I find a stange class of value
-to reduce this time of connection, but I can't
-understanding the logic.
-
-Where I mistake?
-Why if I insert the same value returned from hci inqiry the connection do
-not reduce its time?
-There is a bug in the code or I wrong using some function?
-
-In attach you can find:
-the hcitool.c code (modified)
-a dump with a hci inquiry, and an hci connect with the same value of
- clokoffset bash script for trying a lot value of clkoffset
-
-Can you help me
-
-Thanks
- Ilario
+Marcel
 
 
-
---=_server-28613-1094230143-0001-2
-Content-Type: application/x-gzip; charset=iso-8859-1; name=" "
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="conn.tgz"
-
-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
-pJBCCimkkEIKKaTx0n/1XVAmAKAAAA==
-
---=_server-28613-1094230143-0001-2--
 
 
 -------------------------------------------------------
