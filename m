@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----_=_NextPart_001_01C42328.741C8E76"
-Message-ID: <E65CD2CAB74C80498703D6EF7624BB4C4ACAF0@zmaex.zma.zoran.com>
-From: "Lan Zhang" <Lan.Zhang@Zoran.com>
+From: "Ludovic Wauthy" <ludovic.wauthy@baracoda.com>
 To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Palm problem
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0035_01C422F6.EE8E2A10"
+Message-Id: <20040415123454.C98561BF9578@mwinf0103.wanadoo.fr>
+Subject: [Bluez-devel] BlueZ cross compilation for ColdFire microprocessor
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,142 +16,140 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Apr 2004 16:30:12 -0400
+Date: Thu, 15 Apr 2004 14:35:39 +0200
 
 This is a multi-part message in MIME format.
 
-------_=_NextPart_001_01C42328.741C8E76
+------=_NextPart_000_0035_01C422F6.EE8E2A10
 Content-Type: text/plain;
-	charset="us-ascii"
+	charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+ 
+
+I would like to compile the BlueZ stack for own uC-Linux 2.6 kernel.
+
+I have a development kit based on a ColdFire 5282 microprocessor.
+
+ 
+
+Is there someone who can help me?
+
+I tried several cross compilation but all of them have failed.
+
+ 
+
+Thanks a lot.
+
+Ludovic.
+
+ 
+
+
+------=_NextPart_000_0035_01C422F6.EE8E2A10
+Content-Type: text/html;
+	charset="US-ASCII"
 Content-Transfer-Encoding: quoted-printable
 
-Hi, Marcel:
+<html>
 
-Thanks for your answer before, I bought a new dongle and the problem is
-gone.=20
+<head>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered)">
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:70.85pt 70.85pt 70.85pt 70.85pt;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
 
-The problem now is the palm i705, I used BtPrint try to send data to my
-linux box, and of course I set my linux class to printer, the problem
-looks happened in rfcomm level. I used hcidump to catch the stream data,
-and it is been attached. I think it is rfcomm channel problem. Could you
-take several min to look at the file and give me some suggestion?=20
+</head>
 
-Thanks a lot.=20
+<body lang=3DFR link=3Dblue vlink=3Dpurple>
 
-Regards,
-Lan
-=20
+<div class=3DSection1>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-GB
+style=3D'font-size:12.0pt'>Hi,</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-GB
+style=3D'font-size:12.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-GB
+style=3D'font-size:12.0pt'>I would like to compile the BlueZ stack for =
+own uC-Linux
+2.6 kernel.</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-GB
+style=3D'font-size:12.0pt'>I have a development kit based on a ColdFire =
+5282
+microprocessor.</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-GB
+style=3D'font-size:12.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-GB
+style=3D'font-size:12.0pt'>Is there someone who can help =
+me?</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-GB
+style=3D'font-size:12.0pt'>I tried several cross compilation but all of =
+them have
+failed.</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-GB
+style=3D'font-size:12.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-GB
+style=3D'font-size:12.0pt'>Thanks a lot.</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+lang=3DEN-GB
+style=3D'font-size:12.0pt'>Ludovic.</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>&nbsp;</span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------=_NextPart_000_0035_01C422F6.EE8E2A10--
 
 
-
-------_=_NextPart_001_01C42328.741C8E76
-Content-Type: application/octet-stream;
-	name="hcidump.log"
-Content-Transfer-Encoding: base64
-Content-Description: hcidump.log
-Content-Disposition: attachment;
-	filename="hcidump.log"
-
-SENJRHVtcCAtIEhDSSBwYWNrZXQgYW5hbHl6ZXIgdmVyIDEuNQpkZXZpY2U6IGhjaTAgc25hcF9s
-ZW46IDEwMjggZmlsdGVyOiAweGZmZmZmZmZmCj4gSENJIEV2ZW50OiBDb25uZWN0IFJlcXVlc3Qo
-MHgwNCkgcGxlbiAxMAogIDEzIDRBIDBEIEMyIDUwIDAwIDE0IDAxIDEwIDAxIAo8IEhDSSBDb21t
-YW5kOiBBY2NlcHQgQ29ubmVjdGlvbiBSZXF1ZXN0KDB4MDF8MHgwMDA5KSBwbGVuIDcKICAxMyA0
-QSAwRCBDMiA1MCAwMCAwMSAKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzKDB4MGYpIHBsZW4g
-NAogIDAwIDAxIDA5IDA0IAo+IEhDSSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSgweDAzKSBwbGVu
-IDExCiAgMDAgMjggMDAgMTMgNEEgMEQgQzIgNTAgMDAgMDEgMDAgCjwgSENJIENvbW1hbmQ6IFdy
-aXRlIExpbmsgUG9saWN5IFNldHRpbmdzKDB4MDJ8MHgwMDBkKSBwbGVuIDQKICAyOCAwMCAwRSAw
-MCAKPiBIQ0kgRXZlbnQ6IE1heCBTbG90cyBDaGFuZ2UoMHgxYikgcGxlbiAzCiAgMjggMDAgMDUg
-Cj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlKDB4MGUpIHBsZW4gNgogIDAxIDBEIDA4IDAw
-IDI4IDAwIAo8IEhDSSBDb21tYW5kOiBDaGFuZ2UgQ29ubmVjdGlvbiBQYWNrZXQgVHlwZSgweDAx
-fDB4MDAwZikgcGxlbiA0CiAgMjggMDAgMTggQ0MgCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1
-cygweDBmKSBwbGVuIDQKICAwMCAwMSAwRiAwNCAKPiBIQ0kgRXZlbnQ6IENvbm5lY3Rpb24gUGFj
-a2V0IFR5cGUgQ2hhbmdlZCgweDFkKSBwbGVuIDUKICAwMCAyOCAwMCAxOCBDQyAKPiBBQ0wgZGF0
-YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMTIKICAgIEwyQ0FQKHMpOiBDb25uZWN0
-IHJlcTogcHNtIDEgc2NpZCAweDAwNDAKPCBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyOCBmbGFncyAw
-eDAyIGRsZW4gMTYKICAgIEwyQ0FQKHMpOiBDb25uZWN0IHJzcDogZGNpZCAweDAwNDAgc2NpZCAw
-eDAwNDAgcmVzdWx0IDAgc3RhdHVzIDAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQg
-UGFja2V0cygweDEzKSBwbGVuIDUKICAwMSAyOCAwMCAwMSAwMCAKPiBBQ0wgZGF0YTogaGFuZGxl
-IDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMTIKICAgIEwyQ0FQKHMpOiBDb25maWcgcmVxOiBkY2lk
-IDB4MDA0MCBmbGFncyAweDAwMDAgY2xlbiAwCjwgQUNMIGRhdGE6IGhhbmRsZSAweDAwMjggZmxh
-Z3MgMHgwMiBkbGVuIDE0CiAgICBMMkNBUChzKTogQ29uZmlnIHJzcDogc2NpZCAweDAwNDAgZmxh
-Z3MgMHgwMDAwIHJlc3VsdCAwIGNsZW4gMAo8IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZsYWdz
-IDB4MDIgZGxlbiAxMgogICAgTDJDQVAocyk6IENvbmZpZyByZXE6IGRjaWQgMHgwMDQwIGZsYWdz
-IDB4MDAwMCBjbGVuIDAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cygw
-eDEzKSBwbGVuIDUKICAwMSAyOCAwMCAwMSAwMCAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21w
-bGV0ZWQgUGFja2V0cygweDEzKSBwbGVuIDUKICAwMSAyOCAwMCAwMSAwMCAKPiBBQ0wgZGF0YTog
-aGFuZGxlIDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMTQKICAgIEwyQ0FQKHMpOiBDb25maWcgcnNw
-OiBzY2lkIDB4MDA0MCBmbGFncyAweDAwMDAgcmVzdWx0IDAgY2xlbiAwCj4gQUNMIGRhdGE6IGhh
-bmRsZSAweDAwMjggZmxhZ3MgMHgwMiBkbGVuIDE3Cj4gQUNMIGRhdGE6IGhhbmRsZSAweDAwMjgg
-ZmxhZ3MgMHgwMSBkbGVuIDYKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4gMTkgW3BzbSAxXQog
-ICAgICAgIFNEUCBTUyBSZXE6IHRpZCAweDAgbGVuIDB4ZQogICAgICAgICAgcGF0IHV1aWQtMTYg
-MHgxMTA1IChPQkVYT2JqUHVzaCkgdXVpZC0xNiAweDAxMDAgKEwyQ0FQKSB1dWlkLTE2IDB4MDAw
-MyAoUkZDT01NKQogICAgICAgICAgbWF4IDB4MQogICAgICAgICAgY29udCAwMCAKPCBBQ0wgZGF0
-YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMTgKICAgIEwyQ0FQKGQpOiBjaWQgMHg0
-MCBsZW4gMTQgW3BzbSAxXQogICAgICAgIFNEUCBTUyBSc3A6IHRpZCAweDAgbGVuIDB4OQogICAg
-ICAgICAgY3VyIDB4MSB0b3QgMHgxIGhuZGwgMHg4MDRkNTU4CiAgICAgICAgICBjb250IDAwIAo+
-IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzKDB4MTMpIHBsZW4gNQogIDAx
-IDI4IDAwIDAxIDAwIAo+IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZsYWdzIDB4MDIgZGxlbiAx
-Nwo+IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZsYWdzIDB4MDEgZGxlbiA0CiAgICBMMkNBUChk
-KTogY2lkIDB4NDAgbGVuIDE3IFtwc20gMV0KICAgICAgICBTRFAgU0EgUmVxOiB0aWQgMHgxIGxl
-biAweGMKICAgICAgICAgIGhuZGwgMHg4MDRkNTU4CiAgICAgICAgICBtYXggMHhmZmZmCiAgICAg
-ICAgICBhaWQocykgMHgwMDA0IChQcm90b2NvbERlc2NMaXN0KQogICAgICAgICAgY29udCAwMCAK
-PCBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMzYKICAgIEwyQ0FQKGQp
-OiBjaWQgMHg0MCBsZW4gMzIgW3BzbSAxXQogICAgICAgIFNEUCBTQSBSc3A6IHRpZCAweDEgbGVu
-IDB4MWIKICAgICAgICAgIGNudCAweDE4CiAgICAgICAgICBhaWQgMHgwMDA0IChQcm90b2NvbERl
-c2NMaXN0KQogICAgICAgICAgICAgdXVpZC0xNiAweDAxMDAgKEwyQ0FQKQogICAgICAgICAgICAg
-dXVpZC0xNiAweDAwMDMgKFJGQ09NTSkgdWludCAweDQKICAgICAgICAgICAgIHV1aWQtMTYgMHgw
-MDA4IChPQkVYKQoKICAgICAgICAgIGNvbnQgMDAgCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29t
-cGxldGVkIFBhY2tldHMoMHgxMykgcGxlbiA1CiAgMDEgMjggMDAgMDEgMDAgCj4gQUNMIGRhdGE6
-IGhhbmRsZSAweDAwMjggZmxhZ3MgMHgwMiBkbGVuIDE3Cj4gQUNMIGRhdGE6IGhhbmRsZSAweDAw
-MjggZmxhZ3MgMHgwMSBkbGVuIDQKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4gMTcgW3BzbSAx
-XQogICAgICAgIFNEUCBTQSBSZXE6IHRpZCAweDIgbGVuIDB4YwogICAgICAgICAgaG5kbCAweDgw
-NGQ1NTgKICAgICAgICAgIG1heCAweGZmZmYKICAgICAgICAgIGFpZChzKSAweDAwMDQgKFByb3Rv
-Y29sRGVzY0xpc3QpCiAgICAgICAgICBjb250IDAwIAo8IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4
-IGZsYWdzIDB4MDIgZGxlbiAzNgogICAgTDJDQVAoZCk6IGNpZCAweDQwIGxlbiAzMiBbcHNtIDFd
-CiAgICAgICAgU0RQIFNBIFJzcDogdGlkIDB4MiBsZW4gMHgxYgogICAgICAgICAgY250IDB4MTgK
-ICAgICAgICAgIGFpZCAweDAwMDQgKFByb3RvY29sRGVzY0xpc3QpCiAgICAgICAgICAgICB1dWlk
-LTE2IDB4MDEwMCAoTDJDQVApCiAgICAgICAgICAgICB1dWlkLTE2IDB4MDAwMyAoUkZDT01NKSB1
-aW50IDB4NAogICAgICAgICAgICAgdXVpZC0xNiAweDAwMDggKE9CRVgpCgogICAgICAgICAgY29u
-dCAwMCAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cygweDEzKSBwbGVu
-IDUKICAwMSAyOCAwMCAwMSAwMCAKPiBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAy
-IGRsZW4gMTcKPiBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAxIGRsZW4gNAogICAg
-TDJDQVAoZCk6IGNpZCAweDQwIGxlbiAxNyBbcHNtIDFdCiAgICAgICAgU0RQIFNBIFJlcTogdGlk
-IDB4MyBsZW4gMHhjCiAgICAgICAgICBobmRsIDB4ODA0ZDU1OAogICAgICAgICAgbWF4IDB4ZmZm
-ZgogICAgICAgICAgYWlkKHMpIDB4MDAwNCAoUHJvdG9jb2xEZXNjTGlzdCkKICAgICAgICAgIGNv
-bnQgMDAgCjwgQUNMIGRhdGE6IGhhbmRsZSAweDAwMjggZmxhZ3MgMHgwMiBkbGVuIDM2CiAgICBM
-MkNBUChkKTogY2lkIDB4NDAgbGVuIDMyIFtwc20gMV0KICAgICAgICBTRFAgU0EgUnNwOiB0aWQg
-MHgzIGxlbiAweDFiCiAgICAgICAgICBjbnQgMHgxOAogICAgICAgICAgYWlkIDB4MDAwNCAoUHJv
-dG9jb2xEZXNjTGlzdCkKICAgICAgICAgICAgIHV1aWQtMTYgMHgwMTAwIChMMkNBUCkKICAgICAg
-ICAgICAgIHV1aWQtMTYgMHgwMDAzIChSRkNPTU0pIHVpbnQgMHg0CiAgICAgICAgICAgICB1dWlk
-LTE2IDB4MDAwOCAoT0JFWCkKCiAgICAgICAgICBjb250IDAwIAo+IEhDSSBFdmVudDogTnVtYmVy
-IG9mIENvbXBsZXRlZCBQYWNrZXRzKDB4MTMpIHBsZW4gNQogIDAxIDI4IDAwIDAxIDAwIAo+IEFD
-TCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZsYWdzIDB4MDIgZGxlbiAyMQogICAgTDJDQVAoZCk6IGNp
-ZCAweDQwIGxlbiAxNyBbcHNtIDFdCiAgICAgICAgU0RQIFNBIFJlcTogdGlkIDB4NCBsZW4gMHhj
-CiAgICAgICAgICBobmRsIDB4ODA0ZDU1OAogICAgICAgICAgbWF4IDB4ZmZmZgogICAgICAgICAg
-YWlkKHMpIDB4MDMwMyAoKG51bGwpKQogICAgICAgICAgY29udCAwMCAKPCBBQ0wgZGF0YTogaGFu
-ZGxlIDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMzEKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4g
-MjcgW3BzbSAxXQogICAgICAgIFNEUCBTQSBSc3A6IHRpZCAweDQgbGVuIDB4MTYKICAgICAgICAg
-IGNudCAweDEzCiAgICAgICAgICBhaWQgMHgwMzAzICh1bmtub3duKQogICAgICAgICAgICAgdWlu
-dCAweDEgdWludCAweDIgdWludCAweDMgdWludCAweDQgdWludCAweDUgdWludCAweDYKCiAgICAg
-ICAgICBjb250IDAwIAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzKDB4
-MTMpIHBsZW4gNQogIDAxIDI4IDAwIDAxIDAwIAo+IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZs
-YWdzIDB4MDIgZGxlbiAyMQogICAgTDJDQVAoZCk6IGNpZCAweDQwIGxlbiAxNyBbcHNtIDFdCiAg
-ICAgICAgU0RQIFNBIFJlcTogdGlkIDB4NSBsZW4gMHhjCiAgICAgICAgICBobmRsIDB4ODA0ZDU1
-OAogICAgICAgICAgbWF4IDB4ZmZmZgogICAgICAgICAgYWlkKHMpIDB4MDMwMyAoKG51bGwpKQog
-ICAgICAgICAgY29udCAwMCAKPCBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAyIGRs
-ZW4gMzEKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4gMjcgW3BzbSAxXQogICAgICAgIFNEUCBT
-QSBSc3A6IHRpZCAweDUgbGVuIDB4MTYKICAgICAgICAgIGNudCAweDEzCiAgICAgICAgICBhaWQg
-MHgwMzAzICh1bmtub3duKQogICAgICAgICAgICAgdWludCAweDEgdWludCAweDIgdWludCAweDMg
-dWludCAweDQgdWludCAweDUgdWludCAweDYKCiAgICAgICAgICBjb250IDAwIAo+IEhDSSBFdmVu
-dDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzKDB4MTMpIHBsZW4gNQogIDAxIDI4IDAwIDAx
-IDAwIAo+IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZsYWdzIDB4MDIgZGxlbiAxMgogICAgTDJD
-QVAocyk6IERpc2Nvbm4gcmVxOiBkY2lkIDB4MDA0MCBzY2lkIDB4MDA0MAo8IEFDTCBkYXRhOiBo
-YW5kbGUgMHgwMDI4IGZsYWdzIDB4MDIgZGxlbiAxMgogICAgTDJDQVAocyk6IERpc2Nvbm4gcnNw
-OiBkY2lkIDB4MDA0MCBzY2lkIDB4MDA0MAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRl
-ZCBQYWNrZXRzKDB4MTMpIHBsZW4gNQogIDAxIDI4IDAwIDAxIDAwIAo+IEhDSSBFdmVudDogRGlz
-Y29ubiBDb21wbGV0ZSgweDA1KSBwbGVuIDQKICAwMCAyOCAwMCAxMyAK
-
-------_=_NextPart_001_01C42328.741C8E76--
 
 
 -------------------------------------------------------
