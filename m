@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] No working Bluetooth adapter found
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200503271812.30938.tmp@nitwit.de>
-References: <200503271708.10663.tmp@nitwit.de>
-	 <200503271804.03641.tmp@nitwit.de> <1111939622.9195.238.camel@pegasus>
-	 <200503271812.30938.tmp@nitwit.de>
-Content-Type: text/plain
-Message-Id: <1111942766.9195.243.camel@pegasus>
-Mime-Version: 1.0
+From: tmp@nitwit.de
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Error connecting transport
+References: <200503271845.15263.tmp@nitwit.de>
+In-Reply-To: <200503271845.15263.tmp@nitwit.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200503271859.06756.tmp@nitwit.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,30 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Mar 2005 18:59:26 +0200
+Date: Sun, 27 Mar 2005 18:59:06 +0200
 
-Hi Timo,
+KbluetoothD:
 
-> > so you can try "hciconfig hci0 up" and you should maybe activate the
-> 
-> Hey, great. Thanks a lot! However it didn't get that I changed the name of the 
-> device and still displays the old vendor one. Hmm, some caching issue? I can 
-> even access the device via the faulty name (?).
+"Possible evice/Service class mismatch
 
-I have no idea what you are talking about.
+To use the kbtobexsrv service, some other devices might require a modified 
+class number for your bluetooth adapter in /etc/bluetooth/hcid.conf.
 
-> > autostart function of the Bluetooth subsystem in YaST.
-> 
-> I apologize the stupid question but I don't see any autostart option in YaST..
+current the class is set to 0x0. We suggest you change this to somethign like 
+0x10000000 instead of restart BlueZ's hcid. The service will be activated 
+anyway."
 
-Check the YaST Bluetooth module and you will see. Otherwise contact the
-SuSE support.
-
-Regards
-
-Marcel
-
-
+Well, can somebody translate?
 
 
 -------------------------------------------------------
