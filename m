@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] messaging using bluez tools
+Subject: Re: [Bluez-devel] rfcomm socket and rfcomm tty
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <cqrr8a$su8$1@sea.gmane.org>
-References: <cqrr8a$su8$1@sea.gmane.org>
+In-Reply-To: <41D12158.6020206@avantwave.com>
+References: <41D12158.6020206@avantwave.com>
 Content-Type: text/plain
-Message-Id: <1104316118.6319.18.camel@notepaq>
+Message-Id: <1104315958.6319.13.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,16 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 29 Dec 2004 11:28:38 +0100
+Date: Wed, 29 Dec 2004 11:25:58 +0100
 
-Hi,
+Hi Mike,
 
-> only to take the idea: is it possible to send "Hello world" string from 
-> one box  to another (wich must be listening) only using the built-in 
-> bluez tools (hcitool, sdptool, rfcomm...), or psome code snippet is needed?
+>     I have little knowledge on tty structure, so i want to clarify 
+> something is that, if i want to connect to a rfcomm enabled phone. Are 
+> there any difference when i sending raw data to the phone with tty 
+> rfcomm and socket rfcomm? I ask this question because i see that from 
+> bluez-util rfcomm source code, tty connection is built up from socket 
+> first and then set the tty attr. So if i do not need tty functions, only 
+> read/write from/to external device is needed, socket rfcomm will be more 
+> simple. Am i right?
 
-you can do this with "rfcomm {listen|connect} ..." and tools like cat
-and echo. Or you look at the source code of rctest.c.
+this is right. The RFCOMM socket is the native interface and the TTY is
+only there for legacy reasons.
 
 Regards
 
