@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <35275.80.146.4.18.1102802831.squirrel@schrell.de>
-From: "Andreas Schrell" <as@schrell.de>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Subject: [Bluez-users] "hciconfig -a" ok, but "hcitools scan" shows no devices
+Subject: Re: [Bluez-users] what API to use to disconnect an rfcomm
+	connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200412111314.05010.wim.delvaux@adaptiveplanet.com>
+References: <200412110213.37305.wim.delvaux@adaptiveplanet.com>
+	 <1102756108.19086.1.camel@pegasus>
+	 <200412111314.05010.wim.delvaux@adaptiveplanet.com>
+Content-Type: text/plain
+Message-Id: <1102768483.19086.21.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,61 +21,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 11 Dec 2004 23:07:11 +0100 (CET)
+Date: Sat, 11 Dec 2004 13:34:43 +0100
 
+Hi Wim,
 
-Hello,
+> > > if you started
+> > >
+> > > rfcomm x XXXXXXXXXX y &
+> > > and the connection to XXXXXXXXXXX is running,
+> > >
+> > > How can other application terminate that connection  (much like pand -k
+> > > addr)
+> > >
+> > > What API (ioctl ?) should be used ? Code samples ?>
+> >
+> > the use of ACL connections is tracked with reference counting and as
+> > long as there is a upper layer connection using the ACL link it is not
+> > closed. If the last one is gone, the disconnect timer is started and
+> > after the timeout the ACL link is terminated.
+> 
+> 
+>  I want to create a 'hangup' button that should disconnect from
+>  a phone connection immediately.  This means that is
+>  should terminate say the ppp connection ontop of the serial  
+>  connection and also the serial connection to the phone.
+> 
+>  What you say is that if I close the ppp after a while the rfcomm
+>  connection would stop automatically.  That is nice but that is
+>  not what I want.
+> 
+>  So I am looking for an equivalent to pressing CTRL-C in the 
+>  controlling terminate of the running rfcomm daemon using a
+>  C-API call.
 
-I am new on this list with the following problem:
+this makes it even more unclear to me. You talked about PAN and RFCOMM.
+What profiles do you wanna serve? What is your current setup?
 
-"hciconfig -a" shows
+Regards
 
-hci0:   Type: USB
-        BD Address: 00:10:C6:3A:B5:70 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:4187 acl:0 sco:0 events:370 errors:0
-        TX bytes:1902 acl:0 sco:0 commands:72 errors:0
-        Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
-        Packet type: DM1 DH1 HV1
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'delli-0'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x4f2 LMP Ver: 1.2 (0x2) LMP Subver:
-0x4f2
-        Manufacturer: Cambridge Silicon Radio (10)
-
-"hcitools scan" or "hcitools inq" only show scanning but no device.
-
-Kernel versions tested where 2.6.8.1 and 2.6.10-rc3 and the following
-debian packages
-
-ii  bluez-firmware                1.0-2
-ii  bluez-hcidump                 1.12-1
-ii  bluez-pcmcia-support          2.10-5
-ii  bluez-pin                     0.24-1
-ii  bluez-utils                   2.10-5
-
-dmesg:Bluetooth: Core ver 2.7
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: HCI USB driver ver 2.7
-Bluetooth: L2CAP ver 2.6
-Bluetooth: L2CAP socket layer initialized
-Bluetooth: RFCOMM ver 1.3
-Bluetooth: RFCOMM socket layer initialized
-Bluetooth: RFCOMM TTY layer initialized
-
-Tested also with --length=30, --flush
-
-System is a Dell 8600 and a Siemens S65 mobile.
-
-Any idea what to do next???
-
-Thanx a lot
-Andreas
+Marcel
 
 
 
