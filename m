@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] AVDTP socket?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <418DB442.2050801@uen.org>
-References: <418DB442.2050801@uen.org>
-Content-Type: text/plain
-Message-Id: <1099830449.6896.14.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <418DB442.2050801@uen.org>
+From: Brad Midgley <bmidgley@uen.org>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] AVDTP socket?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +16,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 07 Nov 2004 13:27:29 +0100
+Date: Sat, 06 Nov 2004 22:36:02 -0700
 
-Hi Brad,
+Hi
 
-> Is AVDTP complete enough to pass data around? When I try to create a socket
-> 
-> socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_AVDTP)
-> 
-> perror gave me "Protocol not supported." Is this the right way to get an 
-> AVDTP socket?
+Is AVDTP complete enough to pass data around? When I try to create a socket
 
-there is no AVDTP in the kernel. The only thing I did, was to reserve a
-protocol number for it when it was clear to me that this code should run
-inside the kernel.
+socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_AVDTP)
 
-However what we really need first is an open source implementation of
-the SBC codec. I am not an audio expert and so I am a little bit lost
-here.
+perror gave me "Protocol not supported." Is this the right way to get an 
+AVDTP socket?
 
-Regards
+I'm using debian-testing w/libbluetooth 2.10-1, kernel 2.6.9 (unpatched)
 
-Marcel
-
-
+-- 
+Brad
 
 
 -------------------------------------------------------
