@@ -1,27 +1,32 @@
-Return-Path: <oscarp@acay.com.au>
-Message-ID: <415F1C8A.30806@acay.com.au>
-Date: Sun, 03 Oct 2004 07:24:26 +1000
-From: O Plameras <oscarp@acay.com.au>
-MIME-Version: 1.0
+Return-Path: <sjoerd@spring.luon.net>
+Date: Sat, 2 Oct 2004 11:13:43 +0200
+From: Sjoerd Simons <sjoerd@spring.luon.net>
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: pand freezes upon disconnect
-References: <E1CA5Ze-0006Iu-R6@paris.servershost.net>	 <cjad82$qji$1@sea.gmane.org> <1096371695.4950.2.camel@notepaq>	 <cje512$kj5$1@sea.gmane.org> <1096494023.6380.0.camel@pegasus>	 <415C8B5B.3060400@acay.com.au>  <1096617235.5403.3.camel@notepaq>	 <1096655305.20029.22.camel@localhost.localdomain> <1096701740.4809.4.camel@notepaq>
-In-Reply-To: <1096701740.4809.4.camel@notepaq>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Sending files from phone to ppc machine fails
+Message-ID: <20041002091343.GA16988@spring.luon.net>
+References: <20040930161652.GA10170@spring.luon.net> <1096563173.4371.5.camel@notepaq> <20040930170602.GA13427@spring.luon.net> <1096641358.4265.8.camel@notepaq> <20041001181143.GB4230@spring.luon.net> <1096701500.4809.2.camel@notepaq>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1096701500.4809.2.camel@notepaq>
 List-ID: <bluez-users.lists.sourceforge.net>
 
-Marcel Holtmann wrote:
-> Hi Stephen,
+On Sat, Oct 02, 2004 at 09:18:20AM +0200, Marcel Holtmann wrote:
+> > I've tested the cvs hidd version on my x86, but to no avail. When starting
+> > hidd --server --master sending files from the phone start failing :(.
 > 
-> 
->>Fixed in current 2.6 tree (on 7 Sep)
-> 
-> 
-> thanks for looking at it. Folks, please retest your setups with
-> 2.6.9-rc3-bk1.
-> 
+> Leave the --master option out. CSR based HID input devices will trigger
+> the role switch by themself. Only the Broadcom stuff (Apple) have a
+> problem there.
 
-Retesting and thanks.
+Ah i misunderstood. I though that it should be forced to run as master to not
+roleswitch :) Need to learn somewhat more about bluetooth it seems.
 
-O Plameras
+Without master it works perfectly on my x86 box. On my powerbook it still
+sometimes fails. I will see if i can track down the difference between a
+succeeded connection and a failed one..
+
+Thanks for all the great work on bluez ;)
+  Sjoerd
+-- 
+"If value corrupts then absolute value corrupts absolutely."
