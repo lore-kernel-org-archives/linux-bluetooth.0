@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <408C4D8D.7090104@yahoo.com.au>
-From: Zi Ming GAO <zimgao@yahoo.com.au>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] can't get bthid
+Subject: Re: [Bluez-users] nokia6600 <-> virtual serial port w/Bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nikita Tovstoles <nt3@duke.edu>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <408B0C9A.5090409@duke.edu>
+References: <408B0C9A.5090409@duke.edu>
+Content-Type: text/plain
+Message-Id: <1082896875.28880.70.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,37 +18,72 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 26 Apr 2004 09:45:17 +1000
+Date: Sun, 25 Apr 2004 14:41:15 +0200
 
-Hey guys,
-    The problem i'm having is i get the follow error when i try to start 
-bthid,
+Hi Nikita,
 
-Can't connect to HID service: No such file or directory
+> I'm trying to establish a virtual serial port connection between a linux 
+> box and nokia 6600. the connection will subsequently be used by a java 
+> app. residing on desktop and using javax.comm package. However, though i 
+> can create a connection using rfcomm, /dev/rfcomm0 is never recognized 
+> as a "serial port".
+> 
+> Here are the details:
+> 
+> before bluetooth:
+> -javax.comm sees the following ports on linux system:
+> /dev/ttyS0
+> /dev/lp0
+> 
+> My understanding is that if two devices advertise same service, they can 
+> use it. in this case, sdptool browse <phoneAdr> returns:
+> ----
+> Service Name: Bluetooth Serial Port
+> ...
+> Protocol descriptor list:
+>     "L2CAP"
+>     "RFCOMM"
+>           Channel: 2
+> 
+> That means that Serial Port connection is only available on channel 2, 
+> right?
+> however, when i try:
+> rfcomm connect /dev/rfcomm0 <phoneAddress> 2 
+>  
+> 
+> i see "connected" on linux console, pin prompt on the phone, but as soon 
+> as i enter the pin, the host just disconnects. Why is that?
 
-Now the bluetooth i'm using is the logitech MX900 with the logitech 
-bluetooth dodge. The software i'm using are lib2 and utils2 both from 
-the cvs. I managed to get hid2hci working and from the 
-/proc/bus/usb/devices i can tell the hub is in bluetooth mode. Running 
-"hciconfig hci0 up" to bring the bluetooth interface up, which works 
-fine. "hcid" also ran fine. I could manually linked up the mouse with 
-the hub by using "hcitool cc <mouse address>". Other command such as 
-"hcitool scan" "hcitool inq" all works fine.
+this is may because this is the mRouter serial port. Check with hcidump
+if your phone tries to reconnect to you after cutting the connection.
 
-I had problems previously getting hid2hci working. And it's due to the 
-fact that i'm running on a customised linux and i forgot to enable usb 
-raw hid access. anyway ... under my dev i have
-/dev/misc/uinput
-/dev/input/hid/hiddev[0..15]
-and also other rfcomms and other bluetooth essentials under /dev
-i also updated modprobe.inf with bluetooth alias from other posts
+> But, if i do not specify channel number, ie from linux console say:
+> rfcomm connect /dev/rfcomm0 <phoneAddress>
+> 
+> the connection is successfull and persistent. What exactly did i connect 
+> to? (ie which service? - sdptool says channel 1 on the phone is "dial-up 
+> networking"...)
 
-from what i understand bthid should be accessing the uinput device ...
-is there other devices that bthid requires???
-because the error message looks like i'm missing a devices file somewhere
-or probably forgot to compiled in something necessory ...
+In most phones the serial port and the dial-up are the same.
 
-anyway any help will be appreciated ... thanks ...
+>  However, if i use javax.comm package to list desktop's ports, i do not 
+> see /dev/rfcomm0 added to the list (see above). and if i specifically 
+> try to open that port using javax.comm package, i get NoSuchPort Exception.
+
+You should try using "rfcomm bind ..." and bind a specific /dev/rfcommX
+device to your phone. The connection is then established on demand.
+
+> So, how can i create a virtual serial port connection, and how can i 
+> verify it in linux (in unlikely case javax.comm is at fault here)?
+
+If you have connected to your phone or bound /dev/rfcommX to it, you can
+use minicom and test some AT commands.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
