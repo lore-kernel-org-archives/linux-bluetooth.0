@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] simple rfcomm connect!?
+Subject: Re: [Bluez-users] which profiles are available for BlueZ stack ?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: R.Schade@tu-braunschweig.de
+To: rahul.tanwar@samsung.com
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <517CF7F08A05D4118C380000E869BFA4BDEDD1@emg_ntserv2>
-References: <517CF7F08A05D4118C380000E869BFA4BDEDD1@emg_ntserv2>
+In-Reply-To: <5772142.1098422100921.JavaMail.weblogic@ep_app13>
+References: <5772142.1098422100921.JavaMail.weblogic@ep_app13>
 Content-Type: text/plain
-Message-Id: <1098442298.4704.30.camel@pegasus>
+Message-Id: <1098442052.4704.27.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,31 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Oct 2004 12:51:38 +0200
+Date: Fri, 22 Oct 2004 12:47:32 +0200
 
-Hi Ralf,
+Hi Rahul,
 
-> I have two identical BT-Dongles and I want to make my first steps on
-> programming with bluez. For the first quick and dirty I tried to connect
-> these two dongles on different PCs over a RFCOMM channel. The server comes
-> up and is waiting, but the client breaks the connect with "Connection
-> refused". What can I do? How can I debug or find out more information about
-> whats going wrong? Can I switch to verbose output for the bluez-daemons?
+> Where can i find a sortof list of all available profiles
+> for BlueZ stack. I tried to search on the bluez site but
+> cud not find one.
 
-run "hcidump -X" as root to see the details.
-
-> Both PCs are on Debian Sarge 2.4.27 with whole bluez-stuff compiled in the
-> kernel and the additional bluez-packages. The "hcid.conf" and "pin" are
-> identical on both PCs, for testing the security is none. "l2ping" and the
-> other basic tests are working. "hciconfig -a" and "hcitool scan" looks good,
-> but sdptool browse xxxx shows only "L2CAP" on protocol-lists, no RFCOMM
-> (look at the end of email). All internet examples have the rfcomm on the
-> protocol list ??!
-
-Show them to us and also show us the full source code. The ownsock
-variable can't be an integer, but you treat it like an integer in the
-printf statement. So either the type is wrong or you get a bunch of
-compiler warnings that you are ignoring.
+actually there are some presentation slides on the talks page that you
+might should look at. However this stack is not about the profiles, it
+is about the supported protocols and before you start thinking about
+profiles you should read the profile part of the specification and
+understand what protocols you need.
 
 Regards
 
