@@ -1,80 +1,83 @@
-Return-Path: <n1c0l4s.l3@wanadoo.fr>
-From: nicolas <n1c0l4s.l3@wanadoo.fr>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: inactivity of my Bt
-Date: Thu, 24 Jun 2004 19:32:24 +0200
-References: <200406232055.06709.n1c0l4s.l3@wanadoo.fr> <200406240050.30749.n1c0l4s.l3@wanadoo.fr> <1088030785.4296.17.camel@pegasus>
-In-Reply-To: <1088030785.4296.17.camel@pegasus>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-15"
-Message-Id: <200406241932.24780.n1c0l4s.l3@wanadoo.fr>
+Return-Path: <Neil@OnDrugs.co.nz>
+Subject: Re: [Bluez-devel] Logitech MX900 Hub + i-mate smartphone2
+From: Neil Fenemor <Neil@OnDrugs.co.nz>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1088034079.4296.26.camel@pegasus>
+References: <1088029361.3703.17.camel@localhost.localdomain>
+	 <1088030296.4296.14.camel@pegasus>
+	 <1088030943.3703.26.camel@localhost.localdomain>
+	 <1088031569.4296.20.camel@pegasus>
+	 <1088032096.3703.32.camel@localhost.localdomain>
+	 <1088032753.4296.23.camel@pegasus>
+	 <1088033524.3703.34.camel@localhost.localdomain>
+	 <1088034079.4296.26.camel@pegasus>
+Content-Type: multipart/alternative; boundary="=-wzuFSMnUICl9s+kTmnvN"
+Message-Id: <1088035117.3703.37.camel@localhost.localdomain>
+Mime-Version: 1.0
+Date: Thu, 24 Jun 2004 11:58:37 +1200
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Le jeudi 24 Juin 2004 00:46, Marcel Holtmann a =E9crit=A0:
-> Hi Nicolas,
->
-> > > the bluez-utils-2.7 (and also the Debian package) contains an init
-> > > script that will do this for you.
-> >
-> > i have all installed this rpm from my distrib
-> >
-> > bluez-bluefw-1.0-1mdk
-> > bluez-utils-2.7-4mdk
-> > bluez-hciemu-1.0-2mdk
-> > libbluez1-2.7-1mdk
-> > bluez-hcidump-1.8-1mdk
-> > libbluez1-devel-2.7-1mdk
-> >
-> > and there is no bluetooth service in my mcc but service bluetooth start=
- =20
-> > work
-> >
-> > so  what have i to do?
-> > there is a packaging bug?  ( in this case i will mail the packager
-> > rapidly)
->
-> check /etc/default/* for a Bluetooth configuration file. In general you
-> must set a variable to start hidd at boot time.
->
+
+--=-wzuFSMnUICl9s+kTmnvN
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+I really can't believe I was so stupid....
+
+Channel 7 eh ;)
+
+Cheers for your help Marcel, now to keep working on getting the Active
+Sync working.....
+
+
+On Thu, 2004-06-24 at 11:41, Marcel Holtmann wrote:
+
+> Hi Neil,
+> 
+> > I've attached the dump, and will compile the 2.6.7-mh1 in a moment....
+> 
+> everything is fine. Nothing looks like a timeout or something else. Are
+> you sure your phone has a service running on channel 1?
+> 
 > Regards
->
+> 
 > Marcel
->
->
->
->
-Hi Marcel,=20
+> 
 
-if i enter Hidd --server  the console    tell me:=20
+--=-wzuFSMnUICl9s+kTmnvN
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-# hidd --server
-Can't listen on HID control channel: Address already in use
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
+<HTML>
+<HEAD>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=UTF-8">
+  <META NAME="GENERATOR" CONTENT="GtkHTML/3.0.10">
+</HEAD>
+<BODY>
+I really can't believe I was so stupid....<BR>
+<BR>
+Channel 7 eh ;)<BR>
+<BR>
+Cheers for your help Marcel, now to keep working on getting the Active Sync working.....<BR>
+<BR>
+<BR>
+On Thu, 2004-06-24 at 11:41, Marcel Holtmann wrote:
+<BLOCKQUOTE TYPE=CITE>
+<PRE><FONT COLOR="#737373"><I>Hi Neil,
 
-and if i push the connect but or use the mouse or the keyboard nothing work=
-  i=20
-have to use a ps2 one and do hcitool inq  & hidd -c=20
+&gt; I've attached the dump, and will compile the 2.6.7-mh1 in a moment....
 
+everything is fine. Nothing looks like a timeout or something else. Are
+you sure your phone has a service running on channel 1?
 
-what have i forgotten?
+Regards
 
+Marcel
+</I></FONT></PRE>
+</BLOCKQUOTE>
+</BODY>
+</HTML>
 
-regards,=20
-> -------------------------------------------------------
-> This SF.Net email sponsored by Black Hat Briefings & Training.
-> Attend Black Hat Briefings & Training, Las Vegas July 24-29 -
-> digital self defense, top technical experts, no vendor pitches,
-> unmatched networking opportunities. Visit www.blackhat.com
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-=2D-=20
-Ce mail a =E9t=E9 =E9crit sous linux mandrake cooker (www.linux-mandrake.co=
-m/fr)
-avec KMail 1.6.2 (www.kde.org)
-
-Kernel: 2.6.7-2mdk
-Kde 3.2.3
+--=-wzuFSMnUICl9s+kTmnvN--
