@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec04051118174f3302f3@mail.gmail.com>
-From: Albert Huang <ashuang@gmail.com>
-Reply-To: albert@csail.mit.edu
+From: "Nicholas A. Preyss" <nalp@gmx.net>
 To: bluez-devel@lists.sourceforge.net
+Message-ID: <20040511192919.GB28581@gmx.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] can bluez dynamically allocate l2cap psm?
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] bluez-utils 2.7 default configuration
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,43 +15,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 May 2004 21:17:29 -0400
+Date: Tue, 11 May 2004 21:29:19 +0200
 
-I want a simple client/server that operates as follows.
+Hi,
 
-server listens for l2cap connections.  accepts a connection, does
-something with it.
+i don't get the point why there is a difference in the configuration
+file in /etc/default/bluetooth and the init script. Or the other way
+around: why is hidd and hid2hci activated by default?
+I don't see any sense in this.
 
-client discovers server by entering inquiry mode and then checking SDP
-records for service id of the server.
-
-I don't want to hard-code the l2cap psm, as that seems like it defeats
-half the point of SDP, but I can't figure out how to request a dynamic
-psm.  I want to be able to do somethiing like this:
-
-int s;
-struct sockaddr_l2 s_addr;
-s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-
-s_addr.l2_family = AF_BLUETOOTH;
-bacopy( &s_addr.l2_bdaddr, BDADDR_ANY );
-s_addr.l2_psm = L2CAP_PSM_ANY;
-
-bind(s, (struct sockaddr *)&s_addr, sizeof(s_addr) );
-
-struct sockaddr_l2 local_addr;
-struct socklen_t addr_len = sizeof(local_addr);
-getsockname( s, (struct sockaddr *)&local_addr, &addr_len);
-int psm = btohs( local_addr.l2_psm );
-
-// register service with SDP using dynamic psm
-
-
-Is this possible with bluez?  Or do I have to do the ugly thing and
-pick an arbitrary psm?
-
-thanks!
--albert
+nicholas
 
 
 -------------------------------------------------------
