@@ -1,8 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: "soraberri" <malfonso@able.es>
-Message-ID: <cnv248$vgv$1@sea.gmane.org>
-Subject: [Bluez-users] seems that device is not found
+Subject: Re: [Bluez-users] Bluetooth Printing (Belkin Print Server)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041123091654.GB16952@suse.de>
+References: <41A2089D.5030100@phaldor.co.uk>
+	 <1101139759.15086.14.camel@pegasus> <41A21EE3.5060408@phaldor.co.uk>
+	 <20041123091654.GB16952@suse.de>
+Content-Type: text/plain
+Message-Id: <1101202810.26578.61.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -14,26 +20,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 23 Nov 2004 11:06:18 +0100
+Date: Tue, 23 Nov 2004 10:40:10 +0100
 
-Learning...
-OK, I have just installed a ready fresh Fedora Core 3 distribution kernel
-2.6.9-1.667, no additional packages from bluez.org (I'm guessing they are
-included in my linux distribution, is this correct?). So, I plug a
-Conceptronic CBT100U adapter device (listed in bluetooth adapter list
-www.holtmann.org), execute hcitool dev, and all I get is:
+Hi Stefan,
 
-Devices:
+> >    I have tried that via the web page and the KDE Print manager. It 
+> > still does not work. The blue light on the print server flashes wildly 
+> > for ever, but nothing prints. The same result is obtained by clicking on 
+> 
+> Since you are using Suse, have you tried to configure it using Yast?
+> Printing via BT worked fine for me after configuring it with Yast. Never
+> tried the KDE Printmanager, so I can't say much about that.
+> (Which webpage are you refering to,btw.?)
 
-...anything else. By the way, I get the same response in three different
-linux boxes with the same kernel version.
-I'm afraid this is not the best welcome I could hope, or it is? so I would
-like your opinion for that. Also, I wonder how can I know which of the bluez
-downloads should I install and which don't, and how can I know if they are
-already installed on my system (also Linux novice, excuses for that..)
+the webpage should be localhost:631 and I always configured my printers
+this way.
 
-Thanks in advance,
+> The flashing ligth looks to me like the printer is receiving data, but the
+> printer is not understanding it. Otoh I might be wrong :)
+> I would suggest to configure the pritner with Yast, and set the correct
+> printer there. 
 
+I also think that maybe the printer settings are wrong, because actually
+the Bluetooth CUPS backend is quite dump and it is only a transport.
+
+However if this device is still not working I need one of these to check
+by myself what is going wrong.
+
+Regards
+
+Marcel
 
 
 
