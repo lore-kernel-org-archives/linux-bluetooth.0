@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Gregoire Favre <Gregoire.Favre@freesurf.ch>
+From: =?iso-8859-1?q?S=E9rgio_Alcides_Fernandes?= <sergiofernandes@clix.pt>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] No more bluez.o in 2.6?
-Message-ID: <20040407214322.GA14396@magma.epfl.ch>
-References: <20040407172325.GC9593@magma.epfl.ch>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20040407172325.GC9593@magma.epfl.ch>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200404072157.02734.sergiofernandes@clix.pt>
+Subject: [Bluez-users] bt_inquiry
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,37 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 7 Apr 2004 23:43:22 +0200
+Date: Wed, 7 Apr 2004 21:57:02 +0100
 
-Hello again,
+When i try to compile utils2 from cvs i get the following error :
 
-I compiled 2.6.5-mm2 again, with all blutooth in, and now I can see my
-bluetooth device ;-) I can also scan my Palm device.
-I try http://www-jcsu.jesus.cam.ac.uk/~ned21/tech/tungsten_linux.html
-and after dund --listen --persist --msdun call dun
-I got the following error when I try to connect:
-dund[3647]: RFCOMM TTY creation failed. Operation not supported(95)
+checking bluetooth/bluetooth.h usability... yes
+checking bluetooth/bluetooth.h presence... yes
+checking for bluetooth/bluetooth.h... yes
+checking for bt_inquiry in -lbluetooth... no
+configure: error: Bluetooth library not found
 
-If I lauch pppd before trying to connect:
 
-pppd[3693]: pppd 2.4.1 started by root, uid 0
-pppd[3693]: Using interface ppp0
-pppd[3693]: Connect: ppp0 <--> /dev/pts/1
-dund[3704]: RFCOMM TTY creation failed. Operation
+i installed/compiled libs2 (from cvs) in /opt/bluetooth and 
+added /opt/bluetooth/lib to my /etc/ld.so.conf....
 
-pppd[3693]: LCP: timeout sending Config-Requests=20
-pppd[3693]: Connection terminated.
-pppd[3693]: Exit.
 
-Any idea why? And how I could solve this issue?
-
-Thank you very much,
-
-	Gr=E9goire
-_________________________________________________________________________=
-_
-http://algebra.epfl.ch/greg ICQ:16624071 mailto:Gregoire.Favre@freesurf.c=
-h
+i use kernel 2.6.5-0.rc2-2ark (I use Ark Linux)
 
 
 -------------------------------------------------------
