@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40B6D5E8.2040501@dodgyware.com>
-From: yaboo <yaboo@dodgyware.com>
-Reply-To: yaboo@dodgyware.com
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: cijoml@volny.cz
-CC: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bluetooth and gps
-References: <40B67EB9.7080102@connectingyou.com.au> <200405280852.49067.cijoml@volny.cz>
-In-Reply-To: <200405280852.49067.cijoml@volny.cz>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200405280933.40644.cijoml@volny.cz>
+Subject: [Bluez-users] another BT keyboard
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,71 +17,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 May 2004 16:02:16 +1000
+Date: Fri, 28 May 2004 09:33:40 +0200
 
-Michael
+Hi,
 
-can you please give me a dummy guide on howto.
+there is another BT keyboard:
+http://thinkoutside.com/products/stowaway-bt.html
 
-e,g. please tell what commands you need to type.
-
-regards
-
-Joseph
-
-
-Michal Semler wrote:
-
->user rfcomm as serial port and connect via it to ups using gpsd
->
->Michal
->
->On Friday 28 of May 2004 01:50, Joseph Sirucka wrote:
->  
->
->>Hi All
->>
->>I have a bluetooth gps unit and would like to know how do I get about
->>connecting the unit to my linux machine.
->>
->>I can get the usb bluetooth working with
->>
->>bfusb and hci_usb drivers with others like l2cap, bluez etc
->>
->>I can hcitool scan the bluetooth unit.
->>
->>what do I need to make a connection to the unit.
->>
->>regards
->>
->>Joseph
->>
->>
->>-------------------------------------------------------
->>This SF.Net email is sponsored by: Oracle 10g
->>Get certified on the hottest thing ever to hit the market... Oracle 10g.
->>Take an Oracle 10g class now, and we'll give you the exam FREE.
->>http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
->>_______________________________________________
->>Bluez-users mailing list
->>Bluez-users@lists.sourceforge.net
->>https://lists.sourceforge.net/lists/listinfo/bluez-users
->>    
->>
->
->
->-------------------------------------------------------
->This SF.Net email is sponsored by: Oracle 10g
->Get certified on the hottest thing ever to hit the market... Oracle 10g. 
->Take an Oracle 10g class now, and we'll give you the exam FREE.
->http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
->_______________________________________________
->Bluez-users mailing list
->Bluez-users@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-users
->  
->
-
+Michal
 
 
 -------------------------------------------------------
