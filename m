@@ -1,112 +1,63 @@
-Return-Path: <wb0gaz@hotmail.com>
-From: David Feldman <wb0gaz@hotmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>, wb0gaz@hotmail.com
-Date: Tue, 22 Jun 2004 09:20:50 -0600
-Subject: Re: [Bluez-users] How is pairing completed in rfcomm?
-In-Reply-To: <1087852135.4328.30.camel@pegasus>
-References: <20040621135136.7C703C50.wb0gaz@hotmail.com> <1087852135.4328.30.camel@pegasus>
-Message-Id: <20040622092050.AAF4DB00.wb0gaz@hotmail.com>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Thomas Chiverton <thomas.chiverton@bluefinger.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: diNovo fancy bits
+References: <40D77DC8.5030200@ntlworld.com> <1087897766.4328.97.camel@pegasus>
+In-Reply-To: <1087897766.4328.97.camel@pegasus>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200406221144.35745@moveAlongNothingToSeeHere>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 22 Jun 2004 11:44:35 +0100
 
-Hello Marcel/List:
+On Tuesday 22 Jun 2004 10:49 am, you said:
+> > The best way to test this is - see what keypress events are reported
+> > with the keyboard under normal, backwards compatibility mode (ie usb,
+> > but not bluetooth), and see what keypresses are reported with other (eg.
+> > microsoft) keyboards. Anyone have any idea how to get this info?
 
-I have made more progress!
+run 'xev' in an xterm ?
 
-It is not working, but I think I am now close. I still cannot 
-complete pairing.
+-- 
+Tom Chiverton 
+Advanced ColdFusion Programmer
 
-I did not realize that it was necessary to run "hcid" daemon... I 
-could not
-find a man page... Then when I was beginning to use hcid it gave error
-that it could not execute pin helper, so I fixed the path to 
-executable file
-that generates my selected PIN code. When I manually execute the pin_
-helper
-file, it outputs 4 digits to the console, which is my test PIN. It is 
-executable.
-
-Anyway, now I run hcid before my testing procedure.
-
-At this point, here is my situation:
-
-1. Prepare phone: Set bluetooth ON (not discoverable, by now I know 
-the
-MAC address!), then choose Linked Devices->Add Device->Phone Accepts.
-Phone says "Ready to Pair"
-
-2. Prepare PC: bluetooth card inserted, then do "cardctl insert", and 
-verify
-messages on /var/log/messages (hcid reports HCI dev 0 registered, hci
-dev 0 up, then Starting security manager 0.)
-
-3. Execute script:
-
-    hciconfig hci0 up
-    hciconfig hci0 auth 3 (per Marcel suggestion)
-    rfcomm bind 0 MAC-ADDRESS 1 (note I changed parameter #2 to 0, 
-not /dev/rfcomm0)
-    ---> reports "rfcomm0: MAC-ADDRESS channel 1 clean"
-    cat </dev/rfcomm0
-
-4. At this point the computer device name (from hcid.conf) appears on 
-the phone,
-and the phone says "Add to paired devices?" I select Yes. I enter my 
-PIN digits
-(as configured in pin helper script file) and phone says "Pairing 
-failed, Retry?"
-
-5. The cat command reports:  "Warning: null TTY for (d8:00) in tty_
-fasync" and
-"-bash: /dev/rfcomm0: Permission denied"
-
-6. At this point I went back to /var/log/messages and I see these 
-messages in
-the file:
-
-kernel: application bug: hcid(PID) has SIGCHLD set to SIG_IGN but 
-calls wait()
-kernel: (see the NOTES section of 'man 2 wait'). Workaround activated.
-kernel: Warning: null TTY for (d8:00) in tty_fasync.
-
-As an alternative, I tried using l2ping instead of cat </dev/rfcomm0 
-to get the
-security routine to start. l2ping reported the error message "Can't 
-connect: Permission denied"
-and /var/log/messages included two of the same kernel messages (
-application bug
-about wait) but not the message about null TTY.
-
-My question: What should I do to start the security sequence?
-
-Should I update hcid (I am now using version 2.2 as reported by hcid -?)
-
-I hope I can make more progress without installing a new kernel, 
-because I searched
-for RPM for later kernel in 2.4 series (I am now using 2.4.20-31.9) 
-but there is no
-later version RPM, and my machine does not set up with compiler, so I 
-cannot try
-to compile new kernel.
-
-Dave
-wb0gaz@hotmail.com
+Tel: +44(0)1749 834997
+email: tom.chiverton@bluefinger.com
+BlueFinger Limited
+Underwood Business Park
+Wookey Hole Road, WELLS. BA5 1AF
+Tel: +44 (0)1749 834900
+Fax: +44 (0)1749 834901
+web: www.bluefinger.com
+Company Reg No: 4209395 Registered Office: 2 Temple Back East, Temple
+Quay, BRISTOL. BS1 6EG.
+*** This E-mail contains confidential information for the addressee
+only. If you are not the intended recipient, please notify us
+immediately. You should not use, disclose, distribute or copy this
+communication if received in error. No binding contract will result from
+this e-mail until such time as a written document is signed on behalf of
+the company. BlueFinger Limited cannot accept responsibility for the
+completeness or accuracy of this message as it has been transmitted over
+public networks.***
 
 
-###
-
-
->> So my core question - how do I complete the pairing process, when 
->> initiated
->> by the PC and accepted by the phone?
->
->The phone uses security level 2 and this means the security routines
->kick in when you request access to the RFCOMM channel. If you want them
->earlier then the use of security mode 3 is needed. Use "hciconfig hci0
->auth" to activate it on your device.
->
->Regards
->
->Marcel
+-------------------------------------------------------
+This SF.Net email sponsored by Black Hat Briefings & Training.
+Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
+digital self defense, top technical experts, no vendor pitches, 
+unmatched networking opportunities. Visit www.blackhat.com
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
