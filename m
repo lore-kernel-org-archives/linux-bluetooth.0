@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jason Van Patten <jvp@lateapex.net>
-Message-Id: <200309130515.h8D5FHU06171@localhost.lateapex.net>
 Subject: Re: [Bluez-users] IBM Thinkpad A31p and Bluetooth
-To: bluez-users@lists.sourceforge.net
-Reply-To: jvp@lateapex.net
-In-Reply-To: <1063407456.28890.369.camel@pegasus> from "Marcel Holtmann" at Sep 13, 2003 12:57:30 AM
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Marcel Holtmann <marcel@holtmann.org>
+To: jvp@lateapex.net
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200309122230.h8CMUcP05811@localhost.lateapex.net>
+References: <200309122230.h8CMUcP05811@localhost.lateapex.net>
+Content-Type: text/plain
+Message-Id: <1063407456.28890.369.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -17,35 +18,64 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 13 Sep 2003 01:15:17 -0400 (EDT)
+Date: 13 Sep 2003 00:57:30 +0200
 
-At Fri Sep 12 18:57:30 2003, Marcel Holtmann wrote:
-> this can be a problem, but I after searching a little bit I find some
-> texts that say such a switch must be there and that Bluetooth is working
-> with your notebook:
+Hi Jason,
 
-> No Bluetooth device attached to the USB bus. You have to switch it on ;)
+> > as I know the IBM notebook's have a switch near the keyboard to switch
+> > the Bluetooth device on and off. Or maybe there is a BIOS option. What
+> 
+> I went hunting through the BIOS for something like that and didn't find
+> anything.  The manual isn't very handy and only mentions the option of
+> Bluetooth once.  A quick hunt around the keybd also comes up with nothing.
 
-I found the tiny button just now, after staring straight at it for the last
-couple of days.  Duh.
+this can be a problem, but I after searching a little bit I find some
+texts that say such a switch must be there and that Bluetooth is working
+with your notebook:
 
-laptop# hciconfig -a
-hci0:   Type: USB 
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
-        DOWN 
-        RX bytes:0 acl:0 sco:0 events:0 errors:0
-        TX bytes:0 acl:0 sco:0 commands:0 errors:0
-        Features: 0x00 0x00 0x00 0x00
-        Packet type: DM1 DH1 HV1 
-        Link policy: 
-        Link mode: SLAVE ACCEPT 
+	http://www.linux-portal.com/static/notebook/thinkpad/a31p/
+	http://homepages.uni-regensburg.de/~meo21672/a31p/a31p.html
+	http://www.sleeper-service.org/a31p/a31p.html
 
-Better.
+> > do /proc/bus/usb/devices say? I know that the IBM Ultraport module don't
+> > set the Bluetooth class in the USB descriptor, so maybe we have another
+> > one.
+> 
+> # cat /proc/bus/usb/devices 
+> T:  Bus=03 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
+> B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
+> D:  Ver= 1.00 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+> P:  Vendor=0000 ProdID=0000 Rev= 0.00
+> S:  Product=USB UHCI Root Hub
+> S:  SerialNumber=1840
+> C:* #Ifs= 1 Cfg#= 1 Atr=40 MxPwr=  0mA
+> I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+> E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=255ms
+> T:  Bus=02 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
+> B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
+> D:  Ver= 1.00 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+> P:  Vendor=0000 ProdID=0000 Rev= 0.00
+> S:  Product=USB UHCI Root Hub
+> S:  SerialNumber=1820
+> C:* #Ifs= 1 Cfg#= 1 Atr=40 MxPwr=  0mA
+> I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+> E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=255ms
+> T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
+> B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
+> D:  Ver= 1.00 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+> P:  Vendor=0000 ProdID=0000 Rev= 0.00
+> S:  Product=USB UHCI Root Hub
+> S:  SerialNumber=1800
+> C:* #Ifs= 1 Cfg#= 1 Atr=40 MxPwr=  0mA
+> I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+> E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=255ms
 
-jas
--- 
-Jason Van Patten
-AOL IM: Jason VP 
+No Bluetooth device attached to the USB bus. You have to switch it on ;)
+
+Regards
+
+Marcel
+
 
 
 
