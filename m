@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Keith Pemberton <kbpember@cox.net>
-To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Keeping keyboards alive
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bernard Mentink <Bernard.Mentink@trimble.co.nz>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <8285CB7241FCFC4BB721A6F953F9B35EFB30EB@nzc-ap-xch-01.ap.trimblecorp.net>
+References: 
+	 <8285CB7241FCFC4BB721A6F953F9B35EFB30EB@nzc-ap-xch-01.ap.trimblecorp.net>
 Content-Type: text/plain
-Message-Id: <1079350703.4317.7.camel@linuxcomp.gatep5.net>
+Message-Id: <1079350163.3405.6.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Writing a bluetooth mouse driver...
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,19 +19,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 15 Mar 2004 05:38:23 -0600
+Date: Mon, 15 Mar 2004 12:29:24 +0100
 
-I'm going to write a bluetooth mouse driver for my MS bluetooth mouse
-just to see if I can do it. (yes, I do know that there is one out there
-already, but I don't like the way that that driver is doing things).  My
-hang up in understanding is in the communication between the mouse and
-the wireless transceiver.  I am guessing that the functions providing
-communication to the transceiver are defined in hci.c (or hci.h).  Does
-anyone have a good document that describes how the Bluez stack
-communicates with different hardware?  Any other documents that you can
-suggest would be much appreciated!  Thanks in advance.  
+Hi Bernard,
 
-Keith
+> I have been using my Apple Bluetooth keyboard sucessfully for some weeks now with the stack and am very happy with it.
+> 
+> My only niggle is the lack of support for regular polling of the keyboard to keep it awake.
+> (The keyboard goes into deep sleep after about 10mins of inactivity, I then have to cycle the power to reconnect)
+
+there is a similar problem with the Microsoft devices, but I thought I
+fixed it. Keeping the device connected is bad for battery. For example
+my Apple mouse never disconnects. My only missing Bluetooth HID device
+is the Apple keyboard and so I think that I can't tell you anything
+useful.
+
+Regards
+
+Marcel
+
 
 
 
