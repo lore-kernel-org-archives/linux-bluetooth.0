@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
+From: Stefan Behlert <behlert@suse.de>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Message-ID: <200411231020.07547.cijoml@volny.cz>
-Subject: [Bluez-users] Genius BT mouse
+Subject: Re: [Bluez-users] Bluetooth Printing (Belkin Print Server)
+Message-ID: <20041123091654.GB16952@suse.de>
+References: <41A2089D.5030100@phaldor.co.uk> <1101139759.15086.14.camel@pegasus> <41A21EE3.5060408@phaldor.co.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <41A21EE3.5060408@phaldor.co.uk>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,13 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 23 Nov 2004 10:20:07 +0100
+Date: Tue, 23 Nov 2004 10:16:54 +0100
 
-Hi guys,
+Hi Dave,
 
-there is a new BT mouse from Genius. It should work like a charm :)
+On Nov 22, 04 17:16:19 +0000, Dave Givens wrote:
+> Marcel,
+>    I have tried that via the web page and the KDE Print manager. It 
+> still does not work. The blue light on the print server flashes wildly 
+> for ever, but nothing prints. The same result is obtained by clicking on 
 
-Michal
+Since you are using Suse, have you tried to configure it using Yast?
+Printing via BT worked fine for me after configuring it with Yast. Never
+tried the KDE Printmanager, so I can't say much about that.
+(Which webpage are you refering to,btw.?)
+The flashing ligth looks to me like the printer is receiving data, but the
+printer is not understanding it. Otoh I might be wrong :)
+I would suggest to configure the pritner with Yast, and set the correct
+printer there. 
+
+        ciao,
+          Stefan
+
+-- 
+Stefan Behlert
 
 
 -------------------------------------------------------
