@@ -1,67 +1,58 @@
-Return-Path: <daryl@wideray.com>
-Errors-To: <daryl@wideray.com>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
-Cc: <bluez-devel@lists.sourceforge.net>
-Subject: RE: Qualification testing - rfcomm
-Date: Thu, 12 Jun 2003 10:30:11 -0700
-Message-ID: <000501c33108$47499590$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-In-Reply-To: <5.1.0.14.2.20030611094056.0b771918@unixmail.qualcomm.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-Id: <5.1.0.14.2.20030612101029.0789e508@unixmail.qualcomm.com>
+To: "Daryl Van Vorst" <daryl@wideray.com>, "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+From: Max Krasnyansky <maxk@qualcomm.com>
+Subject: Re: [Bluez-devel] SO_ERROR, LM_RELIABLE
+In-Reply-To: <001001c3248f$838dfdf0$1a01010a@baked>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 12 Jun 2003 10:13:33 -0700
 
-Max,
+At 01:35 PM 5/27/2003, Daryl Van Vorst wrote:
+>Max,
+>
+>I'm working on LM_RELIABLE support in l2test. I'm using aclsession to send
+>both valid and invalid l2cap packets.
+>
+>I'm sending an invalid (wrong length) packet followed by a valid packet. I
+>get the ECOMM error and clear it with getsockopt(SO_ERROR), and then I can
+>receive the next packet. That works fine for both long and short packets.
+>But when I disconnect, I get the following in syslog (for either the too
+>long or the too short case):
+>
+>l2test[583]: Disconnect. Communication error on send
+>
+>Normally that would say "Disconnect. Success".
+>
+>But I'm not sending. (At least not that I know of) Any ideas about what
+>would cause that?
+That what you'd get if you do strerror(ECOMM) :(. So the error message is ok.
+The question is why do you get error after you cleared it with getsockopt(SO_ERROR).
+I'll take a look at it.
 
-Below is exactly why the tests were failing (well, incomplete) - the tester
-was waiting for an MSC which we never sent. Thanks!
+Max
 
-With a little luck there won't be more bugs found in those tests. :) I'll
-let you know what the results are when we do another round of tests.
 
--Daryl.
 
-> Here is the relevant part of the trace 
-> > ACL data: handle 0x0001 flags 0x02 dlen 8
->     L2CAP(d): cid 0x40 len 4 [psm 3]
->       RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c 
-> < ACL data: handle 0x0001 flags 0x02 dlen 8
->     L2CAP(d): cid 0x40 len 4 [psm 3]
->       RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
-> > HCI Event: Number of Completed Packets(0x13) plen 5
->   01 01 00 01 00 
-> > ACL data: handle 0x0001 flags 0x02 dlen 8
->     L2CAP(d): cid 0x40 len 4 [psm 3]
->       RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59 
-> < ACL data: handle 0x0001 flags 0x02 dlen 8
->     L2CAP(d): cid 0x40 len 4 [psm 3]
->       RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92 
-> > HCI Event: Number of Completed Packets(0x13) plen 5
->   01 01 00 01 00 
-> 
-> See, that's what I meant by incomplete in my prev email. We 
-> now always send MSC after UA, 
-> I mean it's unconditional in the code
->                  /* DLC was previously opened by PN request */
->                          rfcomm_send_ua(s, dlci);
-> 
->                         rfcomm_dlc_lock(d);
->                         d->state = BT_CONNECTED;
->                         d->state_change(d, 0);
->                         rfcomm_dlc_unlock(d);
-> 
->                         rfcomm_send_msc(s, 1, dlci, 
-> d->v24_sig);        
-> But there is no MSC in the trace.
-> 
-> Hold on! I think I found a bug here. We always send MSC when 
-> DLC was opened by PN request but don't send it when DLC was 
-> opened by SABM. Ok that would explain it 
-> (trace doesn't have PN in it). They probably sit there and 
-> wait for MSC from us and 
-> in the mean time send() times out.
-> Should be fixed now, I'm pushing a one liner fix as we speak :)
-> 
-> Max
-> 
-> 
+
+
+-------------------------------------------------------
+This SF.NET email is sponsored by: eBay
+Great deals on office technology -- on eBay now! Click here:
+http://adfarm.mediaplex.com/ad/ck/711-11697-6916-5
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
