@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Mark RISON" <mrison@hotmail.com>
+From: Nelson Murilo <nelson@pangeia.com.br>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bd_addr question
+Message-ID: <20040310150142.GD1127@pangeia.com.br>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY8-F42nTe1CIGj0gs000015e1@hotmail.com>
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] local name in hciemu
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,56 +15,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 10 Mar 2004 16:04:32 +0000
+Date: Wed, 10 Mar 2004 12:01:43 -0300
 
-Steven Singer <steven.singer@csr.com>:
 
->Michael Schmidt wrote:
-> > Keep in mind that you break some of the BT functionality when you use
-> > variable BD_ADDRs: The pairing-based security mechanisms (authentication
-> > and encryption) rely on a constant BD_ADDR. I guess there is more
-> > functionality that is affected by the change.
->Don't forget that Bluetooth addresses must be unique otherwise unpleasant
->things happen.
->Bluetooth addresses come out of the same address space as MAC addresses,
->if you want to use your own then you need to get an OUI or IAB allocation
->from the IEEE.
+Hi,
 
-Well, you could use a MAC address with the U(niversal)/L(ocal) bit set,
-which would correspond to a BD_ADDR with bit 9 of the NAP set, as long
-as you can guarantee its uniqueness (which in practice means you have
-control of all the devices which might participate in your network; bear in
-mind that some MAC addresses were allocated with that bit set in pre-IEEE
-days).  You don't have to buy/register locally-administered MAC addresses.
+I try use hciemu and try set localname of interface.
 
->The BD ADDR <-> MAC point is important. If you start running BNEP
->(Bluetooth Network Encapsulation Protocol = Ethernet over Bluetooth)
->then the Bluetooth device will use its Bluetooth address as its Ethernet
->MAC address. This means that you can't simply take the MAC address from
->another device on your system (say an Ethernet card) and use it as your
->Bluetooth address.
+If I try:
+hciemu  -n 00:07:E0:0D:C3:48
+hciemu[9823]: HCI Emulation daemon ver 1.0 started
 
-Unless you refrain from using that Ethernet card in the same network as
-your Bluetooth device.  (This is/was the basis of a popular way to buy a few
-MAC addresses: buy a few bargain-basement NICs, read their BD_ADDRs,
-and junk the NICs).
+And run hciconfig I get: 
+hciconfig hci0
+hci0:   Type: VHCI
+        BD Address: 00:07:E0:0D:C3:48 ACL MTU: 1000:20  SCO MTU: 64:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:0 acl:0 sco:0 events:20 errors:0
+        TX bytes:1332 acl:0 sco:0 commands:20 errors:0
 
-Another top tip: don't pick addresses with the I(ndividual)/G(roup) bit set
-(i.e. multicast addresses), which would correspond to a BD_ADDR with
-bit 8 of the NAP set.  BNEP devices are almost certain to get very confused
-by this!
+But hciconfig -a failed :
+hci0:   Type: VHCI
+        BD Address: 00:07:E0:0D:C3:48 ACL MTU: 1000:20  SCO MTU: 64:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:0 acl:0 sco:0 events:20 errors:0
+        TX bytes:1332 acl:0 sco:0 commands:20 errors:0
+        Features: 0xff 0xff 0xff 0xff 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+Can't read local name on hci0. Input/output error(5)
 
-Mark
+If I try set (hciconfig hci0 name "localname")  I get same error.
 
---
-CPC/IP - A TCP/IP stack for Amstrad CPCs
--- http://www.nenie.org/cpcip/
-"Z88 vs CPC? Christ. How did we miss that platform war?"
--- http://www.ntk.net/index.cgi?back=archive00/now0128.txt&line=110#l
+Any hints? 
 
-_________________________________________________________________
-Create a Job Alert on MSN Careers and enter for a chance to win $1000! 
-http://msn.careerbuilder.com/promo/kaday.htm?siteid=CBMSN_1K&sc_extcmp=JS_JASweep_MSNHotm2
+./nelson -murilo
 
 
 
