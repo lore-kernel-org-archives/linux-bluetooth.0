@@ -1,12 +1,21 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: soraberri <421246@posta.unizar.es>
-Message-ID: <cpmeu8$9qu$1@sea.gmane.org>
-References: <cpk3v3$4bb$1@sea.gmane.org> <1102948606.8750.159.camel@pegasus> <cpkc1i$tpn$1@sea.gmane.org> <cpkdsa$3qu$1@sea.gmane.org> <cpkf63$8up$1@sea.gmane.org>
+Subject: Re: [Bluez-users] SOLVED: Dell Inspiron 8600 was: 'hciconfig -a'  
+	ok, but 'hcitools scan' shows no devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <48713.80.146.12.98.1103017007.squirrel@schrell.de>
+References: <35275.80.146.4.18.1102802831.squirrel@schrell.de>
+	 <1102804861.8750.2.camel@pegasus>
+	 <50745.80.146.4.18.1102837718.squirrel@schrell.de>
+	 <1102838764.8750.32.camel@pegasus>
+	 <33016.80.146.4.18.1102847912.squirrel@schrell.de>
+	 <1102851736.8750.34.camel@pegasus>
+	 <51140.80.146.12.98.1102958276.squirrel@schrell.de>
+	 <1102968114.2143.13.camel@pegasus>
+	 <48713.80.146.12.98.1103017007.squirrel@schrell.de>
+Content-Type: text/plain
+Message-Id: <1103018205.2143.130.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <cpkf63$8up$1@sea.gmane.org>
-Subject: [Bluez-users] Re: [bluetooth-alsa] and [libao-devel]
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,38 +27,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Dec 2004 11:22:14 +0100
+Date: Tue, 14 Dec 2004 10:56:45 +0100
 
-Sebastian Roth wrote:
-> Hi soraberri,
-> 
->  > I actually con load sco (modprobe sco) but not snd_bt_sco as indicated
->  > in http://bluetooth-alsa.sourceforge.net/
-> modprobe just searches the regular directory (/lib/modules/`uname -r`)
-> for the module. Try insmod /full/path/to/snd-bt-sco.ko instead.
-> 
-> Best regards,
-> Sebastian
-> 
-> 
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now. 
-> http://productguide.itmanagersjournal.com/
+Hi Andreas,
 
-I migth be doing something wrong... It should be easier to load it. I've 
-checked the path and the snd_bt_sco.ko file is placed at 
-/lib/modules/`uname -r`/extra. Why in extra?
+> no I used Windows sometimes. And as far as I rember I disabled the
+> Bluetooth in the taskbar. Perhaps some Dell-specific code. Is there a
+> Windows tool like hcidump? Maybe I can trace what happens when disabling
+> or enabling it under Win.
 
-If I use insmod /lib/modules/`uname -r`/extra/snd_bt_sco.k, it claims 
-for dependencies, and well, I have seen in some thread that someone just 
-  use modprobe snd_bt_sco.
+if it is the Widcomm stack then you have something like SpyLite or so,
+but the Microsoft stack I don't know. However USBsnoopy can also do the
+job.
 
-thanks sebastian
+Regards
 
-regards
+Marcel
+
 
 
 
