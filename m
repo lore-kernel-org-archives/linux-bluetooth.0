@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: David Feldman <wb0gaz@hotmail.com>
-To: bluez-users@lists.sourceforge.net
-Cc: wb0gaz@hotmail.com
-Message-Id: <20040620122909.568AD270.wb0gaz@hotmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Subject: [Bluez-users] Getting started - got to l2ping, need help
+Subject: Re: [Bluez-users] BT mouse disconnect
+From: Marcel Holtmann <marcel@holtmann.org>
+To: sandro.weiser@gmx.de
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200406201934.30037.sandro.weiser@gmx.de>
+References: <200406201934.30037.sandro.weiser@gmx.de>
+Content-Type: text/plain
+Message-Id: <1087756769.4781.44.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,72 +18,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 20 Jun 2004 12:29:09 -0600
+Date: Sun, 20 Jun 2004 20:39:29 +0200
 
-I am configuring a RH9 laptop to use bluetooth and am part way 
-through the configuration process, but need help to proceed (I cannot 
-get a serial connection to try out "AT" command, but some 
-intermediate steps appear working.)
+Hi Sandro,
 
-Configuration:
+> When I don't use my BT Mouse, the mouse disconnects after a certain period
+> when I use the hidp Module. After that the mouse isn't detectable anymore!
+> No reboot, no Linux or Windoof can detect the mouse anymore. Only removing
+> the batterys helps and after that the mouse works like before.
+> Note: the mouse is an Epox and switches completely of when it's not used.
+> I've to press one or more buttons to reenable the mouse. But when using the
+> hid-proxy of the adapter, that's no problem.
 
-System is RH9 with 2.4.20-31.9 kernel and bluez RPMs installed.
-Card is HP version of 3COM card, part number 3CRWB6096-HP
-Firmware .bin file for the card taken from a working W2K installation 
-has been installed.
+this is the stupid CSR bug when terminating the L2CAP connections. I
+really thought that I found a workaround, but it seems not :(
 
-Much searching of FAQ/howto was done.
-A few edits have been done based on this searching:
+My EPoX mouse has an earlier build id (0x020a), but I can't remember
+that I tested it with the hidp module before. Will do this as soon as
+possible.
 
-/etc/modules.conf added these alias: net-pf-31 bluez, bt-proto-0 l2cap,
- bt-proto-2 sco, bt-proto-3 rfcomm
+In HID proxy mode the boot mode is used and I don't know if the device
+still uses an idle timeout. Will check this, too.
 
-/etc/bluetooth/hcid.conf was modified just to change the entry pin_
-helper to point to a shell script (the original reference to a file 
-in /bin was going nowhere), and a /etc/bluetooth/bluepin was created 
-that echoes back PIN:00.
+> > HCI Event: Mode Change(0x14) plen 6
+>   00 2D 00 02 78 00
+> > ACL data: handle 0x002d flags 0x02 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x0041 scid 0x0044
+> < ACL data: handle 0x002d flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0044
+> < ACL data: handle 0x002d flags 0x02 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x0043 scid 0x0040
 
-Given this, here is my procedure from cold start:
+This is the problematic command that the CSR firmware don't like. The
+mouse disconnects the control channel. We ack that and then we terminate
+the interrupt channel and this is what these devices make going mad.
 
-1. Card installed, "cardctl insert" command issued.
-2. /var/log/messages reports card detected, firmware loaded, and 
-bluetooth start hci0 executed
-    At this point it also reports /sbin/hotplug no runnable bluetooth.
-agent installed.
-3. Issue hciconfig hci0 up, then executing hciconfig hci0 shows "UP 
-RUNNING PSCAN ISCAN" and some bytes received and transmitted
-4. Set phone to discoverable (necessary so that hcitool scan and 
-l2ping will work)
-5. Issue hcitool scan, and the MAC address of the phone and it's name 
-are shown
-6. Issue l2ping and the MAC address, and replies are received (0 
-bytes from... time xx mS)
-7. When l2ping executed, the message "BlueZ L2CAP ver 2.1" was 
-written to /var/log/messages
+After a little bit more thinking it maybe that the firmware terminates
+the interrupt channel first. I can't tell you that from your hcidump,
+because it misses the L2CAP connection setup calls. From looking at the
+dcid and scid values this can be the problem here. My workaround assumes
+that the control channel is always closed first. I must check that.
 
-Now at this point I am getting lost. My wish is to have the phone 
-usable for dial-out, and it appears the next command to use is "rfcomm
-". I've set up the command
+May you wanna try to start hidd with the --timeout option and set your
+own value that is shorter than the timeout value of the mouse. My list
+says that it uses a timeout of 11 minutes. Maybe you wanna try eight
+minutes. In the case we terminate the connection everything should work
+fine.
 
-rfcomm bind 0 (mac address) 0
+Regards
 
-when executes without error, and another message in /var/log/messages 
-appears, referring to "BlueZ RFCOMM ver 1.0"
+Marcel
 
-Now at this point I can issue another command, just rfcomm, and it 
-prints
-
-rfcomm0: (mac address) channel 0 clean
-
-My wish is to get to the point where I can use minicom to issue "AT" 
-commands, and I've tried configuring minicom to communicate via /dev/
-ttyUB0, but nothing happens (no echo, no sign of activity in the phone.)
-
-This is where I would be grateful for help!
-
-Dave
-wb0gaz@hotmail.com
-(wb0gaz - at - hotmail - dot - com)
 
 
 
