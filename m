@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5f30e26104120912237f20ea80@mail.gmail.com>
-From: Jeff Wilson <jazzbotley@gmail.com>
+From: Michael Zanetti <michael_zanetti@gmx.net>
 To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] setting inquiry and inquiry_scan parameters
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200412091834.34528.michael_zanetti@gmx.net>
+Subject: [Bluez-devel] snd-bt-sco
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,30 +17,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 9 Dec 2004 14:23:33 -0600
+Date: Thu, 9 Dec 2004 18:34:34 +0100
 
-Browsing through the gmane archives, I found this nugget of wisdom:
+Hi!
 
-<quote url=http://article.gmane.org/gmane.linux.bluez.devel/1696>
-From: Steven Singer <steven.singer <at> csr.com>
-Subject: Re: Parameters of the Bluetooth standard in BlueZ...
-Date: Fri, 27 Feb 2004 11:58:04 +0000
+I've got a Logitech HS01 Bluetooth Headset and it works with the Bluetooth 
+Alsa drivers except the Mic produces a noise so that recording or Skypeing is 
+nearly impossible.
 
-... <snip> ...
+I've installed kernel-2.6.9-gentoo-r9, patched it with the patch on the Bluez 
+homepage and installed btsco-cvs-0.2.
 
-BlueZ does have control over the total inquiry length and, on the
-scanning side, the time between entering inquiry scans and the amount
-of time spend in a scan each time.
+Any ideas how to stop that noise?
 
-</quote>
+Thank you all for your great job on this Bluetooth Project!!!
 
-I realize this post is over 9 months old, but I'm trying to write an
-application that does these very kinds of things.  Can someone tell me
-more about the specifics of how to tweak these numbers?  I'm guessing
-it's related to HCI ... ?
-
-     Thanks,
-       jw
+Michael
 
 
 -------------------------------------------------------
