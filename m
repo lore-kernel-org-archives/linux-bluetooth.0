@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-From: Martin Trost <phobozz@sgies.com>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <E1D6TKF-0005T0-Vl@sc8-sf-mx2.sourceforge.net>
-Subject: [Bluez-users] Getting bluetooth working using Belkin F8T003 v2
+Subject: Re: [Bluez-users] BNEP connection destroing :(
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1109691651.42248d0394218@mail.orbitel.bg>
+References: <1109664374.42242276c644b@mail.orbitel.bg>
+	 <1109691651.42248d0394218@mail.orbitel.bg>
+Content-Type: text/plain
+Message-Id: <1109697370.17256.174.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,42 +19,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 02 Mar 2005 07:55:37 -0500
+Date: Tue, 01 Mar 2005 18:16:10 +0100
 
-Hey folks, i'm stuck with the following and have no clue what to do..=0D
-=0D
-Trying to follow that guide=0D
-http://gentoo-wiki.com/HOWTO_mobile_phone%2C_Bluetooth_and_GNOME=0D
-=0D
-i came upon the following error:=0D
-Code:=0D
-=0D
-drivers/usb/class/bluetty.c: Bluetooth converter now attached to ttyUB0 (or=
-=0D
-usb/ttub/0 for devfs)=0D
-drivers/usb/class/bluetty.c: usb_bluetooth_probe - improper number of endpo=
-ints.=0D
-Bluetooth driver not bound.=0D
-bluetty: probe of 3-3:1.1 failed with error -5=0D
-drivers/usb/class/bluetty.c: usb_bluetooth_probe - improper number of endpo=
-ints.=0D
-Bluetooth driver not bound.=0D
-bluetty: probe of 3-3:1.2 failed with error -5=0D
-=0D
-when typing "dmesg"... so it seems as if it doesn't recognize my Belkin Blu=
-etooth=0D
-stick, does it?=0D
-Tried also not using the Linux-Bluetooth but the HCI-USB bluetooth, but whe=
-n=0D
-trying that, it complaing that it can't register rfcomm tty driver.. which =
-shall=0D
-be normal since it ain't installed if not using the Linux Blueooth.. so wha=
-t=0D
-shall i do to get bluetooth (mostly OBEX) to work with my mobile?=0D
-Using kernel: 2.6.11-rc3-nitro0, Belkin Bluetooth Stick, gnome-bluetooth...=
- thx=0D
-in advance for any help, i'd be really happy if you could help me :)=0D
-=0D
+Hi Todor,
+
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>     handle 41 reason 0x13
+>     Reason: Remote User Teminated Connection
+
+this means that we terminate the connection. This is funny, because I
+have no idea why that happens. Maybe you should use a 2.6.11-rc5 kernel
+instead of an old 2.4 kernel.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
