@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Kevin Page <bluez-devel@krp.org.uk>
-To: bluez-devel@lists.sourceforge.net
-cc: rmk@arm.linux.org.uk
-Message-ID: <Pine.LNX.4.58.0411031120260.18518@moog.ecs.soton.ac.uk>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] re: UART-based bluetooth stuff / serial_cs problems solved?
+Subject: Re: [Bluez-devel] Problem with Billionton PCMCIA card
+From: Marcel Holtmann <marcel@holtmann.org>
+To: marcin@telscom.ch
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41879A9F.17242.6433A23@localhost>
+References: <4187903F.16859.61AB28E@localhost>
+	 <41879A9F.17242.6433A23@localhost>
+Content-Type: text/plain
+Message-Id: <1099445373.7125.47.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,39 +19,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 3 Nov 2004 11:38:28 +0000 (GMT)
+Date: Wed, 03 Nov 2004 02:29:33 +0100
 
+Hi Marcin,
 
-I have a IBM Thinkpad X31 with a CF Socket bluetooth card (rev. G),
-which has been one of the serial PCMCIA/CF bluetooth cards which
-mysteriously haven't worked since 2.6. Just done a periodic scan of 
-the list archives, and thought I'd give the latest kernel at try, 
-as changes to serial/UART have been mentioned (I'm normally running
-Fedora Core 2 with 2.6.8).
+> > Do you wanna donate one of these cards so that I can take a look at it?
+> > 
+> Not really, I only have one myself and need it. I can provide some 
+> information if You want, just tell me what/how to get it.
+>  I tried hciattach /dev/ttyS17 bcsp
+> and it works. I can still use it with 2.4 kernel, since the idea is 
+> to use it on some device using arm processor.
 
-Anyway, basically, it seems to fix things.
+I like to sort this problem out, but without a card for testing or an
+oops from you I can't do anything useful.
 
-With linux-2.6.10-rc1-mm2:
+Regards
 
-hciattach /dev/ttyS3 socket
+Marcel
 
-seems to complete ok (none of the "BCSP initialization timed out" 
-messages I was seeing before). I do get a lone:
-
-hcid[2543]: HCI dev 0 registered
-kernel: bcsp_recv: Out-of-order packet arrived, got 1 expected 0
-hcid[2543]: HCI dev 0 up
-
-but then I can successfully hcitool scan etc.
-
-I don't know what's changed, but thanks! This seems to be good news.
-Unfortunately I haven't had the chance to do more rigorous testing as
-the new kernel either doesn't like something else in the thinkpad, or
-I screwed up the config :-/
-
-Regards,
-
-kev
 
 
 
