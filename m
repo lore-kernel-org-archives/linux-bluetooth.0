@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Sebastian Henschel <linux@kodeaffe.de>
+Message-ID: <422C0E72.7030108@futurlink.com>
+From: Pedro Monjo Florit <pedro.monjo@futurlink.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20050307153436.GB13771@fuchi>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cWoXeonUoKmBZSoM"
-Subject: [Bluez-users] Billionton CF card (bt950)
+Subject: Re: [Bluez-users] Re: Fw: Re: Can't able to send data in both direction
+References: <004401c5207b$c13a3210$4100a8c0@benjamin>	 <7aa80ced05030321482f162db2@mail.gmail.com>	 <d09q50$7r9$1@sea.gmane.org> <7aa80ced050306210062f2ad1e@mail.gmail.com>
+In-Reply-To: <7aa80ced050306210062f2ad1e@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,91 +18,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 7 Mar 2005 16:34:36 +0100
+Date: Mon, 07 Mar 2005 09:18:58 +0100
 
+Mohan K wrote:
+>Hi Sebastian,
+>                  Thanks. The send program without closing the
+>connection for each time is working fine. But on the recv side I am
+>unable to read the data immediately.  I am using recv() function
+>available in the bluez. After recv() fn I am using printf(). Until I
+>close the connection it is not printing the received data.
+>
+>Thanks & Regards,
+>Mohan
+>
+>
+>
+>On Fri, 04 Mar 2005 15:14:03 +0100, Sebastian Roth <sebiroth@web.de> wrote:
+>  
+>>Hi Mohan,
+>>
+>>why do you connect for each keypress?
+>>Just connect on programm startup then `do' `send' `while' `getch'
+>>and close the connection on programm shutdown.
+>>This should avoid the delay!
+>>
+>>Best regards,
+>>Sebastian
+>>
+>>    
+>
+Hi Mohan:
 
---cWoXeonUoKmBZSoM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I have done a program which basically does the same thing: and echo 
+server and its couterpart echo client, over bluetooth, of course. In the 
+client part, I open the connection at the begining, read line by line 
+and send the complete line with the trailing '\n' in just one send() 
+call. The server reads the line with recv() and sends it back to the 
+client, including '\n' again. This works perfectly for me.
 
-howdy folks...
+Regards,
 
-i have a CF card from Billionton here with the P/N CFBT02-B2.
-cardctl ident reveals:
-    product info: "Compact Flash", "Bluetooth Card", "", ""
-    manfid: 0x0279, 0x950b
-    function: 2 (serial)
-
-/etc/pcmcia/bluetooth.conf reads:
-    card "Billionton Bluetooth Card"
-        version "Compact Flash", "Bluetooth Card"
-        bind "serial_cs"
-
-having read in the archives, bt950_cs and btuart_cs should not be used
-nowadays, but serial_cs with the combination of hciattach. you
-should forget about the other two, right?
-
-first, i tried to get it going in an Apple Powerbook (Alu, 2nd gen)
-with kernel 2.6.11. but as others with similar cards (i believe the card
-=66rom Socket mentioned here
-http://sourceforge.net/mailarchive/forum.php?thread_id=3D6735172&forum_id=
-=3D1883
-to be more or less the same), it does not work. it is believed to have
-something to do with the serial support in 2.6 kernels.
-
-then, i tried with the machine the card shall actually work with:
-Zaurus SL-5500 with OpenZaurus 3.5.2, kernel 2.4.18-rmk7-pxa3-embedix.
-unfortunately, the situation isn't any better. so far, serial_cs
-recognizes the device:
-    ttyS03 at port 0xc48602f8 (irq=3D35) is a 16C950/954
-
-but using hciattach with type "csr" always fails with
-    Initialization timed out.
-
-trying with type "ericsson" and all kinds of speeds, it fails when
-issueing "hciconfig hci0 up" with the message
-    Can't init device hci0. Connection timet out(110)
-and the kernel log is filled to message
-nearly identical to these seen on the Powerbook with kernel 2.6:
-    h4_recv: Unknown HCI packet type 00
-    h4_recv: Unknown HCI packet type 00
-    h4_recv: Unknown HCI packet type 80
-    h4_recv: Unknown HCI packet type f8
-    h4_recv: Unknown HCI packet type 00
-    h4_recv: Unknown HCI packet type 78
-
-the other types have not been tried on the Zaurus, but on the Powerbook.
-bt950_cs and btuart_cs have also been tried on the Zaurus, with different,
-but somewhat similar error messages (replace h4_recv by btuart_cs for
-instance).
-
-so, it does not seem to be a problem of 2.6 only. 2.4 does not work,
-too. well, i fear this will be nothing more than a "metoo". at least,
-others are warned about this specific card. :)
-
-thanks,
- Sebastian
---=20
-::: .O.
-::: ..O
-::: OOO
-::: lynx -source http://www.kodeaffe.de/shensche.pub | gpg --import
-
---cWoXeonUoKmBZSoM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.5 (GNU/Linux)
-
-iD8DBQFCLHSMreHfL3pi+bQRAu7rAJ476vdc5aW1y5AkzXFX+Uvu6rQSpgCbBgZB
-WWydafBlQyQHAWhXEztSsec=
-=JX4e
------END PGP SIGNATURE-----
-
---cWoXeonUoKmBZSoM--
+Pedro
 
 
 -------------------------------------------------------
