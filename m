@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: Bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Great new site!
-References: <200401221516.50925.cijoml@volny.cz> <200401222007.04710.cijoml@volny.cz> <1074809850.3071.25.camel@pegasus>
-In-Reply-To: <1074809850.3071.25.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200401222324.37290.cijoml@volny.cz>
+Subject: Re: [Bluez-users] Pairing to devices with bluez and widcomm with
+	same adapter
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nosve <nosve@libero.it>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <AGELIJDLJNOPFNMOHHIFEECJCAAA.nosve@libero.it>
+References: <AGELIJDLJNOPFNMOHHIFEECJCAAA.nosve@libero.it>
+Content-Type: text/plain
+Message-Id: <1074810042.3071.29.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,36 +19,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Jan 2004 23:24:37 +0100
+Date: Thu, 22 Jan 2004 23:20:42 +0100
 
-Well,
+Hi Nosve,
 
-Let's have a nice valid logo on the site :)
+> Someone has managed how to pair with both stacks, with the same pc/adapter?
+> The problem seems to be the fact that when paired, the devices exchange a
+> link key
+> that bluez/hcid save in /etc/bluetooth/link_key.
+> When widcomm try to pair, it exchange another link_key, because it didn't
+> find
+> a key in his database, which is returned different with the one exchanged
+> from
+> bluez stack.
+> 
+> I'm wondering of it is possible to changhe the bdaddr of the bt adapter, so
+> the
+> remote device saves the keys for two different devices, but I didn't find
+> anything
+> for this 'solution'.
+> 
+> Another possibility may be the synchronization of the keys between the two
+> stacks,
+> but I don't know how to xtract them..
 
-    <p>
-      <a href=3D"http://validator.w3.org/check/referer"><img border=3D"0"
-          src=3D"http://www.w3.org/Icons/valid-html401"
-          alt=3D"Valid HTML 4.01!" height=3D"31" width=3D"88"></a>
-    </p>
+it is possible to change the BD_ADDR, but only with vendor commands.
 
-Michal
+The only solution for your problem is storing the link key on your
+Bluetooth chip. This was already discussed, so take a look at the
+mailing list archive.
 
-Dne =E8t 22. ledna 2004 23:17 jste napsal(a):
-> Hi Michal,
->
-> > Yes,great job :)
->
-> thanks.
->
-> > But Marcel could validate URL too :)
-> >
-> > http://validator.w3.org/check?uri=3Dhttp%3A%2F%2Fwww.bluez.org%2F
->
-> Two very stupid things. Fixed now ;)
->
-> Regards
->
-> Marcel
+Regards
+
+Marcel
+
 
 
 
