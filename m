@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] MTU in l2test
+Subject: Re: [Bluez-users] Setting up an hotplug connection with USB dongles
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de4657604123007015c2c9461@mail.gmail.com>
-References: <2de4657604123007015c2c9461@mail.gmail.com>
+In-Reply-To: <200501021451.09711.rdorsch@web.de>
+References: <200411282132.37941.rdorsch@web.de>
+	 <200412232343.45609.rdorsch@web.de> <1103889889.20258.82.camel@pegasus>
+	 <200501021451.09711.rdorsch@web.de>
 Content-Type: text/plain
-Message-Id: <1104674721.8894.10.camel@pegasus>
+Message-Id: <1104674297.8894.3.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,38 +20,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 02 Jan 2005 15:05:21 +0100
+Date: Sun, 02 Jan 2005 14:58:17 +0100
 
-Hi Manjunath,
+Hi Rainer,
 
-> I am varying the mtu and data size variables in the l2test program.
-> From the docs, I learnt that maximum L2CAP payload is 65535 bytes. I
-> am unable to set the data size above 45000 bytes inspite of setting my
-> MTU to 65535 (both on the sender and the receiver).
-> I get an error saying "Send failed. Resource temporarily unavailable".
->  Hope you can help me with this one.
+> > add a line with "auto bnep0" and it will bring up your interface when it
+> > is available.
+> 
+> From man interfaces
+> 
+> Stanzas beginning with the word "auto" are used to identify the physical 
+> interfaces to be brought up when ifup is run with the -a option.  (This
+> option  is  used  by  the system boot scripts.)  Physical interface names 
+> should follow the word "auto" on the same line.  There can be multiple
+> "auto" stanzas.  ifup brings the named interfaces up in the order listed.
+> 
+> From the ifup manpage
+> 
+>       -a, --all
+>               If given to ifup, affect all interfaces marked auto.  Interfaces 
+> are brought up in the order in  which  they  are  defined  in  /etc/net-
+>               work/interfaces.  If given to ifdown, affect all interfaces.  
+> Interfaces are brought down in the order in which they are currently listed
+>               in the state file.
 
-the MTU is different for incoming and outgoing side. With what kind of
-device and what commands lines are you testing these.
-
-> Also, in the l2test, is the data channel connectionless(6 byte L2CAP
-> header) or connection oriented(4 byte L2CAP header).I am asking this
-> because the code seems to have a 6-byte offset for the header which
-> means the data channel might be connectionless but i am also able to
-> see the "connection request" and "configuration request" which is a
-> feature of connection oriented data channels.
-
-Actually the connectionless L2CAP is not really supported and maybe
-somekind of buggy. Feel free to send in any improvements.
-
-> Also, how is that I am able to see the packet size of ACL Data in "HCI
-> dump", say a 339 byte packet for DH5 packets. Isn't this supposed to
-> happen at the Baseband?
-
-The HCI sends up the ACL data and actually for most chips it is the same
-size as on the baseband. As far as I know this is not recommanded, but
-it is a good way to not introduce too much overhead for the chip. The
-final SAR is done by the L2CAP layer.
+if you use "auto bnep0" and hotplug is configured to deal also with the
+network interface then bnep0 will be brought up at the time the kernel
+created it. No need to run ifup/ifdown manually.
 
 Regards
 
