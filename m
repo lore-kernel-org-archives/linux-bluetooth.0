@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] newb request
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5f30e2610412090850b7f5f85@mail.gmail.com>
-References: <5f30e2610412090850b7f5f85@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1102611436.9988.237.camel@pegasus>
+Message-ID: <5f30e2610412090850b7f5f85@mail.gmail.com>
+From: Jeff Wilson <jazzbotley@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-devel] newb request
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,32 +16,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 09 Dec 2004 17:57:16 +0100
+Date: Thu, 9 Dec 2004 10:50:03 -0600
 
-Hi Jeff,
+Hi all,
 
-> I have about 5 years experience with sockets programming, but I am new
-> to BlueZ.  I am interested in developing applications using HCI.  I
-> have skimmed through the Bluetooth specifications (through 2.0) and I
-> have created a "Hello World" app using hcitool.c (bluez-utils-2.7) as
-> a guide.
-> 
-> What other documents are available?  Is there a FAQ, man page, or a
-> central location for API documentation somewhere? Looking at the
-> source of hcitool is helpful, but it only gets me so far.  Where can I
-> get more details?
-> 
-> I am looking for anything to help me translate the Bluetooth spec into
-> the practical workings of the BlueZ implementation.
+I have about 5 years experience with sockets programming, but I am new
+to BlueZ.  I am interested in developing applications using HCI.  I
+have skimmed through the Bluetooth specifications (through 2.0) and I
+have created a "Hello World" app using hcitool.c (bluez-utils-2.7) as
+a guide.
 
-I think what you really wanna do is using L2CAP or RFCOMM as transport
-layers and so better look a l2test.c and rctest.c files.
+What other documents are available?  Is there a FAQ, man page, or a
+central location for API documentation somewhere? Looking at the
+source of hcitool is helpful, but it only gets me so far.  Where can I
+get more details?
 
-Regards
+I am looking for anything to help me translate the Bluetooth spec into
+the practical workings of the BlueZ implementation.
 
-Marcel
+Thanks for your time,
 
-
+        Jeff
 
 
 -------------------------------------------------------
