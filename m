@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <416EF4B0.6070802@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
+From: Catalin Drula <Catalin.Drula@imag.fr>
+To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <Pine.GSO.4.33.0410141441210.15261-100000@horus.imag.fr>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] question about hci_usb endpoint selection...
-References: <416D23A6.3010904@dark-reality.de> <1097752849.4640.37.camel@notepaq>
-In-Reply-To: <1097752849.4640.37.camel@notepaq>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-devel] (dtl1_cs) Problems with Socket CF card on HP Jornada
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,61 +15,59 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Oct 2004 23:50:40 +0200
+Date: Thu, 14 Oct 2004 14:41:34 +0200 (CEST)
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi everyone,
 
-Marcel Holtmann wrote:
+I am trying to use a Socket CF card (revision F, model no "8510-00159 F")
+with Linux (2.6.8.1-hh0 kernel) and Bluez on an HP Jornada 568 PDA for a
+project for our lab.
 
-| look at the hci_usb driver and add the notify() callback function for
-| it. This function gets called when you change the voice setting or a new
-| connection is added or removed. I changed the connection hash to count
-| the ACL and SCO links separatly and disabled the tasklet when calling
-| this function so that the core stops processing TX packets and enable it
-| after the driver finished anything it has to do.
+It seems that I am running into the same problem that was described here:
+http://sourceforge.net/mailarchive/message.php?msg_id=1427158
 
-Hi there,
+When I run:
 
-OK, I added hci_usb_notify(..) and it works as it should (get's the
-notify when voice mode is changed).
+root@jornada56x:~# hciconfig
+hci0:   Type: PCCARD
+        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
+        DOWN INIT RUNNING
+        RX bytes:0 acl:0 sco:0 events:0 errors:0
+        TX bytes:0 acl:0 sco:0 commands:1 errors:0
 
-Now for the "real stuff"... :)
+However:
 
-I think to handle the voice mode change correctly, I have to duplicate
-the code from about line 874..922 that locates the "proper" alternate
-setting; before this can happen, the notify function must close
+root@jornada56x:~# hciconfig hci0 up
+Can't init device hci0. Connection timed out(110)
 
-((husb *)hdev->driver_data)->isoc_iface with
-usb_driver_release_interface(...)
+And:
 
-is there anything else to do? Must some buffers be dropped or free'd or
-something? is it possible to simply re-set
-isoc_iface, isoc_in_ep and isoc_out_ep?
+root@jornada56x:~# hcidump -x
+HCIDump - HCI packet analyzer ver 1.10
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
 
-Or is it in fact not neccesary to disconnect isoc_iface and only change
-the values of isoc_in_ep and isoc_out_ep?
+At boot time I get this:
 
-I don't know much about the usb internals, so I ask the list again.
+Starting Bluetooth subsystem:Bluetooth: Core ver 2.6
+NET: Registered protocol family 31
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+ hcid sdpdCan't open HIDP control socket: Protocol not supported
+ hiddCan't open RFCOMM control socket: Protocol not supported
+ rfcomm.
+Starting PCMCIA services: cardmgr[879]: watching 1 socket
+done.
+cardmgr[880]: socket 0: Socket Bluetooth Card
+Bluetooth: Nokia control data = 07 00
 
-Thanks very much for bringing this topic forward :))
+Any ideas/help are most appreciated, thanks in advance,
 
-cu,
-~  Lars
+Catalin
 
-PS: one last question, I'm using kernel 2.6.8.1 now and hci_usb.c uses
-CONFIG_BT_HCIUSB_DEBUG to enable/disable debugging; my kernel config
-says this option does not exists, so, how to enable debugging properly?
-Or is just the option accidently missing from kernel config in this release?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFBbvSwQWC6DTWkDAoRArROAJ9ita8X+pxnxEDeH6f2iU4JUbMsDACfbao5
-F0MQVzgEB8guoBDKw/McCbU=
-=iJew
------END PGP SIGNATURE-----
+
 
 
 -------------------------------------------------------
