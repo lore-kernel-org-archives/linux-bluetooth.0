@@ -1,26 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jonathan Sass <jsass@magnifeye.com>
-Subject: Re: [Bluez-users] Source sample custom Bluetooth
-In-reply-to: <1104778613.8894.62.camel@pegasus>
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-Message-id: <C17DB8CE-5E1A-11D9-8017-000D9348D4BE@magnifeye.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=US-ASCII; format=flowed
-References: <4dfd570904122402134ec2fd32@mail.gmail.com>
- <4dfd570904122509237f2a2f48@mail.gmail.com> <1103995727.8758.31.camel@pegasus>
- <4dfd570904122509451e811d7a@mail.gmail.com> <1103996976.8758.34.camel@pegasus>
- <4dfd5709041225095410f71a46@mail.gmail.com> <1103997529.8758.36.camel@pegasus>
- <4dfd570904122510081a9bfa7@mail.gmail.com>
- <4dfd570904122510085371c17b@mail.gmail.com>
- <4dfd57090412251011705f52be@mail.gmail.com>
- <4dfd5709041225103246f6934c@mail.gmail.com> <1104000494.8758.46.camel@pegasus>
- <002601c4ebb8$4de24200$020ba8c0@heejune> <1104125195.9393.12.camel@pegasus>
- <BEB39C04-5B6A-11D9-8017-000D9348D4BE@magnifeye.com>
- <1104604846.4253.1.camel@pegasus>
- <FA69107A-5DAA-11D9-8017-000D9348D4BE@magnifeye.com>
- <1104776407.8894.53.camel@pegasus>
- <AFDBF1EE-5DB6-11D9-8017-000D9348D4BE@magnifeye.com>
- <1104778613.8894.62.camel@pegasus>
+Subject: Re: [Bluez-users] 2.6.10 multimedia keys
+References: <41D85BB7.5020506@comcast.net> <200501032350.19104.cijoml@volny.cz> <1104793260.8894.83.camel@pegasus>
+In-Reply-To: <1104793260.8894.83.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200501040020.32677.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -32,59 +19,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 03 Jan 2005 22:34:59 -0800
+Date: Tue, 4 Jan 2005 00:20:32 +0100
 
-The stack that I am talking to only supports raw packets.
+Hope we'll discuss it soon in good-old pub using good-old beer Pilsner :))
+We are at the same university ;-]
 
-So far I am able to do an inquiry and see the device and get its 
-address, type and name. I am unable to connect to it.
+Michal
 
-I create a socket
-
-s = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-
-then I set up the parameters for the addr
-
-sockaddr_hci addr
-addr.hci family =  AF_BLUETOOTH;
-addr.hci_dev = 0;
-
-I then do a bind
-
-bind(s, (struct sockaddr *)&addr, sizeof(addr));
-
-I then try a connect
-
-connect(s, (struct sockaddr *) &addr, sizeof(addr)) and it fails
-
-What might I be missing here? I cannot find any samples
-
-Thank you,
-
-Jonathan
-
-
-On Jan 3, 2005, at 10:56 AM, Marcel Holtmann wrote:
-
-> Hi Jonathan,
+Dne =FAt 4. ledna 2005 00:01 Marcel Holtmann napsal(a):
+> Hi Michal,
 >
->> This device has a custom blue tooth stack (no rfcomm). I need to
->> inquire, connect (I can do that and see code to do it) and then to
->> build a aclpacket and do a aclread. What is the equivalent on the 
->> linux
->> side?
+> > I asked Vojtech from suse...hope he will help
 >
-> in this case you have to use the HCI raw socket. Otherwise you won't be
-> able to deal with ACL data packets. However every stack should at least
-> suppport L2CAP, because dealing with raw ACL data packets is never a
-> good idea.
+> do so, but first read his paper from the Linux-Kongress 2004.
 >
 > Regards
 >
 > Marcel
 >
 >
-
+>
+>
+> -------------------------------------------------------
+> The SF.Net email is sponsored by: Beat the post-holiday blues
+> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
