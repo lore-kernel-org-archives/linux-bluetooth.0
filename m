@@ -1,49 +1,86 @@
-Return-Path: <thomae@ei.tum.de>
-Message-ID: <401E22EF.4050009@ei.tum.de>
-Date: Mon, 02 Feb 2004 11:14:07 +0100
-From: Matthias Thomae <thomae@ei.tum.de>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>,
-   ant-phone-devel@nongnu.org
-Subject: Re: [Bluez-users] Telephony with BT headset?
-References: <4018CCA1.9060605@ei.tum.de> <1075500623.3594.6.camel@pegasus>
-In-Reply-To: <1075500623.3594.6.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: jan d tux <janice@asti.dost.gov.ph>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1075714467.1546.49.camel@Asgard>
+Mime-Version: 1.0
+Subject: [Bluez-users] bizzare result when getting the bluetooth address
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: 02 Feb 2004 17:34:27 +0800
 
-Hi Marcel,
+Good day to all.
 
-Marcel Holtmann wrote:
->>>I have a BT headset lying around which came with my mobile
->>>phone. However, I don't use it with my mobile, so the idea
->>>crossed my mind that it could be possible to use the
->>>headset with my linux server to make phone calls using
->>>the ISDN system.
->>>
->>>I'm quite sure that this _is_ possible, as I can receive
->>>and send an audio stream via ISDN4Linux, and the same
->>>applies (more or less) to the headset via BlueZ.
->>
->>There is a telephone application http://www.antcom.de/ant-phone/ which I
->>have tried with a cable headset.
-> 
-> has anyone tried this application with the capidrv? For example with a
-> AVM B1. I own one, but mine is build into the wrong machine for such
-> tests and I need it there. I run some tests with a BlueFRITZ! AP-ISDN
-> and call management stuff seems to work, but I don't hear anything on my
-> soundcard.
+Can anybody help me figure out why the bluetooth address I am getting is
+not right?
 
-In my setup, I used capidrv and a BlueZ cmtp connection to a BlueFritz! 
-AP-X (and a cable-headset), and it worked although I got large 
-latencies. Also see my post(s) at the ant-phone mailing list:
-http://mail.gnu.org/archive/html/ant-phone-devel/2003-11/msg00002.html
+What I am trying to do is get the bluetooth address of the sender/peer
+to my obex server.
 
-> Is there anyone who will spend some time in adding native CAPI support
-> to this application?
+Here are the obex calls I made:
+--------
+	handle = OBEX_Init(OBEX_TRANS_BLUETOOTH, obex_event, 0);
 
-I guess Roland has to be asked this :) I cross-post this to his mailing 
-list as well.
+	BtOBEX_ServerRegister(handle, NULL, OBEX_PUSH_HANDLE);
 
-Regards.
-Matthias
+	btobex_accept(handle);
+
+	OBEX_HandleInput(handle, 1);
+
+	//get addresss
+	
+	fd = OBEX_GetFD(handle);
+	if( fd < 0 )
+		return 0;
+
+	getpeername(fd,(struct sockaddr *)&sa,&len)
+		return 0;
+
+	baswap(&bdaddr, &sa.rc_bdaddr);
+	printf("\tADDRESS: %s\n", batostr(&bdaddr));
+--------
+
+
+when i run the program, i was able to get the following:
+        channel: 10	
+        family: 31
+        ADDRESS 2: 00:0A:00:02:EE:69 -> this is not the bluetooth
+address of the sender!!! Its address is 00:02:EE:69:E1:88. The last for
+digits displayed are the 1st four digits of the device's real address. I
+tried it with another device and the result is the same, from the
+original address (00:E0:03:74:38:8E) to 00:0A:00:E0:03:74.
+
+Bdw, I am using openobex.
+
+Any help would be appreciated.
+
+
+Thanks :)
+
+
+Also, thanks to Marcel for replying to my first email: Getting remote
+device address & name using obex commands
+
+-- 
+
+~jan
+
+
+
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
