@@ -1,63 +1,67 @@
-Return-Path: <bluez@thomae-privat.de>
-Message-ID: <40A480B8.2050400@thomae-privat.de>
-Date: Fri, 14 May 2004 10:18:00 +0200
-From: Matthias Thomae <bluez@thomae-privat.de>
-MIME-Version: 1.0
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] PAN and bridge problem when bnep0 disconnects
+	before bnep1
+From: Diego Liziero <liziero.diego@unimore.it>
 To: Christoph Scholz <scholz@cs.uni-bonn.de>
-CC: bluez-devel@lists.sourceforge.net, marcel@holtmann.org
-Subject: Re: [Fwd: Re: [Bluez-devel] PAN and bridge problem when bnep0	disconnects
- before bnep1]
-References: <1084467658.2322.37.camel@willie.informatik.uni-bonn.de>
-In-Reply-To: <1084467658.2322.37.camel@willie.informatik.uni-bonn.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1084457228.6449.11.camel@igno>
+References: <1084452714.2318.12.camel@willie.informatik.uni-bonn.de>
+	 <1084457228.6449.11.camel@igno>
+Content-Type: text/plain
+Message-Id: <1084472563.3354.17.camel@igno>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 13 May 2004 20:22:43 +0200
 
-Hi Christoph, Marcel, all,
+I've solved my issue.
 
-Christoph Scholz wrote:
->>Aha. These MAC addresses seem to be used in the forwarding database. 
->>Maybe setting the ageing time to 0 (man brctl) would help...
+Mine was just a bridge bug introduced in 2.6.6
+and already solved.
+
+http://lists.osdl.org/pipermail/bridge/2004-May/000321.html
+
+Regards,
+
+Diego.
+
+On Thu, 2004-05-13 at 16:07, Diego Liziero wrote:
+> Maybe I'm hitting a related bug.
+> I'm trying to setup a PAN bridge with kernel 2.6.6-rc3-mm2
+> with ipv6 enabled (same result with other 2.6 kernels) and when I try
+> to add bnep1 to the bridge I got the following error:
 > 
+> # brctl addif pan0 bnep1
+> br_add_interface: File exists
 > 
-> I don't think so. The problem is that the code assumes that MAC
-> addresses are unique. Even if there are multiple Bluetooth BNEP devices,
-> there will only be one entry in the forwarding database. When one of the
-> devices is removed, this entry in the forwarding database is also
-> removed.
-
-You are right, setting ageing 0 doesn't help.
-
->><shemminger@osdl.org>
->>	[BRIDGE]: Forwarding database changes.
->>	
->>	Make forwarding database more robust.
->>	  + Don't insert invalid ether address,
->>	  + Report errors back so adding an interface to bridge can fail
->>	  + get rid of unneeded explicit pads in data structure
->>	  + replace bitfields with byte's for simple booleans.
->>
->>Maybe that fixes our problem? I might be able to try 2.6.6 and the 
->>ageing timer tonight...
-
-2.6.6 (-mh1) didn't help either...
-
-> I am not sure but I would guess that the problem is still there. The
-> same warning can be found in br_fdb.c in 2.6.6:
+> Everything works fine with 2.4.* kernels (without ipv6).
 > 
-> printk(KERN_INFO "%s: attempt to add" " interface with same source add
-> ress.\n", source->dev->name);
+> It seems like in linux-2.6.* + ipv6 it's impossible to have
+> two bnep interfaces in the same bridge.
+> 
+> Any suggestion?
+> 
+> Regards,
+> 
+> Diego.
 
-I also tried the patch that Diego Liziero mentioned in his post, but it 
-didn't help either...
 
-> I have not written to to the bridge people. My personal opinion is that
-> BlueZ should do the forwarding (like Affix does). You can argue about
-> that of course.
 
-I don't have a competent opinion about that (except: it's not only the 
-forwarding problem, but also DHCP, right?), and don't know what Affix does.
 
-Marcel, what do you think? Is there any sense to contact the bridge people?
-
-Regards.
-Matthias
+-------------------------------------------------------
+This SF.Net email is sponsored by: SourceForge.net Broadband
+Sign-up now for SourceForge Broadband and get the fastest
+6.0/768 connection for only $19.95/mo for the first 3 months!
+http://ads.osdn.com/?ad_id=2562&alloc_id=6184&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
