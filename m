@@ -1,18 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Slaves in Sniff mode
-From: Marcel Holtmann <marcel@holtmann.org>
-To: tOpSy TuRvY <topsyturvy@nemo.student.utwente.nl>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.BSO.4.58.0406231319140.20827@nemo.student.utwente.nl>
-References: <E1BcqIi-0002cT-53@sc8-sf-list2.sourceforge.net>
-	 <Pine.BSO.4.58.0406222046050.9882@nemo.student.utwente.nl>
-	 <1087939830.4209.12.camel@pegasus>
-	 <Pine.BSO.4.58.0406222346200.5451@nemo.student.utwente.nl>
-	 <1087942444.4209.45.camel@pegasus>
-	 <Pine.BSO.4.58.0406231319140.20827@nemo.student.utwente.nl>
-Content-Type: text/plain
-Message-Id: <1087992990.4209.79.camel@pegasus>
-Mime-Version: 1.0
+Message-Id: <200406231206.i5NC6NrA007514@news01.csr.com>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Slaves in Sniff mode 
+In-reply-to: "tOpSy TuRvY"'s message of "Wed, 23 Jun 2004 13:23:59 +0200."
+             <Pine.BSO.4.58.0406231319140.20827@nemo.student.utwente.nl>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,21 +15,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Jun 2004 14:16:30 +0200
+Date: Wed, 23 Jun 2004 13:06:22 +0100
 
-Hi Assed,
-
+tOpSy TuRvY wrote:
 > Does anyone know if the master delays ACL transmittions to slaves in sniff 
 > mode (i.e. till they become active again), or will it just keep on 
 > transmitting the baseband frame till the slave eventually wakes up and can 
 > send an ACK.
 
-the master should request an unsiff before it sends the next ACL packet.
+It should transmit any data during the sniff window.  The rules there
+are identical to those in active mode, although obviously you will
+get very much reduced throughput.
 
-Regards
+pws
 
-Marcel
 
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
