@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Gentoo compile error: `HANDSFREE_SVCLASS_ID'
+	undeclared (first use in this function)
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
+To: Sven Ehret <sven.ehret@gmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041002135954.91937.qmail@web53209.mail.yahoo.com>
-References: <20041002135954.91937.qmail@web53209.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1096833638.20349.3.camel@pegasus>
+In-Reply-To: <3eef79ed04100219111bcee37d@mail.gmail.com>
+References: <3eef79ed04100219111bcee37d@mail.gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+Message-Id: <1096833441.20349.0.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Re: linux kernel to compile bluez
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 03 Oct 2004 22:00:38 +0200
+Date: Sun, 03 Oct 2004 21:57:21 +0200
 
-Hi Massimiliano,
+Hi Sven,
 
-> I installed linux suse 9.1 professional
-> it ships the kernel 2.6.4-52
-> 
-> I can't compile bluez (other message posted to the
-> users and developer's list), so I'm thinking that the
-> problem could be the kernel version 
-> 
-> Have I to update the kernel to version 2.6.5-7.108
-> (from suse archive)?
-> 
-> Or other patch/versions are available?
+> I am unable to compile any version of bluez-utils I could get my hand o=
+n.
+>=20
+> Using Gentoo, compiling portage-versions 2.7, 2.10, 2.10-r1 and newest
+> version from sf.net breaks with:
+>=20
+>      [some lines]
+> sdptool.c: In Funktion =BBadd_handsfree=AB:
+> sdptool.c:1130: error: `HANDSFREE_SVCLASS_ID' undeclared (first use in
+> this function)
 
-go for the upcoming SuSE Linux 9.2 release, because this will have the
-latest Bluetooth kernel and userspace code.
+read the ChangeLog file for the bluez-libs requirement.
 
 Regards
 
