@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41EF0C15.3040705@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluetooth headset - connects but no audio
-References: <41EE3974.1010604@fastwebnet.it> <41EE5112.1040502@dark-reality.de> <41EE4ACD.9070105@fastwebnet.it> <41EE66A2.1040106@dark-reality.de> <41EE69F3.1030401@fastwebnet.it> <41EE989A.7030206@dark-reality.de> <41EED6AE.1080205@fastwebnet.it>
-In-Reply-To: <41EED6AE.1080205@fastwebnet.it>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] [PATCH] Fix too-many-keys-pressed error in
+	hidp/core.c
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20050120003408.GA8619@salvia.homeip.net>
+References: <20050119224400.GA7881@salvia.homeip.net>
+	 <1106180379.8190.146.camel@pegasus>
+	 <20050120003408.GA8619@salvia.homeip.net>
+Content-Type: text/plain
+Message-Id: <1106182874.8190.166.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,48 +21,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 02:40:37 +0100
+Date: Thu, 20 Jan 2005 02:01:13 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Juha,
 
-WiseLYNX wrote:
-| | use a vanilla kernel.
-|
-| I did a try, with vanilla 2.6.10 directly from kernel.org. guess what?
-| doesn't work neither that way :(
-|
-| | no really, no idea :)
-|
-| mh.. may it be a hint the fact this (the "Permission denied" and "Too
-| many levels of symbolic links" errors) happened _after_ I applied the
-| mh1 patch?
+> > can you point me to the part of the HID specification that defines this
+> > behaviour? And show me an extract from hcidump when this happens.
+> 
+> I don't know if this is in the spec, or if it is just a quirk of some
+> Logitech keyboards.  However, it shouldn't cause any trouble to check
+> for it as a special case, since that kind of data packet is clearly
+> invalid, no?
+> 
+> Here's the dump of me pressing 'qwert', and then releasing 't':
+> 
+> 1106180982.868085 > ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0041 len 10 [psm 0]
+>       A1 01 00 00 14 00 00 00 00 00 
+> 1106180982.927077 > ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0041 len 10 [psm 0]
+>       A1 01 00 00 14 1A 00 00 00 00 
+> 1106180982.967071 > ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0041 len 10 [psm 0]
+>       A1 01 00 00 14 1A 08 00 00 00 
+> 1106180983.027061 > ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0041 len 10 [psm 0]
+>       A1 01 00 00 14 1A 08 15 00 00 
+> 1106180983.047059 > ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0041 len 10 [psm 0]
+>       A1 01 00 00 01 01 01 01 01 01 
+> 1106180983.267020 > ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0041 len 10 [psm 0]
+>       A1 01 00 00 14 1A 08 15 00 00 
 
-well it *should* work with this setup, as it works on my system with
-stock 2.6.10 plus mh1 patches. Anything else special, like, are you
-using an SMP kernel?
+this looks weird and even the 't' is still missing in that dump. Is this
+a general behaviour? Do we see the same on other keyboard?
 
-Maybe it's a problem with your dongle, do you have access to another one
-to test this? (local setup: epox bt-dg03 + sony/eri. hbh-35 headset)
+Regards
 
-best regards,
-~  Lars
+Marcel
 
-- --
-Lars Grunewaldt
-* software development
-* multimedia design
-skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
-web: http://www.dark-reality.de
-mail: lgw@dark-reality.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFB7wwUQWC6DTWkDAoRAhORAJ9dV//SYKnhv8I8JqtEO+JHyreD3gCeOT1O
-bOedFmkBNJTCTh6kEj7wF8Q=
-=pX58
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
