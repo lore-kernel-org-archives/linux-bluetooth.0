@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: zze-COLBUS Emmanuel RD-MAPS-GRE <emmanuel.colbus@rd.francetelecom.com>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15
-Message-Id: <1108566885.11909.29.camel@g-necml5-146.rd.francetelecom.fr>
+From: soraberri <421246@posta.unizar.es>
+Message-ID: <cuvml7$rkm$1@sea.gmane.org>
+References: <42134A5D.4050309@gmx.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Code questions
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <42134A5D.4050309@gmx.net>
+Subject: [Bluez-devel] Re: Bluetooth-alsa question: possible to use phone itself as headset?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,36 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 16 Feb 2005 16:14:45 +0100
+Date: Wed, 16 Feb 2005 15:53:46 +0100
 
-Hello,
+Hi Marcel,
 
-I've looked to the code of BlueTooth in the linux 2.6.10 kernel, and
-I've a few questions : 
+Marcel Partap wrote:
+> Hey folks,
+> I got a 3650 (also named the 'play bone') and would like to spare money 
+> for a headset. The phone has bluetooth and so I thought, why not use the 
+> phone itself as headset? It seems this is not supported yet, but would 
+> it be possible?
 
-- I've noticed that OCF_PIN_CODE_REPLY and OCF_PIN_CODE_NEG_REPLY are
-defined in include/net/bluetooth/hci.h, but never used in the code; and
-that the function hci_pin_code_request_evt() is void. Does it mean that
-the current BlueZ implementation doesn't support PIN codes? (Just making
-sure.)
+As far as I know, we would only need to implement headset profile in the 
+phone side. I think this shouldn't be impossible, after all Symbian OS 
+has public API for RFCOMM, L2CAP and SDP socket connection, and I think 
+it is also possible to create SCO connections in a socket basis... So, 
+what is the problem then? Even in the assumption that we managed to 
+develop the headset profile I think NONE actual mobile phone would let 
+us hook the audio streaming from/to the microphone/speaker to/into a SCO 
+channel. It is physically posible, of course because the AudioGateway 
+profile embedded in the phone just do it, but I'm afraid we have no 
+public interface to get this functionality (I'm not Symbian developer, 
+let's hope somebody tell this is not true!).
 
-- Is the PIN Code Request event masked away (I think it is, because I
-also read the BlueTooth Specification, and it doesn't allow not reacting
-to this event), and in this case, were is it masked? I didn't found the
-masking in the code.
+Maybe phone manufacturers are too dependent on the Telephony Companies 
+requirements to allow this nice functionality which would lead us 
+without doubt to make VoIP calls from the phone if it detects the 
+presence of the appropiate service running in our home's box.
 
-- I've noticed the same for other events (that they were not treated).
-Are they also just masked away, and, if yes, were in the code do this
-masking happens?
 
-Emmanuel Colbus
+> Connected (wire) to the phone I also have a headset.. Could _that_ be 
+> used via bluetooth? That'd be soo great, I wouldn't have to get another 
+> headset. 
 
--- 
-Please don't care about this useless mail signature:
 
-M. Emmanuel Colbus de l'ENSIMAG intervenant à FTRD/MAPS/AMS du 01/02/05 
-au 30/06/05 sous la responsabilité de M. Tahar Jarboui dans le cadre 
-d'un stage de fin d'études.
+As I said, the problem is in the interface phone|bluetooth, and with an 
+external headset the same interface is still present
+
+Regards,
+
+Luis
 
 
 
