@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Re: Presentation Slides
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jean Tourrilhes <jt@hpl.hp.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Steven Singer <steven.singer@csr.com>
-In-Reply-To: <20040813002514.GA21388@bougret.hpl.hp.com>
-References: <20040813002514.GA21388@bougret.hpl.hp.com>
+To: bluebee@gmail.com
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200408131456.15445.bluebee@gmail.com>
+References: <200408121654.44052.bluebee@gmail.com>
+	 <1092301914.28711.54.camel@pegasus>  <200408131456.15445.bluebee@gmail.com>
 Content-Type: text/plain
-Message-Id: <1092385877.28711.185.camel@pegasus>
+Message-Id: <1092385323.28711.175.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: CSR firmware question...
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,43 +19,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 13 Aug 2004 10:31:17 +0200
+Date: Fri, 13 Aug 2004 10:22:03 +0200
 
-Hi Jean,
+Hi Billy,
 
-> 	A few questions regarding CSR firmware : what's a commonly
-> available BT USB dongle with a recent CSR firmware.
+> 	This is the link of the schedule... http://www.philosc.com/agenda-2ndday.php
+> But the abstract is not yet available(I don't know if it will be available) 
+> since the schedule was given on a short notice. I will try to make my 
+> presentation available online(maybe on another site). Thank you and good day.
 
-as I know there are only dongles with HCI 16.14 firmware available.
-
-> 	I'm hitting various bugs with the CSR firmware in my D-Link
-> USB dongles (0x1bb), where I can easilly deadlock the dongle. My 3Com
-> dongle, which has a more recent firmware (0x20e), behave much better,
-> but not perfect.
-> 	D-Link doesn't provide a firmware updater, but, beeing
-> fearless, I tried to firmware upgrade a D-Link dongle and ended up
-> with a dead dongle (can't even put back the original firmware on it).
-> 	From the release notes, the latest CSR firmwares have zillions
-> of bug fixes. I really wonder how I can enjoy the bug fixes.
-
-The D-Link dongle DBT-120 (Rev B3) can be updated using the Apple
-firmware update file. After that it will be HCI 18.1 with default boot
-mode set to HID. Maybe other revisions of the D-Link dongle don't work
-and I already put some of dongles to death while playing with firmware
-upgrade.
-
-> P.S. : Marcel, do you have a version of btdfu that can write the
-> firmware image to the dongle ? Or some documentation ?
-
-I never announced the new version of the btdfu, but now as you asked for
-it, here it is:
-
-	http://www.holtmann.org/linux/bluetooth/btdfu-0.3.tar.gz
-
-Use it at your own risk, because you can kill your dongle !!!
-
-Read what the CSR guys had written about signed firmware and that it is
-not possible to move firmware from one manufacturer to another !!!
+your talk is now listed on the BlueZ site, but I am little bit confused
+about the title. The agenda says something different then you told us in
+your previous email. What is correct?
 
 Regards
 
