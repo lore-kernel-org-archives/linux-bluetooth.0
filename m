@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] a2dp timing
+Subject: Re: [Bluez-devel] Re: Host to Host Controller flow control
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <42439ADA.5000006@xmission.com>
-References: <42439ADA.5000006@xmission.com>
+In-Reply-To: <loom.20050325T125759-162@post.gmane.org>
+References: <loom.20050324T175954-608@post.gmane.org>
+	 <loom.20050325T100311-440@post.gmane.org>
+	 <1111751283.9195.60.camel@pegasus>
+	 <loom.20050325T125759-162@post.gmane.org>
 Content-Type: text/plain
-Message-Id: <1111756476.9195.105.camel@pegasus>
+Message-Id: <1111753651.9195.74.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,41 +21,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Mar 2005 14:14:36 +0100
+Date: Fri, 25 Mar 2005 13:27:31 +0100
 
-Hi Brad,
+Hi Catalin,
 
-> We've had problems with a2dp timing that I've been ignoring.
+> > the host to host controller flow control means that we tell the chip to
+> > use flow control. This is the other way around and we don't support it
+> > at the moment, because it is easy for us to handle big packets. If you
+> > enable host to host controller flow control you need to tell the chip
+> > when you are ready to receive more packets.
 > 
-> For one, a2play crams frames into the headset just as fast as it can. 
-> Sometimes this is too fast. So we need to clock it so things are 
-> staggered properly. Does the SBC encoder give us a clue about timing 
-> between frames?
-
-it would be really great to get a FTS or CATC trace from the HP
-headphone and the iPAQ for example.
-
-In the case of an ALSA plugin, we may simple use the timing of the ALSA
-system itself. However it would be great if the SBC encoder would also
-calculate the time of the PCM fragment.
-
-> Second, if the headset wanders out of range, the player stops and starts 
-> up where it left off when the headset is back. If we're pacing things 
-> properly, we need to drop frames instead when this happens. I'm thinking 
-> if it results in a legal SBC stream that I'll drop entire SBC frames in 
-> the main loop with something like:
+> Ok, but I think what we are missing then is called "host controller to host flow
+> control" or as in the specification "flow control... in the direction from the
+> Host Controller to the Host". Even the command that enables this is called
+> Set_Host_Controller_To_Host_Flow_Control.
 > 
-> 	frame_len = read_header(fd, &sbc_info);
-> 	bytes_read = read(fd, killbuffer, frame_len);
+> Correct me if I am wrong, but I think you should update the TODO list to say
 
-And then you need to sleep some time before reading/dropping the next
-SBC frame.
-
-> Are there other timing issues I need to think about? Does it get so 
-> messy that I need to watch jitter? I can only vaguely remember this 
-> stuff from my networking classes...
-
-I don't think that this will be needed, but we will see.
+I looked it up in the Bluetooth 2.0 specification and it is now called
+Set_Controller_To_Host_Flow_Control and this means that the todo list
+should talk about "Host Flow Control", because this is what is missing.
 
 Regards
 
