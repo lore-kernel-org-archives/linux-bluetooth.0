@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v613)
-Message-Id: <747B350F-859B-11D8-ADA9-003065B218E0@pepper.com>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-From: Michael Frey <mfrey@pepper.com>
-Subject: [Bluez-devel] Kernel modules?
+Message-ID: <009901c4184c$0c3b4ad0$fcca010a@lysydziadek>
+From: "zubiwat" <zubiwat@poczta.onet.pl>
+To: "devel Bluetooth" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0096_01C4185C.CFA28910"
+Subject: [Bluez-devel] RFCOMM in L2CAP
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,19 +16,60 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 3 Apr 2004 13:19:32 -0500
+Date: Fri, 2 Apr 2004 02:47:17 +0200
 
-I am currently using 2.4.20 kernel from MontaVista and it has Bluetooth 
-driver sub dir -- however I feel I am missing something.  When I build 
-the bluetooth modules I only get the following.
+This is a multi-part message in MIME format.
 
-hci_uart.o
+------=_NextPart_000_0096_01C4185C.CFA28910
+Content-Type: text/plain;
+	charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 
-I thought there were other mods like bluez.o etc...
+Why when I'm sending SABM like this
 
-Do I need some other source?
+0x02 0x28 0x20 0x08 0x00 0x04 0x00 0x45 0x00 0x03 0x3F 0x01 0x1C
 
-Michael
+I only get number of packets sent and nothing else but I should get UA.
+After a while I get disconnect request and that's all.
+What am I doing wrong??
+
+Regards
+
+Maciej
+
+------=_NextPart_000_0096_01C4185C.CFA28910
+Content-Type: text/html;
+	charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-2">
+<META content=3D"MSHTML 5.50.4134.600" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Why when I'm sending SABM like =
+this</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>0x02 0x28 0x20 0x08 0x00 0x04 0x00 0x45 =
+0x00 0x03=20
+0x3F 0x01 0x1C</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I only get number of packets sent and =
+nothing else=20
+but I should get UA.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>After a while I get disconnect request =
+and that's=20
+all.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>What am I doing wrong??</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Regards</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Maciej</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0096_01C4185C.CFA28910--
 
 
 
