@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40E241EF.7000607@mWare.ca>
-From: Mykel <Mykel@mWare.ca>
+Message-ID: <40E1E51A.3080106@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Apple BT Keyboard?
+Subject: [Bluez-users] Re: Headset with snd-bt-sco
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,22 +15,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 30 Jun 2004 00:30:39 -0400
+Date: Tue, 29 Jun 2004 15:54:34 -0600
 
-I've been flagging the discussions about it in the past few weeks, but 
-I'm not up with the whole process of what I'm supposed to do, and I 
-haven't been able to piece it together from what I've seen.
+Hi
 
-I have my MX900 working in 2.4.26 using bthid & hcid.... I don't seem to 
-have hidd... (I have to press the Connect button and do a bthid -c $ADDR 
-after leaving the mouse 20min or the first time I use it.)
+I get the same result when either using the bluetrek 1.0 headset or the 
+jabra 200 (upgraded to handsfree profile) headset.
 
-What do I need to get the keyboard working? Is it worthwhile attempting 
-this with 2.4? Slackware 10 is out and I'm playing with it in 2.6, but I 
-have many other requirements (I'm an on site network tech, lots of fancy 
-stuff in my kernel) so I'm not stable in 2.6 yet.
+Can anyone confirm that snd-bt-sco still works with the hbh-60? The 
+previous maintainer is not working on it any more unfortunately...
 
-Myke
+Brad
+
+On  0, Lasse Jansen <l.jansen@gm...> wrote:
+  > Hi all,
+  > I have some problems with making my BT headset work. Bluetooth works, I
+  > can e.g. exchange files with my T610. For the Headset I downloaded the
+  > snd-bt-sco driver (http://www.dcs.gla.ac.uk/~jp/snd-bt-sco/),
+  > kernel-2.6.4 and alsa-1.0.3 as said in the README. Everything went fine,
+  > when I run
+  > | btsco-0.2/btsco 00:0D:FD:00:7B:CC 1
+  > I hear a little background noise. When I increase/decrease the volume at
+  > the headset, it will be printed on the screen, so there is a connection.
+  >
+  > But when I try to play a sound file, nothing happens. E.g.
+  > | aplay -D plughw:Headset /usr/kde/3.2/share/sounds/KDE_Logout_new.wav
+  > hangs in a loop. Xmms says "couldn"t open audio".
+  > I have deactivated the "loopback" option in the mixer settings.
+  >
+  > Any ideas?
+
+-- 
+Brad
 
 
 -------------------------------------------------------
