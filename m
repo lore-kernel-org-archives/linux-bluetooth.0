@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <20050217111414.40743.qmail@web53202.mail.yahoo.com>
+From: Filipa Duarte <filipa_duarte@yahoo.com>
+Subject: Re: [Bluez-devel] L2CAP & HCI trace
 To: bluez-devel@lists.sourceforge.net
-From: Matthias =?utf-8?b?QnJ1bsOp?= <matthiasbrune@gmx.de>
-Message-ID: <loom.20050217T125538-559@post.gmane.org>
-Mime-Version: 1.0
+In-Reply-To: <1108570362.11909.35.camel@g-necml5-146.rd.francetelecom.fr>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] RFCOMM: UIH response is splitted into 3 packets
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,60 +17,75 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Feb 2005 11:57:20 +0000 (UTC)
+Date: Thu, 17 Feb 2005 03:14:14 -0800 (PST)
 
-Hi,
+Hi
 
-i wrote a programm for testing the RFCOMM layer and during a connection
-i observed a strange behaviour that could be an implementation error within 
-BlueZ?!
-My connection is always broken at this point.
-The scenario is decsribed during the traces below.
-I hope somebody can help me with this problem, because i need a solution 
-urgently.
+Many thanks for your help. 
 
-regards
-Matthias
+--- zze-COLBUS Emmanuel RD-MAPS-GRE
+<emmanuel.colbus@rd.francetelecom.com> wrote:
+
+> Le mercredi 16 février 2005 à 07:57 -0800, Filipa
+> Duarte a écrit :
+> > Hi,
+> > 
+> > I suppose that this is a quite stupid question but
+> I
+> > would like to know how can I have the same kind of
+> > trace as Victor had (in the end of the e-mail)? 
+> > 
+> > The reason why is that I would like to identify
+> which
+> > are the functions (like l2cap_sock_sendmsg,
+> > l2cap_chan_send, hci_send_acl, etc) used to send
+> data
+> > on the l2cap/hci layers. Could anyone give me any
+> > direction to find this?
+> > 
+> > Many thanks,
+> > 
+> > Filipa
+> > 
+> 
+> Hello, 
+> 
+> Try recompilating your kernel with the
+> CONFIG_BT_HCI_SOCK_DEBUG, CONFIG_BT_L2CAP_DEBUG,
+> etc... (All the options
+> mentionned at the beginning of the files, in a block
+> like : 
+> 
+> #ifndef CONFIG_BT_L2CAP_DEBUG
+> #undef  BT_DBG
+> #define BT_DBG(D...)
+> #endif
+> 
+> ) enabled.
+I am a newbie in Linux/BlueZ matters and I am not sure
+how to do this. Could you please explain?
+
+> 
+> I've not tried it myself, but, reading to the code,
+> I think it will
+> work.
+> 
+> Emmanuel Colbus
+
+By the way, does anybody has the l2cap and hci layers
+implemented im User Space? I need to have those layers
+running without OS... 
+
+Cheers,
+
+Filipa
 
 
-command 1 (Request): Set Asynchronous Balanced Mode (SABM)
-20050217 12:34:09 port 1047 --> 127.0.0.1 port 8000 4 octet(s)
-20050217 12:34:09 000000 03 3f 01 1c                 
-
-command 2 (Response): Unnumbered Acknowledgement (UA)
-20050217 12:34:13 port 1047 <-- 127.0.0.1 port 8000 4 octet(s)
-20050217 12:34:13 000000 03 73 01 d7             
-
-command 3 (Request): Unnumbered Information with Header Check (UIH)
-20050217 12:34:13 port 1047 --> 127.0.0.1 port 8000 14 octet(s)
-20050217 12:34:13 000000 03 ef 15 83 11 1c f0 00 ........
-20050217 12:34:13 000008 00 9a 02 00 04 70       .....p  
-
-
-so far so good, but now i get 3 packets response back instead of one with 
-14Bytes length:
-4 Bytes, 6Bytes and 4 Bytes
-
-command 4_1 (Response): Unnumbered Information with Header Check (UIH)
-20050217 12:34:13 port 1047 <-- 127.0.0.1 port 8000 4 octet(s)
-20050217 12:34:13 000000 01 ef 15 81             ....    
-
-After the first response, the next request for further connection is made.
-But because of the missing 10 Bytes from command 4 the conection is broken down.
-Could this be an implementation error within BlueZ?
-
-command 5 (Request): Set Asynchronous Balanced Mode (SABM)
-20050217 12:34:13 port 1047 --> 127.0.0.1 port 8000 4 octet(s)
-20050217 12:34:13 000000 73 00 00 28            
-
-command 4_2: (Response): Unnumbered Information with Header Check (UIH)
-20050217 12:34:13 port 1047 <-- 127.0.0.1 port 8000 6 octet(s)
-20050217 12:34:13 000000 11 1c e0 00 00 9a       ......  
-
-command 4_3: (Response): Unnumbered Information with Header Check (UIH)
-20050217 12:34:14 port 1047 <-- 127.0.0.1 port 8000 4 octet(s)
-20050217 12:34:14 000000 02 00 00 aa             ....  
-
+		
+__________________________________ 
+Do you Yahoo!? 
+Yahoo! Mail - Find what you need with new enhanced search.
+http://info.mail.yahoo.com/mail_250
 
 
 -------------------------------------------------------
