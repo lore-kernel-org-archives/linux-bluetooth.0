@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <41FD2F07.5060209@tootai.net>
+From: administrator tootai <admin@tootai.net>
 MIME-Version: 1.0
-From: Stefan Bellon <sbellon@sbellon.de>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <4d35810838sbellon@sbellon.de>
-In-Reply-To: <4d35427939sbellon@sbellon.de>
-References: <4d3382eb6csbellon@sbellon.de> <41F81D6F.3000908@xmission.com> <4d33b69105sbellon@sbellon.de> <4d348a05e8sbellon@sbellon.de> <41FC4BAF.4090201@xmission.com> <4d35427939sbellon@sbellon.de>
-Content-Type: text/plain
-Subject: [Bluez-users] Re: bluetooth-alsa and Jabra BT800
+Subject: Re: [Bluez-users] Re: Connection issue with headset
+References: <41FA06A5.3010904@tootai.net> <ctdn6n$sqs$1@sea.gmane.org>
+In-Reply-To: <ctdn6n$sqs$1@sea.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,120 +18,185 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 20:15:04 +0100
+Date: Sun, 30 Jan 2005 20:01:27 +0100
 
-Stefan Bellon wrote:
-> Brad Midgley wrote:
+Sebastian Roth a =E9crit :
 
-> > How do you know you're using the right address? 
+> Hi Daniel,
+>
+>> nomade:/home/dh# btsco 00:0b:2e:06:01:2e
+>> Device is 1:0
+>> Voice setting: 0x0060
+>> RFCOMM channel 6 connected
+>
+> You have to press the headset button now!
 
-> Well, because of this:
+I check further and still I can't get it work. If I do a hcitool scan no=20
+device is found. But the info command is working:
 
-> root@roma# hcitool info 00:07:A4:21:1D:86
-> Requesting information ...
->         BD Address:  00:07:A4:21:1D:86
->         Device Name: Jabra BT800
+nomade:/etc/bluetooth# hcitool info 00:0b:2e:06:01:2e
+Requesting information ...
+        BD Address:  00:0b:2e:06:01:2e
+        Device Name: BT1000
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x405
+        Manufacturer: Transilica, Inc. (24)
+        Features: 0xff 0xf9 0x31 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offs=
+et>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <SCO link> <HV2 packets> <HV3 packets>
+                <u-law log> <A-law log> <CVSD>
 
-[snip]
+Here is a hcidump -x when launching btsco with the given channel:
 
-> > No sdp available doesn't look good.
-
-> Hm, is this a mis-feature of the headset then? How does a handy talk
-> to the headset then?
-
-I have partial success here!
-
-Don't ask me what I did change. I plugged the USB Bluetooth dongle into
-my Windows notebook in order to see whether I can get the headset to
-work there. Afterwards I plugged the same dongle into my GNU/Linux box
-and now I get this (which didn't work previously!):
-
-root@roma# sdptool search --bdaddr 00:07:A4:21:1D:86 0x1108
-Class 0x1108
-Searching for 0x1108 on 00:07:A4:21:1D:86 ...
-Service Name: Headset
-Service RecHandle: 0x10000
-Service Class ID List:
-  "Headset" (0x1108)
-  "Generic Audio" (0x1203)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 1
-Profile Descriptor List:
-  "Headset" (0x1108)
-    Version: 0x0100
-
-So, after all, the headset is not that silent when asked for a service.
-
-When I start btsco, I now get the following:
-
-sbellon@roma$ btsco 00:07:A4:21:1D:86  
+nomade:/home/dh#btsco 00:0b:2e:06:01:2e 1
 Device is 1:0
 Voice setting: 0x0060
 RFCOMM channel 1 connected
-recieved AT*GNMK
-recieved AT+CKPD=200
-opened hwdep
-connected SCO channel
-Setting sco fd
-Done setting sco fd
-recieved AT+VGS=09
-Sending up speaker change 9
-recieved AT+CKPD=200
-disconnected SCO channel
 
-However, I can only start btsco once, then it doesn't work. If I query
-hciconfig after one btsco run, it tells me:
+HCIDump - HCI packet analyzer ver 1.12
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+ > HCI Event: Command Complete (0x0e) plen 6
+  01 25 0C 00 60 00
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+  2E 01 06 2E 0B 00 18 CC 02 00 00 00 01
+ > HCI Event: Command Status (0x0f) plen 4
+  00 01 05 04
+ > HCI Event: Link Key Request (0x17) plen 6
+  2E 01 06 2E 0B 00
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+  2E 01 06 2E 0B 00 98 0F 70 E7 AD EE 4B 1A 93 1C BA 18 77 0C
+  19 00
+ > HCI Event: Command Complete (0x0e) plen 10
+  01 0B 04 00 2E 01 06 2E 0B 00
+ > HCI Event: Connect Complete (0x03) plen 11
+  00 29 00 2E 01 06 2E 0B 00 01 00
+< ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+  29 00 0F 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+ > HCI Event: Max Slots Change (0x1b) plen 3
+  29 00 05
+ > HCI Event: Command Complete (0x0e) plen 6
+  01 0D 08 00 29 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+< ACL data: handle 0x0029 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
+    MTU 1024
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 4
+    MTU 1024
+ > ACL data: handle 0x0029 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
+    MTU 317
+< ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
+< ACL data: handle 0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+< ACL data: handle 0x0029 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 2 frame_type 0 credit_flow 15 pri 7 ack_timer 0
+      frame_size 312 max_retrans 0 credits 7
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 2 frame_type 0 credit_flow 14 pri 1 ack_timer 0
+      frame_size 312 max_retrans 0 credits 7
+< ACL data: handle 0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
+< ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+ > ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+< ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0040 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
+< ACL data: handle 0x0029 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 1 ilen 0 fcs 0x86 credits 33
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+< ACL data: handle 0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
+< ACL data: handle 0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+  01 29 00 01 00
+ > ACL data: handle 0x0029 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+ > ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+  29 00 13
+ > HCI Event: Command Status (0x0f) plen 4
+  00 01 06 04
+ > HCI Event: Disconn Complete (0x05) plen 4
+  00 29 00 16
 
-root@roma# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:04:0E:87:88:E9 ACL MTU: 120:20  SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN 
-        RX bytes:1170749 acl:51 sco:22922 events:74 errors:0
-        TX bytes:1338 acl:39 sco:0 commands:31 errors:0
-        Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: RSWITCH HOLD SNIFF PARK 
-        Link mode: ACCEPT MASTER 
-Can't read local name on hci0. Connection timed out(110)
+And here the output from snd-bt-sco
 
-Removing the USB Bluetooth dongle and inserting it again is a way to
-get it working again. Then, btsco runs (but looks slightly different to
-the one above):
+snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 2000
+snd-bt-sco: playback_trigger 1
+snd-bt-sco: setting playback to bspcm
+snd-bt-sco: playback_trigger 0
+snd-bt-sco: setting playback to NULL
 
-sbellon@roma$ btsco 00:07:A4:21:1D:86
-Device is 1:0
-Voice setting: 0x0060
-RFCOMM channel 1 connected
-speaker volume: 11 mic volume: 0
-recieved AT+CKPD=200
-opened hwdep
-connected SCO channel
-Setting sco fd
-Done setting sco fd
-recieved AT+VGS=09
-Sending up speaker change 9
-recieved AT+CKPD=200
-disconnected SCO channel
+Pairing is done, so what could be the problem?
 
-Ok, so far so good. However, when btsco is running, aplay should work.
-But it doesn't:
+I would really appreciate any help to debug this problem.
 
-sbellon@roma$ aplay -D plughw:Headset some.wav
-Playing WAVE 'some.wav' : Unsigned 8 bit, Rate 11025 Hz, Mono
+Thanks
+--=20
+Daniel
 
-Nothing to be heard in the headset (yes, I have set the volumes to max
-in alsamixer).
-
-Ok, I think we're not too far from the point where it works and where
-you could add the BT800 to the list of working headsets. But what am I
-missing now?
-
-TIA.
-
--- 
-Stefan Bellon
 
 
 -------------------------------------------------------
