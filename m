@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Gareth Reakes <gareth@apache.org>
-To: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] MS Wireless keyboard scans remapping
-In-Reply-To: <200310280847.39317.cijoml@volny.cz>
-Message-ID: <20031028023707.H69922@minotaur.apache.org>
-References: <200310280847.39317.cijoml@volny.cz>
+Message-ID: <1067336621.19803eeb5b14f@sf280r.eee.hku.hk>
+From: Leung Cheuk Kit Fernan <h0143913@eee.hku.hk>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset="ISO-8859-1"
+Subject: [Bluez-users] file transfer from one PC to another PC using bluetooth USB dongle
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -18,48 +15,24 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Oct 2003 02:39:09 -0800 (PST)
+Date: Tue, 28 Oct 2003 18:23:41 +0800
 
-Hi,
-	I made a patch for the keyboard to work with UK key bindings. I
-cant get to it until tonight, but it should help you. It defintely fixes
-the ! character.
+I want to send file from one PC to another PC using bluetooth USB dongles and
+the OS is RedHat linus
 
-Gareth
+I've downloaded and installed
+  openobex-1.0.1
+  obexftp -0.10.3
+  ussp-push.tgz
 
-On Tue, 28 Oct 2003, Michal Semler (volny.cz) wrote:
+1.Can I use openobex-1.0.1 and obexftp-0.10.3 to transfer file between two
+linux PC?
 
-> Hi,
->
-> my keyboard works now fine, but I found keys which doesn't. Looks like MS
-> changed scan codes for them.
->
-> How can I get these events from keys and put them unto hid.c of bthid package?
-> Keys which doesn't works are:
->
-> Stand by
-> Functionkey F
-> windows key opens properties
-> colona key |
-> other key in german version marked like criminal key #
->
-> Thanks very much for hinting, coz colona is one of the most used key in Linux
-> :))
->
-> Michal
->
->
->
-> -------------------------------------------------------
-> This SF.net email is sponsored by: The SF.net Donation Program.
-> Do you like what SourceForge.net is doing for the Open
-> Source Community?  Make a contribution, and help us add new
-> features and functionality. Click here: http://sourceforge.net/donate/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+If I can, how can I do that? Or where have the related information?
+
+2.If I can't tranfer file by using them, What choices do I have?
+
+Thank you!
 
 
 -------------------------------------------------------
