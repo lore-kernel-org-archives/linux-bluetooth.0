@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Selection of PtP connection type
-From: Simi Winiker <simi@winiker.ch>
-To: Pavel Ruzicka <pavouk@pavouk.org>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <200402230026.24596.pavouk@pavouk.org>
+Subject: Re: [Bluez-users] Pairing multiple devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alex Eiser <alexe@ed.ca>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <6AC5A768-65C5-11D8-9539-000A959C67D2@ed.ca>
 References: <200402230026.24596.pavouk@pavouk.org>
+	 <6AC5A768-65C5-11D8-9539-000A959C67D2@ed.ca>
 Content-Type: text/plain
-Message-Id: <1077521957.1788.7.camel@kant.winiker.ch>
+Message-Id: <1077521546.2832.62.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,35 +19,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 Feb 2004 08:39:17 +0100
+Date: Mon, 23 Feb 2004 08:32:26 +0100
 
-On Mon, 2004-02-23 at 00:26, Pavel Ruzicka wrote:
-> Hello,
+Hi Alex,
 
-Hello.
+> I have several bluetooth devices, which I am having a hard time getting 
+> them all connected at the same time.
+> 
+> The problem is that, one device (a Logitech MS 900) doesn't seem to 
+> work if I have encryption and authentication enabled.
 
-> I want to connect my Desktop Mandrake linux with my Sharp Zaurus.
-> On desktop side I want automatic solution. Only insert USB dongle.
+and this is correct. Read the HID profile for more details.
 
-[snip]
+> However my apple wireless keyboard does not work with out those options 
+> enabled.
 
-> What is the preferred way of connecting two devices today?
+The Apple mouse is wrong here, because the HID device must not decide
+this. In the case of HID the host stack must trigger the authentication.
 
-In my opinion you should use the PAN Profile to connect the devices. If
-you don't want to share the internet connection of your mandrake box,
-you do not need to worry about bridging. As a rough summary:
+> With encryption and authentication on, the mouse does not have a 
+> successful pairing. (always failing on the key request)
 
-1) Install bluez-pan on both sides
-2) Issue "pand -s -r NAP" on the mandrake box
-3) make "pand -c aa:bb:cc:dd:ee:00" on the zaurus (replace the part
-after -c with the bluetooth address of the mandrake box
+With auth and encrypt set in hcid.conf or with hciconfig you enable
+security mode 3 and this is not what you really want. Disable it and let
+the device decide when to ask for authentication.
 
-And you should be connected. But still read the documentation. And by
-the way, PPP over BNEP does not make sense. 
+> Is there a way to specify that a specific connect uses (or doesn't use) 
+> encryption and authentication?
 
-[snip]
+See above. You are in security mode 3, but what you want is security
+mode 2.
 
-Simi
+Regards
+
+Marcel
+
 
 
 
