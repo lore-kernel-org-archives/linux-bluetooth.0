@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41C38758.5030106@paranoici.org>
-From: ultrakorne <ultrakorne@paranoici.org>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] bt on acer problem
+Subject: Re: [Bluez-users] GPRS /  pppd problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1103312469.4788.15.camel@justakiss>
+References: <1103312469.4788.15.camel@justakiss>
+Content-Type: text/plain
+Message-Id: <1103323155.28046.127.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,13 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 18 Dec 2004 02:26:48 +0100
+Date: Fri, 17 Dec 2004 23:39:15 +0100
 
-hi again, i still have problem detecting my bt on my acer tm 4501
-i have installet the acerhk module, and echoed in blueled.. the output
-on dmesg is  acerhk: enabling Bluetooth via EC variant 1
-but i still didnt see anything in lsusb ...
-loading bt modules is useless
+Hi Erwin,
+
+> I'm using GPRS on a Ericsson T630 over bluetooth successfully. When I
+> press a key on the phone to terminate the GPRS connection, pppd doesn't
+> recognize that, however. I did a hcidump to see what happens after the
+> key has been pressed on the phone (see below). Any ideas if there's a
+> way to signal pppd that the GPRS connection has been terminated? The
+> pppd debug log doesn't show any activity in that case.
+
+get the full dump or run it with --psm=3 to enable RFCOMM decoding.
+
+Regards
+
+Marcel
+
 
 
 
