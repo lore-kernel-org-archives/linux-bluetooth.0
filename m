@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Nokia 7610 phone & logitech DiNovo keyboard /
-	MX900 mouse
+Subject: Re: [Bluez-users] managing pairing
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1102035154.4258.14.camel@localhost>
-References: <1102035154.4258.14.camel@localhost>
+In-Reply-To: <200412030025.02336.wim.delvaux@adaptiveplanet.com>
+References: <200412030025.02336.wim.delvaux@adaptiveplanet.com>
 Content-Type: text/plain
-Message-Id: <1102042749.7350.33.camel@pegasus>
+Message-Id: <1102042677.7350.31.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,34 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 03 Dec 2004 03:59:09 +0100
+Date: Fri, 03 Dec 2004 03:57:57 +0100
 
-Hi Laurence,
+Hi Wim,
 
-> I am using a Logitech DiNovo keyboard & MX900 mouse with the DiNovo
-> wireless hub / mouse charger.
+> another question.  I suppose the link_key file can contain link keys to 
+> multiple remove BT devices (e.g a USB BT dongle and a BT Phone)
 > 
-> My problem is that I can't get my machine to connect to my phone.
+> I also presume that each link_key is associated to the bdaddress of the remote 
+> device it relates to.
 > 
-> As far as I can tell the system has set up the keyboard etc as hid
-> devices, so when I run hid2hci to try to get the phone recognised, the
-> keyboard & mouse stop working which needs a reboot to correct.
+> so 
 > 
-> Easy question.... how do I fix this.
+> 1. can the link_key file be browsed to find all the devices a link_key exists 
+> for
 > 
-> I am running Fedora Core 2, 
-> kernel-2.6.5-1.358
-> bluez-utils-2.4-3
-> bluez-libs-2.5-2.1
-> bluez-hcidump-1.5-4
-> bluez-sdp-1.5-2.1
-> bluez-bluefw-1.0-2
-> bluez-libs-devel-2.5-2.1
-> 
-> Difficult question.... I need easy steps please!
+> 2. can one 'remove' one such record from the link_key file and assume that the 
+> pairing will retry once removed (much like removing the link_key file 
+> completely)
 
-not with this kernel and these packages. Go with Fedora Core 3, SuSE 9.2
-or Debian Sarge/Sid.
+there were plans to move this file into a text file, but no code has
+been written so far. However you can do your modification by hand, but
+at the moment after each change the hcid must be restarted.
 
 Regards
 
