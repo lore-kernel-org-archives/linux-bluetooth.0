@@ -1,38 +1,48 @@
-Return-Path: <bluez@thomae-privat.de>
-Message-ID: <40F02654.1090200@thomae-privat.de>
-Date: Sat, 10 Jul 2004 19:24:36 +0200
-From: Matthias Thomae <bluez@thomae-privat.de>
+Return-Path: <h.frydrych@gmx.de>
+Message-ID: <40EFE1DA.4070709@gmx.de>
+Date: Sat, 10 Jul 2004 14:32:26 +0200
+From: Holger Frydrych <h.frydrych@gmx.de>
 MIME-Version: 1.0
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Epox Barton keyboard: HID create error 53
-References: <40CDE18C.70703@thomae-privat.de>	 <1087255678.13792.51.camel@pegasus>  <40CE96A8.3020407@thomae-privat.de>	 <1087284859.13792.67.camel@pegasus>  <40CEC020.6050107@thomae-privat.de>	 <1087292887.13792.81.camel@pegasus>  <40CF4B17.2010806@thomae-privat.de>	 <1087339715.13792.104.camel@pegasus>  <40D7DDAD.2040908@thomae-privat.de>	 <1087897207.4328.89.camel@pegasus> <40D8D39E.3070301@thomae-privat.de>	 <40E024AD.1000101@thomae-privat.de> <1088452526.6030.86.camel@pegasus>	 <40E12F15.9040805@thomae-privat.de> <1088500144.6030.249.camel@pegasus>	 <40E1C91C.8030500@thomae-privat.de> <1088543513.6030.332.camel@pegasus>
-In-Reply-To: <1088543513.6030.332.camel@pegasus>
+CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Logitech diNovo hub not recognized?
+References: <40EEC9CD.8030003@gmx.de> <1089396942.22528.10.camel@pegasus>	 <40EF0F10.8050302@gmx.de> <1089413516.13519.16.camel@pegasus>	 <40EFABCE.7000503@gmx.de> <1089449283.13519.35.camel@pegasus>	 <40EFB4C7.3040509@gmx.de> <1089451515.13519.49.camel@pegasus>
+In-Reply-To: <1089451515.13519.49.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Marcel,
-
-I just tried bluez-libs/utils 2.8 and the 2.6.7-mh2 patch, and got my 
-"broken" keyboard running with it :)
-
-Great work, please keep it up!
-
-Cheers,
-Matthias
+Hi,
 
 
-Marcel Holtmann wrote:
->>>I will notify EPoX about it, so they can correct their bug. We must
->>>introduce a quirk for it, but I don't know how to trigger. The keyboard
->>>don't uses Bluetooth DeviceID and the presenter DeviceID is also wrong.
->>>At Cebit I told them that they should take care of DeviceID :(
->>
->>Ok. Please keep me (or the list) up-to-date on your findings, I'd like 
->>to know if I have to return this device to the dealer...
+> actually I thought that you enabled auth and encrypt ;)
 > 
-> 
-> don't rely on that you will get a fixed device very soon. I reported
-> that bug to EPoX, but I don't expect anything. I will fix it directly in
-> the hidd and swap the bytes in the HID descriptor before handling the
-> connection over to the HIDP module.
+> Setting auth and encrypt in hcid.conf or with hciconfig sets your device
+> into security mode 3 and this is not what you want. The basic security
+> mode should be 2 which means service level security. I explained this
+> some times, so check the mailing list archive or the Bluetooth spec. for
+> more details.
+
+So it really was my fault then, eh? Well, thanks for your time then, and 
+I'll go read the archives :)
+
+Just two last questions for clarification:
+1. What's the status on hid2hci now? Is it still needed or should it be 
+obsolete by now? Because I've read in this mailing list that others do 
+not need it anymore, but I can't get it to work without, as described.
+2. The usual procedure (as I understand, I'm not much into that 
+bluetooth stuff, as may be obvious ;) ) to connect a new bluetooth 
+device would be to press its connect button and then the one on the hub, 
+right? Well, this does not work, simply because the hub (after hid2hci) 
+does no longer react to a press on 'Connect', so I have to manually 
+search for new devices via hidd. The diNovo devices seem to 
+automatically reconnect when I use them, though, so if that's the way 
+it's meant to be currently, then this is ok, I only rarely connect an 
+additional device (a cell phone). Just wanted to know.
+
+Ok, so far from my end, I hope I did not pose questions that you already 
+had answered more or less recently :)
+
+
+Best regards
+
+Holger
