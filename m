@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050225194018.4684.qmail@web60401.mail.yahoo.com>
-From: Tanveer Chowdhury <tanveer_t2002@yahoo.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Connect to mysql server thorugh SDP
+Message-ID: <ef9938ec05022511243993f46d@mail.gmail.com>
+From: Albert Huang <ashuang@gmail.com>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-devel] confusion about libs/sdp.c - sdp_service_search_req()
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,31 +16,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Feb 2005 11:40:18 -0800 (PST)
+Date: Fri, 25 Feb 2005 14:24:36 -0500
 
-Thanks for answering. 
-Me and my frined are doing a project here just to
-learn where we have a db server(mysql) in Linux PC and
-installed all necessary IDE & SDK in win2000 PC. Now
-We want to design a program that can access that
-database through LAN as we dont have a NOKIA 60 series
-phone or USB dongles. Now asked baout SDP because how
-to offer the mysqld service to my win2000 PC?
-I can connect my emulator to internet and also to
-another PC on LAN. But how to access the mysql server?
-So that when I manage a compatible phone then I can
-interact to database via BT on that phone.
-Hope I made myself clear.
+the documentation for sdp_service_search_req() states that it outputs
+an sdp_list_t * of sdp_record_t * (list of sdp service records)
 
-Regards
--Tanveer 
+reading through the code, it appears that it actually returns a list
+of uint32_t * data structures.
+
+line 2721:
+        extract_record_handle_seq(pdata, rsp, rec_count, &scanned);
 
 
-		
-__________________________________ 
-Do you Yahoo!? 
-Yahoo! Mail - 250MB free storage. Do more. Manage less. 
-http://info.mail.yahoo.com/mail_250
+line 2523:
+static void extract_record_handle_seq(char *pdu, sdp_list_t **seq, int
+count, int *scanned)
+{
+    sdp_list_t *pSeq = *seq;
+    char *pdata = pdu;
+    int n;
+ 
+    for (n = 0; n < count; n++) {
+        uint32_t *pSvcRec = (uint32_t *) malloc(sizeof(uint32_t));
+        *pSvcRec = ntohl(bt_get_unaligned((uint32_t *) pdata));
+        pSeq = sdp_list_append(pSeq, pSvcRec);
+        pdata += sizeof(uint32_t);
+        *scanned += sizeof(uint32_t);
+    }
+    *seq = pSeq;
+}
+
+I think this will cause segfaults when you try to sdp_record_free the
+records in the list (it does for me).
+
+perhaps it shold read something more like:
+        sdp_record_t *pSvcRec = (sdp_record_t*) malloc(sizeof(sdp_record_t));
+        pSvcRec->attrlist = pSvcRec->pattern = 0;
+        pSvcRec->handle = ntohl(bt_get_unaligned((uint32_t *) pdata));
+        pSeq = sdp_list_append(pSeq, pSvcRec);
+
+Regards,
+-albert
 
 
 -------------------------------------------------------
