@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sockfd_lookup missing from older kernel patches
+Subject: Re: [Bluez-devel] hciconfig question
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200501102004.11028.bluez-devel@cpinkney.org.uk>
-References: <200501102004.11028.bluez-devel@cpinkney.org.uk>
+In-Reply-To: <5f30e261050110123968721dc4@mail.gmail.com>
+References: <5f30e261041224131026cfa70a@mail.gmail.com>
+	 <1103931501.20258.94.camel@pegasus>
+	 <5f30e261050110123968721dc4@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1105401255.8056.3.camel@pegasus>
+Message-Id: <1105401124.8056.1.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,27 +20,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Jan 2005 00:54:15 +0100
+Date: Tue, 11 Jan 2005 00:52:04 +0100
 
-Hi Colin,
+Hi Jeff,
 
-> I was updating a BlueZ package for the Sharp Zaurus PDAs that use the 2.4.18 
-> kernel. The previous package had been using BlueZ libs and utils v2.3 and 
-> patch 2.4.18-mh8 and had been working ok.
+> The only 1.2 devices listed at
+> http://www.holtmann.org/linux/bluetooth/devices.html are the Apple G4
+> and the Lifetech BlueConnect (but then I saw Carlos say that isn't
+> so).
 > 
-> With the latest userspace source and patch 2.4.18-mh15 I noticed the function 
-> sockfd_lookup had been removed from the sock.c files. This caused a 
-> unresolved symbol error upon loading the bnep module on the Zaurus.
-> 
-> I noticed in the comments on http://www.holtmann.org/linux/kernel/ that 
-> sockfd_lookup was removed on Dec 15, 2003 from kernel patches for kernels 
-> 2.4.22 and later. I presume this function has been moved into more central 
-> kernel code? Was this function supposed to be removed from the patches for 
-> kernels 2.4.21 and earlier (or at least kernel 2.4.18)?
+> I'm in the market for a couple of 1.2 USB dongles I can use with the
+> latest BlueZ kernel.  Any suggestions?  I found "ANYCOM USB-120 USB
+> Adapter" on Froogle.  Any comments about Anycom?
 
-all -mh patches for 2.4 should deal correctly with an exported or non
-exported sockfd_lookup(). I tested that a long time ago. However if you
-got problems with then simply export that function from the socket core.
+the Anycom with Bluetooth 1.2 uses a Silicon Wave chip, but this is a
+ROM version and the inquiry with RSSI has a bug.
 
 Regards
 
