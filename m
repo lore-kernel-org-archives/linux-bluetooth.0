@@ -3,11 +3,11 @@ Subject: Re: [Bluez-users] bluetooth for network
 From: Marcel Holtmann <marcel@holtmann.org>
 To: "Peter K. Martin" <Peter.K.Martin@t-online.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAcfouidNw6k6Tz/h5bVITlwEAAAAA@t-online.de>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAFSqC4ChMLEGKSvEU2nZPawEAAAAA@t-online.de>
 References: 
-	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAcfouidNw6k6Tz/h5bVITlwEAAAAA@t-online.de>
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAFSqC4ChMLEGKSvEU2nZPawEAAAAA@t-online.de>
 Content-Type: text/plain
-Message-Id: <1097238169.4407.9.camel@pegasus>
+Message-Id: <1097235419.4407.6.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,17 +19,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 08 Oct 2004 14:22:49 +0200
+Date: Fri, 08 Oct 2004 13:36:59 +0200
 
 Hi Peter,
 
-> But how to do this -- only typing dund .......  at the prompt gives no
-> advantage. Please give me the syntax and I have to do with RFCOMM. I already
-> established rfcomm0 -- and now?
+> > I'm using SuSE 9.1 and have installed and activated the 
+> > bluetooth-function of my notebook (Toshiba Satellite Pro M10). Now I 
+> > want to use the bluetooth-connection to an accesspoint - it is 
+> > possible to establish this connection - as a dummy-networkcard.
+> 
+> > if you access point uses the PAN profile then you can use pand and then
+> configure the new >  > bnep0 network interface like you did with eth0
+> before.
+> 
+> Unfortunately I cannot use pand, I already tried it - no reaction, also the
+> second one which comes with bluez. Only hcitool works and with hcitool cc
+> <addr> I'm able to connect to the accesspoint. Is there a way with rfcommX
+> and how to do this?
 
-use "dund --connect ..." and you get a ppp0 device with configured
-Point-to-Point settings. Read the manual page and search Google for more
-information.
+then you must use dund for PPP over RFCOMM.
 
 Regards
 
