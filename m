@@ -1,63 +1,43 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: bluez-announce@lists.sourceforge.net
-Cc: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1054908696.4791.157.camel@baroque.rococosoft.com>
-Mime-Version: 1.0
-Subject: [Bluez-devel] [ANN] Zaurus BlueZ kernel packages for ROM v3.10
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <1056930669.3eff7b6da605c@www.unrooted.net>
+From: reverend@unrooted.net
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] ussp-push and obextool repackage
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 06 Jun 2003 15:11:37 +0100
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sun, 29 Jun 2003 18:51:09 -0500
 
-Hi,
-I don't want to preempt the official packager of the Zaurus BlueZ
-distribution but I couldn't wait for Sharp to get around to distributing
-the kernel source and needed to try out BlueZ on the new ROM.
+I've gotten a bunch of messages over the last few days about ussp-push, a hack
+which I did a while ago to transfer files over rfcomm links.  So if people are
+still using it, I figured I would release a version updated to work with the
+latest openobex library.  I've also packaged up the obextool utility that Marcel
+used to have in CVS, hopefully he doesn't mind.  IMO, the obextool version is a
+much better tool, but both of them are in the package.  Use whichever you like.
+ I've espanded the README quite a bit to hopefully answer the questions I hear
+most often.  My thanks to those of you who sent me patches for the updates to
+ussp-push.  -- Rev
 
-So I built BlueZ kernel modules from a vanilla 2.4.18 plus Marcel's
-2.4.18-mh6 patch-set and a bit of tweaking to the 2.4.6 kernel config
-file. 
-
->>From cursory testing, they seem to be ok: bluecard_cs is successfully
-loaded and the latest versions of hciconfig, hcitool and sdptool all
-work fine. (However YMMV, no warranty, don't blame me if your Z catches
-fire, etc.)
-
-I've uploaded them to our anonymous ftp area, along with the PCMCIA
-configuration files, bluetooth and bluetooth.conf. Get them from
-ftp://rococosoft.com/pub/zaurus
-
-Installation:
-* unpack the tar-ball in the /home/root/modules/2.4.18-rmk7-pxa3-embedix
-directory
-* run depmod -ae
-* install bluetooth and bluetooth.conf in /etc/pcmcia
-* run /etc/rc.d/init.d/pcmcia restart
-
-Cheers,
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
-
+http://www.unrooted.net/openSource/bluez/ussp-push-0.2.tgz
 
 
 -------------------------------------------------------
-This SF.net email is sponsored by:  Etnus, makers of TotalView, The best
-thread debugger on the planet. Designed with thread debugging features
-you've never dreamed of, try TotalView 6 free at www.etnus.com.
+This SF.Net email sponsored by: Free pre-built ASP.NET sites including
+Data Reports, E-commerce, Portals, and Forums are available now.
+Download today and enter to win an XBOX or Visual Studio .NET.
+http://aspnet.click-url.com/go/psa00100006ave/direct;at.asp_061203_01/01
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
