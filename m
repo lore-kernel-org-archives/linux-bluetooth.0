@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: produktivIT <office@produktivIT.com>
+From: Krisztian Mark Szentes <office@produktivit.com>
 To: bluez-users@lists.sourceforge.net
 References: 
 	<53B03DA73719D5119E6A0008C71E1D78030EA9A3@svr-mail1.corp.home.nl>
 In-Reply-To: 
 	<53B03DA73719D5119E6A0008C71E1D78030EA9A3@svr-mail1.corp.home.nl>
 MIME-Version: 1.0
-Message-Id: <200305091039.32292.office@produktivIT.com>
+Message-Id: <200305081542.17759.office@produktivit.com>
 Subject: [Bluez-users] bt3c_cs time out - no firmware loaded?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,22 +20,20 @@ List-Unsubscribe:
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 9 May 2003 10:39:32 +0200
+Date: Thu, 8 May 2003 15:43:44 +0200
 Content-Type: text/plain; CHARSET=iso-8859-1
 
 Hi
 
-I have trouble with the 3COM Cardbus bluetooth card on a Powerbook Titanium 
-(a powerpc notebook). I haven't found any hint on the list yet regarding 
-my problem.
+I have trouble with the 3COM Cardbus bluetooth card on a Powerbook Titanium (a 
+powerpc notebook). I patched the 2.4.20 kernel with the mh-6 patch (and the 
+benh patch which does not collide). I haven't found any hint on the list yet.
 
-I use a Debian unstable system, I patched the 2.4.20 kernel with the mh-6 
-patch (and the benh patch which does not collide). With a USB bluetooth 
-adapter (hci_usb) everything works fine. I have a wonderful RFCOMM 
-communication to a Nokia 6310 and I can get on the internet via GPRS.
+With a USB bluetooth adapter (hci_usb) everything works fine. I have a 
+wonderful RFCOMM communication to a Nokia 6310 and I can get on the internet 
+via GPRS.
 
-However, using a 3COM Bluetooth adapter ("3COM Bluetooth Wireless PC Card, 
-Version 2.0, 3CRWB6096, M/N: SL-1022, PN:10043851-01 Rev:AA), I get 
+When, however, using a 3COM Bluetooth adapter, I get 
 connection timed out errors.
 like:
 tomcat:/home/m# hciconfig hci0 reset
@@ -53,26 +51,21 @@ fstat64(3, {st_mode=S_IFREG|0644, st_size=41397, ...}) = 0
 mmap(NULL, 41397, PROT_READ, MAP_PRIVATE, 3, 0) = 0x30016000
 close(3)                                = 0
 open("/usr/lib/libbluetooth.so.1", O_RDONLY) = 3
-read(3, "\177ELF\1\2\1\0\0\0\0\0\0\0\0\0\0\3\0\24\0\0\0\1\0\0*D"..., 1024) 
-= 
+read(3, "\177ELF\1\2\1\0\0\0\0\0\0\0\0\0\0\3\0\24\0\0\0\1\0\0*D"..., 1024) = 
 1024
 fstat64(3, {st_mode=S_IFREG|0644, st_size=27132, ...}) = 0
 mmap(0xffd9000, 91936, PROT_READ|PROT_EXEC, MAP_PRIVATE, 3, 0) = 0xffd9000
 mprotect(0xffe0000, 63264, PROT_NONE)   = 0
-mmap(0xffe9000, 28672, PROT_READ|PROT_WRITE|PROT_EXEC, 
-MAP_PRIVATE|MAP_FIXED, 
+mmap(0xffe9000, 28672, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_FIXED, 
 3, 0) = 0xffe9000
 close(3)                                = 0
 open("/lib/libc.so.6", O_RDONLY)        = 3
-read(3, "\177ELF\1\2\1\0\0\0\0\0\0\0\0\0\0\3\0\24\0\0\0\1\0\1\316"..., 
-1024) = 
+read(3, "\177ELF\1\2\1\0\0\0\0\0\0\0\0\0\0\3\0\24\0\0\0\1\0\1\316"..., 1024) = 
 1024
 fstat64(3, {st_mode=S_IFREG|0755, st_size=1273304, ...}) = 0
-mmap(0xfe80000, 1343768, PROT_READ|PROT_EXEC, MAP_PRIVATE, 3, 0) = 
-0xfe80000
+mmap(0xfe80000, 1343768, PROT_READ|PROT_EXEC, MAP_PRIVATE, 3, 0) = 0xfe80000
 mprotect(0xffb0000, 98584, PROT_NONE)   = 0
-mmap(0xffb0000, 90112, PROT_READ|PROT_WRITE|PROT_EXEC, 
-MAP_PRIVATE|MAP_FIXED, 
+mmap(0xffb0000, 90112, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_FIXED, 
 3, 0x120000) = 0xffb0000
 mmap(0xffc6000, 8472, PROT_READ|PROT_WRITE|PROT_EXEC, 
 MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0xffc6000
@@ -84,8 +77,7 @@ mprotect(0xfe80000, 1245184, PROT_READ|PROT_EXEC) = 0
 munmap(0x30016000, 41397)               = 0
 socket(0x1f /* PF_??? */, SOCK_RAW, 1)  = 3
 ioctl(3, 0x400448d3, 0x10015fbc)        = 0
-ioctl(3, 0x800448c9, 0)                 = -1 ETIMEDOUT (Connection timed 
-out)
+ioctl(3, 0x800448c9, 0)                 = -1 ETIMEDOUT (Connection timed out)
 fstat64(1, {st_mode=S_IFCHR|0600, st_rdev=makedev(136, 0), ...}) = 0
 mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 
 0x30016000
@@ -115,8 +107,7 @@ bt3c_cs                 9396   1
 l2cap                  18416   2  (autoclean)
 hci_usb                 7744   0  (autoclean) (unused)
 rfcomm                 34548   2  (autoclean)
-bluez                  36472   2  (autoclean) [bt3c_cs l2cap hci_usb 
-rfcomm]
+bluez                  36472   2  (autoclean) [bt3c_cs l2cap hci_usb rfcomm]
 ds                      8432   1  [bt3c_cs]
 yenta_socket           11088   1
 pcmcia_core            42464   0  [bt3c_cs ds yenta_socket]
@@ -137,19 +128,15 @@ May  8 14:58:53 tomcat kernel: BlueZ Core ver 2.2 Copyright (C) 2000,2001
 Qualcomm Inc
 May  8 14:58:53 tomcat kernel: Written 2000,2001 by Maxim Krasnyansky 
 <maxk@qualcomm.com>
-May  8 14:58:53 tomcat kernel: register(bluetooth/rfcomm/47): could not 
-append 
+May  8 14:58:53 tomcat kernel: register(bluetooth/rfcomm/47): could not append 
 to parent, err: -17
-May  8 14:58:53 tomcat kernel: devfs_register(bluetooth/rfcomm/48): could 
-not 
+May  8 14:58:53 tomcat kernel: devfs_register(bluetooth/rfcomm/48): could not 
 append to parent, err: -17
-May  8 14:58:53 tomcat kernel: devfs_register(bluetooth/rfcomm/49): could 
-not 
+May  8 14:58:53 tomcat kernel: devfs_register(bluetooth/rfcomm/49): could not 
 append to parent, err: -17
 ... (this one goes up to /255, this is just because of the devfs daemon, 
 without it the timeout still persists) ...
-May  8 14:58:53 tomcat kernel: devfs_register(bluetooth/rfcomm/255): could 
-not 
+May  8 14:58:53 tomcat kernel: devfs_register(bluetooth/rfcomm/255): could not 
 append to parent, err: -17
 May  8 14:58:53 tomcat kernel: BlueZ RFCOMM ver 0.4
 May  8 14:58:53 tomcat kernel: Copyright (C) 2002 Maxim Krasnyansky 
@@ -227,8 +214,6 @@ What's wrong? Am I supposed to use another bluefw executable?
 Thanks,
 
 Mark
-
-
 
 
 
