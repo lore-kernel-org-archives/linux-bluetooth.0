@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] l2test help
-From: Marcel Holtmann <marcel@holtmann.org>
-To: pierre francois <pierre_francois1981@hotmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY12-F14EWmRj4fXIA0007c10e@hotmail.com>
-References: <BAY12-F14EWmRj4fXIA0007c10e@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1092931225.18082.49.camel@pegasus>
+From: "pierre francois" <pierre_francois1981@hotmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/html
+Message-ID: <BAY12-F14EWmRj4fXIA0007c10e@hotmail.com>
+Subject: [Bluez-users] l2test help
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +15,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Aug 2004 18:00:25 +0200
+Date: Thu, 19 Aug 2004 15:04:30 +0000
 
-Hi Pierre,
-
-> I installed all the Bluez package. But when i tried to use the letest
-> command i got the message: 
-> bash: l2test: command not found 
-> If anyone can help me i will apreciate lot. 
-
-it is not installed by default. You can use --enable-test with the
-latest utils to get it installed.
-
-Regards
-
-Marcel
-
-
+<html><div style='background-color:'><DIV class=RTE>
+<P><BR><BR></P>Hi, </DIV>
+<DIV></DIV>I installed all the Bluez package. But when i tried to use the letest command i got the message: 
+<DIV></DIV>bash: l2test: command not found 
+<DIV></DIV>If anyone can help me i will apreciate lot. 
+<DIV></DIV>
+<DIV></DIV>Thanks a lot for your help. 
+<DIV></DIV>
+<DIV></DIV>Kind regards 
+<DIV></DIV>
+<DIV></DIV>Pierre</div><br clear=all><hr>What type of MSN user are you?  <a href="http://g.msn.com/8HMBENUK/2737??PS=47575">Take our quick quiz </a> and find out!</html>
 
 
 -------------------------------------------------------
