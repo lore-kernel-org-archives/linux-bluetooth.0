@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <41EED6AE.1080205@fastwebnet.it>
+From: WiseLYNX <wiselynx.naima@fastwebnet.it>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-From: Paul Ionescu <i_p_a_u_l@yahoo.com>
-Message-ID: <pan.2005.01.19.22.54.29.108027@yahoo.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: hal@freedesktop.org
-Subject: [Bluez-devel] Bluetooth and HAL
+Subject: Re: [Bluez-devel] bluetooth headset - connects but no audio
+References: <41EE3974.1010604@fastwebnet.it> <41EE5112.1040502@dark-reality.de> <41EE4ACD.9070105@fastwebnet.it> <41EE66A2.1040106@dark-reality.de> <41EE69F3.1030401@fastwebnet.it> <41EE989A.7030206@dark-reality.de>
+In-Reply-To: <41EE989A.7030206@dark-reality.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,38 +18,50 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 00:54:30 +0200
+Date: Wed, 19 Jan 2005 22:52:46 +0100
 
-Hi,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-I want to add bluetooth devices in HAL (Hardware Abstraction Layer).
-This way all programs interesting in bluetooth devices can be notified of
-the addition or removal of a bluetooth device.
-What should we export about a bluetooth device that might be
-of interest for userspace programs ?
-I think of the following, but I don't know if we really need all of them:
+| use a vanilla kernel.
 
-bluetooth.address	string (ex: 00:0d:33:44:33:c6)
-bluetooth.interface	string  (ex: hci0)
-bluetooth.interface_up	int
-bluetooth.linux.driver	string   (ex: hci_usb)
-bluetooth.linux.ifindex		int
-bluetooth.linux.sysfs_path	string
-bluetooth.HCI_version		int
-bluetooth.HCI_revision		int
-bluetooth.LMP_version		int
-bluetooth.LMP_version		int
-bluetooth.Manufacturer	string
-bluetooth.ChipVersion	string
-Maybe :
-bluetooth.features	?
-bluetooth.packet_types	?
+I did a try, with vanilla 2.6.10 directly from kernel.org. guess what?
+doesn't work neither that way :(
 
-Corrections, comments and suggestions are appreciate.
+| no really, no idea :)
 
-Thanks,
-Paul
+mh.. may it be a hint the fact this (the "Permission denied" and "Too
+many levels of symbolic links" errors) happened _after_ I applied the
+mh1 patch?
 
+| maybe someone else?
+
+if someone else wanna help, he would be welcome :)
+
+
+- --
+
+=B0=B0=B0 Wise
+~ O  LYNX
+
+GPG key: http://wiselynx.interfree.it/wiselynx.naima.asc
+MD5 checksum: http://wiselynx.interfree.it/wiselynx.naima.asc.md5
+
+- -----BEGIN GEEK CODE BLOCK-----
+Version: 3.1
+GE>$/IT/S d+ s: !a>? C++(+++)>$ U P>+ L++>++++ E--- W++ N ?o ?K w-- ?O ?M
+?V>+ PS+ !PE Y+ PGP+ t- ?5 X- R+(*) tv- b+(++)>+++ DI(++) !D G e++ h!*@
+r%>++ y-->+
+- ------END GEEK CODE BLOCK------
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iD8DBQFB7taqkYE9G6fXLlgRAiBrAJsEIz61rgQQrnqGdaBQYvdwdhAqTQCfdX5D
+a1pbunEm7XoUPoWCOkIo2Dw=3D
+=3DWO0+
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
