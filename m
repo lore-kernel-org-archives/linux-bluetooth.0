@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] i-Tec Bluetooth USB dongle
+Subject: Re: [Bluez-users] Limitation of emulator ?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Rudolf Matousek <matousek@utia.cas.cz>
+To: Varat Chaikasetsin <varat_c@hotmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4028818C.1070109@utia.cas.cz>
-References: <4028818C.1070109@utia.cas.cz>
+In-Reply-To: <loom.20040210T083307-660@post.gmane.org>
+References: <loom.20040210T083307-660@post.gmane.org>
 Content-Type: text/plain
-Message-Id: <1076401303.32750.6.camel@pegasus>
+Message-Id: <1076401392.32750.9.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,21 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Feb 2004 09:21:43 +0100
+Date: Tue, 10 Feb 2004 09:23:12 +0100
 
-Hi Rudolf,
+Hi Varat,
 
-> I've recently purchased i-Tec USB dongle. Before the purchase, I checked 
-> that the dongle is supported by linux Bluez.
-> 
-> Unfortunatelly, the dongle I purchased has different chipset from the 
-> dongle announced as functional. The chipset is Broadcom with Vendor Id: 
-> 0a5c and Product Id: 200a.
+>    I'm doing  my final year project about routing in Scatternet.I need to have 
+> lots of BT devices for this project so I decided to use "hciemu" to simulate 
+> many BT devices instead of using the real ones.
+>    Everthing seems to be allright with that emulator but now I'm facing a big 
+> problem. I can't simulate BT device more than 15 devices (hci0 - hci15).I  
+> use "hciemu localhost:xx" command to simulated all devices. 
+>    Moreover, when I've simulated 15 devices then pluged the USB device in ,I 
+> can't see or use that USB device by using "hciconfig" command.
+>     What am I doing wrong? what should I do ? or it's a limitation of the 
+> emulator ?
 
-this is not a Broadcom dongle in firmware mode, because it must have id
-0a5c:2033. After the firmware was loaded the id is 0a5c:2001.
-
-What is the content of /proc/bus/usb/devices ?
+the kernel side has no limit of attached devices, but the userspace
+tools like hciconfig etc. are limited to maximal 16 devices.
 
 Regards
 
