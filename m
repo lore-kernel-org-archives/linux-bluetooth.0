@@ -1,78 +1,39 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Nosve" <nosve@libero.it>
-To: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
-Subject: R: [Bluez-users] Pairing to devices with bluez and widcomm withsame adapter
-Message-ID: <AGELIJDLJNOPFNMOHHIFEECKCAAA.nosve@libero.it>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-In-Reply-To: <1074810042.3071.29.camel@pegasus>
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jan 2004 10:30:21 +0100
+Return-Path: <dv_mlist@verizon.net>
+Subject: Re: [Bluez-users] Config for Socket CF card
+From: digger vermont <dv_mlist@verizon.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Max Krasnyansky <maxk@qualcomm.com>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>,
+   Benjamin Herrenschmidt <benh@kernel.crashing.org>
+In-Reply-To: <1074819483.3071.79.camel@pegasus>
+References: <1074566227.3670.24.camel@myrna>
+	 <1074597777.7088.2.camel@pegasus>  <1074697933.3020.19.camel@myrna>
+	 <1074698544.7088.102.camel@pegasus>  <1074749699.2573.17.camel@myrna>
+	 <1074775827.3071.1.camel@pegasus>  <1074814697.3159.3.camel@myrna>
+	 <1074816664.3071.60.camel@pegasus>  <1074818667.1733.27.camel@localhost>
+	 <1074819483.3071.79.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1074832340.3155.70.camel@myrna>
+Mime-Version: 1.0
+Date: Thu, 22 Jan 2004 23:32:20 -0500
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Marcel,
+Hello Marcel
 
-> -----Messaggio originale-----
-> Da: Marcel Holtmann [mailto:marcel@holtmann.org]
->
-> Hi Nosve,
->
-> > Someone has managed how to pair with both stacks, with the same
-> pc/adapter?
-> > The problem seems to be the fact that when paired, the devices
-> > but I don't know how to xtract them..
->
+On Thu, 2004-01-22 at 19:58, Marcel Holtmann wrote:
+> I checked it with my Xircom some hours ago and yes, it don't works. I
+> have no explanation for that, so someone should write all this up and
+> prepare a post for the Linux serial mailing list and notify Rusty Russel
+> about it. Digger, will you do this?
+> 
 
-[blah blah]
+I should be capable of that. I was a bit worried when you suggested I
+delve into the driver code itself :)
 
-> it is possible to change the BD_ADDR, but only with vendor commands.
->
-> The only solution for your problem is storing the link key on your
-> Bluetooth chip. This was already discussed, so take a look at the
-> mailing list archive.
->
-> Regards
->
-> Marcel
->
+ Am I assuming correctly that the rmk in rmk@arm.linux.org.uk is Russell
+King?  In any case it will have to wait till tommorrow.  The powerbook
+battery is at 20% and mine is at less.
 
-Just a thing I forgot, when I have to delete the link key for the explained
-things,
-hcid doesn't matter about it, maybe it buffers the keys only at startup,
-neither with a kill -HUP, which seems however intercepted. The only option
-is to
-restart hcid.
+Good night,
 
-I reported this, because the pairing behaviour may be confusing for
-people who uses the bt adapter in 'mixed' environment.
-
-As for regards the other thread tha discuss the possibility of storing the
-link
-key in bt adapter, I understand that the possibility to do that has to be
-investigated from widcomm? Or from the manufacturer of the adapter, with
-hci arbitrary commands to send to the adapter?
-
-Regards, and thanks for the good job
-
-Nosve
-
-
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+digger
