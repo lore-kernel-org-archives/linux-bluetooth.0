@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?iso-8859-1?Q?Riikka_Jylh=E4?= <jylhar@ac.tut.fi>
-To: <bluez-users@lists.sourceforge.net>
-Message-ID: <000001c35a7d$41d7f630$ae2ae682@ac.tut.fi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Subject: [Bluez-users] USB-drivers
+Subject: Re: [Bluez-users] CSR Firmware upgrade?
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Jose Bernardo Silva <jbs@bandos.homelinux.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20030801102713.M41931@bandos.homelinux.com>
+References: <Pine.GSO.4.44L0.0307311234210.11864-100000@ug7.ece.ubc.ca>
+	<1059732435.2098.289.camel@idoru.kc.de>
+	<20030801102713.M41931@bandos.homelinux.com>
+Content-Type: text/plain
+Message-Id: <1059734468.10884.182.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -17,19 +22,24 @@ List-Unsubscribe:
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 4 Aug 2003 14:40:51 +0300
+Date: 01 Aug 2003 12:41:02 +0200
 
-Hi,
+Hi Jose,
 
-I've read through bluez users and developers mailing-lists and it seems
-that there are problems with usb-sco driver. Are problems completely
-solved or if I'm planning on using sco with my Bluetooth usb dongle
-should I consider twice? My experiments have not succeeded at all but
-I'm still planning on trying with mh2 patch for 2.4.21. Are other
-drivers and devices more recommendable and working better with voice?
+> Well, widcomm/csr firmware update tool doesn't allow you to update a dongle
+> with a firmware meant for another brand dongle - I've tried to update my acer
+> dongle with a msi firmware, and no go... 
+> 
+> As for firmwares, MSI updates the firmware frequently, but it is included in
+> the full drivers package.
 
---
-Riikka Jylh=E4
+if you have MSI dongles with different firmware on it, please archive
+them all and send them to me. I am also interested in the firmware files
+from the drivers package. How much do you have?
+
+Regards
+
+Marcel
 
 
 
