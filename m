@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4247EC03.9040709@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+Message-ID: <f16b04cf05032803331d32b690@mail.gmail.com>
+From: hariharan veerappan <hariharanneevee@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] paging/inquiry during inquiry
-References: <30791.1111942436@www59.gmx.net> <1111943377.9195.253.camel@pegasus>
-In-Reply-To: <1111943377.9195.253.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] HCI Config returns Can't Init device
+In-Reply-To: <1112008411.9016.11.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <f16b04cf050327221766330331@mail.gmail.com>
+	 <1112008411.9016.11.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,36 +19,69 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Mar 2005 13:35:31 +0200
+Date: Mon, 28 Mar 2005 17:03:11 +0530
 
-Marcel Holtmann wrote:
-> Hi Marco,
+Hi,
+
+i have patched kernel 2,4,18 with the yours respective patch. Since i
+am using Samsung S3C2440 processor, smasung officially supports only
+the kernel 2.4.18. hence i need to get
+the best result of bluetooth using this kernel version 2.4.18 only.
+
+Facing the problem is ,
+
+ Can't init device hci0. Connection timed out(110) ERROR.
+    i am using 2.4.18 kernel with the RFMD serial port bluetooth
+module. i have ported the Bluez Stack and HCI_H4 protocol modules. The
+ RFMD device is get attached by
+
+ hciattach /dev/ttyS0 swave 115200 flow
+
+ the patch added in the hciattach.c is soft reset functionality
+ included before sending param acess command in SWAVE function and
+ after that reset again. This attaches my UART dongle with the HCI
+ layer.
+
+ When i try to hciconfig uration i am getting the following errors.
+
+ hciconfig hci0 up
+ But i could have functionality with Kernel 2.6. The HCI config works fine.
+
+ Is there any patch to imply for the 2..4 kernel.
+
+Thanks and regards
+Hariharan.v.
+
+On Mon, 28 Mar 2005 13:13:31 +0200, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Hariharan,
 > 
+
+> >
+> > Can't init device hci0. Connection timed out(110) ERROR.
+> >> >     i am using 2.4.18 kernel with the RFMD serial port bluetooth
+> > module. i have ported the Bluez Stack and HCI_H4 protocol modules. The
+> > RFMD device is get attached by
+> >
+> > hciattach /dev/ttyS0 swave 115200 flow
+> >
+> > the patch added in the hciattach.c is soft reset functionality
+> > included before sending param acess command in SWAVE function and
+> > after that reset again. This attaches my UART dongle with the HCI
+> > layer.
+> >
+> > When i try to hciconfig uration i am getting the following errors.
+> >
+> > hciconfig hci0 up
+> > But i could have functionality with Kernel 2.6. The HCI config works fine.
+> >
+> > Is there any patch to imply for the 2..4 kernel.
 > 
->>what are the requirements that remote devices can page/inquire my dongle
->>when my dongle is in a inquiry?
+> you need at least use my 2.4.18-mh15 patch. However if the 2.6 kernel
+> works then use it.
 > 
-> 
-> as far as I know, you can't page when you run an inquiry. But when a
-> connection is established you can hold this and then page and inquire
-> again.
-
-my question goes in the other direction:
-My dongle is doing an inquiry, can others during this inquiry do a page 
-scan on my dongle or can they inquire me?
-What are the requirements for this?
-
-
-regards
-Marco
-
-
 > Regards
 > 
 > Marcel
-> 
-> 
-> 
 > 
 > -------------------------------------------------------
 > SF email is sponsored by - The IT Product Guide
@@ -58,8 +92,7 @@ Marco
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
-> 
+>
 
 
 -------------------------------------------------------
