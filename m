@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Thea <thea@m-net.arbornet.org>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20040612150207.T12604-100000@m-net.arbornet.org>
+From: Suresh Srinivasan <sspriniv@engr.smu.edu>
+To: bluez-users@lists.sf.net
+Message-ID: <Pine.OSF.4.10.10406121321460.6753-100000@speed.seas.smu.edu>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] Can ping, nothing else
+Subject: [Bluez-users] Broadcasting in Bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,21 +15,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 12 Jun 2004 15:10:12 -0400 (EDT)
+Date: Sat, 12 Jun 2004 13:28:36 -0500 (CDT)
 
 
-Forgive me if this question has been asked before. I've gotten pppd to
-establish a connection to my t610 mobile phone through bluez. I get pair
-of addresses and can properly ping and resolve hosts. Nice, but I can't
-actually connect to hosts. This is something I don't know how to deal
-with. If I telnet to <nameserver> 53, it times-out; if I telnet to
-www.google.com 80, it times-out; if I ping www.altavista.com, it works
-fine. What's happening here?
+Dear Maxim Krasnyansky,
+                        Iam suresh srinivasan, doing my masters in computer
+science at SMU. Iam currently looking at broadcasting in a bluetooth piconet.
+>From my understanding from the bluetooth protocol stack is that broadcast
+is not supported as of now. Iam trying do the following to broadcast a packet in the bluetooth
+piconet:
 
-I'm running linux 2.6, stock-generic on an ibook.
-Just ask if you want to see any configuration files
+1) Creating a connection(ACL) to all the slaves.
+2) In function "HCI_ACL_SEND" the parameter "flag" in the function
+hci_add_acl_hdr(skb,conn->handle,flags|ACL_START) is modified to flags|ACL_ACTIVE_BCAST".
+Can i broadcast with the above changes? or do i ned some more changes?
+Please, give me your valueable sugestions? please, guide me if iam in
+the wrong direction.Eagerly waiting for your response,
 
--Thea DeSilva
+Thanking you,
+Warm regards,
+suresh
+
 
 
 
