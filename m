@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040419104432.74490.qmail@web21006.mail.yahoo.com>
-From: =?iso-8859-1?q?Gary=20Martin?= <gary_martin_au@yahoo.com.au>
-Subject: Re: [Bluez-users] sonyericsson t630 info
-To: cijoml@volny.cz
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <200404142157.41467.cijoml@volny.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Subject: Re: [Bluez-users] Compile bluez-bluefw-1.0 fails
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alex Holland <ah160@student.cs.york.ac.uk>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200404190935.34433.ah160@student.cs.york.ac.uk>
+References: <200404182321.55431.dvornheder@t-online.de>
+	 <1082325338.4403.27.camel@pegasus>
+	 <200404190935.34433.ah160@student.cs.york.ac.uk>
+Content-Type: text/plain
+Message-Id: <1082370224.4403.33.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,48 +20,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 19 Apr 2004 20:44:32 +1000 (EST)
+Date: Mon, 19 Apr 2004 12:23:45 +0200
 
-Michal,
+Hi Alex,
 
-You got info from a T630 using Debian?
-Great --- 2 of my 3 questions solved
-If you only had an Apple PowerBook. Aahh ... !
+> This module seems to have started working on Gentoo without oopsing, I 
+> think with the last hotplug update. Unfortunately, I can't remember 
+> where it expects to find the firmware, and I can't find any decent way 
+> of searching the mailing list archives.
+> 
+> Would it possible to have some info on the Kernel help page saying where 
+> the firmware can be downloaded, and where it should be put? As is, the 
+> only way to find out seems to be to ask here.
 
-Gary Martin
+you can find it at http://www.bluez.org/drivers.html
 
---- "Michal Semler (volny.cz)" <cijoml@volny.cz> wrote: > Hi
-Marcel,
-> 
-> sending info from SE t630 for including into your list:
-> 
-> Requesting information ...
->         BD Address:  XX:XX...
->         Device Name: t630
->         LMP Version: 1.1 (0x1) LMP Subversion: 0x503
->         Manufacturer: Ericsson Mobile Comunications (0)
->         Features: 0x04 0xca 0x31 0x00 0x00 0x00 0x00 0x00
->                 <encryption> <RSSI> <SCO link> <u-law log>
->                 <A-law log> <CVSD>
-> 
-> Michal
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: IBM Linux Tutorials
-> Free Linux tutorial presented by Daniel Robbins, President and
-> CEO of
-> GenToo technologies. Learn everything from fundamentals to
-> system
->
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users 
+Regards
 
-Find local movie times and trailers on Yahoo! Movies.
-http://au.movies.yahoo.com
+Marcel
+
+
 
 
 -------------------------------------------------------
