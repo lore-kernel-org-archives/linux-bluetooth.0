@@ -1,99 +1,71 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] oops when playing audio
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Dagfinn Ilmari =?ISO-8859-1?Q?Manns=E5ker?= <ilmari@ilmari.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <d8jpt8413da.fsf@wirth.ping.uio.no>
-References: <d8jpt8413da.fsf@wirth.ping.uio.no>
-Content-Type: text/plain
-Message-Id: <1087228927.13792.17.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 14 Jun 2004 18:02:07 +0200
+Return-Path: <Steven.Singer@csr.com>
+Message-ID: <40CDA70D.7010008@csr.com>
+Date: Mon, 14 Jun 2004 14:24:29 +0100
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Andreas Gaufer <andreas.gaufer@blue-cell-networks.com>,
+   Bluez Devel
+    <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] hci_create_connection assuming timeout too soon
+References: <20040609154824.531c71b8.Andreas.Gaufer@blue-cell-networks.com>
+    <1087033515.4306.0.camel@pegasus>
+In-Reply-To: <1087033515.4306.0.camel@pegasus>
+Content-Type: text/plain; charset="us-ascii"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Ilmari,
+Marcel Holtmann wrote:
+>Andreas Gaufer wrote:
+>> To catch a condition where the chip is stalled in some way i think the best
+>> approach would be to time out on host side after the chips
+>> page time out * 1,5 or so.
 
-> I was just playing around with hstest and my new Bluetooth headset (a
-> Jabra BT250, to be precise) when I got this oops after a few minutes'
-> playback:
-> 
-> usb 1-1: new full speed USB device using address 3
-> usb 1-1: USB disconnect, address 3
-> __tx_submit: hci0 tx submit failed urb cff5a614 type 3 err -19
-> __tx_submit: hci0 tx submit failed urb cff5a614 type 3 err -19
-> usb 1-1: new full speed USB device using address 4
-> Unable to handle kernel NULL pointer dereference at virtual address 00000000
->  printing eip:
-> c021d454
-> *pde = 00000000
-> Oops: 0000 [#1]
-> PREEMPT 
-> Modules linked in: sco hci_usb af_packet prism54 firmware_class nfs lockd sunrpc rfcomm l2cap bluetooth md5 ipv6 smsc_ircc2 ds iptable_nat ipt_state ip_conntrack iptable_mangle iptable_filter ip_tables e100 mii snd_maestro3 snd_ac97_codec snd_pcm_oss snd_mixer_oss snd_pcm snd_page_alloc snd_timer snd soundcore uhci_hcd usbcore yenta_socket pcmcia_core intel_agp agpgart ircomm_tty ircomm irda ide_cd cdrom mousedev joydev evdev psmouse apm i8k unix
-> CPU:    0
-> EIP:    0060:[<c021d454>]    Not tainted VLI
-> EFLAGS: 00210287   (2.6.7-rc3-mm1) 
-> EIP is at skb_release_data+0x34/0xa0
-> eax: cffc7cd8   ebx: 00000000   ecx: cffc7cd8   edx: 00000000
-> esi: c1d26560   edi: cbc9af38   ebp: cc9c57c0   esp: cbc9ae64
-> ds: 007b   es: 007b   ss: 0068
-> Process hstest (pid: 1437, threadinfo=cbc9a000 task=cf80f830)
-> Stack: c1d26560 00000030 c021d4c8 00000000 c021d56c c1d26560 c1d26560 00000030 
->        c1d26560 c1d26560 d09d252e 00000030 00000000 00000000 d09fe660 cbc9aed8 
->        00000800 c0219f40 00000800 00000000 bfffee30 00000000 00000000 00000000 
-> Call Trace:
->  [<c021d4c8>] kfree_skbmem+0x8/0x20
->  [<c021d56c>] __kfree_skb+0x8c/0x120
->  [<d09d252e>] bt_sock_recvmsg+0x7e/0xb0 [bluetooth]
->  [<c0219f40>] sock_aio_read+0xb0/0xd0
->  [<c014e7ed>] do_sync_read+0x6d/0xb0
->  [<c016007d>] sys_select+0x24d/0x4b0
->  [<c014e917>] vfs_read+0xe7/0x110
->  [<c014eb38>] sys_read+0x38/0x60
->  [<c0103ef9>] sysenter_past_esp+0x52/0x71
-> 
-> Code: 0f 8b 80 a8 00 00 00 ff 08 0f 94 c2 84 d2 74 7a 8b 8e a8 00 00 00 8b 51 04 89 c8 85 d2 74 38 31 db 39 d3 73 32 89 f6 8b 54 d8 10 <8b> 02 f6 c4 08 75 17 8b 42 04 40 74 48 83 42 04 ff 0f 98 c0 84 
->  <3>hci_scodata_packet: hci0 SCO packet for unknown connection handle 43
-> hci_scodata_packet: hci0 SCO packet for unknown connection handle 43
-> 
-> hsplay segfaulted, but I was able to start playing again afterwards.
-> Also, the kernel disconnects and reconnects the device spontaneously
-> every once in a while while playing (both before and after the oops),
-> like this:
-> 
-> Jun 13 06:13:22 galadriel kernel: usb 1-1: new full speed USB device using address 5
-> Jun 13 06:15:19 galadriel kernel: usb 1-1: USB disconnect, address 5
-> Jun 13 06:15:20 galadriel kernel: usb 1-1: new full speed USB device using address 6
-> Jun 13 06:15:57 galadriel kernel: usb 1-1: USB disconnect, address 6
-> Jun 13 06:15:57 galadriel kernel: usb 1-1: new full speed USB device using address 7
-> 
-> I'm running 2.6.7-rc3-mm1 on a Dell Inspiron 4000 (P-III 800Mhz) and
-> using an MSI USB Bluetooth dongle. The relevant .config snippet is:
+Even that might not be sufficient.
 
-try it without the --mm1 patch. What does "hciconfig -a" say about your
-Bluetooth dongle?
+There are two potentially large delays, you've identified just one - the
+page timeout. By default this is just over 5 seconds, but it could be
+raised as high as 41 seconds.
 
-Regards
+The page timeout, however, is applied only over the initial baseband
+connection. Before the connection complete event can be reported to the
+host, the LMP negotiation also has to take place. This can include
+authentication and pairing. In theory, the whole LMP negotiation should
+be bounded by a 30 second timeout, but, in practice I suspect it's better
+to err on the cautious side.
 
-Marcel
+Normally, this isn't a problem as you just wait for the connection
+complete event and it'll give a success or failure code. However, I
+understand that you want to detect non-responsive host controllers.
+
+> your change is me too much at the moment. I simply changed the timeout
+> to 25000 for the hcitool cc command.
+
+If you want just a rough figure that'll probably work, I'd suggest
+assuming that the page timeout is about 10 seconds and allow the full
+30 seconds LMP timeout. That'd give a 40 second timeout.
+
+If you wanted to be sure, then somwhere above 71 seconds is better, but
+to be really, really sure I suspect 2 minutes is better still.
+
+If this is too long, then I suggest a shorter timeout on the command
+status event. This event should always be reported promptly. You
+could get away with a one second timeout on that followed by a two
+minute timeout on the connection complete event.
+
+	- Steven
+-- 
 
 
 
 
--------------------------------------------------------
-This SF.Net email is sponsored by the new InstallShield X.
->From Windows to Linux, servers to mobile, InstallShield X is the
-one installation-authoring solution that does it all. Learn more and
-evaluate today! http://www.installshield.com/Dev2Dev/0504
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
