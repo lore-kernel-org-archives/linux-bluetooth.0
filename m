@@ -1,5 +1,5 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <421221A2.9060009@optibrand.com>
+Message-ID: <4212218D.6060009@optibrand.com>
 From: Dave Henriksen <dhenriksen@optibrand.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
@@ -16,7 +16,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 15 Feb 2005 09:21:54 -0700
+Date: Tue, 15 Feb 2005 09:21:33 -0700
 
 Does anyone know of a really good class 1 Bluetooth network access point ?
 
