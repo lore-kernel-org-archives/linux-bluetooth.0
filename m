@@ -1,42 +1,52 @@
-Return-Path: <SRS0+8d78c3961b6b2a5ec5cb+262+infradead.org+dwmw2@pentafluge-183322.srs.infradead.org>
-Subject: Re: [Bluez-devel] bluez-utils 2.7 default configuration
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Nicholas A. Preyss" <nalp@gmx.net>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1084382951.25099.89.camel@pegasus>
-References: <20040511192919.GB28581@gmx.net>
-	 <1084368229.25099.26.camel@pegasus>
-	 <1084371486.4426.156.camel@hades.cambridge.redhat.com>
-	 <1084382445.25099.77.camel@pegasus>
-	 <1084382743.4426.351.camel@hades.cambridge.redhat.com>
-	 <1084382951.25099.89.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Inquiry result with rssi in bluez libs 2.7
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rognlien Dag Kristian <Dag.K.Rognlien@sintef.no>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <26AF0D77A98E09478A577B2248F72338413FF3@sintefxch1-netapp.sintef.no>
+References: 
+	 <26AF0D77A98E09478A577B2248F72338413FF3@sintefxch1-netapp.sintef.no>
 Content-Type: text/plain
-Message-Id: <1084383201.4426.374.camel@hades.cambridge.redhat.com>
+Message-Id: <1084382753.25099.85.camel@pegasus>
 Mime-Version: 1.0
-Date: Wed, 12 May 2004 18:33:21 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 12 May 2004 19:25:53 +0200
 
-On Wed, 2004-05-12 at 19:29 +0200, Marcel Holtmann wrote:
-> Hi David,
-> 
-> > > I have no problem with that, but for the upstream package I am going to
-> > > keep it this way. If you aren't a developer then you start the daemons
-> > > at boot and kill them at shutdown. That's all.
-> > 
-> > I'm not sure I agree. I'm not a developer; I'm a point'n'drool user. I
-> > run system-config-services and want to turn on 'pand' or 'dund' which
-> > are configured as clients by default so all I have to do is turn them on
-> > and they work...
-> 
-> actually the intention of the pand and dund options in the init script
-> are for server use. You can use them for client setup, but I prefer to
-> use something extra for that. This is of course not covered.
+Hi Dag,
 
-True. And there's a little bit more to be done before the point'n'drool
-user will be able to enable them like that for server mode. But still,
-it's nice to have them separate and I think that's what we'll do in
-Fedora unless you really object. 
+> In the hci_event.c in net/bluetooth the hci_inquiry_result_with_rssi_evt
+> function just ignores the rssi value, and files the values of a normal
+> inquiry_info struct. Is there a plan for how the rssi values should be made
+> available to the user mode application calling ioctl with HCIINQURY? As far
+> as I can see there are now way for an application to get this value now.
 
--- 
-dwmw2
+go ahead and write a patch for the Bluetooth core to store the RSSI
+value so first it will be exported via /sys in the inquiry_cache. Then
+we can think about adding an ioctl that is capable of handling the RSSI
+values.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by Sleepycat Software
+Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to deliver
+higher performing products faster, at low TCO.
+http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
