@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Sean Barry" <sfelkes@hotmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Logitech Bluetooth  Mx900+keyboard support.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Terence Rudkin <trexx@pobox.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1074480891.2817.10.camel@localhost.localdomain>
+References: <1074457244.3254.17.camel@localhost.localdomain>
+	 <1074458664.6070.73.camel@pegasus>
+	 <1074480891.2817.10.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1074514935.6070.80.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY7-F59De03WTxKrbN00033084@hotmail.com>
-Subject: [Bluez-users] BlueZ on Linux iPAQ
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,41 +20,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 20 Jan 2004 02:48:11 +0000
+Date: Mon, 19 Jan 2004 13:22:15 +0100
 
-Hi,
+Hi Terence,
 
-Could anyone help me get BlueZ installed and configured on any of Familiar 
-v0.7, 0.7.1 or 0.7.2.  Ideally the latter I have a 3970 iPAQ which is not 
-able to access the Internet.  Thus far I have installed the following: -
+> Running it I get:
+>  
+>  trudkin Last rc=1  07:43:17 /space/Bluez
+>  $> ./hid2hci -0
+> Switching device 046d:c703 to HCI mode was successful
+>  trudkin Last rc=0  07:43:20 /space/Bluez
+>  $> ./hid2hci -0
+> Switching device 046d:c703 to HCI mode was successful
+>  trudkin Last rc=0  07:43:22 /space/Bluez
+>  $> ./hid2hci -1
+> No devices in HID mode found
+>  trudkin Last rc=1  07:43:26 /space/Bluez
+>  $>
+> I can set to HCI twice and cannot reset to HID.  Leads me to believe
+> that it did not take.  I think all the right mods are loaded and hcid is
+> running.
 
-bluez-modules-2.4.18-rmk3_2.1-1_arm.ipk
-task-bluez_1.3-hh1_arm.ipk
+do you have patched the USB HID driver?
 
-Task-bluez required some other ipkgs which I installed until task-bluez 
-install completed successfully.  However, when I install the Rococo 
-reference implementation of Java APIs in Bluetooth I get the following 
-error.
+Regards
 
-/mnt/hda # ipkg install impronto_1.1_arm.ipk
-ERROR: Cannot satisfy the following dependencies for impronto:
-         libbluetooth libsdp
+Marcel
 
-bluez-libs-2.0_0.9-hh1_arm.ipk is installed as is bluez-sdp_0.7-hh7_arm.ipk.
-
-Are these the right files? Where can I get the right files? I can switch the 
-BT radio on from GPE and perform hciconfig hci0, hcitool scan and hcitool 
-inquiry.  Do I need to install any BlueZ packages in Familiar v0.7.2.
-
-Please help me this problem is really bothering me.
-
-Regards,
-
-Sean
-
-_________________________________________________________________
-Tired of 56k? Get a FREE BT Broadband connection 
-http://www.msn.co.uk/specials/btbroadband
 
 
 
