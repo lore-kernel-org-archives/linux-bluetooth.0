@@ -1,12 +1,29 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41DC8010.7050600@debiancolombia.org>
-From: "Fredy P." <digitalfredy@debiancolombia.org>
-MIME-Version: 1.0
-To: <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain;
-	format=flowed;
-	charset=ISO-8859-1
-Subject: [Bluez-users] usb trendnet
+From: Jonathan Sass <jsass@magnifeye.com>
+Subject: Re: [Bluez-users] Source sample custom Bluetooth
+In-reply-to: <1104925461.4299.8.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+Message-id: <F0DB5022-5F75-11D9-8017-000D9348D4BE@magnifeye.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=US-ASCII; format=flowed
+References: <4dfd570904122402134ec2fd32@mail.gmail.com>
+ <4dfd570904122509237f2a2f48@mail.gmail.com> <1103995727.8758.31.camel@pegasus>
+ <4dfd570904122509451e811d7a@mail.gmail.com> <1103996976.8758.34.camel@pegasus>
+ <4dfd5709041225095410f71a46@mail.gmail.com> <1103997529.8758.36.camel@pegasus>
+ <4dfd570904122510081a9bfa7@mail.gmail.com>
+ <4dfd570904122510085371c17b@mail.gmail.com>
+ <4dfd57090412251011705f52be@mail.gmail.com>
+ <4dfd5709041225103246f6934c@mail.gmail.com> <1104000494.8758.46.camel@pegasus>
+ <002601c4ebb8$4de24200$020ba8c0@heejune> <1104125195.9393.12.camel@pegasus>
+ <BEB39C04-5B6A-11D9-8017-000D9348D4BE@magnifeye.com>
+ <1104604846.4253.1.camel@pegasus>
+ <FA69107A-5DAA-11D9-8017-000D9348D4BE@magnifeye.com>
+ <1104776407.8894.53.camel@pegasus>
+ <AFDBF1EE-5DB6-11D9-8017-000D9348D4BE@magnifeye.com>
+ <1104778613.8894.62.camel@pegasus>
+ <C17DB8CE-5E1A-11D9-8017-000D9348D4BE@magnifeye.com>
+ <1104839435.8894.86.camel@pegasus>
+ <6653F70C-5ECD-11D9-8017-000D9348D4BE@magnifeye.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,36 +35,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 Jan 2005 19:02:24 -0500
+Date: Wed, 05 Jan 2005 16:00:14 -0800
 
-Hello
+Thank you for your help.
 
-First tanks for your time and sorry my bad english (i speak in spanish)
-
-I read the HW compatible list, and no is in it usb trendnet adapters, is=20
-becouse are no tested or becouse are no soported?
-
-I read the user and developer list archives whit the word trendnet and i=20
-no get information.
-
-I neds buy a usb adapter, the trendent TBW-102UB have 1000m, buy it?
-are any other 100m tested in linux?
-
-tanks and again sorry my bad english.
-
-bye
+Progress. I have now made a connection using hci_create_connection. My 
+final task for this device is to read data. Thats all, just read. I am 
+looking for some hci_read command? My hunt continues.
 
 
---=20
-Suerte and F.S.Fv.
+On Jan 5, 2005, at 3:44 AM, Marcel Holtmann wrote:
 
-ATT: Fredy P.
-___________________________________________________
-F.S.Fv. es acr=F3nimo de Free Software Forever
-http://www.fsf.org/philosophy/free-sw.es.html
+> Hi Jonathan,
+>
+>> I have looked at the hcitool.c program and I am stuck by my lack of
+>> understanding. The cmd_cmd seems like what I want to do to read data
+>> from my custom device. What I want to do is given a device address, I
+>> want to read bytes from it and occasionally write to it.  Is there a
+>> code fragment that you can point me to?
+>
+> the HCI raw socket uses H4 as protocol with one packet per read or 
+> write
+> operation. The cmd_cmd() is not what you want, because you wanna send
+> data packets and not a HCI command.
+>
+>>  From the person who wrote the stack on our device.
+>>
+>> This is a connect device with a ACL DH5 packet type. The transfers are
+>> standard ACL L2CAP packets from the remote. The remote appears to the
+>> host as a master device, pushing down ACL packets when a button is
+>> pressed.
+>
+> So do it uses L2CAP or not? However if not, why don't you get your
+> device fixed to response to L2CAP. Relying on ACL data packets is not
+> the best idea to get this working reliable.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> The SF.Net email is sponsored by: Beat the post-holiday blues
+> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
-Normas b=E1sicas de comportamiento en el ciberespacio
-http://www.netiqueta.org/
 
 
 -------------------------------------------------------
