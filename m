@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hciattach killed
+Subject: Re: [Bluez-devel] Bluez on Axis DevBoard 82
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
+To: Tobias Sprafke <webmaster@baxter-net.de>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <AFE91B59A185A5439840B43AB79190470938E8@mchp997a.mch.sbs.de>
-References: <AFE91B59A185A5439840B43AB79190470938E8@mchp997a.mch.sbs.de>
+In-Reply-To: <DGELJAKAPGMFDACACGBEGEHNCCAA.webmaster@baxter-net.de>
+References: <DGELJAKAPGMFDACACGBEGEHNCCAA.webmaster@baxter-net.de>
 Content-Type: text/plain
-Message-Id: <1078326250.2787.128.camel@pegasus>
+Message-Id: <1078323872.2787.105.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,27 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 03 Mar 2004 16:04:11 +0100
+Date: Wed, 03 Mar 2004 15:24:32 +0100
 
-Hi Matthias,
+Hi Tobias,
 
-> we use the latest available bluez-modules on a 2.4.21
-> kernel with the latest available patch.
-
-my fault. I meant what kind of Bluetooth module do you use?
-
-> OK, we did some changes in the hciattach, because we do 
-> weired things like attaching a BT Chip that has no EPROM.
-> so we have to tell the device its MAC address with 
-> "hciattach ttyS0 <special> 115200 <MAC>"
+> we need help to compile and install Bluez on the Axis Devboard 82 with a
+> cross-compiler.
 > 
-> But we think, the Ctrl-C problem isnt due to our changes, 
-> we only adapted the initialisation of the chip, like demanded
-> by the chip. 
+> The DevBoard-Software is running on our computer and we flashed the new
+> kernel on the DevBoard successful.
+> 
+> We solved the kernel part of bluez as well, but we don't know, how to
+> configure and install the other parts.
 
-Show us the code and we will see what you have done. If you really
-changed so much then go back and try it with a standard Bluetooth module
-and see if it also shows the same problems.
+what are you talking about? What do you have solved?
+
+> We need the packages bluez-libs, -utils, -sdp and -pan on the DevBoard.
+> 
+> Can somebody give as an example for how to compile such a package with
+> cris-gcc?
+
+In general it should be enough to set some environment variables like CC
+and LD and then call configure with it.
+
+	env CC="cris-gcc" LD="cris-ld" ./configure
 
 Regards
 
