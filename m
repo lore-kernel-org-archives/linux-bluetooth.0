@@ -1,49 +1,36 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: serguei@ntlworld.com
-Reply-To: sergei@stams.strath.ac.uk
-To: bluez-users@lists.sourceforge.net
+Return-Path: <krose+bluez@krose.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] AMD64 HID pairing
+References: <khnacuya23u.fsf@hunter-killer.kendall.corp.akamai.com>
+	<1097185188.7325.75.camel@pegasus>
+	<khnr7oa8ah1.fsf@hunter-killer.kendall.corp.akamai.com>
+	<1097186322.7325.79.camel@pegasus>
+From: Kyle Rose <krose+bluez@krose.org>
+Date: Thu, 07 Oct 2004 18:07:06 -0400
+In-Reply-To: <1097186322.7325.79.camel@pegasus> (Marcel Holtmann's message of
+	"Thu, 07 Oct 2004 23:58:42 +0200")
+Message-ID: <khnk6u289o5.fsf@hunter-killer.kendall.corp.akamai.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200410080116.49621.serguei@ntlworld.com>
-Subject: [Bluez-users] Bluetooth headphone profile?
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 8 Oct 2004 01:16:49 +0100
+Content-Type: text/plain; charset=us-ascii
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi, everybody!
-Does anyone has an experience in setting bluetooth headphones in linux? I 
-browsed a lot of sites but, alas, found no info on headphones... ;-(
-I own EPoX BT-HS01 and was able to make it recognised by my vaio Z1XSP
+Marcel Holtmann <marcel@holtmann.org> writes:
 
-[root@istra dev]# l2ping 00:0D:FD:00:FB:70
-Ping: 00:0D:FD:00:FB:70 from 08:00:46:CA:78:7B (data size 20) ...
-44 bytes from 00:0D:FD:00:FB:70 id 200 time 48.87ms
-44 bytes from 00:0D:FD:00:FB:70 id 201 time 27.28ms
-44 bytes from 00:0D:FD:00:FB:70 id 202 time 33.28ms
+> If this is a Debian system then hid2hci will normaly run a boot time and
+> switch it from HID to HCI mode.
 
-But what to do next? How to switch to headphone profile so to make audio 
-transfered to the headphone and to get its mic input in?
-The idea is to use the headphone with IP telephony such as www.skype.com - 
-highly recommended!
+You are correct, and this is being run at boot time.  However, I don't
+think this does anything interesting in my case since I have USB
+legacy support disabled in my BIOS as I have only a bluetooth mouse
+and not a bluetooth keyboard, the former of which I don't need until
+after Linux boots.
 
-Thanks in advance!
+> Then use "-x". I think the "-X" option was introduced with 1.11 or so
+> and the Debian packages are a little bit behind.
 
+I'll have to do this when I get home, so I can move the mouse around
+and see what I get.
 
--------------------------------------------------------
-This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
-Use IT products in your business? Tell us what you think of them. Give us
-Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
-http://productguide.itmanagersjournal.com/guidepromo.tmpl
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Thanks,
+Kyle
