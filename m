@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] obex receive and send
+Subject: Re: [Bluez-users] Creating programs with Bluez Libraries..
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY1-F310A1CD35223F76609F8B9C1B90@phx.gbl>
-References: <BAY1-F310A1CD35223F76609F8B9C1B90@phx.gbl>
+In-Reply-To: <BAY21-F1269792B015AEB1770DB46DBB90@phx.gbl>
+References: <BAY21-F1269792B015AEB1770DB46DBB90@phx.gbl>
 Content-Type: text/plain
-Message-Id: <1101423205.6465.22.camel@pegasus>
+Message-Id: <1101423016.6465.16.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Nov 2004 23:53:25 +0100
+Date: Thu, 25 Nov 2004 23:50:16 +0100
 
-Hi,
+Hi Luis,
 
-> I am doing some probes with obex_test and obextool.
-> 
-> With obextool i only send files to the other device, but i can't receive 
-> files.
-> 
-> Why?
+> My name is Luis Amaral and this is my first post to this mailing list.
+> I am startting a project using some Bluetooth USB Dongles (concemptronic) 
+> and i need to creat programs to communicate between them.
+> How can i use the BlueZ libraries? Is it enought to include them in my 
+> "main" program? If anyone have some simple example of a program using this 
+> libraries to communicate between two dongles (or other bluetooth devides), 
+> it may help me to get started is this subject.
 
-I think because it is not implemented yet.
-
-> and with obex_test I try connection between two linux PC and don't connect.
-
-It is a test program. So it might not work or you use it wrong. What
-about error message, hcidump etc.?
+make yourself clear what you mean by communication and then look at the
+example codes in the bluez-utils/test/ directory. Bluetooth programming
+is about socket programming.
 
 Regards
 
