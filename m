@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <dd1169670407291459738f97f8@mail.gmail.com>
-From: Josh Goldsmith <kd7spq@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1091127403.12651.130.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] Typo in pcmcia/bluetooth.conf
+Subject: [Bluez-devel] Removing the RPM spec files
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,19 +15,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Jul 2004 14:59:22 -0700
+Date: Thu, 29 Jul 2004 20:56:43 +0200
 
-Howdy,
+Hi Folks,
 
-  There looks to be a typo in bluetooth.conf on line #30 for both v2.8
-and 2.9.
+with my announcement of the bluez-libs-2.9 and bluez-utils-2.9 I forgot
+to mention that I removed the RPM spec files from the source packages. I
+got sick of maintained them in a source distribution and so I created a
+CVS packages repository for that. Every package maintainer can put their
+specific files at that place in the CVS. Also build scripts are welcome.
 
-#29  card "AmbiCom BT2000C Bluetooth PC/CF Card"
-#30    version ""AmbiCom BT2000C", "Bluetooth PC/CF Card"
-                    ^^
-  Thanks for the great software!
+Regards
 
--Josh
+Marcel
+
+
 
 
 -------------------------------------------------------
