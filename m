@@ -1,39 +1,68 @@
-Return-Path: <DVornheder@t-online.de>
-From: DVornheder@t-online.de (Dirk Vornheder)
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-users] Problem with connection between two pc using bluetooth
-Date: Sun, 15 Feb 2004 13:12:56 +0100
-References: <1ArCh7-0SGjjc0@cmpmail09.bbul.t-online.de> <200402131919.56303.dvornheder@t-online.de> <1076697866.2671.210.camel@pegasus>
-In-Reply-To: <1076697866.2671.210.camel@pegasus>
-Cc: bluez-users@lists.sourceforge.net
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Marc-Andre Laverdiere-Papineau <m_laverd@alcor.concordia.ca>
+To: jawbt@yahoogroups.com, <bluez-users@lists.sourceforge.net>
+Message-ID: <Pine.OSF.4.44.0402141959300.358746-100000@alcor.concordia.ca>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-15"
-Message-Id: <200402151312.56479.dvornheder@t-online.de>
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] Major slowdown when service discovery+opening a service happens on
+ two systems trying to talk to each other
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 14 Feb 2004 20:20:41 -0500 (EST)
+
+Hello all!
+
+I'm working on an application where every Bluetooth device is trying to
+scan for every other one around, and check if it runs my custom service.
+At the same time, said service is running in another thread, waiting to be
+connected to.
+
+I am using Rococo with Bluez. Kernel RH2.4.28, latest version of BlueZ.
+Belkin FT003 dongles.
+
+When I have one computer having the service opened+performing the scan,
+while the other just performs the scan, things go fine. The scans are
+timely and I can send a message.
+
+However, then I have both computers running the service+the service scan,
+things slow down to a crawl. Actually, it depends on its mood.
+ It can take a full minute to have a device scan and a service scan
+completing, or less than 20 seconds! Sometimes, computer a  will be able
+to detect computer b, while B still shows no sign of life.
+
+On top of things, if I manage to get it to send a message to its peer, the
+peer will get an Exception :( I was able to fix this by preventing the
+application from doing a service scan at the moment it would send, but
+that didn't fix the weird behaviour on service discovery. This hackaround
+is not sturdy and I don't like it as a general thing.
+
+Has such thing ever happened to any of you? What can I do to fix it?
+
+It looks like Bluetooth won't let me open a connection while doing a
+service scan. Is there limitations on what can be running simultaneously?
+It looks like service scan + opening connections is no good. Should I
+know other ones like that?
+
+Thanks
+
+MA
 
 
-> Hi Dirk,
->
-> > After using
-> >
-> > pand --connect 00:04:0E:85:35:15
-> >
-> > instead of
-> >
-> > pand --search
-> >
-> > on both pc's everything works fine.
->
-> looks like a role switch or scatternet problem. If you are using
-> connect, there is no inquiry and no SDP request. Is the firmware on the
-> AP-ISDN the latest?
->
-> Regards
->
 
-Yes.
-
-03.18.17 is the latest.
-
-Dirk
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
