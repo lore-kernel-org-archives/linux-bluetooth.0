@@ -1,370 +1,100 @@
-Return-Path: <r.pruen@btinternet.com>
-Message-ID: <017401c423ef$72767be0$0000fea9@RICHARDP>
-From: "Richard Pruen" <r.pruen@btinternet.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Cc: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
-References: <008601c4200c$4c75ee30$0000fea9@RICHARDP> <1081777025.5398.115.camel@pegasus>
-Subject: Re: [Bluez-users] Using BlueZ for network access via ppp does notwork, nothing at all in log files
-Date: Fri, 16 Apr 2004 21:14:37 +0100
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+Return-Path: <jeanplord@videotron.ca>
+Date: Thu, 15 Apr 2004 21:17:47 -0400
+From: Jean-Pierre Lord <jeanplord@videotron.ca>
+Subject: Re: [Bluez-users] Connection dropped or cannot connect
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Message-id: <000601c42350$a1aa60b0$0100a8c0@terre>
+MIME-version: 1.0
+Content-type: text/plain; charset=iso-8859-1
+References: <000801c41e98$9e75d080$0100a8c0@terre>
+ <1081592935.3028.3.camel@pegasus>
 List-ID: <bluez-users.lists.sourceforge.net>
 
+Thank you for your quick reply, Marcel...and sorry for being so slow to
+answer.
+
+----- Original Message ----- 
 From: "Marcel Holtmann" <marcel@holtmann.org>
+To: "Jean-Pierre Lord" <jeanplord@videotron.ca>
+Cc: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
+Sent: Saturday, April 10, 2004 6:28 AM
+Subject: Re: [Bluez-users] Connection dropped or cannot connect
 
 
-Hello Marcel,
+> Hi Jean-Pierre,
+>
+> > My Linux box has a Anycom usb-220 bluetooth adapter connected to it
+> > which is used to serve my iPAQ1940.  Works "superbly great" except
+> > those times it won't work at all ;-).  Either a long connection (like
+> > a download) will be cut or i will not be able to open a new
+> > connection.  When it happens, i have 2 choices: unplung the bluetooth
+> > adapter for a few seconds (which requires no other intervention on the
+> > software side) and replug it or reset the device using hciconfig.
+> > Except that doing this reset will sometimes crash the hole Linux box.
+> > I then get a stack dump and once i got a message that looked like
+> > this: "...killing interrupt handler...".  Sorry i wasn't fast enough
+> > to write down the message.
+>
+> this message is important and you should try to get it over a serial
+> console. Please try a 2.4.25-mh3 or a 2.4.26-rc2. Maybe there is already
+> a fix for it.
+>
+You're right, you need the message and i was able to get one.  I had 2 other
+crashes, this time only by insisting to connect.  By insisting i mean
+turning on the bluetooth on the iPaq and try to connect, turn it off, retry
+and so on a few times.
 
-> Without any logfiles or hcidump or any other clues, how should we find
-> your problem.
+Here are the dump details:
 
-I still don't have any output from logfiles, nothing is written except the
-following when dund is started: Apr 14 22:30:19 linux dund[29905]: DUN
-daemon ver 1.1
+Unable to handle kernel paging request at virtual address 413e3344
+Oops: 0000
+CPU: 0
+EIP: 0010:[<c485920e>] not tainted
+EFlags: 00010086
 
-hcidump follows....
+eax: c1747180 ebx: c1747140 ecx: 01747180 edx: 01747180
+esi: 413e333c edi: c2dca000 ebp: c1745000 esp: c02a9f10
+ds: 0018 es:0018 ss: 0018
 
-Sorry for the late reply, but I have had the week from hell at work.
+Process swapper (pid: 0, stackpage = c02a9000)
 
-Richard
+stack: c1838f20 c1747180 c1747200 0 0 c2dcac08 00084000 00000282 1 0
+c011973b 1 c1745000 c4851000 1 4 c485a38a c1745000 0 c1db1a80 04000001 f
+c02a9fb0 c01081fa
 
-HCIDump - HCI packet analyzer ver 1.8
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request(0x04) plen 10
-< HCI Command: Accept Connection Request(0x01|0x0009) plen 7
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Link Key Request(0x17) plen 6
-< HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
-> HCI Event: Command Complete(0x0e) plen 10
-> HCI Event: Connect Complete(0x03) plen 11
-< HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
-> HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
-> HCI Event: Command Complete(0x0e) plen 6
-< HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
-> HCI Event: Max Slots Change(0x1b) plen 3
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Connection Packet Type Changed(0x1d) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x006c
-< ACL data: handle 0x0029 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x006c result 0 status 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
-    MTU 4096
-< ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x006c flags 0x0000 result 0 clen 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x006c flags 0x0000 clen 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
-> ACL data: handle 0x0029 flags 0x02 dlen 17
-> ACL data: handle 0x0029 flags 0x01 dlen 17
-> ACL data: handle 0x0029 flags 0x01 dlen 2
-    L2CAP(d): cid 0x40 len 32 [psm 1]
-        SDP SSA Req: tid 0x0 len 0x1b
-          pat uuid-128 0x1103 (DUN)
-          max 0xff8
-          aid(s) 0x0004 (ProtocolDescList)
-          cont 00
-< ACL data: handle 0x0029 flags 0x02 dlen 33
-    L2CAP(d): cid 0x6c len 29 [psm 1]
-        SDP SSA Rsp: tid 0x0 len 0x18
-          cnt 0x15
-          srv rec #0
-            aid 0x0004 (ProtocolDescList)
-               < < uuid-16 0x0100 (L2CAP) > <
-               uuid-16 0x0003 (RFCOMM) uint 0x1 > >
+call trace: [<c011973b>] [<c485a38a>] [<c01081fa>] [<c010837d>] [<c0105250>]
+[<c010a788>] [<c0105250>] [<c0105274>] [<c01052e2>] [>c0105000>]
 
-          cont 00
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x006d
-< ACL data: handle 0x0029 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x006d result 0 status 0
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x006c
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x006c
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0041 flags 0x0000 clen 0
-< ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x006d flags 0x0000 result 0 clen 0
-< ACL data: handle 0x0029 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x006d flags 0x0000 clen 4
-    MTU 1024
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x0000 result 0 clen 0
-> ACL data: handle 0x0029 flags 0x02 dlen 8
-    L2CAP(d): cid 0x41 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-< ACL data: handle 0x0029 flags 0x02 dlen 8
-    L2CAP(d): cid 0x6d len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 18
-    L2CAP(d): cid 0x41 len 14 [psm 3]
-      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
-      dlci 2 frame_type 0 credit_flow 15 pri 32 ack_timer 0 frame_size 127
-max_retrans 0 credits 7
-< ACL data: handle 0x0029 flags 0x02 dlen 18
-    L2CAP(d): cid 0x6d len 14 [psm 3]
-      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
-      dlci 2 frame_type 0 credit_flow 14 pri 32 ack_timer 0 frame_size 127
-max_retrans 0 credits 7
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 8
-    L2CAP(d): cid 0x41 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59
-< ACL data: handle 0x0029 flags 0x02 dlen 8
-    L2CAP(d): cid 0x6d len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6d len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6d len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 0 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6d len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 0 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 9
-    L2CAP(d): cid 0x6d len 5 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 33
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6d len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 13
-    L2CAP(d): cid 0x41 len 9 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 1 ilen 4 fcs 0x86 credits 1
-> ACL data: handle 0x0029 flags 0x02 dlen 11
-    L2CAP(d): cid 0x41 len 7 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 3 fcs 0x9a
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 4 fcs 0x9a
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 0 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6d len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 0 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6d len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 4 fcs 0x9a
-< ACL data: handle 0x0029 flags 0x02 dlen 8
-    L2CAP(d): cid 0x6d len 4 [psm 3]
-      RFCOMM(s): DISC: cr 0 dlci 2 pf 1 ilen 0 fcs 0xd9
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x006d
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x006d
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x006e
-< ACL data: handle 0x0029 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x006e result 0 status 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
-    MTU 4096
-< ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x006e flags 0x0000 result 0 clen 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x006e flags 0x0000 clen 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
-> ACL data: handle 0x0029 flags 0x02 dlen 36
-    L2CAP(d): cid 0x40 len 32 [psm 1]
-        SDP SSA Req: tid 0x0 len 0x1b
-          pat uuid-128 0x1103 (DUN)
-          max 0xff8
-          aid(s) 0x0004 (ProtocolDescList)
-          cont 00
-< ACL data: handle 0x0029 flags 0x02 dlen 33
-    L2CAP(d): cid 0x6e len 29 [psm 1]
-        SDP SSA Rsp: tid 0x0 len 0x18
-          cnt 0x15
-          srv rec #0
-            aid 0x0004 (ProtocolDescList)
-               < < uuid-16 0x0100 (L2CAP) > <
-               uuid-16 0x0003 (RFCOMM) uint 0x1 > >
+Code 83 7e 08 01 74 06 f6 47 18 04 74 3c 8b 03 c1 e8 1c 83 f8 0d
 
-          cont 00
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x006f
-< ACL data: handle 0x0029 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x006f result 0 status 0
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x006e
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x006e
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0041 flags 0x0000 clen 0
-< ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x006f flags 0x0000 result 0 clen 0
-< ACL data: handle 0x0029 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x006f flags 0x0000 clen 4
-    MTU 1024
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x0000 result 0 clen 0
-> ACL data: handle 0x0029 flags 0x02 dlen 8
-    L2CAP(d): cid 0x41 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-< ACL data: handle 0x0029 flags 0x02 dlen 8
-    L2CAP(d): cid 0x6f len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> ACL data: handle 0x0029 flags 0x02 dlen 18
-    L2CAP(d): cid 0x41 len 14 [psm 3]
-      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
-      dlci 2 frame_type 0 credit_flow 15 pri 32 ack_timer 0 frame_size 127
-max_retrans 0 credits 7
-< ACL data: handle 0x0029 flags 0x02 dlen 18
-    L2CAP(d): cid 0x6f len 14 [psm 3]
-      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
-      dlci 2 frame_type 0 credit_flow 14 pri 32 ack_timer 0 frame_size 127
-max_retrans 0 credits 7
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 8
-    L2CAP(d): cid 0x41 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59
-< ACL data: handle 0x0029 flags 0x02 dlen 8
-    L2CAP(d): cid 0x6f len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6f len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6f len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 9
-    L2CAP(d): cid 0x6f len 5 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 33
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 0 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6f len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 0 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6f len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 13
-    L2CAP(d): cid 0x41 len 9 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 1 ilen 4 fcs 0x86 credits 1
-> ACL data: handle 0x0029 flags 0x02 dlen 11
-    L2CAP(d): cid 0x41 len 7 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 3 fcs 0x9a
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 4 fcs 0x9a
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 0 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6f len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 0 rtr 1 ic 0 dv 0 b1 1 b2 1 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x6f len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 1 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x41 len 8 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 4 fcs 0x9a
-< ACL data: handle 0x0029 flags 0x02 dlen 8
-    L2CAP(d): cid 0x6f len 4 [psm 3]
-      RFCOMM(s): DISC: cr 0 dlci 2 pf 1 ilen 0 fcs 0xd9
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x006f
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x006f
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-< HCI Command: Disconnect(0x01|0x0006) plen 3
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Disconn Complete(0x05) plen 4
+<0> Kernel panic: Aiee killing interrupt handler!
+Interrupt handler - not syncing
+
+That's it!
+I will move to 2.4.26rc2 (or better).  I will also install the patches you
+may have for this kernel (i haven't check yet).
+
+> > I'm running "Kernel 2.4.24-mh2 on an i586" with bluez-libs-2.5,
+> > bluez-sdp-1.5, bluez-utils-2.5.  I normally run hcid, sdpd, "dund
+> > --listen --msdun call dun".  It seems to me that enabling
+> > authentification and encryption has made the whole thing less
+> > reliable.
+>
+> Setting auth and encrypt switches to security mode 3 which is not what
+> your really want.
+>
+May be.  What i want is making sure no uninvited party connects to my Linux
+server.  I also feel at ease knowing the communications are not easy to
+sniff.  But may be i am a bit to paranoid.  Especially considering that
+Bluetooth is definitly not popular here in Montreal.
+
+I will chech for another way to put a minimum of protection.
+
+Merci!
+
+> Regards
+>
+> Marcel
+>
+>
