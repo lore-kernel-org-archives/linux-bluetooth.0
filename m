@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <41E853A9.5030304@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: Paul Ionescu <i_p_a_u_l@yahoo.com>
-Message-ID: <pan.2005.01.14.23.44.15.944533@yahoo.com>
-References: <pan.2005.01.14.17.46.40.72959@yahoo.com> <41E853A9.5030304@xmission.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Re: btsco and Jabra BT 110 experience
+Subject: Re: [Bluez-users] btsco and Jabra BT 110 experience
+References: <pan.2005.01.14.17.46.40.72959@yahoo.com>
+In-Reply-To: <pan.2005.01.14.17.46.40.72959@yahoo.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,50 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 15 Jan 2005 00:44:18 +0100
+Date: Fri, 14 Jan 2005 16:20:09 -0700
 
-Hi Brad,
+Paul,
 
-I appended some info bellow.
-For some reason, btsco does not work with specified channel, but btsco2
-does.
+> So, here is some feedback about using btsco with this headset:
+> To connect btsco to the device, i have to press the talk/answer button on
+> the headset, and fire btsco on channel 2 which is headset profile, because
+> it seems that by default it connects to channel 1 which is handsfree
+> profile and does not work too reliably (sometime it just disconnects).
 
-here is the info without specified channel:
- ./btsco 00:07:A4:1D:FB:56
-Device is 1:0
-Voice setting: 0x0060
-RFCOMM channel 1 connected
-recieved AT+CKPD=200
-opened hwdep
-connected SCO channel
-Setting sco fd
-Done setting sco fd
-recieved AT+VGS=15
-Sending up speaker change 15
+it sounds like you're saying the automatic channel detection incorrectly 
+chooses channel 1 instead of 2. can you tell me what btsco prints out 
+when it's launched without the channel specified?
 
-
-and with specified channel (using btsco2 as btsco does not work here):
- ./btsco2 00:07:A4:1D:FB:56 2
-Device is 1:0
-Voice setting: 0x0060
-RFCOMM channel 2 connected
-recieved AT+BRSF=24
-recieved AT+CIND=?
-opened hwdep
-connected SCO channel
-Setting sco fd
-Done setting sco fd
-
-
-
-On Fri, 14 Jan 2005 16:20:09 -0700, Brad Midgley wrote: 
-> it sounds like you're saying the automatic channel detection incorrectly
-> chooses channel 1 instead of 2. can you tell me what btsco prints out when
-> it's launched without the channel specified?
-> 
-> Brad
-
-
+Brad
 
 
 -------------------------------------------------------
