@@ -1,25 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Logitech Bluetooth  Mx900+keyboard support.
+Subject: Re: [Bluez-users] epox-presenter
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Terence Rudkin <trexx@pobox.com>
-Cc: Olivier Bornet <Olivier.Bornet@puck.ch>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1075326261.1793.49.camel@localhost.localdomain>
-References: <1074457244.3254.17.camel@localhost.localdomain>
-	 <1074458664.6070.73.camel@pegasus>
-	 <1074480891.2817.10.camel@localhost.localdomain>
-	 <1074514935.6070.80.camel@pegasus>
-	 <1074568150.7831.5.camel@localhost.localdomain>
-	 <20040120081245.GA1871@smartdata.ch>  <1074597908.7088.5.camel@pegasus>
-	 <1075234547.3064.13.camel@localhost.localdomain>
-	 <1075276833.12766.56.camel@pegasus>
-	 <1075306699.1793.38.camel@localhost.localdomain>
-	 <1075307541.26729.18.camel@pegasus>
-	 <1075315567.1793.44.camel@localhost.localdomain>
-	 <1075317417.26729.37.camel@pegasus>
-	 <1075326261.1793.49.camel@localhost.localdomain>
+To: Rob Davis <rob.davis@virgin.net>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <401830B2.5070407@virgin.net>
+References: <4017F953.1090108@virgin.net>
+	 <1075314868.26729.34.camel@pegasus>  <401830B2.5070407@virgin.net>
 Content-Type: text/plain
-Message-Id: <1075354762.26729.51.camel@pegasus>
+Message-Id: <1075355198.26729.58.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -31,16 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 29 Jan 2004 06:39:22 +0100
+Date: Thu, 29 Jan 2004 06:46:38 +0100
 
-Hi Terence,
+Hi Rob,
 
-> Patch works fine.  But if neither path exist then it will silently
-> fail.  while not having /dev/usb should not be an issue, but ya never
-> know.  Presetting err to -1 resolves this. 
+> Okay, my first ever C hack...
 
-I included this fix an committed it to the CVS. Everything should now
-work fine. Thanks.
+no problem, because everyone has to start sometime :)
+
+> Implemented three functions, back button triggers mouse button 4, next 
+> button triggers mouse button 5, fn button triggers a keyboard alt + tab, 
+> which changes window focus in kde, and probably gnome.
+> 
+> I have also reduced the speed of the pointer from 12 to 4, which I am 
+> much happier with as I have a hope of landing on the correct window.
+
+Can we get some command options to change this behaviour?
+
+> Sorry, I'm not sure how to do patch, but the file is small...
+
+take a look at "man diff" and do "diff -urN <orig> <modified>". It is
+much more easier for me to look at a patch, because in most cases only
+the changes matters.
 
 Regards
 
