@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] How can I use Bluez with 460800 kbps
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Daniel Moraes <ra002890@itelefonica.com.br>
+To: Brad Midgley <bmidgley@xmission.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4054022B.8090100@itelefonica.com.br>
-References: <4054022B.8090100@itelefonica.com.br>
+In-Reply-To: <40552815.3060307@xmission.com>
+References: <40552815.3060307@xmission.com>
 Content-Type: text/plain
-Message-Id: <1079350483.3405.14.camel@pegasus>
+Message-Id: <1079350298.3405.9.camel@pegasus>
 Mime-Version: 1.0
+Subject: [Bluez-users] Re: add toshiba_acpi to devices.html
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 15 Mar 2004 12:34:43 +0100
+Date: Mon, 15 Mar 2004 12:31:38 +0100
 
-Hi Daniel,
+Hi Brad,
 
-> I would like to know if anybody here could use bluetooth casira with the 
-> serial with speeds like 460800.
-> I have to configure linux serial?!? What program I can use to do that?!?
+> I would suggest you add another entry to devices.html for acpi-only 
+> toshiba laptops. I can at least confirm it works on the m200:
+> 
+> Toshiba Portege M200 / ? / 1.1 / hci_usb + toshiba_acpi / Working / Brad 
+> Midgley
+> 
+> For the toshiba_acpi link, you could link to 
+> http://www.sfires.net/toshiba/ or put together your own toshiba_acpi 
+> page and mention the sfires kernel patch.
 
-if you have a serial port that can do high speeds than you only have to
-give hciattach the right baud rate.
-
-> And How can I transmit bits via rfcomm?!? I get a tutorial, but it 
-> didn't worked well!!  Does anybody have a good tutorial, or a rapid 
-> solution for me?!?
-
-This is RFCOMM socket programming. Look at my latest slides or take a
-look at attest.c from the bluez-utils package.
+I put a note on my Thoshiba page that dmabt don't works on an ACPI
+kernel and of course a link to that toshiba_acpi site.
 
 Regards
 
