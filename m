@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Disconnections are not being detected.
+Subject: Re: [Bluez-devel] hci_usb bug on 2.6 kernels?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Vlad <vkorolev@nist.gov>
+To: Andronikos Nedos <nedosa@cs.tcd.ie>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <loom.20040827T021529-764@post.gmane.org>
-References: <loom.20040820T185934-862@post.gmane.org>
-	 <1093073294.3544.12.camel@notepaq>
-	 <003f01c48755$3dfe6a70$0301a8c0@zazoumobile>
-	 <1093083055.3650.7.camel@notepaq> <loom.20040827T021529-764@post.gmane.org>
+In-Reply-To: <412EF0FF.4070200@cs.tcd.ie>
+References: <412EF0FF.4070200@cs.tcd.ie>
 Content-Type: text/plain
-Message-Id: <1093606399.2581.101.camel@pegasus>
+Message-Id: <1093605294.2581.88.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,36 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 27 Aug 2004 13:33:20 +0200
+Date: Fri, 27 Aug 2004 13:14:54 +0200
 
-Hi Vlad,
+Hi Andronikos,
 
-> But the official L2CAP specification.  (Version 1.1) says (page 288):
+> When I recently migrated to a 2.6 kernel, my TDK USB bluetooth adapter
+> stopped working. I could load all the modules fine, but as soon as I
+> start hcid I got the following error:
 > 
-> 	Result: 2 octets The result field indicates the outcome of
-> 	the connection request. The result value of 0x0000 indicates
-> 	success while a non-zero value indicates the connection request
-> 	failed or is pending. A logical channel is established on the
-> 	receipt of a successful result. Table 5.5 defines values for
-> 	this field. If the result field is not zero. The DCID and SCID
-> 	fields should be ignored when the result field indicates the
-> 	connection was refused.
+> Aug 12 10:23:33 mulligans hci_usb_intr_rx_submit: hci0 intr rx submit
+> failed urb f744f5ec err -28
 > 
-> So although the BlueZ behavior is correct from common sense perspective,
-> but it is not correct from the specification perspective. I am not sure
-> what does version 1.2 of the spec say about this subject.
+> I've tried a few of the latest kernels, mainly 2.6.7 and the 2.6.8-rc
+> series and the problem remained.
+> 
+> Yesterday though, I switched my TDK from the USB2 controller to a USB1.1
+> ~ controller and it worked.
 
-it is still the same for the 1.2 specification, but it is simply wrong
-and stupid. You need at least the SCID to match the connect response to
-a previous connect request. Otherwise this response is meaningless.
-
-What we did wrong is sending the command reject for a response. I will
-fix this, but this won't fix your problem. If we don't know for what
-L2CAP channel we get a connection refused response, we can't do anything
-else then waiting for a timeout event.
-
-Check the bluetooth.org pages if they had an erratum for that and if not
-ping them to correct it. Also write to SE about that.
+this is weird, because error code 28 means ENOSPC (No space left on
+device) and this is because of a bandwidth problem. May you wanna try to
+disable CONFIG_USB_BANDWIDTH and see if it works then. Please report
+this problem to the USB mailing list (no cross post), because I can't
+really help here.
 
 Regards
 
