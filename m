@@ -1,45 +1,41 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Vladimeros Vladimerou <vladimer@students.uiuc.edu>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <Pine.GSO.4.31.0405141228510.13007-100000@ux7.cso.uiuc.edu>
+Return-Path: <pmarques@grupopie.com>
+Message-ID: <40A4D03D.3060701@grupopie.com>
+Date: Fri, 14 May 2004 14:57:17 +0100
+From: Paulo Marques <pmarques@grupopie.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] l2cap and multiple connections
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 14 May 2004 12:36:48 -0500 (CDT)
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Matthias Thomae <bluez@thomae-privat.de>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] PAN and bridge problem when bnep0 disconnects	before bnep1
+References: <40A27A5C.4080603@thomae-privat.de> <1084398131.25099.115.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Greetings everyone,
- I'm trying to achieve multiple l2cap channels/connections (1 master to 5
-slaves). I'm wondering if anyone knows the method off-hand, so that I
-won't have to look into library and kernel source. I was naively
-trying to bind several sockets to the same address, after issuing a
-"setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));" but
-even if this call returns "Success", the next bind() returns
-"Address already in use". How is this conventionally done?
-Do I have to step down to HCI?
- I'm also wondering if l2cap is the fastest way to send a custom 64-byte
-message to 5 clients (real-time application). Has anyone used SCO for
-such a purpose?
- thanks in advance,
-  -Vlad.
+>>
+>>If bnep1 disconnects before bnep0, no problem.
+>>
 
+I had a similar problem a while ago (it was a 2.4.xx kernel, didn't try a 2.6 
+kernel yet).
 
+The problem was that the bridge interface borrowed the mac address from one of 
+the interfaces attached to it.
 
--------------------------------------------------------
-This SF.Net email is sponsored by: SourceForge.net Broadband
-Sign-up now for SourceForge Broadband and get the fastest
-6.0/768 connection for only $19.95/mo for the first 3 months!
-http://ads.osdn.com/?ad_id=2562&alloc_id=6184&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+When this interface disconnected, the bridge would start using the MAC from some 
+other interface. Because of this, other computers on the network, relying on 
+their arp cache, could not contact the bridge any more.
+
+I tried "arp-pinging" the network to announce the new mac, but couldn't make it 
+work. (maybe I was doing something wrong)
+
+I eventually gave up, without finding any solution.
+
+As I said, I didn't try kernel 2.6. I remember reading somewhere that there was 
+a new kernel internal API to get a "valid" random MAC address and that the 
+bridging code was using it, but I'm not sure I didn't got it wrong.
+
+Just my 2 cents,
+
+-- 
+Paulo Marques - www.grupopie.com
+"In a world without walls and fences who needs windows and gates?"
