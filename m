@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5f30e2610412090850b7f5f85@mail.gmail.com>
-From: Jeff Wilson <jazzbotley@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] libs upgrading
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <cp9uj3$es1$1@sea.gmane.org>
+References: <cp9uj3$es1$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1102610726.9988.235.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] newb request
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,27 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 9 Dec 2004 10:50:03 -0600
+Date: Thu, 09 Dec 2004 17:45:26 +0100
 
-Hi all,
+Hi,
 
-I have about 5 years experience with sockets programming, but I am new
-to BlueZ.  I am interested in developing applications using HCI.  I
-have skimmed through the Bluetooth specifications (through 2.0) and I
-have created a "Hello World" app using hcitool.c (bluez-utils-2.7) as
-a guide.
+> I've installed bluez-libs-2.12 and bluez-utils-2.12 on a kernel version 
+> 2.6.9 (bluez support) (fedora core3 distribution). I have seen that the 
+> installation has placed .h files at /usr/include/bluetooth, but the 
+> previous installation (fedora's default) had placed the tools, and 
+> libraries all arround. So now I guess I have different versions of -for 
+> example- bluetooth.h file, and maybe problems?
 
-What other documents are available?  Is there a FAQ, man page, or a
-central location for API documentation somewhere? Looking at the
-source of hcitool is helpful, but it only gets me so far.  Where can I
-get more details?
+I never heard of any weird installations of the Bluetooth library and
+Fedora Core 3 should be clean, because their version should be 2.10 or
+so.
 
-I am looking for anything to help me translate the Bluetooth spec into
-the practical workings of the BlueZ implementation.
+> So, do I have to uninstall before upgrading ?
 
-Thanks for your time,
+Maybe that is a good idea. Or you try to find an already built RPM for
+bluez-{libs|utils}-2.12.
 
-        Jeff
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
