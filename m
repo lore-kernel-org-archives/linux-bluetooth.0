@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] obexFTP ... does it works?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040925213557.18900.qmail@web53207.mail.yahoo.com>
-References: <20040925213557.18900.qmail@web53207.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1096149821.7719.7.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20040925213557.18900.qmail@web53207.mail.yahoo.com>
+From: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1093528293.2581.25.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] obexFTP ... does it works?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,43 +16,53 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 26 Sep 2004 00:03:42 +0200
+Date: Sat, 25 Sep 2004 14:35:57 -0700 (PDT)
 
-Hi Massimiliano,
+I installed linux suse 9.1 and some rpm from suse and
+now I have a bt support.
 
-> I installed linux suse 9.1 and some rpm from suse and
-> now I have a bt support.
-> 
-> I read in the suse help center a command line that can
-> send files to my cell phones (Nokia 6600)
-> here it is:
-> obexftp -b xx:xx:xx:xx:xx:xx -B 10 -p pippo.jpg
-> 
-> (xx:xx:xx:xx:xx:xx is the addr I read using hcitool
-> scan)
-> (I don't know what is the -B 10 option)
+I read in the suse help center a command line that can
+send files to my cell phones (Nokia 6600)
+here it is:
+obexftp -b xx:xx:xx:xx:xx:xx -B 10 -p pippo.jpg
 
-have you tried to look this up with "man obexftp"? It is the Bluetooth
-RFCOMM channel number of the FTP service.
+(xx:xx:xx:xx:xx:xx is the addr I read using hcitool
+scan)
+(I don't know what is the -B 10 option)
 
-> I already installed obexftp 1.0.1 but it doesn't works
-> ... 
-> it says failed
-> anyone can help me to understand why?
-> others operation works correctly, so I can send a file
-> (note or image) to my linux (using opd) from my phone.
-> 
-> The same operation works if i use the KDEBluetooth
-> framework ... but I need a command line tool
+I already installed obexftp 1.0.1 but it doesn't works
+... 
+it says failed
+anyone can help me to understand why?
+others operation works correctly, so I can send a file
+(note or image) to my linux (using opd) from my phone.
 
-There is a tool call btobex in the BlueZ obex CVS repository that might
-work.
+The same operation works if i use the KDEBluetooth
+framework ... but I need a command line tool
 
-Regards
+In the application BjOD (Bluetooth joke of the day)
+the authors are using ussp-push to achieve the same
+result, but it does not works too
 
-Marcel
+does anyone knows a way to send a file to a phone
+using command line?
+thanks
+
+-----
+linux suse 9.1 (kernel 2.6)
+bluez-libs 2.5
+bluez-pan 1.1
+bluez-sdp 1.5
+bluez-bluefw 1.1
+bluez-utils 2.4
+openobex 1.0.1
+obexftp-0.10.4rc3-28.i586.rpm
 
 
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
