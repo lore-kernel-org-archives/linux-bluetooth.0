@@ -1,18 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] IBM Thinkpad A31p and Bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: jvp@lateapex.net, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1063477310.19165.49.camel@h9n1fls20o980.bredband.comhem.se>
-References: <200309130612.h8D6CKs06276@localhost.lateapex.net>
-	<1063441693.19165.31.camel@h9n1fls20o980.bredband.comhem.se>
-	<1063449127.28890.407.camel@pegasus>
-	<1063473896.18942.35.camel@h9n1fls20o980.bredband.comhem.se>
-	<1063475808.28891.450.camel@pegasus>
-	<1063477310.19165.49.camel@h9n1fls20o980.bredband.comhem.se>
-Content-Type: text/plain
-Message-Id: <1063545999.28890.464.camel@pegasus>
-Mime-Version: 1.0
+From: Gabor Halaszvari <fire@3hacker.hu>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200309132053.40178.fire@3hacker.hu>
+Subject: [Bluez-users] siemens lifebook 6120
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -23,23 +16,18 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 14 Sep 2003 15:26:33 +0200
+Date: Sat, 13 Sep 2003 20:53:40 +0200
 
-Hi Fredrik,
+Hi,
 
-> > seems that Palm uses default record handle number scheme. Please check
-> > the records 0x10000 and onwards for values.
-> 
-> Check records - how?
+I've got a Siemens Lifebook 6120 with built-in ALPS bluetooth (usb).
 
-	sdptool get --tree --bdaddr <bdaddr> 0x10000
-	sdptool get --tree --bdaddr <bdaddr> 0x10001
-	sdptool get --tree --bdaddr <bdaddr> 0x10002
-	...
+I tried to use this with bluez. The hci_usb module was loaded successfully, I 
+can see the device with usbview, but nothing else. I cannot find the device 
+with hciconfig and hcitool. Can anybody help me? (my distr: suse8.2)
 
-Regards
-
-Marcel
+-- 
+Gabor Halaszvari
 
 
 
