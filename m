@@ -1,14 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4166BC7F.8090104@corscience.de>
-From: Thomas Leidenfrost <leidenfrost@corscience.de>
-Reply-To: leidenfrost@corscience.de
-MIME-Version: 1.0
-To: martin f krafft <madduck@madduck.net>
-CC: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth on a MIPS-System
-References: <41651D72.7040806@corscience.de> <1097147273.7325.26.camel@pegasus> <41652A40.4080209@corscience.de> <1097152912.7325.30.camel@pegasus> <41654062.5050009@corscience.de> <1097154841.7325.36.camel@pegasus> <41654D83.1090306@corscience.de> <1097158664.7325.38.camel@pegasus> <41655C4D.1070206@corscience.de> <20041007154102.GA24256@cirrus.madduck.net>
-In-Reply-To: <20041007154102.GA24256@cirrus.madduck.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] hid2hci: No devices in HCI mode found
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alberto Garcia Hierro <tcpdevil@linuxlover.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200410081543.46448.tcpdevil@linuxlover.org>
+References: <3eef79ed04100803094fd88c74@mail.gmail.com>
+	 <1097234566.4407.1.camel@pegasus>
+	 <200410081543.46448.tcpdevil@linuxlover.org>
+Content-Type: text/plain
+Message-Id: <1097246961.4407.18.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,33 +20,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 08 Oct 2004 18:12:47 +0200
+Date: Fri, 08 Oct 2004 16:49:22 +0200
 
+Hi Alberto,
 
-Hi Martin, hi Marcel,
+>  I think there isn't any problems in the Gentoo package. I'm pretty sure the 
+> problem is a bad configuration. Change HID2DCI_ENABLE=true to 
+> HID2DCI_ENABLE=false in /etc/conf.d/bluetooth and the message will 
+> dissappear.
 
-used kernel is 2.4.21 with specific modifications to my Mips-System.
-But you were absolutely right, it was the wrong rfcomm. Now, modprobing 
-rfcomm & bnep is successful! :-)
+actually it is safe to run hid2hci every time at boot even if you don't
+own a HID Proxy Bluetooth dongle, but in that case you shouldn't see any
+error messages. So using the -q switch is better.
 
-And guess what, bluetooth is doing fine, too! I thank you very very much 
-again for giving all those good advices, the manufactor of could't do...
+Regards
 
-Greetz & a nice weekend!
-
-Thomas
-
-
-
-martin f krafft wrote:
-> also sprach Thomas Leidenfrost <leidenfrost@corscience.de> [2004.10.07.1710 +0200]:
-> 
->>Now I have depmod installed and I know that my Linux is
->>Debian-based.
->  
-> What kernel are you using? Is this the Debian kernel, or a vanilla
-> version?
-> 
+Marcel
 
 
 
