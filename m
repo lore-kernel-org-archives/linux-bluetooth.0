@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41AB1804.8070807@Uni-Bielefeld.de>
-From: Nick <Nick.Thomas@Uni-Bielefeld.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] hello
-References: <41AA81F0.8080005@bielefeld.ccc.de> <1101694796.9527.13.camel@pegasus>
-In-Reply-To: <1101694796.9527.13.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] Port parameter negotiation?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200411291226.52638.harbaum@beecon.de>
+References: <200411291226.52638.harbaum@beecon.de>
+Content-Type: text/plain
+Message-Id: <1101728078.7463.37.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,38 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 29 Nov 2004 13:37:24 +0100
+Date: Mon, 29 Nov 2004 12:34:38 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Till,
 
+> does BlueZ implement rfcomm port paramater negotiation? This is required to 
+> allow a bluetooth->rs232 converter so set the baud rate etc according to the 
+> settings on the hosts virtual serial port. E.g. changing the baudrate on a 
+> windows bluetooth com port changes the rs232 bit rate on the bt device as 
+> well (ok, at least my widcomm/win98 notebook does this only for 57600 and 
+> 115200 correctly).
+> 
+> So using something like 
+>   stty -F /dev/rfcomm0 speed 9600 
+> 
+> should IMHO cause a rfcomm port negotiation packet to be sent on client side. 
+> But i don't see this happen ...
 
-|
-| check with "hciconfig hci0 revision" (as root) for the setting of
-| the SCO routing. I think it is set to PCM.
+as far as I remember we haven't fully implemented it. We only have code
+to fulfill the Bluetooth qualification requirements. However the main
+RFCOMM interface are sockets and there you don't have to worry about the
+baud rate. Adding support for it should not be that hard. Find out what
+IOCTL the command above triggers and prepare the correct negotiation
+packet.
 
-you were right:
+Regards
 
-(0:1)root@Muramasa:~$ hciconfig hci0 revision
-hci0:   Type: USB
-~        BD Address: 00:60:57:02:95:FE ACL MTU: 192:8  SCO MTU: 64:8
-~        HCI 12.7
-~        Chip version: BlueCore01b
-~        SCO mapping:  PCM
+Marcel
 
-so, is that the way it should be?
-
-
-~    ,nick
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFBqxgE40bmwXROfRURAvqRAKDsXeO6wiHySifzPpDzAh8sIOBT6ACeJELH
-cVbkAU1OiN0vPgXBjvcpzpg=
-=lamt
------END PGP SIGNATURE-----
 
 
 
