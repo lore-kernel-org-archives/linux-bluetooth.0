@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <403CB92E.1000009@grupopie.com>
-From: Paulo Marques <pmarques@grupopie.com>
-MIME-Version: 1.0
-To: Matthew Reimer <mreimer@vpop.net>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] How to configure a 723kbps connection?
-References: <lists.bluez.users.1077037423.2665.72.camel@pegasus.SOMEWHERE> <lists.bluez.users.403291AD.7080601@csr.com> <403AC9D1.1000902@vpop.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] Where I can find description ??
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Zbyszek <dzidoz@poczta.fm>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040225141752.2E2977CDE@front.interia.pl>
+References: <20040225141752.2E2977CDE@front.interia.pl>
+Content-Type: text/plain
+Message-Id: <1077719809.2919.99.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,31 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Feb 2004 15:03:10 +0000
+Date: Wed, 25 Feb 2004 15:36:49 +0100
 
-Matthew Reimer wrote:
+Hi Zbyszek,
 
-> 
-> I tried setting the divisor to 1 manually, but then bluetooth wouldn't 
-> work. Maybe PPC2003 isn't fast enough to handle interrupts at that rate?
-> 
+> My name is Zbyszek. My final year project includes communication between cell phone and pc via Bluetooth.I have problem with BlueZ. My problem is that, I never programmed in Bluetooth and when I look at source code in directory "test" I see many function f.e. "getsockopt(s, SOL\_L2CAP, L2CAP\_OPTIONS, \&opts, \&opts\_len)" but there is no describtion for them. So I'm asking you, could you tell me, where I can find any documentations describing these functions.
 
-That wouldn't work because the zeevo chip would also have to be configured for 
-921.6kbps. AFAIK only modems try hard to autodetected baudrate from the "at" 
-command string.
+if you want to access your mobile phone you should not look at L2CAP,
+you should look at RFCOMM. The RFCOMM socket programming is much simpler
+and there are plenty good examples. You can look at attest.c to see how
+to read the phonebook using AT commands. Maybe my slides from my last
+workshop are also helpful
 
-There is probably a good reason for the HP guys to set up the port like that. If 
-it would work at 921.6kbps they would probably use the extra bandwidth. This is 
-really a shame, because I was thinking of buying a 2215 myself, but I would like 
-to have a "full-speed" bluetooth (and Linux support) :(
+	http://www.holtmann.org/papers/bluetooth/wtc2003_slides.pdf
 
--- 
-Paulo Marques
-Software Development Department - Restinfor, Lda.
-Phone: +351 252 290600, Fax: +351 252 290601
-Web: www.grupopie.com
+And of course you can look at the Gnokii or MultiSync projects.
 
-"In a world without walls and fences who needs windows and gates?"
+Regards
+
+Marcel
+
 
 
 
