@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Message-ID: <4487C040D663894C961C8297CB8F62B81E6353@apl03.poli.usp.br>
-From: "Oswaldo Seiji Morelli Sakai" <oswaldo.sakai@poli.usp.br>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] using matlab to program bluetooth
+Subject: Re: [Bluez-users] Apple keyboard
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Thomas Chiverton <thomas.chiverton@bluefinger.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200402131211.38367.thomas.chiverton@bluefinger.com>
+References: <20040210175802.GA17705@mail.gmx.de>
+	 <20040213113749.GA13481@mail.gmx.de> <1076673365.2671.30.camel@pegasus>
+	 <200402131211.38367.thomas.chiverton@bluefinger.com>
+Content-Type: text/plain
+Message-Id: <1076674949.2671.41.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,9 +20,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 11:42:47 -0200
+Date: Fri, 13 Feb 2004 13:22:29 +0100
 
-does someone kows if its possible to program hci commands using matlab?
+Hi Thomas,
+
+> > sure replace it with a simple executable shell script.
+> > 	#!/bin/sh
+> > 	echo "PIN:0000"
+> 
+> Is that /usr/bin/bluepin to /etc/bluetooth/pin ?
+
+the /etc/bluetooth/pin is the PIN for incoming connections and the PIN
+helper script from hcid.conf is executed on everything else.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
