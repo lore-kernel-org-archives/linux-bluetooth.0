@@ -1,16 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth Printing (Belkin Print Server)
+Subject: Re: [Bluez-users] rfcomm problems
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41A3B992.7080202@phaldor.co.uk>
-References: <41A2089D.5030100@phaldor.co.uk>
-	 <1101139759.15086.14.camel@pegasus> <41A21EE3.5060408@phaldor.co.uk>
-	 <20041123091654.GB16952@suse.de> <1101202810.26578.61.camel@pegasus>
-	 <41A35BFE.9000507@phaldor.co.uk> <1101226220.27351.4.camel@pegasus>
-	 <41A36388.4010301@phaldor.co.uk> <1101227784.27351.7.camel@pegasus>
-	 <41A3715B.6050101@phaldor.co.uk>  <41A3B992.7080202@phaldor.co.uk>
+In-Reply-To: <200411241854.13007.adq_dvb@lidskialf.net>
+References: <200411241854.13007.adq_dvb@lidskialf.net>
 Content-Type: text/plain
-Message-Id: <1101276396.27351.92.camel@pegasus>
+Message-Id: <1101325813.7538.6.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -23,24 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 Nov 2004 07:06:36 +0100
+Date: Wed, 24 Nov 2004 20:50:13 +0100
 
-Hi Dave,
+Hi Andrew,
 
->     Sorry for the stupid question, here are the results you asked for.
+> Hi, I'm using linux kernel 2.6.9, gentoo, bluez-utils/libs 2.10.
+> I have a Nokia 3650, with firmware 3.16.
+> 
+> I've initially been just trying to connect to the phone using rfcomm...
+> 
+> rfcomm connect 0 MACADDR 1
+> 
+> this works - I get the "Press Ctrl-C to hangup" and /dev/rfcomm0 appears 
+> (using udev BTW).
+> 
+> I then try to use minicom on /dev/rfcomm0. It opens it OK, but nothing 
+> happens... I mean, I send AT commands at it, but I get no response. Do I have 
+> to use a certain set of serial port settings (I've tried quite a few)?
 
-please attach them as *.txt files.
+No. This should simply work.
 
-And the information so far are looking a little bit weird. For the
-serial port they use UUID32 and for HCRP they use UUID16. I've never
-seen this before.
+However some people complained about that minicom and RFCOMM TTY do not
+work very good together. The BlueZ utils packages contains test/attest.c
+and you should give it a try.
 
-However may you wanna force it to use the serial port profile. I haven't
-tried this for a long time, but actually this URI should do it:
+> I also tried running hcidump whilst typing stuff in minicom - nothing was 
+> logged.
 
-	bluetooth://0002724080A3/spp
-
-In hcidump you should now see a connection to RFCOMM channel 3 (DLCI 6).
+Do you started hcidump as root? You must see at least the RFCOMM channel
+setup.
 
 Regards
 
