@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] GhostSong
+Subject: Re: [Bluez-users] Bluez+2.6+Logitech bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
-To: the White Rabbit in Wonderland <ghostsong@aliceposta.it>
+To: Charles Bueche <charles@bueche.ch>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1084655065.19124.3.camel@alice.wonderland>
-References: <1084655065.19124.3.camel@alice.wonderland>
+In-Reply-To: <20040516081059.46f1904b@bluez.bueche.ch>
+References: <20040515163903.CB06543F94@rekin8.go2.pl>
+	 <20040516081059.46f1904b@bluez.bueche.ch>
 Content-Type: text/plain
-Message-Id: <1084708779.4184.7.camel@pegasus>
+Message-Id: <1084708456.4184.0.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +19,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 May 2004 13:59:39 +0200
+Date: Sun, 16 May 2004 13:54:17 +0200
 
-Hi,
+Hi Charles,
 
-> Cardctl ident 3Com "3CRWB6096B Bluetooth PC CARD","",""
-> mandfid 0x0101,0x0041
-> function : 2 (serial)
-> ttyS16|I/O ox100 irq3 FUNCID=2 / 8 8250 16c960 
-> 
-> 3.3V 16bit PCCARD Function 0 [ready]
-> 
-> All i have to do is to test now
+> you may want to try my cookbook at
+> http://www.bueche.ch/comp/mx900/mx900.html
 
-so this is a serial port based Bluetooth card. You must run hciattach to
-attach that serial port through the hci_uart driver to the BlueZ stack.
-I don't own that card, so you must try by yourself which is the correct
-command line.
+maybe you wanna play with the new hidd from bluez-utils-2.7 and the hidp
+kernel module from patch-2.6.6-mh1 ;)
 
 Regards
 
