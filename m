@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <de33c8be0502160425215158ad@mail.gmail.com>
-From: =?ISO-8859-1?Q?Fl=E1vio?= <flavio.henriques@gmail.com>
 To: bluez-devel@lists.sourceforge.net
+From: Sebastian Roth <sebastian.roth@esk.fhg.de>
+Message-ID: <cut6je$4g1$3@sea.gmane.org>
+References: <cusgdr$4g1$1@sea.gmane.org> <4211C910.1020204@dark-reality.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] TPL (transmit power level)
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <4211C910.1020204@dark-reality.de>
+Subject: [Bluez-devel] Re: snd-bt-sco built-in (solved)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,22 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 16 Feb 2005 12:25:51 +0000
+Date: Tue, 15 Feb 2005 17:07:33 +0100
 
-Hi everbody,
-I=B4m working with power control and i saw one thing that could be wrong:
+Hi,
 
-Transmit power level (tpl) : _1octet (signed integer);
-                                 _range: -30<=3D N<=3D20;
-                                 _units: dBm.
+I found the problem! To built it into the kernel I added a directory
+under sound called bluetooth. Getting the make-system to compile the
+module you have to add this path to sound/Makefile:
 
-In BlueZ the value of tpl is defined like unsigned int ( uint8_t level
-) but i think that should be an int ( int8_t level ) like is defined
-in core of bluetooth.
+cat /usr/src/linux/sound/Makefile
+...
+obj-$(CONFIG_SND) += bluetooth/ core/ i2c/ drivers/ isa/ pci/ ppc/ arm/
+synth/ usb/ sparc/ parisc/ pcmcia/
+...
 
-There is any particular reason for the level to be an unsigned int??
+Really don't know why but I've put it in the first position (before
+core). This leads to the problem that on bootup ALSA isn't initialized
+yet when snd_bt_sco is trying to use it. oops...
 
-Regards Fl=E1vio!
+
+cat /usr/src/linux/sound/Makefile #(correct one!)
+...
+obj-$(CONFIG_SND) += core/ i2c/ drivers/ isa/ pci/ ppc/ arm/ synth/
+usb/ sparc/ parisc/ pcmcia/ bluetooth/
+...
+
+Now the kernel boots up! A brief test with one of the headsets was ok!
+
+Best regards,
+Sebastian
+
 
 
 -------------------------------------------------------
