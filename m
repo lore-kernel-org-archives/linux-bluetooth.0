@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <011e01c45d24$fbbf2370$640aa8c0@frodo>
-From: "Torsten E." <linux-user@gmx.com>
-To: <bluez-users@lists.sourceforge.net>
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Presentation slides are online
+References: <1088413405.3774.164.camel@pegasus> <20040628135038.GA28640@gmx.net> <1088431331.4614.6.camel@pegasus>
+In-Reply-To: <1088431331.4614.6.camel@pegasus>
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] Hi there! ... and my first question
+  charset="iso-8859-2"
+Message-Id: <200406281640.24871.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,47 +19,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Jun 2004 17:30:42 +0200
+Date: Mon, 28 Jun 2004 16:40:24 +0200
 
-Hi there,
+On Monday 28 of June 2004 16:02, Marcel Holtmann wrote:
+> Hi Nicholas,
+>
+> > You now have some experience based data, which dongles accept the signed
+> > apple hciproxy firmware and which one render unusable?
+>
+> the D-Link revision B3 and the Allnet ALL1575 seem to work fine. There
+> was another one that I've tested successfully on the LinuxTag, but I
+> can't remember from what manufacturer it was. The revision B4 of the
+> D-Link is not working at the moment. Looks like an USB chip or flash
+> timing problem.
+>
+> Some other dongles can be updated with the same file, but in the case of
+> only 4 Mbit flash you will get HCI 16.14 firmware and not the HCI 18.1
+> with HID proxy support.
 
-well, after reading some docs regarding PAN I wasn't able to manage the
-problem.
-I'd like to attach my iPaq 3970 via BlueTooth to my Linuxbox (SuSE 9.1,
-with SuSE kernel 2.6.5-7.75-default).
+And Marcel,
 
-I configured the Linuxbox so I'm able to l2ping the iPaq, but right when
-using DUND I get errors in /var/log/messages like:
-Jun 28 17:01:09 gandalf /etc/hotplug/tty.agent[6372]: TTY try 1 while
-waiting for /class/tty/rfcomm0's bus_id
-Jun 28 17:01:10 gandalf /etc/hotplug/tty.agent[6372]: TTY try 2 while
-waiting for /class/tty/rfcomm0's bus_id
-Jun 28 17:01:11 gandalf /etc/hotplug/tty.agent[6372]: TTY try 3 while
-waiting for /class/tty/rfcomm0's bus_id
-Jun 28 17:01:11 gandalf dund[6371]: RFCOMM TTY creation failed. No such
-file or directory(2)
-Jun 28 17:01:12 gandalf /etc/hotplug/tty.agent[6389]: remove tty device
-/class/tty/rfcomm0
-Jun 28 17:01:12 gandalf /etc/hotplug/tty.agent[6372]: TTY try 4 while
-waiting for /class/tty/rfcomm0's bus_id
-Jun 28 17:01:13 gandalf /etc/hotplug/tty.agent[6372]: TTY try 5 while
-waiting for /class/tty/rfcomm0's bus_id
-Jun 28 17:01:24 gandalf /etc/hotplug/tty.agent[6372]: add tty device
-/class/tty/rfcomm0
+is it possible to flash Microsoft Wireless Transceiver?
 
-As there's no directory /class onmy box, but /sys/classm I guess that's
-the correct one.
-But I'm not able to create any file or directory there ... what does I
-have to do?
-
-If you need more information please let me know.
-(English isn't my native language, so hopefully you get what I mean ...
-german would be better ... ;))
-
-Best regards
-Torsten
-
-
+Michal
 
 
 -------------------------------------------------------
