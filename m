@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
-To: bluez-users@lists.sf.net
-Subject: Re: [Bluez-users] Re: Can't understand
-Message-ID: <20040513163305.GA4989@gmx.net>
-References: <200405130659.45969.hedin@hiervard.ru> <200405131627.34993.hedin@hiervard.ru> <20040513103228.GA4449@gmx.net> <200405131950.38279.hedin@hiervard.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <200405131950.38279.hedin@hiervard.ru>
+Message-ID: <40A38B84.2030606@gmx.de>
+From: Lasse Jansen <l.jansen@gmx.de>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Headset with snd-bt-sco
+References: <40A2888C.5040805@gmx.de> <20040513103339.GB4449@gmx.net>
+In-Reply-To: <20040513103339.GB4449@gmx.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,42 +17,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 May 2004 18:33:05 +0200
+Date: Thu, 13 May 2004 16:51:48 +0200
 
-On  0, ????? <hedin@hiervard.ru> wrote:
-> Thursday 13 May 2004 17:32, Nicholas A. Preyss ?????:
-> > On  0, ????? <hedin@hiervard.ru> wrote:
-> > > > you guess right and it needs the bcm203x and the hci_usb driver. So
-> > > > when do you start looking at the logfiles to see what is going wrong.
-> > >
-> > > What should I do after loading modules and connecting the device?
-> > > hcitool? Tell me, which logs to look at and I'll do.
-> >
-> > The normal system log, something like /var/log/syslog.
-> > With hciconfig you see the registered hci devices.
-> >
-> 
-> usr/sbin/hciconfig scan
-> Can't get device info: No such device
+Nicholas A. Preyss wrote:
 
-hciconfig hasn't any "scan" argument. 
+ > You should contact the maintainer of this module.
 
-> [root@host-81-1-226-59 hedin]# /usr/sbin/hciconfig inqmode
-> Can't get device info: No such device
 
-nor "inqmode". Why do you think, these are possible arguments?
+ From the Homepage of the maintainer :
 
-> I can't have it working. No such log available.
+"The code will not be maintained any further by me, nor will I provide 
+support, so please do not ask me to fix bugs. It may be worth discussing 
+any problems on the bluez mailing lists, where other people who have had 
+success may be able to help."
 
-Then maybe it is called different in your distribution. Look in /var/log/
-for the right one. 
-Maybe you post:
-- kernel version
-- bluez-utils/libs version
-- distribution 
-
-nicholas
-
+best regards,
+Lasse Jansen
 
 
 -------------------------------------------------------
