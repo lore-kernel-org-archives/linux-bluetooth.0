@@ -1,76 +1,53 @@
-Return-Path: <trexx@pobox.com>
-Subject: Re: [Bluez-users] Logitech Bluetooth  Mx900+keyboard support.
-From: Terence Rudkin <trexx@pobox.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Olivier Bornet <Olivier.Bornet@puck.ch>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1074597908.7088.5.camel@pegasus>
-References: <1074457244.3254.17.camel@localhost.localdomain>
-	 <1074458664.6070.73.camel@pegasus>
-	 <1074480891.2817.10.camel@localhost.localdomain>
-	 <1074514935.6070.80.camel@pegasus>
-	 <1074568150.7831.5.camel@localhost.localdomain>
-	 <20040120081245.GA1871@smartdata.ch>  <1074597908.7088.5.camel@pegasus>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Getting remote device address & name using obex
+	commands
+From: Marcel Holtmann <marcel@holtmann.org>
+To: jan d tux <janice@asti.dost.gov.ph>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1075194444.945.39.camel@Asgard>
+References: <1075194444.945.39.camel@Asgard>
 Content-Type: text/plain
-Message-Id: <1075234547.3064.13.camel@localhost.localdomain>
+Message-Id: <1075212081.12766.6.camel@pegasus>
 Mime-Version: 1.0
-Date: Tue, 27 Jan 2004 13:15:47 -0700
-List-ID: <bluez-users.lists.sourceforge.net>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 27 Jan 2004 15:01:21 +0100
 
-Marcel,
+Hi Jan,
 
-I finally had a chance to patch kernel and try hid2hci  with this patch
-kernel.   I still got success. but hcitool dev never reported any
-devices.   I looked at the code in hid2hci, my diff is below. 
+> Is there an obex command that I can use to get the bluetooth address and
+> name of a remote device? It is possible with hci commands but I would
+> like to use obex commands if it is possible.
 
-I first made the change at 204.  And found that the /dev/usb/hid was not
-opening.  Finding me /dev to be /dev/usb I changed line 79 to match my
-file structure.   
+there is not OBEX command for this.
 
-Now I get
-hciconfig
-hci0:   Type: USB
-        BD Address: 00:07:61:07:ED:A9 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:131 acl:0 sco:0 events:14 errors:0
-        TX bytes:32 acl:0 sco:0 commands:13 errors:0
+> What Im trying to do is run the obexserver (from frasunek) and get the
+> sender's address and name. 
 
-But not input from mouse and keyboard.
+If you know the socket descriptor you can simply get the local and the
+remote address for that connection. Getting the name is a HCI command.
 
+Regards
 
- #> cvs diff  hid2hci.c
-Index: hid2hci.c
-===================================================================
-RCS file: /cvsroot/bluez/utils2/hid/hid2hci.c,v
-retrieving revision 1.3
-diff -r1.3 hid2hci.c
-79c79
-< static char hidpath[PATH_MAX + 1] = "/dev/usb/hid";
----
-> static char hidpath[PATH_MAX + 1] = "/dev/usb";
-204c204
-<       int i, fd, err = 0;
----
->       int i, fd, err = -1;
+Marcel
 
 
-On Tue, 2004-01-20 at 04:25, Marcel Holtmann wrote:
-> Hi Olivier,
-> 
-> > Look at the thread:
-> > 
-> >    http://sourceforge.net/mailarchive/message.php?msg_id=6881178
-> > 
-> > You need to patch your kernel for having hid2hci working. Note also that
-> > at this time, you can only switch from hid to hci, and not from hci to
-> > hid.
-> 
-> at the moment nobody is quite sure if this patch is really correct and
-> don't break any other devices, but it is working for our needs and I
-> included it into my latest -mh patches for the 2.4 series.
-> 
-> Regards
-> 
-> Marcel
-> 
--- 
+
+
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
