@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050222172313.48745.qmail@web26410.mail.ukl.yahoo.com>
-From: benbouzid imad <imad_benb@yahoo.fr>
-Subject: Re: [Bluez-users] Driver version problems..hci_usb & bluetooth parser
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Driver version problems..hci_usb & bluetooth
+	parser
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <20050222164005.71253.qmail@web26409.mail.ukl.yahoo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+References: <20050222164005.71253.qmail@web26409.mail.ukl.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1109092547.8506.26.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,28 +19,10 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Feb 2005 18:23:13 +0100 (CET)
+Date: Tue, 22 Feb 2005 18:15:47 +0100
 
-when I tape
-#modprobe -f hci_usb
-it works, I can do an hciconfig hci0 up  an using
-hcitool etc...
+Hi,
 
-
-dmesg tells:
-hci_usb: no version for "struct_module" found: kernel
-tainted.
-hci_usb: no version magic, tainting kernel.
-Bluetooth: HCI USB driver ver 2.7 
-usbcore: registered new driver hci_usb 
-
-I don't understand where is the matter. But is it
-possible that HCI USB driver is a ver 2.7 and the
-Bluetooth: Core ver 2.6 in the same kernel?
-
- --- benbouzid imad <imad_benb@yahoo.fr> a écrit : 
-> Hi,
-> 
 > I work with 2.6.10-1.766_FC3 kernel. 
 > I rebuilt bluetooth.ko and hci_usb.ko using using
 > those makefile:
@@ -48,8 +32,7 @@ Bluetooth: Core ver 2.6 in the same kernel?
 > #
 > 
 > obj-m	+= bluetooth.o
-> bluetooth-objs := af_bluetooth.o hci_core.o
-> hci_conn.o
+> bluetooth-objs := af_bluetooth.o hci_core.o hci_conn.o
 > hci_event.o hci_sock.o hci_sysfs.o lib.o
 > 
 > KDIR	:= /lib/modules/$(shell uname -r)/build
@@ -58,8 +41,7 @@ Bluetooth: Core ver 2.6 in the same kernel?
 > 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules
 > ----------------------------------
 > #
-> # Makefile for the Linux Bluetooth HCI device
-> drivers.
+> # Makefile for the Linux Bluetooth HCI device drivers.
 > #
 > 
 > obj-m	:= hci_usb.o
@@ -72,8 +54,7 @@ Bluetooth: Core ver 2.6 in the same kernel?
 > ------------------------------------- 
 > 
 > 
-> but with this I used bluetooth files of 2.6.8
-> kernel.
+> but with this I used bluetooth files of 2.6.8 kernel.
 > and before building modules I changed in
 > /lib/modules/2.6.10-1.766_FC3/build/include/net
 > the bluetooth directory by the 2.6.8 kernel one.
@@ -94,8 +75,7 @@ Bluetooth: Core ver 2.6 in the same kernel?
 > I had:
 > 
 > FATAL: Error inserting hci_usb
->
-(/lib/modules/2.6.10-1.766_FC3/kernel/drivers/bluetooth/hci_usb.ko):
+> (/lib/modules/2.6.10-1.766_FC3/kernel/drivers/bluetooth/hci_usb.ko):
 > Unknown symbol in module, or unknown parameter (see
 > dmesg)
 > 
@@ -126,44 +106,15 @@ Bluetooth: Core ver 2.6 in the same kernel?
 > Hci_core for my too modulues. 
 > so I don't undersand why there is a misunderstanding
 > between the too modules?
-> 
-> regards
-> 
-> 
-> 
-> 	
-> 
-> 	
-> 		
-> Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace
-> de stockage pour vos mails ! 
-> Créez votre Yahoo! Mail sur
-> http://fr.mail.yahoo.com/
-> 
-> 
->
--------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT
-> Products from real users.
-> Discover which products truly live up to the hype.
-> Start reading now.
->
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
->  
+
+use either the Fedora Core kernel or the vanilla one. Don't try to play
+tricks and then complain that it does not work.
+
+Regards
+
+Marcel
 
 
-	
-
-	
-		
-Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
-Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
