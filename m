@@ -1,29 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] AVDTP socket?
-Message-Id: <20041123015309.7fde73e7.henryk@ploetzli.ch>
-In-Reply-To: <1101130102.15086.9.camel@pegasus>
-References: <418DB442.2050801@uen.org>
-	<41925793.3050404@xmission.com>
-	<1100113055.25879.73.camel@pegasus>
-	<419543B3.8050601@xmission.com>
-	<1100306337.7349.29.camel@pegasus>
-	<41957BC1.507@xmission.com>
-	<1100351199.7349.50.camel@pegasus>
-	<41970F25.4020902@xmission.com>
-	<1100446172.21403.16.camel@pegasus>
-	<419B7292.9080706@xmission.com>
-	<cbf0aec9041118052714481128@mail.gmail.com>
-	<20041121064655.0b04dd8a.henryk@ploetzli.ch>
-	<1101059050.7250.39.camel@pegasus>
-	<1101093515.7250.97.camel@pegasus>
-	<20041122053213.2685bedd.henryk@ploetzli.ch>
-	<1101130102.15086.9.camel@pegasus>
+Message-Id: <20041123014732.3a03b10e.henryk@ploetzli.ch>
 Mime-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pgp-signature";
  micalg="pgp-sha1";
- boundary="Signature=_Tue__23_Nov_2004_01_53_09_+0100_IESsJMy5E9q+AjZh"
+ boundary="Signature=_Tue__23_Nov_2004_01_47_32_+0100_Yp/O6Dh8y4VQE+6E"
+Subject: [Bluez-devel] SBC packer done, kind of
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -35,22 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Nov 2004 01:53:09 +0100
+Date: Tue, 23 Nov 2004 01:47:32 +0100
 
---Signature=_Tue__23_Nov_2004_01_53_09_+0100_IESsJMy5E9q+AjZh
+--Signature=_Tue__23_Nov_2004_01_47_32_+0100_Yp/O6Dh8y4VQE+6E
 Content-Type: text/plain; charset=ISO-8859-15
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Moin,
 
-Am Mon, 22 Nov 2004 14:28:22 +0100 schrieb Marcel Holtmann:
+Ok, I'm now basically finished with sbc_pack_frame (joint stereo is not
+handled yet). Though I tested it only with mono and two simple test
+signals (one impulse and a sawtooth) because I can't load audio data
+from files. (Marcel?)
 
-> And we need to add a clear license statement to the source files. I
-> like to put the SBC library under LGPL and the programs under GPL. Is
-> this fine with you?
-
-Absolutely, that's what I wanted to do anyways.
+Next thing (after joint stereo) would be some cleanup of sbc.c and
+finally convertion to kernel indentation. I tried the Lindent script but
+don't like what it does to the code, because most of it is nested in
+some kind of for(blk ..) { for(ch ..) { for(sb ..) { ... } } } structure
+and wasting a full 8 columns (out of the precious 80) for each of those
+loops doesn't feel right to me.
 
 --=20
 Henryk Pl=F6tz
@@ -58,18 +45,18 @@ Gr=FC=DFe aus Berlin
 ~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
 ~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
 
---Signature=_Tue__23_Nov_2004_01_53_09_+0100_IESsJMy5E9q+AjZh
+--Signature=_Tue__23_Nov_2004_01_47_32_+0100_Yp/O6Dh8y4VQE+6E
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.6 (GNU/Linux)
 
-iD8DBQFBoon4IjWgKE0OA2gRAk6NAJ0TcTK2XRx98IXs6g3L2fcM1WNqOgCeIbZU
-88llvfb3Ug8kzA86bze0CNM=
-=AdCP
+iD8DBQFBooipIjWgKE0OA2gRAqJsAKCzwbw8Wb5jGxiG07Rw8Da+uS722wCgwMAt
+ZhOrZier+RwSiW2cKJtTOtc=
+=DrYM
 -----END PGP SIGNATURE-----
 
---Signature=_Tue__23_Nov_2004_01_53_09_+0100_IESsJMy5E9q+AjZh--
+--Signature=_Tue__23_Nov_2004_01_47_32_+0100_Yp/O6Dh8y4VQE+6E--
 
 
 -------------------------------------------------------
