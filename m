@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Howto create SCO Connections?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: axs203dd@excite.com
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040603094556.12D993DED@xprdmailfe8.nwk.excite.com>
-References: <20040603094556.12D993DED@xprdmailfe8.nwk.excite.com>
-Content-Type: text/plain
-Message-Id: <1086258410.7542.69.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Reply-To: axs203dd@excite.com
+From: "mr" <axs203dd@excite.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Message-Id: <20040603094556.12D993DED@xprdmailfe8.nwk.excite.com>
+Subject: [Bluez-users] Howto create SCO Connections?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 03 Jun 2004 12:26:50 +0200
+Date: Thu,  3 Jun 2004 05:45:56 -0400 (EDT)
+
 
 Hi,
 
-> I have built a piconet over l2cal and bnep using a desktop and a laptop. Now I need to create a SCO link between them in order to transfer real time audio from laptop to desktop. What do I need to do? Are there any utilities/tools for this particular purpose?
-
-at the moment you can only use the SCO seqpacket socket interface. See
-source code of scotest.c or hstest.c for more details.
-
-Regards
-
-Marcel
 
 
+I have built a piconet over l2cal and bnep using a desktop and a laptop. Now I need to create a SCO link between them in order to transfer real time audio from laptop to desktop. What do I need to do? Are there any utilities/tools for this particular purpose?
+
+
+
+P.S.: The scotest works fine both ways.
+
+_______________________________________________
+Join Excite! - http://www.excite.com
+The most personalized portal on the Web!
 
 
 -------------------------------------------------------
