@@ -1,8 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Franck Arnaud" <franck@nenie.org>
-To: bluez-devel@lists.sourceforge.net
-Message-Id: <45540213.2004.5.22.14.5.39.99703@mem.nenie.org>
-Subject: [Bluez-devel] hidp 2.4 backport
+Subject: Re: [Bluez-devel] Fujitsu-Siemens Celsius
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alexander Kulakov <a.kulakov@mail.ru>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <40AE5A38.5060205@mail.ru>
+References: <40AD87B3.6020805@mail.ru> <1085154942.22191.6.camel@pegasus>
+	 <40AE54A6.3070500@mail.ru> <1085167156.22191.34.camel@pegasus>
+	 <40AE5A38.5060205@mail.ru>
+Content-Type: text/plain
+Message-Id: <1085168277.22191.52.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -13,30 +20,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 22 May 2004 14:05:39 GMT
+Date: Fri, 21 May 2004 21:37:57 +0200
 
-Hello,
+Hi Alexander,
 
-I have an epox (CSR) bluetooth mouse and I'm using kernel 2.4. I 
-tried bthid 0.10, which worked fine initially but I could not make 
-it handle reconnections (after a long enough timeout, clicking 
-the mouse just after the disconnection message seems to 
-reconnect OK). This looks like the problem described in the doc, 
-although the solution (pinging the mouse to keep it awake) is 
-not acceptable.
+> I rebuilt kernel with usb debugging and booted with acpi=off again
+> $ dmesg
+> ...
 
-It would be a pain at this time to upgrade to 2.6 in my setup, so 
-I backported the 2.6.6-mh1 hidp module to 2.4:
+as I said, ask the USB guys. I am not the USB expert.
 
-http://www.nenie.org/misc/bluetooth/bluez-hidp-backport-2.4-26.tar.gz
+Regards
 
-it may be broken as I don't know anything about kernel 
-programming :-) but it seems to work fine, except it seems you 
-need the -t timeout option on hidd, otherwise it fails like with 
-bthid (I do not understand why).
+Marcel
 
-It may not be worth applying to the official 2.4 patches as I 
-guess most people can upgrade to 2.6 more easily than me.
 
 
 
