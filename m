@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1098262358.41762756cf86c@www.songbirdtech.com>
-From: prem@songbirdtech.com
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Bridging bluetooth and a cellular modem
+Subject: Re: [Bluez-users] bluetooth 2.0 compact flash cards
+From: Marcel Holtmann <marcel@holtmann.org>
+To: g m <nyc2kiev@yahoo.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041019190338.6157.qmail@web61208.mail.yahoo.com>
+References: <20041019190338.6157.qmail@web61208.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1098214557.12620.12.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,29 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 20 Oct 2004 01:52:38 -0700
+Date: Tue, 19 Oct 2004 21:35:57 +0200
 
-I am fairly new to telephony and need some help with understanding the transfer
-of voice to and from a bluetooth headset.
+Hi,
 
-I am developing a device which makes use of a GSM/GPRS cellular modem to
-transfer data over the Internet using GPRS. But this same modem (Siemens MC35)
-will also have to handle voice calls - that is, when a call comes in, the voice
-must be captured and transferred over a bluetooth connection to a bluetooth
-headset .. and conversely, the voice must be transferred from the bluetooth
-headset down to the modem.
+> i was hoping to find a list somewhere. maybe i'm searching for the
+> wrong thing (bluecore02). should i just be looking for CSR with 8M
+> flash compact flash cards?
 
-I have been trying to figure out how to use the BlueZ SCO APIs to do this - is
-this possible at all and if so how is this done?
+there exists no list like this on the internet and actually most sales
+guys won't know what you are talking about.
+ 
+> otherwise, i suppose i can pony up the extra money if it means that
+> the card is upgradable
 
-Also, does BlueZ work on the MIPS processor ? I am using AMD Alchemy Au1500
-MIPS32 based processor.
+Ask first and make sure that you get your money back if it not works as
+expected.
 
-Would appreciate any help on this.
+Regards
 
-Thank you,
-Prem Kurian Philip
-
+Marcel
 
 
 
