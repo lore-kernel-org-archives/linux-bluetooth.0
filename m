@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hotplug USB dongle problem
-References: <200402281424.55149.pavouk@pavouk.org> <1077976353.2843.82.camel@pegasus>
-In-Reply-To: <1077976353.2843.82.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200402281549.59370.pavouk@pavouk.org>
+Subject: Re: [Bluez-users] hciemu pb: can't set scan mode
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Gigie Lertriniva <gigie_lertriniva@yahoo.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040228140120.70051.qmail@web20727.mail.yahoo.com>
+References: <20040228140120.70051.qmail@web20727.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1077978175.2843.85.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,27 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 28 Feb 2004 15:49:59 +0100
+Date: Sat, 28 Feb 2004 15:22:55 +0100
 
-Hello,
+Hi Gigie,
 
-> > I have configured Mandrake9.2 desktop with USB dongle.
-> > I have kernel 2.6.2
->
-> don't start pand from bluetooth.agent script. Start it from the init
-> script.
+> I created a fake Bluetooth device on my PC using
+> hciemu. I can see it with hciconfig, get its status to
+> "UP and RUNNING" but I fail to put it to PSCAN:
+> 
+> bash-2.05b# hciconfig hci1 pscan
+> Can't set scan mode on hci1. Invalid request code(56)
+> 
+> What could be a reason for this problem?
 
-Thanks for help, it works now.
-I start hcid, sdpd, pand from init script.
+the hciemu don't implements a full HCI. Only a limited number of
+commands are supported. Look at the source code for details.
 
-What is the right sequence for killing these daemons?
-Original script kills hcid and sdpd.
-I'am killing in reverse sequence:
-pand, sdpd, hcid.
+Regards
 
-Best regards,
+Marcel
 
-Pavel Ruzicka
 
 
 
