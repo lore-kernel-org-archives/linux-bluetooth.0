@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] bluetooth - 6310i - iBook
-From: Stephen Crane <steve.crane@rococosoft.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: Jan Sobek <honza@sis.vutbr.cz>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <20040702105653.GF13439@sis.vutbr.cz>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040702123526.GA32744@sis.vutbr.cz>
 References: <20040702105653.GF13439@sis.vutbr.cz>
+	 <1088766165.2803.0.camel@pegasus>  <20040702123526.GA32744@sis.vutbr.cz>
 Content-Type: text/plain
-Message-Id: <1088774344.8000.20.camel@baroque.rococosoft.com>
+Message-Id: <1088772250.2803.2.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,48 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 02 Jul 2004 14:19:04 +0100
+Date: Fri, 02 Jul 2004 14:44:10 +0200
 
 Hi Jan,
-I use gammu which is better IMHO. Here is the relevant part of its
-config file:
 
-port = 00:60:57:5B:36:AE # your phone's BDADDR
-model = 6310i
-connection = bluephonet
+> | run "hcidump -x" as root while your are trying to connect with Gnokii
+> | and show it to us.
+> 
+> # hcidump -x
+> HCIDump - HCI packet analyzer ver 1.5
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> 
 
-Cheers,
-Steve
+and ???
 
-On Fri, 2004-07-02 at 11:56, Jan Sobek wrote:
-> Hello,
-> 
-> I'm trying to connect ibook and nokia 6310 using bluetooth adapter by
-> microcom.
-> 
-> same configuration works for me on my desktop, but on ibook works
-> only.
-> 	hcitool scan
-> 	hcitool info xx.xx.xx.xx.xx.xx
-> 
-> gnokii --monitor
-> GNOKII 0.6.1
-> Couldn't open PHONET device: No such file or directory
-> Telephone interface init failed: Command failed.
-> Quitting
-> 
-> rfcomm connect rfcomm0 xx.xx.xx.xx.xx.xx
-> Can't connect RFCOMM socket: Connection refused
-> 
-> On phone is pin request.
-> 
-> 
-> can you help me?
-> 
-> thank you
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+Do something with your Bluetooth device. Otherwise no packets will show
+up and we can't see any errors.
+
+Regards
+
+Marcel
+
 
 
 
