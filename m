@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41EFAE20.7010901@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluetooth headset - connects but no audio
-References: <41EE3974.1010604@fastwebnet.it> <41EE5112.1040502@dark-reality.de> <41EE4ACD.9070105@fastwebnet.it> <41EE66A2.1040106@dark-reality.de> <41EE69F3.1030401@fastwebnet.it> <41EE989A.7030206@dark-reality.de> <41EED6AE.1080205@fastwebnet.it> <41EF0C15.3040705@dark-reality.de> <41EF869D.8020705@fastwebnet.it>
-In-Reply-To: <41EF869D.8020705@fastwebnet.it>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] Re: Bluetooth and HAL
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: hal@freedesktop.org
+In-Reply-To: <pan.2005.01.20.08.17.45.630346@yahoo.com>
+References: <pan.2005.01.19.22.54.29.108027@yahoo.com>
+	 <1106180785.8190.151.camel@pegasus>
+	 <pan.2005.01.20.08.17.45.630346@yahoo.com>
+Content-Type: text/plain
+Message-Id: <1106225440.8190.175.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,59 +21,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 14:12:00 +0100
+Date: Thu, 20 Jan 2005 13:50:40 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Paul,
 
-WiseLYNX wrote:
-| | well it *should* work with this setup, as it works on my system with
-| | stock 2.6.10 plus mh1 patches. Anything else special, like, are you
-| | using an SMP kernel?
-|
-| no, ? just checked and SMP is disabled. it may be some issue with other
-| settings, maybe in the bluetooth section?
+> I'll remove the ChipVersion then, and I have some more questions:
+> How do we tell if we have a BT 1.0 or BT 1.1 or BT 1.2  adapter ?
+> By looking at HCI and LMP numbers ?
 
-Don't know, things are quite straight-forward in there. Activate sco
-support...
+it is the HCI_version and LMP_version. They can be different, but in
+general they show the same version of the specification.
 
-|
-| | Maybe it's a problem with your dongle, do you have access to another one
-| | to test this? (local setup: epox bt-dg03 + sony/eri. hbh-35 headset)
-|
-| it could be of course. I'll have a try with the one (other productor,
-| but same chipset I fear) of a friend of mine, but it won't be before
-| next week. anyway, isn't it strange that the dongle works fine with
-| other applications (I'm able to connect via gprs with my phone)?
+> Do we need a separate bluetooth.version too ?
 
-No, because headsets use the sco data transmission, while most other
-services should use rfcomm data channels. So it's quite possible that
-while other things work well, there's a problem with the dongle when it
-comes to the sco channels.
+No.
 
-| I'll do some more experiments on my own, and I'll let you know if I
-| understand something.
+> Do end user programs really need HCI and LMP version/revision ?
 
-Would be great. Good luck! I'm out of ideas :(
+Only if they wanna display some information about the device. Otherwise
+they are useless, because the kernel or the Bluetooth library will hide
+the differences.
 
-- - Lars
+Regards
+
+Marcel
 
 
-- --
-Lars Grunewaldt
-* software development
-* multimedia design
-skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
-web: http://www.dark-reality.de
-mail: lgw@dark-reality.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFB764fQWC6DTWkDAoRAgHvAJ0RlLnR67/Itmv2slWQF84yME0tbQCdGS4/
-xiujbR/82e4y4vdqH7/rW8c=
-=pGrr
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
