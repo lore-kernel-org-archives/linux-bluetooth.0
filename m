@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] cross compiling bluez-utils
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <848611830@web.de>
+References: <848611830@web.de>
 Content-Type: text/plain
-Message-Id: <1107621942.6921.164.camel@pegasus>
+Message-Id: <1107618796.6921.156.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Automatic switching to sniff mode
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,16 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 05 Feb 2005 17:45:42 +0100
+Date: Sat, 05 Feb 2005 16:53:16 +0100
 
-Hi folks,
+Hi Martin,
 
-I like to get some parts from the todo list done. The switching into
-sniff mode when a connection is idle seems to be an interesting start,
-because this will reduce the power consumption of idle connections and
-thus should give us more battery life for our notebooks. Any ideas?
-Anyone who already played with the sniff mode? Any recommendations what
-we should pay attention to?
+> > I crosscompiled bluez-libs, bluez-utils and even hciemu for ARM platform 
+> > and they work fine. I am preparing a little how-to for those insterested 
+> > on doing the same thing.
+> 
+> They work perfectly here, too. Thanks for the hint! I just found it a little inconvenient to find the /etc/bluetooth/ directory in my ARM gcc directory. To be more specific:
+> 
+> The compiler, libs, include, ... directories reside under /usr/arm/arm-linux. That is set with 'prefix'. The executables then go to something like /home/mm/arm/ramdisk/mnt by setting 'exec_prefix' accordingly. I thought it to be funny to see /etc/bluetooth/ in the ramdisk rather than in the compiler area.
+
+are you sure that exec_prefix is meant for cross-compiling. From my
+knowledge it is for architecture dependent executables that will reside
+in the same filesystem. For example for NFS exports.
 
 Regards
 
