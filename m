@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] HID report mode protocol support in 2.6.11-mh1
 	broken/missing?
-From: Vesa Halttunen <vesuri@jormas.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1110826222.629.29.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200503141344.03345.florian-evers@gmx.de>
 References: <1110498275.3040.6.camel@pc.vesuri.net>
 	 <1110796090.8158.56.camel@pegasus>
-	 <200503141344.03345.florian-evers@gmx.de> <1110826222.629.29.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1110829352.3386.1.camel@pc.vesuri.net>
+	 <200503141344.03345.florian-evers@gmx.de>
+Content-Type: text/plain
+Message-Id: <1110826222.629.29.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,22 +21,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Mar 2005 21:42:32 +0200
+Date: Mon, 14 Mar 2005 19:50:22 +0100
 
-On Mon, 2005-03-14 at 19:50 +0100, Marcel Holtmann wrote:
-> I just checked the source code again and actually I forgot to remove an
-> #ifdef when I made the 2.6.11-mh1 patch. Got into hidp/core.c and remov=
-e
-> the "#ifdef 0" and its "#endif" in hidp_add_connection().
+Hi Florian,
 
-That fixed the problem. Thanks. (BTW it's #if 0 in case someone tries to
-find it by searching for #ifdef)
+> I have the same problem here. I'm owner of a Microsoft Wireless Desktop
+> Elite for BT 2.0. The only kernel that offered me support for the
+> mouse wheel was 2.6.10-mh2. It had some quirks (left mouse button does
+> not work properly after reconnection, I've to press all mouse-buttons
+> simultaneously with mouse cursor over background in KDE. Then it
+> works again) but basically it is _far_ better than having no wheel
+> support.
+> 
+> -mh3 and -mh4 didn't work for me. They were not able to detect my bluetooth
+> dongle. Vanilla 2.6.11 and 2.6.11-mh1 detect my MS-BT 2.0 dongle correctly, 
+> but keyboard and mouse are accessed in boot protocol mode. So I'm using
+> 2.6.10-mh2 again...
 
-Regards,
+I just checked the source code again and actually I forgot to remove an
+#ifdef when I made the 2.6.11-mh1 patch. Got into hidp/core.c and remove
+the "#ifdef 0" and its "#endif" in hidp_add_connection().
 
--Vesa
---=20
-            =B7 Vesa Halttunen - http://www.jormas.com/~vesuri/ =B7
+Regards
+
+Marcel
+
 
 
 
