@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <420BBA0B.5090405@web.de>
-From: Andreas Millinger <andreas.millinger@web.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-devel] Re: Re: Re: hciattach problem
+Subject: Re: [Bluez-devel] Lower granularity for INQUIRY interval
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <420BB12D.8010107@csr.com>
+References: <Pine.GSO.4.33.0502101901380.11531-100000@horus.imag.fr>
+	 <420BB12D.8010107@csr.com>
+Content-Type: text/plain
+Message-Id: <1108063153.15974.123.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,27 +19,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 10 Feb 2005 20:46:19 +0100
+Date: Thu, 10 Feb 2005 20:19:13 +0100
 
-Hello Marcel,
+Hi Steven,
 
->please try 2.6.11-rc3-bk7 and what does "modinfo bluetooth" say?
-modinfo bluetooth:
-filename:       /lib/modules/2.6.10-mh3/kernel/net/bluetooth/bluetooth.ko
-author:         Maxim Krasnyansky <maxk@qualcomm.com>, Marcel Holtmann 
-<marcel@holtmann.org>
-description:    Bluetooth Core ver 2.7
-version:        2.7
-license:        GPL
-alias:          net-pf-31
-vermagic:       2.6.10-mh3 PENTIUMIII REGPARM gcc-3.3
-depends:
-srcversion:     DAE2F0A0D8CBDE079A024DB
+> > Could we potential have a new function in the API, say
+> > hci_inquiry_fine_granularity, that does exactly what I described
+> > above?
+> 
+> I don't think that it's a good idea to add an API to make it easy to
+> perform actions that are bad ideas.
 
-I will try 2.6.11-rc3-bk7.
+I will never add such a specific API, but actually there is already one
+for these kind of things. It is called HCI raw socket ;)
 
-Best regards
-Andreas
+Regards
+
+Marcel
+
 
 
 
