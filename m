@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <423021C200007A66@resmta01.ono.com>
-From: kwyjibo@ono.com
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-15"
-Subject: [Bluez-devel] Trouble compiling bluez-hcidump-1.18
+Subject: Re: [Bluez-devel] some basic questions
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20050323181913.12fe9a15@BigWilma>
+References: <20050323181913.12fe9a15@BigWilma>
+Content-Type: text/plain
+Message-Id: <1111603018.1916.11.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,46 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 23 Mar 2005 23:38:33 +0100
+Date: Wed, 23 Mar 2005 19:36:58 +0100
 
-Untar, ./configure and then make and I get this:
+Hi Bjoern,
 
-make  all-recursive
-make[1]: Entering directory `/root/bluez-hcidump-1.18'
-Making all in parser
-make[2]: Entering directory `/root/bluez-hcidump-1.18/parser'
-gcc -DHAVE_CONFIG_H -I. -I. -I..     -Wall -O2 -c `test -f 'parser.c' ||
-echo './'`parser.c
-gcc -DHAVE_CONFIG_H -I. -I. -I..     -Wall -O2 -c `test -f 'hci.c' || ech=
-o
-'./'`hci.c
-hci.c: In function `command_dump':
-hci.c:707: error: `OCF_CHANGE_CONN_LINK_KEY' undeclared (first use in thi=
-s
-function)
-hci.c:707: error: (Each undeclared identifier is reported only once
-hci.c:707: error: for each function it appears in.)
-hci.c: In function `cmd_complete_dump':
-hci.c:966: error: `OCF_SET_AFH_CLASSIFICATION' undeclared (first use in t=
-his
-function)
-hci.c:998: error: `OCF_READ_LINK_QUALITY' undeclared (first use in this f=
-unction)
-hci.c:1001: error: `OCF_READ_CLOCK' undeclared (first use in this functio=
-n)
-hci.c: In function `event_dump':
-hci.c:1376: error: `EVT_CHANGE_CONN_LINK_KEY_COMPLETE' undeclared (first
-use in this function)
-hci.c: In function `hci_dump':
-hci.c:1505: error: `HCI_VENDOR_PKT' undeclared (first use in this functio=
-n)
-make[2]: *** [hci.o] Error 1
-make[2]: Leaving directory `/root/bluez-hcidump-1.18/parser'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/root/bluez-hcidump-1.18'
-make: *** [all] Error 2
+> what is the baswap - function used for? I had a look at the bluetooth.c and it is just changing the order of the MAC-address.
+> 
+> Is there some documentation available where I can read about the functions and why/what they are used for?
 
-I have no idea where the problem is... Any suggestions?
+the BD_ADDR is transmitting in reverse order.
+
+> What is the difference between the ba2str and batostr functions? Why are there 2 functions implemented?
+
+The *2str function do the baswap() and operate on a buffer. The *tostr
+functions allocate a buffer and don't do the baswap().
+
+Regards
+
+Marcel
 
 
 
