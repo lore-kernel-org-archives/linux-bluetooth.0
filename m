@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-From: "Simi Manuel" <roses_3@operamail.com>
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20041228124352.D916D416118@ws5-2.us4.outblaze.com>
-Subject: [Bluez-users] bluetooth host required !!!!!
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200412280941.52066.cijoml@volny.cz>
+Subject: [Bluez-users] another hid2hci error message
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +17,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Dec 2004 13:43:52 +0100
+Date: Tue, 28 Dec 2004 09:41:52 +0100
 
+Hi Marcel,
 
-i am new to this subject,bluetooth.....i am trying to implement LMP,baseban=
-d and simulate Radio...So will i get the Bluetooth Host as a chip so that i=
- can use the important layers of the protocol stack ...if so how abt its co=
-st and where is it available...
---=20
-_____________________________________________________________
-Web-based SMS services available at http://www.operamail.com.
-=46rom your mailbox to local or overseas cell phones.
+# hid2hci
+Switching device 0a12:1000 to HCI mode failed (Invalid or incomplete multibyte 
+or wide character)
 
-Powered by Outblaze
+But device is switched OK
+
+Michal
 
 
 -------------------------------------------------------
