@@ -1,9 +1,9 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050221190756.66973.qmail@web53009.mail.yahoo.com>
+Message-ID: <20050221185035.98722.qmail@web53003.mail.yahoo.com>
 From: Alfredo Meraz <alfredo_meraz@yahoo.com.mx>
-Subject: Re: [Bluez-users] how get differenced two simultaneous bnep interfaces with the same IP address in a single Bluetooth dongle?
+Subject: Re: [Bluez-users] Re: USB Bluetooth works manually, but won't hotplug with the SAME script
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4219DBCF.6040300@teltronic.es>
+In-Reply-To: <cvael0$d6q$1@sea.gmane.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
@@ -17,78 +17,75 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 21 Feb 2005 13:07:55 -0600 (CST)
+Date: Mon, 21 Feb 2005 12:50:35 -0600 (CST)
 
-Hi Esteban:
-This doesn't seem like a bluetooth problem to me,
-rather a network problem. And the root, as it appears
-to me, is that at some point you will have to
-dupplicate the network packets so that they go through
-both access points :) ... and manage your routing
-table acordingly... and some more tweakings :S
-I had a simpler problem a few months back, when I
-inserted 2 NIC's of the same brand into a
-server-router. The second NIC, even when configured
-properly, would not receive packets at all! Using a
-network sniffer, ethereal, I found out that packets
-would leave the second NIC, with the right IP address,
-but with the MAC address of the first NIC!
-The solution? I had to use a second NIC of a different
-brand, and now it works :D
-Regards.
+Hi Sebastian :)
+Thanks for your prompt help.
+I've tried the script... unfortunately, again, it
+works manually, but doesn't work with hotplug :( ... I
+had to remove the "modprobe bluetooth", because it
+didn't find the module, but AFAIK, the functionality
+is implemented in hci_usb... I might be wrong on this
+:(
+What the last 2 lines do, is what other people are
+suggesting to do with an rfcomm-kernel patch :)...
+basically, the second to last line:
+sdptool add --channel=3 SP
+adds the Serial Port service to sdpd, and the last
+line, fires up a pppd connection everytime a
+connection request comes from channel 3, establishing
+a connection to the palm :)
+Is there a chance that the problem is caused by the
+environment the kernel uses to execute the script is
+more restricted than when I do it manually? If so, how
+do I determine the difference? :S
+Best regards.
 Alfredo
 
- --- Esteban Monturus <emonturus@teltronic.es>
-escribió: 
->     Hi all.
+ --- Sebastian Roth <sebiroth@web.de> escribió: 
+> Hi Alfredo,
 > 
->     I am working with a single USB dongle in a Linux
-> laptop with BlueZ 
-> and two PAN-profile access points connected to the
-> same LAN. Each access 
-> point is implemented with a PC with bridge-utils and
-> bluez packets 
-> installed. I stablish two simultaneous PAN
-> connectionsfrom the laptop: 
-> each one to a different access point. Having both
-> connections would 
-> prevent the loss of data between the LAN and the
-> laptop. I would like to 
-> receive all the packets through both connections, in
-> order to have 
-> redundancy.
+> I can't say what exactly the problem is but IMHO the
+> script
+> is not structured very wise. Maybe the script is
+> executed before
+> the needed modules are loaded when used for
+> hotplugging.
+> Here is my suggestion for a script:
 > 
->     I configure both resulting bnep interfaces to
-> have the same IP 
-> address, since I don't want the other side of the
-> communication to know 
-> the existence of two different paths. When I do
-> "ifconfig" in the  
-> laptop, I realize that both bnep interfaces show the
-> same hardware 
-> address, which would let my laptop receive each
-> packet from the LAN 
-> twice. But the reality is that only one of the
-> interfaces at a time 
-> receives the packets.
+> #!/bin/sh
+> # get the bluetooth things ready
+> PATH=/bin:/sbin:/usr/bin:/usr/sbin
 > 
->     For example, when "ping" my laptop from a
-> computer connected to the 
-> LAN, only bnep0 receives ICMP requests, and bnep1
-> doesn't. If I use the 
-> metrics of the routing table to force bnep1 to
-> answer the ping, then 
-> ICMP requests start to be received by bnep1, and
-> bnep0 receives nothing now.
+> # load all modules
+> modprobe bluetooth
+> modprobe hci_usb
+> modprobe l2cap
+> modprobe rfcomm
 > 
->     I would like to know if this issue depends on
-> the bnep 
-> implementation and also would like to know how can
-> the net make 
-> differences between both interfaces, as they have
-> same MAC and IP addresses.
+> # start the deamons
+> # AFAIK the configfile paths are default
+> # so there is no need to specify these
+> hcid
+> sdpd
+> rfcomm bind all
 > 
->     Thanks a lot.
+> # this is done by hcid!
+> # hciconfig hci0 up
+> 
+> # don't really know what these
+> # commands do but seems ok to me
+> sdptool add --channel=3 SP
+> dund --listen --channel 3 --msdun noauth
+:192.168.1.240 crtscts 115200 ms-dns 192.168.1.1
+> lock
+> 
+> 
+> I have not tested this script but it _should_ work.
+> 
+> Best regards,
+> Sebastian
+> 
 > 
 > 
 >
