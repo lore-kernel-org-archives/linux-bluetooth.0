@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] MS-6871 isn't working
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <42381514.3070701@sinister.cz>
-References: <42381514.3070701@sinister.cz>
-Content-Type: text/plain
-Message-Id: <1110971745.9818.131.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <42381514.3070701@sinister.cz>
+From: Trekie <trekie@sinister.cz>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] MS-6871 isn't working
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,37 +16,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Mar 2005 12:15:45 +0100
+Date: Wed, 16 Mar 2005 12:14:28 +0100
 
-Hi David,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> I can't get MS-6871 BT device (USB hub with bluetooth) working.
-> hciconfig shows:
-> 
-> hci0:   Type: USB
-> ~        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
-> ~        DOWN
-> ~        RX bytes:0 acl:0 sco:0 events:0 errors:0
-> ~        TX bytes:0 acl:0 sco:0 commands:0 errors:0
-> 
-> and hciconfig hci0 up:
-> 
-> Can't init device hci0. Input/output error(5)
-> 
-> with this in syslog:
-> 
-> hci_usb_intr_rx_submit: hci0 intr rx submit failed urb c17e1514 err -28
-> 
-> Do anyone know what should I do?
+Hi,
 
-is it directly connected to the USB root hub? We saw problems if another
-USB hub is involved.
+I can't get MS-6871 BT device (USB hub with bluetooth) working.
+hciconfig shows:
 
-Regards
+hci0:   Type: USB
+~        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
+~        DOWN
+~        RX bytes:0 acl:0 sco:0 events:0 errors:0
+~        TX bytes:0 acl:0 sco:0 commands:0 errors:0
 
-Marcel
+and hciconfig hci0 up:
+
+Can't init device hci0. Input/output error(5)
+
+with this in syslog:
+
+hci_usb_intr_rx_submit: hci0 intr rx submit failed urb c17e1514 err -28
+
+Do anyone know what should I do?
 
 
+Thank you
+
+David Brodsky
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iD8DBQFCOBUUMcA3II2AlaIRAnzqAJ4+pTw3+kpgsjRfV0ObBiRG6tT8xwCg6TQ/
+b3+1d+F5bzoeVswGgA+TchI=
+=wWj2
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
