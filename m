@@ -1,86 +1,73 @@
-Return-Path: <igorluiz@magiclink.com.br>
-Subject: Re: [Bluez-users] Problem with pppd through bluetooth
-From: Igor Luiz Oliveira de Souza <igorluiz@magiclink.com.br>
-Reply-To: igorluiz@magiclink.com.br
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] mroute and nokia 6600
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Jordi Molgo (Kryogen)" <kryogen@lleida.net>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1077843554.2843.19.camel@pegasus>
-References: <1077831499.7219.34.camel@emerald>
-	 <1077843554.2843.19.camel@pegasus>
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1077878878.21031.13.camel@emerald>
+In-Reply-To: <1077886228.2002.14.camel@jordi.molgo.com>
+References: <1077886228.2002.14.camel@jordi.molgo.com>
+Content-Type: text/plain
+Message-Id: <1077887281.2843.38.camel@pegasus>
 Mime-Version: 1.0
-Date: Fri, 27 Feb 2004 10:47:58 +0000
-List-ID: <bluez-users.lists.sourceforge.net>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 27 Feb 2004 14:08:01 +0100
 
-Hi Marcel,
+Hi Jordi,
 
-Sorry about my innocence :-)))), but when you say "use the kernel RFCOMM
-layer", you mean load the module "rfcomm" (or even have it built in the
-kernel) ???
-If so, I already have the module(rfcomm) loaded...
-Se my lsmod:
--------------------------------------------------
-root@emerald:~# lsmod
-Module                  Size  Used by    Tainted: P
-ppp_deflate             3512   0  (unused)
-zlib_deflate           18520   0  [ppp_deflate]
-ppp_async               7712   0  (unused)
-ppp_generic            16092   0  [ppp_deflate ppp_async]
-slhc                    5200   0  [ppp_generic]
-hci_usb                 8088   0
-sco                     9132   0  (unused)
-rfcomm                 32672   0
-l2cap                  16876   2  [rfcomm]
-bluez                  32548   1  [hci_usb sco rfcomm l2cap]
-ussp                   17152   0
-uhci                   25872   0  (unused)
-usbcore                62112   1  [hci_usb uhci]
-8139too                15944   1
-mii                     2496   0  [8139too]
-crc32                   2880   0  [8139too]
-nvidia               1962184   6
-es1371                 27400   0
-ac97_codec             13608   0  [es1371]
-soundcore               3588   4  [es1371]
-root@emerald:~#
--------------------------------------------------
-And the problem still remains...
-
-And if ""use the kernel RFCOMM layer"" has no meaning with I sad before,
-can you tell me what it is?
-Any other idea?
-
-Best Regards!!!
--- 
-Igor Luiz Oliveira de Souza
-Magiclink Solucoes Internet
-Analista de TI - 88657412
-Salvador / BA   -  Brasil
-
-
-Em Sex, 2004-02-27 às 00:59, Marcel Holtmann escreveu:
-> Hi Igor,
+> I have a Nokia 6600 and a bluetooth usb dongle. I have installed
+> and configured bluez so I have now
 > 
-> > I'm experimenting a problem trying to connect internet via GRPS through
-> > bluetooth using my Nokia 3650 and a Linux Box with a usb-dongle
-> > bluetooth BT3030, via pppd.
-> > 
-> > The connection between the mobile and the PC via bluetooth is working
-> > fine. I can transfer data in the two ways: PC->mobile , mobile->PC,
-> > using the bluez driver.
-> > So, now when I try to access the internet via GPRS a got this message
-> > when I call "pppd"
-> > 
-> > root@emerald:~# rfcomm 1 xx:xx:xx:xx:xx:xx 9
-> > Connected /dev/ttyU1 to xx:xx:xx:xx:xx:xx on channel 9
-> > rfcomm_send_data: DLCI 18 not connected
-> > rfcomm_send_data: DLCI 18 not connected
-> > rfcomm_send_data: DLCI 18 not connected
-> > rfcomm_send_data: DLCI 18 not connected
+> [root@jordi root]# hciconfig  -a
+> hci0:   Type: USB
+>         BD Address: 00:09:DD:10:22:79 ACL MTU: 192:8  SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:31260 acl:620 sco:0 events:1805 errors:0
+>         TX bytes:284951 acl:1845 sco:0 commands:221 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'Kryogen (0)'
+>         Class: 0x000100
+>         Service Classes: Unspecified
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver:
+> 0x175
+>         Manufacturer: Cambridge Silicon Radio (10)
 > 
-> use the kernel RFCOMM layer.
+> and also I have created two rfcomm
+>   [root@jordi root]# rfcomm
+>   rfcomm0: 00:60:57:B4:52:6D channel 1 closed
+>   rfcomm1: 00:60:57:B4:52:6D channel 2 closed
 > 
-> Regards
-> 
-> Marcel
+> After I have read in http://mobile.linux.pt/p800 I can connect with
+> pppd to my handset, but when connecting it hangs. I have searched 
+> the reason, but I can't manage to correct it.
+
+this is all about the mRouter callback stuff. I don't have a Symbian
+based mobile phone to write an easy to use application for this carp.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
