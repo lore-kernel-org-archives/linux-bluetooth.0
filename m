@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4237FEC0.3000308@carmedialab.de>
-From: Marcus Mikolaiczyk <marcus.mikolaiczyk@carmedialab.de>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] rfcomm gives "no route to host"
-References: <4237F5CE.7030602@carmedialab.de> <1110965630.9818.84.camel@pegasus>
-In-Reply-To: <1110965630.9818.84.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: Re: [Bluez-users] adding sdp service record attributes
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050316012142.60063.qmail@web60906.mail.yahoo.com>
+References: <20050316012142.60063.qmail@web60906.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1110965856.9818.90.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,18 +18,60 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Mar 2005 10:39:12 +0100
+Date: Wed, 16 Mar 2005 10:37:36 +0100
 
-Hi Marcel,
-> you can't connect to yourself. This is not possible with Bluetooth.
-> 
-> 	src = 00:80:37:25:B7:DB	(hci0)
-> 	dst = 00:80:37:25:B7:DB (rfcomm0)
+Hi Michael,
 
-OK that makes sence. Sorry for this dumb question.
+>     Sorry for that. Maybe I rephrase the question like this.
+>     Now, I'm still struggling about how to add sdp service profiles in
+> my Linux PC. And the most important thing is to let my computer to act
+> as headset so that T610 can connect to it. I know that to add the
+> service, using add_headset function is the way. But I find that only
+> using this function is not enough, and I also find that there is a
+> command called "setattr" that sets or adds the attributes to SDP
+> record. Then I wish to know that if the setattr command, or set_attrib
+> function in sdptool.c is necessary. If so, in the setattr command,
+> there are two parameters that I've to enter, attrib_id and
+> attrib_value. I wish to know what are the corresponding values of
+> these two parameters from the following after I've typed "sdptool get
+> --tree <recordhandle>"?
+> Attribute Identifier : 0x0 - ServiceRecordHandle
+>   Integer : 0x10002
+> Attribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     UUID16 : 0x1108 - Headset
+>     UUID16 : 0x1203 - GenericAudio
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x5
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x1108 - Headset
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>      Lastly, I wish to konw that if I can let my PC to act as headset
+> for T610, after I've added the profile in it, is there any program
+> needed to install in T610 so that it can connect to the PC?
+>      Hope that this can be clearer to you. Thank you very much.
 
-thanks and regards
-Marcus
+now I get what you want. In general adding SDP records with sdptool is
+only for testing purpose. You should include you own code for it, like
+we do for pand or dund. However if you think that the add_headset() in
+sdptool misses an attribute then fix this and send in a patch for it.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
