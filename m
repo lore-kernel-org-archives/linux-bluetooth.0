@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PAND and RFCOMM simultaneously
+Subject: Re: [Bluez-users] Bluetooth Scatternet
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Harald Meier <meh1@rts.at>
+To: Ronan Naughton <wadgienaughton@hotmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <004b01c41268$7e8ee810$4000fe0a@rtsviec64>
-References: <004b01c41268$7e8ee810$4000fe0a@rtsviec64>
+In-Reply-To: <BAY10-F83fB2prT8RHQ00011eaf@hotmail.com>
+References: <BAY10-F83fB2prT8RHQ00011eaf@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1080257920.2283.40.camel@pegasus>
+Message-Id: <1080257828.2283.37.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,22 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Mar 2004 00:38:40 +0100
+Date: Fri, 26 Mar 2004 00:37:08 +0100
 
-Hi Harald,
+Hi Ronan,
 
-> I have a NAP/PANU network with pand running and I need to
-> set up some (up to 4) rfcomm connection additionally.
-> 
-> Setting up the rfcomm devices when the pand is down works fine
-> but if pand is up, I get a "Function not implemented" when I try
-> to bring up a rfcomm connection.
-> 
-> If the rfcomm connection is up and I try to connect to the NAP
-> via pand, I get the "Function not implemented" from pand.
+> Has anyone ever implemented a bluetooth scatternet using pan over bnep.
+> I have two simple piconets running at the moment and want to join them.  How 
+> will I assign it so that a node can be a slave in both piconets. Do i need 
+> two bnep connections. Or should I have a node to be a master in one piconet 
+> and a slave in an other. How is this implemented?
 
-tell us more details of your setup. Which devices are involved?
-Connections from what devices etc.
+you need a scatternet capable Bluetooth chip, which means a chip which
+can be master in one and slave in another or slave in two different
+piconets. Actually you form a scatternet if one of these two conditions
+are present and each connection will have its own BNEP connection.
 
 Regards
 
