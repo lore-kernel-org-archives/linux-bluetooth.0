@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Headset Problems
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Brandon Wiley <blanu@synapthein.org>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <20040821081408.GA4969@synapthein.org>
-References: <20040821081408.GA4969@synapthein.org>
-Content-Type: text/plain
-Message-Id: <1093077490.3650.1.camel@notepaq>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20040821081408.GA4969@synapthein.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+From: blanu@synapthein.org (Brandon Wiley)
+Subject: [Bluez-users] Headset Problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +15,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 21 Aug 2004 10:38:11 +0200
+Date: Sat, 21 Aug 2004 03:14:09 -0500
 
-Hi Brandon,
+I'm trying to access my GN6110 headset using the hstest program on Linux
+2.6.2 with bluez-utils 2.1.0.
 
-> I'm trying to access my GN6110 headset using the hstest program on Linux
-> 2.6.2 with bluez-utils 2.1.0.
+It connects to my headset fine and it receives the AT commands from
+button presses on the headset. However, I get no audio using either
+record or play modes.
 
-install at least Linux kernel 2.6.8 and bluez-utils-2.10. Check with
-"hciconfig hci0 revision" if your SCO traffic is routed over HCI.
-
-Regards
-
-Marcel
-
+Any suggestions?
 
 
 
