@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41AE5F72.6030201@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] general rfcomm questions
+Content-Type: text/plain;
+	charset="us-ascii"
+Subject: RE: [Bluez-users] bluetooth sniff mode
+Message-ID: <A1F0D47583A2D711919F00600819B3A46B78C1@goofy.vitronics.com>
+From: "Cruz, Maria" <maria.cruz@VITRONICS.com>
+To: <bluez-users@lists.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,29 +17,89 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Dec 2004 01:18:58 +0100
+Date: Wed, 1 Dec 2004 16:42:45 -0500
 
-Hello
+Thanks Marcel.  I found out that after a "sniff mode" command the HCI
+Event : Mode Change occurs.  I found reference to this in both specs.
+This event shows a "current_mode" field.  If it is set to "0x02" then in
+sniff mode.
 
-i now tried and read quite a few things about rfcomm and multiple 
-connections... but still don't really know what i was searching for...
-maybee someone here can help me (hopefully).
+Running hcidump -x captures this event.
 
-i have one device that needs to parallely serve a service to multiple 
-clients via rfcomm.
-- is it possible that the service runns on multiple rfcommchannels, one 
-for each clients? what's the limit?
-- or is the solution to wait for connections, and on a incoming 
-connection close it to connect to that device (having the local service 
-waiting for new connections)...
-- does a inquiry block the whole device? i noticed that if a connection 
-between my device and a client is etablished, i'm unable to run "hcitool 
-scan"...
+Thanks
+maria
 
-i'd really appreciate if someone had the time to share it's knowledge...
+-----Original Message-----
+From: Marcel Holtmann [mailto:marcel@holtmann.org]=20
+Sent: Wednesday, December 01, 2004 2:37 PM
+To: BlueZ Mailing List
+Subject: Re: [Bluez-users] bluetooth sniff mode
 
-kind regards
-Marco Trudel
+Hi Maria,
+
+> Here is the output from my command:
+>=20
+> # hcitool cmd 0x02 0x0003 0x01 0x00 0x00 0x05 0x00 0x01 0x06 0x00 0x10
+> 0x00
+>=20
+> < HCI Command: ogf 0x02, ocf 0x0003, plen 10
+>=20
+>   01 00 00 05 00 01 06 00 10 00
+>=20
+> > HCI Event: 0x0f plen 4
+>=20
+>   00 01 03 08
+
+run "hcidump -X" as root at the same time and see what it produces.
+
+> Not sure if this indicates a success (or just pending not sure yet of
+> success).  Additionally, I am using bluez-libs&bluez-utils2.10.
+> Should I reference the "BLUETOOTH SPECIFICATION Version 2.0 + EDR"
+> instead?  I found version 2.0 at "Bluetooth.org" web site.  AND the
+> version 2.0 spec is slightly different.  For example the error codes
+> listed in 2.0 are different. =20
+
+The BlueZ versions have nothing to do with the version of the Bluetooth
+specification.
+
+> Maybe it is only semantics... either way I do not understand what
+either
+> really mean.  For the sniff mode I have setup a bnep connection.  I
+> can ping "host", I have static IPs setup.  And=20
+>=20
+> hcitool con
+>=20
+> Connections:
+>=20
+>         < ACL 00:02:72:41:2E:1D handle 1 state 1 lm MASTER
+>=20
+> =20
+>=20
+> Should this indicate "SLAVE"?  Somes times hcitool con will show SLAVE
+> instead.  Your advice on what spec to use and how to decipher hictool
+> output is appreciated.
+
+The device that initiates the connection is the master until it switches
+its role.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now.=20
+http://productguide.itmanagersjournal.com/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+
 
 
 -------------------------------------------------------
