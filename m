@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SDP queries when authentication/encryption are
-	turned on
+Subject: Re: [Bluez-devel] Re: urb timeout with bluetooth USB HCI on
+	ARM	(2.6.11-rc3)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200502231044.48821.bluez-devel@schaettgen.de>
-References: <20050223020808.14745.qmail@web52803.mail.yahoo.com>
-	 <1109132939.8506.113.camel@pegasus>
-	 <200502231044.48821.bluez-devel@schaettgen.de>
+In-Reply-To: <loom.20050222T131039-923@post.gmane.org>
+References: <7d01f9f00502210904ac37fae@mail.gmail.com>
+	 <1109025926.7626.2.camel@pegasus> <loom.20050222T131039-923@post.gmane.org>
 Content-Type: text/plain
-Message-Id: <1109241819.5645.8.camel@notepaq>
+Message-Id: <1109241609.5645.4.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,25 +20,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Feb 2005 11:43:39 +0100
+Date: Thu, 24 Feb 2005 11:40:09 +0100
 
-Hi Fred,
+Hi Thibaut,
 
-> > if you set your device into security mode 3, then this is what you get.
-> > As I have often said, do this only when you know what you are doing and
-> > what does this imply.
+> Looking at the code, "isoc" is only available when CONFIG_BT_HCIUSB_SCO is
+> enabled, which wasn't my case. AFAICT it's used for disabling SCO protocol at
+> runtime in the code, but just to make absolutely sure I rebuilt the module with
+> SCO support enabled, tried various values for isoc=, none changed anything. 
 > 
-> Marcel, why don't you simply put this often repeated sentence into a comment 
-> in default hcid.conf right above auth/encrypt? If people are not familiar 
-> with bluetooth, then it's reasonable to assume that you have to enable this 
-> if you want any security at all. You don't expect everbody to know what 
-> security mode 3 means and what the alternatives are, do you?
+> tried with "reset=1", didn't change anything either
+> 
+> FWIW, it's almost impossible to debug with CONFIG_BT_HCIUSB_DEBUG force set on,
+> for the machine is so slowed down that the timeouts would actually be
+> meaningful. Maybe this is why this config option isn't available from the config
+> menu ;)
 
-there is a comment that this is security mode 3, but actually this does
-not prevents for its misuse and the later complaints. Problem is that
-Bluetooth is still a complex technology and if you change defaults you
-should understand what you are doing. However I always accept patches
-that extends the manual pages with more details about it.
+if both not helps, then I think that it a ARM and USB related problem.
+Since I don't have any of these platform, I can't help you here.
 
 Regards
 
