@@ -1,13 +1,18 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Detecting RSSI without connecting
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41A5CEF7.8090209@csr.com>
-References: <qszactrj3c5.fsf@timepilot.gpcc.itd.umich.edu>
-	 <1099960170.29330.43.camel@pegasus>
-	 <qszu0rfnfil.fsf@mspacman.gpcc.itd.umich.edu>  <41A5CEF7.8090209@csr.com>
+Subject: Re: [Bluez-users] Bluez-sdp depreciated? Was Which fedora core?
+From: Philip Barnes <phil@trig222.f9.co.uk>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1101350779.7538.19.camel@pegasus>
+References: <cnhnd6$toe$1@sea.gmane.org>  <1100769119.7164.17.camel@pegasus>
+	 <1100798738.3439.4.camel@localhost.localdomain>
+	 <1100803683.7164.74.camel@pegasus>
+	 <1100808919.3433.12.camel@localhost.localdomain>
+	 <1100813353.7164.87.camel@pegasus>
+	 <1100861560.7136.49.camel@baroque.rococosoft.com>
+	 <1101329008.3773.10.camel@localhost.localdomain>
+	 <1101350779.7538.19.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1101413514.6465.10.camel@pegasus>
+Message-Id: <1101415238.3485.10.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,28 +25,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Nov 2004 21:11:54 +0100
+Date: Thu, 25 Nov 2004 20:40:38 +0000
 
-Hi Steven,
+I have got bluez working with the rpms from Fedora core 2 and have gone
+back to trying the later rpms.
 
-> >                                    If this device doesn't support it,
-> > can anybody recommend a device available in the US that does support
-> > RSSI on inquiry?
-> 
-> Modesty forbids.
+I now have the following installed 
+bluez-bluefw-1.0-6.i386.rpm       
+bluez-pin-0.23-3.i386.rpm
+bluez-hcidump-1.11-1.i386.rpm     
+bluez-utils-2.10-2.i386.rpm
+bluez-libs-2.10-2.i386.rpm        
+bluez-utils-cups-2.10-2.i386.rpm
 
-all CSR chips with HCI 18.x firmware support inquiry with RSSI as
-defined in the specification and without any bugs. So I said it ;)
+and I am back more or less where I started and running dund with the
+command
+dund --listen --msdun --channel 1 10.2.0.1:10.2.0.10
 
-> Marcel's page at http://www.holtmann.org/linux/bluetooth/features.html
-> really needs updating to quote more features bits now that 1.2 devices
-> are starting to appear.
+The logs return the error
+localhost dund[3561]: Failed to connect to the local SDP server. No such
+file or directory(2)
 
-I know, I know. Time is always against me :(
+In the /usr/lib there are two files
+libbluetooth.so.1       
+libbluetooth.so.1.0.10
 
-Regards
+I have tried symbolic linking them both to various combinations of
+libsdp.so, libsdp.so.1
 
-Marcel
+Dund seems to be searching for sdp, and cannot find it.
+
+Anyone any ideas how I make dund work again?
+
+Thanks Phil
 
 
 
