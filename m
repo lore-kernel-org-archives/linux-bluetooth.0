@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <s0cd9c72.077@cal01.ctech.ac.za>
-From: "Kiran Rama" <ramak@ctech.ac.za>
-To: <bluez-users@lists.sf.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] No module named gtk
+Message-Id: <200406140949.i5E9n0rE002726@news01.csr.com>
+To: list bluez <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] bluepin 
+In-reply-to: "Gene Imes"'s message of "Sat, 12 Jun 2004 17:56:21 CDT."
+             <1087080981.21738.3.camel@tr1a.ozob.net>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,33 +15,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Jun 2004 12:38:48 +0200
+Date: Mon, 14 Jun 2004 10:49:00 +0100
 
-hi
+Gene Imes wrote:
+> Anyone know how to fix this:
+> 
+> gene@tr1a:~> bluepin
+> Xlib: connection to ":0.0" refused by server
+> Xlib: No protocol specified
 
-How do I fix this error?
-Where do I get the module gtk?
+It's probably some kind of authorization problem.  Are you able
+to
 
-linux:/ # bluepin
-Traceback (most recent call last):
-  File "/bin/bluepin", line 34, in ?
-    from gtk import *
-ImportError: No module named gtk
+xauth merge ~/.Xauthority
 
-thanks.
---------------------------------------------------------------------
-Disclaimer 
-This e-mail transmission contains confidential information,
-which is the property of the sender.
-The information in this e-mail or attachments thereto is 
-intended for the attention and use only of the addressee. 
-Should you have received this e-mail in error, please delete 
-and destroy it and any attachments thereto immediately. 
-Under no circumstances will the Cape Technikon or the sender 
-of this e-mail be liable to any party for any direct, indirect, 
-special or other consequential damages for any use of this e-mail.
-For the detailed e-mail disclaimer please refer to 
-http://www.ctech.ac.za/polic or call +27 (0)21 460 3911
+?
+
+-- 
+Peter Stephenson <pws@csr.com>                  Software Engineer
+CSR Ltd., Science Park, Milton Road,
+Cambridge, CB4 0WH, UK                          Tel: +44 (0)1223 692070
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
+
 
 
 -------------------------------------------------------
