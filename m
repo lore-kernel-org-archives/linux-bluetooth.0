@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000c01c4246d$76617470$fcca010a@lysydziadek>
-From: "zubiwat" <zubiwat@poczta.onet.pl>
-To: "devel Bluetooth" <bluez-devel@lists.sourceforge.net>
+From: Simone Gotti <simone.gotti@email.it>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Oops with 2.6.5-mh3
+Cc: "Nicholas A. Preyss" <nalp@gmx.net>
+References: <407C4B88.1010102@thomae-privat.de> <1082161132.4489.33.camel@pegasus> <20040417092404.GA1880@gmx.net>
+In-Reply-To: <20040417092404.GA1880@gmx.net>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0009_01C4247E.39790C10"
-Subject: [Bluez-devel] SDP problems
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200404171109.16683.simone.gotti@email.it>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,65 +19,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 17 Apr 2004 13:16:42 +0200
+Date: Sat, 17 Apr 2004 11:09:16 +0200
 
-This is a multi-part message in MIME format.
+On Saturday 17 April 2004 11:24, Nicholas A. Preyss wrote:
+> On  0, Marcel Holtmann <marcel@holtmann.org> wrote:
+> > > I get a kernel Oops with 2.6.5-mh3 (with and without preempt) and an
+> > > Acer BT-700 USB dongle on a Vaio Notebook, not when unplugging it, but
+> > > when plugging it back in.
+> >
+> > check the latest 2.6.6-rc or Bitkeeper snapshots, because there are many
+> > USB patches that are not merged into 2.6.5. If it still fails send a
+> > report the USB mailing list, because I don't think that this is our
+> > fault.
+>
+> The problem was already submitted to lkml (i found at least 3reports)
+> and one time declared impossible by Andrew Morton. I can't reproduce
+> this error with 2.6.6-rc1 because, the usb dongle ain't even working
+> at all. It seems USB is a bit messed up in that release.
+> In 2.6.5 there is an easy workaround. If you don't need the hci_usb
+> SCO (CONFIG_BT_HCIUSB_SCO) support, disable it in your kernelconfig.
 
-------=_NextPart_000_0009_01C4247E.39790C10
-Content-Type: text/plain;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Hi=20
-I have a problem with SDP. Where I can find examples howto interpret SDP =
-packets. I red Assigned Numbers but I don't know how to answer for =
-SDP_ServiceSearchRequest which looks like this:
-00 00 00 08 35 03 19 10 02 00 14 00
+For the problem that the usb dongle doesn't work anymore with 2.6.6-rc1, After 
+some times I've found the patch that caused the problem and Alan Stern, 
+yesterday, sent me a patch that made it work.
 
-Where I can find what is this ServiceSearchPattern?
-What these values mean??
-I couldn't find this in assigned numbers! Where should I look for this?
+The path is here:
+http://marc.theaimsgroup.com/?l=linux-usb-devel&m=108214198732679&w=2
 
-Regards
+I hope this can help.
 
-Maciej
-
-------=_NextPart_000_0009_01C4247E.39790C10
-Content-Type: text/html;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-2">
-<META content=3D"MSHTML 5.50.4134.600" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I have a problem with SDP. Where I can =
-find=20
-examples howto interpret SDP packets. I red Assigned Numbers but I don't =
-know=20
-how to answer for SDP_ServiceSearchRequest which looks like =
-this:</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>00 00 00 08 35 03 19 10 02 00 14 =
-00</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Where I can find what is this=20
-ServiceSearchPattern?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>What these values mean??</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I couldn't find this in assigned =
-numbers!=20
-Where&nbsp;should I look for this?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Regards</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Maciej</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0009_01C4247E.39790C10--
-
+Bye!
+-- 
+Simone Gotti
+<simone.gotti@email.it>
 
 
 -------------------------------------------------------
