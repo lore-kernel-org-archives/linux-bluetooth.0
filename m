@@ -4,30 +4,32 @@ From: "Daryl Van Vorst" <daryl@wideray.com>
 To: "'Marcel Holtmann'" <marcel@holtmann.org>
 Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Rfcomm Use Count
-Date: Tue, 21 Sep 2004 13:39:19 -0700
-Message-ID: <001801c4a01b$12116eb0$1a01010a@baked>
+Date: Tue, 21 Sep 2004 13:14:43 -0700
+Message-ID: <001101c4a017$a45ae9d0$1a01010a@baked>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="us-ascii"
-In-Reply-To: <1095798744.5762.4.camel@pegasus>
+In-Reply-To: <1095723182.5731.76.camel@pegasus>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 Hi Marcel,
 
-> I will fix 2.6 first, before I will backport it to 2.4.
+> for the L2CAP part the attached patch may fixes the problem 
+> and let the
+> module reference count decrease after the disconnect. The 
+> patch is only
+> compile tested. May you wanna give it a chance and run your 
+> L2CAP tests
+> again.
 
-Sounds good.
+I gave it a try and it works fine as far as I can tell. I had to apply the
+patch manually though (I'm assuming this is because you're working with a
+2.6 kernel and I'm not).
 
-> Attached is the full patch that should also fix the RFCOMM 
-> part. This is
-> again only compile tested, because I had no time to setup a 
-> test system.
-> The L2CAP solution looks very sane to me, but I am not sure about the
-> RFCOMM part and we may will have a locking problem. This really needs
-> intensive testing.
+I don't see the use count incrementing badly any more, and the listening
+socket will continue to accept connections after the number of
+connects/disconnects have exceeded the the accept queue.
 
-Excellent. Thank you very much.
-
-I'll let you know how it works for me.
+Does this give you any ideas for rfcomm?
 
 -Daryl.
