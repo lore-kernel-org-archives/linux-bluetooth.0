@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problem with BlueLogic WingKey Keyboard
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <42406D46.10804@rz-zw.fh-kl.de>
-References: <200503202301.49376.tv@rz-zw.fh-kl.de>
-	 <1111408373.22872.54.camel@pegasus> <423F5B7F.9060200@rz-zw.fh-kl.de>
-	 <423F5E1C.8030301@rz-zw.fh-kl.de> <1111453185.22872.84.camel@pegasus>
-	 <42406D46.10804@rz-zw.fh-kl.de>
-Content-Type: text/plain
-Message-Id: <1111530389.22872.132.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <42409B3B.1080906@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] btsco and Nokia HDW-3 headset not working
+References: <1111528750.12076.18.camel@localhost>
+In-Reply-To: <1111528750.12076.18.camel@localhost>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,29 +18,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Mar 2005 23:26:29 +0100
+Date: Tue, 22 Mar 2005 15:24:59 -0700
 
-Hi Timo,
+James
 
-> I applied your patch and it works now. Thanks a lot! :)
-> 
-> Will your patch be integrated into the offical kernel and if yes when?
+> athos root # sdptool search --bdaddr 00:03:89:67:8F:F7 0x1108
 
-what you applied with that patch is a proof of concept for the report
-protocol mode. The current mainline kernel only supports the boot mode
-and this should also work in most cases. I don't know why it does not
-work for your keyboard and until someone donates such keyboard to me, we
-will may never know.
+Do our docs still recommend this? The channel has been autodetected for 
+some time.
 
-The work for the generic HID parser is on going and when this is merged
-back into mainline then Bluetooth will get full HID report mode protocol
-support.
+> athos root # btsco 00:03:89:67:8F:F7 1
+> Device is 2:0
+> Voice setting: 0x0060
+> RFCOMM channel 1 connected
 
-Regards
+This is not the latest cvs version. It's silent unless you specify "-v" 
+flag. Where did you get the kernel module and btsco daemon you are trying?
 
-Marcel
+> I am running gentoo linux with the following kernel:
+> athos root # uname -a
+> Linux athos.porthosnet.com 2.6.9-gentoo-r14 #11 Fri Mar 4 18:30:23 Local
+> time zone must be set--see zic manu x86_64 AMD Athlon(tm) 64 Processor
+> 3400+ AuthenticAMD GNU/Linux
 
+It would really be a lot easier to debug if you were using the most 
+recent kernel release (we don't have enough resources to maintiain 
+several versions for what is supposed to be a stable kernel series)
 
+Make sure you are using the integrated alsa, not the standalone that is 
+distributed separately. IIRC, this came up because gentoo uses the 
+standalone alsa.
+
+Brad
 
 
 -------------------------------------------------------
