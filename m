@@ -1,18 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] AVDTP socket?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20041121064655.0b04dd8a.henryk@ploetzli.ch>
-References: <418DB442.2050801@uen.org> <41925793.3050404@xmission.com>
-	 <1100113055.25879.73.camel@pegasus> <419543B3.8050601@xmission.com>
-	 <1100306337.7349.29.camel@pegasus> <41957BC1.507@xmission.com>
-	 <1100351199.7349.50.camel@pegasus> <41970F25.4020902@xmission.com>
-	 <1100446172.21403.16.camel@pegasus> <419B7292.9080706@xmission.com>
-	 <cbf0aec9041118052714481128@mail.gmail.com>
-	 <20041121064655.0b04dd8a.henryk@ploetzli.ch>
-Content-Type: text/plain
-Message-Id: <1101059050.7250.39.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41A0D34C.8070400@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] BlueZ and the ALSA support
+References: <1100995285.7250.17.camel@pegasus>	 <41A027BD.5020401@xmission.com> <1101057242.7250.34.camel@pegasus>
+In-Reply-To: <1101057242.7250.34.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -24,30 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 Nov 2004 18:44:10 +0100
+Date: Sun, 21 Nov 2004 18:41:32 +0100
 
-Hi Henryk,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> > I have problems synthesizing the PCM audio samples but can parse all
-> > of the example SBC streams just fine.
-> 
-> Ok, catched it. I reimplemented the SBC analyzer and synthesizer  in
-> Octave which is easier to play around with and found that my C
-> synthesizer was working fine - on wrong subband samples. The bitstream
-> unpacker had a bug which made it shift the incoming bits once to often. 
-> 
-> So sbc-test from the CVS is now able to decode 4 and 8 subband mono SBC
-> files (there's something wrong with stereo, I'll look into that
-> shortly). 
+Marcel Holtmann wrote:
+| Actually I really knew what to do, because I spent so many days in
+| getting the BlueZ CVS in a good shape that this was a really easy job
+| for me. Once you got the understanding for autoconf/automake, things
+| will get really simple. However I will maybe ping you about the beer
+| idea at some time ;)
 
-I was only able to decode 01, 03, 07 and 09. All other mono test files
-are failing. However good work, because these four sound perfect.
+for a starter:
 
-Regards
+(|~|
+~ {_}
 
-Marcel
+Just a pint, though... ;)
 
+| Do anyone mind if we start using the kernel coding style? It will make
+| later integration into the kernel or BlueZ so much easier.
 
+I definitly won't mind, we'll have to migrate anyway, and sooner is
+better than later.
+
+My problem how to change the usb_hci endpoint without killing the n.y.t.
+urbs is still pending, did you have any new ideas on this?
+
+Help appreciated.
+
+regards,
+~  Lars
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFBoNNLQWC6DTWkDAoRAj55AKCTgZl1yflsYLRHrDyXsj85ULtRgQCguZV4
+VPzW4427QTB4slb1Ulpxwtg=
+=RCpm
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
