@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Message-ID: <B72A22937C14184DB0AF3324476E9C791A53FC@MBOX22.stu.nus.edu.sg>
-From: "Khoo Teck Ping" <eng10166@nus.edu.sg>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Question about l2ping: 0 bytes always
+Subject: Re: [Bluez-devel] Error when executing rctest.c
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <B72A22937C14184DB0AF3324476E9C791A53F9@MBOX22.stu.nus.edu.sg>
+References: <B72A22937C14184DB0AF3324476E9C791A53F9@MBOX22.stu.nus.edu.sg>
+Content-Type: text/plain
+Message-Id: <1105960763.8080.25.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,15 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 17 Jan 2005 19:58:11 +0800
+Date: Mon, 17 Jan 2005 12:19:23 +0100
 
-RGVhciBBbGwNCiANCkkgYW0gYWJsZSB0byBydW4gbDJwaW5nLCBhdHRlbXB0aW5nIHRvIHNlbmQg
-YW5kIHJlY2VpdmUgcGFja2V0cyBmcm9tIG15IGxpbnV4IGJveCB0byBteSBzb255IGVyaWNzc29u
-IFQ2MzAuIEhvd2V2ZXIgdGhlIG91dHB1dCBpcyBhbHdheXMgDQogDQowIGJ5dGVzIGZyb20geHg6
-eHg6eHg6eHg6eHggaWQgeCB0aW1lIHggbXMuIA0KIA0KSXQgYWx3YXlzIGVuZHMgd2l0aCB4IGJ5
-dGVzIHNlbnQsIHggYnl0ZXMgcmVjZWl2ZWQsIDAlIGxvc3MuIA0KIA0KSXMgdGhpcyB0aGUgY29y
-cmVjdCBvdXRwdXQ/DQogDQpQbGVhc2UgYXNzaXN0LiANCiANClRoYW5rIFlvdSB2ZXJ5IG11Y2gu
-IA0KIA0KVGVjayBQaW5nDQogDQogDQo=
+Hi Teck,
+
+> I can compile rctest.c, but I get the following error when executing rctest.c
+>  
+> Can't set L2CAP link mode. Protocol not available(92). 
+>  
+> I am using Fedora Core 3 with a Silicon Wave USB dongle. 
+
+the error message is wrong. Use the latest version where this is fixed.
+To set the link mode on a RFCOMM socket you need at least 2.6.10-mh1.
+However RFCOMM service level security is not fully implemented at the
+moment.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
