@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41A6046D.30800@xgarreau.org>
-From: Xavier Garreau <xavier@xgarreau.org>
-MIME-Version: 1.0
-To: "bluez-devel@lists.sourceforge.net" <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Hi all !
+Subject: Re: [Bluez-devel] a2play and Toshiba SR-1 Bluetooth Headset
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: Henryk =?ISO-8859-1?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+In-Reply-To: <20041125105615.GA19821@snoopy.src.ricoh.co.jp>
+References: <20041125091124.GA19805@snoopy.src.ricoh.co.jp>
+	 <20041125112509.75347786.henryk@ploetzli.ch>
+	 <20041125105615.GA19821@snoopy.src.ricoh.co.jp>
+Content-Type: text/plain
+Message-Id: <1101385033.7538.101.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,33 +21,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Nov 2004 17:12:29 +0100
+Date: Thu, 25 Nov 2004 13:17:13 +0100
 
-I'm currently teaching some students the bluetooth protocol stack
+Hi Alain,
 
-Next wednesday, we'll talk about bluetooth programming.
+> actually I was just about to send a new mail to the mailing list.
+> Just looking at the BlueZ page, I saw that there is a new hcidump 
+> package so after updating I clearly saw the bitpool thing. I just
+> replaced the two hardcoded bitpool min and max by the one supported
+> by my headset and I got .....
 
-I have no problem with HCI, L2CAP or RFCOMM programming but I would like 
-to advertise a custom service using sdp calls.
+I tagged the 1.15 release of hcidump some hours ago and the tarball is
+now also available. Please try again with this one and send us the
+binary dump created with -w.
 
-I never used sdp api, did any of you wrote some white paper about 
-bluetooth programming involving sdp (i found 
-http://www.holtmann.org/papers/bluetooth/wtc2003_slides.pdf but it's not 
-dealing with sdp)
+> hum ... weird sound :-(
+> 
+> well I can recognize my music but sometimes it's going faster, slower
+> then faster again .... 
+> 
+> seems also right and left channel are not same ... well can't be sure
+> about that because the sound is very weird ... 
+> 
+> I don't know what I can do else ... just let me know.
 
-My sample app for the session will be a time server working on top of 
-l2cap (PSM ccee) and I'd like to advertise it on sdp server. We'll also 
-be talking of rfcomm stream sockets.
+I am interested in the output of "hcitool info" and "sdptest records"
+from the BlueZ libs2 CVS. Please pipe them into a file and send them to
+me.
 
-First week was a bluetooth introduction. The paper and slides can be 
-found here (subject to changes, this is a temp directory, ok ?). There's 
-a little problem with it, it's written in french :-/
-http://www.xgarreau.org/temp/Uni-Master/
+> did you made any other modification to the CVS ? Just got it few hours ago 
+> so I think except this min/max thing nothing has changed.
 
-Regards,
--- 
-Xavier Garreau <xavier@xgarreau.org>
-http://www.xgarreau.org/
+The Sourceforge people should really get this delay thing between
+anonymous and developer CVS fixed.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
