@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41D85BB7.5020506@comcast.net>
-From: Walt <idunno246@comcast.net>
+Message-ID: <41D85016.3090305@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] 2.6.10 multimedia keys
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] btsco questions
+References: <pan.2005.01.02.14.10.41.509677@yahoo.com>
+In-Reply-To: <pan.2005.01.02.14.10.41.509677@yahoo.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,13 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 02 Jan 2005 15:38:15 -0500
+Date: Sun, 02 Jan 2005 12:48:38 -0700
 
-I just updated to 2.6.10, and my media keys stopped working, hcidump 
-shows nothing.  I tried applying the mh1 patch, but that didnt help.  I 
-have the ms keyboard v1, and using the newest libs/utils.  any ideas?
+Paul,
 
-Walt
+> I don't have a headset device, so I am trying to connect it the other way
+> around, to a NOKIA 6310i phone with support for AudioGateway and Headset
+> profile.
+
+If you want to do things this way, you'll either have to write code for 
+it or use one of the projects that is implementing the headset 
+profile... so far we are implementing the AG side only.
+
+see the first two links at http://bluetooth-alsa.sourceforge.net/
+
+brad
 
 
 -------------------------------------------------------
