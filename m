@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <419F558E.8020907@thomae-privat.de>
-From: Matthias Thomae <bluez@thomae-privat.de>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BT-PM01B-HID
-References: <419F4399.20405@thomae-privat.de> <1100958241.7213.121.camel@pegasus>
-In-Reply-To: <1100958241.7213.121.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] Can l2ping phone but can't `sdptool browse` or
+	discover?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1100949891.419f2983a8527@www.bluebottle.com>
+References: <1100949891.419f2983a8527@www.bluebottle.com>
+Content-Type: text/plain
+Message-Id: <1100958327.7213.124.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,22 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 20 Nov 2004 15:32:46 +0100
+Date: Sat, 20 Nov 2004 14:45:27 +0100
 
-Hi Marcel,
+Hi,
 
-Marcel Holtmann wrote:
->>Has anyone tried the HID version with BlueZ?
-> 
-> I used the HID version for my last 5 presentation I gave. Actually it
-> has the same stupid endian bug as the EPoX keyboard, but the hidd is
-> able to workaround it. The device works perfect.
+> Well I don't know. I can ping bond to the P800 now my initiating it
+> from the phone end but can't discover the phone from the bluez end. I
+> can even send files but I can't `sdptool browse` or `hcitool scan`:
 
-That's good news, I have a presentation soon and might give it a try :)
-Thanks and keep up the great work.
+so again, what does "hciconfig -a" say? What is your kernel version and
+version of the BlueZ packages are you using?
 
 Regards
-Matthias
+
+Marcel
+
+
 
 
 -------------------------------------------------------
