@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Douglas Russell <puggy@gentoo.org>
+From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
+Reply-To: tim@birdsnest.maths.tcd.ie
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Update on sending from K700i
+References: <1279491264f2.1264f2127949@liu.se> <4123C6D8.5090205@home.se> <20040819064900.1836fbb2@bluez.bueche.ch>
+In-Reply-To: <20040819064900.1836fbb2@bluez.bueche.ch>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200408191339.21138.puggy@gentoo.org>
-Subject: [Bluez-users] OSX reprogrammed my mouse!
+  charset="iso-8859-1"
+Message-Id: <200408191239.29484.tim@birdsnest.maths.tcd.ie>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,26 +19,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Aug 2004 13:39:20 +0100
+Date: Thu, 19 Aug 2004 12:39:27 +0100
 
-MX900 Mouse.
-Built in powerbook bluetooth.
+On Thursday 19 August 2004 05:49, Charles Bueche wrote:
 
-Well, I think this is what has happened. I used my mouse in OSX for a couple 
-of days and when I returned to linux my mouse appears as /dev/input/event4 as 
-opposed to a mouse device. Also, kdebluetooth now seems able to determine 
-that it is a MX900 wheras before it just listed the hardware address.
+> I use kbluetoothd to receive files but haven't seen your bad behavior so
+> far when sending files to my PC. 
 
-I've tried unpairing the device in OSX and taking out the batteries and 
-reconnecting it a million times in linux. I even tried pairing it with the 
-MX900 base station (in non-bluetooth mode) then reconnecting to the 
-powerbooks build in bluetooth.
+I don't have this phone,
+but I was interested to see that you are using kde-bluetooth.
+I looked at this - in fact installed it -
+but it seemed to me more difficult to use
+than "command line bluez".
+However, I didn't try it much,
+and wondered how you found it.
 
-Any ideas?
+One thing that put me off was that it had a compiled binary /usr/bin/bluepin
+in place of the usual Perl or Python script,
 
-Cheers.
+However, I would try it again
+if I heard that people found it useful.
 
-Puggy
+-- 
+Timothy Murphy  
+e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
+tel: +353-86-2336090, +353-1-2842366
+s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
 
 
 -------------------------------------------------------
