@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Major slowdown when service discovery+opening a
-	service happens on two systems trying to talk to each other
+Subject: Re: [Bluez-users] SCO module
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Marc-Andre Laverdiere-Papineau <m_laverd@alcor.concordia.ca>
+To: Guang <m9187@cn.ee.ccu.edu.tw>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.OSF.4.44.0402161503210.336210-100000@alcor.concordia.ca>
-References: <Pine.OSF.4.44.0402161503210.336210-100000@alcor.concordia.ca>
+In-Reply-To: <000801c3f505$976e0f80$7b6b7b8c@guang>
+References: <000801c3f505$976e0f80$7b6b7b8c@guang>
 Content-Type: text/plain
-Message-Id: <1077022337.2841.15.camel@pegasus>
+Message-Id: <1077018842.2841.7.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,22 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Feb 2004 13:52:17 +0100
+Date: Tue, 17 Feb 2004 12:54:03 +0100
 
-Hi Marc-Andre,
+Hi Guang,
 
-> I'm not following all the terminology, since
-> I'm working with Java. I was wondering what you would suggest that would
-> be better for performance.
+> We know that there is a modules "soc.o" and "hcitool.o"   in red hat 
+> linux8.0 , and we can type "hcitool" command to do we want to do ,for
+> example: hcitool  inq , and bluetooth device will inquire others
+> bluetooth devices. My question is that does soc have any command to
+> excute ? How do we to use this sco module? Does Bluez support sco ?
 
-even if you work with Java you should follow the Bluetooth terminology,
-because otherwise it can be possible that we speak of different things.
-
-> Hciconfig shows a few options for page scan (device discovery?) and
-> inquiry scan (service discovery?). Should I consider tweaking those?
-
-No, you should read the Bluetooth specification and understand what
-these two means, because you got them wrong.
+the SCO module provides a socket interface.
 
 Regards
 
