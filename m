@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Microsoft Bluethooth "Elite" Keyboard & Mouse
-Message-ID: <20050116193732.GA2326@virgilio.it>
-References: <20050116174616.GA2201@virgilio.it> <200501161851.01291.cijoml@volny.cz> <1105898506.8080.20.camel@pegasus>
+Subject: Re: [Bluez-users] Securing my bluetooth connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1105899721.5669.12.camel@localhost.localdomain>
+References: <1105899721.5669.12.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1105901392.8080.21.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1105898506.8080.20.camel@pegasus>
-From: Francesco Bochicchio <bockman@virgilio.it>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,36 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 Jan 2005 20:37:33 +0100
+Date: Sun, 16 Jan 2005 19:49:52 +0100
 
-On Sun, Jan 16, 2005 at 07:01:46PM +0100, Marcel Holtmann wrote:
-> Hi Michal,
+Hi Phil,
+
+> I have set up my bluetooth connection on Fedora core 3 so that I can
+> connect my Palm Pilot. I just needed to add the sdpd line to rc.local
+> after moving from core 2.
 > 
-> > You should use 2.6.10-mh1 and latest firmware for Digianswer dongle (adapter 
-> > use it I think)
+> My configuration is below.
 > 
-> using the 2.6.10-mh1 is a good idea, but it is a Broadcom dongle with
-> HID proxy and this don't need any extra firmware. However since the
-> other Broadcom HID proxy that I have does the switch into HCI mode when
-> you send a HCI_Reset (CSR HID Proxy needs an extra tool btw), the one
-> from Microsoft may need some extra magic to fully work without problems.
+> A couple of questions
+> How do I configure it so that only my palm pilot can connect, I have
+> tried putting my mac address into rfcomm.conf, but I can still connect
+> when I set it wrong.
 
-Ok. Thanks. I will try out 2.6.10-mh1 anyway.
+you need to modifiy the source of dund for that.
+
+> How do I make the PC not discoverable, I know the chances of being
+> scanned by someone standing on the pavement outside is not as likely as
+> being bluejacked in Tescos or the pub, but it could happen.
+
+Disable the inquiry scan (iscan).
+
+Regards
+
+Marcel
 
 
-BTW, just out of curiosity: would the MS Keyboard works with another Bluetooth USB dongle?
-
-> I need someone to donate one of these, because there is no way to buy
-> only the dongle and I am not going to buy another Bluetooth keyboard. I
-> have enough.
->
-
-I could consider swapping mine with one that already works with Linux :-)
- 
-
-Ciao
------
-FB
 
 
 -------------------------------------------------------
