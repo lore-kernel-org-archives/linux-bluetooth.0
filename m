@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] New BT set from Microsoft!
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <200409101040.36905.cijoml@volny.cz>
-References: <200409101040.36905.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1094810803.5261.5.camel@notepaq>
-Mime-Version: 1.0
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200409101056.29447.cijoml@volny.cz>
+Subject: [Bluez-users] A new Microsoft's transceiver!
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Sep 2004 12:06:43 +0200
+Date: Fri, 10 Sep 2004 10:56:29 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> Microsoft announced a new BT set. Lets have a look :)
-> http://www.microsoft.com/hardware/mouseandkeyboard/productdetails.aspx?pid=033
+In Microsofts very good demo:
+http://www.microsoft.com/hardware/mouseandkeyboard/features/docs/bluetooth.html
 
-I saw their listing on the Bluetooth qualification page. It is Broadcom
-based and it should also include somekind of HID proxy mode.
+is shown a new transceiver! It should be 1.2 compatible and we should try 
+upgrade an old one!
 
-Do anyone may buy one for me and send it over to me?
+Marcel maybe it's chance for you to get back working your destroyed 
+transceiver
 
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
