@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth for network
-From: Marcel Holtmann <marcel@holtmann.org>
 To: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] bluetooth for network
+References: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAOENVeipKPUqttCCB9ZhD1QEAAAAA@t-online.de>
+Message-ID: <opsfjpge1jeocfdv@debian>
+From: "Christoph Torens" <c.torens@web.de>
+Content-Type: text/plain; format=flowed; delsp=yes; charset=iso-8859-15
+MIME-Version: 1.0
 In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAOENVeipKPUqttCCB9ZhD1QEAAAAA@t-online.de>
-References: 
-	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAOENVeipKPUqttCCB9ZhD1QEAAAAA@t-online.de>
-Content-Type: text/plain
-Message-Id: <1097229143.4893.1.camel@pegasus>
-Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,23 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 08 Oct 2004 11:52:23 +0200
+Date: Fri, 08 Oct 2004 11:46:52 +0200
 
-Hi Peter,
+On Fri, 8 Oct 2004 08:56:23 +0200, Peter K. Martin  
+<Peter.K.Martin@t-online.de> wrote:
 
-> I'm using SuSE 9.1 and have installed and activated the
-> bluetooth-function of my notebook (Toshiba Satellite Pro M10). Now I
-> want to use the bluetooth-connection to an accesspoint - it is
-> possible to establish this connection - as a dummy-networkcard.
+> hello,
+> I'm using SuSE 9.1 and have installed and activated the  
+> bluetooth-function
+> of my notebook (Toshiba Satellite Pro M10). Now I want to use the
+> bluetooth-connection to an accesspoint - it is possible to establish this
+> connection - as a dummy-networkcard.
+> What is to do, so that the Linux-System accept the bluetooth-connection  
+> as a
+> network-connection?
+> Thanks in advance for the urgently needed help
+> Peter
 
-if you access point uses the PAN profile then you can use pand and then
-configure the new bnep0 network interface like you did with eth0 before.
 
-Regards
+you want to use the 'pand' tool of the bluez-utils package
+see http://www.holtmann.org/linux/bluetooth/ for howtos.
+for example:
+http://bluez.sourceforge.net/contrib/HOWTO-PAN
+or
+http://fedoranews.org/contributors/muhammad_al_ismail/bluetooth/
 
-Marcel
-
-
+-- 
+regards,
+Christoph
 
 
 -------------------------------------------------------
