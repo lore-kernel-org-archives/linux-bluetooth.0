@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40182154.6030709@3WT.com.br>
-From: Rafael Vidal Aroca <rafael@3WT.com.br>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hci0 problem after timeout
-References: <40170986.70105@3WT.com.br> <1075276651.12766.52.camel@pegasus>	 <4017D6E9.6030700@3WT.com.br> <1075306737.26729.3.camel@pegasus>
-In-Reply-To: <1075306737.26729.3.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] bluetooth pcmcia/cf serial errors with 2.6 kernel
+From: Gene Imes <ebi7@ozob.net>
+To: bluez-users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1074885137.3532.9.camel@myrna>
+References: <1074885137.3532.9.camel@myrna>
+Content-Type: text/plain
+Message-Id: <1075319338.21027.10.camel@go2>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,36 +17,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jan 2004 18:53:40 -0200
+Date: Wed, 28 Jan 2004 13:48:58 -0600
 
+On Fri, 2004-01-23 at 13:16, digger vermont wrote:
+> Hello Russell King and Linux Serial Mailing List,
+> 
+> 	Changes to the serial driver in 2.6.xx kernels have caused problems
+> with some bluetooth pcmcia/cf cards that do work properly with 2.4.xx
+> kernels. 
+> 
 
-    Looks that the dongle problem was solved, but the connection still 
-fails after some time (a bit more now).
+digger, have you made any progress with the Linux Serial people?
 
-    I changed from uhci to usb-uhci and now I can issue hciconfig hci0 
-up and down how many times I want without any problems. Seems that the 
-PC box is clear now.
+Thanks,
 
-    Now the question is: are IP connections using pand reliable? May not 
-pand be the problem?
-   
-    Just to mention, after the failed connection, i have to disable and 
-enable bluetooth again on ipaq, because hcitool inq causes a message 
-"timed out".
-
-   
-
-
-
-Marcel Holtmann wrote:
-
->maybe it is this Broadcom device or maybe it is your USB chipset. What
->host driver do you use? usb-uhci or uhci? Try the other one. If you have
->access to a CSR donlge please try this.
->
->  
->
-
+Gene
 
 
 -------------------------------------------------------
