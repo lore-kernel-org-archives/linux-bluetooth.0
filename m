@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Bernhard Walle <bernhard.walle@gmx.de>
-Message-ID: <d1n8on$1e8$1@sea.gmane.org>
+Subject: Re: [Bluez-users] Help for cross compilation of BlueZ
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <14397664050321031963ce0576@mail.gmail.com>
+References: <14397664050321031963ce0576@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1111404841.22872.50.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Subject: [Bluez-users] Yakumo
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 21 Mar 2005 20:56:09 +0100
+Date: Mon, 21 Mar 2005 12:34:01 +0100
 
-Hello,
+Hi,
 
-is anyone using a Yakumo USB module class 1? Can you recommend this for
-using on Linux?
+> >I have to add bluetooth functionality to my MIPS based hardware
+> > platform. Hardware has montavista linux kernel 2.4.20 without rfcomm
+> > and bnep support. I need help regarding compilation of rfcomm,bnep and
+> > BlueZ. For cross compilation whether i have to use cross compilers or
+> > native gcc which is available in file system?
+> >I am not the right person to ask about cross-compiling stuff, but I
+> >think you need to rebuild your whole kernel. Apply patch-2.4.20-mh18 to
+> >get RFCOMM and BNEP support. However be aware of that most of the fixes
+> >and future enhancements are only present in the 2.6 kernel series.
+> 
+> I am able to add RFCOMM support. Giving problem for BNEP and HIDP support.
+> I can't upgrade kernel version since it is a montavista custom linux
+> kernel for specific board.
 
-If not, any other recommendations for cheap class 1 modules?
+what is the difference between adding RFCOMM support and BNEP or HIDP?
+To do it right you need the correct patch and most changes made by the
+-mh patch are only to the Bluetooth subsystem. The other changes of this
+patch are only to backport some needed things.
 
+Regards
 
+Marcel
 
-Regards,
-Bernhard
-
--- 
 
 
 
