@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?ISO-8859-1?Q?Tomas_Bj=F6rklund?= <tombjo@dd.chalmers.se>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.GSO.4.58.0502111319140.26906@frodo.dd.chalmers.se>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=ISO-8859-1
-Subject: [Bluez-users] MS Optical Desktop Elite for BT; can't reconnect after idle
+Subject: Re: [Bluez-users] hcitool scan question
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.GSO.4.60.0502110314380.12691@columbia.cs.ubc.ca>
+References: <20050211111140.64497886BC@sc8-sf-spam1.sourceforge.net>
+	 <Pine.GSO.4.60.0502110314380.12691@columbia.cs.ubc.ca>
+Content-Type: text/plain
+Message-Id: <1108123392.18099.16.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +19,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Feb 2005 13:31:20 +0100 (MET)
+Date: Fri, 11 Feb 2005 13:03:12 +0100
 
-Hi,
+Hi Jack,
 
-I just got the MS Optical Desktop Elite for BT and I'm now trying it on
-Fedora Core 3 (2.6.10). I'm having some small problems with the extra
-buttons on both the mouse and keyboard but my largest problem is that it
-won't reconnect after being idle.
+> I am running hciemu. hciconfig shows VHCI devices up and running and I can 
+> l2ping the devices, but when I do hcitool scan I get the following:
+> 
+> # hcitool scan
+> Scanning ...
+> Inquiry failed: Connection timed out
+> 
+> hcidump shows the following:
+> 
+> # hcidump -i hci0 -V
+> HCI sniffer - Bluetooth packet analyzer ver 1.17
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> < HCI Command: Inquiry (0x01|0x0001) plen 5
+> > HCI Event: Command Complete (0x0e) plen 4
+>      Inquiry (0x01|0x0001) ncmd 1
+> 
+> Could you give me some ideas about what I should do to make the scan 
+> working? Can I achieve that with VHCI devices? hcidump shows hci0 is doing 
+> the job, but the scan doesn't show it.
 
-I guess it shuts down to save batteries but isn't it supposted to
-reconnect automaticly when you start using the gear again?
+the inquiry is not supported by the hciemu. Get yourself a pair of real
+Bluetooth devices.
 
-Sure I can always reconnect the keyboard by typing the commands
-manually on the keybo... well... never mind ;-)
+Regards
 
--Tomas Bj=C3=B6rklund
+Marcel
+
+
 
 
 -------------------------------------------------------
