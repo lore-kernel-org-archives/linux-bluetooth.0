@@ -1,10 +1,19 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040729045928.46441.qmail@web41107.mail.yahoo.com>
-From: Sean Loh <blaze_wk@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] JAVA API over IP over Bluez
+Subject: Re: [Bluez-users] SDP problems on embedded device
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Rolf E. Thorup" <rolft@daimi.au.dk>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4107B29E.3030909@daimi.au.dk>
+References: <40FC2322.4060204@daimi.au.dk>
+	 <1090270387.4400.100.camel@pegasus>  <40FCF471.4010501@daimi.au.dk>
+	 <1090334863.4400.124.camel@pegasus>  <40FD5217.3060705@daimi.au.dk>
+	 <1090345399.21683.2.camel@pegasus>  <40FE3ACF.4030608@daimi.au.dk>
+	 <1090404291.21683.81.camel@pegasus>  <40FE4BC9.3050509@daimi.au.dk>
+	 <1090412310.21683.87.camel@pegasus> <40FE61F2.3080407@daimi.au.dk>
+	 <4107B29E.3030909@daimi.au.dk>
+Content-Type: text/plain
+Message-Id: <1091041076.4845.153.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,32 +24,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jul 2004 21:59:28 -0700 (PDT)
+Date: Wed, 28 Jul 2004 20:57:57 +0200
 
-Hi,
+Hi Rolf,
 
-I am trying to write an audio streaming program over
-IP over Bluez whilst calculating the throughput of the
-Bluetooth link. I have a couple of questions:-
+> I have tried a couple of more times from the Cerfcube to search for SP 
+> on the laptop and also on my Sony Ericsson T610. Approx. 4 out of 5 
+> times the search will succeed and otherwise I'll get the error message:
+> 
+> "Service Search failed: Connection timed out".
 
-1. With IP over Bluez through BNEP, can I write JAVA
-streaming media programs as if I was writing the
-program for normal Internet IP to IP streaming?
+this can happen sometimes. It is mostly a chip problem.
 
-2. Has anyone written such programs utilizing any C
-RTP library or utilizing the JAVA media framework API?
+> Searching for SP on the Cerfcube from the laptop does (still) not work.
 
-Any help would be greatly appreciated!!
+Can't help you here until someone sends me a Cerfcube and I can do my
+own tests.
 
-Thanks in advance
+Regards
+
+Marcel
 
 
-	
-		
-__________________________________
-Do you Yahoo!?
-New and Improved Yahoo! Mail - 100MB free storage!
-http://promotions.yahoo.com/new_mail 
 
 
 -------------------------------------------------------
