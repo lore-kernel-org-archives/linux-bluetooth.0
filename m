@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <00f101c4dca6$93973a60$6401000a@zool>
-From: "Steffen Larsen" <zool@zool.dk>
-To: <bluez-devel@lists.sourceforge.net>
-References: <00a001c4cee6$5271b4c0$0000fea9@zool> <1100958396.7213.126.camel@pegasus>
-Subject: Re: [Bluez-devel] updating the PSM in SDP..
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+Subject: Re: [Bluez-devel] Re: Problems with anycom usb dongle
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <cp4df4$i6l$1@sea.gmane.org>
+References: <20041206225609.GA1177@zeus.galaxy.org.uk>
+	 <cp3mkk$m7t$1@sea.gmane.org> <1102407664.8447.20.camel@pegasus>
+	 <cp3rr7$1vv$1@sea.gmane.org> <1102411047.8447.28.camel@pegasus>
+	 <cp4a8v$959$1@sea.gmane.org> <1102425729.8447.41.camel@pegasus>
+	 <cp4df4$i6l$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1102439143.8447.47.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +22,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 7 Dec 2004 22:49:06 +0100
+Date: Tue, 07 Dec 2004 18:05:43 +0100
 
-> Hi Steffen,
->
-> > I have used your examples in dund.c to make a proper SDP client that
-> > can advertise my protocol (L2CAP) and PSM correctly to the sdpd
-> > daemon. All the attributes looks correctly and functions ok.
-> > My question is now: How do I update my SDP record (more specifically
-> > the PSM attribute)?
-> > I can't find any example or anything. Explaination or example files
-> > are appriciated! :-)
->
-> I never did this. If you change the PSM maybe it is a good idea to
-> delete the old one and add a new record.
->
-> The library contains a sdp_record_update() function, but I never tried
-> it so far.
+Hi Sebastian,
 
-hmmm.. I tried this sdp_record_update() function, but I can't make it work.
-Anyone in here, who have tried it, where it actually worked?
-Well the deletion and adding a new record of cause works fine, but it could
-be nicer to have a update function instead. ;-)
+>  > Should I mark it as broken in hci_usb driver?
+> The dongle seems broken but IMO it's better to have an acknowledgment
+> of someone else who have tested it.
 
-/Steffen
+I have no problem to mark buggy hardware as broken.
+
+>  > Or should I simply drop SCO packets with no data on handle 0 in the
+>  > HCI core? Is handle 0 a valid handle?
+>  From my bluetooth spec, page 226 (bluetooth_1_1_vol1)
+> "The SCO handle zero is never used."
+
+As far as I know this speaks about the LMP handle and this is different
+from the HCI handle.
+
+Regards
+
+Marcel
+
 
 
 
