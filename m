@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20040701074257.94807.qmail@web20501.mail.yahoo.com>
-From: Pranab Shenoy <pranab_shenoy@yahoo.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-436630355-1088667777=:94783"
-Subject: [Bluez-devel] to build a bluetooth stack that can be embedded
+From: James Cameron <james.cameron@hp.com>
+To: Dave Henriksen <dhenriksen@optibrand.com>
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Ideal mru and mtu ?
+Message-ID: <20040630232127.GK30504@hp.com>
+References: <1088608978.4959.9.camel@linux.site>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1088608978.4959.9.camel@linux.site>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,24 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 1 Jul 2004 00:42:57 -0700 (PDT)
+Date: Thu, 1 Jul 2004 09:21:27 +1000
 
---0-436630355-1088667777=:94783
-Content-Type: text/plain; charset=us-ascii
+An ideal MTU would be the largest that works over the total network path
+from the FTP client to the FTP server.
 
- We want to build a bluetooth stack that can be embedded in a smart device. We wanna know if its possible, if not why and if yes can we build from the existing stack.
+pppd's mru option determines how it negotiates this option with the
+peer.  The negotiated mru forms the basis for the interface MTU.  The
+MTU can be changed up and down after interface creation, using "ifconfig
+ppp0 mtu".
 
-		
----------------------------------
-Do you Yahoo!?
-Yahoo! Mail is new and improved - Check it out!
---0-436630355-1088667777=:94783
-Content-Type: text/html; charset=us-ascii
+pppd running over bluetooth just believes it has a byte stream to the
+peer.  There may be bluetooth specific reasons to choose an MTU that
+matches on the air packet sizes, in order to reduce latency, but if your
+goal is mainly FTP my guess is that latency isn't important.
 
-<DIV>&nbsp;We want to build a bluetooth stack that can be embedded in a smart device. We wanna know if its possible, if not why and if yes can we build from the existing stack.</DIV><p>
-		<hr size=1>Do you Yahoo!?<br>
-Yahoo! Mail is new and improved - <a href="http://us.rd.yahoo.com/mail_us/taglines/new/*http://promotions.yahoo.com/new_mail">Check it out!</a>
---0-436630355-1088667777=:94783--
+-- 
+James Cameron                         http://quozl.netrek.org/
+HP Open Source, Volunteer             http://opensource.hp.com/
+PPTP Client Project, Release Engineer http://pptpclient.sourceforge.net/
 
 
 -------------------------------------------------------
