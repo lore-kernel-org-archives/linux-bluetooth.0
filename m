@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] problem with hstest
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mr Jie Liu <s4048156@student.uq.edu.au>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20561a20c28e.20c28e20561a@uq.edu.au>
-References: <20561a20c28e.20c28e20561a@uq.edu.au>
-Content-Type: text/plain
-Message-Id: <1084873159.5833.75.camel@pegasus>
-Mime-Version: 1.0
+From: Mr Jie Liu <s4048156@student.uq.edu.au>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20561a20c28e.20c28e20561a@uq.edu.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] problem with hstest
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,21 +15,10 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 May 2004 11:39:19 +0200
+Date: Tue, 18 May 2004 19:33:36 +1000
 
-Hi,
-
-> I try to play sound through my HBH-35 headset. I am using the hstest program of the bluez package to test the headset profile. But I can't hear anything through the headset. The voice setting is right(0x0060). I can establish rfcomm and soc link with the headset and the AT command seems to work fine because I can hear the RING tone. When I push the button on the headset, the AT command could also be printed out correctly. I use "hstest recor
-> d sound X:X:X:X:X:X X" to record a file. Then I try to replay it by "hstest play sound X:X:X:X:X:X X". But there is nothing from the headset and the program also has no error message. Has anyone experienced this before? What kind of information should I provide to analyse it? 
-
-check if the SCO data is routed through the HCI or through the PCM
-interface of your Bluetooth dongle. If your dongle is CSR based, this
-can be done with "hciconfig hci0 revision".
-
-Regards
-
-Marcel
-
+I try to play sound through my HBH-35 headset. I am using the hstest program of the bluez package to test the headset profile. But I can't hear anything through the headset. The voice setting is right(0x0060). I can establish rfcomm and soc link with the headset and the AT command seems to work fine because I can hear the RING tone. When I push the button on the headset, the AT command could also be printed out correctly. I use "hstest recor
+d sound X:X:X:X:X:X X" to record a file. Then I try to replay it by "hstest play sound X:X:X:X:X:X X". But there is nothing from the headset and the program also has no error message. Has anyone experienced this before? What kind of information should I provide to analyse it? 
 
 
 
