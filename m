@@ -1,10 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41BC66DC.2050909@supereva.it>
-From: martellif@supereva.it
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Error downloading bluez-pin
+Subject: Re: [Bluez-users] SOLVED: Dell Inspiron 8600 was: 'hciconfig -a'
+	ok, but 'hcitools scan' shows no devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <33016.80.146.4.18.1102847912.squirrel@schrell.de>
+References: <35275.80.146.4.18.1102802831.squirrel@schrell.de>
+	 <1102804861.8750.2.camel@pegasus>
+	 <50745.80.146.4.18.1102837718.squirrel@schrell.de>
+	 <1102838764.8750.32.camel@pegasus>
+	 <33016.80.146.4.18.1102847912.squirrel@schrell.de>
+Content-Type: text/plain
+Message-Id: <1102851736.8750.34.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +23,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 12 Dec 2004 16:42:20 +0100
+Date: Sun, 12 Dec 2004 12:42:16 +0100
 
+Hi Andreas,
 
-I'm unable to download bluez-pin024 from your sourceforge site, I get 
-this error:
+> thanks a lot for your help.
+> 
+> SUMMARY:
+> 
+> hciconfig -a         looked right
+> hcitool scan         did not show any devices
+> 
+> RESOLUTION:
+> 
+> Bluetooth was diabled under Windows!
+> There was no way to start it from Linux as far as I know.
+> 
+> After booting Windows and activation Bluetooth (right click on icon in
+> task bar, then activate) it works under Linux. Nothing to do with <FN-F2>.
+> Now the blue Bluetooth LED is on even on Linux startup.
 
-You don't have permission to access 
-/pub/projects/gpe/source/bluez-pin-0.24.tar.gz on this server.
+do you still get vendor event with hcidump?
 
-pls fix...
+Maybe they have a special VM application running on the Bluetooth chip
+that can enable/disable the antenna or whatever. What Windows stack did
+you used?
 
--- 
+> Thank You, Marcel, for your help!
 
-	Franco Martelli.
+You are welcome.
 
-ImoLUG Staff
-http://www.imolug.org - info@imolug.org
-IRC irc.azzurra.org /join #imolug 
+Regards
+
+Marcel
 
 
 
