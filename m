@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Test Mode
+Subject: Re: [Bluez-users] bluetooth sniff mode
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de4657604113010234e4e3a3f@mail.gmail.com>
-References: <2de4657604113010234e4e3a3f@mail.gmail.com>
+In-Reply-To: <A1F0D47583A2D711919F00600819B3A46B78BA@goofy.vitronics.com>
+References: <A1F0D47583A2D711919F00600819B3A46B78BA@goofy.vitronics.com>
 Content-Type: text/plain
-Message-Id: <1101882666.18840.23.camel@pegasus>
+Message-Id: <1101882585.18840.20.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 01 Dec 2004 07:31:06 +0100
+Date: Wed, 01 Dec 2004 07:29:45 +0100
 
-Hi Manjunath,
+Hi Maria,
 
-> The LMP specification speaks about the Test Mode and Methodology
-> saying that Adaptive power control, adaptive freq hopping scenarios
-> can be imitated provided the respective LMP PDU's are sent.
-> 
-> How do I make the HCI commands initiate these LMP PDU's? The HCI
-> specification have only the "Test Enable" and "Read and Write
-> Loopback"  test commands but other no commands which will result in
-> inititating the LM to the testing modes. How do i conduct these
-> adaptive tests?
+> I have an 5550 IPAQ I placed in sniff mode (once a BNEP was setup).
+> How can I verify that the ipaq is really IN sniff mode?  Any hcitool?
+> hciconfig  commands?
 
-I am the wrong person to talk to about these things. I never used the
-test mode (as I said sometimes now) and actually I think that I never
-will do.
+I don't know of a command that can read the current power safe mode, but
+you can monitor the HCI mode changed event.
 
 Regards
 
