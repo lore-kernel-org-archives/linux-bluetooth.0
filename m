@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040422055958.17526.qmail@web20416.mail.yahoo.com>
-From: am "quiñones" <am_quinones@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4086FFD9.50104@over-here.org>
+From: Eran <eran_l@over-here.org>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1547405518-1082613598=:14708"
-Subject: [Bluez-users] sample applications
+To: Pavel Ruzicka <pavouk@pavouk.org>
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Ambicom BT2000E card, can't get hciattach to work
+References: <4086DDFC.5000107@over-here.org> <200404220027.02236.pavouk@pavouk.org>
+In-Reply-To: <200404220027.02236.pavouk@pavouk.org>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,35 +18,120 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Apr 2004 22:59:58 -0700 (PDT)
+Date: Thu, 22 Apr 2004 02:12:25 +0300
 
---0-1547405518-1082613598=:14708
-Content-Type: text/plain; charset=us-ascii
+Sorry I forgot to mention it - but hciconfig shows a fully 'up and 
+running' interface. I use the bt950_cs driver.
+I further checked and most hcitool commands work except the link quality.
+I Have tried removing the bluetooth.conf from my pcmcia/ directory and 
+use hciattach with /dev/ttyS03, but no success here as well (could not 
+find correct parameters). Why is it the preferred way?
 
-Hi! I'm a college student doing on-the-job training, and my project right now is to make an application which sends data (specifically, personal profiles) from the pc to a mobile phone or PDA upon request of the cell phone or PDA, via bluetooth. Do you guys know where i can find some related sample programs? Just so i can study them. Thanks in advance! :)
- 
-- Amabelle Quiñones
-Student, Ateneo de Manila University
-Student Assistant, Advanced Science and Technology Institute
-Quezon City, Philippines
 
-		
----------------------------------
-Do you Yahoo!?
-Yahoo! Photos: High-quality 4x6 digital prints for 25¢
---0-1547405518-1082613598=:14708
-Content-Type: text/html; charset=us-ascii
+Pavel Ruzicka wrote:
 
-<DIV>Hi! I'm a college student doing on-the-job training, and my project right now is to make an application which sends data (specifically, personal&nbsp;profiles) from the pc to a mobile phone or PDA upon request of the cell phone or PDA, via bluetooth. Do you guys know where i can find some related sample programs? Just so i can study them. Thanks in advance! :)</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>- Amabelle Quiñones</DIV>
-<DIV>Student, Ateneo de Manila University</DIV>
-<DIV>Student Assistant, Advanced Science and Technology&nbsp;Institute</DIV>
-<DIV>Quezon City, Philippines</DIV><p>
-		<hr size=1><font face=arial size=-1>Do you Yahoo!?<br>
-Yahoo! Photos: <a href="http://pa.yahoo.com/*http://us.rd.yahoo.com/evt=23765/*http://photos.yahoo.c
-om/ph/print_splash">High-quality 4x6 digital prints for 25¢</a>
---0-1547405518-1082613598=:14708--
+>Hello,
+>
+>  
+>
+>>I can get an RFCOMM to work, but when trying to work with hci I fail:
+>>1) on /etc/init.d/bluetooth I have a line that does hciattach:
+>>root@thumper:/etc/pcmcia# /usr/sbin/hciattach /dev/ttyS3 bcsp 57600
+>>Can't get port settings: Input/output error
+>>Can't initialize device: Input/output error
+>>    
+>>
+>
+>I have this card (Pretec BT2000E) with Sharp Zaurus SL-C860 with Cacko rom.
+>For this card exists now 3 drivers.
+>
+>1. bt950_cs
+>This driver is probably from Marcel Holtmann and is part of BlueZ.
+>hciattach is not needed for this driver.
+>http://www.holtmann.org/linux/bluetooth/
+>
+>2. bt2000e_cs
+>I use mometally this driver, because it works for me and it is part of Cacko
+>rom installation. There are some fixes with suspend/resume problems
+>and uart speed.
+>hciattach is not needed for this driver too.
+>http://www.iral.com/~albertr/linux/bt2000e/
+>
+>3. serial_cs
+>This path is preferred, but I can't find right parameters for hciattach.
+>I've tried many combinations like this:
+>hciattach /dev/ttyS3 ericsson 460800
+>But all without success.
+>If somebody run card with this driver please write to the list!
+>
+>  
+>
+>>2) hcitool scan and cc <phone> works, but hci lq fails:
+>>root@thumper:/etc/pcmcia# hcitool lq 00:80:37:D6:93:D5
+>>HCI get_link_quality cmd failed (0x01)
+>>    
+>>
+>
+>If this works, you must have corretly runned hciattach...
+>What shows "hciconfig"?
+>
+>  
+>
+>>root@thumper:/etc/pcmcia# cardctl ident
+>>Socket 0:
+>>  product info: "AmbiCom,Inc", "BT2000E", "Bluetooth PC/CF Card"
+>>  manfid: 0x022d, 0x2000
+>>  function: 2 (serial)
+>>    
+>>
+>
+>This is my cardctl ident:
+>Socket 0:
+>  product info: "Pretec", "BT2000E", "Bluetooth PC/CF Card"
+>  manfid: 0x022d, 0x2000
+>  function: 2 (serial)
+>
+>  
+>
+>>dmesg of bluez drivers doesn't show anything special, And before I
+>>installed bluetooth drivers the card showed as serial device on /dev/ttyS3.
+>>    
+>>
+>
+>Yes card is identified as UART.
+>
+>I have this config file: /etc/pcmcia/bt2000e.conf
+>-----------------------------------------------------------------------------
+>device "bt2000e_cs"
+>  class "bluetooth" module "bt2000e_cs"
+>
+>card "AmbiCom BT2000E Bluetooth Card"
+>  version "AmbiCom,Inc", "BT2000E"
+>  bind "bt2000e_cs"
+>
+>card "Pretec BT2000E Bluetooth Card"
+>  version "Pretec", "BT2000E"
+>  bind "bt2000e_cs"
+>------------------------------------------------------------------------------
+>
+>This card works good for me.
+>
+>Best regards,
+>
+>Pavel Ruzicka
+>
+>
+>-------------------------------------------------------
+>This SF.Net email is sponsored by: IBM Linux Tutorials
+>Free Linux tutorial presented by Daniel Robbins, President and CEO of
+>GenToo technologies. Learn everything from fundamentals to system
+>administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>  
+>
 
 
 -------------------------------------------------------
