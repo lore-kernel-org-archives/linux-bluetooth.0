@@ -1,17 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] USB/Bluetooth dongle doesn't work in hub
-References: <qszekj3j47n.fsf@timepilot.gpcc.itd.umich.edu>
-	<1099959115.29330.40.camel@pegasus>
-	<qszzn1rhnmh.fsf@timepilot.gpcc.itd.umich.edu>
-	<qszr7n3lgkp.fsf@timepilot.gpcc.itd.umich.edu>
-	<1099985025.29330.52.camel@pegasus>
-From: Scott W Gifford <gifford@umich.edu>
-In-Reply-To: <1099985025.29330.52.camel@pegasus> (Marcel Holtmann's message
- of "Tue, 09 Nov 2004 08:23:45 +0100")
-Message-ID: <qszvfblv8rv.fsf@mspacman.gpcc.itd.umich.edu>
+Message-ID: <41AE5F72.6030201@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] general rfcomm questions
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -23,51 +16,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 01 Dec 2004 19:33:24 -0500
+Date: Thu, 02 Dec 2004 01:18:58 +0100
 
-Marcel Holtmann <marcel@holtmann.org> writes:
+Hello
 
-[...]
+i now tried and read quite a few things about rfcomm and multiple 
+connections... but still don't really know what i was searching for...
+maybee someone here can help me (hopefully).
 
->> As before, they work fine when plugged directly into the laptop.
->
-> go ahead and report this problem to the USB mailing list, because it is
-> not a Bluetooth problem and I don't know why this fails.
+i have one device that needs to parallely serve a service to multiple 
+clients via rfcomm.
+- is it possible that the service runns on multiple rfcommchannels, one 
+for each clients? what's the limit?
+- or is the solution to wait for connections, and on a incoming 
+connection close it to connect to that device (having the local service 
+waiting for new connections)...
+- does a inquiry block the whole device? i noticed that if a connection 
+between my device and a client is etablished, i'm unable to run "hcitool 
+scan"...
 
-I didn't get an answer on the USB mailing list, but I saw another
-related answer that seemed to help.  Apparently using certain types of
-transfers on a high-speed hub with a low-speed device is still
-unsupported:
+i'd really appreciate if someone had the time to share it's knowledge...
 
-  http://www.linux-usb.org/usb2.html
-
-    In terms of functionality, the latest driver:
-
-    [...]
-
-    * Has partial support for split transactions (full and low speed
-      transfers) through USB 2.0 hubs:
-
-    [...]
-
-      o You can't (yet) use full speed isochronous transfers through
-        USB 2.0 hubs. (At least without an experimental patch.)  That
-        means: don't hook up USB 1.1 webcams, speakers, etc. to high
-        speed buses, they'll enumerate but you won't be able to use
-        them otherwise. Eventually of course a dozen USB 1.1 webcams
-        will easily coexist at full data rate on a single USB 2.0 bus,
-        using USB 2.0 hubs.
-
-The "ehci-hcd" module provides support for high-speed USB 2.0.
-Removing it with rmmod makes everything run as low-speed USB 1.x, and
-that seems to solve the problem.
-
-I tested with the dongles I have: D-link DBT-120, Belkin F8T001,
-AmbiCom BT2000, and IOGear GBU211.  I tested plugged directly in,
-plugged into a hub connected directly, and plugged into a hub
-connected to a hub connected to a hub connected directly.
-
------ScottG.
+kind regards
+Marco Trudel
 
 
 -------------------------------------------------------
