@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] pand Connection refused(111) when connecting to
-	a Belkin NAP
+Subject: Re: [Bluez-devel] hci_cmd_task: hci0 command tx timeout
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Creative Monsters <lta@creativemonsters.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <420F483D.20802@creativemonsters.com>
-References: <27345483$110790477642094908d86d51.65090625@config17.schlund.de>
-	 <1107908002.14624.3.camel@pegasus>  <420F483D.20802@creativemonsters.com>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.GSO.4.33.0502151510240.1694-100000@horus.imag.fr>
+References: <Pine.GSO.4.33.0502151510240.1694-100000@horus.imag.fr>
 Content-Type: text/plain
-Message-Id: <1109031323.7626.81.camel@pegasus>
+Message-Id: <1109028409.7626.48.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,31 +18,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Feb 2005 01:15:23 +0100
+Date: Tue, 22 Feb 2005 00:26:49 +0100
 
-Hi,
+Hi Catalin,
 
-> I'm not sure why the 'Segfault' happens, or what to do to check
-> it.  :-s
+> While using a COM One Bluetooth USB dongle, after a random
+> amount of time, the device becomes unresponsive (no HCI
+> commands are accepted). The only solution is to physically
+> remove the dongle and re-insert it.
 > 
+> The system is Fedora Core 3, kernel version 2.6.10-1.741_FC3.
 > 
-> Version-wise, I'm running...
+> These are the relevant messages from /var/log/messages:
 > 
+> Feb 15 14:20:22 corse kernel: usb 2-2: new full speed USB device using
+> uhci_hcd and address 7
+> Feb 15 14:22:02 corse kernel: hci_cmd_task: hci0 command tx timeout
 > 
-> ( i )   bluez-pin-0.23-3
+> Also, here is the output of hcidump -i hci0 -x before the crash occurs:
 > 
-> ( ii )   bluez-hcidump-1.11-1
+> > HCI Event: Connect Complete (0x03) plen 11
+>   00 28 00 3E 17 39 EE 02 00 01 00
+> < ACL data: handle 0x0028 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 4097 scid 0x0041
+> < ACL data: handle 0x0028 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 4097 scid 0x0040
+> < HCI Command: Inquiry Cancel (0x01|0x0002) plen 0
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>   28 00 13
+> < HCI Command: Write Scan Enable (0x03|0x001a) plen 1
+>   00
 > 
-> ( iii )   bluez-libs-2.10-2
+> As you can see the last three commands get no answers.
 > 
-> ( iv )   bluez-bluefw-1.0-6
+> Here's (the relevant parts of) the output of lsmod:
 > 
-> ( v )   bluez-utils-2.10-2
+> Module                  Size  Used by
+> dtl1_cs                11845  3
+> l2cap                  26053  3
+> pcmcia                 20805  5 dtl1_cs
+> dm_mod                 55509  0
+> ac                      4805  0
+> joydev                  9217  0
+> hci_usb                15041  3
+> bluetooth              48069  7 dtl1_cs,l2cap,hci_usb
+> yenta_socket           19137  1
+> pcmcia_core            50817  3 dtl1_cs,pcmcia,yenta_socket
+> uhci_hcd               31321  0
+> hw_random               5717  0
 > 
-> 
-> ... on the 64-bit version of Fedora Core 3 ( I'm running an AMD64 ).
+> I have read that this behavior might be caused by the loss of
+> syncronization between the host and the device. Is there any way to fix this?
 
-install the latest version of these packages.
+show us the content of /proc/bus/usb/devices and you should try to load
+the hci_usb driver with isoc=0 to disable the ISOC transfers. What does
+lspci say about your USB host controller?
 
 Regards
 
