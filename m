@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <419784ED.8080800@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Re: multi rfcomm/sco connection
-References: <20041110041405.3CC331D4758@sc8-sf-uberspam1.sourceforge.net>	 <003101c4ca02$b9f20d90$6f04a8c0@ZBOX> <1100446527.21403.23.camel@pegasus>
-In-Reply-To: <1100446527.21403.23.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <003101c4ca02$b9f20d90$6f04a8c0@ZBOX>
+References: <20041110041405.3CC331D4758@sc8-sf-uberspam1.sourceforge.net>
+	 <003101c4ca02$b9f20d90$6f04a8c0@ZBOX>
+Content-Type: text/plain
+Message-Id: <1100446527.21403.23.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,60 +19,69 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 14 Nov 2004 17:16:45 +0100
+Date: Sun, 14 Nov 2004 16:35:27 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Suriyan,
 
-Marcel Holtmann wrote:
+> I just found the way to work with three headsets over only one
+> Bluetooth dongle by a few hardcoded to BlueZ:-
+> 
+> 1. force alternate setting of USB interface number 1, isochronous
+>     endpoint to 5 (3 voice channels with 16 bit encoding)
+> 
+> when three SCO channels connected (by run three hsplay consecutively)
+> I found each incoming SCO HCI frame size up to 144 bytes (as I known
+> previously one voice channel with 16-bit encoding SCO HCI frame size
+> equals 48 bytes so that three channels 48 * 3 = 144 bytes)
+> 
+> This mean one HCI frame to transmit/receive for each SCO channel
+> over USB isochronous endpoint when three SCO channels were
+> connected have frame size equals 144 bytes + 3 bytes header
+> (handle and size) but I not sure this is CSR specific since Bluetooth
+> HCI USB transport specification (H:2) have not details in this point,
+> define only suggested Max Packet Size of each USB frame for transport
+> SCO HCI frame.
 
-|>This cause I must do the second step,
-|>
-|>2. bypass checking (skb->len > hdev->sco_mtu) in function
-|>    hci_send_sco(...) [hci_core.c] and (len > conn->mtu) in
-|>    function sco_send_frame(...) [sco.c]
-|>    *** I just think, this step maybe change by hciconfig tool. ***
-|
-|
-| This is wrong. If the MTU increases with a different voice setting then
-| you have to change the check to depend on the voice setting value.
-|
-|
-|>Next step, I would like to fixed to dynamicaly change the alternate
-setting
-|>by looking for previous thread "question about hci_usb endpoint
-|>selection..." as you known in notify() cannot call usb_set_interface()
-|>since always in_interrupt() so that I would like to purpose to add ioctl()
-|>into hci_usb driver to do this or do you have others better approach?
-|
-|
-| The ioctl() way is a no go. You have everything you must know inside the
-| kernel. You know the number of SCO connections and the voice setting and
-| the driver must be able to deal with this by itself.
+looks reasonable to me, but I've neever done this before.
 
-Question is, how can we handle the endpoint selection when we can't use
-usb_set_interface() in the notify function? Or to be more precisly, when.
+> This cause I must do the second step,
+> 
+> 2. bypass checking (skb->len > hdev->sco_mtu) in function
+>     hci_send_sco(...) [hci_core.c] and (len > conn->mtu) in
+>     function sco_send_frame(...) [sco.c]
+>     *** I just think, this step maybe change by hciconfig tool. ***
 
-Next question is what happens to not-yet-send packages, I think we must
-empty all queues before we can use usb_set_interface.
+This is wrong. If the MTU increases with a different voice setting then
+you have to change the check to depend on the voice setting value.
 
-What function in the kernel driver would you use to add this? maybe the
-send functions? We could set a flag "change endpoint to..." in notify
-and apply the change when queues are empty - and reject/hold new send
-urbs until we were able to change the endpoint setting.
+> Next step, I would like to fixed to dynamicaly change the alternate setting
+> by looking for previous thread "question about hci_usb endpoint
+> selection..." as you known in notify() cannot call usb_set_interface()
+> since always in_interrupt() so that I would like to purpose to add ioctl()
+> into hci_usb driver to do this or do you have others better approach?
 
-Maybe?
+The ioctl() way is a no go. You have everything you must know inside the
+kernel. You know the number of SCO connections and the voice setting and
+the driver must be able to deal with this by itself.
 
-CU,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+> Last, I found new problem when three SCO channels were connected
+> ACL links (RFCOMM) that also connected to three Headset for control have
+> very long response time (sometime up to 10 seconds or more to appear
+> after I pressed a button on Headset). What are the sources of this problem?
+> - Bandwidth limitation of Bluetooth and theirs packet type?
+> - Implementation of Bluetooth firmware on USB dongle?
+> - Implementation of USB stack on Linux?
+> - Implementation of BlueZ stack?
 
-iD8DBQFBl4TtQWC6DTWkDAoRAjGfAJ9M/d+eILKDbDOouVVBmIHu5HxtwACglGY2
-RQOhETxlea2hR0mqL0Du7qw=
-=Z5px
------END PGP SIGNATURE-----
+It is maybe a firmware/chip limitation or a limitation of the piconet
+itself, because SCO channels have reserved bandwith and then may nothing
+is left for the ACL links.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
