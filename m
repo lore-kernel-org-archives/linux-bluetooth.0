@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] which profiles are available for BlueZ stack ?
+Subject: Re: [Bluez-users] how to recognize whether the connected device is
+	a headset
 From: Marcel Holtmann <marcel@holtmann.org>
-To: rahul.tanwar@samsung.com
+To: Chen Bin <binch@mobilesoft.com.cn>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <5772142.1098422100921.JavaMail.weblogic@ep_app13>
-References: <5772142.1098422100921.JavaMail.weblogic@ep_app13>
+In-Reply-To: <1098408465.898.15.camel@debian>
+References: <1098352217.1912.4.camel@debian>
+	 <1098380504.4885.18.camel@pegasus>  <1098408465.898.15.camel@debian>
 Content-Type: text/plain
-Message-Id: <1098442052.4704.27.camel@pegasus>
+Message-Id: <1098441914.4704.23.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,19 +20,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Oct 2004 12:47:32 +0200
+Date: Fri, 22 Oct 2004 12:45:14 +0200
 
-Hi Rahul,
+Hi Chen,
 
-> Where can i find a sortof list of all available profiles
-> for BlueZ stack. I tried to search on the bluez site but
-> cud not find one.
+> > actually the class of device value can be inside the inquiry cache and
+> > you will see it when a remote device requests a connection. However we
+> > don't really store these information together with the connection to
+> > make them available afterwards. Any patch is welcome.
+> 
+> Can you tell me exactly how I can obtain the class of device, including
+> using which API or tool or which C file I need to check? I only know the
+> sdp approach (code in sdptool.c) to check the services provided by
+> device.
 
-actually there are some presentation slides on the talks page that you
-might should look at. However this stack is not about the profiles, it
-is about the supported protocols and before you start thinking about
-profiles you should read the profile part of the specification and
-understand what protocols you need.
+this must be done inside the kernel code and actually there is still the
+case where the master connects without a previous inquiry and so the
+class of device can be unknown.
+
+> > > My phone  will be appeared in 3G conference next month, so I am very
+> > > anxious about the bluetooth feature...
+> > 
+> > What does this mean? Is it good or is it bad? And btw my first name is
+> > Marcel and not Holtmann.
+> Sorry,Marcel. What I am anxious about is this task is very urgent, the
+> bluetooth feature is very important(my boss says), if I can't
+> complish...
+> 
+> Sorry for expressing my individual trifle in this list...
+
+this is ok, but remember that your company wants to make money with a
+product and we don't ;)
 
 Regards
 
