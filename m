@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: "Nicholas A. Preyss" <nalp@gmx.net>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Questions about BlueZ in  commercial use
-From: Marcel Holtmann <marcel@holtmann.org>
-To: KeiHachi <keihachi@swissinfo.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <003401c45c2b$b6eab240$0364a8c0@haruo>
-References: <003401c45c2b$b6eab240$0364a8c0@haruo>
-Content-Type: text/plain
-Message-Id: <1088359746.3774.20.camel@pegasus>
+Message-ID: <20040627171336.GA25886@gmx.net>
+References: <003401c45c2b$b6eab240$0364a8c0@haruo> <20040627125235.GA15938@gmx.net> <001101c45c55$7803b160$0364a8c0@haruo>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <001101c45c55$7803b160$0364a8c0@haruo>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,90 +17,104 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Jun 2004 20:09:07 +0200
+Date: Sun, 27 Jun 2004 19:13:36 +0200
 
-Hi Keihachi,
-
-> Our company is investigating now about BlueZ,
-> to determine whether it is useful to use in our commercial product, or not.
-
-about what kind of product are you talking?
-
-> Q1. development schedule in the future
-> I saw  "http://www.bluez.org/todo.html"
-> But there is no information I want to know.
-> Please tell me the following things.
-
-This list only shows kernel related items that other people can start
-working on if they want to contribute anything to BlueZ. My personal
-todo list is much longer.
-
-> - eSCO (enhanced SCO) in Bluetooth 1.2
-> Do you have any plan to develop these?
-
-Define what kind of eSCO support do you need? Must the SCO packets go
-though the HCI layer or through an extra PCM interface?
-
-Do you own Bluetooth chips that supports eSCO? I only own two devboards
-and both don't support SCO over HCI and they also don't came with a PCM
-codec on it.
-
-> - Audio/Video related profiles
-> Do you have any plan to develop these(A2DP, AVRCP)?
-
-Audio/video is along with HID one of the two major things that will be
-supported in the future. However talking about A2DP the problem I see is
-that there is not free GPL code for the suband codec at the moment and I
-am not an audio expert. I haven't spent any time with thinking about the
-remote control profiles.
-
-> Q2. maintenance/support
-> I found some examples about the support of open-source that
-> companies which want to use such a open-source software,
-> pay some maintenance fee to the community or some companies which
-> provide the service to maintain it, so that
-> the community or such companies ensure the quality of their software is a certain level.
-> For example, MySQL, JBoss, etc.
-> These open-sources are maintained to ensure the quality,
-> by some kind of organizations which get the maintenance fee.
+On  0, KeiHachi <keihachi@swissinfo.org> wrote:
+> Thanks for your reply, nicholas.
+> > If this is the first GPL software you are using, please read and 
+> > understand the implications of this license. This is no offense, but i
+> > think some DVD and Router manufacturer didn't do this before integrating
+> > linux code in their products.
 > 
-> Does BlueZ allow such a business model?
+> Thanks.
+> I know the topic of GPL in Linux world of course,
+> so we have already studied about the license issues,
+> and will continue to study more & more about it from now.
 
-Many business models are possible, but you must be more specific about
-that what you had in mind. What kind of maintenance and support do you
-need?
 
-> Q3. version control
-> Many open-sources are composed of two versions,
-> one is a "testing version", and another is a "stable version". 
-> But I think BlueZ has only a "testing version".
+> > > - eSCO (enhanced SCO) in Bluetooth 1.2
+> > > Do you have any plan to develop these?
+> > 
+> > I am not Marcel and not writing any kernel code, but i listened his talk
+> > at Linuxtag Karlsruhe. I think the problem is the lack of the end-user
+> > products already supporting this. But it is on his plan:
+> > 
+> > http://www.holtmann.org/papers/bluetooth/lt2004_slides.pdf
 > 
-> Why doesn't BlueZ have a "stable version"?
-> Do you have any plan to have a "stable version" of BlueZ?
+> Thanks.
+> I think he will need to spend a little extra time (maybe a few months) 
+> for supporting eSCO. 
 
-That is wrong. BlueZ itself is stable. Speaking about the kernel part
-then every code in a stable kernel like 2.4 and 2.6 is stable. Bugs
-exists and later kernel releases are more stable than previous, but
-every BlueZ code in the kernel can be considered as stable.
+I think if you pay him for supporting eSCO, then it will be very quickly
+integrated.
 
-The -mh patches for 2.4 are also stable, because they don't add new
-features. They only make it possible to use the latest BlueZ code 2.4
-with older kernel releases. I did this, because embedded developers are
-very stuck to some kernel versions.
+> > > - Audio/Video related profiles
+> > > Do you have any plan to develop these(A2DP, AVRCP)?
+> > 
+> > He posted some time ago a request, that if people supply him such
+> > hardware he would implent those support.
+> 
+> Do you mean that offering a headphone with Bluetooth audio functionality
+> to him is necessary to develop A2DP?
 
-Starting with 2.6 I changed the use case of my -mh patches. They are
-only maintained for the latest kernel version and they include testing
-code. For example the upcoming HIDP support.
+Look here:
+http://sourceforge.net/mailarchive/message.php?msg_id=8643774
+I don't know whether someone donated anything after this request, but I
+think he can't get enought. ;)
 
-The BlueZ library and utils are also stable. The next generation work
-(or may you wanna call it "testing") can be found in CVS under libs2 and
-utils2.
+> > I don't understand, are you looking for a company that provides such
+> > support or you want to start a business providing such support?
+> > I don't know of the first, but contacting the developer directly, one
+> > may provide such support. The second is of course possible.
+> 
+> I supposed the first one you mentioned. The latter one is out of my 
+> supposition.
+> If you have a few guesses about such a company that provides the 
+> support of using BlueZ, please tell me the name of such a company.
 
-Regards
+I don't know of any...
 
-Marcel
+> Or, please forgive me for asking this rude question, but,
+> could the developers of BlueZ community provide the support to ensure 
+> the quality,  as counter value for some maintenance fee?
 
+..but i am quite sure this might be possible. Marcel while probably
+reply itself. He is the best suited person, for such a job.
 
+> > It is so stable, you don't need one, ;) Just kidding. Why do you think,
+> > there is no stable version? I think the releases are considered stable
+> > and the CVS stuff and the utils2/libs2 are the testing branch.
+> 
+> For example, Affix provides us these two versions software,
+> the testing version and the stable version.
+> http://affix.sourceforge.net/#download
+> 
+> I suppose such version control or management like Affix.
+> 
+> If a new profile is testing or has been released immediately 
+> after the development,  probably some bugs are still included.
+> So we think if BlueZ is used for the commercial use, the stable 
+> version is necessary,
+> because a commercial product is required to be a high quality.
+
+Yeah I understand your problem and IMO you are partly right. There is no
+so strict seperation of a testing and a stable tree. But you have to
+seperate: the generic ACL/RFCOMM support is quite stable. You can use
+it without integrating all those parts which might be considered not
+completely stable. 
+I personaly wouldn't use HID or SCO support in a commercial device.
+
+> If I misundersood, I am sorry.
+> The utils2/libs2 are the testing version, the others are the 
+> stable version, you mean?
+
+yes 
+
+> If so, is the modification of the kernel part still stable?
+
+You mean those -mh patches for 2.6?
+
+nicholas
 
 
 -------------------------------------------------------
