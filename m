@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Code questions
+Subject: Re: [Bluez-devel] L2CAP & HCI trace
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1108566885.11909.29.camel@g-necml5-146.rd.francetelecom.fr>
-References: <1108566885.11909.29.camel@g-necml5-146.rd.francetelecom.fr>
+In-Reply-To: <20050217111414.40743.qmail@web53202.mail.yahoo.com>
+References: <20050217111414.40743.qmail@web53202.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1109027849.7626.38.camel@pegasus>
+Message-Id: <1109027746.7626.35.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,34 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Feb 2005 00:17:29 +0100
+Date: Tue, 22 Feb 2005 00:15:46 +0100
 
-Hi Emmanuel,
+Hi Filipa,
 
-> I've looked to the code of BlueTooth in the linux 2.6.10 kernel, and
-> I've a few questions : 
-> 
-> - I've noticed that OCF_PIN_CODE_REPLY and OCF_PIN_CODE_NEG_REPLY are
-> defined in include/net/bluetooth/hci.h, but never used in the code; and
-> that the function hci_pin_code_request_evt() is void. Does it mean that
-> the current BlueZ implementation doesn't support PIN codes? (Just making
-> sure.)
+> > Try recompilating your kernel with the
+> > CONFIG_BT_HCI_SOCK_DEBUG, CONFIG_BT_L2CAP_DEBUG,
+> > etc... (All the options
+> > mentionned at the beginning of the files, in a block
+> > like : 
+> > 
+> > #ifndef CONFIG_BT_L2CAP_DEBUG
+> > #undef  BT_DBG
+> > #define BT_DBG(D...)
+> > #endif
+> > 
+> > ) enabled.
+> I am a newbie in Linux/BlueZ matters and I am not sure
+> how to do this. Could you please explain?
 
-currently these events are handled by the hcid, but for the upcoming
-security and profile manager they will be moved inside the kernel.
+add a line with "#define CONFIG_BT_L2CAP_DEBUG" before this block and
+recompile the module.
 
-> - Is the PIN Code Request event masked away (I think it is, because I
-> also read the BlueTooth Specification, and it doesn't allow not reacting
-> to this event), and in this case, were is it masked? I didn't found the
-> masking in the code.
+> By the way, does anybody has the l2cap and hci layers
+> implemented im User Space? I need to have those layers
+> running without OS... 
 
-Nothing is masked away.
-
-> - I've noticed the same for other events (that they were not treated).
-> Are they also just masked away, and, if yes, were in the code do this
-> masking happens?
-
-Explain what you mean.
+Actually it is possible to do this, but you are on the wrong mailing
+list for this question ;)
 
 Regards
 
