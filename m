@@ -1,53 +1,129 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3FFD826F.5080808@hotmail.com>
-From: Christian Hennrich <tettokalle@hotmail.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] problems with connect()
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 08 Jan 2004 17:16:47 +0100
+Return-Path: <charles@bueche.ch>
+Subject: Re: [Bluez-devel] Re: blueZ-bthid testing
+From: Charles Bueche <charles@bueche.ch>
+To: Deepesh S Gujarathi <d_gujarathi@hotmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Law11-OE66zpDERHZWY00000fb1@hotmail.com>
+References: <LAW11-OE33GHeqXipAS00015cf1@hotmail.com>
+	 <1073314449.2508.1.camel@pegasus> <LAW11-OE14JMxg22Civ0001db81@hotmail.com>
+	 <1073394980.2508.59.camel@pegasus>
+	 <Law11-OE46C3SpmFZfs000064c7@hotmail.com>
+	 <1073481066.2508.150.camel@pegasus>
+	 <Law11-OE66zpDERHZWY00000fb1@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1073563642.6616.14.camel@bluez.bueche.ch>
+Mime-Version: 1.0
+Date: Thu, 08 Jan 2004 13:07:22 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
 Hi,
 
-I'm working on a programm which uses sdp to connect only to PANU, 
-creating l2cap and bnep connections. First i start the master, that 
-inquires and then connects to the discovered devices (using sdp), that 
-are started as slaves. 2 slaves are connected(with one L2cap and one 
-Bnep for each slave). this works very fine. then i want to connect the 
-third and so on... but there is the problem: the third one can't connect 
-   with sdp on or off. the connect(socket) command fails with the error:
+looks OK to me. If you want, when you have a stable version, I can host
+it beside mine on my web server.
 
-Connect failed. Function not implemented(38).
+Charles
 
-on the slave machine is only one program started. i tried around with 
-different dongles, but they are not the problem. what is wrong? has 
-anybody some idea? i don't use fork. the sockets that are created(have 
-all different numbers(increasing)). is there any limitation of creating 
-sockets or something like this.
-
-i think the problem is the master, because on the clients there are only 
-2 sockets created. i only have one dongle per pc.
-
-regards Christian
-
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: Perforce Software.
-Perforce is the Fast Software Configuration Management System offering
-advanced branching capabilities and atomic changes on 50+ platforms.
-Free Eval! http://www.perforce.com/perforce/loadprog.html
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+On Thu, 2004-01-08 at 12:09, Deepesh S Gujarathi wrote:
+> Hi all,
+> 
+> Thanks to Marcel, finally the MS mouse is working effortlessly with the
+> bthid program and I am a happy man.
+> 
+> I had messed up two things,
+> - had not loaded the mousedev.o module and
+> - made a typo in the XF86Config-4 file.
+> 
+> my two cents
+> please find attached a howto document that details the steps involved in
+> making the MS IntelliExplorer mouse working with Marcel's bthid utility.
+> 
+> PS: maybe some one can just verify the howto document for any possible
+> errors.
+> 
+> thanks everyone for your patience.
+> Deepesh
+> 
+> Deepesh S Gujarathi
+> Encodex Technologies (India) Pvt. Ltd.
+> 69 Amchi Colony, Bavdhan Khurd
+> Pune - 411021
+> 91-20-2953590 , 2953591
+> URL: www.encodexindia.com
+> 
+> 
+> 
+> ----- Original Message -----
+> From: "Marcel Holtmann" <marcel@holtmann.org>
+> To: "Deepesh S Gujarathi" <d_gujarathi@hotmail.com>
+> Cc: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+> Sent: Wednesday, January 07, 2004 6:41 PM
+> Subject: Re: blueZ-bthid testing
+> 
+> 
+> > Hi Deepesh,
+> >
+> > > I created the uinput node with the following command
+> > > # mknod /dev/input/uinput c 10 223
+> > > and the bthid error (bthid[2040]: can't open input device: no such file
+> or
+> > > directory (2))  is gone, but for some reason I still cant move the
+> cursor.
+> > >
+> > > - I checked the hcidump and it shows all the data coming from the MS
+> > > wireless mouse as I move the mouse and click
+> > >
+> > > - the tail -f /var/log/messages shows the following
+> > >     Bluetooth HID service started
+> > >     Connected: Microsoft Five Button Mouse
+> > >     Vendor HID usage 0xff00fe01 value 0x1
+> > >     adequate battery
+> > >
+> > > - when I do an lsmod I see
+> > >     Module         Used by                Not     tainted
+> > >     uinput            1
+> > >     hci_usb          1
+> > >     l2cap              5
+> > >     bluez              4 [hci_usb l2cap]
+> > >     input              0 (autoclean)    [uinput]
+> > >
+> > > I doubt the following, if anyone can verify it would be great
+> > >
+> > > - my XF86Config-4 file consists
+> > >
+> > > Section "InputDevice"
+> > >          Identifier "MSmouse"
+> > >          driver "mouse"
+> > >          option "Protocol" "IMPS/2"
+> > >          option "Device" "/dev/input/mice"
+> > >          option "ZAxisMapping" "4 5"
+> > >          option "Buttons" "5"
+> > >          option "Emulate3Buttons" "false"
+> > > EndSection
+> > >
+> > > now is the protocol IMPS/2 correct for a MS Intelliexplorer mouse (I
+> copied
+> > > it from the Logitech example) ?
+> >
+> > yes it is, but maybe you need to have additional CorePointer options.
+> > Look at some XFree config howto's.
+> >
+> > > - also in the option "Device" the value specified as "/dev/input/mice"
+> does
+> > > it need to be /dev/input/uinput or something else ?
+> >
+> > No. The mice device is correct.
+> >
+> > > - does the mousedev module need to be loaded to make it work ?
+> >
+> > Yes.
+> >
+> > Regards
+> >
+> > Marcel
+> >
+> >
+> >
+-- 
+Charles Bueche <charles@bueche.ch>
+sand, snow, wave, wind and net -surfer
