@@ -1,6 +1,6 @@
 Return-Path: <survivor@uni-paderborn.de>
-Message-ID: <41496B2C.1030103@uni-paderborn.de>
-Date: Thu, 16 Sep 2004 12:30:04 +0200
+Message-ID: <4148C1AA.1080200@uni-paderborn.de>
+Date: Thu, 16 Sep 2004 00:26:50 +0200
 From: Stefan Mischke <survivor@uni-paderborn.de>
 MIME-Version: 1.0
 To: Marcel Holtmann <marcel@holtmann.org>
@@ -21,14 +21,28 @@ Marcel Holtmann schrieb:
 >
 >  
 >
-Your suggestions have no effect for me. Still errno 16. I think at the 
-moment it is not possible to connect concurrently via l2cap if one 
-device is down. But as a workaround I can use non-blocking connect (but 
-with a timeout of 60 seconds just to prevent deadlocks) and simply 
-reduce the pageto. My connection attempts are sequential anyway because 
-of the master-slave-limit. But I would suggest to change the behavior of 
-l2cap to allow more concurrent connection attempts even if some devices 
-are down.
+I'll give it a try tomorrow.
+I already tried the lingering option to be able to close the socket 
+directly after the last send, but it didn't work for me. I had to put a 
+sleep 1000 (ms) to prevent read errors. As much as I understood the man 
+pages....
+
+"When enabled, a *close 
+<http://www.die.net/doc/linux/man/man2/close.2.html>*(2) or *shutdown 
+<http://www.die.net/doc/linux/man/man2/shutdown.2.html>*(2) will not 
+return until all queued messages for the socket have been successfully 
+sent or the linger timeout has been reached. Otherwise, the call returns 
+immediately and the closing is done in the background. When the socket 
+is closed as part of *exit*(2), it always lingers in the background."
+
+...disabling linger makes also a clean shutdown in the background. Is 
+there also a timeout for background lingering?
+
+Anyway, thanks a lot for your help. I really appreciate it. I'll test 
+your linger suggestion tomorrow. But I'm still of the opinion that l2cap 
+should not return errno 16 to connection attempts to reachable devices 
+even if a connection attempt is in progress to an unreachable device. 
+There should be some concurrency possible.
 
 Regards
 Stefan
