@@ -1,124 +1,65 @@
-Return-Path: <Albert.Rybalkin@Fiserv.com>
-Message-ID: <CF8C38B8FA1ED511A92400508BE37F0B0A961D04@exchange_corp.bhcsecurities.com>
-From: "Rybalkin, Albert" <Albert.Rybalkin@Fiserv.com>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>,
-   "Rybalkin, Albert"
-	 <Albert.Rybalkin@Fiserv.com>
-Cc: "'bluez-users@lists.sourceforge.net'"
-	 <bluez-users@lists.sourceforge.net>,
-   "'albertr@iral.com'"
-	 <albertr@iral.com>
-Subject: RE: [Bluez-users] panu question
-Date: Mon, 22 Mar 2004 09:00:49 -0600
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C4101E.7619E1CC"
-List-ID: <bluez-users.lists.sourceforge.net>
-
-This message is in MIME format. Since your mail reader does not understand
-this format, some or all of this message may not be legible.
-
-------_=_NextPart_001_01C4101E.7619E1CC
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] l2test problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: mohalik@india.hp.com
+Cc: Xavier Garreau <x.garreau@prim-time.fr>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <405EECA6.2080407@india.hp.com>
+References: <405E6C9E.1030600@india.hp.com>
+	 <1079937432.2663.78.camel@pegasus>  <405EBCDD.3090402@india.hp.com>
+	 <1079951177.2663.90.camel@pegasus> <016701c40ffc$8a07f8d0$b67ba8c0@zaz1>
+	 <405EECA6.2080407@india.hp.com>
 Content-Type: text/plain
+Message-Id: <1079965396.2663.276.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 22 Mar 2004 15:23:16 +0100
 
-Sorry for HTML message, didn't want to offend you...
+Hi Swarup,
 
-On a subject matter, I tracked down the problem to BlueSoeil.
-There's a possibility to set up NAT on incoming connections to
-PAN profile, which doesn't seem to work on my Win2K PC. Basic
-PAN (without NAT) works fine, even has a lame DHCP server.
-Thanks,
---
-Albert Rybalkin
+> Actually I started with a client on the linux PC and a symbian server
+> on the nokia 3650. I used the API's for l2cap sockets and had set the 
+> psm to 5 (arbitrary choice). Then i got the 
+>     connection refused(111) 
+> message from the PC.
+> 
+> It was now that I wanted to use l2test as a client (just for the
+> connection part).
+> So I changed the psm in l2test.c to 5 and tested. But connection still
+> gets refused.
+> The reason for connect response is always - "psm not supported".
+> 
+> Does this mean that the nokia device may not have l2cap socket
+> support?
+> I did not find any such information though on the web.
 
-
------Original Message-----
-From: Marcel Holtmann [mailto:marcel@holtmann.org] 
-Sent: Sunday, March 21, 2004 12:41 PM
-To: Rybalkin, Albert
-Cc: 'bluez-users@lists.sourceforge.net'; 'albertr@iral.com'
-Subject: Re: [Bluez-users] panu question
-
-
-Hi Albert,
-
-> The NAP server is win2k box running BlueSoleil 1.4.2. PANU client is 
-> linux 2.4.18 with latest BlueZ kernel patches and recent userland. The 
-> client was trying to connect with:
-
-first stop sending HTML emails, because they are ugly to read and second
-create a binary hcidump with the -w option.
+you must use a PSM > 0x1000, so PSM 4097 is the first usable choise and
+of course your application on the Symbian must listen on that PSM for
+incoming connection. From what your hcidump shows is that the problem is
+on the phone side and so a problem of your symbian server code.
 
 Regards
 
 Marcel
 
 
-------_=_NextPart_001_01C4101E.7619E1CC
-Content-Type: text/html
-Content-Transfer-Encoding: quoted-printable
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
-<HTML>
-<HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
-5.5.2657.73">
-<TITLE>RE: [Bluez-users] panu question</TITLE>
-</HEAD>
-<BODY>
 
-<P><FONT SIZE=3D2>Sorry for HTML message, didn't want to offend =
-you...</FONT>
-</P>
-
-<P><FONT SIZE=3D2>On a subject matter, I tracked down the problem to =
-BlueSoeil.</FONT>
-<BR><FONT SIZE=3D2>There's a possibility to set up NAT on incoming =
-connections to</FONT>
-<BR><FONT SIZE=3D2>PAN profile, which doesn't seem to work on my Win2K =
-PC. Basic</FONT>
-<BR><FONT SIZE=3D2>PAN (without NAT) works fine, even has a lame DHCP =
-server.</FONT>
-<BR><FONT SIZE=3D2>Thanks,</FONT>
-<BR><FONT SIZE=3D2>--</FONT>
-<BR><FONT SIZE=3D2>Albert Rybalkin</FONT>
-</P>
-<BR>
-
-<P><FONT SIZE=3D2>-----Original Message-----</FONT>
-<BR><FONT SIZE=3D2>From: Marcel Holtmann [<A =
-HREF=3D"mailto:marcel@holtmann.org">mailto:marcel@holtmann.org</A>] =
-</FONT>
-<BR><FONT SIZE=3D2>Sent: Sunday, March 21, 2004 12:41 PM</FONT>
-<BR><FONT SIZE=3D2>To: Rybalkin, Albert</FONT>
-<BR><FONT SIZE=3D2>Cc: 'bluez-users@lists.sourceforge.net'; =
-'albertr@iral.com'</FONT>
-<BR><FONT SIZE=3D2>Subject: Re: [Bluez-users] panu question</FONT>
-</P>
-<BR>
-
-<P><FONT SIZE=3D2>Hi Albert,</FONT>
-</P>
-
-<P><FONT SIZE=3D2>&gt; The NAP server is win2k box running BlueSoleil =
-1.4.2. PANU client is </FONT>
-<BR><FONT SIZE=3D2>&gt; linux 2.4.18 with latest BlueZ kernel patches =
-and recent userland. The </FONT>
-<BR><FONT SIZE=3D2>&gt; client was trying to connect with:</FONT>
-</P>
-
-<P><FONT SIZE=3D2>first stop sending HTML emails, because they are ugly =
-to read and second create a binary hcidump with the -w option.</FONT>
-</P>
-
-<P><FONT SIZE=3D2>Regards</FONT>
-</P>
-
-<P><FONT SIZE=3D2>Marcel</FONT>
-</P>
-
-</BODY>
-</HTML>
-------_=_NextPart_001_01C4101E.7619E1CC--
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
