@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] out of range
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41E48785.2010100@avantwave.com>
-References: <41E48785.2010100@avantwave.com>
-Content-Type: text/plain
-Message-Id: <1105532053.7961.51.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <01de01c4f89f$e6d0d230$6f04a8c0@ZBOX>
+From: "Suriyan" <suriyan@netgadgets.co.th>
+To: <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset=windows-874
+Subject: [Bluez-devel] Re: Multiple Headsets
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,18 +17,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 Jan 2005 13:14:13 +0100
+Date: Wed, 12 Jan 2005 19:11:50 +0700
 
-Hi Mike,
+Hi,
 
->     Could anyone tell me , how to detect out of range from user 
-> application when i am using rfcomm SPP profile?
+I used to success with multiple headsets by a few hardcoded in BlueZ stack,
+steps & results found in serveral recently "Re: multi rfcomm/sco connection"
+subject.
 
-the RFCOMM socket will terminate.
-
-Regards
-
-Marcel
+Regards,
+Suriyan.
 
 
 
