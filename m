@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] pppd, bluez and phone
+Subject: Re: [Bluez-users] Release of new BlueZ libs and utils
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Raul Jimeno Mouzo <pichas23@hotmail.com>
+To: Edd Dumbill <edd@usefulinc.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <LAW11-F1213ocBCkKqL00077993@hotmail.com>
-References: <LAW11-F1213ocBCkKqL00077993@hotmail.com>
+In-Reply-To: <1073148476.8729.56.camel@saag>
+References: <1071791711.6635.18.camel@pegasus>
+	 <1073147533.8729.53.camel@saag>  <1073148476.8729.56.camel@saag>
 Content-Type: text/plain
-Message-Id: <1073150435.25261.109.camel@pegasus>
+Message-Id: <1073149849.25261.97.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,16 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 03 Jan 2004 18:20:35 +0100
+Date: Sat, 03 Jan 2004 18:10:49 +0100
 
-Hi Raul,
+Hi Edd,
 
-> I don`t speak english. I have a problem with the Bluetooth connection 
-> between my computer and my phone.
-> I want assign one IP to my p800. I do:
+> > I have a problem that I believe is caused by the new libs.
+> 
+> Agh, I suck.  On a different machine it happens whatever libs I have
+> (2.4.23-mh1).  Sorry for the conflicting error reports.  But I still
+> have the difficulty. :(  Maybe extra cosmic rays are bombarding my house
+> this weekend.
 
-as I already told you, the Symbian based phones like the P800 uses a
-callback mechnism known as mRouter.
+this can never be a libs problem, because L2CAP and RFCOMM are only
+kernel related. However having this problem is somekind odd. Do it only
+happens on BlueZ <-> BlueZ connections?
 
 Regards
 
