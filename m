@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050208074804.15870.qmail@web26404.mail.ukl.yahoo.com>
-From: benbouzid imad <imad_benb@yahoo.fr>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1107547801.6921.103.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] PAN-BNEP-and TCP/IP
+Subject: Re: [Bluez-users] Re: Re: CSR USB dongle w/BT 1.2 and
+	headset/handsfree profiles?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <cu8ldk$3b8$1@sea.gmane.org>
+References: <ctriti$j66$1@sea.gmane.org>
+	 <200502022312.51283.cijoml@volny.cz> <cttelp$240$1@sea.gmane.org>
+	 <1107451039.11944.92.camel@pegasus>  <cu8ldk$3b8$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1107819680.7327.155.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,27 +21,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 8 Feb 2005 08:48:04 +0100 (CET)
+Date: Tue, 08 Feb 2005 00:41:20 +0100
 
-Hi Marcel,
+Hi Jesse,
 
-I was thinking about how PAN profile interact with the
-TCP/IP stacks in blueZ.
-PAN uses the BNEP layer to provide layer 3 IP data and
-for instance how do we detect a ping answer or a ping
-request? 
+> >> > D-Link DBT-120 rev B3 is your choice :)
+> >> 
+> >> Is the new B4 revision OK too?
+> > 
+> > I had timing problems when flashing it with btdfu. Try it at your own
+> > risk.
+> 
+> What does that mean, exactly? Does the dongle become unusable? Does audio
+> not work correctly after a firmware upgrade? Does the firmware just not
+> upgrade properly?
 
-regards
-imad
+actually the flashing itself fails. I also killed already one of the B4
+dongles, but that was maybe my fault.
+
+> Sorry to keep bugging you about this, but you can imagine that it's not
+> incredibly easy to find B3 revisions. I've found tons of B4 revisions,
+> but the B3s are a bit more rare. I'm just wondering if I can get by with
+> a B4.
+
+May you should try eBay. I ran out of B4 dongles for testing and so I
+can't improve the btdfu program.
+
+Regards
+
+Marcel
 
 
-
-	
-
-	
-		
-Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
-Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
