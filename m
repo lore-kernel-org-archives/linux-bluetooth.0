@@ -6,8 +6,8 @@ In-Reply-To: <1102317505.8510.66.camel@pegasus>
 References: <1102340081.653.6.camel@debian>
 	 <1102315236.8510.55.camel@pegasus>  <1102345868.2011.2.camel@debian>
 	 <1102317505.8510.66.camel@pegasus>
-Content-Type: multipart/mixed; boundary="=-VW/RdfNqzQsEnq3nPAXa"
-Message-Id: <1102348405.3281.4.camel@debian>
+Content-Type: text/plain; charset=gbk
+Message-Id: <1102348252.3281.2.camel@debian>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,15 +20,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 06 Dec 2004 23:53:25 +0800
+Date: Mon, 06 Dec 2004 23:50:52 +0800
+
+Hi Marcel,
+
+I haven't patched for the kernel before, so I don't know what is the
+Singed-off-by statement.I only added my change log at the header of the
+file and in the part of the file I modified I have added some comments.
+
+/*
+   BlueZ - Bluetooth protocol stack for Linux
+   Copyright (C) 2000-2001 Qualcomm Incorporated
+
+   Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License version 2 as
+   published by the Free Software Foundation;
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY
+RIGHTS.
+   IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR
+ANY
+   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY
+DAMAGES
+   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+OF
+   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
+   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
+   SOFTWARE IS DISCLAIMED.
+
+ * Add some code for CoD value, 06/12/04, Chen Bin
+ *     binch@mobilesoft.com.cn
+*/
 
 
---=-VW/RdfNqzQsEnq3nPAXa
-Content-Type: text/plain; charset=gbk
-Content-Transfer-Encoding: quoted-printable
-
-The attachment is my patch, the comments and the debug info can be
-removed as soon as this patch is tested fully.
+Sorry for inconvient.
 
 Chen
 =D4=DA 2004-12-06=D2=BB=B5=C4 08:18 +0100=A3=ACMarcel Holtmann=D0=B4=B5=C0=
@@ -67,121 +101,6 @@ the
 > Bluez-devel mailing list
 > Bluez-devel@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---=-VW/RdfNqzQsEnq3nPAXa
-Content-Disposition: attachment; filename=patch-2.6.9-CoD
-Content-Type: text/x-patch; name=patch-2.6.9-CoD; charset=gbk
-Content-Transfer-Encoding: 7bit
-
-diff -ruN linux-2.6.9/include/net/bluetooth/hci_core.h linux-2.6.9-my/include/net/bluetooth/hci_core.h
---- linux-2.6.9/include/net/bluetooth/hci_core.h	Tue Oct 19 05:54:30 2004
-+++ linux-2.6.9-my/include/net/bluetooth/hci_core.h	Mon Dec  6 23:39:24 2004
-@@ -20,6 +20,9 @@
-    ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS, 
-    COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS 
-    SOFTWARE IS DISCLAIMED.
-+
-+ * Add some code for CoD value, 06/12/04, Chen Bin 
-+ *     binch@mobilesoft.com.cn
- */
- 
- #ifndef __HCI_CORE_H
-@@ -143,6 +146,11 @@
- 	__u8		 out;
- 	__u32		 link_mode;
- 	unsigned long	 pend;
-+
-+	/* 
-+	 * added by Chen Bin.
-+	 */
-+	__u8     dev_class[3];
- 	
- 	unsigned int	 sent;
- 	
-diff -ruN linux-2.6.9/net/bluetooth/hci_conn.c linux-2.6.9-my/net/bluetooth/hci_conn.c
---- linux-2.6.9/net/bluetooth/hci_conn.c	Tue Oct 19 05:55:29 2004
-+++ linux-2.6.9-my/net/bluetooth/hci_conn.c	Mon Dec  6 23:14:59 2004
-@@ -20,6 +20,9 @@
-    ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS, 
-    COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS 
-    SOFTWARE IS DISCLAIMED.
-+
-+ * Add some code for CoD value, 06/12/04, Chen Bin 
-+ *     binch@mobilesoft.com.cn
- */
- 
- /* Bluetooth HCI connection handling. */
-@@ -143,6 +146,7 @@
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- {
- 	struct hci_conn *conn;
-+	struct inquiry_entry *ie;
- 
- 	BT_DBG("%s dst %s", hdev->name, batostr(dst));
- 
-@@ -154,6 +158,31 @@
- 	conn->type   = type;
- 	conn->hdev   = hdev;
- 	conn->state  = BT_OPEN;
-+
-+	/*
-+	 * added by Chen Bin for CoD value.
-+	 */
-+
-+	if ((ie = hci_inquiry_cache_lookup(hdev, dst)) &&
-+			inquiry_entry_age(ie) <= INQUIRY_ENTRY_AGE_MAX) {
-+		/*
-+		 * Found a valid entry
-+		 * copy the CoD value to the hci_conn
-+		 */
-+		conn->dev_class[0] = ie->info.dev_class[0];
-+		conn->dev_class[1] = ie->info.dev_class[1];
-+		conn->dev_class[2] = ie->info.dev_class[2];
-+
-+	} else {
-+		conn->dev_class[0] = 0x00;
-+		conn->dev_class[1] = 0x00;
-+		conn->dev_class[2] = 0x00; 
-+	}
-+	
-+	printk("hci_conn_add: the dev_class = %x %x %x\n", conn->dev_class[0], conn->dev_class[1], conn->dev_class[2]);
-+
-+	//---------------------------------------------------------
-+
- 
- 	skb_queue_head_init(&conn->data_q);
- 	hci_conn_init_timer(conn);
-diff -ruN linux-2.6.9/net/bluetooth/hci_event.c linux-2.6.9-my/net/bluetooth/hci_event.c
---- linux-2.6.9/net/bluetooth/hci_event.c	Tue Oct 19 05:53:06 2004
-+++ linux-2.6.9-my/net/bluetooth/hci_event.c	Mon Dec  6 23:15:06 2004
-@@ -20,6 +20,9 @@
-    ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS, 
-    COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS 
-    SOFTWARE IS DISCLAIMED.
-+
-+ * Add some code for CoD value, 06/12/04, Chen Bin 
-+ *     binch@mobilesoft.com.cn
- */
- 
- /* Bluetooth HCI event handling. */
-@@ -539,6 +542,15 @@
- 			}
- 		}
- 		conn->state = BT_CONNECT;
-+		/*
-+		 * added by Chen Bin
-+		 * if the remote ba address is in the cache, hci_conn_add will add the
-+		 * dev_class field in conn.
-+		 * So the following two lines is useless.
-+		 */
-+		memcpy(conn->dev_class, &ev->dev_class, 3);
-+		printk("hci_conn_request_evt:the dev_class = %x %x %x\n", conn->dev_class[0], conn->dev_class[1], conn->dev_class[2]);
-+		//--------------------------------------------------------
- 		hci_dev_unlock(hdev);
- 
- 		bacpy(&cp.bdaddr, &ev->bdaddr);
-
---=-VW/RdfNqzQsEnq3nPAXa--
 
 
 
