@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Setting up an hotplug connection with USB dongles
-From: Erwin Authried <eauth@softsys.co.at>
+Message-ID: <2de4657604112905095c31f953@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200411282132.37941.rdorsch@web.de>
-References: <200411282132.37941.rdorsch@web.de>
-Content-Type: text/plain
-Message-Id: <1101740700.19573.48.camel@justakiss>
+Subject: Re: [Bluez-users] HCI connection_handle
+In-Reply-To: <1101585529.27074.18.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <2de46576041127045238dc2264@mail.gmail.com>
+	 <1101585529.27074.18.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,85 +19,105 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Nov 2004 16:05:00 +0100
+Date: Mon, 29 Nov 2004 18:39:44 +0530
 
-Am Son, den 28.11.2004 schrieb Rainer Dorsch um 21:32:
-> Hello,
-> 
-> I am wondering, if there is a way to setup a hotplug connection between two 
-> Linux machines using two bluetooth dongles. One of them is a NAP (with 
-> Internet access) and booted first, the other box a PANU.
-> 
-> My problem is that I need the pand running on both sides first before I can do 
-> an ifconfig for the bnep0 interface on the NAP.
-> 
-> 
-> 
-> What I did on both Debian Linux systems is:
-> 
-> Add a file
-> 
-> /etc/hotplug/usb/libbt.usermap
-> 
-> The file contains a line for an epox DG02A dongle
-> 
-> epoxbt                0x0003 0x0a12   0x0001    0x0000       0x0000       0x00         
-> 0x00            0x00            0x00            0x00            0x00            
-> 0x00000000
-> 
-> with the vendor ID (here 0x0a12) and the product ID (here 0x0001).
-> 
-> Then add the script epoxbt to the same directory:
-> 
-> # cat epoxbt
-> echo "Load epox bluetooth dongle..."
-> 
-> modprobe bnep
-> pand --master --listen --role NAP
-> #
-> 
-> and 
-> 
-> topsi:~# cat /etc/hotplug/usb/epoxbt
-> #!/bin/bash
-> 
-> echo "Load epox bluetooth dongle..."
-> modprobe bnep
-> pand --role PANU --connect <BT-ID>
-> topsi:~#
-> 
-> 
-> Then I do on the NAP an 
-> 
-> # ifconfig 192.128.2.1
-> 
-> and on the PANU
-> 
-> # dhclient
-> 
-> This works fine, I can access the Internet from the PANU.
-> 
-> 
-> The problem is that the ifconfig on the NAP fails when I do not have the PANU 
-> connected before....thus I can't add the network configuration part into the 
-> expobt scripts.
-> 
-> Does anyone have an idea or pointer for that problem.
-> 
-> Thanks,
-> Rainer
+Hi Marcel,
+I still have a lot of doubts on my previous question 2.
 
-Hi,
-here is a nice description for Debian:
+On Sat, 27 Nov 2004 20:58:49 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Manjunath,
+> 
+> 
+> 
+> > I am trying to use the "hcitool cmd" options and i have to pass the
+> > connection_handle as a command parameter.
+> > root:]#hcitool  con
+> > < ACL 00:0B:0D:31:D1:BA handle 7 state 1 lm MASTER
+> >
+> > Assuming the connection_handle to be 7, i tried to read the rssi value
+> >
+> > root:]#hcitool cmd 0x05 0x0005 0x0007
+> > I get the following
+> >
+> > < HCI Command: ogf 0x05, ocf 0x0005, plen 1
+> >   07
+> > > HCI Event: 0x0e plen 4
+> >   01 05 14 12
+> >
+> > This means there is some error as i have got 12 instead of 00......
+> >
+> > Can you tell me what the problem is??
+> 
+> the problem is that you should read the HCI specification if you wanna
+> play with the "hcitool cmd ..." call. The handle is a 16 bit value. And
+> btw error code 0x12 means invalid parameters.
+> 
+> However the RSSI can be read with "hcitool rssi ..." and this code also
+> does the handle lookup for you.
+> 
+> > 2) I tried using the test mode commands and I am simulatameously
+> > running the hcidump, which prints a unknown command type. I am just
+> > presuming that the commands might be working alright , only that
+> > hcidump doesn't decipher the test commands. Am i right??
+> 
+> What version of hcidump do you use? Show the undecoded output to us.
+> 
 
-http://quozl.netrek.org/bluetooth/
+I am using hcidump ver 1.15.
 
-the interfaces aren't brought up directly by ifconfig, but by a "dev-up"
-script in /etc/bluetooth/pan. In addition, the "-persist" option for
-pand may be useful to keep the connection up. 
+I am trying to set my dongle for  a local loopback test. I try with a
+"Enable device  under test command"
+root]# hcitool cmd 0x06 0x0003 
 
--Erwin
+Hci dump output is 
 
+< HCI Command: Unknown (0x06|0x0003) plen 0
+> HCI Event: Command Complete (0x0e) plen 4
+  01 03 18 00
+
+I am not getting an error.  I try to write the "write loopback method
+command" and enable local loopback.
+
+root]# hcitool cmd 0x06 0x0002 0x01
+
+Hci dump output is 
+< HCI Command: Unknown (0x06|0x0002) plen 1
+  01
+> HCI Event: Command Complete (0x0e) plen 4
+  01 02 18 11
+
+Status shows 11 which is "HCI unsupported feature". I am using  a
+version 1.1 anycom-120 usb dongle.
+hciconfig -a gives the features as 
+
+Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
+
+ Is this a problem with the firmware. Do i have to upgrade the
+firmware and Can i do it??
+
+I also have another doubt......how can i generate the LMP commands
+required for the test mode....as in LMP_test_activate PDU and several
+other LMP commands. The test methodology only speaks about the LMP
+PDU's. How can i generate these LMP commands for the test scenarios.
+
+Thanks,
+Best Regards,
+Manjunath.
+ 
+> Regards
+> 
+> Marcel
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
