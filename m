@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec04051123362c7aa9f8@mail.gmail.com>
+Message-ID: <ef9938ec04051118174f3302f3@mail.gmail.com>
 From: Albert Huang <ashuang@gmail.com>
+Reply-To: albert@csail.mit.edu
 To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] does bluez support dynamic psm for l2cap?
+Subject: [Bluez-devel] can bluez dynamically allocate l2cap psm?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,7 +16,7 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 May 2004 02:36:26 -0400
+Date: Tue, 11 May 2004 21:17:29 -0400
 
 I want a simple client/server that operates as follows.
 
@@ -45,6 +46,7 @@ getsockname( s, (struct sockaddr *)&local_addr, &addr_len);
 int psm = btohs( local_addr.l2_psm );
 
 // register service with SDP using dynamic psm
+
 
 Is this possible with bluez?  Or do I have to do the ugly thing and
 pick an arbitrary psm?
