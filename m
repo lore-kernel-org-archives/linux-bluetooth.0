@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: hcid config
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Chris Searle <usenet@chrissearle.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <lg8ydbgliv.fsf@montgomery.empolis.no>
+To: bluez-users@lists.sourceforge.net
+From: Chris Searle <usenet@chrissearle.org>
+Message-ID: <lg8ydbgliv.fsf@montgomery.empolis.no>
 References: <lgk6wvgqax.fsf@montgomery.empolis.no>
-	 <1090572097.21828.53.camel@pegasus>  <lg8ydbgliv.fsf@montgomery.empolis.no>
-Content-Type: text/plain
-Message-Id: <1090572685.21828.58.camel@pegasus>
+	<1090572097.21828.53.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: hcid config
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,21 +17,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jul 2004 10:51:25 +0200
+Date: Fri, 23 Jul 2004 10:44:56 +0200
 
-Hi Chris,
+>>>>> "Marcel" == Marcel Holtmann <marcel@holtmann.org> writes:
 
-> chris@chris:~$ ps aux | grep hci
-> root      3810  0.0  0.1  1896  796 ?        Ss   08:35   0:00 hcid: processing events
-> 
-> It's started up from /etc/init.d/bluez-utils script under boot.
+    Marcel> Hi Chris,
 
-and what do "hciconfig -a" say?
+    Marcel> check if you have hcid running as root.
+
+chris@chris:~$ ps aux | grep hci
+root      3810  0.0  0.1  1896  796 ?        Ss   08:35   0:00 hcid: processing events
+
+It's started up from /etc/init.d/bluez-utils script under boot.
 
 Regards
 
-Marcel
-
+-- 
+Chris
 
 
 
