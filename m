@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20040528141127.24199.qmail@web51304.mail.yahoo.com>
-From: Aarti Kumar <akmr2000@yahoo.com>
-Subject: RE: [Bluez-devel] BC Flag in HCI ACL Data PACket.
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1085494294.9779.130.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Bluez-devel] Nagle Algorithm
+From: Marcel Holtmann <marcel@holtmann.org>
+To: dsas@mega.ist.utl.pt
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1085671672.40b608f822846@webmail.rnl.ist.utl.pt>
+References: <1085671672.40b608f822846@webmail.rnl.ist.utl.pt>
+Content-Type: text/plain
+Message-Id: <1085673757.2797.29.camel@merlin>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,43 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 28 May 2004 07:11:27 -0700 (PDT)
+Date: Thu, 27 May 2004 18:02:38 +0200
+
+Hi Didier,
+
+> I'd like to know if bluez uses the nagle algorithm and if it can be disabled
+> with the setsockopt in a rfcomm connection.
+
+I don't think we don't use the algorithm in RFCOMM. Actually I never
+thought about that before, so go and look at the source code. What I
+definitiv can say is that no option exists to control the reaction of
+the flow control mechanism.
+
+Regards
+
+Marcel
 
 
-Hi Marcel,
-I am doing some performance relatedd work over
-bluetooth and I need to use the BC (Broadcast Control)
-Flag in HCI ACL Data packet. The packet format
-specifies 12 bits of connection handle and 2 bits each
-of Packet Boudary Flag and BC Flag. I set the BC flag
-to a value before sending (that is in function
-hci_send_acl in hci_core.c) and have changed the
-receiver function hci_acldata_packet function (in
-hci_core.c) to recognize the value. But somehow it
-dosent work. I was looking through the code for hci
-and bcsp layer but couldnt locate anything related to
-Flag field embeded in connection handle value. Are you
-aware of any function which checks the Flag value in
-HCI ACL data packet header after hci_send_acl function
-(at sender side)and before hci_acldata_function (at
-receiver side). Or anyother way so that I can use the
-BC flag field.
-
-Thanking you.
-
-Regards,
-Aarti.
-
-
-
-
-
-	
-		
-__________________________________
-Do you Yahoo!?
-Friends.  Fun.  Try the all-new Yahoo! Messenger.
-http://messenger.yahoo.com/ 
 
 
 -------------------------------------------------------
