@@ -1,17 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jean Tourrilhes <jt@hpl.hp.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040809195448.GA24140@bougret.hpl.hp.com>
-References: <20040805013335.GA13608@bougret.hpl.hp.com>
-	 <1091976547.2773.29.camel@pegasus>
-	 <20040809185159.GA21899@bougret.hpl.hp.com>
-	 <1092078516.4564.40.camel@pegasus>
-	 <20040809195448.GA24140@bougret.hpl.hp.com>
-Content-Type: text/plain
-Message-Id: <1092125599.4564.76.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: [PATCH 2.6] link trigger for AODV and +
+Message-ID: <411810BF.8010001@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] "comlicated" setup - known issues for	hid and SCO?
+References: <4117A907.7010006@dark-reality.de>	 <1092071597.4564.17.camel@pegasus>  <4117B376.3030507@dark-reality.de>	 <1092073484.4564.32.camel@pegasus>  <4117BA71.5000800@dark-reality.de> <1092090585.4564.51.camel@pegasus>
+In-Reply-To: <1092090585.4564.51.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,44 +17,71 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 10:13:19 +0200
+Date: Tue, 10 Aug 2004 02:03:11 +0200
 
-Hi Jean,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> > this is a good point and I do think that this patch is a nice additional
-> > feature for BlueZ, but I am not fully comfortable with it in its current
-> > shape. Actually some time ago I thought about removing the support for
-> > stack internal events.
-> 
-> 	In my stuff, I use internal events to know when hci interfaces
-> go up and down and when they appear and disappear. As far as I know,
-> those events are not available by any other means. They are not
-> available through RtNetlink because hci interfaces are not real netdev
-> interfaces.
+Marcel Holtmann wrote:
+| Hi Lars,
+|
+|
+|>| I don't see the hold mode. This can cause problem if they form a
+|>| scatternet. When both are connect what does "hcitool con" say?
+|>
+|>without SCO connection active:
+|>Connections:
+|>~        < ACL 00:0E:07:33:DE:2B handle 45 state 1 lm MASTER
+|>~        > ACL 00:07:61:04:D6:7D handle 41 state 1 lm MASTER
+|>
+|>
+|>with active SCO connection:
+|>Connections:
+|>~        < SCO 00:0E:07:33:DE:2B handle 44 state 1 lm SLAVE
+|>~        < ACL 00:0E:07:33:DE:2B handle 45 state 1 lm MASTER
+|>~        > ACL 00:07:61:04:D6:7D handle 41 state 1 lm MASTER
+|
+|
+| so both devices are in the same piconet. There should be no problem, but
+| from my position I can't tell you anything more.
+|
 
-these events should be available via hotplug and the bluetooth.agent and
-because of this I was thinking about removing the stack internal stuff.
+Hm OK thanks anyway. I'll try to find out what's happening.
 
-If the HCI connections themself are fully integrated into the driver and
-device model an event through hotplug would be the best. Comments?
+|>BTW, do you know what is the difference between using channel "1" and
+|>"no" channel for the SCO connection? The btsco client has this option,
+|>and if it's used as "1" the language for the RFCOMM commands seems to be
+|>different (i.e. if I press the take/hold button on the headset, I get
+|>"AT+BVRA=?" when using without "channel", but "AT+CKPD=200" when used
+|>with channel 1).
+|
+| I've never used the btsco software.
 
-> > I sent the full patch for inclusion, but it came out that one part
-> > causes troubles and so I removed this part. I didn't found the time for
-> > a further investigation.
-> 
-> 	That's what I said : I'm going to test it properly. If you
-> could remember the issue, that would help.
+I'd not have asked if I thought it would have to do (much) with btsco.
 
-I searched the email exchange between Michal and me from the mailing
-list archives for you. Check out this thread:
+Here's what this channel does (default if not given is 2):
 
-	http://thread.gmane.org/gmane.linux.bluez.user/2672
+	addr.rc_family = AF_BLUETOOTH;
+	bacpy(&addr.rc_bdaddr, dst);
+	addr.rc_channel = channel;
+	if (connect(s, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+		close(s);
+		return -1;
+	}
 
-Regards
+I just thought you might remember something from the BT specs or so. But
+if you don't, I don't want to bother you, I can read up myself :)
 
-Marcel
+thanks,
+~  Lars
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-
+iD8DBQFBGBC+QWC6DTWkDAoRAsD3AKCiWO+t6jNpm35Sq3EzoXG/+oPUeQCfdmAm
+dlxxjGyWd45MV3RvVQvPJFI=
+=nZcH
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
