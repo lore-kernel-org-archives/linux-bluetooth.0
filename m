@@ -1,76 +1,58 @@
-Return-Path: <Steven.Singer@csr.com>
-Message-ID: <3FF99BA8.7040806@csr.com>
-Date: Mon, 05 Jan 2004 17:15:20 +0000
-From: Steven Singer <steven.singer@csr.com>
+Return-Path: <Chris.Hubball@csr.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Chris Hubball <chris.hubball@csr.com>,
-   BlueZ Mailing List
-    <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Apple mouse and disconnect problem
-References: <7D3093619D15A841A322413C3F138E0855C2F9@exchange02.csr.com>
-    <1073320020.2508.17.camel@pegasus>
-In-Reply-To: <1073320020.2508.17.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset="us-ascii"
+Subject: RE: [Bluez-devel] Apple mouse and disconnect problem
+Date: Mon, 5 Jan 2004 16:52:33 -0000
+Message-ID: <7D3093619D15A841A322413C3F138E0855C2FC@exchange02.csr.com>
+From: "Chris Hubball" <Chris.Hubball@csr.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-> So the question is if it is ok if both ends call hci_disconnect? Do you
-> have seen any problems both ends are trying to terminate the ACL link?
-> How do the link manager handles this? I can't find any valuable comment
-> in the specification or the profiles which end should terminate the ACL
-> link.
+Hi Marcel,
 
-In theory link managers should handle this fine. If they don't then it's
-a bug in the link manager and not the host's fault. Just be aware of the
-race hazard. You may get two disconnection_complete events one with an
-error code.
+There shouldn't be any problems with both sides sending HCI_disconnect
+at the same time.  When the connection closes, both sides receive
+HCI_Disconnect_Complete whichever end detached.  They only part that may
+be misleading is that the Error code may state that the other end closed
+it when you thought you had!
 
-Note that when I say that a disconnection_complete event is flagged with
-an error, I mean that the status field is non-zero, not that the reason
-field is non-zero.
+Chris.
 
-So I'd expect something like (local side wins the race):
+-----Original Message-----
+From: Marcel Holtmann [mailto:marcel@holtmann.org]=20
+Sent: 05 January 2004 16:27
+To: Chris Hubball
+Cc: BlueZ Mailing List
+Subject: RE: [Bluez-devel] Apple mouse and disconnect problem
 
-   v Disconnect hnd:h
-   ^ Command_Status Pending
-   ^ Disconnect_Complete Success hnd:h Connection_Terminated_By_Local_Host
 
-or (local side loses the race):
+Hi Chris,
 
-   v Disconnect hnd:h
-   ^ Disconnect_Complete Success hnd:h Other_End_Terminated_Connection:...
-   ^ Command_Status No_Connection
+> There is no defined "owner" of an ACL connection mainly because the=20
+> L2CAP connections on top of it can be established by either end.
+>=20
+> From general interop experience, if you close the last L2CAP=20
+> connection on the ACL, you should also disconnect the ACL.  Not sure=20
+> if you've got this feature, but it's also a nice idea to add a timeout
 
-or (if the race is a little closer and the link manager is not taking
-special care to avoid this situation):
+> before closing an ACL as it's common to open another L2CAP connection=20
+> immediately after e.g. SDP search followed by HID.  This saves the=20
+> paging time to re-open the ACL.
 
-   v Disconnect hnd:h
-   ^ Command_Status Pending
-   ^ Disconnect_Complete Success hnd:h Other_End_Terminated_Connection:...
-   ^ Disconnect_Complete No_Connection hnd:h
+we got all these things, but we only take care of the ACL links that we
+set up. If the other side reconnects to us and had to create an ACL link
+(because none exists) we don't terminate the ACL link after the timeout.
+So the question is if it is ok if both ends call hci_disconnect? Do you
+have seen any problems both ends are trying to terminate the ACL link?
+How do the link manager handles this? I can't find any valuable comment
+in the specification or the profiles which end should terminate the ACL
+link.
 
-Note, however, that these are no worse than the races you get if you try
-to disconnect a link just as the supervision timeout fires.
+Regards
 
-I'm straining my memory here, but I vaguely recall having seen bugs with
-this race in some link managers in the distant past so you should be
-robust against suprious errors. One likely error is to get two successful
-disconnection_complete events for the same handle (you should either get
-just one or the second should be flagged with an error). A second
-possible error is that you get two disconnection_complete events and one
-is marked with an invalid connection handle (such as 0x0000).
+Marcel
 
-My memory is a little hazy - I may be confusing this scenario with other
-problems I've seen in the past (they all blur into one after a while).
-
-Basically, every level in the stack should be able to cope with abrupt
-and unexpected disconnections as they have to be able to cope with
-supervision timeouts. Once you get above HCI, apart from the reason code
-in the disconnection_complete event, there's no difference between a
-supervision timeout and the remote end cleanly terminating the link.
-
-	- Steven
--- 
 
 
 
