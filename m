@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
+Message-ID: <40CB0CB1.3040003@web.de>
+From: Lars von Wedel <vonwedel@web.de>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Thinkpad X31 @ fedora core 2, trying to connect to Nokia 6380i
-Message-ID: <20040612144834.GA12364@gmx.net>
-References: <m365a0b8f9.fsf@bfnet.com> <20040610101649.GA7496@gmx.net> <m3oenr9t1k.fsf@bfnet.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <m3oenr9t1k.fsf@bfnet.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] Bluetooth keyboards / Frogpad
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,31 +15,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 12 Jun 2004 16:48:34 +0200
+Date: Sat, 12 Jun 2004 16:01:21 +0200
 
-On  0, David Wuertele <dave-gnus@bfnet.com> wrote:
-> Nicholas> Does appear a pin windows on the mobile display?
-> 
-> No, there was no change on my 6310i display.
-> But on my laptop display I got a dialog asking for the PIN.
-> Where do I get this mysterious PIN?
-> I tried making one up.  Then it worked!
-> 
-> Is this PIN stored somewhere?  I see a file
-> 
->   /etc/bluetooth/pin
-> 
-> but it doesn't contain the PIN that I typed into the laptop dialog and
-> the phone dialog.
 
-No, the PIN is only needed for Pairing bluetooth devices. The
-/etc/bluetooth/pin specifies a lasting key you take for every
-connection. It is taken instead of the key you insert in the dialog-box
-for incoming connections. 
-The PIN you insert is stored nowhere, but the devices generate a link-key
-from the pin and other data, this stored in the /etc/bluetooth/link_key. 
+Hello,
 
-nicholas
+I'm new to bluetooth and wonder, whether keyboards (especially a Frogpad 
+from frogpad.com) are generally supposed to work with linux?
+
+Lars
+
 
 
 -------------------------------------------------------
