@@ -2,11 +2,10 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] DBT-120 firmware upgrade
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200411270158.54567.cijoml@volny.cz>
+In-Reply-To: <200411261152.29925.pavouk@pavouk.org>
 References: <200411261152.29925.pavouk@pavouk.org>
-	 <200411270158.54567.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1101524620.6514.62.camel@pegasus>
+Message-Id: <1101489949.6514.33.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,13 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 27 Nov 2004 04:03:40 +0100
+Date: Fri, 26 Nov 2004 18:25:49 +0100
 
-Hi Michal,
+Hi Pavel,
 
-> kdes koupil tuhle dongle? Ji nemuzu nikde sehnat - teda tuhle revizi :(
+> I want to upgrade DBT-120 Ver B3 (details below).
+> I read instructions on http://www.holtmann.org/linux/bluetooth/dfu.html
+> I have downloaded BluetoothFWUpdate1.2.dmg.
+> On web is version 1.1, but when I try to download it, then version 1.2
+> is saved on to disk.
+> 
+> There are 3 dfu files:
+> md5sum and name:
+> --------------------------------
+> f1cb8ce8d3222af2bb6b512f99be62c7  DeskTop.dfu
+> 00acbb467c76a1bca899f888fc23a779  GenericCSR.dfu
+> f16c41fa42e04d77a9df6ae8c2d40c82  Portable.dfu
+> 
+> Is this right GenericCSR.dfu for DBT-120 B3?
+> I mean correct md5sum.
+> 
+> I know, that flashing with btdfu is without warranty, but do you think that it 
+> will works?
 
-maybe this is the wrong language ;)
+it should work. You can use "btdfu verify" before upgrading. However
+always at your own risk ;)
 
 Regards
 
