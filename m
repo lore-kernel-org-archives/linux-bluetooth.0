@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <IAMEH4$7B12F58979DCF74FDA06F760E707D16D@libero.it>
-Subject: Re: [Bluez-devel] how compile kernel modules
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-From: "andi.c@libero.it" <andi.c@libero.it>
-To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Alignment issue
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Daryl Van Vorst <daryl@wideray.com>,
+   "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1106231454.26551.582.camel@hades.cambridge.redhat.com>
+References: <001301c47f09$3900e650$1301010a@baked>
+	 <1092208405.4564.227.camel@pegasus>
+	 <1106231454.26551.582.camel@hades.cambridge.redhat.com>
+Content-Type: text/plain
+Message-Id: <1106232343.8190.187.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,57 +22,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 15:48:40 +0100
+Date: Thu, 20 Jan 2005 15:45:42 +0100
 
-maybe i am not made myself clear
-i am in need to compile a CUSTOM kernel=
-, not add an offcial kernel patch
+Hi David,
 
+> > > The attached patch should fix the problem (it does as far as I can tell).
+> > > The compiler probably thinks both arguments to memcpy() are aligned and so
+> > > makes an optimization which breaks the copy (because the destination is not
+> > > actually aligned). Perhaps this is a compiler bug... I'm using gcc 3.3.3.
+> > > After googling and reading some discussion on the topic it seems that it's
+> > > probably not a compiler bug. I'll leave that for someone else to decide. :)
+> > 
+> > after checking some more resources, you may be right and the compiler
+> > optimizes here where it should not. I found a comment about gcc and
+> > using its __builtin_memcpy. Try to replace the memcpy with memmove and
+> > see if this works.
+> 
+> That isn't guaranteed to work either. This is the patch I've been
+> testing in the Fedora RPM since August. It lets the compiler know what's
+> happening so it can generate optimal code.
 
-> Hi Andi,
-> 
-> > i simple quest=
-ion: how can i compile a custom set of bluez-modules ?
-> > I ve the sour=
-ce code , from linux 2.4.19 kernel (i need them for that version),
-> > b=
-ut in
-> > the net\bluetooth\ there is no "configure" file. Can someone t=
-ell me the
-> > commands to use ? 
-> 
-> apply the latest patch for that=
- kernel and then simply select Bluetooth
-> support in the config menu.=0D
-=
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> --------------------------=
------------------------------
-> This SF.Net email is sponsored by: Intel=
-liVIEW -- Interactive Reporting
-> Tool for open source databases. Create=
- drag-&-drop reports. Save time
-> by over 75%! Publish reports on the we=
-b. Export to DOC, XLS, RTF, etc.
-> Download a FREE copy at http://www.in=
-telliview.com/go/osdn_nl
-> _____________________________________________=
-__
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> ht=
-tps://lists.sourceforge.net/lists/listinfo/bluez-devel
-> =0A=0A=0A=0A___=
-_________________________________________________________=0A6X velocizzar=
-e la tua navigazione a 56k? 6X Web Accelerator di Libero!=0AScaricalo su =
-INTERNET GRATIS 6X http://www.libero.it=0A
+why using a do-while for put_unaligned() and not for get_unaligned(). Is
+this supposed to work with each GCC version? Will it also work with
+other compilers? What about performance? If a platform can do unaligned
+access by itself it should be faster than compiler tricks.
+
+Regards
+
+Marcel
+
 
 
 
