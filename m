@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040525145414.13698.qmail@web51405.mail.yahoo.com>
-From: =?iso-8859-1?q?Miguel=20=FFffffc1ngel=20Ripalda=20Mar=FFffffedn?= <maripalda@yahoo.com>
+From: Alex <welpan@gmx.de>
 To: bluez-users@lists.sourceforge.net
+Cc: welpan@gmx.de
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] PocketPC can't connect to my BlueZ
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200405251646.29853.welpan@gmx.de>
+Subject: [Bluez-users] rfcomm connection as normal user
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,39 +17,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 25 May 2004 16:54:14 +0200 (CEST)
+Date: Tue, 25 May 2004 16:46:29 +0200
 
-Hi everyone,
+Hello, if i try to connect via rfcomm as normal user i get the message:
+Cannot create device operation not Operation not permitted.
 
-I have setup my Linux and my USB Bluetooth adapter
-with BlueZ, to work as an internet gateway for several
-Palm devices.
+My question what can I do to give a standard user permission?
 
-Now, I have to setup one PocketPC 2003 Axim5, to work
-in the same way; but I cannot connect to the linux
-gateway. Devices are paired and recognized, the PPP
-negotiation seems to start, but suddenly it stops with
-no reason...
+Best regards 
 
-Maybe it has something to do with the fact that I must
-write a phone number when configuring the connection
-at the PocketPC device.
-
-I found and read the howto related with Linux+BlueZ as
-internet gateway for PocketPC, but nothing is said
-there about the PocketPC configuration issues.
-
-Has anyone come throught that difficulties yet?
-
-Thanks in advance and best regards,
-
-Miguel-Angel
-
-
-		
-______________________________________________________________________
-Correo Yahoo! - 6MB, más protección contra el spam ¡Gratis!
-http://correo.yahoo.es
+Alex
 
 
 -------------------------------------------------------
