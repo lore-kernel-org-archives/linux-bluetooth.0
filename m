@@ -1,26 +1,65 @@
-Return-Path: <ubaldo@eja.it>
-Message-ID: <20040723112955.4177.qmail@webmail.aruba.it>
-References: <20040718194607.29341.qmail@webmail.aruba.it>
-            <1090183633.4400.42.camel@pegasus>
-In-Reply-To: <1090183633.4400.42.camel@pegasus>
-From: "ubaldo" <ubaldo@eja.it>
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] modify RFCOMM_DISC_TIMEOUT
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Carlos AM <Carlos@naxus.biz>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: SCO audio packets dropping
-Date: Fri, 23 Jul 2004 13:29:55 +0200
+In-Reply-To: <003b01c47095$488aa3e0$5000005a@naxus>
+References: <000a01c46ff6$f6013a10$5000005a@naxus>
+	 <1090517537.21828.26.camel@pegasus>  <003b01c47095$488aa3e0$5000005a@naxus>
+Content-Type: text/plain
+Message-Id: <1090575554.4791.5.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="iso-8859-1"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 23 Jul 2004 11:39:14 +0200
 
+Hi Carlos,
 
->> With kernel 2.4.22, hcitools 2.2 and voice set 0x0060 HV1 if I play what I 
->> recorded (aplay -f S16_LE) the voice is a little bit quicker than normal. If 
->> I set voice as 0x0040 and "aplay -f S8" everything is perfect.  
->> 
->> With kernel 2.6.6 and voice 0x0060 HV1 everything is ok until I set the 
->> packet type as HV3, then same problem as with kernel 2.4.22. 
+> I run a rfcomm server built on top of bluez using sockets, the client runs a
+> different bluetooth protocol implementation that is very buggy and sometimes
+> stops the rfcomm comunication without sending a DISC. So the rfcomm server
+> waits for 20 seconds (RFCOMM_DISC_TIMEOUT) and then closes the connections
+> and become available again. The sending loop of the server is:
 > 
-> try 2.4.22-mh6 and don't modify the packet types. Let the link manager
-> be able to choose between HV1, HV2 and HV3.
+> //using sockets
+> //send until write returns -1
+>  while(n>=0)
+>  {
+>     n=write(client,s,strlen(s));
+>     sleep(1);
+>  }
+> //go to listen again
+> 
+> 
+> If the client simply stops the communication, not disconnect, the server
+> must be available as soon as possible. 20 seconds it's too long for our
+> application.
 
-If I don't set HV3 I always get "Address already in use"... 
+what you want is an idle timeout detection. The RFCOMM_DISC_TIMEOUT is
+not meant for doing this. Show us the output of "hcidump -x -t" while
+this happens.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by BEA Weblogic Workshop
+FREE Java Enterprise J2EE developer tools!
+Get your free copy of BEA WebLogic Workshop 8.1 today.
+http://ads.osdn.com/?ad_id=4721&alloc_id=10040&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
