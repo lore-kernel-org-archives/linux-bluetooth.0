@@ -1,17 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] L2CAP raw socket patch
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Collin R. Mulliner" <collin@betaversion.net>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040211000722.2368d2e9.collin@betaversion.net>
-References: <20040210124942.393a6da0.collin@betaversion.net>
-	 <1076451408.2777.13.camel@pegasus>
-	 <20040210232330.4cf4935d.collin@betaversion.net>
-	 <1076452346.2777.31.camel@pegasus>
-	 <20040211000722.2368d2e9.collin@betaversion.net>
-Content-Type: multipart/mixed; boundary="=-/Zodkoa/0mpQZeefWq8T"
-Message-Id: <1077463890.2716.53.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <4038A415.2070506@soft.uni-linz.ac.at>
+From: "Dr. Simon Vogl" <vogl@soft.uni-linz.ac.at>
+MIME-Version: 1.0
+To: James Courtier-Dutton <James@superbug.demon.co.uk>
+CC: =?ISO-8859-1?Q?Fred_Sch=E4ttgen?= <bluez-devel@schaettgen.de>,
+   bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] sco link help needed
+References: <4034CA08.50500@soft.uni-linz.ac.at> <200402191629.38846.bluez-devel@schaettgen.de> <40376D2B.1060904@superbug.demon.co.uk>
+In-Reply-To: <40376D2B.1060904@superbug.demon.co.uk>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,68 +19,76 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 22 Feb 2004 16:31:30 +0100
+Date: Sun, 22 Feb 2004 13:44:05 +0100
 
+Hi James,
+have you looked at what Jonathan Paisley implemented?
+http://www.dcs.gla.ac.uk/~jp/snd-bluez-sco/
+Cheers,
+Simon
 
---=-/Zodkoa/0mpQZeefWq8T
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+James Courtier-Dutton wrote:
 
-Hi Collin,
+> Fred Schättgen wrote:
+>
+>> On Thursday 19 February 2004 15:36, Simon Vogl wrote:
+>>
+>>> Hi,
+>>> I desparately need some help with audio links:
+>>> I have written two small programs that use my pc to emulate a headset
+>>> and a handsfree device. Both work quite nicely, the rfcomm-based
+>>> initialization takes place, and I get an SCO connection, but 
+>>> mysteriously,
+>>> I don't get a single byte of audio data (I don't see it with hcidump
+>>> neither).
+>>>
+>>> my setup:
+>>> * Acer usb bluetooth dongle
+>>> * test phones used: p800 (headset), p6600/ngage/3650 (handsfree) 
+>>> with no
+>>> luck... * kernel 2.4.23
+>>> * bluez utils&lib from cvs
+>>> * and yes, i did register hset profile via sdptool....
+>>>
+>>> I had the program running perfectly already with a T68i....
+>>> Any help appreciated heavily (for example a traace of a successful
+>>> connection...), Simon
+>>
+>>
+>>
+>> I wrote a small handsfree application as a part of the KDE Bluetooth 
+>> Framework. It basically worked, even though it had problems with an 
+>> ever increasing lag, which has probably nothing to do with bluez. But 
+>> at the moment it's broken and it's not very high priority, since my 
+>> microphone is also broken ;)
+>> But you might take a look at it.. it's in kdeextragear-3:
+>> http://webcvs.kde.org/cgi-bin/cvsweb.cgi/kdeextragear-3/kdebluetooth/handsfree/ 
+>>
+>> I'll try to fix it during the next days.
+>>
+>> Btw. I'm not sure if the sound doesn't work currently because of a 
+>> kernel problem. Maybe I should try with an older kernel.. It used to 
+>> work with 2.4.24 if I remember correctly.
+>>
+>> greetings
+>> Fred
+>>
+> For those interested, I am planning to write an alsa driver for 
+> bluetooth headsets.
+> The alsa driver module would load into kernel, but not present any 
+> sound devices.
+> Once a pairing had been set up (a small tool will be used for the 
+> pairing), the alsa driver module would then dynamically add a sound 
+> card to the kernel device list, and this sound card would work just 
+> like any other sound device in linux.
+> The alsa driver would handle both iso and rfcomm connections, iso for 
+> the sound, rfcomm for mixer volume etc.
+>
+> Is anyone else working on this, or shall I start alone?
+>
+> Cheers
+> James
 
-> so what do you all think about the RAW socket patch, does it make sense
-> putting it into the official tree?
-
-the original code was even wrong. If a SKB contains two or more commands
-or responses the SKB will be put more than once to the raw socket. I am
-going to apply the attached patch and hope we don't get a performance
-decrease.
-
-Regards
-
-Marcel
-
-
---=-/Zodkoa/0mpQZeefWq8T
-Content-Disposition: attachment; filename=patch
-Content-Type: text/plain; name=patch; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
-
-===== net/bluetooth/l2cap.c 1.36 vs edited =====
---- 1.36/net/bluetooth/l2cap.c	Wed Jan 14 21:56:53 2004
-+++ edited/net/bluetooth/l2cap.c	Sun Feb 22 16:22:51 2004
-@@ -1629,6 +1629,8 @@
- 	struct l2cap_cmd_hdr cmd;
- 	int err = 0;
- 
-+	l2cap_raw_recv(conn, skb);
-+
- 	while (len >= L2CAP_CMD_HDR_SIZE) {
- 		memcpy(&cmd, data, L2CAP_CMD_HDR_SIZE);
- 		data += L2CAP_CMD_HDR_SIZE;
-@@ -1670,7 +1672,6 @@
- 
- 		case L2CAP_COMMAND_REJ:
- 			/* FIXME: We should process this */
--			l2cap_raw_recv(conn, skb);
- 			break;
- 
- 		case L2CAP_ECHO_REQ:
-@@ -1680,11 +1681,10 @@
- 		case L2CAP_ECHO_RSP:
- 		case L2CAP_INFO_REQ:
- 		case L2CAP_INFO_RSP:
--			l2cap_raw_recv(conn, skb);
- 			break;
- 
- 		default:
--			BT_ERR("Uknown signaling command 0x%2.2x", cmd.code);
-+			BT_ERR("Unknown signaling command 0x%2.2x", cmd.code);
- 			err = -EINVAL;
- 			break;
- 		}
-
---=-/Zodkoa/0mpQZeefWq8T--
 
 
 
