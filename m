@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Florian Echtler <echtler@fs.tum.de>
+Subject: Re: [Bluez-devel] about connection timeout
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.62.0503092351590.6694@block>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] btsco volume commands
+In-Reply-To: <422BC615.2060600@avantwave.com>
+References: <422BC615.2060600@avantwave.com>
+Content-Type: text/plain
+Message-Id: <1110390909.5462.26.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,30 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 9 Mar 2005 23:57:42 +0100 (CET)
+Date: Wed, 09 Mar 2005 18:55:09 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi,
 
-Hello everyone,
+>    How can i know there is connection error? 
 
-I noticed that in btsco.c from CVS, line 465 and 470, the string
-that is to be sent to the headset seems to be lacking an "AT" 
-prefix. After adding that, my headset now correctly changes its
-volume when done via alsamixer (previously, it ignored that).
+you can look at the error code of the connect() call or check with
+select() or poll() on that socket. Or you can open a HCI raw socket and
+look for a HCI disconnect event.
 
-If desired, I can prepare a patch.
+> And when i want to 
+> reconnect the other side, do i need to reset the bluetooth stack ?
 
-Yours, Florian
-- -- 
-Preserve wildlife - pickle a squirrel today!
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
+No.
 
-iD8DBQFCL39q7CzyshGvatgRAqDAAJ9N8jKS7IMcZryqctfxTNjM9UoIFgCg2Vop
-VNn5oa7oazG22PPYY6mH6Mg=
-=cdwz
------END PGP SIGNATURE-----
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
