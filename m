@@ -1,11 +1,19 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200402250154.18963.wim.delvaux@adaptiveplanet.com>
-Subject: [Bluez-users] link_key_request problems
+Subject: Re: [Bluez-users] rfcomm socket message: function not implemented
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Zbigniew Diaczyszyn (gmx)" <z.dia@gmx.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <006c01c3fb29$c2b4b700$184cb850@ULLA>
+References: <000d01c3f343$d89f1ad0$e04db850@ULLA>
+	 <1076855680.14758.55.camel@pegasus>  <000b01c3f599$04aaf520$de4bb850@ULLA>
+	 <1077058491.2665.131.camel@pegasus>  <003b01c3f65e$371ef400$dc4db850@ULLA>
+	 <1077147114.2685.11.camel@pegasus>  <000601c3f8c9$98e2c820$3d4bb850@ULLA>
+	 <1077415764.2716.21.camel@pegasus>  <000b01c3f98e$697f79a0$494db850@ULLA>
+	 <1077486947.2832.20.camel@pegasus>  <000b01c3fa66$4dccee30$4c4bb850@ULLA>
+	 <1077580779.2880.4.camel@pegasus>  <006c01c3fb29$c2b4b700$184cb850@ULLA>
+Content-Type: text/plain
+Message-Id: <1077663786.2919.64.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,22 +24,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Feb 2004 01:54:18 +0100
+Date: Wed, 25 Feb 2004 00:03:06 +0100
 
-HI all,
+Hi Zbigniew,
 
-I am setting up a pan connection between my Ipaq/Linux and my Linux/2.6 
-server.
+> > the /bin/bluepin script should look like this
+> > 
+> > #!/bin/sh
+> > echo "PIN:0000"
+> > 
+> > and you must make sure that the script is executable.
 
-When I try to connect I see in the logfile that hcid tries to authenticate by 
-using a stored link key.  This does not seem to work since the connection is 
-not established.
+is the hcid running?
 
-When I remove the link_key file and use the pin it works.
+> I did so, but the only reaction was: function not implemented. I got the same result when I typed:
+> 
+> echo "PIN:xxxx" > /dev/rfcomm0
 
-What might be the problem here ? 
+This is wrong and I never said that you should do this.
 
-W
+Regards
+
+Marcel
+
 
 
 
