@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <424C151B.9090008@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <424AEF7E.1000304@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] btsco + Plantronics headset + Trust bt dongle -
- stops after 1 sec
-References: <1112223455.7866.14.camel@localhost.localdomain>
-In-Reply-To: <1112223455.7866.14.camel@localhost.localdomain>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] file transfer from phone to PC
+References: <20050330174856.17375.qmail@web8505.mail.in.yahoo.com>
+In-Reply-To: <20050330174856.17375.qmail@web8505.mail.in.yahoo.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,36 +18,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 31 Mar 2005 08:19:55 -0700
+Date: Wed, 30 Mar 2005 20:27:10 +0200
 
-Francesco
+what have you done? what's the error message? which part failed?
 
-I haven't seen anyone else reporting this same problem. I agree the 
-adapter diagnostics look fishy. I think it would likely help the SCO 
-connection to have a different/newer adapter.
 
-Brad
-
-> Hi everybody and thanks for the help.
-> I'm running ubuntu warty (kernel 2.6.8.1) compiled for K7, using
-> bluez-utils 2.7.
-> I've got a Plantronics M3000 headset and a Trust BT120 bluetooth USB
-> dongle and i can't for my life get them to work together.
-> I compiled btsco from CVS, kernel module included, the dongle's drivers
-> get loaded (it works, at least partially, because i used it with my old
-> nokia to browse the web), the snd-bt-sco module too, without warnings or
-> errors. 
-> Launching btsco, it seems to work, the RFCOMM connection works, clicks
-> on the headset buttons are reported and acted upon, but any application
-> trying to record from the headset gets only 1 second of (bad) audio and
-> then stops, while playback never works, just gives background noise (but
-> the headset actually becomes 'active' when an app tries to play
-> something)
-> Hcidump shows SCO packets from handset with voice in it (packets payload
-> varies with audio in input in the microphone)
-> I also failed when trying the same setup with chan_bluetooth in asterisk
-> in more or less in the same way, so i suppose it's a matter of
-> compatibility ?
+mahabaleshwara k wrote:
+> Hi all,
+> I am trying for file transfer between PC and MOTOROLA
+> mobile-E398 over bluetooth.I am having linux-2.4.20
+> kernel with blueZ libs, utilis,openobex and obexftp
+> compiled. I am able to transfer(put) images from PC to
+> mobile using obexftp but NOT FROM MOBILE TO PC. Can
+> any one suggest me solution or where I went wrong?
+> Regards,
+> Maha.
+> 
+> 
+> ________________________________________________________________________
+> Yahoo! India Matrimony: Find your life partner online
+> Go to: http://yahoo.shaadi.com/india-matrimony
+> 
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+> 
 
 
 -------------------------------------------------------
