@@ -1,36 +1,34 @@
-Return-Path: <daryl@wideray.com>
-Errors-To: <daryl@wideray.com>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'James Courtier-Dutton'" <James@superbug.demon.co.uk>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
-Subject: RE: [Bluez-devel] Qualification testing - rfcomm
-Date: Fri, 18 Jul 2003 13:25:52 -0700
-Message-ID: <000701c34d6a$c9c5c740$1a01010a@baked>
+Return-Path: <James@superbug.demon.co.uk>
+Message-ID: <3F184BED.8010409@superbug.demon.co.uk>
+Date: Fri, 18 Jul 2003 20:35:09 +0100
+From: James Courtier-Dutton <James@superbug.demon.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <3F184AD5.5090709@superbug.demon.co.uk>
+To: Daryl Van Vorst <daryl@vanvorst.org>
+CC: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>, "'Siegfried Lehmann'" <Siegfried.Lehmann@CetecomUSA.com>, "'Benjamin Ko'" <Benjamin.Ko@CetecomUSA.com>
+Subject: Re: [Bluez-devel] Qualification testing - rfcomm
+References: <000201c345a7$e6a3df20$d5b5160a@baked>
+In-Reply-To: <000201c345a7$e6a3df20$d5b5160a@baked>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-James,
+Daryl Van Vorst wrote:
+> James,
+> 
+> Unfortunately I'm not going to be of much help with SCO testing...  We've
+> been doing our testing with Cetecom (they're on the CC list).
+> 
+> It may be possible for you to arrange something with them if you (or someone
+> else) are making a product. Contact Ben Ko (benjamin.ko@CetecomUSA.com) if
+> you'd like to discuss it.
+> 
+> -Daryl.
+>
 
-> > Finally got some results on those latest rfcomm changes for=20
-> > qualification. Looks like there are a few more problems. :(=20
->  But we're=20
-> > close. :)
-> >=20
-> Can you outline what hardware you are using to do the test.
-> Is it:
-> 1) USB bluetooth adapters
-> 2) PCI bluetooth adapters
-> 3) PCMCIA bluetooth adapters
-> 4) Serial bluetooth adapters.
 
-We are using an Ericsson ROK 104001 bluetooth module. It's connected to a
-high-speed UART. The stack is running on an ARM processor.
+I am just an open source developer. I am not making any products or 
+otherwise profiting from what I am doing.
+So, unless CetecomUSA.com do testing for free, I don't think your 
+suggestion will help me much.
 
-Once qualification testing is complete I'll put together a list of all test=
-s
-that were performed, and what kind of software tools or programs needed to
-be used for each test.
-
--Daryl.
+Cheers
+James
