@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: RE: [Bluez-devel] tcsendbreak and flow control on hciattach (csrchip)
-Message-ID: <39417DF3286A66428FA558987839F44F152D9A@SINTEFXCH01.sintef.no>
-From: "Rognlien Dag Kristian" <Dag.K.Rognlien@sintef.no>
-To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Bletooth Driver
+From: Marcel Holtmann <marcel@holtmann.org>
+To: h_lim.ost@olympus.com.sg
+Cc: "bluez-devel@lists.sourceforge.net" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <OFF3295719.6069BC02-ON48256F2A.001AB589-48256F2A.001AC97C@olympus.com.sg>
+References: 
+	 <OFF3295719.6069BC02-ON48256F2A.001AB589-48256F2A.001AC97C@olympus.com.sg>
+Content-Type: text/plain
+Message-Id: <1097488509.9474.2.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,29 +19,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 11 Oct 2004 12:21:10 +0200
+Date: Mon, 11 Oct 2004 11:55:27 +0200
 
+Hi,
 
+> Anyone has got a bluetooth driver for serial profile on Qtopia? 
 
-> -----Original Message-----
-> From: David Woodhouse [mailto:dwmw2@infradead.org]=20
-> Sent: 9. oktober 2004 11:30
-> To: Marcel Holtmann
-> Cc: Rognlien Dag Kristian; BlueZ Mailing List
-> Subject: Re: [Bluez-devel] tcsendbreak and flow control on=20
-> hciattach (csrchip)
->=20
-> IIRC the CSR units ship with the 'reset on break' PS key=20
-> turned off so it doesn't have any effect anyway.
+a profile is an application and not a driver. Be more specific what you
+really want.
 
-There is no problem to change the PS keys through the SPI interface. We
-have the 'reset on break' set on our systems.
+Regards
 
-Regards,
-Dag K. W. Rognlien
-Research Scientist
-SINTEF ICT
-Communication Systems
+Marcel
+
 
 
 
