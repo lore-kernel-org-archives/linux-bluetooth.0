@@ -1,52 +1,39 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: tOpSy TuRvY <topsyturvy@nemo.student.utwente.nl>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <E1BcqIi-0002cT-53@sc8-sf-list2.sourceforge.net>
-Message-ID: <Pine.BSO.4.58.0406222046050.9882@nemo.student.utwente.nl>
-References: <E1BcqIi-0002cT-53@sc8-sf-list2.sourceforge.net>
+Return-Path: <wb0gaz@hotmail.com>
+From: David Feldman <wb0gaz@hotmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>, wb0gaz@hotmail.com
+Date: Tue, 22 Jun 2004 09:30:51 -0600
+Subject: Solved pairing problem - big success!
+In-Reply-To: <1087852135.4328.30.camel@pegasus>
+References: <20040621135136.7C703C50.wb0gaz@hotmail.com> <1087852135.4328.30.camel@pegasus>
+Message-Id: <20040622093051.CF78DDA0.wb0gaz@hotmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] Max Number of PANUs supported in PAN
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Jun 2004 20:57:46 +0200 (CEST)
+Content-Type: text/plain; charset="US-ASCII"
+List-ID: <bluez-users.lists.sourceforge.net>
 
+Hello Marcel/List:
 
-Hello,
+I sent my last message too soon - sorry for the noise on the list.
 
-Can someone tell me the maximum number of users supported in one PAN?
-I guess this question boils down to:
+I did more reading, and discovered there was an error in my pin 
+helper file.
 
-a) Are PANUs in Parked mode supported (i.e. 200+ PANUs in one PAN 
-possible).
-b) Is the PAN able to juggle PANUs between active and parked mode so 
-they all seem "connected" and are able to communicate with each 
-other.
+It appears the message generated must be PIN:xxxx, not just xxxx, so I
+changed that. 
 
-Also, can something tell me if something like above is possible in the BT 
-SIG PAN specification, or does it also support a maximum of 8 users in a 
-PAN.
+This made pairing successful!
 
-Thank you in advance.
+Then, I configured minicom to communicate with /dev/rfcomm0 at 19200
+bps, and the phone bluetooth went on-line. I was able to manually 
+dial to
+my home linux server phone number, and log in!
 
-Regards,
-Assed
+It is a very big success!!!
 
+Thank you VERY MUCH for all of your fine help and advice, I now have
+beginning bluetooth connection on my old Omnibook 800.
 
--------------------------------------------------------
-This SF.Net email sponsored by Black Hat Briefings & Training.
-Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
-digital self defense, top technical experts, no vendor pitches, 
-unmatched networking opportunities. Visit www.blackhat.com
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Soon, I will get ppp running, then I can access internet directly...
+
+Dave
+wb0gaz@hotmail.com
