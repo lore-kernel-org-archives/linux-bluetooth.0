@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Belkin Bluetooth USB Printer Adapter
+Subject: Re: [Bluez-users] Device class resetting itself after device is
+	removed
 From: Marcel Holtmann <marcel@holtmann.org>
-To: dave.givens@phaldor.co.uk
+To: trejkaz@xaoza.net
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <418601B6.2010905@phaldor.co.uk>
-References: <418601B6.2010905@phaldor.co.uk>
+In-Reply-To: <200411012222.49520.trejkaz@trypticon.org>
+References: <200411012222.49520.trejkaz@trypticon.org>
 Content-Type: text/plain
-Message-Id: <1099313330.16247.91.camel@pegasus>
+Message-Id: <1099313117.16247.84.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,29 +19,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 01 Nov 2004 13:48:50 +0100
+Date: Mon, 01 Nov 2004 13:45:17 +0100
 
-Hi Dave,
+Hi Trejkaz,
 
->    I am writing to you as I cannot find the help I require on the net 
-> and the product manufactures will not help. I have a bluetooth printer  
-> adapter which I am trying to set up on Linux (Fedora Core 2, Kernel 
-> 2.6.8). I have read Marcels web pages and downloaded the relevant 
-> software, but even though I have copied the bluetooth file into the 
-> directory as instructed and created an entry in printers.conf, the 
-> printer/adapter does not appear anywhere in the gnome printer software 
-> that I know of. It might be that I am looking in the wrong places, it 
-> appears as an item in gnome-bluetooth-manager, but the only chooses of 
-> printers in the printer configuration gui are dev/lp0 and ptal. Am I 
-> looking in the correct place? Is it a Fedora Core 2 problem? Have I 
-> installed the software correctly? Any help you can give me will be 
-> greatfully accepted as I have spent two weeks trying to get it to work. 
-> I have tried installing as a custom device, but it rejects even that.
+> I've been noticing some issues which seemed to start happening after I left my 
+> machine alone for a while.  Eventually I thought I would try to nail the 
+> problem down and exclude some parties like kdebluetooth from the picture.  
+> What's left is quite reproducible.  It turns out that these periods of 
+> leaving the machine alone coincided with the times I removed the dongle to 
+> use it at work. :-)
+> 
+> System in healthy state:
+> 
+> raven root # hciconfig hci0 class
+> hci0:   Type: USB
+>         BD Address: 00:0B:0D:40:14:0D ACL MTU: 120:20  SCO MTU: 64:0
+>         Class: 0xff0104
+>         Service Classes: Positioning, Networking, Rendering, Capturing, Object 
+> Transfer, Audio, Telephony, Information
+>         Device Class: Computer, Desktop workstation
+> 
+> System after removing dongle:
+> 
+> raven root # hciconfig hci0 class
+> Can't get device info: No such device
+> 
+> System after replacing dongle:
+> 
+> raven root # hciconfig hci0 class
+> hci0:   Type: USB
+>         BD Address: 00:0B:0D:40:14:0D ACL MTU: 120:20  SCO MTU: 64:0
+>         Class: 0x000000
+>         Service Classes: Unspecified
+>         Device Class: Miscellaneous,
+> 
+> Now, the class has reset to 0x000000, but that's not the value I have in 
+> hcid.conf.
+> 
+> It also destroys my hostname value and probably everything else important at 
+> the same time, which would certainly explain why I suddenly can't connect ot 
+> the computer from any devices when it happens.
 
-actually the CUPS backend is included in bluez-utils-2.10 and I think
-you should use this version, because the other is no longer maintained.
-However the printers.conf file is gone and you have to setup your
-Bluetooth printer manually by entering the URI.
+are you sure that your hcid is running?
 
 Regards
 
