@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200407210941.07765.pavouk@pavouk.org>
-Subject: [Bluez-users] Suspend BT Socket card on Zaurus
+Subject: Re: [Bluez-users] Cross-compile pand to Arm system problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?UTF-8?Q?=E9=BB=83=E5=AD=90?= =?UTF-8?Q?=E5=84=80?= <sammy@autumn.ccl.itri.org.tw>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <021d01c46ed2$1b00eed0$7053608c@ccl.itri.org.tw>
+References: <021d01c46ed2$1b00eed0$7053608c@ccl.itri.org.tw>
+Content-Type: text/plain
+Message-Id: <1090395444.21683.39.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,25 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Jul 2004 09:41:07 +0200
+Date: Wed, 21 Jul 2004 09:37:24 +0200
 
-Hello,
+Hi Sammy,
 
-I have old Socket BT CF card (Nokia based) on Sharp Zaurus SL-C860.
-This card use module dtl1_cs on 2.4.18-rmk7-pxa3-embedix kernel.
-On every suspend/resume Zaurus makes cardctl eject/insert
-action, which takes many of time. I was tried to remove these actions
-from apm.d scripts and leave only cardctl suspend/resume.
-But after this modification card doesn't work ;-)
+> I download bluez-utils-2.7.tar.gz and bluez-lib-2.7.tar.gz
+> and cross-compile the pand daemon to arm-uclibc-gcc environment smoothly.
+> The process includes cross-compile bluez-lib firstly.
+> and copy the pand daemon to my all embedded system.(bnep module is ok too)
+> i hope they can be connected by pand.
 
-It's possible to do something for working card without cardctl eject/insert
-commands?
+use the and bluez-libs-2.8 and bluez-utils-2.8, because I included some
+fixes for pand in that release.
 
-It's a problem of controller, card or kernel module?
+> But it always show the message like "bcsp_timed_event: Timeout, retransmitting 1 pkts"
+> of course the line is not connected.(But i try hcitool cc solution it can work.)
 
-Best regards,
+You can ignore this error, because it only tells you that it lost one
+packet and it is now going to resend it. I will change that error into a
+debug message.
 
-Pavel Ruzicka
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
