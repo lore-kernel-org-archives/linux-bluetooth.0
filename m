@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Moni <monikahubrich@aol.com>
-Message-ID: <loom.20040806T193121-781@post.gmane.org>
-References: <001601c47a50$36024fb0$8b1cb7ac@monika> <1091662770.16182.91.camel@pegasus>
+Subject: Re: [Bluez-users] can't establish a connection
+From: ben4fun <ben_4_fun@freenet.de>
+To: bluez-users mailing list <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200408060216.05030.cijoml@volny.cz>
+References: <1091742606.6143.17.camel@localhost>
+	 <1091747064.6143.25.camel@localhost> <1091748133.20839.63.camel@pegasus>
+	 <200408060216.05030.cijoml@volny.cz>
+Content-Type: multipart/alternative; boundary="=-cyvUB1lxshuMBwgUxZBX"
+Message-Id: <1091810383.4570.14.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Connection pcmcia pico bluetooth and modem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,45 +19,95 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 6 Aug 2004 17:38:24 +0000 (UTC)
+Date: Fri, 06 Aug 2004 18:39:45 +0200
 
-Marcel Holtmann <marcel <at> holtmann.org> writes:
 
+--=-cyvUB1lxshuMBwgUxZBX
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+
+> add 
 > 
-> Hi Monika,
+> none            /proc/bus/usb   usbdevfs faults                 0       0
 > 
-> check that your card works correctly. Do this with "hciconfig -a". If it
-> is shown, then start "hcid" and call "rfcomm connect 0 <bdaddr> 1".
+> into /etc/fstab
 > 
-> For more information look at the mailing list archives and check my
-> articles and slides:
-> 
-> 	http://www.holtmann.org/papers/bluetooth/uptimes2003.html
-> 	http://www.bluez.org/talks.html
-> 
-> Regards
-> 
-> Marcel
+> then write
+> mount -a 
+
+It's done.
+After a reboot, I did  "mount -t usbdevfs none /proc/bus/usb" from the
+USB-howto . It confirmed me it was already mounted. But it is strange
+that /proc/bus/usb/device file is still empty.
+
+Then I did "hciconfig hci0 up"
+and I still have "Can't init device hci0. Connection timed out(110)"
+
+But the hciconfig message changed. It is now: 
+
+"hci0:   Type: USB
+        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
+        DOWN
+        RX bytes:0 acl:0 sco:0 events:0 errors:0
+        TX bytes:6 acl:0 sco:0 commands:2 errors:0"
+
+No idea why I have so much difficulties with this dongle.
+
+Regards,
+
+Ben
 
 
-Sorry. 
-Please don't be angry.
-It's completely new for me, to work with Linux.
-So please tell me:
-Where can I find <hciconfig -a>?
-It isn't a command for the Shell, isn't it? 
-(When I input <hciconfig> to the shell, i get a error)
-Have I to install this programm separately?
-Has it the same name in German-Linux?
+--=-cyvUB1lxshuMBwgUxZBX
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Greetings
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
+<HTML>
+<HEAD>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=UTF-8">
+  <META NAME="GENERATOR" CONTENT="GtkHTML/3.0.10">
+</HEAD>
+<BODY>
+Hi,<BR>
+<BR>
+<BLOCKQUOTE TYPE=CITE>
+<PRE><FONT COLOR="#737373"><I>add 
 
-Moni
+none            /proc/bus/usb   usbdevfs faults                 0       0
 
+into /etc/fstab
 
+then write
+mount -a </I></FONT></PRE>
+</BLOCKQUOTE>
+It's done.<BR>
+After a reboot, I did <TT> &quot;mount -t usbdevfs none /proc/bus/usb&quot; from the USB-howto . It confirmed me it was already mounted. But it is strange that /proc/bus/usb/device file is still empty.<BR>
+<BR>
+Then I did &quot;hciconfig hci0 up&quot;<BR>
+and I still have &quot;Can't init device hci0. Connection timed out(110)&quot;</TT><BR>
+<BR>
+But the hciconfig message changed. It is now: <BR>
+<BR>
+&quot;hci0:&nbsp;&nbsp; Type: USB<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:00:00:00:00:00 ACL MTU: 0:0&nbsp; SCO MTU: 0:0<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOWN<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:0 acl:0 sco:0 events:0 errors:0<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:6 acl:0 sco:0 commands:2 errors:0&quot;<BR>
+<BR>
+No idea why I have so much difficulties with this dongle.<BR>
+<BR>
+Regards,<BR>
+<BR>
+Ben<BR>
+<BR>
+</BODY>
+</HTML>
 
-
-
+--=-cyvUB1lxshuMBwgUxZBX--
 
 
 
