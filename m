@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: martin f krafft <madduck@madduck.net>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Bluetooth on a MIPS-System
-Message-ID: <20041007144133.GA15142@cirrus.madduck.net>
-References: <41651D72.7040806@corscience.de> <1097147273.7325.26.camel@pegasus> <41652A40.4080209@corscience.de> <1097152912.7325.30.camel@pegasus> <41654062.5050009@corscience.de> <1097154841.7325.36.camel@pegasus> <41654D83.1090306@corscience.de>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mP3DRpeJDSE+ciuQ"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: leidenfrost@corscience.de
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <41654D83.1090306@corscience.de>
+References: <41651D72.7040806@corscience.de>
+	 <1097147273.7325.26.camel@pegasus>  <41652A40.4080209@corscience.de>
+	 <1097152912.7325.30.camel@pegasus>  <41654062.5050009@corscience.de>
+	 <1097154841.7325.36.camel@pegasus>  <41654D83.1090306@corscience.de>
+Content-Type: text/plain
+Message-Id: <1097158664.7325.38.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,49 +21,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 7 Oct 2004 16:41:33 +0200
+Date: Thu, 07 Oct 2004 16:17:44 +0200
 
+Hi Thomas,
 
---mP3DRpeJDSE+ciuQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-also sprach Thomas Leidenfrost <leidenfrost@corscience.de> [2004.10.07.1606=
- +0200]:
+> Now after doing hciconfig hci0 up I am able to ping other devices,
+> but I guess I'll need rfcomm, too. But there is something missing... but 
+> what?
+> 
+> # modprobe rfcomm
+> Using /lib/modules/2.4.21/rfcomm.o
+> insmod: unresolved symbol putchar
+> insmod: unresolved symbol obex_dump
+> insmod: unresolved symbol parser
+> insmod: unresolved symbol get_proto
+> insmod: unresolved symbol raw_dump
+> insmod: unresolved symbol _gp_disp
+> insmod: unresolved symbol printf
+> modprobe: failed to load module rfcomm
+> 
 > Trying to figure out whats missing with depmod -a won't help because:
->=20
-> # depmod -a
-> -sh: depmod: not found
 
-man, what kind of system is this?
+this rfcomm.o is not a kernel module. It is a compiled object file from
+the bluez-hcidump package.
 
-would you consider trying Debian on MIPS? That just works...
+Regards
 
---=20
-martin;              (greetings from the heart of the sun.)
-  \____ echo mailto: !#^."<*>"|tr "<*> mailto:" net@madduck
-=20
-invalid/expired pgp subkeys? use subkeys.pgp.net as keyserver!
-spamtraps: madduck.bogus@madduck.net
-=20
-"geld ist das brecheisen der macht."
-                                                 - friedrich nietzsche
+Marcel
 
---mP3DRpeJDSE+ciuQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.5 (GNU/Linux)
-
-iD8DBQFBZVWdIgvIgzMMSnURAr/kAKDiRLxOCZ9XZCduaTGIQfrhzU0IYQCgjbAx
-KlV5eOItmsUy7jElIx6narg=
-=nvTk
------END PGP SIGNATURE-----
-
---mP3DRpeJDSE+ciuQ--
 
 
 -------------------------------------------------------
