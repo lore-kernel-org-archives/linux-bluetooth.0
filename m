@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] how to obtain address for rfcomm connection
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1106154308.8190.128.camel@pegasus>
-References: <1106148402.12428.21.camel@justakiss>
-	 <1106154308.8190.128.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1106164863.12437.44.camel@justakiss>
+Message-ID: <8272108050119101561d8eb9b@mail.gmail.com>
+From: tcalexander <tcalexander@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: bluez-utils-2.14 compile error: make returns "cannot find -lbluetooth"
+In-Reply-To: <csllc3$c6d$1@sea.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <82721080501190249144cfac0@mail.gmail.com>
+	 <csllc3$c6d$1@sea.gmane.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,41 +19,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 Jan 2005 21:01:03 +0100
+Date: Wed, 19 Jan 2005 20:15:20 +0200
 
-Am Mit, den 19.01.2005 schrieb Marcel Holtmann um 18:05:
-> Hi Erwin,
+Added /usr/local/bluez/lib (even tried /usr/local/bluez), ran ldconfig as root.
+ldconfig -p | grep bluetooth
+        libbluetooth.so.1 (libc6) => /usr/local/bluez/lib/libbluetooth.so.1
+        libbluetooth.so (libc6) => /usr/local/bluez/lib/libbluetooth.so
+Same thing gets spat out during make. :((
+bluez-libs...I had that installed first...at least that's what I
+presume I did. :)
+I've even turned religous - started praying, that is. :P
+
+On Wed, 19 Jan 2005 13:55:30 +0100, Sebastian Roth
+<sebastian.roth@esk.fhg.de> wrote:
+> Hello!
 > 
-> > I want to establish a rfcomm connection to a mobile phone. I don't know
-> > the phone's address or name a-priori. The pairing is initated from the
-> > phone before the rfcomm connection is initiated. Is there an easy way to
-> > get the phone's address from the preceding link key exchange (from
-> > /etc/bluetooth/link_key?). Browsing/scanning for devices might give more
-> > than one canditate for communication, but I want to use only the one
-> > that has already paired.
+> I guess your linker just can't find the bluetooth library because you
+> have installed it into a non-standard path.
+>  > ./configure --prefix=/usr/local/bluez
 > 
-> you will find any paired device in the link_key file. However if the
-> phone was connected then you can use normal technics to get the device
-> address at the that time. To what service did the phone connect?
+> make install runs the command `ldconfig -n /usr/local/bluez/lib' but the
+> option -n forces ldconfig just to create the library links and not to
+> update the cache. (man ldconfig)
+> Add this path to your /etc/ld.so.conf and re-run ldconfig as root.
 > 
-> Regards
+> `ldconfig -p | grep bluetooth' should show libbluetooth now!
 > 
-> Marcel
-
-Hi Marcel,
-the phone (ericsson t630) didn't connect to a specific service, there's
-a menu entry for discovering new devices. After a few seconds, the names
-of the discovered devices show up. When one of them is selected, the
-phone shows a prompt for entering the pincode, and the link key is saved
-on the Linux system. The purpose of the system is a tcp/ip transmission
-from the Linux system via GSM/GPRS. On the Linux system, no selection or
-entry should be necessary, the ppp over rfcomm connection should come up
-automatically or by pressing a button.
-
-Regards,
-Erwin
-
-
+> Best regards,
+> Sebastian
 
 
 -------------------------------------------------------
