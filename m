@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4045E93F.4040900@soft.uni-linz.ac.at>
-From: Simon Vogl <vogl@soft.uni-linz.ac.at>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Subject: [Bluez-devel] sco links
+Subject: Re: [Bluez-devel] hciattach killed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <AFE91B59A185A5439840B43AB79190470938E7@mchp997a.mch.sbs.de>
+References: <AFE91B59A185A5439840B43AB79190470938E7@mchp997a.mch.sbs.de>
+Content-Type: text/plain
+Message-Id: <1078323020.2787.92.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,32 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 03 Mar 2004 15:18:39 +0100
+Date: Wed, 03 Mar 2004 15:10:20 +0100
 
-hi,
-can anyone help me with my sco link? in about 50% of cases, the audio dat=
-a
-has an offset of one byte, resulting in terrible noise. I think I saw a
-flag in a packet header somewhere that indicates the number of bytes to s=
-kip
-until the audio data starts -- I looked through the bt specs several time=
-s now
-but can't find it again. Anyone has a clue for this?
-Simon
+Hi Matthias,
 
---=20
-_______________________________________________________________________
-Dr. Simon Vogl
-Institut f=C3=BCr Pervasive Computing, Johannes Kepler Universit=C3=A4t L=
-inz
-Altenberger Stra=C3=9Fe 69, A-4040 Linz, Austria
+> sorry I mixed it with another problem we had: hciconfig shows 
+> NOTHING, not even 00:00:00:00:00:00.
+> so I think, hciattach IS killed.
+> 
+> How can I check what is going on there? 
 
-Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
-mailto: vogl@soft.uni-linz.ac.at,  http://www.soft.uni-linz.ac.at/
+I would start with a binary hcidump of the connection that causes the
+problem and then add some debugging printk's to the hci_uart driver. And
+add debug code to hciattach, so you can be sure that the ldisc is closed
+by the kernel module and that there is not segfault in the hciattach
+itself. If you think this is a module versus built-in problem check it
+with an identical setup, but only different kernel's.
 
+And btw what hciattach command line and what module do you use?
 
+Regards
 
-
+Marcel
 
 
 
