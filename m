@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problem with OBEX Object Push Service Description
-From: Edd Dumbill <edd@usefulinc.com>
-To: beichuang@yahoo.com
-Cc: BlueZ Users List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040202045646.51663.qmail@web40406.mail.yahoo.com>
-References: <20040202045646.51663.qmail@web40406.mail.yahoo.com>
+Subject: Re: RE : RE : [Bluez-users] SuSE and Audio
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?ISO-8859-1?Q?J=E9r=F4me?= Stadelmann <jerome.stadelmann@hta-bi.bfh.ch>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <008901c3e9a0$4b488970$2d105793@N64101>
+References: <008901c3e9a0$4b488970$2d105793@N64101>
 Content-Type: text/plain
-Message-Id: <1075744909.5080.20.camel@saag>
+Message-Id: <1075739193.29899.61.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,18 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 02 Feb 2004 18:01:49 +0000
+Date: Mon, 02 Feb 2004 17:26:34 +0100
 
-On Mon, 2004-02-02 at 04:56, beichuang wrote:
-> Anyone can find the reason why it is not interoperable
-> with my iPAQ? I can just not find any error with the
-> comparison with another working OBEX server.
+Hi Jerome,
 
-It may be that you need the object exchange bit set in your device
-service class.  Try running hciconfig hci0 class 0x100100 and trying
-again.  You can make this setting permanent in hcid.conf.
+> > what kernel are you talking about 2.4.21 or 2.6.1? For the 2.4.21 you need
+> at least -mh4.
+> 
+> Sorry :) It's the 2.6.1-mh3
 
--- Edd
+you have to enable CONFIG_BT_HCIUSB_SCO, but this can cause crashes at
+unplug on UHCI host adapters.
+
+> > What does "hciconfig hci0 revision" say? You need a SCO over HCI mapping
+> and I never tested this stuff on a 2.6 kernel.
+> 
+> It gives me SCO mapping : HCI
+
+This is correct, but I never checked that it also works with 2.6.
+
+Regards
+
+Marcel
 
 
 
