@@ -1,92 +1,61 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <3F50803C.607@gtmp.org>
+Return-Path: <mid@gtmp.org>
+Message-ID: <3F4F70B1.20200@gtmp.org>
+Date: Fri, 29 Aug 2003 17:26:41 +0200
 From: "Alexandre Jousset@NL" <mid@gtmp.org>
 MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Belkin F8T002 PC Card problem with Bluez
-References: <3F4F6BF2.6080303@gtmp.org>
-	<1062170277.27784.138.camel@pegasus> <3F4F70B1.20200@gtmp.org>
-In-Reply-To: <3F4F70B1.20200@gtmp.org>
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 30 Aug 2003 12:45:16 +0200
-Content-Type: text/plain; CHARSET=us-ascii; FORMAT=flowed
+References: <3F4F6BF2.6080303@gtmp.org> <1062170277.27784.138.camel@pegasus>
+In-Reply-To: <1062170277.27784.138.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-users.lists.sourceforge.net>
 
-	Hi all,
+	Hi Marcel,
 
-	I tried with setserial to set ttyS4 to irq 3 (it gave me this value
-once when doing setserial autoconfig) -> hang.
+Marcel Holtmann wrote:
+> try "hciattach /dev/ttyS4 bcsp".
 
-	I tried with setserial to set port to 0x4010 (as listed as second I/O
-ports region with lspci), no error but hciconfig hci0 up fails with timeout.
+	I tried this and it says, after some seconds : "BCSP initialization 
+timed out".
 
-	With the original setup (irq 11 and ports at 0x4000, as the serial
-module set them and the config that put the lines h4_recv: Unknown HCI
-packet type xx), I wrote a small C program to read ttyS4 and print the
-numbers on stdout. I noticed some reccurrent value so I told the program
-to put a newline before each value 18. The output is :
+> Send the patch (diff -urN) to the mailing list.
 
------------------------------------------------------------
-18 20 e8 36 be f0
-18 20 e8 36 be f8
-18 20 e8 36 be f8
-18 20 e8 36 ef 0f
-18 24 e8 36 ef f0
-18 24 e8 36 ef f0
-18 20 e8 9b be f8
-18 20 e8 36 ef 0f ff
-18 20 e8 36 ef 0f ff
-18 20 e8 9b be f8
-18 24 e8 36 ef f0
-18 20 e8 36 ef 0f
-18 24 e8 36 ef d0
-18 20 e8 36 ef d0
-18 20 e8 9b be f8
-18 20 e8 9b be f8
-18 20 e8 9b be f8
-18 20 e8 36 ef 0f
-18 20 e8 36 ef 0f
-18 20 e8 36 ef 0f
-18 20 e8 9b be f8
-18 20 e8 36 ef 0f ff
-18 20 e8 9b be f8
-18 20 e8 36 ef 41
-18 20 e8 36 ef 0f
-18 20 e8 36 ef 0f
------------------------------------------------------------
+	Sorry I forgot this. I found the patch on 
+"http://www.ussg.iu.edu/hypermail/linux/kernel/0203.0/0040.html".
 
-	So that must mean something but I don't know what. The first octet is
-always 18, the second is either 20 or 24, the third always e8, the
-fourth either 36 or 9b, the fifth either be or ef, the sixth either 0f
-or d0 or f8 and when it is 0f it is sometimes followed by ff...
+and it is :
 
-	Any clue ?
+---------------------------------------
+diff -ruN linux/drivers/char/serial.c linux-new/drivers/char/serial.c
+--- linux/drivers/char/serial.c Fri Dec 21 18:41:54 2001
++++ linux-new/drivers/char/serial.c Fri Mar 1 09:43:42 2002
+@@ -4658,6 +4658,9 @@
+         { PCI_VENDOR_ID_OXSEMI, PCI_DEVICE_ID_OXSEMI_16PCI952,
+                 PCI_ANY_ID, PCI_ANY_ID, 0, 0,
+                 pbn_b0_2_115200 },
++ { PCI_VENDOR_ID_OXSEMI, PCI_DEVICE_ID_OXSEMI_OXCB950,
++ PCI_ANY_ID, PCI_ANY_ID, 0, 0,
++ pbn_b0_bt_1_115200 },
 
-	Thanx !
+         /* Digitan DS560-558, from jimd@esoft.com */
+         { PCI_VENDOR_ID_ATT, PCI_DEVICE_ID_ATT_VENUS_MODEM,
+diff -ruN linux/include/linux/pci_ids.h linux-new/include/linux/pci_ids.h
+--- linux/include/linux/pci_ids.h Fri Dec 21 18:42:03 2001
++++ linux-new/include/linux/pci_ids.h Fri Mar 1 09:43:52 2002
+@@ -1458,6 +1458,7 @@
+  #define PCI_DEVICE_ID_OXSEMI_12PCI840 0x8403
+  #define PCI_DEVICE_ID_OXSEMI_16PCI954 0x9501
+  #define PCI_DEVICE_ID_OXSEMI_16PCI952 0x950A
++#define PCI_DEVICE_ID_OXSEMI_OXCB950 0x950B
+  #define PCI_DEVICE_ID_OXSEMI_16PCI95N 0x9511
+  #define PCI_DEVICE_ID_OXSEMI_16PCI954PP 0x9513
+---------------------------------------
+
+	I applied the patch by hand since I have kernel 2.4.22 and not 2.4.17 
+and after this I had the new ttyS4 device.
 -- 
     \^/   Cordialement/Regards,
   -/ O \----------------------------------------
 | |/ \|       Alexandre (Midnite) Jousset      |
   -|___|----------------------------------------
-
-
-
-
--------------------------------------------------------
-This sf.net email is sponsored by:ThinkGeek
-Welcome to geek heaven.
-http://thinkgeek.com/sf
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
