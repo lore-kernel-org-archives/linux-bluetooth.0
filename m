@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <00c901c4df6a$f8c11f70$6401000a@zool>
-From: "Steffen Larsen" <zool@zool.dk>
-To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] setting inquiry and inquiry_scan parameters
+In-Reply-To: <1102624670.9988.243.camel@pegasus>
+Message-ID: <Pine.LNX.4.33.0412100958350.16121-100000@redbean.intranet.gw-instruments.de>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_00C6_01C4DF73.5A3A9BC0"
-Subject: [Bluez-devel] piconet..
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,92 +17,57 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 11 Dec 2004 11:20:00 +0100
+Date: Fri, 10 Dec 2004 10:37:54 +0100 (CET)
 
-This is a multi-part message in MIME format.
+Hi Marcel, Hi Jeff,
 
-------=_NextPart_000_00C6_01C4DF73.5A3A9BC0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Inquiry  duration is a parameter of the Inquiry  command.
 
-Hi again!,
+Inquiry scan Interval and Inquiry Scan Window can be set by the HCI
+command Write_Inquiry_Scan_Activity. However, I've not checked if this is
+implemented by every baseband chip. It shall be possible with BlueZ to
+issue those HCI commands directly (see HCITOOL for arbitrary commands).
 
-I am trying to form a piconet, consisting of one server and two clients. =
-I have snaped the most of the code from l2test.c and also made an =
-advertising service and all. My problem is just that one one client can =
-connect and the other one fails (host is down, i belive) . I have =
-implemented the server using fork(), so that the parent process is still =
-listening for new connections and closing my sockets correct (as what I =
-can see..).
-I have browsed this newsgroup for answers, and can see something about =
-setting the master/slave switch should help. I have also tried this, but =
-it dosn't help. Anyone that have a clue about, what could be wrong??=20
+Ciao,
 
-PS. I belive that the PSM in the L2CAP layer can serve more than one =
-client or am I totally wrong? otherwise I should update the PSM =
-everytime a new client connect..
-
-I anyone want the source code, I can send it. But I haven't attached it =
-in this document, due to the size of it.. :-)
+Peter
 
 
--Thanks in advance!
+On Thu, 9 Dec 2004, Marcel Holtmann wrote:
 
-/Steffen Larsen
-------=_NextPart_000_00C6_01C4DF73.5A3A9BC0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+> Hi Jeff,
+>
+> > I realize this post is over 9 months old, but I'm trying to write an
+> > application that does these very kinds of things.  Can someone tell me
+> > more about the specifics of how to tweak these numbers?  I'm guessing
+> > it's related to HCI ... ?
+>
+> nothing has changed since then. You can only tweak things you find an
+> HCI command for.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1106" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi again!,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I am trying to form a piconet, =
-consisting of one=20
-server and two clients. I have snaped the most of the code from l2test.c =
-and=20
-also made an advertising service and all. My problem is just that one =
-one client=20
-can connect and the other one fails (host is down, i belive) . I have=20
-implemented the server using fork(), so that the parent process is still =
+|	Peter Wippich 			Voice: +49 30 46776411		|
+|	G&W Instruments GmbH		fax:   +49 30 46776419		|
+|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
+|	D-13355 Berlin  / Germany					|
 
-listening for new connections and closing my sockets correct (as what I =
-can=20
-see..).</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I have browsed this newsgroup for =
-answers, and can=20
-see something about setting the master/slave switch should help. I have =
-also=20
-tried this, but it dosn't help. Anyone that have a clue about, what =
-could be=20
-wrong?? </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>PS. I belive that the PSM in the L2CAP =
-layer can=20
-serve more than one client or am I totally wrong? otherwise I should =
-update the=20
-PSM everytime a new client connect..</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I anyone want the source code, I can =
-send it. But I=20
-haven't attached it in this document, due to the size of it.. =
-:-)</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>-Thanks in advance!</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>/Steffen =
-Larsen</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_00C6_01C4DF73.5A3A9BC0--
 
 
 
