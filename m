@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] A2DP working :-) , voice not :-(
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200412010943.33419.mail@sebastian-eichner.de>
-References: <200412010839.06669.mailsp@sebastian-eichner.de>
-	 <200412010907.09587.mail@sebastian-eichner.de>
-	 <1101889919.18840.40.camel@pegasus>
-	 <200412010943.33419.mail@sebastian-eichner.de>
-Content-Type: text/plain
-Message-Id: <1101894192.18840.44.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41AD8DD1.9020904@prim-time.fr>
+From: Xavier Garreau <x.garreau@prim-time.fr>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] using select()?
+References: <000a01c4d733$8609ce30$6401000a@zool>
+In-Reply-To: <000a01c4d733$8609ce30$6401000a@zool>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,26 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 10:43:12 +0100
+Date: Wed, 01 Dec 2004 10:24:33 +0100
 
-Hi Sebastian,
+Hi,
 
-> > this should work. Do you enabled CONFIG_BT_HCIUSB_SCO in your
-> > kernel?
-> 
-> cat /proc/config.gz |gunzip -|grep CONFIG_BT_HCIUSB_SCO
-> CONFIG_BT_HCIUSB_SCO=y
-> 
-> Yes, it's enabled. Hmm, tricky thing...
-> Generally it should work with kernel 2.6.9, right?
+> Is there anyware some examples or any source code in the BlueZ utils. 
+> where they use the standard network select() function?
+> I really want to use this instead of the more "heavier" fork() function. :-)
 
-yes, and last time I tested this, it worked for me.
+Marcel sent us some time ago an example which uses poll on hci raw sockets.
 
-Regards
+A cached version can be found here : 
+http://www.xgarreau.org/temp/bluetooth_docs/bluez/mh_hci_raw.c
 
-Marcel
+Maybe Marcel has a more recent example ?
 
-
+Regards,
+Xavier Garreau
 
 
 -------------------------------------------------------
