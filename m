@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <I1BFOA$6F8B55EA549C83F73724227F68765C33@bol.com.br>
+Message-ID: <1025.200.207.51.132.1090605410.squirrel@webmail.ic.unicamp.br>
+From: ra002890@ic.unicamp.br
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-From: "ra002890" <ra002890@bol.com.br>
-To: "bluez-users" <bluez-users@lists.sourceforge.net>
-Cc: "ra002890" <ra002890@itelefonica.com.br>
-Subject: [Bluez-users] How to use rfcomm in a ppc
+Content-Type: text/plain;charset=iso-8859-1
+Subject: [Bluez-users] RFCOMM error message
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,33 +15,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jul 2004 14:38:34 -0300
+Date: Fri, 23 Jul 2004 14:56:50 -0300 (BRT)
 
-Hello everybody, 
+Hello everybody;
 
-I'm back again... I have compiled bluez to my embedded
-linux application that uses a ppc cpu to run my
-aplications. Bluez works fine til l2cap layer; when I
-try to use rfcomm I receive this message:
+ I'm back again...
+ Now I'm trying to put bluez to work with my embedded linux aplication in
+a ppc cpu. I have already recompiled it and tested it with l2ping and
+l2test, but when I try to use rfcomm I receive this message:
 
-/mnt/flash/validador/aplicativo # rfcomm connect rfcomm1
-00:01:24:00:30:de 1 &      ///trying to connect
-/mnt/flash/validador/aplicativo # bcsp_timed_event:
-Timeout, retransmitting 1 pkts   ///common message(if
-anyone knows how to eliminate it, I would like to know)
-
-And this is the killer message that I was talking:
+/mnt/flash/validador/aplicativo # rfcomm connect rfcomm1 00:01:24:00:30:de
+1 &
+/mnt/flash/validador/aplicativo # bcsp_timed_event: Timeout,
+retransmitting 1 pkts
 Can't create RFCOMM TTY: Operation not supported
 
-What I have to do to eliminate this error?
-my bluez utils is version 2.4 and libs 2.5....
+Does anybody knows why it sends me this error?
+And why I'm receiving a bcsp_timed_event warning?
+My bluez version are:
+utils 2.4
+libs  2.5
 
+I tryed to xcompile the 2.8 version but I couldn't do it, it does not
+work. I had problems in the compilation. Have anyone had this problem?
+Could you help me?
 
-                    Thanks in advance...
-                      Direct from Brasil, by Daniel Moraes.
-=0A =0A__________________________________________________________________=
-________=0AAcabe com aquelas janelinhas que pulam na sua tela.=0AAntiPop-=
-up UOL - =C9 gr=E1tis!=0Ahttp://antipopup.uol.com.br/=0A
+                                Thanks in advance by Daniel Moraes from   
+                                  Brasil.
 
 
 
