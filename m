@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <401B7892.1000704@jbc-computer.de>
+From: Jan Bandouch <news.jan@jbc-computer.de>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] sockets connect before accept()
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jan Bandouch <news.jan@jbc-computer.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <401B7892.1000704@jbc-computer.de>
 References: <40193837.1070605@jbc-computer.de>
-	 <401B7892.1000704@jbc-computer.de>
-Content-Type: text/plain
-Message-Id: <1075562028.2720.0.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <40193837.1070605@jbc-computer.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,27 +17,75 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 31 Jan 2004 16:13:48 +0100
+Date: Sat, 31 Jan 2004 10:42:42 +0100
 
-Hi Jan,
+Hi,
+I've finally figured out how to establish the connection correctly via 
+select(..). Was my error in interpreting the return code.
+The main problem seems to be on the Palm side, because it gets the
+connection established event, even if it isn't really established (but 
+somehow pending), cause I didn't yet accept it on the server side. This 
+is strange behavior in my opinion, but well, thats how it seems to be.
 
-> I've finally figured out how to establish the connection correctly via 
-> select(..). Was my error in interpreting the return code.
-> The main problem seems to be on the Palm side, because it gets the
-> connection established event, even if it isn't really established (but 
-> somehow pending), cause I didn't yet accept it on the server side. This 
-> is strange behavior in my opinion, but well, thats how it seems to be.
+But I would still be interested in someone who can tell me what's the 
+exact information that "cat /proc/bluetooth/rfcomm" gives me. Or a hint 
+where to find this information.
+
+Thanks,
+Jan
+
+
+Jan Bandouch wrote:
+
+> Hello,
+> I'm developing a Bluetooth Client/Server application with the client 
+> being a Palm Handheld and the Server being a linux PC using BlueZ 
+> (Debian Kernel 2.4.22, libbluetooth1-dev version 2.5-1).
 > 
-> But I would still be interested in someone who can tell me what's the 
-> exact information that "cat /proc/bluetooth/rfcomm" gives me. Or a hint 
-> where to find this information.
-
-look at rctest for an example or show us your code.
-
-Regards
-
-Marcel
-
+> My client programm (PalmOS) does the following:
+> 1) Establish an Acl Link to the server (address and channel is hardcoded)
+> 2) Create and Connect an RfComm socket to the server (address/channel 
+> still hardcoded)
+> 
+> The connection does get established all right.
+> The funny thing is, that on the server side all I did was to create a 
+> RfComm socket, bind that socket to BDADDR_ANY and channel 10, and 
+> listen. Thats all. No accept(..) call, no select(..) etc.
+> I can do a select(..), but I never get told of any connection requests.
+> I believe that is because my connection request was already handled 
+> before calling select(..).
+> But why or by whom? I'm new to socket programming, but as far as I know 
+> this is not the way it's supposed to work, or is it? And BlueZ 
+> programming should work similar to socket programming, or not?
+> And how am I supposed to get a socket handler for the data socket 
+> without calling accept(..)?
+> 
+> Some more info:
+> The rfcomm-module is not in use, before I start my server programm.
+> After the client establishes the connection, "cat 
+> /proc/bluetooth/rfcomm" shows the following information:
+> 
+> dlc EF:30:04:72:02:00 94:A1:10:E0:07:00 1 20 127 40 1
+> sk  EF:30:04:72:02:00 94:A1:10:E0:07:00 1 10
+> sk  00:00:00:00:00:00 00:00:00:00:00:00 4 10
+> 
+> the last line is my listening socket, the first two seem to be the 
+> connection "initiated" by the Palm. Any infos on how to read the above 
+> information? what does "dlc" stand for, and the numbers on the right?
+> 
+> Any help appreciated. At first I thought that some other process accepts 
+> the connection, but the connection gets only established after listening 
+> on my socket.
+> 
+> Thanks,
+> 
+> Jan
+> 
+> 
+> 
+> By the way, any documentation, links regarding BlueZ programming are 
+> welcome! I know the site of Marcel Holtmann, but there's only one 
+> article dealing with programming, and it's seems I could use some more :-)
 
 
 
