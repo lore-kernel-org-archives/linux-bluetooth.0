@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040625113905.7735.qmail@web90104.mail.scd.yahoo.com>
-From: karthik bala guru <bluekarthik@yahoo.com>
-Subject: Re: [Bluez-users] MX900 page updated
-To: Charles Bueche <charles@bueche.ch>
+From: Charles Bueche <charles@bueche.ch>
+To: karthik bala guru <bluekarthik@yahoo.com>
 Cc: cijoml@volny.cz, bluez-users@lists.sourceforge.net
-In-Reply-To: <20040625132014.7fd4b05d@bluez.bueche.ch>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Bluez-users] MX900 page updated
+Message-Id: <20040625132014.7fd4b05d@bluez.bueche.ch>
+In-Reply-To: <20040625095336.7270.qmail@web90103.mail.scd.yahoo.com>
+References: <20040625103907.2f5af751@bluez.bueche.ch>
+	<20040625095336.7270.qmail@web90103.mail.scd.yahoo.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,47 +19,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 25 Jun 2004 04:39:05 -0700 (PDT)
+Date: Fri, 25 Jun 2004 13:20:14 +0200
 
-hei charles,
-kindly,try and map that key combination . 
-Then they would be really very sad .
-U do it and we would be surprised by the
-rate at which the product will move in the 
-market .... that tooo especially among
-the almost-stable-os-users as they would
-be requiring it frequently while using it.
+Sad we can't map ctrl-alt-del for that-other-almost-stable-OS users :-)
 
-U map the combination into a single key press.
-It would be even more attractive for them.
-wht do u say ?
+On Fri, 25 Jun 2004 02:53:36 -0700 (PDT)
+karthik bala guru <bluekarthik@yahoo.com> wrote:
 
-cheeeeeeers,
-regards,
-karthik bala guru
-
-
---- Charles Bueche <charles@bueche.ch> wrote:
-> Sad we can't map ctrl-alt-del for
-> that-other-almost-stable-OS users :-)
-> 
-> On Fri, 25 Jun 2004 02:53:36 -0700 (PDT)
-> karthik bala guru <bluekarthik@yahoo.com> wrote:
-> 
-> > Hi,
-> > Thatz nice, with 8 keys we can do miracles.
-> > It is more or less a bluetooth mini-keyboard /
-> > mini-remote .  
-> ...
-> 
-
-
-
-		
-__________________________________
-Do you Yahoo!?
-Read only the mail you want - Yahoo! Mail SpamGuard.
-http://promotions.yahoo.com/new_mail 
+> Hi,
+> Thatz nice, with 8 keys we can do miracles.
+> It is more or less a bluetooth mini-keyboard /
+> mini-remote .  
+...
 
 
 -------------------------------------------------------
