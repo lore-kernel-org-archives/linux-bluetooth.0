@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] automatic bnep0 configuration
-Cc: "Christoph Torens" <c.torens@web.de>
-References: <opseq1blhheocfdv@debian>
-In-Reply-To: <opseq1blhheocfdv@debian>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-15"
-Message-Id: <200409230038.29082.pavouk@pavouk.org>
+Subject: Re: [Bluez-users] pand freezes upon disconnect
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bora@ai.com.tr
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E1CACyf-0001js-SO@paris.servershost.net>
+References: <E1CACyf-0001js-SO@paris.servershost.net>
+Content-Type: text/plain
+Message-Id: <1095882382.6223.120.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,29 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Sep 2004 00:38:29 +0200
+Date: Wed, 22 Sep 2004 21:46:22 +0200
 
-Hello,
+Hi,
 
-> I tried to configure this with /etc/network/interfaces
-> but that didn't help. I also tried to set 'auto bnep0'
-> but this only works at boot time, when the device is
-> not there yet.
-> What's the trick?
+> ok, my windows client works very well after disconnect, but linux 
+> freezes.any other comments marcel? thanks very much.
 
-This is done automatically by hotplug feature in kernel. I was problems, that
-hotplug scripts was for kernel 2.4 and they doesn't correctly work with 2.6
-kernel.
+switch to the console or use netconsole and see if there are any oopses
+on your Linux machine. Update to the 2.6.9-rc2-bk8 kernel.
 
-I have enabled "DEBUG=yes export DEBUG"
-in /etc/hotplug.d/default/default.hotplug in Mandrake10.0 distribution.
+Regards
 
-Look at mailing list archive, because this was here discussed before
-few months.
+Marcel
 
-Best regards,
 
-Pavel Ruzicka
 
 
 -------------------------------------------------------
