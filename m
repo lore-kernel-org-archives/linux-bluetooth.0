@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluez-utils 2.7 default configuration
+Subject: Re: [Bluez-devel] BT3C ceased working in kernel 2.6.6
 From: Marcel Holtmann <marcel@holtmann.org>
 To: David Woodhouse <dwmw2@infradead.org>
-Cc: "Nicholas A. Preyss" <nalp@gmx.net>,
+Cc: Antti =?ISO-8859-1?Q?M=E4kel=E4?= <zarhan@cs.tut.fi>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1084371486.4426.156.camel@hades.cambridge.redhat.com>
-References: <20040511192919.GB28581@gmx.net>
-	 <1084368229.25099.26.camel@pegasus>
-	 <1084371486.4426.156.camel@hades.cambridge.redhat.com>
+In-Reply-To: <1084371696.4426.160.camel@hades.cambridge.redhat.com>
+References: <Pine.GSO.4.58.0405111227090.9721@viherkiuru.cs.tut.fi>
+	 <1084371696.4426.160.camel@hades.cambridge.redhat.com>
 Content-Type: text/plain
-Message-Id: <1084382445.25099.77.camel@pegasus>
+Message-Id: <1084382223.25099.72.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,31 +20,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 May 2004 19:20:45 +0200
+Date: Wed, 12 May 2004 19:17:03 +0200
 
 Hi David,
 
-> > the bluez-utils-2.7 now contains sdpd, pand, dund and hidd. So there was
-> > a need for a new init script that is able to start each of these daemons
-> > on bootup. I enabled hidd by default, because it didn't harm if it is
-> > started and hid2hci makes also sense. Why should it not be started?
+> >   The firmware is placed in /usr/lib/hotplug/firmware as it should be,
 > 
-> For the Fedora package I've put pand, dund and hidd in separate init
-> scripts. It's expected that individual services can be enabled or
-> disabled with chkconfig or system-config-services, rather than by
-> manually editing a separate config file. 
-> 
-> Also, I've often been glad of being able to restart pand _separately_
-> from hcid and sdpd. Doesn't sdpd forget _everything_ that's registered
-> when you restart it?
-> 
-> But hid2hci does make sense, assuming of course that you're not relying
-> on a Bluetooth HID device without having the Linux BT-HID support
-> working yet.
+> That's not a bad idea....
 
-I have no problem with that, but for the upstream package I am going to
-keep it this way. If you aren't a developer then you start the daemons
-at boot and kill them at shutdown. That's all.
+right now I am not going to keep up with a new version of bluefw,
+because the bt3c_cs driver didn't use it anymore and for 2.6 the bcm203x
+kernel firmware loader works much better. However I am going to apply
+patches if they look correct. So this one is in CVS.
 
 Regards
 
