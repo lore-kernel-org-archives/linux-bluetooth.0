@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4050323B.1030307@ei.tum.de>
+From: Matthias Thomae <thomae@ei.tum.de>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200403112106.31567.cijoml@volny.cz>
-Subject: [Bluez-users] FujitsuSiemens BT USB Adapter
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] crash on remove
+References: <20040310182158.GA9279@naginata.ccs.neu.edu> <404F84BC.4020406@xmission.com> <20040310223504.GA3398@omocha.vort.org> <404FB5D1.5030104@xmission.com> <20040311024720.GA3297@omocha.vort.org>
+In-Reply-To: <20040311024720.GA3297@omocha.vort.org>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,14 +17,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 11 Mar 2004 21:06:31 +0100
+Date: Thu, 11 Mar 2004 10:32:43 +0100
 
-Hi,
+Hi all,
 
-is this dongle supported? If so, I'll buy it imeditially, coz its SO small!!
-http://pcshop.pells.cz/img.asp?stiid=3483
+I also get a crash when unplugging my bt usb adapter (Acer BT-700, 
+CSR-based) on a VIA Chipset machine with 2.6.4-rc3 kernel. 
+CONFIG_BT_HCIUSB_SCO is *not* set, CONFIG_BT_SCO is.
 
-Michal
+Regards.
+Matthias
+
+Russell Neches wrote:
+> Now, by SCO support, do we mean the module (CONFIG_BT_SCO) or
+> CONFIG_BT_HCIUSB_SCO? I'm actually getting the crash without the sco
+> module loaded, and I have my kernel built with CONFIG_BT_HCIUSB_SCO not
+> set. I don't think SCO shows up anywhere else in the kernel. Sorry if
+> I'm beginning to sound pedantic. 
+> 
+> Maybe I should figure out how to use SysReq after all...
+
 
 
 -------------------------------------------------------
