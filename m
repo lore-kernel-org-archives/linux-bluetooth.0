@@ -1,18 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hidd weirdness under 2.4.20
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BD226CAD-43D6-11D9-9BD7-00039390D626@pepper.com>
-References: <D041B252-43B9-11D9-9BD7-00039390D626@pepper.com>
-	 <1101929973.15615.32.camel@pegasus>
-	 <888FEE62-43D1-11D9-9BD7-00039390D626@pepper.com>
-	 <1101930622.15615.34.camel@pegasus>
-	 <F6F2876E-43D2-11D9-9BD7-00039390D626@pepper.com>
-	 <1101932186.15615.37.camel@pegasus>
-	 <BD226CAD-43D6-11D9-9BD7-00039390D626@pepper.com>
+To: Matthew Grant <grantma@anathoth.gen.nz>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1101930555.6182.15.camel@localhost>
+References: <1101930555.6182.15.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1101933300.15615.57.camel@pegasus>
+Message-Id: <1101933187.15615.54.camel@pegasus>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Re: [PATCH] - for BT HID fixes + beginning of ctrl handling
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -24,26 +19,58 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 21:35:00 +0100
+Date: Wed, 01 Dec 2004 21:33:07 +0100
 
-Hi Michael,
+Hi Matthew,
 
-> here is the dump:
-> 
-> root@(none):~# hcidump -X
-> HCIDump - HCI packet analyzer ver 1.12
-> device: hci0 snap_len: 1028 filter: 0xffffffff
->  > ACL data: handle 0x0001 flags 0x02 dlen 10keyboard.c: can't emulate 
-> rawmode for keycode 272
-> 
->      L2CAP(d): cid 0x0041 len 6 [psm 0]
->        0000: a1 02 01 00 00 00                                 ......
-> 
-> Yes -- I am running the latest mh patch.
+don't do any cross postings and there is no need to address these mails
+to me directly. I read the mailing lists ;)
 
-this is a mouse report (id 2) and this should not produce a keyboard
-input. Is this reproduceable with a plain 2.6.9 or the latest 2.4 with
-my -mh patch?
+> Please find 2 patches attached.  My original against 2.6.9-mh4, and one
+> for 2.6.10-rc2-bk.  These are the patches I can easily produce. Is this
+> OK with you? Please let me know what else you need and I will see what
+> can be done.
+
+from a first review, this looks good so far, but please don't change any
+debug stuff. Leave it as it is. I am not going to apply any debug config
+options.
+
+It is "Bluetooth" and not "Blue Tooth" or "BlueTooth" and you should
+follow more the coding style:
+
+	"hidp_process_hid_control (" ==> "hidp_process_hid_control("
+	"if ( hdr" == > "if (hdr"
+	"HIDP_TRANS_DATA|HIDP_D..." ==> "HIDP_TRANS_DATA | HIDP_D..."
+
+I think you see what I mean and don't introduce extra whitespaces:
+
+-                 atomic_inc(&session->terminate);<== correct
++                 atomic_inc(&session->terminate);        <== wrong
+
+
+There is no need to use "retval" and "result". Use one of them and I
+actually prefer using "err".
+
+And you must explain the extra need of the "schedule" parameter to me.
+
+> I have not one yet between straight 2.6.10-rc2-bk+base-bthid+-mh4 and my
+> trunk as the source tree manipulations are getting quite convoluted.
+> Making this patching easier is something I would really like to sort out
+> for both our work flows.
+
+Fix the stuff I mentioned above and don't forget the Signed-off-by line
+and I will start testing it on my machines.
+
+> My question is, how do you manage the patch creation of -mh4 patches
+> etc? Looks like this just a simple diff of your trunk net/bluetooth and
+> drivers/bluetooth against current mainstream kernel.
+
+The -mh patches are created by a bunch of scripts. Actually every patch
+is part of a collection and these scripts will apply them in the correct
+order and then rediff against vanilla. If all my work is merged mainline
+then this a diff of mainline versus trunk. But sometimes there are also
+testing patches in there, like the HIDP report mode support and the
+RFCOMM service level security stuff.
 
 Regards
 
