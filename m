@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200501301948.ALU26389@ms12.netsolmail.com>
-References: <200501301948.ALU26389@ms12.netsolmail.com>
-Content-Type: text/plain
-Message-Id: <1107114746.8384.1.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41FD3BB4.70204@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] bluez-libs (and utils) cross-compiling
+References: <41FD0B7D.90007@gmx.ch>
+In-Reply-To: <41FD0B7D.90007@gmx.ch>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +18,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 20:52:26 +0100
+Date: Sun, 30 Jan 2005 20:55:32 +0100
 
-Hi Chris,
+Hello everybody
 
-> >it will be installed into /etc/hotplug/usb/ and you need a working and
-> >up-to-date hotplug to make this working.
+I'll answer this myself:
+configure is able to support cross compiling.
+just set the flags correctly.
+
+kind regards
+Marco
+
+
+Marco Trudel wrote:
+> Hello everybody
 > 
-> When I did a 'make install', it completed with no errors but I don't see 
-> anything installed in /etc/hotplug/usb at all. How do I check if the install 
-> failed?
-
-do a "make install DESTDIR=$PWD/x" and then check what it is in the
-directory "x". Show us the result of a "find x".
-
-Regards
-
-Marcel
-
-
+> I have to cross-compile the bluez-libs and bluez-utils.
+> Is there a cross-compilation documentation?
+> 
+> I'm unable to use the configure scripts and the makefile.
+> I need the gcc commands...
+> 
+> Any help would really be appreciated.
+> 
+> kind regads
+> Marco
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+> Tool for open source databases. Create drag-&-drop reports. Save time
+> by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+> Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+> 
 
 
 -------------------------------------------------------
