@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Question about role switch
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <A1F0D47583A2D711919F00600819B3A45BDE4F@goofy.vitronics.com>
-References: <A1F0D47583A2D711919F00600819B3A45BDE4F@goofy.vitronics.com>
-Content-Type: text/plain
-Message-Id: <1103127611.8717.7.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <1BA1B83CE375514DAB6DB46EF338CF2C011421B5@vwagwox00005.vw.vwg>
+From: "Wu, Qi (K-EFE/I)" <qi.wu@volkswagen.de>
+To: "'bluez-devel@lists.sourceforge.net'"
+	 <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="------------InterScan_NT_MIME_Boundary"
+Subject: [Bluez-devel] Need for Bluetooth A2DP sink
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,54 +18,99 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Dec 2004 17:20:11 +0100
+Date: Wed, 15 Dec 2004 16:18:36 +0100
 
-Hi Richard,
+This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
 
-> >>>>>>>>This is my X-scale embedded system
-> [System 1]$hciconfig -a
-> hci0:   Type: UART
->         BD Address: 00:A0:96:08:E7:86 ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:1842 acl:20 sco:0 events:93 errors:0
->         TX bytes:1415 acl:19 sco:0 commands:41 errors:0
->         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'BlueZ (0)'
->         Class: 0x000100
->         Service Classes: Unspecified
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver: 0x175
->         Manufacturer: Cambridge Silicon Radio (10)
->                                
-> >>>>>>>> This is my Linux PC. 
-> >>>>>>>> I have the same USB dongle in the Linux and Windows PCs
-> [System 2]# /sbin/hciconfig -a
-> hci0:   Type: USB
->         BD Address: 00:02:72:40:3F:C2 ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:135 acl:0 sco:0 events:19 errors:0
->         TX bytes:569 acl:0 sco:0 commands:18 errors:0
->         Features: 0xff 0xff 0x0f 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'Linux_Rich'
->         Class: 0x700408
->         Service Classes: Object Transfer, Audio, Telephony
->         Device Class: Audio/Video, Hands-free
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
->         Manufacturer: Cambridge Silicon Radio (10)
+--------------InterScan_NT_MIME_Boundary
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C4E2B9.59030AAA"
 
-everything before HCI 16.4 has not even limited scatternet support.
-Check you my CSR page for more details.
+------_=_NextPart_001_01C4E2B9.59030AAA
+Content-Type: text/plain
 
-Regards
 
-Marcel
+Hallo Mr. Hotmann,
 
+With intereting, I have read your article
+(<http://www.holtmann.org/linux/bluetooth/sbc.html
+<http://www.holtmann.org/linux/bluetooth/sbc.html> >). And I have bought the
+product <http://www.bluetake.com/products/BT420EX.htm
+<http://www.bluetake.com/products/BT420EX.htm> >.
+
+
+My questions are:
+
+Do you have opensource-based A2DP sink (plus SBC decoding) for Windows,
+WinCE, or linux?
+
+If yes, I would like to make some test with BT420's audio adapter (A2DP
+source)?
+
+Thanks in advance
+
+Best regards
+
+Qi Wu
+
+------_=_NextPart_001_01C4E2B9.59030AAA
+Content-Type: text/html
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+5.5.2654.19">
+<TITLE>Need for Bluetooth A2DP sink</TITLE>
+</HEAD>
+<BODY>
+<BR>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Hallo Mr. Hotmann,</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">With intereting, I have read your =
+article (&lt;</FONT><A =
+HREF=3D"http://www.holtmann.org/linux/bluetooth/sbc.html"><U><FONT =
+COLOR=3D"#0000FF" SIZE=3D2 =
+FACE=3D"Arial">http://www.holtmann.org/linux/bluetooth/sbc.html</FONT></=
+U></A><FONT SIZE=3D2 FACE=3D"Arial">&gt;). And I have bought the =
+product &lt;</FONT><A =
+HREF=3D"http://www.bluetake.com/products/BT420EX.htm"><U><FONT =
+COLOR=3D"#0000FF" SIZE=3D2 =
+FACE=3D"Arial">http://www.bluetake.com/products/BT420EX.htm</FONT></U></=
+A><FONT SIZE=3D2 FACE=3D"Arial">&gt;.</FONT></P>
+<BR>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">My questions are:</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Do you have opensource-based A2DP sink =
+(plus SBC decoding) for Windows, WinCE, or linux?</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">If yes, I would like to make some test =
+with BT420's audio adapter (A2DP source)?</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Thanks in advance</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Best regards</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Qi Wu</FONT>
+</P>
+
+</BODY>
+</HTML>
+------_=_NextPart_001_01C4E2B9.59030AAA--
+
+--------------InterScan_NT_MIME_Boundary--
 
 
 
