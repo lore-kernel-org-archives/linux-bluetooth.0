@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] init script 0.1
+Subject: Re: [Bluez-users] How to initiate a Pin-Exchange?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
+To: "Nicholas A. Preyss" <nalp@gmx.net>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404171431.32008.cijoml@volny.cz>
-References: <200404171431.32008.cijoml@volny.cz>
+In-Reply-To: <20040417140311.GA2532@gmx.net>
+References: <200404142203.21126.panizzon@woody.ch>
+	 <200404142211.55534.cijoml@volny.cz> <200404151149.35989.panizzon@woody.ch>
+	 <200404151729.32798.cijoml@volny.cz> <20040415202106.GA17934@gmx.net>
+	 <1082160503.4489.25.camel@pegasus>  <20040417140311.GA2532@gmx.net>
 Content-Type: text/plain
-Message-Id: <1082280582.4403.17.camel@pegasus>
+Message-Id: <1082280336.4403.12.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,26 +21,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 18 Apr 2004 11:29:42 +0200
+Date: Sun, 18 Apr 2004 11:25:36 +0200
 
-Hi Michal,
+Hi Nicholas,
 
-> sending you first version of bluetooth init script and bluetooth default 
-> script.
-> 
-> PLS check it out and tell me your comments.
-> 
-> PAND like master is now started using following switches:
-> pand -s -M -r NAP
-> which I think are most common used.
-> 
-> This version needs implement DUNDmaster,DUNDclient, PANDclient
-> 
-> tell me how would you like these to implement
+> What is security mode 3? AUTH and ENCRYPT ?
+> What is wrong about it?
 
-install the Debian bluez-pan package and look at /etc/default/bluez-pan.
-I think that variables like PAND_ENABLED and PAND_OPTION are a good way
-of doing this, but you should also check the Debian guides.
+look at the Bluetooth specification or read my Bluetooth security paper.
+What you really wan't is security mode 1/2 and setting auth and encrypt
+is security mode 3.
+
+> > You can use the D-Bus enabled hcid and bluez-pin package.
+> 
+> Anyone written some doc about this combination? I dont get it running..
+
+Set "dbus_pin_helper" option in hcid.conf and run "bluez-pin --dbus" as
+normal user.
 
 Regards
 
