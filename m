@@ -1,62 +1,70 @@
-Return-Path: <fd@cisco.com>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Logitech MX900 oddities and solutions
-From: Frederic Detienne <fd@cisco.com>
-Reply-To: fd@cisco.com
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1078915401.2537.14.camel@pegasus>
+In-Reply-To: <1078916559.6886.5.camel@pc-04.ycom.ch>
 References: <1078912919.32148.356.camel@metal.cisco.com>
-	 <1078915401.2537.14.camel@pegasus>
+	 <1078915401.2537.14.camel@pegasus>  <1078916559.6886.5.camel@pc-04.ycom.ch>
 Content-Type: text/plain
-Message-Id: <1078917509.32636.453.camel@metal.cisco.com>
+Message-Id: <1078917101.2537.21.camel@pegasus>
 Mime-Version: 1.0
-Date: Wed, 10 Mar 2004 12:18:29 +0100
-List-ID: <bluez-users.lists.sourceforge.net>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Wed, 10 Mar 2004 12:11:41 +0100
 
-On Wed, 2004-03-10 at 11:43, Marcel Holtmann wrote:
+Hi Alexandre,
 
-> you can enable it with the --enable-compat switch for configure, but by
-> default this is not on.
-
-I forgot to say that. The problem is that it did not compile anything
-(Make says there is "nothing to make for all"). I may have done dirty
-things while fiddling around. I will try downloading again from CVS and
-do it cleanly.
-
-Don't you thing hcitool should be made current and not just "compat" ?
-It is a precious tool...
-
-> > http://sourceforge.net/mailarchive/forum.php?thread_id=3803086&forum_id=1883
-> > 
-> > I would have expected this patch to be part of -mh4 (that is what I
-> > remember having read) but it was not there. It should! :-) I can't wait
-> > to have the patches synced to the 2.6 kernel tree.
+> > I never said that I include the multi-byte patch into -mh4. It seems
+> > that some people assume this, but this is not true. Use diffstat to
+> > check the patch and you will see that it only changes Bluetooth stuff.
 > 
-> I never said that I include the multi-byte patch into -mh4. It seems
-> that some people assume this, but this is not true. Use diffstat to
-> check the patch and you will see that it only changes Bluetooth stuff.
+> Strange ... with my 2.6.3 I don't use any other path for this .. :-)
 
-I realized that after debugging hid2hci :-) So the multibyte fix is
-intentionally not part of -mh4. It is good that you confirm that fact.
+you must used another one. At least the -mm patch.
 
-> However Vojtech Pavlik told me that he will push these patches for
-> mainline integration.
+> > I add your device ID to the CVS.
+> 
+> Huh, Logitech has many device ID for same hardware ?
+> Maybe we need some clarification from Logitech .. :-)
 
-You mean the multibyte stuff, right ? What about the -mh4 patch, util2
-and lib2 ? Will they be made grand public soon ?
+This is normal stuff ;)
 
-> I add your device ID to the CVS.
+> > If you start the hcid it will modifiy your link policy settings and it
+> > is important that RSWITCH and SNIFF is on.
+> 
+> Mine is working fine ... without any mod or blood :-)
 
-thanks!
+What does "hciconfig hci0 lp" say?
 
-> If you start the hcid it will modifiy your link policy settings and it
-> is important that RSWITCH and SNIFF is on.
+> Maybe the next thing to do is to have a correct encryption link, of
+> course for the keyboard ( I don't think that mouse mouvements are very
+> important ...).
 
-slap me! that's exactly what is in /etc/bluetooth/hcid.conf. I guess
-I'll have to learn more about BT now that I can experiment with it.
+If the HID device is a keyboard we must simply send and authentication
+request and then activate the encryption. Patches are welcome.
 
-Pseudo-mistery solved.
+Regards
 
-thanks again!
+Marcel
 
-	fred
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
