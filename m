@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Kernel panic when unplugging USB dongle
+Subject: Re: [Bluez-users] MTU and MRU for Bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Arthur Dent <tobili@hotmail.com>
+To: Florian <Kimpenhaus@gmx.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY18-F13k1Ed28kIN400001802@hotmail.com>
-References: <BAY18-F13k1Ed28kIN400001802@hotmail.com>
+In-Reply-To: <opr7hpnaqeqdj9uv@mail.gmx.de>
+References: <opr7hpnaqeqdj9uv@mail.gmx.de>
 Content-Type: text/plain
-Message-Id: <1083763071.4420.11.camel@pegasus>
+Message-Id: <1083692600.4666.57.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,29 +18,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 May 2004 15:17:51 +0200
+Date: Tue, 04 May 2004 19:43:20 +0200
 
-Hi Arthur,
+Hi Florian,
 
-> I compiled the kernel with the SCO variables set and I
-> compiled the kernel where I disabled _any_ kernel variable
-> containing SCO in ".config". The behavior did not change.
-> I have looked through the mailing lists and I have found
-> the hint to shut down the USB device before removing
-> it, but when I execute "hciconfig hci0 down" the system
-> instantly freezes just as in the case of removing the dongle
-> by hand.
-> Note, that additionally installing the bluez-kernel-2.3
-> package removes the kernel panics.
-> Unfortunately the hook-ups are so complete that I am not able
-> to obtain any information about the reason from the log files.
-> Could you give me a hint how to trace the reason...
+> some suggestions for suitable values for MTU / MRU when using pppd and PAP?
 
-installing bluez-kernel-2.3 don't counts, because this code it totally
-outdated. What kind of dongle do you use? What do hciconfig -a say?
-
-Do anyone else has problems with hci_usb and 2.4.26, because my test
-machine with 2.4.26-mh1 works perfect.
+are these values not related to the upper protocols like TCP/IP? The
+underlaying RFCOMM protocol is a stream, so you don't have a MTU.
 
 Regards
 
