@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: Lalith Chakravarthi <lalithvc@yahoo.com>,
-   bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] USB Dongle to Dongle -- Connection
-References: <20040305094657.98433.qmail@web40713.mail.yahoo.com>
-In-Reply-To: <20040305094657.98433.qmail@web40713.mail.yahoo.com>
+Message-ID: <20040305142714.44803.qmail@web40708.mail.yahoo.com>
+From: Lalith Chakravarthi <lalithvc@yahoo.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200403051606.50925.pavouk@pavouk.org>
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] IP Forwarding
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,30 +15,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 5 Mar 2004 16:06:50 +0100
+Date: Fri, 5 Mar 2004 06:27:14 -0800 (PST)
 
-Hello,
+Hi...
 
-> I can even ping between the two. But I dont understand how I can
-> transfer files between the two computers. I checked using the sdptool
-> but the only service that can be found on the other computer is the sdp
-> server running.
+I just connected my laptop to my Pc and now I want to connect to the
+internet using my PC as the gateway. I already have the bluetooth PAN
+network between my laptop and PC. I am working on a linux 2.4.20-8
+kernel on both the laptop and the PC.  Also, I use proxies to connect
+to the internet from my PC. So, could anyone please tell me the files
+that have to be modified to enable the successful completion of my
+internet connection thru my laptop.
 
-If you can ping on IP layer, you have probably BNEP0 interface active and you 
-can use standard tools like FTP or SCP.
+Reagrds
+Laltih
 
-If you can ping with "l2ping" and you haven't activated some service on L2, 
-you must run "pand" with right parameters on both sides.
-After this you must add config file /etc/sysconfig/network-scripts/ifcfg-bnep0 
-with IP parameters. You can config this automatically by hotplug.
-
-Please find mails in list with subject "hotplug USB dongle problem" from 28 
-Feb 2004.
-
-Best regards,
-
-Pavel Ruzicka
-
+__________________________________
+Do you Yahoo!?
+Yahoo! Search - Find what you’re looking for faster
+http://search.yahoo.com
 
 
 -------------------------------------------------------
