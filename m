@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Nelson Murilo <nelson@pangeia.com.br>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] TCP/IP Connection
-Message-ID: <20050107173358.GA21131@pangeia.com.br>
-References: <I9YBGA$6FFE4EA1F7A0F5363F7A838C24BF7DDF@uol.com.br>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <I9YBGA$6FFE4EA1F7A0F5363F7A838C24BF7DDF@uol.com.br>
+Message-Id: <I9YM8N$7FAD017A09BC73827FE250A0E50B0128@uol.com.br>
+Subject: Re:[Bluez-devel] miax
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+From: "omap" <omap@uol.com.br>
+To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +16,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 7 Jan 2005 15:33:58 -0200
+Date: Fri,  7 Jan 2005 16:33:59 -0200
 
-On Fri, Jan 07, 2005 at 12:40:58PM -0200, omap wrote:
+
+Hi ubaldo.
+
+I have special interest on telephony
+over the internet. Where can i find
+more information about your
+application? I visited the project
+homepage but i could not find a
+description about it.
+And I want to congrat you for your project
+
+Regards
+
+
+> Hi, I developed a mobile iax client
+for asterisk server with bluetooth
+> support that can be found on
+http://sourceforge.net/projects/miax/ . 
 > 
-> Hi Murilo,
+> Thanx to everyone who helped here! :) 
 > 
-> Thanks for the help, it helped to
-> connect them. But I am sorry if I was
-> not clear in my question. I would like
-> to know how i could write code (using
-> bluez api) to acomplish this task.
-
-
-May you could look the pand source, is very small: 
-
-debian:~/bluez-utils-2.13/pand# wc -l *
-   17 Makefile.am
-  462 Makefile.in
-  316 bnep.c
-  729 main.c
-   68 pand.1
-   51 pand.h
-  224 sdp.c
- 1867 total
+>  
+> 
+> ubaldo porcheddu - eja.it software
+development
+> 
+> 
+>
+-------------------------------------------------------
+> The SF.Net email is sponsored by:
+Beat the post-holiday blues
+> Get a FREE limited edition
+SourceForge.net t-shirt from ThinkGeek.
+> It's fun and FREE -- well,
+almost....http://www.thinkgeek.com/sfshirt
+>
+_______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> =0A =0A________________________________________________________________=
+__________=0AAcabe com aquelas janelinhas que pulam na sua tela.=0AAntiPo=
+p-up UOL - =C9 gr=E1tis!=0Ahttp://antipopup.uol.com.br/=0A
 
 
 
