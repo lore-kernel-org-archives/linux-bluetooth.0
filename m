@@ -2,14 +2,12 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Bluetooth on a MIPS-System
 From: Marcel Holtmann <marcel@holtmann.org>
 To: leidenfrost@corscience.de
-Cc: martin f krafft <madduck@madduck.net>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <416536BA.3080901@corscience.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41652A40.4080209@corscience.de>
 References: <41651D72.7040806@corscience.de>
-	 <1097147273.7325.26.camel@pegasus>
-	 <20041007114224.GA9849@cirrus.madduck.net> <416536BA.3080901@corscience.de>
+	 <1097147273.7325.26.camel@pegasus>  <41652A40.4080209@corscience.de>
 Content-Type: text/plain
-Message-Id: <1097154674.7325.32.camel@pegasus>
+Message-Id: <1097152912.7325.30.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,38 +19,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 07 Oct 2004 15:11:14 +0200
+Date: Thu, 07 Oct 2004 14:41:52 +0200
 
 Hi Thomas,
 
->  > modprobe takes the name of a module, not the filename.
-> 
-> you're right, that was a little mistake by my own. Now it says this:
-> (I've absolutely no idea what's going wrong here)
-> 
-> # modprobe l2cap
-> Using /lib/modules/2.4.21/l2cap.o
-> insmod: unresolved symbol malloc
-> insmod: unresolved symbol putchar
-> insmod: unresolved symbol free
-> insmod: unresolved symbol perror
-> insmod: unresolved symbol parser
-> insmod: unresolved symbol get_proto
-> insmod: unresolved symbol cmtp_dump
-> insmod: unresolved symbol sdp_dump
-> insmod: unresolved symbol avdtp_dump
-> insmod: unresolved symbol stderr
-> insmod: unresolved symbol hidp_dump
-> insmod: unresolved symbol bnep_dump
-> insmod: unresolved symbol hcrp_dump
-> insmod: unresolved symbol rfcomm_dump
-> insmod: unresolved symbol raw_dump
-> insmod: unresolved symbol _gp_disp
-> insmod: unresolved symbol printf
-> insmod: unresolved symbol fwrite
-> modprobe: failed to load module l2cap
+> But I think the Problem is not MIPS-specific, the question is where to 
+> get the missing modules like l2cap, hci_usb, bluez...
+> Should they be created automaticly after compiling the BlueZ-Libs & 
+> -Utils? Support for them is activated in the kernel (as module).
 
-do you tried to load the l2cap.o from bluez-hcidump into your kernel?
+the kernel modules are part of the Linux kernel you use on your MIPS
+system. So you need a Linux kernel compiled for MIPS with activated
+Bluetooth subsystem.
+
+If you find the modules on your filesystem, check what modinfo or file
+says about them.
+
+> > Do a "modprobe hci_usb" and then check with "dmesg" what happens.
+> 
+> # modprobe hci_usb (on target says:)
+> insmod: hci_usb.o: no module by that name found
+> modprobe: failed to load module hci_usb
+> 
+> because there is no module on target, searching for it resulted nothing. 
+> And I think I just can't take them from the host (x86). Are there any 
+> precompiled modules for MIPS?
+
+So what does "find /lib/modules/ | grep bluetooth" say?
 
 Regards
 
