@@ -1,20 +1,20 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Bluetooth address specific device
-	configuration
+Subject: Re: [Bluez-devel] [PATCH] New keytab storage
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Fredrik Noring <noring@nocrew.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1075565699.14644.186.camel@akka.yeti.nocrew.org>
-References: <1075316178.553.18.camel@akka.yeti.nocrew.org>
-	 <1075355567.26729.65.camel@pegasus>
-	 <1075405154.22564.64.camel@akka.yeti.nocrew.org>
-	 <1075406315.22564.67.camel@akka.yeti.nocrew.org>
-	 <1075563018.2720.19.camel@pegasus>
-	 <1075564164.14644.167.camel@akka.yeti.nocrew.org>
-	 <1075564788.2720.49.camel@pegasus>
-	 <1075565699.14644.186.camel@akka.yeti.nocrew.org>
+In-Reply-To: <1075565012.14644.176.camel@akka.yeti.nocrew.org>
+References: <1075506991.14644.114.camel@akka.yeti.nocrew.org>
+	 <1075509170.3594.36.camel@pegasus>
+	 <1075510549.14644.135.camel@akka.yeti.nocrew.org>
+	 <1075511922.3594.49.camel@pegasus>
+	 <1075541234.14644.149.camel@akka.yeti.nocrew.org>
+	 <1075562590.2720.13.camel@pegasus>
+	 <1075563628.14644.161.camel@akka.yeti.nocrew.org>
+	 <1075564322.2720.42.camel@pegasus>
+	 <1075565012.14644.176.camel@akka.yeti.nocrew.org>
 Content-Type: text/plain
-Message-Id: <1075572554.2720.67.camel@pegasus>
+Message-Id: <1075572088.2720.59.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -26,42 +26,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 31 Jan 2004 19:09:14 +0100
+Date: Sat, 31 Jan 2004 19:01:28 +0100
 
 Hi Fredrik,
 
-> The "char *ref" comment in hcid.h? I understand the kernel people you
-> referred to before use this type of comment as well. :)
-
-no, this comment is correct.
-
-> The other three comments do not refer to the if:s but the code inside
-> each if. So I don't think these are misplaced either.
-
-	/* First try to get BD_ADDR based settings ... */
-	di.dev_id = hdev;
-	if (!ioctl(sock, HCIGETDEVINFO, (void *) &di))
-		device_opts = get_bdaddr_device_opts(&di.bdaddr);
-
-	/* ... then try HCI based settings ... */
-	if (!device_opts)
-		device_opts = get_hci_device_opts(hdev);
-
-	/* ... and last use the default settings. */
-	if (!device_opts)               
-		device_opts = &default_device;
-
-Make it look like this. It is much more easier to read :)
-
-> More places? That's the only comments I know of...
-
-Not comments. Whitespaces and braces.
-
-> > And of course in this case inlining the function is a good idea.
+> > But I think we should discuss some design goals of the new device manager.
 > 
-> Why is that?
+> Great idea. What's your plan for it?
 
-Short code that only init a structure can be inlined.
+one of my big goals is to have a library with a much improved API. This
+means that all HCI related functions use the hci_* prefix and follow the
+naming scheme from the HCI part of the Bluetooth specification. But the
+HCI part should not be used for common applications. These applications
+should use bt_* functions that offer an enhanced functionality. For
+example setting the local name. The hci_* part only send the HCI
+command, while the bt_* stuff also stores the name in a database so it
+can be restored after reboot. I think you get the idea.
+
+> > I don't see what kind of mess in "glib-ectomy" you mean, but go ahead
+> > and send a patch for it. 
+> 
+> Some bads, I think:
+> 
+>   - The API can be improved
+>   - Tons of ugly (even in opionon) typedef:s
+>   - No style
+
+in the early days the hcid depends on glib and this code is a small
+compat layer to be free from the glib. I wrote a similar replacement for
+utils2. May you want to take a look at the helper library.
 
 Regards
 
