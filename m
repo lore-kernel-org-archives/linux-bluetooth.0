@@ -1,50 +1,55 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <daryl@wideray.com>
+Errors-To: <daryl@wideray.com>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Qualification Testing
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: Daryl Van Vorst <daryl@wideray.com>
-Cc: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001501c33124$cc792160$1a01010a@baked>
-References: <001501c33124$cc792160$1a01010a@baked>
-Content-Type: text/plain
-Message-Id: <1055453309.3443.74.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 12 Jun 2003 23:28:22 +0200
+Date: Thu, 12 Jun 2003 13:54:20 -0700
+Message-ID: <001501c33124$cc792160$1a01010a@baked>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+In-Reply-To: <5.1.0.14.2.20030612120846.0ba3b5c8@unixmail.qualcomm.com>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Daryl,
+Max,
 
-> Looks like all of the current failures now have fixes from you and Marcel.
-> So far the only way that I've been updating my stack is by using Marcel's
-> patches. Marcel, any chance you could make another patch once Max has put in
-> this L2CAP thing?
+> -----Original Message-----
+> From: bluez-devel-admin@lists.sourceforge.net=20
+> [mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of=20
+> Max Krasnyansky
+> Sent: June 12, 2003 12:12 PM
+> To: Daryl Van Vorst; 'Marcel Holtmann'
+> Cc: 'BlueZ Mailing List'
+> Subject: RE: [Bluez-devel] Qualification Testing
+>=20
+>=20
+> At 11:49 AM 6/12/2003, Daryl Van Vorst wrote:
+> >> >Apparently, in step 3 above, if we send a config request with no
+> >> >options it will also pass the test. How silly is that? (specially=20
+> >> >considering that's what we send by default in the first place!)
+> >> I'm pretty sure that it's just because they use some dumb
+> >> tester implementation. It doesn't make sense to resend the=20
+> >> same config request.
+> >
+> >It's actually written that way in the test case. Here's a quote from=20
+> >the updated test case (errata correction ID 241):
+> >
+> >"Pass Verdict: The IUT sends an L2CAP_ConfigReq with=20
+> acceptable values=20
+> >received in the L2CAP_ConfigRsp with Result =3D Failure - unacceptable=20
+> >parameters, or the L2CAP_ConfigReq contains no options."
+> Consider it done then :). Sounds like this will be useful for=20
+> other folks to pass qualification. I'll put it in.
 
-the next patches are planned for the end of next week, because they will
-include the CMTP implementation for the Commmon ISDN Profile. But you
-can use patch-2.4.18-mh6 and I sent you the incremental fixes by email.
+Fantastic! Thanks. :)
 
-Regards
+Yeah, it should help others. Hopefully there aren't other subtleties that
+we've missed regarding this.
 
-Marcel
+Looks like all of the current failures now have fixes from you and Marcel.
+So far the only way that I've been updating my stack is by using Marcel's
+patches. Marcel, any chance you could make another patch once Max has put i=
+n
+this L2CAP thing?
 
-
-
-
--------------------------------------------------------
-This SF.NET email is sponsored by: eBay
-Great deals on office technology -- on eBay now! Click here:
-http://adfarm.mediaplex.com/ad/ck/711-11697-6916-5
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-Daryl.
