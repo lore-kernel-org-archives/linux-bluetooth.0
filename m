@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <004b01c41268$7e8ee810$4000fe0a@rtsviec64>
-From: "Harald Meier" <meh1@rts.at>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] PAND and RFCOMM simultaneously
+From: "Ronan Naughton" <wadgienaughton@hotmail.com>
+To: bluez-users@lists.sourceforge.net
+Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Message-ID: <BAY10-F83fB2prT8RHQ00011eaf@hotmail.com>
+Subject: [Bluez-users] Bluetooth Scatternet
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,33 +15,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Mar 2004 13:55:43 +0100
+Date: Thu, 25 Mar 2004 12:01:17 +0000
 
-Dear list members!
+Hi all,
+Has anyone ever implemented a bluetooth scatternet using pan over bnep.
+I have two simple piconets running at the moment and want to join them.  How 
+will I assign it so that a node can be a slave in both piconets. Do i need 
+two bnep connections. Or should I have a node to be a master in one piconet 
+and a slave in an other. How is this implemented?
+Any ideas?
+Ronan.
 
-I have a NAP/PANU network with pand running and I need to
-set up some (up to 4) rfcomm connection additionally.
+_________________________________________________________________
+Add photos to your e-mail with MSN 8. Get 2 months FREE*. 
+http://join.msn.com/?page=features/featuredemail
 
-Setting up the rfcomm devices when the pand is down works fine
-but if pand is up, I get a "Function not implemented" when I try
-to bring up a rfcomm connection.
-
-If the rfcomm connection is up and I try to connect to the NAP
-via pand, I get the "Function not implemented" from pand.
-
-What I am using:
-
-    Debian (not shure what version, was not installed by me)
-    kernel 2.4.18-mh10
-    bluez-pan-1.1
-    bluez-utils-2.4
-    bluez-libs-2.5
-
-    Pico Bluetooth PCI Card (Class 1)
-
-
-any help appreciated,
-Harald.
 
 
 -------------------------------------------------------
