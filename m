@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Wang Haiguang <wanghg@i2r.a-star.edu.sg>
-To: bluez-devel@lists.sourceforge.net
-Message-id: <LMEOKMJFKNFFHEAEDGDEKEKNCGAA.wanghg@i2r.a-star.edu.sg>
-MIME-version: 1.0
-Content-type: text/plain; charset=gb2312
-Subject: [Bluez-devel] Question about baseband configuration.
+Subject: Re: [Bluez-devel] Bluez + USB2Serial Adaptor + UART CSR BC02 ==
+	Data at 20 kBps??
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daniel Moraes <ra002890@itelefonica.com.br>
+Cc: Bluez Devel <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4092AACD.4040303@itelefonica.com.br>
+References: <4092AACD.4040303@itelefonica.com.br>
+Content-Type: text/plain
+Message-Id: <1083686654.4666.45.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,30 +19,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 05 May 2004 10:46:09 +0800
+Date: Tue, 04 May 2004 18:04:14 +0200
 
-Hi, all.
+Hi Daniel,
 
-I have some questions about the baseband configuration. 
+> Is the combination above possible?!? How can I do to increase my UART 
+> CSR troughtput?!?   In my linux doesn't matter if I stablish one  
+> conection at 57600 or 460800, my bluetooth works at the same rate... 
+> why?!? My speed are so slowly, I calculate then using l2ping is it 
+> right?!? And they are about 3kBps...
+> If anybody can solve one of my problems I will be much more happier....  
+> hehehe...
 
-In our development, we want the baseband to delivery packet with
-bit errors to the L2CAP. 
+in theory this is possible. Actually I tried to get a high speed serial
+card working, but without luck. If you found a USB<->serial converter
+which is working also at 920KB let me know.
 
-After reading the Baseband specification, we found there are 7 packet
-types for ACL connection in Baseband level -- DM1, DM3, DM5, DH1, 
-DH3, DH5 and AUX1. The first 6 has 16 bit CRC for payload. 
+Regards
 
-My question is: 
+Marcel
 
-Is it possible to disable the CRC check for payload at the receiver side 
-through the some configuration command so that the IP packet with bit 
-errors could be passed to L2CAP? 
 
-Thanks a lot.
-
-BR
-
-Haiguang 
 
 
 -------------------------------------------------------
