@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <6.1.2.0.2.20050124165802.04168330@luna.tlmat.unican.es>
-To: bluez-users@lists.sourceforge.net
-From: George <george.news@gmx.net>
+Subject: Re: [Bluez-users] Piconet problems
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <IATJ7L$F41B3A46DE3A45B01678E92541884038@libero.it>
+References: <IATJ7L$F41B3A46DE3A45B01678E92541884038@libero.it>
+Content-Type: text/plain
+Message-Id: <1106569506.9269.71.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; format=flowed
-Subject: [Bluez-users] Bluez BNEP connection close
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,26 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 24 Jan 2005 17:06:23 +0100
+Date: Mon, 24 Jan 2005 13:25:06 +0100
 
-Hi all.
+Hi Jers,
 
-I'm facing a problem using the Bluez stack for linux and I don't know the 
-reason and how to solve it.
-I'm using the PAN environment, using the BNEP over L2CAP. I'm using kernel 
-2.4.28-mh1 and bluez-libs-2.10 and bluez-utils-2.10.
+> I'm very sorry, but still it does not work! 
 
-I manage to get both devices connected and running a ping over it. However 
-when I do some web browsing a problem appear (also if doing an FTP or 
-whatever thing).
-When the amount of traffic through the connection increase, the connection 
-shut down without any reason.
+you have all the information needed to make this sucessful working. It
+works at least for me in a similar setup. You can of course try to get
+yourself a set of dongles where all of them HCI 16.4 or later.
 
-Any idea of why when stressing the connection by transferring big amount of 
-data it closes.
+Regards
 
-
-TA.
+Marcel
 
 
 
