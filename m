@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Kazuhiro Ota <j0006@stu.matsue-ct.jp>
+MIME-Version: 1.0
+From: Stefan Bellon <sbellon@sbellon.de>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20050130174730.3a78367f.j0006@stu.matsue-ct.jp>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] TPL is not changing
+Message-ID: <4d3543a818sbellon@sbellon.de>
+In-Reply-To: <4d35427939sbellon@sbellon.de>
+References: <4d3382eb6csbellon@sbellon.de> <41F81D6F.3000908@xmission.com> <4d33b69105sbellon@sbellon.de> <4d348a05e8sbellon@sbellon.de> <41FC4BAF.4090201@xmission.com> <4d35427939sbellon@sbellon.de>
+Content-Type: text/plain
+Subject: [Bluez-users] Re: bluetooth-alsa and Jabra BT800
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,38 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 17:47:30 +0900
+Date: Sun, 30 Jan 2005 09:04:41 +0100
 
-Hi,
+Stefan Bellon wrote:
+> How does a handy talk to the headset then?
 
-I've installed bluez-libs-2.8-1 and bluez-utils-2.8-1 on our linux 2.4.27 systems with 
-HAGIWARA SYS-COM HNT-CFBT Bluetooth cards.
+s/handy/mobile/
 
-I measured TPL on one computer and found that it was always 0 independently of the  
-distance between devices.
+Sorry, in German we use the term "handy" and mean cellular/mobile
+phone. It's in such a regular use that it's hard to remember that it's
+not the correct English term. :-}
 
-The following is the result of actual measurement.
-
-[root@localhost root]# hcitool cc 00:90:02:XX:XX:XX
-[root@localhost root]# hcitool tpl 00:90:02:XX:XX:XX
-Current transmit power level: 0
-[root@localhost root]# hcitool rssi 00:90:02:XX:XX:XX
-RSSI return value: -3
-[root@localhost root]# hcitool tpl 00:90:02:XX:XX:XX
-Current transmit power level: 0
-[root@localhost root]# hcitool rssi 00:90:02:XX:XX:XX
-RSSI return value: -13
-[root@localhost root]# hcitool dc 00:90:02:XX:XX:XX
-
-As you can see, RSSI is changing according to the distance between devices, but 
-TPL is not.
-
-I would like to know the reason of this phenomenon.
-
-Anyone has encounterd the same situation ?
-
-Thanks
-Kazuhiro
+-- 
+Stefan Bellon
 
 
 -------------------------------------------------------
