@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Can l2ping phone but can't `sdptool browse` or
-	discover?
+Subject: Re: [Bluez-users] BT-PM01B-HID
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1100949891.419f2983a8527@www.bluebottle.com>
-References: <1100949891.419f2983a8527@www.bluebottle.com>
+In-Reply-To: <419F4399.20405@thomae-privat.de>
+References: <419F4399.20405@thomae-privat.de>
 Content-Type: text/plain
-Message-Id: <1100958327.7213.124.camel@pegasus>
+Message-Id: <1100958241.7213.121.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,16 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 20 Nov 2004 14:45:27 +0100
+Date: Sat, 20 Nov 2004 14:44:01 +0100
 
-Hi,
+Hi Matthias,
 
-> Well I don't know. I can ping bond to the P800 now my initiating it
-> from the phone end but can't discover the phone from the bluez end. I
-> can even send files but I can't `sdptool browse` or `hcitool scan`:
+> has anyone noticed there is a second version of the Epox Presenter that 
+> supports the HID Profile?
+> 
+> SPP: http://www.epox.de/produkte/produkt.asp?ProduktID=268
+> HID: http://www.epox.de/produkte/produkt.asp?ProduktID=309
+> 
+> Has anyone tried the HID version with BlueZ?
 
-so again, what does "hciconfig -a" say? What is your kernel version and
-version of the BlueZ packages are you using?
+I used the HID version for my last 5 presentation I gave. Actually it
+has the same stupid endian bug as the EPoX keyboard, but the hidd is
+able to workaround it. The device works perfect.
 
 Regards
 
