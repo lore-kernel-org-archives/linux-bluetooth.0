@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Continuous Inquiry
+Subject: Re: [Bluez-devel] Inquiry Scan Question
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Cc: uwpegasus@hotmail.com
-In-Reply-To: <BAY12-F23AB83A4A7F029ACE4AC76AB9E0@phx.gbl>
-References: <BAY12-F23AB83A4A7F029ACE4AC76AB9E0@phx.gbl>
+In-Reply-To: <BAY12-DAV9F11C1DAD4F5A777DF8A5AB9D0@phx.gbl>
+References: <BAY12-DAV9F11C1DAD4F5A777DF8A5AB9D0@phx.gbl>
 Content-Type: text/plain
-Message-Id: <1104605311.4253.11.camel@pegasus>
+Message-Id: <1104605225.4253.8.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,16 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 01 Jan 2005 19:48:31 +0100
+Date: Sat, 01 Jan 2005 19:47:05 +0100
 
-Hi Keshab,
+Hi,
 
-> My program is running a thread with continuos hci_inquiry(). I need to know 
-> when a new device is discovered in the middle of the inquiry. How do I do 
-> this?
+> Is it possible to set a inquiry scanning device to respond only to
+> devices 
+> of certain Major Device Class(which is doing Inquiry) ?
 
-program the HCI raw socket directly maybe you should use periodic
-inquiry. You will find example code in the mailing list archive.
+check the HCI part of the Bluetooth specification. There is a HCI filter
+command, but I think it is not possible. However maybe I am wrong.
 
 Regards
 
