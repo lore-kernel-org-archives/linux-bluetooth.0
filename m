@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: Eran <eran_l@over-here.org>
-Subject: Re: [Bluez-users] Ambicom BT2000E card, can't get hciattach to work
-Cc: bluez-users@lists.sourceforge.net
-References: <4086DDFC.5000107@over-here.org> <200404220027.02236.pavouk@pavouk.org> <4086FFD9.50104@over-here.org>
-In-Reply-To: <4086FFD9.50104@over-here.org>
+Message-ID: <20040422073712.86329.qmail@web20419.mail.yahoo.com>
+From: Marian Gasparovic <marosg@yahoo.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200404221124.34165.pavouk@pavouk.org>
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] bluetooth/gprs problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,32 +15,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Apr 2004 11:24:33 +0200
+Date: Thu, 22 Apr 2004 00:37:12 -0700 (PDT)
 
-Hello,
+Hi all,
+I have i-Tec USB Dongle with Broadcom chip connected
+to my notebook with Debian Woody. I am able to
+establish bluetooth connection to my Siemens S55
+mobile. After I start pppd for GPRS access to Internet
+I get connected. I can ping any server for as long as
+I want. But when I open any web page under Konqueror
+or try ping -f, after couple of seconds (10-20) I
+loose connection. First I see bluetooth going away on
+mobil display, then gprs disconnect and after a minute
+pppd finds it out too. Any suggestions where to look ?
+I tried it with several notebooks, usb bluetooth
+devices and mobiles and only this i-Tec USB Dongle
+makes troubles. Under Windows XP it works without a
+problem.
+Thank you a lot
 
-> Sorry I forgot to mention it - but hciconfig shows a fully 'up and
-> running' interface. I use the bt950_cs driver.
-> I further checked and most hcitool commands work except the link quality.
 
-I don't try link quality. It's possible, that this function doesn't work with 
-this driver or your BT devices doesn't have established connection.
+=====
+===================
+ Marian Gasparovic
+===================
+"The mere thought hadn't  even  begun  to speculate about the merest possibility of crossing my mind."
 
-> I Have tried removing the bluetooth.conf from my pcmcia/ directory and
-> use hciattach with /dev/ttyS03, but no success here as well (could not
-> find correct parameters). Why is it the preferred way?
 
-Because there are more BT cards with BT950 uart and ericsson chipset which
-supposedly works with serial_cs driver and hciattach.
-It's better to have for all these cards only one universal driver.
 
-It's possible, that BT2000E requires some special initialization which 
-hciattach doesn't know, but I'am not expert.
 
-Best regards,
-
-Pavel Ruzicka
-
+	
+		
+__________________________________
+Do you Yahoo!?
+Yahoo! Photos: High-quality 4x6 digital prints for 25¢
+http://photos.yahoo.com/ph/print_splash
 
 
 -------------------------------------------------------
