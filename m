@@ -1,53 +1,76 @@
-Return-Path: <maxk@qualcomm.com>
-Subject: Re: [Bluez-devel] Re: Qualification testing - rfcomm
-From: Max Krasnyansky <maxk@qualcomm.com>
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-Cc: Daryl Van Vorst <daryl@wideray.com>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1057911516.1026.7.camel@pegasus>
-References: <001501c3457d$18b63a10$1a01010a@baked>
-	<1057911516.1026.7.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1058838934.3470.5.camel@localhost.localdomain>
-Mime-Version: 1.0
-Date: 22 Jul 2003 09:23:23 -0700
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: jp-www@dcs.gla.ac.uk
+To: Max Krasnyansky <maxk@qualcomm.com>
+cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re: Re: Bluetooth headset with Bluetooth usb
+	dongle status.
+In-Reply-To: <5.1.0.14.2.20030721172151.094589f0@unixmail.qualcomm.com>
+Message-ID: <Pine.LNX.4.54.999.0307221409450.25418@sibu.dcs.gla.ac.uk>
+References: <E19a5DI-0002jL-00@sc8-sf-list2.sourceforge.net>
+	<3F1752C5.5020701@dsto.defence.gov.au>
+	<3F17E4EF.5060401@superbug.demon.co.uk>
+	<1058533496.25379.237.camel@pegasus>
+	<3F17FD1A.9050003@superbug.demon.co.uk>
+	<5.1.0.14.2.20030721172151.094589f0@unixmail.qualcomm.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 22 Jul 2003 14:35:27 +0100 (BST)
 
-On Fri, 2003-07-11 at 01:18, Marcel Holtmann wrote:
-> Hi Daryl,
-> 
-> > TP/RFC/BV-12-C:
-> > "Verify that the IUT handles aggregate flow control correctly when the
-> > Tester, acting as a device conforming to Bleutooth version 1.0B, controls
-> > the data flow using the Flow Control on/off commands FCon and FCoff. The
-> > IUT's device role is of no importance."
-> > 
-> > The command and console output:
-> > 
-> > root@jack-00000000:~>./rctest -s -P 1 -b 20 00:A0:96:1F:83:71
-> > rctest[362]: Connected
-> > rctest[362]: Sending ...
-> > rfcomm_recv_mcc: Unknown control type 0x18
-> > rfcomm_recv_mcc: Unknown control type 0x28
-> > 
-> > The IUT does not respond to FCoff with FCoff, and continues sending data. It
-> > also does not respond to FCon with FCon. 
-> 
-> we don't have support for flow control on the entire RFCOMM session. But
-> it seems that the FCOFF and FCON should be supported. The attached patch
-> implements support for it, but I am not quite sure if it is the right
-> way to do this.
-Is it mandatory ? I always thought it's optional.
+On Mon, 21 Jul 2003 5:23pm -0700, Max Krasnyansky wrote:
 
-> @@ -1533,6 +1591,9 @@
->  	struct list_head *p, *n;
-> 
->  	BT_DBG("session %p state %ld", s, s->state);
-> +
-> +	if (test_bit(RFCOMM_TX_THROTTLED, &s->flags))
-> +		return;
-> 
->  	list_for_each_safe(p, n, &s->dlcs) {
->  		d = list_entry(p, struct rfcomm_dlc, list);
-This part is not ok. We still have to check for timeout. Rest of patch is fine.
+> At 07:33 AM 7/20/2003, Jonathan Paisley wrote:
+> >I have managed to get playback and recording (with the PC acting as a
+> >headset for my phone) to work well. I've made the following changes which
+> >are included in the patch at the end:
+> >
+> >        (1) submit two rx urbs (same as your proposed patch, but done at caller)
+> >        (2) allow two pending isoc urbs instead of one
+> >        (3) only use the 9 byte (single voice channel) isoc endpoint
+> I buy #1 and #2, although I'm surprised that it's supported by HCD.
+> But 9 bytes packets ?
 
-Max 
+I must admit that I don't fully understand what's going on... The SCO
+socket reports mtu 64 bytes. The read() on the socket returns 24 bytes at
+a time. Thus, I'm also sending 24 bytes with send() -- sending more
+results in no audio on the remote device. There's some question about how
+this data relates to the timings described in the example in the
+specification.
+
+How does this 24 byte message correspond to the 9 byte endpoint? I
+see that the SCO packets have a handle and length header (3 bytes):
+
+typedef struct {
+	__u16 	handle;
+	__u8 	dlen;
+} __attribute__ ((packed))	hci_sco_hdr;
+
+so I suppose the 24 byte message becomes 27 bytes with the header, which
+gets divided into 3 x 9 byte packets.
+
+I'm using an ohci interface, but will try things on a uhci interface in
+another computer to see how it copes with (1) and (2) from my original
+message.
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: VM Ware
+With VMware you can run multiple operating systems on a single machine.
+WITHOUT REBOOTING! Mix Linux / Windows / Novell virtual machines at the
+same time. Free trial click here: http://www.vmware.com/wl/offer/345/0
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
