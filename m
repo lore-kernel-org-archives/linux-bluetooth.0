@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41EAA3A4.4040509@dark-reality.de>
+Message-ID: <41EA9FF3.5090900@dark-reality.de>
 From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] btsco crash without daemon
+References: <41E91B7A.1070303@egabriel.de> <41E925F4.3060907@dark-reality.de> <41E92C83.8010406@egabriel.de> <41E9349C.8060001@dark-reality.de> <41E96812.7030903@egabriel.de> <41E9B60E.2010509@dark-reality.de> <41EA44F4.50606@egabriel.de>
+In-Reply-To: <41EA44F4.50606@egabriel.de>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] btsco website problems
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,79 +18,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 16 Jan 2005 18:25:56 +0100
+Date: Sun, 16 Jan 2005 18:10:11 +0100
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-Hi there,
+ligi wrote:
+|
+| | Why do you want to use the external alsa-driver anyway?
+| |
+| It recommended to use the external Driver in the Gentoo docs - and i
+| found nothing in the btsco docs that says something diffrent - so i
+| used the external Driver ( Well -  I like the external Driver Concept
+| (in a world with so much devices ) more too .... )
 
-I just took a look at our website to find out why some people have setup
-problems like using the btsco for a2dp and stuff. Don't get me wrong,
-it's great that we have a page and the content is not that bad ->
-credits to the writer :)
+well, we want to migrate the snd-bt-sco to userspace if possible, so you
+won't need a specific alsa driver (kernel vs. standalone) sooner or
+later, hopefully. But until than it's the easiest way (and the proper
+way) to use kernel alsa as a reference, not the standalone alsa (the
+kernel is available on any system, isn't it? ;)
 
-I think the problem is that the sections are not very well-named on the
-web page, so one does not know what section describes what part of the
-project (hs or a2dsp profile).
+I ran into some problems myself when I was using btsco on a system that
+had an unsupported audio device that needed a driver patched into alsa
+(no patch for the kernel available) AND that was written in C++ so very
+bad mojo. I hacked in into the kernel, got bad voices from lkml (*vbeg*)
+for using c++ in kernel space and stuff. Well was fun. The point beeing:
+meanwhile this driver has been re-implemented in C and there's a kernel
+patch so it can easily used with alsa-kernel.
 
-Right now we have:
+| PS: You can mark the SouthWing NeoVoice Headset ( on a Sitecom USB ->
+| BT Dongle ) as working for btsco - there is no wiki so I cant do this
+| now !-)
+| btw. anyone interested in a btscoWiki ?
 
-*introduction
-Stereo Streaming!
-Alsa userspace plugin
-Build
-Discussion
-Credits
+Sounds good for me, it would make changing the site a lot easier, would
+it not? Any more comments from i.e. Brad?
 
-with no more info in the headlines. If I - as a btsco n00b - would come
-to the site I would think that
-
-stereo streaming -> alsa -> build
-
-are all about the same topic, making the stereo streaming work.
-
-I think things would be much easier if the headlines of the sections
-would be a little more descriptive, also it might be usefull to re-order
-them.
-
-I'd propose:
-
-*introduction
-~  (hello world, supported headsets - pretty much like the current version)
-
-Features
-(here we describe what parts of btsco handle what part of features and a
-bit of the technical background)
-~ * HS profile description ("Headset support")
-~ * a2dp description ("Stereo sound")
-
-Download
-~  proper link into the download section and to CVS (do we have nightly
-tarballs, by the way? I think SF builds those for us, and puts them
-somewhere?)
-
-Installation
-(with remarks "building this is only for hs or a2dp" or alike)
-~ * build process
-~ * build provess for alsa kernel module (headset profile)
-~ * build process for a2dp (if this is different)
-
-Usage
-~ * hs profile, daemon
-~ * a2dp examples
-
-If we use this structure, anyone should be able to distinguish between
-headset and stereo stuff.
-
-Too bad I don't have time right now :(
-
-If no one else as a little bit of time to write this together, it will
-have to wait until I do. I won't mind to do it, though :)
+Of course an "external resource site" is possible even if we don't want
+to have an official wiki ;)
 
 best regards,
 ~  Lars
-
 
 - --
 Lars Grunewaldt
@@ -101,9 +71,9 @@ mail: lgw@dark-reality.de
 Version: GnuPG v1.2.3 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFB6qOkQWC6DTWkDAoRAr5xAJ4qILrefqnDFluLsdte/N9c6Yu5WgCeLmwU
-878FORnXs7u5k0hfmIoZuBA=
-=eYzF
+iD8DBQFB6p/yQWC6DTWkDAoRAuRUAKCImgzbBTD/5PhqzRKUSRJAgce1SQCeNEWQ
+ff5CCb1DTfXrk21W9n05SAQ=
+=nx+Z
 -----END PGP SIGNATURE-----
 
 
