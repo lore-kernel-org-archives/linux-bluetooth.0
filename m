@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Kai Haberzettl <kai@khaberz.net>
-Message-ID: <87r7mqidhb.fsf@khaberz.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] problems using rfcomm device
+Subject: Re: [Bluez-users] Using windows breaks bluetooth in linux? huh
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200411190218.22275.wim.delvaux@adaptiveplanet.com>
+References: <419AE72F.3030307@patbert.com>
+	 <1100762008.7164.15.camel@pegasus> <419D45AE.5060306@patbert.com>
+	 <200411190218.22275.wim.delvaux@adaptiveplanet.com>
+Content-Type: text/plain
+Message-Id: <1100828535.7164.104.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,46 +20,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 19 Nov 2004 07:01:36 +0100
+Date: Fri, 19 Nov 2004 02:42:15 +0100
 
-Trying to get bluetooth running under Debian Testing here. Connecting
-to my device (Nokia 6600 cell) works fine, but whenever I try to
-access the device using pppd or minicom I get something like this:
+Hi Wim,
 
-Nov 19 06:18:01 arthur pppd[1382]: Failed to open /dev/rfcomm0:
-Invalid argument
+> What is that problem with the link_key file.  I have to remove that file from 
+> time to time too.  I use a usb dongle and have to connect my device sometimes 
+> to this system sometimes to another. 
+> 
+> Could you explain why a link_key file could get 'out of sync' ?
 
-Yes, I did see the FAQ, but the rfcomm connect doesn't help either.
+the link key is invalid when you pair the two devices on a different
+operating system. It is that simple, because a new link key deprecates
+the old one.
 
-Here's what I do have working:
+Regards
 
-arthur:/home/khaberz# rfcomm show
-rfcomm0: 00:0E:6D:56:44:FA channel 0 clean
+Marcel
 
-
-arthur:/home/khaberz# hciconfig -a 
-hci0:   Type: USB
-        BD Address: 00:0F:3D:5F:6C:FD ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN 
-        RX bytes:99 acl:0 sco:0 events:13 errors:0
-        TX bytes:296 acl:0 sco:0 commands:12 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: RSWITCH HOLD SNIFF PARK 
-        Link mode: SLAVE ACCEPT 
-        Name: 'arthur-0'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP
-        Subver: 0x20d
-        Manufacturer: Cambridge Silicon Radio (10)
-
-
-Any help is greatly appreciated.
-
-Thanks,
-Kai
 
 
 
