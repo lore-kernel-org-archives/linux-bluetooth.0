@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <E73D9A5BC4A2D711BBC600065BF3595F1C66D013@il06exm10>
-From: Mandalia Hiren-AHM047 <hirenm@motorola.com>
-To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: Re: Re: CSR USB dongle w/BT 1.2 =?iso-8859-1?q?and=09headset/handsfree?= profiles?
+References: <ctriti$j66$1@sea.gmane.org> <1107819680.7327.155.camel@pegasus> <pan.2005.04.05.19.53.17.138671@wingnet.net>
+In-Reply-To: <pan.2005.04.05.19.53.17.138671@wingnet.net>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Bluez-users] Bluetooth on Linux Familiar
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200504061711.36270.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,15 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 6 Apr 2005 14:18:32 -0500
+Date: Wed, 6 Apr 2005 17:11:36 +0200
 
-Hi there,
+Hello,
 
-I have installed Linux familiar v0.8.1 on iPAQ h3800 and need to configure Bluetooth on it. All the needed bluez utils are installed successfully. Any idea how to configure Bluetooth? I tried running hciattach as a starting point but got a 'Initialization Timed out' message?
+I use this dongle DBT-120 B3 BT1.2 with Bluetooth headset Jabra BT-250
+without problems.
 
-Any suggestions?
+Best regards,
 
-Hiren
+Pavel Ruzicka
+
+> It's been a while since this post. I'm finally about to buy a DBT 120 B3.
+> Is it still the ideal USB Bluetooth dongle if I want to play with BT audio
+> features?
 
 
 
