@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sdp patch
+Subject: Re: [Bluez-devel] browsing non-public services?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Simon Vogl <vogl@soft.uni-linz.ac.at>
+To: "Collin R. Mulliner" <collin@betaversion.net>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <403B5BB2.4060306@soft.uni-linz.ac.at>
-References: <403B08B4.1000602@soft.uni-linz.ac.at>
-	 <1077624690.2880.40.camel@pegasus>  <403B471D.7080908@soft.uni-linz.ac.at>
-	 <1077628380.2880.84.camel@pegasus>  <403B5BB2.4060306@soft.uni-linz.ac.at>
+In-Reply-To: <20040224144209.3b34125d@coredump>
+References: <403B1072.1020102@soft.uni-linz.ac.at>
+	 <1077624474.2880.37.camel@pegasus> <20040224132517.0434ab6d@coredump>
+	 <1077626176.2880.54.camel@pegasus> <20040224134200.45dab5be@coredump>
+	 <1077627172.2880.70.camel@pegasus> <20040224142400.212a912f@coredump>
+	 <1077629602.2880.90.camel@pegasus>  <20040224144209.3b34125d@coredump>
 Content-Type: text/plain
-Message-Id: <1077632076.2880.96.camel@pegasus>
+Message-Id: <1077630299.2880.93.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,19 +22,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 Feb 2004 15:14:36 +0100
+Date: Tue, 24 Feb 2004 14:44:59 +0100
 
-Hi Simon,
+Hi Collin,
 
-> hmm, I tested with
-> cd sdp; patch -p1 <../foo
-> and it worked like a charm.
+> > I need the output of "sdptest records <bdaddr-6310i>" to see if this
+> > model has more hidden SDP records.
 > 
-> Are there different branches in the sourceforge cvs? (nb that i am only 
-> an anonymous user ;)
+> sdptest, where is it? in the CVS?
 
-we don't use any branches and I always apply it to an anonymous checkout
-first, before I commit it. Please do a new and clean checkout.
+you can found it under libs2/test/sdptest.c in CVS.
 
 Regards
 
