@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] lockup problem with larger packets
+Subject: Re: [Bluez-users] help for bluez installation
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Erwin Authried <eauth@softsys.co.at>
+To: mahabaleshwara k <mahabaleshwara_k@yahoo.co.in>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1098480115.3258.61.camel@justakiss>
-References: <1098480115.3258.61.camel@justakiss>
+In-Reply-To: <20041023091355.5885.qmail@web8501.mail.in.yahoo.com>
+References: <20041023091355.5885.qmail@web8501.mail.in.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1098539750.26310.17.camel@pegasus>
+Message-Id: <1098539657.26310.14.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,29 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 23 Oct 2004 15:55:50 +0200
+Date: Sat, 23 Oct 2004 15:54:16 +0200
 
-Hi Erwin,
+Hi Mahabaleshwara,
 
-> I have cross-compiled bluez for uClinux-2.4.20 for ARM7, with the bluez
-> kernel patch applied, and bluez-utils 2.10. I'm using the Conceptronic
-> CBT100C PCMCIA card on the system. The card is initialized with
-> "hciattach ttyS2 bcsp". Basically, the system works fine, but I see
-> occasional overrun errors on the UART, maybe because the ARM7 is running
-> with 40MHz only. When I transmit larger packets (l2ping -s 300 ...), the
-> number of overrun errors increases, and sometimes the system locks up.
-> I'm getting an endless sequence of: 
-> 
-> bcsp_pkt_cull: Peer acked invalid packet
-> bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
-> bcsp_pkt_cull: Peer acked invalid packet
-> bcsp_handle_le_pkt: Found a LE sync pkt, card has reset
-> bcsp_pkt_cull: Peer acked invalid packet
-> ...
+> I am new user of bluez. I want to know about detailed
+> installation of bluez because I don't know about
+> kernal compilation and other stuffs in linux which is
+> mentioned in bluez site. I am having linux 2.4.20-8
+> kernal. It has all ready some bluez modules. Whether
+> we have to install other bluez packages mentioned in
+> site? Without that can't we run bluetooth on my USB
+> dongle D-Link DBT-120 B4. My target is to do file
+> transfer(picture) between two computers.
 
-I am not a BCSP or uClinux expert so I think that I can't help you here,
-but from my testing with the BCSP part of the hci_uart driver I never
-saw any problems like this.
+there are so many kernel compilation howtos on the internet, you should
+start looking at one or use a Linux Distribution with all this stuff
+already prepared. You can try the upcoming SuSE 9.2 or a Debian Sid.
 
 Regards
 
