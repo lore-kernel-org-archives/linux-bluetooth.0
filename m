@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <517CF7F08A05D4118C380000E869BFA4BDEDD5@emg_ntserv2>
+Message-ID: <517CF7F08A05D4118C380000E869BFA4BDEDD4@emg_ntserv2>
 From: R.Schade@tu-braunschweig.de
 To: bluez-users@lists.sourceforge.net
-Subject: RE: [Bluez-users] simple rfcomm connect!?
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="iso-8859-1"
+	charset="utf-8"
+Subject: [Bluez-users] =?utf-8?B?UkU6IFtCbHVlei11c2Vyc10gc2ltcGxlIHJmY29tbSBjb25uZWN0?=
+ =?utf-8?B?IT8=?=
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,29 +17,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 22 Oct 2004 14:07:45 +0200
+Date: Fri, 22 Oct 2004 14:07:37 +0200
 
-Hi Marcus,
+Hi Fred,
 
-> From: bluez-users-admin@lists.sourceforge.net
-> [mailto:bluez-users-admin@lists.sourceforge.net]On Behalf Of Marcel
-> Holtmann
+> -----Original Message-----
+> From: Fred Schaettgen [mailto:bluez-user@schaettgen.de]
+> Sent: Friday, October 22, 2004 9:21 AM
+> > ...
+> Did you initialize ownaddr correctly? Try hcidump.
+I don't know why, but here on two PCc with different linux- and
+bluez-versions it works. At home, two PCs with the identical environment
+doesn't work. I think the problem sit in front of the computer and I have a
+look in the evening.
+ 
+> anywhere else. Try scrolling upwards a little in all those "internet 
+> examples" ;)
+I think my mistake is examples uses an "intelligent" device such smartphones
+or mobiles to connect a PC and I use a simple dongle. With sdptool add SP I
+see the RFCOMM protocol.
+
 > 
-> run "hcidump -X" as root to see the details.
-Now it works here (I wrote it in an email to this list before), but I will
-test my programm at home in the evening with hcidump.
-
-> Show them to us and also show us the full source code. The ownsock
-> variable can't be an integer, but you treat it like an integer in the
-> printf statement. So either the type is wrong or you get a bunch of
-> compiler warnings that you are ignoring.
-The ownsock-variable is the return-code from socket() and this is an
-integer?! Compiling with -Wall don't show me any warnings. Do you confuse
-ownsock with the ownaddr, a variable from type struct sockaddr_rc?
-In a former message you suggest a look on rctest-code. I look at the code
-for learning.
-
-Thank you,
+> regards
+> Fred
+> 
+Thank you for your advice,
 Ralf
 
 
