@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42409B3B.1080906@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <42406D46.10804@rz-zw.fh-kl.de>
+From: Timo Veith <tv@rz-zw.fh-kl.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] btsco and Nokia HDW-3 headset not working
-References: <1111528750.12076.18.camel@localhost>
-In-Reply-To: <1111528750.12076.18.camel@localhost>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] Problem with BlueLogic WingKey Keyboard
+References: <200503202301.49376.tv@rz-zw.fh-kl.de>	 <1111408373.22872.54.camel@pegasus> <423F5B7F.9060200@rz-zw.fh-kl.de>	 <423F5E1C.8030301@rz-zw.fh-kl.de> <1111453185.22872.84.camel@pegasus>
+In-Reply-To: <1111453185.22872.84.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,38 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Mar 2005 15:24:59 -0700
+Date: Tue, 22 Mar 2005 20:08:54 +0100
 
-James
+Marcel Holtmann wrote:
+> a clash with the Makefile is fine. If you look at Makefile.rej you will
+> see why this must happen ;)
+> 
 
-> athos root # sdptool search --bdaddr 00:03:89:67:8F:F7 0x1108
+Hello Marcel,
 
-Do our docs still recommend this? The channel has been autodetected for 
-some time.
+I applied your patch and it works now. Thanks a lot! :)
 
-> athos root # btsco 00:03:89:67:8F:F7 1
-> Device is 2:0
-> Voice setting: 0x0060
-> RFCOMM channel 1 connected
+Will your patch be integrated into the offical kernel and if yes when?
 
-This is not the latest cvs version. It's silent unless you specify "-v" 
-flag. Where did you get the kernel module and btsco daemon you are trying?
+Kind regards and thanks again
 
-> I am running gentoo linux with the following kernel:
-> athos root # uname -a
-> Linux athos.porthosnet.com 2.6.9-gentoo-r14 #11 Fri Mar 4 18:30:23 Local
-> time zone must be set--see zic manu x86_64 AMD Athlon(tm) 64 Processor
-> 3400+ AuthenticAMD GNU/Linux
-
-It would really be a lot easier to debug if you were using the most 
-recent kernel release (we don't have enough resources to maintiain 
-several versions for what is supposed to be a stable kernel series)
-
-Make sure you are using the integrated alsa, not the standalone that is 
-distributed separately. IIRC, this came up because gentoo uses the 
-standalone alsa.
-
-Brad
+Timo
 
 
 -------------------------------------------------------
