@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42109EB0.9090506@gmail.com>
-From: Alberto Pianon <alberto.pianon@gmail.com>
-MIME-Version: 1.0
+From: Markus Kohli <kohli@webdeko.com>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-devel] Re: btsco (and SuSE 9.2)
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200502120858.46323.kohli@webdeko.com>
+Subject: [Bluez-devel] DiNovo in Bluetooth-Mode
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,22 +17,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 14 Feb 2005 13:50:56 +0100
+Date: Sat, 12 Feb 2005 08:58:46 +0100
 
-I've tried to build the btsco kernel module on SuSE 9.2
-I just had to uninstall automake1.9 and install v1.7, and change "/source" to "/build" in the makefile of the module.
-I followed all the instructions I found on http://bluetooth-alsa.sourceforge.net/
-Everything worked without errors, but when I come to "modprobe snd_bt_sco" it says "FATAL: Module snd_bt_sco
-not found".
-I tried to locate the module, and it is in "/lib/modules/2.6.8-24.11-default/extra/snd-bt-sco.ko"
-I tried with insmod, but it says "error inserting 'snd-bt-sco.ko': -1 Unknown symbol in module"
-I tried with "modprobe snd-bt-sco" but it says always "FATAL: Module snd_bt_sco not found".
-Did anyone manage to make it work on SuSE 9.2?
-thanks,
-Alberto
+Hi
 
+I read some posts in the archives, because I was trying to get my DiNovo 
+working under SuSE 9.2, and found this here:
 
+>  > I tested it with SuSE 9.2, Fedora Core 3 and Ubuntu. The only thing you 
+have 
+>  > to do, is to call
+>  > 
+>  > hid2hci
+>  > 
+>  > Then you should see a message, like
+>  > 
+>  > Switching device XXXX:XXXX to HCI mode was successful
+>  > 
+>  > Now check with
+>  > 
+>  > hcitool dev
+>  > 
+>  > if it sees the bluetooth hub.
+>  > 
+>  
+>  yes it did that, said it was successful, 
+>  BUT the keyboard & mouse stopped responding! 
+>  The only way to get them working again was to reboot.
+>  
+>  Laurence
 
+Now, I found out how to get this working... Only enable the following 
+bluetooth-services:
+HCI
+SDP 
+HID 
+HID2HCI
+
+If you have any others, like obex stuff enabled, that'll block the keyboard 
+and the mouse. With SuSE you can easily configure that by help of yast2, or 
+by hand in /etc/sysconfig/bluetooth. 
+Then additionaly, once I had this working, the F-keys had gone missing, but an 
+update to the latest kernel-of-the-day also fixed that (I'm running on 
+2.6.11rc3 now, that's probably got the -mh patch included).
+
+Hope this helps anyone.
+
+Kind regards
+Markus
 
 
 -------------------------------------------------------
