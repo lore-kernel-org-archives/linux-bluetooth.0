@@ -1,10 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: radoa <cat@pobox.sk>
-Message-ID: <loom.20041025T141305-8@post.gmane.org>
+Subject: Re: [Bluez-devel] how to do inquiry with RSSI in bluetooth 1.2
+	devices?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: albert@csail.mit.edu
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <ef9938ec041019171179f1e8d0@mail.gmail.com>
+References: <ef9938ec041012125930f0b8e3@mail.gmail.com>
+	 <1097658003.4643.17.camel@notepaq>
+	 <ef9938ec04101511326a6342c3@mail.gmail.com>
+	 <1097928625.4911.30.camel@pegasus>
+	 <ef9938ec04101914447e122c22@mail.gmail.com>
+	 <1098222911.23046.5.camel@pegasus>
+	 <ef9938ec04101916584d188ffc@mail.gmail.com>
+	 <ef9938ec041019171179f1e8d0@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1098690211.24932.4.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] =?utf-8?b?aGNpX2Rldl9vcGVu?= function
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,22 +26,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 25 Oct 2004 12:21:00 +0000 (UTC)
+Date: Mon, 25 Oct 2004 09:43:30 +0200
 
-Hi,
+Hi Albert,
 
-I want to ask how linux kernel initializes HCI sockets.
-When bluetooth dongle is inserted to USB, is registered by USB driver in bluez 
-stack as new device. But has not set flag HCI_UP, this flag is set only in call 
-of ioctl command HCIDEVUP - which calls hci_dev_open(). Function hci_dev_open() 
-resets BT dongle and receives its BT address. But where and when is ioctl with 
-HCIDEVUP cmd called? It seems that ioctl call is only place where is BT dongle 
-initialized.
-I use kernel 2.6.8.1
+> > Attached is a patch for bluez-libs.  Two functions are added.
+> 
+> please ignore previous message.  That patch doesn't follow the
+> naming/tabbing conventions in the rest of bluez-libs.  Attached is a
+> patch that does.
 
-Thank you very much
+the coding style is still not correct and you screwed the patch up by
+inserting memset() that overrides previous set values. Besides this you
+set the rq.rlen wrong.
 
-radoa
+I implemented the hci_{read|write}_inquiry_mode() functions by myself
+and also changed hciconfig to use them. My version is not so different
+from yours, but the details matter. Please compare them and start
+sending in more patches to enhance the Bluetooth library.
+
+Regards
+
+Marcel
+
 
 
 
