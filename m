@@ -1,15 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] "comlicated" setup - known issues for
-	hid	and	SCO?
+Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Lars Grunewaldt <lgw@dark-reality.de>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4117BA71.5000800@dark-reality.de>
-References: <4117A907.7010006@dark-reality.de>
-	 <1092071597.4564.17.camel@pegasus>  <4117B376.3030507@dark-reality.de>
-	 <1092073484.4564.32.camel@pegasus>  <4117BA71.5000800@dark-reality.de>
+To: James Courtier-Dutton <James@superbug.demon.co.uk>
+Cc: Lars Grunewaldt <lgw@dark-reality.de>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4117C0AB.2010609@superbug.demon.co.uk>
+References: <4117AB9A.9010909@dark-reality.de>
+	 <1092071356.4564.12.camel@pegasus>  <4117B098.5020805@dark-reality.de>
+	 <1092073167.4564.26.camel@pegasus>  <4117C0AB.2010609@superbug.demon.co.uk>
 Content-Type: text/plain
-Message-Id: <1092090585.4564.51.camel@pegasus>
+Message-Id: <1092090364.4564.46.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,47 +21,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 00:29:46 +0200
+Date: Tue, 10 Aug 2004 00:26:04 +0200
 
-Hi Lars,
+Hi James,
 
-> | I don't see the hold mode. This can cause problem if they form a
-> | scatternet. When both are connect what does "hcitool con" say?
+> > I think the SCO driver should provide two interfaces. The first one we
+> > know already is a socket interface to the SCO packets and the second
+> > should handle the SCO packets directly over into an ALSA interface. May
+> > you would like to switch between these two via an IOCTL, like we did it
+> > for the RFCOMM layer.
 > 
-> without SCO connection active:
-> Connections:
-> ~        < ACL 00:0E:07:33:DE:2B handle 45 state 1 lm MASTER
-> ~        > ACL 00:07:61:04:D6:7D handle 41 state 1 lm MASTER
-> 
-> 
-> with active SCO connection:
-> Connections:
-> ~        < SCO 00:0E:07:33:DE:2B handle 44 state 1 lm SLAVE
-> ~        < ACL 00:0E:07:33:DE:2B handle 45 state 1 lm MASTER
-> ~        > ACL 00:07:61:04:D6:7D handle 41 state 1 lm MASTER
+> I looked at doing ALSA -> SCO interface a long time ago, but gave up due 
+> to what I considered limitations with the current bluetooth stack.
 
-so both devices are in the same piconet. There should be no problem, but
-from my position I can't tell you anything more.
+you never sent any patches for changing this. Start writing code and
+send it in for review.
 
-> | Use "hciconfig hci0 revision" as root.
-> 
-> hci0:   Type: USB
-> ~        BD Address: 00:04:61:81:4A:3E ACL MTU: 192:8  SCO MTU: 64:8
-> ~        HCI 16.4
-> ~        Chip version: BlueCore02
-> ~        Max key size: 56 bit
-> ~        SCO mapping:  HCI
+> To summarise, we need low latency, full duplex, and to provide that, we 
+> need to accurately be able to determine and control the buffer sizes. 
+> The current bluetooth stack has no api to help us in this regard, and 
+> therefore will not work very well.
 
-This is a recent firmware version. So it should be fine.
-
-> BTW, do you know what is the difference between using channel "1" and
-> "no" channel for the SCO connection? The btsco client has this option,
-> and if it's used as "1" the language for the RFCOMM commands seems to be
-> different (i.e. if I press the take/hold button on the headset, I get
-> "AT+BVRA=?" when using without "channel", but "AT+CKPD=200" when used
-> with channel 1).
-
-I've never used the btsco software.
+Actually you think that we need it, but I am still not sure that this is
+really needed in case of the concept of the SCO packet from the HCI and
+the SCO handling that is done on link manager/chip level. However you
+can still convince me with real code.
 
 Regards
 
