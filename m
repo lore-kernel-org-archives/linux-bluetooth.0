@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <418FC205.7070102@tootai.net>
-From: administrator tootai <admin@tootai.net>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Audio & Bluetooth
+Subject: Re: [Bluez-users]  Again dund
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAT2mvzXDViU6RxBXLMLKoFgEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAT2mvzXDViU6RxBXLMLKoFgEAAAAA@t-online.de>
+Content-Type: text/plain
+Message-Id: <1099939109.29330.17.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +19,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 08 Nov 2004 19:59:17 +0100
+Date: Mon, 08 Nov 2004 19:38:29 +0100
 
-Hi list,
+Hi Peter,
 
-I have a question: for my mobile I use an HAMA Bluetooth headset. If I 
-buy a bluetooth PCMCIA card for my notebook, will I be able to use this 
-headset with this card? recognized as a second soundcard? as a normal 
-headset for my integrate soundcard? recognized by my software phone 
-clients? If I buy an USB bluetooth device, would it be the same? better?
+> I'm not yet able to tell linux, that my bluetooth-connection is a
+> ethernet-connection. I have no idea how to manage this with PPP. With YaST I
+> tried to define the bt-connection as a networkcard - but it doesn't realy
+> work.
 
-I'm running a Debian SID kernel 2.6.
+I don't get your point. The ppp0 interface can be used and when the
+routing information are right then this works. It is not different from
+dialin with a modem.
 
-Thanks for reply
+> Linux-Notebook:~ # sdptool search --bdaddr 00:0B:CE:00:01:8F lan
+> Searching for lan on 00:0B:CE:00:01:8F ...
+> Service Name: Netzwerkzugang
+> Service RecHandle: 0x10000
+> Service Class ID List:
+>   "LAN Access Using PPP" (0x1102)
+> Protocol Descriptor List:
+>   "L2CAP" (0x0100)
+>   "RFCOMM" (0x0003)
+>     Channel: 1
+> Language Base Attr List:
+>   code_ISO639: 0x656e
+>   encoding:    0x6a
+>   base_offset: 0x100
+> 
+> What can I do - ? - perhaps I have to install SuSE 9.2 ??!
 
--- 
-Daniel
+The SuSE 9.2 will improve things, because the kernel, libs and utils are
+up to date. However I don't know if that is the problem here. You should
+remember that "LAN access using PPP" is deprecated and this stuff is all
+PPP related. Look on the internet for more information.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
