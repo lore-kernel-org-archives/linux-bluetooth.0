@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050131163631.39991.qmail@web53205.mail.yahoo.com>
-From: Filipa Duarte <filipa_duarte@yahoo.com>
-Subject: Re: [Bluez-users] Can't connect RFCOMM socket
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1106939965.10580.0.camel@pegasus>
+Message-ID: <41FE5D06.8080304@cloutier-vilhuber.net>
+From: Lars Vilhuber <lars.vilhuber@cloutier-vilhuber.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] experience with TDK PCMCIA Bluetooth Card, (goBlue)?
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,148 +16,81 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 Jan 2005 08:36:31 -0800 (PST)
+Date: Mon, 31 Jan 2005 11:29:58 -0500
 
-Hi everyone,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-Marcel, many thanks for your help, but I still
-couldn't connect to my friend PC. So I decided to
-connect to a mobile phone first. It is an Sony
-Ericsson Z600.
+| Hi Lars,
+|
+|>> Symptoms are a collection of
+|>>
+|>> bcsp_recv: Short BCSP packet
+|>> bcsp_recv: Out-of-order packet arrive
+|>> bcsp_recv: Error in BCSP hdr checksum
+|>>
+|>> which I have seen reported for some cards before, but for which I
+|>> haven't a solution reported.
+|
+| so in general your card gets detected as serial port and normal stuff
 
-The 'hcitool scan' shows me the phone and the phone
-also recognize my laptop. After this, I did a 'rfcomm
-bind' on the laptop.
+... after some filling up of /etc/pcmcia/ config files... yes. The lists
+helped on that:
 
-When I try to connect the mobile phone to my laptop,
-the mobile phone asks me the passkey. When I
-introduced the PIN (the same I have defined in the
-/etc/bluetooth/pin) the reply on the phone is 'passkey
-mismatch'.
+config.opts AND bluetooth.conf (one may be redundant):
+card "TDK goBlue PCMCIA Bluetooth Adapter"
+~  manfid 0x0105,0x4254
+~  version "TDK","Bluetooth PC Card II","",""
+~  bind "serial_cs" class "bluetooth"
 
-Here is the output of the 'hcidump -X':
-HCIDump - HCI packet analyzer ver 1.16
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request (0x04) plen 10
-  0000: b4 db c9 d9 0a 00 04 02  52 01      ........R.
-< HCI Command: Accept Connection Request (0x01|0x0009)
-plen 7
-  0000: b4 db c9 d9 0a 00 01                .......
-> HCI Event: Command Status (0x0f) plen 4
-  0000: 00 01 09 04                         ....
-> HCI Event: PIN code Request (0x16)plen6
-  0000: b4 db c9 d9 0a 00                   ......
-< HCI Command: PIN Code Request Reply (0x01|0x000d)
-plen 23
-  0000: b4 db c9 d9 0a 00 05 42  6c 75 65 5a 00 00 00
-00          .......BlueZ....
-  0010: 00 00 00 00 00 00 00                .......
-> HCI Event: Command Complete (0x0e) plen 10
-  0000: 01 0d 04 00 b4 db c9 d9  0a 00      ..........
-< HCI Command: PIN Code Request Reply (0x01|0x000d)
-plen 23
-  0000: b4 db c9 d9 0a 00 05 42  6c 75 65 5a 00 00 00
-00          .......BlueZ....
-  0010: 00 00 00 00 00 00 00                .......
-> HCI Event: Command Complete (0x0e) plen 10
-  0000: 01 0d 04 00 b4 db c9 d9  0a 00      ..........
-> HCI Event: Connect Complete (0x03) plen 11
-  0000: 05 29 00 b4 db c9 d9 0a  00 01 00  
-.).........
+and adding an elif condition in /etc/pcmcia/bluetooth conditional on MANFID.
 
-Could you please help me with this output? I am not
-sure what it means, if the PIN helper is working or
-not...
+| like "hciconfig -a" is working?
 
-If it is not the PIN helper, could you give any
-directions to look for the problem?
+that yields:
 
-Many thanks. Regards,
-
-Filipa
-
---- Marcel Holtmann <marcel@holtmann.org> wrote:
-
-> Hi Filipa,
-> 
-> > I am have Linux 2.6.9 in my laptop and an
-> Conceptronic
-> > CBT 100U USB adapter. I installed bluez-utils-2.14
-> and
-> > bluez-libs-2.14.
-> > 
-> > 'hciconfig -a' shows me my device and 'hcitool
-> scan'
-> > show me the computer of a friend (a windows pc). I
-> can
-> > do an 'l2ping' and an 'rfcomm bind' to this
-> computer
-> > without any problem. 
-> > 
-> > The problems arrive when I try to do 'rfcomm
-> connect'.
-> > The answer is: "Can't connect RFCOMM socket:
-> resource
-> > temporarily unavailable". 
-> 
-> you can't use bind and connect together. Choose one.
-> 
-> > I saw on the web and on the mailling lists that
-> there
-> > is a problem with the 'bluepin'. I checked mine
-> and it
-> > didn't work. So, I created a new file (called pin
-> in 
-> > /usr/bin/) with:
-> > 
-> > #!bin/sh
-> > # file: /usr/bin/pin
-> > echo -n "PIN: "
-> > cat /etc/bluetooth/pin
-> > 
-> > and created a file in /etc/bluetooth/ also called
-> pin
-> > with a numerical the PIN code.
-> > 
-> > Still I could not make the 'rfcomm connect' work!
-> It
-> > appears a window asking for the PIN in my friend's
-> > computer, but in my computer I still have the same
-> > answer.
-> 
-> Check with "hcidump -x" as root if it is really a
-> PIN helper problem.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
->
--------------------------------------------------------
-> This SF.Net email is sponsored by: IntelliVIEW --
-> Interactive Reporting
-> Tool for open source databases. Create drag-&-drop
-> reports. Save time
-> by over 75%! Publish reports on the web. Export to
-> DOC, XLS, RTF, etc.
-> Download a FREE copy at
-> http://www.intelliview.com/go/osdn_nl
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+hci0:   Type: UART
+~        BD Address: 00:80:98:64:B4:D1 ACL MTU: 192:8  SCO MTU: 64:8
+~        UP RUNNING PSCAN ISCAN AUTH
+~        RX bytes:240 acl:0 sco:0 events:12 errors:0
+~        TX bytes:492 acl:0 sco:0 commands:12 errors:0
+~        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+~        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+~        Link policy: RSWITCH HOLD SNIFF PARK
+~        Link mode: SLAVE ACCEPT
+~        Name: 'Laptop iveshall (0)'
+~        Class: 0x14010c
+~        Service Classes: Rendering
+~        Device Class: Computer, Laptop
+~        HCI Ver: 1.1 (0x1) HCI Rev: 0x33d LMP Ver: 1.1 (0x1) LMP Subver:
+0x33d
+~        Manufacturer: Cambridge Silicon Radio (10)
 
 
-		
-__________________________________ 
-Do you Yahoo!? 
-Yahoo! Mail - Easier than ever with enhanced search. Learn more.
-http://info.mail.yahoo.com/mail_250
+I should note that most everything works in principle:
+	- I can browse services of other devices using this card
+~        - I can receive browse requests from other devices
+~          (T610, Palm T3)
+~        - I can receive/send *small* data chunks (vcard, etc.)
+	- I can *not* receive/send larger data chunks (jpeg)
+~          or streams of data (PPP connection)
+
+It all breaks apart at the short packet/bcsp/etc.
+
+|
+
+- --
+Lars Vilhuber           Private:  lars.vilhuber@cloutier-vilhuber.net
+~                        Business: lars.vilhuber@cornell.edu
+~                        http://www.cloutier-vilhuber.net/
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFB/l0F/QE38DNic0YRAo4gAJ4msDfKWixpIuJiqN7GfoEvoqLxFwCg+i0w
+tzeIZ+dZJACoNOmfUGuaF1A=
+=VSrB
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
