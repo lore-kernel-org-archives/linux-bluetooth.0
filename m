@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41E694A2.8020908@gmx.net>
-From: Bernhard Gehl <bernhard.gehl@gmx.net>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Piconet problems
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-users] TDK Bluetooth PC Card
+In-Reply-To: <IA9BDQ$E5979E3A6C8D2962359721362D0B163D@libero.it>
+References: <IA9BDQ$E5979E3A6C8D2962359721362D0B163D@libero.it>
+Content-Type: text/plain
+Message-Id: <1105627179.7961.226.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,50 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Jan 2005 16:32:50 +0100
+Date: Thu, 13 Jan 2005 15:39:39 +0100
 
-Hi there,
+Hi Jers,
 
-It might be just me being stupid, but it seems I cannot figure out how 
-to get the TDK Bluetooth PC Card running - even though it's listed in 
-the compatibility list as "working".
+> hcid was not running. I've solved the inconsistency but no my problem.
+> 
+> Hi tried to create connection on slave1 side by
+> # hcitool cc <master_addr>
+> and so
+> # hcitool con
+> lists me the established connection.
 
-My system is a Debian Sarge box with the 2.6.10 kernel-image from the 
-unstable branch (not that unstable though).
+send us the outputs of "hciconfig -a" for all of your devices. And don't
+play with "hcitool cc". If you wanna test stuff then use l2test.
 
-The card as read by the cardmanager:
-   product info: "TDK", "Bluetooth PC Card", "", ""
-   manfid: 0x0105, 0x4254
+> After that, I tried to create the second connection on slave2 side by running the same command (hcitool cc <master_addr>) and I obtain the following error:
+> # Can't create connectio: input/output error.
 
-Problem number one was that this card (or the seemingly identical IBM PC 
-Card II) doesn't seem to be listed in the /etc/pcmcia/bluetooth.conf 
-that comes with the Debian-Sarge standard Bluez-package and therefore 
-the cardmanager didn't have a clue what to do with it. However I don't 
-really know how that entry in the config file is supposed to look like.
+Run "hcidump -x" as root and show us the output.
 
-I've already tried the following:
+Regards
 
-	card "TDK PCMCIA Bluetooth Card"
-	  manfid 0x0105, 0x4254
-	  version "TDK", "Bluetooth PC Card", "", ""
-	  bind "serial_cs" class "bluetooth"
+Marcel
 
-with the result of (syslog):
 
-	cardmgr[7528]: socket 0: TDK PCMCIA Bluetooth Card
-	cardmgr[7528]: executing: 'modprobe serial_cs'
-	kernel: ttyS14: detected caps 00000700 should be 00000100
-	cardmgr[7528]: executing: './bluetooth start ttyS14'
-	kernel: ttyS14 at I/O 0x1e0 (irq = 10) is a 16C950/954
-
-That brings me to problem number two: there is no /dev/ttyS14 in my 
-filesystem. I suppose "mknod" would be the suitable tool to create this 
-entry but I have no idea what parameters would be necessary.
-
-Frankly said I'm not even sure if that's the right approach to the problem.
-
-Thanks for the advice!
-Bernhard
 
 
 -------------------------------------------------------
