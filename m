@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <27251cb805010914064780a27a@mail.gmail.com>
-From: jago25_98 / ajpearce <ajpearceuk@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Issues with multiple (concurrent) rfcomm
+	connections
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <loom.20050109T210055-110@post.gmane.org>
+References: <loom.20050109T210055-110@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1105305890.8637.5.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] rfcomm -> /dev/dsp?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,16 +19,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 9 Jan 2005 22:06:36 +0000
+Date: Sun, 09 Jan 2005 22:24:50 +0100
 
-How do I use my phone as a microphone input? It has the "Voice
-gateway" bluetooth profile on channel 1, which is bound to
-/dev/rfcomm1
+Hi George,
 
-Maybe there's something in the kbluetoothd (KDE) that can help?
+> I just ran across an issue with setting up multiple rfcomm connections from a 
+> linux laptop with kernel 2.4.28-mh1 using an Anycom USB-120 dongle with Silicon 
+> Wave chipset.
+> 
+> I just tried to maintain 2 connections to 2 seperate commercial rs232 adapters 
+> (roalan wcs 232) using the socket API (test source attached). While connection 
+> setup is ok, and reconnects (e.g. after powerfail of peers) work too for a 
+> single device, running the same procedure in parallel leads to a behavor where 
+> no more sockets can be opened. It starts with a write failed to the socket (ok 
+> so far), but the following connection attempts lead to errors 16 (resource or 
+> device busy) and 11 (resource temp. unavailable) or 110 (timeout). From this 
+> state, the system does not recover and all bluez modules have to be reloaded ;-(
+> 
+> as an alternative I tried the same thing using seperate processes instead of 
+> threads or, using the rfcomm utility and cat for sending data. I always end up 
+> with the same errors.
+> 
+> I wonder whether this problem is known, or related to Silicon Wave. Could 
+> anyone try this with a CSR based system?
 
-hmm... I see there is the alsa-bluetooth project but I'm not sure how
-to use it, and not sure if it will work with my phone.
+try to reproduce it with a 2.6.10-mh1 kernel.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
