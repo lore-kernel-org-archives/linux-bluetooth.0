@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Using my linux box as an internet gateway for my
-	i-mate/xda
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mark Coetser <mark@thummb.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <000101c4b9b7$4332e860$f500000a@citadel>
-References: <000101c4b9b7$4332e860$f500000a@citadel>
-Content-Type: text/plain
-Message-Id: <1098618444.6465.1.camel@pegasus>
-Mime-Version: 1.0
+From: Florian Echtler <echtler@fs.tum.de>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <Pine.LNX.4.61.0410241307180.7693@block.bubble>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] Disabling HID Boot Protocol
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,34 +15,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 24 Oct 2004 13:47:24 +0200
+Date: Sun, 24 Oct 2004 13:11:54 +0200 (CEST)
 
-Hi Mark,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> System info
-> 
-> Debian woody
-> 
-> Uname -a
-> Linux fw1.mid 2.6.7 #1 SMP Sat Oct 23 12:41:48 SAST 2004 i686 unknown
-> 
-> dpkg -l | grep bluez
-> ii  bluez-hcidump  1.5-2          Analyses Bluetooth HCI packets
-> ii  bluez-pan      1.1rel-1       Personal area networking for Bluetooth
-> devic
-> ii  bluez-sdp      1.1-1          BlueZ Bluetooth SDP daemon and tool
-> ii  bluez-utils    2.3-1.woody.1  Utilities for controlling Bluetooth
-> devices
+Hello everyone,
 
-maybe this will work with Debian Woody, but these versions of the BlueZ
-userspace utilities are outdated. I think you should better switch to
-Debian Sarge.
+I'm using a MS Bluetooth Optical Desktop and would like to
+use the hotkeys again. I have kernel 2.6.8.1-mh1 and bluez-utils
+2.10.. According to the mailing list archives, this version of 
+hidp.ko should already support report mode, however, I couldn't
+find any description on how to enable it. I suppose it's necessary
+to pass the correct "-b <subclass>" parameter to hidd?
 
-Regards
+hcidump -x doesn't show any packets when the multimedia keys
+are pressed, so I suspect the boot protocol is still in use,
+even though hidd --show doesn't say so.
 
-Marcel
+Yours, Florian
+- -- 
+Homo homini lupus.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
 
-
+iD8DBQFBe43+7CzyshGvatgRAln5AJ0QEbSMDR4fDa2AUWgWUBeIKnKpdQCbB607
+HVIswFPgW6QRCCmQ8hFu6w4=
+=8DIS
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
