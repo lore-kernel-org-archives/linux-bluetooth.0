@@ -1,119 +1,42 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andi Kleen <ak@suse.de>
-Cc: bluez-devel@lists.sf.net, netdev@oss.sgi.com,
-   viro@parcelfarce.linux.org.uk
-In-Reply-To: <20040206050042.20a2b3b0.ak@suse.de>
-References: <20040206050042.20a2b3b0.ak@suse.de>
-Content-Type: text/plain
-Message-Id: <1076079512.2806.40.camel@pegasus>
+Return-Path: <jt@bougret.hpl.hp.com>
+Date: Thu, 5 Feb 2004 15:43:17 -0800
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Max Krasnyansky <maxk@qualcomm.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: L2CAP non-blocking socket nasty race conditions
+Message-ID: <20040205234317.GA11427@bougret.hpl.hp.com>
+Reply-To: jt@hpl.hp.com
+References: <20040205014030.GA23802@bougret.hpl.hp.com> <1075947705.2783.117.camel@pegasus> <20040205022635.GA24757@bougret.hpl.hp.com> <1075948602.2783.129.camel@pegasus> <20040205033019.GA25518@bougret.hpl.hp.com> <1075988978.2783.140.camel@pegasus> <20040205171919.GA5417@bougret.hpl.hp.com> <1076005057.2806.7.camel@pegasus> <20040205231325.GA10683@bougret.hpl.hp.com> <1076024244.2806.20.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: some bluetooth fixes
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 06 Feb 2004 15:58:32 +0100
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1076024244.2806.20.camel@pegasus>
+From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Andi,
-
-> While reading bluetooth code I noticed some bugs and potential overflows.
+On Fri, Feb 06, 2004 at 12:37:24AM +0100, Marcel Holtmann wrote:
+> Hi Jean,
 > 
-> Also I commented one ref-counting bug.
+> > 	There is one thing I don't like about your patch : you disable
+> > error checking for listening socket. I don't think it's right,
+> > especially for checking socket shutdown.
+> > 	Let's take the following scenario. Multi-threaded program, one
+> > listening l2cap socket. One thread poll/select on the socket. At some
+> > point, the second thread close the socket. I would expect the first
+> > thread to receive a POLLHUP. Note that you can do the same with a
+> > single threaded program, closing the listening socket in the signal
+> > handler.
+> > 	The attached patch is a minor modification of your patch that
+> > should fix this issue.
 > 
-> Patch against 2.6.2.
+> take a look at tcp_poll() in net/ipv4/tcp.c, because they do it the same
+> and do we really have to care about it? How does TCP handles this case?
+> 
+> Regards
+> 
+> Marcel
 
-thanks for looking at it. Same applies to 2.4, right?
+	Well, it never hurts to be on the safe side. And if you look
+at my patch, you would see that it's only a trivial change to your
+patch. Anyway, up to you...
 
-> diff -u linux-2.6.2-work32/net/bluetooth/cmtp/sock.c-o linux-2.6.2-work32/net/bluetooth/cmtp/sock.c
-> --- linux-2.6.2-work32/net/bluetooth/cmtp/sock.c-o	2004-02-05 08:09:54.000000000 +0100
-> +++ linux-2.6.2-work32/net/bluetooth/cmtp/sock.c	2004-02-05 14:57:57.000000000 +0100
-> @@ -87,8 +87,10 @@
->  		if (!nsock)
->  			return err;
->  
-> -		if (nsock->sk->sk_state != BT_CONNECTED)
-> +		if (nsock->sk->sk_state != BT_CONNECTED) { 
-> +			fput(nsock->file);
->  			return -EBADFD;
-> +		}
->  
->  		err = cmtp_add_connection(&ca, nsock);
->  		if (!err) {
-
-The same should apply to net/bluetooth/bnep/sock.c
-
-> diff -u linux-2.6.2-work32/net/bluetooth/hci_sock.c-o linux-2.6.2-work32/net/bluetooth/hci_sock.c
-> --- linux-2.6.2-work32/net/bluetooth/hci_sock.c-o	2004-02-05 08:09:54.000000000 +0100
-> +++ linux-2.6.2-work32/net/bluetooth/hci_sock.c	2004-02-05 14:57:59.000000000 +0100
-> @@ -392,6 +392,8 @@
->  
->  	skb->pkt_type = *((unsigned char *) skb->data);
->  	skb_pull(skb, 1);
-> +	/* AK: looks broken. Who guarantees that hdev doesn't go away while
-> +	   the skb is queued ? */
->  	skb->dev = (void *) hdev;
->  
->  	if (skb->pkt_type == HCI_COMMAND_PKT) {
-
-Why should hdev go away?
-
-> diff -u linux-2.6.2-work32/net/bluetooth/hci_conn.c-o linux-2.6.2-work32/net/bluetooth/hci_conn.c
-> --- linux-2.6.2-work32/net/bluetooth/hci_conn.c-o	2004-02-05 08:09:54.000000000 +0100
-> +++ linux-2.6.2-work32/net/bluetooth/hci_conn.c	2004-02-05 15:06:10.000000000 +0100
-> @@ -353,21 +353,24 @@
->  	struct hci_conn_info *ci;
->  	struct hci_dev *hdev;
->  	struct list_head *p;
-> -	int n = 0, size;
-> +	int n = 0, size, err;
->  
->  	if (copy_from_user(&req, (void *) arg, sizeof(req)))
->  		return -EFAULT;
->  
-> -	if (!(hdev = hci_dev_get(req.dev_id)))
-> -		return -ENODEV;
-> +	if (req.conn_num >= (2*PAGE_SIZE)/sizeof(struct hci_conn_info))
-> +		return -EINVAL; 
->  
->  	size = req.conn_num * sizeof(struct hci_conn_info) + sizeof(req);
->  
-> -	if (verify_area(VERIFY_WRITE, (void *)arg, size))
-> -		return -EFAULT;
-> -
->  	if (!(cl = (void *) kmalloc(size, GFP_KERNEL)))
->  		return -ENOMEM;
-> +
-> +	if (!(hdev = hci_dev_get(req.dev_id))) { 
-> +		kfree(cl);
-> +		return -ENODEV;
-> +	}
-> +
->  	ci = cl->conn_info;
->  
->  	hci_dev_lock_bh(hdev);
-
-Why 2*PAGE_SIZE in this case? What is different?
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+	Jean
