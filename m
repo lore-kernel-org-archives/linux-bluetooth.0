@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-To: <bluez-users@lists.sourceforge.net>
-Subject: AW: [Bluez-users] Re: Toshiba and BT (SuSE 9.2)
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAA6tqE7hLQa0S+aqgtmuHzUAEAAAAA@t-online.de>
+From: Michal Semler <cijoml@volny.cz>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] pand connection to XP SP2 fails
+References: <1103024795.4097.65.camel@justakiss>
+In-Reply-To: <1103024795.4097.65.camel@justakiss>
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1103024865.2143.154.camel@pegasus>
+  charset="iso-8859-2"
+Message-Id: <200412142239.17110.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +19,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 15 Dec 2004 09:33:52 +0100
+Date: Tue, 14 Dec 2004 22:39:17 +0100
 
-Hi Marcel,
-I doesn't hear anything about the problem that I described.
+Look what MS stack knows:
 
-The AP is dund related, but I'm not able to connect via dund internet.
-What's about rfcomm? Does rfcomm understand LAP or how have I to combine
-rfcomm with dund?
+http://qualweb.bluetooth.org/Template2.cfm?LinkQualified=3DQualifiedProduct=
+s&Details=3DYes&ProductID=3D956
 
-Pleas give me a hint!!!
+It should work with our pand
 
-Regards
-Peter
+Michal
 
-
+Dne =FAt 14. prosince 2004 12:46 Erwin Authried napsal(a):
+> I want to establish a pand connection to XP/SP2 with a MSI-6967 dongle.
+> I have installed the MSI driver for WinXP with SP2. The client is a
+> Laptop with a CBT100C card, Linux 2.4.22-mh7, bluez-libs+utils 2.12.
+> When I try to connect to the XP box with
+>   pand --role PANU -c <ADR>
+> Windows is asking for the Pin. After entering the correct pin, I'm
+> always getting the following pand error:
+>
+> ...
+> pand[15249]: Connecting to <ADR>
+> hcid[15183]: link_key_request (sba=3D..., dab=3D...)
+> pand[15249]: Connect to <ADR> failed. Protocol error(71)
+>
+> I'm able to connect to a PC running Bluez with the same setup.
+>
+> -Erwin
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
