@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] ms explorer for bluetooth
+Subject: Re: [Bluez-users] Socket CF adaptor, limited to 2-3KB/sec RFCOMM
+	PPP connection?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: neoclust <n1c0l4s.l3@wanadoo.fr>
+To: "Jay W. Summet" <summetj@cc.gatech.edu>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <200410140042.12450.n1c0l4s.l3@wanadoo.fr>
-References: <200410122022.30501.n1c0l4s.l3@wanadoo.fr>
-	 <200410131224.13689.n1c0l4s.l3@wanadoo.fr>
-	 <1097668334.4643.24.camel@notepaq>
-	 <200410140042.12450.n1c0l4s.l3@wanadoo.fr>
+In-Reply-To: <Pine.GSO.4.58.0410121425040.24690@gaia3.cc.gatech.edu>
+References: <Pine.GSO.4.58.0410121425040.24690@gaia3.cc.gatech.edu>
 Content-Type: text/plain
-Message-Id: <1097753159.4640.43.camel@notepaq>
+Message-Id: <1097752969.4640.40.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,40 +19,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Oct 2004 13:25:59 +0200
+Date: Thu, 14 Oct 2004 13:22:49 +0200
 
-Hi Nicholas,
+Hi Jay,
 
-> > > > I misread your email. What I think is that maybe the keyboard will only
-> > > > work if you enforce the encryption. Is this the second generation of
-> > > > the Microsoft keyboard?
-> > >
-> > > how can i know this info ?
-> >
-> > look at your box. What does it say and how does the keyboard look like?
+> I am using a Socket Compact Flash Bluetooth adaptor, (dtl1_cs module),
+> Revision F (8510-00159 F) and am able to successfully connect to my
+> Sony Ericsson T610 GSM phone over a RFCOMM interface with PPPD.
 > 
-> my mouse: http://images.ldlc.com/photosldlc/00/00/41/13/LD0000411349_1.jpg
-> my KB       : http://images.ldlc.com/photos/00/00/24/16/ME0000241663_1.jpg
-
-please do actually pictures with a digitial camera from them and publish
-that ones.
-
-> > > > Can you do a "hcitool info ..." as root to your
-> > > > keyboard?
-> > >
-> > > how can i know my <bdaddr> for my keabord  ?
-> >
-> > Press the "connect" button on the keyboard and run "hcitool scan".
+> I'm running a generic Kernel.org 2.6.7 kernel on a Mandrake 10.0
+> distribution. All of my user space tools came with the Mandrake 10.0
+> distro, hcitool reports version 2.11, hcidump reports version 1.11.
 > 
-> if i let only the keyboard pluged it doesn't work better and when i plug the 
-> mouse it ( the mouse) work directly
+> However, when I connect to my GPRS data provider, I only get 2.1 to 2.5
+> KBytes/second of transfer. If I use IrDA instead of bluetooth, I can
+> obtain the typical 5.1 to 5.6 KBytes/second transfer that I am expecting
+> from GPRS.
 > 
-> I use a mdk kernel can it be a mdk bug ?
+> My ppp "peers" configuration script is setting the /dev/rfcomm0 tty to
+> 115200, and a friend is using the same scripts, configuration, and phone
+> with a USB bluetooth adaptor and getting the 5.1 to 5.6 KBytes/second
+> transfer.
 > 
-> but i mh patches wasn't include in the kernel the mouse would not work isn't 
-> it ?
+> I believe the problem is either with the phone (unlikely) or the Socket CF
+> card and/or software link to it.
 
-As long as it is 2.6.8 or later you will have some basic HID support.
+get a Bluetooth USB dongle and test it, but I think it is a problem of
+the RFCOMM implementation with credit based flow control of your phone.
+We already saw in the past that this not working as good as it should
+work.
 
 Regards
 
