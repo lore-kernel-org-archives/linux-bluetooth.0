@@ -1,13 +1,18 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Great new site!
+Subject: Re: [Bluez-users] Config for Socket CF card
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Max Krasnyansky <maxk@qualcomm.com>
-Cc: cijoml@volny.cz, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1074796243.1707.227.camel@localhost>
-References: <200401221516.50925.cijoml@volny.cz>
-	 <1074796243.1707.227.camel@localhost>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Max Krasnyansky <maxk@qualcomm.com>, digger vermont <dv_mlist@verizon.net>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1074820370.976.166.camel@gaston>
+References: <1074566227.3670.24.camel@myrna>
+	 <1074597777.7088.2.camel@pegasus>  <1074697933.3020.19.camel@myrna>
+	 <1074698544.7088.102.camel@pegasus>  <1074749699.2573.17.camel@myrna>
+	 <1074775827.3071.1.camel@pegasus>  <1074814697.3159.3.camel@myrna>
+	 <1074816664.3071.60.camel@pegasus>  <1074818667.1733.27.camel@localhost>
+	 <1074819483.3071.79.camel@pegasus>  <1074820370.976.166.camel@gaston>
 Content-Type: text/plain
-Message-Id: <1074823391.3071.104.camel@pegasus>
+Message-Id: <1074821198.3071.84.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,20 +24,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jan 2004 03:03:11 +0100
+Date: Fri, 23 Jan 2004 02:26:38 +0100
 
-Hi Max,
+Hi Ben,
 
-> By looking at the credits link it becomes obvious that Marcel did all that.
-> He's obviously much better Web designer than I'm :).
-> And he's got bluez.org thing going and PayPal donations etc. Wow.
-> Good job Marcel.
+> Well, adding the second "l" to Russell might make him happier, though 
+> in the end, you really want the "other" Russell, that is Mr King
+> which is the serial driver author, not poor Rusty :)
 
-thanks. Maybe you want to contribute a little history abstract of the
-BlueZ project for the new site. For example the start of the project at
-Qualcomm etc. I kept your original announcement on the bluetooth-dev
-mailing list from 03 May 2001 (18:59:48 -0700, it was a Thursday) in my
-Bluetooth mailbox folder.
+of course I meant Russell King. Sorry for that confusion. Seems like I
+mixed the two entries from my addressbook ;)
 
 Regards
 
