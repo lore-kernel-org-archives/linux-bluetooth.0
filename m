@@ -12,7 +12,7 @@ References: <1086088581.40bc65850efcf@webmail.rnl.ist.utl.pt>
 	 <1086537556.4765.59.camel@pegasus>
 	 <1086538596.40c34364bec57@webmail.rnl.ist.utl.pt>
 Content-Type: text/plain
-Message-Id: <1086555166.4765.157.camel@pegasus>
+Message-Id: <1086539180.4765.89.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -24,15 +24,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 06 Jun 2004 22:52:47 +0200
+Date: Sun, 06 Jun 2004 18:26:20 +0200
 
 Hi Didier,
 
 > No, I don't use hcidump. I simply compare the array of chars passed in send()
 > with the one I receive with recv().
 
-please use read() and write() to be sure that it not a problem of send()
-or recv().
+then I really need a simple program that triggers this effect. It must
+be a kernel bug and we should solve it.
+
+Btw is there any difference when you use write() and read()?
 
 Regards
 
