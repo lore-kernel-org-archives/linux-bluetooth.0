@@ -1,58 +1,48 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <daryl@wideray.com>
+Errors-To: <daryl@wideray.com>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>, "'Max Krasnyansky'" <maxk@qualcomm.com>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Qualification Testing
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: Daryl Van Vorst <daryl@wideray.com>
-Cc: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000b01c31953$e3a50a90$1a01010a@baked>
-References: <000b01c31953$e3a50a90$1a01010a@baked>
-Content-Type: text/plain
-Message-Id: <1052834579.13864.191.camel@pegasus.local>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 13 May 2003 16:02:52 +0200
+Date: Tue, 13 May 2003 06:30:58 -0700
+Message-ID: <000b01c31953$e3a50a90$1a01010a@baked>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1052584255.1133.13.camel@pegasus.local>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Daryl,
+Marcel,
 
-> How do I get those 5 patches from the bt-2.4 repository? Or better yet:
-> Where is the bt-2.4 repository?
+How do I get those 5 patches from the bt-2.4 repository? Or better yet:
+Where is the bt-2.4 repository?
 
-you can find the repository at http://linux-bt.bkbits.net/ and you need
-to use Bitkeeper. You have to clone to repository as specified in the
-bk-kernel-howto.txt and after that you can extract each patch step by
-step.
+> Daryl, so it is now up to you to do your tests with Cetecom 
+> again and see what we pass and what we fail. The RFCOMM layer 
+> should now perform perfect, but the L2CAP config stuff will 
+> still fail. You can use 2.4.18-mh4 and apply these 5 patches 
+> from the bt-2.4 repository to it:
+> 
+> ChangeSet@1.1162, 2003-05-09 21:11:49-07:00
+>   [Bluetooth] RFCOMM must wait for MSC exchange to complete 
+> before sending the data.
+> 
+> ChangeSet@1.1161, 2003-05-09 16:41:45-07:00
+>   [Bluetooth] Detect and log error condition when first L2CAP 
+> fragment is too long.
+> 
+> ChangeSet@1.1160, 2003-05-09 11:55:22-07:00
+>   [Bluetooth] L2CAP config req/rsp handling fixes. 
+> 
+> ChangeSet@1.1126.3.2, 2003-05-09 03:22:06+02:00
+>   [Bluetooth] Handle priority bits in parameter negotiation
+> 
+> ChangeSet@1.1126.3.1, 2003-05-09 02:07:07+02:00
+>   [Bluetooth] Send the correct values in RPN response
+> 
+> Max, please go ahead and forward them to Marcelo and Linus. 
+> If you have some extra time, please update my repositories 
+> with the new stuff.
+> 
+> I will make some new -mh patches on monday or tuesday.
 
-	bk export -tpatch -du -h -r<cset>
-
-Another way is the BK->CVS thing, but I never tried it.
-
-If you have problems with Bitkeeper and you need the patches now, I can
-send them to you. The new -mh patches have to wait until I finished some
-other things.
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-Enterprise Linux Forum Conference & Expo, June 4-6, 2003, Santa Clara
-The only event dedicated to issues related to Linux enterprise solutions
-www.enterpriselinuxforum.com
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-Daryl.
