@@ -1,48 +1,177 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: Lockups (was Re: [Bluez-devel] Bluetooth kernel patch for
-	2.6.0)
-From: Edd Dumbill <edd@usefulinc.com>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1073141037.8729.47.camel@saag>
-References: <1073041104.25261.15.camel@pegasus>
-	 <1073132228.8729.39.camel@saag>  <1073141037.8729.47.camel@saag>
-Content-Type: text/plain
-Message-Id: <1073420681.27652.20.camel@saag>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 06 Jan 2004 20:24:41 +0000
+Return-Path: <t.schorpp@gmx.de>
+Message-ID: <3FFB14A5.3040803@gmx.de>
+Date: Tue, 06 Jan 2004 21:03:49 +0100
+From: "thomas.schorpp" <t.schorpp@gmx.de>
+MIME-Version: 1.0
+CC: Marcel Holtmann <marcel@holtmann.org>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] hci_acl_tx_to: hci0 ACL tx timeout, solved, kmod
+ loaded wrong ALTERNATE uhci driver by default
+References: <3FF9E3F2.4040506@gmx.de> <1073393043.2508.50.camel@pegasus>	 <3FFAB0C5.4050407@gmx.de> <1073396288.2508.72.camel@pegasus>	 <3FFABD90.1020903@gmx.de> <1073397402.2508.81.camel@pegasus> <3FFACF71.70607@gmx.de> <3FFADA5E.8050202@gmx.de>
+In-Reply-To: <3FFADA5E.8050202@gmx.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Sat, 2004-01-03 at 14:43, Edd Dumbill wrote:
-> I've also been able to repeat this by attempting multiple rfcomm
-> connections using dund, under 2.6.0-test11.  After a few
-> connect/disconnects on my Linux iBook the same lockup happened
-> (interestingly the screen jumped to full brightness at the same time.)
+hi,
 
-To keep on this: I found somebody else on IRC today who also experiences
-these lockups with 2.6 kernels, so it's not just me.
+thomas.schorpp wrote:
+> thomas.schorpp wrote:
+> 
+>> Marcel Holtmann wrote:
+>>
+>>> Hi Thomas,
+>>>
+>>>
+>>>>> This is HCI 16.4 firmware and it should work fine. Do you use the SCO
+>>>>> audio support for the HCI USB driver? If yes, disable it, because I
+>>>>> heard of problems with ISOC transfers on VIA chips if I remember
+>>>>> correctly.
+>>>>
+>>>>
+>>>>
+>>>> NO sco module loaded(?)
+>>>
+>>>
+>>>
+>>>
+>>> I am not talking about the sco module. I am talking about the SCO audio
+>>> option of the HCI USB driver. Disable it to avoid ISOC transfers.
+>>
+>>
+>>
+>> yes, ill check, i think it is disabled, wanted only pan from the 
+>> beginning, thx a lot.
+> 
+> 
+> was enabled, now disabled, no change, stalled after 2 minutes transfer:
+> 
+> Jan  6 16:38:46 TOM1 pand[4118]: New connection from 00:10:60:A5:0F:DC 
+> bnep0
+> 
+> Jan  6 16:42:37 TOM1 kernel: hci_acl_tx_to: hci0 ACL tx timeout
+> Jan  6 16:42:37 TOM1 kernel: hci_acl_tx_to: hci0 killing stalled ACL 
+> connection DC:0F:A5:60:10:00
+> 
+> trying alternate usb driver...
 
-Nobody else here having them?
-
--- Edd
+SOLVED! compile only the usb-uhci (via...) driver, ok with at least :
 
 
+00:11.1 IDE interface: VIA Technologies, Inc. VT82C586/B/686A/B PIPC Bus 
+Master IDE (rev 06) (prog-if 8a [Master SecP PriP])
+         Subsystem: VIA Technologies, Inc. VT8235 Bus Master 
+ATA133/100/66/33 IDE
+         Flags: bus master, medium devsel, latency 32, IRQ 11
+         I/O ports at d400 [size=16]
+         Capabilities: [c0] Power Management version 2
 
+00:11.2 USB Controller: VIA Technologies, Inc. USB (rev 1b) (prog-if 00 
+[UHCI])
+         Subsystem: VIA Technologies, Inc. (Wrong ID) USB Controller
+         Flags: bus master, medium devsel, latency 32, IRQ 5
+         I/O ports at d800 [size=32]
+         Capabilities: [80] Power Management version 2
 
--------------------------------------------------------
-This SF.net email is sponsored by: IBM Linux Tutorials.
-Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
-Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
-Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+00:11.3 USB Controller: VIA Technologies, Inc. USB (rev 1b) (prog-if 00 
+[UHCI])
+         Subsystem: VIA Technologies, Inc. (Wrong ID) USB Controller
+         Flags: bus master, medium devsel, latency 32, IRQ 5
+         I/O ports at dc00 [size=32]
+         Capabilities: [80] Power Management version 2
+
+00:11.4 USB Controller: VIA Technologies, Inc. USB (rev 1b) (prog-if 00 
+[UHCI])
+         Subsystem: VIA Technologies, Inc. (Wrong ID) USB Controller
+         Flags: bus master, medium devsel, latency 32, IRQ 5
+         I/O ports at e000 [size=32]
+         Capabilities: [80] Power Management version 2
+
+thx a lot,
+sorry for bothering you ;)
+
+now testing the vt6202 on the gateway, should work, via says, its 
+downwardscompatible to usb 1.1 drivers, well see.
+
+> 
+> 
+>>
+>>>
+>>>
+>>>>> Use 2.4.23-mh1 or 2.4.24-mh1.
+>>>>
+>>>>
+>>>>
+>>>> roger that. what change do you think in the changelogs should target 
+>>>> the problem?
+>>>
+>>>
+>>>
+>>>
+>>> In general nothing will help here, but I must be sure that we talk about
+>>> the same version of the Bluetooth subsystem.
+>>
+>>
+>>
+>> yes, ill try the patches IF theyre considered stable.
+>> will also try another usb driver -WARNING- do not use via vt6202 ehci 
+>> chipsets, they crashed my gatewaysystem reproducable on boot. :(
+>>
+>> but i wonder why the window$ stacks do not trigger the fault... maybe 
+>> usb... have problems with sane scanner too :)
+>>
+>>>
+>>> Regards
+>>>
+>>> Marcel
+>>>
+>>>
+>>>
+>>>
+>>> -------------------------------------------------------
+>>> This SF.net email is sponsored by: IBM Linux Tutorials.
+>>> Become an expert in LINUX or just sharpen your skills.  Sign up for 
+>>> IBM's
+>>> Free Linux Tutorials.  Learn everything from the bash shell to sys 
+>>> admin.
+>>> Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
+>>> _______________________________________________
+>>> Bluez-devel mailing list
+>>> Bluez-devel@lists.sourceforge.net
+>>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>>>
+>>>
+>>
+>> y
+>> tom
+>>
+>>
+>>
+>> -------------------------------------------------------
+>> This SF.net email is sponsored by: IBM Linux Tutorials.
+>> Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
+>> Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
+>> Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
+>> _______________________________________________
+>> Bluez-devel mailing list
+>> Bluez-devel@lists.sourceforge.net
+>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>>
+>>
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.net email is sponsored by: IBM Linux Tutorials.
+> Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
+> Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
+> Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
+> 
+
+y
+tom
