@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 To: bluez-devel@lists.sourceforge.net
 From: Sebastian Roth <sebiroth@web.de>
-Message-ID: <cv895o$2k1$1@sea.gmane.org>
-References: <4215D3EF.9010003@cmc.ca>
+Message-ID: <cv7vnn$b2i$1@sea.gmane.org>
+References: <cv4qgt$8h4$1@sea.gmane.org> <4215FC4A.20504@dark-reality.de> <cv50e9$tm3$1@sea.gmane.org> <42161CC7.1090800@dark-reality.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <4215D3EF.9010003@cmc.ca>
-Subject: [Bluez-devel] Re: Can't init device hci0, Input/output error(5)
+In-Reply-To: <42161CC7.1090800@dark-reality.de>
+Subject: [Bluez-devel] Re: mystic AT-Command
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,14 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 19 Feb 2005 21:59:54 +0100
+Date: Sat, 19 Feb 2005 19:18:49 +0100
 
-Hi Nathanael,
+Hi Lars,
 
-this is known as Marcel pointed out in the thread:
-http://thread.gmane.org/gmane.linux.bluez.user/6170
+google shows me that this AT command enables/disables voice recognition.
+So I think this behavior of the headset isn't wrong in principle. What
+do you think?
 
-Maybe this is one good point for the bluez FAQ?
+ > the check in btsco.c for AT+BVRA=1 was only added because I had no
+ > understanding why my headset sometimes used this, and sometimes the
+ > expected AT+CKPD=200 - it was because btsco sometimes used the wrong
+ > channel. Now this should not happen any more as we have (hopefully)
+ > proper channel auto-detection.
+Thanks, this explains the check!
+
+ > You can try to remove AT+BVRA=1 from btsco.c:
+Have done this already and it works! When initially asking this my idea
+was to have this change merged into the cvs.
+
+Thanks for your great help.
 
 Best regards,
 Sebastian
