@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-users] Serial connection between two Linux machines
+Subject: Re: [Bluez-users] Serial connection between two Linux machines
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Thomas.Luby@nokia.com
+To: Thomas Luby <thomas.luby@nokia.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <37AD475D23C5D0469726DD437E5971412D0D25@esebe022.ntc.nokia.com>
-References: <37AD475D23C5D0469726DD437E5971412D0D25@esebe022.ntc.nokia.com>
+In-Reply-To: <40FE8D68.9040007@nokia.com>
+References: <40FE8D68.9040007@nokia.com>
 Content-Type: text/plain
-Message-Id: <1090428620.21683.126.camel@pegasus>
+Message-Id: <1090426562.21683.119.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,22 +18,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Jul 2004 18:50:20 +0200
+Date: Wed, 21 Jul 2004 18:16:02 +0200
 
 Hi Thomas,
 
-> I have tried "rfconn connect" instead but get the same results. 
+> I have two Linux machines. I wish to connect to one from the other
+> using a terminal over Bluetooth
 > 
-> If I keep the connection open it works (using cat as you suggested) however this doesnt work if I make a getty port on the slave side
+> The problem I have is annoying because it basically works. Anyway,
+> here is the problem
 > 
-> I think the problem is on the slave side because if I connect the slave to Windows then I get the same issue. The Windows terminal disconnects after 1 "echo" or one file cat
+> Master (USB bluetooth):
 > 
-> Is there a command I can use on the slave side that keeps the port open once connected (this is what I tried with dund --persist)
+> modprobe hci_usb
+> hciconfig hci0 up
+> hciconfig
 > 
-> Are the commands OK on the slave side?
+> mknod -m 666 /dev/rfcomm0 c 216 0
+> rfcomm bind 0 00:60:57:18:FB:6E 1
+> 
+> Slave (UART bluetooth):
+> 
+> hciattach /dev/ttyS0 -s 115200 csr
+> hciconfig hci0 up
+> hcid
+> dund --persist --listen
+> sdpd
+> sdptool add SP --channel=1
+> 
+> 
+> I open a terminal on the master. A connection is present.
+> 
+> I type echo "Hello" > /dev/bluetooth/rfcomm/0
+> 
+> and on the master terminal I see "Hello"
+> 
+> And this is where the problem comes. If I repeat the echo, I get:
+> cannot create /dev/rfcomm0: No such device
+> 
+> because the connection was closed
+> 
+> I have sent huge files down the link with no problem...but when it
+> reaches the end of the file, the connection closes everytime!
+> 
+> If anyone knows what Im doing wrong I would appreciate it! I have
+> searched for 2 days now and not managed to find the solution
 
-there is no easy command to bind a listen RFCOMM channel to a TTY. You
-must write your own program that does this the same way as dund does it.
+use "rfconn connect ..." instead of "rfcomm bind ..." or keep the link
+opened with "cat /dev/rfcomm0".
 
 Regards
 
