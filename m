@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Hannes Reiff <faster10@gmx.net>
-Message-ID: <loom.20041220T180020-785@post.gmane.org>
+Subject: Re: [Bluez-users] GPRS /  pppd problem
+From: Erwin Authried <eauth@softsys.co.at>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1103323155.28046.127.camel@pegasus>
+References: <1103312469.4788.15.camel@justakiss>
+	 <1103323155.28046.127.camel@pegasus>
+Content-Type: multipart/mixed; boundary="=-mIODeDPJWpGJ1oIKwd4c"
+Message-Id: <1103555401.28429.78.camel@justakiss>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] File Transfer via Bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,20 +19,62 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 20 Dec 2004 17:08:48 +0000 (UTC)
+Date: Mon, 20 Dec 2004 16:10:01 +0100
 
-Hi All,
 
-I'm using two pcs to create a pan connection so that both have access to the
-web. No problems. But when it comes to exchange files between the the two pcs -
-what has to be done? Is it possible to establish NFS over bluetooth? (I know
-there are some threads - but no solutions).
+--=-mIODeDPJWpGJ1oIKwd4c
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Hope you can help me!
+Am Fre, den 17.12.2004 schrieb Marcel Holtmann um 23:39:
+> Hi Erwin,
+> 
+> > I'm using GPRS on a Ericsson T630 over bluetooth successfully. When I
+> > press a key on the phone to terminate the GPRS connection, pppd doesn't
+> > recognize that, however. I did a hcidump to see what happens after the
+> > key has been pressed on the phone (see below). Any ideas if there's a
+> > way to signal pppd that the GPRS connection has been terminated? The
+> > pppd debug log doesn't show any activity in that case.
+> 
+> get the full dump or run it with --psm=3 to enable RFCOMM decoding.
+> 
+> Regards
+> 
+> Marcel
+> 
+Hi Marcel,
+the dump with "hcidump --psm=3 -X" after canceling the GPRS connection
+on the phone:
 
-Thanks,
+Regards,
+Erwin
 
-Hannes
+
+--=-mIODeDPJWpGJ1oIKwd4c
+Content-Disposition: attachment; filename=dump
+Content-Type: text/plain; name=dump; charset=iso-8859-1
+Content-Transfer-Encoding: 7bit
+
+
+> ACL data: handle 0x0029 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0040 len 9 [psm 3]
+      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 0 len 4
+< ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0094 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 1 len 2
+> ACL data: handle 0x0029 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0040 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  0000: 01 29 00 01 00                                    .)...
+> ACL data: handle 0x0029 flags 0x02 dlen 16
+    L2CAP(d): cid 0x0040 len 12 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 6 fcs 0x5c credits 0
+      0000: 0d 0a 4f 4b 0d 0a  
+
+--=-mIODeDPJWpGJ1oIKwd4c--
 
 
 
