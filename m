@@ -1,56 +1,66 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: =?iso-8859-1?Q?J=E9r=F4me_Stadelmann?= <jerome.stadelmann@hta-bi.bfh.ch>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <000a01c3dffa$0e58e230$2d105793@N64101>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-devel] Audio to headset
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Jan 2004 09:39:17 +0100
+Return-Path: <strikewing16th@hotmail.com>
+From: "Anthony Yulo" <strikewing16th@hotmail.com>
+To: marcel@holtmann.org
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] rfcomm error message?
+Date: Wed, 21 Jan 2004 08:32:20 +0000
+Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Message-ID: <Law11-F41C9IHzQL9P30004988b@hotmail.com>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
 
-Hello everybody,
+Hey Marcel,
 
-I'm actually working on a diploma project with bluetooth and audio. I =
-have
-an Anycom Bluetooth USB adapter and an Ericsson HBH-15 headset. I would =
-use
-first the hstest example in order to send some music to the headset but =
-it
-doesn't work. I only hear some noise but no music.
+sorry, i didn't know i'm sending html, because i'm sending the previous 
+emails using Outlook express, maybe i have to set it to send text only...
+sorry..:)
 
-Is this command correct ? "hstest play music.mp3 xx:xx:xx:xx:xx:xx"
+well, im just testing with the rfcomm program to see if i can connect to the 
+linux box with a smartphone.. i didn't read the source of rfcomm that much, 
+so im asking if i can still make a bluetooth program thru RFCOMM, without 
+the TTY support?..
 
-I have mpg123 and sox installed,
-scoinfo return PSKEY_HOSTIO_MAP_SCO_PCM: 0x00,
-voice setting is 0x0060.
+how do i set the kernel options CONFIG_BLUEZ_RFCOMM_TTY? The only way i know 
+how to set it is thru recompiling the kernel.. i.e. "make xconfig"... other 
+ways to do it?
 
-The pin works and I receive back from the headset the AT commands =
-(AT+VGS=3D11
-and AT+CKPD=3D200) but I only hear some noise.
+sorry :) hehe im just starting bluetooth programming, and i know very little 
+on the kernel...
 
-Could somebody please help me in this?
+regards,
 
-Jerome
+Anton
 
+>
+>Hi Anthony,
+>
+>first, can you please send text only emails. There is no reason to send
+>HTML emails to a mailing list and I tend to delete emails with a blue
+>background without reading them. Thanks.
+>
+> > i tried using the rfcomm program to test for connections between
+> > cellphone and linux pc...
+> >
+> > anton@maverick home]rfcomm -i hci0 listen 2
+> > Waiting for connection on channel 1
+> >
+> > ...when i try to connect the smartphone the program returns and
+> > outputs the error message:
+> >
+> > "can't create RFCOMM TTY: Operation not supported"
+> >
+> > whats wrong with this? do i have to set some configuration files?
+>
+>your kernel is compiled without RFCOMM TTY support. Set the kernel
+>option CONFIG_BLUEZ_RFCOMM_TTY.
+>
+>Regards
+>
+>Marcel
+>
+>
 
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+_________________________________________________________________
+MSN 8 helps eliminate e-mail viruses. Get 2 months FREE*. 
+http://join.msn.com/?page=features/virus
