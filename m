@@ -1,38 +1,69 @@
-Return-Path: <noring@nocrew.org>
-Subject: Re: [Bluez-devel] D-Bus interfaces
-From: Fredrik Noring <noring@nocrew.org>
-To: Philip Blundell <pb@nexus.co.uk>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-   Fred Sch??ttgen <bluez-devel@schaettgen.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1077064144.685.16.camel@dixie.nexus.co.uk>
-References: <1076265358.2670.36.camel@pegasus>
-	 <1076278554.14742.112.camel@akka.yeti.nocrew.org>
-	 <1076279508.6869.54.camel@pegasus>
-	 <200402090015.24318.bluez-devel@schaettgen.de>
-	 <20040216144615.GA318@nexus.co.uk> <1076945776.17824.6.camel@merlin>
-	 <20040216154155.GB32285@nexus.co.uk>  <1077058771.2665.134.camel@pegasus>
-	 <1077061102.685.0.camel@dixie.nexus.co.uk>
-	 <1077061494.2665.148.camel@pegasus>
-	 <1077061750.685.3.camel@dixie.nexus.co.uk>
-	 <1077062239.2665.153.camel@pegasus>
-	 <1077062886.685.8.camel@dixie.nexus.co.uk>
-	 <1077063432.2665.165.camel@pegasus>
-	 <1077064144.685.16.camel@dixie.nexus.co.uk>
-Content-Type: text/plain
-Message-Id: <1077206112.20897.156.camel@kalkyl.roxen.com>
-Mime-Version: 1.0
-Date: Thu, 19 Feb 2004 16:55:12 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Fred =?utf-8?q?Sch=C3=A4ttgen?= <bluez-devel@schaettgen.de>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] sco link help needed
+References: <4034CA08.50500@soft.uni-linz.ac.at>
+In-Reply-To: <4034CA08.50500@soft.uni-linz.ac.at>
+Cc: Simon Vogl <vogl@soft.uni-linz.ac.at>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200402191629.38846.bluez-devel@schaettgen.de>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 19 Feb 2004 16:29:38 +0100
 
-Hi Philip
+On Thursday 19 February 2004 15:36, Simon Vogl wrote:
+> Hi,
+> I desparately need some help with audio links:
+> I have written two small programs that use my pc to emulate a headset
+> and a handsfree device. Both work quite nicely, the rfcomm-based
+> initialization takes place, and I get an SCO connection, but mysteriously,
+> I don't get a single byte of audio data (I don't see it with hcidump
+> neither).
+>
+> my setup:
+> * Acer usb bluetooth dongle
+> * test phones used: p800 (headset), p6600/ngage/3650 (handsfree) with no
+> luck... * kernel 2.4.23
+> * bluez utils&lib from cvs
+> * and yes, i did register hset profile via sdptool....
+>
+> I had the program running perfectly already with a T68i....
+> Any help appreciated heavily (for example a traace of a successful
+> connection...), Simon
 
-ons 2004-02-18 klockan 01.29 skrev Philip Blundell:
-> I agree that it's just a name, but I don't think it's necessarily
-> appropriate for us to use the Bluetooth name just because that's the
-> underlying technology.
+I wrote a small handsfree application as a part of the KDE Bluetooth 
+Framework. It basically worked, even though it had problems with an ever 
+increasing lag, which has probably nothing to do with bluez. But at the 
+moment it's broken and it's not very high priority, since my microphone is 
+also broken ;)
+But you might take a look at it.. it's in kdeextragear-3:
+http://webcvs.kde.org/cgi-bin/cvsweb.cgi/kdeextragear-3/kdebluetooth/handsfree/
+I'll try to fix it during the next days.
 
-I too had this discussion with Marcel on this list a week ago and I
-agree with you: "org.bluez" appears to be the proper D-Bus prefix.
+Btw. I'm not sure if the sound doesn't work currently because of a kernel 
+problem. Maybe I should try with an older kernel.. It used to work with 
+2.4.24 if I remember correctly.
 
-Fredrik
+greetings
+Fred
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
