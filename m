@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] starting hcid
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200412050059.34530.pavouk@pavouk.org>
-References: <200412050059.34530.pavouk@pavouk.org>
-Content-Type: text/plain
-Message-Id: <1102224599.8510.10.camel@pegasus>
-Mime-Version: 1.0
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] managing pairing
+References: <200412030025.02336.wim.delvaux@adaptiveplanet.com> <200412050159.55909.bluez-user@schaettgen.de>
+In-Reply-To: <200412050159.55909.bluez-user@schaettgen.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200412050236.17227.wim.delvaux@adaptiveplanet.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,31 +19,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 05 Dec 2004 06:29:59 +0100
+Date: Sun, 5 Dec 2004 02:36:16 +0100
 
-Hi Pavel,
+On Sunday 05 December 2004 01:59, Fred Schaettgen wrote:
+> On Friday 03 December 2004 00:25, wim delvaux wrote:
+> > another question.  I suppose the link_key file can contain link keys to
+> > multiple remove BT devices (e.g a USB BT dongle and a BT Phone)
+> >
+> > I also presume that each link_key is associated to the bdaddress of the
+> > remote device it relates to.
+> >
+> > 1. can the link_key file be browsed to find all the devices a link_key
+> > exists for
+> >
+> > 2. can one 'remove' one such record from the link_key file and assume
+> > that the pairing will retry once removed (much like removing the link_key
+> > file completely)
+>
+> Just for the record and for the KDE users out there:
+> The KDE Bluetooth Framework just got it's own link key management tool a
+> few minutes ago, so you can see and remove any paired device without using
+> a hex editor or deleting the whole link key file now. I just wonder why no
+> one seemed to miss something like that the whole time.
 
-> I have problem, that hcid cannot be started from startup-script
-> or manually.
-> It says:
-> -------------
-> hcid[4760]: Bluetooth HCI daemon
-> Failed to open connection to system message bus: Failed to connect to 
-> socket /var/run/dbus/system_dbus_socket: No such file or directory
-> hcid[4760]: Unable to get on D-BUS
-> --------------
-> I use vanilla-kernel 2.6.9 and hcid 2.10.
-> 
-> What can be wrong?
+opie has it now too ;-)
 
-you have to choices. Install D-Bus and start it or compile bluez-utils
-without D-Bus support.
-
-Regards
-
-Marcel
-
-
+However i think that for safety one should start/stop the hcid because it 
+'could' open the link_key file while one is rewriting it
+>
+> regards
+> Fred
 
 
 -------------------------------------------------------
