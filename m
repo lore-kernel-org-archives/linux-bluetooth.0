@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] apple wireless mouse on apple ibook (g4, builtin
-	usb)
+Subject: Re: [Bluez-users] rfcomm: permission denied
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Sunnan <sunnan@handgranat.org>
+To: "Zbigniew Diaczyszyn (gmx)" <z.dia@gmx.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <402D4959.10704@handgranat.org>
-References: <402D07B8.8030504@handgranat.org>
-	 <1076694675.2671.191.camel@pegasus>  <402D1E8C.6020301@handgranat.org>
-	 <1076702197.18588.11.camel@pegasus>  <402D381D.1000306@handgranat.org>
-	 <1076709007.18588.39.camel@pegasus>  <402D4959.10704@handgranat.org>
+In-Reply-To: <000201c3f27d$66d8e4b0$124db850@ULLA>
+References: <000201c3f27d$66d8e4b0$124db850@ULLA>
 Content-Type: text/plain
-Message-Id: <1076711341.18588.57.camel@pegasus>
+Message-Id: <1076710573.18588.43.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -22,32 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 23:29:01 +0100
+Date: Fri, 13 Feb 2004 23:16:13 +0100
 
-Hi Sunnan,
+Hi Zbigniew,
 
-> slowstorm/home/sunnan/.dl/mouseemu% sudo /sbin/hciconfig -a
-> hci0:   Type: USB
->          BD Address: 00:0D:93:04:19:15 ACL MTU: 192:8  SCO MTU: 64:8
->          UP RUNNING PSCAN ISCAN
->          RX bytes:593 acl:2 sco:0 events:40 errors:0
->          TX bytes:670 acl:2 sco:0 commands:28 errors:0
->          Features: 0xff 0xff 0x0f 0x00 0x18 0x18 0x00 0x00
->          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->          Link policy: RSWITCH HOLD SNIFF PARK
->          Link mode: SLAVE ACCEPT
->          Name: 'slowstorm-0'
->          Class: 0x000100
->          Service Classes: Unspecified
->          Device Class: Computer, Uncategorized
->          HCI Ver: 1.1 (0x1) HCI Rev: 0x385 LMP Ver: 1.1 (0x1) LMP 
-> Subver: 0x385
->          Manufacturer: Cambridge Silicon Radio (10)
+> I have compiled hcidump on my system (suse 8.2), but hcidump seems to have crashed down. I had to terminate the process with Ctrl-C:
+> 
+> linux:~ # hcidump -w info.txt
+> HCIDump - HCI packet analyzer ver 1.5
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> 
+> Is this a hardware problem or a wrong compilation of hcidump?
 
-this looks much better now. Your laptop contains a CSR chip with the
-Bluetooth 1.2 AFH feature. Very nice.
-
-Do you got your mouse working?
+no, everything works fine. Terminate it with CTRL-C and send us the
+dump.
 
 Regards
 
