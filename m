@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] get remote bt address
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de4657604122303546f813ecf@mail.gmail.com>
-References: <2de4657604122303546f813ecf@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1103803109.20258.79.camel@pegasus>
+Message-ID: <2de4657604122303546f813ecf@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] get remote bt address
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +16,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Dec 2004 12:58:29 +0100
+Date: Thu, 23 Dec 2004 17:24:03 +0530
 
-Hi Manjunath,
+Hi marcel,
+I am using l2cap sockets. On the receiving side, i want to find out
+the remote (sender's) bluetooth address. i do not have the dev_id or
+handle of the sender which has already established a connection. I
+want to get it in my c code, not using hcitool con or other means.
+I am trying getpeername, but it doesn't seem to work. Hope you can
+suggest something.
 
-> I am using l2cap sockets. On the receiving side, i want to find out
-> the remote (sender's) bluetooth address. i do not have the dev_id or
-> handle of the sender which has already established a connection. I
-> want to get it in my c code, not using hcitool con or other means.
-> I am trying getpeername, but it doesn't seem to work. Hope you can
-> suggest something.
-
-the getpeername() is the right function and it works. If not, then your
-code is wrong.
-
-Regards
-
-Marcel
-
-
+Thanx,
+Regards,
+Manjunath
 
 
 -------------------------------------------------------
