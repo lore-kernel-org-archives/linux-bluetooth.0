@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT test mode operation
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de4657604112410314e3c5140@mail.gmail.com>
-References: <2de46576041124081140dc74b7@mail.gmail.com>
-	 <1101314675.27351.126.camel@pegasus>
-	 <2de4657604112410314e3c5140@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1101323169.7538.1.camel@pegasus>
-Mime-Version: 1.0
+From: Andrew de Quincey <adq_dvb@lidskialf.net>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200411241854.13007.adq_dvb@lidskialf.net>
+Subject: [Bluez-users] rfcomm problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,29 +17,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 Nov 2004 20:06:09 +0100
+Date: Wed, 24 Nov 2004 18:54:12 +0000
 
-Hi Manjunath,
+Hi, I'm using linux kernel 2.6.9, gentoo, bluez-utils/libs 2.10.
+I have a Nokia 3650, with firmware 3.16.
 
-> 1> So, i might have to generate hci cmds with correct opcodes for my
-> BT dongles to communicate....I'll try and experiment a little bit. Has
-> any work taken place on this front??
+I've initially been just trying to connect to the phone using rfcomm...
 
-actually using "hcitool cmd ..." is very easy.
+rfcomm connect 0 MACADDR 1
 
-> 2> the BT tester i was talking about is more of a RF tester as given
-> in this link http://www.elsinco.com/wi_blue.htm
-> So my question again is ...does a CATC trainer also accomodate the
-> features of the product given  in the above link.
+this works - I get the "Press Ctrl-C to hangup" and /dev/rfcomm0 appears 
+(using udev BTW).
 
-I don't think so, but how should I know. I am not a RF expert. May you
-should simply ask the CATC sales staff.
+I then try to use minicom on /dev/rfcomm0. It opens it OK, but nothing 
+happens... I mean, I send AT commands at it, but I get no response. Do I have 
+to use a certain set of serial port settings (I've tried quite a few)?
 
-Regards
+I also tried running hcidump whilst typing stuff in minicom - nothing was 
+logged.
 
-Marcel
-
-
+What am I missing?
 
 
 -------------------------------------------------------
