@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] rfcomm receive problem and success
+Subject: Re: [Bluez-devel] Strange answer from HCI
 From: Marcel Holtmann <marcel@holtmann.org>
-To: franz keuner <franz_keuner@gmx.net>
+To: zubiwat <zubiwat@poczta.onet.pl>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <18344.1080206436@www52.gmx.net>
-References: <1080129568.2515.100.camel@pegasus>
-	 <18344.1080206436@www52.gmx.net>
+In-Reply-To: <000a01c41299$f48241d0$fcca010a@lysydziadek>
+References: <000a01c41299$f48241d0$fcca010a@lysydziadek>
 Content-Type: text/plain
-Message-Id: <1080259105.2283.65.camel@pegasus>
+Message-Id: <1080258434.2283.52.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,28 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Mar 2004 00:58:25 +0100
+Date: Fri, 26 Mar 2004 00:47:14 +0100
 
-Hi Franz,
+Hi Maciej,
 
-> that's maybe a stupid question:
-> but why is there a error message if the bytes are received?
+> I'm programming a microchip to work with BT and when I send some bits
+> I get in the answer sth like this: 04 10 01 FE.
+> If someone knows what it means I would be greatfull for some help.
+> How to set parameteres like pscan or read BD ADDR by sending bits to
+> BT dongle. Does any one knows what bits are coresponding to what
+> commends while setting parameteres of BT because I know bits for
+> transmition from Specification.
 
-actually these is a test program and not for normal use. Maybe the code
-is simply wrong. I never checked it and I don't really care. If you
-fixed it, send me a patch.
+it is all in the Bluetooth HCI specification. You should really read and
+understand it. Your bytes mean
 
-> when i use the dump function i can work in my program with the data sended
-> by the phone and no error.
-> 
-> when i try to use the receive function there's this error.
-> 
-> is the fault on the phone side and what can i do about it?
-> does the receive function needs any additional information compared to the
-> dump(read) function?
+	HCI event, hardware error, error code 0xfe
 
-Compare the code of the recv and the dump functions and check what
-happens. Look at it with hcidump to see if it is really an error.
+The error codes are vendor specific, so I don't know what 0xfe means.
 
 Regards
 
