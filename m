@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Message-id: <8d7248bf39.8bf398d724@estudiants.urv.es>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Subject: [Bluez-users] rfcomm connection refused / Host is down  (Again)
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C4169F.F7C9E06F"
+Message-ID: <E65CD2CAB74C80498703D6EF7624BB4C4ACABC@zmaex.zma.zoran.com>
+From: "Lan Zhang" <Lan.Zhang@Zoran.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] About Ipaq and Nokia phone
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,49 +16,171 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 31 Mar 2004 00:02:37 +0200
+Date: Tue, 30 Mar 2004 16:42:58 -0500
 
-Hi!
+This is a multi-part message in MIME format.
 
-I'm using the BlueZ stack in kernel 2.4.24, and I've got an usb dongle and I try to connect to an RS232-bluetooth attached to a robot's serial port.
+------_=_NextPart_001_01C4169F.F7C9E06F
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-So, I do hciconfig and I get
-hci0:
-Type: USB
-BD Address: 00:0A:3A:50:20:15 ACL MTU: 192:8  SCO
-MTU: 64:8
-UP RUNNING PSCAN ISCAN 
-RX bytes:8280 acl:233 sco:0 events:233 errors:0
-TX bytes:3096 acl:93 sco:0 commands:45 errors:0
+Hi,=20
+
+=20
+
+I have an ipaq and Nokia 3650 phone; I try to use both of them with my
+linux box. I download bluez packet and obex packet, before I make any
+connect or pair, both of them can find my linux, and each of them can
+setup a connection with the linux Bluetooth. But they cannot work
+together. The problem is the Nokia phone cannot find the Bluetooth
+device after the ipaq connected to LAN access point. Before the ipaq
+connect to LAN access over ppp, the phone can find my linux Bluetooth
+device, and it can use the sdp service which provided. But after the
+ipaq connected to the linux; the phone will not able to look this
+Bluetooth device anymore. I didn't try to pair these two; I just try to
+search the Bluetooth around the phone. And if I disconnect the ipaq,
+then the phone can find it again. So dose it support multiple
+connections?=20
+
+=20
+
+Thanks a lot.=20
+
+=20
+
+Regards,=20
+
+Lan Zhang
+
+=20
+
+=20
+
+=20
+
+=20
 
 
-When I do an hcitool -i hci0 inq, I can find the RS232 adapter, but on doing
+------_=_NextPart_001_01C4169F.F7C9E06F
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-rfcomm -i hci0 connect /dev/rfcomm0 00:c0:1B:05:C8:2A 1
+<html>
 
-I get a message with:
- Can't connect RFCOMM socket: Connection refused
-or either:
- Can't connect RFCOMM socket: Host is down
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii">
+<meta name=3DGenerator content=3D"Microsoft Word 10 (filtered)">
 
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
 
-Tom Chiverton asked if were the devices already paired.What do I need to do to pair the devices?
+</head>
 
-Oh! one more thing, if I do 
+<body lang=3DEN-US link=3Dblue vlink=3Dpurple>
 
-rfcomm -i hci0 bind /dev/rfcomm0 00:c0:1B:05:C8:2A 1
+<div class=3DSection1>
 
-The two devices get binded, but I'm still not capable to connect them!!!!
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Hi, </span></font></p>
 
-Can you help me??
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>&nbsp;</span></font></p>
 
-Tank you!!!!!!
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>I have an ipaq and Nokia 3650 phone; I try to use =
+both of
+them with my linux box. I download bluez packet and obex packet, before =
+I make
+any connect or pair, both of them can find my linux, and each of them =
+can setup
+a connection with the linux Bluetooth. But they cannot work together. =
+The
+problem is the Nokia phone cannot find the Bluetooth device after the =
+ipaq
+connected to LAN access point. Before the ipaq connect to LAN access =
+over ppp,
+the phone can find my linux Bluetooth device, and it can use the sdp =
+service
+which provided. But after the ipaq connected to the linux; the phone =
+will not
+able to look this Bluetooth device anymore. I didn&#8217;t try to pair =
+these
+two; I just try to search the Bluetooth around the phone. And if I =
+disconnect
+the ipaq, then the phone can find it again. So dose it support multiple
+connections? </span></font></p>
 
-Albert
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>&nbsp;</span></font></p>
 
-Thank you 
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Thanks a lot. </span></font></p>
 
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>&nbsp;</span></font></p>
 
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>Regards,&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Lan Zhang</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>&nbsp;</span></font></p>
+
+</div>
+
+</body>
+
+</html>
+=00
+------_=_NextPart_001_01C4169F.F7C9E06F--
 
 
 -------------------------------------------------------
