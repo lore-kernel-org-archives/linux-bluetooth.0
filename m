@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] BC Flag in HCI ACL Data PACket.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: Aarti Kumar <akmr2000@yahoo.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040528141127.24199.qmail@web51304.mail.yahoo.com>
+References: <20040528141127.24199.qmail@web51304.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1085900700.12117.106.camel@pegasus>
+Message-Id: <1085773175.4516.6.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Thoughts about AVDTP support
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,43 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 30 May 2004 09:05:00 +0200
+Date: Fri, 28 May 2004 21:39:35 +0200
 
-Hi Folks,
+Hi Aarti,
 
-I think one of the next major goals of BlueZ should be the support of
-the Audio/Video Distribution Transport Protocol (AVDTP). So I spent some
-time in reading the protocol specification. The specification is very
-complex and I think most of the products will only support the basic
-mode with signal and media channel. However it took me some time to
-realize that they are using multiple L2CAP channels between two devices
-with the same PSM. I never thought that this was possible, but our L2CAP
-core already supports such configuration. Now I asked myself, why HID
-and HCRP needed two different PSM values?
+> I am doing some performance relatedd work over
+> bluetooth and I need to use the BC (Broadcast Control)
+> Flag in HCI ACL Data packet. The packet format
+> specifies 12 bits of connection handle and 2 bits each
+> of Packet Boudary Flag and BC Flag. I set the BC flag
+> to a value before sending (that is in function
+> hci_send_acl in hci_core.c) and have changed the
+> receiver function hci_acldata_packet function (in
+> hci_core.c) to recognize the value. But somehow it
+> dosent work. I was looking through the code for hci
+> and bcsp layer but couldnt locate anything related to
+> Flag field embeded in connection handle value. Are you
+> aware of any function which checks the Flag value in
+> HCI ACL data packet header after hci_send_acl function
+> (at sender side)and before hci_acldata_function (at
+> receiver side). Or anyother way so that I can use the
+> BC flag field.
 
-To be capable of handling multiple audio and video streams nicely, I
-think we need to implement AVDTP as a kernel module. In that case we can
-make use of two different interfaces to AVDTP. One for the A2DP support
-that is directly connected to ALSA and the second should be a simple
-socket interface. I am no audio/video streaming expert, so what socket
-type is the best for this case?
-
-Before I start writing any source code, I would like to get my hands on
-a product that already uses AVDTP. I need to know what parts of this
-protocol are in use and how they handle it. Searching for an end user
-product I found one from Air2U (www.air2u.com.tw). The german reseller
-is Aiptek and they call it BT MusiCool 300
-
-	http://www.aiptek.de/index.php?mapid=31&katid1=4&detailid=11
-
-I asked them to donate one of these to me, but they said no. Actually
-not a nice company. Searching a little bit more I found out that Amazon
-is selling it for 99 EUR. This is fair price for two Bluetooth devices
-(SNK and SRC), but I decided not to buy them. My conclusion was that if
-I should really start working on AVDTP, someone else should buy me an
-end user device for testing any of my code. However there is always the
-possibility to donate money (www.bluez.org/sponsors.html) which I can
-use to buy unsupported hardware.
+show me your code modifications and explain what you are trying to
+achieve. I am not sure how the BC flag can help you.
 
 Regards
 
