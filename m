@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <IAMCRI$22F218423567355D825477FD83475F70@libero.it>
+Message-ID: <41EFB84B.8070403@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-From: "andi.c@libero.it" <andi.c@libero.it>
-To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] how compile kernel modules
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] BlueZ rfcomm channel
+References: <20050120142851.72c326f4@CleverSophie>
+In-Reply-To: <20050120142851.72c326f4@CleverSophie>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,21 +18,78 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 15:11:42 +0100
+Date: Thu, 20 Jan 2005 14:55:23 +0100
 
-Hello,
-i simple question: how can i compile a custom set of bluez-module=
-s ?
-I ve the source code , from linux 2.4.19 kernel (i need them for tha=
-t version),
-but in
-the net\bluetooth\ there is no "configure" file. Can=
- someone tell me the
-commands to use ? =0A=0A=0A=0A_____________________=
-_______________________________________=0A6X velocizzare la tua navigazio=
-ne a 56k? 6X Web Accelerator di Libero!=0AScaricalo su INTERNET GRATIS 6X=
- http://www.libero.it=0A
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
+# Bj=F6rn Specht # wrote:
+| Hi guys,
+|
+| I am working on BlueZ for a few days now and it is hard to start
+working with it for me. I want to write a program (Client/Server) in C
+which uses the rfcomm socket and I want to use a channel to transfer
+data between these two computers.
+| The HCI_inquiry function is running and finds the other PC. How can I
+establish a connection between these two computers with the rfcomm socket=
+s?
+
+have a look at the example programs. it should be something like:
+
+(this is for connection to a headset with rfcomm, but it should be
+similar. There are other examples in bluez-tools, if I'm not mistaken.
+
+static int rfcomm_connect(bdaddr_t * src, bdaddr_t * dst, uint8_t channel=
+)
+{
+~        struct sockaddr_rc addr;
+~        int s;
+
+~        if ((s =3D socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < =
+0) {
+~                return -1;
+~        }
+
+~        memset(&addr, 0, sizeof(addr));
+~        addr.rc_family =3D AF_BLUETOOTH;
+~        bacpy(&addr.rc_bdaddr, src);
+~        addr.rc_channel =3D 0;
+~        if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+~                close(s);
+~                return -1;
+~        }
+
+~        memset(&addr, 0, sizeof(addr));
+~        addr.rc_family =3D AF_BLUETOOTH;
+~        bacpy(&addr.rc_bdaddr, dst);
+~        addr.rc_channel =3D channel;
+~        if (connect(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+~                close(s);
+~                return -1;
+~        }
+
+~        return s;
+}
+
+have fun,
+~  Lars
+
+
+- --
+Lars Grunewaldt
+* software development
+* multimedia design
+skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+web: http://www.dark-reality.de
+mail: lgw@dark-reality.de
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFB77hLQWC6DTWkDAoRAqv0AJoCI5XuhYrqFGAM9qvqmbJr/VEQawCcD0uj
+34s/2fQhdoiN+maE7liaH2M=3D
+=3DPhyO
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
