@@ -1,67 +1,72 @@
-Return-Path: <zhikui.chen@po.uni-stuttgart.de>
-Message-ID: <40E40A44.60008@po.uni-stuttgart.de>
-Date: Thu, 01 Jul 2004 14:57:40 +0200
-From: Zhikui Chen <zhikui.chen@po.uni-stuttgart.de>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <20040701105513.10755.qmail@web90102.mail.scd.yahoo.com>
+From: karthik bala guru <bluekarthik@yahoo.com>
+To: karthik bala guru <bluekarthik@yahoo.com>,
+   Charles Bueche <charles@bueche.ch>, cijoml@volny.cz
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <20040625080734.28606.qmail@web90108.mail.scd.yahoo.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: bluez-users <bluez-users@lists.sourceforge.net>
-Subject: Re: Help for bluez-bluefw-1.0.
-References: <40E40440.8070109@po.uni-stuttgart.de> <1088685238.4540.190.camel@pegasus>
-In-Reply-To: <1088685238.4540.190.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] XHTML Parser and Generator Tools
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 1 Jul 2004 03:55:13 -0700 (PDT)
 
-Thanks. Whats bluez modules will be needed for 2.6.7?
+Hi,
+Has anyone come across / used a XHTML Parser generator
+tool in Opensource community developed in C ?
+Do Kindly post the link / tool name .
 
- Bluetooth I will use is USB dongle ePox and the courrent kernel is 2.6.7.
-I configured 2.6.7 kernel and built it. and built bluez stuffs: hcidump, 
-hciemu, libs2.7, pan1.1, utils2.7
-And I modified /etc/modules.conf by adding lines:
-alias bt-proto-0 l2cap
-alias net-pf-31 bluez
-alias bt-proto-2 sco
-alias bt-proto-3 rfcomm
-alias bt-proto-4 bnep
-alais char-major-10-250 hci_uhci
+I saw Amaya but it is big and will consume time
+to get just the XHTML Parser / Generator from it.
 
-BUT:
-For my redhat 8 (my notebook PCG 2600TEK only can be installed redhat 8, 
-redhat 9 and mandrake 9.2 could not be install), hciconfig could not be 
-found, and using locate hciconfig, there is output. Marcel could tell me 
-the reason and how should I do?
-For my redhat 9 (my PC), hciconfig reports that Can't open HCI socket, 
-Address family not surport by protocol, but for 2.4.25, it is ok. Would 
-you like to tell me, whta sould I do? I want to build a bluetooth 
-connection betweent my pc and my notebook. The both bluetooth drivers 
-are BT-DG03 (USB ePOX).
+1) GENX is XML Parser and No XHTML Parser / Generator
+tool
+developed using GENX by GENX till now.
 
-Thanks a lot.
+2) EXPAT doesnt provide a opensource XHTML Parser /
+Generator till today.
 
-Zhikui
+3) X-Smiles is simple and good but Java Based .
 
-Marcel Holtmann wrote:
+4) LibXml is also a library and no XHTML parser /
+Generator Tool by them in opensource till today.
 
->Hi Zhikui,
->
->  
->
->>I have download bluez-bluefw-1.0 source code for Redhat 8 and 9, and 
->>extracted the gziped file. But ./configure outputs "configure error : 
->>Linux kernel source not found in /usr/src/linux", who can tell me why 
->>and how to the next step? And tried to install bluez-bluefw-1.0.rpm, I 
->>was told cannot open packages database in /var/lib/rpm and I am sure I 
->>am root login.
->>    
->>
->
->for what driver do you need bluefw? If you use a 2.6.7 kernel then there
->is no need to use bluefw.
->
->Regards
->
->Marcel
->
->
->
->  
->
+Has Someone got a simple setup with just
+the XHTML Parser and Generator alone developed in C 
+available in OpenSource 
+or 
+Atleast a tool Develped Using the above library tools 
+available in Open source for XHTML Parsing and 
+Generation ?
+
+Kindly let me know And Do Give me your link.
+
+Thanks & Regards,
+karthik bala guru
+
+
+		
+__________________________________
+Do you Yahoo!?
+New and Improved Yahoo! Mail - Send 10MB messages!
+http://promotions.yahoo.com/new_mail 
+
+
+-------------------------------------------------------
+This SF.Net email sponsored by Black Hat Briefings & Training.
+Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
+digital self defense, top technical experts, no vendor pitches, 
+unmatched networking opportunities. Visit www.blackhat.com
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
