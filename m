@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] cups (non)printing
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Nelson Hogg <nhogg@whoi.edu>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <408FDFFD.2090904@whoi.edu>
-References: <408FDFFD.2090904@whoi.edu>
-Content-Type: text/plain
-Message-Id: <1083172830.4000.52.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <408FDFFD.2090904@whoi.edu>
+From: Nelson Hogg <nhogg@whoi.edu>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] cups (non)printing
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,30 +15,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Apr 2004 19:20:30 +0200
+Date: Wed, 28 Apr 2004 12:46:53 -0400
 
-Hi Nelson,
-
-> I have a canon i80 printer equipped with a bluetooth receiver which 
-> prints properly under cups and a usb connection. I've compiled the 
-> cups-bluetooth package and transfered the 2 files manually to their 
-> appropriate locations. I edited the printer.conf file to put in the 
-> device address that I had determined from looking at the winxp 
-> configuration (where bluetooth does work). However, I can't get any 
-> response from trying to set the printer up in cups using the second 
-> method described in the install instructions. I am not sure where to 
-> look for it in the device list. I have a "zoom pccard" bluetooth device 
-> that flashes and is listed as running in the services. It seems to 
-> attach itself to ttyS4. I am running Mandrake 10.0 with the 2.6.3 
-> kernel. Thanks for any help, Nelson Hogg
-
-actually I think the problem is to get your card running. What is the
-output of dump_cis? Do hciconfig shows a HCI device?
-
-Regards
-
-Marcel
-
+I have a canon i80 printer equipped with a bluetooth receiver which 
+prints properly under cups and a usb connection. I've compiled the 
+cups-bluetooth package and transfered the 2 files manually to their 
+appropriate locations. I edited the printer.conf file to put in the 
+device address that I had determined from looking at the winxp 
+configuration (where bluetooth does work). However, I can't get any 
+response from trying to set the printer up in cups using the second 
+method described in the install instructions. I am not sure where to 
+look for it in the device list. I have a "zoom pccard" bluetooth device 
+that flashes and is listed as running in the services. It seems to 
+attach itself to ttyS4. I am running Mandrake 10.0 with the 2.6.3 
+kernel. Thanks for any help, Nelson Hogg
 
 
 
