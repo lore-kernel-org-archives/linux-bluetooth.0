@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Sean Barry" <sfelkes@hotmail.com>
-To: Bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Socket CF card problems
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Gene Imes <ebi7@ozob.net>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1073341923.6567.20.camel@tr1a.ozob.net>
+References: <3FF9CA56.1060205@Fampeeters.com>
+	 <1073341923.6567.20.camel@tr1a.ozob.net>
+Content-Type: text/plain
+Message-Id: <1073344171.2508.29.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY7-F1074lDPHpNwqe00003086@hotmail.com>
-Subject: [Bluez-users] BlueZ on Linux iPAQ
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,109 +19,96 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 06 Jan 2004 00:27:04 +0000
+Date: Tue, 06 Jan 2004 00:09:31 +0100
 
-Hi,
+Hi Gene,
 
-I have the following instructions for installing BlueZ on a Sharp Zaurus, 
-however, I have attempted to follow them for Familiar but with no luck.  
-Could someone translate the Sharp Zaurus instructions into instructions for 
-Familiar on an iPAQ with integrated Bluetooth, but Bluetooth on a CF or 
-PCMCIA card.
+> I apologize if this is too lengthy, but I need some help.
+> 
+> I am running a 2.6.0 kernel and I am trying to get a Socket CF card
+> running.
+> 
+> root@tr1a:~# ver
+> Linux version 2.6.1-rc1-mm1 (root@tr1a) (gcc version 3.3.2 20031218
+> (Gentoo Linux 3.3.2-r5, propolice-3.3-7)) #5 Mon Jan 5 10:54:39 CST 2004
+> 
+> cardctl shows:
+> 
+> root@tr1a:~# cardctl ident
+> Socket 0:
+>   product info: "Socket", "CF+ Personal Network Card Rev 2.5"
+>   manfid: 0x0104, 0x0096
+>   function: 2 (serial)
+> 
+> According to http://www.holtmann.org/linux/bluetooth/devices.html this
+> card is 'working'.
+> 
+> My /usr/src/linux/.config file looks like this:
+> 
+> ...
+> CONFIG_BT=m
+> CONFIG_BT_L2CAP=m
+> CONFIG_BT_SCO=m
+> CONFIG_BT_RFCOMM=m
+> CONFIG_BT_RFCOMM_TTY=y
+> CONFIG_BT_BNEP=m
+> CONFIG_BT_BNEP_MC_FILTER=y
+> CONFIG_BT_BNEP_PROTO_FILTER=y
+>                                                                                                                              
+> #
+> # Bluetooth device drivers
+> #
+> # CONFIG_BT_HCIUSB is not set
+> CONFIG_BT_HCIUART=m
+> CONFIG_BT_HCIUART_H4=y
+> CONFIG_BT_HCIUART_BCSP=y
+> # CONFIG_BT_HCIUART_BCSP_TXCRC is not set
+> # CONFIG_BT_HCIDTL1 is not set
+> # CONFIG_BT_HCIBT3C is not set
+> # CONFIG_BT_HCIBLUECARD is not set
+> CONFIG_BT_HCIBTUART=m
+> CONFIG_BT_HCIVHCI=m
+> # CONFIG_KGDBOE is not set
+> # CONFIG_NETPOLL is not set
+> # CONFIG_NETPOLL_RX is not set
+> # CONFIG_NETPOLL_TRAP is not set
+> # CONFIG_NET_POLL_CONTROLLER is not set
+> 
+> ...
+> CONFIG_SERIAL_8250=m
+> CONFIG_SERIAL_8250_CS=m
+> # CONFIG_SERIAL_8250_ACPI is not set
+> CONFIG_SERIAL_8250_NR_UARTS=4
+> # CONFIG_SERIAL_8250_EXTENDED is not set
+> 
+> When I insert the Socket card (which is of course itself inserted in a
+> pcmcia adapter) I get this:
+> 
+> root@tr1a:~# lsmod
+> Module                  Size  Used by
+> serial_cs               9352  1
+> 8250                   21280  3 serial_cs
+> 
+> I guess this is proper.
+> 
+> And then:
+> 
+> root@tr1a:~# dmesg
+> ...
+> Serial: 8250/16550 driver $Revision: 1.90 $ 8 ports, IRQ sharing
+> disabled
+> ttyS0 at I/O 0x3f8 (irq = 5) is a 16C950/954
+> 
+> So I issue:
+> 
+> root@tr1a:/boot# hciattach /dev/ttyS0 any 115200
 
----------------------------------------------------------------------
-Installation instructions for BlueZ binaries on Sharp Zaurus with ROM v3.10
-===========================================================================
+I prefer that you use "hciattach ttyS0 socket".
 
-Upload all of the files to /home/root on the Zaurus, either using scp or 
-ftp.
-Log into the Zaurus as root.
+Regards
 
-* Kernel modules
-----------------
+Marcel
 
-# mv bluez-kernel-2.4.18-rmk7-pxa3-embedix-arm.tar.gz 
-/home/root/modules/2.4.18-rmk7-pxa3-embedix
-# cd /home/root/modules/2.4.18-rmk7-pxa3-embedix
-# tar zxf bluez-kernel-2.4.18-rmk7-pxa3-embedix-arm.tar.gz
-# depmod -a
-# mv bluetooth /etc/pcmcia
-# mv bluetooth.conf /etc/pcmcia
-# /etc/rc.d/init.d/pcmcia restart
-
-* User-libraries
-----------------
-
-# cd
-# mv libbluetooth.so.1.0.1 libsdp.so.2.0.1 /usr/lib
-# cd /usr/lib
-# ln -s libbluetooth.so.1.0.1 libbluetooth.so.1
-# ln -s libbluetooth.so.1.0.1 libbluetooth.so
-# ln -s libsdp.so.2.0.1 libsdp.so.2
-# ln -s libsdp.so.2.0.1 libsdp.so
-
-* User-programs
----------------
-
-# cd
-# mv hciconfig /usr/sbin
-# mv hcid /usr/sbin
-# mv sdpd /usr/sbin
-# mv sdptool /usr/bin
-
-* Verifying the install
------------------------
-(Insert the Bluetooth card!)
-
-# modprobe l2cap
-# lsmod
-bluecard_cs             6944   1
-l2cap                  16368   2
-bluez                  33984   3  [bluecard_cs l2cap]
-
-# hciconfig hci0 up
-hci0:   Type: PCCARD
-        BD Address: 00:90:02:03:89:0C ACL MTU: 672:10  SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:1659564 acl:10626 sco:0 events:5147 errors:0
-        TX bytes:1255739 acl:11550 sco:0 commands:1214 errors:0
-# sdpd
-# sdptool browse ff:ff:ff
-Browsing FF:FF:FF:00:00:00 ...
-Service Name: SDP Server
-Service Description: Bluetooth service discovery server
-Service Provider: BlueZ
-Service RecHandle: 0x0
-Service Class ID List:
-  "SDP Server" (0x1000)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 1
-    Version: 0x0001
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-
-Service Name: Public Browse Group Root
-Service Description: Root of public group hierarchy
-Service Provider: BlueZ
-Service RecHandle: 0x15000
-Service Class ID List:
-  "Browse Group Descriptor" (0x1001)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-
----------------------------------------------------------------------
-
-Regards,
-
-Sean
-
-_________________________________________________________________
-Express yourself with cool new emoticons http://www.msn.co.uk/specials/myemo
 
 
 
