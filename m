@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <b5c638dc05032815321b2739c5@mail.gmail.com>
-From: David Vitrant <prussia@gmail.com>
+Message-ID: <42486E7F.8050407@coloradocollege.edu>
+From: Jonathan Bredin <jbredin@coloradocollege.edu>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] bluez and billionton pcbtc1
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Re: creating the bnep0 device
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,13 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Mar 2005 18:32:51 -0500
+Date: Mon, 28 Mar 2005 13:52:15 -0700
 
-I saw this in the list of adapters.. pcbtc1 but i can't get it to work
-in my laptop.. any ideas or thoughts on if it works or not with
-bluez..
+Thanks, Anderson and Marcel. 
 
-dGV
+I think that I must have been too slow in moving between the two 
+devices....  bnep0 comes up at both sites, now.
+
+At the slave side, though, I get
+NETDEV WATCHDOG: bnep0: transmit timed out
+once I try to use the connection.  I'll dig around and see if can figure 
+it out.
+
+Thanks!
+
+jonathan
 
 
 -------------------------------------------------------
