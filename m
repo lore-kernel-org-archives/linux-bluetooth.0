@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: pand connection to XP SP2 fails
-From: Erwin Authried <eauth@softsys.co.at>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1103107355.2143.185.camel@pegasus>
-References: <1103024795.4097.65.camel@justakiss>
-	 <1103024932.2143.156.camel@pegasus> <1103025459.4095.68.camel@justakiss>
-	 <cpmnro$2p5$1@sea.gmane.org>  <1103036073.4095.101.camel@justakiss>
-	 <1103107355.2143.185.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1103110263.4099.109.camel@justakiss>
+Subject: Re: [Bluez-users] Re: Toshiba and BT (SuSE 9.2)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAQUJlMiCNgE+BBNd7LHoCQwEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAQUJlMiCNgE+BBNd7LHoCQwEAAAAA@t-online.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1103109183.2143.215.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,27 +19,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 15 Dec 2004 12:31:03 +0100
+Date: Wed, 15 Dec 2004 12:13:03 +0100
 
-Am Mit, den 15.12.2004 schrieb Marcel Holtmann um 11:42:
-> Hi Erwin,
-> 
-> > Thanks a lot, I found out now that XP SP2 is obviously always configured
-> > as PANU, I didn't find any way to change that. Maybe a different driver
-> > would help to be able to configure it as NAP, I don't know.
-> 
-> so doing a PANU (Linux) <-> PANU (XP SP2) connection works?
-> 
-> Regards
-> 
-> Marcel
-> 
-Hello Marcel,
+Hi Peter,
 
-yes, this works fine (with pand --service PANU ...).
+> ##>
+> ##>LAP and DUN are two different profiles. I don't get what you mean.
+> ##>
+> elmeg Hotline wrote:
+> leider liegen uns f=FCr Anwendungen unter Linux keine Informationen vor.
+>=20
+> Fuer einen Verbindungsaufbau zum Bluetooth-Accesspoint wird das LAP (LA=
+N
+> Access Profile) via DUN (Dial-Up Networking) verwendet. Wenn diese Dien=
+ste
+> unterstuetzt werden, sollte ein Verbindungsaufbau problemlos moeglich s=
+ein.
 
-Regards,
-Erwin
+what the f* is this. Use "sdptool browse ..." and "sdptool search ..."
+to find out what services/profiles this device really supports, because
+it seems that their support don't even know it.
+
+Also do a "hcitool info ..." for me.
+
+> So, I'm not so good in Linux to find the right way. Perhaps it may be
+> possible with rfcomm ?
+> What da you mean?
+
+Of course it is possible, but maybe this is not the best device you can
+buy (at least speaking about its Bluetooth support).
+
+Regards
+
+Marcel
+
 
 
 
