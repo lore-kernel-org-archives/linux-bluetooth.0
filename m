@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3FFEB4E0.3070603@hotmail.com>
-From: Christian Hennrich <tettokalle@hotmail.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] problems with connect()
-References: <3FFD826F.5080808@hotmail.com> <1073583332.2563.24.camel@pegasus>
-In-Reply-To: <1073583332.2563.24.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] Bluetoooth and Threads?
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
+To: Anthony Yulo <strikewing16th@hotmail.com>
+Cc: bluez-devel@lists.sourceforge.net, blueinfo@yahoogroups.com
+In-Reply-To: <Law11-F108gLzhVOJwn00013a60@hotmail.com>
+References: <Law11-F108gLzhVOJwn00013a60@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1073655487.989.50.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,18 +18,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 09 Jan 2004 15:04:16 +0100
+Date: Fri, 09 Jan 2004 14:38:07 +0100
 
-Hi,
+Am Fr, den 09.01.2004 schrieb Anthony Yulo um 04:38:
+> Hi!
+Hi!
 
-today i tried to connect more than 2 slaves with pand -c "Addresse of 
-master" to one master that is started with pand -s -r GN. the same 
-problem occurs, i can't connect more than 2 slaves to one master, the 
-third one makes no connection.
+> I'm just wondering if multiple threads can have their own bluetooth stack?
 
-is the configuration of pand wrong?
+Errrmm... several *stacks* ??
+Do you use several IP stacks for several IP connections??
+I don't...
 
-regards christian
+> I'm planning of a single program that uses threads, one thread does only 
+> device discovery.. and then store the devices on a list/queue.. and then 
+> maybe a couple of threads that reads from  the queue and send data from the 
+> devices on the queue using RFCOMM.. maybe i can have seven threads since 
+> this is the maximum number bluetooth allows...
+> is this possible?
+
+Sure, perfectly possible.
+You simply open the appropriate sockets in each thread and that's it.
+CU
+  nils faerber
+
+-- 
+kernel concepts          Tel: +49-271-771091-12
+Dreisbachstr. 24         Fax: +49-271-771091-19
+D-57250 Netphen          D1 : +49-170-2729106
+--
 
 
 
