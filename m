@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Disabling HID Boot Protocol
+Subject: Re: [Bluez-users] Using my linux box as an internet gateway for my
+	i-mate/xda
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Florian Echtler <echtler@fs.tum.de>
+To: Mark Coetser <mark@thummb.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.61.0410241307180.7693@block.bubble>
-References: <Pine.LNX.4.61.0410241307180.7693@block.bubble>
+In-Reply-To: <000101c4b9b7$4332e860$f500000a@citadel>
+References: <000101c4b9b7$4332e860$f500000a@citadel>
 Content-Type: text/plain
-Message-Id: <1098618588.6465.5.camel@pegasus>
+Message-Id: <1098618444.6465.1.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,21 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 24 Oct 2004 13:49:48 +0200
+Date: Sun, 24 Oct 2004 13:47:24 +0200
 
-Hi Florian,
+Hi Mark,
 
-> I'm using a MS Bluetooth Optical Desktop and would like to
-> use the hotkeys again. I have kernel 2.6.8.1-mh1 and bluez-utils
-> 2.10.. According to the mailing list archives, this version of 
-> hidp.ko should already support report mode, however, I couldn't
-> find any description on how to enable it. I suppose it's necessary
-> to pass the correct "-b <subclass>" parameter to hidd?
+> System info
+> 
+> Debian woody
+> 
+> Uname -a
+> Linux fw1.mid 2.6.7 #1 SMP Sat Oct 23 12:41:48 SAST 2004 i686 unknown
+> 
+> dpkg -l | grep bluez
+> ii  bluez-hcidump  1.5-2          Analyses Bluetooth HCI packets
+> ii  bluez-pan      1.1rel-1       Personal area networking for Bluetooth
+> devic
+> ii  bluez-sdp      1.1-1          BlueZ Bluetooth SDP daemon and tool
+> ii  bluez-utils    2.3-1.woody.1  Utilities for controlling Bluetooth
+> devices
 
-the subclass parameter is only for overriding the value if the SDP
-records are wrong. Check with hidd and if it tells you something about
-boot mode then you are in boot mode, otherwise it uses report mode
-automaticly. So what does "hidd --show" say?
+maybe this will work with Debian Woody, but these versions of the BlueZ
+userspace utilities are outdated. I think you should better switch to
+Debian Sarge.
 
 Regards
 
