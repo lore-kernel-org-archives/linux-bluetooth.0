@@ -1,28 +1,39 @@
-Return-Path: <affix_kidd@hotmail.com>
-From: "kidd" <affix_kidd@hotmail.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Cc: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
-References: <BAY22-DAV10ew8k69RK00007d15@hotmail.com> <1091877842.20839.152.camel@pegasus>
-Subject: Re: [Bluez-users] Re:BCM2035
-Date: Sun, 8 Aug 2004 15:19:43 +0800
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <4115C899.2050300@patbert.com>
+From: Patrick <patbert@patbert.com>
+Reply-To: patbert@patbert.com
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="gb2312"
-Message-ID: <BAY22-DAV9aAD19zzGV0000d637@hotmail.com>
-List-ID: <bluez-users.lists.sourceforge.net>
+To: Bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Apple bluetooth keyboard fun...
+References: <4115A5E3.8000107@patbert.com>
+In-Reply-To: <4115A5E3.8000107@patbert.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sun, 08 Aug 2004 02:30:49 -0400
 
-VGhhbmtzIE1hcmNlbDoNCg0KICAgSSAndmUgc29sdmUgdGhpcyBwcm9ibGVtLg0KSnVzdCBwb3dl
-ciB1cCBhbmQgdGhlbiBwbHVnIGluIC5JIHRoaW5rIHRoaXMgaXMgbGludXgncyBob3RwbHVnLg0K
-DQoNCiAgIGtpZGQNCiAgIDIwMDQvOC84DQotLS0tLSBPcmlnaW5hbCBNZXNzYWdlIC0tLS0tIA0K
-RnJvbTogIk1hcmNlbCBIb2x0bWFubiIgPG1hcmNlbEBob2x0bWFubi5vcmc+DQpUbzogImtpZGQi
-IDxhZmZpeF9raWRkQGhvdG1haWwuY29tPg0KQ2M6ICJCbHVlWiBNYWlsaW5nIExpc3QiIDxibHVl
-ei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ+DQpTZW50OiBTYXR1cmRheSwgQXVndXN0IDA3
-LCAyMDA0IDc6MjQgUE0NClN1YmplY3Q6IFJlOiBbQmx1ZXotdXNlcnNdIFJlOkJDTTIwMzUNCg0K
-DQo+IEhpLA0KPiANCj4gPiAgIFRoZXJlIGFyZSB0aGUgcmVhbGx5IG1lc3NhZ2UgOg0KPiA+ICBo
-NF9yZWN2OlVua25vd24gSENJIHBhY2tldCB0eXBlIDAwLg0KPiA+ICBEb3NlIGFueXRoaW5nIG5l
-ZWQgdG8gY2hhbmdlICxwbGVhc2UgZ3VpZGUgbWUuDQo+IA0KPiBhcyBJIHNhaWQgdGhhdCB3YXMg
-bm90IGFuIGVycm9yIG1lc3NhZ2Ugb2YgaGNpYXR0YWNoLiBXaGF0IHlvdSBzZWUgaXMgYW4NCj4g
-ZXJyb3IgbWVzc2FnZSBvZiB0aGUgaGNpX3VhcnQga2VybmVsIG1vZHVsZS4gTG9va3MgbGlrZSB0
-aGUgaGNpYXR0YWNoDQo+IHBhcmFtZXRlcnMgYXJlIHdyb25nLiBBc2sgQnJvYWRjb20gZm9yIHRo
-ZSBjb3JyZWN0IG9uZXMgZm9yIHRoZWlyIHNlcmlhbA0KPiBpbnRlcmZhY2UgdG8gdGhlIGNoaXAu
-DQo+IA0KPiBSZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQo+IA0KPiA=
+Feel a bit silly replying to my own question but I did just now notice 
+with dmesg the single line error:
+
+drivers/usb/input/hid-input.c: event field not found
+
+Maybe that's a clue to what's happening? Or not happening?
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by OSTG. Have you noticed the changes on
+Linux.com, ITManagersJournal and NewsForge in the past few weeks? Now,
+one more big change to announce. We are now OSTG- Open Source Technology
+Group. Come see the changes on the new OSTG site. www.ostg.com
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
