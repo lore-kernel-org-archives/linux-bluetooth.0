@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41E853A9.5030304@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] btsco and Jabra BT 110 experience
-References: <pan.2005.01.14.17.46.40.72959@yahoo.com>
-In-Reply-To: <pan.2005.01.14.17.46.40.72959@yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] Piconet problems
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <IAAY31$664B7AA9753F60F7A4D5D72B66AB0F53@libero.it>
+References: <IAAY31$664B7AA9753F60F7A4D5D72B66AB0F53@libero.it>
+Content-Type: text/plain
+Message-Id: <1105737535.7525.48.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +18,64 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 14 Jan 2005 16:20:09 -0700
+Date: Fri, 14 Jan 2005 22:18:55 +0100
 
-Paul,
+Hi Jers,
 
-> So, here is some feedback about using btsco with this headset:
-> To connect btsco to the device, i have to press the talk/answer button on
-> the headset, and fire btsco on channel 2 which is headset profile, because
-> it seems that by default it connects to channel 1 which is handsfree
-> profile and does not work too reliably (sometime it just disconnects).
+> > send us the outputs of "hciconfig -a" for all of your devices. And don't 
+> > play with "hcitool cc". If you wanna test stuff then use l2test. 
+>  
+> hci0:   Type: USB 
+>         BD Address: 00:08:E0:01:9E:86 ACL MTU: 192:8  SCO MTU: 64:8 
+>         UP RUNNING PSCAN ISCAN 
+>         RX bytes:653 acl:0 sco:0 events:19 errors:0 
+>         TX bytes:314 acl:0 sco:0 commands:18 errors:0 
+>         Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00 
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+>         Link policy: RSWITCH HOLD SNIFF PARK 
+>         Link mode: SLAVE ACCEPT 
+>         Name: 'PC A' 
+>         Class: 0x3e0100 
+>         Service Classes: Networking, Rendering, Capturing 
+>         Device Class: Computer, Uncategorized 
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x33c LMP Ver: 1.1 (0x1) LMP Subver: 0x33c 
+>         Manufacturer: Cambridge Silicon Radio (10) 
+>  
+> hci0:   Type: USB 
+>         BD Address: 00:E0:98:85:A1:64 ACL MTU: 192:8  SCO MTU: 64:8 
+>         UP RUNNING PSCAN ISCAN 
+>         RX bytes:99 acl:0 sco:0 events:13 errors:0 
+>         TX bytes:296 acl:0 sco:0 commands:12 errors:0 
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00 
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+>         Link policy: RSWITCH HOLD SNIFF PARK 
+>         Link mode: SLAVE ACCEPT 
+>         Name: 'BlueZ (0)' 
+>         Class: 0x3e0100 
+>         Service Classes: Networking, Rendering, Capturing 
+>         Device Class: Computer, Uncategorized 
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver: 0x175 
+>         Manufacturer: Cambridge Silicon Radio (10) 
 
-it sounds like you're saying the automatic channel detection incorrectly 
-chooses channel 1 instead of 2. can you tell me what btsco prints out 
-when it's launched without the channel specified?
+the 0x175 firmwares are not HCI 16.4 and thus don't support scatternet
+and are difficult to connect.
+ 
+> > > After that, I tried to create the second connection on slave2 side by running the same command (hcitool cc 
+> <master_addr>) and I obtain the following error: 
+> > > # Can't create connectio: input/output error. 
+> >  
+> > Run "hcidump -x" as root and show us the output. 
+>  
+> HCIDump - HCI packet analyzer ver 1.16 
+> device: hci0 snap_len: 1028 filter: 0xffffffff 
 
-Brad
+What about trying to connect now, so we see traffic?
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
