@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <d1f423d305030711427248a3e9@mail.gmail.com>
+Message-ID: <d1f423d30503071045794c487e@mail.gmail.com>
 From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
 To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] PAN Configuration
+Subject: [Bluez-users] PAN Configurations
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,7 +16,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 7 Mar 2005 15:42:19 -0400
+Date: Mon, 7 Mar 2005 14:45:27 -0400
 
 Hi folks,
 
@@ -55,13 +55,11 @@ FIFO write timed out
 
 and I can not find the bnep0 network interface.
 
-am I doing something wrong?
+am I doing something wrong? 
 
 any help is very welcome
 
 cheers,
-
-
 
 -- 
 Anderson Clayton B. Rodrigues
