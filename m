@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de46576041207211852e826cc@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] hidp report mode in 2.6.10?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1102459374.10705.2.camel@saag.bunker.heddley.com>
+References: <1102459374.10705.2.camel@saag.bunker.heddley.com>
+Content-Type: text/plain
+Message-Id: <1102478483.8447.59.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] HCI send and receive
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,20 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Dec 2004 10:48:00 +0530
+Date: Wed, 08 Dec 2004 05:01:23 +0100
 
-Hi Marcel,
-I want to set up an HCI connection between 2 dongles, see the default
-packet type at connection, then send data. Now keeping the existing
-connection, I want to change packet type and  then send data....Is
-this possible????
-Should I write small programs just to send and receive data with known
-payload....then I can establish a connection using hcitool and use
-these programs to send and receive data passing the connection handle
-as the parameter. Is this right??
+Hi Edd,
 
-Regards,
-Manjunath
+> It doesn't look like hid report mode made it into 2.6.10-rc3.  Are you
+> planning for it to be part of 2.6.10?
+
+my plan is to push the generic HID parser support into 2.6.10 when it is
+out and everything works like expected. If this happens the report mode
+support will come with no costs.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
