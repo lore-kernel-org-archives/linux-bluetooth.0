@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4057094A.3040804@identisys.de>
-From: Thomas Eller <te@identisys.de>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Question regarding Rfcomm-Timeout
+Subject: Re: [Bluez-users] timeout after rfcomm or pan connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Christoph Torens <c.torens@web.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <opr4zbdmyoeocfdv@debian>
+References: <20040309161702.24407.qmail@web40713.mail.yahoo.com>
+	 <opr4mgbutyeocfdv@debian> <1078882388.30990.24.camel@pegasus>
+	 <opr4wj0bjgeocfdv@debian> <1079358305.3405.32.camel@pegasus>
+	 <opr4zbdmyoeocfdv@debian>
+Content-Type: text/plain
+Message-Id: <1079482776.3301.7.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,35 +21,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 16 Mar 2004 15:03:54 +0100
+Date: Wed, 17 Mar 2004 01:19:36 +0100
 
-Hello, there !
+Hi Christoph,
 
-I'm using the rfcomm executable from bluez-utils to connect to a 
-bluetooth device. It looks like this:
+> #
+> # USB Host Controller Drivers
+> #
+> # CONFIG_USB_EHCI_HCD is not set
+> # CONFIG_USB_UHCI is not set
+> # CONFIG_USB_UHCI_ALT is not set
+> # CONFIG_USB_OHCI is not set
+> # CONFIG_USB_OHCI_SA1111 is not set
+> CONFIG_USB_ISP116x=m
 
-rfcomm connect 0 xx:xx:xx:xx:xx:xx 1
+maybe your host controller is a little bit buggy. I don't know anything
+about it.
 
-If the remote device is not present the rfcomm-connect ends with a 
-timeout after ~20s with the error-message: "Can't connect..... ...Host 
-is down."
+> #
+> # Bluetooth device drivers
+> #
+> CONFIG_BLUEZ_HCIUSB=m
+> CONFIG_BLUEZ_USB_SCO=y
+> CONFIG_BLUEZ_USB_ZERO_PACKET=y
 
-Where can i push this 20s-timeout down to a lower value ???
+Disable USB_SCO and USB_ZERO_PACKET if you don't really need it. The
+zero packet should not be needed in any case and disabling the SCO
+support safes USB bandwith.
 
-I see in the source-code that a socket-connection is made, so possibly 
-there may be a parameter that can be configured through the 
-proc-filesystem ?!?
+> hm, why does the comment say:
+> "USB Bluetooth can only be used with disabled Bluetooth subsystem"
+
+It's about the old bluetooth.o kernel module. See archives for more
+details.
+
+Regards
+
+Marcel
 
 
-Regards,
-
-Tom
-
--- 
----------------------------
-
-Thomas Eller
-te@identisys.de
 
 
 -------------------------------------------------------
