@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth test mode
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de4657604112322066bf42c1e@mail.gmail.com>
-References: <2de4657604112322066bf42c1e@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1101353296.7538.27.camel@pegasus>
+Message-ID: <2de4657604112322066bf42c1e@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] bluetooth test mode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,23 +16,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Nov 2004 04:28:16 +0100
+Date: Wed, 24 Nov 2004 11:36:02 +0530
 
-Hi Manjunath,
-
-> can i configure my bt dongles to operate in test mode....and then
-> conduct the loopback or transmitter tests. This is indicated in the
-> HCI part of the specification....so is it possible to run these tests
-> just with BT devices connected to host PC's,  and not using some
-> protocol analyser.
-
-I think you can do this, but I've never done this before.
-
-Regards
-
-Marcel
-
-
+hi marcel,
+can i configure my bt dongles to operate in test mode....and then
+conduct the loopback or transmitter tests. This is indicated in the
+HCI part of the specification....so is it possible to run these tests
+just with BT devices connected to host PC's,  and not using some
+protocol analyser.
 
 
 -------------------------------------------------------
