@@ -1,61 +1,37 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <5.1.0.14.2.20031008174223.058f41d8@unixmail.qualcomm.com>
-To: Stephen Crane <steve.crane@rococosoft.com>,
-   bluez-devel@lists.sourceforge.net
+Return-Path: <maxk@qualcomm.com>
+Message-Id: <5.1.0.14.2.20031008172506.020cef30@unixmail.qualcomm.com>
+Date: Wed, 08 Oct 2003 17:35:53 -0700
+To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 From: Max Krasnyansky <maxk@qualcomm.com>
-Subject: Re: [Bluez-devel] RFComm channel allocation
-Cc: marcel@rvs.uni-bielefeld.de
-In-Reply-To: <1062078007.1823.33.camel@baroque.rococosoft.com>
+Subject: Re: [Bluez-devel] New SDP client library
+In-Reply-To: <1061810955.972.100.camel@pegasus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 08 Oct 2003 17:52:57 -0700
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-At 06:40 AM 8/28/2003, Stephen Crane wrote:
->Hi,
->It seems that bind() on a sockaddr_rc doesn't check its channel
->argument: it allows binding to a channel number which then cannot be
->connect()ed to. (connect() seems to check this argument fine.)
+At 04:29 AM 8/25/2003, Marcel Holtmann wrote:
+>Hi Folks,
 >
->For example, I can bind a listening socket to channel 0 or 40:
->$ cat /proc/bluetooth/rfcomm
->sk  00:00:00:00:00:00 00:00:00:00:00:00 2 0
->sk  00:00:00:00:00:00 00:00:00:00:00:00 4 40
->
->$ cat /proc/bluetooth/rfcomm
->sk  00:00:00:00:00:00 00:00:00:00:00:00 2 0
->sk  00:00:00:00:00:00 00:00:00:00:00:00 4 0
-Definitely a bug. The thing is that when we do bind() we don't call RFCOMM 
-DLC layer (ie rfcomm_dlc_xxx stuff). connect() is calling rfcomm_dlc_open() 
-which where channel validity check it performed.
-I guess we'll have to add the same check in bind().
+>in the last two months I have done much work with the current SDP
+>implementation. The library is full featured and works fine for me in
+>all situations, but the programming interface is a mess. It is not easy
+>to get the service name or the number of the RFCOMM channel. You have to
+>play with internal SDP lists, pointer of pointer stuff and static
+>assigned UUID's. Since I already have rewritten most of the HCI part
+>from scratch for the new Bluetooth library,
+Hmm, what do you mean by that ? As far as I can (in CVS) core functions 
+like hci_open(), hci_send_request(), etc are the same. 
 
->On a related matter (and I'm pretty sure this /has/ come up before),
->would it be possible to perform automatic channel allocation in the
->kernel? 0 would be a good distinguishing value for this (since it is
->reserved to the RFComm multiplexer).
-It's possible but does not seem to be needed. I mean so far nobody had
-a strong argument why we need to support it.
+>The simple interface will have of course a lot of limitations, but these
+>can all be eliminated by using the full interface if needed. I tested
+>the new version with all my devices on my desktop and it works flawless.
+Cool.
 
+>I will now clean up the internal stuff a little bit and then place it
+>into the libs2 CVS instead of the "old" one. Comments?
+Looks good to me. We've been talking about simplifying SDP library
+for quite a while. And I completely support the idea.
+
+Thanks
 Max
-
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: SF.net Giveback Program.
-SourceForge.net hosts over 70,000 Open Source Projects.
-See the people who have HELPED US provide better services:
-Click here: http://sourceforge.net/supporters.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
