@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: Lalith Chakravarthi <lalithvc@yahoo.com>
+Message-ID: <20040318091849.58373.qmail@web40707.mail.yahoo.com>
+From: Lalith Chakravarthi <lalithvc@yahoo.com>
 Subject: Re: [Bluez-users] Data across Bluetooth Connection - Not file transfer
+To: Pavel Ruzicka <pavouk@pavouk.org>
 Cc: bluez-users <bluez-users@lists.sourceforge.net>
-References: <20040318091849.58373.qmail@web40707.mail.yahoo.com>
-In-Reply-To: <20040318091849.58373.qmail@web40707.mail.yahoo.com>
+In-Reply-To: <200403180939.06022.pavouk@pavouk.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200403181100.21296.pavouk@pavouk.org>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,33 +17,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 18 Mar 2004 11:00:21 +0100
+Date: Thu, 18 Mar 2004 01:18:49 -0800 (PST)
 
-Hi,
+Hi
 
-> I want the server to wait (you cud say listen) for a command to come
-> from the client and when that command comes, the server should be able
-> to do something, like opening an application.
+> I don't know if I exactly understand your needs.
+> When you have running PAND server and other side try to make PAN
+> connection,
+> that kernel calls HOTPLUG with NET ADD action and you can
+> automatically 
+> configure BNEP0 interface or do some other action, what do you want.
 
-I have two ideas.
-1.  Running server on virtual serial port /dev/rfcomm0 and waiting for 
-commands.
-2. Running server on IP socket and waiting for commands.
+I want the server to wait (you cud say listen) for a command to come
+from the client and when that command comes, the server should be able
+to do something, like opening an application. 
 
-Both solutions are universal for bluetooth, IrDA, serial cable...
-You must write daemon, or look on the freshmeat or find something similar with 
-Google...
+I dont want it to start up when the bnep interface comes up while the
+connection is established. I cant send the command in the file because
+I have to pass many such commands to the server in real-time case.
 
-> I think there would be a way out for this. But I am not much of a
-> programmer. If you can give me any ideas, I can have our programmer
-> implement the same.
+I think there would be a way out for this. But I am not much of a
+programmer. If you can give me any ideas, I can have our programmer
+implement the same.
 
-I'am not programmer too ;-) Only some perl scripts...
+Regards
+Lalith
 
-Best regards,
-
-Pavel
-
+__________________________________
+Do you Yahoo!?
+Yahoo! Mail - More reliable, more storage, less spam
+http://mail.yahoo.com
 
 
 -------------------------------------------------------
