@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Fred Schaettgen <Sch@ttgen.net>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] how to detect if a device is up.
-Cc: wim delvaux <wim.delvaux@adaptiveplanet.com>
-References: <200412061608.48387.wim.delvaux@adaptiveplanet.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <200412061608.48387.wim.delvaux@adaptiveplanet.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200412061623.29139.Sch@ttgen.net>
+References: <200412061608.48387.wim.delvaux@adaptiveplanet.com>
+Content-Type: text/plain
+Message-Id: <1102346397.9644.31.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,25 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 6 Dec 2004 16:23:28 +0100
+Date: Mon, 06 Dec 2004 16:19:57 +0100
 
-On Monday 06 December 2004 16:08, wim delvaux wrote:
+Hi Wim,
+
 > suppose you manage a list of 'seen' but not necessarily paired devices.
 > How can you figure out if a certain device is UP or not ?
-> l2ping apparently not since you need to be paired with that device or else
-> you get permission denied
 
-How about an inquiry? You can also use name requests for instance. We use this 
-in kdebluetooth for the device discovery service to poll undiscoverable 
-devices. But you can't do that frequently and for a lot of devices of course. 
-Apart from that, if you get "permission denied" with l2ping, then the device 
-*is* reachable, isn't it?
+for remote device you have to page them.
 
-Fred
+> l2ping apparently not since you need to be paired with that device or else you 
+> get permission denied
 
--- 
-Fred Schaettgen
-Sch@ttgen.net
+This is only true is the remote device uses security mode 3.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
