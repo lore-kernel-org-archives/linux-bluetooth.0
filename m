@@ -1,54 +1,82 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Steffen Schwientek <schwientek@web.de>
-Message-ID: <amsbr1-glo.ln1@ID-90813.users.dfncis.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Subject: [Bluez-users] headset
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 01 Jul 2004 00:50:13 +0200
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Message-ID: <001601c48fa7$38cce900$1a01010a@baked>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Subject: [Bluez-devel] Rfcomm use count
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 31 Aug 2004 15:09:44 -0700
 
-I want to use my plantronics M9000 headset. Since it?s my only bluetooth
-part, I can?t figure out, if bluetooth works. Connecting the USB dongle,
-the kernel (2.6.6) reports:
+Hi Marcel,
 
-usb 3-1: USB disconnect, address 7
-usb 3-1: new full speed USB device using address 8
-usb 3-1: control timeout on ep0in
-usb 3-1: control timeout on ep0in
+Any suggestions you have regarding the following would be greatly
+appreciated.
 
-However, hciconfig detects the dongle.
+I have a server program which does the following:
 
-An hcitool scan detects (if I put the headset in pairing mode)
-00:03:89:46:E2:0F       M3000 by Plantronics
+1. Intializes and attaches two modules via serial port (CSR 18.1)
+2. Has SPP and OPP servers
+3. Does some HCI-level stuff to monitor connections and close =
+connections to
+misbehaving devices.
 
-So nice, so far. Unfortunately I don?t know what I need next (I tried the
-kbluetooth daemon, but this doesn?t detect the headset at all, or failed
-due to an timeout.
+The program will initiate rfcomm connections to devices which do not =
+allow
+role switches.
 
-Next I try an hcitool cc, but nothing happens. kdebluetooth shows me an
-connection, but after a while it reports an error (0x22).
-/var/log/messages shows no error.
+If I kill the program while several devices are connected (or are in the
+process of connecting/disconnecting), sometimes the rfcomm use count is =
+left
+above 0 (I've seen it as high as 4). Killing the program detaches the
+modules (this is verified by hcid's log output). Killing sdpd and hcid
+doesn't reduce the use count. No other bluetooth programs are running,
+except a kernel thread krfcommd.
 
-Any suggestions?
+Re-starting the program produces the error "Address already in us(98)" =
+when
+trying to bind the SPP server socket. The only remedy I've found is to
+reboot the device.
+
+Could sending an hci_disconnect directly, rather than using close(), be
+confusing the stack? I realize this isn't the ideal way of closing
+connections... It only gets used if the normal process is taking longer =
+than
+is desired when a device is forcing the server to be a slave.
+
+The kernel version is 2.4.21-mh10, with various ARM patches (which, as =
+far
+as I can tell, do not touch any bluetooth related code). I have a very
+similar program running on 2.4.18-mh8 and have never noticed this =
+problem.
+
+This doesn't seem to be related, but just in case it is: I'm also seeing
+"hci_cmd_task: hci0 command tx timeout" errors. I am able to get the =
+above
+situation to happen without a timeout error.
+
+Thanks,
+
+-Daryl.
 
 
 
 -------------------------------------------------------
-This SF.Net email sponsored by Black Hat Briefings & Training.
-Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
-digital self defense, top technical experts, no vendor pitches, 
-unmatched networking opportunities. Visit www.blackhat.com
+This SF.Net email is sponsored by BEA Weblogic Workshop
+FREE Java Enterprise J2EE developer tools!
+Get your free copy of BEA WebLogic Workshop 8.1 today.
+http://ads.osdn.com/?ad_id=5047&alloc_id=10808&op=click
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
