@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <1ffb4b0704120505108a498f3@mail.gmail.com>
-From: Mike Lee <eemike@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Socket error: No such file or directory
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1102093748.17476.167.camel@baroque.rococosoft.com>
+References: <41A705AA000053C5@mta02.ono.com>
+	 <1102093748.17476.167.camel@baroque.rococosoft.com>
+Content-Type: text/plain
+Message-Id: <1102143210.8479.40.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] About rfcomm
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,21 +19,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 5 Dec 2004 05:10:45 -0800
+Date: Sat, 04 Dec 2004 07:53:30 +0100
 
-Dear all
-   Could anyone tell me , Could i use datagram socket for rfcomm? if
-not, Which layer should i use on application like e.g. video streaming
-. l2cap? Or anyone do such a thing before?
+Hi Steve,
 
-best regard
-Mike,Lee
+if you sign your emails, please make sure that your public key is
+available through the normal channels.
+
+	# gpg --recv-key 5CCBC967
+	gpg: no valid OpenPGP data found.
+	gpg: Total number processed: 0
+
+Regards
+
+Marcel
 
 
-
--- 
--------------------------------------------------------
-Mike Lee
 
 
 -------------------------------------------------------
