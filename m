@@ -3,12 +3,10 @@ Subject: Re: [Bluez-users] NAT connection established but no data transport
 From: Marcel Holtmann <marcel@holtmann.org>
 To: skrzypek-piotr@o2.pl
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041101235513.2017B3816E@rekin11.go2.pl>
+In-Reply-To: <20041101214200.C1E5BD0B0C@rekin6.o2.pl>
 References: <20041101214200.C1E5BD0B0C@rekin6.o2.pl>
-	 <1099347952.10948.19.camel@pegasus>
-	 <20041101235513.2017B3816E@rekin11.go2.pl>
 Content-Type: text/plain
-Message-Id: <1099362451.10948.22.camel@pegasus>
+Message-Id: <1099347952.10948.19.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,25 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 02 Nov 2004 03:27:31 +0100
+Date: Mon, 01 Nov 2004 23:25:51 +0100
 
 Hi Pete,
 
-there is a "Reply to All" button in your mail client ;)
+> First of all i would like to describe my situation. I`ve got two
+> computers: first one is a linux debian server (with kernel 2.4.27
+> pachted with grsecurity and bluez patch) and second is a notebook
+> running windows XP Professional. After many problems i`ve
+> succesfully established a NAT connection between the devices
+> (bluetake bt-007 using hciusb driver). The devices are paired and
+> connected but i can`t  notice the data transmittion. I tried to ping
+> one device from the other but i recive "timeout". I also tried
+> l2ping and it shows that connection id good (i`ve pinged a winmac
+> from linuxmac and it showed that data comes from linuxmac i don`t
+> know why but i think it means that connection is good). I`m not
+> really good in linux but i think it`s a problem with linux he can`t
+> recognise it as a network device. When i type ifconfig it shows
+> everything but not the bluetooth connection until i type ifconfig
+> bnep0. Maybe you can give me some advice how to make linux recognise
+> it and let it use wlan0 connection and eth0 connection. Please help
+> me cause i`m tryin to configure it for weeks.
 
-> >try to activate bnep0 and set an IP address.
-> i set: ifconfig bnep0 192.168.0.1
-> and when i type ifconfig there is nothing about bnep0, but when i type
-> ifconfig bnep0
-> i can see everything just like it should be: the same mac adress
-> (read from cover of usb device), ip 192.168.0.1, appropriate mask
-> etc. but still it doesn`t send/recieve data. 
-> 
-> Maybe it can help somehow:
-> I checked the transmission status on the notebook and it says that
-> the device is transmitting (especially while pinging) but not reciving.
-
-are you sure that you are using the latest -mh patch for your kernel?
+try to activate bnep0 and set an IP address.
 
 Regards
 
