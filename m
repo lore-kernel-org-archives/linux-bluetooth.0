@@ -1,45 +1,114 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200412010157.11129.wim.delvaux@adaptiveplanet.com>
-Subject: [Bluez-users] convert sdp browse list to icons`
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 1 Dec 2004 01:57:11 +0100
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] btsco
+From: Dave Henriksen <dhenriksen@optibrand.com>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <41FEB971.7060302@dark-reality.de>
+References: <1107212460.6703.9.camel@linux.site>
+	 <1107209370.8848.4.camel@pegasus>  <1107214572.4223.1.camel@linux.site>
+	 <1107212183.8848.6.camel@pegasus>  <41FEB971.7060302@dark-reality.de>
+Content-Type: text/plain
+Message-Id: <1107217417.9566.5.camel@linux.site>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Mon, 31 Jan 2005 16:23:37 -0800
 
-Can anybody point me to a document describing how to map an sdp service entry
-to the 'class' of a service.
+I think the docs a pretty good, it just would help a bit if they made
+reference to where the dependent packages could be downloaded from.
 
-I.e. if the 'text'  field (attribute 0x100) shows 'dialup networking' then 
-connecting to this service provides just that.  However could this string be 
-different from device to device ? If so is there a CODE somewhere in that sdp 
-record that says the same but does not change ?
+Wih my problem specifically, alsa-devel-1.0-6.8 is installed, so I'm not
+sure what the problem is.
 
-I thing the attribute 0x9 (BluetoothProfileDescriptorList) can be used for 
-that but it is a LIST meaning multiple values are allowed to there might be 
-different values in that entry ...
 
-W
+Dave
+
+On Tue, 2005-02-01 at 00:04 +0100, Lars Grunewaldt wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+> 
+> are the docs THAT bad?
+> 
+> *needtosleepmuchlessworkmuchmore*
+> - -Lars
+> 
+> Marcel Holtmann wrote:
+> | Hi Dave,
+> |
+> |
+> |>Thanks, I think that I have everything that I need now.   I just can't
+> |>get past the following error:
+> |>
+> |>./bootstrap
+> |>aclocal: configure.in: 21: macro `AM_PATH_ALSA' not found in library
+> |
+> |
+> | install the alsa-devel package.
+> |
+> | Regards
+> |
+> | Marcel
+> |
+> |
+> |
+> |
+> | -------------------------------------------------------
+> | This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+> | Tool for open source databases. Create drag-&-drop reports. Save time
+> | by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+> | Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+> | _______________________________________________
+> | Bluez-devel mailing list
+> | Bluez-devel@lists.sourceforge.net
+> | https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> |
+> 
+> 
+> - --
+> Lars Grunewaldt
+> * software development
+> * multimedia design
+> skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+> web: http://www.dark-reality.de
+> mail: lgw@dark-reality.de
+> -----BEGIN PGP SIGNATURE-----
+> Version: GnuPG v1.2.3 (GNU/Linux)
+> Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+> 
+> iD8DBQFB/rlxQWC6DTWkDAoRAhyvAKCUQ7A0fe88zckUa0csLuFyRQg8CQCdH5xk
+> gnmreGj0wDz7Q3MXD41EzK0=
+> =dJ8l
+> -----END PGP SIGNATURE-----
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+> Tool for open source databases. Create drag-&-drop reports. Save time
+> by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+> Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+Dave Henriksen <dhenriksen@optibrand.com>
+
 
 
 -------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now. 
-http://productguide.itmanagersjournal.com/
+This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+Tool for open source databases. Create drag-&-drop reports. Save time
+by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+Download a FREE copy at http://www.intelliview.com/go/osdn_nl
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
