@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: BlueFritz! AP-x working as a Bluetooth
-	device?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200503262108.34103.ch.schuetz@addcom.de>
+From: Christoph =?iso-8859-1?q?Sch=FCtz?= <ch.schuetz@addcom.de>
+To: bluez-users@lists.sourceforge.net
 References: <200503261218.00580.ch.schuetz@addcom.de>
-	 <200503262108.34103.ch.schuetz@addcom.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1111894327.9195.206.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <200503261218.00580.ch.schuetz@addcom.de>
+MIME-Version: 1.0
+Message-Id: <200503262108.34103.ch.schuetz@addcom.de>
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Subject: [Bluez-users] Re: BlueFritz! AP-x working as a Bluetooth device?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,39 +19,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Mar 2005 05:32:07 +0200
+Date: Sat, 26 Mar 2005 21:08:34 +0100
 
-Hi Christoph,
+Hi Marcel!
 
-> In fact it should be poosible on windows to connect a Pc with a AP-x to=
+In fact it should be poosible on windows to connect a Pc with a AP-x to=20
+another with a USB-Stick if you have two windows-machines.=20
+
+You find the following information on the avm-sites:
+
+"Zuvor muss allerdings der Access Point mit dem entsprechenden "PAN-f=E4h=
+igen"=20
+Treiber und der zugeh=F6rigen Firmware ausgestattet werden. Wie das=20
+funktioniert ist unter "Download neue Version" auf dem BlueFRITZ! AP-X=20
+Service-Portal zu erfahren.
+
+Nutzer eines BlueFRITZ! Startpaketes, die lediglich zwei PCs miteinander=20
+vernetzen wollen, nutzen am ersten PC die BlueFRITZ! AP-X mit einer=20
+Verbindung =FCber USB. Nach Firmware- und Treiberupdate und anschlie=DFen=
+dem=20
+Neustart steht der dieser als Netzwerk-Comuter zur Verf=FCgung."
+
+(http://www.avm.de/de/Service/AVM_Service_Portale/BlueFRITZ_Startpaket/Pr=
+axis_und_Tipps/bluefritz_netzwerk.html)
+
+When I start my linux-machine the Bluetooth LED at the AP-x is on after t=
+he=20
+bluetooth daemon starts. So I thought that a Bluetooth-connection with th=
+e=20
+Ap-x is possible.=20
+But if it is not working under linux it is not really a great problem. Th=
+e=20
+notebook that my wive has is running with windows xp, I couldn't convince=
 =20
-> another with a USB-Stick if you have two windows-machines.=20
->=20
-> You find the following information on the avm-sites:
->=20
-> "Zuvor muss allerdings der Access Point mit dem entsprechenden "PAN-f=E4=
-higen"=20
-> Treiber und der zugeh=F6rigen Firmware ausgestattet werden. Wie das=20
-> funktioniert ist unter "Download neue Version" auf dem BlueFRITZ! AP-X=20
-> Service-Portal zu erfahren.
->=20
-> Nutzer eines BlueFRITZ! Startpaketes, die lediglich zwei PCs miteinande=
-r=20
-> vernetzen wollen, nutzen am ersten PC die BlueFRITZ! AP-X mit einer=20
-> Verbindung =FCber USB. Nach Firmware- und Treiberupdate und anschlie=DF=
-endem=20
-> Neustart steht der dieser als Netzwerk-Comuter zur Verf=FCgung."
+her. If I need a connection for a Backup, I have to change the devices=20
+USB-Stick for linux and AP-x for windows. The other way round it would be=
+=20
+more convenient.
 
-this is not a Bluetooth problem. You need a driver for the USB part of
-the BlueFRITZ! AP-X. If AVM haven't changed anything then there is no
-driver available for it, besides the binary driver from AVM. I think it
-is easier to buy another BlueFRITZ! USB and then connect everything.
+Thanks for your work on bluez (and your answer)
 
-Regards
-
-Marcel
-
-
+Christoph Schuetz
 
 
 -------------------------------------------------------
