@@ -1,42 +1,64 @@
-Return-Path: <trexx@pobox.com>
-Subject: Re: [Bluez-users] Logitech Bluetooth  Mx900+keyboard support.
-From: Terence Rudkin <trexx@pobox.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Olivier Bornet <Olivier.Bornet@puck.ch>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1075307541.26729.18.camel@pegasus>
-References: <1074457244.3254.17.camel@localhost.localdomain>
-	 <1074458664.6070.73.camel@pegasus>
-	 <1074480891.2817.10.camel@localhost.localdomain>
-	 <1074514935.6070.80.camel@pegasus>
-	 <1074568150.7831.5.camel@localhost.localdomain>
-	 <20040120081245.GA1871@smartdata.ch>  <1074597908.7088.5.camel@pegasus>
-	 <1075234547.3064.13.camel@localhost.localdomain>
-	 <1075276833.12766.56.camel@pegasus>
-	 <1075306699.1793.38.camel@localhost.localdomain>
-	 <1075307541.26729.18.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1075346991.1793.65.camel@localhost.localdomain>
-Mime-Version: 1.0
-Date: Wed, 28 Jan 2004 20:29:51 -0700
-List-ID: <bluez-users.lists.sourceforge.net>
-
-Marcel,  et al,
-
-The keyboard and mouse now work!  The last issue on getting them to work
-was I needed to umount/mount the /proc/bus/usb file system. 
-
-Actually just umount and reinsert the USB devices.  I restarted hcid and
-bthid after umount'ing and before the insert.  Getting the right modules
-in /etc/modules should be all that is needed. 
-
-I'll get the steps needed I used put together as an addendum the the
-MX900 page referenced eariler
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <40183939.1000209@3WT.com.br>
+From: Rafael Vidal Aroca <rafael@3WT.com.br>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] hci0 problem after timeout
+References: <40170986.70105@3WT.com.br> <1075276651.12766.52.camel@pegasus>	 <4017D6E9.6030700@3WT.com.br> <1075306737.26729.3.camel@pegasus>	 <40182154.6030709@3WT.com.br> <1075323686.26729.41.camel@pegasus>	 <40182452.2040509@3WT.com.br> <1075324208.26729.44.camel@pegasus>
+In-Reply-To: <1075324208.26729.44.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Wed, 28 Jan 2004 20:35:37 -0200
 
 
-Now to get the Tungsten T3 talking (passcode not exchanging) , but that
-a different thread. 
+    Well, i managed to make the connection i wanted using ppp over a 
+rfcomm channel. I works great with no timeouts :-)
 
-Thanks again, Marcel, for all the help!! 
- 
-TR
+    I really don't know anyone here in my city that has a bluetooth 
+dongle, or even a csr based one.
+
+[]s Rafael.
+
+
+Marcel Holtmann wrote:
+
+>Hi Rafael,
+>
+>  
+>
+>>    Unfortunatly, i don't have access to any other bluetooth dongle :-(
+>>    
+>>
+>
+>this is actually bad. Maybe a friend or a colleague has one that you can
+>borrow for testing.
+>
+>Regards
+>
+>Marcel
+>
+>
+>  
+>
+
+
+
+
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
