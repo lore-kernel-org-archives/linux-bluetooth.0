@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Re: MSI 6970 removing - kernel freeze
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Pavel Ruzicka <pavouk@pavouk.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200402221311.10244.pavouk@pavouk.org>
-References: <200402210038.59119.pavouk@pavouk.org>
-	 <200402221306.46964.pavouk@pavouk.org>
-	 <200402221311.10244.pavouk@pavouk.org>
-Content-Type: text/plain
-Message-Id: <1077452237.2716.33.camel@pegasus>
-Mime-Version: 1.0
+References: <200402210038.59119.pavouk@pavouk.org> <200402221306.46964.pavouk@pavouk.org>
+In-Reply-To: <200402221306.46964.pavouk@pavouk.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200402221311.10244.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,22 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 22 Feb 2004 13:17:17 +0100
+Date: Sun, 22 Feb 2004 13:11:10 +0100
 
-Hi Pavel,
+Hello,
 
-> > > When I have hci0 up and I remove my USB MSI 6970 dongle, then kernel
-> > > freezes.
-> 
-> Workaround is to make "hciconfig hci0 down" before removing USB dongle
-> from computer.
+> > When I have hci0 up and I remove my USB MSI 6970 dongle, then kernel
+> > freezes.
 
-or you don't select CONFIG_BT_HCIUSB_SCO in your kernel config.
+Workaround is to make "hciconfig hci0 down" before removing USB dongle
+from computer.
 
-Regards
-
-Marcel
-
+Pavouk
 
 
 
