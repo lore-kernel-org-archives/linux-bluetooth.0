@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <422F4208.8070706@ul.ie>
-From: Joe Sloan <joe.sloan@ul.ie>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Is there authenticate only incoming mode
+Subject: Re: [Bluez-users] Billionton CF card (bt950)
+From: Erwin Authried <eauth@softsys.co.at>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050307153436.GB13771@fuchi>
+References: <20050307153436.GB13771@fuchi>
+Content-Type: text/plain
+Message-Id: <1110392099.10620.272.camel@justakiss>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 09 Mar 2005 18:35:52 +0000
+Date: Wed, 09 Mar 2005 19:14:59 +0100
+
+Am Mon, den 07.03.2005 schrieb Sebastian Henschel um 16:34:
+> howdy folks...
+> 
+> i have a CF card from Billionton here with the P/N CFBT02-B2.
+> cardctl ident reveals:
+>     product info: "Compact Flash", "Bluetooth Card", "", ""
+>     manfid: 0x0279, 0x950b
+>     function: 2 (serial)
+> 
+> /etc/pcmcia/bluetooth.conf reads:
+>     card "Billionton Bluetooth Card"
+>         version "Compact Flash", "Bluetooth Card"
+>         bind "serial_cs"
+> 
+> having read in the archives, bt950_cs and btuart_cs should not be used
+> nowadays, but serial_cs with the combination of hciattach. you
+> should forget about the other two, right?
 
 Hi,
+your card has the same manufacturer/device id as the Conceptronic
+CBT100C. Try serial_cs and "hciattach ttyS.. bcsp"
 
-Is it possible to configure hcid so that authentication (i.e. PIN 
-challenge) is only invoked on incoming connections. I'd like to make a 
-PIN request only if some other device tries to use my PC (e.g. object 
-push) but it is not required if I want to send to them (and my PC 
-initiates the connection). I'm not too bothered about encryption at this 
-stage..
-
-I've searched the newslist and tried configuring hcid.conf but haven't 
-been able to get it working. Guess it is not intended to  work that way.
-
-Joe
-
+Regards,
+Erwin
 
 
 
