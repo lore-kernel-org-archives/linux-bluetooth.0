@@ -1,65 +1,50 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <vogl@soft.uni-linz.ac.at>
+Message-ID: <403B4565.1020201@soft.uni-linz.ac.at>
+Date: Tue, 24 Feb 2004 13:36:53 +0100
+From: Simon Vogl <vogl@soft.uni-linz.ac.at>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] browsing non-public services?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Collin R. Mulliner" <collin@betaversion.net>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040224132517.0434ab6d@coredump>
-References: <403B1072.1020102@soft.uni-linz.ac.at>
-	 <1077624474.2880.37.camel@pegasus>  <20040224132517.0434ab6d@coredump>
-Content-Type: text/plain
-Message-Id: <1077626176.2880.54.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 Feb 2004 13:36:16 +0100
+References: <403B1072.1020102@soft.uni-linz.ac.at> <1077624474.2880.37.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Collin,
 
-> > > can I retrieve service information on non-public services? My nokia
-> > > phones show an SDP-entry for service class 0x5555 that the phones
-> > > also inquire when connecting, now I'd like to see what is registered
-> > > there...
+
+Marcel Holtmann wrote:
+> Hi Simon,
 > 
-> I bet that 0x5555 refers to RFCOMM channel 17,18 or both ;-)
+> 
+>>can I retrieve service information on non-public services? My nokia phones
+>>show an SDP-entry for service class 0x5555 that the phones also inquire when
+>>connecting, now I'd like to see what is registered there...
+> 
+> 
+> read the manpage or use "sdptool -h" ;)
+> 
+> 	sdptool search --bdaddr <bdaddr> --tree 0x5555
+> 
+> Must be something vendor specific. Please show us the output.
+> 
 
-what is on RFCOMM channel 17 and 18? On channel 14 we have the Nokia PC
-Suite FBUS protocol for Bluetooth.
-
-My Nokia 6310 has a UUID128 that starts with 0x5555
-
-	Sequence
-	        Attribute 0x0000 - Service record handle
-	                UINT32 0x00010008
-	        Attribute 0x0001 - Service class ID list
-	                Sequence
-	                        UUID128 00005555-0000-1000-8000-0002ee000001
-	        Attribute 0x0300
-	                UINT16 0x005f
-
-Maybe this is only checked to activate some Nokia<->Nokia special
-features. For example remote PIN code or name change.
-
-Regards
-
-Marcel
+tried that already, but with no luck. From hcidump, I see that this is a 128bit
+uuid - how can I specify this as an argument??
+Cheers
+Simon
 
 
+> Regards
+> 
+> Marcel
+> 
 
 
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+_______________________________________________________________________
+Dr. Simon Vogl
+Institut für Pervasive Computing, Johannes Kepler Universität Linz
+Altenberger Straße 69, A-4040 Linz, Austria
+
+Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
+mailto: vogl@soft.uni-linz.ac.at,  http://www.soft.uni-linz.ac.at/
