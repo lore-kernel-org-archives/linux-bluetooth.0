@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] some basic questions
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050323181913.12fe9a15@BigWilma>
-References: <20050323181913.12fe9a15@BigWilma>
-Content-Type: text/plain
-Message-Id: <1111603018.1916.11.camel@pegasus>
+From: # =?ISO-8859-1?Q?Bj=F6rn?= Specht # <bspecht@gmx.net>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20050323181913.12fe9a15@BigWilma>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] some basic questions
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,26 +16,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 23 Mar 2005 19:36:58 +0100
+Date: Wed, 23 Mar 2005 18:19:13 +0100
 
-Hi Bjoern,
+Hi all,
 
-> what is the baswap - function used for? I had a look at the bluetooth.c and it is just changing the order of the MAC-address.
-> 
-> Is there some documentation available where I can read about the functions and why/what they are used for?
+what is the baswap - function used for? I had a look at the bluetooth.c and=
+ it is just changing the order of the MAC-address.
 
-the BD_ADDR is transmitting in reverse order.
+Is there some documentation available where I can read about the functions =
+and why/what they are used for?
 
-> What is the difference between the ba2str and batostr functions? Why are there 2 functions implemented?
+What is the difference between the ba2str and batostr functions? Why are th=
+ere 2 functions implemented?
 
-The *2str function do the baswap() and operate on a buffer. The *tostr
-functions allocate a buffer and don't do the baswap().
+Thanks a lot. A link or something else to read about this stuff would be ap=
+preciated as well!
 
-Regards
-
-Marcel
-
-
+Bj=F6rn
 
 
 -------------------------------------------------------
