@@ -1,69 +1,53 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] "comlicated" setup - known issues
-	for	hid	and	SCO?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Lars Grunewaldt <lgw@dark-reality.de>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4118BEBE.2010505@dark-reality.de>
-References: <4117A907.7010006@dark-reality.de>
-	 <1092071597.4564.17.camel@pegasus>  <4117B376.3030507@dark-reality.de>
-	 <1092073484.4564.32.camel@pegasus>  <4117BA71.5000800@dark-reality.de>
-	 <1092090585.4564.51.camel@pegasus>  <4118BEBE.2010505@dark-reality.de>
-Content-Type: text/plain
-Message-Id: <1092142142.4564.101.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 14:49:02 +0200
+Return-Path: <James@superbug.demon.co.uk>
+Message-ID: <4118C562.1050300@superbug.demon.co.uk>
+Date: Tue, 10 Aug 2004 13:53:54 +0100
+From: James Courtier-Dutton <James@superbug.demon.co.uk>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Lars Grunewaldt <lgw@dark-reality.de>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
+References: <4117AB9A.9010909@dark-reality.de>	 <1092071356.4564.12.camel@pegasus>  <4117B098.5020805@dark-reality.de>	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>	 <1092090364.4564.46.camel@pegasus> <41180E64.1010007@dark-reality.de> <1092140041.4564.96.camel@pegasus>
+In-Reply-To: <1092140041.4564.96.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Lars,
+I don't know if this will help, but I will itemise the requirements that 
+and alsa driver will need:
 
-> | so both devices are in the same piconet. There should be no problem, but
-> | from my position I can't tell you anything more.
-> 
-> I think this message might have something to do with the problem:
-> 
-> hci_scodata_packet: hci0 SCO packet for unknown connection handle 44
-> 
-> My main problem does not even seem to be connected to the mouse, because
-> it also happens when the mouse is far far away and not connected.
+1) A ring buffer, that is then broken up into 2 or more chunks called 
+periods. The userland application will set the buffer_size and period_size.
+2) An interrupt or callback routine is called as each period reaches the 
+headset speakers, same for capture from headset mic.
+3) A hardware pointer value, that can be read at any time, and returns 
+the current sample being played by the speakers, or as close as possible 
+to it.
+4) Latency between samples leaving the ring buffer and being played to 
+the speakers should be as small as possible. This should be less than 
+10ms. Optimum low latency is achieved using 2 periods per buffer.
+5) The rate at which samples leave the ring buffer should be constant, 
+and ideally under hardware control.
 
-this can also happen when the connection is already closed and then some
-data packets arrive. Maybe it is a chip problem, because as I know CSR
-never official supported the SCO over HCI/USB transport. Or the USB host
-controller has problems with the ISOC transfers.
+My suggestion for the SCO channel, is to use a fixed number, normally 2, 
+of SCO packets in a loop.
+1) User app fills buffer.
+2) SCO takes X samples from ring buffer, creates a SCO packet, and sends 
+it to the hardware.
+3) SCO takes X more samples from the ring buffer, creates another SCO 
+packet, and sends it to the hardware.
+4) SCO then waits until SCO has finished (2), and only then takes X 
+samples from the ring buffer, creates a SCO packet, and sends it to the 
+hardware...then repeats.
+5) Add a SCO api call, so that the higher level module can find out how 
+much of the SCO packet has been output, and thus return accurate 
+hardware pointer values.
 
-> In about 50% of SCO connections the sound coming from the headset is
-> totally garbage (not the sound send TO the headset!); I think this might
-> be connected to another report here on the list when someone mentioned
-> he had to cut the first byte when recording audio from an SCO channel
-> (because I'm using 16bit right now, too). This never happend with 8bit
-> transmissions over SCO.
+In this way there are only ever 2 SCO packets in the pipeline.
+It fixes the latency, and we always have an accurate idea of which 
+sample is currently being played.
 
-This can be that problem. We need an algorithm in the hci_usb driver to
-detect this.
+Summary: Limit the size of the SCO packet buffer to 2 packets, or some 
+fixed even value.
 
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
-100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
-Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
-http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Cheers
+James
