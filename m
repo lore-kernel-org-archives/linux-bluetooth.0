@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: jirka@dopis.cz
+From: Jiri Kaderavek <jiri.kaderavek@webstep.net>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200312171020.50300.jirka@dopis.cz>
+Message-Id: <200312171019.20938.jiri.kaderavek@webstep.net>
 Subject: [Bluez-users] rfcomm failing after PIN is entered on nokia 6310i
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -16,7 +16,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Dec 2003 10:20:50 +0100
+Date: Wed, 17 Dec 2003 10:19:20 +0100
 
 Hi all.
 
