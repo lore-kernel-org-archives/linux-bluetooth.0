@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Pablo Vieira" <listas@loquecreas.com>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
-Message-ID: <E1CO9gP-0006mn-OE@sc8-sf-mx1.sourceforge.net>
-Subject: [Bluez-users] Talking to a digital camera
+From: Hans Bausewein <hans@comerwell.xs4all.nl>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Broadcom Corporation (Firmware 105.105.074) USB dongle
+Message-ID: <20041030204753.GA10315@comerwell.xs4all.nl>
+References: <20041030094327.GA8724@comerwell.xs4all.nl> <1099136877.6912.41.camel@pegasus> <20041030124433.GA9232@comerwell.xs4all.nl> <1099143692.10448.14.camel@pegasus> <20041030152320.GA9566@comerwell.xs4all.nl> <1099150958.16247.12.camel@pegasus> <20041030155712.GA9715@comerwell.xs4all.nl> <1099152611.16247.23.camel@pegasus> <20041030195917.GA10109@comerwell.xs4all.nl> <1099167789.6644.6.camel@notepaq>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1099167789.6644.6.camel@notepaq>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,27 +17,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 31 Oct 2004 07:59:15 +0100
+Date: Sat, 30 Oct 2004 22:47:54 +0200
 
-Hi,
+On Sat, Oct 30, 2004 at 10:23:09PM +0200, Marcel Holtmann wrote:
+> 
+> I don't think so, because this is some kind of init problem. You can try
+> to set the quirk for your device 0a5c:2009 to HCI_BROKEN_ISOC only,
+> because it seems that parts of it still work if you don't call reset.
 
-I'm new to this list so I apologize if this has been treated before.
+Did this, but with same result. I only compiled 'hci_usb.c' and replaced the
+'hci_usb.ko' since it's only a piece of implementation that changed. Must be
+OK, I guess.
 
-I want to talk wirelessly to a digicam (a Canon Powershot A75, but most use
-similar protocols). These cameras use USB to talk to the host computer and
-I'm wondering if I could use any Bluetooth device to serve as a wireless
-bridge to the camera, in the same way there are Bluetooth printer adapters
-that talk to printers. Actually, I was thinking: would it be possible to use
-one of these adapters?
+> Btw do you compiled your kernel with the CONFIG_BT_HCIUSB_SCO option? If
+> yes, then try without it.
 
-I AM NOT TRYING TO DOWNLOAD OR UPLOAD PICTURES from or to the camera. I just
-want the camera's shutter to be released remotely, as well as setting up
-parameters such as shutter speed, aperture, etc.
+OK, maybe this is the problem. The Debian default was with
+CONFIG_BT_HCIUSB_SCO=y, so I kept that.
 
-Thanks for any help
+Now I have to recompile everything, I guess.
+It's compiling on the 2.8 GHz P4 machine at my work, now.
 
-Pablo
+> The other thing is to change the init sequence of HCI commands and
+> actually for this I must have this dongle at home. Think about donating
+> it to me instead of returning it.
 
+Maybe I'll buy another one for you, if I think it will work. 
+
+
+Hans
 
 
 -------------------------------------------------------
