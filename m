@@ -1,51 +1,49 @@
-Return-Path: <linux-usb-users-admin@lists.sourceforge.net>
-Message-ID: <403144AB.9040504@yahoo.com>
-From: "Todd E. Johnson" <tejohnson@yahoo.com>
+Return-Path: <kdesai@mail.smu.edu>
 MIME-Version: 1.0
-To: "Todd E. Johnson" <tejohnson@yahoo.com>
-Cc: bluez-users@lists.sourceforge.net, linux-usb-users@lists.sourceforge.net,
-   maxk@qualcomm.com
-References: <402E2E29.7040207@yahoo.com> <1076769794.14758.2.camel@pegasus>	 <402E4E02.9020600@yahoo.com> <1076851622.14758.22.camel@pegasus> <402F99AC.7020500@yahoo.com> <403137F9.1050108@yahoo.com>
-In-Reply-To: <403137F9.1050108@yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Linux-usb-users] Re: 2.6.2 errors with DBT-120 (B2)
-Sender: linux-usb-users-admin@lists.sourceforge.net
-Errors-To: linux-usb-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/linux-usb-users>,
-	<mailto:linux-usb-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Post: <mailto:linux-usb-users@lists.sourceforge.net>
-List-Help: <mailto:linux-usb-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/linux-usb-users>,
-	<mailto:linux-usb-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=linux-usb-users>
-Date: Mon, 16 Feb 2004 17:31:07 -0500
+Content-Type: text/plain;
+	charset="utf-8"
+Subject: RE: [Bluez-users] L2CAP connectionless
+Date: Mon, 16 Feb 2004 16:20:25 -0600
+Message-ID: <38F76B90B82C0A4A822651EACE4FF8E9C23327@s31xs2>
+From: "Desai, Keyur Rajnikant" <kdesai@mail.smu.edu>
+To: "Michel Planques" <mplanque@laas.fr>, <marcel@holtmann.org>
+Cc: <bluez-users@lists.sourceforge.net>
 List-ID: <bluez-users.lists.sourceforge.net>
 
-Todd E. Johnson wrote:
-
->
-> The attached patch includes patch-2.4.24-mh2, a fix for the error, and 
-> a few minor fixes so the kernel can build when debugging is enabled...
-
-1,$s/patch-2.4.24-mh2/patch-2.2.2-mh2/
-
-Sorry, I meant to say patch-2.2.2-mh2... Sorry about any confusion this may have caused...
-
--- 
-
-        Regards,
-        
-        Todd E. Johnson
-
-
-
-
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Linux-usb-users@lists.sourceforge.net
-To unsubscribe, use the last form field at:
-https://lists.sourceforge.net/lists/listinfo/linux-usb-users
+SGkgLA0KIA0KWWVhaCBpdCB3b3VsZCBiZSBncmVhdCBpZiBzb21lIGJvZHkgY291bGQgdGhyb3cg
+c29tZSBsaWdodCBvbiB3aGF0IHRoaXMgaGFuZGxlciBmdW5jdGlvbiBkb2VzIGluIHRoZSBjb25u
+ZWN0aW9sZXNzIG1vZGUNCiANCnRoZSBjb2RlIGdvZXMgbGlrZSB0aGlzDQogDQppZiAoc29ja3R5
+cGU9U09DS19ER1JBTSkNCnsgDQogICBoYW5kbGVyKHMpOw0KICAgcmV0dXJuOw0KfQ0KIA0KSSBz
+b21lIGhvdyBjYW5ub3QgZ2V0IGluc2lkZSBvZiB0aGlzIGZ1bmN0aW9uIHRocnUgeHhnZGIgLi4u
+Y2FuIG55Ym9keSBoZWxwIG1lIGluIHRoaXMuLi4uDQogDQpjaGVlcnMuLg0KRGVzYWkNCg0KCS0t
+LS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tIA0KCUZyb206IE1pY2hlbCBQbGFucXVlcyBbbWFpbHRv
+Om1wbGFucXVlQGxhYXMuZnJdIA0KCVNlbnQ6IE1vbiAyLzE2LzIwMDQgMzo0MyBQTSANCglUbzog
+bWFyY2VsQGhvbHRtYW5uLm9yZyANCglDYzogRGVzYWksIEtleXVyIFJham5pa2FudDsgYmx1ZXot
+dXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0IA0KCVN1YmplY3Q6IFJlOiBbQmx1ZXotdXNlcnNd
+IEwyQ0FQIGNvbm5lY3Rpb25sZXNzDQoJDQoJDQoNCglIaSBNYXJjZWwsDQoJDQoJQXMgSSBrbm93
+LCBhIEwyQ0FQIGxpbmsgaXMgY29ubmVjdGlvbiBvcmllbnRlZCwgc28gSSBkb24ndCB1bmRlcnN0
+YW5kIGhvdw0KCXRoZSBjb25uZWN0aW9ubGVzcyBtb2RlIGlzIHdvcmtpbmcuDQoJSSBhbHJlYWR5
+IHNlYXJjaGVkIGluZm9ybWF0aW9ucyBhYm91dCBTT0NLX0RHUkFNIGltcGxlbWVudGF0aW9uIGlu
+IEJsdWV6DQoJYW5kIG5ldmVyIGZvdW5kIGFueXRoaW5nIDogZXZlbiBpbiB0aGlzIG1haWxpbmcg
+bGlzdCAobWF5YmUgSSdtIGJsaW5kICEpDQoJSWYgYW55Ym9keSBjb3VsZCBwb2ludCBtZSBvbiBz
+b21lIGluZm9ybWF0aW9ucyAuLi4NCgkNCglUaGFuayB5b3UuDQoJDQoJTWljaGVsLg0KCQ0KCT4g
+SGkgRGVzYWksDQoJPg0KCT4+IEkgYW0gIGp1c3Qgd29uZGVyaW5nIGhvdyBMMkNBUCBjb25uZWN0
+aW9ubGVzcyBtb2RlIHdvcmtzDQoJPj4NCgk+PiB3aGVuIGkgZG8gYSAuL2wydGVzdCAtcyAtRCBC
+RF9BRERSIGl0IGhhcyB0byB1c2UgdGhlIGNvbm5lY3QgbWV0aG9kLg0KCT4+DQoJPj4gQWxzbyB3
+aGVuIHRoZSAtRCBvcHRpb24gY2F1c2VzIHRoZSBzb2NrZXQgdG8gYmUgc2V0IHRvIFNPQ0tfREdS
+QU0gIEkNCgk+PiBjYW5ub3QgdW5kZXJzdGFuZCB3aGF0IHRoZSAgaGFuZGxlciAocykgZnVuY3Rp
+b24gZG9lcw0KCT4+DQoJPj4gSSB0cmllZCB0byBzaW5nbGUgc3RlcCB1c2luZyB4eGdkYiBidXQg
+aXQgd291bGQgYWx3YXlzIHNraXAgdGhlDQoJPj4gaGFuZGxlcihzKSBmdW5jdGlvbi4NCgk+DQoJ
+PiBubyBjb21tZW50cyBmcm9tIG1lLCBiZWNhdXNlIEkgbmV2ZXIgd29ya2VkIHdpdGggTDJDQVAg
+Y29ubmVjdGlvbmxlc3MNCgk+IHNvY2tldHMuIFRoZXJlIHdhcyBzb21lIGRpc2N1c3Npb24gYWJv
+dXQgaXQgb24gdGhlIG1haWxpbmcgbGlzdCwgc28gSQ0KCT4gdGhpbmsgeW91IHNob3VsZCBnbyB0
+aHJvdWdoIHRoZSBhcmNoaXZlLg0KCT4NCgk+IFJlZ2FyZHMNCgk+DQoJPiBNYXJjZWwNCgk+DQoJ
+Pg0KCT4NCgk+DQoJPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tDQoJPiBTRi5OZXQgaXMgc3BvbnNvcmVkIGJ5OiBTcGVlZCBTdGFydCBZb3Vy
+IExpbnV4IEFwcHMgTm93Lg0KCT4gQnVpbGQgYW5kIGRlcGxveSBhcHBzICYgV2ViIHNlcnZpY2Vz
+IGZvciBMaW51eCB3aXRoDQoJPiBhIGZyZWUgRFZEIHNvZnR3YXJlIGtpdCBmcm9tIElCTS4gQ2xp
+Y2sgTm93IQ0KCT4gaHR0cDovL2Fkcy5vc2RuLmNvbS8/YWRfaWQ9MTM1NiZhbGxvY19pZD0zNDM4
+Jm9wPWNsaWNrDQoJPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fXw0KCT4gQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0DQoJPiBCbHVlei11c2Vyc0BsaXN0cy5z
+b3VyY2Vmb3JnZS5uZXQNCgk+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xp
+c3RpbmZvL2JsdWV6LXVzZXJzDQoJDQoJDQoJDQoJDQoNCg==
