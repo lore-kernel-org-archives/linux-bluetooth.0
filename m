@@ -1,17 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] DBT-120 firmware upgrade
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200411291815.iATIFK0a022472@news01.csr.com>
-References: <200411261152.29925.pavouk@pavouk.org>
-	 <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus>
-	 <200411272130.44783.pavouk@pavouk.org> <1101588637.27074.22.camel@pegasus>
-	 <41AB14DD.3010807@csr.com> <1101731638.10115.0.camel@pegasus>
-	 <41AB1AF5.3030901@csr.com> <1101749410.7562.21.camel@pegasus>
-	 <200411291815.iATIFK0a022472@news01.csr.com>
-Content-Type: text/plain
-Message-Id: <1101753185.7562.36.camel@pegasus>
-Mime-Version: 1.0
+Message-Id: <200411291815.iATIFK0a022472@news01.csr.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] DBT-120 firmware upgrade 
+In-reply-to: <1101749410.7562.21.camel@pegasus> 
+References: <200411261152.29925.pavouk@pavouk.org> <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus> <200411272130.44783.pavouk@pavouk.org> <1101588637.27074.22.camel@pegasus> <41AB14DD.3010807@csr.com> <1101731638.10115.0.camel@pegasus> <41AB1AF5.3030901@csr.com> <1101749410.7562.21.camel@pegasus>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -23,35 +16,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Nov 2004 19:33:05 +0100
+Date: Mon, 29 Nov 2004 18:15:19 +0000
 
-Hi Peter,
-
-> > # hciconfig hci0 revision
-> > hci0:   Type: USB
-> >         BD Address: 00:C0:DF:xx:xx:xx ACL MTU: 192:8  SCO MTU: 64:8
-> >         Build 1354
-> >         Chip version: BlueCore02
-> >         Max key size: 56 bit
-> >         SCO mapping:  HCI
-> > 
-> > I assume that this is also a HCI 18.2, right?
+Marcel Holtmann wrote:
+> # hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:C0:DF:xx:xx:xx ACL MTU: 192:8  SCO MTU: 64:8
+>         Build 1354
+>         Chip version: BlueCore02
+>         Max key size: 56 bit
+>         SCO mapping:  HCI
 > 
-> That's not a production build and I can't find any record of it being
-> sent to anyone.  Very, very interesting.  It should be functionally
-> similar to 18.2
+> I assume that this is also a HCI 18.2, right?
 
-but it is an official build, right? This is the HID proxy dongle sold
-with the Genius Bluetooth mouse. The mouse has build id 0x417. The USB
-descriptors states this as "KYE Systems Corp. (Mouse Systems)" and they
-use the VID/PID 0458:1000 and 0458:003f.
+That's not a production build and I can't find any record of it being
+sent to anyone.  Very, very interesting.  It should be functionally
+similar to 18.2
 
-Do you have the build information for my web page?
+pws
 
-Regards
 
-Marcel
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
 
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
