@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Timo Veith <tv@rz-zw.fh-kl.de>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <423CB216.8050006@email.it>
+From: Antonio-Blasco Bonito <blasco.bonito@email.it>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200503202301.49376.tv@rz-zw.fh-kl.de>
-Subject: [Bluez-devel] Problem with BlueLogic WingKey Keyboard
+To: Antonio-Blasco Bonito <blasco.bonito@email.it>
+Cc: Fredrik Tolf <fredrik@dolda2000.com>, bluez-devel@lists.sourceforge.net,
+   ms419@freezone.co.uk, durtro@ginnungagap.de
+Subject: Re: [Bluez-devel] Fwd: alsa bluetooth module
+References: <e36f1e61ac13a554d52d2f7b8d7a5df4@freezone.co.uk> <1111098892.19889.88.camel@pc7.dolda2000.com> <423B6547.5040001@email.it>
+In-Reply-To: <423B6547.5040001@email.it>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,123 +20,132 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 20 Mar 2005 23:01:49 +0100
+Date: Sun, 20 Mar 2005 00:13:26 +0100
 
-Hi bluez-devel readers,
+Antonio-Blasco Bonito ha scritto:
 
-I bought the nice BlueLogic WingKey Keyboard. Unfortunately I wasn't able to 
-get it working yet. On http://www.holtmann.org/linux/bluetooth/hid.html you 
-wrote that it should work with linux.
+> Fredrik Tolf ha scritto:
+>
+>> Try to check the output of `grep kcalloc /proc/kallsyms' and compare
+>> that to the output of `nm /path/to/snd-bt-sco.ko | grep kcalloc'.
+>>  
+>>
+> $ grep kcalloc /proc/kallsyms
+> ce9f6a40 U snd_kcalloc  [snd_opl3_lib]
+> ce9f6a40 U snd_kcalloc  [snd_hwdep]
+> ce9f6a40 U snd_kcalloc  [snd_mpu401_uart]
+> ce9f6a40 U snd_kcalloc  [snd_rawmidi]
+> ce9f6a40 U snd_kcalloc  [snd_seq_device]
+> ce9f6a40 U snd_kcalloc  [snd_cs4231_lib]
+> ce9f6a40 U snd_kcalloc  [snd_pcm_oss]
+> ce9f6a40 U snd_kcalloc  [snd_mixer_oss]
+> ce9f6a40 U snd_kcalloc  [snd_pcm]
+> ce9f6a40 U snd_kcalloc  [snd_timer]
+> ce9fc4d8 r __kcrctab_snd_kcalloc        [snd]
+> ce9fc634 r __kstrtab_snd_kcalloc        [snd]
+> ce9fca40 r __ksymtab_snd_kcalloc        [snd]
+> ce9f6a40 T snd_kcalloc  [snd]
+> 4da9e78a a __crc_snd_kcalloc    [snd]
+>
+> $ nm /lib/modules/2.6.8-2-686/extra/snd-bt-sco.ko |grep kcalloc
+>         U kcalloc
+>
+Having seen that, knowing almost nothing about that, I tried editing the 
+source code of the module btsco.c
+I replaced the three occurrences of kcalloc with snd_kcalloc. It 
+compiled without errors. And then OK!!! ... I've been able to modprobe it.
 
-At least I can type some characters. But when I start to type the keyoard 
-randomly begins to produce characters after some time. Like so:
+# lsmod
+Module                  Size  Used by
+sco                    15108  0
+isofs                  37240  1
+snd_bt_sco             13088  3
+rfcomm                 39420  3
+l2cap                  25796  7 rfcomm
+ipv6                  264644  12
+ds                     18756  4
+appletalk              36628  20
+lp                     11176  0
+snd_cs4236             18568  4
+snd_opl3_lib           10656  1 snd_cs4236
+snd_hwdep               9412  3 snd_bt_sco,snd_opl3_lib
+snd_cs4236_lib         16896  1 snd_cs4236
+snd_mpu401_uart         7968  1 snd_cs4236
+snd_rawmidi            25124  1 snd_mpu401_uart
+snd_seq_device          8200  2 snd_opl3_lib,snd_rawmidi
+snd_cs4231_lib         27744  2 snd_cs4236,snd_cs4236_lib
+snd_pcm_oss            55080  0
+snd_mixer_oss          20096  4 snd_pcm_oss
+snd_pcm                98728  4 
+snd_bt_sco,snd_cs4236_lib,snd_cs4231_lib,snd_pcm_oss
+snd_timer              25668  3 snd_opl3_lib,snd_cs4231_lib,snd_pcm
+snd                    57156  20 
+snd_bt_sco,snd_cs4236,snd_opl3_lib,snd_hwdep,snd_cs4236_lib,snd_mpu401_uart,snd_rawmidi,snd_seq_device,snd_cs4231_lib,snd_pcm_oss,snd_mixer_oss,snd_pcm,snd_timer
+soundcore              10336  4 snd
+snd_page_alloc         11752  3 snd_bt_sco,snd_cs4231_lib,snd_pcm
+...
 
-ddddddddddddddddddd
+I get the address of my headset:
+# hcitool scan
+Scanning ...
+        00:0B:2E:30:9B:03       Motorola HS805
 
-Then I have to press backspace on my normal keyboard (which is still 
-connected) to stop that behaviour. It's not always a "d", it depends on what I 
-typed before. Also sometimes some characters get mixed.
+I connect it:
 
-The trackball and the mouse buttons aren't working at all. This keyboard was 
-so expensive and it would be a great pity if I couldn't use it now. :(
+# btsco 00:0B:2E:30:9B:03
+Device is 1:0                                  (here I'm asked to key in 
+the pin)
+Voice setting: 0x0060
+RFCOMM channel 1 connected
+                                                       (I press the 
+connect button on the headset)
+recieved AT+CKPD=200
+opened hwdep
+connected SCO channel
+Setting sco fd
+Done setting sco fd
+recieved AT+VGS=09
+Sending up speaker change 9
 
-Here are some infos about my system: I am using Gentoo Linux with kernel 
-2.6.11-gentoo-r4, bluez-libs and bluez-utils 2.15. The bluetooth daemon is 
-started and when I plug in the usb dongle the log says:
+I can see the alsa audio device
 
-Mar 20 19:42:02 tristan usb 3-1: new full speed USB device using uhci_hcd and 
-address 2
-Mar 20 19:42:03 tristan Bluetooth: HCI USB driver ver 2.8
-Mar 20 19:42:03 tristan hcid[7523]: HCI dev 0 registered
-Mar 20 19:42:03 tristan usbcore: registered new driver hci_usb
-Mar 20 19:42:03 tristan hcid[7523]: HCI dev 0 up
-Mar 20 19:42:03 tristan hcid[7523]: Starting security manager 0
+# aplay -l
+**** List of PLAYBACK Hardware Devices ****
+card 0: CS4239 [CS4239], device 0: CS4231 [CS4239]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 1: Headset [BT Headset], device 0: Bluetooth SCO PCM [BT SCO PCM]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
 
+But if I play some audio:
+# aplay -t wav -B 1000000 -D plughw:Headset audiofile.wav
 
-And when I push the power button of the keyboard I get:
+I hear nothing   :-(
+while syslog says:
+Mar 19 23:41:57 localhost kernel: snd-bt-sco: playback_open
+Mar 19 23:41:57 localhost kernel: snd-bt-sco: prepare ok bps: 16000 
+size: 16002 count: 4000
+Mar 19 23:41:57 localhost kernel: snd-bt-sco: playback_trigger 1
+Mar 19 23:41:57 localhost kernel: snd-bt-sco: setting playback to bspcm
 
-Mar 20 19:42:21 tristan hidd[7529]: New HID device 00:02:72:49:3C:2D 
-(Bluelogic Technologies Inc. Bluetooth Keyboard)
+I'm so close... what else I have to do now? Please...
 
+ 
 
-So far, everything seems to be good, but if I press some keys the upper 
-mentioned behaviour takes place and I see the following kind of messages in 
-the log file:
+ 
 
-Mar 20 19:42:43 tristan hidp_input_report: Unknown key (scancode 0xbe) 
-pressed.
-Mar 20 19:42:43 tristan hidp_input_report: Unknown key (scancode 0xbe) 
-released.
-Mar 20 19:42:43 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:42:43 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:42:44 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:42:44 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:42:52 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:42:53 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:42:53 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:42:53 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:42:53 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:42:53 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:42:53 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:42:54 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:43:01 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:43:01 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:43:04 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:43:05 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:43:05 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:43:06 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:43:06 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:43:06 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:43:07 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:43:07 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:43:07 tristan hidp_input_report: Unknown key (scancode 0xcd) 
-pressed.
-Mar 20 19:43:07 tristan hidp_input_report: Unknown key (scancode 0xcd) 
-released.
-Mar 20 19:43:08 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:43:08 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:43:09 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:43:10 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:43:12 tristan hidp_input_report: Unknown key (scancode 0xff) 
-pressed.
-Mar 20 19:43:12 tristan hidp_input_report: Unknown key (scancode 0xff) 
-released.
-Mar 20 19:43:15 tristan hidp_input_report: Unknown key (scancode 0xae) 
-pressed.
-Mar 20 19:43:15 tristan hidp_input_report: Unknown key (scancode 0xae) 
-released.
+ --
 
-It would be really nice get some help here, because I am completly lost. 
-Please tell me if I can provide more info. Thanks in advance and kind 
-regards,
+ Email.it, the professional e-mail, gratis per te: http://www.email.it/f
 
-Timo
+ 
+
+ Sponsor:
+
+ Solo 10 Euro per chiamare in tutto il mondo!! Scopri il vantaggio di Email Phone Card,        clicca subito
+
+ Clicca qui: http://adv.email.it/cgi-bin/foclick.cgi?mid=2685&d=20-3
 
 
 -------------------------------------------------------
