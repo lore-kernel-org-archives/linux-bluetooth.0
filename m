@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <405022B6.7010504@sets.lv>
-From: Ivars Strazdins <ivars.strazdins@sets.lv>
+Message-ID: <20040311045957.47445.qmail@web40703.mail.yahoo.com>
+From: Lalith Chakravarthi <lalithvc@yahoo.com>
+Subject: Re: [Bluez-users] Shell script during bluetooth connection
+To: bluez-users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1078923303.2537.33.camel@pegasus>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Epox BT-DG02A crashes kernel 2.6.3
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,22 +16,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 11 Mar 2004 10:26:30 +0200
+Date: Wed, 10 Mar 2004 20:59:57 -0800 (PST)
 
-hi all,
+HI Marcel..
+> 
+> I don't use RedHat, but in general there is not a big difference
+> between
+> an executable file and an executable shell script. It is important
+> that
+> the script is mode 755. However you can also put your script directly
+> into /etc/hotplug/net.agent.
 
-I'm trying to use Epox BT-DG02A USB dongle on HP Omnibook 6000 with 
-gentoo linux and kernel 2.6.3, but the dongle crashes kernel 
-intermittently. It happens almost every time I remove the dongle or try 
-to remove uhci-hcd module after Bluetooth has been in use. In every 
-other sense the installation is pretty stable and is working under heavy 
-load and with various external devices including USB storage.
-Yep, I saw that this dongle has NOT been reported as working in hardware 
-list, but two other very similar devices (DG03 and DG02) were there.
-Thank you in advance for any suggestions.
+When is the script /etc/hotplug/net.agent called? Is it when the USB
+Dongle is plugged in??? Or is it when another USB device comes within
+the range (I cant think of a way that this can happen without a
+connexion)... or is it when a bluetooth connection is established??
 
-wbr,
-ivars
+Regards
+Lalith
+
+__________________________________
+Do you Yahoo!?
+Yahoo! Search - Find what you’re looking for faster
+http://search.yahoo.com
 
 
 -------------------------------------------------------
