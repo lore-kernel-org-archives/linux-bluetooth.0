@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Mathias Adam serial patch for 2.6.x kernel,
-	Socket CF and BrainBox CF, working!
+Subject: Re: [Bluez-users] HID report mode protocol support in 2.6.11-mh1
+	broken/missing?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4230599B.70909@summet.com>
-References: <4230599B.70909@summet.com>
+In-Reply-To: <1110498275.3040.6.camel@pc.vesuri.net>
+References: <1110498275.3040.6.camel@pc.vesuri.net>
 Content-Type: text/plain
-Message-Id: <1110796152.8158.58.camel@pegasus>
+Message-Id: <1110796090.8158.56.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,22 +19,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Mar 2005 11:29:12 +0100
+Date: Mon, 14 Mar 2005 11:28:10 +0100
 
-Hi Jay,
+Hi Vesa,
 
-> I have tested the patch Mathias Adam posted to this list a week ago on kernel
-> 2.6.8.1-24mdk (a Mandrake version of 2.6.8). It applied cleanly, and made my
-> socket compact flash card (rev H) work great!
-> 
-> It also fixed the same type of problem I was having with an older BrainBox CF
-> (H4 mode) card!  (The brainbox card works, but does not support encryption.)
-> 
-> If you missed it, I archived the patch here:
-> http://www.summet.com/x31/socket.html
+> I upgraded my kernel from 2.6.10-mh2 to 2.6.11-mh1 and now my mouse and
+> keyboard operate in boot protocol mode again so the special keys don't
+> work. Does 2.6.11-mh1 lack full support for the report mode protocol, is
+> it broken or has something else changed I'd have to know about? I'm
+> using bluez-libs and -utils 2.15. The keyboard is a Logitech Elite
+> keyboard and the mouse is Logitech MX900.
 
-it is not solving all serial problems, but it is at least a start. So
-work on getting this merged back into mainline.
+maybe I made a mistake when porting the report mode to 2.6.11. Last time
+I checked it, it worked for me.
 
 Regards
 
