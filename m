@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] why use 0x0060 as default voice setting?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: s4048156@student.uq.edu.au
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1085048297.4556.22.camel@tom.mshome>
+From: cuanyu <s4048156@student.uq.edu.au>
+Reply-To: s4048156@student.uq.edu.au
+To: bluez-devel <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <E1BQkU2-0007Fe-4t@sc8-sf-list2.sourceforge.net>
 References: <E1BQkU2-0007Fe-4t@sc8-sf-list2.sourceforge.net>
-	 <1085048297.4556.22.camel@tom.mshome>
 Content-Type: text/plain
-Message-Id: <1085048602.4327.157.camel@pegasus>
+Message-Id: <1085048297.4556.22.camel@tom.mshome>
 Mime-Version: 1.0
+Subject: [Bluez-devel] why use 0x0060 as default voice setting?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,20 +18,10 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 May 2004 12:23:23 +0200
+Date: Thu, 20 May 2004 20:18:17 +1000
 
-Hi,
-
-> the SCO link uses only 8kps @ 8-bits audio sample, why should the
-> default voice setting be set to 0x0060 which means 16-bits per sample? 
-
-there is a difference between the air data and the input data. The
-default input is 16-bits PCM with 8kps. Read the specification.
-
-Regards
-
-Marcel
-
+the SCO link uses only 8kps @ 8-bits audio sample, why should the
+default voice setting be set to 0x0060 which means 16-bits per sample? 
 
 
 
