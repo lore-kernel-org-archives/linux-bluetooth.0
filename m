@@ -1,8 +1,8 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: "Franck Arnaud" <franck@nenie.org>
 To: bluez-devel@lists.sourceforge.net
-Message-Id: <45540213.2004.5.20.14.0.11.47584@mem.nenie.org>
-Subject: Re: [Bluez-devel] LIBS vs LD_FLAGS in bluez-utils makefiles
+Message-Id: <45540213.2004.5.20.13.56.39.93532@mem.nenie.org>
+Subject: [Bluez-devel] LIBS vs LD_FLAGS in bluez-utils makefiles
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -13,15 +13,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 20 May 2004 14:00:11 GMT
+Date: 20 May 2004 13:56:39 GMT
 
-I wrote:
+Hello,
 
-> $LIBS = @BLUEZ_LIBS@
+In bluez-utils's Makefile.am files, it usually says:
 
-Sorry, typo, this is without $:
+LDFLAGS = @BLUEZ_LIBS@
 
-LIBS = @BLUEZ_LIBS@
+which fails when linking statically, apparently because it's too 
+early in the command line ("gcc ... -l ... -o ... foo.o"). I don't 
+think the lib description is a "flag" as intended for $LDFLAGS.
+
+I replaced the above with 
+
+$LIBS = @BLUEZ_LIBS@
+
+so that -l is after the .o files, and linking now succeeds.
 
 
 
