@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] l2cap question
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Christoph Torens <c.torens@web.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <opsda220m9eocfdv@debian>
-References: <opsda220m9eocfdv@debian>
-Content-Type: text/plain
-Message-Id: <1093469385.537.17.camel@pegasus>
-Mime-Version: 1.0
+To: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
+From: "Christoph Torens" <c.torens@web.de>
+Content-Type: text/plain; format=flowed; delsp=yes; charset=iso-8859-15
+MIME-Version: 1.0
+Message-ID: <opsda220m9eocfdv@debian>
+Subject: [Bluez-users] l2cap question
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,43 +15,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Aug 2004 23:29:45 +0200
+Date: Wed, 25 Aug 2004 22:55:38 +0200
 
-Hi Christoph,
+Hi,
 
-> I have two questions:
-> First:
-> Is it possible to do a program communication just over l2cap?
-> Without rfcomm/pand/dund.
+I have two questions:
+First:
+Is it possible to do a program communication just over l2cap?
+Without rfcomm/pand/dund.
+(Because after a very long time of tests, l2ping is the only
+thing that works with my USB host-controller chip / driver)
+If yes: Is there some small Tool I could use to test this?
+Perhaps read and write a string over l2cap.
 
-it might be possible, but L2CAP is SOCK_SEQPACKET and RFCOMM is
-SOCK_STREAM. You should keep this in mind and also is written in the
-profile specifications.
+Second:
+Does a Bluetooth USB-Dongle use isochronus USB transfers?
+And if yes: when or where?
+(Because the USB host driver seems to have problems with
+isoc. transfers and I'm not sure if this actaully is the
+error I am fighting with)
 
-> (Because after a very long time of tests, l2ping is the only
-> thing that works with my USB host-controller chip / driver)
-> If yes: Is there some small Tool I could use to test this?
-> Perhaps read and write a string over l2cap.
-
-Take a look at l2test and rctest from bluez-utils.
-
-> Second:
-> Does a Bluetooth USB-Dongle use isochronus USB transfers?
-> And if yes: when or where?
-
-It uses it for SCO support.
-
-> (Because the USB host driver seems to have problems with
-> isoc. transfers and I'm not sure if this actaully is the
-> error I am fighting with)
-
-Disable SCO support for the USB driver and no ISOC transfers are used.
-
-Regards
-
-Marcel
-
-
+-- 
+Regards,
+Christoph
 
 
 -------------------------------------------------------
