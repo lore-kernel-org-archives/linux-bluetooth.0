@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <20040308161155.51782.qmail@web40709.mail.yahoo.com>
+From: Lalith Chakravarthi <lalithvc@yahoo.com>
 Subject: Re: [Bluez-users] bluez pan problem
-From: Marcel Holtmann <marcel@holtmann.org>
 To: Ronan Naughton <wadgienaughton@hotmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Cc: bluez-users@lists.sourceforge.net
 In-Reply-To: <BAY10-F1216PYzDabig00010bb6@hotmail.com>
-References: <BAY10-F1216PYzDabig00010bb6@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1078765164.10671.11.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,21 +17,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 08 Mar 2004 17:59:24 +0100
+Date: Mon, 8 Mar 2004 08:11:55 -0800 (PST)
 
-Hi Ronan,
+Hi Ronan
 
-> I am having a problem with setting up a bluez pan between three machines and 
+> I am having a problem with setting up a bluez pan between three
+> machines and 
 > i don't know what I'm doing wrong.
 > 
 > I set one node ( say B )the GN to listen
 > 
->                                            pand --listen --master --role GN
+>                                            pand --listen --master
+> --role GN
 > 
 > 
 > I then connect  the other two nodes ( A & C )
 > 
->                                           pand --connect  mac_addr_of_master
+>                                           pand --connect 
+> mac_addr_of_master
 > 
 > 
 > I then assign an ip address to A, C and then the master B:
@@ -40,24 +42,39 @@ Hi Ronan,
 >                                            ifconfig bnep0 10.0.0.1
 >                                            ifconfig bnep0 10.0.0.3
 >                                            ifconfig bnep0 10.0.0.2
-> 
+
+I am not exactly sure about your problem. But I think you should be
+using the ifconfig bnep0 for the connection with one PANU and ifconfig
+bnep1 for the other PANU. 
 > 
 > Then for some reason:
 > The first pc (10.0.0.1) can ping the other PANU and the GN
 > The second pc (10.0.0.3) cannot ping the other PANU or the GN
 > The GN (10.0.0.2 ) can only ping the second pc (10.0.0.3)
+> 
+> Why on earth is this happening. Ip forwarding is turned on on all
+> machines. 
+> I have no idea why it won't work-please help!!!!!!!!
+Anyways, do send the output screens when you enter 
 
-from your setup the master must be have to BNEP connection bnep0 and
-bnep1. You must bring both up and assign an IP to them. Actually you
-will ran into problems with PANU to PANU connections over the GN. I
-propose that you build a bridge above every bnepX connection on the
-master. See the PAN HOWTO and the mailing list archive for more details.
+##> ifconfig bnep0 
+
+and 
+
+##> ifconfig bnep1 
+
+on the three computers. That will help in getting a clearer
+understanding of your problem. And guys, if I am wrong, please do
+correct me also...
 
 Regards
+Lalith
 
-Marcel
 
-
+__________________________________
+Do you Yahoo!?
+Yahoo! Search - Find what you’re looking for faster
+http://search.yahoo.com
 
 
 -------------------------------------------------------
