@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <009601c47642$9c950ef0$79000f0a@matrix>
-From: "Virat Gohil" <virat4lug@hotpop.com>
-To: <johan@vandenbrande.com>, <bluez-users@lists.sourceforge.net>
-References: <64925.213.118.22.110.1091145636.squirrel@webmail.fusebox.be>
 Subject: Re: [Bluez-users] Palm connection problems.
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: johan@vandenbrande.com
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <64925.213.118.22.110.1091145636.squirrel@webmail.fusebox.be>
+References: <64925.213.118.22.110.1091145636.squirrel@webmail.fusebox.be>
+Content-Type: text/plain
+Message-Id: <1091179050.12651.174.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,28 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Jul 2004 20:06:24 +0530
+Date: Fri, 30 Jul 2004 11:17:30 +0200
 
-> Hi,
->
+Hi Johan,
+
 > I'm facing a problem connecting my Palm|T to my linux box.
+> 
+> I've installed BlueZ and can run sdptool to see OPUSH services on my Palm.
+> Also, I'm able to bind the device etc. However, when I try to connect via
+> network (pppd), I get the following error:
+> 
+> Jul 30 01:37:24 questor dund[1032]: New connection from 00:07:E0:0E:00:3A
+> Jul 30 01:37:24 questor pppd[1033]: pppd 2.4.1 started by root, uid 0
+> Jul 30 01:37:24 questor pppd[1033]: Failed to open /dev/rfcomm0: No such
+> device
 
-> I can connect to the Palm manually (at least, the Palm says 'connection in
-> progress') using:
-> rfcomm connect /dev/rfcomm0 00:07:E0:0E:00:3A 1
+the problem is simple. There is no /dev/rfcomm0 device. What kernel
+version do you use? What version of bluez-libs and bluez-utils do you
+installed?
 
-# rfcomm bind 0 00:07:E0:0E:00:3A 1
+Regards
 
-the 1 at the end refers to the channel no. for DUN on your mobile, usually
-its 1, check out your palm's channel.
-
-> Anybody who knows what the problem can be?
->
-> Johan
-
-Regards,
-
-Virat
+Marcel
 
 
 
