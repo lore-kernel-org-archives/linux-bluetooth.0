@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41AE995F.7030107@avantwave.com>
-From: mike <mikelee@avantwave.com>
+Message-ID: <41AE59AC.5000505@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] About rfcomm socket
-References: <41AD2B86.6010002@avantwave.com>	 <1101882506.18840.18.camel@pegasus>  <41AD867D.2060609@avantwave.com> <1101894514.18840.50.camel@pegasus>
-In-Reply-To: <1101894514.18840.50.camel@pegasus>
+Subject: Re: [Bluez-devel] btsco2
+References: <200412010839.06669.mailsp@sebastian-eichner.de>	 <200412010943.33419.mail@sebastian-eichner.de>	 <1101894192.18840.44.camel@pegasus>	 <200412011224.29191.mail@sebastian-eichner.de>  <41ADAC67.10706@suche.org>	 <1101901302.18840.72.camel@pegasus>  <41ADB1C2.8070805@suche.org> <1101902920.18840.79.camel@pegasus> <41ADD32D.2060502@suche.org> <41AE065F.9040601@xmission.com> <41AE281E.3050908@suche.org> <41AE3871.1000608@xmission.com> <41AE3CC7.4070804@suche.org>
+In-Reply-To: <41AE3CC7.4070804@suche.org>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,209 +18,116 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 02 Dec 2004 12:26:07 +0800
+Date: Thu, 02 Dec 2004 00:54:20 +0100
 
-Dear Marcel
-    Thanks for helping. and sorry for disturbing two mailing list.
-    Here are the codes generate problems.(i omitted some codes because 
-of the size)
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-My english is no good, I try to make it clear.
-There are 3 device, Target device, computer A, computer B. Target device 
-is running the code below i.e. connect to computer A through channel 3 
-and listen at channel 2. It supposed that computer B can connect to 
-target device when target device is connecting others, but it fails. And 
-when target stop connecting computer A, computer B can then connect to 
-target with channel 2!
+Bluetooth wrote:
+| Brad Midgley wrote:
+|
+|> We can continue to maintain a daemon that does not support these
+|> features and works well for embeded systems. What applications will
+|> you use the headset with and how will they start/stop/detect connections?
+|
+|
+| Currently kphone sjphone, kphone vor example try to open the dsp device
+| on inbound or outbond connection if we can signal btsco that dsp is open
+| this would be sufficent or not ?
 
+There are several reasons why a Headset can be "connected" to the DSP
+(that is, open the SCO channel).
 
+We discussed those earlier (I think on the old mailing list - is there
+an archive?), and it pretty much boiles down to:
 
-int main(void)
-{
-    if ((connect_pid=fork())==0)
-    {
-        DEBPRINT("Connect process %d\n",getpid());
-        printf("Start connecting...\n");
-        do_connect(&stateData);
-        return 0;
-    }
-    else
-    {
-        DEBPRINT("RTSP listen process %d\n",getpid());
-        // waiting phone to connect
-        printf("Start listening...\n");
-        do_listen(&stateData);
-    }
-}
-int do_connect(TPVSerial_State_t *stateData)
-{
-    struct sockaddr_rc sa;
-    int sk,retry;
+1. user presses button on the headset. Headset sends some RFCOMM stuff
+to the server, and that one should open the SCO channel
+2. the server opens the SCO channel
 
+to indicate a ring on the headset there's also an RFCOMM signal that
+should, following the BT specs, used to signalize the user "incoming
+call" so that the user can connect the headphone and take the call by
+pressing the button.
 
-    // Create RFCOMM socket
-    sk = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-    if(sk < 0)
-    {
-        syslog(LOG_ERR, "Cannot create RFCOMM socket. %s(%d)",
-                strerror(errno), errno);
-        return -1;
-    }
-   
-    sa.rc_family  = AF_BLUETOOTH;
-    sa.rc_channel = 3;
-    str2ba("00:e0:07:cb:15:68",&sa.rc_bdaddr);
+In fact I think a phone software must be able to use some "general"
+interface to connect to the btsco daemon to signal "incoming call" and
+recieve a "take call". That's what I'd expect of a real good phone
+application supporting a headset - it should work excatly like my phone
+connected to the headset.
 
-    retry = 3;   
-    while(retry--)
-    {
-        int ret, alen = sizeof(sa);
-        DEBPRINT("Conecting...\n");
-        ret = connect(sk, (struct sockaddr *) &sa, alen);
-        if(ret<0)
-        {
-            syslog(LOG_ERR, "Connect failed. %s(%d)", strerror(errno), 
-errno);
-            continue;
-        }
-        DEBPRINT("Connected\n");
+But of course, there are many ways a headset could be used, so I think
+we also need an "auto connect" mode that opens the sco connection when
+the dsp is opened - like you described. Like the "auto-pickup" function
+of a cellphone when in car mode or headset connected...
 
-        ba2str(&sa.rc_bdaddr, ba);
-   
-        syslog(LOG_INFO, "New connection from %s", ba);
-        // to handle the SPP connection
-        sp_open_connection(sk, stateData);
-        close(sk);
-    }
+So the user must be able to select what his headset should do:
 
-    return 0;
-}
+a) idle until user presses connect button, than connect
+b) connect when audio interface is opened
 
+(b) has some problems because there's a connection delay, and some
+programs might open/close devices often, so maybe we need a disconnect
+timeout (when device is disconnected, keep SCO running in case it
+immediatly re-connects)
 
-int do_listen(TPVSerial_State_t *stateData)
-{
-    struct sockaddr_rc sa;
-    int sk;
-    fd_set netfd;
+Just my thoughts...
 
-    /* setup RFCOMM channel */
-    if (!channel)
-        channel = SP_DEFAULT_CHANNEL;
+|> the kernel needs changes in bluez.
+|>
+|> Marcel explained it once: "To get more than one SCO channel working
+|> the hci_usb driver must be fixed to dynamicaly change the alternate
+|> settting."
+|>
+|> again, I don't know SCO well enough to understand this, but it sounds
+|> fundamental.
+|>
+|> the btsco in the kernel also needs to be changed to allow for multiple
+|> simultaneous audio streams.
+|
+|
+| Hm sounds bad :-(
 
-    /* add SPP to local SDP server */
-    if (use_sdp)
-        sp_sdp_register(channel);
+Well it depends. What sounded more badly was his note about "the whole
+hci_usb is a mess and should be rewritten".
 
-    // Create RFCOMM socket
-    sk = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+The problem with hci_usb and sco is that you need to select the correct
+"alternate setting" depending on the bitrate that is needed for *all*
+sco channels together. So i.e. three 16 bit sco connections lead to the
+48bit endpoint (just gussing, but it's something alike).
 
-    if(sk < 0)
-    {
-        syslog(LOG_ERR, "Cannot create RFCOMM socket. %s(%d)",
-                strerror(errno), errno);
-        return -1;
-    }
-    //NONBLOCK socket
-    flags = fcntl(sk,F_GETFL,0);
-    fcntl(sk,F_SETFL,O_NONBLOCK|flags);
-   
-    sa.rc_family  = AF_BLUETOOTH;
-    sa.rc_channel = channel;
-    sa.rc_bdaddr  = src_addr;
+So the endpoint depends on the number of channels and of course on the
+bitrate (there are several codecs that only use 8bit).
 
-    if (bind(sk, (struct sockaddr *) &sa, sizeof(sa)))
-    {
-        syslog(LOG_ERR, "Bind failed. %s(%d)", strerror(errno), errno);
-        return -1;
-    }
+How the endpoint could be set is sorted out in a "rough style", but
+there are several issues when it comes to interupts and not-yet-send
+data in the USB urb's that I don't know how to fix right now. We have a
+notify that tells the hci_usb about new made connections, and a counter
+for sco connections. But are unable to simply change the alternate
+settings as long as there are unsent USB packages, and we are unsure
+where to safely switch the setting.
 
+I'd have to dig deeply into it and I don't have the time right now. I
+hope I'll have some more soon, but... *sigh*
 
-    listen(sk, 10);
-    FD_ZERO(&netfd);
-   
-    terminate = 0;
-    while(!terminate)
-    {
-        int  alen = sizeof(sa), nsk;
-       
+Please don't focus only on your use case for btsco but remember that
+there are very different topics that have to be addressed here. If you
+are looking at embedded devices and trying to reduce dependencies than
+we should think about one full-featured *and* one light-weight program
+to solve our problems the best way for different platforms and needs.
+And have a look what the BT specs say about how the headsets should
+operate (audio connection stuff)
 
-        FD_SET(sk,&netfd);
-        syslog(LOG_INFO, "Waiting for connection...");
-        DEBPRINT("wait Accept\n");
-        select(sk+1,&netfd,NULL,NULL,NULL)
+regards,
+~  Lars
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-        if(FD_ISSET(sk,&netfd)){       
-            nsk = accept(sk, (struct sockaddr *) &sa, &alen);
-            if(nsk<0)
-            {
-                syslog(LOG_ERR, "Accept failed. %s(%d)", 
-strerror(errno), errno);
-                continue;
-            }
-            DEBPRINT("Accepted\n");
-   
-            ba2str(&sa.rc_bdaddr, ba);
-   
-            syslog(LOG_INFO, "New connection from %s", ba);
-
-            // to handle the SPP connection
-            sp_open_connection(nsk, stateData);
-            close(nsk);
-        }
-    }
-
-    if(use_sdp)
-        sp_sdp_unregister();
-    return 0;
-}
-
-Best regard
-Mike,Lee
-
-Marcel Holtmann wrote:
-
->Hi Mike,
->
->you posted your request to both mailing lists. Don't do any cross
->posting.
->
->  
->
->>    Here is code fragment. I use usual fork practise to run these two 
->>func do_connect and do_listen.  I hard code the bluetooth device to be 
->>connected just because code is under testing.
->>    And these two func are using different channel, it can be connected 
->>when do_connect retry more than 3 times.
->>    So i do not why it can not be connected when it is trying to connect 
->>another device.
->>    
->>
->
->I don't get your point. Make it clear who is connecting to whom.
->
->And if you don't set your socket to non-blocking the use of select makes
->no sense. Show us the full code.
->
->Regards
->
->Marcel
->
->
->
->
->-------------------------------------------------------
->SF email is sponsored by - The IT Product Guide
->Read honest & candid reviews on hundreds of IT Products from real users.
->Discover which products truly live up to the hype. Start reading now. 
->http://productguide.itmanagersjournal.com/
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->  
->
-
+iD8DBQFBrlmrQWC6DTWkDAoRAmL3AJ9+GYhlERvP1kejG2RN01qePkcmMwCgrqz+
+mK8aBQ/E3oW8uoZhJNSzQhI=
+=dweH
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
