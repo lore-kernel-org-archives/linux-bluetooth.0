@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] colona key problem in 2.6 and bthid
-References: <200405102355.12055.cijoml@volny.cz> <1084243988.25099.5.camel@pegasus>
-In-Reply-To: <1084243988.25099.5.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200405112215.21743.cijoml@volny.cz>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200405102355.12055.cijoml@volny.cz>
+References: <200405102355.12055.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1084243988.25099.5.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,26 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 11 May 2004 22:15:21 +0200
+Date: Tue, 11 May 2004 04:53:08 +0200
 
-On Tuesday 11 of May 2004 04:53, Marcel Holtmann wrote:
-> Hi Michal,
->
-> > under 2.6.6 doesn't work colona key - when pressed, non reply to console.
-> > 2.4.26 works fine with the same bthid
->
-> I don't know why. Must be the input subsystem.
->
-> Regards
->
-> Marcel
+Hi Michal,
 
-Hi Marcel,
+> under 2.6.6 doesn't work colona key - when pressed, non reply to console.
+> 2.4.26 works fine with the same bthid
 
-with hidd and hidp colona key works under 2.6.6 :)
-Those were probably some shadows on moon
+I don't know why. Must be the input subsystem.
 
-Michal
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
