@@ -1,9 +1,9 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <404C7FC9.7010002@lnt.uni-saarland.de>
-From: Eric Chapman <eric@lnt.uni-saarland.de>
+Message-ID: <404C7E9A.7000000@chapman.lu>
+From: Eric Chapman <eric@chapman.lu>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Subject: [Bluez-devel] Re: Bluez on Axis DevBoard 82
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -15,7 +15,7 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 08 Mar 2004 15:14:33 +0100
+Date: Mon, 08 Mar 2004 15:09:30 +0100
 
 Hi Tobias,
 
@@ -54,26 +54,6 @@ axis top-level makefile so that the binaries may be flashed to the board
 and be used as applications
 
 greets, Eric
-
--- 
-Eric Chapman
-
------------------
-Lehrstuhl für Nachrichtentechnik
-Universität des Saarlandes
-
--- 
-Eric Chapman
-
------------------
-Lehrstuhl für Nachrichtentechnik
-Universität des Saarlandes
-Postfach 15 11 50
-D-66041 Saarbrücken
-Tel: +49 681 302 3975
-Fax: +49 681 302 3972
-Web: www.lnt.uni-saarland.de
-
 
 
 
