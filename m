@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: the White Rabbit in Wonderland <ghostsong@aliceposta.it>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] BT3030
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Hedin <hedin@hiervard.ru>
+Cc: bluez-users@lists.sf.net
+In-Reply-To: <200405150903.23338.hedin@hiervard.ru>
+References: <200405150903.23338.hedin@hiervard.ru>
 Content-Type: text/plain
-Message-Id: <1084533280.23187.13.camel@alice.wonderland>
+Message-Id: <1084611681.24119.24.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] GhostSong
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,24 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 14 May 2004 13:14:41 +0200
+Date: Sat, 15 May 2004 11:01:21 +0200
 
-Greetings,
+Hi Hedin,
 
-I get a bind 'memory_cs' to socket 0 failed : invalid argument
+> Here is my `dmesg` log after I load my modules after connecting the dongle:
+> 
+> usb 1-1: new full speed USB device using address 3
+> Bluetooth: Core ver 2.4
+> NET: Registered protocol family 31
+> Bluetooth: HCI device and connection manager initialized
+> Bluetooth: HCI socket layer initialized
+> Bluetooth: L2CAP ver 2.1
+> Bluetooth: L2CAP socket layer initialized
+> Bluetooth: HCI USB driver ver 2.5
+> usbcore: registered new driver hci_usb
+> Bluetooth: Broadcom Blutonium firmware driver ver 1.0
+> bcm203x_probe: Mini driver request failed
+> bcm203x: probe of 1-1:1.0 failed with error -5
+> usbcore: registered new driver bcm203x
 
-This means it's a 16 bit , the _cs right ?
+this means that the request for the mini driver file BCM2033-MD.hex
+failed. You need /sys mounted, you need /etc/hotplug/firmware.agent and
+you must put the two firmware files from Broadcom in the firmware
+directory under /usr/lib/hotplug/firmware.
 
-Is there anything i could do about it to deal with my 3com wireless
-bluetooth 3CRWB6096B ?
+Regards
 
-I couldnt get the .bin since i dont have windows at all , plus i couldnt
-extract that file to get the .bin i was in need to proceed with further
-testing.
+Marcel
 
-Thanks and keep up the good work
-
-Best regards
 
 
 
