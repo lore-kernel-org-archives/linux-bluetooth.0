@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41AD8DD1.9020904@prim-time.fr>
-From: Xavier Garreau <x.garreau@prim-time.fr>
-MIME-Version: 1.0
+From: Sebastian Eichner <mail@sebastian-eichner.de>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] using select()?
-References: <000a01c4d733$8609ce30$6401000a@zool>
-In-Reply-To: <000a01c4d733$8609ce30$6401000a@zool>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] A2DP working :-) , voice not :-(
+References: <200412010839.06669.mailsp@sebastian-eichner.de> <200412010907.09587.mail@sebastian-eichner.de> <1101889919.18840.40.camel@pegasus>
+In-Reply-To: <1101889919.18840.40.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200412010943.33419.mail@sebastian-eichner.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +19,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 10:24:33 +0100
+Date: Wed, 1 Dec 2004 09:43:33 +0100
 
-Hi,
+On Wednesday, 1. December 2004 09:31, Marcel Holtmann wrote:
+> this should work. Do you enabled CONFIG_BT_HCIUSB_SCO in your
+> kernel?
 
-> Is there anyware some examples or any source code in the BlueZ utils. 
-> where they use the standard network select() function?
-> I really want to use this instead of the more "heavier" fork() function. :-)
+cat /proc/config.gz |gunzip -|grep CONFIG_BT_HCIUSB_SCO
+CONFIG_BT_HCIUSB_SCO=y
 
-Marcel sent us some time ago an example which uses poll on hci raw sockets.
+Yes, it's enabled. Hmm, tricky thing...
+Generally it should work with kernel 2.6.9, right?
 
-A cached version can be found here : 
-http://www.xgarreau.org/temp/bluetooth_docs/bluez/mh_hci_raw.c
-
-Maybe Marcel has a more recent example ?
-
-Regards,
-Xavier Garreau
+Sebastian
 
 
 -------------------------------------------------------
