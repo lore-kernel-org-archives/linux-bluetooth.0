@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Edd Dumbill <edd@usefulinc.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1100286100.7349.5.camel@pegasus>
-References: <1100260673.8785.20.camel@saag>
-	 <1100261630.12168.71.camel@pegasus>  <1100267525.8785.39.camel@saag>
-	 <1100268649.8785.43.camel@saag>  <1100282119.7349.3.camel@pegasus>
-	 <1100285554.8785.60.camel@saag>  <1100286100.7349.5.camel@pegasus>
-Message-Id: <1100299941.8785.66.camel@saag>
+Subject: Re: [Bluez-users] Help Me ! Pstool of csr bt chip
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041112211827.71472.qmail@web54509.mail.yahoo.com>
+References: <20041112211827.71472.qmail@web54509.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1100294565.7349.7.camel@pegasus>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Debian testing required: bcm203x firmware
-Content-Type: text/plain; charset=UTF-8
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,30 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 12 Nov 2004 22:52:20 +0000
+Date: Fri, 12 Nov 2004 22:22:45 +0100
 
-On Fri, 2004-11-12 at 20:01 +0100, Marcel Holtmann wrote:
->=20
-> What is stronger from the Debian package view. Suggested or
-> Recommended?
+Hi Luis,
 
-Recommended.  So Suggests bluez-firmware is as strong as I can get
-without necessitating the move to contrib.
+> Please help me! I need Pstool win32 for configure csr
+> bluetooth chip.
 
-See =C2=A72.2 of http://www.debian.org/doc/debian-policy/ch-archive.html
+the pstool is not free software. Ask your sales contact at CSR.
 
+Regards
 
--- Edd
-
+Marcel
 
 
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by: InterSystems CACHE
-FREE OODBMS DOWNLOAD - A multidimensional database that combines
-robust object and relational technologies, making it a perfect match
-for Java, C++,COM, XML, ODBC and JDBC. www.intersystems.com/match8
+This SF.Net email is sponsored by:
+Sybase ASE Linux Express Edition - download now for FREE
+LinuxWorld Reader's Choice Award Winner for best database on Linux.
+http://ads.osdn.com/?ad_id=5588&alloc_id=12065&op=click
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
