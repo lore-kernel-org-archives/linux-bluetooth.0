@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] link_key editor
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Paul Hedderly <bulkpaul@mjr.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040920104619.GV26469@wacka.mjr.org>
-References: <20040920102151.GT26469@wacka.mjr.org>
-	 <1095676325.5562.88.camel@pegasus>  <20040920104619.GV26469@wacka.mjr.org>
+To: diego.liziero@unimore.it
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1095695153.15993.40.camel@igno>
+References: <1095695153.15993.40.camel@igno>
 Content-Type: text/plain
-Message-Id: <1095695596.5731.25.camel@pegasus>
+Message-Id: <1095695515.5731.22.camel@pegasus>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Re: [patch] hciattach: added other serial speeds and small help
+ fix.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,23 +19,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 20 Sep 2004 17:53:16 +0200
+Date: Mon, 20 Sep 2004 17:51:55 +0200
 
-Hi Paul,
+Hi Diego,
 
-> > > Well I think the subject says it all. Is there (preferably command line)
-> > > a link_key editor? I'd like to be able to list the keys and remove them
-> > > individually for when I'm playing with stuff.
-> > 
-> > the simple answer is NO.
+> I spent a couple of hours before understanding that to disable
+> flow control in H4 modules I needed to put the word "noflow" instead
+> of just omitting the word "flow" :)
 > 
-> Ooh - quick reply!
+> That's why I propose this help change.
 > 
-> And the less simple answer is?
+> Added also other speeds (tested with a csr based module).
 
-I wait how the kernel internal key management stuff will look like in
-the end and then extend hcid to a general instance for every key related
-stuff.
+applied. Thanks.
 
 Regards
 
