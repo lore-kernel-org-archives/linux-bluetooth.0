@@ -1,177 +1,63 @@
-Return-Path: <t.schorpp@gmx.de>
-Message-ID: <3FFB14A5.3040803@gmx.de>
-Date: Tue, 06 Jan 2004 21:03:49 +0100
-From: "thomas.schorpp" <t.schorpp@gmx.de>
-MIME-Version: 1.0
-CC: Marcel Holtmann <marcel@holtmann.org>,
+Return-Path: <Olivier.Bornet@puck.ch>
+Date: Tue, 6 Jan 2004 18:53:18 +0100
+From: Olivier Bornet <Olivier.Bornet@puck.ch>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Alexander Holler <holler@ahsoftware.de>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hci_acl_tx_to: hci0 ACL tx timeout, solved, kmod
- loaded wrong ALTERNATE uhci driver by default
-References: <3FF9E3F2.4040506@gmx.de> <1073393043.2508.50.camel@pegasus>	 <3FFAB0C5.4050407@gmx.de> <1073396288.2508.72.camel@pegasus>	 <3FFABD90.1020903@gmx.de> <1073397402.2508.81.camel@pegasus> <3FFACF71.70607@gmx.de> <3FFADA5E.8050202@gmx.de>
-In-Reply-To: <3FFADA5E.8050202@gmx.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] Success: switching the Logitech-Hub
+Message-ID: <20040106175318.GC14879@puck.ch>
+References: <9810000.1073197538@[192.168.207.2]> <1073267036.3804.4.camel@pegasus> <20040106171510.GE15149@smartdata.ch> <1073411335.2508.96.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="0ntfKIWw70PvrIHh"
+In-Reply-To: <1073411335.2508.96.camel@pegasus>
+Sender: Olivier Bornet <Olivier.Bornet@puck.ch>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-hi,
 
-thomas.schorpp wrote:
-> thomas.schorpp wrote:
-> 
->> Marcel Holtmann wrote:
->>
->>> Hi Thomas,
->>>
->>>
->>>>> This is HCI 16.4 firmware and it should work fine. Do you use the SCO
->>>>> audio support for the HCI USB driver? If yes, disable it, because I
->>>>> heard of problems with ISOC transfers on VIA chips if I remember
->>>>> correctly.
->>>>
->>>>
->>>>
->>>> NO sco module loaded(?)
->>>
->>>
->>>
->>>
->>> I am not talking about the sco module. I am talking about the SCO audio
->>> option of the HCI USB driver. Disable it to avoid ISOC transfers.
->>
->>
->>
->> yes, ill check, i think it is disabled, wanted only pan from the 
->> beginning, thx a lot.
-> 
-> 
-> was enabled, now disabled, no change, stalled after 2 minutes transfer:
-> 
-> Jan  6 16:38:46 TOM1 pand[4118]: New connection from 00:10:60:A5:0F:DC 
-> bnep0
-> 
-> Jan  6 16:42:37 TOM1 kernel: hci_acl_tx_to: hci0 ACL tx timeout
-> Jan  6 16:42:37 TOM1 kernel: hci_acl_tx_to: hci0 killing stalled ACL 
-> connection DC:0F:A5:60:10:00
-> 
-> trying alternate usb driver...
+--0ntfKIWw70PvrIHh
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-SOLVED! compile only the usb-uhci (via...) driver, ok with at least :
+Hi Marcel,
 
+> > one of our device has an ID of 0x046d:0xc703. Can you add it to the
+> > hid2hci.c file in the CVS ? I have tested it, and it works OK.
+>=20
+> done.
 
-00:11.1 IDE interface: VIA Technologies, Inc. VT82C586/B/686A/B PIPC Bus 
-Master IDE (rev 06) (prog-if 8a [Master SecP PriP])
-         Subsystem: VIA Technologies, Inc. VT8235 Bus Master 
-ATA133/100/66/33 IDE
-         Flags: bus master, medium devsel, latency 32, IRQ 11
-         I/O ports at d400 [size=16]
-         Capabilities: [c0] Power Management version 2
+Thanks. :-)
 
-00:11.2 USB Controller: VIA Technologies, Inc. USB (rev 1b) (prog-if 00 
-[UHCI])
-         Subsystem: VIA Technologies, Inc. (Wrong ID) USB Controller
-         Flags: bus master, medium devsel, latency 32, IRQ 5
-         I/O ports at d800 [size=32]
-         Capabilities: [80] Power Management version 2
+> > One question: I can't switch back to USB mode. Is this not supported at
+> > this time ?
+>=20
+> No. I think it is possible, but at the moment we don't understand how
+> the Logitech protocol works. I have some written notes about it on my
+> desktop, because they also use the same protocol framework for driving
+> the display of the mediapad. But I haven't found the time to setup a
+> webpage about it.
 
-00:11.3 USB Controller: VIA Technologies, Inc. USB (rev 1b) (prog-if 00 
-[UHCI])
-         Subsystem: VIA Technologies, Inc. (Wrong ID) USB Controller
-         Flags: bus master, medium devsel, latency 32, IRQ 5
-         I/O ports at dc00 [size=32]
-         Capabilities: [80] Power Management version 2
+OK, thanks for the info. And good luck in your search.
 
-00:11.4 USB Controller: VIA Technologies, Inc. USB (rev 1b) (prog-if 00 
-[UHCI])
-         Subsystem: VIA Technologies, Inc. (Wrong ID) USB Controller
-         Flags: bus master, medium devsel, latency 32, IRQ 5
-         I/O ports at e000 [size=32]
-         Capabilities: [80] Power Management version 2
+		Olivier
+--=20
+Olivier Bornet                 |      fran=E7ais : http://puck.ch/f
+Swiss Ice Hockey Results       |      english  : http://puck.ch/e
+http://puck.ch/                |      deutsch  : http://puck.ch/g
+Olivier.Bornet@puck.ch         |      italiano : http://puck.ch/i
+Get my PGP-key at http://puck.ch/pgp or at http://wwwkeys.pgp.net
 
-thx a lot,
-sorry for bothering you ;)
+--0ntfKIWw70PvrIHh
+Content-Type: application/pgp-signature
+Content-Disposition: inline
 
-now testing the vt6202 on the gateway, should work, via says, its 
-downwardscompatible to usb 1.1 drivers, well see.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
 
-> 
-> 
->>
->>>
->>>
->>>>> Use 2.4.23-mh1 or 2.4.24-mh1.
->>>>
->>>>
->>>>
->>>> roger that. what change do you think in the changelogs should target 
->>>> the problem?
->>>
->>>
->>>
->>>
->>> In general nothing will help here, but I must be sure that we talk about
->>> the same version of the Bluetooth subsystem.
->>
->>
->>
->> yes, ill try the patches IF theyre considered stable.
->> will also try another usb driver -WARNING- do not use via vt6202 ehci 
->> chipsets, they crashed my gatewaysystem reproducable on boot. :(
->>
->> but i wonder why the window$ stacks do not trigger the fault... maybe 
->> usb... have problems with sane scanner too :)
->>
->>>
->>> Regards
->>>
->>> Marcel
->>>
->>>
->>>
->>>
->>> -------------------------------------------------------
->>> This SF.net email is sponsored by: IBM Linux Tutorials.
->>> Become an expert in LINUX or just sharpen your skills.  Sign up for 
->>> IBM's
->>> Free Linux Tutorials.  Learn everything from the bash shell to sys 
->>> admin.
->>> Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
->>> _______________________________________________
->>> Bluez-devel mailing list
->>> Bluez-devel@lists.sourceforge.net
->>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->>>
->>>
->>
->> y
->> tom
->>
->>
->>
->> -------------------------------------------------------
->> This SF.net email is sponsored by: IBM Linux Tutorials.
->> Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
->> Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
->> Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
->> _______________________________________________
->> Bluez-devel mailing list
->> Bluez-devel@lists.sourceforge.net
->> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->>
->>
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.net email is sponsored by: IBM Linux Tutorials.
-> Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
-> Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
-> Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-> 
+iD8DBQE/+vYOdj3R/MU9khgRAkjpAKC7h07s9SlM71dO9nHmd/CelIWGcwCdEQoD
+msEQCddHmKN8X3p9wdlUISU=
+=2hzy
+-----END PGP SIGNATURE-----
 
-y
-tom
+--0ntfKIWw70PvrIHh--
