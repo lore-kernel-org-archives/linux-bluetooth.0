@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] help me
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vitaliy <pub@mifki.ru>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20040523T164826-243@post.gmane.org>
-References: <loom.20040523T164826-243@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1085324502.8309.19.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: Vitaliy <pub@mifki.ru>
+Message-ID: <loom.20040523T164826-243@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] help me
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,19 +15,10 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 23 May 2004 17:01:42 +0200
+Date: Sun, 23 May 2004 14:51:53 +0000 (UTC)
 
-Hi,
-
-> Really nobody knows how to solve this problem ("can't connect" topic)?
-> I can post any required info here..
-
-you should better do so, because this posting is useless.
-
-Regards
-
-Marcel
-
+Really nobody knows how to solve this problem ("can't connect" topic)?
+I can post any required info here..
 
 
 
