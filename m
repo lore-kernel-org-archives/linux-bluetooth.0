@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Igor Luiz Oliveira de Souza <igorluiz@magiclink.com.br>
-Reply-To: igorluiz@magiclink.com.br
+Message-ID: <403E7EFD.90500@netcabo.pt>
+From: filipe abrantes <filipe_abrantes@netcabo.pt>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1077831499.7219.34.camel@emerald>
-Mime-Version: 1.0
-Subject: [Bluez-users] Problem with pppd through bluetooth
+Subject: Re: [Bluez-users] Failed to connect to SDP server on	00:10:60:A4:89:15:
+ Function not implemented
+References: <5CD2BD8F1F23A943BAEBE96AB20C24980549DD3E@VS1.hdi.tvcabo> <1077818189.2849.3.camel@pegasus>
+In-Reply-To: <1077818189.2849.3.camel@pegasus>
+Content-Type: text/html; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,71 +18,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Feb 2004 21:38:19 +0000
+Date: Thu, 26 Feb 2004 23:19:25 +0000
 
-Hello all,
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-15"
+ http-equiv="Content-Type">
+  <title></title>
+</head>
+<body>
+Marcel Holtmann wrote:
+<blockquote cite="mid1077818189.2849.3.camel@pegasus" type="cite">
+  <pre wrap="">Hi Filipe,
 
-I'm experimenting a problem trying to connect internet via GRPS through
-bluetooth using my Nokia 3650 and a Linux Box with a usb-dongle
-bluetooth BT3030, via pppd.
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">[root@ee99217 bluez-sdp-1.5]# sdptool search GN
+Inquiring ...
+Failed to connect to SDP server on 00:10:60:A4:89:15: Function not implemented
 
-The connection between the mobile and the PC via bluetooth is working
-fine. I can transfer data in the two ways: PC->mobile , mobile->PC,
-using the bluez driver.
-So, now when I try to access the internet via GPRS a got this message
-when I call "pppd"
+if i try this i get :
 
-root@emerald:~# rfcomm 1 xx:xx:xx:xx:xx:xx 9
-Connected /dev/ttyU1 to xx:xx:xx:xx:xx:xx on channel 9
-rfcomm_send_data: DLCI 18 not connected
-rfcomm_send_data: DLCI 18 not connected
-rfcomm_send_data: DLCI 18 not connected
-rfcomm_send_data: DLCI 18 not connected
+[root@ee99217 bluez-sdp-1.5]# pand --connect 00:10:60:A4:89:15 --nosdp
 
-My pppd scripts are:
+Feb 26 17:16:34 ee99217 pand[8447]: PAN daemon ver 1.1
+Feb 26 17:16:34 ee99217 pand[8447]: Connecting to 00:10:60:A4:89:15
+Feb 26 17:16:37 ee99217 pand[8447]: Connect to 00:10:60:A4:89:15 failed. Function not implemented(38)
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+show us the output of "hciconfig -a" on both sides.
 
-in /etc/ppp/chat-gprs
------------------------------------
-TIMEOUT         5
-ECHO            ON
-ABORT           '\nBUSY\r'
-ABORT           '\nERROR\r'
-ABORT           '\nNO ANSWER\r'
-ABORT           '\nNO CARRIER\r'
-ABORT           '\nNO DIALTONE\r'
-ABORT           '\nRINGING\r\n\r\nRINGING\r'
-''              \rAT
-TIMEOUT         12
-OK              ATE1
-OK              'AT+cgdcont=1,"IP","tim"'
-OK              ATD*99***1#
------------------------------------
+Regards
+
+Marcel
 
 
-and in /etc/ppp/peers/gprs
------------------------------------
-/dev/modem 57600
-connect '/usr/sbin/chat -v -f /etc/ppp/chat-gprs'
-noauth
-defaultroute
-debug
------------------------------------
 
-I have a symbolic link from /dev/ttyU1 to /dev/modem
-
-And when I call: "pppd call gprs"
-I got that message "rfcomm_send_data: DLCI 18 not connected"
-
-Does anyone can help me with this?
-Sorry about the long message...
-
-TIA,
--- 
-Igor Luiz Oliveira de Souza
-Magiclink Solucoes Internet
-Analista de TI - 88657412
-Salvador / BA   -  Brasil
-
+  </pre>
+</blockquote>
+i think it is solved now, it was some error in hcid.conf file, don't
+know for sure what line it was cause i changed a few...<br>
+<br>
+sorry for wasting your time<br>
+<br>
+and thanks <br>
+<br>
+filipe<br>
+</body>
+</html>
 
 
 -------------------------------------------------------
