@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41F32C16.8000000@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <001a01c500fc$a37ffdc0$a14c12ac@stu.nus.edu.sg>
+From: "Khoo Teck Ping" <eng10166@nus.edu.sg>
+To: <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] snd-bt-sco blocking audio mode
-References: <pan.2005.01.22.15.45.57.119048@yahoo.com>
-In-Reply-To: <pan.2005.01.22.15.45.57.119048@yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0015_01C5013F.AD589BC0"
+Subject: [Bluez-devel] Question about the command hcitool -i hci0 cmd <ogf><ocf>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,48 +17,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 22 Jan 2005 21:46:14 -0700
+Date: Sun, 23 Jan 2005 11:35:45 +0800
 
-Paul,
+This is a multi-part message in MIME format.
 
-Do you know what the OSS and ALSA api has to say about nonblocking 
-open/write? I'm a little clueless here about whether or not we are 
-producing the behavior the client is asking for.
+------=_NextPart_000_0015_01C5013F.AD589BC0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-I do see what you mean. Another example for which you'd want nonblocking 
-writes is live streaming.
+Dear All
 
-Brad
+Regarding the command hcitool -i hci0 cmd <ogf><ocf>, may I know if =
+there exists a full listing of all possible hex numbers for <ogf><ocf> =
+and their corresponding functions?
 
-Paul Ionescu wrote:
-> Hi,
-> 
-> Currently when snd-bt-sco is loaded but btsco is not connected, any
-> attempt to play something will be blocked until a btsco connection is made.
-> Sometimes, a "play anyway" mode would be preferred.
-> Example:
-> If I watch a movie with mplayer with output to my headset, and I
-> disconnect the headset, the movie will stop playing, because snd-bt-sco is
-> not sending positive response.
-> Can snd-bt-sco be made to send positive response even if there is no
-> headset connected ?
-> This should be user selectable.
-> 
-> Thanks,
-> Paul
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
-> Tool for open source databases. Create drag-&-drop reports. Save time
-> by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
-> Download a FREE copy at http://www.intelliview.com/go/osdn_nl
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Thank You.
+
+Teck Ping
+------=_NextPart_000_0015_01C5013F.AD589BC0
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2523" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial>Dear All</FONT></DIV>
+<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial>Regarding the command hcitool -i hci0 cmd=20
+&lt;ogf&gt;&lt;ocf&gt;, may I know if there exists a full listing of all =
+
+possible hex numbers for &lt;ogf&gt;&lt;ocf&gt; and their corresponding=20
+functions?</FONT></DIV>
+<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial>Thank You.</FONT></DIV>
+<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial>Teck Ping</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0015_01C5013F.AD589BC0--
+
 
 
 -------------------------------------------------------
