@@ -1,55 +1,125 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] ussp-push and obextool repackage
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Digianswer USB driver
 From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: reverend@unrooted.net
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1056930669.3eff7b6da605c@www.unrooted.net>
-References: <1056930669.3eff7b6da605c@www.unrooted.net>
-Content-Type: text/plain
-Message-Id: <1057065253.15796.37.camel@pegasus>
+To: "Jan J. Jessen" <jjjessen@control.auc.dk>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: 
+	<Pine.GSO.4.40.0308261317320.19084-100000@prosit.control.auc.dk>
+References: <Pine.GSO.4.40.0308261317320.19084-100000@prosit.control.auc.dk>
+Message-Id: <1062202301.11258.19.camel@pegasus>
 Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 01 Jul 2003 15:14:04 +0200
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 30 Aug 2003 02:11:35 +0200
+Content-Type: multipart/mixed; boundary="=-LBtt+MFjhe7jqZEkS6IZ"
 
-Hi,
 
-> I've gotten a bunch of messages over the last few days about ussp-push, a hack
-> which I did a while ago to transfer files over rfcomm links.  So if people are
-> still using it, I figured I would release a version updated to work with the
-> latest openobex library.  I've also packaged up the obextool utility that Marcel
-> used to have in CVS, hopefully he doesn't mind.  IMO, the obextool version is a
-> much better tool, but both of them are in the package.  Use whichever you like.
->  I've espanded the README quite a bit to hopefully answer the questions I hear
-> most often.  My thanks to those of you who sent me patches for the updates to
-> ussp-push.  -- Rev
+--=-LBtt+MFjhe7jqZEkS6IZ
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-the obextool from CVS is replaced by the btobex program. It can be found
-in the CVS module obex.
+Hi Jan,
+
+> > Changing the bRequestType is such an ugly hack, but on the other side it
+> > is a very simple change to get these devices supported by hci_usb. I
+> > will write a patch for supporting Digianswer devices and H:2 Bluetooth
+> > devices at the same time, but I need some more information about the
+> > your device. Please send me the output of "cat /proc/bus/usb/devices"
+> > and "hciconfig -a".
+> 
+> At the moment my Linux dist is having a vacation! Can you do with vendor
+> and product IDs? From my own driver:
+> 
+> /* Digianswer specific values */
+> #define USB_DIGI_VENDOR_ID    0x08fd
+> #define USB_DIGI_PRODUCT_ID   0x1
+> #define BLUETOOTH_REQ_TYPE    0x40
+> 
+> I hope this will do.
+
+attached is a patch which modifies the hci_usb.o driver to deal with
+normal H:2 and the Digianswer devices. Please test it and send me a
+report with "hciconfig -a" and "cat /proc/bus/usb/devices".
 
 Regards
 
 Marcel
 
 
+--=-LBtt+MFjhe7jqZEkS6IZ
+Content-Disposition: attachment; filename=patch-hci-usb-digianswer
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/x-patch; NAME=patch-hci-usb-digianswer; CHARSET=ISO-8859-15
 
+diff -urN linux-2.4.22/drivers/bluetooth/hci_usb.c linux-2.4.22-digianswer/=
+drivers/bluetooth/hci_usb.c
+--- linux-2.4.22/drivers/bluetooth/hci_usb.c	Mon Aug 25 13:44:41 2003
++++ linux-2.4.22-digianswer/drivers/bluetooth/hci_usb.c	Sat Aug 30 01:59:59=
+ 2003
+@@ -79,6 +79,9 @@
+ 	/* Bluetooth Ultraport Module from IBM */
+ 	{ USB_DEVICE(0x04bf, 0x030a) },
+=20
++	/* Digianswer device */
++	{ USB_DEVICE(0x08fd, 0x0001), driver_info: HCI_DIGIANSWER },
++
+ 	{ }	/* Terminating entry */
+ };
+=20
+@@ -427,7 +430,7 @@
+ 	} else
+ 		dr =3D (void *) _urb->urb.setup_packet;
+=20
+-	dr->bRequestType =3D HCI_CTRL_REQ;
++	dr->bRequestType =3D husb->ctrl_req;
+ 	dr->bRequest =3D 0;
+ 	dr->wIndex   =3D 0;
+ 	dr->wValue   =3D 0;
+@@ -872,6 +875,11 @@
+ 	husb->bulk_out_ep =3D bulk_out_ep[0];
+ 	husb->bulk_in_ep  =3D bulk_in_ep[0];
+ 	husb->intr_in_ep  =3D intr_in_ep[0];
++
++	if (id->driver_info & HCI_DIGIANSWER)
++		husb->ctrl_req =3D HCI_DIGI_REQ;
++	else
++		husb->ctrl_req =3D HCI_CTRL_REQ;
+=20
+ #ifdef CONFIG_BLUEZ_USB_SCO
+ 	if (isoc_iface) {
+diff -urN linux-2.4.22/drivers/bluetooth/hci_usb.h linux-2.4.22-digianswer/=
+drivers/bluetooth/hci_usb.h
+--- linux-2.4.22/drivers/bluetooth/hci_usb.h	Fri Jun 13 16:51:32 2003
++++ linux-2.4.22-digianswer/drivers/bluetooth/hci_usb.h	Sat Aug 30 02:02:46=
+ 2003
+@@ -35,6 +35,9 @@
+ #define HCI_DEV_PROTOCOL     0x01	/* Bluetooth programming protocol */
+=20
+ #define HCI_CTRL_REQ	     0x20
++#define HCI_DIGI_REQ	     0x40
++
++#define HCI_DIGIANSWER       0x01
+=20
+ #define HCI_MAX_IFACE_NUM	3=20
+=20
+@@ -118,6 +121,8 @@
+ 	struct usb_interface            *isoc_iface;
+ 	struct usb_endpoint_descriptor	*isoc_out_ep;
+ 	struct usb_endpoint_descriptor	*isoc_in_ep;
++
++	__u8			ctrl_req;
+=20
+ 	struct sk_buff_head	transmit_q[4];
+ 	struct sk_buff		*reassembly[4]; // Reassembly buffers
 
--------------------------------------------------------
-This SF.Net email sponsored by: Free pre-built ASP.NET sites including
-Data Reports, E-commerce, Portals, and Forums are available now.
-Download today and enter to win an XBOX or Visual Studio .NET.
-http://aspnet.click-url.com/go/psa00100006ave/direct;at.asp_061203_01/01
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+--=-LBtt+MFjhe7jqZEkS6IZ--
