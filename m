@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] /usr/include/bluetooth/bnep.h
-References: <1083857533.16650.25.camel@saag> <200405062127.11184.cijoml@volny.cz> <1083877306.4420.72.camel@pegasus>
-In-Reply-To: <1083877306.4420.72.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200405070028.06843.cijoml@volny.cz>
+From: Przemek <aquamala@o2.pl>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] l2test: Send failed. Invalid argument(22)
+Message-ID: <20040506221323.GA3838@reynevan>
+Reply-To: aquamala@o2.pl
+References: <20040506204859.GA2483@reynevan> <1083877861.4420.84.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-2
+In-Reply-To: <1083877861.4420.84.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,18 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 7 May 2004 00:28:06 +0200
+Date: Fri, 7 May 2004 00:13:23 +0200
 
-On Thursday 06 of May 2004 23:01, Marcel Holtmann wrote:
-> hidp module
+On 06/05, Marcel Holtmann wrote:
+> From a quick view it looks like your
+> data is bigger than your MTU. L2CAP is sequential packet and not a
+> stream.
 
-Marcel,
+That's right! I should have used -b option with l2test.
+Thank you vary much!
 
-can you write more info about this module? What will it take care of?
-Only Human Interface Device Protocol? And hidd will serve events to it to 
-decode them instead of doing it by hidd?
-
-Michal
+Best regards, 
+Przemek
 
 
 -------------------------------------------------------
