@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] MS multimedia keys
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vojtech Pavlik <vojtech@suse.cz>
-Cc: cijoml@volny.cz, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <411EF7C7.10900@hotmail.com> <1092565721.4375.37.camel@pegasus> <20040815131009.GA1752@ucw.cz>
 In-Reply-To: <20040815131009.GA1752@ucw.cz>
-References: <411EF7C7.10900@hotmail.com>
-	 <200408151040.00772.cijoml@volny.cz> <200408151132.15730.cijoml@volny.cz>
-	 <1092565721.4375.37.camel@pegasus>  <20040815131009.GA1752@ucw.cz>
-Content-Type: text/plain
-Message-Id: <1092590175.4375.59.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200408151559.04506.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,10 +19,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 Aug 2004 19:16:15 +0200
+Date: Sun, 15 Aug 2004 15:59:04 +0200
 
-Hi Vojtech,
+Marcel,
 
+that means, that these keys will never work?
+
+Michal
+
+Dne ne 15. srpna 2004 15:10 Vojtech Pavlik napsal(a):
+> On Sun, Aug 15, 2004 at 12:28:41PM +0200, Marcel Holtmann wrote:
+> > Hi Michal,
+> >
+> > > and when pressed this is sent into dmesg:
+> > >
+> > > Eigene Dateien
+> > > keyboard.c: can't emulate rawmode for keycode 253
+> > > keyboard.c: can't emulate rawmode for keycode 253
+> > > Eigene Bilder
+> > > keyboard.c: can't emulate rawmode for keycode 254
+> > > keyboard.c: can't emulate rawmode for keycode 254
 > > > Eigene Musik
 > > > keyboard.c: can't emulate rawmode for keycode 255
 > > > keyboard.c: can't emulate rawmode for keycode 255
@@ -33,23 +48,13 @@ Hi Vojtech,
 > > > Abmelden
 > > > keyboard.c: can't emulate rawmode for keycode 248
 > > > keyboard.c: can't emulate rawmode for keycode 248
-> > 
+> >
 > > this problem is because in drivers/char/keyboard.c the x86_keycodes[256]
 > > array miss the line for the last 16 keycode translations.
-> > 
+> >
 > > Vojtech, any reason why they are not filled in?
->  
+>
 > Because rawmode only can express 240 different scancodes.
-
-may you explain this a little bit. I found a posting from you on the
-LKML where you said this has something do to with the PS/2 protocol, but
-I still can't follow it.
-
-Regards
-
-Marcel
-
-
 
 
 -------------------------------------------------------
