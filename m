@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] How to initiate a Pin-Exchange?
+Subject: Re: [Bluez-users] patched script
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Benoit Panizzon <panizzon@woody.ch>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404142203.21126.panizzon@woody.ch>
-References: <200404142203.21126.panizzon@woody.ch>
+In-Reply-To: <200404150002.29515.cijoml@volny.cz>
+References: <200404150002.29515.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1082160295.4489.21.camel@pegasus>
+Message-Id: <1082160114.4489.17.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,29 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Apr 2004 02:04:55 +0200
+Date: Sat, 17 Apr 2004 02:01:54 +0200
 
-Hi Benoit,
+Hi Michal,
 
-> Probably this is a often asked Question and would belong into the FAQ section.
-> I was not able to find out how to search this list's archive so I probably ask 
-> again :-)
+> sending patched script bluetooth for debian
+> 
+> 1]added bthid daemon to start/stop sections
+> 2]fixes variables to prevent atacker pass some extended values into them
+> 
+> Hope you`ll include it
 
-if you think something belongs into the FAQ, wrote it up and I add it ;)
+nice script, but I don't include it. However I am going to include dund
+and pand into the utils package and I also wanna put a version of the
+bthid into it that uses the old SDP library.
 
-> There are some devices which cannot initiate a pin-exchange but await that the 
-> computer does that task.
+Right now there are three Debian init script from bluez-utils, bluez-sdp
+and bluez-pan package. If you wanna do me a favour, write a complete new
+one with the same features and the settings in /etc/default/bluetooth
+and I am going to include that one.
 
-Don't set auth and encrypt in hcid.conf unless you really wanna set your
-device into security mode 3.
-
-> How can I start the pin exchange with bluez?
-
-	hcitool auth <bdaddr>
-
-> What is bluez-pin exaclty for?
-
-It is the graphical PIN helper program.
+And please use "hidd" as name for the HID daemon, because I am going to
+use that name to keep the namespace a little bit cleaner.
 
 Regards
 
