@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Enabling BT 1.2 features on Logitech Mobile
-	Freedom Headset?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <ctqd54$geq$1@sea.gmane.org>
-References: <ctqd54$geq$1@sea.gmane.org>
-Content-Type: text/plain
-Message-Id: <1107344136.11616.16.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: Jesse Guardiani <jesse@wingnet.net>
+Message-ID: <ctqd54$geq$1@sea.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Enabling BT 1.2 features on Logitech Mobile Freedom Headset?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,34 +16,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 02 Feb 2005 12:35:36 +0100
+Date: Wed, 02 Feb 2005 06:23:07 -0500
 
-Hi Jesse,
+Hello,
 
-> My Anycom USB-240 dongle, marketed as BT 1.2 *ready*, despite
-> containing BT 1.1 firmware, seems to be doing AFH by default:
-> 
-> [5:55]jesse@trevarthan:[/home/jesse]# hciconfig hci0 afhmode
-> hci0:   Type: USB
->         BD Address: 00:0B:0D:34:1F:E0 ACL MTU: 120:20  SCO MTU: 64:0
->         AFH mode: Enabled
-> 
-> However, my Logitech Mobile Freedom Headset, also marketed
-> as a BT 1.2 device, *isn't* doing AFH:
-> 
-> [5:55]jesse@trevarthan:[/home/jesse]# hcitool afh 00:0D:44:36:E6:F4
-> AFH disabled
-> 
-> Does anyone know how I might enable AFH on my headset? Without
-> AFH, my 802.11b network is unusable while the headset is streaming
-> audio...
+My Anycom USB-240 dongle, marketed as BT 1.2 *ready*, despite
+containing BT 1.1 firmware, seems to be doing AFH by default:
 
-what does "hciconfig hci0 features version" and "hcitool info <headset>"
-prints out?
+[5:55]jesse@trevarthan:[/home/jesse]# hciconfig hci0 afhmode
+hci0:   Type: USB
+        BD Address: 00:0B:0D:34:1F:E0 ACL MTU: 120:20  SCO MTU: 64:0
+        AFH mode: Enabled
 
-Regards
+However, my Logitech Mobile Freedom Headset, also marketed
+as a BT 1.2 device, *isn't* doing AFH:
 
-Marcel
+[5:55]jesse@trevarthan:[/home/jesse]# hcitool afh 00:0D:44:36:E6:F4
+AFH disabled
+
+Does anyone know how I might enable AFH on my headset? Without
+AFH, my 802.11b network is unusable while the headset is streaming
+audio...
+
+Any help appreciated!
+
+Thanks!
+
+-- 
+Jesse Guardiani, Systems Administrator
+WingNET Internet Services,
+P.O. Box 2605 // Cleveland, TN 37320-2605
+423-559-LINK (v)  423-559-5145 (f)
+http://www.wingnet.net
 
 
 
