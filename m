@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Dund instructions?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Heikki Rantanen <hrantane@cc.hut.fi>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40BC910A.9030508@cc.hut.fi>
+Message-ID: <40BC910A.9030508@cc.hut.fi>
+From: Heikki Rantanen <hrantane@cc.hut.fi>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 References: <40BBAC4D.2070403@cc.hut.fi> <1086041772.4690.9.camel@pegasus>
-	 <40BC910A.9030508@cc.hut.fi>
-Content-Type: text/plain
-Message-Id: <1086100451.4702.28.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <1086041772.4690.9.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] Re: Dund instructions?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,25 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Jun 2004 16:34:11 +0200
+Date: Tue, 01 Jun 2004 17:22:02 +0300
 
-Hi Heikki,
+Marcel Holtmann wrote:
+>>Where can I find instructions on using the dund program? Thanks.
+> 
+> 
+> use "man dund" or look at http://www.holtmann.org/linux/bluetooth/
 
-> Ok. Apparently the bluez-pan-1.1-2mdk rpm package I found in rpmseek and 
-> installed yesterday hasn't the newest version, since there is no manual 
-> entry for dund. I think it would be nice if there was a list of 
-> available commands with their man pages at the www-site. Now a question 
-> as fundamental as "What commands/programs is available in Bluez?" is 
-> actually very difficult to find answer to.
-
-install bluez-libs-2.7 and bluez-utils-2.7 and you also get the manpages
-for dund and pand. For the list of commands check the howtos and the
-mailing list archives.
-
-Regards
-
-Marcel
-
+Ok. Apparently the bluez-pan-1.1-2mdk rpm package I found in rpmseek and 
+installed yesterday hasn't the newest version, since there is no manual 
+entry for dund. I think it would be nice if there was a list of 
+available commands with their man pages at the www-site. Now a question 
+as fundamental as "What commands/programs is available in Bluez?" is 
+actually very difficult to find answer to.
 
 
 
