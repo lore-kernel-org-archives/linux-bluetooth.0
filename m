@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Achim Bohnet <ach@mpe.mpg.de>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200401221347.32481.ach@mpe.mpg.de>
-Subject: [Bluez-devel] PF_BLUETOOTH AF_BLUETOOTH redefinitions
+Subject: Re: [Bluez-devel] WindowsCE and DUND
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ronny Bremer <rbremer@future-gate.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040122T124812Z_5232000B0001@future-gate.com>
+References: <20040122T124812Z_5232000B0001@future-gate.com>
+Content-Type: text/plain
+Message-Id: <1074774284.19046.33.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,42 +18,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 22 Jan 2004 13:47:32 +0100
+Date: Thu, 22 Jan 2004 13:24:44 +0100
 
-Hi,
-During compilation of some bluetooth apps I get lots of warings like this:
+Hi Ronny,
 
-In file included from /usr/include/sys/socket.h:35,
-                 from connectiondlg.h:31,
-                 from connectiondlg.cpp:24:
-/usr/include/bits/socket.h:91: warning: `PF_BLUETOOTH' redefined
-/usr/include/bluetooth/bluetooth.h:43: warning: this is the location of the previous definition
-/usr/include/bits/socket.h:123: warning: `AF_BLUETOOTH' redefined
-/usr/include/bluetooth/bluetooth.h:42: warning: this is the location of the previous definition
-In file included from connectiondlg.h:35,
-                 from connectiondlg.cpp:24:
-/usr/include/bluetooth/hci.h:482: warning: ANSI C++ forbids zero-size array `condition'
-/usr/include/bluetooth/hci.h:909: warning: ANSI C++ forbids zero-size array `data'
-/usr/include/bluetooth/hci.h:1046: warning: ANSI C++ forbids zero-size array `dev_req'
-/usr/include/bluetooth/hci.h:1052: warning: ANSI C++ forbids zero-size array `conn_info'
-/usr/include/bluetooth/hci.h:1058: warning: ANSI C++ forbids zero-size array `conn_info'
+> I am using RedHat Fedora Core 1 with the latest updates. I remember
+> from earlier on, that in order to provide connectivity to a WindowsCE
+> device I need to run
+> dund --listen --msdun call synce-device
+> 
+> which will register with SDP automatically.
+> 
+> 2 questions
+> 
+> 1) I created a section in /etc/bluetooth/rfcommd.conf called rfcomm1,
+> pointing to channel 1. If I then use
+> dund --listen --msdun -P rfcomm1 call synce-device
+> will it always listen on channel 1 so once configured devices are
+> connecting to the right channel?
 
-Would be nice if bluetooth.h would not override stuff already defined
+the config file rfcomm.conf has nothing to do with dund. Both are
+different applications and also an outgoing connection to channel 1 and
+an incoming connection to channel 1 results in two different DLCI's.
 
-sys/socket.h:123:#define AF_BLUETOOTH    PF_BLUETOOTH
+And the argument for -P is the only channel number.
 
-I would suggest that bluetooth.h includes itself sys/socket.h before checking if AF_BLUETOOTH
-is defined.   This removed the dependency on how headers are ordered in source files.
-Works for me ;)
+> 2) In order to sync you need to create an ActiveSync session. This is
+> searching for SP (serial port) service on the linux host, but dund
+> registers LAN service only. Is there any option to have dund register
+> both LAN and SP? Or am I mistaken? And why does calling
+> sdptool add SP
+> works afterwards, how does it route the request for the SP to dund?
 
-hci.h may be due to old g++2.94.4 used on debian.  No idea about a workaround :(
+Go ahead and modify the dund application to take another argument like
+--spp, so it will add a serial port record instead of a LAN service. You
+don't need both. If you had done this send me a patch.
 
-Achim
--- 
-  To me vi is Zen.  To use vi is to practice zen. Every command is
-  a koan. Profound to the user, unintelligible to the uninitiated.
-  You discover truth everytime you use it.
-                                      -- reddy@lion.austin.ibm.com
+SDP is like DNS only a lookup database. You can also do anything without
+it, if you know where and how to connect.
+
+Regards
+
+Marcel
+
 
 
 
