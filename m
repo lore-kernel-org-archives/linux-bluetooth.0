@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] disappointed with my MX900 battery life
+Subject: Re: [Bluez-users] pppd problems
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Charles Bueche <charles@bueche.ch>
+To: =?ISO-8859-1?Q?Jo=E3o?= Santos <jsantos_pt@hotmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1073555620.5632.8.camel@bluez.bueche.ch>
-References: <1073555620.5632.8.camel@bluez.bueche.ch>
+In-Reply-To: <Sea2-F5425UE9chbN2t0002c71b@hotmail.com>
+References: <Sea2-F5425UE9chbN2t0002c71b@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1073583568.2563.29.camel@pegasus>
+Message-Id: <1073583234.2563.21.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,28 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Jan 2004 18:39:28 +0100
+Date: Thu, 08 Jan 2004 18:33:55 +0100
 
-Hi Charles,
+Hi Joao,
 
-> I'm using the CVS version of libs2 and utils2, with my MX900. I have the
-> impression that the MX900 batteries don't last very long between two
-> charging cycles (2-3 days). Can other here confirm this ?
-> 
-> I must explain that I use my MX900 without the docking (with a laptop
-> underway), so I only dock the mouse to load it when it blink red.
-> 
-> And being with empty batteries underway leaves me with the poor
-> touchpad.
-> 
-> Any better experience under Window$ ? Is some optimization possible in
-> the code to better use the "standby" modes of the MX900 ?
+> [root@olivia /]# pppd
+> pppd: This system lacks kernel support for PPP.  This could be because
+> the PPP kernel module is not loaded, or because the kernel is
+> not configured for PPP.  See the README.linux file in the
+> ppp-2.3.3 distribution.
 
-the HID specification is clear about that the HID device itself must
-take care about its power consumption. What is your link policy? Maybe
-the sniff mode is not enabled. On the other hand the Apple Bluetooth
-mouse never uses sniff mode to save power. Run a hcidump and check what
-your mouse is doing.
+this is a pppd against kernel PPP problem. Do what the text says and
+look at the README.
 
 Regards
 
