@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] lmx9814
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Philip Blundell <pb@nexus.co.uk>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076864335.23437.70.camel@dixie.nexus.co.uk>
-References: <1076864335.23437.70.camel@dixie.nexus.co.uk>
+From: Philip Blundell <pb@nexus.co.uk>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1076865499.2840.8.camel@pegasus>
+Message-Id: <1076864335.23437.70.camel@dixie.nexus.co.uk>
 Mime-Version: 1.0
+Subject: [Bluez-devel] lmx9814
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,33 +15,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 15 Feb 2004 18:18:19 +0100
+Date: Sun, 15 Feb 2004 16:58:55 +0000
 
-Hi Philip,
+I've been trying to use BlueZ on an HP iPAQ H5500, which uses a National
+LMX9814 chip interfaced via UART.  Connecting with "hciattach /dev/tts/1
+any 921600" seems to work ok, and hcitool dev shows the device as hci0,
+but a subsequent hcitool scan fails with "connection timed out".  dmesg
+shows:
 
-> I've been trying to use BlueZ on an HP iPAQ H5500, which uses a National
-> LMX9814 chip interfaced via UART.  Connecting with "hciattach /dev/tts/1
-> any 921600" seems to work ok, and hcitool dev shows the device as hci0,
-> but a subsequent hcitool scan fails with "connection timed out".  dmesg
-> shows:
-> 
-> hci_cmd_task: hci0 command tx timeout
-> hci_cmd_task: hci0 command tx timeout
-> h4_recv: Unknown HCI packet type 70
-> h4_recv: Unknown HCI packet type f8
-> h4_recv: Unknown HCI packet type f0
-> 
-> Is anybody successfully using one of these devices, or does anybody have
-> a suggestion as to what might be going wrong here?
+hci_cmd_task: hci0 command tx timeout
+hci_cmd_task: hci0 command tx timeout
+h4_recv: Unknown HCI packet type 70
+h4_recv: Unknown HCI packet type f8
+h4_recv: Unknown HCI packet type f0
 
-are you sure that this iPAQ contains a National chip? I thought they are
-using a CSR chip and only the never 2xxx series contain a Zeevo chip.
+Is anybody successfully using one of these devices, or does anybody have
+a suggestion as to what might be going wrong here?
 
-Regards
+Thanks
 
-Marcel
-
-
+p.
 
 
 
