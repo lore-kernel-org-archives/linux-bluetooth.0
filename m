@@ -1,55 +1,68 @@
-Return-Path: <Steven.Singer@csr.com>
-Message-ID: <3F2E5F7D.50702@csr.com>
-Date: Mon, 04 Aug 2003 14:28:29 +0100
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-CC: =?ISO-8859-1?Q?Riikka_Jylh=E4?= <jylhar@ac.tut.fi>, BlueZ Mailing List  <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] USB-drivers
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: RE: [Bluez-users] USB-drivers
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Riikka =?ISO-8859-1?Q?Jylh=E4?= <jylhar@ac.tut.fi>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <000201c35a85$b18576d0$ae2ae682@ac.tut.fi>
 References: <000201c35a85$b18576d0$ae2ae682@ac.tut.fi>
-	<1060001774.955.4.camel@pegasus>
-In-Reply-To: <1060001774.955.4.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1060001774.955.4.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: 04 Aug 2003 14:56:04 +0200
 
-Marcel Holtmann wrote:
-> My CSR dongles only support linear PCM (2's complement) with 8 or 16 bit
-> for input. See output of "hciconfig hci0 voice".
+Hi Riikka, 
 
-That shouldn't be the whole truth. The full list should be:
+> > You need to apply a patch for using two ISOC URB's
+> > per TX and RX path. 
+> 
+> Is this included in patch-2.4.21-mh2.gz. There is "Quirk for devices
+> with no ISOC endpoints" at the Changelog. There is ISOC mentioned but is
+> this the right patch or do I have to use the one I remember sawing
+> somewhere in the bluez-developers mail-archive?
 
-   Linear:
-     16 bit with up to 7 MSBs ignored, or 8 bit
-     1's complement, 2's complement or sign-magnitude
-   Logarithmic:
-     8 bit u-law or A-law
+it is also not in 2.4.21-mh3, because it is not the complete solution.
+You can see it as a quick hack to make it working, but you have to apply
+it by yourself. The patch sent by Jonathan Paisley makes it working for
+voice setting 0x0040 (8 bit). If you want to use the default setting
+0x0060 (16 bit) you have to use ISOC alternate setting 2 which is
+indicated by packet size 17. 
 
-That's the full set of host formats allowed by the BT 1.1 HCI spec.
+The quirk you mention and which can be found in 2.4.21-mh2 is only for
+the buggy USB Bluetooth devices that have no ISOC interface. This is not
+allowed by the H:2 specification, but some manufacturers are unable to
+read such documents. 
 
-The sample rate is fixed at 8 kHz (as defined by the Bluetooth spec).
+> What audio formats are supported? Am I able to send .wav and .mp3
+> sounds?
 
-I wouldn't recommend sending mp3s over a SCO link. Wavs should be
-fine provided they're resampled at 8 kHz, you set the voice setting
-to the appropriate data format, you skip the header and you get the
-rate matching right.
+My CSR dongles only support linear PCM (2's complement) with 8 or 16 bit
+for input. See output of "hciconfig hci0 voice".
 
-(Anyone else reading this thread, particularly in the archive, should
-  look at the thread Rikka started called "About Scotest" for several
-  important caveats from me about SCO data).
+Regards
 
-	- Steven
--- 
-
+Marcel
 
 
-**********************************************************************
-The information transmitted is intended only for the person or
-entity to which it is addressed and may contain confidential 
-and/or privileged material. 
-Any review, retransmission, dissemination or other use of, or
-taking of any action in reliance upon, this information by 
-persons or entities other than the intended recipient is 
-prohibited.  
-If you received this in error, please contact the sender and 
-delete the material from any computer.
-**********************************************************************
+
+
+-------------------------------------------------------
+This SF.Net email sponsored by: Free pre-built ASP.NET sites including
+Data Reports, E-commerce, Portals, and Forums are available now.
+Download today and enter to win an XBOX or Visual Studio .NET.
+http://aspnet.click-url.com/go/psa00100003ave/direct;at.aspnet_072303_01/01
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
