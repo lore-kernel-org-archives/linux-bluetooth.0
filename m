@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Audio & Bluetooth
+Subject: Re: [Bluez-users] How to emulate slave serial ports ?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <17005.1100011637@csr.com>
-References: <418FC205.7070102@tootai.net> <1099954588.6339.144.camel@loke>
-	 <1099956503.29330.35.camel@pegasus>
-	 <200411091411.33911.tim@birdsnest.maths.tcd.ie>  <17005.1100011637@csr.com>
+In-Reply-To: <4190FB84.1040000@eidosspa.it>
+References: <4190FB84.1040000@eidosspa.it>
 Content-Type: text/plain
-Message-Id: <1100048195.25879.7.camel@pegasus>
+Message-Id: <1100023997.6866.16.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,39 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 10 Nov 2004 01:56:35 +0100
+Date: Tue, 09 Nov 2004 19:13:17 +0100
 
-Hi Peter,
+Hi Davide,
 
-> > A bit OT, but I tried that on my Sony Picturebook (C1VFK) and got
-> > =====================================
-> > tim@william ~]$ sudo hciconfig hci0 revision
-> > hci0:   Type: USB
-> >         BD Address: 08:00:46:21:58:29 ACL MTU: 128:8  SCO MTU: 64:8
-> >         Build 66
-> >         Chip version: BlueCore01b (ES)
-> > =====================================
-> > 
-> > I guess that means the chip in the in-built Bluetooth is pre-pre-historic.
-> 
-> 66              beta-9.8 2001-01-17
-> 
-> Congratulations, this is the oldest chip I've ever heard of in the wild.
-> The "ES" chip is an engineering sample, even before the full production
-> run of BC01b.  I'm not 100% sure these are properly supported by the
-> later BC01 firmware, so I wouldn't recommend upgrading the firmware,
-> even if you find away, unless you're pretty sure you can get back.
+> I'm experimenting with Bluez, I got some important results, but ...
+> I found a lot of mailings about how to use RFCOMM as a master, so how to 
+> use Phones as slaves to connect to internet or phone lines.
+> My approach is different: I have a target system based on Linux 2.6.9 
+> (ARM architecture), on which I fitted an USB to Bluetooth dongle. I want 
+> my target system to make available one virtual serial port, and to 
+> connect to it from an external Windows-based PC.
+> Now I have all low-level working, I use hciconfig, hcid and sdpd 
+> (currently my sdpd has some problems, it doesnt'returns so I have to 
+> call it as "hcid & ls"). Currently, from the Windows PC I successfully 
+> browsed my linux device and paired it, but I'm not able to view the list 
+> of exported services.
+> I understand how to establish a serial connection to an external device, 
+> knowing its 6-bytes address, but I didn't found any literature on how to 
+> export a "virtual" serial port.
+> Should I use "sdptool add SP" ? Or maybe "rfcomm listen /dev/rfcomm0" ?
+> Which tool is needed to achieve this ?
 
-as far as I know only the Xircom cards are the other ones with beta
-firmware there were out there in the wild, but the C1VFK is really the
-oldest one.
-
-The ES is interesting, because once I flashed a BC02 ES with a newer
-firmware afterwards the ES was gone ;)
-
-However if anyone has old Bluetooth hardware and has replaced it with
-newer one I would be very happy if they donate these old devices to me,
-because I collect them. Something like a Bluetooth museum.
+the question is what do you wanna do with the serial port on your
+machine? If you know that, then look for a profile that fits and use
+that program or write your own one.
 
 Regards
 
