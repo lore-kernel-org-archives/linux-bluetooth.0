@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] how to detect if a device is up.
+Subject: Re: [Bluez-users] Security
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200412061608.48387.wim.delvaux@adaptiveplanet.com>
-References: <200412061608.48387.wim.delvaux@adaptiveplanet.com>
+Cc: marcel@holtman.org
+In-Reply-To: <BAY12-F513FD3FD46540B31815448AB40@phx.gbl>
+References: <BAY12-F513FD3FD46540B31815448AB40@phx.gbl>
 Content-Type: text/plain
-Message-Id: <1102346397.9644.31.camel@pegasus>
+Message-Id: <1102346344.9644.29.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,19 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 16:19:57 +0100
+Date: Mon, 06 Dec 2004 16:19:03 +0100
 
-Hi Wim,
+Hi Salvatore,
 
-> suppose you manage a list of 'seen' but not necessarily paired devices.
-> How can you figure out if a certain device is UP or not ?
+> Does BlueZ support Secure mode 2 and 3?
 
-for remote device you have to page them.
+it supports security mode 1, 2 and 3.
 
-> l2ping apparently not since you need to be paired with that device or else you 
-> get permission denied
+> In which way?
 
-This is only true is the remote device uses security mode 3.
+You set *_LM_AUTH and *_LM_ENCRYPT with a setsockopt() call.
+
+> The security in BlueZ consist only in the arrange Authorisation, 
+> Authentication, Pin, ecc.?
+
+What do you mean by that?
 
 Regards
 
