@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4dfd570904122505192221bf97@mail.gmail.com>
-From: CoCozZ geek <cocozz@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Error when compiling bluez-utils
-In-Reply-To: <1103980205.8758.22.camel@pegasus>
+Subject: Re: [Bluez-users] Help, Xscale-based Linux machin cannot use
+	Bluetooth USB  dongle ^^;;;
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Cc: heejune@snut.ac.kr
+In-Reply-To: <1106071c70101.heejune@snut.ac.kr>
+References: <1106071c70101.heejune@snut.ac.kr>
+Content-Type: text/plain
+Message-Id: <1103980267.8758.23.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <4dfd570904122402134ec2fd32@mail.gmail.com>
-	 <BAY104-F28B10D34C6CA29EC4D37E9C1A70@phx.gbl>
-	 <4dfd5709041225041648e1f356@mail.gmail.com>
-	 <1103980205.8758.22.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,36 +20,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 25 Dec 2004 14:19:24 +0100
+Date: Sat, 25 Dec 2004 14:11:07 +0100
 
-Oh ok , any solution for hcdi ?
+Hi,
+
+> I have problem using Bluetooth USB Dongle in a Xscale-based Linux
+> machine.
+> The bluez official site announces that it suuport arm-based machine
+> (including xscale).
+> I am wondering what I have to do solve this problem.. please help me.
+> 
+> 
+> First of all, I tested and succeeded in using the dongle with Redhat
+> 9.x (2.4.20-8) with bluez 1.12 applications.
+> l2ping, hciconfig, ... and finally pand, where I get a ftp file
+> trasfer speed of 500 kbp!
+> 
+> Now I tried to the same thing on the xsale-machine. I got a patch for
+> 2.4.19 from the bluez site and applied it to my machine kernel.
+> and cross-compiled the bluez lib and utility.
+> Then, I plug in the dongle, I typed "hciconfig" and got a nice results
+> 
+> >hciconfig
+>  hci0 
+>  DN brabra.....
+> 
+> It is time to do the hci0 up:
+> 
+> >hciconfig hci0 up
+> IRQ occurred while service SOF: irq = 0x1
+> IRQ occurred while service SOF: irq = 0x1
+> Cannot init device: time-out (101)
+> 
+> I checked the /proc/bus/usb/drivers and devices. It looks ok, it has
+> the hci_usb devices and drivers also.
+> So, I cheked the source and internet: it seems that the SL811 USB HOST
+> controller driver of Arm-based linux kernel
+> has some problem. I even tried to patch the usb low leve driver, but
+> still not ok ^^;;;;;
+> 
+> Is there any solution and hint or some suggestion for this??????
+
+this don't look like a BlueZ problem. This really looks like a problem
+with the USB host controller.
+
+Regards
+
+Marcel
 
 
-On Sat, 25 Dec 2004 14:10:05 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi,
-> 
-> > I uninstalled bluez-sdp , installed bluez-utils succesfully and
-> > reinstalled bluez-sdp without problems.
-> 
-> do you think there is a reason that the BlueZ website has no longer a
-> link to the bluez-sdp download? It is deprecated. And the ChangeLog for
-> bluez-utils-2.10 (besides this is not the latest version) has a clear
-> statement that you need bluez-libs-2.10 at least.
-> 
-> Regards
-> 
-> Marcel
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://productguide.itmanagersjournal.com/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
 
 
 -------------------------------------------------------
