@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Creating programs with Bluez Libraries..
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY21-F1269792B015AEB1770DB46DBB90@phx.gbl>
-References: <BAY21-F1269792B015AEB1770DB46DBB90@phx.gbl>
-Content-Type: text/plain
-Message-Id: <1101423016.6465.16.camel@pegasus>
+Message-ID: <BAY21-F1269792B015AEB1770DB46DBB90@phx.gbl>
+From: "Luís Amaral" <suffas@hotmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Subject: [Bluez-users] Creating programs with Bluez Libraries..
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Nov 2004 23:50:16 +0100
+Date: Thu, 25 Nov 2004 22:40:28 +0000
 
-Hi Luis,
+Hello!
+My name is Luis Amaral and this is my first post to this mailing list.
+I am startting a project using some Bluetooth USB Dongles (concemptronic) 
+and i need to creat programs to communicate between them.
+How can i use the BlueZ libraries? Is it enought to include them in my 
+"main" program? If anyone have some simple example of a program using this 
+libraries to communicate between two dongles (or other bluetooth devides), 
+it may help me to get started is this subject.
+Thank you for the attention,
 
-> My name is Luis Amaral and this is my first post to this mailing list.
-> I am startting a project using some Bluetooth USB Dongles (concemptronic) 
-> and i need to creat programs to communicate between them.
-> How can i use the BlueZ libraries? Is it enought to include them in my 
-> "main" program? If anyone have some simple example of a program using this 
-> libraries to communicate between two dongles (or other bluetooth devides), 
-> it may help me to get started is this subject.
+Luis Amaral.
 
-make yourself clear what you mean by communication and then look at the
-example codes in the bluez-utils/test/ directory. Bluetooth programming
-is about socket programming.
-
-Regards
-
-Marcel
-
+_________________________________________________________________
+Express yourself instantly with MSN Messenger! Download today it's FREE! 
+http://messenger.msn.click-url.com/go/onm00200471ave/direct/01/
 
 
 
