@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alvin Lam <alvinlam@shaw.ca>
-In-reply-to: <20040323223102.25A8F1D0425@sc8-sf-uberspam1.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Message-id: <40616653.3000904@shaw.ca>
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=us-ascii
-References: <20040323223102.25A8F1D0425@sc8-sf-uberspam1.sourceforge.net>
-Subject: [Bluez-users] hcitool returns error 0x11 with RSSI command
+Subject: Re: [Bluez-users] l2ping Can't connect.: Permission denied
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ullrich Martini <mailbox@ullrich.martini.name>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403232243.25854.mailbox@ullrich.martini.name>
+References: <200403232153.26004.mailbox@ullrich.martini.name>
+	 <1080076647.2515.47.camel@pegasus>
+	 <200403232243.25854.mailbox@ullrich.martini.name>
+Content-Type: text/plain
+Message-Id: <1080080941.2515.50.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,28 +20,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 Mar 2004 02:43:31 -0800
+Date: Tue, 23 Mar 2004 23:29:01 +0100
 
-Hello,
+Hi Ullrich,
 
-I am using BlueZ with two Socket CompactFlash BT card using the dtl1_cs 
-driver.  I run "sdptool browse &" and when a connection is established I 
-then run "hcitool <rssi | lq | tpl> <bdaddr>".  This yields the 
-following errors:
+> # l2ping  00:04:0E:84:15:F5
+> > HCI Event: Command Status(0x0f) plen 4
+>   00 01 05 04
+> > HCI Event: Connect Complete(0x03) plen 11
+>   05 0C 00 F5 15 84 0E 04 00 01 00
 
-HCI get_link_quality cmd failed (0x11)
-Read RSSI returned (error) status 0x11
-HCI read_transmit_power_level cmd failed (0x11)
+this is an authentication error. Disable auth and encrypt in hcid.conf
+and let the AP trigger the authentication.
 
-Since 0x11 is 17 in decimal, looking at errno.h shows that this error 
-corresponds to "File Exists".  I found several previous messages on the 
-mailing list referring to a similar error, but a different return value 
-(0x01).
+What firmware version is on your AP?
 
-I am thinking perhaps the Socket CF card does not support these 
-features?  Any ideas what in particular is failing in hci_send_req()?
+Regards
 
-Thanks.
+Marcel
+
+
 
 
 -------------------------------------------------------
