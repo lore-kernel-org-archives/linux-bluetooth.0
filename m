@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Millinger <andreas.millinger@web.de>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: Re: [Bluez-users] Help, Xscale-based Linux machin cannot
+	useBluetooth USB  dongle ^^;;;
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?UTF-8?Q?=EC=95=88=ED=9D=AC?= =?UTF-8?Q?=EC=A4=80?= <heejune@snut.ac.kr>
+Cc: "Marcel Holtmann<marcel@holtmann.org>;  BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3132c39ad0101.heejune@snut.ac.kr>
+References: <3132c39ad0101.heejune@snut.ac.kr>
 Content-Type: text/plain
-Message-Id: <1104073705.4578.2.camel@tuxlaptop.site>
+Message-Id: <1104036221.8758.49.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Re: Re: Re: Re: 3com bluetooth card
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +20,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 26 Dec 2004 16:08:24 +0100
+Date: Sun, 26 Dec 2004 05:43:41 +0100
 
-Hello,
+Hi,
 
-what do I have to write in the serial.opts file? Can you maybe send me a
-copy of your serial.opts?
-
-Andreas
-
+> Ja,  I think it is mostly probable due to the the USB host device
+> driver for SL811 in Linux-Arm Branch.
 > 
-> Put whatever you want to run (hciattach command) into your rc.local file
-> (/etc/rc.d) and it will be executed at bootup.
+> The reason I posted it I think that there must be many people who
+> works Bluez in ARM-based system, (at leaset next large number for
+> developers to x86), So I am asking how they solved this problems and
+> whether I made some dull mistakes for using bluez.
 > 
-> But, if you do not always have your 3com card installed when you boot it
-> might be better to use the pcmcia subsystem to just run the command when
-> you insert the card. (on Mandrake I edit the /etc/pcmcia/serial.opts file,
-> your system may be different).
-> 
-> Jay
+> Since the bluez site anounces that it support Xscale machine, I
+> believe someone can answer me.
+
+actually most people use UART interface and the iPAQs also connected
+their Bluetooth modules through an UART. However I don't know what's
+wrong, but I doubt that it is a BlueZ problem.
+
+Regards
+
+Marcel
+
 
 
 
