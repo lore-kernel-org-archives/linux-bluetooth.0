@@ -1,101 +1,54 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <karypid@inf.uth.gr>
 From: Alexandros Karypidis <karypid@inf.uth.gr>
-To: Max Krasnyansky <maxk@qualcomm.com>, bluez-devel@lists.sourceforge.net
+To: Max Krasnyansky <maxk@qualcomm.com>, Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
 Subject: Re: [Bluez-devel] Re: [Bluez-users] How do I obtain a free PSM
 	automatically?
-References: <200302081740.48000.karypid@inf.uth.gr>
-	<5.1.0.14.2.20030210125138.04183f58@mail1.qualcomm.com>
-In-Reply-To: <5.1.0.14.2.20030210125138.04183f58@mail1.qualcomm.com>
+Date: Tue, 11 Feb 2003 18:22:44 +0200
+Cc: bluez-devel@lists.sourceforge.net
+References: <1044653775.32672.14.camel@pegasus.local>
+	<5.1.0.14.2.20030210123957.0417f4c0@mail1.qualcomm.com>
+In-Reply-To: <5.1.0.14.2.20030210123957.0417f4c0@mail1.qualcomm.com>
 MIME-Version: 1.0
-Message-Id: <200302111830.51716.karypid@inf.uth.gr>
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Feb 2003 18:30:51 +0200
-Content-Type: text/plain; CHARSET=iso-8859-1
+Content-Type: text/plain; charset="iso-8859-1"
+Message-Id: <200302111822.44704.karypid@inf.uth.gr>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Monday 10 February 2003 23:13, Max Krasnyansky wrote:
-> At 06:14 PM 2/8/2003 +0200, Alexandros Karypidis wrote:
-> >BTW, it dawned on me that:
-> >
-> >1) connect() succeeds even if bind() wasn't previously called for the
-> > client socket.
-> >2) accept() also produces a new socket.
-> >
-> >I assumed that these operations evidently select a free PSM for the
-> > sockets they use/produce. I could not find any such thing in the code
-> > however (but I don't really know the BlueZ code).
-> >
-> >Then, I did the simple tests of:
-> >
-> >A. Calling getsockname() after a connect() with no previous bind()
-> >B. Calling getsockname() after a accept()
-> >
-> >Case A reported PSM zero (0) !!! This is clearly a bug!
->
-> No it's _not_.
-> L2CAP PSM != TCP/UDP port. Although it may look like it's the same thing.
-> It's not.
-
-Ok, I get this now.
+On Monday 10 February 2003 22:49, Max Krasnyansky wrote:
 
 > [...]
-> L2CAP PSM identifies a protocol or a service. CID identifies a logical
-> channel. Since both client and server sockets use the _same_ protocol they
-> must have the same PSM.
->
-> TCP/UDP
->         [client port]:[client IP]  ---> [server port]:[server IP]
->
-> L2CAP
->         [service PSM]:[client CID] ---> [service PSM]:[server CID]
->
-> See the difference ?
-> Don't ask me why L2CAP designers didn't stick to common port concept.
-> Bluetooth spec is full of "innovations" ;-).
+> Currently psm zero means that socket doesn't have PSM assigned to it.
+> bind(psm==0) means that application doesn't need PSM it's simply wants to
+> bind it's socket to some BD address. Which is exactly what L2CAP clients
+> need. So you proposing a change that will brake current bind() interface.
+> Well I guess it won't really break it but it will allocated PSM for all
+> client apps which doesn't make any sense.
 
-Ok. The problem with this design from my viewpoint is that this design assumes 
-that a service always uses the same PSM. It assumes that there is no reason 
-why I would not want to run the service on PSM A at one point and some time 
-later on PSM B. More specifically, it assumes that I may not even care which 
-PSM I will be providing the service from, as I might use some "other means" 
-to coordinate this with clients (see my previous e-mail).
+Ok, from another e-mail you sent in this thread I realize that I should not 
+consider the PSM as the equivalent of a port number. CIDs are closer to that 
+notion. Sorry, I've only started using Bluetooth for a week now and since IP 
+is all I've ever known, I'm trying (perhaps too much) to find analogies.
 
-> So the current code is correct.
->
-> Now if people really want dynamic PSMs. We could introduce something like
-> bind(psm == 0xffff).
+> Why do you think we need dynamic PSM allocation ? l2cap already allocates
+> CIDs dynamically. I don't see why people would want the same thing for
+> PSMs.
 
-As Marcel already pointed out, this would not adhere to the specs... :(
+Well, assume that I need to run several server processes on a BT device. When 
+each process launches, it needs to bind to a BDADDR:PSM entry point and 
+accept() connections. Currently, I need to pre-assign this PSM value for each 
+server process, as I have no other option. I would like to have a fixed 
+BDADDR:PSM value for only one "special" server and have the others bind() to 
+a BDADDR:I_DONT_CARE_PSM pair. Then, clients could inquire and obtain the 
+PSMs of the other servers from the "special" server at the well-known entry 
+point. It would be very much like a custom "service contact-address 
+discovery" method.
 
-I think dynamic PSMs are a good idea. The add capability. If only there is a 
-way to add them without "breaking" anything it may be worth doing so! Anyway, 
-I'm not trying to insist too much or anything -- I'm just throwing around 
-some ideas which make sense to me.
+Basically, my problem is that when you have a device where you can 
+install/remove services created from various manufacturers, there must exist 
+a global agreement about PSM allocations. For example, suppose I install 2 
+services which are manufactured from entities A and B. Now, A decides that it 
+will receive connections on PSM 15000 and B chooses 16004. No problem. If by 
+pure bad luck they had chosen the same PSM, I would be unable to run both 
+concurrently. Ideally, each would obtain an arbitrary PSM when it was 
+launched and publish its contact address via some other mechanism.
 
--- 
-To err is human, but to forgive is beyond the scope of the Operating System...
-
-Alexandros Karypidis
-University of Thessaly
-Computer & Communications Engineering dept.
-
-
-
--------------------------------------------------------
-This SF.NET email is sponsored by:
-SourceForge Enterprise Edition + IBM + LinuxWorld = Something 2 See!
-http://www.vasoftware.com
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Sorry for the long e-mail. I hope I've explained clearly what "bothers" me. :)
