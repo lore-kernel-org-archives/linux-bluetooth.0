@@ -1,52 +1,34 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4aaa2e1c04121406315ecf8659@mail.gmail.com>
-From: Wartan Hachaturow <wartan.hachaturow@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Return-Path: <netdev-bounce@oss.sgi.com>
+Subject: Re: [2.6 patch] net/bluetooth/: misc possible cleanups
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Adrian Bunk <bunk@stusta.de>, Max Krasnyansky <maxk@qualcomm.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+   Network Development Mailing List <netdev@oss.sgi.com>
+In-Reply-To: <20041214094543.GA963@infradead.org>
+References: <20041214041352.GZ23151@stusta.de>
+	 <1103009649.2143.65.camel@pegasus>  <20041214094543.GA963@infradead.org>
+Content-Type: text/plain
+Date: Tue, 14 Dec 2004 10:54:59 +0100
+Message-Id: <1103018099.2143.127.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] HSP and audio -- "right thing" to look at?
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 14 Dec 2004 17:31:20 +0300
+Sender: netdev-bounce@oss.sgi.com
+Errors-to: netdev-bounce@oss.sgi.com
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hello.
+Hi Christoph,
 
-First of all, thanks for a great job.
+> > these functions must stay. They have users outside the mainline kernel
+> > that are not merged back yet. Otherwise they won't be exported ;)
+> 
+> But we traditionally don't keep APIs only for the sake of external modules.
+> Exceptions are made if you have short- to mid-term plans to merge them.
 
-Second, a question. 
-As far as I see, most development on audio transmission is happening
-at bluetooth-alsa, which is a separate project from bluez (right?).
-Having read the mailing list, I didn't quite understand the
-development direction that bluez would like to follow "mainstream"
-implementing audio and headset profiles, and if things now being
-implemented by bluetooth-alsa are "Right Way".
+it is a short term plan, because otherwise I won't have submitted it in
+the first place. And as I said, they are not merged back yet. They are
+not tested enough for mainline at the moment.
 
-I would be really thankful if someone would summarize the TODOs for
-bluez on that matter (like what should be a kernel module, what should
-be a userland application, what is good about current snd_bt_sco, and
-what is bad), so that I could prepare myself for development on those
-subjects in a more "clever" way -- since now I'm pretty lost in the
-code and ideas..
+Regards
 
--- 
-Thanks in advance, Wartan.
-
-
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now. 
-http://productguide.itmanagersjournal.com/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Marcel
