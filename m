@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Please help me
+Subject: Re: [Bluez-devel] BTHID instructions...
 From: Marcel Holtmann <marcel@holtmann.org>
-To: zubiwat <zubiwat@poczta.onet.pl>
+To: Michael Frey <mfrey@pepper.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001701c41123$058cfd30$fcca010a@lysydziadek>
-References: <001701c41123$058cfd30$fcca010a@lysydziadek>
+In-Reply-To: <F849ADA4-7D17-11D8-BFCD-00039390D626@pepper.com>
+References: <F849ADA4-7D17-11D8-BFCD-00039390D626@pepper.com>
 Content-Type: text/plain
-Message-Id: <1080081124.2515.55.camel@pegasus>
+Message-Id: <1080081008.2515.52.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,17 +18,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Mar 2004 23:32:04 +0100
+Date: Tue, 23 Mar 2004 23:30:08 +0100
 
-Hi Maciej,
+Hi Michael,
 
-> I need help with some programming. If someone knows the table of bits
-> who are as hci commands I would be greatfull because I'm programming
-> microchip to work as a bluez under linux and I get some bits from BT
-> device but howto interprete them.
+> Can someone point me in the direction of how to build and install the 
+> new BTHID stuff?  I was just on the Bluez website and did not find any 
+> mention of it.
 
-read the Bluetooth HCI specification. Everything you need to know can be
-found in it.
+take a look at this HOWTO http://www.bueche.ch/comp/mx900/mx900.html
 
 Regards
 
