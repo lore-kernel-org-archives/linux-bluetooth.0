@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Colin Pinkney <bluez-devel@cpinkney.org.uk>
-To: bluez-users@lists.sourceforge.net
-References: <200403022202.19259.mitsu@syntheticzero.com> <200403091754.52270.mitsu@syntheticzero.com> <1078877075.30990.2.camel@pegasus>
-In-Reply-To: <1078877075.30990.2.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <200403101825.28236.bluez-devel@cpinkney.org.uk>
-Subject: [Bluez-users] Re: [Bluez-devel] Suspend/resume issues with bluez
+From: Russell Neches <russell@ccs.neu.edu>
+To: bluez-users <bluez-users@lists.sourceforge.net>
+Message-ID: <20040310182158.GA9279@naginata.ccs.neu.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] crash on remove
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,51 +15,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 10 Mar 2004 18:25:24 +0000
+Date: Wed, 10 Mar 2004 13:21:58 -0500
 
-=2D----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
 
-On Wednesday 10 Mar 2004 00:04, Marcel Holtmann wrote:
-> Hi Mitsu,
->
-> > Just a note to the list regarding suspend/resume.  I have a Thinkpad T4=
-0p
-> > which was having problems with bluez and suspend/resume.  I just tried
-> > installing the Affix drivers on my Thinkpad T40p; but I had the same
-> > problem (well, it was slightly different, but the upshot was, Bluetooth
-> > didn't work when I came back from suspend).
->
-> I think the problem is in the USB subsystem at the moment. There are
-> some outstanding issues with some USB cards, but Alan Stern is going to
-> fix them. This will only happen for 2.6.x and I don't think that these
-> issues can be solved in 2.4, too.
+Sorry if this is mildly off-topic...
 
-This also happens with CF cards on the Sharp Zaurus. The only way I have fo=
-und=20
-to get Bluetooth cards to come back after a suspend is to do:
+Every time I remove a bluetooth USB key from my desktop machine, I get
+a hard lock. I've tried this with a Belkin key and D-Link key (not the
+one with the Broadcom chipset). I don't even see a kernel panic in
+text mode. However, my laptop (running exactly the same kernel
+version) works fine on remove. So far, this only seems to happen with
+bluetooth USB keys. I've tried a number of other USB devices on my
+desktop, and they all remove cleanly (even after several such cycles).  
+ 
+The desktop (where the problems are occuring) has an A-Bit motherboard
+with all Via components, and has both a USB 1.1 and 2.0 controller
+(I'm pretty sure I'm plugging the key into one of the 1.1 ports). 
 
-cardctl eject
-cardctl insert
+The laptop is a Toshiba Libretto L5 with ALI components (USB 1.1). 
 
-I think the Bluetooth kernel modules are 'busy' after a suspend so you cann=
-ot=20
-remove them and insmod them again.
+I'm running kernel 2.6.3 with no patches applied on both systems. 
 
-The Affix drivers survive suspend/resume fine on the Zaurus, but I much pre=
-fer=20
-the BlueZ drivers.
+This is most likely a module unloading bug triggered by the hotplug
+event, but I figured I'd ask here first, as it is bluetooth related.
+If anyone else has a similar hardware combination, would you mind
+attempting to remove the key a couple of times? (occasionally the
+desktop will only freeze after the second unload)
 
-=2D --=20
-Colin Pinkney
-http://www.cpinkney.org.uk
-=2D----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.2 (GNU/Linux)
+Does anyone have any strategies for extracting some debugging
+information? I've not played with SysReq or tracebacks, so I'm not
+sure if they'd help in this case.
 
-iD8DBQFAT12YioDqRlN9/eURAk2EAJ9XrmIdyTEwxEYPpGM+KOyq1+r1qgCfUVlL
-kdfRBgh5ZVP//GjGXcADaCQ=3D
-=3DxaYQ
-=2D----END PGP SIGNATURE-----
+Thanks,
+
+Russell
+
 
 
 -------------------------------------------------------
