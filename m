@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <008901c50f7e$eccd4a60$7aac623e@pc>
-From: "Jers" <salanga@tiscali.it>
-To: <bluez-users@lists.sourceforge.net>
-References: <20050208134358.17173.qmail@web53202.mail.yahoo.com> <1107880993.7327.190.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] IP address
+Subject: Re: [Bluez-users] BT programming
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E73D9A5BC4A2D711BBC600065BF3595F1C66CF8C@il06exm10>
+References: <E73D9A5BC4A2D711BBC600065BF3595F1C66CF8C@il06exm10>
+Content-Type: text/plain
+Message-Id: <1107992601.13863.99.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Feb 2005 15:41:17 +0100
+Date: Thu, 10 Feb 2005 00:43:21 +0100
 
-Hi all,
-I intend to create a wireless network of laptops using bt-dongles.
-I know that, first "pand -c <btaddr>" creates a connection and a bnep
-interface, then an ip-address can be set to the bnep (ifconfig  bnepX
-<ipaddr>)
-Is it possible to assign the ip-address to each laptop/dongle before
-creating connections?
-Suppose that the ip-addressess of devices in a coverage area are set and
-known. I'd like that involved laptops can require connection among
-themselves using the ipaddress instead of btaddr.
-Does BlueZ meet my requirements?
-Thanks a lot.
-Jers
+Hi Hiren,
+
+> I'm a newbie to BT programming. I have successfully installed my BT 
+> hardware device using BlueZ packages. As a next goal I need to write my own code for simple applications like Chat and/or PIM Item Transfer based profile. Does blueZ have implemented profiles like OBEX, DUN, etc that I can use?
+
+the profiles are implemented in applications. Either you find a
+application that fits your needs or you have to write one. Be more
+specific about what profiles and what roles do you wanna support.
+
+> Also when I'm trying to connect to a particular remote BT device using  
+> hcitool cc .. it does not work..no connection is established.. any idea why is that happening?
+
+Check with "hcidump -X" what's the error code, but as I always say there
+is no need to establish an ACL link by hand. The kernel core will do it
+when one is needed.
+
+Regards
+
+Marcel
+
 
 
 
