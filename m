@@ -1,16 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] D-Link DBT-120
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gene Imes <ebi7@ozob.net>
+From: Gene Imes <ebi7@ozob.net>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1078518584.11763.2.camel@tr1a.ozob.net>
+In-Reply-To: <1078503094.3700.5.camel@pegasus>
 References: <1078322158.11523.83.camel@go2>
 	 <1078322721.2787.86.camel@pegasus>  <1078339075.8547.2.camel@go2>
 	 <1078487569.2762.56.camel@pegasus>
 	 <1078493466.27893.11.camel@tr1a.ozob.net> <1078503094.3700.5.camel@pegasus>
-	 <1078518584.11763.2.camel@tr1a.ozob.net>
 Content-Type: text/plain
-Message-Id: <1078525247.19852.29.camel@pegasus>
+Message-Id: <1078518584.11763.2.camel@tr1a.ozob.net>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -22,32 +21,60 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Mar 2004 23:20:48 +0100
+Date: Fri, 05 Mar 2004 14:29:44 -0600
 
-Hi Gene,
-
-> > what kind of USB host controller driver do you use? What do lspci say?
+On Fri, 2004-03-05 at 10:11, Marcel Holtmann wrote:
+> Hi Gene,
 > 
-> Hope this helps.
+> > Marcel, I am not sure which patch fixes this but I was rebooting once
+> > and pulled the DBT-120 out and got an oops or whatever. As much as I
+> > could see looked like it may be the USB stuff.
 > 
-> #
-> # USB Host Controller Drivers
-> #
-> CONFIG_USB_EHCI_HCD=y
-> # CONFIG_USB_EHCI_SPLIT_ISO is not set
-> # CONFIG_USB_OHCI_HCD is not set
-> CONFIG_USB_UHCI_HCD=y
+> what kind of USB host controller driver do you use? What do lspci say?
 
-Alan Stern is working on a better UHCI support that could explain it and
-there was a unlink-while-submit patch for the OHCI driver I use. Please
-check the latest 2.6.4-bk kernel and if it you still have a problem on
-unplug post it to the USB mailing list, so some of the patches from the
--mm branch are forwarded for inclusion.
+Hope this helps.
 
-Regards
+#
+# USB Host Controller Drivers
+#
+CONFIG_USB_EHCI_HCD=y
+# CONFIG_USB_EHCI_SPLIT_ISO is not set
+# CONFIG_USB_OHCI_HCD is not set
+CONFIG_USB_UHCI_HCD=y
 
-Marcel
 
+root@tr1a:/usr/src# lspci
+0000:00:00.0 Host bridge: Intel Corp. 82852/855GM Host Bridge (rev 02)
+0000:00:00.1 System peripheral: Intel Corp.: Unknown device 3584 (rev
+02)
+0000:00:00.3 System peripheral: Intel Corp.: Unknown device 3585 (rev
+02)
+0000:00:02.0 VGA compatible controller: Intel Corp. 82852/855GM
+Integrated Graphics Device (rev 02)
+0000:00:02.1 Display controller: Intel Corp. 82852/855GM Integrated
+Graphics Device (rev 02)
+0000:00:1d.0 USB Controller: Intel Corp. 82801DB USB (Hub #1) (rev 03)
+0000:00:1d.1 USB Controller: Intel Corp. 82801DB USB (Hub #2) (rev 03)
+0000:00:1d.2 USB Controller: Intel Corp. 82801DB USB (Hub #3) (rev 03)
+0000:00:1d.7 USB Controller: Intel Corp. 82801DB USB2 (rev 03)
+0000:00:1e.0 PCI bridge: Intel Corp. 82801BAM/CAM PCI Bridge (rev 83)
+0000:00:1f.0 ISA bridge: Intel Corp. 82801DBM LPC Interface Controller
+(rev 03)
+0000:00:1f.1 IDE interface: Intel Corp. 82801DBM Ultra ATA Storage
+Controller (rev 03)
+0000:00:1f.3 SMBus: Intel Corp. 82801DB/DBM SMBus Controller (rev 03)
+0000:00:1f.5 Multimedia audio controller: Intel Corp. 82801DB AC'97
+Audio Controller (rev 03)
+0000:00:1f.6 Modem: Intel Corp. 82801DB AC'97 Modem Controller (rev 03)
+0000:02:05.0 CardBus bridge: Ricoh Co Ltd RL5c475 (rev b8)
+0000:02:05.1 FireWire (IEEE 1394): Ricoh Co Ltd R5C551 IEEE 1394
+Controller
+0000:02:08.0 Ethernet controller: Intel Corp. 82801BD PRO/100 VE (MOB)
+Ethernet Controller (rev 83)
+0000:02:0b.0 Network controller: Intel Corp. PRO/Wireless LAN 2100 3B
+Mini PCI Adapter (rev 04)
+
+Gene
 
 
 
