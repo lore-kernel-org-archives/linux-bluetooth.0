@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Alexander Holler <holler@ahsoftware.de>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <27710000.1071661012@[192.168.207.2]>
+Message-ID: <AFE91B59A185A5439840B43AB7919047093816@mchp997a.mch.sbs.de>
+From: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
+To: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] bluepin (gtk2 and actual xfree86)
+Content-Type: text/plain
+Subject: [Bluez-devel] bandwidth when using serial cable
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,42 +15,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 17 Dec 2003 12:36:52 +0100
+Date: Wed, 17 Dec 2003 11:05:55 +0100
 
-Hi,
+Hi all, 
 
-as I'm using gentoo, I had the need for a gtk2-enabled-bluepin.
+I work with several Bluetooth Chips, but they have
+one commonality: they all have to be connected via serial
+cable. Am I right, that attaching with
+	hciattach /dev/ttyS0 any 115200 
+limits the data rate to 115,2 Kbit/s, which is the
+speed of serial cable? I am not talking about any 'baseband'
+datarate or l2ping, I am talking about the user data rate, 
+lets say for transfering a 10 MBit file.
+Did anyone get higher throughput than this 115, 
+when using serial cables? 
 
-I've found a working patch in bluez-utils-2.3-14.src.rpm.
-
-But to get it running on my system with xfree 4.3.0 I also had to comment 
-out the following two lines:
-
-#--------------------------------------------
-# Set X display before initializing GTK
-#set_display()
-
-# Some versions of fontconfig will segfault if HOME isn't set.
-#os.environ['HOME'] = ""
---------------------------------------------
-
-Maybe this should be included in bluez-utils. GTK2 is now used widely so 
-the rh-patch is something really usefull.
-
-For the env-settings (HOME, DISPLAY, and XAUTHORITY), I don't now why they 
-are set in bluepin, but without it works fin on my system (with it work 
-not).
-
-As I have only gentoo systems here, maybe someon with Debain, SuSE and/or 
-RH could test if it works on those Systems too without setting these 
-evnironment variables inside bluepin.
-
-For the bluez-utils package, I would prefer to rename bluepin to 
-bluepin-gtk1 and would checkin the gtk2-enabled-bluepin as plain bluepin.
-
-Regards,
-
-Alexander
+Regards, Matthias
 
 
 
