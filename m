@@ -1,75 +1,79 @@
-Return-Path: <the-flash@web.de>
-Date: Thu, 20 May 2004 13:47:52 +0200
-From: the-flash@web.de
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Unresolved Symbols
-Message-ID: <20040520114752.GA3125@mcmabrruq.sirius.net>
-References: <20040520090502.GA4352@mcmabrruq.sirius.net> <1085044940.4327.135.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; Format=Flowed; DelSp=Yes; charset=ISO-8859-1
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Mime-Version: 1.0 (Apple Message framework v613)
+In-Reply-To: <m3u0ycqbym.fsf@bfnet.com>
+References: <m3y8noqpc2.fsf@bfnet.com> <20040519195849.GB4698@evdebs.org> <m3u0ycqbym.fsf@bfnet.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-Id: <B5C4713C-AA46-11D8-B94D-00039310C34C@boksa.de>
+From: Benjamin Boksa <benjamin@boksa.de>
+Subject: Re: [Bluez-users] Re: Are there ANY ultralight notebooks with built-in bluetooth?
+To: bluez-users@lists.sourceforge.net
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 20 May 2004 12:16:08 +0200
 
-Thanks for your answer.
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> > What can I do?
-> 
-> don't use bluez-kernel-2.3 !!! This package is deprecated and no
-> longer
-> needed. The only way to update the kernel drivers is via my -mh  
-> patch.
+Hi David,
 
-The problem is the following. I want to use my Sitecom CN-500 USB- 
-Bluetooth adapter. On Sitecom's webpage they say that I have to use the  
-bluez-kernel-2.3-package but they actually use kernel 2.4.18.
+what about:
 
-Because im want to use a newer kernel and - as you said - the bluez- 
-kernel-2.3-package is deprecated, I tried it now with 2.4.26-mh1. After  
-compiling and rebooting and having plugged in the bluetooth adapter, I  
-get the following output from from dmesg
+http://www.apple.com/de/powerbook/specs.html
 
-usb.c: USB device 2 (vend/prod 0xa12/0x1) is not claimed by any active  
-driver.
-usb-uhci.c: ENXIO 80000280, flags 0, urb dedad280, burb dedad400
-usbdevfs: USBDEVFS_CONTROL failed dev 2 rqt 128 rq 6 len 193 ret -6
-usb-uhci.c: ENXIO 80000280, flags 0, urb dedad200, burb dedad400
-usbdevfs: USBDEVFS_CONTROL failed dev 2 rqt 128 rq 6 len 18 ret -6
-BlueZ Core ver 2.3 Copyright (C) 2000,2001 Qualcomm Inc
-Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
-usb-uhci.c: ENXIO 80000280, flags 0, urb dedad400, burb df388f00
-usbdevfs: USBDEVFS_CONTROL failed dev 2 rqt 128 rq 6 len 193 ret -6
-usb-uhci.c: ENXIO 80000280, flags 0, urb dedad400, burb df388f00
-usbdevfs: USBDEVFS_CONTROL failed dev 2 rqt 128 rq 6 len 18 ret -6
-usb-uhci.c: ENXIO 80000280, flags 0, urb df388f00, burb dedad400
-usbdevfs: USBDEVFS_CONTROL failed dev 2 rqt 128 rq 6 len 9 ret -6
-BlueZ HCI USB driver ver 2.5 Copyright (C) 2000,2001 Qualcomm Inc
-Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
-usb.c: registered new driver hci_usb
-BlueZ L2CAP ver 2.3 Copyright (C) 2000,2001 Qualcomm Inc
-Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
+?
+
+Regards,
+
+Benne
 
 
+Am 20.05.2004 um 00:38 schrieb David Wuertele:
 
-Furthermore I get
+> Adam> Some ThinkPad X40 modules do come with internal bluetooth.  And
+> Adam> it even works (without SCO support) in kernel 2.6.6!
+>
+> I scoured the IBM website for any info about X40 internal bluetooth.
+> The only thing I found was an ultraport module.  Is that what you're
+> talking about?  I thought that to connect an ultraport device to an
+> X40 you have to use a USB adapter?
+>
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: Oracle 10g
+> Get certified on the hottest thing ever to hit the market... Oracle 
+> 10g.
+> Take an Oracle 10g class now, and we'll give you the exam FREE.
+> http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (Darwin)
 
-/usr/sbin/hciconfig
-hci0:   Type: USB
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
-        DOWN
-        RX bytes:0 acl:0 sco:0 events:0 errors:0
-        TX bytes:0 acl:0 sco:0 commands:0 errors:0
+iD8DBQFArIVrR5U9XkJXZKwRAnCFAJ9K0f9bwybQp+m+YPWZ2BV86vq6cwCfcrwg
+AhvfOI+Oy4+yoWa2Ny1ZwRc=
+=vJB8
+-----END PGP SIGNATURE-----
 
 
-and
 
-hcitool dev
-Devices:
-
-
-which does NOT look good, right?
-
-Is there no working driver available at the moment? Should I try to go  
-back to kernel-2.4.18 as the Sitecom-people suggest?
-
-Thanks and goodbye,
-Florian
+-------------------------------------------------------
+This SF.Net email is sponsored by: Oracle 10g
+Get certified on the hottest thing ever to hit the market... Oracle 10g. 
+Take an Oracle 10g class now, and we'll give you the exam FREE.
+http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
