@@ -1,11 +1,19 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Andreas Gaufer <Andreas.Gaufer@blue-cell-networks.com>
-To: Bluez Devel <bluez-devel@lists.sourceforge.net>
-Message-Id: <20040609154824.531c71b8.Andreas.Gaufer@blue-cell-networks.com>
+Subject: Re: [Bluez-devel] Re: Problems while sending and receiving with
+	rfcomm sockects
+From: Marcel Holtmann <marcel@holtmann.org>
+To: dsas@mega.ist.utl.pt
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1086538596.40c34364bec57@webmail.rnl.ist.utl.pt>
+References: <1086088581.40bc65850efcf@webmail.rnl.ist.utl.pt>
+	 <1086094054.1978.26.camel@fischer>
+	 <1086102474.40bc9bca939eb@webmail.rnl.ist.utl.pt>
+	 <1086536804.40c33c64e8456@webmail.rnl.ist.utl.pt>
+	 <1086537556.4765.59.camel@pegasus>
+	 <1086538596.40c34364bec57@webmail.rnl.ist.utl.pt>
+Content-Type: text/plain
+Message-Id: <1086555166.4765.157.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="Multipart_Wed__9_Jun_2004_15:48:24_+0200_08263370"
-Subject: [Bluez-devel] hci_create_connection assuming timeout too soon
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,126 +24,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 9 Jun 2004 15:48:24 +0200
+Date: Sun, 06 Jun 2004 22:52:47 +0200
 
-This is a multi-part message in MIME format.
+Hi Didier,
 
---Multipart_Wed__9_Jun_2004_15:48:24_+0200_08263370
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+> No, I don't use hcidump. I simply compare the array of chars passed in send()
+> with the one I receive with recv().
 
-Hi,
+please use read() and write() to be sure that it not a problem of send()
+or recv().
 
-I noticed that many tools that use hci_create_connection use a hard coded 
-timeout-value that varries between 1000 and 25000. 1000 is much to short for 
-most mobile phones. 
+Regards
 
-This leads to error messages even if the chip didnt report a "connection 
-complete" yet. Very often a conection complete with 00 is reported 
-later but the tool did exit already.
-
-IMHO we could rely on the chips page timeout and wait for its "connection
-complete" event. This timeout can also be changed with hciconfig pageto 
-by the user.
-
-To catch a condition where the chip is stalled in some way i think the best 
-approach would be to time out on host side after the chips 
-page time out * 1,5 or so.
-
-I changed hcitool to make it possible to specifiy the host side
-timeout via command line but i dont belive that this is a good aproach because
-it only fixes the symthoms not the root of the problem. Anyways I attach the 
-patch against the latest CVS-HEAD to show what im talking about.
-
-In the moment my time is extremly short, i will try to bring up some code 
-that realy helps here later. Since im not that familiar with C please let me 
-know if somethings not right with my changes.
-
-Greetings
-
-Andreas Gaufer
+Marcel
 
 
---Multipart_Wed__9_Jun_2004_15:48:24_+0200_08263370
-Content-Type: text/plain;
- name="hcitool.c.diff"
-Content-Disposition: attachment;
- filename="hcitool.c.diff"
-Content-Transfer-Encoding: base64
-
-SW5kZXg6IGhjaXRvb2wuYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91dGls
-cy90b29scy9oY2l0b29sLmMsdgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuNDMKZGlmZiAtdSAtcjEu
-NDMgaGNpdG9vbC5jCi0tLSBoY2l0b29sLmMJMjggQXByIDIwMDQgMTA6Mzk6NDcgLTAwMDAJMS40
-MworKysgaGNpdG9vbC5jCTkgSnVuIDIwMDQgMTM6Mzc6MzUgLTAwMDAKQEAgLTM4MCwxMiArMzgw
-LDEzIEBACiAKIHN0YXRpYyBzdHJ1Y3Qgb3B0aW9uIGluZm9fb3B0aW9uc1tdID0gewogCXsiaGVs
-cCIsCTAsMCwgJ2gnfSwKKwl7InRvIiwJCTEsMCwgJ3QnfSwKIAl7MCwgMCwgMCwgMH0KIH07CiAK
-IHN0YXRpYyBjaGFyICppbmZvX2hlbHAgPSAKIAkiVXNhZ2U6XG4iCi0JIlx0aW5mbyA8YmRhZGRy
-PlxuIjsKKwkiXHRpbmZvIFstLXRvPXRpbWVvdXRdIDxiZGFkZHI+XG4iOwogCiBzdGF0aWMgdm9p
-ZCBjbWRfaW5mbyhpbnQgZGV2X2lkLCBpbnQgYXJnYywgY2hhciAqKmFyZ3YpCiB7CkBAIC0zOTUs
-MTAgKzM5NiwxNCBAQAogCXVuc2lnbmVkIGNoYXIgZmVhdHVyZXNbOF07CiAJc3RydWN0IGhjaV92
-ZXJzaW9uIHZlcnNpb247CiAJc3RydWN0IGhjaV9jb25uX2luZm9fcmVxICpjcjsKLQlpbnQgb3B0
-LCBkZCwgY2MgPSAwOworCWludCBvcHQsIGRkLCBjYyA9IDAsIHRvID0gMjUwMDA7CiAKIAlmb3Jf
-ZWFjaF9vcHQob3B0LCBpbmZvX29wdGlvbnMsIE5VTEwpIHsKIAkJc3dpdGNoKG9wdCkgeworCQlj
-YXNlICd0JzoKKwkJCXRvID0gYXRvaShvcHRhcmcpOworCQkJYnJlYWs7CisJCQkKIAkJZGVmYXVs
-dDoKIAkJCXByaW50ZihpbmZvX2hlbHApOwogCQkJcmV0dXJuOwpAQCAtNDQzLDcgKzQ0OCw3IEBA
-CiAJYmFjcHkoJmNyLT5iZGFkZHIsICZiZGFkZHIpOwogCWNyLT50eXBlID0gQUNMX0xJTks7CiAJ
-aWYgKGlvY3RsKGRkLCBIQ0lHRVRDT05OSU5GTywgKHVuc2lnbmVkIGxvbmcpIGNyKSA8IDApIHsK
-LQkJaWYgKGhjaV9jcmVhdGVfY29ubmVjdGlvbihkZCwgJmJkYWRkciwgaHRvYnMoSENJX0RNMSB8
-IEhDSV9ESDEpLCAwLCAwLCAmaGFuZGxlLCAyNTAwMCkgPCAwKSB7CisJCWlmIChoY2lfY3JlYXRl
-X2Nvbm5lY3Rpb24oZGQsICZiZGFkZHIsIGh0b2JzKEhDSV9ETTEgfCBIQ0lfREgxKSwgMCwgMCwg
-JmhhbmRsZSwgdG8pIDwgMCkgewogCQkJcGVycm9yKCJDYW4ndCBjcmVhdGUgY29ubmVjdGlvbiIp
-OwogCQkJY2xvc2UoZGQpOwogCQkJZXhpdCgxKTsKQEAgLTQ1NCwxNyArNDU5LDE3IEBACiAKIAlw
-cmludGYoIlx0QkQgQWRkcmVzczogICVzXG4iLCBhcmd2WzBdKTsKIAotCWlmIChoY2lfcmVhZF9y
-ZW1vdGVfbmFtZShkZCwgJmJkYWRkciwgc2l6ZW9mKG5hbWUpLCBuYW1lLCAyNTAwMCkgPT0gMCkK
-KwlpZiAoaGNpX3JlYWRfcmVtb3RlX25hbWUoZGQsICZiZGFkZHIsIHNpemVvZihuYW1lKSwgbmFt
-ZSwgdG8pID09IDApCiAJCXByaW50ZigiXHREZXZpY2UgTmFtZTogJXNcbiIsIG5hbWUpOwogCi0J
-aWYgKGhjaV9yZWFkX3JlbW90ZV92ZXJzaW9uKGRkLCBoYW5kbGUsICZ2ZXJzaW9uLCAyMDAwMCkg
-PT0gMCkgeworCWlmIChoY2lfcmVhZF9yZW1vdGVfdmVyc2lvbihkZCwgaGFuZGxlLCAmdmVyc2lv
-biwgdG8pID09IDApIHsKIAkJcHJpbnRmKCJcdExNUCBWZXJzaW9uOiAlcyAoMHgleCkgTE1QIFN1
-YnZlcnNpb246IDB4JXhcbiIKIAkJCSJcdE1hbnVmYWN0dXJlcjogJXMgKCVkKVxuIiwKIAkJCWxt
-cF92ZXJ0b3N0cih2ZXJzaW9uLmxtcF92ZXIpLCB2ZXJzaW9uLmxtcF92ZXIsIHZlcnNpb24ubG1w
-X3N1YnZlciwgCiAJCQlidF9jb21waWR0b3N0cih2ZXJzaW9uLm1hbnVmYWN0dXJlciksIHZlcnNp
-b24ubWFudWZhY3R1cmVyKTsKIAl9CiAKLQlpZiAoaGNpX3JlYWRfcmVtb3RlX2ZlYXR1cmVzKGRk
-LCBoYW5kbGUsIGZlYXR1cmVzLCAyMDAwMCkgPT0gMCkgeworCWlmIChoY2lfcmVhZF9yZW1vdGVf
-ZmVhdHVyZXMoZGQsIGhhbmRsZSwgZmVhdHVyZXMsIHRvKSA9PSAwKSB7CiAJCXByaW50ZigiXHRG
-ZWF0dXJlczogMHglMi4yeCAweCUyLjJ4IDB4JTIuMnggMHglMi4yeCAweCUyLjJ4IDB4JTIuMngg
-MHglMi4yeCAweCUyLjJ4XG4lc1xuIiwKIAkJCQlmZWF0dXJlc1swXSwgZmVhdHVyZXNbMV0sIGZl
-YXR1cmVzWzJdLCBmZWF0dXJlc1szXSwKIAkJCQlmZWF0dXJlc1s0XSwgZmVhdHVyZXNbNV0sIGZl
-YXR1cmVzWzZdLCBmZWF0dXJlc1s3XSwKQEAgLTQ3Miw3ICs0NzcsNyBAQAogCX0KIAogCWlmIChj
-YykKLQkJaGNpX2Rpc2Nvbm5lY3QoZGQsIGhhbmRsZSwgSENJX09FX1VTRVJfRU5ERURfQ09OTkVD
-VElPTiwgMTAwMDApOworCQloY2lfZGlzY29ubmVjdChkZCwgaGFuZGxlLCBIQ0lfT0VfVVNFUl9F
-TkRFRF9DT05ORUNUSU9OLCB0byk7CiAKIAljbG9zZShkZCk7CiB9CkBAIC02MDEsMTIgKzYwNiwx
-MyBAQAogCXsiaGVscCIsCTAsMCwgJ2gnfSwKIAl7InJvbGUiLAkxLDAsICdyJ30sCiAJeyJwdHlw
-ZSIsCTEsMCwgJ3AnfSwKKwl7InRvIiwJMSwwLCAndCd9LAogCXswLCAwLCAwLCAwfQogfTsKIAog
-c3RhdGljIGNoYXIgKmNjX2hlbHAgPSAKIAkiVXNhZ2U6XG4iCi0JIlx0Y2MgWy0tcm9sZT1tfHNd
-IFstLXB0eXBlPXBrdF90eXBlc10gPGJkYWRkcj5cbiIKKwkiXHRjYyBbLS1yb2xlPW18c10gWy0t
-cHR5cGU9cGt0X3R5cGVzXSBbLS10bz10aW1lb3V0XSA8YmRhZGRyPlxuIgogCSJFeGFtcGxlOlxu
-IgogCSJcdGNjIC0tcHR5cGU9ZG0xLGRoMyxkaDUgMDE6MDI6MDM6MDQ6MDU6MDZcbiIKIAkiXHRj
-YyAtLXJvbGU9bSAwMTowMjowMzowNDowNTowNlxuIjsKQEAgLTYxNCwxMiArNjIwLDEzIEBACiBz
-dGF0aWMgdm9pZCBjbWRfY2MoaW50IGRldl9pZCwgaW50IGFyZ2MsIGNoYXIgKiphcmd2KQogewog
-CWJkYWRkcl90IGJkYWRkcjsKLQlpbnQgb3B0LCBwdHlwZSwgZGQ7CisJaW50IG9wdCwgcHR5cGUs
-IGRkLCB0bzsKIAl1aW50MTZfdCBoYW5kbGU7CiAJdWludDhfdCByb2xlOwogCiAJcm9sZSA9IDA7
-CiAJcHR5cGUgPSBIQ0lfRE0xIHwgSENJX0RNMyB8IEhDSV9ETTUgfCBIQ0lfREgxIHwgSENJX0RI
-MyB8IEhDSV9ESDU7CisJdG8gPSAxMDAwOwogCiAJZm9yX2VhY2hfb3B0KG9wdCwgY2Nfb3B0aW9u
-cywgTlVMTCkgewogCQlzd2l0Y2gob3B0KSB7CkBAIC02MzAsNiArNjM3LDEwIEBACiAJCWNhc2Ug
-J3InOgogCQkJcm9sZSA9IG9wdGFyZ1swXSA9PSAnbScgPyAwIDogMTsKIAkJCWJyZWFrOworCQkK
-KwkJY2FzZSAndCc6CisJCQl0byA9IGF0b2kob3B0YXJnKTsKKwkJCWJyZWFrOwogCiAJCWRlZmF1
-bHQ6CiAJCQlwcmludGYoY2NfaGVscCk7CkBAIC02NjAsNyArNjcxLDcgQEAKIAkJZXhpdCgxKTsK
-IAl9CiAKLQlpZiAoaGNpX2NyZWF0ZV9jb25uZWN0aW9uKGRkLCAmYmRhZGRyLCBodG9icyhwdHlw
-ZSksIDAsIHJvbGUsICZoYW5kbGUsIDEwMDApIDwgMCkKKwlpZiAoaGNpX2NyZWF0ZV9jb25uZWN0
-aW9uKGRkLCAmYmRhZGRyLCBodG9icyhwdHlwZSksIDAsIHJvbGUsICZoYW5kbGUsIHRvKSA8IDAp
-CiAJCXBlcnJvcigiQ2FuJ3QgY3JlYXRlIGNvbm5lY3Rpb24iKTsKIAloY2lfY2xvc2VfZGV2KGRk
-KTsKIH0K
-
---Multipart_Wed__9_Jun_2004_15:48:24_+0200_08263370--
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by: GNOME Foundation
-Hackers Unite!  GUADEC: The world's #1 Open Source Desktop Event.
-GNOME Users and Developers European Conference, 28-30th June in Norway
-http://2004/guadec.org
+This SF.Net email is sponsored by the new InstallShield X.
+>From Windows to Linux, servers to mobile, InstallShield X is the one
+installation-authoring solution that does it all. Learn more and
+evaluate today! http://www.installshield.com/Dev2Dev/0504
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
