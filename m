@@ -1,15 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT mouse disconnect
-From: Marcel Holtmann <marcel@holtmann.org>
-To: sandro.weiser@gmx.de
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200406210029.58265.sandro.weiser@gmx.de>
-References: <200406201934.30037.sandro.weiser@gmx.de>
-	 <1087756769.4781.44.camel@pegasus>
-	 <200406210029.58265.sandro.weiser@gmx.de>
+From: Di Pietro Nicolas <potens@swing.be>
+To: bluez <bluez-users@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1087787604.4781.149.camel@pegasus>
+Message-Id: <1087773092.16254.29.camel@darthvader.linuxkot.kap>
 Mime-Version: 1.0
+Subject: [Bluez-users] DiNovo /MX900 : some help for the others (and questions for me)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,27 +15,75 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 21 Jun 2004 05:13:24 +0200
+Date: Mon, 21 Jun 2004 01:11:32 +0200
 
-Hi Sandro,
+Hi all,
+I'm writing this to say to you that I'm happy because my DiNovo set
+(with keyboards, mediapad and mouse) works in BT mode !!! yeah, it's
+great.
+Thanks a lot to all the hackers who do that possible ! And for all the
+people who respond to my (sometimes) stupid questions
 
-> > May you wanna try to start hidd with the --timeout option and set your
-> > own value that is shorter than the timeout value of the mouse. My list
-> > says that it uses a timeout of 11 minutes. Maybe you wanna try eight
-> > minutes. In the case we terminate the connection everything should work
-> > fine.
-> I already tried with -t 0 and -t 999999 but none of them solved the problem. 
-> After your email I tried -t 8 and now it works as expected.
+<help>
+For to people having bad luck with this, here are the steps I followed :
+compile new kernel (2.6.6 or 2.6.7, no matter) with mh patches
+here are the options I used :
+<snip>
+CONFIG_BT_HCIUSB=m
+CONFIG_BT_HCIUSB_SCO=y
+CONFIG_BT_HCIUART=m
+CONFIG_BT_HCIUART_H4=y
+CONFIG_BT_HCIUART_BCSP=y
+CONFIG_BT_HCIUART_BCSP_TXCRC=y
+CONFIG_BT_HCIBCM203X=m
+CONFIG_BT_HCIBFUSB=m
+CONFIG_BT_HCIVHCI=m
+CONFIG_NETDEVICES=y
+CONFIG_DUMMY=m
+</snip>
 
-the point here is who terminates the connection. With -t equal 0 or
-greater 12 the mouse will initiate the disconnect and this causes the
-problem. This bug is now on my todo list and I hopefully can fix it in a
-nice way.
+compile bluez-lib 2.7 and bluez-utils 2.7 (and install it !)
+#modprobe bluetooth
+#modprobe sbp2
 
-Regards
+there should be a script named bluetooth in your init.d
+#/etc/init.d/bluetooth start
 
-Marcel
+If all works, the BT hub should blink once and all should work !!!
 
+If not, say what append, maybe I've missed a step in this explaination.
+</help>
+
+<question>
+Has someone succeded getting all the buttons to work ?
+I mean only 7 on the 30 special keys of the keyboard works and
+only 5 of the 10 buttons of the mouse work for me.
+
+If not, is there a way I could help developers with it ? I can't help
+with code (I'm a java developer) but I can send dumps (with hcidumps) or
+I can try some instructions. If someone think it could help, the only
+thing he has to do is to tell it to me, I'll be pleased to give some
+help by this way.
+
+Is there something to do to get the keyboad  working after a reboot ?
+Mine seems (in fact, the hub seems) the stay in BT mode but, it's a bit
+annoying when you've to do something before the /etc/init.d/bluetooth is
+lauched.
+
+</question>
+
+Good luck for the people having this keyboard and, once again,
+thanks a lot to the developers.
+
+Nicolas
+
+PS: I've writen a letter to Logitech, they respond me that they won't
+nor want to help the developers, they won't write some drivers and
+that's all! So, if you own some Logitech device and this device doesn't
+work under linux, write them to say that your're not happy to be
+ignored. (but do it smartly, please, do give a bad picture of all the
+people using Linux or some other free(as free speech, not as pirated) OS
+!
 
 
 
