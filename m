@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <005b01c4165b$5541b0e0$4000fe0a@rtsviec64>
-From: "Harald Meier" <meh1@rts.at>
-To: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
-References: <003201c4161f$d37a2050$4000fe0a@rtsviec64> <1080630888.4094.5.camel@pegasus>
-Subject: Re: [Bluez-users] PAND and RFCOMM simultaneously
+Message-ID: <20040330105649.14115.qmail@web21002.mail.yahoo.com>
+From: =?iso-8859-1?q?Gary=20Martin?= <gary_martin_au@yahoo.com.au>
+Subject: Re: [Bluez-users] Desperate newbie
+To: Bluez <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403301050.08300.thomas.chiverton@bluefinger.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0058_01C4166C.15C53020"
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,95 +16,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 30 Mar 2004 15:31:34 +0200
+Date: Tue, 30 Mar 2004 20:56:49 +1000 (EST)
 
-This is a multi-part message in MIME format.
+Thank you Thomas for the suggestion, but KDE-Bluetooth does not
+appear to be available for Debian PowerPC. I haven't been able to
+get GNOME-Bluetooth running.
 
-------=_NextPart_000_0058_01C4166C.15C53020
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Gary
 
-Hi Marcel,
+ --- Thomas Chiverton <thomas.chiverton@bluefinger.com> wrote: >
+On Tuesday 30 Mar 2004 10:24 am, you said:
+> > find the numerical equivalents of "Computer" or "Mobile phone"
+> 
+> If you have kde-bluetooth you can choose them in the bluetooth
+> adapter control 
+> panel.
+> 
+> > too new
+> 
+> I don't think the bluetooth spec has changed that much :-)
+> 
+> -- 
+> Tom Chiverton 
+> Advanced ColdFusion Programmer
+> 
+> Tel: +44(0)1749 834997
+> email: tom.chiverton@bluefinger.com
+> BlueFinger Limited
+> Underwood Business Park
+> Wookey Hole Road, WELLS. BA5 1AF
+> Tel: +44 (0)1749 834900
+> Fax: +44 (0)1749 834901
+> web: www.bluefinger.com
+> Company Reg No: 4209395 Registered Office: 2 Temple Back East,
+> Temple
+> Quay, BRISTOL. BS1 6EG.
+> *** This E-mail contains confidential information for the
+> addressee
+> only. If you are not the intended recipient, please notify us
+> immediately. You should not use, disclose, distribute or copy
+> this
+> communication if received in error. No binding contract will
+> result from
+> this e-mail until such time as a written document is signed on
+> behalf of
+> the company. BlueFinger Limited cannot accept responsibility for
+> the
+> completeness or accuracy of this message as it has been
+> transmitted over
+> public networks.*** 
 
-the output of hciconfig -a is:
-
-hci0: Type: PCIBD Address: 00:02:78:02:2E:C3 ACL MTU: 192:8 SCO MTU: =
-64:8
-
-UP RUNNING PSCAN ISCAN
-
-RX bytes:70 acl:0 sco:0 events:7 errors:0
-
-TX bytes:34 acl:0 sco:0 commands:7 errors:0
-
-Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-
-Link policy:
-
-Link mode: SLAVE ACCEPT
-
-Name: 'ka0009 (0)'
-
-Class: 0x000000
-
-Service Classes: Unspecified
-
-Device Class: Miscellaneous,
-
-HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver:
-
-0x175
-
-Manufacturer: Cambridge Silicon Radio (10)
-
-------=_NextPart_000_0058_01C4166C.15C53020
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1106" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY>
-<DIV>
-<P><FONT face=3DArial size=3D2>Hi Marcel,</FONT></P>
-<P><FONT face=3DArial size=3D2>the output of hciconfig -a is:</FONT></P>
-<P><FONT face=3DArial size=3D2>hci0: Type: PCI</FONT><FONT face=3DArial =
-size=3D2>BD=20
-Address: 00:02:78:02:2E:C3 ACL MTU: 192:8 SCO MTU: 64:8</FONT></P>
-<P><FONT face=3DArial size=3D2>UP RUNNING PSCAN ISCAN</FONT></P>
-<P><FONT face=3DArial size=3D2>RX bytes:70 acl:0 sco:0 events:7 =
-errors:0</FONT></P>
-<P><FONT face=3DArial size=3D2>TX bytes:34 acl:0 sco:0 commands:7=20
-errors:0</FONT></P>
-<P><FONT face=3DArial size=3D2>Features: 0xff 0xff 0x0f 0x00 0x00 0x00 =
-0x00=20
-0x00</FONT></P>
-<P><FONT face=3DArial size=3D2>Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 =
-HV2=20
-HV3</FONT></P>
-<P><FONT face=3DArial size=3D2>Link policy:</FONT></P>
-<P><FONT face=3DArial size=3D2>Link mode: SLAVE ACCEPT</FONT></P>
-<P><FONT face=3DArial size=3D2>Name: 'ka0009 (0)'</FONT></P>
-<P><FONT face=3DArial size=3D2>Class: 0x000000</FONT></P>
-<P><FONT face=3DArial size=3D2>Service Classes: Unspecified</FONT></P>
-<P><FONT face=3DArial size=3D2>Device Class: Miscellaneous,</FONT></P>
-<P><FONT face=3DArial size=3D2>HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP =
-Ver: 1.1 (0x1)=20
-LMP Subver:</FONT></P>
-<P><FONT face=3DArial size=3D2>0x175</FONT></P>
-<P><FONT face=3DArial size=3D2>Manufacturer: Cambridge Silicon Radio=20
-(10)</FONT></P></DIV></BODY></HTML>
-
-------=_NextPart_000_0058_01C4166C.15C53020--
-
+Find local movie times and trailers on Yahoo! Movies.
+http://au.movies.yahoo.com
 
 
 -------------------------------------------------------
