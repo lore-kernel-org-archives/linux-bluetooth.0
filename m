@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <de33c8be05022119091917b7ff@mail.gmail.com>
-From: =?ISO-8859-1?Q?Fl=E1vio?= <flavio.henriques@gmail.com>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] TPL (transmit power level)
-In-Reply-To: <1109039332.7626.102.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <de33c8be050221181635c1a751@mail.gmail.com>
 References: <de33c8be0502160425215158ad@mail.gmail.com>
 	 <1109028291.7626.45.camel@pegasus>
 	 <de33c8be050221181635c1a751@mail.gmail.com>
-	 <1109039332.7626.102.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1109039332.7626.102.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,28 +20,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Feb 2005 03:09:40 +0000
+Date: Tue, 22 Feb 2005 03:28:52 +0100
 
-Hi Marcel
-My dongle is an conceptronic CBT100U class1 (100m) and here it=B4s the
-information :
+Hi Flavio,
 
-chip version : BlueCore2 ;
-HCI 17,11 ;
+> In bluetooth core says that the range of the tpl (transmit power
+> level) is between -30<=3D N<=3D20 and the step (resolution) is one
+> unit,but when i execute the command hci_read_tpl (transmit power
+> level) all the values that i receive are:
+> 17 ; 14 ; 10 ; 6 ; 2 ; -2 ; -6 ; -9 and no more :(
+> why? it=B4s something about Bluez or is the Firmware (of my dongle usb)
+> that realy gives that values for tpl?
 
-SCO mapping : HCI ;
-HCI ver:1,1 ;
-HCI rev: 0X460;
-LMP ver:1,1 ;
-LMP subver:0X460
-Should i update the firmware? Resolves my problem?In the chip specific
-don=B4t say about the class 1 :(
+this should be chip specific. Who is the manufacturer of your Bluetooth
+chip inside your dongle?
 
-Note: My dongle is 1,1 version but can i update for the 1,2 version
-with the firmware?
+Regards
 
-Thanks for all the help Marcel!
-Regards Flavio
+Marcel
+
+
 
 
 -------------------------------------------------------
