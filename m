@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: 3com bluetooth card
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1103743130.4607.1.camel@tuxlaptop.site>
-References: <1103743130.4607.1.camel@tuxlaptop.site>
+From: Andreas Millinger <andreas.millinger@web.de>
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1103745066.20258.56.camel@pegasus>
+Message-Id: <1103743130.4607.1.camel@tuxlaptop.site>
 Mime-Version: 1.0
+Subject: [Bluez-users] Re: 3com bluetooth card
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,19 +16,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Dec 2004 20:51:06 +0100
+Date: Wed, 22 Dec 2004 20:18:50 +0100
 
-Hi Andreas,
+Hello,
 
-> thanks a lot, that has worked properly. And how can I attach the device at startup?
+thanks a lot, that has worked properly. And how can I attach the device at startup?
 
-what hciattach parameters did you used? Please also post the output of
-dump_cis.
-
-Regards
-
-Marcel
-
+best regards
+Andreas
 
 
 
