@@ -1,53 +1,48 @@
-Return-Path: <jd@sdf.lonestar.org>
-Date: Fri, 30 Jul 2004 08:36:42 -0500 (CDT)
-From: John Dahlstrom <jd@freeshell.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: bluez-devel@lists.sourceforge.net
-Subject: Re: Linux 2.4.27rc3 and Bluetooth
-In-Reply-To: <1090055676.4558.15.camel@pegasus>
-Message-ID: <Pine.NEB.4.60.0407300813490.24330@mx.freeshell.org>
-References: <Pine.NEB.4.60.0407131537590.12135@norge.freeshell.org>
- <1089826204.4517.0.camel@pegasus>  <Pine.NEB.4.60.0407141844100.22049@mx.freeshell.org>
- <1090055676.4558.15.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Typo in pcmcia/bluetooth.conf
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Josh Goldsmith <kd7spq@gmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <dd1169670407291459738f97f8@mail.gmail.com>
+References: <dd1169670407291459738f97f8@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1091138628.12651.168.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 30 Jul 2004 00:03:48 +0200
 
-Marcel,
+Hi Josh,
 
-Yes, your new patch works!
+>   There looks to be a typo in bluetooth.conf on line #30 for both v2.8
+> and 2.9.
+> 
+> #29  card "AmbiCom BT2000C Bluetooth PC/CF Card"
+> #30    version ""AmbiCom BT2000C", "Bluetooth PC/CF Card"
 
-When the firmware file is removed and the Bluetooth card is inserted,
-the machine humbly protests as expected, without a kernel panic.
-Then, with the file copied back into place, everything runs smoothly
-upon subsequent insertions.
+that's right. It is fixed in CVS now.
 
-Thank you again for your assistance.
+Regards
 
-Kind regards,
-
-- John
-
---
-http://jodarom.sdf1.org/
+Marcel
 
 
 
-On Sat, 24 Jul 2004, Marcel Holtmann wrote:
 
-> Hi John,
->
->> [...]
->
-> you are right. That is the problem. I fixed it in a different way.
-> Please try out the attached patch and report if it also works.
->
->> [...]
->
-> No. The 2.6 kernel is not affected, because the hdev is a pointer in
-> that kernel series and we have the NULL pointer check in place.
->
-> Regards
->
-> Marcel
->
+-------------------------------------------------------
+This SF.Net email is sponsored by OSTG. Have you noticed the changes on
+Linux.com, ITManagersJournal and NewsForge in the past few weeks? Now,
+one more big change to announce. We are now OSTG- Open Source Technology
+Group. Come see the changes on the new OSTG site. www.ostg.com
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
