@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] adding sdp service record attributes
+Subject: Re: [Bluez-users] BLueZ Questions
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050316012142.60063.qmail@web60906.mail.yahoo.com>
-References: <20050316012142.60063.qmail@web60906.mail.yahoo.com>
+In-Reply-To: <4237F516.2040804@carmedialab.de>
+References: <4237F516.2040804@carmedialab.de>
 Content-Type: text/plain
-Message-Id: <1110965856.9818.90.camel@pegasus>
+Message-Id: <1110965751.9818.87.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,54 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Mar 2005 10:37:36 +0100
+Date: Wed, 16 Mar 2005 10:35:51 +0100
 
-Hi Michael,
+Hi Marcus,
 
->     Sorry for that. Maybe I rephrase the question like this.
->     Now, I'm still struggling about how to add sdp service profiles in
-> my Linux PC. And the most important thing is to let my computer to act
-> as headset so that T610 can connect to it. I know that to add the
-> service, using add_headset function is the way. But I find that only
-> using this function is not enough, and I also find that there is a
-> command called "setattr" that sets or adds the attributes to SDP
-> record. Then I wish to know that if the setattr command, or set_attrib
-> function in sdptool.c is necessary. If so, in the setattr command,
-> there are two parameters that I've to enter, attrib_id and
-> attrib_value. I wish to know what are the corresponding values of
-> these two parameters from the following after I've typed "sdptool get
-> --tree <recordhandle>"?
-> Attribute Identifier : 0x0 - ServiceRecordHandle
->   Integer : 0x10002
-> Attribute Identifier : 0x1 - ServiceClassIDList
->   Data Sequence
->     UUID16 : 0x1108 - Headset
->     UUID16 : 0x1203 - GenericAudio
-> Attribute Identifier : 0x4 - ProtocolDescriptorList
->   Data Sequence
->     Data Sequence
->       UUID16 : 0x0100 - L2CAP
->     Data Sequence
->       UUID16 : 0x0003 - RFCOMM
->       Channel/Port (Integer) : 0x5
-> Attribute Identifier : 0x5 - BrowseGroupList
->   Data Sequence
->     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
-> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
->   Data Sequence
->     Data Sequence
->       UUID16 : 0x1108 - Headset
->       Version (Integer) : 0x100
-> Attribute Identifier : 0x100
->      Lastly, I wish to konw that if I can let my PC to act as headset
-> for T610, after I've added the profile in it, is there any program
-> needed to install in T610 so that it can connect to the PC?
->      Hope that this can be clearer to you. Thank you very much.
+> I'm new to the BT and just want to know some things about the BLueZ.
+> ?1 Where can I see what profiles are supported (through what)(SAP?).
+> As far as I understand we got no 'profiles' but protocols implemented 
+> through applications within BlueZ.
+> Example: for the serial profile I would rather say RFCOMM offers a 
+> serial connection over bt. Right?
 
-now I get what you want. In general adding SDP records with sdptool is
-only for testing purpose. You should include you own code for it, like
-we do for pand or dund. However if you think that the add_headset() in
-sdptool misses an attribute then fix this and send in a patch for it.
+if the protocol is implemented you can easily have an application
+running that provides the profile function.
+
+This is not general, but if you ask what profiles you have in mind, I
+can give you a more detailed answer.
+
+> I found the slides from Marcel Holtmann from the BT Kongress 2003 which 
+> show some information for supported protocols/profiles. Are there other 
+> resources?
+
+Not that I know of. However you can always use the source, Luke ;)
 
 Regards
 
