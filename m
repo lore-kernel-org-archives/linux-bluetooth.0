@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Suspend/resume issues with bluez
-From: Paul Ionescu <paul@acorp.ro>
-To: Mitsu Hadeishi <mitsu@syntheticzero.com>
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200403022202.19259.mitsu@syntheticzero.com>
-References: <200403022202.19259.mitsu@syntheticzero.com>
-Message-Id: <1078379087.17118.22.camel@t40>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/mixed; boundary="=-2If04tWJGFSjXn4+DQ8h"
+Message-Id: <1078361235.2921.12.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-devel] Problem with the i-Tec dongle solved
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,39 +15,71 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 04 Mar 2004 07:44:47 +0200
+Date: Thu, 04 Mar 2004 01:47:15 +0100
 
-Hi Mitsu,
 
-On T40* the bluetooth adapter is an USB one, so you can try to remove
-all USB modules before suspend, and load them again after resume.
+--=-2If04tWJGFSjXn4+DQ8h
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2004-03-03 at 05:02, Mitsu Hadeishi wrote:
-> Hi, just thought I'd run this issue past you folks.  I'm running the bluez 
-> stack and utilities from Debian unstable on kernel 2.4.22-x1 (Xandros Desktop 
-> 2) on a Thinkpad T40p.  It seems to run fine when I first boot; I am able to 
-> discover other devices, they can discover me.  I am a newbie trying to use 
-> this protocol stack; so I haven't yet gotten any applications to work yet.  
-> However, it seems to function, basically.
-> 
-> The problem is bluez never seems to work again after a suspend/resume.  I have 
-> tried shutting down the Bluetooth card (you can do with with Fn-F5 on a 
-> Thinkpad) before suspending, as well as doing hciconfig hci0 down, and even 
-> rmmod rfcomm, rmmod hci_usb (rmmod l2cap never seems to work) before 
-> suspending, and then modprobe them back afterwards.  Though my machine does 
-> not hang or crash when coming back from suspend, the Bluetooth card never 
-> works again.  hciconfig -a prints nothing.
-> 
-> Interestingly, before I installed the bluez stack, whenever I hit Fn-F5 it 
-> would freeze my machine.  Now, it doesn't freeze it, but correctly toggles 
-> the little LED saying Bluetooth is active/inactive.  When bluez is working, 
-> Fn-F5 makes hciconfig -a report the device there, then Fn-F5 again will make 
-> hciconfig -a report nothing.  But after a suspend/resume, Fn-F5 will *still* 
-> toggle the Bluetooth LED, but hciconfig -a never shows a card.
-> 
-> Rebooting the system causes bluez to work again.
-> 
-> Mitsu
+Hi Folks,
+
+I got the problematic i-Tec dongle working. The important thing is to
+send a HCI_Reset as the first command at initialization. We don't do
+this, but I can't remember why not. Maybe there were some problematic
+chips in the early times of BlueZ. The attached patch is against 2.6.
+
+And here is the new dongle:
+
+hci0:   Type: USB
+        BD Address: 00:03:C9:xx:xx:xx ACL MTU: 377:10  SCO MTU: 16:0
+        UP RUNNING PSCAN ISCAN 
+        RX bytes:107 acl:0 sco:0 events:14 errors:0
+        TX bytes:303 acl:0 sco:0 commands:14 errors:0
+        Features: 0xff 0xff 0x0d 0x38 0x08 0x08 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset> 
+                <timing accuracy> <role switch> <hold mode> <sniff mode> 
+                <park state> <RSSI> <channel quality> <SCO link> 
+                <HV2 packets> <HV3 packets> <u-law log> <A-law log> 
+                <CVSD> <power control> <transparent SCO> <enhanced iscan> 
+                <interlaced iscan> <interlaced pscan> <AFH cap. slave> <AFH cap. master> 
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+        Link policy: RSWITCH HOLD SNIFF PARK 
+        Link mode: SLAVE ACCEPT 
+        Name: 'Broadcom BCM2035'
+        Class: 0x000100
+        Service Classes: Unspecified
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x69 LMP Ver: 1.1 (0x1) LMP Subver: 0xe00
+        Manufacturer: Broadcom Corporation (15)
+
+The nice thing is that it already supports AFH ;)
+
+Regards
+
+Marcel
+
+
+--=-2If04tWJGFSjXn4+DQ8h
+Content-Disposition: attachment; filename=patch
+Content-Type: text/plain; name=patch; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
+
+===== net/bluetooth/hci_core.c 1.25 vs edited =====
+--- 1.25/net/bluetooth/hci_core.c	Thu Feb 26 00:53:38 2004
++++ edited/net/bluetooth/hci_core.c	Thu Mar  4 01:06:44 2004
+@@ -189,6 +189,9 @@
+ 
+ 	/* Mandatory initialization */
+ 
++	/* Reset */
++	hci_send_cmd(hdev, OGF_HOST_CTL, OCF_RESET, 0, NULL);
++
+ 	/* Read Local Supported Features */
+ 	hci_send_cmd(hdev, OGF_INFO_PARAM, OCF_READ_LOCAL_FEATURES, 0, NULL);
+ 
+
+--=-2If04tWJGFSjXn4+DQ8h--
 
 
 
