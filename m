@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Till Harbaum <harbaum@beecon.de>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] L2CAP dropping packets on BlueZ based receiver
-References: <200408021859.44496.harbaum@beecon.de> <1091472875.4259.6.camel@pegasus>
-In-Reply-To: <1091472875.4259.6.camel@pegasus>
+To: Talbi <amine@baracoda.com>
+Subject: Re: [Bluez-devel] BlueZ Disconnects
+References: <410E51C9.1020401@celar.fr> <1091521684.12594.137.camel@imladris.demon.co.uk> <200408031214.36250.amine@baracoda.com>
+In-Reply-To: <200408031214.36250.amine@baracoda.com>
+Cc: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-15"
-Message-Id: <200408031223.11789.harbaum@beecon.de>
+Message-Id: <200408031222.31152.harbaum@beecon.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,32 +19,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 3 Aug 2004 12:23:11 +0200
+Date: Tue, 3 Aug 2004 12:22:31 +0200
 
-Hi Marcel,
+On Tuesday 03 August 2004 12:14, Talbi wrote:
+> there is a way using BlueZ to detect a disconnection between my dongle and
+> a Bluetooth device.
+Sure, it works exaclty like it does with e.g. a lost tcp connection. If you 
+are using the select, you e.g. get a read event. But the actual read() call  
+returns with 0 bytes read. You then know, that your l2cap connection is gone.
 
-On Monday 02 August 2004 20:57, Marcel Holtmann wrote:
-> Some Bluetooth stacks emulate L2CAP flow control with the flow control
-> of the HCI layer, but this is more bad than dropping a packet. Actually
-> this is the reason why most mobiles phones don't support more than one
-> ACL at the same time.
-Hmm ... you are right. I have been implementing l2cap and have never really 
-faced this problem. In fact i have been using HCI layer flow control to have 
-a reliable L2CAP layer and thus, one blocking L2CAP client will affect all 
-clients.
-
-> The solution for this is using RFCOMM or L2CAP with retransmission and
-> flow control from the Bluetooth 1.2 specification.
-It's been some time since i wrote my rfcomm layer, but i didn't remember 
-rfcomm having a sequence number or the like and IMHO it does not have a 
-mechanism for retransmission. Or have i really missed something that 
-important?
-
-IMHO you can use rfcomm to make the whole transmission reliable, but this 
-means, that you have to use acl flow control and make sure, that l2cap/acl 
-won't block via rfcomms credit based flow control. Are there other options?
-
-Thanks for your hints so far.
+This should work similar with rfcomm.
 
 Till
 
@@ -52,6 +37,7 @@ Dr.-Ing. Till Harbaum                       Tel.:  +49 721 4998963
 BeeCon GmbH                                 Fax:   +49 721 4998962
 Haid-und-Neu Strasse 7, 76131 Karlsruhe     Mobil: +49 179 9087904
 harbaum@beecon.de                           http://www.beecon.de
+
 
 
 -------------------------------------------------------
