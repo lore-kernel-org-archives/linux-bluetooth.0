@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Catalin Drula <catalin@cs.toronto.edu>
-To: steven.singer@csr.com
-Cc: bluez-devel@lists.sourceforge.net
-Message-ID: <Pine.GSO.4.58.0502101727190.7559@qew.cs>
+Message-ID: <420BDA1B.7040708@web.de>
+From: Andreas Millinger <andreas.millinger@web.de>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] Re: Lower granularity for INQUIRY interval
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: [Bluez-devel] PCMCIA/hciattach problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,59 +16,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 10 Feb 2005 17:42:25 -0500 (EST)
+Date: Thu, 10 Feb 2005 23:03:07 +0100
 
-Stever Singer wrote:
-> Catalin Drula wrote:
-> > Is there a way to perform INQUIRY for intervals with
-> > a lower granularity than 1.28 seconds? I know the Bluetooth
-> > specification says no.
+Hello Marcel,
 
-> To inquire for less than 10.24 seconds is a bad idea. Unless you
-> inquire for a single contiguous block lasting 10.24 seconds you do not
-> have a good probability of picking up all devices.
->
-> Note that, for example, 8 consecutive 1.28 second inquiries is not
-> guaranteed to work.
+>so no SMP and no PREEMPT. This means that this can't be a deadlock and
+>there should be no problem, but you can try to disable the REGPARM.
+>  
 
-Not necessarily a bad idea. In my case, I need to do symmetric Bluetooth
-discovery. There are no predefined roles (master-slave, server-client) for
-the devices which must continually scan their surroundings in order to
-discover other devices. Hence, each device must continously switch between
-the INQUIRY and INQUIRY SCAN states. Since in my setup, the devices will
-be in range for 20-30 seconds (i.e. humans walking past each other), to
-remain for 10.24 seconds in INQUIRY mode might just me too much. Imagine
-that the "phases" of the devices are almost synchronized, then they will
-both be in INQUIRY mode at the same time, then in INQUIRY SCAN mode at the
-same time, and so on, and none of them will discover the other one.
+I have done some tests with different PCMCIA-Cards. It seams, that this 
+problem doesn`t depend on the bluetooth subsystem. With other cards, 
+there is also a error when shuting down (but no freez). And when no card 
+is in PCMCIA there is a error, too:
 
-The problem has been studied both theoretically and experimentally (for
-example, see:
-http://web.informatik.uni-bonn.de/IV/Mitarbeiter/scholz/10_Bohman.pdf
+FATAL: Module yenta_socket is in use
 
-The conclusion of the authors of this study was that each a device should
-stay in each of the two states for a random amount of time with a mean
-around 2 to 3 seconds (more details, are in the above paper). Doing this
-yields and average neighbor discovery delay of about 8 seconds.
+output of lspci is:
 
-Now obviously if we can only stay in INQUIRY state mode, for multiples of
-1.28 seconds, the above scenario will not work. So there are _legitimate_
-uses (i.e. it is not necessarily a bad idea) for my request.
+0000:00:00.0 Host bridge: VIA Technologies, Inc. VT8605 [ProSavage PM133]
+0000:00:01.0 PCI bridge: VIA Technologies, Inc. VT8605 [PM133 AGP]
+0000:00:05.0 Ethernet controller: Realtek Semiconductor Co., Ltd. 
+RTL-8139/8139C/8139C+ (rev 10)
+0000:00:06.0 Communication controller: Ambient Technologies Inc HaM 
+controllerless modem (rev02)
+0000:00:07.0 ISA bridge: VIA Technologies, Inc. VT82C686 [Apollo Super 
+South] (rev 40)
+0000:00:07.1 IDE interface: VIA Technologies, Inc. 
+VT82C586A/B/VT82C686/A/B/VT823x/A/C PIPC Bus Master IDE (rev 06)
+0000:00:07.2 USB Controller: VIA Technologies, Inc. VT82xxxxx UHCI USB 
+1.1 Controller (rev 1a)
+0000:00:07.4 ISA bridge: VIA Technologies, Inc. VT82C686 [Apollo Super 
+ACPI] (rev 40)
+0000:00:07.5 Multimedia audio controller: VIA Technologies, Inc. 
+VT82C686 AC97 Audio Controller (rev 50)
+0000:00:0c.0 CardBus bridge: O2 Micro, Inc. OZ6933 Cardbus Controller 
+(rev 01)
+0000:00:0c.1 CardBus bridge: O2 Micro, Inc. OZ6933 Cardbus Controller 
+(rev 01)
+0000:00:0d.0 FireWire (IEEE 1394): Agere Systems (former Lucent 
+Microelectronics) FW323 (rev 04)
+0000:01:00.0 VGA compatible controller: S3 Inc. 86C380 [ProSavageDDR 
+K4M266] (rev 02)
 
-For your information, I did some experiments with the above algorithm and
-four Bluetooth devices. Without having precise figures, I can tell you,
-that two of the devices were discovered about 50% of the time during the
-first time in INQUIRY state (3-4 seconds) and about 80% time the first or
-second time (8-9 seconds). The third device which is the builtin Bluetooth
-card in an iPaq h5550, was discovered far less often (30 seconds). I don't
-know why but I am guessing this has to do with the hardware
-implementation. An USB dongle (I forget the manufacturer) was the most
-"discoverable" device.
+What to do now? If I should post on the kernel mailing list, where do I 
+find the kernel mailing list? And what information is needed?
 
-But, to put a conclusion to this, I agree with you that this has to be
-done at the HCI level, and that is what my implementation does.
-
-Catalin
+Best regards
+Andreas
 
 
 -------------------------------------------------------
