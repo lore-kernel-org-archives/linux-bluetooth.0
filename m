@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41A39A11.3040906@musikcheck.dk>
-From: Hasse Hagen Johansen <hhj@musikcheck.dk>
+Message-ID: <41A387FD.2050909@phaldor.co.uk>
+From: Dave Givens <dave.givens@phaldor.co.uk>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Troubles compiling btsco
+Subject: Re: [Bluez-users] Bluetooth Printing (Belkin Print Server)
+References: <41A2089D.5030100@phaldor.co.uk> <1101139759.15086.14.camel@pegasus> <41A21EE3.5060408@phaldor.co.uk> <20041123091654.GB16952@suse.de> <1101202810.26578.61.camel@pegasus> <41A35BFE.9000507@phaldor.co.uk> <20041123161157.GK16952@suse.de>
+In-Reply-To: <20041123161157.GK16952@suse.de>
+Content-Type: multipart/alternative;
+ boundary="------------080700010709050507030008"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,45 +19,134 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 23 Nov 2004 21:14:09 +0100
+Date: Tue, 23 Nov 2004 18:57:01 +0000
 
-Hi
+This is a multi-part message in MIME format.
+--------------080700010709050507030008
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I have checked out btsco from cvs from 
-http://www.gargan.org/linux/snd-bt-sco/
+Stefan,
+    Yes I did configure it the way you have suggested, but when it comes 
+to the uri, I entered bluetooth://0002724080A3 as per instructions. This 
+does not allow me to specify that the printer is a Star TSP700 or 
+install the specific drivers for the model.
 
-tried to run the bootstrap but i failed because the automake(on my 
-debian sid) didn't include --ignore-deps but only had a include-deps 
-option. I removed that
+Dave Givens
 
-But when running configure I get this:
+Stefan Behlert wrote:
 
-./configure: line 2919: XIPH_PATH_AO: command not found
+>Hi Dave,
+>
+>On Nov 23, 04 15:49:18 +0000, Dave Givens wrote:
+>  
+>
+>>Stefan,
+>>  Marcel is correct, the web page I tried is localhost:631. I have also 
+>>    
+>>
+>
+>Ah, swat. Didn't use that for a loooong time.
+>
+>  
+>
+>>tried using Yast, the same problem occurs, the additional problem with 
+>>this way is that you cannot specify what drivers to use.
+>>    
+>>
+>
+>Sorry, I don't understand that part: 'cannot specify what drivers to use'.
+>I think the problem is, that your printer is not specified. 
+>I know only the Yast-way to configure that - sorry :|
+>In the printer-module of Yast, you must specify an 'other printer' to set
+>the URI, and afterwards you can specify which type of printer you use. Was
+>that the way you tried to configure it with Yast, or did you do it another
+>way? If that was your way, I have no idea what's wrong :(
+>
+>        ciao,
+>          Stefan
+>
+>  
+>
+>>Marcel,
+>>   The problem is still here, I have tried everything I can think of . 
+>>The device is a Belkin Bluetooth USB Printer Adapter (F8T031uk). If you 
+>>need use of the device let me know where to send it to and I will ship 
+>>it to you.
+>>
+>>Dave Givens
+>>
+>>    
+>>
 
-Don't know what that means, but it seems that this error is causing some 
-variable in the makefile not to substituted. I get this if I then try to 
-run make
+--------------080700010709050507030008
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-miyagi:/home/hhj/btsco# make
-make  all-recursive
-make[1]: Entering directory `/home/hhj/btsco'
-Making all in sbc
-make[2]: Entering directory `/home/hhj/btsco/sbc'
-gcc -DHAVE_CONFIG_H -I. -I. -I..    @AO_CFLAGS@ -Wall -O2 -c sbclib.c
-gcc: @AO_CFLAGS@: No such file or directory
-make[2]: *** [sbclib.o] Error 1
-make[2]: Leaving directory `/home/hhj/btsco/sbc'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/home/hhj/btsco'
-make: *** [all-recursive-am] Error 2
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
+  <title></title>
+</head>
+<body>
+Stefan,<br>
+&nbsp;&nbsp;&nbsp; Yes I did configure it the way you have suggested, but when it
+comes to the uri, I entered bluetooth://0002724080A3 as per
+instructions. This does not allow me to specify that the printer is a
+Star TSP700 or install the specific drivers for the model.<br>
+<br>
+Dave Givens<br>
+<br>
+Stefan Behlert wrote:<br>
+<blockquote type="cite" cite="mid20041123161157.GK16952@suse.de">
+  <pre wrap="">Hi Dave,
 
-I have tried to use a patch for debian from http://www.lxtreme.nl but 
-this doesn't seem to apply to the cvs version of btsco.
+On Nov 23, 04 15:49:18 +0000, Dave Givens wrote:
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">Stefan,
+  Marcel is correct, the web page I tried is localhost:631. I have also 
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+Ah, swat. Didn't use that for a loooong time.
 
-Does anyone have some tips ffor compiling it on debian?
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">tried using Yast, the same problem occurs, the additional problem with 
+this way is that you cannot specify what drivers to use.
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+Sorry, I don't understand that part: 'cannot specify what drivers to use'.
+I think the problem is, that your printer is not specified. 
+I know only the Yast-way to configure that - sorry :|
+In the printer-module of Yast, you must specify an 'other printer' to set
+the URI, and afterwards you can specify which type of printer you use. Was
+that the way you tried to configure it with Yast, or did you do it another
+way? If that was your way, I have no idea what's wrong :(
 
-Best Regards
-Hasse H. Johansen
+        ciao,
+          Stefan
+
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">Marcel,
+   The problem is still here, I have tried everything I can think of . 
+The device is a Belkin Bluetooth USB Printer Adapter (F8T031uk). If you 
+need use of the device let me know where to send it to and I will ship 
+it to you.
+
+Dave Givens
+
+    </pre>
+  </blockquote>
+</blockquote>
+</body>
+</html>
+
+--------------080700010709050507030008--
 
 
 
