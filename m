@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] RFCOMM communication gets stalled
+Subject: Re: [Bluez-devel] access to hci devices
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Carlos AM <Carlos@naxus.biz>
-Cc: lista bluez <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <002c01c46a77$034a25e0$5000005a@naxus>
-References: <002c01c46a77$034a25e0$5000005a@naxus>
+To: Rob Shepherd <robshep@informatics.bangor.ac.uk>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <40F69A7B.7040802@informatics.bangor.ac.uk>
+References: <40F69A7B.7040802@informatics.bangor.ac.uk>
 Content-Type: text/plain
-Message-Id: <1089913722.4517.37.camel@pegasus>
+Message-Id: <1089913632.4517.34.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,30 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Jul 2004 19:48:42 +0200
+Date: Thu, 15 Jul 2004 19:47:12 +0200
 
-Hi Carlos,
+Hi Rob,
 
-> I'm using bluez-libs-2.7 and bluez-utils-2.7 to develop a GPS system
-> that communicates via bluetooth. I use the RFCOMM and the connection
-> and disconnection works fine but the transmission gets stalled in
-> about ten minutes. Both sides indicate that they are still connected,
-> but in the GPS side, the process that writes in the rfcomm device
-> (/dev/bluetooth/rfcomm/0) stops on a blocking write call:
->  
->     write(fdbluetooth,s,strlen(s));
->  
-> I open the rfcomm device this way:
->  
->     fdbluetooth= open("/dev/bluetooth/rfcomm/0",O_RDWR | O_NOCTTY);
->  
->  
-> That write call works fine for a while until the communication gets
-> stalled.
+> I've written a basic bluetooth stack in java which is fine for my embedded java systems 
+> and talks H4 to a device out of a serial port.
+> 
+> I would like to talk to USB devices in Linux using my stack also.
+> Rather than re-invent the wheel, how hard would it be for me to fire my HCI packets at a 
+> usb device using the HCI-USB / HCI_UART bluez drivers?
 
-don't use the RFCOMM TTY terminal emulation. Go directly throught the
-RFCOMM socket interface. If you still got problems check with hcidump
-what is going on.
+it is possible with BlueZ, but in that case you better should use the
+BlueTTY driver you can found under the USB subsystem, when you disable
+the Bluetooth subsystem in your kernel config.
 
 Regards
 
