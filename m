@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] multiple BT dongles
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41E6ED75.2060800@gmx.ch>
-References: <18514.1105613960@www29.gmx.net>
-	 <1105614296.7961.162.camel@pegasus>  <41E6ED75.2060800@gmx.ch>
+Subject: Re: [Bluez-users] BCSP problem
+From: Erwin Authried <eauth@softsys.co.at>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <BAY104-F40DFDF64BCF0100D83487BC18A0@phx.gbl>
+References: <BAY104-F40DFDF64BCF0100D83487BC18A0@phx.gbl>
 Content-Type: text/plain
-Message-Id: <1105687666.7525.13.camel@pegasus>
+Message-Id: <1105654294.3361.25.camel@kabel>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,33 +18,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 14 Jan 2005 08:27:46 +0100
+Date: Thu, 13 Jan 2005 23:11:35 +0100
 
-Hi Marco,
-
-> > you can assign the services (application like pand) for each dongle, but
-> > right now you can't make the sdpd differ between them.
+On Thu, 2005-01-13 at 18:01, blookk - wrote:
+> Hello:
 > 
-> I think we talk about the same thing, but just to get shure:
-> If i program two different rfcomm services, that would mean that i can 
-> control which service runs on which dongle?
-
-if you use the RFCOMM socket then you simply bind() the socket to a
-specific BD_ADDR of a local dongle.
-
-> > Every CSR dongle with at least HCI 16.4 firmware.
+> I am working with CompactFlash Bluetooth BT0100M, and when I make some data 
+> tranference or operations  as hciattach or other operations  I obtain these 
+> warnings:
 > 
-> Is the firmware updateable?
+> 
+> bcsp_recv: Short BCSP packet
+> bcsp_recv: Error in BCSP hdr checksum
+> bcsp_recv: Error in BCSP hdr checksum
+> bcsp_timed_event: Timeout, retransmitting 1 pkts
+> bcsp_recv: Short BCSP packet
+> bcsp_recv: Error in BCSP hdr checksum
+> bcsp_recv: Error in BCSP hdr checksum
+> bcsp_recv: Out-of-order packet arrived, got 0 expected 5
+> bcsp_timed_event: Timeout, retransmitting 1 pkts
+> bcsp_unslip_one_byte: Invalid byte a8 after esc byte
+> bcsp_recv: Out-of-order packet arrived, got 3 expected 2
+> bcsp_recv: Out-of-order packet arrived, got 4 expected 2
+> bcsp_recv: Out-of-order packet arrived, got 5 expected 2
+> bcsp_timed_event: Timeout, retransmitting 1 pkts
+> 
+> 
+> Is there any form to modify the timeout?
+> How can manage this?
+> 
+> Thanks and regards.
+> 
+That looks like you get overrun errors in the serial driver. You can
+check /proc/tty/driver/ if there are overrun errors. I don't know your
+particular card, but generally PCMCIA/CF cards do no have a real uart
+and can send data far beyond the specified baudrate. I had to modify the
+serial driver as well as hci_bcsp.c to get rid of the errors for an
+embedded system (ARM7,40MHz).
 
-Yes.
-
-> Do i have to contact the manufacturer?
-
-Yes.
-
-Regards
-
-Marcel
+Regards,
+Erwin
 
 
 
