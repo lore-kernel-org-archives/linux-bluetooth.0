@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] PF_BLUETOOTH AF_BLUETOOTH redefinitions
-From: Max Krasnyansky <maxk@qualcomm.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: Achim Bohnet <ach@mpe.mpg.de>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <200401221434.10203.ach@mpe.mpg.de>
 References: <200401221347.32481.ach@mpe.mpg.de>
-	 <1074776673.3071.4.camel@pegasus>  <200401221434.10203.ach@mpe.mpg.de>
+	<1074776673.3071.4.camel@pegasus>  <200401221434.10203.ach@mpe.mpg.de>
 Content-Type: text/plain
-Message-Id: <1074794987.1707.214.camel@localhost>
+Message-Id: <1073575676.7039.8.camel@merlin>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,22 +19,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 22 Jan 2004 10:09:48 -0800
+Date: 08 Jan 2004 16:27:55 +0100
 
-On Thu, 2004-01-22 at 05:34, Achim Bohnet wrote:
-> > > hci.h may be due to old g++2.94.4 used on debian.  No idea about a workaround :(
-> > 
-> > include "sys/socket.h" before you include "bluetooth/bluetooth.h".
-> 
-> Hi Marcel,
-> 
+Hi Achim,
+
 > That one solution, but why isn't it done by bluetooth.h itself?  Makes it header order
 > independent, and fixes _once and forever_ annoying warnings like that.
 > (that was my last try to convience you, promised ;)
-Actually sys/socket.h didn't have PF_\AF_ BLUETOOTH defined up till now
-I guess. Mine for example (latest Fedora 1) still doesn't. Looks like
-GLIBC folks pulled Bluetooth related things into standard headers. Which
-is cool. We'll just have to #ifdef defines that may clash.
+
+it is not a nice programming style to include header files from another
+header file. From my view only really needed headers should be included
+from bluetooth.h and sys/socket.h is not needed at this point. It is
+first needed when you start socket programming and if you do so I think
+we can expect that you include sys/socket.h first.
 
 > What about condition[0] etc in hci.h.  Should this be contition[] etc?
 > 
@@ -45,10 +42,12 @@ is cool. We'll just have to #ifdef defines that may clash.
 >         struct hci_conn_info conn_info[0];
 >         struct hci_conn_info conn_info[0];
 
-No those should be [0] no []. I'm not sure why your GCC does not like
-them.
+Maybe this is compiler problem, because this statement is correct.
 
-Max
+Regards
+
+Marcel
+
 
 
 
