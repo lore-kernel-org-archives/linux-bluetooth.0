@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Laurence Orchard <laurence@orchards.org.uk>
-To: Bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1102035154.4258.14.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-users] Nokia 7610 phone & logitech DiNovo keyboard / MX900 mouse
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200412030025.02336.wim.delvaux@adaptiveplanet.com>
+Subject: [Bluez-users] managing pairing
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,35 +17,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 03 Dec 2004 00:52:34 +0000
+Date: Fri, 3 Dec 2004 00:25:02 +0100
 
-Hi
+Hi all,
 
-I am using a Logitech DiNovo keyboard & MX900 mouse with the DiNovo
-wireless hub / mouse charger.
+another question.  I suppose the link_key file can contain link keys to 
+multiple remove BT devices (e.g a USB BT dongle and a BT Phone)
 
-My problem is that I can't get my machine to connect to my phone.
+I also presume that each link_key is associated to the bdaddress of the remote 
+device it relates to.
 
-As far as I can tell the system has set up the keyboard etc as hid
-devices, so when I run hid2hci to try to get the phone recognised, the
-keyboard & mouse stop working which needs a reboot to correct.
+so 
 
-Easy question.... how do I fix this.
+1. can the link_key file be browsed to find all the devices a link_key exists 
+for
 
-I am running Fedora Core 2, 
-kernel-2.6.5-1.358
-bluez-utils-2.4-3
-bluez-libs-2.5-2.1
-bluez-hcidump-1.5-4
-bluez-sdp-1.5-2.1
-bluez-bluefw-1.0-2
-bluez-libs-devel-2.5-2.1
+2. can one 'remove' one such record from the link_key file and assume that the 
+pairing will retry once removed (much like removing the link_key file 
+completely)
 
-Difficult question.... I need easy steps please!
-
-Laurence
-
-
+W
 
 
 -------------------------------------------------------
