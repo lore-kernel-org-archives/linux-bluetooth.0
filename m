@@ -2,9 +2,9 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 MIME-Version: 1.0
 From: Stefan Bellon <sbellon@sbellon.de>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <4d3543a818sbellon@sbellon.de>
-In-Reply-To: <4d35427939sbellon@sbellon.de>
-References: <4d3382eb6csbellon@sbellon.de> <41F81D6F.3000908@xmission.com> <4d33b69105sbellon@sbellon.de> <4d348a05e8sbellon@sbellon.de> <41FC4BAF.4090201@xmission.com> <4d35427939sbellon@sbellon.de>
+Message-ID: <4d35427939sbellon@sbellon.de>
+In-Reply-To: <41FC4BAF.4090201@xmission.com>
+References: <4d3382eb6csbellon@sbellon.de> <41F81D6F.3000908@xmission.com> <4d33b69105sbellon@sbellon.de> <4d348a05e8sbellon@sbellon.de> <41FC4BAF.4090201@xmission.com>
 Content-Type: text/plain
 Subject: [Bluez-users] Re: bluetooth-alsa and Jabra BT800
 Sender: bluez-users-admin@lists.sourceforge.net
@@ -18,16 +18,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 09:04:41 +0100
+Date: Sun, 30 Jan 2005 08:51:46 +0100
 
-Stefan Bellon wrote:
-> How does a handy talk to the headset then?
+Brad Midgley wrote:
 
-s/handy/mobile/
+> How do you know you're using the right address? 
 
-Sorry, in German we use the term "handy" and mean cellular/mobile
-phone. It's in such a regular use that it's hard to remember that it's
-not the correct English term. :-}
+Well, because of this:
+
+root@roma# hcitool info 00:07:A4:21:1D:86
+Requesting information ...
+        BD Address:  00:07:A4:21:1D:86
+        Device Name: Jabra BT800
+        LMP Version: 1.2 (0x2) LMP Subversion: 0x68d
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xfc 0xff 0x8b 0x78 0x08 0x08 0x00 0x80
+                <encryption> <slot offset> <timing accuracy> <role switch> 
+                <hold mode> <sniff mode> <park state> <RSSI> <channel quality> 
+                <SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log> 
+                <CVSD> <paging scheme> <transparent SCO> <broadcast encrypt> 
+                <enhanced iscan> <interlaced iscan> <interlaced pscan> 
+                <inquiry with RSSI> <AFH cap. slave> <AFH cap. master> 
+                <extended features> 
+
+Isn't that enough?
+
+> No sdp available doesn't look good.
+
+Hm, is this a mis-feature of the headset then? How does a handy talk to
+the headset then?
+
+> Is the headset paired with a cellphone that is in range? Some
+> embedded bluetooth radios will only talk to one device... if it
+> discovers the paired phone at power on then your laptop typically
+> won't be able to talk to it.
+
+The Jabra BT800 can be paired with 8 devices. You see a list in the
+display and can choose which one it talks to. I can verify that
+switching the communication devices works. If I select my SonyEricsson
+P900 and press the "answer" key, then voice dial on the P900 is
+initiated. If I select the computer and press the "answer" key, then
+the second light of my USB Bluetooth dongle lights up and hcidump
+displays a connection handshake whereas my P900 stays silent.
 
 -- 
 Stefan Bellon
