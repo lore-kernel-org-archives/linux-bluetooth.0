@@ -20,50 +20,48 @@ References: <1076265358.2670.36.camel@pegasus>
 	 <1076322129.5263.28.camel@kalkyl.roxen.com>
 	 <1076323138.6869.93.camel@pegasus>
 Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1076502776.6281.81.camel@kalkyl.roxen.com>
+Message-Id: <1076493798.6281.19.camel@kalkyl.roxen.com>
 Mime-Version: 1.0
-Date: Wed, 11 Feb 2004 13:32:56 +0100
+Date: Wed, 11 Feb 2004 11:03:18 +0100
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 Marcel,
 
 mån 2004-02-09 klockan 11.38 skrev Marcel Holtmann:
-> The goal is to have an interface that can be used by Gnome, KDE etc.
-> without any proper knowledge of the running implementations and its
-> configuration files. So this is not about hcid, this is about what do
-> the UI applications need.
+> The HCI is well defined in the Bluetooth specification and you can of
+> course look at libs2. The source contains all defined HCI commands and
+> events for Bluetoth 1.2.
 
-It's important for the Gnome applications to be able to do both
-configuration and device management. These are two separate things.
+This looks good but many HCI functions are perhaps a bit low level? These
+are probably OK:
 
-Configuration management is about the persistent configurations
-(past and present), basically those configrations stored in hcid.conf.
-The Gnome applications must be able to list, add, remove and modify
-such configurations. 
+   org.bluetooth.hci.devup
+   org.bluetooth.hci.devdown
+   org.bluetooth.hci.devreset
+   org.bluetooth.hci.devinfo
+   org.bluetooth.hci.set_pkt_type
+   org.bluetooth.hci.set_link_policy
+   org.bluetooth.hci.set_link_mode
+   org.bluetooth.hci.write_local_name
+   org.bluetooth.hci.read_local_name
+   etc.
 
-There may exist configurations for devices that are not attached, and 
-there may also be devices attached that do not have any specific
-configuration. The Gnome applications must be able to deal with these
-kinds of situations intelligently.
+But these do not appear to be suited for a DBus interface because they deal
+with low level things like sockets:
 
-Device management is about the devices currently attached, basically
-a light version of the HCI functionality in the Bluetooth lib. The
-Gnome applications should be able to list, probe and control such
-devices, but probably only at a very basic/high level through DBus.
+   hci_open
+   hci_close
+   hci_recv
+   hci_send_command
+   hci_send_request
+   hci_errno
+   etc.
 
-Your idea of having device managment in "org.bluetooth.hci" is good,
-I think. However, we will have to decide on what that interface looks
-like, because as noted in my previous e-mail, the HCI is not straight 
-forward for a DBus interface. Many things are too low-level.
+> We will provide a general and extend interface to the HCI functions, 
+> so we call it "hci".
 
-The configuration management is probably better suited for another
-interface, possibly "org.bluetooth.conf".
+Do you mean an extended subset of HCI? I'm not sure I understand, please
+explain. What will be omitted and what will be extended?
 
-Name caches, pairing etc. also have several requirements to address.
-For example, requesting a pairing procedure is a typical device management
-task. But managing paired devices (listing, removing etc.) is typically a 
-configuration management kind of thing.
-
-Comments?
-
+Thanks,
 Fredrik
