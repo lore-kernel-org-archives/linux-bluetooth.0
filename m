@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Robert Foster <rfoster@mountainvisions.com.au>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] uclinux and bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: egroJorge <egroJorge@terra.es>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <155715390.20040509133553@terra.es>
+References: <1083853467.28356.18.camel@pancho>
+	 <1083877519.4420.78.camel@pegasus>  <1083925117.1946.36.camel@pancho>
+	 <1083946524.4420.124.camel@pegasus>  <143918984.20040508155253@terra.es>
+	 <1084054174.4420.169.camel@pegasus>  <155715390.20040509133553@terra.es>
 Content-Type: text/plain
-Message-Id: <1084105014.13776.15.camel@rover.mountainvisions.com.au>
+Message-Id: <1084102922.9269.23.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] bluez-libs & bluez-utils updated!
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,19 +21,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 09 May 2004 22:16:54 +1000
+Date: Sun, 09 May 2004 13:42:02 +0200
 
-So, I noticed a new set of bluez-libs and bluez-utils (2.7) on the bluez
-website...
+Hi Jorge,
 
-Incorporating HID, no less:)
+> M> what kind of hciattach command do you use?
+> 
+> #hciattach -n /dev/tts/2 any 115200 flow
+> 
+> M> What kind of Bluetooth module
+> M> do you use?
+> 
+> It is made by Taiyo Yuden. I dont remember the exact reference, but I
+> can look for it (tomorrow at work)
 
-Is there anything we need to know about here, regarding differences to
-bthid from the utils2 in cvs?
+I think they use a Bluetooth chip from CSR, so I prefer you use "csr" or
+"bcsp" as type for hciattach (depending if it is in H4 or BCSP mode).
 
-Great work! thanks!  So, I guess you are now working on release 2.8:)
+> M> What endian is your ucLinux platform?
+> 
+> Little endian
 
-Rob.
+So you shouldn't get any endian problems.
+
+Regards
+
+Marcel
+
 
 
 
