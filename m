@@ -1,71 +1,80 @@
-Return-Path: <Steven.Singer@csr.com>
-Message-ID: <40CDA70D.7010008@csr.com>
-Date: Mon, 14 Jun 2004 14:24:29 +0100
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Andreas Gaufer <andreas.gaufer@blue-cell-networks.com>,
-   Bluez Devel
-    <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hci_create_connection assuming timeout too soon
-References: <20040609154824.531c71b8.Andreas.Gaufer@blue-cell-networks.com>
-    <1087033515.4306.0.camel@pegasus>
-In-Reply-To: <1087033515.4306.0.camel@pegasus>
-Content-Type: text/plain; charset="us-ascii"
-List-ID: <bluez-devel.lists.sourceforge.net>
-
-Marcel Holtmann wrote:
->Andreas Gaufer wrote:
->> To catch a condition where the chip is stalled in some way i think the best
->> approach would be to time out on host side after the chips
->> page time out * 1,5 or so.
-
-Even that might not be sufficient.
-
-There are two potentially large delays, you've identified just one - the
-page timeout. By default this is just over 5 seconds, but it could be
-raised as high as 41 seconds.
-
-The page timeout, however, is applied only over the initial baseband
-connection. Before the connection complete event can be reported to the
-host, the LMP negotiation also has to take place. This can include
-authentication and pairing. In theory, the whole LMP negotiation should
-be bounded by a 30 second timeout, but, in practice I suspect it's better
-to err on the cautious side.
-
-Normally, this isn't a problem as you just wait for the connection
-complete event and it'll give a success or failure code. However, I
-understand that you want to detect non-responsive host controllers.
-
-> your change is me too much at the moment. I simply changed the timeout
-> to 25000 for the hcitool cc command.
-
-If you want just a rough figure that'll probably work, I'd suggest
-assuming that the page timeout is about 10 seconds and allow the full
-30 seconds LMP timeout. That'd give a 40 second timeout.
-
-If you wanted to be sure, then somwhere above 71 seconds is better, but
-to be really, really sure I suspect 2 minutes is better still.
-
-If this is too long, then I suggest a shorter timeout on the command
-status event. This event should always be reported promptly. You
-could get away with a one second timeout on that followed by a two
-minute timeout on the connection complete event.
-
-	- Steven
--- 
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH] Deleted acl-handles on failed
+	hci_create_connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andreas Gaufer <andreas.gaufer@blue-cell-networks.com>
+Cc: Bluez Devel <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040610203555.273c77bd.Andreas.Gaufer@blue-cell-networks.com>
+References: <20040610203555.273c77bd.Andreas.Gaufer@blue-cell-networks.com>
+Content-Type: multipart/mixed; boundary="=-bTYfbb0CI/IaQv5TeAXy"
+Message-Id: <1086893582.7930.55.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 10 Jun 2004 20:53:02 +0200
 
 
+--=-bTYfbb0CI/IaQv5TeAXy
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+Hi Andreas,
+
+> Heres a patch for hci_event.c to fix the problem that acl-handles are removed 
+> from the kernels connection hash when a hci_create_connection returnes a
+> command status thats not 0x00.
+> 
+> One of the problems that was caused by this bug was that cc could be issued 
+> even if the peer was already connected. This case leads to the error message 
+> "Too many links" with sdptool and rfcomm for example. This connection could 
+> only be removed if the acl handle was known otherwise or by removing power 
+> from the usb-dongle (unplugg).
+
+I think your patch is wrong, because in case of the first try through
+L2CAP etc. a negative return value must result in a drop of the hci_conn
+structure. Check if the attached patch is also working (againt 2.6).
+
+Regards
+
+Marcel
 
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
+--=-bTYfbb0CI/IaQv5TeAXy
+Content-Disposition: attachment; filename=patch
+Content-Type: text/plain; name=patch; charset=iso-8859-1
+Content-Transfer-Encoding: 7bit
 
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
+===== net/bluetooth/hci_event.c 1.13 vs edited =====
+--- 1.13/net/bluetooth/hci_event.c	2004-05-31 22:15:12 +02:00
++++ edited/net/bluetooth/hci_event.c	2004-06-10 20:48:55 +02:00
+@@ -358,7 +358,7 @@
+ 			status, batostr(&cp->bdaddr), conn);
+ 
+ 	if (status) {
+-		if (conn) {
++		if (conn && conn->state == BT_CONNECT) {
+ 			conn->state = BT_CLOSED;
+ 			hci_proto_connect_cfm(conn, status);
+ 			hci_conn_del(conn);
 
-www.mimesweeper.com
-**********************************************************************
+--=-bTYfbb0CI/IaQv5TeAXy--
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by the new InstallShield X.
+>From Windows to Linux, servers to mobile, InstallShield X is the
+one installation-authoring solution that does it all. Learn more and
+evaluate today! http://www.installshield.com/Dev2Dev/0504
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
