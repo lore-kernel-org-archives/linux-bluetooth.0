@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Are there ANY ultralight notebooks with built-in
-	bluetooth?
+Subject: Re: [Bluez-users] bthid,ppc,sdp
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Adam Goode <adam@evdebs.org>
-Cc: David Wuertele <dave-gnus@bfnet.com>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040519195849.GB4698@evdebs.org>
-References: <m3y8noqpc2.fsf@bfnet.com>  <20040519195849.GB4698@evdebs.org>
+To: Ben Wilson <bwilson@yooser.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040519212124.GI15386@stag.mark-and-erika.com>
+References: <878yfp4bmz.fsf@handgranat.org>
+	 <20040519212124.GI15386@stag.mark-and-erika.com>
 Content-Type: text/plain
-Message-Id: <1085002698.4327.84.camel@pegasus>
+Message-Id: <1085002651.4327.82.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,14 +19,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 May 2004 23:38:19 +0200
+Date: Wed, 19 May 2004 23:37:32 +0200
 
-Hi Adam,
+Hi Ben,
 
-> Some ThinkPad X40 modules do come with internal bluetooth.
-> And it even works (without SCO support) in kernel 2.6.6!
+> I did try patch-2.6.6-mh1, but get the following errors:
+> 
+> net/built-in.o(.text+0x71360): In function `hid_output_report':
+> : multiple definition of `hid_output_report'
+> drivers/built-in.o(.text+0xf23c0): first defined here
+> net/built-in.o(.text+0x715f0): In function
+> `hid_find_field_in_report':
+> : multiple definition of `hid_find_field_in_report'
+> drivers/built-in.o(.text+0xf2650): first defined here
+> net/built-in.o(.text+0x714a8): In function `hid_find_field':
+> : multiple definition of `hid_find_field'
+> ...(etc.)
 
-with 2.6.6-mh1 they should also work with SCO support enabled.
+build the hidp support as module, because it looks like that some
+function will collide with the usbhid driver.
 
 Regards
 
