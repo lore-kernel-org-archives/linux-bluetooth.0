@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Stefan Behlert <behlert@suse.de>
+Message-ID: <1101252992.41a3c98082312@www.bluebottle.com>
+From: jago25_98 <jago25_98@bluebottle.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth Printing (Belkin Print Server)
-Message-ID: <20041124101828.GN16952@suse.de>
-References: <41A2089D.5030100@phaldor.co.uk> <1101139759.15086.14.camel@pegasus> <41A21EE3.5060408@phaldor.co.uk> <20041123091654.GB16952@suse.de> <1101202810.26578.61.camel@pegasus> <41A35BFE.9000507@phaldor.co.uk> <20041123161157.GK16952@suse.de> <41A387FD.2050909@phaldor.co.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <41A387FD.2050909@phaldor.co.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Kernel 2.6.10r2 fixed -scan-no-find- problem but...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +16,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 Nov 2004 11:18:28 +0100
+Date: Tue, 23 Nov 2004 17:36:32 -0600
 
-Moin,
 
-On Nov 23, 04 18:57:01 +0000, Dave Givens wrote:
-> Stefan,
->    Yes I did configure it the way you have suggested, but when it comes 
-> to the uri, I entered bluetooth://0002724080A3 as per instructions. This 
-> does not allow me to specify that the printer is a Star TSP700 or 
-> install the specific drivers for the model.
 
-Hm. I still think that that's  the problem so I'm going to stress that
-issue a little bit more...sorry :)
-I'm not sure what of the printer model mentioned in the Yast-modul is
-compatible to the TSP700. Can the TSP handle postscript?
+Upgrading to Kernel 2.6.10r2 fixed my problem where scanning fails to
+find my phone; thanks for suggestion.
 
-        Stefan
- 
-> Dave Givens
--- 
-Stefan Behlert
+But now I have another problem - can't get the kernel working with my
+NVidia graphics card so I need to downgrade. But to what?
+
+Don't bother replying if it takes effort to find out - I'll just keep
+downgrading until it works, just might take a while that's all.
 
 
 -------------------------------------------------------
