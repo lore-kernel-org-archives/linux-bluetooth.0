@@ -1,50 +1,57 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] headset connection problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Guang <m9187@cn.ee.ccu.edu.tw>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <003301c3f5c1$9e11b640$7b6b7b8c@guang>
-References: <002801c3f55d$e5c9d800$7b6b7b8c@guang>
-	 <1077032640.2665.14.camel@pegasus>  <003301c3f5c1$9e11b640$7b6b7b8c@guang>
-Content-Type: text/plain
-Message-Id: <1077086400.2665.168.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Feb 2004 07:40:00 +0100
+Return-Path: <mreimer@vpop.net>
+Message-ID: <4032E275.8050801@vpop.net>
+Date: Tue, 17 Feb 2004 21:56:37 -0600
+From: Matthew Reimer <mreimer@vpop.net>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] How to configure a 723kbps connection?
+References: <lists.bluez.users.1077061006.2665.141.camel@pegasus.SOMEWHERE> <lists.bluez.users.4032E137.7080902@vpop.net>
+In-Reply-To: <lists.bluez.users.4032E137.7080902@vpop.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Guang,
-
-> > run "hcidump -w <file>" (as root) and show us the dump.
+Matthew Reimer wrote:
+> Marcel Holtmann wrote:
 > 
+>>Run "hcidump -w <file>" (as root).
+>>  
+>>
+> Ok, it's at http://sermons.desiringGod.org/~mreimer/h2215.dump. It's 
+> large (11M), but I thought that it would be better to give you more info 
+> than less. This is what I did:
 > 
-> sorry, how do i use the "hcidump " command?
-> For example, "hcidump -w <file> " ,what does the "file" mean?
+> 1. linux: start hcidump
+> 2. ipaq: start a NAP session from PocketPC2003 to the linux box
+> 3. ipaq: start PocketIE and began downloading a movie trailer
+> 4. ipaq: stopped the download after a minute or so
+> 5. ipaq: disconnected the NAP connection, then turned off bluetooth
+> 6. linux: stopped the dump
+> 
+> My Actiontec dongle is 00:20:E0:3A:2E:57 and the ipaq is 00:04:3E:81:90:E0.
+> 
+> Let me know if there might be sensitive information in this dump so I 
+> can respond appropriately. I hope this info helps.
+> 
+> Matt
 
-the run of "hcidump -w dumpfile" produces a file named "dumpfile". If
-you think you are finished press CTRL-C and send us the file.
+BTW, the bluetooth dongle on the linux box was in its normal state:
 
-Regards
+$ hciconfig -a
+hci0:   Type: USB
+         BD Address: 00:20:E0:3A:2E:57 ACL MTU: 192:8  SCO MTU: 64:8
+         UP RUNNING PSCAN ISCAN AUTH ENCRYPT
+         RX bytes:2825848 acl:32991 sco:0 events:161779 errors:0
+         TX bytes:42819062 acl:228294 sco:0 commands:117 errors:0
+         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+         Link policy: HOLD SNIFF PARK
+         Link mode: ACCEPT MASTER
+         Name: 'sermons.desiringGod.org-0'
+         Class: 0x000104
+         Service Classes: Unspecified
+         Device Class: Computer, Desktop workstation
+         HCI Ver: 1.1 (0x1) HCI Rev: 0x322 LMP Ver: 1.1 (0x1) LMP 
+Subver: 0x322
+         Manufacturer: Cambridge Silicon Radio (10)
 
-Marcel
-
-
-
-
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Matt
