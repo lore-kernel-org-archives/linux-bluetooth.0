@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] USB Died
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1090229630.8193.5.camel@pc-04.ycom.ch>
-References: <1089366625.6730.7.camel@pc-04.ycom.ch>
-	 <1089368028.4857.75.camel@pegasus>  <1090229630.8193.5.camel@pc-04.ycom.ch>
-Content-Type: text/plain
-Message-Id: <1090229969.4400.62.camel@pegasus>
-Mime-Version: 1.0
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] bluecore3-based usb dongles 
+In-reply-to: "Mauro Tortonesi"'s message of "Fri, 16 Jul 2004 16:15:20 +0200."
+             <200407161615.20726.mtortonesi@ing.unife.it>
+Message-ID: <12870.1090229632@csr.com>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,30 +15,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 19 Jul 2004 11:39:29 +0200
+Date: Mon, 19 Jul 2004 10:33:52 +0100
 
-Hi Alexandre,
+Mauro Tortonesi wrote:
+> i would like to buy a couple of usb dongles based on the bluecore 3 chip to 
+> use them with bluez. 
 
-> > > There is the dmesg related :
-> > > uhci_hcd 0000:00:10.1: host system error, PCI problems?
-> > > uhci_hcd 0000:00:10.1: host controller halted, very bad!
-> > 
-> > this VIA UHCI host controllers seem to be buggy in some cases. Try to
-> > compile your kernel without CONFIG_BT_HCIUSB_SCO.
-> 
-> Tested, now with -mh2, same thing. Is this related to USB stack ? If so,
-> I'm on the wrong list :-(
+I'd be surprised if they were available in commercial packages yet.
+I'm not sure if they ever will be (though that's not my domain).
+BlueCore 3 isn't really targetted at the PC world.  There are
+two versions: Multimedia, which has a digital signal processor, and
+is targeted at embedded applications, and ROM, which has (suprise)
+code in ROM and therefore can't be upgraded.  There are, of course,
+versions available for developers, but whether people will bother
+putting these in cheap PC dongles I don't know.
 
-it is maybe a Linux USB problem. Try the 2.6.8-rc2 kernel and if it
-still occurs ask them.
+BlueCore 4 External, which supports Enhanced Data Rate, is the next
+chip specifically designed for the PC market.  I would expect stuff
+to start appearing on the market with that in some time around the 
+back end of this year (although as I'm not in marketing that's a guess).
 
-Or this is a hardware problem. Try a BIOS update. Buy yourself a new USB
-PCI card without a VIA chip or better a OHCI controller on it.
+-- 
+Peter Stephenson <pws@csr.com>                  Software Engineer
+CSR Ltd., Science Park, Milton Road,
+Cambridge, CB4 0WH, UK                          Tel: +44 (0)1223 692070
 
-Regards
 
-Marcel
 
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
