@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41A91085.2000004@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] inquiry scan problems
+Subject: Re: [Bluez-users] DBT-120 firmware upgrade
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pavel Ruzicka <pavouk@pavouk.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200411272130.44783.pavouk@pavouk.org>
+References: <200411261152.29925.pavouk@pavouk.org>
+	 <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus>
+	 <200411272130.44783.pavouk@pavouk.org>
+Content-Type: text/plain
+Message-Id: <1101588637.27074.22.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,103 +21,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 28 Nov 2004 00:40:53 +0100
+Date: Sat, 27 Nov 2004 21:50:37 +0100
 
-Hello everybody
+Hi Pavel,
 
-After i noticed the problems (description follows), i updated the 
-software to the most recent versions. Now I have:
-- kernel 2.6.8-24
-- bluez-libs-2.11.tar.gz
-- bluez-utils-2.11.tar.gz
-- bluez-hcidump-1.15.tar.gz
-- avetanabt-20041119 (http://sourceforge.net/projects/avetanabt/)
--> acer bt500 usb dongle
+> thanks for perfect explaining.
 
-My goal is to get a list of all bluetooth devices in rainge. I do five 
-inquirys in a row (with one second break between two complete scans).
-The problems now are:
+you are welcome.
 
-- the inquiry doesn't always find all devices
-that raises the question: how reliable/secure is it that all devices are 
-found in an inquiry? how possible is that one or more devices are missed?
+> I have good news. I flashed my dongle, and she is not dead ;-)
+> 
+> Dongle now starts in HID mode. I must switch her to HCI with hid2hci.
+> hid2hci says something, that it fails, but it works. I have probably old 
+> version of this utility.
 
-- the fife inquirys sometimes stop in the middle and won't continue.
-for example after starting the 3. inquiry, it never completes (comes to 
-[public void inquiryCompleted(int status)] (jsr82)
+This is a general problem with using libusb. The URB isn't finished, but
+the device already resets. So an error occurs, but this error can be
+ignored.
 
-- [RemoteDevice].getFriendlyName(true) sometimes (well - in fact often) 
-returns the String "null" (not null object) instead of the real friendly 
-name. if i do a loop with getFriendlyName(true), after ~8 times it gets 
-the correct friendlyName...
-the null (object) should only be returned if the hardware doesn't 
-support getting the friendlyName (but obviusly this works). i have no 
-idea why the "null" string is supposed to be returned...
-I added the hcidump of a request with "null" returns... maybe someone of 
-you can do more with it than me...
+> Dongle in HID mode lights with power LED, but in HCI is power LED off.
+> Second LED blinks in both modes.
 
-- [RemoteDevice].getFrienlyName(true) returns a friendly name of another 
-device if multiple devices are in rainge.
+I know the LED stuff is weird.
 
-- general question: what if multiple bluetooth devices are connected to 
-the computer. which level has to support that?
-bluez / avetana (jsr82 implementation)?
+> # hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:0D:88:XX:XX:XX ACL MTU: 192:8  SCO MTU: 64:8
+>         Build 1586
+>         Chip version: BlueCore02
+>         Max key size: 128 bit
+>         SCO mapping:  HCI
+
+I assume this is HCI 18.2 firmware, but I am not quite sure. It is not
+in my list.
+
+Regards
+
+Marcel
 
 
-I don't know which one of the problems are a subject of bluez.
-If it's not a bluez subject, i would appreciate if someone could point 
-me to the source of the problem.
-
-I assume the usb dongle is the problem here. Someone on this mailinglist 
-already mentioned that it's a crappy dongle. (thanks again for the time 
-you invested - you really helped me a lot!)
-If it's the dongle again, what do other users here use? which ones work 
-reliably?
-
-please let me know if you need additional informations...
-
-
-kind regards
-Marco Trudel
-
-
-
-hcidump:
-(please note, every friendlyName is (intentinally) requested twice.
---------------------
-< HCI Command: Inquiry (0x01|0x0001) plen 5
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Result (0x02) plen 15
- > HCI Event: Inquiry Complete (0x01) plen 1
- > HCI Event: Command Complete (0x0e) plen 3
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Remote Name Req Complete (0x07) plen 255
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
- > HCI Event: Command Complete (0x0e) plen 3
- > HCI Event: Command Status (0x0f) plen 4
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Remote Name Req Complete (0x07) plen 255
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
- > HCI Event: Command Complete (0x0e) plen 3
- > HCI Event: Command Status (0x0f) plen 4
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Remote Name Req Complete (0x07) plen 255
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
- > HCI Event: Command Complete (0x0e) plen 3
- > HCI Event: Command Status (0x0f) plen 4
---------------------
 
 
 -------------------------------------------------------
