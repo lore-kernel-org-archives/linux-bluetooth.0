@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: approach <wuyunb@neusoft.com>
-Message-ID: <loom.20040423T110033-105@post.gmane.org>
-References: <1082618249.10405.1.camel@localhost> <1082622732.1845.1.camel@merlin>
+Subject: Re: [Bluez-devel] RE: Recent CSR BlueCore2 firmware
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Rybalkin, Albert" <Albert.Rybalkin@Fiserv.com>
+Cc: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>,
+   "'albertr@iral.com'" <albertr@iral.com>
+In-Reply-To: <CF8C38B8FA1ED511A92400508BE37F0B0A961D3A@exchange_corp.bhcsecurities.COM>
+References: 
+	 <CF8C38B8FA1ED511A92400508BE37F0B0A961D3A@exchange_corp.bhcsecurities.COM>
+Content-Type: text/plain
+Message-Id: <1082698267.23959.90.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Re: html email blocker
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,31 +20,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 23 Apr 2004 09:09:17 +0000 (UTC)
+Date: Fri, 23 Apr 2004 07:31:07 +0200
 
-Marcel Holtmann <marcel <at> holtmann.org> writes:
+Hi Albert,
 
-> 
-> Hi Mans,
-> 
-> > In many other mailing lists there are html mail filters to block spam.
-> > Maybe can this be installed to filter the spam messages that are sent
-> > here from time to time.
-> 
-> this list is driven by the SF.net people, so you should better ask them,
-> because I can't do anything about it.
-> 
-> Regards
-> 
-> Marcel
-> 
+> Does anyone have a windows PSTool utility? I don't have a linux
+> machine here, so can't use pskey... If anyone can email me
+> PSTool, it would be greatly appreciated!
 
- Thanks.
- Did you know the companies( "Toshiba", "Ericsson" etc. )have the product can 
-support spec1.2?
- I'm trying to develop the stack for spec1.2, and so happy to communicate with 
-you.
+please don't ask here for specific windows software that nobody is
+allowed to send you. Only the guys from CSR can send you the software
+and actually I think they will tell you, that you can download it from
+their support sites if you have the right permissions.
 
+Regards
+
+Marcel
 
 
 
