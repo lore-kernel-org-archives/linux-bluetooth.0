@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-Message-ID: <001001c3248f$838dfdf0$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Subject: [Bluez-devel] SO_ERROR, LM_RELIABLE
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/mixed; boundary="=-w0x4ly/0UYG3fCzOK66G"
+Message-Id: <1053620481.17764.129.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Changes to inquiry
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -17,31 +17,71 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 27 May 2003 13:35:29 -0700
+Date: 22 May 2003 18:21:15 +0200
 
-Max,
 
-I'm working on LM_RELIABLE support in l2test. I'm using aclsession to send
-both valid and invalid l2cap packets.
+--=-w0x4ly/0UYG3fCzOK66G
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-I'm sending an invalid (wrong length) packet followed by a valid packet. I
-get the ECOMM error and clear it with getsockopt(SO_ERROR), and then I can
-receive the next packet. That works fine for both long and short packets.
-But when I disconnect, I get the following in syslog (for either the too
-long or the too short case):
+Hello,
 
-l2test[583]: Disconnect. Communication error on send
+the inquiry process have some problems if devices report Bluetooth
+addresses more than once. This can be seen with the Nokia cards. The
+kernel inside inquiry cache is able to handle this, but the number of
+responses parameter will mess this up. The most problem case is if you
+want to set the number of inquiry responses to zero, which means
+unlimted number of inquiry reponses until the specified time is over.
 
-Normally that would say "Disconnect. Success".
+Currently a value of zero will be recoded as 200, but if you use a large
+time value this number can be reached very quick and not all devices
+will be found. I suppose the attached change to the Bluetooth library
+and fix the kernel code to dump up to 255 devices if the num_rsp
+parameter is zero.
 
-But I'm not sending. (At least not that I know of) Any ideas about what
-would cause that?
+Comments?
 
-The same code will print "Disconnect. Success" if aclsession is used to sen=
-d
-two valid packets.
+Regards
 
--Daryl.
+Marcel
+
+
+--=-w0x4ly/0UYG3fCzOK66G
+Content-Disposition: attachment; filename=patch-libs-inq
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/x-patch; name=patch-libs-inq; charset=ISO-8859-15
+
+diff -urN libs/src/hci.c libs-mh/src/hci.c
+--- libs/src/hci.c	Mon May 19 20:41:00 2003
++++ libs-mh/src/hci.c	Thu May 22 18:02:41 2003
+@@ -473,8 +473,10 @@
+ 	void *buf;
+ 	int s, err;
+=20
+-	if (nrsp <=3D 0)
+-		nrsp =3D 200; // enough ?
++	if (nrsp < 0) {
++		errno =3D EINVAL;
++		return -1;
++	}
+=20
+ 	if (dev_id < 0 && (dev_id =3D hci_get_route(NULL)) < 0) {
+ 		errno =3D ENODEV;
+@@ -485,7 +487,11 @@
+ 	if (s < 0)
+ 		return -1;
+=20
+-	buf =3D malloc(sizeof(*ir) + (sizeof(inquiry_info) * (nrsp)));
++	if (nrsp =3D=3D 0)
++		buf =3D malloc(sizeof(*ir) + (sizeof(inquiry_info) * 255));
++	else
++		buf =3D malloc(sizeof(*ir) + (sizeof(inquiry_info) * nrsp));
++
+ 	if (!buf) {
+ 		close(s);
+ 		return -1;
+
+--=-w0x4ly/0UYG3fCzOK66G--
 
 
 
