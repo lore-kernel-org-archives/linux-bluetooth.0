@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050224152204.4953.qmail@web26601.mail.ukl.yahoo.com>
-From: BZ Benny <bennybbz@yahoo.fr>
-Subject: Re: [Bluez-users] trying to send data at HCI level
+From: "Max M." <bluez-ml@maxim.comm2000.it>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <7aa80ced0502212224cce2126@mail.gmail.com>
+Message-ID: <Pine.LNX.4.21.0502241626280.12963-100000@blomma.comm2000.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] tx submit failed urb c4c6b014 type 3 err -19
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,35 +16,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Feb 2005 16:22:04 +0100 (CET)
+Date: Thu, 24 Feb 2005 17:09:07 +0100 (MET)
 
-Hi,
+Hi.
 
-I was trying to send HCI command i define all the
-debug tools of buetooth.ko.
-Therfore I create AF_Bluetooth socket family.
-My data isn't received by my dongle.
+I'm prototyping an application that should eventually become a
+Voip/Bluethooth gateway.
 
-for debuging I was searching for the command read()
-from socket in the hci_sock.c side.
-But I didn't find it. 
-I think that it's hci_sock_sendmsg() wich forward my
-HCI command to hci_usb.ko.
+Among the various problems I'm facing (i.e. occasional bizzare errors on
+SCO connections, or inability to open more than one SCO link through the
+same BT dongle), the currently most serious one is the following.
 
-but how bluetooth.ko layer catch my HCI command?
+After a while my program is running (repeatedly dialing a phone number,
+opening and closing the audio link), the following error shows up
 
-regards 
-benny
+ kernel: __tx_submit: hci0 tx submit failed urb c4c6b014 type 3 err -19
+
+followed, a few seconds later, by an "Unable to handle kernel NULL
+pointer..." message, which does not get logged.
+
+Of course, I'm not asking what the cause is. I just need some suggestions
+as to how to further investigate the problem and provide a more useful
+report.
+
+My system is Debian with kernel package 2.6.10-1-686.
+
+Thanks,
+
+Maxim
 
 
-
-
-	
-
-	
-		
-Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
-Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
