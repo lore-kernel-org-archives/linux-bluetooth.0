@@ -1,9 +1,9 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <noring@nocrew.org>
 Subject: Re: [Bluez-devel] D-Bus interfaces
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Fredrik Noring <noring@nocrew.org>
+From: Fredrik Noring <noring@nocrew.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076508315.6281.131.camel@kalkyl.roxen.com>
+In-Reply-To: <1076506129.2777.83.camel@pegasus>
 References: <1076265358.2670.36.camel@pegasus>
 	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
 	 <1076267396.2670.58.camel@pegasus>
@@ -19,52 +19,39 @@ References: <1076265358.2670.36.camel@pegasus>
 	 <1076321200.6869.75.camel@pegasus>
 	 <1076322129.5263.28.camel@kalkyl.roxen.com>
 	 <1076323138.6869.93.camel@pegasus>
-	 <1076493798.6281.19.camel@kalkyl.roxen.com>
-	 <1076506369.2777.88.camel@pegasus>
-	 <1076508315.6281.131.camel@kalkyl.roxen.com>
+	 <1076502776.6281.81.camel@kalkyl.roxen.com>
+	 <1076506129.2777.83.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1076517913.2696.39.camel@pegasus>
+Message-Id: <1076510103.6281.162.camel@kalkyl.roxen.com>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 Feb 2004 17:45:13 +0100
+Date: Wed, 11 Feb 2004 15:35:03 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Fredrik,
+Marcel,
 
-> When using "hci0", the setting will be permanently stored and used for
-> all devices that become "hci0". When using "00:00:00:00:00:00", the
-> device with that address will have that setting, regardless of the
-> interface (hci0, hci1 or otherwise). Configurations based on addresses
-> should have higher priority than those based on interfaces.
-> 
-> The applications will have to be careful on how to use the references,
-> unless we decide that configurations only will be stored on addresses
-> regardless of the type reference used by the application.
+ons 2004-02-11 klockan 14.28 skrev Marcel Holtmann:
+> I think we should summarise what tasks an UI have to do and then design
+> a D-Bus interface from it.
 
-do we really need to store configurations based on the device id? I
-think we should store them all based on the device address only.
+Here are some basic requirements, I think, for a Gnome Bluetooth Configuration
+tool:
 
-Regards
+   1. List devices currently attached.
+   2. Get info on devices currently attached (address, name, manufacturer,
+      type etc.)
+   3. Permanently configure device status (up/down).
+   4. Permanently configure device name.
+   5. Permanently configure device discoverability (Iscan? Pscan? Which?)
+   6. Permanently configure pair mode (allow/disallow).
+   7. List permanently stored configurations.
+   8. Remove permanently stored configurations.
+   9. List devices which are paired.
+  10. Remove devices which are paired.
+  11. Request the name for a device address, if available in the name cache.
+  12. Perform av device scan (this will also update the name cache).
+  13. Perform a pairing procedure (will update the name cache too).
+  14. Provide a one-time PIN during a pairing procedure.
 
-Marcel
+(1) and (2) can possibly be solved without DBus, but the rest will require it.
 
-
-
-
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Fredrik
