@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT_ADDR Address Resolution
+Subject: Re: [Bluez-users] Zaurus and PAN profile
 From: Marcel Holtmann <marcel@holtmann.org>
-To: tOpSy TuRvY <topsyturvy@nemo.student.utwente.nl>
+To: "Mateo, Jose-Luis" <Jose-Luis.Mateo@t-systems.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.BSO.4.58.0406241335110.23949@nemo.student.utwente.nl>
-References: <200406241009.i5OA9wFo030305@news01.csr.com>
-	 <Pine.BSO.4.58.0406241335110.23949@nemo.student.utwente.nl>
+In-Reply-To: <D971A27FCD3DE04689089E8A98D8AF710361C30D@G9JJ1.mgb01.telekom.de>
+References: 
+	 <D971A27FCD3DE04689089E8A98D8AF710361C30D@G9JJ1.mgb01.telekom.de>
 Content-Type: text/plain
-Message-Id: <1088078815.4296.55.camel@pegasus>
+Message-Id: <1088078443.4296.53.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,18 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Jun 2004 14:06:55 +0200
+Date: Thu, 24 Jun 2004 14:00:44 +0200
 
-Hi Assed,
+Hi Jose,
 
-> Does anyone know how IP addresses in the Bluez PAN get resolved to 
-> BT_ADDRs that will be used by BNEP? Is there an ARP broadcast (i.e. query 
-> like slave -> master -> broadcast to all slaves) or some sort of proxy ARP
-> mechanism at master (e.g. query from slave->master and then a reply 
-> master->slave).
+> hcidump hangs when I try to connect from the PC. hciconfig runs ok:
+> 
+> Type : UART
+> BD Adress: ... ACL MUT:192:8 SCO MTU: 64:8
+> UP RUNNING PSCAN ISCAN
+> .....
+> 
+> but with the option "-a" hangs just before the filed "Name". Can it be because of the different MTU values on the two devices?
 
-BNEP is only an ethernet emulation over Bluetooth L2CAP. So you must use
-ARP and IP for the IP addresses.
+No. This is must be because of H4 or BCSP troubles. What hciattach
+command do you use? Try to install newer kernel modules.
 
 Regards
 
