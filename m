@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] What's the best way to go about device detection?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Rob Raper <djrobx@hotmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY14-F18SByh133tYw0004e544@hotmail.com>
-References: <BAY14-F18SByh133tYw0004e544@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1084791892.4109.5.camel@pegasus>
-Mime-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] BT3030
+References: <200405150903.23338.hedin@hiervard.ru> <200405161807.38658.cijoml@volny.cz> <200405171448.23338.hedin@hiervard.ru>
+In-Reply-To: <200405171448.23338.hedin@hiervard.ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="koi8-r"
+Message-Id: <200405171223.33013.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,53 +19,59 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 17 May 2004 13:04:52 +0200
+Date: Mon, 17 May 2004 12:23:32 +0200
 
-Hi Rob,
+On Monday 17 of May 2004 09:48, =E8=C5=C4=C9=CE wrote:
+> Sunday 16 May 2004 23:07, Michal Semler =D0=C9=DB=C5=D4:
+> > On Sunday 16 of May 2004 17:53, =E8=C5=C4=C9=CE wrote:
+> > > Saturday 15 May 2004 16:01, Marcel Holtmann =D0=C9=DB=C5=D4:
+> > > > Hi Hedin,
+> > > >
+> > > > > Here is my `dmesg` log after I load my modules after connecting t=
+he
+> > > > > dongle:
+> > > > >
+> > > > > usb 1-1: new full speed USB device using address 3
+> > > > > Bluetooth: Core ver 2.4
+> > > > > NET: Registered protocol family 31
+> > > > > Bluetooth: HCI device and connection manager initialized
+> > > > > Bluetooth: HCI socket layer initialized
+> > > > > Bluetooth: L2CAP ver 2.1
+> > > > > Bluetooth: L2CAP socket layer initialized
+> > > > > Bluetooth: HCI USB driver ver 2.5
+> > > > > usbcore: registered new driver hci_usb
+> > > > > Bluetooth: Broadcom Blutonium firmware driver ver 1.0
+> > > > > bcm203x_probe: Mini driver request failed
+> > > > > bcm203x: probe of 1-1:1.0 failed with error -5
+> > > > > usbcore: registered new driver bcm203x
+> > > >
+> > > > this means that the request for the mini driver file BCM2033-MD.hex
+> > > > failed. You need /sys mounted, you need /etc/hotplug/firmware.agent
+> > > > and you must put the two firmware files from Broadcom in the firmwa=
+re
+> > > > directory under /usr/lib/hotplug/firmware.
+> > >
+> > > Sorry for dumb questions. I got these two filfes into
+> > > /usr/lib/hotplug/firware (I took them from bluez-blufw package).
+> > > The error still remains.
+> > >
+> > > But how about another one? I can't find it and what is "/sys" ? (I'm
+> > > not really experienced with Linux, sorry).
+> >
+> > write:
+> > mkdir /sys
+> >
+> > edit /etc/fstab and add this line:
+> > sysfs           /sys            sysfs   defaults                0      =
+ 0
+> > save it and write:
+> > mount -a as root
+>
+> Yes I did it. But still nothing changed (where do I get firmware.agent?).
 
-> Without involving any of my source code at alll, I can demonstrate one of my 
-> biggest problems.     I'll first create a connection to an existing 
-> bluetooth device.  It works fine.  I can get an RSSI value or link value.  
-> Then, I'lll try a non-existent device.   I get a connection timed out error 
-> fairly quickly.  Great, that's exactly what I want and what I expect.  What 
-> follows, however, is what is really causing me problems.  I can no longer 
-> connect to the valid bt device.   I just get errors for a long time.  I 
-> can't disconnect either.   How can I clear out the failed connection and 
-> move on without everything breaking down like this?
-> 
-> pluto62:~/bluez-utils-2.4/tools# hcitool cc 00:60:57:23:35:15
-> pluto62:~/bluez-utils-2.4/tools# hcitool rssi 00:60:57:23:35:15
-> RSSI return value: -1
-> pluto62:~/bluez-utils-2.4/tools# hcitool dc 00:60:57:23:35:15
-> 
-> So far so good...Now try an invalid address
-> 
-> pluto62:~/bluez-utils-2.4/tools# hcitool cc 00:60:57:23:35:14
-> Can't create connection: Connection timed out
-> 
-> As expected.
-> 
-> pluto62:~/bluez-utils-2.4/tools# hcitool dc 00:60:57:23:35:14
-> Disconnect failed: Input/output error
-> 
-> Why an input/output error?  It's on the con list, how do I get it off?
+It is part of hotplug scripts. You should use latest -mh kernel patches too.
 
-if create_connection fails no ACL link is in the connection list and
-there is no need to disconnect it unless we have a bug in the Bluetooth
-core layer. However using the native HCI create_connection and
-disconnect functions is not a good idea and the timeout you see is not
-from the Bluetooth chip I think. If the create_connection process is
-still running you can't disconnect anything and in some cases you
-trouble the Bluetooth chip with such actions. Check with hcidump what is
-going on.
-
-What kind of Bluetooth modules are you using? Show us "hciconfig -a".
-
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
