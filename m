@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Moran" <moran@moozatech.com>
-To: <bluez-users@lists.sourceforge.net>
+From: Rainer Dorsch <rdorsch@web.de>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset=us-ascii
-In-Reply-To: <1101664326.18467.56.camel@pegasus>
-Message-ID: <E1CYXHQ-0006VU-6W@sc8-sf-mx2.sourceforge.net>
-Subject: [Bluez-users] Broadcomm usb dongle problems.
+  charset="us-ascii"
+Message-Id: <200411282132.37941.rdorsch@web.de>
+Subject: [Bluez-users] Setting up an hotplug connection with USB dongles
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,52 +17,79 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Nov 2004 00:10:49 +0200
+Date: Sun, 28 Nov 2004 21:32:37 +0100
 
-Hi,
-Well it looks like that from the all dongles in the world I bought the one
-that is have problems.
+Hello,
 
-I will appreciate any help with this issue.
+I am wondering, if there is a way to setup a hotplug connection between two 
+Linux machines using two bluetooth dongles. One of them is a NAP (with 
+Internet access) and booted first, the other box a PANU.
 
-Here is the info:
+My problem is that I need the pand running on both sides first before I can do 
+an ifconfig for the bnep0 interface on the NAP.
 
-[root@anubis ~]# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:0C:55:FA:3E:21 ACL MTU: 377:10  SCO MTU: 16:0
-        UP RUNNING
-        RX bytes:159 acl:0 sco:0 events:23 errors:0
-        TX bytes:837 acl:0 sco:0 commands:23 errors:0
-        Features: 0xff 0xff 0x0d 0x38 0x08 0x08 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-Can't read local name on hci0. Input/output error(5)
-[root@anubis ~]# hcid -n
-hcid[8179]: Bluetooth HCI daemon
-hcid[8179]: Starting security manager 0
-hcid[8181]: Can't set scan mode on hci0. Device or resource busy(16)
-hcid[8181]: Can't set auth on hci0. Device or resource busy(16)
-hcid[8181]: Can't set encrypt on hci0. Device or resource busy(16)
-hcid[8179]: Exit.
-[root@anubis ~]# lsusb
-Bus 003 Device 001: ID 0000:0000
-Bus 002 Device 006: ID 0a5c:3503 Broadcom Corp.
-Bus 002 Device 005: ID 0a5c:3502 Broadcom Corp.
-Bus 002 Device 004: ID 0a5c:2009 Broadcom Corp.
-Bus 002 Device 003: ID 0a5c:3535 Broadcom Corp.
-Bus 002 Device 001: ID 0000:0000
-Bus 001 Device 001: ID 0000:0000
-[root@anubis ~]# hcitool scan
-Scanning ...
-Inquiry failed: Connection timed out
-[root@anubis ~]# hciconfig version
-hci0:   Type: USB
-        BD Address: 00:0C:55:FA:3E:21 ACL MTU: 377:10  SCO MTU: 16:0
-        UP RUNNING
-        RX bytes:201 acl:0 sco:0 events:30 errors:0
-        TX bytes:1117 acl:0 sco:0 commands:30 errors:0
 
+
+What I did on both Debian Linux systems is:
+
+Add a file
+
+/etc/hotplug/usb/libbt.usermap
+
+The file contains a line for an epox DG02A dongle
+
+epoxbt                0x0003 0x0a12   0x0001    0x0000       0x0000       0x00         
+0x00            0x00            0x00            0x00            0x00            
+0x00000000
+
+with the vendor ID (here 0x0a12) and the product ID (here 0x0001).
+
+Then add the script epoxbt to the same directory:
+
+# cat epoxbt
+echo "Load epox bluetooth dongle..."
+
+modprobe bnep
+pand --master --listen --role NAP
+#
+
+and 
+
+topsi:~# cat /etc/hotplug/usb/epoxbt
+#!/bin/bash
+
+echo "Load epox bluetooth dongle..."
+modprobe bnep
+pand --role PANU --connect <BT-ID>
+topsi:~#
+
+
+Then I do on the NAP an 
+
+# ifconfig 192.128.2.1
+
+and on the PANU
+
+# dhclient
+
+This works fine, I can access the Internet from the PANU.
+
+
+The problem is that the ifconfig on the NAP fails when I do not have the PANU 
+connected before....thus I can't add the network configuration part into the 
+expobt scripts.
+
+Does anyone have an idea or pointer for that problem.
+
+Thanks,
+Rainer
+
+-- 
+Rainer Dorsch
+Alzentalstr. 28
+D-71083 Herrenberg
+07032-919495
+Icq: 32550367
 
 
 -------------------------------------------------------
