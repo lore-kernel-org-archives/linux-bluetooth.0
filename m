@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Florian Echtler <echtler@fs.tum.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.61.0411011023040.15228@block.bubble>
+Message-ID: <418601B6.2010905@phaldor.co.uk>
+From: Dave Givens <dave.givens@phaldor.co.uk>
+Reply-To: dave.givens@phaldor.co.uk
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] MS BT Keyboard problem solved
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Belkin Bluetooth USB Printer Adapter
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,31 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 1 Nov 2004 10:26:37 +0100 (CET)
+Date: Mon, 01 Nov 2004 09:28:22 +0000
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi,
+   I am writing to you as I cannot find the help I require on the net 
+and the product manufactures will not help. I have a bluetooth printer  
+adapter which I am trying to set up on Linux (Fedora Core 2, Kernel 
+2.6.8). I have read Marcels web pages and downloaded the relevant 
+software, but even though I have copied the bluetooth file into the 
+directory as instructed and created an entry in printers.conf, the 
+printer/adapter does not appear anywhere in the gnome printer software 
+that I know of. It might be that I am looking in the wrong places, it 
+appears as an item in gnome-bluetooth-manager, but the only chooses of 
+printers in the printer configuration gui are dev/lp0 and ptal. Am I 
+looking in the correct place? Is it a Fedora Core 2 problem? Have I 
+installed the software correctly? Any help you can give me will be 
+greatfully accepted as I have spent two weeks trying to get it to work. 
+I have tried installing as a custom device, but it rejects even that.
 
-Hello everyone,
+thanks in advance
 
-remember my keyboard which refused to handle the multimedia
-buttons, boot mode or not? Well, the solution was easier than
-I thought - obviously, once the keyboard is in boot mode, it 
-refuses to go back, even if hidd tells otherwise. I just had
-to remove the batteries, wait a few seconds, pop them back in
-and voila, the multimedia keys work as expected (with 2.6.8.1-mh1).
+Dave Givens
 
-Thanks for reading,
-Yours, Florian
-- -- 
-Homo homini lupus.
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQFBhgFR7CzyshGvatgRAvSDAJwMbdtiJR4r8D2aFzdttWS94lLbtACfZdQL
-0yOLdauYJs4SBjWAOvtQpbM=
-=/VRL
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
