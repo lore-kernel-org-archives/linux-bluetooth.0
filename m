@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] problems using rfcomm device
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <87r7mqidhb.fsf@khaberz.net>
-References: <87r7mqidhb.fsf@khaberz.net>
-Content-Type: text/plain
-Message-Id: <1100861511.7213.0.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <419D8CFD.7060604@hotmail.com>
+From: Walter King <idunno2468@hotmail.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Re: Using windows breaks bluetooth in linux? huh
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +16,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 19 Nov 2004 11:51:51 +0100
+Date: Fri, 19 Nov 2004 01:04:45 -0500
 
-Hi Kai,
+Hi,
+I had this problem too.  I use the ms keyboard, i was able to get it to 
+switch back and forth fine if i set windows to use no passkey.
 
-> Trying to get bluetooth running under Debian Testing here. Connecting
-> to my device (Nokia 6600 cell) works fine, but whenever I try to
-> access the device using pppd or minicom I get something like this:
-> 
-> Nov 19 06:18:01 arthur pppd[1382]: Failed to open /dev/rfcomm0:
-> Invalid argument
-
-run "hcidump -X" as root and see what happens.
-
-Regards
-
-Marcel
-
-
+Walt King
 
 
 -------------------------------------------------------
