@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: "Collin R. Mulliner" <collin@betaversion.net>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Documentation for hcid.conf ?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Collin R. Mulliner" <collin@betaversion.net>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040323183818.3d21f901@coredump>
+Message-Id: <20040323183818.3d21f901@coredump>
+In-Reply-To: <1080053029.7507.40.camel@gryffindor>
 References: <1080053029.7507.40.camel@gryffindor>
-	 <20040323183818.3d21f901@coredump>
-Content-Type: text/plain
-Message-Id: <1080064121.2515.35.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,27 +17,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Mar 2004 18:48:41 +0100
+Date: Tue, 23 Mar 2004 18:38:18 +0100
 
-Hi Collin,
+Hi,
 
-> buy the way ... how do I configure multiple bluetooth devices thru
-> hcid.conf?
-> 
-> How can one set the "options" and "defaults" for a specific device
-> (selected by BD_ADDR?) ... of course not all options make sense on a per
-> device configuration.
+buy the way ... how do I configure multiple bluetooth devices thru
+hcid.conf?
 
-you can use this syntax:
-
-	device [hciX|bdaddr] {
-	}
-
-Regards
-
-Marcel
+How can one set the "options" and "defaults" for a specific device
+(selected by BD_ADDR?) ... of course not all options make sense on a per
+device configuration.
 
 
+thanks ... Collin
+
+-- 
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+Don't expect to understand this!
 
 
 -------------------------------------------------------
