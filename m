@@ -1,50 +1,75 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40789619.3020608@pobox.com>
-From: Daniel Jimenez <djimenez@pobox.com>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Return-Path: <pavouk@pavouk.org>
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Subject: Re: [Bluez-users] Pretec and Ambicom BT2000E driver
-References: <200404100030.49916.pavouk@pavouk.org> <1081593241.3028.7.camel@pegasus> <200404110036.47661.pavouk@pavouk.org>
-In-Reply-To: <200404110036.47661.pavouk@pavouk.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 10 Apr 2004 19:49:29 -0500
+Date: Sun, 11 Apr 2004 00:36:47 +0200
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <200404100030.49916.pavouk@pavouk.org> <1081593241.3028.7.camel@pegasus>
+In-Reply-To: <1081593241.3028.7.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200404110036.47661.pavouk@pavouk.org>
+List-ID: <bluez-users.lists.sourceforge.net>
 
+Hello,
 
-Pavel Ruzicka wrote:
-> Hello,
-> 
+> I know that driver and I really thought of including it, but the best
+> way is to make it working through serial_cs and hci_uart/hciattach. Once
+> this is solved every card with a 16C950 UART will work and not only the
+> two with an Ericsson chip on it.
 
-> This cards works now with bt2000e_cs.o but sometimes my Zaurus freezes when 
-> removing card...
-> 
-> Best regards,
-> 
-> Pavel Ruzicka
-> 
+Today I make some experiments with it.
+I have Zaurus SL-C860 with CackoRom kernel 2.4.18...
 
-What kernel does it work on? I'm trying to figure out HOW to compile it!
+I edit configuration. After inserting BT2000E CF card is loaded serial_cs
+kernel module.
+DMESG: ttyS03 at port 0xf60002f8 (irq = 39) is a 16C950/954
 
--- 
-Daniel Jimenez <djimenez[at]pobox[dot]com>
+# hciattach 10 ttyS3 ericsson 115200
+# hciconfig hci0 up
+Can't init device hci0. Connection timed out(110)
 
+I've tried several combination with hciattach command with speed from 9600 to 
+460800, flow enabled/disabled but without success.
 
+Do you have some idea?
 
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Do you know right parameters for hciattach?
+
+There are some more useful informations:
+# cat /proc/tty/driver/serial
+serinfo:1.0 driver:5.05c revision:2001-07-08
+0: uart:16C950/954 port:F60002F8 irq:39 baud:115200 tx:139 rx:21 fe:6 brk:11 
+RTS|CTS|DTR|DSR|CD|RI
+1: uart:unknown port:0 irq:0
+2: uart:unknown port:0 irq:0
+3: uart:unknown port:0 irq:0
+
+# cat /proc/tty/drivers
+serial_cpu           /dev/cua        5   64-66 serial:callout
+serial_cpu           /dev/ttyS       4   64-66 serial
+serial               /dev/cua        5   67-70 serial:callout
+serial               /dev/ttyS       4   67-70 serial
+
+# ls -l /dev/ttyS3
+crw-------    1 zaurus   root       4,  67 Apr 10 21:58 /dev/ttyS3
+
+I have few more questions.
+In dmesg I see: ttyS03... Why not ttyS3?
+
+When I make"rmmod serial_cs"
+I see in dmesg this: tty03 unloaded.
+Why tty03 and not ttyS3?
+
+I'am a little confused ;-)
+
+This cards works now with bt2000e_cs.o but sometimes my Zaurus freezes when 
+removing card...
+ 
+> Regards
+> Marcel
+
+Best regards,
+
+Pavel Ruzicka
