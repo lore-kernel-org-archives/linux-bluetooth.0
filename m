@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Can't connect RFCOMM socket
+Subject: Re: [Bluez-users] experience with TDK PCMCIA Bluetooth Card,
+	(goBlue)?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050131163631.39991.qmail@web53205.mail.yahoo.com>
-References: <20050131163631.39991.qmail@web53205.mail.yahoo.com>
+In-Reply-To: <41FE5D06.8080304@cloutier-vilhuber.net>
+References: <41FE5D06.8080304@cloutier-vilhuber.net>
 Content-Type: text/plain
-Message-Id: <1107191250.7902.32.camel@pegasus>
+Message-Id: <1107191122.7902.29.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,65 +19,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 Jan 2005 18:07:30 +0100
+Date: Mon, 31 Jan 2005 18:05:22 +0100
 
-Hi Filipa,
+Hi Lars,
 
-> Marcel, many thanks for your help, but I still
-> couldn't connect to my friend PC. So I decided to
-> connect to a mobile phone first. It is an Sony
-> Ericsson Z600.
+> ... after some filling up of /etc/pcmcia/ config files... yes. The lists
+> helped on that:
 > 
-> The 'hcitool scan' shows me the phone and the phone
-> also recognize my laptop. After this, I did a 'rfcomm
-> bind' on the laptop.
+> config.opts AND bluetooth.conf (one may be redundant):
+> card "TDK goBlue PCMCIA Bluetooth Adapter"
+> ~  manfid 0x0105,0x4254
+> ~  version "TDK","Bluetooth PC Card II","",""
+> ~  bind "serial_cs" class "bluetooth"
 > 
-> When I try to connect the mobile phone to my laptop,
-> the mobile phone asks me the passkey. When I
-> introduced the PIN (the same I have defined in the
-> /etc/bluetooth/pin) the reply on the phone is 'passkey
-> mismatch'.
-> 
-> Here is the output of the 'hcidump -X':
-> HCIDump - HCI packet analyzer ver 1.16
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> > HCI Event: Connect Request (0x04) plen 10
->   0000: b4 db c9 d9 0a 00 04 02  52 01      ........R.
-> < HCI Command: Accept Connection Request (0x01|0x0009)
-> plen 7
->   0000: b4 db c9 d9 0a 00 01                .......
-> > HCI Event: Command Status (0x0f) plen 4
->   0000: 00 01 09 04                         ....
-> > HCI Event: PIN code Request (0x16)plen6
->   0000: b4 db c9 d9 0a 00                   ......
-> < HCI Command: PIN Code Request Reply (0x01|0x000d)
-> plen 23
->   0000: b4 db c9 d9 0a 00 05 42  6c 75 65 5a 00 00 00
-> 00          .......BlueZ....
->   0010: 00 00 00 00 00 00 00                .......
-> > HCI Event: Command Complete (0x0e) plen 10
->   0000: 01 0d 04 00 b4 db c9 d9  0a 00      ..........
-> < HCI Command: PIN Code Request Reply (0x01|0x000d)
-> plen 23
->   0000: b4 db c9 d9 0a 00 05 42  6c 75 65 5a 00 00 00
-> 00          .......BlueZ....
->   0010: 00 00 00 00 00 00 00                .......
-> > HCI Event: Command Complete (0x0e) plen 10
->   0000: 01 0d 04 00 b4 db c9 d9  0a 00      ..........
-> > HCI Event: Connect Complete (0x03) plen 11
->   0000: 05 29 00 b4 db c9 d9 0a  00 01 00  
-> .).........
-> 
-> Could you please help me with this output? I am not
-> sure what it means, if the PIN helper is working or
-> not...
-> 
-> If it is not the PIN helper, could you give any
-> directions to look for the problem?
+> and adding an elif condition in /etc/pcmcia/bluetooth conditional on MANFID.
 
-it looks like you have two instances of hcid running. This is bad. Kill
-one and make sure that you restart the other one. The PIN you have to
-enter in your phone is "BlueZ" according to this log.
+this looks like a new generation of the card. Please post the output of
+dump_cis.
+
+> I should note that most everything works in principle:
+> 	- I can browse services of other devices using this card
+> ~        - I can receive browse requests from other devices
+> ~          (T610, Palm T3)
+> ~        - I can receive/send *small* data chunks (vcard, etc.)
+> 	- I can *not* receive/send larger data chunks (jpeg)
+> ~          or streams of data (PPP connection)
+> 
+> It all breaks apart at the short packet/bcsp/etc.
+
+Sounds like a bug in the BCSP driver. Maybe this card uses a variant of
+BCSP that the driver can't handle.
 
 Regards
 
