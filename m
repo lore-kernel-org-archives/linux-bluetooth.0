@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40B67EB9.7080102@connectingyou.com.au>
-From: Joseph Sirucka <jsirucka@connectingyou.com.au>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] bluetooth and gps
+Subject: Re: [Bluez-users] packet types / speed (USB dongles)?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lutz Pressler <Lutz.Pressler@SerNet.DE>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E1BTRbh-0005QP-00@intern.SerNet.DE>
+References: <E1BTRbh-0005QP-00@intern.SerNet.DE>
+Content-Type: text/plain
+Message-Id: <1085691569.8896.59.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,24 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 May 2004 09:50:17 +1000
+Date: Thu, 27 May 2004 22:59:29 +0200
 
-Hi All
+Hi Lutz,
 
-I have a bluetooth gps unit and would like to know how do I get about 
-connecting the unit to my linux machine.
+> > every CSR based that I have seen so far supports every packet type from
+> > the Bluetooth 1.1 specification. However you can set the used packet
+> > types by yourself, but this makes no sense. Simply enable them all and
+> > let the link manager decide what's the best to use. The HVx packets for
+> > SCO audio links and don't matter for the data transfers over ACL.
+> Is it normal than that file transfer with obexftp to the phone is
+> not faster than 1 MB per minute?
 
-I can get the usb bluetooth working with
+I never did any bandwith tests with OBEX, but actually the flow of
+L2CAP<->RFCOMM<->OBEX gives you a big performance decrease of the 1 Mbit
+bandwith of a piconet. But this must not be a problem of the dongle,
+because both link managers must decide to use the correct packet type.
+And of course the phone CPU must be fast enough to handle the RFCOMM and
+OBEX protocol very well. There are more bottlenecks so this question is
+not really easy to answer.
 
-bfusb and hci_usb drivers with others like l2cap, bluez etc
+Regards
 
-I can hcitool scan the bluetooth unit.
+Marcel
 
-what do I need to make a connection to the unit.
 
-regards
-
-Joseph
 
 
 -------------------------------------------------------
