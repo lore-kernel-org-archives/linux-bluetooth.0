@@ -1,24 +1,44 @@
-Return-Path: <SRS0+4f15b46af01b1a515adc+353+infradead.org+dwmw2@pentafluge.srs.infradead.org>
+Return-Path: <steve.crane@rococosoft.com>
 Subject: Re: [Bluez-devel] Alignment issue
-From: David Woodhouse <dwmw2@infradead.org>
-To: Stephen Crane <steve.crane@rococosoft.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Daryl Van Vorst <daryl@wideray.com>,
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Daryl Van Vorst <daryl@wideray.com>,
    "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092216034.25087.1122.camel@baroque.rococosoft.com>
+In-Reply-To: <1092179574.4564.216.camel@pegasus>
 References: <001301c47f09$3900e650$1301010a@baked>
 	 <1092179574.4564.216.camel@pegasus>
-	 <1092216034.25087.1122.camel@baroque.rococosoft.com>
 Content-Type: text/plain
-Message-Id: <1092222502.15466.13.camel@hades.cambridge.redhat.com>
+Message-Id: <1092216034.25087.1122.camel@baroque.rococosoft.com>
 Mime-Version: 1.0
-Date: Wed, 11 Aug 2004 12:08:23 +0100
+Date: Wed, 11 Aug 2004 10:20:34 +0100
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Wed, 2004-08-11 at 10:20 +0100, Stephen Crane wrote:
-> Why are these macros even here? ISTR Max having some reason not to use
-> <asm/unaligned.h> but surely that's what it's there for...
+Hi Daryl, Marcel,
 
-No, asm/unaligned.h is there for kernel code only.
+On Wed, 2004-08-11 at 00:12, Marcel Holtmann wrote:
+> Hi Daryl,
+> 
+> > I ran into an alignment problem on our ARM platform. It showed up as corrupt
+> > SDP responses. I traced it back to bt_put_unaligned() in bluetooth.h
+> > 
+> > The attached patch should fix the problem (it does as far as I can tell).
+> > The compiler probably thinks both arguments to memcpy() are aligned and so
+> > makes an optimization which breaks the copy (because the destination is not
+> > actually aligned). Perhaps this is a compiler bug... I'm using gcc 3.3.3.
+> > After googling and reading some discussion on the topic it seems that it's
+> > probably not a compiler bug. I'll leave that for someone else to decide. :)
+> 
+> I am not an expert in this area. I thought that this method of getting
+> unaligned support was compatible accross the platforms. Looking at the
+> kernel unaligned for ARM shows me that this is actually more different.
+> I need verification of that patch with GCC 2.95 and from PowerPC and
+> SPARC platforms. I would do it by myself for SPARC, but the harddrive of
+> my Sun machine is dead.
 
+Why are these macros even here? ISTR Max having some reason not to use
+<asm/unaligned.h> but surely that's what it's there for...
+
+Steve
 -- 
-dwmw2
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
