@@ -1,47 +1,36 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] D-Link DBT-120
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gene Imes <ebi7@ozob.net>
-Cc: list-bluez <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1078339075.8547.2.camel@go2>
-References: <1078322158.11523.83.camel@go2>
-	 <1078322721.2787.86.camel@pegasus>  <1078339075.8547.2.camel@go2>
-Content-Type: text/plain
-Message-Id: <1078487569.2762.56.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Mar 2004 12:52:49 +0100
+Return-Path: <Bernd.Jucknischke@web.de>
+From: Bernd Jucknischke <Bernd.Jucknischke@web.de>
+Reply-To: Bernd.Jucknischke@web.de
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-users] AVM AP-X and DUN profile
+Date: Fri, 5 Mar 2004 11:09:05 +0100
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <200403030832.19665.Bernd.Jucknischke@web.de> <200403040924.58522.Bernd.Jucknischke@web.de> <1078398559.5347.1.camel@pegasus>
+In-Reply-To: <1078398559.5347.1.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200403051109.06057.Bernd.Jucknischke@web.de>
+Sender: Bernd.Jucknischke@web.de
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Gene,
+On Donnerstag, 4. M=E4rz 2004 12:09, Marcel Holtmann wrote:
+> Hi Bernd,
+>
+> > ...
+>
+> you can search for a patch named i4l-t9bk22 or use 2.6.4-rc1 which
+> already includes every ISDN update that is needed. However you must make
+> sure that the module capi.ko is loaded and that /dev/capi is mounted,
+> because capiinit sometimes forget about it.
 
-> Disregard my previous post. 2.6.4-rc1-mm2 has fixed this problem.
+Under 2.6.4-rc2 ISDN with AVM BlueFritz-USB/BlueFritz-AP-X and the capi-uti=
+ls=20
+works under Debian SID. Thanks again.
 
-I had now the same problem with 2.6.4-rc2. Please try to find the patch
-from 2.6.4-rc1-mm2 that fixes your problem, because this needs to be
-send to Linus before he releases 2.6.4 (final).
+> Regards
+>
+> Marcel
 
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Cheers,
+Bernd
