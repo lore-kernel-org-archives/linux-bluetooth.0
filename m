@@ -1,60 +1,80 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <Neil@OnDrugs.co.nz>
 Subject: Re: [Bluez-devel] Logitech MX900 Hub + i-mate smartphone2
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Neil Fenemor <Neil@OnDrugs.co.nz>
+From: Neil Fenemor <Neil@OnDrugs.co.nz>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1088032096.3703.32.camel@localhost.localdomain>
+In-Reply-To: <1088031569.4296.20.camel@pegasus>
 References: <1088029361.3703.17.camel@localhost.localdomain>
 	 <1088030296.4296.14.camel@pegasus>
 	 <1088030943.3703.26.camel@localhost.localdomain>
 	 <1088031569.4296.20.camel@pegasus>
-	 <1088032096.3703.32.camel@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1088032753.4296.23.camel@pegasus>
+Content-Type: multipart/alternative; boundary="=-6OiFDx9xxsTiJDpG6lVA"
+Message-Id: <1088032096.3703.32.camel@localhost.localdomain>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Jun 2004 01:19:13 +0200
+Date: Thu, 24 Jun 2004 11:08:16 +1200
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Neil,
 
-> The standard Fedora 2.6.5 kernel, I'm just doing a compile of the
-> kernel again, making sure I've got all the options I need. 
+--=-6OiFDx9xxsTiJDpG6lVA
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-maybe you should install 2.6.7-mh1.
+The standard Fedora 2.6.5 kernel, I'm just doing a compile of the kernel
+again, making sure I've got all the options I need. 
 
-> However, if I use a different phone (in fact I've tried two other
-> phones) I can create a L2CAP link, and even use it happily.
+However, if I use a different phone (in fact I've tried two other
+phones) I can create a L2CAP link, and even use it happily.
 
-Run "hcidump -w <dumpfile>" as root and send us the binary dump file. I
-must compare the timestamps.
+Maybe the Windows phone just doesn't like playing nice with Linux ;)
 
-> Maybe the Windows phone just doesn't like playing nice with Linux ;)
+Cheers
 
-Actually the L2CAP and RFCOMM layers of BlueZ behave like the Bluetooth
-specification say they should ;)
+Neil
+
+
+On Thu, 2004-06-24 at 10:59, Marcel Holtmann wrote:
+
+> what kernel do you use? Everything looks normal and I don't see any
+> reason why your phone disconnects the L2CAP link.
+> 
+> Regards
+> 
+> Marcel
+> 
+
+--=-6OiFDx9xxsTiJDpG6lVA
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
+<HTML>
+<HEAD>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=UTF-8">
+  <META NAME="GENERATOR" CONTENT="GtkHTML/3.0.10">
+</HEAD>
+<BODY>
+The standard Fedora 2.6.5 kernel, I'm just doing a compile of the kernel again, making sure I've got all the options I need. <BR>
+<BR>
+However, if I use a different phone (in fact I've tried two other phones) I can create a L2CAP link, and even use it happily.<BR>
+<BR>
+Maybe the Windows phone just doesn't like playing nice with Linux ;)<BR>
+<BR>
+Cheers<BR>
+<BR>
+Neil<BR>
+<BR>
+<BR>
+On Thu, 2004-06-24 at 10:59, Marcel Holtmann wrote:
+<BLOCKQUOTE TYPE=CITE>
+<PRE><FONT COLOR="#737373"><I>what kernel do you use? Everything looks normal and I don't see any
+reason why your phone disconnects the L2CAP link.
 
 Regards
 
 Marcel
+</I></FONT></PRE>
+</BLOCKQUOTE>
+</BODY>
+</HTML>
 
-
-
-
--------------------------------------------------------
-This SF.Net email sponsored by Black Hat Briefings & Training.
-Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
-digital self defense, top technical experts, no vendor pitches, 
-unmatched networking opportunities. Visit www.blackhat.com
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--=-6OiFDx9xxsTiJDpG6lVA--
