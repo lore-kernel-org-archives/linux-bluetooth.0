@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PAN-BNEP-and TCP/IP
+Subject: Re: [Bluez-users] connection timeout after interrupted software
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050208125725.38505.qmail@web26402.mail.ukl.yahoo.com>
-References: <20050208125725.38505.qmail@web26402.mail.ukl.yahoo.com>
+In-Reply-To: <20050208143303.GA5194@cirrus.madduck.net>
+References: <20050208143303.GA5194@cirrus.madduck.net>
 Content-Type: text/plain
-Message-Id: <1107880667.7327.182.camel@pegasus>
+Message-Id: <1107880590.7327.180.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 08 Feb 2005 17:37:47 +0100
+Date: Tue, 08 Feb 2005 17:36:30 +0100
 
-Hi,
+Hi Martin,
 
-> Tanks for your help I see the bnep.c file and the
-> pand.h, when we perform a connection the pan call a
-> bnep fonction which create the bnep0 interface. Bnep
-> interface interact directlly with the TCP/IP stack so
-> we can immagine that bnep is in the layer 2 just under
-> IP.
+> I use a bluetooth software that establishes connections with my
+> phone via libbluetooth.so.1. Sometimes this software has to be
+> killed. When I do this, it leaves the bluetooth stack in a broken
+> state:
+> 
+>   # hcitool scan
+>   Scanning ...
+>   Inquiry failed: Connection timed out
+> 
+> How can I prevent this? What is the best way to rectify the
+> situation? So far, only reloading the hci_usb kernel module (I use
+> a dongle) and reconfiguring hci0 works. Since some of my machines
+> have monolithic kernels, this requires a restart. I'd prefer if
+> there was a different solution.
 
-and again. OSI is only model and you may know that TCP/IP exists before
-the ISO/OSI model.
-
-> ps: pand.c doesn't exist because we dosen't need it.
-> All is being do by bnep, isn't it? 
-
-And who should create the connection then?
+the shouldn't be any problems, but anyway what kernel version is this
+and what does hciconfig show after you discover this problem. Are there
+any other information in dmesg or the logfiles?
 
 Regards
 
