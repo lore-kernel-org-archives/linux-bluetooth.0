@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] problems with connect()
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: Christian Hennrich <tettokalle@hotmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <3FFEB4E0.3070603@hotmail.com>
+References: <3FFD826F.5080808@hotmail.com>
+	 <1073583332.2563.24.camel@pegasus>  <3FFEB4E0.3070603@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1073660187.2532.2.camel@pegasus>
+Message-Id: <1073657444.2563.77.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Bluetooth kernel patch for 2.6.1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,35 +19,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 09 Jan 2004 15:56:28 +0100
+Date: Fri, 09 Jan 2004 15:10:45 +0100
 
-Hi Folks,
+Hi Christian,
 
-the first Bluetooth kernel patch for 2.6.1 is now available [1] and it
-is only a resync with the previous 2.6.0-mh2 patch. Here is the full
-changelog:
+> today i tried to connect more than 2 slaves with pand -c "Addresse of 
+> master" to one master that is started with pand -s -r GN. the same 
+> problem occurs, i can't connect more than 2 slaves to one master, the 
+> third one makes no connection.
 
-  o Convert interrupt handlers to use irqreturn_t
-  o Support for Broadcom Blutonium
-  o Improve blacklist handling
-  o Add missing maintainer entries for the Bluetooth subsystem
-  o Add CAPI message transport protocol support
-  o Update the Kconfig entry for the BlueFRITZ! USB driver
-  o Add module aliases for the Bluetooth protocols
-  o Support for AVM BlueFRITZ! USB
-  o Remove USB zero packet option
-  o Support inquiry results with RSSI
-  o Update HCI security filter
-  o Add support for an old ALPS module
-  o Add support for the Digianswer USB devices
-  o Always use two ISOC URB's
-  o Disable credit based flow control by default
+you are connecting two master ;) Think again about the master/slave
+roles of a Bluetooth device. You must use the role switch. What do
+"hciconfig -a" say?
 
 Regards
 
 Marcel
-
-[1] http://www.holtmann.org/linux/kernel/patch-2.6.1-mh1.gz
 
 
 
