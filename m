@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Extra keyboard events are back with 2.6.8.1 and
 	bluez-libs/utils 2.10
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vesa Halttunen <vesuri@jormas.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1093385241.495.3.camel@pc.vesuri.net>
+From: Vesa Halttunen <vesuri@jormas.com>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1093376692.17083.1.camel@pegasus>
 References: <1093375338.560.11.camel@pc.vesuri.net>
-	 <1093376692.17083.1.camel@pegasus>  <1093385241.495.3.camel@pc.vesuri.net>
-Content-Type: text/plain
-Message-Id: <1093423799.17083.3.camel@pegasus>
+	 <1093376692.17083.1.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1093385241.495.3.camel@pc.vesuri.net>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,23 +19,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 25 Aug 2004 10:49:59 +0200
+Date: Wed, 25 Aug 2004 01:07:21 +0300
 
-Hi Vesa,
+On Tue, 2004-08-24 at 21:44 +0200, Marcel Holtmann wrote:
+> maybe this is a problem of the boot protocol mode. Try using the patch
+> 2.6.8-mh1 with kernel 2.6.8.1.
 
-> > maybe this is a problem of the boot protocol mode. Try using the patch
-> > 2.6.8-mh1 with kernel 2.6.8.1.
-> 
-> ...and it works fine! Thanks. I should have tried it out earlier but I
-> thought it isn't necessary "since all bugfixes and new features for the
-> Bluetooth subsystem got merged into the 2.6.8 release"... :)
+...and it works fine! Thanks. I should have tried it out earlier but I
+thought it isn't necessary "since all bugfixes and new features for the
+Bluetooth subsystem got merged into the 2.6.8 release"... :)
 
-the news item also states that this patch contains the HID report
-protocol mode support ;)
+Regards,
 
-Regards
-
-Marcel
+-Vesa
+-- 
+            · Vesa Halttunen - http://www.jormas.com/~vesuri/ ·
 
 
 
