@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BNEP connection destroing :(
+Subject: Re: [Bluez-users] Re: Report of working dongle: IOGear GBU311 and,
+	question
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1109691651.42248d0394218@mail.orbitel.bg>
-References: <1109664374.42242276c644b@mail.orbitel.bg>
-	 <1109691651.42248d0394218@mail.orbitel.bg>
+In-Reply-To: <42250989.1040908@cloutier-vilhuber.net>
+References: <20050301154820.930E6C5364@sc8-sf-spam1.sourceforge.net>
+	 <42250989.1040908@cloutier-vilhuber.net>
 Content-Type: text/plain
-Message-Id: <1109697370.17256.174.camel@pegasus>
+Message-Id: <1109775358.8284.22.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,17 +20,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Mar 2005 18:16:10 +0100
+Date: Wed, 02 Mar 2005 15:55:58 +0100
 
-Hi Todor,
+Hi Lars,
 
-> < HCI Command: Disconnect (0x01|0x0006) plen 3
->     handle 41 reason 0x13
->     Reason: Remote User Teminated Connection
+> >>However, I am curious: when plugging it in, the logs show a USB *HUB*, 
+> >>and registers keyboard and mouse drivers. Is this something SuSE 
+> >>specific, something driver-specific? Is SuSE misconfigured? or what does 
+> >>it mean when the USB dongle registers as a keyboard/mouse?
+> > 
+> > the registration as mouse and keyboard is fine, 
+> 
+> But I am still curious: what is the purpose of a keyboard-and-mouse free 
+> Bluetooth dongle reporting those capabilities? Just in case there was a 
+> BT keyboard and mouse around, neither of which I own?
 
-this means that we terminate the connection. This is funny, because I
-have no idea why that happens. Maybe you should use a 2.6.11-rc5 kernel
-instead of an old 2.4 kernel.
+read something about the HID Proxy thing created by CSR in the first
+place.
+
+> > but actually this device
+> > should only start working with a recent 2.6.11-rc5 kernel. 
+> 
+> This might be another one of those SuSE-backports - my latest SuSE 
+> kernel is "2.6.8-24.11-default #1 Fri Jan 14 13:01:26"
+
+Not that I know of, but you may wanna check the latest KOTD and see if
+it is still working.
 
 Regards
 
