@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] security mode 3
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY12-F7DA5E202CE09ED8BA6E418AB80@phx.gbl>
-References: <BAY12-F7DA5E202CE09ED8BA6E418AB80@phx.gbl>
-Content-Type: text/plain
-Message-Id: <1101313630.27351.119.camel@pegasus>
+Message-ID: <2de46576041124081140dc74b7@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] BT test mode operation
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +16,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 Nov 2004 17:27:10 +0100
+Date: Wed, 24 Nov 2004 21:41:50 +0530
 
-Hi,
+hi marcel,
+can i configure my bt dongles to operate in test mode....and then
+conduct the loopback or transmitter tests. This is indicated in the
+HCI part of the specification....so is it possible to run these tests
+just with BT devices connected to host PC's,  and not using a BT
+protocol analyser.
+If i buy a BT tester, then wouldn't my BT dongle be the DUT....
+Also, if i buy a CATC-tracer/trainer, should I again buy a BT tester????
 
-> Does BlueZ support security mode 3 (link-level security) of Bluetooth ?
-
-it supports all three security modes, but actually using mode 3 is
-normally not a good choice. However you can set your local device into
-security mode 3 with "hciconfig hci0 auth encrypt".
-
-Regards
-
-Marcel
-
-
+thanks and regards,
+manjunath
 
 
 -------------------------------------------------------
