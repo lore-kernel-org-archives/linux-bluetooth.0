@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] L2CAP and SDP interface specification?
+Subject: Re: [Bluez-devel] Where do I report a kernel OOPS?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Stefan Mischke <survivor@uni-paderborn.de>
+To: cybermans@xs4all.nl
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <407174BC.8020503@uni-paderborn.de>
-References: <407174BC.8020503@uni-paderborn.de>
+In-Reply-To: <1081178729.13350.8.camel@localhost>
+References: <1081178729.13350.8.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1081179607.2843.9.camel@pegasus>
+Message-Id: <1081179303.2843.3.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,25 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Apr 2004 17:40:07 +0200
+Date: Mon, 05 Apr 2004 17:35:03 +0200
 
-Hi Stefan,
+Hi Mans,
 
-> where can I find the specification of the BlueZ L2CAP and SDP API? I 
-> hope there ist any.
+> When shutting down my PC with my dongle attached the kernel generates an
+> OOPS and completely freezes. Without dongle everything is ok. Also when
+> removing the dongle during runtime it will lock. The problem start
+> showing up since I moved from 2.4 kernels to 2.6 stock kernels. Is this
+> a known problem? If yes, is there a patch?
 
-the L2CAP API is a socket interface and you will find the API in the
-bluetooth/l2cap.h header file. For an usage example look at l2test.
-
-The SDP API can be found in bluetooth/sdp.h and bluetooth/sdp_lib.h and
-for example code look at the dund and pand applications.
-
-> And how can I register my application for getting HCI events, so that I 
-> don't have to poll? hcid? API/specs?
-
-The HCI API is also a socket interface. If you want to have some kind of
-event based approach you have to use and IO event main loop like it is
-used in the Glib.
+this problem is known, but it is not a Bluetooth problem. Ask the USB
+guys about a patch for it.
 
 Regards
 
