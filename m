@@ -1,191 +1,91 @@
-Return-Path: <survivor@uni-paderborn.de>
-Message-ID: <41484B1B.2000000@uni-paderborn.de>
-Date: Wed, 15 Sep 2004 16:00:59 +0200
-From: Stefan Mischke <survivor@uni-paderborn.de>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   =?ISO-8859-1?Q?Bernd_E=DFmann?= <psycho@uni-paderborn.de>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] L2CAP: One failing connection hurts others?
-References: <41470C59.2050909@uni-paderborn.de>	 <1095186861.5695.193.camel@pegasus>  <41474247.8090602@uni-paderborn.de>	 <1095189878.5695.201.camel@pegasus>  <41474870.3020204@uni-paderborn.de>	 <1095191352.5695.205.camel@pegasus>  <41475033.3030209@uni-paderborn.de>	 <1095196325.5263.3.camel@pegasus>  <414780B0.2070908@uni-paderborn.de> <1095234376.5263.10.camel@pegasus>
-In-Reply-To: <1095234376.5263.10.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stefan Mischke <survivor@uni-paderborn.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <414780B0.2070908@uni-paderborn.de>
+References: <41470C59.2050909@uni-paderborn.de>
+	 <1095186861.5695.193.camel@pegasus>  <41474247.8090602@uni-paderborn.de>
+	 <1095189878.5695.201.camel@pegasus>  <41474870.3020204@uni-paderborn.de>
+	 <1095191352.5695.205.camel@pegasus>  <41475033.3030209@uni-paderborn.de>
+	 <1095196325.5263.3.camel@pegasus>  <414780B0.2070908@uni-paderborn.de>
+Content-Type: text/plain
+Message-Id: <1095234376.5263.10.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 15 Sep 2004 09:46:16 +0200
 
-Hello again!
+Hi Stefan,
 
-Marcel Holtmann schrieb:
+> > > Is there a way to upgrade it? Are there better dongles the University
+> > > could buy?
+> > >     
+> > You can upgrade the D-Link DBT-120 Rev. B3 with the Apple firmware
+> > update package to HCI 18.1.
+> > 
+> Would that solve the problem? Actually, is it a known problem?
 
->There are more than one timeouts in the BlueZ stack. Even the ACL
->disconnect timeout is different for the initiator and the acceptor of
->and ACL connection. Keep an eye on the HCI disconnect events on each of
->your devices and compare the timestamps.
->
->  
->
-Hmmm, these timeouts are really difficult. I've written a script 
-"l2client.sh" (see below) using bluez-utils' l2test to make sure the 
-problem is not inside of my code. I also included the output of a 
-testrun. Take a look at it!
+only if there was a bug in previous CSR firmwares, but on the other hand
+the HCI 18.x firmwares are Bluetooth 1.2 capable.
 
-#### BEGIN SCRIPT l2client.sh ####
+> Btw, I read something about getting RSSI via Inquiry. Is it possible
+> with BlueZ? This could be used to faster decrease the backoff if the
+> unavailable device is found by inquiry and probably with a good RSSI
+> near 0.
 
-#!/bin/bash
+You need a CSR dongle with HCI 18.x firmware, a newer Silicon Wave or
+the AVM BlueFRITZ! USB v2.0 to use inquiry with RSSI. The support is
+already included in BlueZ.
 
-ROUNDS=10
-SLEEP=`which sleep`
-TSLEEP=5
-SERVER1="00:02:72:B1:1D:6C"
-SERVER2="00:02:72:B1:1D:62"
+> > > One year ago, I wrote another Location Awareness App on top of a
+> > > modified JBlueZ and it just used ACL links to measure RSSI and LQ. It
+> > > worked. I probably have to take care of the ACLs myself (does L2CAP
+> > > use existing ACLs?). The only drawback: The App has to run as root :(.
+> > >     
+> > The L2CAP creates the same ACL links, so this can't be the problem.
+> > 
+> Yes, but I could disconnect faster on timeout and make L2CAP throw a
+> clean error instead of behaving strange. 
+> 
+> Connections:
+>         < ACL 00:02:72:B1:1D:62 handle 0 state 5 lm MASTER
+>         < ACL 00:02:72:B1:1D:6C handle 45 state 1 lm MASTER
+> 
+> stargazer:~ # hcitool dc 00:02:72:B1:1D:62
+> Disconnect failed: Input/output error
+> 
+> The connection to 62 persists even 5 minutes after I pulled the 62
+> Dongle out. A manual disconnect failed. This simply can't be! I
+> sometimes even have to reboot because BlueZ or something is confused.
+> I think there is a serious problem. I'll do further testing tomorrow.
 
-for i in `seq 1 $ROUNDS`;
-do
-        printf "Round $i of $ROUNDS\n"
-
-        printf "Connecting to Server $SERVER1...\n"
-        l2test -s -N 1 $SERVER1
-        printf "\n"
-
-        printf "Connecting to Server $SERVER2...\n"
-        l2test -s -N 1 $SERVER2 &
-        printf "Waiting for $TSLEEP seconds...\n"
-        $SLEEP ${TSLEEP}s
-        printf "\n"
-done
-
-printf "l2client.sh terminating.\n"
-
-#### END SCRIPT l2client.sh ####
-
-I ran "l2client.sh" on 00:02:72:B1:59:46 and "l2test -r" on 
-00:02:72:B1:1D:6C and 00:02:72:B1:1D:62. 
-After the 2nd round, I pulled out dongle 00:02:72:B1:1D:62. See what 
-happens...
-
-#### BEGIN OUTPUT OF SCRIPT l2client.sh ####
-
-Round 1 of 10
-Connecting to Server 00:02:72:B1:1D:6C...
-l2test[4385]: Connected [imtu 672, omtu 672, flush_to 65535]
-l2test[4385]: Sending ...
-l2test[4385]: Closing channel ...
-l2test[4385]: Done
-l2test[4385]: Exit
-
-Connecting to Server 00:02:72:B1:1D:62...
-Waiting for 5 seconds...
-l2test[4386]: Connected [imtu 672, omtu 672, flush_to 65535]
-l2test[4386]: Sending ...
-l2test[4386]: Closing channel ...
-l2test[4386]: Done
-l2test[4386]: Exit
-
-Round 2 of 10
-Connecting to Server 00:02:72:B1:1D:6C...
-l2test[4388]: Connected [imtu 672, omtu 672, flush_to 65535]
-l2test[4388]: Sending ...
-l2test[4388]: Closing channel ...
-l2test[4388]: Done
-l2test[4388]: Exit
-
-Connecting to Server 00:02:72:B1:1D:62...
-Waiting for 5 seconds...
-l2test[4389]: Connected [imtu 672, omtu 672, flush_to 65535]
-l2test[4389]: Sending ...
-l2test[4389]: Closing channel ...
-l2test[4389]: Done
-l2test[4389]: Exit
-
-Round 3 of 10
-Connecting to Server 00:02:72:B1:1D:6C...
-l2test[4391]: Connected [imtu 672, omtu 672, flush_to 65535]
-l2test[4391]: Sending ...
-l2test[4391]: Closing channel ...
-l2test[4391]: Done
-l2test[4391]: Exit
-
-Connecting to Server 00:02:72:B1:1D:62...
-Waiting for 5 seconds...
-
-Round 4 of 10
-Connecting to Server 00:02:72:B1:1D:6C...
-l2test[4394]: Can't connect. Device or resource busy(16)
-
-Connecting to Server 00:02:72:B1:1D:62...
-Waiting for 5 seconds...
-
-Round 5 of 10
-Connecting to Server 00:02:72:B1:1D:6C...
-l2test[4397]: Can't connect. Device or resource busy(16)
-
-Connecting to Server 00:02:72:B1:1D:62...
-Waiting for 5 seconds...
-
-Round 6 of 10
-Connecting to Server 00:02:72:B1:1D:6C...
-l2test[4400]: Can't connect. Device or resource busy(16)
-
-Connecting to Server 00:02:72:B1:1D:62...
-Waiting for 5 seconds...
-
-Round 7 of 10
-Connecting to Server 00:02:72:B1:1D:6C...
-l2test[4403]: Can't connect. Device or resource busy(16)
-
-Connecting to Server 00:02:72:B1:1D:62...
-Waiting for 5 seconds...
-l2test[4404]: Can't connect. Host is down(112)
-l2test[4401]: Can't connect. Host is down(112)
-l2test[4398]: Can't connect. Host is down(112)
-l2test[4395]: Can't connect. Host is down(112)
-l2test[4392]: Can't connect. Host is down(112)
-
-Round 8 of 10
-Connecting to Server 00:02:72:B1:1D:6C...
-l2test[4406]: Connected [imtu 672, omtu 672, flush_to 65535]
-l2test[4406]: Sending ...
-l2test[4406]: Closing channel ...
-l2test[4406]: Done
-l2test[4406]: Exit
-
-Connecting to Server 00:02:72:B1:1D:62...
-Waiting for 5 seconds...
-
-Round 9 of 10
-Connecting to Server 00:02:72:B1:1D:6C...
-l2test[4409]: Can't connect. Device or resource busy(16)
-
-Connecting to Server 00:02:72:B1:1D:62...
-Waiting for 5 seconds...
-
-Round 10 of 10
-Connecting to Server 00:02:72:B1:1D:6C...
-l2test[4412]: Can't connect. Device or resource busy(16)
-
-Connecting to Server 00:02:72:B1:1D:62...
-Waiting for 5 seconds...
-
-l2client.sh terminating.
-l2test[4413]: Can't connect. Host is down(112)
-l2test[4407]: Can't connect. Host is down(112)
-l2test[4410]: Can't connect. Host is down(112)
-
-#### END OUTPUT OF SCRIPT l2client.sh ####
-
-After "l2client.sh" tries to contact the unreachable host 
-00:02:72:B1:1D:62, all connection attempts to the reachable hist 
-00:02:72:B1:1D:6C fail with errno 16. Just before round 8, all  
-connection attempts to 00:02:72:B1:1D:62 fail together with errno 112 
-and in round 8 the connection attempt to 00:02:72:B1:1D:6C succeeds. But 
-even after one more connection attempt to the unreachable 
-00:02:72:B1:1D:62, the connection attempts to 00:02:72:B1:1D:6C fail 
-again. After "l2client.sh" has already terminated, the remaining 
-backgrounded l2sends fail.
-
-So there is really a problem if I don't wait for connect to fail with 
-errno 112. My Location Awareness App of course can't afford to wait for 
-20 seconds. But how to solve this? I hope to get another dongle this 
-evening, so I can equip the client with it and test if the dongle matters.
+There are more than one timeouts in the BlueZ stack. Even the ACL
+disconnect timeout is different for the initiator and the acceptor of
+and ACL connection. Keep an eye on the HCI disconnect events on each of
+your devices and compare the timestamps.
 
 Regards
-Stefan
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: thawte's Crypto Challenge Vl
+Crack the code and win a Sony DCRHC40 MiniDV Digital Handycam
+Camcorder. More prizes in the weekly Lunch Hour Challenge.
+Sign up NOW http://ad.doubleclick.net/clk;10740251;10262165;m
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
