@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <20050325002021.85942.qmail@web52801.mail.yahoo.com>
+From: Shawn Rutledge <e_cloud@yahoo.com>
 Subject: Re: [Bluez-devel] Hp bluetooth headset a2dp
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050325002021.85942.qmail@web52801.mail.yahoo.com>
-References: <20050325002021.85942.qmail@web52801.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1111710700.9195.37.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: 6667
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,43 +17,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Mar 2005 01:31:40 +0100
+Date: Thu, 24 Mar 2005 16:20:21 -0800 (PST)
 
-Hi Shawn,
 
-> > > I also have the Aiptek and Bluetake ones.  I just noticed that so
-> > much
-> > > activity with A2DP has been happening while I was not paying
-> > attention,
-> > > so I will try to do some testing.
-> > 
-> > The Aiptek is not conforming to the specification. However the SBC
-> > over
-> > RFCOMM is a nice feature.
+--- Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Shawn,
 > 
-> Is SBC over RFCOMM the only method they support?  Or is their "not
-> conforming" just in small points?
-
-the SBC over RFCOMM is additional.
-
-> I noticed that they don't work with either our phone or the BlueSoleil
-> but wasn't sure why.  And they do say in the manual that they support
-> A2DP, and explain how to bond them, enter pin "0000" etc.  I emailed
-> tech support but haven't got a response yet.
+> > I have a pair of these headphones too, at work.  (My job involves a
+> > cellphone media player application which depends on being able to
+> > stream A2DP.)  There are a lot of them on ebay, going for 83.99USD,
+> > just search for "ipaq headphones".
 > 
-> Too bad - IMO those are the only ones so far that are actually
-> comfortable.  The iPAQ ones aren't too bad either.
+> they are more expensive here in Germany. The cheapest I found was for
+> around 112 EUR.
 
-You will find almost every information about that in the mailing list
-archive. However the problem with the Aiptek is that it conforms to
-AVDTP, but then it does not conform to A2DP when it comes to sending the
-actual SBC stream.
+Well some ebay sellers will export them, I think.
 
-Regards
+> > I also have the Aiptek and Bluetake ones.  I just noticed that so
+> much
+> > activity with A2DP has been happening while I was not paying
+> attention,
+> > so I will try to do some testing.
+> 
+> The Aiptek is not conforming to the specification. However the SBC
+> over
+> RFCOMM is a nice feature.
 
-Marcel
+Is SBC over RFCOMM the only method they support?  Or is their "not
+conforming" just in small points?
 
+I noticed that they don't work with either our phone or the BlueSoleil
+but wasn't sure why.  And they do say in the manual that they support
+A2DP, and explain how to bond them, enter pin "0000" etc.  I emailed
+tech support but haven't got a response yet.
 
+Too bad - IMO those are the only ones so far that are actually
+comfortable.  The iPAQ ones aren't too bad either.
+
+. _______  Shawn T. Rutledge / KB7PWD ecloud@bigfoot.com
+ (_  | |_)    http://ecloud.org/  kb7pwd@kb7pwd.ampr.org
+ __) | | \______________________________________________
 
 
 -------------------------------------------------------
