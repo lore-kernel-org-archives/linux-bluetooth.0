@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Pretec and Ambicom BT2000E driver
+Subject: Re: [Bluez-users] Connection dropped or cannot connect
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Pavel Ruzicka <pavouk@pavouk.org>
+To: Jean-Pierre Lord <jeanplord@videotron.ca>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404100030.49916.pavouk@pavouk.org>
-References: <200404100030.49916.pavouk@pavouk.org>
+In-Reply-To: <000801c41e98$9e75d080$0100a8c0@terre>
+References: <000801c41e98$9e75d080$0100a8c0@terre>
 Content-Type: text/plain
-Message-Id: <1081593241.3028.7.camel@pegasus>
+Message-Id: <1081592935.3028.3.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,19 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 10 Apr 2004 12:34:01 +0200
+Date: Sat, 10 Apr 2004 12:28:55 +0200
 
-Hi Pavel,
+Hi Jean-Pierre,
 
-> yesterday somebody talks about BT2000E CF card.
-> I have Pretec BT2000E CF card.
-> I found new version of alternative driver which probably fix resume problems 
-> and 2.6 kernel compiling.
+> My Linux box has a Anycom usb-220 bluetooth adapter connected to it
+> which is used to serve my iPAQ1940.  Works "superbly great" except
+> those times it won't work at all ;-).  Either a long connection (like
+> a download) will be cut or i will not be able to open a new
+> connection.  When it happens, i have 2 choices: unplung the bluetooth
+> adapter for a few seconds (which requires no other intervention on the
+> software side) and replug it or reset the device using hciconfig. 
+> Except that doing this reset will sometimes crash the hole Linux box. 
+> I then get a stack dump and once i got a message that looked like
+> this: "...killing interrupt handler...".  Sorry i wasn't fast enough
+> to write down the message.
 
-I know that driver and I really thought of including it, but the best
-way is to make it working through serial_cs and hci_uart/hciattach. Once
-this is solved every card with a 16C950 UART will work and not only the
-two with an Ericsson chip on it.
+this message is important and you should try to get it over a serial
+console. Please try a 2.4.25-mh3 or a 2.4.26-rc2. Maybe there is already
+a fix for it.
+ 
+> I'm running "Kernel 2.4.24-mh2 on an i586" with bluez-libs-2.5,
+> bluez-sdp-1.5, bluez-utils-2.5.  I normally run hcid, sdpd, "dund
+> --listen --msdun call dun".  It seems to me that enabling
+> authentification and encryption has made the whole thing less
+> reliable.
+
+Setting auth and encrypt switches to security mode 3 which is not what
+your really want.
 
 Regards
 
