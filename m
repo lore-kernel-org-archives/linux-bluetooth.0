@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Device specific pins
+Subject: Re: [Bluez-devel] Windows Port
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Eugene Crosser <crosser@average.org>
-Cc: Dave Henriksen <dhenriksen@optibrand.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1075187139.9727.29.camel@pccross.average.org>
-References: <1075153448.2906.2.camel@linux.local>
-	 <1075151423.25442.135.camel@pegasus>
-	 <1075187139.9727.29.camel@pccross.average.org>
+To: acr@acroberts.com
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <31555.80.63.28.114.1075193693.squirrel@acroberts.com>
+References: <31555.80.63.28.114.1075193693.squirrel@acroberts.com>
 Content-Type: text/plain
-Message-Id: <1075212653.12766.13.camel@pegasus>
+Message-Id: <1075211962.12766.3.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,29 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 27 Jan 2004 15:10:53 +0100
+Date: Tue, 27 Jan 2004 14:59:22 +0100
 
-Hi Eugene,
+Hi Antony,
 
-> Do you think it might be right to leave "low level" PIN management as it
-> is now, via an executable helper?  It is very much the same way as
-> kernel "hotplug" works.  So it can stay the same even if hcid eventually
-> becomes a kernel thread.
+> Is anybody working on a Windows port? I did a lot of the work on
+> Digianswers Windows stack (certainly the inovator back in the day) and I
+> would passionately like to see the current lack of BT support in Windows
+> resolved.
 > 
-> The "real" PIN management, with the database, GUI prompt boxes etc.
-> could be isolated from the BT stack, helper executable being the only
-> interface.
-> 
-> E.g., a Gnome or KDE applet could listen on a unix domain socket.  The
-> helper, when invoked, would try to talk over this socket, and if the
-> latter is not present or nobody listens on it, default to preexisting
-> database.  This way, both fancy GUI dialogues and unattended operation
-> could be implemented rather easily.
-> 
-> Sorry if I say stupid or trivial things, I did not really try to learn
-> how these things are currently done in Blues..
+> So if there are any porting projects in progress, please let me know.
 
-the answer for all this stuff will be D-BUS.
+I already answered this many times. BlueZ will not and can not be ported
+to the Windows platform.
 
 Regards
 
