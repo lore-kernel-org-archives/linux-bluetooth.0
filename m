@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Elimar Riesebieter <riesebie@lxtec.de>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-Message-ID: <20040801225614.GB22083@aragorn.home.lxtec.de>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="C7zPtVaVf+AK4Oqc"
-Subject: [Bluez-users] bluez-utils 2.9
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] hidp and hidd and MS keyboard hotkeys
+References: <200408012330.32328.cijoml@volny.cz> <1091396840.4279.4.camel@pegasus>
+In-Reply-To: <1091396840.4279.4.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200408020013.48105.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,43 +19,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 2 Aug 2004 00:56:14 +0200
+Date: Mon, 2 Aug 2004 00:13:47 +0200
 
+Hi Marcel,
 
---C7zPtVaVf+AK4Oqc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Now I am writing from 2.6.7-mh4 and non hotkey works as soon as in 2.4.
 
-Hi all,
+With bthid in 2.4 all works fine
+with 2.6.7-mh2 worked only few keys.
 
-why does hid2hci doesn't compile in bluez-utils 2.9?
+Michal
 
-Both --enable-hid2hci nor --enable-all built the binary hid2hci.
-
-Tried the same on 2.8 where it works!
-
-Ciao
-
-Elimar
-
---=20
-  Do you smell something burning or ist it me?
-
---C7zPtVaVf+AK4Oqc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.5 (GNU/Linux)
-
-iD8DBQFBDXUO3Ig8bsVPf7ARAhtRAKCCRzXlddkvqACWFFGLT+frptZi1wCgnqJG
-2Da30Sd2dsrSsfoGjGiGnZ0=
-=Ztr4
------END PGP SIGNATURE-----
-
---C7zPtVaVf+AK4Oqc--
+Dne ne 1. srpna 2004 23:47 Marcel Holtmann napsal(a):
+> Hi Michal,
+>
+> > I tested this combination and under 2.6. and 2.4 still doesn't works
+> > hotkeys. Do you expect to fix it soon?
+>
+> my main focus is now to get the generic HID parser for 2.6 in a good
+> shape so I can submit it for inclusion into the mainline kernel. The 2.4
+> HIDP backport is boot protocol mode only and this will stay a little bit
+> until the 2.6 part is mature.
+>
+> Do you get the hotkeys working with 2.6.7-mh4? This patch contains a HID
+> parser and support for the HID report protocol mode.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by OSTG. Have you noticed the changes on
+> Linux.com, ITManagersJournal and NewsForge in the past few weeks? Now,
+> one more big change to announce. We are now OSTG- Open Source Technology
+> Group. Come see the changes on the new OSTG site. www.ostg.com
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
