@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] nonblocking connect : Wrong return code ?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200412040251.25791.wim.delvaux@adaptiveplanet.com>
-References: <200412040251.25791.wim.delvaux@adaptiveplanet.com>
-Content-Type: text/plain
-Message-Id: <1102135551.8479.34.camel@pegasus>
-Mime-Version: 1.0
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200412040251.25791.wim.delvaux@adaptiveplanet.com>
+Subject: [Bluez-users] nonblocking connect : Wrong return code ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,45 +17,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 04 Dec 2004 05:45:51 +0100
+Date: Sat, 4 Dec 2004 02:51:25 +0100
 
-Hi Wim,
+when using a nonblocking socket,
 
-> when using a nonblocking socket,
-> 
-> when the connect is requested the errno that is returned is 11. (resource 
-> temporarily unavailable)
-> 
-> Man page says that it should be EINPROGRESS (which is 115).
-> 
-> Man page for connect says :
-> 
-> EINPROGRESS : 
-> 
-> The socket is non-blocking and the connection cannot be completed immediately.  
-> It is possible to select(2) or poll(2) for completion by selecting
-> 
-> but
-> 
-> EAGAIN :
-> 
-> No more free local ports or insufficient entries in the routing cache
-> 
-> 
-> EAGAIN is a proper return code for this situations for read or write but not 
-> for connect ...
+when the connect is requested the errno that is returned is 11. (resource 
+temporarily unavailable)
 
-we had this questions a long time ago and I never got a final answer
-from anyone what is the right way to do. However the change must be done
-in bt_sock_wait_state() and you must check rfcomm/sock.c, l2cap.c and
-sco.c if it is still working as expected. Feel free to send in a patch
-for it.
+Man page says that it should be EINPROGRESS (which is 115).
 
-Regards
+Man page for connect says :
 
-Marcel
+EINPROGRESS : 
+
+The socket is non-blocking and the connection cannot be completed immediately.  
+It is possible to select(2) or poll(2) for completion by selecting
+
+but
+
+EAGAIN :
+
+No more free local ports or insufficient entries in the routing cache
 
 
+EAGAIN is a proper return code for this situations for read or write but not 
+for connect ...
 
 
 -------------------------------------------------------
