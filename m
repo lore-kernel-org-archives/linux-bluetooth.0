@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Simon Huggins <huggie@earth.li>
-To: list bluez <bluez-users@lists.sf.net>
-Subject: Re: [Bluez-users] bluepin
-Message-ID: <20040613091328.GB27985@paranoidfreak.co.uk>
-References: <1087080981.21738.3.camel@tr1a.ozob.net>
+From: Ben Wilson <bwilson@yooser.org>
+To: Thea <thea@m-net.arbornet.org>
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Can ping, nothing else
+Message-ID: <20040613022458.GC32460@stag.mark-and-erika.com>
+References: <20040612150207.T12604-100000@m-net.arbornet.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1087080981.21738.3.camel@tr1a.ozob.net>
+In-Reply-To: <20040612150207.T12604-100000@m-net.arbornet.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,44 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 13 Jun 2004 10:13:28 +0100
+Date: Sat, 12 Jun 2004 22:24:58 -0400
 
-'ello list
+* On Sat, Jun 12, 2004 at 03:10:12PM -0400, I received from Thea:
+> 
+> Forgive me if this question has been asked before. I've gotten pppd to
+> establish a connection to my t610 mobile phone through bluez. I get pair
 
-On Sat, Jun 12, 2004 at 05:56:21PM -0500, Gene Imes wrote:
-> Sorry about that. I inadvertantly tacked this to another thread. My
-> apologies.
+This most likely isn't a bluez problem then.
 
-> Anyone know how to fix this:
+> of addresses and can properly ping and resolve hosts. Nice, but I can't
+> actually connect to hosts. This is something I don't know how to deal
+> with. If I telnet to <nameserver> 53, it times-out; if I telnet to
+> www.google.com 80, it times-out; if I ping www.altavista.com, it works
+> fine. What's happening here?
 
-> gene@tr1a:~> bluepin
-> Xlib: connection to ":0.0" refused by server
-> Xlib: No protocol specified
+Probably a proxy server. Depending on the service, you may have
+to authenticate first. Who are you using?
 
-> Traceback (most recent call last):
->   File "/usr/bin/bluepin", line 39, in ?
->     import gtk
->   File "/usr/lib/python2.3/site-packages/gtk-2.0/gtk/__init__.py", line
-> 43, in ?    from _gtk import *
-> RuntimeError: could not open display
-
-You're trying to run the python-gtk bluez pin helper.  Are you actually
-in X?
-
-You could change your pin helper to just be:
-#!/bin/sh
-echo "PIN:1234"
-
-or whatever yours is and the corresponding pin_helper line in hcid.conf
-
-I guess ultimately you might want the python-gtk helper to work though.
-
-Simon.
+> I'm running linux 2.6, stock-generic on an ibook.
+> Just ask if you want to see any configuration files
+> 
+> -Thea DeSilva
+> 
 
 -- 
-        Black Cat Networks        -( "I'm gonna eat you, little fishy!"  )-
-UK domain, email and web hosting  -(              - The Cat              )-
-http://www.blackcatnetworks.co.uk -(                                     )-
+Ben
 
 
 -------------------------------------------------------
