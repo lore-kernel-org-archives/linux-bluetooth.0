@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Rfcomm use count
+Subject: Re: [Bluez-devel] Help needed with getting Bluez on Axis Dev Board
+	82
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Daryl Van Vorst <daryl@wideray.com>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001601c48fa7$38cce900$1a01010a@baked>
-References: <001601c48fa7$38cce900$1a01010a@baked>
+To: "theresa g." <tereza99@hotmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY2-F7xJagXTi8M19V0000e6e7@hotmail.com>
+References: <BAY2-F7xJagXTi8M19V0000e6e7@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1094998515.5695.28.camel@pegasus>
+Message-Id: <1094997879.5695.16.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,52 +19,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 12 Sep 2004 16:15:15 +0200
+Date: Sun, 12 Sep 2004 16:04:39 +0200
 
-Hi Daryl,
+Hi Theresa,
 
-> Any suggestions you have regarding the following would be greatly
-> appreciated.
+> I am a desperate newbie in need of help getting Bluez working on my Axis Dev 
+> board 82.  I have seen some posts by others implying they somehow got things 
+> working on their boards.
 > 
-> I have a server program which does the following:
+> For those who dont know much about kernels and writing patches, is there a 
+> "how to" or list of instructions to help us get going.  For instance, what 
+> do I do first?  The latest version for the board is 2.4.26 - so am I 
+> supposed to apply Marcel's patch for that kernel from the Bluez site?  If 
+> so, are there any special things that I am to do in addition?
 > 
-> 1. Intializes and attaches two modules via serial port (CSR 18.1)
-> 2. Has SPP and OPP servers
-> 3. Does some HCI-level stuff to monitor connections and close connections to
-> misbehaving devices.
+> I also saw a post that said someone had cross compiled bluez...does that 
+> mean i have to put that into my makefile for the board?
 > 
-> The program will initiate rfcomm connections to devices which do not allow
-> role switches.
-> 
-> If I kill the program while several devices are connected (or are in the
-> process of connecting/disconnecting), sometimes the rfcomm use count is left
-> above 0 (I've seen it as high as 4). Killing the program detaches the
-> modules (this is verified by hcid's log output). Killing sdpd and hcid
-> doesn't reduce the use count. No other bluetooth programs are running,
-> except a kernel thread krfcommd.
-> 
-> Re-starting the program produces the error "Address already in us(98)" when
-> trying to bind the SPP server socket. The only remedy I've found is to
-> reboot the device.
-> 
-> Could sending an hci_disconnect directly, rather than using close(), be
-> confusing the stack? I realize this isn't the ideal way of closing
-> connections... It only gets used if the normal process is taking longer than
-> is desired when a device is forcing the server to be a slave.
-> 
-> The kernel version is 2.4.21-mh10, with various ARM patches (which, as far
-> as I can tell, do not touch any bluetooth related code). I have a very
-> similar program running on 2.4.18-mh8 and have never noticed this problem.
-> 
-> This doesn't seem to be related, but just in case it is: I'm also seeing
-> "hci_cmd_task: hci0 command tx timeout" errors. I am able to get the above
-> situation to happen without a timeout error.
+> Please forgive me for not knowing much, as I am still learning about things.
 
-I haven't had time to look at your problem in the last two weeks and
-dealing with ARM related stuff still not fits into my left free time for
-the next weeks. Is this behaviour reproduceable on x86 machines and do
-you have a small text program to trigger this effect? And what I really
-care about, is this problem also available with a 2.6 kernel?
+I have never done this before. Ask the Axis guys directly to provide you
+with more information. They should drop their OpenBT in favour of BlueZ
+and help people using it or ask them to send me a bunch of their boards
+for testing.
 
 Regards
 
