@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Alexandros Karypidis <karypid@inf.uth.gr>
-To: bluez-devel@lists.sourceforge.net
+From: "christian.gohmann@dsa-ac.de" <cg@dsa-ac.de>
+To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <Pine.LNX.4.33.0310101545410.11639-100000@testcg.dsa-ac.de>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200310101836.54089.karypid@inf.uth.gr>
-Subject: [Bluez-devel] Lost L2CAP packet problems in 2.6.0-test5
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-devel] Stability problems with USB BT modules based on CSR chipset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -16,40 +15,47 @@ List-Id: <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Oct 2003 18:36:54 +0300
+Date: Fri, 10 Oct 2003 16:25:41 +0200 (CEST)
 
-Hi all,
+Hello,
 
-I am having some problems with the last packet sent over an L2CAP connection 
-using 2.6.0-test5.
+I am running a COM1 USB bluetooth module (and also tried other devices
+based on the CSR chipset) and I am using kernel 2.4.19 with
+patch-2.4.19-mh12.
 
-The short description:
+When I do the following test:
 
-I have a program which runs correctly on 2.4.22. It is a simple packet 
-exchange over an L2CAP connection among peers A and B. When I run it using 
-2.6.0, it always loses the last packet sent from peer A to peer B.
+  while :; do hciconfig hci0 name ; done
 
-Peer A closes the connection after sending the last packet. IMPORTANT: Peer A 
-is a custom-built embedded device which does not even have an OS. It is a 
-dumb device which does not have a real BT stack. It simply repeats a sequence 
-of HCI commands which results in an L2CAP connection establishment, a couple 
-of small packets being exchanged (less than 100 bytes payload) and then the 
-connection being torn down.
+I recognize after a while (1-2 minutes), that the USB module will not
+respond to USB requests anymore. I cross-checked that with an USB
+bus analyzer. It is also possible to check it with hcidump, but I wanted
+to get shure that there is no response from the physical layer.
 
-Now, I am pretty sure that A operates correctly, because whenever I run the 
-client B on a computer with the 2.4.22 kernel (tested both with BlueZ and 
-Affix stacks), everything works perfectly.
+When I do a
 
-Whenever I run client B on a computer with the 2.6.0-test5 kernel, the last 
-packet sent from A before the connection is closed is lost.
+  hciconfig hci0 reset
 
--- 
-In theory, there is no difference between theory and practice.
-In practice, there is. -- Yogi Berra.
+I am able to get the USB module alive again (in most cases). Sometimes
+the USB module will crash completely and you must unplug it.
 
-Alexandros Karypidis
-University of Thessaly
-Computer & Communications Engineering dept.
+It is also interesting, that a
+
+  while :; do hciconfig hci0 class ; done
+
+runs quite stable.
+
+I think, that a local name request (which returns 252 bytes split into
+several USB return packets) is confusing the module's firmware. Short
+return packets (as with the class request) seem to be OK.
+
+My questions are:
+1. Has someone experienced similar hardware problems?
+2. Are there any timing restrictions on the HCI layer (maybe the frequency
+of HCI requests is too high and my test is not allowed) ?
+
+Thank you in advance,
+Christian Gohmann
 
 
 
