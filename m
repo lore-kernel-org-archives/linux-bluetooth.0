@@ -1,15 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Socket CF adaptor, limited to 2-3KB/sec RFCOMM
-	PPP connection?
+Subject: Re: [Bluez-users] News: Stereo BT Headset from BlueTake
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Jay W. Summet" <summetj@cc.gatech.edu>
+To: Brad Midgley <bmidgley@xmission.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.GSO.4.58.0410141051300.8280@gaia3.cc.gatech.edu>
-References: <Pine.GSO.4.58.0410121425040.24690@gaia3.cc.gatech.edu>
-	 <1097752969.4640.40.camel@notepaq>
-	 <Pine.GSO.4.58.0410141051300.8280@gaia3.cc.gatech.edu>
+In-Reply-To: <416EE163.1050605@xmission.com>
+References: <416D8520.5060102@thomae-privat.de>
+	 <416DA635.2070105@xmission.com> <1097741691.4640.19.camel@notepaq>
+	 <416E8560.3070801@xmission.com> <1097762684.4640.49.camel@notepaq>
+	 <416EE163.1050605@xmission.com>
 Content-Type: text/plain
-Message-Id: <1097929292.4911.37.camel@pegasus>
+Message-Id: <1097927962.4911.16.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,45 +21,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 16 Oct 2004 14:21:33 +0200
+Date: Sat, 16 Oct 2004 13:59:22 +0200
 
-Hi Jay,
+Hi Brad,
 
-> I have a Socket Compact Flash bluetooth adaptor, which uses the dtl1_cs
-> kernel module. I have it configured, and everything works, but
-> I am getting very slow GPRS speeds with my Sony Ericsson T610 telephone.
+> I must not have understood the distinction. I've seen stuff 
+> (http://www.ericsson.com/bluetooth/files/newsletter5_0403_lores.pdf) 
+> that suggests 1.2 brings with it higher-quality audio through new 
+> profiles (A2DP, AVRCP, GAVDP) and stuff 
+> (http://www.wordiq.com/definition/Bluetooth#Bluetooth_1.2) that says it 
+> gives us better transfer heuristics (eSCO).
 > 
-> I first noticed it with my GPRS data transfer when I only got 1.9 to 2.2 KB
-> per second of throughput on downloads. When I use IrDA to connect to
-> my phone instead of bluetooth, I get the expected 5.0 to 5.6 KB per second
-> of throughput.
-> 
-> I borrowed a friend's USB bluetooth adaptor (DBT-120 D-Link) and am able
-> to get the 5.0 to 5.6 KB/sec GPRS transfer while the Socket Compact Flash
-> (CF) adaptor got 2.0KB/sec. (Tested in the same location, with excellent
-> cellular signal strength, at the same time of day.)
-> 
-> I also tested both devices using the obextool to "push" an 84 KB jpeg
-> image to my telephone. I believe that this transfer was speed limited by
-> the phone's internal (flash?) memory, as with both the Socket CF and
-> D-Link USB adaptor I got about the same speeds, in the 24-30 second range
-> (best case, in a few cases I got much worth throughput). [That's about
-> 3.4KB/Sec, slower than the GPRS throughput (below) I was getting with the
-> USB adaptor or IrDA, even when I was using the USB adaptor for the obex
-> push.]
+> Are the profiles purely a function of the software stack? What about eSCO?
 
-what I assume is that the link manager on the Socket card is not doing a
-good job, because it should select a different packet type automaticly
-to get the best troughput as possible. However this card is very old and
-maybe you should simply ask Socket to get one of there newer cards with
-a CSR chip. There are some problems with a 2.6 kernel to get the serial
-part of them working, but maybe these are solved now. I don't have one
-of these newer cards, because I stopped spending money for buying them.
-People of companies have to donate them to me.
+I checked the articles above and no one said, that you need Bluetooth
+1.2 for A2DP. It might be confusing, but A2DP uses the ACL data link for
+high quality audio and not SCO/eSCO links like the headset/handsfree or
+cordless telephony/intercom profiles.
 
-In general it is a bad idea to play with the packet types from the HCI
-level, because the link manager knows best what type to select. In your
-case you may wanna change them with hciconfig and see if it helps.
+> I'd love to hear that the 1.1 adapter hardware is not being obsoleted by 
+> 1.2. I don't mind having to get a new headset like the bluetake.
+
+Everything should be backward compat as long as it based on the ACL data
+links. If you like, you can use a Bluetooth 1.0b device like the old
+Nokia DTL-1 Bluetooth card.
 
 Regards
 
