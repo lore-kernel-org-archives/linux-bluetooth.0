@@ -1,65 +1,87 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bthid cvs question
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Steven Singer <steven.singer@csr.com>
-Cc: Florian Echtler <echtler@fs.tum.de>,
-   Olivier Bornet <olivier.bornet@smartdata.ch>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3FF99466.8080209@csr.com>
-References: <Pine.LNX.4.44.0312091023470.6471-100000@speare5-1-11.nmt.edu>
-	 <1071020597.10655.4.camel@pegasus> <20031210080259.GF26896@smartdata.ch>
-	 <1071065922.10655.60.camel@pegasus>
-	 <Pine.NEB.4.58.0312202356540.10214@gaia.fachschaften.tu-muenchen.de>
-	 <1071969925.2684.5.camel@pegasus>  <3FF99466.8080209@csr.com>
-Content-Type: text/plain
-Message-Id: <1073329354.2508.26.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Jan 2004 20:02:34 +0100
+Return-Path: <Steven.Singer@csr.com>
+Message-ID: <3FF99BA8.7040806@csr.com>
+Date: Mon, 05 Jan 2004 17:15:20 +0000
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Chris Hubball <chris.hubball@csr.com>,
+   BlueZ Mailing List
+    <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Apple mouse and disconnect problem
+References: <7D3093619D15A841A322413C3F138E0855C2F9@exchange02.csr.com>
+    <1073320020.2508.17.camel@pegasus>
+In-Reply-To: <1073320020.2508.17.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Steven,
+> So the question is if it is ok if both ends call hci_disconnect? Do you
+> have seen any problems both ends are trying to terminate the ACL link?
+> How do the link manager handles this? I can't find any valuable comment
+> in the specification or the profiles which end should terminate the ACL
+> link.
 
-> A lot of devices use page scan repetition mode R2 by default as it's the
-> lowest power mode.
+In theory link managers should handle this fine. If they don't then it's
+a bug in the link manager and not the host's fault. Just be aware of the
+race hazard. You may get two disconnection_complete events one with an
+error code.
 
-the most device I have seen are using R1 by default and the only R2 are
-my HID devices.
+Note that when I say that a disconnection_complete event is flagged with
+an error, I mean that the status field is non-zero, not that the reason
+field is non-zero.
 
-> BlueZ's behaviour is wrong. If you do not know the page scan repetition
-> mode of the device you're going to connect to then you must use R2. The
-> 1.1 spec does not state this explicitly, but it can be implied.
+So I'd expect something like (local side wins the race):
 
-I am no baseband expert, so let me see if I understand you right. In the
-case we don't know the page scan repetition mode we should use R2 in
-prefer of R1 or even R0? Does this have disadvantages if the devices is
-in R1 or R0 mode? I ask because we found that connecting with R1 by
-default gives us a significant page time improvement.
+   v Disconnect hnd:h
+   ^ Command_Status Pending
+   ^ Disconnect_Complete Success hnd:h Connection_Terminated_By_Local_Host
 
-If only R2 makes sense in case that we don't the exact value, somebody
-should bring up an errata to the HCI working group ;)
+or (local side loses the race):
 
-Regards
+   v Disconnect hnd:h
+   ^ Disconnect_Complete Success hnd:h Other_End_Terminated_Connection:...
+   ^ Command_Status No_Connection
 
-Marcel
+or (if the race is a little closer and the link manager is not taking
+special care to avoid this situation):
+
+   v Disconnect hnd:h
+   ^ Command_Status Pending
+   ^ Disconnect_Complete Success hnd:h Other_End_Terminated_Connection:...
+   ^ Disconnect_Complete No_Connection hnd:h
+
+Note, however, that these are no worse than the races you get if you try
+to disconnect a link just as the supervision timeout fires.
+
+I'm straining my memory here, but I vaguely recall having seen bugs with
+this race in some link managers in the distant past so you should be
+robust against suprious errors. One likely error is to get two successful
+disconnection_complete events for the same handle (you should either get
+just one or the second should be flagged with an error). A second
+possible error is that you get two disconnection_complete events and one
+is marked with an invalid connection handle (such as 0x0000).
+
+My memory is a little hazy - I may be confusing this scenario with other
+problems I've seen in the past (they all blur into one after a while).
+
+Basically, every level in the stack should be able to cope with abrupt
+and unexpected disconnections as they have to be able to cope with
+supervision timeouts. Once you get above HCI, apart from the reason code
+in the disconnection_complete event, there's no difference between a
+supervision timeout and the remote end cleanly terminating the link.
+
+	- Steven
+-- 
 
 
 
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
 
--------------------------------------------------------
-This SF.net email is sponsored by: IBM Linux Tutorials.
-Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
-Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
-Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
