@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Error messages from hid2hci
+Subject: Re: [Bluez-users] general rfcomm questions
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <qszis7lv8ho.fsf@mspacman.gpcc.itd.umich.edu>
-References: <qszis7lv8ho.fsf@mspacman.gpcc.itd.umich.edu>
+In-Reply-To: <41AE5F72.6030201@gmx.ch>
+References: <41AE5F72.6030201@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1101970554.15615.63.camel@pegasus>
+Message-Id: <1101970457.15615.60.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,28 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Dec 2004 07:55:54 +0100
+Date: Thu, 02 Dec 2004 07:54:17 +0100
 
-Hi Scott,
+Hi Marco,
 
-> After upgrading my D-Link DBT-120 with the Apple firmware, I have to
-> use hid2hci to put it in hci mode.  hid2hci usually seems to work
-> fine, except it prints out an error message:
+> i now tried and read quite a few things about rfcomm and multiple 
+> connections... but still don't really know what i was searching for...
+> maybee someone here can help me (hopefully).
 > 
-> If I plug the device directly in, I get:
-> 
->   Switching device 0a12:1000 to HCI mode failed (Protocol error)
-> 
-> Through a hub, I get:
-> 
->     Switching device 0a12:1000 to HCI mode failed (Invalid or incomplete multibyte or wide character)
-> 
-> This is with a very recent Bluetooth kernel from BK, bluez-libs-2.10,
-> and bluez-utils-2.10
+> i have one device that needs to parallely serve a service to multiple 
+> clients via rfcomm.
+> - is it possible that the service runns on multiple rfcommchannels, one 
+> for each clients? what's the limit?
 
-I think we should not print out certain error codes, because the switch
-into HCI will be still succeed. However the error is correct, because
-the device resets before the URB is completed.
+you don't need different RFCOMM channels if the underlaying ACL/L2CAP
+connection is not the same.
+
+> - or is the solution to wait for connections, and on a incoming 
+> connection close it to connect to that device (having the local service 
+> waiting for new connections)...
+
+Don't understand what this is trying to do.
+
+> - does a inquiry block the whole device? i noticed that if a connection 
+> between my device and a client is etablished, i'm unable to run "hcitool 
+> scan"...
+
+This depends on the firmware version. See other discussion in the
+mailing list archive.
 
 Regards
 
