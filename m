@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-users] Has anyone seen these problems with the
-	CSRBlueCore and BlueZ before ?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E1DBvrG-0002tO-0b@sc8-sf-mx1.sourceforge.net>
-References: <E1DBvrG-0002tO-0b@sc8-sf-mx1.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1111071510.11792.88.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <423992C8.8000309@prim-time.fr>
+From: Xavier Garreau <x.garreau@prim-time.fr>
+MIME-Version: 1.0
+To: "bluez-users@lists.sf.net" <bluez-users@lists.sf.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] obex howto
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,39 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Mar 2005 15:58:30 +0100
+Date: Thu, 17 Mar 2005 15:23:04 +0100
 
-Hi Han,
+Hi,
 
-> The info I get from hciconfig -a is :
-> 
-> hci0:   Type: UART
->         BD Address: 00:A0:96:0A:BF:D4 ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:303 acl:0 sco:0 events:13 errors:0
->         TX bytes:434 acl:0 sco:0 commands:12 errors:0
->         Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'BlueZ (0)'
->         Class: 0x000100
->         Service Classes: Unspecified
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.2 (0x2) HCI Rev: 0x5df LMP Ver: 1.2 (0x2) LMP Subver:
-> 0x5df
->         Manufacturer: Cambridge Silicon Radio (10)
-> 
-> This info is what I get just after booting the board.
+Is there somewhere a bluez/obex HOWTO ?
 
-this is a HCI 18.2 firmware on a BlueCore02 or BlueCore3 chip. What kind
-of chip is it? Is it a ROM or External/Flash version?
+I'm about to write a tutorial for python on Symbian/Series60. An 
+Application from nokia allows to execute python scripts on a Series60 
+phone via a Bluetooth remote python console (this works using spp).
 
-Regards
+Actually, to complete my _linux_ tutorial, i need do transfer a .sis to 
+the phone (via obex) and have not yet played with this on linux ...
 
-Marcel
+Any hints ?
 
-
+Thanks in advance
+-- 
+Xavier Garreau <xavier@xgarreau.org>
+http://www.xgarreau.org/
 
 
 -------------------------------------------------------
