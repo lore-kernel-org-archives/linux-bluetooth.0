@@ -1,109 +1,93 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <daryl@wideray.com>
+Errors-To: <daryl@wideray.com>
 From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
+Cc: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Qualification Testing
-Message-ID: <000001c31b28$8d98f7c0$1a01010a@baked>
+Date: Wed, 14 May 2003 15:35:29 -0700
+Message-ID: <001901c31a69$2163c220$1a01010a@baked>
 MIME-Version: 1.0
-In-Reply-To: <000801c3197e$8591e290$1a01010a@baked>
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 May 2003 14:25:27 -0700
-Content-Type: text/plain; CHARSET=us-ascii
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1052951229.4609.71.camel@pegasus.local>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Max,
+Here you go (sorry about that):
 
-Regarding the L2CAP parameter negotiation.  Not sure if you saw this (see
-below).
-
-This is the one remaining problem impeding qualification. Except, of course=
-,
-for the possibility of more failures in the next round of testing.
-
-What are your thoughts on it?
-
-Thanks,
-
--Daryl.
+--- /home/daryl/bluez/bluez-utils-2.3/test/l2test.c	Wed May 14 15:11:32
+2003
++++ l2test.c	Wed May 14 15:10:58 2003
+@@ -71,6 +71,9 @@
+ bdaddr_t bdaddr;
+ unsigned short psm = 10;
+ 
++/* Default number of blocks to send */
++int num_blocks = -1; // Infinite
++
+ int master = 0;
+ int auth = 0;
+ int encrypt = 0;
+@@ -324,7 +327,7 @@
+ 		buf[i]=0x7f;
+ 
+ 	seq = 0;
+-	while (1) {
++	while ((num_blocks == -1) || (num_blocks-- > 0)) {
+ 		*(uint32_t *) buf = htobl(seq++);
+ 		*(uint16_t *)(buf+4) = htobs(data_size);
+ 		
+@@ -386,9 +389,9 @@
+ 	printf("Options:\n"
+ 		"\t[-b bytes] [-S bdaddr] [-P psm]\n"
+ 	       	"\t[-I imtu] [-O omtu]\n"
++	        "\t[-N num] send num blocks (default = infinite)\n"
+ 		"\t[-D] use connectionless channel (datagram)\n"
+ 		"\t[-E] request encryption\n"
+-		"\t[-E] request encryption\n"
+ 	       	"\t[-M] become master\n");
+ }
+ 
+@@ -402,7 +405,7 @@
+ 
+ 	mode = RECV; need_addr = 0;
+ 	
+-	while ((opt=getopt(argc,argv,"rdscuwmnb:P:I:O:S:MAED")) != EOF) {
++	while ((opt=getopt(argc,argv,"rdscuwmnb:P:I:O:S:N:MAED")) != EOF) {
+ 		switch(opt) {
+ 		case 'r':
+ 			mode = RECV;
+@@ -477,6 +480,10 @@
+ 			socktype = SOCK_DGRAM;
+ 			break;
+ 
++		case 'N':
++			num_blocks = atoi(optarg);
++			break;
++
+ 		default:
+ 			usage();
+ 			exit(1);
 
 > -----Original Message-----
-> From: bluez-devel-admin@lists.sourceforge.net=20
-> [mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of=20
-> Daryl Van Vorst
-> Sent: May 13, 2003 11:36 AM
-> To: 'Max Krasnyansky'; 'Marcel Holtmann'
-> Cc: 'BlueZ Mailing List'
+> From: Marcel Holtmann [mailto:marcel@rvs.uni-bielefeld.de] 
+> Sent: May 14, 2003 3:27 PM
+> To: Daryl Van Vorst
+> Cc: 'Max Krasnyansky'; 'BlueZ Mailing List'
 > Subject: RE: [Bluez-devel] Qualification Testing
->=20
->=20
-> Max,
->=20
-> > >Max - You mentioned that the spec says that what the stack
-> > does with a
-> > >config reject can be implementation specific. I just had a
-> > look at the
-> > >spec and couldn't find it. Could you tell me where to look
-> > in the spec?
-> >=20
-> > section 6.1
-> > page 297
-> >=20
-> > "Since all L2CAP implementations are capable to support a
-> > minimum L2CAP packet size, see Section 4 on page 280, MTU is=20
-> > not really a negotiated value but rather an informational=20
-> > parameter to the remote device that the local device can=20
-> > accommodate in this channel an MTU larger than the minimum=20
-> > required. In the unlikely case that the remote device is only=20
-> > willing to send L2CAP packets in this channel that are larger=20
-> > than the MTU announced by the local device, then this=20
-> > Configuration Request will receive a negative response in=20
-> > which the remote device will include the value of MTU that is=20
-> > indented to transmit. In this case, it is implementation=20
-> > specific on whether the local device will continue the=20
-> > configuration process or even maintain this channel."
->=20
-> What about flowspec and flush timeout?
->=20
-> In section 6.4.2 FlushTO is listed as one of the items in the=20
-> response path (along with MTU and InFlow). But in section 7.5=20
-> only MTU and InFlow are listed.
->=20
-> I sent the above quote to Cetecom last week. They responded=20
-> saying that MTU isn't the only negotiated parameter.
->=20
-> -Daryl.
->=20
->=20
->=20
-> -------------------------------------------------------
-> Enterprise Linux Forum Conference & Expo, June 4-6, 2003,=20
-> Santa Clara The only event dedicated to issues related to=20
-> Linux enterprise solutions www.enterpriselinuxforum.com
->=20
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net=20
-> https://lists.sourceforge.net/lists/listinfo/b> luez-devel
->=20
-
-
-
--------------------------------------------------------
-Enterprise Linux Forum Conference & Expo, June 4-6, 2003, Santa Clara
-The only event dedicated to issues related to Linux enterprise solutions
-www.enterpriselinuxforum.com
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
+> 
+> Hi Daryl,
+> 
+> > Got to it a bit quicker than expected. I haven't needed to change 
+> > rctest for testing, so I haven't modified that one yet.
+> > 
+> > Here's the diff.
+> 
+> thats great, but can you please use "diff -urN". Because a 
+> unified diff is much more easier to read.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
