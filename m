@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Laszlo Sogor" <shogy@shogy.ohsh.u-szeged.hu>
-To: "bluez-users" <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <E1AaCHm-0004YL-00@shogy.ohsh.u-szeged.hu>
-Subject: [Bluez-users] Linux + Bluez problem
+From: Michael Mauch <michael.mauch@gmx.de>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Message-ID: <20031224142613.GE2657@elmicha.333200002251-0001.dialin.t-online.de>
+References: <3FE5D72B.2000108@nue.et-inf.uni-siegen.de> <1072032518.2684.90.camel@pegasus> <3FE6021B.2010702@nue.et-inf.uni-siegen.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <3FE6021B.2010702@nue.et-inf.uni-siegen.de>
+Subject: [Bluez-users] Re: bluepin with SuSE 9.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,74 +17,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 27 Dec 2003 12:07:10 +0100
+Date: Wed, 24 Dec 2003 15:26:13 +0100
 
-Hi all,
+Michael Schmidt wrote:
 
-I have a problem with the Bluetooth connection between my computer and
-my phone. Sometimes it drops the Bluetooth connection, I could reproduce
-it in two different ways:
+> So I ask other people on the mailing list to test the script with other 
+> distributions.
 
-case #1
-I use GPRS with my phone, the phone is connected to my computer using
-Bluetooth. When I try to retrieve a page with images, the Bluetooth
-connection fails with high probability (90 %).
+I can confirm that your version of the bluepin script works on Gentoo,
+when I call
 
-I use /dev/rfcomm2 to access DUN (channel 1) service of my phone.
-I monitored the Bluetooth connection with l2ping:
+  /usr/local/bin/bluepin in 11:22:33:44:55:66
 
-# l2ping 00:60:57:2F:11:8C
-...
-0 bytes from 00:60:57:2F:11:8C id 215 time 94.99ms
-0 bytes from 00:60:57:2F:11:8C id 216 time 121.83ms
-0 bytes from 00:60:57:2F:11:8C id 217 time 26.51ms
-no response from 00:60:57:2F:11:8C: id 218
-no response from 00:60:57:2F:11:8C: id 219
-no response from 00:60:57:2F:11:8C: id 220
-no response from 00:60:57:2F:11:8C: id 221
-Recv failed: Software caused connection abort
-#
+as root (it asks for the PIN in a nice GTK2 dialog, and prints
+"PIN:12345").
 
-At this point, the pppd drops the connection and the Bluetooth subsystem
-will be unusable until I remove and re-insert the USB dongle (for the sw 
-and
-hw specification, see the end of the mail).
+The bluepin script from bluez-utils-2.3 didn't work here:
 
-Unfortunately I have only one Buetooth device, so I could not determine 
-whether the error is in the device, the driver or anything else.
+# /usr/bin/bluepin in 11:22:33:44:55:66
+Traceback (most recent call last):
+  File "/usr/bin/bluepin", line 39, in ?
+    class Dialog(GtkDialog):
+NameError: name 'GtkDialog' is not defined
 
 
-case #2
-I use p3nfs package (5.12) to mount my phone (Symbian Series 60). I 
-mounted the phone and did some tests:
-- in a loop
- - copy a large (3MB) file to the phone
- - wait 20 seconds
- - delete the file
-- monitor the Bluetooth connection
-
-I found that the Bluetooth connection failed just like when I used GPRS.
-
-Used SW:
-- Linux kernels 2.4.22 and 2.4.23 (with and without -mh1 patch for both)
-- Debian Woody and Sarge
-- bluez-libs-2.4 with bluez-utils-2.3
-- bluez-libs-2.5 with bluez-utils-2.4
-
-Used HW:
-- Nokia 3650 (sw ver 3.16)
-- Epox BT-DG03 USB dongle
-
-I checked IRDA, it works perfectly.
-
-I did not find anything that can help in the system logs.
-
-Has anyone meet with this problem yet? Any tips?
-
-Thanks,
-
-shogy
-
+Regards...
+		Michael
 
 
 -------------------------------------------------------
