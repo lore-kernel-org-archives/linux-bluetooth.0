@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth ipaq problem
+Subject: Re: [Bluez-users] mh3 not in 2.4.26-pre6
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?S=E9bastien?= Delneste <seb@pong.be>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040325194812.GA28260@pong.be>
-References: <20040325194812.GA28260@pong.be>
+In-Reply-To: <200403251849.21765.cijoml@volny.cz>
+References: <200403251849.21765.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1080258707.2283.57.camel@pegasus>
+Message-Id: <1080258240.2283.48.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,51 +18,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Mar 2004 00:51:47 +0100
+Date: Fri, 26 Mar 2004 00:44:00 +0100
 
-Hi Sebastien,
+Hi Michal,
 
-> I'm having a serious problem with an iPaq 3870 running Linux (Familiar)
-> 
-> 6 months ago, I've been trying to change the PS registers of my CSR
-> chipset (using the pskey tool)
-> 
-> Since then, my bluetooth hasn't worked anymore.
-> 
-> Today, I finally found back the URL I was looking for with the default
-> values of the registers.
-> http://www.samengstrom.com/ipaq/PSKEY-README
-> 
-> I've restored one but, apparently I failed to modify the second one,
-> which results to the following problem : 
-> 
-> I still can't use the bluetooth function of my iPaq and I can't access
-> it with pskey anymore 
-> 
-> the values are now : 
-> 1f9	0001
-> 191 01d8 00a8 00fa 0014 0004 0000 0004 001e 0064 000a
-> 
-> now, when I try to use pskey (no matter the speed , I've tried
-> 15200,230400, etc), it gives me the following error :
-> 
-> ~ # pskey -d /dev/ttySB0
-> Physical device :/dev/ttySB0
-> Speed           :115200
-> Use BCSP        :NO
-> Initiating read thread
-> Now trying to read firmware info
-> Timeout!!!
-> Error in reading firmware info
-> 
-> 
-> Is there anyone out there who already had this problem ?
+> why is not mh3 in 2.4.26-pre6 included?
 
-playing with the CSR PS and not really knowing what you are doing is
-dangerous, because you can set your Bluetooth chip to a non working
-state. The archive contains some post from CSR guys that may can help
-you, but actually I think you broke it. Btw you never had to do this
-modifications, because the iPAQ is working out of the box ;)
+I noticed it, but I don't know why. I will ask Dave what was wrong.
 
 Regards
 
