@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Michael Klose <mk@pottklose.de>
-Message-ID: <loom.20040926T103741-961@post.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Connect printer via bluetooth printer adaper
+Message-ID: <003001c4a3ba$d064fba0$8696a8c0@marcy>
+From: "Wolfgang" <wood.stock@gmx.net>
+To: "Nigel Magnay" <nigel.magnay@gmail.com>,
+   <bluez-users@lists.sourceforge.net>
+References: <320075ff040925153753850d92@mail.gmail.com> <1096153758.7719.12.camel@pegasus> <320075ff040926011212538dac@mail.gmail.com>
+Subject: Re: [Bluez-users] ipaq 1945
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,25 +18,69 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 26 Sep 2004 08:40:16 +0000 (UTC)
+Date: Sun, 26 Sep 2004 13:20:22 +0200
 
-Hi all
+Just a non-technical idea:
 
-I use Debian 3.1. The connection between usb bt dongle and bt printer adapter
-works. (hcitool scan delivers correct address of bt printer adapter, l2ping
-works alls well).
+It took me two nights to find out that SuSE has a
+running firewall and every new interface like bnep0 *is*
+protected.....
 
-How do I set up the printer (cups), so that bt connection will be used.
-
-
-Many thanks in advance for your help.
-
-Best Regards
-
-Michael
+Wood
 
 
 
+----- Original Message -----
+From: "Nigel Magnay" <nigel.magnay@gmail.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>;
+<bluez-users@lists.sourceforge.net>
+Sent: Sunday, September 26, 2004 10:12 AM
+Subject: Re: [Bluez-users] ipaq 1945
+
+
+> it's 2.6.8.1, built on FC2
+>
+>
+> On Sun, 26 Sep 2004 01:09:18 +0200, Marcel Holtmann <marcel@holtmann.org>
+wrote:
+> > Hi Nigel,
+> >
+> >
+> >
+> > > I'm having a bit of trouble. I'm using kernel 2.6.8.1, and I'm trying
+> > > to get my iPaq 1945 to be able to connect via bluetooth to the
+> > > internet, though to start with I'm just trying to get it to connect to
+> > > the host computer.
+> > >
+> > > I think everything is working correctly - I have the stack up and
+> > > running, I can get my bnep0 interface up, and assign it an ip address
+> > > - e.g. 192.168.1.56. I can then ping that address from linux, and I
+> > > can browse it as an internet connection on my ipaq, and connect to it.
+> > >
+> > > Problem is, neither IE nor Pocket puTTY can use the connection (I try
+> > > to ssh to 192.168.1.55, my linux box). I don't know if I'm just
+> > > missing something, but I've read all the guides and I'm just confused
+> > > as to whether I'm trying something that isn't possible.
+> >
+> > what kernel version do you use on your Linux machine?
+> >
+> > Regards
+> >
+> > Marcel
+> >
+> >
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
+> Project Admins to receive an Apple iPod Mini FREE for your judgement on
+> who ports your project to Linux PPC the best. Sponsored by IBM.
+> Deadline: Sept. 24. Go here: http://sf.net/ppc_contest.php
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 
