@@ -1,15 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] AVM AP-X and DUN profile
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bernd.Jucknischke@web.de
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403040924.58522.Bernd.Jucknischke@web.de>
-References: <200403030832.19665.Bernd.Jucknischke@web.de>
-	 <1078320979.2787.68.camel@pegasus>
-	 <200403040924.58522.Bernd.Jucknischke@web.de>
-Content-Type: text/plain
-Message-Id: <1078398559.5347.1.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] HCI_switch_role 
+In-reply-to: ""Thor Egil Skaug""'s message of "Wed, 03 Mar 2004 18:59:51 PST."
+             <000501c40194$c308add0$9349edc7@thores>
+Message-ID: <7130.1078397385@csr.com>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +15,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 04 Mar 2004 12:09:19 +0100
+Date: Thu, 04 Mar 2004 10:49:45 +0000
 
-Hi Bernd,
+"Thor Egil Skaug" wrote:
+> Does anyone know why the HCI_switch_role command takes a BDADDR argument
+> instead of
+> a connectionhandle?
 
-> Thanks for the fast reply. I know that page already. I'm running the 2.6 
-> kernel series and haven't been able to find a working capi, yet. I guess I'll 
-> have to wait until it's (capi) supported for 2.6...
+It's not clear to me, either, but it may be for compatibility with the
+role-change event when generated during connection creation: in that
+case, the connection_complete event hasn't come up yet, so there's no
+valid ACL handle.  Hence it has to report the BD ADDR (as with
+the connection_request event).
 
-you can search for a patch named i4l-t9bk22 or use 2.6.4-rc1 which
-already includes every ISDN update that is needed. However you must make
-sure that the module capi.ko is loaded and that /dev/capi is mounted,
-because capiinit sometimes forget about it.
+> The role_change event should be sent from both devices to their
+> respective sw stacks after this.
+> 
+> I don't understand the following from the BT specification:
+> 
+> 1. Is the BDADDR the address of the remote device, or the local device
+> (to the caller)?
 
-Regards
+The remote device.
 
-Marcel
+> 2. In the returned event, what bdaddr is returned to the
+> (HCI_switch_role) calling stack, and what bdaddr
+>    is returned to the stack on the remote device?
 
+Each side reports the remote address (where it reports anything).
+
+> 3. What if there is more than one connection between two devices?
+
+There can't be, you can only have one ACL between any two devices.
+This a specific error code acl_connection_already_exists or something
+similar if you try and add another one.
+
+pws
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
