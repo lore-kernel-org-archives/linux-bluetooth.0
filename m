@@ -1,50 +1,55 @@
-Return-Path: <dv_mlist@verizon.net>
-Subject: bluetooth pcmcia/cf serial errors with 2.6 kernel
-From: digger vermont <dv_mlist@verizon.net>
-To: Russell King <rmk+serial@arm.linux.org.uk>,
-   Linux Serial <linux-serial@vger.kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Max Krasnyansky <maxk@qualcomm.com>,
-   bluez-users <bluez-users@lists.sourceforge.net>,
-   Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Pairing to devices with bluez and
+	widcommwithsame adapter
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nosve <nosve@libero.it>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <AGELIJDLJNOPFNMOHHIFAECLCAAA.nosve@libero.it>
+References: <AGELIJDLJNOPFNMOHHIFAECLCAAA.nosve@libero.it>
 Content-Type: text/plain
-Message-Id: <1074885137.3532.9.camel@myrna>
+Message-Id: <1074874501.3071.132.camel@pegasus>
 Mime-Version: 1.0
-Date: Fri, 23 Jan 2004 14:16:42 -0500
-List-ID: <bluez-users.lists.sourceforge.net>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 23 Jan 2004 17:15:01 +0100
 
-Hello Russell King and Linux Serial Mailing List,
+Hi Nosve,
 
-	Changes to the serial driver in 2.6.xx kernels have caused problems
-with some bluetooth pcmcia/cf cards that do work properly with 2.4.xx
-kernels. 
+> I don't want to be pedantic, but the question is how to store the link key
+> in the chip, I must use hcitool to send some form of commands? Or maybe
+> there are some documented possibilities which I have not found?
 
-When the cards are plugged the uarts are correctly identified and the
-ports created.  However, hciattach returns errors when trying to attach
-the port to the BlueZ stack. Different settings have been tried such as
-baud rates and irq's through setserial with no difference.
-	
-The problem is not platform specific.  It occurs on my powerbook.  I'm
-not sure of the platforms of the other reported errors, but they are not
-powerpc's.
+the support for stored link keys is not very good. You must write it by
+your own. The code of the new library also have no tool for it at the
+moment, but the API call is there.
 
-Here are more specifics:
+> Even from the other thread I don't understand if maybe we must hope there is
+> a possibility to save the link key with widcomm stack.
 
-kernel 2.4.24 works fine
+If the link key is stored on the chip, the host stack don't have to do
+anything. All authentication stuff will be handled by the link manager.
 
-kernel 2.6.2-rc1 and 2.6.2-rc1-ben1
-	Com One Platinum:Reported to work fine.
-	Xircom PC cards:Reported to time out.
-	Socket CF:	Error is "BCSP initialization timed out".
-			Card is reported as "Socket", "CF+ Personal
-			Network Card Rev 2.5"
+Regards
 
-Here is the top of the thread on the bluez-users mailing list:
-	http://thread.gmane.org/gmane.linux.bluez.user/1864
-	
-If there is any other information I can help with please let me know.
+Marcel
 
 
-Thanks,
 
-digger	
-	
+
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
