@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <c93f2a29050203210522694d38@mail.gmail.com>
+From: Embedded System <embed.sys@gmail.com>
 To: bluez-users@lists.sourceforge.net
-From: Sebastian Roth <sebastian.roth@esk.fhg.de>
-Message-ID: <ctv818$aa1$1@sea.gmane.org>
-References: <c93f2a29050203210522694d38@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <c93f2a29050203210522694d38@mail.gmail.com>
-Subject: [Bluez-users] Re: where can I find patch for 2.6.9?
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] where can I find patch for 2.6.9?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,23 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Feb 2005 08:26:11 +0100
+Date: Fri, 4 Feb 2005 13:05:08 +0800
 
-Hi Andy,
+hi, 
 
-> I can only find the patch for latest 2.6 kernel at bluez.org. Where
-> can I find other 2.6 kernel patches?
+I can only find the patch for latest 2.6 kernel at bluez.org. Where
+can I find other 2.6 kernel patches?
 
-Go to www.bluez.org -> Download -> Patches then copy the URL of the
-2.6.10-mh3 patch paste it to a new tab and edit it, e.g.
-http://www.holtmann.org/linux/kernel/patch-2.6.9-mh1.gz
+Thanks a lot!
 
-But as far as I know this is undesired. You _should_ use the current
-kernel and patch!
-
-Regards,
-Sebastian
-
+-Andy
 
 
 -------------------------------------------------------
