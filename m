@@ -1,42 +1,42 @@
-Return-Path: <Steven.Singer@csr.com>
-Message-ID: <40435D9D.5020509@csr.com>
-Date: Mon, 01 Mar 2004 15:58:21 +0000
-From: Steven Singer <steven.singer@csr.com>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Thor Egil Skaug" <paxtonrd@hotmail.com>
+To: "'BlueZ Mailing List'" <bluez-users@lists.sourceforge.net>
+Message-ID: <000101c3ffa4$a060e550$46a57e40@thores>
 MIME-Version: 1.0
-To: Thor Egil Skaug <paxtonrd@hotmail.com>
-CC: "'Marcel Holtmann'" <marcel@holtmann.org>,
-   "'BlueZ Mailing List'"
-    <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] AUX1 packets
-References: <000001c3ffa4$181dee40$46a57e40@thores>
-In-Reply-To: <000001c3ffa4$181dee40$46a57e40@thores>
-Content-Type: text/plain; charset="us-ascii"
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain;
+	charset="us-ascii"
+Subject: [Bluez-users] Socket permissions
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 1 Mar 2004 07:48:22 -0800
 
-Thor Egil Skaug wrote:
-> I am trying to have my application select different packet types based
-> on the current BER.
+When I use the hciconfig, hcitool, etc. applications that depend on
+raw-data hci-sockets,
+I have to be logged in as root for it to work. If not I get a permission
+denied error.
 
-If both ends of the link support CQDDR then the Link Managers will do
-this automatically.
+Which files do I have to alter permissions on in order for a normal user
+to do this?
 
-If you try to do this yourself, you'll just end up with the host and the
-controller fighting each other.
+I am using Linux 2.4.25, hci_usb + usb-uhci, Belkin USB dongle (CSR).
 
-	- Steven
--- 
-
+Thor
 
 
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
