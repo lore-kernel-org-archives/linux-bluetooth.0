@@ -1,17 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Vesa Halttunen <vesuri@jormas.com>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1087774058.4781.140.camel@pegasus>
-References: <1087757523.839.10.camel@pc.vesuri.net>
-	 <1087767604.4781.52.camel@pegasus>  <1087760721.1232.5.camel@pc.vesuri.net>
-	 <1087770579.4781.59.camel@pegasus> <1087763282.1232.17.camel@pc.vesuri.net>
-	 <1087765554.4781.67.camel@pegasus>  <1087764428.551.3.camel@pc.vesuri.net>
-	 <1087768641.4781.74.camel@pegasus>  <1087767270.860.4.camel@pc.vesuri.net>
-	 <1087774058.4781.140.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1087769891.524.2.camel@pc.vesuri.net>
-Mime-Version: 1.0
-Subject: [Bluez-users] Re: Jerky MX900 mouse movement with 2.6.7-mh1, hidp and hidd
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200406210004.08754.cijoml@volny.cz>
+Subject: [Bluez-users] Bluez patch from 2.6.4. to 2.6.7-mh1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,23 +17,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 21 Jun 2004 01:18:11 +0300
+Date: Mon, 21 Jun 2004 00:04:08 +0200
 
-On Mon, 2004-06-21 at 02:27, Marcel Holtmann wrote:
-> I recharged the batteries of my MX900 and I don't have any problem with
-> it. The mouse is working perfect with my setup.
+Hi Marcel,
 
-Uhhuh. This is embarrassing.
+how could I make patch applied to 2.6.4 to get all things from 2.6.7-mh1?
 
-It turned out that I wasn't running hcid at all. I commented it out
-since I thought it isn't necessary with hidd. I was wrong.
+Thanks
 
-Everything works fine now - no need for bthid. Thanks again for help. :)
-
--Vesa
--- 
-            · Vesa Halttunen - http://www.jormas.com/~vesuri/ ·
-
+Michal
 
 
 -------------------------------------------------------
