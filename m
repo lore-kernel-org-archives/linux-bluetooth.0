@@ -3,10 +3,10 @@ Subject: Re: [Bluez-devel] Thoughts about AVDTP support
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Aarti Kumar <akmr2000@yahoo.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040605042247.96059.qmail@web52307.mail.yahoo.com>
-References: <20040605042247.96059.qmail@web52307.mail.yahoo.com>
+In-Reply-To: <20040604215717.30223.qmail@web52309.mail.yahoo.com>
+References: <20040604215717.30223.qmail@web52309.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1086430086.16316.49.camel@pegasus>
+Message-Id: <1086393485.16316.26.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,30 +18,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 05 Jun 2004 12:08:06 +0200
+Date: Sat, 05 Jun 2004 01:58:06 +0200
 
 Hi Aarti,
 
-> I agree that we have to keep the provision of recovery
-> and reporting functionality from the start.
+> The bluetooth avdtp specification is complex but the
+> if we are dealing with the basic functionality part
+> itself and it reduces a lot of complexities. 
 
-and there are some more, like multiplexing etc.
+you can leave reporting and recovery out, but it will be still complex
+and at some point you must include these features. So we must think
+about them from the start.
 
-> The PSM value for AVDTP is 17 and the order of
-> creation will determine the channel type -signal or
-> media transfer. 
+> What makes you think that avdtp is using Multiple
+> l2cap channels between same devices with same PSM - is
+> it beacuse of the siganlling link and data transfer
+> link ?
 
-The PSM for AVDTP is 0x19 and this is 25 decimal ;)
+As I read the specification, between two devices there is always one
+signal channel (and only one). This is the first L2CAP channel opened on
+the PSM 25. It also assigns the roles of initiator and acceptor. For the
+streaming between two endpoints it has to open at least another L2CAP
+channel for the media transport. This channel uses the same PSM and so
+the order of the L2CAP channel creation tells us what they are for.
 
-> For the socket type I think it should be
-> SOCK_SEQPACKET.
+> Using AVDTP as kernel module is good idea (much better
+> than using it at user space).
 
-Any other comments about the socket type?
+No. Doing something in userspace is almost better and easier, but with
+the definition of the streaming endpoints a kernel based socket design
+makes sense.
 
-> Yes I do have initial part of the code that I can
-> share but have nothing with SBC codec.
+> I think the connection oriented socket is required for
+> avdtp. Its also mentioned in the specification.
 
-Please send it over, so I can see if I can integrate it or not.
+For the L2CAP connection, yes, but I was asking for the socket type of
+our AVDTP socket. I think it should be SOCK_DGRAM or SOCK_SEQPACKET.
+
+> I would like to help with coding and testing if it
+> fine with you. I had started with the AVDTP
+> implementation, but it was at the user level only and
+> I have not much experience coding at kernel level.
+
+How far did you came? Any code that you can share with us?
+
+Do anyone started implementing the SBC audio codec? The specification of
+this codec is in the A2DP document and the test document contains sample
+*.sbc files and a DOS decoder and encoder (works fine with wine). I like
+to see an open source implementation of SBC for FFMPEG or a separate
+library.
 
 Regards
 
