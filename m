@@ -1,45 +1,66 @@
-Return-Path: <vojtech@suse.cz>
-Date: Sun, 15 Aug 2004 15:10:09 +0200
-From: Vojtech Pavlik <vojtech@suse.cz>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: cijoml@volny.cz, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] MS multimedia keys
-Message-ID: <20040815131009.GA1752@ucw.cz>
-References: <411EF7C7.10900@hotmail.com> <200408151040.00772.cijoml@volny.cz> <200408151132.15730.cijoml@volny.cz> <1092565721.4375.37.camel@pegasus>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+From: Paul Ionescu <i_p_a_u_l@yahoo.com>
+Message-ID: <pan.2004.08.14.22.56.57.538948@yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1092565721.4375.37.camel@pegasus>
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Need help with PAND between 2  linux boxes
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sun, 15 Aug 2004 01:56:58 +0300
 
-On Sun, Aug 15, 2004 at 12:28:41PM +0200, Marcel Holtmann wrote:
+Hi,
 
-> Hi Michal,
-> 
-> > and when pressed this is sent into dmesg:
-> > 
-> > Eigene Dateien
-> > keyboard.c: can't emulate rawmode for keycode 253
-> > keyboard.c: can't emulate rawmode for keycode 253
-> > Eigene Bilder
-> > keyboard.c: can't emulate rawmode for keycode 254
-> > keyboard.c: can't emulate rawmode for keycode 254
-> > Eigene Musik
-> > keyboard.c: can't emulate rawmode for keycode 255
-> > keyboard.c: can't emulate rawmode for keycode 255
-> > Messenger
-> > keyboard.c: can't emulate rawmode for keycode 252
-> > keyboard.c: can't emulate rawmode for keycode 252
-> > Abmelden
-> > keyboard.c: can't emulate rawmode for keycode 248
-> > keyboard.c: can't emulate rawmode for keycode 248
-> 
-> this problem is because in drivers/char/keyboard.c the x86_keycodes[256]
-> array miss the line for the last 16 keycode translations.
-> 
-> Vojtech, any reason why they are not filled in?
- 
-Because rawmode only can express 240 different scancodes.
+I have two linux boxes with FedoraCore 2 installed on both.
+Both of them have USB bluetooth adapters.
+I have tried to connect them in a NAP - PANU config, as indicated in
+http://bluez.sourceforge.net/contrib/HOWTO-PAN, but something is not
+working and I can't figure out what.
+Here are the details:
+service bluetooth start
+Then I check with hciconfig that both BT are UP.
+Then, on both computers I modprobe bnep.
+(one note here, ifconfig -a does not show any bnep0 at this moment)
+On both of them launch
+hcidump in separate windows to see what is going on. 
 
--- 
-Vojtech Pavlik
-SuSE Labs, SuSE CR
+On one I launch 
+pand --listen --role NAP -n --master
+and on the other
+pand -c 00:20:E0:73:EB:F7 -n --role PANU
+
+and after some messages in hcidump on both sides, I receive:
+pand[1431]: Bluetooth PAN daemon
+pand[1431]: Connecting to 00:20:E0:73:EB:F7
+pand[1431]: Connect to 00:20:E0:73:EB:F7 failed. Function not implemented(38)
+
+I tried both ways, but the behavior is the same.
+Then I tried on one side:
+strace pand --listen --role NAP -n --master
+but when I try to connect from the other side, nothing happens here.
+
+Do I miss something here ?
+
+Thanks,
+Paul
+
+
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
