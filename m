@@ -1,57 +1,44 @@
-Return-Path: <taylor@ms.usi.com.tw>
-Message-ID: <001101c47e79$57380c10$df0618ac@USI08844>
-From: "taylor" <taylor@ms.usi.com.tw>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Cc: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
-References: <004a01c47dd4$45be1380$df0618ac@USI08844> <1092071688.4564.20.camel@pegasus>
-Subject: Re: [Bluez-users] Adpat PAN profile to Samba Server
-Date: Tue, 10 Aug 2004 09:28:15 +0800
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="big5"
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Nicholas A. Preyss" <nalp@gmx.net>
+To: bluez-users mailing list <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] can't establish a connection
+Message-ID: <20040809214036.GB30443@gmx.net>
+References: <1091742606.6143.17.camel@localhost> <1091747064.6143.25.camel@localhost> <1091748133.20839.63.camel@pegasus> <200408060216.05030.cijoml@volny.cz> <1091810383.4570.14.camel@localhost>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1091810383.4570.14.camel@localhost>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 9 Aug 2004 23:40:36 +0200
 
-Dear Holtmann,
-   My plan is that:
-a. Set up an PAN master profile at Linux Site, then Configure interface of
-Samba Service as this PAN
-b. User(Linux or Window) access this Samba service if he/she have jointed
-this PAN group.
-   I am not sure if this usage could work, I still try to set up this usage.
-Have somebody ever do that as far as you know?
-If my understanding is right for Bluetooth PAN Profile, I think this usage
-is possible.
+On  0, ben4fun <ben_4_fun@freenet.de> wrote:
+> It's done.
+> After a reboot, I did  "mount -t usbdevfs none /proc/bus/usb" from the
+> USB-howto . It confirmed me it was already mounted. But it is strange
+> that /proc/bus/usb/device file is still empty.
+> 
+> Then I did "hciconfig hci0 up"
+> and I still have "Can't init device hci0. Connection timed out(110)"
 
-   The advantage for user is :
-a. One profile could do more thing, share file, transfer file, share
-printer.
-b. User is familiar with Windows neighbor.
+Check if hcid is running. If it is, try a more recent kernel. 
 
-Taylor Shieh
-Engineer, Bluetooth Module Section
-New Technology Development Dept., R&D Division
-Tel:886-49-2325876 Ext:2188
-
-
------ Original Message ----- 
-From: "Marcel Holtmann" <marcel@holtmann.org>
-To: "taylor" <taylor@ms.usi.com.tw>
-Cc: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
-Sent: Tuesday, August 10, 2004 1:14 AM
-Subject: Re: [Bluez-users] Adpat PAN profile to Samba Server
+nicholas
 
 
-Hi Taylor,
-
->    Yesterday, an idea come to my mind. I adpat the Bluez Profile to
-> Samba server. Really, it could work. User could share the file and
-> printer from Samba server. IT is a good solution for me. We doesn't
-> need the wire more at office.
-
-I don't get the point behind your email. Do you wanna say that using
-Samba services over BNEP is working fine for you or would you ask if
-such scenario is possible with BlueZ?
-
-Regards
-
-Marcel
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
