@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Microsoft  Mouse
+Subject: Re: [Bluez-users] Network Access Point - pairing problem
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jonathan Sass <jsass@magnifeye.com>
+To: "D.W." <sword@gmx.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <450E38B8-2D19-11D9-ADC1-0005027BA2B7@magnifeye.com>
-References: <450E38B8-2D19-11D9-ADC1-0005027BA2B7@magnifeye.com>
+In-Reply-To: <001201c4c128$5c9137d0$0300a8c0@supercomputer>
+References: <001201c4c128$5c9137d0$0300a8c0@supercomputer>
 Content-Type: text/plain
-Message-Id: <1099440358.7125.14.camel@pegasus>
+Message-Id: <1099440420.7125.16.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,35 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 03 Nov 2004 01:05:57 +0100
+Date: Wed, 03 Nov 2004 01:07:00 +0100
 
-Hi Jonathan,
+Hi Daniel,
 
-> I am trying to install the Microsoft Bluetooth mouse and keyboard.
+> I want to use bluez for a standalone network access point. All works
+> fine(pand or dund), the thing is that the pairing doesn't work at
+> first contact (client is a windows-pc). 
 > 
-> Using a custom built 2.6.8-1.521 with uinputs enabled and the latest 
-> bluetooth cvs.
+> So I have to establish a rfcomm-connection manually(from the server
+> side rfcomm connect 0 btad) first. This pairing works,  I disconnect
+> and then I am able to connect the client to the NAT.
 > 
-> The hardware I have is supported according to Marcel Holtmann's list of 
-> devices.
-> 
-> I do not know what to do to get it to work tho.
-> 
-> I can run a modinfo hidp. It shows I am using ver 1.0
-> 
-> I can "see" the mouse and keyboard when I do a scan.
-> I can "connect" using the -c <address> command
-> 
-> But I do not know what to do next.
-> 
-> I have been reading www.beuche.ch/comp/mx900/mx900_old.html
-> 
-> It  mentions looking for and loading uinput, but I cannot find any 
-> module to load.
-> I run bthid -d yet no log gets created.
+> Does anybody know what's wrong and what I can do to make the pairing
+> work without this manually initiated rfcomm-connnection ?
 
-using uinput and bthid is the old way. Try hidp kernel module and hidd
-from the latest bluez-utils.
+are we talking about security mode 2 or security mode 3? What kernel do
+you use?
 
 Regards
 
