@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050322121551.33023.qmail@web52408.mail.yahoo.com>
-From: jose <twblr@yahoo.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Bluetooth communication between devices running on linux
+Subject: Re: [Bluez-devel] About obexftp cross compile
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1ffb4b0705032306446b2edc2b@mail.gmail.com>
+References: <1ffb4b0705032306446b2edc2b@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1111589864.1916.0.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,34 +18,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Mar 2005 04:15:51 -0800 (PST)
+Date: Wed, 23 Mar 2005 15:57:44 +0100
 
-Hi,
+Hi Mike,
 
-Where do I get info on:
+>     This is my config script,
+> ./configure  --host=arm-linux --prefix=/usr/local/arm/3.3.2/arm-linux 
+> 
+>     The error is on line 179 , which is "FD_ZERO(&fdset);" Is this the
+> problem to ARM platiform? or
+> 
+> make[2]: Entering directory `/home/mike/elinux/app/obexftp-0.10.6/cobexbfb'
+> if /bin/sh ../libtool --mode=compile arm-linux-gcc -DHAVE_CONFIG_H -I.
+> -I. -I.. -I/usr/include -I.. -I../includes    -g -O2 -g -Wall
+> -Wmissing-declarations -Wmissing-prototypes -Wall -MT cobex_bfb.lo -MD
+> -MP -MF ".deps/cobex_bfb.Tpo" \
+>   -c -o cobex_bfb.lo `test -f 'cobex_bfb.c' || echo './'`cobex_bfb.c; \
+> then mv -f ".deps/cobex_bfb.Tpo" ".deps/cobex_bfb.Plo"; \
+> else rm -f ".deps/cobex_bfb.Tpo"; exit 1; \
+> fi
+>  arm-linux-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I/usr/include -I..
+> -I../includes -g -O2 -g -Wall -Wmissing-declarations
+> -Wmissing-prototypes -Wall -MT cobex_bfb.lo -MD -MP -MF
+> .deps/cobex_bfb.Tpo -c cobex_bfb.c  -fPIC -DPIC -o .libs/cobex_bfb.o
+> cobex_bfb.c: In function `cobex_handleinput':
+> cobex_bfb.c:179: error: impossible constraint in `asm'
+> make[2]: *** [cobex_bfb.lo] Error 1
+> make[2]: Leaving directory `/home/mike/elinux/app/obexftp-0.10.6/cobexbfb'
+> make[1]: *** [all-recursive] Error 1
+> make[1]: Leaving directory `/home/mike/elinux/app/obexftp-0.10.6'
+> make: *** [all] Error 2
+
+this is the wrong mailing list for an ObexFTP question. Use the OpenOBEX
+mailing list instead.
+
+Regards
+
+Marcel
 
 
-1. File/Data transfer between two linux desktops/PCs.
-
-2. File/Data transfer between a linux desktop and a
-handheld/Simputer/PDA running on linux.
-
-Thanks & Rgds,
-Jose
-
-
-		
-__________________________________ 
-Do you Yahoo!? 
-Yahoo! Small Business - Try our new resources site!
-http://smallbusiness.yahoo.com/resources/ 
 
 
 -------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+This SF.net email is sponsored by: 2005 Windows Mobile Application Contest
+Submit applications for Windows Mobile(tm)-based Pocket PCs or Smartphones
+for the chance to win $25,000 and application distribution. Enter today at
+http://ads.osdn.com/?ad_id=6882&alloc_id=15148&op=click
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
