@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1109664374.42242276c644b@mail.orbitel.bg>
-From: Todor Todorov <dr_doom@engineer.bg>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=windows-1251
-Subject: [Bluez-users] BNEP connection destroing :(
+From: Alain Volmat <avolmat@src.ricoh.co.jp>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] SDP service
+Message-ID: <20050301010048.GA32017@snoopy.src.ricoh.co.jp>
+References: <1109606794.17256.111.camel@pegasus> <20050301005541.32014.qmail@web60909.mail.yahoo.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20050301005541.32014.qmail@web60909.mail.yahoo.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,57 +18,68 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue,  1 Mar 2005 10:06:14 +0200
+Date: Tue, 1 Mar 2005 10:00:48 +0900
 
-Hi. I successful make a bnep connection between my laptop (with Slackware 10.0, kernel 2.4.26 with openmosix 
-patch and latest version of bluez libs and bluez pand, but i tryed also with other versions) and desktop PC with 
-Windows XP Pro, after few minutes  (not measured), on linux system the bnep0 interface was destroyed.
+Hi Michael,
 
-Attempting to reconnect with pand worked silently, but the bnep0 interface was not created. Workaround was to 
-remove and re-insert the dongle on my laptop, then i recreate the bnep connection again.
-I make a simple script for making bnep connection with windows machine:
+SDP and PAN packages are now depracated since their functionalities
+are now included into LIBS/UTILS.
+So now, only utils, libs and hcidump are necessary.
 
-#!/bin/sh
-hciconfig hci0 up
-#sdpd
-#sdptool add LAN
-echo "Making PAN connection"
-#pand --role PANU -c 00:10:60:A6:1C:30 --service GN
-pand --role PANU -c 00:10:60:A6:1C:30 --service PANU
-echo "Wait for connection"
-sleep 6
-echo "Bring UP BNEP"
-hcitool lst 00:10:60:A6:1C:30 0
-ifconfig bnep0 10.0.0.2 netmask 255.255.255.0
-ifconfig bnep0 up
-route add default gw 10.0.0.1
-rm /etc/resolv.conf
-touch /etc/resolv.conf
-echo "nameserver 10.13.0.1" > /etc/resolv.conf
+in your case, you shouldn't have the 2 followings packages:
+> > bluez-sdp-1.5-1.i386.rpm
+> > bluez-pan-1.1-1.i386.rpm
 
-This is my kernel config for bluez:
+Alain
 
-CONFIG_BLUEZ=y
-CONFIG_BLUEZ_L2CAP=y
-# CONFIG_BLUEZ_SCO is not set
-CONFIG_BLUEZ_RFCOMM=y
-CONFIG_BLUEZ_RFCOMM_TTY=y
-CONFIG_BLUEZ_BNEP=y
-# CONFIG_BLUEZ_BNEP_MC_FILTER is not set
-# CONFIG_BLUEZ_BNEP_PROTO_FILTER is not set
-# CONFIG_BLUEZ_CMTP is not set
-CONFIG_BLUEZ_HCIUSB=y
-# CONFIG_BLUEZ_USB_SCO is not set
-# CONFIG_BLUEZ_HCIUART is not set
-# CONFIG_BLUEZ_HCIBFUSB is not set
-# CONFIG_BLUEZ_HCIDTL1 is not set
-# CONFIG_BLUEZ_HCIBT3C is not set
-# CONFIG_BLUEZ_HCIBLUECARD is not set
-# CONFIG_BLUEZ_HCIBTUART is not set
-# CONFIG_BLUEZ_HCIVHCI is not set
-
-Help me to resolve this problem.
-Thank you in advance.
+* Ka Kin Cheung [Tue,  1 Mar 2005 at 08:55 +0800]
+<quote>
+> Hi Marcel!
+>     Does you mean that something is/are not needed to be installed, suc=
+h as the rpm of sdp and pan? And is it ok if I just installed utils, libs=
+ and hcidump?
+> Thx!
+> Michael
+> =20
+> Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Michael,
+>=20
+> > My config of bluez tools are as follows:
+> > bluez-utils-2.15
+> > bluez-libs-2.15
+> > bluez-sdp-1.5-1.i386.rpm
+> > bluez-pan-1.1-1.i386.rpm
+> > bluez-hcidump-1.18
+> > bluez-hciemu-1.1
+> > Is there any tool that have newer version than I've installed? Or
+> > is there any problem about the sdp/pan installation?
+>=20
+> the bluez-{sdp|pan} is included in bluez-{libs|utils} and thus you have
+> a screwed installation.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>=20
+>=20
+>=20
+> ---------------------------------
+> Yahoo! =E5=B7=A5=E5=85=B7=E5=88=97 - =E5=85=A7=E7=BD=AE=E9=98=B2=E6=AD=A2=
+=E5=BD=88=E5=87=BA=E8=A6=96=E7=AA=97=E5=B7=A5=E8=83=BD=EF=BC=81
+</quote>
 
 
 -------------------------------------------------------
