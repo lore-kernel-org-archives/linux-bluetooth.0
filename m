@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <200406140949.i5E9n0rE002726@news01.csr.com>
-To: list bluez <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluepin 
-In-reply-to: "Gene Imes"'s message of "Sat, 12 Jun 2004 17:56:21 CDT."
-             <1087080981.21738.3.camel@tr1a.ozob.net>
-From: Peter Stephenson <pws@csr.com>
+Message-Id: <4.3.2-J.20040613230727.0638bee8@emi.s-direct.com>
+To: bluez-users@lists.sourceforge.net
+From: Tetsuo Shiraishi <tetsu@s-direct.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="ISO-2022-JP"
+Subject: [Bluez-users] hcid pin problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,39 +15,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Jun 2004 10:49:00 +0100
+Date: Mon, 14 Jun 2004 00:08:14 +0900
 
-Gene Imes wrote:
-> Anyone know how to fix this:
-> 
-> gene@tr1a:~> bluepin
-> Xlib: connection to ":0.0" refused by server
-> Xlib: No protocol specified
+Hello,
 
-It's probably some kind of authorization problem.  Are you able
-to
+I could not get pin_helper to work, 
+since I upgraded to bluez-utils-2.7 from bluez-utils-2.3.
 
-xauth merge ~/.Xauthority
+Using system
+- sh4-linux
+- patch-2.4.24-mh5.gz 
+- bluez-libs-2.7.tar.gz 
+- bluez-utils-2.7.tar.gz 
+- pin_helper in hcid.conf
 
-?
+I modified bluez-utils-2.7 as follows, so it work fine.
 
--- 
-Peter Stephenson <pws@csr.com>                  Software Engineer
-CSR Ltd., Science Park, Milton Road,
-Cambridge, CB4 0WH, UK                          Tel: +44 (0)1223 692070
+--- bluez-utils-2.7/hcid/security.c	Sun May  9 19:39:43 2004
++++ bluez-utils-2.7_mod/hcid/security.c	Sun Jun 13 22:53:29 2004
+@@ -236,7 +236,7 @@
+ {
+ 	pin_code_reply_cp pr;
+ 	struct sigaction sa;
+-	char addr[12], str[255], *pin, name[20];
++	char addr[18], str[255], *pin, name[20];
+ 	FILE *pipe;
+ 	int ret, len;
+ 
+Thanks,
 
+Tetsuo 
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
+//
+//　　　白石哲夫　tetsu@s-direct.com
+//　　　　　　　　tshiro@arion.ocn.ne.jp
+//
 
 
 
