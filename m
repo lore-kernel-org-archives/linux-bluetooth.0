@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Palm connection problems.
+Subject: Re: [Bluez-users] Multihop question
 From: Marcel Holtmann <marcel@holtmann.org>
-To: johan@vandenbrande.com
+To: libo <libo@semit.com.cn>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <64925.213.118.22.110.1091145636.squirrel@webmail.fusebox.be>
-References: <64925.213.118.22.110.1091145636.squirrel@webmail.fusebox.be>
+In-Reply-To: <20040730104427.19ffd026.libo@semit.com.cn>
+References: <41090B25.6090806@xmission.com>
+	 <1091112872.12651.50.camel@pegasus>
+	 <20040730104427.19ffd026.libo@semit.com.cn>
 Content-Type: text/plain
-Message-Id: <1091179050.12651.174.camel@pegasus>
+Message-Id: <1091176264.12651.171.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +20,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Jul 2004 11:17:30 +0200
+Date: Fri, 30 Jul 2004 10:31:04 +0200
 
-Hi Johan,
+Hi,
 
-> I'm facing a problem connecting my Palm|T to my linux box.
-> 
-> I've installed BlueZ and can run sdptool to see OPUSH services on my Palm.
-> Also, I'm able to bind the device etc. However, when I try to connect via
-> network (pppd), I get the following error:
-> 
-> Jul 30 01:37:24 questor dund[1032]: New connection from 00:07:E0:0E:00:3A
-> Jul 30 01:37:24 questor pppd[1033]: pppd 2.4.1 started by root, uid 0
-> Jul 30 01:37:24 questor pppd[1033]: Failed to open /dev/rfcomm0: No such
-> device
+> I need to implement multihop using bluetooth devices.
+> The topology is as follows:
+> [Ethernet]---A---B---C
+> BT device C can visit Ethernet through B and A.
+> I want to know if I can implement multihop using BlueZ and what I shall do.
 
-the problem is simple. There is no /dev/rfcomm0 device. What kernel
-version do you use? What version of bluez-libs and bluez-utils do you
-installed?
+if you use BNEP as the underlaying protocol, you can use IP on top of it
+and this is all about IP routing.
 
 Regards
 
