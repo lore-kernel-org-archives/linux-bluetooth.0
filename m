@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] RFCOMM support for nonblocking sockets
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Collin R. Mulliner" <collin@betaversion.net>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040601183206.7f99aacf@coredump>
-References: <20040601183206.7f99aacf@coredump>
-Content-Type: text/plain
-Message-Id: <1086108068.4702.67.camel@pegasus>
+From: "Collin R. Mulliner" <collin@betaversion.net>
+To: bluez-devel@lists.sourceforge.net
+Message-Id: <20040601183206.7f99aacf@coredump>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-devel] RFCOMM support for nonblocking sockets
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,25 +15,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Jun 2004 18:41:11 +0200
+Date: Tue, 1 Jun 2004 18:32:06 +0200
 
-Hi Collin,
+Hi,
 
-> does anybody know if O_NONBLOCK is supported for RFCOMM?
-> 
-> I allways get "errno == 11" and 
-> perror tells me "Resource temporarily unavailable"
-> 
-> If I don't do: fcntl(sock, F_SETFL, O_NONBLOCK) the code works fine.
+does anybody know if O_NONBLOCK is supported for RFCOMM?
 
-the non-blocking support should work. What kernel version do you? Show
-us your code.
+I allways get "errno == 11" and 
+perror tells me "Resource temporarily unavailable"
 
-Regards
-
-Marcel
+If I don't do: fcntl(sock, F_SETFL, O_NONBLOCK) the code works fine.
 
 
+thanks ... Collin
+
+-- 
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+USS Enterprise Bumperstricker: Our other starship separates into 3
+pieces! 
 
 
 -------------------------------------------------------
