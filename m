@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Epox Barton keyboard: HID create error 53
+Subject: Re: [Bluez-users] Motorola v600 and Obex problems
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Matthias Thomae <bluez@thomae-privat.de>
+To: Alexandre Boeglin <alex@boeglin.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40CF4B17.2010806@thomae-privat.de>
-References: <40CDE18C.70703@thomae-privat.de>
-	 <1087255678.13792.51.camel@pegasus>  <40CE96A8.3020407@thomae-privat.de>
-	 <1087284859.13792.67.camel@pegasus>  <40CEC020.6050107@thomae-privat.de>
-	 <1087292887.13792.81.camel@pegasus>  <40CF4B17.2010806@thomae-privat.de>
+In-Reply-To: <20040615222333.GA18668@boeglin.org>
+References: <20040615222333.GA18668@boeglin.org>
 Content-Type: text/plain
-Message-Id: <1087339715.13792.104.camel@pegasus>
+Message-Id: <1087339402.13792.101.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,28 +18,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Jun 2004 00:48:35 +0200
+Date: Wed, 16 Jun 2004 00:43:22 +0200
 
-Hi Matthias,
+Hi Alexandre,
 
-> > someone has to fix the HID parser to get it working with the keyboard
-> > and the presenter from EPoX. I am a little bit busy in getting the boot
-> > protocol support ready, so that we can at least include HID boot support
-> > into the mainline kernel. The full report protocol support has to wait
-> > until the kernel gets its device independent HID support.
+> My current system is a Debian sid, running a stock 2.6.6 kernel.
 > 
-> Alright, thank you meanwhile.
-
-feel free to investigate and send me a patch.
-
-> > Please do so. I want to compare it with my devices. The keyboard looks
-> > the same as mine. It seems they only choosed a newer CSR firmware.
+> My Bluetooth USB dongle is a noname with a CSR chip
+> (http://www.kabiloo.fr/boutique/telephonie/view.php?ref=USBDONGLE)
+> Vendor Id: 0a12
+> Product Id: 0001
+> Revision Number:  5.25
 > 
-> Hopefully a better one ;)
+> Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+> Class: 0x000100
+> HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+> Manufacturer: Cambridge Silicon Radio (10)
+> 
+> My phone is actually a Motorola v525 flashed with the latest v600
+> firmware (the hardware is globally the same).
+> 
+> When transferring file from or to the phone using Obex Push, (with
+> obexftp, or gnome-bluetooth), the speed is generally around 2 or 3
+> kilobytes per second, which is really slow. I changed the preffered
+> packet type from DM1 to DH5, but it didn't changed anything...
+> 
+> Could someone tell me how to reach better performances? or what step I
+> must go through to find where the problem could be?
 
-I think my EPoX keyboard and mouse were a prototype and this is why I
-had a different build id. The SPD records and the HID descriptor are the
-same.
+leave all packet types on, because the link manager should really choose
+what packet is will use. Allowing different types for a connection is in
+general very senseless.
+
+Your bandwith depends on the usage of the HCI on the phone side and how
+fast the microcontroller of the phone is. Another point is the size of
+the RFCOMM buffer and how good and fast their stack is.
 
 Regards
 
