@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Nokia SU-1B digital pen
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Edd Dumbill <edd@usefulinc.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1086618157.32217.54.camel@saag>
-References: <1086618157.32217.54.camel@saag>
-Content-Type: text/plain
-Message-Id: <1086626231.28514.6.camel@pegasus>
+From: David Mackie <d.mackie@ru.ac.za>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Can you spoof/forge Bluetooth Devices/Address?
+Message-ID: <20040607160324.GA97052@rucus.ru.ac.za>
+References: <E320A8529CF07E4C967ECC2F380B0CF90140382A@bsebe001.americas.nokia.com> <1086595869.12811.28.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1086595869.12811.28.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,31 +17,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 07 Jun 2004 18:37:12 +0200
+Date: Mon, 7 Jun 2004 18:03:24 +0200
 
-Hi Edd,
-
-> I just succeeded in getting one of these pens paired with Linux, running
-> BlueZ.  Here's a write-up of what I did:
-> http://usefulinc.com/edd/blog/contents/2004/06/07-nokia-su-1b/read
+On Mon 2004-06-07 (10:11), Marcel Holtmann wrote:
+>
+> However David mentioned he wants to talk to a phone and right now I
+> haven't seen any phone with PAN or UPnP. To support legacy devices you
+> need a distributed SDP database (you must keep it up-to-date) and use
+> somekind of tunneling for the RFCOMM channels. The RFCOMM tunnel is very
+> easy to achieve. It is a simple mapping from a TCP stream to a RFCOMM
+> stream. You can also map it to different channel numbers on each side.
+> The real problem here is the SDP database. Think about it.
 > 
-> I basically made a hacky misuse of dund to emulate the modem of a
-> cellphone, which the pen needs to contact in order to get
-> manuf/model/version information.  The writeup contains a link to the
-> hack.
-> 
-> After pairing, it works fine with regular OBEX PUSH.
 
-this sounds great. Actually I can't spend any additional money for such
-toys, but I will put it on my must-have list ;)
+Hi,
 
-Please make a "hcitool info ..." for me.
+You are right in that we are wanting this to work with legacy devices, and
+therefore there can be no modification to the phone's bluetooth stack. For
+all intesnts and purposes the phone must think it communicating with the PC,
+or the applications on the phone at least. I had thought that intial device
+discovery would be the first and hardest problem to get around. Or am I
+missing somthing in SDP? How to get a phone to talk to a repeater intailly
+is the problem I think I will have. And that was why I was hopping to spoof
+the PC by the repeater. Thanks for help and suggestions so far.
 
-Regards
-
-Marcel
-
-
+-dave
 
 
 -------------------------------------------------------
