@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PPP & Smartphones
+Subject: Re: [Bluez-users] problems establishing connection to Cellular
+	phone
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Cc: victor.shcherbatyuk@tomtom.com
-In-Reply-To: <Pine.LNX.4.44.0503250940070.12685-100000@antilope>
-References: <Pine.LNX.4.44.0503250940070.12685-100000@antilope>
+In-Reply-To: <1111737665.9400.2.camel@tux.homenetwork>
+References: <1110766661.9456.4.camel@tux> <1110795678.8158.46.camel@pegasus>
+	 <1110802026.9167.11.camel@tux>  <1110802408.629.3.camel@pegasus>
+	 <1110832829.9705.5.camel@tux>  <1110833972.629.30.camel@pegasus>
+	 <1111737665.9400.2.camel@tux.homenetwork>
 Content-Type: text/plain
-Message-Id: <1111751518.9195.65.camel@pegasus>
+Message-Id: <1111751143.9195.57.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,28 +22,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 25 Mar 2005 12:51:58 +0100
+Date: Fri, 25 Mar 2005 12:45:43 +0100
 
-Hi Victor,
+Hi Tamer,
 
-> Does anyone have experience running PPP through DUN profile of a Windows 
-> Mobile smartphone? The problem I encountered is that when PPP connection 
-> is up and running and the phone receives an incoming call it sends RING 
-> over the RFCOMM channel used by PPP and if you pick up and then hang up it 
-> also sends NO CARRIER over the same channel. I have feeling this $%^&s up 
-> PPP deamon, cause after this it does not work anymore, it also does not detect any problems, so you have to kill it. Worse than that, after 
-> killing pppd, the phone remains in some weird state where it ignores any AT's 
-> sent to it, so needs to be rebooted...
-> I had this with Qtek's and Motorola's, the problem with weird state after 
-> killing pppd was solved for motorola's by using modem and crtscts in 
-> ppp options, but it changed nothing for Qtek's.
-> 
-> Is sending RING and NO CARRIER over RFCOMM used by PPP (when ppp is 
-> active) is a part of protocol?
+> I want you to thank very much for your support and help you regarded
+> me making a bluetooth connection to my device. However, I am asking
+> myself why I can establish only as the user "root" a stable bluetooth
+> connection. For me, with a usual useraccount would be more interisted
+> to establish connections. 
 
-I never looked at the Windows Smartphones, because I don't have one of
-these. Do these phones run the Windows Bluetooth stack or the stack from
-Widcomm?
+you can establish L2CAP and RFCOMM socket connections as normal user.
 
 Regards
 
