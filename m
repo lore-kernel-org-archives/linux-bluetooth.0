@@ -2,13 +2,14 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Bluetooth on a MIPS-System
 From: Marcel Holtmann <marcel@holtmann.org>
 To: leidenfrost@corscience.de
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41654062.5050009@corscience.de>
+Cc: martin f krafft <madduck@madduck.net>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <416536BA.3080901@corscience.de>
 References: <41651D72.7040806@corscience.de>
-	 <1097147273.7325.26.camel@pegasus>  <41652A40.4080209@corscience.de>
-	 <1097152912.7325.30.camel@pegasus>  <41654062.5050009@corscience.de>
+	 <1097147273.7325.26.camel@pegasus>
+	 <20041007114224.GA9849@cirrus.madduck.net> <416536BA.3080901@corscience.de>
 Content-Type: text/plain
-Message-Id: <1097154841.7325.36.camel@pegasus>
+Message-Id: <1097154674.7325.32.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,36 +21,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 07 Oct 2004 15:14:01 +0200
+Date: Thu, 07 Oct 2004 15:11:14 +0200
 
 Hi Thomas,
 
-> > the kernel modules are part of the Linux kernel you use on your MIPS
-> > system. So you need a Linux kernel compiled for MIPS with activated
-> > Bluetooth subsystem.
+>  > modprobe takes the name of a module, not the filename.
 > 
-> I already had this kernel, but without doing "make modules" I can look 
-> for them a long long time... ;-)
+> you're right, that was a little mistake by my own. Now it says this:
+> (I've absolutely no idea what's going wrong here)
 > 
-> Now I created the following modules and loaded them on target via modprobe:
-> -bluez
-> -l2cap
-> -hci_vhci
-> -hci_uart
-> -hci_usb
-> 
-> Doing hcitool scan now results: Device is not available: Success
-> So I guess that not all neccessary modules are loaded, right?
+> # modprobe l2cap
+> Using /lib/modules/2.4.21/l2cap.o
+> insmod: unresolved symbol malloc
+> insmod: unresolved symbol putchar
+> insmod: unresolved symbol free
+> insmod: unresolved symbol perror
+> insmod: unresolved symbol parser
+> insmod: unresolved symbol get_proto
+> insmod: unresolved symbol cmtp_dump
+> insmod: unresolved symbol sdp_dump
+> insmod: unresolved symbol avdtp_dump
+> insmod: unresolved symbol stderr
+> insmod: unresolved symbol hidp_dump
+> insmod: unresolved symbol bnep_dump
+> insmod: unresolved symbol hcrp_dump
+> insmod: unresolved symbol rfcomm_dump
+> insmod: unresolved symbol raw_dump
+> insmod: unresolved symbol _gp_disp
+> insmod: unresolved symbol printf
+> insmod: unresolved symbol fwrite
+> modprobe: failed to load module l2cap
 
-you may also need a USB host controller driver. I don't know which to
-use for your system. Is it PCI based? If yes, post the output of lspci.
-
-> > So what does "find /lib/modules/ | grep bluetooth" say?
-> 
-> This results nothing, just the # again.
-
-This is wrong unless you copied the BlueZ modules somewhere else by
-hand.
+do you tried to load the l2cap.o from bluez-hcidump into your kernel?
 
 Regards
 
