@@ -1,15 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] D-BUS fixes for hcid
+Subject: Re: [Bluez-devel] question: what does this patch from snd-bt-sco
+	do?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@nokia.com>
-Cc: Achim Bohnet <ach@mpe.mpg.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040616141845.GA8921@kone>
-References: <20040616112702.GA898@kone> <20040616124541.GA8629@kone>
-	 <1087391183.4309.13.camel@pegasus> <200406161558.56578.ach@mpe.mpg.de>
-	 <20040616141845.GA8921@kone>
+To: Lars Grunewaldt <lgw@dark-reality.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <40D0CE71.2010208@dark-reality.de>
+References: <40A9E6CB.4010505@dark-reality.de>
+	 <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk>
+	 <40A9EE51.2080102@dark-reality.de> <1084881439.5833.108.camel@pegasus>
+	 <40AA11AB.6010307@dark-reality.de> <1084888843.4327.1.camel@pegasus>
+	 <40D0CE71.2010208@dark-reality.de>
 Content-Type: text/plain
-Message-Id: <1087399222.4309.26.camel@pegasus>
+Message-Id: <1087427168.4309.30.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,24 +23,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Jun 2004 01:06:08 +0200
+Date: Thu, 17 Jun 2004 01:06:15 +0200
 
-Hi Johan,
+Hi Lars,
 
-> > On debian, dbus-1-utils installs a xsession startup script
-> > that checks for use-session-dbus in /etc/X11/Xsession.options
-> > Therefore dbus daemon knows the $DISPLAY.
+> I hope you can remember the issue we had a few weeks ago about
+> snd-bt-sco/bt-headset stuff.
 > 
-> However, hcid uses the system D-BUS which knows nothing about the
-> session (system D-BUS and session D-BUS are run as two separate
-> processes). This is an interesting problem, because from a lowlevel
-> (BT-stack) standpoint we want to use the system bus, but from a higher
-> level (pin-code dialog) standpoint the session bus would be apropriate.
+> I'm right now moving it from alsa 1.0.3 to 1.0.5a and kernel 2.6.7, and
+> I want to get rid of this patch (as it seems you all don't like it).
 > 
-> It would be nice to know how the D-BUS designers have thought about
-> this kinds of problems.
+> But I still don't understand, and can't find out, what I have to do to
+> set the dubious "alternate" setting of the hci_usb you spoke of. I'm
+> totally lost here, and I hope you can help me out easily :)
+> 
+> I understand what it does, but I don't have *any* clue right now what I
+> have to do to set the usb alternate setting.
 
-feel free to come up with a solution for this.
+the alternate setting is right for one SCO channel and a voice setting
+of 0x0060.
+
+> - - parameter to hci_usb on module load or some other CL stuff?
+> - - changing something in the btsco userspace daemon that handles the
+> rfcomm/sco-stuff?
+> 
+> If you could just supply a short code snippet that shows how to handle
+> this stuff. Right now it does not look very wise to reduce support to
+> audio 0x0060, because it seems that not many headsets support that audio
+> encoding.
+
+This has nothing to do with the headset, because we are talking about
+the input coding and not the air coding.
+
+> As soon as this works again, I'll put a new patch together and make it
+> available.
+
+What kind of patch? We need dynamic alternate setting adjustment for the
+hci_usb driver. Nothing else.
 
 Regards
 
