@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Stephen Crane'" <steve.crane@rococosoft.com>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Qualification Testing
-Message-ID: <000401c314b7$e8efb4a0$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <1052304997.1379.535.camel@baroque.rococosoft.com>
+Subject: Re: [Bluez-devel] Qualification Testing
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: Daryl Van Vorst <daryl@wideray.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000c01c313f5$b57ae030$1a01010a@baked>
+References: <000c01c313f5$b57ae030$1a01010a@baked>
+Content-Type: text/plain
+Message-Id: <1052304997.1379.535.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -19,48 +20,40 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 7 May 2003 09:44:21 -0700
+Date: 07 May 2003 11:56:38 +0100
 
-Hey Steve,
+Hi Daryl,
 
-> >         1.) The SDP entry for the SDP server itself should have a 
-> > Language Base Attribute ID List (because there are text 
-> descriptions). 
-> > I'm not absolutely clear on whether or not it is mandatory, but it 
-> > would make the testers happy. Can an application add an 
-> attribute to 
-> > that record, or would sdpd have to be modified?
+On Tue, 2003-05-06 at 18:34, Daryl Van Vorst wrote:
+> Qualification failures/problems: (I can get tester logs for most of these
+> failures if they would be helpful.)
 > 
-> Should be fixed in CVS for sdpd. (However, I can't find out 
-> how the ISO 639 language name, e.g., 'en', is mapped to a 
-> UINT_16. I assumed 'e' is more significant.)
+> SDP:
+>         PASS! (for our purposes), but there were a few things of note:
+>         1.) The SDP entry for the SDP server itself should have a Language
+> Base Attribute ID List (because there are text descriptions). I'm not
+> absolutely clear on whether or not it is mandatory, but it would make the
+> testers happy. Can an application add an attribute to that record, or would
+> sdpd have to be modified?
 
-Great, thanks. I took a quick look and it appears that other people think
-the 'e' is more significant too. So the 16-bit code that other devices use
-is 0x656e.
+Should be fixed in CVS for sdpd. (However, I can't find out how the ISO
+639 language name, e.g., 'en', is mapped to a UINT_16. I assumed 'e' is
+more significant.)
 
-> >         2.) There appears to be a problem handling continuation 
-> > states. Handling continuation state is optional. We found 
-> that if the 
-> > querying device sends a maximum byte count of 100, the 
-> continutation 
-> > state worked fine. But if the querying device sent a maximum byte 
-> > count of 8, the continuation state doesn't work (the 
-> continuation flag 
-> > wasn't recognized in the next packet). I can dig up an 
-> example log if 
-> > it would help.
-> 
-> Yeah it would be good to get a log. I imagine 8-bytes is 
-> pretty close to the minimum size.
+>         2.) There appears to be a problem handling continuation states.
+> Handling continuation state is optional. We found that if the querying
+> device sends a maximum byte count of 100, the continutation state worked
+> fine. But if the querying device sent a maximum byte count of 8, the
+> continuation state doesn't work (the continuation flag wasn't recognized in
+> the next packet). I can dig up an example log if it would help.
 
-I'll forward the logs as soon as I get them.
+Yeah it would be good to get a log. I imagine 8-bytes is pretty close to
+the minimum size.
 
-We stumbled across this one accidentally. We didn't intend to test
-continuation states. But apparently the real test for continuation states
-uses a maximum byte count less than 8.
-
--Daryl.
+Steve
+-- 
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
 
 
