@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY21-F1269792B015AEB1770DB46DBB90@phx.gbl>
-From: "Luís Amaral" <suffas@hotmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Detecting RSSI without connecting
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41A5CEF7.8090209@csr.com>
+References: <qszactrj3c5.fsf@timepilot.gpcc.itd.umich.edu>
+	 <1099960170.29330.43.camel@pegasus>
+	 <qszu0rfnfil.fsf@mspacman.gpcc.itd.umich.edu>  <41A5CEF7.8090209@csr.com>
+Content-Type: text/plain
+Message-Id: <1101413514.6465.10.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Subject: [Bluez-users] Creating programs with Bluez Libraries..
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,23 +20,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Nov 2004 22:40:28 +0000
+Date: Thu, 25 Nov 2004 21:11:54 +0100
 
-Hello!
-My name is Luis Amaral and this is my first post to this mailing list.
-I am startting a project using some Bluetooth USB Dongles (concemptronic) 
-and i need to creat programs to communicate between them.
-How can i use the BlueZ libraries? Is it enought to include them in my 
-"main" program? If anyone have some simple example of a program using this 
-libraries to communicate between two dongles (or other bluetooth devides), 
-it may help me to get started is this subject.
-Thank you for the attention,
+Hi Steven,
 
-Luis Amaral.
+> >                                    If this device doesn't support it,
+> > can anybody recommend a device available in the US that does support
+> > RSSI on inquiry?
+> 
+> Modesty forbids.
 
-_________________________________________________________________
-Express yourself instantly with MSN Messenger! Download today it's FREE! 
-http://messenger.msn.click-url.com/go/onm00200471ave/direct/01/
+all CSR chips with HCI 18.x firmware support inquiry with RSSI as
+defined in the specification and without any bugs. So I said it ;)
+
+> Marcel's page at http://www.holtmann.org/linux/bluetooth/features.html
+> really needs updating to quote more features bits now that 1.2 devices
+> are starting to appear.
+
+I know, I know. Time is always against me :(
+
+Regards
+
+Marcel
+
 
 
 
