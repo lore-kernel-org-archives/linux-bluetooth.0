@@ -1,46 +1,89 @@
-Return-Path: <nils.faerber@kernelconcepts.de>
-Subject: Re: [Bluez-devel] Renaming USB HID driver
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
-To: Herr Philip Blundell <pb@nexus.co.uk>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Vojtech Pavlik <vojtech@suse.cz>, Greg Kroah-Hartman <greg@kroah.com>
-In-Reply-To: <1080142065.2648.39.camel@mill.nexus.co.uk>
-References: <1079963694.2663.247.camel@pegasus>
-	 <1080037332.7098.83.camel@localhost>
-	 <1080142065.2648.39.camel@mill.nexus.co.uk>
-Content-Type: text/plain
-Message-Id: <1080225946.7098.120.camel@localhost>
-Mime-Version: 1.0
-Date: Thu, 25 Mar 2004 15:45:46 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <4062C2F9.5090808@soft.uni-linz.ac.at>
+From: Simon Vogl <vogl@soft.uni-linz.ac.at>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [Bluez-devel] resetting usb bt device
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 25 Mar 2004 12:31:05 +0100
 
-Am Mi, den 24.03.2004 schrieb Philip Blundell um 16:27:
-> On Tue, 2004-03-23 at 10:22, Nils Faerber wrote:
-> > For example I am currently working on Linux for PDAs. Some of them can
-> > be attached to external keyboards, mostly serial. Having a cleanly
-> > abstracted HID layer would make it possible to have those properly
-> > supported. Currently this is done by a pretty ugly hack calling
-> > handle_scancode() or similar :(
-> I don't think this would actually help much for those keyboards.  As far
-> as I know, none of the common PDA keyboards speak HID; they all use some
-> custom serial protocol for event reporting.  You can avoid the gruesome
-> handle_scancode() stuff by injecting EV_KEY events into the input stack,
-> either via input_report_key() within the kernel, or via uinput from
-> user-space.
+hi,
+notice that sometimes the bluez stack runs into a state where I cannot
+connect rfcomm channels any more etc. To get into a sane mode of operatio=
+n,
+pulling and plugging the bt dongle helps normally.
 
-Ah, yes indeed, that make more sense.
-So pls ignore my post ;)
+As we build a system that will be hidden behind a wall, I need a software=
+-
+only solution to this. I tried to stop the bluetooth services as well as =
+hotplug,
+unload any dangling modules, then start hotplug and bluetooth services ag=
+ain and
+I send a hci_reset to the device.
 
-I was about almost about to start digging through HID parsing and
-thinking about emulating it...
+Unfortunately, this does not resolve my issues, but I get lots of submit =
+failures:
+Mar 25 07:59:46 wall6 kernel: Written 2000,2001 by Maxim Krasnyansky <max=
+k@qualcomm.com>
+Mar 25 07:59:46 wall6 kernel: sco_sock_connect: sk dedfe080
+Mar 25 07:59:46 wall6 kernel: sco_conn_ready: conn dfc92e00
+Mar 25 07:59:46 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for p=
+ipe 18200 is zero
+Mar 25 07:59:46 wall6 kernel: __tx_submit: hci0 tx submit failed urb f7e3=
+fe14 type 3 err -90
+Mar 25 07:59:47 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for p=
+ipe 18200 is zero
+Mar 25 07:59:47 wall6 kernel: __tx_submit: hci0 tx submit failed urb f7e3=
+fe14 type 3 err -90
+Mar 25 07:59:47 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for p=
+ipe 18200 is zero
+Mar 25 07:59:47 wall6 kernel: __tx_submit: hci0 tx submit failed urb f7e3=
+fe14 type 3 err -90
+Mar 25 07:59:47 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for p=
+ipe 18200 is zero
 
-> p.
-CU
-  nils faerber
+etc., as well as loads of other mysterious happenings.
 
--- 
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          D1 : +49-170-2729106
---
+Is there a proper way to reset this device other than soldering a paralle=
+l-port controlled
+power switch?
+
+SImon
+
+
+--=20
+_______________________________________________________________________
+Dr. Simon Vogl
+Institut f=C3=BCr Pervasive Computing, Johannes Kepler Universit=C3=A4t L=
+inz
+Altenberger Stra=C3=9Fe 69, A-4040 Linz, Austria
+
+Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
+mailto: vogl@soft.uni-linz.ac.at,  http://www.soft.uni-linz.ac.at/
+
+
+
+
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
