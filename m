@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42036A83.8090309@web.de>
-From: Andreas Millinger <andreas.millinger@web.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-devel] hciattach problem
+Subject: Re: [Bluez-devel] cross compiling bluez-utils
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <847626459@web.de>
+References: <847626459@web.de>
+Content-Type: text/plain
+Message-Id: <1107520269.6921.8.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,16 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 04 Feb 2005 13:28:51 +0100
+Date: Fri, 04 Feb 2005 13:31:09 +0100
 
-Hello,
+Hi Martin,
 
-I have also a Problem with hciattach. As written in a Thread befor a kill of hciattach causes a System freez. Also the System hangs, when I want to shutdown the System at shuting down PCMCIA. I have tested with different kernels an bluez-utils/lib versions. I have found out, that with kernel 2.6.10 and bluez-utils/lib 2.14 the problem isn't there. With patch mh1 it works also. But with patch mh2 or kernel 2.6.11-rc2 or with kernel 2.6.10 and utils/lib 2.15 the freez is also there. I have a 3com Version 3 PCMCIA Card.
+> does it make sense to change the line "sysconfdir='${prefix}/etc'" into "sysconfdir='${exec_prefix}/etc'" in the configure file? I found that useful while compiling the utils for an ARM platform. The /etc will be generated in the right place then.
 
-Best regards
+explain what the differences are. However the acinclude.m4 is a little
+bit more complex and there are other corner cases.
 
-Andreas
+Regards
 
+Marcel
 
 
 
