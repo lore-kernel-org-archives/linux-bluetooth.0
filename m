@@ -9,7 +9,7 @@ Cc: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200407251632.32162.cijoml@volny.cz>
+Message-Id: <200407251630.07865.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,10 +20,12 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 25 Jul 2004 16:32:32 +0200
+Date: Sun, 25 Jul 2004 16:30:07 +0200
 
-And you should better run hotplug
-apt-get install hotplug
+post into mailing list=20
+lsusb
+
+To see if your kernel see BT hub from Logitech
 
 Michal
 
