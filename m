@@ -1,28 +1,39 @@
-Return-Path: <James@superbug.demon.co.uk>
-Message-ID: <3F184AD5.5090709@superbug.demon.co.uk>
-Date: Fri, 18 Jul 2003 20:30:29 +0100
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
+Return-Path: <daryl@wideray.com>
+Errors-To: <daryl@wideray.com>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] RE: Qualification testing - rfcomm
+Date: Fri, 18 Jul 2003 12:19:32 -0700
+Message-ID: <002501c34d61$84afdc30$5796fea9@baked>
 MIME-Version: 1.0
-To: Daryl Van Vorst <daryl@wideray.com>
-CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
-Subject: Re: [Bluez-devel] Qualification testing - rfcomm
-References: <001501c3457d$18b63a10$1a01010a@baked>
-In-Reply-To: <001501c3457d$18b63a10$1a01010a@baked>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1058555551.31052.261.camel@pegasus>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Daryl Van Vorst wrote:
-> Marcel,
-> 
-> Finally got some results on those latest rfcomm changes for qualification.
-> Looks like there are a few more problems. :(  But we're close. :)
-> 
-Can you outline what hardware you are using to do the test.
-Is it:
-1) USB bluetooth adapters
-2) PCI bluetooth adapters
-3) PCMCIA bluetooth adapters
-4) Serial bluetooth adapters.
+Marcel,
 
-Cheers
-James
+> > Do you mean you tried the aclsession script and didn't see the same 
+> > send 5 frames, wait 20 sec, send 5 more etc problem?
+> 
+> the aclsession scripts produces this effect, but it also left 
+> the ACL link in some kind of buggy state. It must be some 
+> really stupid that I always overlook. The code looks correct 
+> to me and my Bluetooth 1.0b devices are working fine.
+
+Ok...  I guess we can leave it for now then. If it becomes a more serious
+issue I'll let you know.
+
+> > > Did the other patch helped?
+> > 
+> > We haven't tested it yet...  I was hoping for a resolution to the 
+> > above problem before I sent updates for evaluation.
+> 
+> It would be nice to know if the patch is enough for 
+> qualification, because I don't plan to integrate a session 
+> wide flow control.
+
+I'll get things ready for more testing. Will probably be able to give it a
+go next week sometime.
+
+-Daryl.
