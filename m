@@ -1,14 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
-Reply-To: tim@birdsnest.maths.tcd.ie
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Confessions of an ignoramus - what is all this PIN stuff?
-References: <412D99CA.5050209@nue.et-inf.uni-siegen.de> <200408271059.06005.tim@birdsnest.maths.tcd.ie> <412F22D7.9040908@csr.com>
-In-Reply-To: <412F22D7.9040908@csr.com>
+Message-ID: <412F22D7.9040908@csr.com>
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200408271327.45501.tim@birdsnest.maths.tcd.ie>
+To: tim@birdsnest.maths.tcd.ie
+CC: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Confessions of an ignoramus - what is all this PIN
+    stuff?
+References: <412D99CA.5050209@nue.et-inf.uni-siegen.de>
+    <200408261502.13690.tim@birdsnest.maths.tcd.ie>
+    <412E45FC.4070604@csr.com>
+    <200408271059.06005.tim@birdsnest.maths.tcd.ie>
+In-Reply-To: <200408271059.06005.tim@birdsnest.maths.tcd.ie>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,34 +22,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 27 Aug 2004 13:27:45 +0100
+Date: Fri, 27 Aug 2004 13:02:31 +0100
 
-On Friday 27 August 2004 13:02, Steven Singer wrote:
+Timothy Murphy wrote:
+> Which raises one very minor point -
+> how can one force two devices to re-pair?
 
-> > Which raises one very minor point -
-> > how can one force two devices to re-pair?
->
-> This is usually a user interface issue. Look for some option to forget
-> about a device.
->
-> If all else fails, delete the link key.
+This is usually a user interface issue. Look for some option to forget
+about a device.
 
-I thought of doing this,
-but decided that in view of my total ignorance of the subject
-it might be a little dangerous - bluetooth might never work again ...
+If all else fails, delete the link key.
 
-But regarding pairing, I was wondering about the probably mythical future
-in which one wanders through a shopping mall
-getting info on bargains on one's bluetooth phone.
-Will the phone have to pair with all these shops?
-Or can one download some info without pairing?
-
-
+	- Steven
 -- 
-Timothy Murphy  
-e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
-tel: +353-86-2336090, +353-1-2842366
-s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
+
 
 
 -------------------------------------------------------
