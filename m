@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BlueZ on iPAQ 2200 ???
+Subject: Re: [Bluez-users] How can I use Bluez with 460800 kbps
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
+To: Daniel Moraes <ra002890@itelefonica.com.br>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403131347.50697.cijoml@volny.cz>
-References: <200403131347.50697.cijoml@volny.cz>
+In-Reply-To: <4054022B.8090100@itelefonica.com.br>
+References: <4054022B.8090100@itelefonica.com.br>
 Content-Type: text/plain
-Message-Id: <1079350736.3405.19.camel@pegasus>
+Message-Id: <1079350483.3405.14.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,19 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 15 Mar 2004 12:38:56 +0100
+Date: Mon, 15 Mar 2004 12:34:43 +0100
 
-Hi Michal,
+Hi Daniel,
 
-> I would like to buy iPAQ 2200. I looked at handhelds.org and there is 
-> bluetooth for this device marked as non-working. Is there any progress on 
-> this device to get BT work?
+> I would like to know if anybody here could use bluetooth casira with the 
+> serial with speeds like 460800.
+> I have to configure linux serial?!? What program I can use to do that?!?
 
-this iPAQ generation is work in progress, but the Bluetooth chip in it
-is a Zeevo TC2001. Not a quit nice one, but it works. The problem I see
-is, that this chip only support H4 as transport protocol and I don't
-know if the automatic flow control really works. If not, you may get bit
-errors and loose your H4 stream.
+if you have a serial port that can do high speeds than you only have to
+give hciattach the right baud rate.
+
+> And How can I transmit bits via rfcomm?!? I get a tutorial, but it 
+> didn't worked well!!  Does anybody have a good tutorial, or a rapid 
+> solution for me?!?
+
+This is RFCOMM socket programming. Look at my latest slides or take a
+look at attest.c from the bluez-utils package.
 
 Regards
 
