@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <HVI9GX$IDS3gDUdf06VCb6ODUPlAa2l6e7HJtg5g8qTWg3_jM6V@uol.com.br>
-MIME-Version: 1.0
-Content-Type: text/plain;charset="iso-8859-1"
-From: "beatriz.hargrave" <beatriz.hargrave@uol.com.br>
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Bluetooth - USB adapters
+Subject: Re: [Bluez-users] Software caused connection abort
+From: Marcel Holtmann <marcel@holtmann.org>
+To: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <9140293f27.93f2791402@estudiants.urv.es>
+References: <9140293f27.93f2791402@estudiants.urv.es>
+Content-Type: text/plain
+Message-Id: <1080821403.2774.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,28 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu,  1 Apr 2004 15:46:09 -0300
+Date: Thu, 01 Apr 2004 14:10:03 +0200
 
-Hello everybody !
+Hi Albert,
 
-I am new in the list - sorry if my question is too basic. 
+> I'm using rh7.3 with kernel 2.4.24. 
+> I've installed bluez-libs-2.5, bluez-utils-2.5,
+> bluez-sdp1.5, bluez-pan1.1, buez-hcidump-1.8,
+> bluez-hciemu-1.0 and bluez-bluefw-1.0, and I have an
+> usb-dongle that I want to rfcomm with an rs232
+> adapter in a robot.
 
-I would like to know if there is a bluetooth-USB adapter for 
-Linux Red Hat 7.1, and where can I buy it (Internet or in 
-Brazil) . The adapters I have found so far are only for 
-Windows (Leadership and Apple). 
+what do "hciconfig -a" show?
 
-Thank you very much.
+Regards
 
-Beatriz.
+Marcel
 
-
-
- 
----
-Acabe com aquelas janelinhas que pulam na sua tela.
-AntiPop-up UOL - =C9 gr=E1tis! 
-http://antipopup.uol.com.br
 
 
 
