@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Message-id: <d6795d5190.d5190d6795@estudiants.urv.es>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Subject: [Bluez-users] PAN
+Subject: Re: [Bluez-users] keys under 2.6.5 and bthid
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200404200044.02565.cijoml@volny.cz>
+References: <200404200032.51458.cijoml@volny.cz>
+	 <1082414314.4403.84.camel@pegasus>  <200404200044.02565.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1082415057.4403.87.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,27 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 20 Apr 2004 10:48:23 +0200
+Date: Tue, 20 Apr 2004 00:50:58 +0200
 
-Hello all!!
+Hi Michal,
 
-I'm sorry for my lasts postings, I didn't know how
-to ask questions and I started annoying you, I hope
-now I'll do it in the right way (not changing the
-subject!!).
+> > as the error says, this is a XFree86 bug and not a kernel bug ;)
+> 
+> Hmmm but I don't understand, why this doesn't happens under 2.4?
 
-Well, I already solved the problem with rfcomm, and
-now I'm trying to set up a PAN between two Belkin
-USB dongles. The thing is, when I have both USB
-plugged into my computer, I just can get one of them
-UP RUNNING, the other one is not possible to
-initialize, so it continues with DOWN, I want to
-create the PAN but I only have one computer to test
-it. Is this possible to do? 
+in 2.6 the input subsystem is fully integrated and it now handles more
+than USB mice and keyboards. Even hardware components like PS/2 must go
+through the input subsystem to deliver their events.
 
-Thank you very much!!
+Regards
 
-Albert
+Marcel
+
 
 
 
