@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Armin Bauer <armin.bauer@desscon.com>
-To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Rfcomm Use Count
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daryl Van Vorst <daryl@wideray.com>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000c01c49c4a$ca42b9a0$1a01010a@baked>
+References: <000c01c49c4a$ca42b9a0$1a01010a@baked>
 Content-Type: text/plain
-Message-Id: <1095586945.4389.11.camel@azrael>
+Message-Id: <1095411534.3280.17.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] configure.in question
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,44 +18,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 19 Sep 2004 11:42:25 +0200
+Date: Fri, 17 Sep 2004 10:58:54 +0200
 
-Hi,
+Hi Daryl,
 
-im one of the multisync devs. as you probably know, we are using your
-bluetooth libraries in our application.
+> I have a simple way to reproduce at least part of this bug. I don't have an
+> up-to-date x86 machine to try this on, but I suspect you'll see the same
+> behaviour:
+> 
+> 1. Compile and run the attached code on one machine
+> 2. Connect to it from another machine using: rctest -n -P1 <bd_addr>
+> 3. Hit ctrl-c on rctest
+> 4. Hit ctrl-c on bzt (or whatever you called the compiled code)
+> 5. lsmod and look at the rfcomm use count.
+> 
+> I think the problem stems from rfcomm_cleanup_listen() and
+> bluez_accept_dequeue(). Bluez_accept_dequeue() won't return the socket if it
+> is in the closed state, and so rfcomm_cleanup_listen() can't fully cleanup.
+> 
+> And if accept is called before rfcomm_cleanup_listen(), then (I think) the
+> socket will be unlinked from the accept queue (by accept) but not killed,
+> and so also will not get cleaned up.
+> 
+> Things appear to work if you reverse the order of steps 3 and 4.
 
-Up until now we used this in a configure.in to detect the bluetooth
-libraries:
+I can verify that this bug exists even in a 2.6 kernel. There is no need
+to execute step 4, because the missing decrementing of the use count is
+already there after step 3. And I think the same problem will exists for
+the L2CAP module. Please verify this for me.
 
-AC_CHECK_LIB(bluetooth,baswap,BLUETOOTH=1,BLUETOOTH=0)
-SDP=0
-AC_CHECK_LIB(sdp,sdp_list_free,SDP=1,BLUETOOTH=0)
-AC_MSG_CHECKING(for correct SDP lib version)
-AC_TRY_COMPILE([
-#include <bluetooth/sdp.h>
-#include <bluetooth/sdp_lib.h>
-],[sdp_record_t t;],AC_MSG_RESULT(yes),BLUETOOTH=0;AC_MSG_RESULT(no))
-AM_CONDITIONAL(BLUETOOTH,test "${BLUETOOTH}" = "1")
-if test "x${BLUETOOTH}" = "x0"; then
-  echo "Bluetooth is DISABLED. You must have bluez-libs and bluez-kernel
->= 2.3 and bluez-sdp >= 1.0-pre1."
-fi
-AC_DEFINE_UNQUOTED(HAVE_BLUETOOTH, ${BLUETOOTH},Defined if Bluetooth is
-enabled.)
+> I'd send you a patch if I had a simple one, but I don't know what the best
+> approach is. On solution may be to make bluez_accept_dequeue() always return
+> the socket regardless of state and then fix anything that calls
+> bluez_accept_dequeue() to handle the possibility of a closed socket being
+> returned.
 
-and src/Makefile.am
+At the moment I must admit that I have no idea how to fix this in a sane
+way. It seems that this bug is in there from the beginning and a wrong
+fix can cause unexpected side effects.
 
-libirmc_bluetooth_la_LIBADD = -lbluetooth -lsdp -lpthread
+I don't think that the problem is in rfcomm_sock_cleanup_listen(),
+because the wrong use count is already present after step 3. So when we
+close a connected DLC that is not accepted yet, we still have it on the
+accept queue then we have a problem. Maybe there is a bug in our state
+machine and this is not socket related.
 
-some time ago, the sdp library merged into the libbluetooth. Therefore
-this check will not detect this correctly anymore.
+Regards
 
-So i was wondering what would be the correct approach to detect if the
--lsdp is needed? Which version was the first version of libbluetooth
-that got rid of the libsdp?
+Marcel
 
-Armin
 
 
 
