@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
-From: "Christoph Torens" <c.torens@web.de>
-Content-Type: text/plain; format=flowed; delsp=yes; charset=iso-8859-15
-MIME-Version: 1.0
-Message-ID: <opsda220m9eocfdv@debian>
-Subject: [Bluez-users] l2cap question
+Subject: Re: [Bluez-users] Limit communication to serveral devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Philip Lawatsch <philip@lawatsch.at>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <412CED9A.2070405@lawatsch.at>
+References: <412C9803.6080306@lawatsch.at> <1093443880.537.0.camel@pegasus>
+	 <412CED9A.2070405@lawatsch.at>
+Content-Type: text/plain
+Message-Id: <1093464960.537.14.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,29 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Aug 2004 22:55:38 +0200
+Date: Wed, 25 Aug 2004 22:16:00 +0200
 
-Hi,
+Hi Philip,
 
-I have two questions:
-First:
-Is it possible to do a program communication just over l2cap?
-Without rfcomm/pand/dund.
-(Because after a very long time of tests, l2ping is the only
-thing that works with my USB host-controller chip / driver)
-If yes: Is there some small Tool I could use to test this?
-Perhaps read and write a string over l2cap.
+> > you must change the code of the accept routine in the RFCOMM server
+> > program that you are using.
+> 
+> This is not quite what I want. I'd like to limit this at lowest layer 
+> possible. Actually I'm starting to wonder that there seems to be 
+> _nothing_ to that, which, at least I think so, poses a potential 
+> security risk.
 
-Second:
-Does a Bluetooth USB-Dongle use isochronus USB transfers?
-And if yes: when or where?
-(Because the USB host driver seems to have problems with
-isoc. transfers and I'm not sure if this actaully is the
-error I am fighting with)
+you can of course limit this at HCI level, but then you must change the
+kernel code. There is somekind of filter on the HCI hardware level, but
+I am not quite sure if it can be used for that. Check the HCI part of
+the Bluetooth specification.
 
--- 
-Regards,
-Christoph
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
