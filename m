@@ -1,45 +1,29 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <nosve@libero.it>
+Date: Sun,  1 Feb 2004 20:20:50 +0100
+Message-Id: <HSF72Q$81AC435577A04D305EC3D9A6D38BF815@libero.it>
 Subject: Re: [Bluez-devel] [PATCH] Bluetooth address specific device
 	configuration
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "nosve@libero.it" <nosve@libero.it>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <HSF72Q$81AC435577A04D305EC3D9A6D38BF815@libero.it>
-References: <HSF72Q$81AC435577A04D305EC3D9A6D38BF815@libero.it>
-Content-Type: text/plain
-Message-Id: <1075678076.29899.0.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 02 Feb 2004 00:27:56 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+From: "nosve\@libero\.it" <nosve@libero.it>
+To: "marcel" <marcel@holtmann.org>
+Cc: "bluez-devel" <bluez-devel@lists.sourceforge.net>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Nosve,
+>>Hi Nosve,
+>>
+>>> BTW, hcid.conf with his options where is documented?=
 
-> Sure, why not! I have to start from parser.c ?
+>>
+>>would you apply for the job of writing the hcid.conf manpage?
+>>=
 
-the config file format is defined by parser.y and lexer.l
+>>Regards
+>>
+>>Marcel
+>>
+>>
+>>
 
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Sure, why not! I have to start f=
+rom parser.c ?
