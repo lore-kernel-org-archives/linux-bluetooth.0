@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de46576041208102112be98ee@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
-To: bluez-users@lists.sourceforge.net
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Peter K. Martin" <Peter.K.Martin@t-online.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAuD34QxxG80OHXRWPDw9h+QEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAuD34QxxG80OHXRWPDw9h+QEAAAAA@t-online.de>
+Content-Type: text/plain
+Message-Id: <1102515083.9988.76.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] HCI data bits corruption
+Subject: [Bluez-users] Re: BT unter SuSE 9.2
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,32 +20,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Dec 2004 23:51:26 +0530
+Date: Wed, 08 Dec 2004 15:11:23 +0100
 
-Hi Marcel,
-I am communicating between 2 d-link DBT-120 dongles. I am using the
-l2test for sending known data. I am using the DH packets to avoid FEC.
-I am measuring the link quality for various scenarios.
-I try and compare the link quality values to corresponding BER values
-as per the CSR article at your website. I use hcidump to record
-received bytes, but with link quality dropping as low as 180-170, I am
-unable to see any corrupted bits. With the l2test, the connection
-terminates even before the assigned bytes are sent with link quality
-going bad, but there is no data corruption. Could you tell me how I
-could get the corrupted data bits???I want some sort of error over air
-interface.
+Hi Peter,
 
-I am also looking to study the behaviour of HCI and LM firmware. Is
-this available at the Bluez or are the firmware well guarded by the
-manufacturers and not to be given to users.
+> the BT-device is always activate by the switch. I was really astonished that
+> it doesn't work under 9.2
 
-I also wanted to know if there are any bluetooth Test development kit,
-in hardware and software as we could build a BT device. Buying a
-Trainer/Analyser is a little over budget for my project.
+maybe you simply have to run YaST once and activate Bluetooth.
 
-Thanks,
-Regards,
-Manjunath
+> At the moment I'm working with Windows, also connected by the BT-device to
+> my network.
+
+That is a problem of course ;)
+
+> What have I to do, when it is not shown up in /proc/bus/usb/devices ???
+> In order to find out, I have to reboot with Linux.
+
+If it is not recognized by USB subsystem, then you have to activate it
+and in general this is somekind of ACPI magic.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
