@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1104257005.41d19fedcd4db@bluebottle.com>
-From: jago25_98 <jago25_98@bluebottle.com>
-To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Reason to not enable encryption
+From: "Simi Manuel" <roses_3@operamail.com>
+To: bluez-users@lists.sourceforge.net
+Message-Id: <20041228124352.D916D416118@ws5-2.us4.outblaze.com>
+Subject: [Bluez-users] bluetooth host required !!!!!
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +16,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Dec 2004 12:03:25 -0600
+Date: Tue, 28 Dec 2004 13:43:52 +0100
 
 
-I seem to remember someone saying something like "Don't enable
-encryption if you dual boot" but searched the list and could see why.
-Maybe there was another reason to not use encryption
+i am new to this subject,bluetooth.....i am trying to implement LMP,baseban=
+d and simulate Radio...So will i get the Bluetooth Host as a chip so that i=
+ can use the important layers of the protocol stack ...if so how abt its co=
+st and where is it available...
+--=20
+_____________________________________________________________
+Web-based SMS services available at http://www.operamail.com.
+=46rom your mailbox to local or overseas cell phones.
 
-Am I mistaken?
-
-Need to know because we have a new app born yesterday and it could
-become encryption only:
-
-http://www.symbianos.org/yabbse/index.php?board=2;action=display;threadid=7;start=15
-
-Thanks for jogging my memory
+Powered by Outblaze
 
 
 -------------------------------------------------------
