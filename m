@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: snd_bt_sco unknown symbol snd_hwdep_new
-Message-Id: <20050120234824.511ba0e4@coredump>
-In-Reply-To: <csq9pg$4gu$1@sea.gmane.org>
+From: Sebastian Roth <sebastian.roth@esk.fhg.de>
+Message-ID: <csq9pg$4gu$1@sea.gmane.org>
 References: <20050120225148.2bd40d9f@coredump>
-	<csq9pg$4gu$1@sea.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <20050120225148.2bd40d9f@coredump>
+Subject: [Bluez-devel] Re: snd_bt_sco unknown symbol snd_hwdep_new
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,26 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 23:48:24 -0800
+Date: Fri, 21 Jan 2005 08:08:32 +0100
 
-Hi Sebastian,
+Hi Collin!
 
-thanks this was it.
+snd-bt-sco needs the module snd-hwdep! You have to select a driver which
+uses snd-hwdep too. e.g. EMU10K1 (SB Live! & Audigy, E-mu APS)
 
-@SCO people
-Great job guys! Really what can I say, workd right away. Also you can
-add the Jabra BT250 to your list of supported devices (FYI: the volume
-can be changed on both ends).
+/usr/src/linux(-2.6.10-mh1)/sound/pci/Kconfig
+...
+config SND_EMU10K1
+	tristate "EMU10K1 (SB Live! & Audigy, E-mu APS)"
+	depends on SND
+	select SND_HWDEP
+	select SND_RAWMIDI
+	select SND_AC97_CODEC
+...
 
+Best regards,
+Sebastian
 
-... Collin
-
--- 
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-Never argue with an idiot. He brings you down to his level, then beats
-you with experience...
 
 
 -------------------------------------------------------
