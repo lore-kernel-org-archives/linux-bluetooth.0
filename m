@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41651D72.7040806@corscience.de>
-From: Thomas Leidenfrost <leidenfrost@corscience.de>
-Reply-To: leidenfrost@corscience.de
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Bluetooth on a MIPS-System
+Subject: Re: [Bluez-users] rfcommX and ppp
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rafael Vidal Aroca <rafael@3wt.com.br>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4162D886.8010406@3wt.com.br>
+References: <41629C2B.4040201@3wt.com.br>
+	 <1096991861.20349.73.camel@pegasus>  <4162D886.8010406@3wt.com.br>
+Content-Type: text/plain
+Message-Id: <1097055892.4937.3.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,55 +19,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 07 Oct 2004 12:41:54 +0200
+Date: Wed, 06 Oct 2004 11:44:52 +0200
 
-Hello BlueZ-Users,
+Hi Rafael,
 
-hope I can get a little help here after some days of vainly trying. 
-Currently I want to make my MIPS-System (AMD-Alchemy) working with 
-Bluetooth. Support for Bluetooth was implemented as a Module in Kernel 
-2.4.21 (without any patch).
+>        Well, everything is fine, but my ppp is configured to give a 
+> unique ip. You can check this from my peer file /etc/ppp/peers/dun that 
+> follows:
+> 
+>     # do not require auth
+> noauth
+> 
+> # do not use modem control lines we aren't using a real serial line
+> local
+> 
+> # do not determinate local ip from hostname
+> noipdefault
+> 
+> # usefull ARP proxing
+> proxyarp
+> 
+> # do not enable default route
+> nodefaultroute
+> 
+> # do not use ipx
+> noipx
+> 
+> # set disconnect timeout
+> idle 0
+> 
+> # local ip : remote ip
+> 10.0.0.1:10.0.0.2
+> 
+> # dns
+> ms-dns 10.0.0.1
+> 
+> # netmask
+> netmask 255.255.255.0
+> 
+> 
+>     Note the line: 10.0.0.1:10.0.0.2
+> 
+>     Can i change this to multiple ips? Because the problem is exactly 
+> this: all devices in the same ip...
 
-Then I crosscompiled the BlueZ-Libs & - Utils, and hcitool says:
+try to use 10.0.0.1: or other way around. Or you can define multiple
+options.rfcommX files in /etc/ppp/ and use a bridge. There are some ways
+to get this working.
 
-"Device ist not available: Address Family not supported by protocol", 
-altough there is a Bluetooth-USB-Dongle present or not. Before it was: 
-"Device ist not available: Success", so I think I am one step closer 
-than before.
+Regards
 
-lsmod says:
-
-Module Size Used by Not tainted
-saa7113 2540 0 (unused)
-sii164 2980 0 (unused)
-i2c-mb86290 1620 0 (unused)
-i2c-algo-mb86290 2828 1 [i2c-mb86290]
-i2c-dev 4428 0 (unused)
-i2c-core 15504 0 [saa7113 sii164 i2c-algo-mb86290 i2c-dev]
-ide-cs 3888 1
-hostap 96208 0
-ds 8012 1 [ide-cs]
-au1x00_ss 8084 1
-pcmcia_core 42176 0 [ide-cs ds au1x00_ss]
-
-
-but nothing like:
-
-l2cap, hci_usb, bluez
-
-doing # modprobe l2cap.o in /bin results:
-insmod: l2cap.o: no module by that name found
-modprobe: failed to load module l2cap.o
-
-although l2cap is there!
--rwxr-xr-x 1 root root 12400 Jan 1 2004 l2cap.o
-
-now I am at the end of my ideas and would thank you in advance for any 
-little hint!
-edit: the Bluetooth-Dongle is working properly on a x86-based 
-Linux-System, but not on my embedded-Mips-system...
-
-tom
+Marcel
 
 
 
