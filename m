@@ -1,48 +1,55 @@
-Return-Path: <h.frydrych@gmx.de>
-Message-ID: <40EFE1DA.4070709@gmx.de>
-Date: Sat, 10 Jul 2004 14:32:26 +0200
-From: Holger Frydrych <h.frydrych@gmx.de>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Logitech diNovo hub not recognized?
-References: <40EEC9CD.8030003@gmx.de> <1089396942.22528.10.camel@pegasus>	 <40EF0F10.8050302@gmx.de> <1089413516.13519.16.camel@pegasus>	 <40EFABCE.7000503@gmx.de> <1089449283.13519.35.camel@pegasus>	 <40EFB4C7.3040509@gmx.de> <1089451515.13519.49.camel@pegasus>
-In-Reply-To: <1089451515.13519.49.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] bluetooth.init enhance
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200407101251.18796.cijoml@volny.cz>
+References: <200407101216.11706.cijoml@volny.cz>
+	 <1089456352.13519.52.camel@pegasus>  <200407101251.18796.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1089457318.13519.56.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 10 Jul 2004 13:01:58 +0200
 
-Hi,
+Hi Michal,
 
-
-> actually I thought that you enabled auth and encrypt ;)
+> > this is nice, but there exists already a backport of HIDP for 2.4 and I
+> > submitted the HIDP support with boot protocol only for inclusion into
+> > 2.6 and my plan is to include the same into 2.4.28 and my patches if I
+> > found time to do this.
 > 
-> Setting auth and encrypt in hcid.conf or with hciconfig sets your device
-> into security mode 3 and this is not what you want. The basic security
-> mode should be 2 which means service level security. I explained this
-> some times, so check the mailing list archive or the Bluetooth spec. for
-> more details.
+> Hmmm :) Few mounths ago you posted into mailing list that you don't plan to 
+> port hidp into 2.4. It's nice to hear that you changed your opinion :)
 
-So it really was my fault then, eh? Well, thanks for your time then, and 
-I'll go read the archives :)
+I don't really planned it, but at that point I also had no plans for the
+boot protocol mode. The broken EPoX devices convinced me otherwise and
+so a least the boot protocol mode should be possible for 2.4, but don't
+ask me how soon I will do that. Is there anyone else who will fill this
+gap right now?
 
-Just two last questions for clarification:
-1. What's the status on hid2hci now? Is it still needed or should it be 
-obsolete by now? Because I've read in this mailing list that others do 
-not need it anymore, but I can't get it to work without, as described.
-2. The usual procedure (as I understand, I'm not much into that 
-bluetooth stuff, as may be obvious ;) ) to connect a new bluetooth 
-device would be to press its connect button and then the one on the hub, 
-right? Well, this does not work, simply because the hub (after hid2hci) 
-does no longer react to a press on 'Connect', so I have to manually 
-search for new devices via hidd. The diNovo devices seem to 
-automatically reconnect when I use them, though, so if that's the way 
-it's meant to be currently, then this is ok, I only rarely connect an 
-additional device (a cell phone). Just wanted to know.
+Regards
 
-Ok, so far from my end, I hope I did not pose questions that you already 
-had answered more or less recently :)
+Marcel
 
 
-Best regards
 
-Holger
+
+-------------------------------------------------------
+This SF.Net email sponsored by Black Hat Briefings & Training.
+Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
+digital self defense, top technical experts, no vendor pitches, 
+unmatched networking opportunities. Visit www.blackhat.com
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
