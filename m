@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Can Burak Cilingir <canburak@cs.bilgi.edu.tr>
-To: Bluez-users@lists.sourceforge.net
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-KXBltiCjOnIDnLSYTFnx"
-Message-Id: <1105814392.14979.8.camel@portable.canb.net>
-Mime-Version: 1.0
-Subject: [Bluez-users] bluetooth gateway
+From: Christian Schubert <mail@apexo.de>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200501151854.40656.mail@apexo.de>
+Subject: [Bluez-users] error attaching device
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,45 +17,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 15 Jan 2005 20:39:52 +0200
+Date: Sat, 15 Jan 2005 18:54:40 +0100
 
+Hi there,
 
---=-KXBltiCjOnIDnLSYTFnx
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+I'm using linux kernel 2.6.10 with the following debian bluez packages:
+bluez-bluefw            1.0-1
+bluez-hcidump           1.12-1
+bluez-pin               0.24-1
+bluez-utils             2.10-5
 
-Hi,
-        I am trying to build a bluetooth gateway in my home.
-       =20
-        GSM Phone --bluetooth--> laptop --cable modem--> internet
-       =20
-        I can do this on windows but not on linux. I tried with bluez +
-        pand in NAP mode but it didn't worked.
-        ( http://bluez.sourceforge.net/contrib/HOWTO-PAN )
-       =20
-        anyone did this here?
-       =20
-        ps: my bluetooth adapter works on linux. i can send and receive
-        files via obex.
---=20
-Can Burak Cilingir
-http://canb.net/
-http://tdk.org.tr/dogruyazalim.html
-icq#10720999
+my problem now is:
+I have a Acer Bluetooth USB Dongle which works correctly when plugged into 
+either one of the primary USB ports as well as within the Microsoft Natural 
+Keyboad USB Hub but NOT in my newly acquired Acer USB 2.0 Hub which leaves 
+the following error messages in the syslog:
 
---=-KXBltiCjOnIDnLSYTFnx
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
+kernel: hci_usb_intr_rx_submit: hci0 intr rx submit failed urb c6586b74 err 
+-28
+hcid[11781]: Can't init device hci0. Input/output error(5)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.5 (GNU/Linux)
+Any hints?
 
-iD8DBQBB6WN3UNn5mAEjWBwRAuFAAJ9AtnhJhc7kE2eb41w/N4ehnAJipgCgjPjH
-tiQdDFd+3Nhs50Fso/jc6X8=
-=jVW7
------END PGP SIGNATURE-----
+Cheers,
+Christian
 
---=-KXBltiCjOnIDnLSYTFnx--
+p.s.: not subscribed to the list
 
 
 -------------------------------------------------------
