@@ -1,14 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] How to configure a 723kbps connection?
+Subject: Re: [Bluez-users] Mailing list gateway corrupting messages (was:
+	L2CAP connectionless)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Steven Singer <steven.singer@csr.com>
-Cc: grpmind+bluez.users@boromir.vpop.net,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40323EC2.8080203@csr.com>
-References: <200402171142.i1HBgRV5023132@mail.holtmann.net>
-	 <1077018777.2841.5.camel@pegasus>  <40323EC2.8080203@csr.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>,
+   "Desai, Keyur Rajnikant" <kdesai@mail.smu.edu>
+In-Reply-To: <403237AF.5030501@csr.com>
+References: <38F76B90B82C0A4A822651EACE4FF8E9C23322@s31xs2>
+	 <403237AF.5030501@csr.com>
 Content-Type: text/plain
-Message-Id: <1077037423.2665.72.camel@pegasus>
+Message-Id: <1077037010.2665.64.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,49 +21,69 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Feb 2004 18:03:43 +0100
+Date: Tue, 17 Feb 2004 17:56:50 +0100
 
 Hi Steven,
 
-> >> # hcitool rssi 00:04:3E:81:90:E0
-> >> RSSI return value: 0
-> >> # hcitool lq 00:04:3E:81:90:E0
-> >> Link quality: 255
-> >> # hcitool tpl 00:04:3E:81:90:E0
-> >> Current transmit power level: -8
-> >> 
-> >> 
-> >> Does all this mean that my ipaq has a slow UART?
-> > 
-> > No, because the link quality and the RSSI has nothing to do with the
-> > choosen packet type.
+> We're getting messages from Keyur Desai blocked by our corporate
+> filters. One such message was titled "L2CAP connectionless" and was
+> sent on 16th of February. A direct link is:
 > 
-> Marcel, I don't think this is what Matt meant. I think he was asking
-> that given that the link quality and power levels are good and given
-> that he can't get more that 265 kbps regardless of packet type, is it
-> likely that he's being limited by some component of the system other
-> than the Bluetooth link - such as the UART baud rate on the Ipaq.
+> http://sourceforge.net/mailarchive/forum.php?thread_id=3903638&forum_id=1883
+> 
+> I've also appended an edited version to the end of this message.
+> 
+> The problem appears to be that the original mail message was sent in
+> MIME Base64 encoding (no problem there - it's completely legal), however,
+> the mailing list gateway is appending text to the end (the usual SF.net
+> advert and mailing list info). Since the text is appended to the end of
+> a Base64 section, mail clients are intepreting it as Base64 encoded data.
+> Since the data has not been Base64 encoded this results in the message
+> appearing to contain lots of garbage characters. This is what trips up
+> our corporate filters.
+> 
+> Netscape and Outlook both show a lot of garbage characters at the end
+> of the message. More tellingly, Sourceforge's own web list interface
+> (the link I gave above) also shows some garbage characters (though it
+> gives up after three).
+> 
+> A colleague also reports a similar problem with MIME quoted-printable
+> messages. The Sourceforge appended text also contains equals signs.
+> This trips up quoted-printable decoders (most clients just show a few
+> incorrect characters - breaking the advertising link, however, mh
+> spots the illegal quoting and refuses to display the entire message).
+> 
+> This is a known bug in Mailman 2.0 (tracker ID 617930). It was reported
+> in October 2002 and is fixed in mailman 2.1:
+> 
+> https://sourceforge.net/tracker/?func=detail&atid=100103&aid=617930&group_id=103
+> 
+> Apparently, judging by the X-Mailman-Version headers in the mailing
+> list messages, we're still using Mailman 2.0 (2.0.9-sf.net).
+> 
+> Is there any way to change this? Sourceforge's issues list at:
+> 
+> http://sourceforge.net/docman/display_doc.php?docid=17790&group_id=1
+> 
+> says:
+> 
+>   Software Upgrades
+> 
+>     [...]
+> 
+>     Mailing list services will be upgraded, though the exact time frame has
+>     not yet been determined. This upgrade will include Mailman upgrades and
+>     additional anti-spam mechanisms (we know what needs to be done, but have
+>     not yet scheduled the resources to perform the implementation).
+> 
+> Is there a known workaround? I've tried to search Sourceforge's support
+> requests, but it's not being very helpful.
 
-no I don't missed the point here. But the thread was broken and if you
-look at the beginning you see that I already told him that it can be a
-problem with a too slow UART. This is true for the 3870.
-
-> Is there an easy way to find out what baud rate the Ipaq is using?
-> That would answer the question straight away. 265 kbps over the air
-> is equivalent to roughly 350 kbps over the UART (assuming one start bit,
-> one stop bit, no parity and large HCI packets).
-
-He said that it run Windows, so I can't tell :(
-
-> Also, although you're right that the RSSI has nothing to do with the
-> chosen packet type, the link quality has a big effect. As the link
-> quality falls, devices will tend to switch automatically from DH
-> packets to the more robust DM packets.
-
-The link quality is problematic, because every chip manufacturer can
-interpret this value different. For CSR this is bound to the BER. Had
-you ever run any test with your chips against the old Zeevo TC2001
-generation?
+I don't know of any technical workaround. My workaround is that people
+should start using mail clients that are not messing up the emails. The
+prefered format for posts to a mailing list is still 7-bit ASCII. No
+multipart HTML or other fancy stuff. Personally I tend to ignore mails
+that I can't read or that my mail client can't display.
 
 Regards
 
