@@ -5,8 +5,8 @@ To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200405102355.12055.cijoml@volny.cz>
-Subject: [Bluez-users] colona key problem in 2.6 and bthid
+Message-Id: <200405102345.45845.cijoml@volny.cz>
+Subject: [Bluez-users] uinput and bthid minor problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,12 +17,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 May 2004 23:55:12 +0200
+Date: Mon, 10 May 2004 23:45:45 +0200
 
 Hi Marcel,
 
-under 2.6.6 doesn't work colona key - when pressed, non reply to console.
-2.4.26 works fine with the same bthid
+I found out that starting bthid and connect mouse and keyboard to it without 
+uinput module loaded don't work as expected.
+after modprobe uinput, it doesn't work too. I have to restart bthid to get it 
+working
+
+2.6.6
 
 Michal
 
