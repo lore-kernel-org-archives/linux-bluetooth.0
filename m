@@ -1,38 +1,61 @@
-Return-Path: <SRS0+824b9af48ed8284d9739+263+infradead.org+dwmw2@baythorne-075349.srs.infradead.org>
-Subject: Re: [Bluez-devel] autoconf breaks portability. Film at 11.
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1084398405.25099.118.camel@pegasus>
-References: <1084268833.11301.0.camel@hades.cambridge.redhat.com>
-	 <1084368666.25099.38.camel@pegasus>
-	 <1084369122.4426.106.camel@hades.cambridge.redhat.com>
-	 <1084369703.25099.56.camel@pegasus>
-	 <1084371089.4426.148.camel@hades.cambridge.redhat.com>
-	 <1084382619.25099.81.camel@pegasus>
-	 <1084384989.4426.450.camel@hades.cambridge.redhat.com>
-	 <1084398405.25099.118.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] bluez-utils 2.7 default configuration
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: "Nicholas A. Preyss" <nalp@gmx.net>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1084384590.4426.428.camel@hades.cambridge.redhat.com>
+References: <20040511192919.GB28581@gmx.net>
+	 <1084368229.25099.26.camel@pegasus>
+	 <1084371486.4426.156.camel@hades.cambridge.redhat.com>
+	 <1084382445.25099.77.camel@pegasus>
+	 <1084382743.4426.351.camel@hades.cambridge.redhat.com>
+	 <1084382951.25099.89.camel@pegasus>
+	 <1084383201.4426.374.camel@hades.cambridge.redhat.com>
+	 <1084383929.25099.94.camel@pegasus>
+	 <1084384590.4426.428.camel@hades.cambridge.redhat.com>
 Content-Type: text/plain
-Message-Id: <1084431228.21553.75.camel@imladris.demon.co.uk>
+Message-Id: <1084398630.25099.122.camel@pegasus>
 Mime-Version: 1.0
-Date: Thu, 13 May 2004 07:53:48 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 12 May 2004 23:50:30 +0200
 
-On Wed, 2004-05-12 at 23:46 +0200, Marcel Holtmann wrote:
-> > hades /hades/bluez/libs2 $ ./configure
-> > -bash2: ./configure: No such file or directory
-> 
-> There must be another problem. Please do a clean CVS checkout.
+Hi David,
 
-A clean checkout on a third machine shows the same problem. It seems I
-can make it build by running 'libtoolize' or manually copying in
-ltmain.sh from one of the five different versions of automake which is
-installed.
+> It's basically only the init scripts in which my packages differ now, I
+> believe. Just about everything else I had in patches is now in CVS --
+> most of it a long time ago; I don't know why the swave array overflow
+> slipped through the cracks. 
 
-Perhaps someone needs to write 'autoauto' to help people automate all
-this gratuitous package automation?
+actually I only wanna make sure that the Fedora guys are looking at the
+postings on the list, because I am using a vanilla kernel and Debian ;)
 
-Personally, I'll stick with M-x makefile-mode :)
+> /me checks... oh, you probably want this one too...
 
--- 
-dwmw2
+Applied.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by Sleepycat Software
+Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to deliver
+higher performing products faster, at low TCO.
+http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
