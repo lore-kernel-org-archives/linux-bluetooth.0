@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de46576050103071248159461@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] BT-1.2 spec device
+From: "Michael Firsching" <michael.firsching@gmx.net>
+To: <bluez-users@lists.sourceforge.net>
+Subject: RE: [Bluez-users] 2.6.10 multimedia keys
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="US-ASCII"
+In-Reply-To: <200501022247.51104.cijoml@volny.cz>
+Message-Id: <20050103135443.5D28D129932@rrzmta1.rz.uni-regensburg.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 3 Jan 2005 20:42:21 +0530
+Date: Mon, 3 Jan 2005 14:54:37 +0100
 
-Hi marcel,
-I am looking at a BT dongle with Adaptive Frequency Hopping and power
-control. I think I will find both these features in a Class-1 ,1.2
-spec device.
 
-I am looking at another feature, that is the device should be able to
-read the piconet clock. i found that DBT-120 did not have this
-feature. But DBT seemed to give a better LQ value. So i am a little
-unsure about which product to purchase.
- 
-can you tell me which BT product with 1.2 spec with the above features
-i can purchase??Will the BT products with EDR hit the market soon..
+> Marcel you REALLY NEED IT :) If you write support, I'll send 
+> you my scripts :)
 
-Thanks,
-Regards,
-Manjunath
+If it ever works, please post them through the group, I guess there will be
+many happy coffee addicts ;)
+
+Regards
+Michael
+
 
 
 -------------------------------------------------------
