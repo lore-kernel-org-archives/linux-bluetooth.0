@@ -1,9 +1,9 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <310520066.16529@bjut.edu.cn>
+Message-ID: <310519989.15540@bjut.edu.cn>
 From: "=?gb2312?B?ufnI8A==?=" <rguo@emails.bjut.edu.cn>
 To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Subject: [Bluez-users] where is rfcomm source code?
+Subject: [Bluez-users] (no subject)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -15,15 +15,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Mar 2005 13:47:46 +0800
+Date: Fri, 11 Mar 2005 13:46:29 +0800
 
- I have read the RFCOMM protocol of Bluetooth Specification,and want to read the
+I have read the RFCOMM protocol of Bluetooth Specification,and want to read the
 source code of the rfcomm in  Bluez,but I don't find it in the bluez-kernel-2.2
 packet.Where is it? 
 
 	thanks in advance.
+                 
 
- 
 
 
 
