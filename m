@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hcid dying
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Edd Dumbill <edd@usefulinc.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1087817504.10134.16.camel@saag>
-References: <1087817504.10134.16.camel@saag>
-Content-Type: text/plain
-Message-Id: <1087818250.4328.1.camel@pegasus>
+From: Edd Dumbill <edd@usefulinc.com>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Message-Id: <1087817504.10134.16.camel@saag>
 Mime-Version: 1.0
+Content-Type: text/plain
+Subject: [Bluez-users] hcid dying
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +15,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 21 Jun 2004 13:44:10 +0200
+Date: Mon, 21 Jun 2004 12:31:44 +0100
 
-Hi Edd,
+Recently I've experienced the hcid process dying without warning.  I've
+not yet been able to isolate why this happens, but another user reported
+the same thing happening to me today, so I thought I'd ask if anybody
+else was seeing this happen.
 
-> Recently I've experienced the hcid process dying without warning.  I've
-> not yet been able to isolate why this happens, but another user reported
-> the same thing happening to me today, so I thought I'd ask if anybody
-> else was seeing this happen.
-
-I don't saw that on my machines. What distribution? What kernel?
-
-Regards
-
-Marcel
+-- Edd
 
 
 
