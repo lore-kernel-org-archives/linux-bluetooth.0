@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41E25ECD.2000505@fcse.co.uk>
-From: Jeff Fern <sf@fcse.co.uk>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Multiple Headsets
+Subject: Re: [Bluez-devel] HCIemu
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <I9YMFW$9C1101C4F2CA67296B6C4EF740486702@uol.com.br>
+References: <I9YMFW$9C1101C4F2CA67296B6C4EF740486702@uol.com.br>
+Content-Type: text/plain
+Message-Id: <1105192958.8137.0.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,31 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Jan 2005 10:54:05 +0000
+Date: Sat, 08 Jan 2005 15:02:38 +0100
 
-Hello all,
+Hi,
 
-I have sucessfully got Bluez and the bt-snd-sco alsa stuff working with 
-my debian 2.6.9 and mh5 patch.
+> Thanks a lot for your help. And I
+> would like to bore you with one more
+> question. is there any howto about
+> hciemu ? I mean, pratical examples or
+> experiments. If not, could you folks
+> give me one example of hciemu operation?
 
-What I would like to do is get two headsets working, as two seperate 
-audio devices so I can cat /dev/dsp1 to /dev/dsp2 and pass audio through.
+the hciemu is for emulating a Bluetooth device. Check the mailing list
+archive for examples.
 
-Whenever I currently try and connect two headsets, the second one 
-reports the SCO channel is already in use.
+Regards
 
-I do have two bluetooth USB dongles that can be used (although would 
-like to just use one if possible).
+Marcel
 
-I should point out that my background is in Java and not C, so although 
-I have examined the bt-snd-sco and btsco source files, I do not 
-understand them enough to be able to see what is going on.
 
-Any help would be much appreciated,
-
-Regards,
-
--Jeff Fern
 
 
 -------------------------------------------------------
