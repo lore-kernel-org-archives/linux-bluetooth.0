@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Nicholas A. Preyss" <nalp@gmx.net>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] packet types / speed (USB dongles)?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Lutz Pressler <Lutz.Pressler@SerNet.DE>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E1BTRbh-0005QP-00@intern.SerNet.DE>
-References: <E1BTRbh-0005QP-00@intern.SerNet.DE>
-Content-Type: text/plain
-Message-Id: <1085691569.8896.59.camel@pegasus>
+Message-ID: <20040527204855.GB3114@gmx.net>
+References: <E1BTQag-0001L7-00@intern.SerNet.DE>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <E1BTQag-0001L7-00@intern.SerNet.DE>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,31 +17,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 27 May 2004 22:59:29 +0200
+Date: Thu, 27 May 2004 22:48:55 +0200
 
-Hi Lutz,
+On  0, Lutz Pressler <Lutz.Pressler@SerNet.DE> wrote:
+> I've got CSR based USB dongles, for which hciconfig -a
+> gives "Packet type: DM1 DH1 HV1". Whatever HV1 is,
+> for DH1 http://www.holtmann.org/lecture/bluetooth/bt_primer.pdf
+> reports payload rates of around 180 kbit/s.
+> Now when querying the phone (Nokia 6230) I get as feature
+> <HV3 packets>.
+> Does this mean, that I could use e.g. DH3 with that phone
+> (390 kbit/s symmetric or 586 / 86 asymmetric)?
+> Which USB dongles would support that?
 
-> > every CSR based that I have seen so far supports every packet type from
-> > the Bluetooth 1.1 specification. However you can set the used packet
-> > types by yourself, but this makes no sense. Simply enable them all and
-> > let the link manager decide what's the best to use. The HVx packets for
-> > SCO audio links and don't matter for the data transfers over ACL.
-> Is it normal than that file transfer with obexftp to the phone is
-> not faster than 1 MB per minute?
+HV* are packets of an SCO connection. My understanding of the
+specification ist that the speed of an SCO connection is always 
+64kb/s. You need only larger HV Packets if you have several SCO
+Connections which have to share bandwidth. 
+Why SCO isn't usable for data transfer is explained several times in
+mailinglist archive.
 
-I never did any bandwith tests with OBEX, but actually the flow of
-L2CAP<->RFCOMM<->OBEX gives you a big performance decrease of the 1 Mbit
-bandwith of a piconet. But this must not be a problem of the dongle,
-because both link managers must decide to use the correct packet type.
-And of course the phone CPU must be fast enough to handle the RFCOMM and
-OBEX protocol very well. There are more bottlenecks so this question is
-not really easy to answer.
-
-Regards
-
-Marcel
-
-
+nicholas
 
 
 -------------------------------------------------------
