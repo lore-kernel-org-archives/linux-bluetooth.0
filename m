@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Logitech MX900 oddities and solutions
-From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
+Message-ID: <405022B6.7010504@sets.lv>
+From: Ivars Strazdins <ivars.strazdins@sets.lv>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1078917101.2537.21.camel@pegasus>
-References: <1078912919.32148.356.camel@metal.cisco.com>
-	 <1078915401.2537.14.camel@pegasus>  <1078916559.6886.5.camel@pc-04.ycom.ch>
-	 <1078917101.2537.21.camel@pegasus>
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1078993556.24004.8.camel@pc-04.ycom.ch>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] Epox BT-DG02A crashes kernel 2.6.3
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,46 +15,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 11 Mar 2004 09:25:56 +0100
+Date: Thu, 11 Mar 2004 10:26:30 +0200
 
-Marcel,
+hi all,
 
-Le mer 10/03/2004 =E0 12:11, Marcel Holtmann a =E9crit :
-> Hi Alexandre,
-> > > If you start the hcid it will modifiy your link policy settings and=
- it
-> > > is important that RSWITCH and SNIFF is on.
-> >=20
-> > Mine is working fine ... without any mod or blood :-)
->=20
-> What does "hciconfig hci0 lp" say?
+I'm trying to use Epox BT-DG02A USB dongle on HP Omnibook 6000 with 
+gentoo linux and kernel 2.6.3, but the dongle crashes kernel 
+intermittently. It happens almost every time I remove the dongle or try 
+to remove uhci-hcd module after Bluetooth has been in use. In every 
+other sense the installation is pretty stable and is working under heavy 
+load and with various external devices including USB storage.
+Yep, I saw that this dongle has NOT been reported as working in hardware 
+list, but two other very similar devices (DG03 and DG02) were there.
+Thank you in advance for any suggestions.
 
-hci0:   Type: USB
-        BD Address: 00:07:61:08:76:70 ACL MTU: 192:8  SCO MTU: 64:8
-        Link policy: HOLD SNIFF PARK
-
-And my hcid.conf:
- 	lp hold,sniff,hold,park;
-
-
-So, what is the exact mean for RSWITCH ?
-
-> > Maybe the next thing to do is to have a correct encryption link, of
-> > course for the keyboard ( I don't think that mouse mouvements are ver=
-y
-> > important ...).
->=20
-> If the HID device is a keyboard we must simply send and authentication
-> request and then activate the encryption. Patches are welcome.
-
-Huh, it's a good job for me, need some spare time ... :-(
-Maybe in same time that the modification of bthid parser to have
-function keys working for the keyboard.
-
-best regards,=20
-
-	--Alexandre
-
+wbr,
+ivars
 
 
 -------------------------------------------------------
