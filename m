@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Piconet problems
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <IAAY31$664B7AA9753F60F7A4D5D72B66AB0F53@libero.it>
-References: <IAAY31$664B7AA9753F60F7A4D5D72B66AB0F53@libero.it>
-Content-Type: text/plain
-Message-Id: <1105737535.7525.48.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: Paul Ionescu <i_p_a_u_l@yahoo.com>
+Message-ID: <pan.2005.01.14.18.04.15.317521@yahoo.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] recording btsco traffic
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,63 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 14 Jan 2005 22:18:55 +0100
+Date: Fri, 14 Jan 2005 19:04:16 +0100
 
-Hi Jers,
+Hi,
 
-> > send us the outputs of "hciconfig -a" for all of your devices. And don't 
-> > play with "hcitool cc". If you wanna test stuff then use l2test. 
->  
-> hci0:   Type: USB 
->         BD Address: 00:08:E0:01:9E:86 ACL MTU: 192:8  SCO MTU: 64:8 
->         UP RUNNING PSCAN ISCAN 
->         RX bytes:653 acl:0 sco:0 events:19 errors:0 
->         TX bytes:314 acl:0 sco:0 commands:18 errors:0 
->         Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00 
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
->         Link policy: RSWITCH HOLD SNIFF PARK 
->         Link mode: SLAVE ACCEPT 
->         Name: 'PC A' 
->         Class: 0x3e0100 
->         Service Classes: Networking, Rendering, Capturing 
->         Device Class: Computer, Uncategorized 
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x33c LMP Ver: 1.1 (0x1) LMP Subver: 0x33c 
->         Manufacturer: Cambridge Silicon Radio (10) 
->  
-> hci0:   Type: USB 
->         BD Address: 00:E0:98:85:A1:64 ACL MTU: 192:8  SCO MTU: 64:8 
->         UP RUNNING PSCAN ISCAN 
->         RX bytes:99 acl:0 sco:0 events:13 errors:0 
->         TX bytes:296 acl:0 sco:0 commands:12 errors:0 
->         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00 
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
->         Link policy: RSWITCH HOLD SNIFF PARK 
->         Link mode: SLAVE ACCEPT 
->         Name: 'BlueZ (0)' 
->         Class: 0x3e0100 
->         Service Classes: Networking, Rendering, Capturing 
->         Device Class: Computer, Uncategorized 
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver: 0x175 
->         Manufacturer: Cambridge Silicon Radio (10) 
+Is it possible to record a phone conversation with btsco ?
+Like dumping all in and out traffic in a big stereo .wav file, where left
+channel should be incoming traffic and right channel should be outgoing
+traffic.
+I mean, btsco already sees this traffic, how hard would be to save it in
+also in a file ?
 
-the 0x175 firmwares are not HCI 16.4 and thus don't support scatternet
-and are difficult to connect.
- 
-> > > After that, I tried to create the second connection on slave2 side by running the same command (hcitool cc 
-> <master_addr>) and I obtain the following error: 
-> > > # Can't create connectio: input/output error. 
-> >  
-> > Run "hcidump -x" as root and show us the output. 
->  
-> HCIDump - HCI packet analyzer ver 1.16 
-> device: hci0 snap_len: 1028 filter: 0xffffffff 
+Or this can be done with some ALSA magic ? Some routing of both incoming
+and outgoing audio to a virtual alsa device from which one can record ?
 
-What about trying to connect now, so we see traffic?
 
-Regards
-
-Marcel
-
+Thanks,
+Paul
 
 
 
