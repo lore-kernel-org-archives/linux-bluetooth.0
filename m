@@ -1,40 +1,31 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec040628194321db5d9c@mail.gmail.com>
-From: Albert Huang <ashuang@gmail.com>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Return-Path: <james.cameron@hp.com>
+Date: Tue, 29 Jun 2004 08:48:03 +1000
+From: James Cameron <james.cameron@hp.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH] pand/main.c, restore signals for dev-up script
+Message-ID: <20040628224803.GA20139@hp.com>
+References: <20040627233437.GD28828@hp.com> <1088408656.3774.136.camel@pegasus> <20040628085356.GA8871@hp.com> <1088413518.3774.167.camel@pegasus> <20040628095541.GB8871@hp.com> <1088417629.3774.177.camel@pegasus> <20040628101927.GC8871@hp.com> <1088419197.3774.183.camel@pegasus> <20040628120612.GF8871@hp.com> <1088427271.3774.198.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] how to do asynchronous device inquiry?
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Jun 2004 22:43:00 -0400
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1088427271.3774.198.camel@pegasus>
+Sender: james.cameron@hp.com
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-hello,
+On Mon, Jun 28, 2004 at 02:54:31PM +0200, Marcel Holtmann wrote:
+> what do you wanna do with that information? Actually I never needed it.
 
-Can somone point me to an example of how to do an asynchronous device
-inquiry using bluez?  I'd like to start an inquiry with an ioctl or
-something like that, and then be notified either with signals or by
-polling as devices are discovered.  If this is currently not possible,
-can you point me to which source files I could modify that would allow
-me to do this?  Thanks!
+Select access policies.  Probably not a terribly reliable access
+control, but at least ringing alarms if I sight a connection from an
+unexpected address would be useful.
 
--albert
+I'm using 100m range modules in a rural environment, on top of a
+mountain.
 
+See http://quozl.netrek.org/bluetooth/ for the coverage mapping that I
+did; it was quite enjoyable.  Some of the configuration information
+there is out of date; I haven't reviewed it in light of the current
+Debian package versions.
 
--------------------------------------------------------
-This SF.Net email sponsored by Black Hat Briefings & Training.
-Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
-digital self defense, top technical experts, no vendor pitches, 
-unmatched networking opportunities. Visit www.blackhat.com
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+James Cameron
