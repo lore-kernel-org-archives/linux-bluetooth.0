@@ -1,53 +1,277 @@
-Return-Path: <linux-kernel-owner+marcel=40rvs.uni-bielefeld.de@vger.kernel.org>
-Date: Wed, 10 Sep 2003 15:58:10 -0700
-To: Max Krasnyansky <maxk@qualcomm.com>,
-   BlueZ mailing list <bluez-devel@lists.sourceforge.net>,
-   Linux kernel mailing list <linux-kernel@vger.kernel.org>
-Subject: [BUG] BlueTooth socket busted in 2.6.0-test5
-Message-ID: <20030910225810.GA7712@bougret.hpl.hp.com>
-Reply-To: jt@hpl.hp.com
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+Message-ID: <001701c376f2$bc163100$0500a8c0@baked>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_NextPart_000_0018_01C376B8.0FB75900"
+Subject: [Bluez-devel] FW: Patches: Qualification - SDP
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 9 Sep 2003 09:52:18 -0700
 
-	Hi,
+This is a multi-part message in MIME format.
 
-	This is self explanatory :
------------------------------------------------------------
-kernel BUG at include/net/sock.h:459!
-invalid operand: 0000 [#1]
-CPU:    1
-EIP:    0060:[<d08ae64e>]    Not tainted
-EFLAGS: 00010282
-EIP is at l2cap_sock_alloc+0x36/0xb4 [l2cap]
-eax: d08b3500   ebx: c6b4de40   ecx: 00000020   edx: d08ac440
-esi: 00000000   edi: 00000000   ebp: ffffffa3   esp: c81abf1c
-ds: 007b   es: 007b   ss: 0068
-Process sdpd (pid: 390, threadinfo=c81aa000 task=ce634cc0)
-Stack: 00000000 d08ac524 d08ae72c c20e7780 00000000 000000d0 d08a10f4 c20e7780 
-       00000000 c20e7780 0000007c c033ecc0 ffffff9f c01e1236 c20e7780 00000000 
-       0000001f bffff894 c81abfa8 00000001 c01e1325 0000001f 00000005 00000000 
-Call Trace:
- [<d08ae72c>] l2cap_sock_create+0x60/0x7c [l2cap]
- [<d08a10f4>] bt_sock_create+0x8c/0xd0 [bluetooth]
- [<c01e1236>] sock_create+0x12e/0x200
- [<c01e1325>] sys_socket+0x1d/0x50
- [<c01e216c>] sys_socketcall+0xbc/0x260
- [<c0108cd3>] syscall_call+0x7/0xb
+------=_NextPart_000_0018_01C376B8.0FB75900
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Code: 0f 0b cb 01 e2 1a 8b d0 89 83 28 01 00 00 85 c0 74 30 50 e8 
- 
------------------------------------------------------------
+This didn't make it through the first time... Trying again.
 
-	Basically, the socket is already owned by the 'bluetooth'
-module in bt_sock_alloc(), and the 'l2cap' module try to change the
-ownersip to itself in l2cap_sock_alloc(). The socket layer doesn't
-like it. At least, that's the way I read it.
-	Without the ability to open BT socket, BT is pretty much
-useless.
+-Daryl.
 
-	Good luck...
+-----Original Message-----
+From: Daryl Van Vorst [mailto:daryl@wideray.com]=20
+Sent: September 8, 2003 11:29 AM
+To: 'Stephen Crane'
+Cc: 'BlueZ Mailing List'
+Subject: Patches: Qualification - SDP
 
-	Jean
+
+Steve, All,
+
+Attached are two versions of a patch to SDP which make it pass the =
+mandatory
+qualification tests. One patch is against version 1.4 which is available =
+for
+download. The other patch is against what _I THINK_ is in CVS (if
+sourceforge's CVS was better I'd be able to give a more definitive
+statement).
+
+The changes that I've made perform some simple checks on the PDU =
+structure
+for the three different SDP queries (SS, SA, SSA), and return the
+appropriate error code (Invalid Request Syntax) to the initiator. =
+Previously
+the code would return "Invalid Continuation Sate" as the error code for
+certain malformed queries.
+
+The only difference between the two patches is a change that Steve made
+which fixed a bug in handling the MaximumServiceRecordCount parameter in =
+an
+SS request. One patch includes it (the patch against version 1.4) and =
+the
+other patch does not.
+
+-Daryl.
+
+------=_NextPart_000_0018_01C376B8.0FB75900
+Content-Type: text/plain;
+	name="patch-sdp-1.4.txt"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+	filename="patch-sdp-1.4.txt"
+
+--- bluez-sdp-1.4/sdpd/request.c	Wed Feb 12 05:18:07 2003=0A=
++++ bluez-sdp-1.4-mods/sdpd/request.c	Thu Sep  4 14:28:12 2003=0A=
+@@ -228,7 +228,7 @@=0A=
+  */=0A=
+ static int service_search_req(sdp_req_t *req, sdp_buf_t *buf)=0A=
+ {=0A=
+-	int status =3D 0, i;=0A=
++	int status =3D 0, i, plen;=0A=
+ 	sdp_list_t *pattern =3D NULL;=0A=
+ 	int expected, actual;=0A=
+ 	uint8_t dtd;=0A=
+@@ -249,6 +249,14 @@=0A=
+ 		goto done;=0A=
+ 	}=0A=
+ 	pdata +=3D scanned;=0A=
++=0A=
++	plen =3D ntohs(((sdp_pdu_hdr_t *)(req->buf))->plen);=0A=
++	if((plen < (scanned + sizeof(uint16_t) + 1)) || // To ensure we don't =
+read past buffer=0A=
++	   (plen !=3D (scanned + sizeof(uint16_t) + 1 + *((uint8_t =
+*)(pdata+sizeof(uint16_t)))))) {=0A=
++	  status =3D SDP_INVALID_SYNTAX;=0A=
++	  goto done;=0A=
++	}=0A=
++=0A=
+ 	expected =3D ntohs(sdp_get_unaligned((uint16_t *)pdata));=0A=
+ 	=0A=
+ 	SDPDBG("Expected count: %d\n", expected);=0A=
+@@ -285,7 +293,7 @@=0A=
+ 		sdp_list_t *list =3D sdp_get_record_list();=0A=
+ =0A=
+ 		handleSize =3D 0;=0A=
+-		for (; list; list =3D list->next) {=0A=
++		for (; list && rsp_count < expected; list =3D list->next) {=0A=
+ 			sdp_record_t *rec =3D (sdp_record_t *)list->data;=0A=
+ =0A=
+ 			SDPDBG("Checking svcRec : 0x%x\n", rec->handle);=0A=
+@@ -480,7 +488,7 @@=0A=
+ 	uint8_t dtd =3D 0;=0A=
+ 	int scanned =3D 0;=0A=
+ 	int max_rsp_size;=0A=
+-	int status =3D 0;=0A=
++	int status =3D 0, plen;=0A=
+ 	char *pdata =3D req->buf + sizeof(sdp_pdu_hdr_t);=0A=
+ 	uint32_t handle =3D ntohl(sdp_get_unaligned((uint32_t *)pdata));=0A=
+ =0A=
+@@ -498,6 +506,13 @@=0A=
+ 	}=0A=
+ 	pdata +=3D scanned;=0A=
+ =0A=
++	plen =3D ntohs(((sdp_pdu_hdr_t *)(req->buf))->plen);=0A=
++	if((plen < (scanned + sizeof(uint32_t) + sizeof(uint16_t) + 1)) || // =
+To ensure we don't read past buffer=0A=
++	   (plen !=3D (scanned + sizeof(uint32_t) + sizeof(uint16_t) + 1 + =
+*((uint8_t *)pdata)))) {=0A=
++	  status =3D SDP_INVALID_SYNTAX;=0A=
++	  goto done;=0A=
++	}=0A=
++=0A=
+ 	/*=0A=
+ 	 * if continuation state exists, attempt=0A=
+ 	 * to get rsp remainder from cache, else send error=0A=
+@@ -584,7 +599,7 @@=0A=
+  */=0A=
+ static int service_search_attr_req(sdp_req_t *req, sdp_buf_t *buf)=0A=
+ {=0A=
+-	int status =3D 0;=0A=
++	int status =3D 0, plen, totscanned;=0A=
+ 	char *pdata, *pResponse =3D NULL;=0A=
+ 	int scanned, max, rsp_count =3D 0;=0A=
+ 	sdp_list_t *pattern =3D NULL, *seq =3D NULL, *svcList;=0A=
+@@ -600,6 +615,7 @@=0A=
+         	status =3D SDP_INVALID_SYNTAX;=0A=
+ 		goto done;=0A=
+ 	}=0A=
++	totscanned =3D scanned;=0A=
+ =0A=
+ 	SDPDBG("Bytes scanned: %d", scanned);=0A=
+ =0A=
+@@ -616,6 +632,14 @@=0A=
+ 		goto done;=0A=
+ 	}=0A=
+ 	pdata +=3D scanned;=0A=
++	totscanned +=3D scanned;=0A=
++=0A=
++	plen =3D ntohs(((sdp_pdu_hdr_t *)(req->buf))->plen);=0A=
++	if((plen < (totscanned + sizeof(uint16_t) + 1)) || // To ensure we =
+don't read past buffer=0A=
++	   (plen !=3D (totscanned + sizeof(uint16_t) + 1 + *((uint8_t =
+*)pdata)))) {=0A=
++	  status =3D SDP_INVALID_SYNTAX;=0A=
++	  goto done;=0A=
++	}=0A=
+ =0A=
+ 	/*=0A=
+ 	 * if continuation state exists attempt=0A=
+
+------=_NextPart_000_0018_01C376B8.0FB75900
+Content-Type: text/plain;
+	name="patch-sdp-cvs.txt"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+	filename="patch-sdp-cvs.txt"
+
+--- bluez-sdp-cvs/sdpd/request.c	Thu Sep  4 15:07:28 2003=0A=
++++ bluez-sdp-1.4-mods/sdpd/request.c	Thu Sep  4 14:28:12 2003=0A=
+@@ -228,7 +228,7 @@=0A=
+  */=0A=
+ static int service_search_req(sdp_req_t *req, sdp_buf_t *buf)=0A=
+ {=0A=
+-	int status =3D 0, i;=0A=
++	int status =3D 0, i, plen;=0A=
+ 	sdp_list_t *pattern =3D NULL;=0A=
+ 	int expected, actual;=0A=
+ 	uint8_t dtd;=0A=
+@@ -249,6 +249,14 @@=0A=
+ 		goto done;=0A=
+ 	}=0A=
+ 	pdata +=3D scanned;=0A=
++=0A=
++	plen =3D ntohs(((sdp_pdu_hdr_t *)(req->buf))->plen);=0A=
++	if((plen < (scanned + sizeof(uint16_t) + 1)) || // To ensure we don't =
+read past buffer=0A=
++	   (plen !=3D (scanned + sizeof(uint16_t) + 1 + *((uint8_t =
+*)(pdata+sizeof(uint16_t)))))) {=0A=
++	  status =3D SDP_INVALID_SYNTAX;=0A=
++	  goto done;=0A=
++	}=0A=
++=0A=
+ 	expected =3D ntohs(sdp_get_unaligned((uint16_t *)pdata));=0A=
+ 	=0A=
+ 	SDPDBG("Expected count: %d\n", expected);=0A=
+@@ -480,7 +488,7 @@=0A=
+ 	uint8_t dtd =3D 0;=0A=
+ 	int scanned =3D 0;=0A=
+ 	int max_rsp_size;=0A=
+-	int status =3D 0;=0A=
++	int status =3D 0, plen;=0A=
+ 	char *pdata =3D req->buf + sizeof(sdp_pdu_hdr_t);=0A=
+ 	uint32_t handle =3D ntohl(sdp_get_unaligned((uint32_t *)pdata));=0A=
+ =0A=
+@@ -498,6 +506,13 @@=0A=
+ 	}=0A=
+ 	pdata +=3D scanned;=0A=
+ =0A=
++	plen =3D ntohs(((sdp_pdu_hdr_t *)(req->buf))->plen);=0A=
++	if((plen < (scanned + sizeof(uint32_t) + sizeof(uint16_t) + 1)) || // =
+To ensure we don't read past buffer=0A=
++	   (plen !=3D (scanned + sizeof(uint32_t) + sizeof(uint16_t) + 1 + =
+*((uint8_t *)pdata)))) {=0A=
++	  status =3D SDP_INVALID_SYNTAX;=0A=
++	  goto done;=0A=
++	}=0A=
++=0A=
+ 	/*=0A=
+ 	 * if continuation state exists, attempt=0A=
+ 	 * to get rsp remainder from cache, else send error=0A=
+@@ -584,7 +599,7 @@=0A=
+  */=0A=
+ static int service_search_attr_req(sdp_req_t *req, sdp_buf_t *buf)=0A=
+ {=0A=
+-	int status =3D 0;=0A=
++	int status =3D 0, plen, totscanned;=0A=
+ 	char *pdata, *pResponse =3D NULL;=0A=
+ 	int scanned, max, rsp_count =3D 0;=0A=
+ 	sdp_list_t *pattern =3D NULL, *seq =3D NULL, *svcList;=0A=
+@@ -600,6 +615,7 @@=0A=
+         	status =3D SDP_INVALID_SYNTAX;=0A=
+ 		goto done;=0A=
+ 	}=0A=
++	totscanned =3D scanned;=0A=
+ =0A=
+ 	SDPDBG("Bytes scanned: %d", scanned);=0A=
+ =0A=
+@@ -616,6 +632,14 @@=0A=
+ 		goto done;=0A=
+ 	}=0A=
+ 	pdata +=3D scanned;=0A=
++	totscanned +=3D scanned;=0A=
++=0A=
++	plen =3D ntohs(((sdp_pdu_hdr_t *)(req->buf))->plen);=0A=
++	if((plen < (totscanned + sizeof(uint16_t) + 1)) || // To ensure we =
+don't read past buffer=0A=
++	   (plen !=3D (totscanned + sizeof(uint16_t) + 1 + *((uint8_t =
+*)pdata)))) {=0A=
++	  status =3D SDP_INVALID_SYNTAX;=0A=
++	  goto done;=0A=
++	}=0A=
+ =0A=
+ 	/*=0A=
+ 	 * if continuation state exists attempt=0A=
+
+------=_NextPart_000_0018_01C376B8.0FB75900--
+
+
+
+-------------------------------------------------------
+This sf.net email is sponsored by:ThinkGeek
+Welcome to geek heaven.
+http://thinkgeek.com/sf
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
