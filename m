@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm problems
-From: Marcel Holtmann <marcel@holtmann.org>
-To: zubiwat@poczta.onet.pl
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040312160822Z2706732-18648+146257@kps3.test.onet.pl>
-References: <20040312160822Z2706732-18648+146257@kps3.test.onet.pl>
-Content-Type: text/plain
-Message-Id: <1079179936.1795.5.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20040313093829.3814.qmail@web41713.mail.yahoo.com>
+From: =?iso-8859-1?q?c=E9cile=20Ayr?= <tetilou2003@yahoo.fr>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] unable to retrieve services
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +15,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 13 Mar 2004 13:12:17 +0100
+Date: Sat, 13 Mar 2004 10:38:29 +0100 (CET)
 
-Hi Maciej,
+Hi,
 
-> I have problems with rfcomm, because when i connect two pc's I don't know how to make them to transfer files or text between tty's. One komputer uses bluez and the other one USB dongle with WinXP.
-> 
-> Please help because the two compueters are paired and connected using rfcomm and Serial Port. But when I try to type sth on tty nothing happens.
+I have a laptop with a bluez environment and a USB
+port. I tried to connect to my laptop with a PDA
+running bluetooth. The PDA can locate my laptop but is
+unabled to retrieve the services of my laptop. I set
+the service/device class on my laptop, such as:
 
-for file transfer you must put another protocol on top of RFCOMM. For
-example Obex, Kermit etc. or you can use PAN and get a TCP/IP connection
-between your machines.
+hciconfig hci0 class 0x92010C 
 
-Regards
+Any idea why it doesn't work? 
 
-Marcel
+On the other hand, I can retrieve the services of my
+PDA from my laptop without problem.
+
+Thanks for your help. 
+Cecile
 
 
+	
+
+	
+		
+Yahoo! Mail : votre e-mail personnel et gratuit qui vous suit partout ! 
+Créez votre Yahoo! Mail sur http://fr.benefits.yahoo.com/
+
+Dialoguez en direct avec vos amis grâce à Yahoo! Messenger !Téléchargez Yahoo! Messenger sur http://fr.messenger.yahoo.com
 
 
 -------------------------------------------------------
