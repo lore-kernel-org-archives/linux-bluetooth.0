@@ -1,70 +1,91 @@
-Return-Path: <strikewing16th@hotmail.com>
-From: "Anthony Yulo" <strikewing16th@hotmail.com>
-To: marcel@holtmann.org, bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] multiple connections on rfcomM?
-Date: Fri, 12 Dec 2003 08:23:16 +0000
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] HID testing
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Deepesh S Gujarathi <d_gujarathi@hotmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Law11-OE56C4Mkg3fDM00007728@hotmail.com>
+References: <Law11-OE56C4Mkg3fDM00007728@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1071150458.27256.16.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <Law11-F23jdb5IBf53a00030f69@hotmail.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 11 Dec 2003 14:47:39 +0100
 
-Hello..
+Hi Saturn,
 
-i'd like to use C++, but are there any classes made already to encapsulate 
-bluetooth functions? none yet ryt? i'll have to do classes myself but then 
-again i'll still use C to do it...
+> I have been playing around with the BlueZ stack for last couple of
+> days and I would say that you guys have done an wonderful job. The
+> stack appears to be fairly stable and rich with features and tools.
+> However the most important feature is the socket interface provided
+> which is missing in other stacks. Kudos to Max, Marcel at rest of the
+> team.
 
-aniwei, id like to low-level C more.. so its ok..
+you are welcome :)
+ 
+> I am working on the developing HID profile (firmware) for a pointing
+> device and utilising BlueZ as a host side testing tool.
 
-another question regarding this topic...
-This is the set-up:
-1st pda initiates connection to the desktop server.. and then remain 
-connected for a while.. My Question is would the desktop server still be 
-searchable/discoverable by other devices while its
-connected to the 1st pda?
+What kind of Bluetooth chip do you use?
 
-I tried to test this setup using WIDCOMM stack and used the API's in it...
-First I launched the sample RFCOMM server program and then assigned an 
-SCN... and then i connected the 1st pda using device/service discovery 
-procedures...
+Please use "sdptest" from libs2/test CVS to show us the SDP record of
+your HID device.
 
-Next I launched a new instance of that RFCOMM server program but this time 
-with a different SCN... when a 2nd pda tries to search for the server, it 
-doesn't find the server anymore..
+> 1. What could be the best way to test the HID device firmware from the
+> host side using BlueZ ? I believe there are two alternatives, the
+> bthid program by Peter and an alternate hid program by Marcel. I was
+> not successful in getting the bthid working. My system is Mandrake 9.2
+> with Linux 2.4.21-0.13mdk and I have installed BlueZ from rpms.
+> Basically I want to test my HID firmware implementation for HID
+> compliance.
+
+You should make sure that you have the uinput driver compiled and
+installed on your system. And you have to apply the patches from Edd
+Dumbill and Olivier Bornet for the bthid from Peter. But this will not
+solve the SDP problem of Peter's implementation.
+
+My implementation is based on the new Bluetooth library (which is in
+development state), but is working fine for HID devices from Logitech,
+Microsoft and EPoX. Yesterday I posted a short installation help to the
+mailing list.
+
+Non of the implementations can guarantee HID compliance. The USB HID
+parser will be of course much better for testing, but as stated in one
+of my previous posts I have stopped working on an integration.
+
+> 2. Is there a way to disconnect individual L2CAP connection from
+> within user space program ? I saw a call  l2cap_sock_close in l2cap.c
+> file, is there a way to call this function from a user program. I have
+> already tried to use the close(socket) call but it closes down the ACL
+> connection instead of closing the _individual_ L2CAP connection.
+> do advise....
+
+You can do it by simply call close(l2cap_sk) in your user application,
+but depending on your firmware it will maybe close the other L2CAP
+channel too and then the ACL link have to be closed. To be sure that you
+have no L2CAP bugs in your kernel I propose that you start using 2.4.23.
+
+Regards
+
+Marcel
 
 
 
 
-
-
-
->From: Marcel Holtmann <marcel@holtmann.org>
->To: Anthony Yulo <strikewing16th@hotmail.com>
->CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
->Subject: Re: [Bluez-devel] multiple connections on rfcomM?
->Date: Fri, 12 Dec 2003 04:35:06 +0100
->
->Hi Anthony,
->
-> > so this project is very easy to do huh!!?!:)
-> > how do i multiplex?, do i use fork()? select()? :)
->
->use what you like. I would prefer some kind of event loop, because it
->makes your code simpler, but even forking or poll()/select() is fine.
->
-> > hehe... sorry for the silly questions, just a newbie in bluez, in socket
-> > programming?
-> > my background in c is not very deep.. i'm more familiar with C++.. so
-> > sorry..:)
->
->You can use C++ if you like. I don't like C++, so I would never use it.
->
->Regards
->
->Marcel
->
->
-
-_________________________________________________________________
-Add photos to your e-mail with MSN 8. Get 2 months FREE*. 
-http://join.msn.com/?page=features/featuredemail
+-------------------------------------------------------
+This SF.net email is sponsored by: SF.net Giveback Program.
+Does SourceForge.net help you be more productive?  Does it
+help you create better code?  SHARE THE LOVE, and help us help
+YOU!  Click Here: http://sourceforge.net/donate/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
