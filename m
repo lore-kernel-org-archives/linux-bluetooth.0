@@ -1,27 +1,50 @@
-Return-Path: <daryl@wideray.com>
-Errors-To: <daryl@wideray.com>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Missing data in ACL packets from CSR chip
-Date: Fri, 13 Feb 2004 11:42:35 -0800
-Message-ID: <001501c3f269$87a19f70$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1076700127.2671.213.camel@pegasus>
-List-ID: <bluez-devel.lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daryl Van Vorst <daryl@wideray.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <001001c3f262$b708a620$1a01010a@baked>
+References: <001001c3f262$b708a620$1a01010a@baked>
+Content-Type: text/plain
+Message-Id: <1076700127.2671.213.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 13 Feb 2004 20:22:08 +0100
 
-Marcel,
+Hi Daryl,
 
-> > Unfortunately I don't have one to test with. Is the Casira=20
-> the $3000=20
-> > development system? I also saw just an endpoint for $700.
->=20
-> I am not an employee of CSR. Ask their sales team.
+> > > It looks like a UART problem to me too, but it's probably not on my 
+> > > side because both the sniffer and the host saw the same error.
+> > 
+> > is it reproduceable when you use a Casira?
+> 
+> Unfortunately I don't have one to test with. Is the Casira the $3000
+> development system? I also saw just an endpoint for $700.
 
-I was just trying to determine if that was the device you were referring =
-to.
-I wasn't looking for a quote from you. :)
+I am not an employee of CSR. Ask their sales team.
 
--Daryl.
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
