@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Cleaning up after sdp_get_access_protos()
+Subject: Re: [Bluez-devel] SDP queries when authentication/encryption are
+	turned on
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Cc: Stephen Crane <steve.crane@rococosoft.com>
-In-Reply-To: <001401c51b9d$4c81af30$1a01010a@baked>
-References: <001401c51b9d$4c81af30$1a01010a@baked>
+In-Reply-To: <200502241322.06715.bluez-devel@schaettgen.de>
+References: <20050223020808.14745.qmail@web52803.mail.yahoo.com>
+	 <200502231044.48821.bluez-devel@schaettgen.de>
+	 <1109241819.5645.8.camel@notepaq>
+	 <200502241322.06715.bluez-devel@schaettgen.de>
 Content-Type: text/plain
-Message-Id: <1109579551.17256.27.camel@pegasus>
+Message-Id: <1109579295.17256.24.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,38 +22,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Feb 2005 09:32:31 +0100
+Date: Mon, 28 Feb 2005 09:28:15 +0100
 
-Hi Daryl,
+Hi Fred,
 
-> This stuff hurts my brain, so I was hoping someone (Marcel? ;) could verify
-> my logic.
+> > > > if you set your device into security mode 3, then this is what you get.
+> > > > As I have often said, do this only when you know what you are doing and
+> > > > what does this imply.
+> > >
+> > > Marcel, why don't you simply put this often repeated sentence into a
+> > > comment in default hcid.conf right above auth/encrypt? If people are not
+> > > familiar with bluetooth, then it's reasonable to assume that you have to
+> > > enable this if you want any security at all. You don't expect everbody to
+> > > know what security mode 3 means and what the alternatives are, do you?
+> >
+> > there is a comment that this is security mode 3, but actually this does
+> > not prevents for its misuse and the later complaints. Problem is that
+> > Bluetooth is still a complex technology and if you change defaults you
+> > should understand what you are doing. However I always accept patches
+> > that extends the manual pages with more details about it.
 > 
-> I'm mentioning this mostly because the utils code gets used as example code.
-> 
-> In this snippet from sdptool.c, proto is cleaned up with
-> sdp_list_free(proto, (sdp_free_func_t)sdp_data_free);
-> 
->         if (sdp_get_access_protos(rec, &proto) == 0) {
->                 printf("Protocol Descriptor List:\n");
->                 sdp_list_foreach(proto, print_access_protos, 0);
->                 sdp_list_free(proto, (sdp_free_func_t)sdp_data_free);
->         }
-> 
-> I think the cleanup should be:
-> 
->     sdp_list_foreach(proto,(sdp_list_func_t)sdp_list_free,0);
->     sdp_list_free(proto,0);
-> 
-> Looking at sdp.c source (in libs), sdp_get_access_protos() returns a list of
-> lists of data sequences. The data sequences themselves shouldn't be freed at
-> this point because they weren't allocated by sdp_get_access_protos() (thus
-> the ,0 in the sdp_list_foreach call). But the list of lists is allocated
-> inside sdp_get_access_protos().
+> "should understand what you are doing"? Well, obviously this is wishful 
+> thinking. You should really comment these settings right in the hcid.conf or 
+> at least referr to the manpage. Then it's nearly impossible to change these 
+> settings without reading the warnings about it. Not everyone will look into a 
+> manpage, you should be more pragmatic here. It's your time that is wasted 
+> with these questions after all ;)
 
-actually I have no idea, because I didn't wrote this code.
-
-Steve, any thoughts?
+even if I put a big explanation into the config file, people still will
+do it wrong. Actually I think of removing some commands from the example
+config file and only mentions their existens in the manual page or in
+the source code.
 
 Regards
 
