@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Vesa Halttunen <vesuri@jormas.com>
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1110498275.3040.6.camel@pc.vesuri.net>
+Subject: Re: [Bluez-users] Use of /etc/bluetooth/link-key Bug or Feature ??
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200503090001.00828.jschindele@arcor.de>
+References: <422DF27C.8080301@bjitodc.com>
+	 <200503090001.00828.jschindele@arcor.de>
+Content-Type: text/plain
+Message-Id: <1110496215.8511.0.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] HID report mode protocol support in 2.6.11-mh1 broken/missing?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Mar 2005 01:44:35 +0200
+Date: Fri, 11 Mar 2005 00:10:14 +0100
 
-Hi,
+Hi Juergen,
 
-I upgraded my kernel from 2.6.10-mh2 to 2.6.11-mh1 and now my mouse and
-keyboard operate in boot protocol mode again so the special keys don't
-work. Does 2.6.11-mh1 lack full support for the report mode protocol, is
-it broken or has something else changed I'd have to know about? I'm
-using bluez-libs and -utils 2.15. The keyboard is a Logitech Elite
-keyboard and the mouse is Logitech MX900.
+> by an error i misconfigured a link with autentification.
+> so a entry in the file /etc/bluetooth/link-key was created.
+> Then M. Holtmann helped me out and told me how to configure it right. 
+> But From there on when a connection was demanded a link key request 
+> was always sent even it AUTH was switched off.
 
-Regards,
+if the other sides requests it, then this is correct.
 
--Vesa
---=20
-            =B7 Vesa Halttunen - http://www.jormas.com/~vesuri/ =B7
+> Is this a bug or a feature ??
+>  If this is a feature how can i delete a unique entry for one device
+> and not delete the whole file content because the content is not ascii ?
+
+An ASCII based link key file is on the todo list.
+
+Regards
+
+Marcel
+
 
 
 
