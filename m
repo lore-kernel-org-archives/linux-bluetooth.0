@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problem with Microsoft Keyboard
+Subject: Re: [Bluez-users] Bluetooth Synchronization on Nokia (3650)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <424C0E8C.4060806@sbox.tugraz.at>
-References: <424C0E8C.4060806@sbox.tugraz.at>
+In-Reply-To: <OF5B3D8884.B77486D9-ON85256FD7.007C2BAB-85256FD7.007C5FC0@alps.com>
+References: 
+	 <OF5B3D8884.B77486D9-ON85256FD7.007C2BAB-85256FD7.007C5FC0@alps.com>
 Content-Type: text/plain
-Message-Id: <1112554579.8263.10.camel@pegasus>
+Message-Id: <1112554808.8263.15.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +19,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 03 Apr 2005 20:56:19 +0200
+Date: Sun, 03 Apr 2005 21:00:08 +0200
 
-Hi Thomas,
+Hi Scott,
 
-> I'm using Debian (Kernel 2.6.11 with the mh2 patch) and my Microsoft 
-> Bluetooth Mouse works fine. After hidd --search it is found and also 
-> connected so I'm able to use it. However my Keyboard is not found (tried 
-> it 1000 times...). Shouldn't it also work with hidd --search? Is there a 
-> way to get the address from the keyboard and connect it manually? (It 
-> works fine under windows)
+> A while back I wrote an application that syncs my Sony Ericcson phone
+> via IrMC synchronization.  Recently I purchased a Nokia 3650 thinking
+> that it supported same IrMC Synchronization profile over Bluetooth (I
+> guess I just based that thinking on Apple iSync supporting the 3650,
+> because I though that iSync only used IrMC sync).  Well I was
+> wrong :-) ...
+> 
+> Does anyone know how synchronization is done over bluetooth on this
+> nokia 3650 (and other symbian nokias?).  It must be possible, iSync is
+> doing it...  some kind of OBEX command ? or something over
+> tcp/ip/network ? 
 
-is this the first or the second generation of the Microsoft keyboard.
-
-What does "hciconfig -a" tells you? Do you find it with "hcitool scan"?
+as far as I know, you need the mRouter (PPP over RFCOMM) for syncing the
+old Symbian based phones via SyncML. For the newer ones it seems that
+they started using SyncML over OBEX.
 
 Regards
 
