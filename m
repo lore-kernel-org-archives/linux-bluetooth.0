@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] xtrememac dropped bluetooth
+Subject: Re: [Bluez-users] Pairing a keyboard
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41A580FF.7040906@xmission.com>
-References: <41A580FF.7040906@xmission.com>
+In-Reply-To: <20041125064110.GA2505@frostnet.net>
+References: <20041125064110.GA2505@frostnet.net>
 Content-Type: text/plain
-Message-Id: <1101368008.7538.89.camel@pegasus>
+Message-Id: <1101367010.7538.78.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Nov 2004 08:33:27 +0100
+Date: Thu, 25 Nov 2004 08:16:49 +0100
 
-Hi Brad,
+Hi Chris,
 
-> I only noticed recently that these xtrememac.com guys were promising a 
-> class 1 device supporting a2dp (about a year ago!). They say they've 
-> shelved the product. Too bad... I don't think there are any class 1 
-> headsets (a2dp or no)
-> 
-> Class 1 headset(s) + asterisk pbx + voice-commands + streaming a2dp 
-> audio would be an extrememly slick setup...
+> When trying to pair with an apple wireless keyboard, hcitool cc errors
+> "Can't create connection: Input/output error". I was hoping someone
+> might have a suggestion on what to look into.
 
-don't worry so much about the class 1 headphones, because even using a
-class 1 dongle will increase the range. However there will be others
-that will build a class 1 headphone. The Bluetooth devices with A2DP
-support are at their beginning. I expect more to come in the near future
-and then there is no longer any need for a sound card in your desktop or
-notebook. If for example Apple will include A2DP audio source support
-into their iPODs everything might change very quickly.
+who said that pairing works by calling "hcitool cc ..."? You should use
+the "hidd --connect ..." command instead.
+
+> I'm kernel 2.6.9-mh4 and bluez 2.11 on an x86 with a D-Link DBT-120.
+> After starting hcid I run "hcitool cc <addr>" and get the error above.
+> I've included "hcidump -x"'s transcript at the bottom of this email.
+> bluepin does not work on my installation (pygtk seems broken), so I wrote
+> a script to echo "0000" to stdout. This may well be my problem? I do not know
+> if this is the format hcid is expecting or if it is the initial pin apple
+> sets. I did read that the mouse uses this pin, this is the only reason for
+> my choice. For my hcid.conf file, security is auto, pin_helper is set to this
+> script, and auth and encrypt are commented out.
+
+The bluepin script must echo "PIN:0000".
 
 Regards
 
