@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <AFE91B59A185A5439840B43AB791904709391B@mchp997a.mch.sbs.de>
-From: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
-To: "'Philip Blundell'" <pb@nexus.co.uk>
-Cc: "'Bluez-devel@lists.sourceforge.net'"
-	 <Bluez-devel@lists.sourceforge.net>
-Subject: AW: [Bluez-devel] pan on zaurus
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+Subject: Re: [Bluez-devel] Service Record Problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: franz keuner <franz_keuner@gmx.net>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <16619.1079606404@www34.gmx.net>
+References: <16619.1079606404@www34.gmx.net>
+Content-Type: text/plain
+Message-Id: <1079619908.3301.35.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,56 +18,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 18 Mar 2004 16:39:11 +0100
+Date: Thu, 18 Mar 2004 15:25:09 +0100
+
+Hi Franz,
+
+> thanks for your help with my last problem.
+> 
+> now i have a problem with service registration. i register a service using
+> the Java Bluetooth APIs. it creates a service record with an uuid of length
+> 128. that seems to be predetermined.
+> 
+> if i search for services on the device i can't find that specific service.
+> but if i scan for SP services i receive the following message:
+>   ...
+>   Service Name: Service Name
+> Service RecHandle: 0x1000a
+> Service Class ID List:
+>   "Error: This is uuid128" (0xabcd0000-1000-8000-0080-5f9b34fb0000)
+>   "Serial Port" (0x1101)
+> Protocol Descriptor List:
+>   "L2CAP" (0x0100)
+>   "RFCOMM" (0x0003)
+>     Channel: 5
+> Language Base Attr List:
+>   code_ISO639: 0x656e
+>   encoding:    0x6a
+>   base_offset: 0x100
+> Profile Descriptor List:
+>   "Serial Port" (0x1101)
+> ..
+> 
+> if i use a pda (pocket pc) with bluetooth support and search for services i
+> find the service without a problem.
+> 
+> so my question is: what can i do to find that service using bluez and the
+> "normal" sdptool search browse command?
+
+the problem is not the UUID128, it is that your record is not in the
+public browse group and so you have to search for the service. Look at
+the --help information from sdptool.
+
+	sdptool search --bdaddr <bdaddr> SP
+
+Regards
+
+Marcel
 
 
-mystery dissolves, when you watch it byte-wise and in hex notation !
-
-
-thanks for the "strace" tip. I found the error soon:
-
- 9687  bind(5, {sa_family=3D0x1f /* AF_??? */,
-sa_data=3D"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"...}=
-, 10)
-=3D 0
-
-pand initialises the l2a-struct with "0"s, before binding.
-	static bdaddr_t src_addr =3D *BDADDR_ANY; // where BDADDR_ANY is
-{0,0,0,0,0,0}
-	l2a.l2_bdaddr =3D src_addr;
-    if (bind(sk, (struct sockaddr *) &l2a, sizeof(l2a)))
-
-
-thats what I forgot, a simple=20
-  memset(&l2a, 0, sizeof(l2a));
-makes the code working.
-
-the padding seems to make no problems.
-
-Matthias
-
-
-
-
-> -----Urspr=FCngliche Nachricht-----
-> Von: Philip Blundell [mailto:pb@nexus.co.uk]=20
-> Gesendet: Donnerstag, 18. M=E4rz 2004 01:40
-> An: Kutschenreuter Matthias
-> Cc: 'Bluez-devel@lists.sourceforge.net'
-> Betreff: Re: [Bluez-devel] pan on zaurus
->=20
->=20
-> On Wed, 2004-03-17 at 19:28, Kutschenreuter Matthias wrote:
-> > Now I cannot understand, why my software fails on Zaurus,
-> > using the same commands as the official PAN, that doesnt fail.
->=20
-> I suggest you run both programs under strace and look for=20
-> difference in the syscalls that they make.  There should be=20
-> nothing special about the ARM other than the=20
-> structure-packing issue that you mentioned.
->=20
-> p.
->=20
 
 
 -------------------------------------------------------
