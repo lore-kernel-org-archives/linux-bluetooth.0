@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Zia Syed <zs@comp.rgu.ac.uk>
-Reply-To: zs@comp.rgu.ac.uk
-To: Bluez <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] hid2usb error
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1077206432.17056.7.camel@pc-04.ycom.ch>
+References: <1077206432.17056.7.camel@pc-04.ycom.ch>
 Content-Type: text/plain
-Message-Id: <1077215650.9218.31.camel@zs>
+Message-Id: <1077215608.2767.2.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Bluetooth Service
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,18 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Feb 2004 18:34:10 +0000
+Date: Thu, 19 Feb 2004 19:33:29 +0100
 
-Hi, 
+Hi Alexandre,
 
-I was wondering how can I create my own Bluetooth service using Bluez? I
-was looking for any Bluez programming guide or sumthing but no luck :(.
-Can anyone guide/advise me about how to implement custom bluetooth
-service?
+> I've the Logitech diNovo Bluetooth kit, and try to use it as BT device.
+> So, i've bluez-libs2 & bluez-utils2 to use the hid2hci tool to pass my
+> Logitech USB HUB to an Bluetooth HUB.
+> 
+> Kernel 2.6.2-mh
+> hid module loaded.
+> 
+> Running the hid2usb give :
+> Invalid argument ...
+> 
+> After some investigations, it appear that the following line return the
+> error (around line 240) :
+> 
+> err = send_report(fd, rep1, sizeof(rep1))
+> 
+> at the 2nd byte send (0xff 0x80)
 
-Thanks.
+you need a patch for the USB HID driver to send multiple bytes. I think
+it is not included so far. Must be pending in Greg's list.
 
-Zia
+Regards
+
+Marcel
+
 
 
 
