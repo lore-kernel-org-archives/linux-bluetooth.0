@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Apple keyboard
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Radu Maurer <a400@gmx.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040210175802.GA17705@mail.gmx.de>
-References: <20040210175802.GA17705@mail.gmx.de>
-Content-Type: text/plain
-Message-Id: <1076451979.2777.21.camel@pegasus>
+From: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20040210175959.250411D05C8@sc8-sf-uberspam1.sourceforge.net>
+Message-Id: <10865.30319-12503-1360465066-1076449270@seznam.cz>
+Content-Type: text/plain;
+	charset="iso-8859-2"
 Mime-Version: 1.0
+Cc: 
+Reply-To: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
+Subject: [Bluez-users] =?us-ascii?Q?I=2DTec=20Bluetooth=20USB=20=2D=2D=20Same=20Problem=2E=2E=2E?=
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,35 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Feb 2004 23:26:19 +0100
+Date: Tue, 10 Feb 2004 22:41:10 +0100 (CET)
 
-Hi Radu,
+I'm having the same problem with the I-Tec device -- got it today, put =
+it in -- and nothing comes up with HCICONFIG -- if I take it out, and p=
+ut in the EPOX device -- the EPOX device works fine -- if I take it bac=
+k out, and put the I-Tec back in, nothing.
 
-> What is the method of choice to get an Apple BT keyboard running with
-> linux?
+Let me know if (and how) I can get you info to get it working.
 
-start here http://www.bueche.ch/comp/mx900/mx900.html
-
-> I am running kernel 2.4.24 and debian unstable. 
-> I have a USB dongle Epox DG02A.
-> 
-> Do I need to patch the kernel?
-
-Maybe, because you need the uinput kernel module.
-
-> Do I need to upgrade to the 2.6 kernel series?
-
-You don't need, if you don't want to ;)
-
-> Do i need bluez from CVS?
-
-Yes.
-
-Regards
-
-Marcel
-
-
+Thanks.
+____________________________________________________________
+ADSL za korunu od Contactelu - nejp=F8=EDjemn=ECj=B9=ED ADSL na trhu do=
+ru=E8=EDme rychle a=BE k V=E1m!
+http://ad2.seznam.cz/redir.cgi?instance=3D70017%26url=3Dhttp://www.cont=
+actel.cz/adsl
 
 
 -------------------------------------------------------
