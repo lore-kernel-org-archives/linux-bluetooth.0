@@ -1,46 +1,58 @@
-Return-Path: <SRS0+7df27e75be190699ff02+264+infradead.org+dwmw2@baythorne-140453.srs.infradead.org>
-Subject: Re: [Fwd: Re: [Bluez-devel] PAN and bridge problem when
-	bnep0	disconnects before bnep1]
-From: David Woodhouse <dwmw2@infradead.org>
-To: Matthias Thomae <bluez@thomae-privat.de>
-Cc: Christoph Scholz <scholz@cs.uni-bonn.de>,
-   bluez-devel@lists.sourceforge.net, marcel@holtmann.org
-In-Reply-To: <40A480B8.2050400@thomae-privat.de>
-References: <1084467658.2322.37.camel@willie.informatik.uni-bonn.de>
-	 <40A480B8.2050400@thomae-privat.de>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Diego Liziero <liziero.diego@unimore.it>
+To: Stephen Hemminger <shemminger@osdl.org>
+Cc: bridge@lists.osdl.org, bluez-devel@lists.sourceforge.net
+In-Reply-To: <20040513111904.6001c62a@dell_ss3.pdx.osdl.net>
+References: <1084467136.3083.27.camel@igno>
+	 <20040513102829.5d5e1484@dell_ss3.pdx.osdl.net>
+	 <1084472140.3354.9.camel@igno>
+	 <20040513111904.6001c62a@dell_ss3.pdx.osdl.net>
 Content-Type: text/plain
-Message-Id: <1084539891.6181.68.camel@imladris.demon.co.uk>
+Message-Id: <1084526845.6774.55.camel@igno>
 Mime-Version: 1.0
-Date: Fri, 14 May 2004 14:04:51 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Subject: [Bluez-devel] Re: [Bridge] bridging bluetooth bnep devices with kernel 2.6.6-*
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 14 May 2004 11:27:25 +0200
 
-On Fri, 2004-05-14 at 10:18 +0200, Matthias Thomae wrote:
-> > I have not written to to the bridge people. My personal opinion is that
-> > BlueZ should do the forwarding (like Affix does). You can argue about
-> > that of course.
-> 
-> I don't have a competent opinion about that (except: it's not only the 
-> forwarding problem, but also DHCP, right?), and don't know what Affix does.
+On Thu, 2004-05-13 at 20:19, Stephen Hemminger wrote:
+> I do think each bluetooth device should have a different hardware
+> address to keep themselves sane.
 
-I don't think it makes sense to do the bridging in our BNEP code. We
-already _have_ bridging code in the kernel, and there's no sense in
-duplicating it. Using the existing code allows us to do things like
-bridging directly onto real Ethernet, too.
+Things are not so easy.
 
-> Marcel, what do you think? Is there any sense to contact the bridge people?
+Each bluetooth dongle has it's own harware address (MAC)
+and in a piconet (one master and up to 7 slaves)
+at each PAN connection a device called bnep0, ... bnep6
+is created on the master PC by bluez with the same MAC of the dongle.
 
-The mail at http://lists.osdl.org/pipermail/bridge/2004-May/000321.html
-to which Diego referred was from the 'bridge people', and says:
+Each device bnep? for each maste-slave point to point connection.
 
-"The bridge code was being to picky. The bridge will still work fine
-when there are two interfaces with the same local address, because it is
-only used for setting the source address on the outgoing bridge
-packets."
+And the bad thing is that when one of these connection is
+closed, its relative device (bnep?) cease to exist.
 
-It seems that we can read 'should still work fine' instead of 'will
-still work fine' in the above, given your report -- so yes, you should
-report it as a bug in the bridging code if you still can't get it to
-work on 2.6.6 + Stephen's patch.
+And this create serious problems with things like
+a dhcp server and a bridge.
 
--- 
-dwmw2
+Regards,
+Diego
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: SourceForge.net Broadband
+Sign-up now for SourceForge Broadband and get the fastest
+6.0/768 connection for only $19.95/mo for the first 3 months!
+http://ads.osdn.com/?ad_id=2562&alloc_id=6184&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
