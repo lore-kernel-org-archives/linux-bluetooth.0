@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Rfcomm Use Count
-From: Marcel Holtmann <marcel@holtmann.org>
-To: diego.liziero@unimore.it
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1096471423.20392.444.camel@igno>
-References: <001d01c4a02c$9aaeab00$1a01010a@baked>
-	 <1095851321.6223.15.camel@pegasus>  <1095861229.6223.32.camel@pegasus>
-	 <1096471423.20392.444.camel@igno>
-Content-Type: text/plain
-Message-Id: <1096709172.4809.17.camel@notepaq>
-Mime-Version: 1.0
+Message-ID: <415D2FA0.9060506@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [Fwd: Re: [Asterisk-Dev] New Bounty: Bluetooth
+ Phone Support]
+References: <415C4A11.8070903@biarritx.dyndns.org> <1096617904.5403.11.camel@notepaq>
+In-Reply-To: <1096617904.5403.11.camel@notepaq>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,32 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 02 Oct 2004 11:26:12 +0200
+Date: Fri, 01 Oct 2004 12:21:20 +0200
 
-Hi Diego,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> I had the same problem here.
-> 
-> The patch seems to solve it.
-> 
-> Tested rfcomm on linux 2.6 single processor.
-> 
-> I tried to apply the fix also to 2.4.x with
-> the following patch that compiles.
-> 
-> I hope it is correct.
-> 
-> Thanks for your work.
+Marcel Holtmann wrote:
+| [...] However,
+| what you first need is correct ALSA-SCO-Bluetooth integration.
+|
 
-I will do a patch for 2.4 when I resynced every pending 2.6 stuff. At
-the moment I am not quite sure that even my 2.6 patch is the best
-solution. However it is better then nothing.
+Just wanted to drop a note that we still try to improve things on this:
+http://sourceforge.net/projects/bluetooth-alsa/
 
-Regards
+We are still stuck with the not-that-good structures of snd-bt-sco, but
+I think this will improve eventually. If anyone wants to develop
+something in this direction, it would be great if you could team up with
+us :)
 
-Marcel
+cu,
+~  Lars
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-
+iD8DBQFBXS+fQWC6DTWkDAoRAoF6AJ9p1QfdZIRH3DKeg2eoHv8n+43tegCfcm+M
+mIMwCFeqBdysKlyKUXimQP8=
+=8lIW
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
