@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth pcmcia/cf serial errors with 2.6 kernel
-From: digger vermont <digver@verizon.net>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1075319338.21027.10.camel@go2>
-References: <1074885137.3532.9.camel@myrna>  <1075319338.21027.10.camel@go2>
-Content-Type: text/plain
-Message-Id: <1075323612.2356.67.camel@myrna>
-Mime-Version: 1.0
+Message-ID: <40182154.6030709@3WT.com.br>
+From: Rafael Vidal Aroca <rafael@3WT.com.br>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] hci0 problem after timeout
+References: <40170986.70105@3WT.com.br> <1075276651.12766.52.camel@pegasus>	 <4017D6E9.6030700@3WT.com.br> <1075306737.26729.3.camel@pegasus>
+In-Reply-To: <1075306737.26729.3.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,38 +17,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jan 2004 16:00:12 -0500
-
-Hi Gene,
-
-On Wed, 2004-01-28 at 14:48, Gene Imes wrote:
-> On Fri, 2004-01-23 at 13:16, digger vermont wrote:
-> > Hello Russell King and Linux Serial Mailing List,
-> > 
-> > 	Changes to the serial driver in 2.6.xx kernels have caused problems
-> > with some bluetooth pcmcia/cf cards that do work properly with 2.4.xx
-> > kernels. 
-> > 
-> 
-> digger, have you made any progress with the Linux Serial people?
-> 
-
-I have not heard a thing and now  wonder if the serial mailing list ever
-got it.  I sent it to the list hoping it would go through, as I'm not
-subscribed.  After I got you email I finally was able to find an archive
-for the list and my post doesn't appear on it.  I probably deleted it
-when it was returned thinking it was just more virus cruft.
-
-On the other hand I saw that 2.6.2-rc2 was released the other day with
-changes to serial_core.c and serial_cs.c.  My c-reading skilsl are poor
-and I don't know it the patches will make a difference.  I have hope and
-will try it as soon as there is a benh kernel to rsync.
-
-If that doesn't do it I'll subscribe to linux-serial and resubmit the
-report.
+Date: Wed, 28 Jan 2004 18:53:40 -0200
 
 
-digger
+    Looks that the dongle problem was solved, but the connection still 
+fails after some time (a bit more now).
+
+    I changed from uhci to usb-uhci and now I can issue hciconfig hci0 
+up and down how many times I want without any problems. Seems that the 
+PC box is clear now.
+
+    Now the question is: are IP connections using pand reliable? May not 
+pand be the problem?
+   
+    Just to mention, after the failed connection, i have to disable and 
+enable bluetooth again on ipaq, because hcitool inq causes a message 
+"timed out".
+
+   
+
+
+
+Marcel Holtmann wrote:
+
+>maybe it is this Broadcom device or maybe it is your USB chipset. What
+>host driver do you use? usb-uhci or uhci? Try the other one. If you have
+>access to a CSR donlge please try this.
+>
+>  
+>
 
 
 
