@@ -1,18 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] audio problems with a2play
+Subject: Re: [Bluez-devel] more encoder stuff
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41A3FD27.6060400@xmission.com>
-References: <41A22C0B.4050008@xmission.com>	<41A234FA.7020303@xmission.com>
-	 <20041123033429.132bf84b.henryk@ploetzli.ch>
-	 <41A2B331.4010001@xmission.com>
-	 <20041123070621.50569968.henryk@ploetzli.ch>
-	 <41A3471C.4000602@xmission.com>
-	 <20041123203836.046fb4f4.henryk@ploetzli.ch>
-	 <41A3ACE2.4030501@xmission.com> <1101246735.27351.45.camel@pegasus>
-	 <41A3FD27.6060400@xmission.com>
+In-Reply-To: <20041125071423.10e449c3.henryk@ploetzli.ch>
+References: <41A56774.1000308@xmission.com>
+	 <20041125071423.10e449c3.henryk@ploetzli.ch>
 Content-Type: text/plain
-Message-Id: <1101272951.27351.76.camel@pegasus>
+Message-Id: <1101365484.7538.74.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -25,24 +19,50 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Nov 2004 06:09:11 +0100
+Date: Thu, 25 Nov 2004 07:51:24 +0100
 
-Hi Brad,
+Hi Henryk,
 
-> If I'm understanding right, the payload should include the sbc_info 
-> header. I thought all along that was just for the purpose of storing the 
-> sbc in a file, but it sounds like the headset needs it.
+> > you were saying the reference encoder runs faster. Is there
+> > any chance they are using vector processing like sse/sse2? Do projects
+> > like xine and mplayer detect and use a vector processor through a
+> > library?
+> 
+> Nope, that was an error on my side. My file output was awfully slow. I
+> didn't test with large files since then, though. However, I_did_ profile
+> it and know that most of the encoding time is spent in sbc_analyze_audio
+> (no surprise there) in the matrixing, windowing and partial calculation
+> stages.
+> 
+> I just tested it again with a -O3 compiled sbcenc:
+> 
+> | time wine sbc_encoder.exe -o Uninvited.sbc Uninvited.wav
+> gives 
+> | real    0m30.095s
+> | user    0m18.766s
+> | sys     0m0.686s
+> 
+> | time ./sbcenc Uninvited.au > Uninvited.sbc
+> gives
+> | real    0m36.539s
+> | user    0m27.200s
+> | sys     0m1.500s
+> 
+> That's not _too_ bad, especially since they are using dual channel while
+> we are using stereo (the latter gives smaller file size in this case).
 
-I also don't see any reason why we need to store a SBC configuration and
-then submit the same values with every frame. However without the header
-it is impossible to get the SBC frame size.
+there exists a switch to sbc_encoder.exe to tell them to use stereo or
+joint stereo.
 
-> Is this closer? It doesn't sound right yet, but maybe we really do need 
-> to load up the packet to be closer to the mtu in order for the headset 
-> to be happy.
+> By using CC=icc CFLAGS="-O3 -tpp7 -march=pentium4" I can easily get it
+> down to
+> | real    0m19.122s
+> | user    0m11.272s
+> | sys     0m1.474s
 
-Do you mean you get some working sound with the specification conform
-payload?
+The MAD library (www.underbit.com/products/mad/) is using fixed-point
+integer computation. Do you think it is possible to do the same thing
+for SBC? Will it give us some extra performance?
 
 Regards
 
