@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Adding services with sdptool
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4240E6DB.5010901@ono.com>
-References: <4240E6DB.5010901@ono.com>
-Content-Type: text/plain
-Message-Id: <1111566161.22872.139.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <4240E6DB.5010901@ono.com>
+From: kwyjibo <kwyjibo@ono.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Adding services with sdptool
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +16,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Mar 2005 09:22:41 +0100
+Date: Wed, 23 Mar 2005 04:47:39 +0100
 
 Hi,
 
-> I have a pair of bluetooth dongles, and I want one to provide access to 
-> services. I load de sdpd daemon, and then I ouse the sdtool, like this 
-> "#sdptool add --channel 5 SP".
-> 
-> Then, with the other dongle I try to discover the services, using 
-> "#sdptool browse", but I get an error message: "Can't acces to remote 
-> host: File not found" or "Can't acces to remote host: Host refuse 
-> connection"
+I have a pair of bluetooth dongles, and I want one to provide access to 
+services. I load de sdpd daemon, and then I ouse the sdtool, like this 
+"#sdptool add --channel 5 SP".
 
-try to use "sdptool search --bdaddr <bdaddr> SP".
+Then, with the other dongle I try to discover the services, using 
+"#sdptool browse", but I get an error message: "Can't acces to remote 
+host: File not found" or "Can't acces to remote host: Host refuse 
+connection"
 
-You can also check with "hcidump -X -V" what happens on your interface.
-
-Regards
-
-Marcel
-
+Any suggestions?
 
 
 
