@@ -1,18 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Epox Barton keyboard: HID create error 53
+Subject: Re: [Bluez-users] yet another Barton Keyboard problem
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Matthias Thomae <bluez@thomae-privat.de>
+To: Soenke von Stamm <bluez0406@elmo.dyn.lindenarea.net>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40E024AD.1000101@thomae-privat.de>
-References: <40CDE18C.70703@thomae-privat.de>
-	 <1087255678.13792.51.camel@pegasus>  <40CE96A8.3020407@thomae-privat.de>
-	 <1087284859.13792.67.camel@pegasus>  <40CEC020.6050107@thomae-privat.de>
-	 <1087292887.13792.81.camel@pegasus>  <40CF4B17.2010806@thomae-privat.de>
-	 <1087339715.13792.104.camel@pegasus>  <40D7DDAD.2040908@thomae-privat.de>
-	 <1087897207.4328.89.camel@pegasus> <40D8D39E.3070301@thomae-privat.de>
-	 <40E024AD.1000101@thomae-privat.de>
+In-Reply-To: <200406281843.14536.bluez0406@elmo.dyn.lindenarea.net>
+References: <200406281843.14536.bluez0406@elmo.dyn.lindenarea.net>
 Content-Type: text/plain
-Message-Id: <1088452526.6030.86.camel@pegasus>
+Message-Id: <1088442071.6030.14.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -24,39 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Jun 2004 21:55:26 +0200
+Date: Mon, 28 Jun 2004 19:01:11 +0200
 
-Hi Matthias,
+Hi Soenke,
 
-> Well, I looked a little closer, and it seems that the debugging message
+> I'm new to the list but I've read about another guy's problem with this kb in 
+> the archive. My problem might be a little different as I assume my shiny 
+> lilly Barton is jast broken.
 > 
-> net/bluetooth/hidp/hid.c: usage index exceeded
-> net/bluetooth/hidp/hid.c: hid_add_usage failed
-> net/bluetooth/hidp/hid.c: item 0 2 2 2 parsing failed
+> I have purchased it just a few days back, plugged it into the next computer 
+> (the originally supplied dongle that is) and wondered a bit why I couldn't 
+> access the BIOS. I had jus read in c't that this should work... (and it works 
+> with my Logitech Cordless Desktop via USB)
 > 
-> is caused by the item USAGE_MAXIMUM(65280) which corresponds to "2A 00 
-> FF", the 18th item of the descriptor (see below). The maximum number of 
-> usages is set in net/bluetooth/hidp/hid.h
-> 
-> #define HID_MAX_USAGES                  1024
-> 
-> I tried to increase this to 65535 (FFFF), the theoretical max according 
-> to HUT 1.11, but it didn't help, because then the max page size is exceeded.
-> 
-> But this doesn't seem reasonable anyway, since the codes E8-FFFF are not 
-> defined yet (and which keyboard has several tens of thousand keys? ;).
-> 
-> So, can we assume the HID descriptor is "broken"? If yes, what would be 
-> the way to deal with this? Can we re-set the USAGE_MAXIMUM to a 
-> reasonable value?
+> Further on under Linux (debian sid, 2.6.[67]-mh1/custom) after some trouble I 
+> was able to attach the mouse which then also ran in hidproxy mode, but the kb 
+> still refuses every connection attempt. On one machine I was able to see it 
+> via 
 
-I don't know if the descriptor is broken or if the HID parser has a bug.
+<snip>
 
-The value you are talking about is 255 and not 65280. The questions is
-if the descriptor encodes these values in big or in little endian. If
-they must be in little endian than EPoX made a mistake here, otherwise
-our HID parser is broken. Please check the specification for the used
-endian encoding, because I will not have time to read it.
+> As I've read the other thread I've tried each and every option described there 
+> but nothing helps.
+> 
+> Now I'm wondering if I should just return the whole package because of the 
+> non-operational hidproxy mode. Or I could bite the bullet and try with a 
+> win98se install only for testing my hardware :-(
+
+this is easy to answer, but it seems that actually nobodoy knows it. The
+original HID proxy software needs the link key of the keyboard. At the
+moment the Linux HID code don't asks for a PIN code when connectiong a
+keyboard the first time. I worked on it, but I ran into troubles with
+some non CSR chips. Once you connected your keyboard you only have to
+request an authentication with "hcitool auth ..." and everything should
+work afterwards.
 
 Regards
 
