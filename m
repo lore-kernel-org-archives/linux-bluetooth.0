@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Changing baud default in CSR
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: zubiwat@poczta.onet.pl
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200403041254.47428.zubiwat@poczta.onet.pl>
+References: <200403041254.47428.zubiwat@poczta.onet.pl>
 Content-Type: text/plain
-Message-Id: <1078411850.5347.43.camel@pegasus>
+Message-Id: <1078401373.5347.8.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] First HCI command sent to a device
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,49 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 04 Mar 2004 15:50:50 +0100
+Date: Thu, 04 Mar 2004 12:56:13 +0100
 
-Hi Folks,
+Hi Maciej,
 
-while debugging the i-Tec dongle with Broadcom HID proxy support I saw
-that this dongle expects that the first command is a HCI_Reset. I can't
-remember any time where BlueZ has used this command. Our command
-sequence on initialization can be found in hci_core.c:hci_init_req() and
-it looks like this:
+> I have to change the default baud base in chip because it is set to 921600 and 
+> I have to use microchip to translate this 921600 to 115200. Now it is the 
+> only way for me to connect to my BT through RS232. I want to change this 
+> default baud to be able to connect directly to my BT through RS232 without 
+> any microchip between them.
+> Please help to find a command or sth to change this - offcourse if it's 
+> possible.
 
-/* Mandatory initialization */
-
-        /* Read Local Supported Features */
-        hci_send_cmd(hdev, OGF_INFO_PARAM, OCF_READ_LOCAL_FEATURES, 0, NULL);
-
-        /* Read Buffer Size (ACL mtu, max pkt, etc.) */
-        hci_send_cmd(hdev, OGF_INFO_PARAM, OCF_READ_BUFFER_SIZE, 0, NULL);
-
-        /* Read BD Address */
-        hci_send_cmd(hdev, OGF_INFO_PARAM, OCF_READ_BD_ADDR, 0, NULL);
-
-        /* Read Voice Setting */
-        hci_send_cmd(hdev, OGF_HOST_CTL, OCF_READ_VOICE_SETTING, 0, NULL);
-
-/* Optional initialization */
-
-        /* Clear Event Filters */
-        cp.flt_type  = HCI_FLT_CLEAR_ALL;
-        hci_send_cmd(hdev, OGF_HOST_CTL, OCF_SET_EVENT_FLT, sizeof(cp), &cp);
-
-        /* Page timeout ~20 secs */
-        param = __cpu_to_le16(0x8000);
-        hci_send_cmd(hdev, OGF_HOST_CTL, OCF_WRITE_PG_TIMEOUT, 2, &param);
-
-        /* Connection accept timeout ~20 secs */
-        param = __cpu_to_le16(0x7d00);
-        hci_send_cmd(hdev, OGF_HOST_CTL, OCF_WRITE_CA_TIMEOUT, 2, &param);
-
-Until the i-Tec dongle this worked perfect, but now my question is what
-is the prefered init sequence? How do other stacks do it? Acutally how
-do Microsoft or Widcomm init a device? Will adding a HCI_Reset break any
-other Bluetooth adapter? Feedback from everyone is welcome before I am
-going to make a decission on adding HCI_Reset or not.
+look for the pskey tool.
 
 Regards
 
