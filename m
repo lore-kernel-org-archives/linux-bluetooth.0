@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] uinput and modules.conf
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403161337.13936.cijoml@volny.cz>
-References: <200403160905.27291.cijoml@volny.cz>
-	 <1079426897.3307.64.camel@pegasus>  <200403161337.13936.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1079442594.3307.73.camel@pegasus>
-Mime-Version: 1.0
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200403161357.54997.cijoml@volny.cz>
+Subject: [Bluez-users] bthid and mouse wanted reconnect
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,61 +17,217 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 16 Mar 2004 14:09:54 +0100
+Date: Tue, 16 Mar 2004 13:57:54 +0100
 
-Hi Michal,
+Hi Marcel,
 
-> Hmm I have it and module is not autoloaded  :(
-> 
-> crw-r--r--    1 root     root      10, 223 led 11 23:22 /dev/input/uinput
+sending hcidump when my mouse wants reconnect:
 
-do you use a 2.6 kernel?
+notas:/home/cijoml# hcidump
+HCIDump - HCI packet analyzer ver 1.7
+device: hci0 snap_len: 1028 filter: 0xffffffff
+> HCI Event: Connect Request(0x04) plen 10
+< HCI Command: Accept Connection Request(0x01|0x0009) plen 7
+> HCI Event: Command Status(0x0f) plen 4
+> HCI Event: Role Change(0x12) plen 8
+> HCI Event: Connect Complete(0x03) plen 11
+< HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+> HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
+> ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 17 scid 0x005a
+< ACL data: handle 0x0029 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x005a result 0 status 0
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> HCI Event: Command Complete(0x0e) plen 6
+< HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
+> HCI Event: Command Status(0x0f) plen 4
+> HCI Event: Connection Packet Type Changed(0x1d) plen 5
+> ACL data: handle 0x0029 flags 0x02 dlen 17
+> ACL data: handle 0x0029 flags 0x01 dlen 17
+> ACL data: handle 0x0029 flags 0x01 dlen 6
+    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 28
+    MTU 48 Unknown (type 03, len 22)
+< ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x005a flags 0x0000 result 0 clen 0
+< ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x005a flags 0x0000 clen 0
+> HCI Event: QoS Setup Complete(0x0d) plen 21
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
+> ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 19 scid 0x005b
+< ACL data: handle 0x0029 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x005b result 0 status 0
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0029 flags 0x02 dlen 17
+> ACL data: handle 0x0029 flags 0x01 dlen 17
+> ACL data: handle 0x0029 flags 0x01 dlen 6
+    L2CAP(s): Config req: dcid 0x0041 flags 0x0000 clen 28
+    MTU 48 Unknown (type 03, len 22)
+< ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x005b flags 0x0000 result 0 clen 0
+< ACL data: handle 0x0029 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x005b flags 0x0000 clen 0
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0041 flags 0x0000 result 0 clen 0
+> ACL data: handle 0x0029 flags 0x02 dlen 4
+> ACL data: handle 0x0029 flags 0x01 dlen 6
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> HCI Event: Mode Change(0x14) plen 6
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
+> ACL data: handle 0x0029 flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 19]
+      HIDP: Data: Input report
 
-> I runs /opt/bluetooth/sbin/bthid -d in script, daemon starts but not auto 
-> accepts my mouse which wants reconnect. Blue Led blinks on microsoft BT 
-> dongle, but I have to call bthid -c and then mouse is connected.
-> How to instruct your bthid, Marcel, to auto accept my devices?
-
-Do you have special settings in hcid.conf?
-
-> Second problem is follows:
-> My keyboard doesn't work:
-> Mar 16 13:30:06 notas bthid[740]: Connected: Microsoft Bluetooth keyboard 
-> (045e:007b)
-> Mar 16 13:30:06 notas bthid[740]: Vendor HID usage 0xff00fe01 value 0x1
-> Mar 16 13:30:06 notas bthid[740]: adequate battery
-> Mar 16 13:30:06 notas bthid[740]: Vendor HID usage 0xff00fe03 value 0x0
-> Mar 16 13:30:06 notas bthid[740]: Vendor HID usage 0xff00fe04 value 0x0
-> Mar 16 13:30:06 notas bthid[740]: Unknown HID usage (0xff00fe04 + 0)
-> 
-> At first time it worked, then I switched off computer and wanted started it 
-> again, but then bthid writes this into syslog.
-> I write on keyboard, but no reply is sent into console :(
-
-The usage errors can be ignored, because they are vendor specific.
-
-> hcidump but shows data when I writes on keyboard:
-> notas:/home/cijoml# hcidump
-> HCIDump - HCI packet analyzer ver 1.7
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> > ACL data: handle 0x0029 flags 0x02 dlen 14
->     L2CAP(d): cid 0x41 len 10 [psm 0]
-> > HCI Event: Mode Change(0x14) plen 6
-> > HCI Event: Mode Change(0x14) plen 6
-> > ACL data: handle 0x0029 flags 0x02 dlen 14
->     L2CAP(d): cid 0x41 len 10 [psm 0]
-> > ACL data: handle 0x0029 flags 0x02 dlen 14
->     L2CAP(d): cid 0x41 len 10 [psm 0]
-
-So there is a connection and it looks like the HID parser is also
-working, but no input events are generated. Do you forget to load or
-compile in some extra modules like keybdev for 2.4.
-
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
