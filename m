@@ -1,22 +1,23 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] SBC packer done, kind of
-Message-Id: <20041125060727.7b1bf533.henryk@ploetzli.ch>
-In-Reply-To: <1101278049.27351.98.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20041125060213.4c8c34d5.henryk@ploetzli.ch>
 References: <20041123014732.3a03b10e.henryk@ploetzli.ch>
-	<1101191260.26578.43.camel@pegasus>
-	<20041123074829.7f978ce7.henryk@ploetzli.ch>
-	<1101201897.26578.54.camel@pegasus>
-	<20041123204901.776fe240.henryk@ploetzli.ch>
-	<1101243809.27351.18.camel@pegasus>
-	<20041124042114.5e1fee94.henryk@ploetzli.ch>
-	<1101272477.27351.67.camel@pegasus>
-	<1101278049.27351.98.camel@pegasus>
+	 <1101191260.26578.43.camel@pegasus>
+	 <20041123074829.7f978ce7.henryk@ploetzli.ch>
+	 <1101201897.26578.54.camel@pegasus>
+	 <20041123204901.776fe240.henryk@ploetzli.ch>
+	 <1101243809.27351.18.camel@pegasus>
+	 <20041124042114.5e1fee94.henryk@ploetzli.ch>
+	 <1101272477.27351.67.camel@pegasus> <41A43E8A.8030602@xmission.com>
+	 <1101307146.27351.104.camel@pegasus>
+	 <20041124213730.46aefcb7.henryk@ploetzli.ch>
+	 <1101350953.7538.22.camel@pegasus>
+	 <20041125060213.4c8c34d5.henryk@ploetzli.ch>
+Content-Type: text/plain
+Message-Id: <1101360632.7538.36.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Thu__25_Nov_2004_06_07_27_+0100_kINKfXflmgcvFqA6"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -28,45 +29,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Nov 2004 06:07:27 +0100
+Date: Thu, 25 Nov 2004 06:30:32 +0100
 
---Signature=_Thu__25_Nov_2004_06_07_27_+0100_kINKfXflmgcvFqA6
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Henryk,
 
-Moin,
+> > maybe you wanna try:
+> > 
+> > 	mpg321 --au /dev/stdout foo.mp3 | sbcenc - | a2play <bdaddr> -
+> 
+> That works fine, too, and is a lot less to type, thanks. But now the 100
+> Million Dollar question: When a2play is streaming my Microsoft Wireless
+> IntelliMouse Explorer for Bluetooth can't connect to the hidd. And vice
+> versa: If the mouse is connected a2play won't stream.
+> 
+> Is this expected? Can it be fixed?
 
-Am Wed, 24 Nov 2004 07:34:09 +0100 schrieb Marcel Holtmann:
+this depends on your version of hidd I think. If it has the --master
+option and it uses it, then start without. This sounds like a role
+switch problem and the headphone want's to be the master of the piconet.
 
-> when using sbcenc in a pipe with rcplay I get a delay for the first
-> bits of music that should be played. This is only on the first call of
-> the program or after the kernel removed it from its cache. Do you have
-> any idea what might causes this?
+Regards
 
-Hmm, don't know exactly what you mean. I know that there is a delay of
-about 38 samples for 4 subbands (and I guess simply double that number
-for 8 subbands), but that is inherent in SBC and can be seen in the
-reference encoder/decoder, too.
+Marcel
 
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
 
---Signature=_Thu__25_Nov_2004_06_07_27_+0100_kINKfXflmgcvFqA6
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQFBpWiUIjWgKE0OA2gRAso/AKCurjfUV6PP2gSSwbtOJc8uT8ruzQCgkRSl
-DmvmjgUhYYiNUDQPtyG0SNI=
-=FyGG
------END PGP SIGNATURE-----
-
---Signature=_Thu__25_Nov_2004_06_07_27_+0100_kINKfXflmgcvFqA6--
 
 
 -------------------------------------------------------
