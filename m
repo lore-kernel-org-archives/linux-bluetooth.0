@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] HID report mode protocol support in 2.6.11-mh1
-	broken/missing?
+Subject: Re: [Bluez-users] regarding configuring in Sarge
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1110498275.3040.6.camel@pc.vesuri.net>
-References: <1110498275.3040.6.camel@pc.vesuri.net>
+In-Reply-To: <4233BF6B.5050007@gmail.com>
+References: <4233BF6B.5050007@gmail.com>
 Content-Type: text/plain
-Message-Id: <1110796090.8158.56.camel@pegasus>
+Message-Id: <1110795994.8158.54.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,19 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Mar 2005 11:28:10 +0100
+Date: Mon, 14 Mar 2005 11:26:34 +0100
 
-Hi Vesa,
+Hi,
 
-> I upgraded my kernel from 2.6.10-mh2 to 2.6.11-mh1 and now my mouse and
-> keyboard operate in boot protocol mode again so the special keys don't
-> work. Does 2.6.11-mh1 lack full support for the report mode protocol, is
-> it broken or has something else changed I'd have to know about? I'm
-> using bluez-libs and -utils 2.15. The keyboard is a Logitech Elite
-> keyboard and the mouse is Logitech MX900.
+> i am newbie to configure in Sarge.i have a bluetooth with winddcomm 
+> driver in windows and i want to configure in gnu/linux.plz help me
+> thankyou in advance
+> neverstable
 
-maybe I made a mistake when porting the report mode to 2.6.11. Last time
-I checked it, it worked for me.
+there is nothing really to configure. Install the bluez-utils package
+and make sure that you have a recent 2.6 kernel running.
 
 Regards
 
