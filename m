@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Thomas Chiverton <thomas.chiverton@bluefinger.com>
-To: Gary Martin <gary_martin_au@yahoo.com.au>
-Subject: Re: [Bluez-users] Desperate newbie
-Cc: bluez-users@lists.sourceforge.net
-References: <20040331144144.786.qmail@web21004.mail.yahoo.com>
-In-Reply-To: <20040331144144.786.qmail@web21004.mail.yahoo.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200403311553.37118.thomas.chiverton@bluefinger.com>
+Subject: RE: [Bluez-users] About Ipaq and Nokia phone
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lan Zhang <Lan.Zhang@Zoran.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E65CD2CAB74C80498703D6EF7624BB4C4ACABE@zmaex.zma.zoran.com>
+References: <E65CD2CAB74C80498703D6EF7624BB4C4ACABE@zmaex.zma.zoran.com>
+Content-Type: text/plain
+Message-Id: <1080744196.2536.7.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,40 +18,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 31 Mar 2004 15:53:36 +0100
+Date: Wed, 31 Mar 2004 16:43:16 +0200
 
-On Wednesday 31 Mar 2004 15:41 pm, Gary Martin wrote:
-> numerical
-> class codes for "computer" and "mobile phone"
+Hi Lan,
 
-:hunts
-No, it's not clear is it...
+> The "hciconfig -a" is showed below. And because I want to use the phone
+> to print, so I set the linux class as a printer. 
+> 
+> hci0:   Type: USB
+>         BD Address: 00:04:76:C8:44:48 ACL MTU: 128:8 SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:27601 acl:487 sco:0 events:473 errors:0
+>         TX bytes:69807 acl:835 sco:0 commands:18 errors:0
+>         Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'LINUX'
+>         Class: 0x140680
+>         Service Classes: Rendering, Object Transfer
+>         Device Class: Imaging, Printer
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x73 LMP Ver: 1.1 (0x1) LMP Subver:
+> 0x73
+>         Manufacturer: Cambridge Silicon Radio (10)
 
-:looks
-0x000100 and 0x000200 according to khciconfig.
+there is a way too old firmware on this Bluetooth module. You can't have
+an inquiry and a connection at the same time. Try to get a dongle with a
+least CSR firmware HCI 16.4.
 
--- 
-Tom Chiverton 
-Advanced ColdFusion Programmer
+> By the way, I try to use hcidump to catch what is going on, but it looks
+> the hcidump didn't catch up the lower level signal, or inquire signals.
+> Is there a way to look at that? 
 
-Tel: +44(0)1749 834997
-email: tom.chiverton@bluefinger.com
-BlueFinger Limited
-Underwood Business Park
-Wookey Hole Road, WELLS. BA5 1AF
-Tel: +44 (0)1749 834900
-Fax: +44 (0)1749 834901
-web: www.bluefinger.com
-Company Reg No: 4209395 Registered Office: 2 Temple Back East, Temple
-Quay, BRISTOL. BS1 6EG.
-*** This E-mail contains confidential information for the addressee
-only. If you are not the intended recipient, please notify us
-immediately. You should not use, disclose, distribute or copy this
-communication if received in error. No binding contract will result from
-this e-mail until such time as a written document is signed on behalf of
-the company. BlueFinger Limited cannot accept responsibility for the
-completeness or accuracy of this message as it has been transmitted over
-public networks.***
+First you must run it with root rights to catch all HCI packets and of
+course its name is hcidump and it can only sniff on the HCI layer and
+above. For link manager or baseband decoding you need a protocol
+analyser.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
