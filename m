@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] CSR Firmware upgrade?
 From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: Jose Bernardo Silva <jbs@bandos.homelinux.com>
+To: MUSSON MICHAEL JOHN <mmusson@ece.ubc.ca>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20030801102713.M41931@bandos.homelinux.com>
+In-Reply-To: <Pine.GSO.4.44L0.0307311234210.11864-100000@ug7.ece.ubc.ca>
 References: <Pine.GSO.4.44L0.0307311234210.11864-100000@ug7.ece.ubc.ca>
-	<1059732435.2098.289.camel@idoru.kc.de>
-	<20030801102713.M41931@bandos.homelinux.com>
 Content-Type: text/plain
-Message-Id: <1059734468.10884.182.camel@pegasus>
+Message-Id: <1059734251.10567.179.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -22,20 +20,16 @@ List-Unsubscribe:
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 01 Aug 2003 12:41:02 +0200
+Date: 01 Aug 2003 12:37:23 +0200
 
-Hi Jose,
+Hi Michael,
 
-> Well, widcomm/csr firmware update tool doesn't allow you to update a dongle
-> with a firmware meant for another brand dongle - I've tried to update my acer
-> dongle with a msi firmware, and no go... 
-> 
-> As for firmwares, MSI updates the firmware frequently, but it is included in
-> the full drivers package.
+> I have 2 USB dongles with CSR chips.  The firmware on each is build
+> 14.3 and 14.7.  Is it possible to somehow obtain the most up-to-date
+> CSR firmware and upgrade these?
 
-if you have MSI dongles with different firmware on it, please archive
-them all and send them to me. I am also interested in the firmware files
-from the drivers package. How much do you have?
+what kind of USB dongles are they? Please upload your firmware from the
+dongles and send them to me with the output of "hciconfig -a".
 
 Regards
 
