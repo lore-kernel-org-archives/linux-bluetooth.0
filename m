@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42294598.6010004@adamis.de>
-From: Mathias Adam <a2@adamis.de>
+Message-ID: <42292687.5080204@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Once again: Socket CF card and Kernel 2.6
-References: <20050226031901.GL11723@adamis.de>	 <1109578431.17256.9.camel@pegasus>  <20050228220209.GA8151@adamis.de> <1109665776.17256.122.camel@pegasus>
-In-Reply-To: <1109665776.17256.122.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: Re: [Bluez-users] Interference between btsco and hidd
+References: <Pine.LNX.4.62.0503032051240.10779@block>
+In-Reply-To: <Pine.LNX.4.62.0503032051240.10779@block>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,28 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 05 Mar 2005 06:37:28 +0100
+Date: Fri, 04 Mar 2005 20:24:55 -0700
 
-Hi,
+Florian
 
-I just got it working by doing a little change in the serial driver 
-(8250.c). I tested it with 2.6.11 but I think it could work for any 2.6 
-kernel.
+> 1. While btsco works fine, I've just noticed that when it's running
+>    and a connection is established to my headset, my other Bluetooth
+>    devices (MS Optical Desktop) can't establish a connection by them-
+>    selves anymore. After keyboard or mouse go to sleep mode with 
+>    btsco running, they can only be reconnected with hidd --connect
+>    or by killing btsco first.. Has anyone got an idea how to fix this?
 
-Marcel Holtmann schrieb:
-> I am not an serial card expert. This is a problem in the serial
-> subsystem and a BlueZ problem.
+I remember Lars Grunewaldt bringing this up a while ago. Marcel told him 
+something like changing how hidd runs? master? Anyway, check the 
+bluez-devel (possibly bluez-users) list archives.
 
-That proved to be true.
+> 2. I had a look at the hcid source code, as I was thinking about
+>    implementing a little function to call some script when a
+>    connection request arrives. However, my understanding of BT
+>    is still limited, so can somebody give me a hint where to start?
+>    What kind of event is received when a connection request comes in?
 
-Marcel: One thing I discovered while debugging this: the hci_uart driver 
-seems to initialize the actual UART with only 230400 baud. Is this 
-really the case or are those UARTs clocked at nonstandard (higher) 
-frequencies so that this setting does result in a higher real baud rate?
+Yes, it appears as an AT string on the command channel. See the way 
+btsco examines AT strings.
 
+> 3. Again concerning btsco: has anybody tried to disconnect the SCO
+>    channel while not in use? Maybe that would fix the problem with
+>    hidd, too..
 
-Regards,
-Mathias
+Yes, we would all love it. As far as I know, no one has done it.
+
+Brad
 
 
 -------------------------------------------------------
