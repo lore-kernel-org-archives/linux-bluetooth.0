@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] snd-bt-sco
+Subject: Re: [Bluez-devel] to build a bluetooth stack that can be embedded
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Peter Favrholdt <pfavr@mip.sdu.dk>
+To: Pranab Shenoy <pranab_shenoy@yahoo.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <40E346A8.2050209@mip.sdu.dk>
-References: <40E33BF2.7010705@mip.sdu.dk>  <40E346A8.2050209@mip.sdu.dk>
+In-Reply-To: <20040701074257.94807.qmail@web20501.mail.yahoo.com>
+References: <20040701074257.94807.qmail@web20501.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1088691001.4540.230.camel@pegasus>
+Message-Id: <1088690625.4540.228.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,26 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 01 Jul 2004 16:10:01 +0200
+Date: Thu, 01 Jul 2004 16:03:45 +0200
 
-Hi Peter,
+Hi Pranab,
 
-> Well, I figured out I didn't have the /dev/snd/* device files
-> 
-> So now it almost works. The headset seems connected. I can use alsamixer (and 
-> the volume buttons on the headset changes the volume in the mixer window). 
-> hciconfig shows data is flowing at a steady rate from the microphone:
-> 
-> hci0:   Type: USB
->          BD Address: 00:0B:0D:20:79:21 ACL MTU: 339:4  SCO MTU: 64:0
->          UP RUNNING PSCAN ISCAN
->          RX bytes:8895374 acl:72 sco:329395 events:232 errors:0
->          TX bytes:3768 acl:151 sco:0 commands:47 errors:0
-> 
-> But no sound
+>  We want to build a bluetooth stack that can be embedded in a smart
+> device. We wanna know if its possible, if not why and if yes can we
+> build from the existing stack.
 
-and I am not sure that your USB dongle supports SCO over HCI. Show us
-the output of "hciconfig -a" and "cat /proc/bus/usb/devices".
+Linux is already working in many embedded or smart devices and the BlueZ
+Bluetooth stack is known to work perfect on different hardware platform.
+So I don't see any need write an own Bluetooth stack, but of course you
+are free to do it.
 
 Regards
 
