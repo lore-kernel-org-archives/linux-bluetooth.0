@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Rfcomm use count
-Message-ID: <001501c495f5$f36b05e0$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-reply-to: <001601c48fa7$38cce900$1a01010a@baked>
+Subject: Re: [Bluez-devel] LAN access server
+From: Marcel Holtmann <marcel@holtmann.org>
+To: blookk - <blookk@hotmail.com>
+Cc: bluez-devel@lists.sf.net
+In-Reply-To: <BAY1-F38wr0qxO83cIO000af2e9@hotmail.com>
+References: <BAY1-F38wr0qxO83cIO000af2e9@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1094652818.5289.1.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,61 +18,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 8 Sep 2004 15:48:25 -0700
+Date: Wed, 08 Sep 2004 16:13:38 +0200
 
-Marcel,
+Hi,
 
-I've been able to get the rfcomm use count to stick above 0 using a
-single-threaded app which only does RFCOMM socket calls. After killing
-hciattach and all bluetooth related programs, I have this:
+> I am trying to create a LAN access server with bluetooth.
+> 
+> In server side I execute:
+> insmod rfcomm
+> insmod l2cap
+> hcid -n &
+> sdpd -n &
+> sdptool add sp
+> sdptool add  lan
+> dund --listen --persist
+> 
+> In client side:
+> insmod rfcomm
+> insmod l2cap
+> hcid -n &
+> sdpd -n &
+> sdptool add sp
+> sdptool add  lan
+> dund --connect 00:11:22:33:44:55
+> dund --search
+> 
+> after I do these things in messages of kernel say that "connection refused"
+> 
+> What happend?
 
-lsmod:
-Module                  Size  Used by    Not tainted
-rfcomm                 23268   2  (autoclean)
-hci_uart                5656   0  (autoclean)
-l2cap                  17028   1  (autoclean) [rfcomm]
-bluez                  32392   0  (autoclean) [rfcomm hci_uart l2cap]
+you haven't checked the mailing list archive, because I already wrote
+sometimes that "sdptool add ..." is not necessary when using dund.
 
-cat /proc/bluetooth/rfcomm:
-sk  3A:A4:58:16:05:00 26:02:5F:16:05:00 9 4
-sk  3A:A4:58:16:05:00 26:02:5F:16:05:00 9 10
+Regards
 
-This shows, I think, two sockets in the BT_CLOSED state which aren't =
-getting
-cleaned up. Kernel is 2.4.21-mh10 running on an ARM (with ARM patches, =
-which
-as far as I can tell don't touch any bluetooth code).
+Marcel
 
-The test program loops, doing the following, in pseudo code:
-
-While(1) {
-	1. Connect to remote device via rfcomm
-	2. send a few 100 bytes of data
-	3. Attempt to receive, but the remote side closes the connection.
-	4. creates a socket, binds, listens, and accepts an incomming rfcomm
-connection
-	5. closes the listening socket (continues to use the socket return
-by accept)
-	6. sends a few 100 bytes and receives ~100kB.
-	7. closes the socket
-}
-
-Unfortunately the problem is not easily reproduced. It can take all day =
-for
-it to happen, with the test program being re-run many times (and stopped
-with ctrl-c).
-
-There are two modules connected via serial. On the device two copies of =
-this
-program are run, each one specifying a local bluetooth device in the =
-bind
-calls for connect and listen/accept. i.e. each program works with its =
-own
-local device and does not do anything with the other device.
-
-Any thoughts?
-
--Daryl.
 
 
 
