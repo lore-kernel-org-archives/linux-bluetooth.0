@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41B88BFD.8000907@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <5f30e2610412090915395a1747@mail.gmail.com>
+From: Jeff Wilson <jazzbotley@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: starting btsco-in-libalsa
-References: <41B81ACB.1080807@xmission.com> <1102589835.9988.114.camel@pegasus> <41B83BA8.5010001@suche.org>
-In-Reply-To: <41B83BA8.5010001@suche.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] newb request
+In-Reply-To: <1102611436.9988.237.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <5f30e2610412090850b7f5f85@mail.gmail.com>
+	 <1102611436.9988.237.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,28 +19,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 09 Dec 2004 10:31:41 -0700
+Date: Thu, 9 Dec 2004 11:15:21 -0600
 
-Thomas,
+On Thu, 09 Dec 2004 17:57:16 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Jeff,
+> 
+> I think what you really wanna do is using L2CAP or RFCOMM as transport
+> layers and so better look a l2test.c and rctest.c files.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-> i think this goes to the wrong direction.
-> 1. Even if there exist alsa library for many programms it is sufficent 
-> to use /dev/dsp and /dev/audio.
-> This mean that the soundcard driver should work independent of the alsa 
-> library.
-...
-> So what are the grounds for moving btsco to the lib inseat of moving it 
-> to the module ?
+Thank you for your prompt reply!
 
-I think Marcel explained sufficiently that this is how we can get 
-handsfree and a2dp profiles working properly in the audio driver.
+Sorry, I was not very clear about that part.  I use RFCOMM for the
+transport.  (It's been a couple of months since I wrote "Hello
+World".)  You are correct; I used rctest.c as my guide for that.
 
-When we get the libalsa stuff going, there will be overlap in function 
-with the current kernel module and daemon, but we can keep the kernel 
-module in our project. As with everything open source, it'll be 
-maintained by people who care about it.
+My frustration is trying to understand more about HCI.  I'm sure there
+is no way around a steep learning curve -- my objective is to get as
+fine-tuned control as possible over the INQUIRY and INQUIRY_SCAN
+modes.  I want two nodes (with zero prior knowledge of each other) to
+be able to discover each other and exchange messages within a couple
+of seconds.
 
-Brad
+   Thanks again for your time,
+     Jeff
 
 
 -------------------------------------------------------
