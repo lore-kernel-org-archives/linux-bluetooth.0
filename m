@@ -1,14 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Which is needed to have usb bluetooth? (kernels
-	modules)
+Subject: Re: [Bluez-users] Connection dropped or cannot connect
+	(Solved!!!!!!)
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Gregoire Favre <Gregoire.Favre@freesurf.ch>
+To: rcox27@triad.rr.com
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040410161909.GC26618@magma.epfl.ch>
-References: <20040410155935.GA26618@magma.epfl.ch>
-	 <1081613259.5398.5.camel@pegasus>  <20040410161909.GC26618@magma.epfl.ch>
+In-Reply-To: <200404111146.47402.conardcox@earthlink.net>
+References: <000801c41e98$9e75d080$0100a8c0@terre>
+	 <1081632356.5398.48.camel@pegasus>
+	 <200404111138.50546.conardcox@earthlink.net>
+	 <200404111146.47402.conardcox@earthlink.net>
 Content-Type: text/plain
-Message-Id: <1081701708.5398.58.camel@pegasus>
+Message-Id: <1081701462.5398.54.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,23 +22,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 11 Apr 2004 18:41:48 +0200
+Date: Sun, 11 Apr 2004 18:37:42 +0200
 
-Hi Greogire,
+Hi Richard,
 
-> > I personally prefer having the USB and Bluetooth subsystem as modules,
-> > but it should work in both ways. May you wanna try a modular system.
-> 
-> I have also tried with everything in module (I have no preference...).
+> Seems I spoke too soon 8^(  As soon as I sent this, it disconnected again.  I 
+> should have waited a bit longer to post I suppose.  Nevertheless, for some 
+> reason, it went much longer without this error this time....I'll keep trying.
 
-use it as modules, because it will be less complicated.
-
-> http://www.computerbase.de/bild/article/91/63/ has a good picture of the
-> Bluetooth for my motherboard (MSI Max2-BLR).
-
-No USB Bluetooth adapter at the USB bus. Maybe you have to activate the
-bus itself in your BIOS. Check if another USB device (for example a
-mouse) will work in the same slot.
+I really think that this an USB problem. You should test the 2.4.26-rc2
+or switch to the latest 2.6.
 
 Regards
 
