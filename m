@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] killing a persisted pand session
 From: Marcel Holtmann <marcel@holtmann.org>
 To: wim delvaux <wim.delvaux@adaptiveplanet.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403070334.32315.wim.delvaux@adaptiveplanet.com>
-References: <200403070334.32315.wim.delvaux@adaptiveplanet.com>
+In-Reply-To: <200403070310.27377.wim.delvaux@adaptiveplanet.com>
+References: <200403070058.50508.wim.delvaux@adaptiveplanet.com>
+	 <200403070245.59604.wim.delvaux@adaptiveplanet.com>
+	 <1078624633.2807.20.camel@pegasus>
+	 <200403070310.27377.wim.delvaux@adaptiveplanet.com>
 Content-Type: text/plain
-Message-Id: <1078627214.2807.31.camel@pegasus>
+Message-Id: <1078627054.2807.27.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Re: bnep module use count ...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,42 +21,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 07 Mar 2004 03:40:14 +0100
+Date: Sun, 07 Mar 2004 03:37:34 +0100
 
 Hi Wim,
 
-> I have a theory about this module use count.
+> > when do you start your "pand --listen"? Don't start it from
+> > bluetooth.agent script.
 > 
-> What is my setup.
+> 	Ah that might be the problem. Indeed it is started from there.
 > 
-> When I insert the usb dongle, hci/sdp and pand --listen is started wating for 
-> a connection.
-> 
-> Then I activate the connection on my Ipaq and notice in syslog that the 
-> connection is request.
-> 
-> Pand will then create a bnep module in the kernel.  This will trigger a 
-> hotplug event causing ifup to be executed on bnep0.
-> 
-> So far so good.
-> 
-> Now I disconnect my Ipaq. (either by pand -k and kill or whatever).  
-> This event does not get detected by anybody.
-> 
-> The Ipaq when it comes back will request a new session and a new handle to 
-> bnep0 is created in the kernel (causing refcount to increase beyond the real 
-> use count).
-> 
-> Once this occurs the module is no longer unloadable and actually causes the 
-> system to hang when the usb dongle is removed !!!! A reboot is then 
-> needed ;-((((((
-> 
-> WHat you think of this scenario ?
+> 	Why ? As said I have a dongle that gets inserted and removed frequently.
+> 	Therefore I wanted the hcid/sdpd/pand thing to start when the dongle
+> 	is inserted. so I added the start / stop of these apps to the bluetooth.agent	
+> 	script.  
 
-this can be possible, but I can't tell you anything without more
-information. Last time I check the reference counting it was working
-perfect for all upper L2CAP modules. Maybe there is a problem in the
-BNEP module or in the network layer.
+all these daemons can run all the time, even when no dongle is inserted.
+Start them from /etc/init.d/... and not from bluetooth.agent, because
+the hotplug stuff is not for starting daemons. It is for device
+configuration.
 
 Regards
 
