@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] L2CAP dropping packets on BlueZ based receiver
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Till Harbaum <harbaum@beecon.de>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200408021859.44496.harbaum@beecon.de>
-References: <200408021859.44496.harbaum@beecon.de>
-Content-Type: text/plain
-Message-Id: <1091472875.4259.6.camel@pegasus>
-Mime-Version: 1.0
+From: Till Harbaum <harbaum@beecon.de>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200408021859.44496.harbaum@beecon.de>
+Subject: [Bluez-devel] L2CAP dropping packets on BlueZ based receiver
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,51 +16,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 02 Aug 2004 20:57:07 +0200
+Date: Mon, 2 Aug 2004 18:59:44 +0200
 
-Hi Till,
+Hi,
 
-> i have been using bluez l2cap for quite some time now. To my BlueMP3 receiver 
-> i have streamed gigabytes via l2cap with no problems using bluez as a sender 
-> so far.
-> 
-> A customer of mine now told me, that l2cap under bluez is unrealible. It was 
-> hard to believe, but the follwing archive contains to little programs i wrote 
-> to verify this. It's a sender and a (artifically slowed down) receiver:
-> 
-> http://www.harbaum.org/till/l2flow.tgz
-> 
-> The sender is marking the packets with some sequence number. After about 
-> 80kBytes the receiver starts complaining about missing sequence numbers. 
-> Since i can stream to my won hardware (and successfully slowing down the 
-> transmission, since the receiving mp3 decoder is only taking the data at the 
-> appropriate bandwidth) i am sure that sending data with bluez is not the 
-> problem. However the receiver seems to fetch all packets from its bluetooth 
-> hardware and is dropping packets if it then sees, that it has run out of 
-> internal buffers.
-> 
-> Why is that? Can this be avoided? Is this by purpose?
+i have been using bluez l2cap for quite some time now. To my BlueMP3 receiver 
+i have streamed gigabytes via l2cap with no problems using bluez as a sender 
+so far.
 
-the L2CAP of the Bluetooth 1.1 specification has no flow control and so
-it can't be fully reliable. See the comment the l2cap.c source code:
+A customer of mine now told me, that l2cap under bluez is unrealible. It was 
+hard to believe, but the follwing archive contains to little programs i wrote 
+to verify this. It's a sender and a (artifically slowed down) receiver:
 
-        /* If socket recv buffers overflows we drop data here
-         * which is *bad* because L2CAP has to be reliable.
-         * But we don't have any other choice. L2CAP doesn't
-         * provide flow control mechanism. */
+http://www.harbaum.org/till/l2flow.tgz
 
-Some Bluetooth stacks emulate L2CAP flow control with the flow control
-of the HCI layer, but this is more bad than dropping a packet. Actually
-this is the reason why most mobiles phones don't support more than one
-ACL at the same time.
+The sender is marking the packets with some sequence number. After about 
+80kBytes the receiver starts complaining about missing sequence numbers. 
+Since i can stream to my won hardware (and successfully slowing down the 
+transmission, since the receiving mp3 decoder is only taking the data at the 
+appropriate bandwidth) i am sure that sending data with bluez is not the 
+problem. However the receiver seems to fetch all packets from its bluetooth 
+hardware and is dropping packets if it then sees, that it has run out of 
+internal buffers.
 
-The solution for this is using RFCOMM or L2CAP with retransmission and
-flow control from the Bluetooth 1.2 specification.
+Why is that? Can this be avoided? Is this by purpose?
 
-Regards
+Ciao,
+  Till
 
-Marcel
-
+-- 
+Dr.-Ing. Till Harbaum                       Tel.:  +49 721 4998963
+BeeCon GmbH                                 Fax:   +49 721 4998962
+Haid-und-Neu Strasse 7, 76131 Karlsruhe     Mobil: +49 179 9087904
+harbaum@beecon.de                           http://www.beecon.de
 
 
 
