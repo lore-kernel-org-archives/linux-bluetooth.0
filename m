@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
+From: Diego Liziero <liziero.diego@unimore.it>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200411261152.29925.pavouk@pavouk.org>
-Subject: [Bluez-users] DBT-120 firmware upgrade
+In-Reply-To: <1101413321.6465.6.camel@pegasus>
+References: <qszactrj3c5.fsf@timepilot.gpcc.itd.umich.edu>
+	 <1099960170.29330.43.camel@pegasus>
+	 <qszu0rfnfil.fsf@mspacman.gpcc.itd.umich.edu>
+	 <1101413321.6465.6.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1101460561.11603.89.camel@igno>
+Mime-Version: 1.0
+Subject: [Bluez-users] Firmware update & HID profile (Was: Detecting RSSI without
+ connecting)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,48 +22,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Nov 2004 11:52:29 +0100
+Date: Fri, 26 Nov 2004 10:16:01 +0100
 
-Hello,
+On Thu, 2004-11-25 at 21:08 +0100, Marcel Holtmann wrote:
+>[...]
+> Maybe the easiest way is a D-Link DBT-120 Rev. B3 and then put the Apple
+> firmware update on it.
 
-I want to upgrade DBT-120 Ver B3 (details below).
-I read instructions on http://www.holtmann.org/linux/bluetooth/dfu.html
-I have downloaded BluetoothFWUpdate1.2.dmg.
-On web is version 1.1, but when I try to download it, then version 1.2
-is saved on to disk.
+BTW, any improvements in the new Apple firmware update?
 
-There are 3 dfu files:
-md5sum and name:
---------------------------------
-f1cb8ce8d3222af2bb6b512f99be62c7  DeskTop.dfu
-00acbb467c76a1bca899f888fc23a779  GenericCSR.dfu
-f16c41fa42e04d77a9df6ae8c2d40c82  Portable.dfu
+I used the previous one on two BT-120 (H/W: B2 and H/W: B3)
+and both of them now start with HID profile.
 
-Is this right GenericCSR.dfu for DBT-120 B3?
-I mean correct md5sum.
+I know that to have them back starting with hci I should change a PS key
+setting, but the only linux program I found is for serial modules only.
 
-I know, that flashing with btdfu is without warranty, but do you think that it 
-will works?
+Is the new update behaving the same way?
 
-Best regards,
+(I know that I can use hid2hci each time I use them, but, unfortunately,
+I don't use Bluetooth _only_ with Linux and with my up-to-date Linux
+box).
 
-Pavoel Ruzicka
+Regards,
+-- 
+Diego Liziero <diego.liziero@unimore.it>
 
-Dongle details:
----------------------
-# hciconfig hci0 version
-hci0:   Type: USB
-        BD Address: 00:0D:88:XX:XX:XX ACL MTU: 192:8  SCO MTU: 64:8
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x1bb LMP Ver: 1.1 (0x1) LMP Subver: 0x1bb
-        Manufacturer: Cambridge Silicon Radio (10)
-# hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:0D:88:8E:B9:F0 ACL MTU: 192:8  SCO MTU: 64:8
-        HCI 15.3
-        Chip version: BlueCore02
-        Max key size: 56 bit
-        SCO mapping:  HCI
--------------------------
 
 
 -------------------------------------------------------
