@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Fabrice =?iso-8859-1?q?M=E9nard?= <menard.fabrice@wanadoo.fr>
+From: "Arthur Dent" <tobili@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200405041444.45061.menard.fabrice@wanadoo.fr>
-Subject: [Bluez-users] Boot problem
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Message-ID: <BAY18-F35upP0Xthjx700009162@hotmail.com>
+Subject: [Bluez-users] Kernel panic when unplugging USB dongle
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,84 +15,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 4 May 2004 14:44:45 +0200
+Date: Tue, 04 May 2004 10:51:09 +0000
 
-Hi all
+I have been using the Bluez architecture for quite some
+time now in combination with a bluetooth modem and
+everything has been working nicely. Now I decided to
+update my system: I have downloaded the 2.4.26 kernel
+from kernel.org, patched the kernel (2.4.26-mh1) and
+additionally installed: bluez-libs-2.6, bluez-utils-2.6
+and bluez-pan-1.1
+When I plugged in the USB dongle everything worked nicely
+and "hcitool dev" reports the address so bluetooth should be
+working. However, when I unplug the dongle the kernel freezes
+instantly and I am also not able to obtain any hint from
+/var/log/messages and stuff.
 
-I've succeeded to make my dinovo work in bluetooth mode.
-Thanks for your great work !!
+When I additionally install the outdated bluez-kernel-2.3
+package the kernel does not freeze...
+What did I do wrong, can anybody give me a hint? This is
+beyond my capabilities.
+I am using SuSE 9.0 on a Toshiba Satellite.
 
-But in boot time nothing happens and I don't have any error message.
-No response from the keyboard and the media pad but the mouse is ok.
-
-Any clue ?
-
-Here is my init script:
-
-#!/bin/bash
-# D=E9marrage du sous-syst=E8me bluetooth
-
-# Source function library.
-=2E /etc/init.d/scripts/functions
-
-start()=20
-{
-        echo $"D=E9marrage de Bluetooth..."
-        loadproc /sbin/hcid
-	evaluate_retval
-
-	echo "Passage du mode USB au mode Bluetooth pour le DiNovo..."
-	hid2hci > /dev/null
-	evaluate_retval
-
-	echo "Lancement du d -b=E9mon de service HID..."
-	bthid -d
-	evaluate_retval
-
- 	touch /var/lock/bluetooth
-}
-
-stop()=20
-{
-        echo "Arr=EAt du d=E9mon de service HID..."
-	bthid -k
-	evaluate_retval
-
-        echo $"Arr=EAt de Bluetooth..."
-	killproc hcid
-	evaluate_retval
-
-	rm -f  /var/lock/bluetooth
-}
-
-[ -f /sbin/hcid ] || exit 0
-
-case "$1" in
-  start)
-	start
-        ;;
-  stop)
-	stop
-        ;;
-  restart|reload)
-	stop
-	start
-	;;
-  condrestart)
-	[ -e /var/lock/bluetooth ] && (stop; start)
-	;;
-  *)
-        echo $"Utilisation: $0 {start|stop|restart|reload|condrestart}"
-        exit 1
-esac
-
-exit 0
-
-=2D-=20
-=46abrice M=E9nard
-menard.fabrice@wanadoo.fr
-
-ps: if my english is very bad, please send me a note !!
+_________________________________________________________________
+MSN Messenger - sehen, welche Freunde online sind! 
+http://www.msn.de/messenger Jetzt kostenlos downloaden und mitmachen!
 
 
 
