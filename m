@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Tcl bindings
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Hannes Reiff <faster10@gmx.net>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20040623T124001-66@post.gmane.org>
-References: <loom.20040623T124001-66@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1087989171.4209.77.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: Hannes Reiff <faster10@gmx.net>
+Message-ID: <loom.20040623T124001-66@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Tcl bindings
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,18 +15,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Jun 2004 13:12:51 +0200
+Date: Wed, 23 Jun 2004 10:43:37 +0000 (UTC)
 
-Hi Hannes,
+Hi,
 
-> is there a Tcl binding for the bluez utilities/libs or has anyone written one?
+is there a Tcl binding for the bluez utilities/libs or has anyone written one?
+Thanks in advance.
 
-not that I know of.
+Regards,
 
-Regards
-
-Marcel
-
+Hannes
 
 
 
