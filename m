@@ -1,14 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: # =?ISO-8859-1?Q?Bj=F6rn?= Specht # <bspecht@gmx.net>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] omtu, imtu
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050209160702.56b74881@CleverSophie>
+Message-ID: <20050209160702.56b74881@CleverSophie>
+In-Reply-To: <1107957430.13863.34.camel@pegasus>
 References: <20050209140701.2cf50710@CleverSophie>
-	 <1107955171.13863.26.camel@pegasus> <20050209143858.1e0350c3@CleverSophie>
-	 <1107957430.13863.34.camel@pegasus>  <20050209160702.56b74881@CleverSophie>
-Content-Type: text/plain
-Message-Id: <1107962283.13863.65.camel@pegasus>
+	<1107955171.13863.26.camel@pegasus>
+	<20050209143858.1e0350c3@CleverSophie>
+	<1107957430.13863.34.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,25 +21,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 09 Feb 2005 16:18:03 +0100
+Date: Wed, 9 Feb 2005 16:07:02 +0100
 
-Hi Bjoern,
+Hi Marcel,
 
-> can you also tell me what omtu and imtu are for? I know the Maximum Transfer Unit, but what exactly do these 2? I have set them to 672 and 0 like in the rctest.c file.
+can you also tell me what omtu and imtu are for? I know the Maximum Transfe=
+r Unit, but what exactly do these 2? I have set them to 672 and 0 like in t=
+he rctest.c file.
 
-what about reading the L2CAP part of the Bluetooth specification. It is
-all there, but in short (i)ncoming MTU and (o)utgoing MTU.
+Is 672 the maximum? It would just be nice to know the maximum data per fram=
+e, for a good header to data proportion.
 
-> Is 672 the maximum? It would just be nice to know the maximum data per frame, for a good header to data proportion.
-
-The maximal value is 65535. The header/payload is not important for the
-throughput. Only matching it to the baseband packet types helps.
-
-Regards
-
-Marcel
-
-
+Thanks again=20
+Bj=F6rn
 
 
 -------------------------------------------------------
