@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] valgrind complains
+Subject: Re: [Bluez-users] hidp report mode in 2.6.10?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200412080123.07501.wim.delvaux@adaptiveplanet.com>
-References: <200412080123.07501.wim.delvaux@adaptiveplanet.com>
+In-Reply-To: <200412072348.46144.cijoml@volny.cz>
+References: <1102459374.10705.2.camel@saag.bunker.heddley.com>
+	 <200412072348.46144.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1102478579.8447.62.camel@pegasus>
+Message-Id: <1102478395.8447.56.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +19,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 08 Dec 2004 05:02:59 +0100
+Date: Wed, 08 Dec 2004 04:59:55 +0100
 
-Hi Wim,
+Hi Michal,
 
-> about unintialized values in the following code
-> 
->  struct hci_dev_info di;
-> 
->          di.dev_id = dev_id;
-> 
->          if( ioctl( fd, HCIGETDEVINFO, (void*)&di) != 0 )
->               continue;  // uh ?
-> 
->  printf( "%s\n", di.name ); // here valgrind complains on the third character
-> 
-> 
-> Should I perhaps memset ? is name field null terminated ?
+> it should be finally released as Marcel 2 mounths ago promised...
+> for 2.4 too! :)
 
-maybe you should include the filename to let us know where to look.
+I never promised anything for 2.4 and the report mode support will never
+go into 2.4 at any time. If I get some extra time for looking at 2.4
+then you might see some backports of 2.6 features and the boot protocol
+support. However this is on the bottom of my todo list. Feel free to
+send me backported and full documented patches for easy integration into
+my Bitkeeper tree.
 
 Regards
 
