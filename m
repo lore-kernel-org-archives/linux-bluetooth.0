@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Qualification testing.
-Message-ID: <001a01c4d7d9$4c61a800$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1101883367.18840.31.camel@pegasus>
+Subject: Re: [Bluez-devel] hcid vs. hciconfig hci0 up
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY102-F210C30E45F8EA3793EF85AD2BF0@phx.gbl>
+References: <BAY102-F210C30E45F8EA3793EF85AD2BF0@phx.gbl>
+Content-Type: text/plain
+Message-Id: <1101927915.15615.13.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,54 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 1 Dec 2004 11:09:35 -0800
+Date: Wed, 01 Dec 2004 20:05:15 +0100
 
-Marcel,
+Hi Theresa,
 
-> lets go ahead and fix them all.
+> I got my server app running on an Axis developer's board  83 with the use of 
+> an RFCOMM socket on channel one for the BT comm.  After flashing my board 
+> w/the new kernel (for BlueZ to work) I noticed I could not run the hcid 
+> daemon w/out the board either giving msgs about no kernel access to the 
+> device or even kernel panics when i put the hcid in a startup script.  (For 
+> those familiar w/this board, I can do a network boot of the same image and 
+> it all works fine)
+> 
+> I know this issue has nothing to do w/this list, but I wanted to know:
+> 
+> What is the difference between running the hcid and using "hciconfig hci0 
+> up" to bring up the device.  Since I cannot use hcid, I just use hciconfig 
+> to manually bring up the device and my app works fine.  Whats the difference 
+> between the two?  And is it better to use the daemon?
 
-I got word back on one of the unmentioned bugs and it appears to be a =
-bug in
-the tester. So now there is only one outstanding item. I don't see why =
-this
-is a failure:
+the hcid brings the device up and sets some more settings based on its
+config file (for example name etc.).
 
-CFD/BV-01:
-Tester sends an l2cap config request in two pieces (using continuation =
-flag)
-to the IUT. The tester expects to see one of two alternatives:
+Regards
 
-1. The IUT includes in the response to each request the requested =
-options.
-2. The IUT first sends an empty response and in its second response it =
-sends
-all the requested options.
+Marcel
 
-We currently just send two empty responses. I think an empty response =
-would
-be acceptable if all the requested options were in one request, so I =
-don't
-see why this fails.
-
-> to be honest, I am already aware of this problem. I ran into it when I
-> first started to look at the support for L2CAP retransmission and flow
-> control. Our current way of handling the configuration must be changed
-> to deal better with L2CAP 1.2 devices and their features. It=20
-> is not that
-> easy to change and my time was too limited for it. However I=20
-> am open for
-> any ideas and I am sorry to say that, but your patch looks=20
-> like a dirty
-> hack.
-
-Ah yes, the expected response. ;)  But you are right, it is a bit of a =
-hack.
-As far as I can see it's either going to be a hack or a rewrite of that
-config request handling code. Do you have a better solution?
-
-Is QoS one of the things you're thinking of?
-
--Daryl.
 
 
 
