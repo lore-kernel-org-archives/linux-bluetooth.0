@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: Re:[Bluez-devel] BlueZ on CSR ?
-From: David Woodhouse <dwmw2@infradead.org>
+From: Victor Shcherbatyuk <victor@win.tue.nl>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <ICGZCE$7DF6A31DCAD3E31E3169B51A8859A4C6@bol.com.br>
-References: <ICGZCE$7DF6A31DCAD3E31E3169B51A8859A4C6@bol.com.br>
-Content-Type: text/plain
-Message-Id: <1109520020.27107.30.camel@localhost.localdomain>
-Mime-Version: 1.0
+Cc: victor@win.tue.nl
+Message-ID: <Pine.LNX.4.44.0502271406520.18458-100000@antilope>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-devel] Connection with a phone stays open after closing RFCOMM channel
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +17,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Feb 2005 16:00:19 +0000
+Date: Sun, 27 Feb 2005 14:25:16 +0100 (MET)
 
-On Fri, 2005-02-25 at 10:41 -0300, ra002890 wrote:
->Can you configure your module(home made) or it is a shop-self module?!?
->I worked with csr modules and Bluez worked very well with them. At
->first remember that common PCs serial port works only at 115200 bps or
->less. Try "hciattach ttyS0 any 115200", or
->"hciattach ttyS0 bcsp 115200". If you can change PSKEYS, and firmware,
->recall me.
+Hi Marcel!
 
-Most PC serial ports can do at least 460800 baud if you ask them nicely.
-Search for 'Shsmod' which puts the port into high-speed mode.
+I have the following prob.:
 
--- 
-dwmw2
+My prog. listens on a RFCOMM chan. (adv. as HF channel via SDP) of  a 
+laptop, when I 
+connect from my phone to the laptop the chan. is opened, I send some 
+commands to configure the phone and when finished, close the chan. The 
+problem is that L2CAP connection stays open, from the output of hcidump I 
+see that laptop sends DISC request on dlci 6 and receives UA, but then 
+according to protocol it should also then send DISC for dlci 0, and then 
+terminate L2CAP -- it does not happen...
+If I do the same, but initiating connection from laptop - it works fine...
+I'm sure there is no other RFCOMM chan. opened.
+
+I have latest lib. and utils, 2.6.10 kernel not pached. The phone is 
+SE630.
+
+Thanks in advance.
+
+Kind regards,
+          Victor Shcherbatyuk.
+ -- 
+P.S. btw, phone detects that RFCOMM chan. is closed and changes HF icon to 
+general connected icon...
 
 
 
