@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michael Firsching" <michael.firsching@gmx.net>
-To: <bluez-users@lists.sourceforge.net>
-Subject: RE: [Bluez-users] Apple BT connection problem
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1105532015.7961.49.camel@pegasus>
-Message-Id: <20050112133556.290DC12B103@rrzmta1.rz.uni-regensburg.de>
+Subject: Re: [Bluez-users] bluetooth headsets
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <pan.2005.01.12.07.34.39.13819@yahoo.com>
+References: <pan.2005.01.12.07.34.39.13819@yahoo.com>
+Content-Type: text/plain
+Message-Id: <1105532446.7961.61.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 Jan 2005 14:35:47 +0100
+Date: Wed, 12 Jan 2005 13:20:46 +0100
 
+Hi Paul,
 
-> 
-> we saw that problem and it only occurs when you configured 
-> another input device through YaST. It is unclear what 
-> triggers this problem. Using a vanilla kernel I wasn't able 
-> to reproduce it. What other input devices are in your machine?
+> Does anyone knows any studies regarding health dangers using bluetooth
+> headsets ?
+> Something like for mobile phones ?
+> I am planning to buy a BT headset and I want to know if is dangerous for
+> my brain to use something like this.
+> I know it uses much less power than a mobile phone, but the usage is also
+> different, while we use our phones only when speaking, we tend to keep the
+> headset on for longer periods, and if it used also for listening to music,
+> then it will be even longer periods.
 
-I am having the same problems with SUSE 9.2, kernel 2.6.10, a EPOX dongle a
-MX900 mouse and a M$ Bluetooth keyboard. I can not creat connections on boot
-and have to connect the devices manually every time. Connecting is only
-possible after pressing the connect buttons of the devices or removing the
-batteries on the keyboard.
+I am not an expert in any health questions or when it comes down to the
+Bluetooth radio and baseband stuff. However in general, if there is no
+low level ACL link (headset is not part of any piconet) then there is no
+active radio transmission.
 
-Error messages and config is identical to snik1`s...
+Regards
 
-Regards 
-Michael
+Marcel
+
 
 
 
