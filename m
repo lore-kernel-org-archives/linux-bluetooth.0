@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Edd Dumbill <edd@usefulinc.com>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <1086618157.32217.54.camel@saag>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Can you spoof/forge Bluetooth Devices/Address?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Xavier Garreau <x.garreau@prim-time.fr>
+Cc: David Mackie <d.mackie@ru.ac.za>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <015f01c44c68$0a24a520$b67ba8c0@zaz1>
+References: <20040606162154.GA94074@rucus.ru.ac.za>
+	 <015f01c44c68$0a24a520$b67ba8c0@zaz1>
 Content-Type: text/plain
-Subject: [Bluez-users] Nokia SU-1B digital pen
+Message-Id: <1086596922.12811.39.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,20 +20,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 07 Jun 2004 15:22:37 +0100
+Date: Mon, 07 Jun 2004 10:28:42 +0200
 
-I just succeeded in getting one of these pens paired with Linux, running
-BlueZ.  Here's a write-up of what I did:
-http://usefulinc.com/edd/blog/contents/2004/06/07-nokia-su-1b/read
+Hi Xavier,
 
-I basically made a hacky misuse of dund to emulate the modem of a
-cellphone, which the pen needs to contact in order to get
-manuf/model/version information.  The writeup contains a link to the
-hack.
+> > Does anyone know if you are able to spoof or forge a Bluetooth Device
+> > Address? I am wanting to pick up Bluetooth comms at one point and
+> > forward it on to another device but I am wanting the repeating
+> > devices to act like the original sending devices. Eg. If I have a
+> > phone that wants to communicate with my PC, I can have 2 repeaters,
+> > one spoofed as the PC and one as the phone.
+> >
+> > phone <-BT-> Repeater(spoof PC) <-Not BT-> Repeater(spoof phone)
+> > <-BT-> PC
+> 
+> As far as i know you can change the BD Address of a CSR BT chip by using CSR
+> vendor specific commands. At least, you can use an application they've made
+> to achieve this.
 
-After pairing, it works fine with regular OBEX PUSH.
+you can change the BD_ADDR of almost every Bluetooth dongle, but as
+Michael correctly pointed out, you must reset the dongle after it. So
+changing the address on the fly is not possible.
 
--- Edd
+Regards
+
+Marcel
 
 
 
