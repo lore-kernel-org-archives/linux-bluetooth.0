@@ -1,104 +1,98 @@
-Return-Path: <James@superbug.demon.co.uk>
-Message-ID: <403916CB.3060205@superbug.demon.co.uk>
-Date: Sun, 22 Feb 2004 20:53:31 +0000
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: =?ISO-8859-1?Q?Fred_Sch=E4ttgen?= <bluez-devel@schaettgen.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Simon Vogl <vogl@soft.uni-linz.ac.at>
-Subject: Re: [Bluez-devel] sco link help needed
-References: <4034CA08.50500@soft.uni-linz.ac.at>	 <200402191629.38846.bluez-devel@schaettgen.de>	 <40376D2B.1060904@superbug.demon.co.uk> <1077452836.2716.42.camel@pegasus>
-In-Reply-To: <1077452836.2716.42.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] L2CAP raw socket patch
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Collin R. Mulliner" <collin@betaversion.net>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040211000722.2368d2e9.collin@betaversion.net>
+References: <20040210124942.393a6da0.collin@betaversion.net>
+	 <1076451408.2777.13.camel@pegasus>
+	 <20040210232330.4cf4935d.collin@betaversion.net>
+	 <1076452346.2777.31.camel@pegasus>
+	 <20040211000722.2368d2e9.collin@betaversion.net>
+Content-Type: multipart/mixed; boundary="=-/Zodkoa/0mpQZeefWq8T"
+Message-Id: <1077463890.2716.53.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Sun, 22 Feb 2004 16:31:30 +0100
 
-Marcel Holtmann wrote:
-> Hi James,
-> 
-> 
->>For those interested, I am planning to write an alsa driver for 
->>bluetooth headsets.
->>The alsa driver module would load into kernel, but not present any sound 
->>devices.
->>Once a pairing had been set up (a small tool will be used for the 
->>pairing), the alsa driver module would then dynamically add a sound card 
->>to the kernel device list, and this sound card would work just like any 
->>other sound device in linux.
->>The alsa driver would handle both iso and rfcomm connections, iso for 
->>the sound, rfcomm for mixer volume etc.
-> 
-> 
-> we don't need a kernel module that implements the headset profile as an
-> audio device. What we need is a generic SCO kernel module with a well
-> defined interface that is between the Bluetooth HCI SCO traffic and the
-> ALSA sound layer. This means that if a SCO connection is created the
-> driver must set up a new sound device, but the mixer stuff is profile
-> stuff and must be done by a userspace application.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
 
-A agree that we need a clearly defined interface for the bluetooth SCO.
-For SCO connections the interface will HAVE to be a callback based 
-interface. SCO is all about realtime data, and we must ensure minimal 
-latency, so that requires a callback interface.
-I.E. We set up the SCO connection, and get it to callback after every X 
-frames received. The same for sending, callback saying I need X samples now!
+--=-/Zodkoa/0mpQZeefWq8T
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-It will be up to the layer above, what is does in each callback function.
+Hi Collin,
 
-The interface between bluetooth SCO and upper layers will have to be 
-able to work in both kernel and user space.
-alsa has all it's low level drivers in kernal space.
-The low level drivers provide the direct access to the hardware.
-E.g. Output/input of samples, IRQ handling, Interface to mixer hardware.
-The alsa driver can dynamically add and remove what is visable to the 
-user space. I.E. One plugs in a USB sound card, the card automatically 
-appears for use to the user.
+> so what do you all think about the RAW socket patch, does it make sense
+> putting it into the official tree?
 
-For alsa to work well with bluetooth, we will need some special handling 
-. The main use of alsa with bluetooth will be for headset communications 
-and therefore use the bluetooth headset profile.
-Problems to overcome: -
-1) Pairing. Provide a method to pair a bluetooth headset, so that if the 
-headset tried to open the connection. bluez will link to alsa only for 
-that paired device. So, we will need to be able to register alsa as a 
-pairing handler to bluez. Does the concept of a pairing handler even 
-exist yet in bluez?
-2) There is currently no method in alsa, for alsa to tell the 
-application "I am here now, listen to me!". So, if the headset initiates 
-the connection, there is currently no way to use alsa to inform the 
-application that the headset wishes to do such a thing. Maybe we could 
-implement this with an alsa mixer element that is present all the time 
-the pairing is present. And the application could poll the mixer 
-element, and if the mixer element changed state, we would open the PCM 
-to receive the audio. A sort of on/off hook indication.
+the original code was even wrong. If a SKB contains two or more commands
+or responses the SKB will be put more than once to the raw socket. I am
+going to apply the attached patch and hope we don't get a performance
+decrease.
 
-3) The headset profile consists of a RFCOMM connection for setting 
-volume levels etc. and also a SCO connection for passing audio samples.
-The alsa driver will implement the headset profile when working with 
-bluez. We might be able to expand that to the hands-free profile later.
-The RFCOMM will therefore interface with the alsa mixer. the SCO 
-connection will interface with the alsa PCM.
+Regards
 
-Summary: -
-1) The alsa driver for bluetooth will be a kernel mode implementation of 
-the bluetooth headset profile.
+Marcel
 
-2) A userspace tool will be used to configure the bluetooth pairing and 
-configure the alsa-bluez link.
 
-3) We will need to be able to implement bluetooth profiles in kernel 
-modules as well as user space applications.
+--=-/Zodkoa/0mpQZeefWq8T
+Content-Disposition: attachment; filename=patch
+Content-Type: text/plain; name=patch; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
 
-4) The bluez SCO interface should be changed to a callback interface.
+===== net/bluetooth/l2cap.c 1.36 vs edited =====
+--- 1.36/net/bluetooth/l2cap.c	Wed Jan 14 21:56:53 2004
++++ edited/net/bluetooth/l2cap.c	Sun Feb 22 16:22:51 2004
+@@ -1629,6 +1629,8 @@
+ 	struct l2cap_cmd_hdr cmd;
+ 	int err = 0;
+ 
++	l2cap_raw_recv(conn, skb);
++
+ 	while (len >= L2CAP_CMD_HDR_SIZE) {
+ 		memcpy(&cmd, data, L2CAP_CMD_HDR_SIZE);
+ 		data += L2CAP_CMD_HDR_SIZE;
+@@ -1670,7 +1672,6 @@
+ 
+ 		case L2CAP_COMMAND_REJ:
+ 			/* FIXME: We should process this */
+-			l2cap_raw_recv(conn, skb);
+ 			break;
+ 
+ 		case L2CAP_ECHO_REQ:
+@@ -1680,11 +1681,10 @@
+ 		case L2CAP_ECHO_RSP:
+ 		case L2CAP_INFO_REQ:
+ 		case L2CAP_INFO_RSP:
+-			l2cap_raw_recv(conn, skb);
+ 			break;
+ 
+ 		default:
+-			BT_ERR("Uknown signaling command 0x%2.2x", cmd.code);
++			BT_ERR("Unknown signaling command 0x%2.2x", cmd.code);
+ 			err = -EINVAL;
+ 			break;
+ 		}
 
-That is currently what I think would need to happen.
-Any comments?
+--=-/Zodkoa/0mpQZeefWq8T--
 
-Cheers
-James
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
