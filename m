@@ -1,62 +1,53 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] GSM Multiplexer Protocol
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Daniel Haensse <haensse@swissembedded.com>
-Cc: uclinux-dev <uclinux-dev@uclinux.org>, bluez-users@lists.sourceforge.net
-In-Reply-To: <200409262123.50707.haensse@swissembedded.com>
-References: <200409262123.50707.haensse@swissembedded.com>
-Content-Type: text/plain
-Message-Id: <1096359052.4684.20.camel@notepaq>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Sep 2004 10:10:52 +0200
+Return-Path: <palli@pallit.lhi.is>
+Message-ID: <415921D4.9000605@pallit.lhi.is>
+Date: Tue, 28 Sep 2004 08:33:24 +0000
+From: Pall Thayer <palli@pallit.lhi.is>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] accessing info on paired devices
+References: <41570BC9.6090109@pallit.lhi.is> <1096359364.4684.28.camel@notepaq>
+In-Reply-To: <1096359364.4684.28.camel@notepaq>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Daniel,
+But the link key is in binary form so I can't read it. What I've been 
+doing is just sending a single l2ping to each of the discovered devices, 
+the ones that are paired and authorized respond, the others time-out and 
+are eventually ignored. The only problem is that I end up with a stack 
+of PIN request pop-ups for the ones that aren't paired and authorized. 
+Not a big deal but somewhat annoying. I tried playing around with the 
+security settings in hcid.conf but nothing I did managed to avoid the 
+PIN request pop-up.
 
-> we need GPRS and SMS services at the same time. For this reason a multiplexer 
-> protocol is supported in GSM 07.10 which creates several virtual serial ports 
-> which can be controlled with normal AT commands. The AT commands are routed 
-> through a software multiplexer circuit which on the other end is connected to 
-> the real GSM modem's tty.
+Pall
+
+Marcel Holtmann wrote:
+> Hi Pall,
 > 
-> Is there any GSM multiplexer protocol for linux available?
 > 
-> Unfortunately, I did not find any driver in the kernel or userland to support 
-> this. I did find out so far that RFCOMM might be a good point to start 
-> writing virtual tty ports as bluetooth also supports GSM 07.10 in connection 
-> with the RFCOMM protocol. The basic idea behind it is to interface the sock 
-> to a the GSM modem TTY instead of L2CAP. Any hints?
+>>I'm working on a little project that would have to automatically scan 
+>>for bluetooth devices (using a little perl script) and then attempt to 
+>>connect to them. However, I would prefer if it would only attempt to 
+>>connect to devices that have already been paired with the computer (via 
+>>bluetooth usb-dongle) and ignore discovered devices that have not been 
+>>paired. So, how can I find out which of the discovered devices have been 
+>>paired?
+> 
+> 
+> if there exists a link key for this device then they are paired, but the
+> problem is that security mode 1 not demands to pair two devices.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
 
-the RFCOMM is not a good starting point, because it is only a subset of
-GSM 07.10 specification and they already changed some parts of them to
-met their requirements.
-
-You should implement it as a serial line discipline like we have done
-for the hci_uart driver, but as far as I know nobody started working on
-such a kernel driver.
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
-Project Admins to receive an Apple iPod Mini FREE for your judgement on
-who ports your project to Linux PPC the best. Sponsored by IBM.
-Deadline: Sept. 24. Go here: http://sf.net/ppc_contest.php
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+-- 
+_______________________________
+Pall Thayer
+artist/teacher
+http://www.this.is/pallit
+http://pallit.lhi.is/panse
+_______________________________
