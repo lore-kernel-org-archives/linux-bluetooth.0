@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Di Pietro Nicolas <potens@swing.be>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] bluez-utils2: Bluetooth header files not found
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pierre N <pierren@mac.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1082725021.10395.6.camel@localhost>
+References: <Pine.LNX.4.44.0404231939570.1728-100000@data.home>
+	 <1082717535.24548.16.camel@localhost>  <1082725021.10395.6.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1082745203.718.0.camel@darthvader.linuxkot.kap>
+Message-Id: <1082730157.23959.113.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Can't get di Nuovo works in BT :'( help please.  (a bit long,
- sorry)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,96 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Apr 2004 20:33:23 +0200
+Date: Fri, 23 Apr 2004 16:22:37 +0200
 
-Hi !
-Here is the story:
-A long time ago (three days) in a land far far away (Belgium)
-I've bougth a di Nuovo keyboard and...
-... since, I'm trying to get it work :-(
-At the moment, the keyboard works and the media pad also (without the
-screen but
-for now, I don't care), the multimedia key doesn't work (some a of them
-but not
-much) and the mouse doen't work at all. 
+Hi Pierre,
 
-I've read dozens mail, forums howto's and I really
-don't know what to do now.
+> Well, I'm even more stupid than my wildest dreams. Forgot to run make,
+> now that I did it everything is fine. And my USB dongle is used for the
+> first time since switching to Linux!!! Great work. Thanks for all your
+> help guys and you should advertise hid2hci everywhere!!
 
-My kernel is a 2.6.5 with gentoo patch and patch-2.6.5-mh3.gz .
-It seems that he is patched against multibyte (hid-core)
+since this tool don't depends on any other library I plan to include it
+into the next release of bluez-utils.
 
-first, I've tried what was explained <a
-href='http://www.bueche.ch/comp/mx900/mx900.html'>here</a>
-but it doesn't work :
-> /opt/bluetooth/sbin/bthid --daemon
-># move your MX900, watch /var/log/daemon.log
->(Connected: Logitech Bluetooth Mouse (abcd:abcd)) 
-No, nothing like this. So :
-> if your have used your MX900 mouse with another dongle (eg the
-Bluetooth
-docking >delivered with the MX900), even with another OS (eg Windows
-XP), you
-have to >convince your HID device (the MX900) to talk to your usual
-dongle
-again. To do >this, first start the bthid daemon as above (if not yet
-done) :
->/opt/bluetooth/sbin/bthid --daemon
-># then, with the -c option, poke the mouse using its Bluetooth Address
-:
->/opt/bluetooth/sbin/bthid -c 00:07:61:13:E8:21 (this address is mine,
-look up
->yours under the mouse)
-># then, press the connect button under the mouse
-># move your MX900, watch /var/log/daemon.log
->(Connected: Logitech Bluetooth Mouse (abcd:abcd)) 
-Nothing better append
+Regards
 
-<----->
-after, I've tried this :
-http://www.bueche.ch/comp/mx900/feedback/ghisoli_alexandre_mx900_with_hub.txt
+Marcel
 
-without success :
-
->Check usb buses to see your USB HUB :
->  lsusb
->Bus 004 Device 001: ID 0000:0000
->Bus 003 Device 003: ID 046d:c704 Logitech, Inc.
->Bus 003 Device 002: ID 0451:2036 Texas Instruments, Inc. TUSB2036 Hub
->Bus 003 Device 001: ID 0000:0000
->Bus 002 Device 001: ID 0000:0000
->Bus 001 Device 001: ID 0000:0000
-
-Okay, I have the same.
-
->Then switch it :
-
->/usr/local/bluetooth/sbin/hid2hci
->Switching device 046d:c704 to HCI mode was successful
-
-No, never seen that, I get :
-Switching device 046d:c704 to HCI mode failed (No such file or
-directory)
-
-once, I get something different (but don't remember)
-I think it was successfull but then my BT receiver (the mouse charger)
-freezed
-(no more keyboad, keypad, mouse and pushing the button did nothing)
-
-I've seen in this mailing list archive a lot of treads about this mouse
-or
-keyboard, success and failure hid2hci problem, and no clues for me.
-I've tried the libs2 and utils2 (CVS) with and without the
---enable-compat flag.
-
-I'm really sad and turning mad.
-Two times the mouse worked (but without BT) but I have to connect
-another usb
-mouse on the machine and it doesn't work each time.
-
-Help me please.
-Tanks in advance an sorry for this awful english.
-Nicolas
 
 
 
