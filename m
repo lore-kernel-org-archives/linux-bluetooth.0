@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Till Harbaum <harbaum@beecon.de>
+Subject: Re: [Bluez-devel] hello
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200411291226.52638.harbaum@beecon.de>
-Subject: [Bluez-devel] Port parameter negotiation?
+In-Reply-To: <41AA81F0.8080005@bielefeld.ccc.de>
+References: <41AA81F0.8080005@bielefeld.ccc.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1101694796.9527.13.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,32 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 29 Nov 2004 12:26:52 +0100
+Date: Mon, 29 Nov 2004 03:19:56 +0100
 
-Hi list,
+Hi Nick,
 
-does BlueZ implement rfcomm port paramater negotiation? This is required to 
-allow a bluetooth->rs232 converter so set the baud rate etc according to the 
-settings on the hosts virtual serial port. E.g. changing the baudrate on a 
-windows bluetooth com port changes the rs232 bit rate on the bt device as 
-well (ok, at least my widcomm/win98 notebook does this only for 57600 and 
-115200 correctly).
+> I=B4m still experimenting with my usb-dongle from acer
+>=20
+> lsusb: Bus 003 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+> Bluetooth Dongle
+>=20
+> and try to get it work with my logitech bluetooth headset via btsco
+> and the snd-bt-sco module.
 
-So using something like 
-  stty -F /dev/rfcomm0 speed 9600 
+check with "hciconfig hci0 revision" (as root) for the setting of the
+SCO routing. I think it is set to PCM.
 
-should IMHO cause a rfcomm port negotiation packet to be sent on client side. 
-But i don't see this happen ...
+Regards
 
-Am i doing something wrong? I am using rfcomm 1.3 on a 2.6.8 kernel.
+Marcel
 
-Till
 
--- 
-Dr.-Ing. Till Harbaum                       Tel.:  +49 721 4998963
-BeeCon GmbH                                 Fax:   +49 721 4998962
-Haid-und-Neu Strasse 7, 76131 Karlsruhe     Mobil: +49 179 9087904
-harbaum@beecon.de                           http://www.beecon.de
 
 
 -------------------------------------------------------
