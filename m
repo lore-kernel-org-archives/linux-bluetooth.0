@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] new bthid and switching off sensor in mouse???
+Subject: Re: [Bluez-users] Two simultanous connections
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
+To: Pierre N <pierren@mac.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404022335.41175.cijoml@volny.cz>
-References: <200404021906.54779.cijoml@volny.cz>
-	 <1080926895.2836.87.camel@pegasus>  <200404022335.41175.cijoml@volny.cz>
+In-Reply-To: <1080928843.9541.90.camel@localhost>
+References: <1080928843.9541.90.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1080945468.3456.1.camel@pegasus>
+Message-Id: <1080929429.2836.101.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,25 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 03 Apr 2004 00:37:49 +0200
+Date: Fri, 02 Apr 2004 20:10:29 +0200
 
-Hi Michal,
+Hi Pierre,
 
-> > I don't know what you are talking about, but maybe the battery of your
-> > mouse is almost empty.
-> 
-> Hi, my batteries are good.
-> problem is follows:
-> 
-> red lightning sensor goes totally off after a while when I for a little time 
-> don't move my mouse or don't press button. Light stopps shining.
-> This started happens after updating to latest Bluez-CVS libs2 and utils2
-> previous version were without problem - I tried returned to previous version 
-> of CVS and it works OK.
+> I've been trying to setup ip net with 3 identical devices connected
+> simultanously over bluetooth. It works after a long
+> while of fiddling around. I had to go the hcitool route manually to set
+> the initial connections and then I could use dund no problem. My
+> question is: why can't I initiate a connection (hcitool cc) from a
+> device which is already connected?
 
-I can't imagine what causes this effect. Do you still have the source
-code of both version? If yes, please diff them, so I can see what I have
-changed.
+for some setups this depends on your Bluetooth chip. So what does
+"hciconfig -a" show? But I am not sure about what kind of network you
+are talking, because between two device there can be only _one_ ACL link
+and this means you can only use "hcitool cc" once. Actually there is no
+need for creating the ACL link manually with hcitool, because every
+higher layer will create it on demand.
 
 Regards
 
