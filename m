@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] snd-bt-sco - unknown symbol snd_hwdep_new
+	undefined!
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200411271059.42204.ruben@hotheads.de>
+References: <200411270038.51554.ruben@hotheads.de>
+	 <1101524868.6514.67.camel@pegasus>  <200411271059.42204.ruben@hotheads.de>
 Content-Type: text/plain
-Message-Id: <1101599506.18467.6.camel@pegasus>
+Message-Id: <1101585182.27074.11.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Elimination of pow() in SBC code
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,18 +20,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 28 Nov 2004 00:51:46 +0100
+Date: Sat, 27 Nov 2004 20:53:02 +0100
 
-Hi Henryk,
+Hi Ruben,
 
-the pow() function is the only reason for linking with -lm and it is
-only used in one place with a limit range of parameters.
+> > you may need to make "depmod -e" first or simply load the "snd-hwdep"
+> > kernel module.
+> 
+> The problem is that there doesn't exist a module called snd-hwdep.
+> For my last kernel I generated a kernel patch from the cvs kernel module.
+> Building only the module that is included in the cvs btsco module doesn't 
+> work.
 
-	scalefactor[ch][sb] = pow(2.0, (frame->scale_factor[ch][sb] + 1));
-
-So what is the range of scale_factor[ch][sb]. From a quick testing a saw
-that it ranges from 0 - 15. Is this always true? If yes, then I would
-use a pre-calculated array for 2^x.
+this module is not always built. Select CONFIG_SND_USB_USX2Y and it
+should be built.
 
 Regards
 
