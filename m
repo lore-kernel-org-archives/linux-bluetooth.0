@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] can't establish a connection
-From: Marcel Holtmann <marcel@holtmann.org>
-To: ben4fun <ben_4_fun@freenet.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1092727197.12606.1.camel@localhost>
+From: ben4fun <ben_4_fun@freenet.de>
+To: bluez-users mailing list <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1091810383.4570.14.camel@localhost>
 References: <1091742606.6143.17.camel@localhost>
 	 <1091747064.6143.25.camel@localhost> <1091748133.20839.63.camel@pegasus>
 	 <200408060216.05030.cijoml@volny.cz>  <1091810383.4570.14.camel@localhost>
-	 <1092727197.12606.1.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1092728177.31651.6.camel@pegasus>
+Message-Id: <1092727197.12606.1.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,51 +19,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Aug 2004 09:36:17 +0200
+Date: Tue, 17 Aug 2004 09:20:00 +0200
 
-Hi Ben,
+Hi,
 
-> I still cannot use my broadcom bluetooth dongle. It doesn't seem to be a
-> usb relevant problem. (as far as I know, cause I'm a newbie).
-> 
-> This is what I get when I plug my dongle.
-> 
-> tail -f /var/log/messages | grep usb
-> 
-> Aug 16 11:17:25 localhost kernel: usb 1-1: new full speed USB device
-> using address 10
-> Aug 16 11:17:27 localhost kernel: usb 1-1.1: new full speed USB device
-> using address 11
-> Aug 16 11:17:28 localhost kernel: hci_usb_isoc_rx_submit: hci0 isoc rx
-> submit failed urb c1cb1014 err -90
-> Aug 16 11:17:28 localhost kernel: hci_usb_isoc_rx_submit: hci0 isoc rx
-> submit failed urb c1cb1014 err -90
-> Aug 16 11:17:30 localhost kernel: usb 1-1.2: new full speed USB device
-> using address 12
-> Aug 16 11:17:31 localhost kernel: input: USB HID v1.11 Keyboard
-> [0a5c:3502] on usb-0000:00:07.2-1.2
-> Aug 16 11:17:32 localhost kernel: usb 1-1.3: new full speed USB device
-> using address 13
-> Aug 16 11:17:33 localhost kernel: input: USB HID v1.11 Mouse [0a5c:3503]
-> on usb-0000:00:07.2-1.3
-> 
-> 
-> lsusb
-> Bus 002 Device 001: ID 0000:0000
-> Bus 001 Device 013: ID 0a5c:3503 Broadcom Corp.
-> Bus 001 Device 012: ID 0a5c:3502 Broadcom Corp.
-> Bus 001 Device 011: ID 0a5c:200a Broadcom Corp.
-> Bus 001 Device 010: ID 0a5c:3535 Broadcom Corp.
-> Bus 001 Device 001: ID 0000:0000
-> 
-> I read your article Marcel Broadcom devices with bluetooth support but
-> the command HCI_Reset, returned an error. Do you have a clue?
+I still cannot use my broadcom bluetooth dongle. It doesn't seem to be a
+usb relevant problem. (as far as I know, cause I'm a newbie).
 
-install a kernel where this problem is fixed.
+This is what I get when I plug my dongle.
 
-Regards
+tail -f /var/log/messages | grep usb
 
-Marcel
+Aug 16 11:17:25 localhost kernel: usb 1-1: new full speed USB device
+using address 10
+Aug 16 11:17:27 localhost kernel: usb 1-1.1: new full speed USB device
+using address 11
+Aug 16 11:17:28 localhost kernel: hci_usb_isoc_rx_submit: hci0 isoc rx
+submit failed urb c1cb1014 err -90
+Aug 16 11:17:28 localhost kernel: hci_usb_isoc_rx_submit: hci0 isoc rx
+submit failed urb c1cb1014 err -90
+Aug 16 11:17:30 localhost kernel: usb 1-1.2: new full speed USB device
+using address 12
+Aug 16 11:17:31 localhost kernel: input: USB HID v1.11 Keyboard
+[0a5c:3502] on usb-0000:00:07.2-1.2
+Aug 16 11:17:32 localhost kernel: usb 1-1.3: new full speed USB device
+using address 13
+Aug 16 11:17:33 localhost kernel: input: USB HID v1.11 Mouse [0a5c:3503]
+on usb-0000:00:07.2-1.3
+
+
+lsusb
+Bus 002 Device 001: ID 0000:0000
+Bus 001 Device 013: ID 0a5c:3503 Broadcom Corp.
+Bus 001 Device 012: ID 0a5c:3502 Broadcom Corp.
+Bus 001 Device 011: ID 0a5c:200a Broadcom Corp.
+Bus 001 Device 010: ID 0a5c:3535 Broadcom Corp.
+Bus 001 Device 001: ID 0000:0000
+
+I read your article Marcel Broadcom devices with bluetooth support but
+the command HCI_Reset, returned an error. Do you have a clue?
+
+Regards,
+
+Ben
+
 
 
 
