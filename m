@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <200501290231.ALR00339@ms12.netsolmail.com>
-From: Chris Taylor <cht@imipolex-g.com>
 Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200501290128.ALQ93612@ms12.netsolmail.com>
+References: <200501290128.ALQ93612@ms12.netsolmail.com>
+Content-Type: text/plain
+Message-Id: <1106962609.10580.14.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Jan 2005 18:31:58 -0800
+Date: Sat, 29 Jan 2005 02:36:49 +0100
 
->
->it will be installed into /etc/hotplug/usb/ and you need a working and
->up-to-date hotplug to make this working.
+Hi Chris,
 
-Thanks for your help. Nothing got installed into /etc/hotplug/usb. Can I 
-just manually copy somethng from bluez-utils-2.14/extra into there, like 
-bcm203x.usermap? I can't figure out where it should go.
+> Hmm, when I did a 'configure' in bluez-utils-2.14, I used the "--enable-
+> bcm203x" option before I did a "make install". Where does the utility get 
+> installed?
 
-My /etc/rc.d/rc.hotplug says this at the top:
-# $Id: hotplug,v 1.3 2002/12/03 02:01:48 dbrownell Exp $
+it will be installed into /etc/hotplug/usb/ and you need a working and
+up-to-date hotplug to make this working.
 
-Is that too old?
+Regards
 
-------------------
-Chris Taylor
-cht@imipolex-g.com
-Los Angeles
+Marcel
+
+
 
 
 -------------------------------------------------------
