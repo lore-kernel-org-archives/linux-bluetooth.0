@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4246DF1F.4020408@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] A2DP btsco support
-References: <200503261356.57766.mh@intellinetservices.net> <1111894787.9195.213.camel@pegasus> <20050327154013.GC26485@externe.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <20050327154013.GC26485@externe.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+References: <200503261356.57766.mh@intellinetservices.net>
+	 <1111894787.9195.213.camel@pegasus>  <20050327154013.GC26485@externe.net>
+Content-Type: text/plain
+Message-Id: <1111938439.9195.232.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,27 +19,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Mar 2005 09:28:15 -0700
+Date: Sun, 27 Mar 2005 17:47:19 +0200
 
-Guylhem
+Hi Guylhem,
 
+> > the goal will be to go for a direct ALSA plugin, but my Aiptek is not
+> > really conforming to the A2DP specification. This means that I don't
+> > have any headphone to really work with and thus I can't solve this
+> > issue.
+> 
 > I recommand keeping standalone sbc encoder and a2play, at least for
 > those who want to use such headphones with linux PDAs (I do !)
 
-the problem here is there is one way to fix timing issues in a2play and 
-a different solution for timing issues in an alsa userspace plugin. if 
-it's important to someone, it will be maintained of course.
-
-i've been hoping a company would see potential in this stuff and throw 
-in some resources. during the .com boom it would have happened :(
+we will see, but the goal should be still an integration into the sound
+system. And this is ALSA at the moment.
 
 > BTW I did report somes bug and proposed fixes when I was compiling
 > with gcc 2.95 for ARM. Did they make it in?
 
-i think so. check cvs to see if it all looks good.
+I haven't seen any. Resend them.
 
-thanks
-brad
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
