@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jonathan Sass <jsass@magnifeye.com>
-Subject: Re: [Bluez-users] Permissions on Sockets
-In-reply-to: <1106092579.8190.81.camel@pegasus>
-To: bluez-users@lists.sourceforge.net
-Message-id: <6DD9FBCE-69DB-11D9-A39A-000D9348D4BE@magnifeye.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=US-ASCII; format=flowed
-References: <41B8A67C.3060608@paytec.com> <1102627652.7962.4.camel@pegasus>
- <8EEDF252-6988-11D9-A39A-000D9348D4BE@magnifeye.com>
- <1106092579.8190.81.camel@pegasus>
+Subject: Re: [Bluez-users] how to obtain address for rfcomm connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1106148402.12428.21.camel@justakiss>
+References: <1106148402.12428.21.camel@justakiss>
+Content-Type: text/plain
+Message-Id: <1106154308.8190.128.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,33 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 18 Jan 2005 21:31:54 -0800
+Date: Wed, 19 Jan 2005 18:05:08 +0100
 
-Thank you for your help.
+Hi Erwin,
 
-I am doing an inquiry of all devices, finding our device, connecting to 
-it and the reading bytes via a rawsocket.
+> I want to establish a rfcomm connection to a mobile phone. I don't know
+> the phone's address or name a-priori. The pairing is initated from the
+> phone before the rfcomm connection is initiated. Is there an easy way to
+> get the phone's address from the preceding link key exchange (from
+> /etc/bluetooth/link_key?). Browsing/scanning for devices might give more
+> than one canditate for communication, but I want to use only the one
+> that has already paired.
 
-The only issue I see so far is the writev command (I copied the code 
-from hci_send_cmd).
+you will find any paired device in the link_key file. However if the
+phone was connected then you can use normal technics to get the device
+address at the that time. To what service did the phone connect?
 
-How do I assign root rights for this?
+Regards
 
-On Jan 18, 2005, at 3:56 PM, Marcel Holtmann wrote:
+Marcel
 
-> Hi Jonathan,
->
->> My application connects to a custom device.  The app works when I run
->> as su but I get an error from hci_send_cmd from the writev(dd, iv, 
->> ivn)
->> when I run as a regular user.
->>
->> Are there some permissions that I need to set to allow my regular user
->> to write to the socket?
->
-> for some HCI commands you need root rights. About what commands are we
-> talking?
->
 
 
 
