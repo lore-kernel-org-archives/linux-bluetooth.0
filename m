@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Cambrige chip, 2.6.3
+Subject: Re: [Bluez-users] Shell script during bluetooth connection
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Petec <petesblackhole@yahoo.co.uk>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <loom.20040311T223500-626@post.gmane.org>
-References: <loom.20040311T223500-626@post.gmane.org>
+To: Lalith Chakravarthi <lalithvc@yahoo.com>
+Cc: bluez-users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040311045957.47445.qmail@web40703.mail.yahoo.com>
+References: <20040311045957.47445.qmail@web40703.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1079087942.738.18.camel@merlin>
+Message-Id: <1079087680.738.15.camel@merlin>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,42 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 12 Mar 2004 11:39:03 +0100
+Date: Fri, 12 Mar 2004 11:34:41 +0100
 
-Hi Pete,
+Hi Lalith,
 
-> Im running 2.6.3 on ibm thinkpad x31 with internal bluetooth. All I seem to be
-> able to do is use hcitool scan and hcitool inq, all other bluetooth related
-> things seem to fail. This problem has followed me from 2.4.2x to this kernel as
-> I only upgraded to try to get it working! If anyone could help I would really
-> appreciate, ive been working on this (till the wee hours) for some days now. 
-> 
-> [root@petespad test]# hcitool inq
-> Inquiring ...
->         00:0E:07:39:35:62       clock offset: 0x7522    class: 0x520204
-> [root@petespad test]#
-> 
-> For instance, hcitool info {address} fails:-
-> 
-> [root@petespad test]# hcitool info 00:0E:07:39:35:62
-> Requesting information ...
-> Can't create connection: Connection timed out
-> [root@petespad test]#
-> 
-> Using hcidump during this operation produces:-
-> 
-> [root@petespad root]# /usr/sbin/hcidump
-> HCIDump - HCI packet analyzer ver 1.7
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> #< HCI Command: Create Connection(0x01|0x0005) plen 13
-> #> HCI Event: Command Status(0x0f) plen 4
-> #> HCI Event: Link Key Request(0x17) plen 6
-> #> HCI Event: Connect Complete(0x03) plen 11
-> 
-> Looks to me like the computer is not responding to a key request from the phone.
+> When is the script /etc/hotplug/net.agent called? Is it when the USB
+> Dongle is plugged in??? Or is it when another USB device comes within
+> the range (I cant think of a way that this can happen without a
+> connexion)... or is it when a bluetooth connection is established??
 
-looks like you are in security mode 3. Don't enable auth and encrypt in
-hcid.conf. Let the mobile phone trigger the security mechanism.
+the net.agent is called when the new bnep0 (or any other network
+interface) is created or released.
 
 Regards
 
