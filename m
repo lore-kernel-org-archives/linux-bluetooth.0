@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Charles Bueche <charles@bueche.ch>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Message-Id: <20040624205328.47bf51ee@bluez.bueche.ch>
+Subject: Re: [Bluez-users] Low bit rate
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ramin Rezaiifar <ramin@popak.myftp.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40DAFE80.2010207@popak.myftp.org>
+References: <40DA45E0.9000207@popak.myftp.org>
+	 <1088068716.4296.35.camel@pegasus>  <40DAFE80.2010207@popak.myftp.org>
+Content-Type: text/plain
+Message-Id: <1088098195.4296.65.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] MX900 page updated
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,26 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Jun 2004 20:53:28 +0200
+Date: Thu, 24 Jun 2004 19:29:55 +0200
 
-Hi all,
+Hi Rmain,
 
-now that gentoo has a 2.6.7 kernel, I have tried Marcel's mh patch with
-success, and I have updated my page about my setup :
+> > actually I don't use Windows, so I can't tell. In general the BlueZ is
+> > as fast as possible. Maybe it is a RFCOMM flow control problem.
+> Can the flow control in RFCOMM be disabled? If yes, how can that be
+> done?
 
-	http://www.bueche.ch/comp/mx900/mx900.html
+no, because otherwise you won't get a stream.
 
-Feedback welcome.
+Regards
 
-I'm not sure wheter I still need the uinput module since I switched to
-hidd. I remember Marcel saying uinput is not needed with hidd. So who
-sends events to /dev/input/mice ? hidd directly ?
+Marcel
 
-Charles
 
--- 
-Charles Bueche <charles@bueche.ch>
-sand, snow, wave, wind and net -surfer
 
 
 -------------------------------------------------------
