@@ -1,53 +1,61 @@
 Return-Path: <maxk@qualcomm.com>
-Subject: RE: [Bluez-devel] Qualification Testing
+Subject: Re: [Bluez-devel] Qualification Testing
 From: Max Krasnyansky <maxk@qualcomm.com>
 To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-Cc: Daryl Van Vorst <daryl@wideray.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1052526375.1214.130.camel@pegasus.local>
-References: <000801c31684$627d9f80$1a01010a@baked>
-	<1052526375.1214.130.camel@pegasus.local>
+Cc: Daryl Van Vorst <daryl@wideray.com>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1052442873.1069.35.camel@pegasus.local>
+References: <000c01c313f5$b57ae030$1a01010a@baked>
+	<000c01c313f5$b57ae030$1a01010a@baked>
+	<5.1.0.14.2.20030508171149.01c082c0@unixmail.qualcomm.com>
+	<1052442873.1069.35.camel@pegasus.local>
 Content-Type: text/plain
-Message-Id: <1052547309.10456.259.camel@localhost.localdomain>
+Message-Id: <1052545687.10456.235.camel@localhost.localdomain>
 Mime-Version: 1.0
-Date: 09 May 2003 23:17:08 -0700
+Date: 09 May 2003 23:16:53 -0700
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Fri, 2003-05-09 at 17:26, Marcel Holtmann wrote:
-> > Here's Cetecom's response to your comment:
-> > 
-> > "Good point ! I agree, in a messed up remote L2CAP stack, CID could be wrong
-> > as well if length is wrong. But I think it is a good approach to check
-> > first, if that CID exists and if yes, notify the app about that channel."
-> > 
-> > So how about we do this:  As above, if it exists then we close it. If not,
-> > we log an error.
+On Thu, 2003-05-08 at 18:14, Marcel Holtmann wrote:
+> > >>         2.) TP/RFC/BV-07: Closing rfcomm doesn't appear to close l2cap. Is
+> > >> this true? This isn't actually required to pass this test, but it did
+> > >> confuse the tester. This may have been a mistake on my part. I just hit
+> > >> ctrl-c when rctest was connected and assumed that everything would get
+> > >> closed. Would calling close() have a different effect?
+> > >
+> > >This is working fine for me. After closing the channel, we close dlci 0
+> > >and this also closes the L2CAP connection.
+> > Yes. I'm 100% sure it works. rfcomm_session_del() kills L2CAP socket.
 > 
-> the proposal from Cetecom makes no sense.
+> Can you remember if we had a problem with this in bluez-kernel-2.3 ?
+It should work even in 2.3. But I wouldn't bet on it :)
+
+> > >>         5.) Once an RFCOMM channel is established, the IUT must exchange
+> > >> MSC's (modem status commands) before sending data. That is, it must send an
+> > >> MSC, wait for a response, wait for the sender's MSC, and respond to it
+> > >> before sending data. Our device sent an MSC and then immediately started
+> > >> sending data when we used rctest. This applies to many test cases.
+> > >
+> > >We send the MSC after the UA. But we also go into BT_CONNECTED state and
+> > >in this state you can also start sending data. We should maybe go from
+> > >BT_CONNECT -> BT_CONFIG and only switch to BT_CONNECTED after the
+> > >successful exchange of MSC.
+> > I remember thinking about that. But they way I interpreted spec was that we
+> > don't have to wait for MSC response. 
+> > This should be easy to fix.
 > 
-> If you have one channel with correct data and you get a wrong packet
-> which was for another channel, but the CID is corrupt and show now the
-> value of the correct channel. You will infect a correct working channel
-> with a false packet.
-Yep. We could do that but it simply makes no sense. I'm glad our IP 
-stack doesn't kill random sockets when it receives corrupted IP packets,
-just because it wants to indicate an error to an application and port
-number happened to exist :-).
+> I leave this up to you to fix.
+> 
+> > btw When CFC is not enabled we will have to wait for MSC from the other side. Notice that we set
+> > THROTTLED flag in that case. Which is cleared by the MSC or more credits.
+> > So I guess we can just always set that flag and clear it when we get MSC which will fix the MSC 
+> > test case without messing with the state machine.
+> 
+> Sounds reasonable to me.
 
-> The main problem is that wrong packets should not arrive at the L2CAP
-> layer. If they do and we decect them (like a length mismatch), we have
-> to close down all channels and remove the infected ACL link.
-The key words is 'should not' here. I've seen it happen because of USB problems
-or UART H4 problems. Not the wrong length but missing fragments and
-stuff.  
-
-> Max, what do you think? This way is a little bit radical, but I think it
-> is an acceptable way of handling these errors. And with this method we
-> will pass this test.
-Yeah, I think it's a bit to aggressive. BNEP connection, for example,
-survives missing frags and pretty much anything else just fine. 
-
-I'd rather keep the current code. Which I fixed btw to correctly drop
-frame if first fragment is too long. It was a real bug which could cause
-kernel oops in certain conditions.
+Ok. I've fixed that (and pushed changes to BK). My idea about 
+with TX_THROTTLED flag didn't work. Well, it worked but only in 
+one direction :). Changing state machine would've been fairly big
+change and could've affected compatibility.
+So I added a simple logic to track MSC exchange state. Works beautifully
+:) 
 
 Max
