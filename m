@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: nicolas <n1c0l4s.l3@wanadoo.fr>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200406151155.09370.n1c0l4s.l3@wanadoo.fr>
-Subject: [Bluez-users] probleme installing Wireless IntelliMouse and optical desktop
+Subject: Re: [Bluez-users] Epox Barton keyboard: HID create error 53
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Matthias Thomae <bluez@thomae-privat.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40CEC020.6050107@thomae-privat.de>
+References: <40CDE18C.70703@thomae-privat.de>
+	 <1087255678.13792.51.camel@pegasus>  <40CE96A8.3020407@thomae-privat.de>
+	 <1087284859.13792.67.camel@pegasus>  <40CEC020.6050107@thomae-privat.de>
+Content-Type: text/plain
+Message-Id: <1087292887.13792.81.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,69 +20,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 15 Jun 2004 11:55:09 +0200
+Date: Tue, 15 Jun 2004 11:48:07 +0200
 
-hi,=20
+Hi Matthias,
 
-i have some questions =A0because i have kernel 2.6.7Rc2mdk and my bluetooth=
- is=20
-recognise
+> > it is a problem of the HID parser. If you enable debugging with "#define
+> > DEBUG" in net/bluetooth/hidp/hid.h then you should see those lines with
+> > dmesg:
+> > 
+> > net/bluetooth/hidp/hid.c: usage index exceeded
+> > net/bluetooth/hidp/hid.c: hid_add_usage failed
+> > net/bluetooth/hidp/hid.c: item 0 2 2 2 parsing failed
+> > 
+> > Do you see it, too?
+> 
+> Yes, I see exactly the same.
+
+someone has to fix the HID parser to get it working with the keyboard
+and the presenter from EPoX. I am a little bit busy in getting the boot
+protocol support ready, so that we can at least include HID boot support
+into the mainline kernel. The full report protocol support has to wait
+until the kernel gets its device independent HID support.
+
+> > Please send me the output of your mouse too and use
+> 
+> I`ll send it tonight, 'cause I haven't got it with me now.
+> 
+> > 	sdptest records 00:04:61:xx:xx:xx > file
+> > 
+> > from the utils2 CVS to get the full SDP record information.
+> 
+> It's attached. Do you need the same from the mouse, too?
+> Anything else I can do?
+
+Please do so. I want to compare it with my devices. The keyboard looks
+the same as mine. It seems they only choosed a newer CSR firmware.
+
+Regards
+
+Marcel
 
 
-$ hcitool inq
-Inquiring ...
-=A0 =A0 =A0 =A0 00:50:F2:7F:C4:E8 =A0 =A0 =A0 clock offset: 0x6892 =A0 =A0c=
-lass: 0x002580
-=A0 =A0 =A0 =A0 00:50:F2:80:A1:2B =A0 =A0 =A0 clock offset: 0x6d26 =A0 =A0c=
-lass: 0x002540
-$ hcitool scan
-Scanning ...
-=A0 =A0 =A0 =A0 00:50:F2:7F:C4:E8 =A0 =A0 =A0 Microsoft Mouse
-=A0 =A0 =A0 =A0 00:50:F2:80:A1:2B =A0 =A0 =A0 Microsoft Keyboard
-# hcitool info 00:50:F2:80:A1:2B
-Requesting information ...
-=A0 =A0 =A0 =A0 BD Address: =A000:50:F2:80:A1:2B
-=A0 =A0 =A0 =A0 Device Name: Microsoft Keyboard
-=A0 =A0 =A0 =A0 LMP Version: 1.1 (0x1) LMP Subversion: 0x1df
-=A0 =A0 =A0 =A0 Manufacturer: Cambridge Silicon Radio (10)
-=A0 =A0 =A0 =A0 Features: 0xfc 0xfb 0x0f 0x00 0x00 0x00 0x00 0x00
-=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 <encryption> <slot offset> <timing accuracy=
-> <role switch>
-=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 <hold mode> <sniff mode> <park state> <RSSI=
-> <SCO link>
-=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 <HV2 packets> <HV3 packets> <u-law log> <A-=
-law log> <CVSD>
-=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 <paging scheme> <power control> <transparen=
-t SCO>
-# hcitool info 00:50:F2:7F:C4:E8
-Requesting information ...
-=A0 =A0 =A0 =A0 BD Address: =A000:50:F2:7F:C4:E8
-=A0 =A0 =A0 =A0 Device Name: Microsoft Mouse
-=A0 =A0 =A0 =A0 LMP Version: 1.1 (0x1) LMP Subversion: 0x1d0
-=A0 =A0 =A0 =A0 Manufacturer: Cambridge Silicon Radio (10)
-=A0 =A0 =A0 =A0 Features: 0xfc 0xfb 0x0f 0x00 0x00 0x00 0x00 0x00
-=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 <encryption> <slot offset> <timing accuracy=
-> <role switch>
-=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 <hold mode> <sniff mode> <park state> <RSSI=
-> <SCO link>
-=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 <HV2 packets> <HV3 packets> <u-law log> <A-=
-law log> <CVSD>
-=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 <paging scheme> <power control> <transparen=
-t SCO>
-#
-
-but how to connecte it =A0 to use it?
-
-i don't understand =A0 i have look at=20
-http://www.holtmann.org/linux/bluetooth/microsoft.html but it doesn't
-
-there is someone using it and which have the solution?
-
-thanks=20
-=2D-=20
-Ce mail a =E9t=E9 =E9crit sous linux mandrake cooker (www.linux-mandrake.co=
-m/fr)
-avec KMail 1.6.2 (www.kde.org)
 
 
 -------------------------------------------------------
