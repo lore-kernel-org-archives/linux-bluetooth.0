@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <408C5F5C.1040501@mWare.ca>
-From: Mykel <Mykel@mWare.ca>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] can't get bthid
-References: <408C4D8D.7090104@yahoo.com.au>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Zi Ming GAO <zimgao@yahoo.com.au>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <408C4D8D.7090104@yahoo.com.au>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+References: <408C4D8D.7090104@yahoo.com.au>
+Content-Type: text/plain
+Message-Id: <1082937237.28880.109.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,29 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 25 Apr 2004 21:01:16 -0400
+Date: Mon, 26 Apr 2004 01:53:58 +0200
 
-I have the exact same problem! I just joined this mailing list yesterday 
-to ask this same question.
-I have a BlueTooth equipped laptop and I have the Logitech cradle 
-plugged in... I have no idea what I'm doing tho. I've seen 
-http://www.bueche.ch/comp/mx900/mx900.html and followed what I can, but 
-I still get the same errors.
+Hi,
 
-But like I said, I'm just doing this stuff blindly, I'm quite clueless 
-at most of this. :(
-
-Myke
-
-
-Zi Ming GAO wrote:
-
-> Hey guys,
->    The problem i'm having is i get the follow error when i try to 
-> start bthid,
->
+>     The problem i'm having is i get the follow error when i try to start 
+> bthid,
+> 
 > Can't connect to HID service: No such file or directory
->
+
+you must start a bthid daemon instance with "bthid -d" first.
+
 > Now the bluetooth i'm using is the logitech MX900 with the logitech 
 > bluetooth dodge. The software i'm using are lib2 and utils2 both from 
 > the cvs. I managed to get hid2hci working and from the 
@@ -48,21 +37,14 @@ Zi Ming GAO wrote:
 > fine. "hcid" also ran fine. I could manually linked up the mouse with 
 > the hub by using "hcitool cc <mouse address>". Other command such as 
 > "hcitool scan" "hcitool inq" all works fine.
->
-> I had problems previously getting hid2hci working. And it's due to the 
-> fact that i'm running on a customised linux and i forgot to enable usb 
-> raw hid access. anyway ... under my dev i have
-> /dev/misc/uinput
-> /dev/input/hid/hiddev[0..15]
-> and also other rfcomms and other bluetooth essentials under /dev
-> i also updated modprobe.inf with bluetooth alias from other posts
->
-> from what i understand bthid should be accessing the uinput device ...
-> is there other devices that bthid requires???
-> because the error message looks like i'm missing a devices file somewhere
-> or probably forgot to compiled in something necessory ...
->
-> anyway any help will be appreciated ... thanks ...
+
+Don't play with "hcitool cc". The HCI connection is created automaticly
+when needed.
+
+Regards
+
+Marcel
+
 
 
 
