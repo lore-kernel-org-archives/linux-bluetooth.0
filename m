@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Possible bug in hci_core.h ?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bhatt Abhi-ABHATT <ABHISHEK.BHATT@motorola.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5987A7CB1694D811A04D0002B32C289601BF3C16@il93exb05.corp.mot.com>
-References: 
-	 <5987A7CB1694D811A04D0002B32C289601BF3C16@il93exb05.corp.mot.com>
-Content-Type: text/plain
-Message-Id: <1099322142.16247.107.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <5987A7CB1694D811A04D0002B32C289601BF3C17@il93exb05.corp.mot.com>
+From: Bhatt Abhi-ABHATT <ABHISHEK.BHATT@motorola.com>
+To: "'bluez-devel@lists.sourceforge.net'"
+	 <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C4C020.D085AF08"
+Subject: [Bluez-devel] Bluez Patches for kernel v2.4
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,49 +17,106 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 01 Nov 2004 16:15:42 +0100
+Date: Mon, 1 Nov 2004 08:41:04 -0600
 
-Hi Abhi,
+This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
 
-> Version: Kernel 2.6.9 with bluez patch 2.6.9-mh3
-> 
-> File: hci_core.h
-> 
-> Line: 234
-> 
->  
-> 
-> Shouldn't line 234 be h->acl_num--;
-> 
->  
-> 
-> 229: static inline void hci_conn_hash_del(struct hci_dev *hdev, struct
-> hci_conn *c)
-> 
-> 230: {
-> 
-> 231:          struct hci_conn_hash *h = &hdev->conn_hash;
-> 
-> 232:          list_del(&c->list);
-> 
-> 233:          if (c->type == ACL_LINK)
-> 
-> 234:                  h->acl_num++;
-> 
-> 235:          else
-> 
-> 236:                  h->sco_num--;
-> 
-> 237: }
+------_=_NextPart_001_01C4C020.D085AF08
+Content-Type: text/plain
 
-you are right. Looks like a stupid copy and paste bug. I will fix it and
-send it to mainline.
+Hello,
 
-Regards
+ 
 
-Marcel
+I work on kernel v2.4 and I would be interested in having some of the new bluez patches for kernel v2.6 applied to v2.4. 
+
+I believe there are no new feature patches for kernel v2.4 and new features are only being developed for kernel v2.6. Is
+
+there someone out there who also works on v2.4 and if so I would like to know if there is a better way to put in the new
+
+kernel patches (for e.g. patch-2.6.9-mh3) to v2.4 other than manually putting them in.
+
+ 
+
+Thanks
+
+Abhi
+
+ 
+
+ 
+
+ 
+
+ 
 
 
+------_=_NextPart_001_01C4C020.D085AF08
+Content-Type: text/html
+Content-Transfer-Encoding: base64
+
+PGh0bWw+DQoNCjxoZWFkPg0KPE1FVEEgSFRUUC1FUVVJVj0iQ29udGVudC1UeXBlIiBDT05URU5U
+PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9VVMtQVNDSUkiPg0KDQoNCjxtZXRhIG5hbWU9R2VuZXJhdG9y
+IGNvbnRlbnQ9Ik1pY3Jvc29mdCBXb3JkIDEwIChmaWx0ZXJlZCkiPg0KDQo8c3R5bGU+DQo8IS0t
+DQogLyogRm9udCBEZWZpbml0aW9ucyAqLw0KIEBmb250LWZhY2UNCgl7Zm9udC1mYW1pbHk6Ik1T
+IE1pbmNobyI7DQoJcGFub3NlLTE6MiAyIDYgOSA0IDIgNSA4IDMgNDt9DQpAZm9udC1mYWNlDQoJ
+e2ZvbnQtZmFtaWx5OiJcQE1TIE1pbmNobyI7DQoJcGFub3NlLTE6MiAyIDYgOSA0IDIgNSA4IDMg
+NDt9DQogLyogU3R5bGUgRGVmaW5pdGlvbnMgKi8NCiBwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFs
+LCBkaXYuTXNvTm9ybWFsDQoJe21hcmdpbjowaW47DQoJbWFyZ2luLWJvdHRvbTouMDAwMXB0Ow0K
+CWZvbnQtc2l6ZToxMi4wcHQ7DQoJZm9udC1mYW1pbHk6IlRpbWVzIE5ldyBSb21hbiI7fQ0KYTps
+aW5rLCBzcGFuLk1zb0h5cGVybGluaw0KCXtjb2xvcjpibHVlOw0KCXRleHQtZGVjb3JhdGlvbjp1
+bmRlcmxpbmU7fQ0KYTp2aXNpdGVkLCBzcGFuLk1zb0h5cGVybGlua0ZvbGxvd2VkDQoJe2NvbG9y
+OnB1cnBsZTsNCgl0ZXh0LWRlY29yYXRpb246dW5kZXJsaW5lO30NCnAuTXNvQXV0b1NpZywgbGku
+TXNvQXV0b1NpZywgZGl2Lk1zb0F1dG9TaWcNCgl7bWFyZ2luOjBpbjsNCgltYXJnaW4tYm90dG9t
+Oi4wMDAxcHQ7DQoJZm9udC1zaXplOjEyLjBwdDsNCglmb250LWZhbWlseToiVGltZXMgTmV3IFJv
+bWFuIjt9DQpzcGFuLkVtYWlsU3R5bGUxNw0KCXtmb250LWZhbWlseTpBcmlhbDsNCgljb2xvcjp3
+aW5kb3d0ZXh0O30NCkBwYWdlIFNlY3Rpb24xDQoJe3NpemU6OC41aW4gMTEuMGluOw0KCW1hcmdp
+bjoxLjBpbiAxLjI1aW4gMS4waW4gMS4yNWluO30NCmRpdi5TZWN0aW9uMQ0KCXtwYWdlOlNlY3Rp
+b24xO30NCi0tPg0KPC9zdHlsZT4NCg0KPC9oZWFkPg0KDQo8Ym9keSBsYW5nPUVOLVVTIGxpbms9
+Ymx1ZSB2bGluaz1wdXJwbGU+DQoNCjxkaXYgY2xhc3M9U2VjdGlvbjE+DQoNCjxwIGNsYXNzPU1z
+b05vcm1hbD48Zm9udCBzaXplPTIgY29sb3I9Ymx1ZSBmYWNlPSJUaW1lcyBOZXcgUm9tYW4iPjxz
+cGFuDQpzdHlsZT0nZm9udC1zaXplOjEwLjBwdDtjb2xvcjpibHVlJz5IZWxsbyw8L3NwYW4+PC9m
+b250PjwvcD4NCg0KPHAgY2xhc3M9TXNvTm9ybWFsPjxmb250IHNpemU9MiBjb2xvcj1ibHVlIGZh
+Y2U9IlRpbWVzIE5ldyBSb21hbiI+PHNwYW4NCnN0eWxlPSdmb250LXNpemU6MTAuMHB0O2NvbG9y
+OmJsdWUnPiZuYnNwOzwvc3Bhbj48L2ZvbnQ+PC9wPg0KDQo8cCBjbGFzcz1Nc29Ob3JtYWw+PGZv
+bnQgc2l6ZT0yIGNvbG9yPWJsdWUgZmFjZT0iVGltZXMgTmV3IFJvbWFuIj48c3Bhbg0Kc3R5bGU9
+J2ZvbnQtc2l6ZToxMC4wcHQ7Y29sb3I6Ymx1ZSc+SSB3b3JrIG9uIGtlcm5lbCB2Mi40IGFuZCBJ
+IHdvdWxkIGJlDQppbnRlcmVzdGVkIGluIGhhdmluZyBzb21lIG9mIHRoZSBuZXcgYmx1ZXogcGF0
+Y2hlcyBmb3Iga2VybmVsIHYyLjYgYXBwbGllZCB0byB2Mi40Lg0KPC9zcGFuPjwvZm9udD48L3A+
+DQoNCjxwIGNsYXNzPU1zb05vcm1hbD48Zm9udCBzaXplPTIgY29sb3I9Ymx1ZSBmYWNlPSJUaW1l
+cyBOZXcgUm9tYW4iPjxzcGFuDQpzdHlsZT0nZm9udC1zaXplOjEwLjBwdDtjb2xvcjpibHVlJz5J
+IGJlbGlldmUgdGhlcmUgYXJlIG5vIG5ldyBmZWF0dXJlIHBhdGNoZXMgZm9yDQprZXJuZWwgdjIu
+NCBhbmQgbmV3IGZlYXR1cmVzIGFyZSBvbmx5IGJlaW5nIGRldmVsb3BlZCBmb3Iga2VybmVsIHYy
+LjYuIElzPC9zcGFuPjwvZm9udD48L3A+DQoNCjxwIGNsYXNzPU1zb05vcm1hbD48Zm9udCBzaXpl
+PTIgY29sb3I9Ymx1ZSBmYWNlPSJUaW1lcyBOZXcgUm9tYW4iPjxzcGFuDQpzdHlsZT0nZm9udC1z
+aXplOjEwLjBwdDtjb2xvcjpibHVlJz50aGVyZSBzb21lb25lIG91dCB0aGVyZSB3aG8gYWxzbyB3
+b3JrcyBvbg0KdjIuNCBhbmQgaWYgc28gSSB3b3VsZCBsaWtlIHRvIGtub3cgaWYgdGhlcmUgaXMg
+YSBiZXR0ZXIgd2F5IHRvIHB1dCBpbiB0aGUgbmV3PC9zcGFuPjwvZm9udD48L3A+DQoNCjxwIGNs
+YXNzPU1zb05vcm1hbD48Zm9udCBzaXplPTIgY29sb3I9Ymx1ZSBmYWNlPSJUaW1lcyBOZXcgUm9t
+YW4iPjxzcGFuDQpzdHlsZT0nZm9udC1zaXplOjEwLjBwdDtjb2xvcjpibHVlJz5rZXJuZWwgcGF0
+Y2hlcyAoZm9yIGUuZy4gcGF0Y2gtMi42LjktbWgzKQ0KdG8gdjIuNCBvdGhlciB0aGFuIG1hbnVh
+bGx5IHB1dHRpbmcgdGhlbSBpbi48L3NwYW4+PC9mb250PjwvcD4NCg0KPHAgY2xhc3M9TXNvTm9y
+bWFsPjxmb250IHNpemU9MiBjb2xvcj1ibHVlIGZhY2U9IlRpbWVzIE5ldyBSb21hbiI+PHNwYW4N
+CnN0eWxlPSdmb250LXNpemU6MTAuMHB0O2NvbG9yOmJsdWUnPiZuYnNwOzwvc3Bhbj48L2ZvbnQ+
+PC9wPg0KDQo8cCBjbGFzcz1Nc29Ob3JtYWw+PGZvbnQgc2l6ZT0yIGNvbG9yPWJsdWUgZmFjZT0i
+VGltZXMgTmV3IFJvbWFuIj48c3Bhbg0Kc3R5bGU9J2ZvbnQtc2l6ZToxMC4wcHQ7Y29sb3I6Ymx1
+ZSc+VGhhbmtzPC9zcGFuPjwvZm9udD48L3A+DQoNCjxwIGNsYXNzPU1zb05vcm1hbD48Zm9udCBz
+aXplPTIgY29sb3I9Ymx1ZSBmYWNlPSJUaW1lcyBOZXcgUm9tYW4iPjxzcGFuDQpzdHlsZT0nZm9u
+dC1zaXplOjEwLjBwdDtjb2xvcjpibHVlJz5BYmhpPC9zcGFuPjwvZm9udD48L3A+DQoNCjxwIGNs
+YXNzPU1zb05vcm1hbD48Zm9udCBzaXplPTIgY29sb3I9Ymx1ZSBmYWNlPSJUaW1lcyBOZXcgUm9t
+YW4iPjxzcGFuDQpzdHlsZT0nZm9udC1zaXplOjEwLjBwdDtjb2xvcjpibHVlJz4mbmJzcDs8L3Nw
+YW4+PC9mb250PjwvcD4NCg0KPHAgY2xhc3M9TXNvTm9ybWFsPjxmb250IHNpemU9MiBjb2xvcj1i
+bHVlIGZhY2U9IlRpbWVzIE5ldyBSb21hbiI+PHNwYW4NCnN0eWxlPSdmb250LXNpemU6MTAuMHB0
+O2NvbG9yOmJsdWUnPiZuYnNwOzwvc3Bhbj48L2ZvbnQ+PC9wPg0KDQo8cCBjbGFzcz1Nc29Ob3Jt
+YWw+PGZvbnQgc2l6ZT0yIGNvbG9yPWJsdWUgZmFjZT0iVGltZXMgTmV3IFJvbWFuIj48c3Bhbg0K
+c3R5bGU9J2ZvbnQtc2l6ZToxMC4wcHQ7Y29sb3I6Ymx1ZSc+Jm5ic3A7PC9zcGFuPjwvZm9udD48
+L3A+DQoNCjxwIGNsYXNzPU1zb05vcm1hbD48Zm9udCBzaXplPTIgY29sb3I9Ymx1ZSBmYWNlPSJU
+aW1lcyBOZXcgUm9tYW4iPjxzcGFuDQpzdHlsZT0nZm9udC1zaXplOjEwLjBwdDtjb2xvcjpibHVl
+Jz4mbmJzcDs8L3NwYW4+PC9mb250PjwvcD4NCg0KPC9kaXY+DQoNCjwvYm9keT4NCg0KPC9odG1s
+Pg0K
+
+------_=_NextPart_001_01C4C020.D085AF08--
 
 
 -------------------------------------------------------
