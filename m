@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PAN-BNEP-and TCP/IP
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050208074804.15870.qmail@web26404.mail.ukl.yahoo.com>
-References: <20050208074804.15870.qmail@web26404.mail.ukl.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1107855015.7327.159.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20050208074804.15870.qmail@web26404.mail.ukl.yahoo.com>
+From: benbouzid imad <imad_benb@yahoo.fr>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1107547801.6921.103.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] PAN-BNEP-and TCP/IP
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +17,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 08 Feb 2005 10:30:15 +0100
+Date: Tue, 8 Feb 2005 08:48:04 +0100 (CET)
 
-Hi,
+Hi Marcel,
 
-> I was thinking about how PAN profile interact with the
-> TCP/IP stacks in blueZ.
-> PAN uses the BNEP layer to provide layer 3 IP data and
-> for instance how do we detect a ping answer or a ping
-> request? 
+I was thinking about how PAN profile interact with the
+TCP/IP stacks in blueZ.
+PAN uses the BNEP layer to provide layer 3 IP data and
+for instance how do we detect a ping answer or a ping
+request? 
 
-when using BNEP you get a virtual network card in your system for every
-connection. So call ifconfig and you see bnep0, bnep1 and so on network
-devices. They work like physical network cards and so every IP stuff in
-Linux also works over Bluetooth.
-
-Regards
-
-Marcel
+regards
+imad
 
 
+
+	
+
+	
+		
+Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
+Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
