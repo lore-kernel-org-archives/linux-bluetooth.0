@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Gene Imes <ebi7@ozob.net>
-To: bluez <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3FF9CA56.1060205@Fampeeters.com>
-References: <3FF9CA56.1060205@Fampeeters.com>
-Content-Type: text/plain
-Message-Id: <1073341923.6567.20.camel@tr1a.ozob.net>
-Mime-Version: 1.0
-Subject: [Bluez-users] Socket CF card problems
+Message-ID: <3FF9CA56.1060205@Fampeeters.com>
+From: Francesco Peeters <Francesco@Fampeeters.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [Bluez-users] BT and Tungsten T3?????
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,172 +15,173 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 05 Jan 2004 16:32:04 -0600
+Date: Mon, 05 Jan 2004 21:34:30 +0100
 
-I apologize if this is too lengthy, but I need some help.
+I'm new on the list, and am trying to get my Tungsten|T3 to talk to my 
+RedHat 9 (vanilla kernel, updated to the latest patch version yesterday) 
+laptop/home automation server.
 
-I am running a 2.6.0 kernel and I am trying to get a Socket CF card
-running.
+I have been trying several days now to get this working, but no go!
 
-root@tr1a:~# ver
-Linux version 2.6.1-rc1-mm1 (root@tr1a) (gcc version 3.3.2 20031218
-(Gentoo Linux 3.3.2-r5, propolice-3.3-7)) #5 Mon Jan 5 10:54:39 CST 2004
+Sorry for the length, but I'll be trying to get all information needed 
+in this e-mail...
 
-cardctl shows:
+First off I have set up a profile for ppp in /etc/ppp/peers/btpalm:
+[root@mrhouse peers]# cat btpalm
+debug
+57600
+noipdefault
+proxyarp
+10.50.164.20:10.50.164.21
+ms-dns 10.50.164.9
+ktune
+noauth
+local
+asyncmap 0
+idle 1000
+noipx
+passive
+silent
 
-root@tr1a:~# cardctl ident
-Socket 0:
-  product info: "Socket", "CF+ Personal Network Card Rev 2.5"
-  manfid: 0x0104, 0x0096
-  function: 2 (serial)
+For Bluez I have these settings:
+[root@mrhouse peers]# cat /etc/bluetooth/hcid.conf
+# HCId options
+options {
+        autoinit yes;
+        security auto;
+        pairing multi;
+        pin_helper /bin/bluepin;
+}
 
-According to http://www.holtmann.org/linux/bluetooth/devices.html this
-card is 'working'.
+# Default settings for HCI devices
+device {
+        name "%h - BlueZ (%d)";
+        class 0x100;
+        iscan enable; pscan enable;
+        lm accept,master;
+        lp hold,sniff,park,rswitch;
+}
 
-My /usr/src/linux/.config file looks like this:
+[root@mrhouse peers]# cat /etc/bluetooth/rfcomm.conf
+rfcomm0 {
+        bind no;
+        device 00:10:60:A3:0F:30;
+        channel 3;
+        comment "Sitecom BT Dongle";
+}
 
-...
-CONFIG_BT=m
-CONFIG_BT_L2CAP=m
-CONFIG_BT_SCO=m
-CONFIG_BT_RFCOMM=m
-CONFIG_BT_RFCOMM_TTY=y
-CONFIG_BT_BNEP=m
-CONFIG_BT_BNEP_MC_FILTER=y
-CONFIG_BT_BNEP_PROTO_FILTER=y
-                                                                                                                             
-#
-# Bluetooth device drivers
-#
-# CONFIG_BT_HCIUSB is not set
-CONFIG_BT_HCIUART=m
-CONFIG_BT_HCIUART_H4=y
-CONFIG_BT_HCIUART_BCSP=y
-# CONFIG_BT_HCIUART_BCSP_TXCRC is not set
-# CONFIG_BT_HCIDTL1 is not set
-# CONFIG_BT_HCIBT3C is not set
-# CONFIG_BT_HCIBLUECARD is not set
-CONFIG_BT_HCIBTUART=m
-CONFIG_BT_HCIVHCI=m
-# CONFIG_KGDBOE is not set
-# CONFIG_NETPOLL is not set
-# CONFIG_NETPOLL_RX is not set
-# CONFIG_NETPOLL_TRAP is not set
-# CONFIG_NET_POLL_CONTROLLER is not set
+And in the modules:
+[root@mrhouse peers]# cat /etc/modules.conf
+alias xirc2ps_cs
+alias usb-controller usb-ohci
+alias net-pf-31    bluez
+alias bt-proto-0   l2cap
+alias bt-proto-2   sco
+alias bt-proto-3   rfcomm
+alias bt-proto-4   bnep
+alias tty-ldisc-15 hci_uart
+alias char-major-10-250 hci_vhci
 
-...
-CONFIG_SERIAL_8250=m
-CONFIG_SERIAL_8250_CS=m
-# CONFIG_SERIAL_8250_ACPI is not set
-CONFIG_SERIAL_8250_NR_UARTS=4
-# CONFIG_SERIAL_8250_EXTENDED is not set
+A snipped dump of lsmod shows:
+Module                  Size  Used by    Not tainted
+rfcomm                 34720  10  (autoclean)
+l2cap                  17932   2  (autoclean)
+hci_usb                 9272   1
+bluez                  37860   4  [rfcomm l2cap hci_usb]
+usbcore                73280   1  [hci_usb hid usb-ohci]
 
-When I insert the Socket card (which is of course itself inserted in a
-pcmcia adapter) I get this:
+The HCI is up:
+[root@mrhouse peers]# hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:10:60:A3:0F:30 ACL MTU: 192:8  SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:5192 acl:25 sco:0 events:289 errors:0
+        TX bytes:1901 acl:25 sco:0 commands:134 errors:0
+        Features: 0xff 0xff 0x0f 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: ACCEPT MASTER
+        Name: 'mrhouse.fampeeters.com - BlueZ (0)'
+        Class: 0x000100
+        Service Classes: Unspecified
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 
+0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
 
-root@tr1a:~# lsmod
-Module                  Size  Used by
-serial_cs               9352  1
-8250                   21280  3 serial_cs
+A scan finds the T|T3, and I was able to pair them already:
+[root@mrhouse peers]# hcitool scan
+Scanning ...
+        00:07:E0:30:EA:48       Francesco Peeters
+[root@mrhouse peers]# hcitool info 00:07:E0:30:EA:48
+Requesting information ...
+        BD Address:  00:07:E0:30:EA:48
+        Device Name: Francesco Peeters
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x700
+        Manufacturer: Broadcom Corporation (15)
+        Features: 0xff 0xff 0x0d 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park mode> <RSSI> <channel quality> <SCO link>
+                <HV2 packets> <HV3 packets> <u-law log> <A-law log>
+                <CVSD> <power control> <transparent SCO>
 
-I guess this is proper.
+hcid and sdpd are running:
+ 3853 ?        SW     0:00 [krfcommd]
+ 3973 ?        S      0:00 hcid: processing events
+ 3979 ?        S      0:00 /usr/sbin/sdpd
+ 3983 pts/2    R      0:00 ps ax
 
-And then:
+But sdp browse does not return anything useful:
+[root@mrhouse peers]# sdptool browse 00:07:E0:30:EA:48
+Browsing 00:07:E0:30:EA:48 ...
 
-root@tr1a:~# dmesg
-...
-Serial: 8250/16550 driver $Revision: 1.90 $ 8 ports, IRQ sharing
-disabled
-ttyS0 at I/O 0x3f8 (irq = 5) is a 16C950/954
+Lastly, I start dund and attempt a connection:
+[root@mrhouse peers]# dund -s --persist -n call btpalm
+dund[3985]: DUN daemon ver 1.1
+dund[3985]: Accept failed. Interrupted system call(4)
 
-So I issue:
+hcidump then shows this:
+[root@mrhouse /]# hcidump -a
+HCIDump - HCI packet analyzer ver 1.5
+device: hci0 snap_len: 1028 filter: 0xffffffff
+ > HCI Event: Connect Request(0x04) plen 10
+  H . 0 . . . . . . .
+< HCI Command: Accept Connection Request(0x01|0x0009) plen 7
+  H . 0 . . . .
+ > HCI Event: Command Status(0x0f) plen 4
+  . . . .
+ > HCI Event: Role Change(0x12) plen 8
+  . H . 0 . . . .
+ > HCI Event: Connect Complete(0x03) plen 11
+  . ) . H . 0 . . . . .
+ > HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
+  H . 0 . . . .
+< HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+  ) . . .
+ > HCI Event: Command Complete(0x0e) plen 6
+  . . . . ) .
+< HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
+  ) . . .
+ > HCI Event: Command Status(0x0f) plen 4
+  . . . .
+ > HCI Event: Connection Packet Type Changed(0x1d) plen 5
+  . ) . . .
+ > HCI Event: Max Slots Change(0x1b) plen 3
+  ) . .
+ > HCI Event: Disconn Complete(0x05) plen 4
+  . ) . .
 
-root@tr1a:/boot# hciattach /dev/ttyS0 any 115200
+The T|T3 is set up to connect to the PC over BT, and it successfully 
+found the PC via BT. After trying to connect I see this error: 
+Error:Serial:timeout.Could be bad cable or faulty Modem. (0x0305).
 
-the bluetooth modules load:
+I can successfully connect to the Internet over my Ericsson T68 via BT...
 
-root@tr1a:~# lsmod
-Module                  Size  Used by
-hci_uart               16848  0
-bluetooth              49508  1 hci_uart
-serial_cs               9352  1
-8250                   21280  3 serial_cs
-...
-serial_core            23168  2 8250,hsfserial
+Any help will be appreciated!
 
-root@tr1a:~# dmesg
+--FP
 
-Bluetooth: Core ver 2.3
-NET: Registered protocol family 31
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: HCI UART driver ver 2.1
-Bluetooth: HCI H4 protocol initialized
-Bluetooth: HCI BCSP protocol initialized
-h4_recv: Unknown HCI packet type cf
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type a5
-h4_recv: Unknown HCI packet type e7
-h4_recv: Unknown HCI packet type e0
-h4_recv: Unknown HCI packet type ef
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type f0
-h4_recv: Unknown HCI packet type e3
-h4_recv: Unknown HCI packet type cf
-h4_recv: Unknown HCI packet type 8a
-h4_recv: Unknown HCI packet type eb
-h4_recv: Unknown HCI packet type 2d
-h4_recv: Unknown HCI packet type cf
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type a5
-h4_recv: Unknown HCI packet type e7
-h4_recv: Unknown HCI packet type e0
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type cf
-h4_recv: Unknown HCI packet type 8e
-h4_recv: Unknown HCI packet type cf
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type 08
-h4_recv: Unknown HCI packet type 00
-h4_recv: Unknown HCI packet type 38
-h4_recv: Unknown HCI packet type a5
-h4_recv: Unknown HCI packet type e7
-h4_recv: Unknown HCI packet type e0
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type cf
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type 8a
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type 0c
-h4_recv: Unknown HCI packet type 20
-h4_recv: Unknown HCI packet type 1a
-h4_recv: Unknown HCI packet type f6
-h4_recv: Unknown HCI packet type c5
-h4_recv: Unknown HCI packet type f0
-h4_recv: Unknown HCI packet type cf
-h4_recv: Unknown HCI packet type f4
-h4_recv: Unknown HCI packet type cf
-h4_recv: Unknown HCI packet type 8e
-Trying to free nonexistent resource <000003f8-000003ff>
-
-And then:
-
-root@tr1a:~# hciconfig
-hci0:   Type: UART
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
-        DOWN
-        RX bytes:445 acl:0 sco:0 events:0 errors:38
-        TX bytes:0 acl:0 sco:0 commands:0 errors:0
-
-And it doesn't work.
-
-Thanks for any help,
-
--- 
-Gene Imes                               www.ozob.net
 
 
 -------------------------------------------------------
