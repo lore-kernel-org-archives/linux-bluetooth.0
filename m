@@ -6,7 +6,7 @@ Cc: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 References: <1085439691.9779.36.camel@pegasus>
 Subject: Re: [Bluez-users] Error message
-Message-ID: <3207.1085487004@www6.gmx.net>
+Message-ID: <3131.1085487004@www6.gmx.net>
 Content-Type: text/plain; charset="us-ascii"
 List-ID: <bluez-users.lists.sourceforge.net>
 
