@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Gregoire Favre <Gregoire.Favre@freesurf.ch>
+From: Aben Siatris <aben@webcom.sk>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20040410155935.GA26618@magma.epfl.ch>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Which is needed to have usb bluetooth? (kernels modules)
+Subject: Re: [Bluez-users] Hotplug
+References: <200404101126.25631.conardcox@earthlink.net>
+In-Reply-To: <200404101126.25631.conardcox@earthlink.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200404101747.11107.aben@webcom.sk>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,54 +18,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 10 Apr 2004 17:59:35 +0200
+Date: Sat, 10 Apr 2004 17:47:11 +0200
 
-Hello,
+D=C5=88a Saturday 10 April 2004 17:26 Richard Cox nap=C3=ADsal:
+> Gentlemen,
+> 	I'm trying to get bluez running on my gentoo linux server so I can conne=
+ct to=20
+> my IPaq 2215.  I've got a connection successfully established, but I'm tr=
+ying=20
+> to automate it with hotplug in hopes of setting up a NAP bridge.  The doc=
+s=20
+> I've found so far are rather unclear on this subject, but I've created an=
+=20
+> '/etc/hotplug/bluetooth.agent' script.  Right now, I'm just trying to get=
+=20
+> hotplug to call that script when a connection is established to automatic=
+ally=20
+> configure bnep0, but it only seems to get called on startup when I reboot=
+ my=20
+> kernel.  I had the impression that 'pand' would emit a hotplug event for=
+=20
+> bnep0 when a connection is established, but I'm not so sure now.  Any=20
+> guidance about how I might proceed.  Thank you in advance for any informa=
+tion=20
+> you may provide.
 
-I am getting deseperate regarding bluetooth under linux :-(
+not bluetooth.agent, but net.agent.
+you need action after creating NET (bnep0)
 
-I got a kernel with which I could access my onboard usb bluetooth, but I
-cannot anymore since at least 10 kernels rebuild...
-
-I am using 2.6.5-mm3.
-I don't find aynwhere exactly what is needed for Bluez, could someone
-point me to the right config?
-
-Right now I have:
-
-CONFIG_BT=3Dy
-CONFIG_BT_L2CAP=3Dy
-CONFIG_BT_SCO=3Dy
-CONFIG_BT_RFCOMM=3Dy
-CONFIG_BT_RFCOMM_TTY=3Dy
-CONFIG_BT_BNEP=3Dy
-CONFIG_BT_BNEP_MC_FILTER=3Dy
-CONFIG_BT_BNEP_PROTO_FILTER=3Dy
-CONFIG_BT_HCIUSB=3Dy
-CONFIG_BT_HCIUART=3Dy
-CONFIG_BT_HCIUART_H4=3Dy
-CONFIG_BT_HCIUART_BCSP=3Dy
-CONFIG_BT_HCIVHCI=3Dy
-CONFIG_USB=3Dy
-CONFIG_USB_DEVICEFS=3Dy
-CONFIG_USB_BANDWIDTH=3Dy
-CONFIG_USB_DYNAMIC_MINORS=3Dy
-CONFIG_USB_EHCI_HCD=3Dy
-CONFIG_USB_EHCI_ROOT_HUB_TT=3Dy
-CONFIG_USB_UHCI_HCD=3Dy
-CONFIG_USB_STORAGE=3Dy
-CONFIG_USB_SERIAL=3Dy
-CONFIG_USB_SERIAL_VISOR=3Dy
-
-And cat /proc/bus/usb/devices just show my hub and cards readers...
-
-Thank for any info :-)
-
-	Gr=E9goire
-_________________________________________________________________________=
-_
-http://algebra.epfl.ch/greg ICQ:16624071 mailto:Gregoire.Favre@freesurf.c=
-h
+i have iPAQ4155 connected.
+read thread  "No more bluez.o in 2.6?"
 
 
 -------------------------------------------------------
