@@ -1,57 +1,89 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050201062510.46102.qmail@web60904.mail.yahoo.com>
-From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1107182296.7902.11.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <424AF7E3.3060208@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=big5
-Subject: [Bluez-users] rfcomm question 3
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 1 Feb 2005 14:25:10 +0800 (CST)
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Connect button does not work anymore?
+References: <200503301323.56682.rjenster@web.de>
+In-Reply-To: <200503301323.56682.rjenster@web.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 30 Mar 2005 12:02:59 -0700
 
-Hi all users!
-    I thank Marcel here for help on initializing
-connection from mobile to PC. Now, before I can do
-that, I initialize the rfcomm connection from PC to
-mobile, and then run my project program. The syntax is
-as follows:
-snprintf (tmp, sizeof (tmp), "t68_remote_v2 (%s)",
-modemname);
-tmp[sizeof (tmp) - 1] = 0;
-openlogfile (tmp, logfile, LOG_DAEMON, loglevel);
-set_alarmhandler (alarmhandler, alarmlevel,
-modemname);
-openmodem ();
-setmodemparams ();
-But now, when I initialize the connection from mobile
-to PC, once I run the program, "/dev/rfcomm0: No such
-device" is shown. So, I wish to know how can I modify
-the program by changing some syntax from that I post
-here? Or is there any program that I can include in my
-main program? Thank you very much.
-Michael
+Ruben,
 
-_______________________________________________________________________
-新年願望第一位 : 找到友緣人
-http://personals.yahoo.com.hk
+Now, the SCO connection will be brought up on demand when the audio 
+client tries to use it. Is there something you're trying to do that is 
+not working with this new scheme?
+
+You can use the new stuff Fredrik Tolf added to invoke a program when 
+the connect button is clicked. I haven't documented it yet--I need to 
+dig up his explanation of it from the list.
+
+Brad
+
+Ruben Jenster wrote:
+> Hi,
+> 
+> connecting to my headset works with btsco v0.4 but the connect/disconnect 
+> button does not work anymore. When starting btsco in verbose mode I get 
+> displayed when the button was pressed but nothing happens.
+> Is this a wanted behaviour?
+> 
+> tsco v0.4
+> Device is 0:0
+> Voice setting: 0x0060
+> RFCOMM channel 1 connected
+> speaker volume: 1 mic volume: 1
+> driver is in use
+> connected SCO channel
+> Done setting sco fd
+> recieved AT+VGS=01
+> Sending up speaker change 1
+> speaker volume: 1 mic volume: 1
+> driver is not in use
+> disconnected SCO channel
+> speaker volume: 1 mic volume: 1
+> driver is in use
+> connected SCO channel
+> Done setting sco fd
+> recieved AT+VGS=01
+> Sending up speaker change 1
+> recieved AT+CKPD=200		-> connect button pressed
+> 
+> 
+> Regards 
+> 
+> Ruben
+> 
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
-Tool for open source databases. Create drag-&-drop reports. Save time
-by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
-Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+This SF.net email is sponsored by Demarc:
+A global provider of Threat Management Solutions.
+Download our HomeAdmin security software for free today!
+http://www.demarc.com/Info/Sentarus/hamr30
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
