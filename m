@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Talbi <amine@baracoda.com>
-To: bluez-devel@lists.sourceforge.net
-References: <410E51C9.1020401@celar.fr> <1091478399.12594.131.camel@imladris.demon.co.uk>
-In-Reply-To: <1091478399.12594.131.camel@imladris.demon.co.uk>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200408030959.02131.amine@baracoda.com>
-Subject: [Bluez-devel] BlueZ Disconnects
+Subject: Re: [Bluez-devel] IPv6 Bluez and Router Advertissement
+From: David Woodhouse <dwmw2@infradead.org>
+To: =?ISO-8859-1?Q?J=E9r=F4me?= LECOMTE <lecomte@celar.fr>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <410E51C9.1020401@celar.fr>
+References: <410E51C9.1020401@celar.fr>
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1091478399.12594.131.camel@imladris.demon.co.uk>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,16 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 3 Aug 2004 09:59:02 +0200
+Date: Mon, 02 Aug 2004 21:26:39 +0100
 
-hello,
+On Mon, 2004-08-02 at 16:38 +0200, Jérôme LECOMTE wrote:
+> With a sniffer, router sollicication are going well from the slave to 
+> the router but router advertisement (with ipv6 prefix) can't go through 
+> Bluetooth links (sniffer on slaves shows that) and I don't understand why.
+> Experience about this would be welcome
 
-I'm struggling with how to use/configure the BlueZ stack to automatically 
-re-establish the bluetooth connection after a disconnection.
+Is radvd definitely trying to send advertisements on the interface in
+question? Are these part of a bridge on which radvd is configured to
+broadcast, or is radvd configured to use each bnep device separately?
 
-Can you indicate me how can I know that there is a disconnection.
+IPv6 autoconfig over BNEP is working fine for me. When used with Linux
+bridging, I have to send a SIGHUP to radvd after adding the first BNEP
+device to the bridge; otherwise radvd thinks the MAC address is all
+zeroes and it doesn't work.
 
-Regards,
+If that's not it, give more precise details of your setup, and tcpdump
+from both ends. If radvd isn't sending the packets you want, look there
+to find out why. If it _is_ and you're not seeing them at the other end,
+I'll be surprised.
+
+-- 
+dwmw2
+
+
 
 
 -------------------------------------------------------
