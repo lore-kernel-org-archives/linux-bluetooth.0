@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PICO Bluetooth Card / Modem hcidump -x
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Monika Hubrich <monikahubrich@aol.com>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <001801c4afbc$6f476980$ea11b4ac@monika>
-References: <001801c4afbc$6f476980$ea11b4ac@monika>
-Content-Type: text/plain
-Message-Id: <1097563819.4165.0.camel@notepaq>
-Mime-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: RE: [Bluez-users] PICO Bluetooth Card / Modem hcidump -x
+Reply-To: axs203dd@excite.com
+From: "mr" <axs203dd@excite.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Message-Id: <20041012000239.B04111BCB8@xprdmailfe23.nwk.excite.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,22 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 12 Oct 2004 08:50:19 +0200
+Date: Mon, 11 Oct 2004 20:02:39 -0400 (EDT)
 
-Hi Monika,
 
-> -run "hcidump -x" as root and show us the output.
-> 
-> When I type in the command hcicump -x, 
-> the output is: Command not found.
+>When I type in the command hcicump -x, 
 
-you have to install the bluez-hcidump package.
+
+
+Maybe you mean hcidump
+
+
 
 Regards
 
-Marcel
-
-
+_______________________________________________
+Join Excite! - http://www.excite.com
+The most personalized portal on the Web!
 
 
 -------------------------------------------------------
