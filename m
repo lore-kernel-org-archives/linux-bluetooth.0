@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Zoom 4312 PCMCIA Bluetooth freezes laptop
-References: <opsj5ahvnzdfsa41@dfavro-3>  <opsj5r1azldfsa41@dfavro-3> <1105014703.4299.31.camel@pegasus>
-From: "David Favro" <dfavro@users.sourceforge.net>
-Content-Type: text/plain; format=flowed; delsp=yes; charset=utf-8
-MIME-Version: 1.0
-Message-ID: <opsj66u506dfsa41@dfavro-3>
-In-Reply-To: <1105014703.4299.31.camel@pegasus>
+Subject: Re: [Bluez-users] Some general HID questions..
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.61.0501061406380.17785@block.bubble>
+References: <Pine.LNX.4.61.0501061130420.17785@block.bubble>
+	 <1105014500.4299.25.camel@pegasus>
+	 <Pine.LNX.4.61.0501061406380.17785@block.bubble>
+Content-Type: text/plain
+Message-Id: <1105017117.4299.53.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,20 +20,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 06 Jan 2005 15:22:07 -0500
+Date: Thu, 06 Jan 2005 14:11:57 +0100
 
-On Thu, 06 Jan 2005 13:31:43 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
+Hi Florian,
 
-> maybe you should simple test a vanilla 2.6.10 or later. The reports
-> about the RedHat kernel are not the bests lately and I am not going to
-> debug any of their kernels.
+> > you read the email where I explained that I will keep the revision
+> > history by any costs? The input subsystem is no merged back and once I
+> > get my x-mas and new years backlog done, I will start with it.
+> Hm, I must have missed that one. 
+> So an universal HID parser is indeed planned?
 
-Right.  I am having other problems with that kernel acting flaky, such as ACPI, so I'm just going to stay away from it.  I've now got the whole set-up including the mouse now working on (Fedora's previously released) 2.6.8 kernel and I'm going to stick with that for a while.  Thanks for the help!
+it is planned since the beginning, but it is not an easy goal.
 
-Cheers,
-David Favro
-Meta-Dynamic Solutions, LLC
-dfavro@users.sourceforge.net
+> And the sources are presumably in the bluez-CVS?
+
+There will be a Bitkeeper tree and of course I will integrate them into
+my -mh patches.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
