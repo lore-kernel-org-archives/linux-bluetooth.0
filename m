@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hcidump supports real raw packets ??
+Subject: Re: [Bluez-users] GSM Multiplexer Protocol
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Emmanuel Mendoza Acevedo <emma_kev@hotmail.com>
+To: Daniel Haensse <haensse@swissembedded.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY17-F20BVVI6x9isZ00009d04@hotmail.com>
-References: <BAY17-F20BVVI6x9isZ00009d04@hotmail.com>
+In-Reply-To: <200409282203.25838.haensse@swissembedded.com>
+References: <200409262123.50707.haensse@swissembedded.com>
+	 <1096359052.4684.20.camel@notepaq>
+	 <200409282203.25838.haensse@swissembedded.com>
 Content-Type: text/plain
-Message-Id: <1096498912.6380.20.camel@pegasus>
+Message-Id: <1096496649.6380.11.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +20,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 30 Sep 2004 01:01:52 +0200
+Date: Thu, 30 Sep 2004 00:24:10 +0200
 
-Hi Emmanuel,
+Hi Daniel,
 
-> Apologize my expression, but I wanted to say capture packets on the air  and 
-> therefore display the HCI layer and upper layers of these with hcidump.
+> ok, so I'll start from the scratch. Thanks for your reply. Do you know how to 
+> get the GSM 07.10 spec? I only have the source code of a siemens multiplexer 
+> driver and it don't make me very happy to analyse their code first in 
+> details.
 
-for capturing air packets you need a air sniffer aka protocol analyser
-and there are no HCI packets on the air.
+look at www.etsi.org. You can download them for free.
 
 Regards
 
