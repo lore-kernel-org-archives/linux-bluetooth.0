@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Geert Geurts <geert@ebm.nl>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <1080225769.3064.6.camel@geert.ebm.nl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] (no subject)
+Message-ID: <004b01c41268$7e8ee810$4000fe0a@rtsviec64>
+From: "Harald Meier" <meh1@rts.at>
+To: <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Subject: [Bluez-users] PAND and RFCOMM simultaneously
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,47 +16,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Mar 2004 15:42:49 +0100
+Date: Thu, 25 Mar 2004 13:55:43 +0100
 
-Hi Marcel! 
-Man your fanatic with your bluez driver! good work!
-I've got some more for you :-)
-I've done the stuff you told me to, rebuild kernel with patch applied
-and it works better! but after half a minute or something the connection
-breaks again... and after pinging over the ppp I get the same message...
-uuuugh...
-What to do next??
+Dear list members!
 
-Hi Geert,
+I have a NAP/PANU network with pand running and I need to
+set up some (up to 4) rfcomm connection additionally.
 
-> Hello, I've got a problem with my usb-dongle...
-> as soon as I put request too much traffic over ppp (a webpage is too
-> much, ping is no problem) the connection is broken...
-> when I try to ping over the ppp after I got the timeout on my palm, I
-> get sendmsg: No buffer space available 
-> when I do the same when I didn't get the timeout message yet I get a
-> normal reply...
-> 
-> I found out that I have the same problem when I try connecting via
-> normal cradle/cable...
-> no matter witch speed I set! well tried 19200 without success...
-> 
-> I'm using gentoo linux
-> devfs and usbfs
-> 2.4.23-ck3-mh2 kernel
-> bluez-kernel-2.3
-> bluez-libs-2.4
-> bluez-pan-1.1
-> bluez-sdp-1.5
-> bluez-utils-2.3-r1
+Setting up the rfcomm devices when the pand is down works fine
+but if pand is up, I get a "Function not implemented" when I try
+to bring up a rfcomm connection.
 
-don't use bluez-kernel-2.3, because my latest -mh patch should be
-enough.
+If the rfcomm connection is up and I try to connect to the NAP
+via pand, I get the "Function not implemented" from pand.
 
-Regards
+What I am using:
 
-Marcel
+    Debian (not shure what version, was not installed by me)
+    kernel 2.4.18-mh10
+    bluez-pan-1.1
+    bluez-utils-2.4
+    bluez-libs-2.5
 
+    Pico Bluetooth PCI Card (Class 1)
+
+
+any help appreciated,
+Harald.
 
 
 -------------------------------------------------------
