@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="=-2If04tWJGFSjXn4+DQ8h"
-Message-Id: <1078361235.2921.12.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Problem with the i-Tec dongle solved
+From: Colin Pinkney <bluez-devel@cpinkney.org.uk>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Suspend/resume issues with bluez
+References: <200403022202.19259.mitsu@syntheticzero.com>
+In-Reply-To: <200403022202.19259.mitsu@syntheticzero.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <200403032224.08229.bluez-devel@cpinkney.org.uk>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,72 +18,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 04 Mar 2004 01:47:15 +0100
+Date: Wed, 3 Mar 2004 22:24:04 +0000
 
+=2D----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
---=-2If04tWJGFSjXn4+DQ8h
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+On Wednesday 03 Mar 2004 03:02, Mitsu Hadeishi wrote:
+> Hi, just thought I'd run this issue past you folks.  I'm running the bluez
+> stack and utilities from Debian unstable on kernel 2.4.22-x1 (Xandros
+> Desktop 2)=20
+=2E..
+> The problem is bluez never seems to work again after a suspend/resume.  I
+> have tried shutting down the Bluetooth card (you can do with with Fn-F5 on
+> a Thinkpad) before suspending, as well as doing hciconfig hci0 down, and
+> even rmmod rfcomm, rmmod hci_usb (rmmod l2cap never seems to work) before
+> suspending, and then modprobe them back afterwards. =20
 
-Hi Folks,
+We get that on the Sharp Zaurus Linux PDA with any Bluetooth CF card. After=
+ a=20
+suspend/resume of the PDA, all operations on the Bluetooth card just timeou=
+t.
 
-I got the problematic i-Tec dongle working. The important thing is to
-send a HCI_Reset as the first command at initialization. We don't do
-this, but I can't remember why not. Maybe there were some problematic
-chips in the early times of BlueZ. The attached patch is against 2.6.
+> Rebooting the system causes bluez to work again.
 
-And here is the new dongle:
+Since the Zaurus does not have builtin Bluetooth, every Zaurus must use=20
+Bluetooth CF cards so we're able to eject the card and reinsert it. Nothing=
+=20
+else brings it back (apart from a reboot of course), not even things like=20
+'cardctl reset'. But at least the ejecting and reinserting can be automated=
+=20
+which I put into a script that is run on every resume. I guess you don't ha=
+ve=20
+this option though if the Bluetooth device is built into your laptop.
 
-hci0:   Type: USB
-        BD Address: 00:03:C9:xx:xx:xx ACL MTU: 377:10  SCO MTU: 16:0
-        UP RUNNING PSCAN ISCAN 
-        RX bytes:107 acl:0 sco:0 events:14 errors:0
-        TX bytes:303 acl:0 sco:0 commands:14 errors:0
-        Features: 0xff 0xff 0x0d 0x38 0x08 0x08 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset> 
-                <timing accuracy> <role switch> <hold mode> <sniff mode> 
-                <park state> <RSSI> <channel quality> <SCO link> 
-                <HV2 packets> <HV3 packets> <u-law log> <A-law log> 
-                <CVSD> <power control> <transparent SCO> <enhanced iscan> 
-                <interlaced iscan> <interlaced pscan> <AFH cap. slave> <AFH cap. master> 
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: RSWITCH HOLD SNIFF PARK 
-        Link mode: SLAVE ACCEPT 
-        Name: 'Broadcom BCM2035'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x69 LMP Ver: 1.1 (0x1) LMP Subver: 0xe00
-        Manufacturer: Broadcom Corporation (15)
+BTW the Affix Bluetooth drivers have no problem with suspending and resumin=
+g.=20
+Is your Bluetooth device supported by Affix?
 
-The nice thing is that it already supports AFH ;)
+=2D --=20
+Colin Pinkney
+http://www.cpinkney.org.uk
+=2D----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (GNU/Linux)
 
-Regards
-
-Marcel
-
-
---=-2If04tWJGFSjXn4+DQ8h
-Content-Disposition: attachment; filename=patch
-Content-Type: text/plain; name=patch; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-
-===== net/bluetooth/hci_core.c 1.25 vs edited =====
---- 1.25/net/bluetooth/hci_core.c	Thu Feb 26 00:53:38 2004
-+++ edited/net/bluetooth/hci_core.c	Thu Mar  4 01:06:44 2004
-@@ -189,6 +189,9 @@
- 
- 	/* Mandatory initialization */
- 
-+	/* Reset */
-+	hci_send_cmd(hdev, OGF_HOST_CTL, OCF_RESET, 0, NULL);
-+
- 	/* Read Local Supported Features */
- 	hci_send_cmd(hdev, OGF_INFO_PARAM, OCF_READ_LOCAL_FEATURES, 0, NULL);
- 
-
---=-2If04tWJGFSjXn4+DQ8h--
-
+iD8DBQFARlsIioDqRlN9/eURAqT7AKDPD9uUEcDw4TezKbAf3h+EgSMwlgCfTOXK
+ttu8XI/LaXZKvCFlANA0Wmc=3D
+=3DnKSA
+=2D----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
