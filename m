@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: mark <gress2k1@copper.net>
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1078063562.2814.4.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-users] hcidump-1.6, Intellimouse, and HID Parser
+From: "Thor Egil Skaug" <paxtonrd@hotmail.com>
+To: <bluez-users@lists.sourceforge.net>
+Message-ID: <000301c3fe31$fdf2b460$46a57e40@thores>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Subject: [Bluez-users] AUX1 packets
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,18 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 29 Feb 2004 09:06:02 -0500
+Date: Sat, 28 Feb 2004 11:35:16 -0800
 
-What are the proper steps to get this working?
+Is there any way of having an ACL connection use AUX1 packets?
 
-I'm using Mandrake 9.2 which is based on the 2.4.22 kernel, all of the
-stuff that is listed here
-http://www.holtmann.org/linux/bluetooth/hid.html I can do to identify my
-mouse.
+The packet type is not defined in the Bluetooth specification for
+the HCI_create_connection command.
 
-How do I get it properly linked up so that the HID software will
-identify with the mouse and I can use it?
+I am using Belkin USB devices (CSR).
 
+Can this be done by setting one of the reserved packet types,
+or using a vendor specific command, or is it simply not possible?
+
+The reason I want to do this is to measure the effect of having
+CRC, FEC and ARQ on the software side, also using proactive
+retransmits.
+
+Thanks,
+
+Thor E. Skaug
 
 
 -------------------------------------------------------
