@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Patrick Duchstein <patrick-bluez.org@prote.st>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <20040608230122.3504775c.patrick-bluez.org@prote.st>
+Subject: Re: [Bluez-users] Re: D-Link DBT-120 destroyed? (with bluefw)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Roger Larsson <roger.larsson@norran.net>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200406082235.59864.roger.larsson@norran.net>
+References: <200405290103.26485.roger.larsson@norran.net>
+	 <200406082046.30496.roger.larsson@norran.net>
+	 <1086721405.5040.24.camel@pegasus>
+	 <200406082235.59864.roger.larsson@norran.net>
+Content-Type: text/plain
+Message-Id: <1086727565.5040.48.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] rfcomm connection setup
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,29 +21,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 8 Jun 2004 23:01:22 +0200
+Date: Tue, 08 Jun 2004 22:46:05 +0200
 
-Hi,
+Hi Roger,
 
-I am currently working on my own embedded solution of a Bluetooth
-protocol stack, and always actively testing its interoperability with
-BlueZ. First thing to say: great work for reference, thanks a lot!
+> > > > > I was following instructions on a German site to get my DBT-120 to
+> > > > > work in Linux. First time I skipped over that command. Second time I
+> > > > > forgot to skip it.
+> >
+> > what site?
+> 
+> I do not remember.
 
-I am currently stuck on setting up an rfcomm connection. L2CAP works
-totally fine, but when connecting over an rfcomm socket with either
-rctest or rfcomm, bluez does not seem to send out a SABM frame on DLCI 0
-as mentioned in the specification; a timeout appears after some time.
+you followed some stupid and wrong informations and don't remember. That
+is very bad ;)
 
-Since I do not have any other BT devices to check it, I would be very
-pleased if somebody on this list could help me by just sending me the
-full debugging output of the bluez modules (3 kernel definitons) of a
-successfully established rfcomm connection using rctest -s -N 2. Though
-I am by now very familiar with both the Bluetooth 1.1 and TS 07.10
-specs, I probably understood something wrong; thus, a connection trace
-would help me a lot.
+> > > > > The D-Link does not light up any more - can it be repaired?
+> >
+> > I don't know. What does dmesg say? What is in the log files?
+> 
+> Nothing! lsusb does not find it anymore...
 
-Many thanks in advance,
-Patrick
+Check dmesg, /var/log/syslog, /proc/bus/usb/devices etc.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
