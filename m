@@ -3,12 +3,12 @@ Subject: Re: [Bluez-users] uinput and modules.conf
 From: Marcel Holtmann <marcel@holtmann.org>
 To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403161813.51693.cijoml@volny.cz>
+In-Reply-To: <200403161746.03391.cijoml@volny.cz>
 References: <200403160905.27291.cijoml@volny.cz>
-	 <200403161746.03391.cijoml@volny.cz> <1079456964.3307.116.camel@pegasus>
-	 <200403161813.51693.cijoml@volny.cz>
+	 <200403161418.11554.cijoml@volny.cz> <1079444743.3307.82.camel@pegasus>
+	 <200403161746.03391.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1079457663.3307.120.camel@pegasus>
+Message-Id: <1079456964.3307.116.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,18 +20,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 16 Mar 2004 18:21:03 +0100
+Date: Tue, 16 Mar 2004 18:09:24 +0100
 
 Hi Michal,
 
-> I don't understand???
+> > You started bthid as root, right? The device node for uinput must be
+> > writeable.
 > 
-> > add extra syslog() statement to see where your code fails. It is working
-> > perfect with all my Bluetooth HID devices.
+> yes, as root, is writable...
 
-syslog() is like printf(), but you get your message through syslogd. Try
-to track down where the input events are not sent to uinput. I don't see
-any problem in the current code.
+add extra syslog() statement to see where your code fails. It is working
+perfect with all my Bluetooth HID devices.
 
 Regards
 
