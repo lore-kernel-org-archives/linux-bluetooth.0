@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BlueZ error in cc,cc,dc sequence
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404162339.01392.cijoml@volny.cz>
-References: <200404162339.01392.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1082159344.4489.1.camel@pegasus>
-Mime-Version: 1.0
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200404162339.01392.cijoml@volny.cz>
+Subject: [Bluez-users] BlueZ error in cc,cc,dc sequence
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,39 +17,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Apr 2004 01:49:04 +0200
+Date: Fri, 16 Apr 2004 23:39:01 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
-> notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
-> Can't create connection: Input/output error
+see this:
 
-you can't have to ACL links to the same remote device.
+notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
+notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
+Can't create connection: Input/output error
+notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
+Can't create connection: Input/output error
+notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
+Can't create connection: Input/output error
+notas:/etc/hotplug# hcitool dc 00:0A:D9:FC:EC:51
+Not connected.
+notas:/etc/hotplug# hcitool dc 00:0A:D9:FC:EC:51
+Not connected.
+notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
+Can't create connection: Input/output error
+notas:/etc/hotplug# hcitool dc 00:0A:D9:FC:EC:51
+Not connected.
 
-> notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
-> Can't create connection: Input/output error
-> notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
-> Can't create connection: Input/output error
-> notas:/etc/hotplug# hcitool dc 00:0A:D9:FC:EC:51
-> Not connected.
-> notas:/etc/hotplug# hcitool dc 00:0A:D9:FC:EC:51
-> Not connected.
-> notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
-> Can't create connection: Input/output error
-> notas:/etc/hotplug# hcitool dc 00:0A:D9:FC:EC:51
-> Not connected.
-> 
-> But device is connected
+But device is connected
 
-Check with "hcitool con" every time, because this is what the kernel
-sees and "hcitool dc" only sends the raw HCI_Disconnect command.
-
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
