@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-To: <bluez-users@lists.sourceforge.net>
-Subject: AW: [Bluez-users] Toshiba and BT (SuSE 9.2)
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAqEXdOIv5C0ypKYTFbykpjAEAAAAA@t-online.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1103195360.28046.56.camel@pegasus>
+From: Jani Pellikka <jpellikk@ee.oulu.fi>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20041216125827.GB24108@ee.oulu.fi>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Bluez and threading
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,31 +16,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 16 Dec 2004 15:21:32 +0100
+Date: Thu, 16 Dec 2004 14:58:27 +0200
 
-Hi Marcel,
-very, very good news. I got the connection.
+Hi,
 
-##>
-##>	dund -n -D -P 1 -X -c 00:0B:CE:00:01:8F
-##>
+Is there support for threading in bluez?
 
-Linux-Notebook:~ # dund -n -D -P 1 -X -c 00:0B:CE:00:01:8F
-dund[8823]: Bluetooth DUN daemon
-dund[8823]: Connecting to 00:0B:CE:00:01:8F channel 1
-dund[8823]: Connection established
-Linux-Notebook:~ # Using interface ppp0
-Connect: ppp0 <--> /dev/rfcomm0
-local  IP address 192.168.1.76
-remote IP address 192.168.1.250
-Script /etc/ppp/ip-up finished (pid 8862), status = 0x0
+For example, I have different threads for HCI inquering,
+sending stuff via rfcomm socket and for listening incoming
+rfcomm connections. Is it possible to do all this at the
+same time in separate threads?
 
-What is now to do in order to reach the router and by this the internet?
+Right now, I have written C++ code using bluez libs for all
+these threads but I get segmentation fault when I try to run
+them at the same time. So, I wonder if it was possible to
+thread these tasks at all.
 
-Regards
-Peter
+Thanks in advance,
 
-
+-- 
+Jani
 
 
 -------------------------------------------------------
