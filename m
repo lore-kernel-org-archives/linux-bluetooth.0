@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Message-ID: <39417DF3286A66428FA558987839F44F152D99@SINTEFXCH01.sintef.no>
-From: "Rognlien Dag Kristian" <Dag.K.Rognlien@sintef.no>
-To: <Bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] tcsendbreak and flow control on hciattach (csr chip)
+Subject: Re: [Bluez-devel] Local Position Profile for Bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Casimiro Serrano Caballero <casimiro@telecos-malaga.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41645C41.3020000@telecos-malaga.com>
+References: <41644DA5.5020704@telecos-malaga.com>
+	 <1097095151.7325.6.camel@pegasus>  <41645C41.3020000@telecos-malaga.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1097145903.7325.23.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,32 +19,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 8 Oct 2004 11:14:47 +0200
+Date: Thu, 07 Oct 2004 12:45:03 +0200
+
+Hi Casimiro,
+
+> =BFWhat about documentation?. Here, in the Ingeneering Communications=20
+> Department we follow an structure to make documentation about projects,=
+=20
+> and i dont want to start anything that finally no one of you will=20
+> supervise (at the end of the implementation i mean) without=20
+> documentation. My final goal is to prepare an standard LPP profile=20
+> (written in C, i forgot to tell that) avaliable for everybody from the=20
+> bluez page (like the other profiles, it will be basically a daemon and =
+a=20
+> terminal application). If you dont have any problems, i`ll follow our=20
+> documetation structure and at the end translate it to english.
+
+I actually only require a manual page for a program at the moment. You
+can follow your documentation structure, because I will look at the
+source and "judge" from that view. So go and write your code.
+
+Regards
+
+Marcel
 
 
-Hello,
-
-If I enable both flow control and send break with hciattach:
-hciattach -b ttyS1 csr 921600 flow
-
-The unit fails to initialize. This does not happen if I disable flow
-control, or send break.
-The problem is also solved by setting a sleep of 0.5 seconds after the
-tcsendbreak command in the hciattach.c code.
-
-This is on an Intel XScale platform.
-
-I use bluez libs and bluez utils 2.9 on a 2.4.21 kernel with the mh9
-patch.
-
-Any ideas for another solution than the usleep, or is this the best
-solution?
-
-Regards,
-Dag K. W. Rognlien
-Research Scientist
-SINTEF ICT
-Communication Systems
 
 
 -------------------------------------------------------
