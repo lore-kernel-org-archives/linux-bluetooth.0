@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bthid and console switching
+Subject: Re: [Bluez-users] Problem "coldplugging"
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jeffrey Arbuckle <jbarbuc@nmt.edu>
+To: Oguzhan Eris <eris3@ekls.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.44.0401031458050.20028-100000@speare5-1-11.nmt.edu>
-References: <Pine.LNX.4.44.0401031458050.20028-100000@speare5-1-11.nmt.edu>
+In-Reply-To: <1073252537.4255.6.camel@localhost>
+References: <1073239248.2928.18.camel@localhost>
+	 <1073243976.25261.160.camel@pegasus>  <1073252537.4255.6.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1073267659.3804.13.camel@pegasus>
+Message-Id: <1073253546.25261.165.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,56 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 05 Jan 2004 02:54:19 +0100
+Date: Sun, 04 Jan 2004 22:59:06 +0100
 
-Hi Jeffrey,
+Hi,
 
-> I'm using the cvs bthid with kernel 2.6 with
-> Microsoft's Bluetooth desktop.
-> 
-> Everything is working great except when using the bluetooth
-> keyboard to switch to console with CNTL-ALT-F[1-6] from xwindows.
-> 
-> Doing so causes bthid to crash.  Syslog reveals:
-> 
-> Unable to handle kernel paging request at virtual address 00100100
->  printing eip:
->  c024b1ee
->  *pde = 00000000
->  Oops: 0000 [#1]
->  CPU:    0
->  EIP:    0060:[<c024b1ee>]    Tainted: P  
->  EFLAGS: 00010246
->  EIP is at mousedev_event+0x80/0x1fc
->  eax: 00100100   ebx: 001000f8   ecx: 00100100   edx: f7264000
->  esi: c03ae3a0   edi: 00000000   ebp: f7265efc   esp: f7265ed4
->  ds: 007b   es: 007b   ss: 0068
->  Process bthid (pid: 902, threadinfo=f7264000 task=f7269310)
->  Stack: f7d26900 0000001d 00020001 0000001e 00000001 f7272a00 c03ae3a0 00000000 
->         f7265f00 f7272a00 c03ae3a0 00000000 00000000 f7272a34 f723ce38 00000000 
->         00000000 c024976b f7272a34 00000000 00000000 00000000 00000000 00000000 
->  Call Trace:
->   [<c024976b>] input_event+0xef/0x3fa
->   [<f8830541>] uinput_write+0xa9/0xd2 [uinput]
->   [<c015beee>] vfs_write+0xbc/0x127
->   [<c015bffe>] sys_write+0x42/0x63
->   [<c010953b>] syscall_call+0x7/0xb
-> 
-> Code: 8b 53 08 89 d1 0f 18 02 90 8d 56 2c 39 d0 75 cf 8b 44 24 10 
-> 
-> Note that when using a ps/2 keyboard and the bluetooth keyboard, the
-> ps/2 keyboard will not cause bthid to crash when switching consoles, but the
-> bluetooth keyboard will.
-> 
-> After bthid crashes and the machine is in console, no input from the ps/2
-> keyboard appears on the screen.  However, CNTL-ALT-F7 returns the machine
-> to xwindows where input from the ps/2 allows bthid to be run again.
-> Bluetooth keyboard and mouse then work as normal but switching consoles
-> repeats the cyle all over again.
+> all bluetooth core drivers are in-kernel. hci_usb is a module and so is 
+> bcm203x (which I guess can never be in kernel as it needs way too many
+> userland stuff)
 
-I have no idea why this happens. Please run ksymoops on the oops. Do you
-use a SMP or preempt kernel? Do it also fail if you don't connect the
-mouse?
+personally I prefer to have all Bluetooth stuff as modules.
+
+> I have tried lots and lots of different ways of going about it all.  I'm
+> guessing hci_usb needs to be loaded before bcm203x, please correct me if
+> I'm wrong.  But regardless,  SOMETIMES it works perfectly,  most of the
+> time it just doesn't work.  By doesn't work, i mean I can see the hci0
+> device but bringing it up sometimes results in ...
+> Can't init device hci0. Connection timed out(110)
+> and in the logs I see 
+> hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb dd071214 err -90
+
+Compile the hci_usb driver without the SCO audio support. Maybe the
+Broadcom devices don't really like the ISOC transfers.
 
 Regards
 
