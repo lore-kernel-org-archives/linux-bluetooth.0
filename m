@@ -1,22 +1,20 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
 From: Marcel Holtmann <marcel@holtmann.org>
-To: James Courtier-Dutton <James@superbug.demon.co.uk>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4118FBFD.6000606@superbug.demon.co.uk>
-References: <4117AB9A.9010909@dark-reality.de>
-	 <1092071356.4564.12.camel@pegasus> <4117B098.5020805@dark-reality.de>
-	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>
-	 <1092090364.4564.46.camel@pegasus> <41180E64.1010007@dark-reality.de>
-	 <1092140041.4564.96.camel@pegasus>
-	 <Pine.LNX.4.59.9999.0408101355310.22497@brava.dcs.gla.ac.uk>
-	 <1092143505.4564.117.camel@pegasus> <4118D049.9060000@superbug.demon.co.uk>
-	 <1092145771.4564.148.camel@pegasus> <4118D6B9.3090708@superbug.demon.co.uk>
-	 <1092148473.4564.156.camel@pegasus> <4118E6A1.4030709@superbug.demon.co.uk>
-	 <1092151554.4564.188.camel@pegasus> <4118FBFD.6000606@superbug.demon.co.uk>
+To: Jean Tourrilhes <jt@hpl.hp.com>
+Cc: Michal Semler <cijoml@volny.cz>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040810163203.GA1963@bougret.hpl.hp.com>
+References: <20040805013335.GA13608@bougret.hpl.hp.com>
+	 <1091976547.2773.29.camel@pegasus>
+	 <20040809185159.GA21899@bougret.hpl.hp.com>
+	 <1092078516.4564.40.camel@pegasus>
+	 <20040809195448.GA24140@bougret.hpl.hp.com>
+	 <1092125599.4564.76.camel@pegasus>
+	 <20040810163203.GA1963@bougret.hpl.hp.com>
 Content-Type: text/plain
-Message-Id: <1092178711.4564.210.camel@pegasus>
+Message-Id: <1092178402.4564.204.camel@pegasus>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Re: [PATCH 2.6] link trigger for AODV and +
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -27,33 +25,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 Aug 2004 00:58:32 +0200
+Date: Wed, 11 Aug 2004 00:53:23 +0200
 
-Hi James,
+Hi Jean,
 
-> > the point is in writing an ALSA driver and not changing the ALSA
-> > subsystem. The SCO driver is part of the Bluetooth subsystem and so it
-> > will go in by me. The ALSA subsystem provides an in-kernel API and that
-> > can be used without any acknowledge of the ALSA maintainer.
+> > If the HCI connections themself are fully integrated into the driver and
+> > device model an event through hotplug would be the best. Comments?
 > 
-> ALSA is very modularised. This separates the hardware specific driver 
-> stuff from the more general alsa kernel code. So, if you write your own 
-> ALSA driver hardware module, it will have to depend on other ALSA 
-> modules. The only ALSA API that is going to be stable is the user land 
-> alsa-lib, which talks to applications. Although the ALSA kernel API and 
-> ALSA low level hardware driver API has not changed in some time, the 
-> ALSA maintainer reserves the right to change it at any time without 
-> having to warn people, as alsa-lib hides all the changes from users.
-> It is therefore a good idea to place any ALSA specific code in the ALSA 
-> tree, so that the ALSA maintainers keep it's kernel API up to date.
-> This would then leave the BlueZ team to only have to worry about the 
-> ALSA to BlueZ API.
+> 	I personally don't like hotplug for this application. Hotplug
+> force the event to go through a bunch of scripts, which is good for
+> simple config and daemon-less stuff, but bad for daemons.
+> 	Let say you have a big daemon monitoring a bunch of stuff and
+> keeping track of state. Examples are pand, waproamd, MobileIP... With
+> hotplug you have to write a script that somehow forward the event to
+> the daemon. As events are usually passed via Unix sockets, shared
+> memory or something similar, the scripts need to call a little program
+> generating the event.
+> 	Therefore you have :
+> 		hotplug event ->
+> 			-> my shell script
+> 				-> my tiny program
+> 					-> Unix socket or shared memory
+> 						-> My daemon
+> 	For each event, you need to create two processes (shell script
+> and tiny program) than need to be paged from disk. Yuck...
+> 	If you look at waproamd, it uses exclusively the RtNetlink
+> events, even though the equivalent events exist in Hotplug.
 
-you don't get my point. The ALSA code in the kernel is the base and if I
-want to use that API I don't have to ask anyone for inclusion. The ALSA
-subsystem is part of the Linux kernel and so they must take of that
-every component is working with their changes. This has nothing to do
-with their CVS, because as I said, the kernel counts.
+you are right, but there are pros and cons on both sides and I like to
+find the best solution. However I never looked at RtNetlink before. I
+think that I should educate myself a little bit more.
+
+> > > > I sent the full patch for inclusion, but it came out that one part
+> > > > causes troubles and so I removed this part. I didn't found the time for
+> > > > a further investigation.
+> > > 
+> > > 	That's what I said : I'm going to test it properly. If you
+> > > could remember the issue, that would help.
+> > 
+> > I searched the email exchange between Michal and me from the mailing
+> > list archives for you. Check out this thread:
+> > 
+> > 	http://thread.gmane.org/gmane.linux.bluez.user/2672
+> 
+> 	The bug is obvious, you forgot that in 2.4.X the list doesn't
+> point to struct sock but to struct bluez_pinfo. Compare your patch to
+> the version below.
+
+What a stupid mistake. I must been blind at that time :(
 
 Regards
 
