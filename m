@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] phone+heaset
+Subject: Re: [Bluez-users] New bc203x driver
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?Jo=E3o?= Santos <jsantos_pt@hotmail.com>
+To: Nosve <nosve@libero.it>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Sea2-F62gC2DWpmy20h00009644@hotmail.com>
-References: <Sea2-F62gC2DWpmy20h00009644@hotmail.com>
+In-Reply-To: <AGELIJDLJNOPFNMOHHIFAECHCAAA.nosve@libero.it>
+References: <AGELIJDLJNOPFNMOHHIFAECHCAAA.nosve@libero.it>
 Content-Type: text/plain
-Message-Id: <1073583113.2563.17.camel@pegasus>
+Message-Id: <1073582894.2563.11.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,21 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Jan 2004 18:31:54 +0100
+Date: Thu, 08 Jan 2004 18:28:15 +0100
 
-Hi Joao,
+Hi,
 
-> I think you are talking about this:
-> 
-> [root@olivia scoinfo-0.1]# ./scoinfo -i hci0
-> PSKEY_HOSTIO_MAP_SCO_PCM: 0x00
-> 
-> and this means that the SCO traffic goes over HCI, as you already told me.
-> 
-> So what is the problem.
+> excuse the easy questions but i never use usb devices with linux and
+> hotplug; how it is intended to use the bcm203x driver? Has the firmware to
+> be put in some particular location?
 
-do you read the headset profile specification? You have to answer the AT
-commands on the RFCOMM channel. Look at hstest.c for an example.
+my setup has it this way
+
+	/etc/hotplug/firmware.agent
+	/usr/lib/hotplug/firmware/BCM2033-MD.hex
+	/usr/lib/hotplug/firmware/BCM2033-FW.bin
+
+> Also, the hotplug configuration which started the bluefw program has to be
+> removed? And how?
+
+Check /etc/hotplug/usb.usermap or /etc/hotplug/usb/* for the bluefw
+entry.
+
+> Am I missing some documentation? Or I'm i the wrong place? :-)
+
+The place is right, but I haven't written any documentation about this
+new driver. I only wrote this driver for myself and made it public.
 
 Regards
 
