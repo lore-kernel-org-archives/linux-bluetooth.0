@@ -1,15 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] libtool and autoconf versions
+Subject: Re: [Bluez-devel] broadcast and qos
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Max Krasnyansky <maxk@qualcomm.com>
-Cc: Edd Dumbill <edd@usefulinc.com>,
+Cc: Mauro Tortonesi <mtortonesi@ing.unife.it>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1074633031.1707.190.camel@localhost>
-References: <1074424282.16573.52.camel@saag>
-	 <1074632525.1707.181.camel@localhost>  <1074632708.23181.56.camel@saag>
-	 <1074633031.1707.190.camel@localhost>
+In-Reply-To: <1074632340.1707.177.camel@localhost>
+References: <200401131559.37742.mtortonesi@ing.unife.it>
+	 <1074288506.2559.438.camel@localhost>  <1074302495.2629.140.camel@pegasus>
+	 <1074632340.1707.177.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1074650005.7088.56.camel@pegasus>
+Message-Id: <1074649861.7088.52.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,20 +21,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Jan 2004 02:53:26 +0100
+Date: Wed, 21 Jan 2004 02:51:01 +0100
 
-Hi Edd,
+Hi Max,
 
-> > I'm talking about what's shipped in the tarballs, which uses
-> > libtool1.4.  Packagers for distros rely on the tarball releases.  In the
-> > (admittedly) unlikely event that changes need to be made and autoconf
-> > re-run for the purposes of packaging, the old ac and libtool would be
-> > needed.
-> I see. Yeah, I think we should release our tarballs with new autoconf. 
-> Marcel, it's time for you to upgrade ;-).
+> > do you have a link for this patch, because I can't remember that I read
+> > something like that.
+> 
+> Here is what I was referring to. btw Patch is probably messed up
+> (spaces, etc) but it shouldn't be applied as is anyway.
 
-what version of libtool and autoconf is used for Debian Woody? Do Debian
-Sarge already uses the new versions?
+the patch brings a little bit light to my memory. I if remember
+correctly there was also a longer discussion on it and some problems
+were unsolved. Actually I haven't worked with Bluetooth broadcast
+transmission, so at the moment I haven no idea how should we implement
+this. Do anyone have used one of the broadcast patches in daily usage or
+for a project?
 
 Regards
 
