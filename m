@@ -1,156 +1,53 @@
-Return-Path: <wim.delvaux@adaptiveplanet.com>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] link_key_request problems
-Date: Wed, 25 Feb 2004 03:51:06 +0100
+From: Marcel Holtmann <marcel@holtmann.org>
+To: wim delvaux <wim.delvaux@adaptiveplanet.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-References: <200402250154.18963.wim.delvaux@adaptiveplanet.com> <1077672429.2919.67.camel@pegasus>
-In-Reply-To: <1077672429.2919.67.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200402250351.06911.wim.delvaux@adaptiveplanet.com>
-List-ID: <bluez-users.lists.sourceforge.net>
+In-Reply-To: <200402250154.18963.wim.delvaux@adaptiveplanet.com>
+References: <200402250154.18963.wim.delvaux@adaptiveplanet.com>
+Content-Type: text/plain
+Message-Id: <1077672429.2919.67.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Wed, 25 Feb 2004 02:27:10 +0100
 
->
-> what are your hcid.conf settings? Set the pairing mode to "multi".
+Hi Wim,
 
-	Pairing is in both MULTI
+> I am setting up a pan connection between my Ipaq/Linux and my Linux/2.6 
+> server.
+> 
+> When I try to connect I see in the logfile that hcid tries to authenticate by 
+> using a stored link key.  This does not seem to work since the connection is 
+> not established.
+> 
+> When I remove the link_key file and use the pin it works.
+> 
+> What might be the problem here ? 
 
-HCID.conf of IPAQ
+what are your hcid.conf settings? Set the pairing mode to "multi".
 
-# HCId options
-options {
-        # Automatically initialize new devices
-        autoinit yes;
+Regards
 
-        # Security Manager mode
-        #   none - Security manager disabled
-        #   auto - Use local PIN for incoming connections
-        #   user - Always ask user for a PIN
-        #
-        security user;
-
-        # Pairing mode
-        #   none  - Pairing disabled
-        #   multi - Allow pairing with already paired devices
-        #   once  - Pair once and deny successive attempts
-        pairing multi;
-
-        # PIN helper
-        pin_helper /bin/bluepin;
-        #dbus_pin_helper;
-}device {
-        # Local device name
-        #   %d - device id
-        #   %h - host name
-        name "%h (%d)";
-
-        # Local device class
-        class 0x120112;
-
-        # Default packet type
-        #pkt_type DH1,DM1,HV1;
-
-        # Inquiry and Page scan
-        iscan enable; pscan enable;
-
-        # Default link mode
-        #   none   - no specific policy
-        #   accept - always accept incoming connections
-        #   master - become master on incoming connections,
-        #            deny role switch on outgoing connections
-        #
-        #lm accept,master;
-        #
-        lm accept;
-
-        # Default link policy
-        #   none    - no specific policy
-        #   rswitch - allow role switch
-        #   hold    - allow hold mode
-        #   sniff   - allow sniff mode
-        #   park    - allow park mode
-        #
-        #lp hold,sniff;
-        #
-        lp hold,sniff,park;
-
-        # Authentication and Encryption
-        auth enable;
-        #encrypt enable;
-}
-
-Hcid for the SERVER :
-
-options {
-        # Automatically initialize new devices
-        autoinit yes;
-
-        # Security Manager mode
-        #   none - Security manager disabled
-        #   auto - Use local PIN for incoming connections
-        #   user - Always ask user for a PIN
-        #
-        # security auto;
-        security user;
-
-        # Pairing mode
-        #   none  - Pairing disabled
-        #   multi - Allow pairing with already paired devices
-        #   once  - Pair once and deny successive attempts
-        pairing multi;
-
-        # PIN helper
-        pin_helper /usr/bin/bluez-pin;
-}
-
-# Default settings for HCI devices
-device {
-        # Local device name
-        #   %d - device id
-        #   %h - host name
-        name "%h-%d";
-
-        # Local device class
-        class 0x100;
-
-        # Default packet type
-        #pkt_type DH1,DM1,HV1;
-
-        # Inquiry and Page scan
-        iscan enable; pscan enable;
-
-        # Default link mode
-        #   none   - no specific policy
-        #   accept - always accept incoming connections
-        #   master - become master on incoming connections,
-        #            deny role switch on outgoing connections
-        #
-        lm accept,master;
-        #
-        #lm accept;
-
-        # Default link policy
-        #   none    - no specific policy
-        #   rswitch - allow role switch
-        #   hold    - allow hold mode
-        #   sniff   - allow sniff mode
-        #   park    - allow park mode
-        #
-        #lp hold,sniff;
-        #
-        lp hold,sniff,park;
-
-        # Authentication and Encryption
-        auth enable;
-        # encrypt enable;
-}
+Marcel
 
 
 
 
->
-> Regards
->
-> Marcel
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
