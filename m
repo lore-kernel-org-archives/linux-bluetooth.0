@@ -1,22 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth serial vs. audio connection
+Subject: Re: [Bluez-users] creating the bnep0 device
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.62.0503281112030.3082@ybpnyubfg.ybpnyqbznva>
-References: <Pine.LNX.4.62.0503271303450.3134@ybpnyubfg.ybpnyqbznva>
-	 <1111923433.9195.216.camel@pegasus>
-	 <Pine.LNX.4.62.0503271357080.3134@ybpnyubfg.ybpnyqbznva>
-	 <1111926923.9195.218.camel@pegasus>
-	 <Pine.LNX.4.62.0503271736360.3135@ybpnyubfg.ybpnyqbznva>
-	 <1111938339.9195.229.camel@pegasus>
-	 <Pine.LNX.4.62.0503271751420.3135@ybpnyubfg.ybpnyqbznva>
-	 <1111939568.9195.236.camel@pegasus>
-	 <Pine.LNX.4.62.0503271813180.3135@ybpnyubfg.ybpnyqbznva>
-	 <1111942691.9195.241.camel@pegasus>
-	 <Pine.LNX.4.62.0503280908130.3082@ybpnyubfg.ybpnyqbznva>
-	 <Pine.LNX.4.62.0503281112030.3082@ybpnyubfg.ybpnyqbznva>
+In-Reply-To: <424780AA.4020705@coloradocollege.edu>
+References: <424780AA.4020705@coloradocollege.edu>
 Content-Type: text/plain
-Message-Id: <1112006630.9016.3.camel@pegasus>
+Message-Id: <1112006473.9016.0.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -29,30 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Mar 2005 12:43:50 +0200
+Date: Mon, 28 Mar 2005 12:41:13 +0200
 
-Hi Andreas,
+Hi Jonathan,
 
-> >AF: >MH: > Yes, I misread the question. This is a Samsung SGH-D500 (a 
-> >AF: >MH: > nice phone but crappy windows software...)
-> >AF: >MH: > 
-> >AF: >MH: > No difference. With or without --tree, there is only one 
-> >AF: >MH: > line of output "Browsing 00:xx ...", nothing else
-> >AF: >MH: 
-> >AF: >MH: I actually meant the "spdtool search" part to see if the 
-> >AF: >MH: segmentation fault is still present then. However, again the 
-> >AF: >MH: bad Samsung phone. I think I need one of these at home for 
-> >AF: >MH: fixing this thing.
+> I have a pretty remedial question involving setting up bluettoth in 
+> Linux, but I don't think that I've seen any answers in the documentation 
+> or mailing list. 
 > 
-> Well, I tried to debug this segmentation fault, but the changes I made 
-> in the code haven't been reflected in the binary. I'm not that 
-> experienced as a programmer, so I don't know what happened (probably 
-> due to the static declaration of the functions?)
+> I'm using kernel 2.6.11 with a LinkSys USBBT100 adaptor.  The adaptor 
+> can scan and ping other bluetooth devices with l2ping, but I'm having 
+> problems getting bnep0 recognized as a network interface.
+> 
+> ifconfig bnep0 returns
+> bnep0: error fetching interface information: Device not found
+> 
+> The fedora utility sees bnep0, but cannot activate it and returns
+> SIOCGIFFLAGS: No such device
+> when I try to deactivate it.
+> 
+> I get the same results when I use bluez/benp compiled into the kernel or 
+> loading them as modules.  /var/log/messages has the bluetooth messages:
+> Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: L2CAP ver 2.7
+> Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: L2CAP socket layer initialized
+> Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM ver 1.5
+> Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM socket layer 
+> initialized
+> Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM TTY layer initialized
+> Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: BNEP (Ethernet Emulation) 
+> ver 1.2
+> Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: BNEP filters: protocol 
+> multicast
+> Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: HIDP (Human Interface 
+> Emulation) ver 1.1
+> 
+> Does anyone have suggestions to get bnep0 off the ground?
 
-what happens is quite clear. It is a Sequence against a Sequence of
-Sequence clash. There is another thread in the mailing list with this
-exact problem and a lot of explanation. However nobody fixed this so
-far.
+what about using "pand --connect" before you try to use "ifconfig".
 
 Regards
 
