@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Permissions on Sockets
+Subject: Re: [Bluez-users] Re: bluez-utils-2.14 compile error: make returns
+	"cannot find -lbluetooth"
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <6DD9FBCE-69DB-11D9-A39A-000D9348D4BE@magnifeye.com>
-References: <41B8A67C.3060608@paytec.com> <1102627652.7962.4.camel@pegasus>
-	 <8EEDF252-6988-11D9-A39A-000D9348D4BE@magnifeye.com>
-	 <1106092579.8190.81.camel@pegasus>
-	 <6DD9FBCE-69DB-11D9-A39A-000D9348D4BE@magnifeye.com>
+In-Reply-To: <8272108050119101561d8eb9b@mail.gmail.com>
+References: <82721080501190249144cfac0@mail.gmail.com>
+	 <csllc3$c6d$1@sea.gmane.org>  <8272108050119101561d8eb9b@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1106167261.8190.138.camel@pegasus>
+Message-Id: <1106167174.8190.135.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,20 +20,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 Jan 2005 21:41:01 +0100
+Date: Wed, 19 Jan 2005 21:39:34 +0100
 
-Hi Jonathan,
+Hi,
 
-> I am doing an inquiry of all devices, finding our device, connecting to 
-> it and the reading bytes via a rawsocket.
-> 
-> The only issue I see so far is the writev command (I copied the code 
-> from hci_send_cmd).
-> 
-> How do I assign root rights for this?
+> Added /usr/local/bluez/lib (even tried /usr/local/bluez), ran ldconfig as root.
+> ldconfig -p | grep bluetooth
+>         libbluetooth.so.1 (libc6) => /usr/local/bluez/lib/libbluetooth.so.1
+>         libbluetooth.so (libc6) => /usr/local/bluez/lib/libbluetooth.so
+> Same thing gets spat out during make. :((
+> bluez-libs...I had that installed first...at least that's what I
+> presume I did. :)
+> I've even turned religous - started praying, that is. :P
 
-you need to change the HCI security filter inside the kernel or make
-your application setuid root or adapt the capabilities of your program.
+if you use a different prefix than /usr you might to tell the utils
+about it. Look at --with-bluez=... for example.
 
 Regards
 
