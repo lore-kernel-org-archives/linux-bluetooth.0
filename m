@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guylhem Aznar <bluez-devel@externe.net>
+Message-ID: <4241FBEE.9060408@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050323235401.GA4662@externe.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] hidd\hidp on a 2.4.18 kernel
+Subject: Re: [Bluez-devel] btsco and Nokia HDW-3 headset not working
+References: <1111528750.12076.18.camel@localhost>	 <42409B3B.1080906@xmission.com> <f68b8ee1050323043862bc4c6d@mail.gmail.com> <1111619908.16128.6.camel@localhost>
+In-Reply-To: <1111619908.16128.6.camel@localhost>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,44 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 23 Mar 2005 18:54:01 -0500
+Date: Wed, 23 Mar 2005 16:29:50 -0700
 
-Hello
+James
 
-I am trying to use hidd on a 2.4.18 kernel
-(externe.net/zaurus/kernel) and I am encoutering a strange problem.
+> Ok, I've just rebuilt using the latest cvs version. I am still having
+> the same issue where I can connect to the headset, volume etc works, but
+> no sound (eg from XMMS).
 
-hidd connect works, the device is listed as connected, but when I
-press the keys nothing happens at all.
+You're using the current kernel module too, right?
 
-Basically, the keyboard input is not bound to the standard input.
-because when I insmod evdev and cat /dev/input/event0, I see some activit=
-y
-when I press the keys, but nothing happens on the console (!!)
+Try xmms with /dev/dsp1 as well as the alsa plughw:Headset output device.
 
-The keyboard works fine on my other linux computers. I can not use 2.6
-on my handheld (6000W) because all the drivers haven't been ported
-yet, so I'm a bit stuck.
+I think I remember having troubles like this when my alsa configuration 
+wasn't quite right, the alsa stuff wasn't run at bootup, or something 
+like that. fwiw, my /etc/alsa/modutils/1.0 looks like:
 
-I was wondering if it was a known problem, and what I could do to fix
-that? I think it's just a problem of having that input dev. bound
-correctly.
+# Example Configuration of ALSA 0.9 for Debian GNU/Linux
 
-If nothing can be done, I can still hack a /dev/input/event0 reader
-which will inject back keys through VNC /dev/kbdsim, but I'd rather
-do a clean fix :-)
+alias char-major-116 snd
+alias char-major-14 soundcore
 
---=20
-Bien =E0 vous - Best regards,
-Guylhem P. Aznar
+options snd major=116 cards_limit=2
 
---=20
-*@externe.net                                            http://externe.n=
-et
-P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
-un.org
-GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
-ey
+alias sound-service-0-0 snd-mixer-oss
+alias sound-service-0-1 snd-seq-oss
+alias sound-service-0-3 snd-pcm-oss
+alias sound-service-0-8 snd-seq-oss
+alias sound-service-0-12 snd-pcm-oss
+
+alias snd-card-0 snd_intel8x0
+alias snd-card-1 snd_bt_sco
+#alias snd-card-2 snd-share
+#alias snd-card-3 snd-virmidi
+
+alias sound-slot-0 snd-card-0
+alias sound-slot-1 snd-card-1
+alias sound-slot-2 snd-card-2
+alias sound-slot-3 snd-card-3
+
+Brad
 
 
 -------------------------------------------------------
