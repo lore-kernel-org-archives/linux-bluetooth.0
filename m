@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4239A289.4080204@futurlink.com>
-From: Pedro Monjo Florit <pedro.monjo@futurlink.com>
-MIME-Version: 1.0
+From: Jonathan McDowell <noodles@earth.li>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] obex howto
-References: <423992C8.8000309@prim-time.fr>
-In-Reply-To: <423992C8.8000309@prim-time.fr>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Message-ID: <20050317151924.GY2054@earth.li>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Billionton(?) CF card - success
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,37 +16,70 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Mar 2005 16:30:17 +0100
+Date: Thu, 17 Mar 2005 15:19:24 +0000
 
-Xavier Garreau wrote:
-> Hi,
->
-> Is there somewhere a bluez/obex HOWTO ?
->
-> I'm about to write a tutorial for python on Symbian/Series60. An 
-> Application from nokia allows to execute python scripts on a Series60 
-> phone via a Bluetooth remote python console (this works using spp).
->
-> Actually, to complete my _linux_ tutorial, i need do transfer a .sis 
-> to the phone (via obex) and have not yet played with this on linux ...
->
-> Any hints ?
->
-> Thanks in advance
+Hi.
 
-Hi Xavier,
+I bought a CF Bluetooth card from a UK supplier's (ebuyer) budget range.
+It said it was based on the CSR chipset, which seems to be reasonably
+well supported. Should have done more research first really. :)
 
-AFAIK, the only implementation running under Linux is OpenOBEX 
-(http://openobex.sourceforge.net/). There is not much documentation in 
-it, but, as with BlueZ, if you follow the applications, you can (more or 
-less) understand how it works.
+Anyway. It idents as:
 
-If you want to send a file via OBEX over Bluetooth, I use KBluetooth, 
-that works pretty well.
+Socket 0:
+  product info: "Compact Flash", "Bluetooth Card", "", ""
+  manfid: 0x0279, 0x950b
+  function: 2 (serial)
 
-Regards,
+There's no manufacturer listed on it. The front says "CF CompactFlash
+BluetoothTM". The back says "BluetoothTM CompactFlash Card" and "P/N:
+CFBT02-N2".
 
-Pedro
+Plugging the card into my Zaurus with the BlueZ packages installed led
+to no luck. The card got detected, serial_cs was loaded, hciattach
+wasn't happy. So I switched to my laptop, which already had a working
+BlueZ setup with a USB device (Debian testing/2.6.11 kernel). Not much
+better.
+
+ttyS0: detected caps 00000700 should be 00000100
+ttyS0 at I/O 0x3f8 (irq = 5) is a 16C950/954
+
+and then hciattach wouldn't work, no matter what speed I tried.
+
+Much Googling didn't seem to turn up much. And then I found a link to:
+
+http://www.summet.com/x31/8250_patch_CFcard.txt
+
+I thought this would be the answer, but it turned out not to be.
+However, with the addition of a:
+
+setserial /dev/ttyS0 baud_base 912600
+
+I can then do:
+
+hciattach -s 912600 /dev/ttyS0 bcsp
+
+And I have working Bluetooth. hciscan works locally and on a remote box
+finds the laptop ok and I can make an rfcomm connection to my mobile
+phone.
+
+I get a:
+
+bcsp_recv: Out-of-order packet arrived, got 1 expected 0
+
+message, but only the once.
+
+Hopefully this might help someone else battling with a similar card; I
+couldn't find any success stories about similar ones. Now all I need to
+do is try it again with the Zaurus, which it was actually bought for. :)
+
+J.
+
+-- 
+] http://www.earth.li/~noodles/ [] Who said that itemised phone bills  [
+]  PGP/GPG Key @ the.earth.li   []          were a good idea?          [
+] via keyserver, web or email.  []                                     [
+] RSA: 4DC4E7FD / DSA: 5B430367 []                                     [
 
 
 -------------------------------------------------------
