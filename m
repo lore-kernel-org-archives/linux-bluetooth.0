@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40FA3DBD.5010401@home.se>
-From: niklas adolfsson <niklas.adolfsson@home.se>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Trouble sending from device (K700i)
+Subject: Re: [Bluez-users] bluecore3-based usb dongles
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mauro Tortonesi <mtortonesi@ing.unife.it>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200407161615.20726.mtortonesi@ing.unife.it>
+References: <200407161615.20726.mtortonesi@ing.unife.it>
+Content-Type: text/plain
+Message-Id: <1089991518.5119.13.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,19 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 18 Jul 2004 11:07:09 +0200
+Date: Fri, 16 Jul 2004 17:25:19 +0200
 
-I have sucessfully used Bluez for sending files to my K700i without 
-problems but when i want to send from the phone to my notebook it only 
-works once. After i have sent one file from the phone i get a constant 
-bluetooth connection showing on the phone and i don't get bluetooth as 
-an alternative to send to on the phone. It seems that the connection 
-doesn't go down allowing a new one to be initialized. If i disconnect 
-the bluetooth device on the notebook an reconnect it again it works with 
-one file again from the phone. Any ideas? Please tell me if you want any 
-logfiles etc. and i will supply them.
+Hi Mauro,
 
-/niklas adolfsson
+> i would like to buy a couple of usb dongles based on the bluecore 3 chip to 
+> use them with bluez. 
+> 
+> has anyone of you already tried one of those dongles? do you have any buying 
+> suggestions?
+
+do you know any BlueCore3 based USB dongles? I haven't seen any of them
+on the market so far. However I tested a BlueCore3 chip within a Casira
+and it works as good as a BlueCore02 chip.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
