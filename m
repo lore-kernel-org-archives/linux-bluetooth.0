@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Can a Linux/Impronto developed application be
-	run on Windows environment?
+Subject: Re: [Bluez-users] installing bluez-hciemu-1.0 on Debian--GLib
+	not	found
 From: Marcel Holtmann <marcel@holtmann.org>
-To: jerry angelo <bmangra@yahoo.com>
+To: Tehyih D Wan <tdwan@MIT.EDU>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20040421T065041-933@post.gmane.org>
-References: <loom.20040421T065041-933@post.gmane.org>
+In-Reply-To: <1082563268.40869ac41cfc3@webmail.mit.edu>
+References: <1081889721.407c53b90c5d4@webmail.mit.edu>
+	 <1082161011.4489.30.camel@pegasus>
+	 <1082563268.40869ac41cfc3@webmail.mit.edu>
 Content-Type: text/plain
-Message-Id: <1082565593.23959.53.camel@pegasus>
+Message-Id: <1082565326.23959.48.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,23 +21,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Apr 2004 18:39:53 +0200
+Date: Wed, 21 Apr 2004 18:35:26 +0200
 
-Hi Jerry,
+Hi Debbie,
 
-> In other words can i develop my BT application using Impronto DK and transport 
-> it over to two Windows machines and make them run as they did with two linux 
-> machines over Bluez?  
-> 
-> My current USB dongles are D-Link's DBT 120 and Windows XP installed drivers 
-> are from WIDCOMM, its a btport.sys driver version 1.4.2.8.
-> 
-> I am using Bluez w/ the hci_usb driver for my linux machine.  i have a fedora 
-> box w/ 2.4.22 w/bluez installed.
+> I looked in hciemu.c and the only reference I found to Glib was the #include
+> <glib.h> line.  Should I change this to say glib-2.0?  Or is there another
+> source file I should look at?
 
-a better place for asking such questions is the Impronto support team,
-because this mailing list is for BlueZ related questions. However since
-it is a Java based DK it should be theoretical possible.
+check for yourself, because I don't have time to look into that source.
+
+> I did get the emulator installed (at least, I no longer get configuration
+> errors) by installing the glib1.2-dev library.  However, I'm not able to
+> emulate any devices.  Typing "hciemu localhost:11" gives no errors, but when I
+> try "hciconfig hci11 up" I get a message that there is no such device.  I run
+> /etc/init.d/bluetooth start before everything but that does not seem to make a
+> difference.  Suggestions on what log files or messages I can look for to see
+> what is wrong?
+
+maybe you should better use localhost:100011 or any higher port number
+and the new device will be hci0.
 
 Regards
 
