@@ -4,12 +4,99 @@ From: "Daryl Van Vorst" <daryl@wideray.com>
 To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
 Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Qualification Testing
-Date: Thu, 8 May 2003 11:33:10 -0700
-Message-ID: <000901c31590$472273e0$5796fea9@baked>
+Date: Thu, 8 May 2003 11:11:45 -0700
+Message-ID: <000801c3158d$497da950$5796fea9@baked>
 MIME-Version: 1.0
 In-Reply-To: <1052401433.2669.93.camel@pegasus.local>
 Content-Type: text/plain; CHARSET=us-ascii
 List-ID: <bluez-devel.lists.sourceforge.net>
+
+Hey Marcel,
+
+Thanks for your response!
+
+It'll take me a bit of time to gather all of the logs. I'll send them to yo=
+u
+as I get them. The logs are a bit lengthy, so I'll send them directly to yo=
+u
+instead of the list.
+
+My comments are inserted below.
+
+> Can you tell us a little bit more about your product, because=20
+> I can't find enough details on the website.
+
+The product hasn't been released yet, so I can't publicly discuss too much.
+We could talk a bit off-list about it if you'd like.
+
+> The biggest problem in this test case is the=20
+> bluez-kernel-2.3, because it is too much outdated. You should=20
+> better use one of -mh patches or try to build a new=20
+> bluez-kernel package from the kernel scripts that I have put=20
+> into CVS. The bluez-libs-2.3 shouldn't make any problems, but=20
+> it is a good idea to update to bluez-sdp-1.1.
+
+Yeah, I figured.  It took a bit of work, but I now have a 2.4.18 kernel up
+to mh4 (the latest on your site).
+
+> The L2CAP and RFCOMM part is kernel specific and it is a good=20
+> idea to do the qualification tests with the an up-to-date=20
+> kernel, because in this case it is easier to look at the=20
+> problems and fix them.
+
+Yup. From here on it will be done on an up-to-date kernel (Is 2.4.18 with
+your most recent patch level considered up-to-date? Moving to 2.4.20 would
+be a major hassle). I would have done that earlier, but I didn't realize ho=
+w
+outdated the bluez-kernel package was until it was too late.
+
+> > L2CAP:
+> >         1.) TP/COS/CED/BI-01: Verifies that the IUT rejects=20
+> an unkown=20
+> > signalling command. The tester sends an unkown L2CAP=20
+> command. The IUT=20
+> > should respond with an L2CAP_Reject with reason 0 "Command not=20
+> > understood". The IUT did not.
+>=20
+> We have a fixme for this in the l2cap.c code, but currently=20
+> no code exists. Should be easy to fix, but nobody cares about it.
+
+Heh heh. I care! ;)  Are you going to take a look at that?  I could have a
+look, but it might take me a while to figure it out.
+
+> >         2.) TP/COS/CFD/BV-01: Tests that IUT is able to handle the=20
+> > receiving of more than one request for configuration of=20
+> data channel.=20
+> > Tester sends L2CAP_Config Req with flag=3D1, IUT responds=20
+> with flag=3D0.=20
+> > According to section 5.4 p.290 of the version 1.1 spec,=20
+> "When used in=20
+> > the Configuration Response, the continuation flag must be=20
+> set if the=20
+> > flag is set in the Request".
+>=20
+> This seems to be a bug in the current code. But I have to=20
+> re-read the L2CAP specification for the details.
+
+It might also help to take a look at the test cases, which are free to
+download. But, as with everything bluetooth, if you want all the details yo=
+u
+have to pay. ;)
+
+> >         3.) TP/COS/CFD/BV-02: Tests that IUT is able to perform=20
+> > negotiation while the tester rejects the configuration of a data=20
+> > channel. The IUT sends a configuration request and the=20
+> tester rejects=20
+> > it. The IUT should send another configuration request, but it does=20
+> > not.
+>=20
+> Currently the channel is closed if they reject our config=20
+> request, because we don't know how to proceed if they don't=20
+> like our settings. We can sent them again, but they will be=20
+> rejected again. For this case I also have to read the L2CAP in detail.
+
+Yeah, it seemed a bit odd to me too. But that's what the test case tests.
+I'll get some clarification on this one.
 
 > >         4.) TP/COS/RCO/BI-01, BI-02: These tests verify=20
 > that the IUT=20
@@ -31,116 +118,122 @@ List-ID: <bluez-devel.lists.sourceforge.net>
 > Did you have a detailed log of this test which shows us byte=20
 > by byte which request was sent?
 
-It appears that things got a bit confused in the BV-01 case. In the BV-02
-case, the stack tossed the extra byte and reported the error to stderror bu=
-t
-not to the application. To pass the test the application must be told that
-there was an error reading the data (my interpretation of the test case is
-that the stack can still send the application the data, but it must be
-flagged as a failure). In both cases, the second packet should be correctly
-received. It's not clear to me from the test case that receiving the second
-packet correctly is mandatory, but it might be. It shouldn't be a problem t=
-o
-receive it correctly.
+Yeah. I should have an HCI dump for both cases. I'll send them to you right
+after this.
 
-Below are the two scenarios:
+> > RFCOMM:
+> > 	Note: Some of these comments don't apply to a specific=20
+> test case=20
+> > (they are more general).
+> >         1.) Must not modify pbits in pn (parameter negotiation)=20
+> > response. The pbits are dependent on which DLC is being configured.=20
+> > Apparently this is a common problem, and one that has been argued=20
+> > about with the SIG because apparently nobody uses the bits=20
+> - but the=20
+> > SIG would not give in (refer to erratum 364). They are specified in=20
+> > the TS GSM 07.10 630 spec, section 5.4.6.3.1.
+>=20
+> I am little bit confused, because I thought that the P/F bit=20
+> in a UIH packet response on dlci 0 should always be zero. The=20
+> only case where the P/F bit is set should be with credit=20
+> based flow control. I will check the specification. Can you=20
+> send me the erratum 364?
 
-BV-01 case:
+I should have been more clear. By pbits I meant priority bits, not the P/F
+bit. I don't have a copy of the 07.10 630 spec, so I can't look up the
+details. Do you have a copy? Anyway, the priority bits are set to a certain
+value depending on which DLC you are using. I'm pretty sure that for DLC 0
+they should be set to 0. For DLC's 1 through 7, I think they are set to 7.
+Beyond that I don't remember. I'll see what I can do about getting a copy o=
+f
+the erratum 364...  But I'm pretty sure there aren't any interesting detail=
+s
+in it, just people complaining that the bits are pointless. The TS GSM 07.1=
+0
+630 spec is where the details are.
 
-3451624.786137 < 01 05 04 0D 71 83 1F 96 A0 00 18 CC 00 00 00 00 01=20
- 3451624.790905 > 04 0F 04 00 07 05 04=20
- 3451628.318245 > 04 03 0B 00 01 00 71 83 1F 96 A0 00 01 00=20
- 3451628.318729 > 04 0F 04 00 08 00 00=20
- 3451628.318786 < 02 01 20 0C 00 08 00 01 00 02 01 04 00 01 00 40 00=20
- 3451628.318851 < 01 0D 08 04 01 00 0E 00=20
- 3451628.352279 > 04 0E 06 08 0D 08 00 01 00=20
- 3451628.354970 > 04 1B 03 01 00 05=20
- 3451628.412420 > 04 13 05 01 01 00 01 00=20
- 3451629.731541 > 02 01 20 10 00 0C 00 01 00 03 01 08 00 40 00 40 00 00 00
-00=20
-  00=20
- 3451629.732281 < 02 01 20 0C 00 08 00 01 00 04 02 04 00 40 00 00 00=20
- 3451629.772684 > 04 13 05 01 01 00 01 00=20
- 3451630.704342 > 02 01 20 16 00 12 00 01 00 05 02 0E 00 40 00 00 00 00 00
-01=20
-  02 FF 00 02 02 FF FF=20
- 3451631.824537 > 02 01 20 14 00 10 00 01 00 04 01 0C 00 40 00 00 00 01 02
-FF=20
-  00 02 02 FF FF=20
- 3451631.824697 < 02 01 20 0E 00 0A 00 01 00 05 01 06 00 40 00 00 00 00 00=20
- 3451631.843088 > 04 13 05 01 01 00 01 00=20
- 3451635.601252 > 02 01 20 33 00 30 00 40 00 31 32 33 34 35 36 37 38 39 30
-3A=20
-  3B 3C 3D 3E 3F 31 32 33 34 35 36 37 38 39 30 3A 3B 3C 3D 3E=20
-  3F 31 32 33 34 35 36 37 38 39 30 3A 3B 3C 3D 3E=20
- 3451635.601809 > 04 FF 1B 06 19 45 72 72 6F 72 20 69 6E 20 6C 6D 5F 64 61
-74=20
-  61 2E 63 28 31 37 31 34 29 0A=20
- 3451635.630626 > 02 01 20 34 00 30 00 40 00 31 32 33 34 35 36 37 38 39 30
-3A=20
-  3B 3C 3D 3E 3F 31 32 33 34 35 36 37 38 39 30 3A 3B 3C 3D 3E=20
-  3F 31 32 33 34 35 36 37 38 39 30 3A 3B 3C 3D 3E 3F=20
+> >         2.) TP/RFC/BV-07: Closing rfcomm doesn't appear to close=20
+> > l2cap. Is this true? This isn't actually required to pass=20
+> this test,=20
+> > but it did confuse the tester. This may have been a mistake on my=20
+> > part. I just hit ctrl-c when rctest was connected and assumed that=20
+> > everything would get closed. Would calling close() have a different=20
+> > effect?
+>=20
+> This is working fine for me. After closing the channel, we=20
+> close dlci 0 and this also closes the L2CAP connection.
 
-root@jack-00000000:~>./l2test1 -u -P 1 00:a0:96:1f:83:71
-l 2test[568]: Conl2cap_recv_acldata: Unexpected start frame (len 52)
-l2test[568]: seq missmatch: 0 -> 875770417
-l2test[568]: size missmatch: 48 -> 13877
-l2test[568]: Read failed. Function not implemented(38)
-DV: recv error: Function not implemented(38)
-l2test[568]: Exit
+I can retry it with the new kernel modules.
 
-Note: the line above that starts with "DV:" was just a printf I added just
-to check something. You can ignore it.
+> >         3.) TP/RFC/BV-13-C: Verifies that the IUT responds=20
+> to a Remote=20
+> > Line Status command from the tester. When the remote line status=20
+> > command is received, the remote device must respond with a=20
+> remote line=20
+> > status response. We responded with NSC (not supported=20
+> command) instead=20
+> > of RLS response.
+>=20
+> I have fixed this in patch-2.4.20-mh7 and it is in the not=20
+> released 2.4.21-rc2 mainstream kernel.
 
-BV-02 case:
+Great!  Is that also in patch-2.4.18-mh4?
 
-3451212.377519 > 04 05 04 00 01 00 1F=20
- 3451217.001182 > 04 04 0A 71 83 1F 96 A0 00 00 00 00 01=20
- 3451217.001882 < 01 09 04 07 71 83 1F 96 A0 00 01=20
- 3451217.005163 > 04 0F 04 00 08 09 04=20
- 3451217.022390 > 04 03 0B 00 01 00 71 83 1F 96 A0 00 01 00=20
- 3451217.023089 < 01 0D 08 04 01 00 0E 00=20
- 3451217.038752 > 04 0E 06 08 0D 08 00 01 00=20
- 3451217.039391 < 01 0F 04 04 01 00 18 CC=20
- 3451217.042422 > 04 0F 04 00 07 0F 04=20
- 3451217.053451 > 04 1D 05 00 01 00 18 CC=20
- 3451217.053881 > 04 0F 04 00 08 00 00=20
- 3451217.054253 > 04 1B 03 01 00 05=20
- 3451221.347537 > 02 01 20 0C 00 08 00 01 00 02 01 04 00 01 00 40 00=20
- 3451221.348308 < 02 01 20 10 00 0C 00 01 00 03 01 08 00 40 00 40 00 00 00
-00=20
-  00=20
- 3451221.379927 > 04 13 05 01 01 00 01 00=20
- 3451222.532855 > 02 01 20 14 00 10 00 01 00 04 01 0C 00 40 00 00 00 01 02
-FF=20
-  00 02 02 FF FF=20
- 3451222.533633 < 02 01 20 0E 00 0A 00 01 00 05 01 06 00 40 00 00 00 00 00=20
- 3451222.533719 < 02 01 20 0C 00 08 00 01 00 04 01 04 00 40 00 00 00=20
- 3451222.568912 > 04 13 05 01 01 00 01 00=20
- 3451222.580161 > 04 13 05 01 01 00 01 00=20
- 3451223.503064 > 02 01 20 16 00 12 00 01 00 05 01 0E 00 40 00 00 00 00 00
-01=20
-  02 FF 00 02 02 FF FF=20
- 3451225.027417 > 02 01 20 33 00 2F 00 40 00 31 32 33 34 35 36 37 38 39 30
-3A=20
-  3B 3C 3D 3E 3F 31 32 33 34 35 36 37 38 39 30 3A 3B 3C 3D 3E=20
-  3F 31 32 33 34 35 36 37 38 39 30 3A 3B 3C 3D 3E=20
- 3451225.035109 > 02 01 00 01 00 3F=20
- 3451225.035598 > 04 FF 1B 06 19 45 72 72 6F 72 20 69 6E 20 6C 6D 5F 64 61
-74=20
-  61 2E 63 28 31 39 30 34 29 0A=20
- 3451226.772904 > 02 01 20 34 00 30 00 40 00 31 32 33 34 35 36 37 38 39 30
-3A=20
-  3B 3C 3D 3E 3F 31 32 33 34 35 36 37 38 39 30 3A 3B 3C 3D 3E=20
-  3F 31 32 33 34 35 36 37 38 39 30 3A 3B 3C 3D 3E 3F=20
+> >         4.) TP/RFC/BV-17-C: RFCOMM Parameter Negotiation: RFCOMM=20
+> > doesn't respond with desired parameters in RPN response (it=20
+> responds=20
+> > with 0's). I took a quick look at the RFCOMM code (our=20
+> older version)=20
+> > and it's apparent that variables are being set with the=20
+> desired values=20
+> > when the tester requests values that we don't like, but those=20
+> > variables are not the ones that are actually sent in the=20
+> response. The=20
+> > parameter mask is set correctly though.
+>=20
+> Please enable RFCOMM debug output and send us the request=20
+> that the Tester performs.
 
-root@jack-00000000:~>./l2test -d -P 1
-l2test[586]: Waiting for connection on psm 1 ...
-l2test[587]: Connect from 00:A0:96:1F:83:71 [imtu 672, omtu 255, flush_to
-65535]
-l2test[587]: Receiving ...
-l2cap_recv_acldata: Unexpected continuation frame (len 1)
-l2test[587]: Recevied 47 bytes
-l2test[587]: Recevied 48 bytes
+It'll take a bit of work to accomplish that because testing is being done
+remotely... But if we need to do it, we can.
+
+As a first step I'll send you an e-mail with the snippet of code I'm talkin=
+g
+about and point out what I think the problem is. And when I get tester logs
+I'll send them too.
+
+> >         5.) Once an RFCOMM channel is established, the IUT must=20
+> > exchange MSC's (modem status commands) before sending data.=20
+> That is,=20
+> > it must send an MSC, wait for a response, wait for the=20
+> sender's MSC,=20
+> > and respond to it before sending data. Our device sent an=20
+> MSC and then=20
+> > immediately started sending data when we used rctest. This=20
+> applies to=20
+> > many test cases.
+>=20
+> We send the MSC after the UA. But we also go into=20
+> BT_CONNECTED state and in this state you can also start=20
+> sending data. We should maybe go from BT_CONNECT -> BT_CONFIG=20
+> and only switch to BT_CONNECTED after the successful exchange of MSC.
+
+That sounds good to me. Not sure about the UA though... I'll check on it.
+
+> >         6.) If a connecting device doesn't send a PN=20
+> command with CL=20
+> > bits set to 0x0f, then it means it is not a 1.1 device and=20
+> we must not=20
+> > use credit based flow control. In our case, when such a PN=20
+> command was=20
+> > received, data was sent using credit based flow control but=20
+> shouldn't=20
+> > have been. This applies to many test cases.
+>=20
+> This should not happen, because the current RFCOMM code can=20
+> deal with 1.0b and 1.1 devices correctly. Please check this=20
+> with latest RFCOMM code and send us the detailed log of this problem.
+
+Ok... I'll try it out with the new kernel modules.
 
 -Daryl.
