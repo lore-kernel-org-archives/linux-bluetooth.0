@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <848611830@web.de>
+Message-ID: <420431F1.8000509@uol.com.br>
+From: Anderson Clayton B Rodrigues <omap@uol.com.br>
 MIME-Version: 1.0
-From: "Martin Mueller" <Ma.Mueller@tu-bs.de>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] cross compiling bluez-utils
-Content-Type: text/plain; charset="iso-8859-1"
+References: <847626459@web.de>
+In-Reply-To: <847626459@web.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,22 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 05 Feb 2005 07:48:51 +0100
+Date: Fri, 04 Feb 2005 21:39:45 -0500
 
-Hi,
 
-> I crosscompiled bluez-libs, bluez-utils and even hciemu for ARM platform 
-> and they work fine. I am preparing a little how-to for those insterested 
-> on doing the same thing.
+Hi Martin,
 
-They work perfectly here, too. Thanks for the hint! I just found it a little inconvenient to find the /etc/bluetooth/ directory in my ARM gcc directory. To be more specific:
 
-The compiler, libs, include, ... directories reside under /usr/arm/arm-linux. That is set with 'prefix'. The executables then go to something like /home/mm/arm/ramdisk/mnt by setting 'exec_prefix' accordingly. I thought it to be funny to see /etc/bluetooth/ in the ramdisk rather than in the compiler area.
+I crosscompiled bluez-libs, bluez-utils and even hciemu for ARM platform 
+and they work fine. I am preparing a little how-to for those insterested 
+on doing the same thing.
 
-Martin
-__________________________________________________________
-Mit WEB.DE FreePhone mit hoechster Qualitaet ab 0 Ct./Min.
-weltweit telefonieren! http://freephone.web.de/?mc=021201
+cheers,
 
 
 
