@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: James Cameron <james.cameron@hp.com>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20040630112137.GE30504@hp.com>
+Subject: Re: [Bluez-devel] how to do asynchronous device inquiry?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: James Cameron <james.cameron@hp.com>
+Cc: Albert Huang <ashuang@gmail.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040630014836.GI15948@hp.com>
+References: <ef9938ec040628194321db5d9c@mail.gmail.com>
+	 <20040629043356.GK20139@hp.com> <1088545055.6030.339.camel@pegasus>
+	 <20040630014836.GI15948@hp.com>
+Content-Type: text/plain
+Message-Id: <1088586574.22940.13.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] hci_acl_tx_to: hci0 ACL tx timeout
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,35 +21,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 30 Jun 2004 21:21:37 +1000
+Date: Wed, 30 Jun 2004 11:09:34 +0200
 
-Problem: connection via bnep0 eventually freezes, and one of the two
-hosts displays in dmesg;
+Hi James,
 
-hci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection F5:E5:01:72:02:00
+> > > You could certainly fork() a process to exec() hcitool, and when it
+> > > finishes it could send the information to your program, through a pipe
+> > > that your program is select()ing on, or something similar.
+> > 
+> > very bad idea :(
+> 
+> Aww, it's just another way to do it, that doesn't require as much
+> dependency or learning.  ;-)
 
-What does this mean?  Is there something I can do to prevent it?  Or
-something I can do to gather more information to help explain it?
+It is not fork() that is bad. It the combination of exec() and hcitool
+you propose to use. If you fork or use a thread then use hci_inquiry().
 
-I've been experimenting with a couple of USB modules, establishing
-connections with pand and routing laptop to gateway IP traffic over
-bnep0.
+> > You don't looked into the details. The inquiry ioctl() is one way. The
+> > other one is the HCI raw socket. Open and bind a device and then set an
+> > event filter on it. Send an inquiry command according to the spec. and
+> > listen for the incoming inquiry result events.
+> 
+> I stand corrected.
+> 
+> Albert, there is a good example of this in src/btctl-discovery-source.c
+> in the libbtctl-0.4.1 package.
+> http://usefulinc.com/software/gnome-bluetooth/
+> 
+> btctl_discovery_source_new()
+> The hci device is opened, then set O_NONBLOCK, and the event filters are
+> set.  There's no sign of binding.
 
-Some months ago, I had tried the same thing, but with 2.4.24.  The "ACL
-tx timeout" would occur generally within ten minutes if lots of data was
-transferred.  Now I'm trying it with 2.6.6, and it had been working fine
-for many hours before it happened again, with no heavy data transfer.
+If you use hci_open_dev() the binding is done by that call.
 
-I've reviewed kernel ChangeLog-2.6.7 for each of the Bluetooth or BlueZ
-changes, but none of the changes seem to cover this problem.  I've
-surfed Google for "ACL tx timeout", but nothing springs up as a
-solution.
+Regards
 
-I'm using bluez-utils 2.7, and uhci_hcd.
+Marcel
 
--- 
-James Cameron
+
 
 
 -------------------------------------------------------
