@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Ciro Scognamiglio <moray@libero.it>
+From: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20030907143700.GA9936@libero.it>
+Content-Type: text/plain; charset="us-ascii"
+Message-Id: <18254.476735-32120-513904206-1062794584@seznam.cz>
+Cc: 
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] DBT-120
+Reply-To: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
+Subject: [Bluez-users] =?us-ascii?Q?Errror=20=23=2021?=
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -17,36 +19,27 @@ List-Unsubscribe:
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 7 Sep 2003 16:37:00 +0200
+Date: Fri, 05 Sep 2003 22:43:04 +0200 (CEST)
 
-Hullo,
+Anyone know what this error "21" is at the bottom and why role-switching is refusing to take place?  Can you tell if it's the host (USB dongle) or remote device (client/7650) that is refusing to role-switch?
 
-I still have problems with the usb dongle in subj.
+Thanks in advance.  D.
 
-After setting up a serial connection the BT link
-goes down with apparently no reasons.
 
-This happens after a random range of time (5-50min)
-and I have no clues of what happens (hcidump simply
-stops dumping and nothing appears in the syslog)
+root@localhost jds]# /usr/sbin/hcidump -x -t
+HCIDump - HCI packet analyzer ver 1.5
+device: hci0 snap_len: 1028 filter: 0xffffffff
+1062687133.011099 > HCI Event: Connect Request(0x04) plen 10
+B8 50 30 EE 02 00 04 22 50 01
+1062687133.011643 < HCI Command: Accept Connection Request(0x01|0x0009) plen 7
+B8 50 30 EE 02 00 00
+1062687133.026095 > HCI Event: Command Status(0x0f) plen 4
+00 01 09 04
+1062687133.104082 > HCI Event: Connect Complete(0x03) plen 11 
+21 28 00 B8 50 30 EE 02 00 01 00
 
-Does anyone have the usb dongle from d-link?
-do I have to set some option in the kernel that I missed?
-
-I *think* it is the dongle as when connection goes down
-if I unplug and replug the dongle and re-bind the serial
-profile to the phone everything works again...
-
-also I cannot manage to get the obex push to work, I tried
-using the ussp-push (from http://mobile.linux.pt/p800/),
-k68 (that works with irda).
-
-BTW my phone is a P800
-
-thnx,
-
-Ciro. 
-
+____________________________________________________________
+WWW stranky zdarma na http://www.sweb.cz
 
 
 -------------------------------------------------------
