@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] CardServices PCMCIA changed?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: abhay b <abhay7182@rediffmail.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040914105655.17926.qmail@webmail32.rediffmail.com>
-References: <20040914105655.17926.qmail@webmail32.rediffmail.com>
-Content-Type: text/plain
-Message-Id: <1095168233.5695.138.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20040914105655.17926.qmail@webmail32.rediffmail.com>
+MIME-Version: 1.0
+From: "abhay b" <abhay7182@rediffmail.com>
+Reply-To: "abhay b" <abhay7182@rediffmail.com>
+To: bluez-devel@lists.sourceforge.net
+Content-type: multipart/alternative;
+	boundary="Next_1095159415---0-203.199.83.32-17766"
+Subject: [Bluez-devel] CardServices PCMCIA changed?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,20 +17,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 14 Sep 2004 15:23:54 +0200
+Date: 14 Sep 2004 10:56:55 -0000
 
-Hi Abhay,
+ This is a multipart mime message
 
-> i want to know whether the CardServices call related to PCMCIA is changed in 2.6 kernel as i m not able to find it in 2.6.5 instaed some pcmcia_xxx stuff is present ther
-> can anyone guide me on this?
 
-this was changed and there are more changes to come for the 2.6 kernel
-series. Check the PCMCIA and LKML mailing list archive for more details.
+--Next_1095159415---0-203.199.83.32-17766
+Content-type: text/html;
+	charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Regards
+<P>=0A&nbsp; <BR>=0Ahi<BR>=0Ai want to know whether the CardServices call r=
+elated to PCMCIA is changed in 2.6 kernel as i m not able to find it in 2.6=
+.5 instaed some pcmcia_xxx stuff is present ther<BR>=0Acan anyone guide me =
+on this?<BR>=0Athanks<BR>=0AAbhay=0A</P>=0A<br><br>=0A<A target=3D"_blank" =
+HREF=3D"http://clients.rediff.com/signature/track_sig.asp"><IMG SRC=3D"http=
+://ads.rediff.com/RealMedia/ads/adstream_nx.cgi/www.rediffmail.com/inbox.ht=
+m@Bottom" BORDER=3D0 VSPACE=3D0 HSPACE=3D0></a>=0A
+--Next_1095159415---0-203.199.83.32-17766
+Content-type: text/plain;
+	charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Marcel
-
+ =A0=0Ahi=0Ai want to know whether the CardServices call related to PCMCIA =
+is changed in 2.6 kernel as i m not able to find it in 2.6.5 instaed some p=
+cmcia_xxx stuff is present ther=0Acan anyone guide me on this?=0Athanks=0AA=
+bhay
+--Next_1095159415---0-203.199.83.32-17766--
 
 
 
