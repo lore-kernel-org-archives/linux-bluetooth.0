@@ -1,66 +1,50 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] PAN and kernel 2.4.26
-From: Bastian Ballmann <Crazydj@chaostal.de>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1088414347.3774.170.camel@pegasus>
-References: <1088271695.29447.5.camel@espy.crazydj.de>
-	 <1088364052.3774.67.camel@pegasus>
-	 <1088372482.2430.4.camel@espy.crazydj.de>
-	 <1088406110.3774.91.camel@pegasus>
-	 <1088413956.2508.3.camel@espy.crazydj.de>
-	 <1088414347.3774.170.camel@pegasus>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-liA9FAlfe88FuGVXQIJY"
-Message-Id: <1088418472.2513.6.camel@espy.crazydj.de>
+Return-Path: <james.cameron@hp.com>
+Date: Mon, 28 Jun 2004 20:19:27 +1000
+From: James Cameron <james.cameron@hp.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH] pand/main.c, restore signals for dev-up script
+Message-ID: <20040628101927.GC8871@hp.com>
+References: <20040627133325.GA23996@hp.com> <1088366793.3774.70.camel@pegasus> <20040627233437.GD28828@hp.com> <1088408656.3774.136.camel@pegasus> <20040628085356.GA8871@hp.com> <1088413518.3774.167.camel@pegasus> <20040628095541.GB8871@hp.com> <1088417629.3774.177.camel@pegasus>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Jun 2004 12:27:52 +0200
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1088417629.3774.177.camel@pegasus>
+Sender: james.cameron@hp.com
+List-ID: <bluez-devel.lists.sourceforge.net>
 
+On Mon, Jun 28, 2004 at 12:13:49PM +0200, Marcel Holtmann wrote:
+> > But dev-up is given the peer's Bluetooth device address.  net.agent is not
+> > given this.  Can it be determined from just the interface name?  I could
+> > do a "hcitool con" if I knew what the right hci device number was, but
+> > it seems sensible to have the dev-up script provide the knowledge.
+> 
+> it is the same as the ethernet address of the bnep0 interfaces.
 
---=-liA9FAlfe88FuGVXQIJY
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+No, it isn't.  You're thinking of the local device address.  I'm talking
+about the peer's address, which is passed to dev-up by pand.
 
-Hi Marcel,
+While the bnep0 interface on the peer has the address, that doesn't
+help the local host get it.
 
-On Mon, 2004-06-28 at 11:19, Marcel Holtmann wrote:
-> Is this a vanilla 2.4.26 from kernel.org?
+Here's output that demonstrates the difference:
 
-Yes it is. Including the security patch from openwall.com.
-Greets
+# ifconfig bnep0
+bnep0     Link encap:Ethernet  HWaddr 00:02:72:01:E5:FF  
+          inet addr:10.2.0.1  Bcast:10.255.255.255  Mask:255.255.255.0
+          inet6 addr: fe80::202:72ff:fe01:e5ff/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:11 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:17 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:761 (761.0 b)  TX bytes:1100 (1.0 KiB)
 
-Basti
+# hcitool dev
+Devices:
+        hci0    00:02:72:01:E5:FF
+# hcitool con
+Connections:
+        > ACL 00:02:72:01:E5:F5 handle 42 state 1 lm SLAVE 
+#  
 
---=-liA9FAlfe88FuGVXQIJY
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQBA3/Ko3rCd3KdGxg4RAhvJAJ9T05IEjUJhttOOvPscFTxE5tjHmgCeIR+E
-Vl+Ook3OFz9F/1Ie6m9dkkc=
-=VzX+
------END PGP SIGNATURE-----
-
---=-liA9FAlfe88FuGVXQIJY--
-
-
-
--------------------------------------------------------
-This SF.Net email sponsored by Black Hat Briefings & Training.
-Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
-digital self defense, top technical experts, no vendor pitches, 
-unmatched networking opportunities. Visit www.blackhat.com
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+James Cameron
