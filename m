@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SDP & RFCOMM SYNC
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5000105b05010705172040f6c3@mail.gmail.com>
-References: <5000105b0501070138cd4b4a8@mail.gmail.com>
-	 <1105102531.4299.97.camel@pegasus>
-	 <5000105b05010705172040f6c3@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1105108041.4299.100.camel@pegasus>
-Mime-Version: 1.0
+Message-Id: <I9YBGA$6FFE4EA1F7A0F5363F7A838C24BF7DDF@uol.com.br>
+Subject: Re: [Bluez-devel] TCP/IP Connection
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+From: "omap" <omap@uol.com.br>
+To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,37 +16,71 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 07 Jan 2005 15:27:21 +0100
+Date: Fri,  7 Jan 2005 12:40:58 -0200
 
-Hi Amit,
 
-> can u explain how it is possible? 
+Hi Murilo,
+
+Thanks for the help, it helped to
+connect them. But I am sorry if I was
+not clear in my question. I would like
+to know how i could write code (using
+bluez api) to acomplish this task.
+
+Thanks again for your help
+
+> On Fri, Jan 07, 2005 at 11:50:00AM
+-0200, omap wrote:
+> > 
+> > 
+> > Hi folks,
+> > 
+> > 
+> > Here I am with another dummy question
+> > for those with more experience in
+Bluez.
+> > I am intending to build an application
+> > to connect a Bluetooth device to PC
+> > using TCP/IP. Well, can anyone help me
+> > on finding any howto or samples where
+> > i can find the necessary steps to
+> > acomplish my task?
+> > 
 > 
-> Because only one  l2cap connection is possible over a ACL connection
-> (between 2 devices).
-
-who said so? There can only be one ACL connection between two devices,
-but there is no limit for L2CAP connections. You can even have multiple
-connections on the same PSM.
-
-> According to SDP specification, SDP seesion first issue a SDP connect,
-> send SDP query, wait for response and then send SDP disconnect.
->  
->  if we start a SDP session, What will happen with the l2cap
-> connection, over which 1( or more ) rfcomm session is running?
+> [Server Side] 
+> # pand --master --listen role GN
+> # ifconfig bnep0 192.168.0.1
 > 
-> Should l2cap implementation provide a support for this or SDP should
-> check for that?
+> [Client Side]
+> # pand --connect 00:11:22:33:44:55 #
+SERVER ADDR 
+> # ifconfig bnep0 192.168.0.2
+> # route add default gw 192.168.0.1
 > 
-> if so how to implement this at the l2cap level? 
-
-Read the specification and look at the source code. As I said, this
-simply works.
-
-Regards
-
-Marcel
-
+> 
+> I hope this help,
+> 
+> ./nelson -murilo
+> 
+> 
+> 
+>
+-------------------------------------------------------
+> The SF.Net email is sponsored by:
+Beat the post-holiday blues
+> Get a FREE limited edition
+SourceForge.net t-shirt from ThinkGeek.
+> It's fun and FREE -- well,
+almost....http://www.thinkgeek.com/sfshirt
+>
+_______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> =0A =0A________________________________________________________________=
+__________=0AAcabe com aquelas janelinhas que pulam na sua tela.=0AAntiPo=
+p-up UOL - =C9 gr=E1tis!=0Ahttp://antipopup.uol.com.br/=0A
 
 
 
