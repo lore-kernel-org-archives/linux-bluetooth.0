@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-users] SCO question
+Subject: Re: [Bluez-users] Problem with l2test
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Thor Egil Skaug <paxtonrd@hotmail.com>
+To: Zbyszek <dzidoz@poczta.fm>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <000201c3fe26$6f530530$46a57e40@thores>
-References: <000201c3fe26$6f530530$46a57e40@thores>
+In-Reply-To: <20040228173402.ECDBD1EC7AB@front.interia.pl>
+References: <20040228173402.ECDBD1EC7AB@front.interia.pl>
 Content-Type: text/plain
-Message-Id: <1077995792.2843.95.camel@pegasus>
+Message-Id: <1077995657.2843.91.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,16 +18,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 28 Feb 2004 20:16:32 +0100
+Date: Sat, 28 Feb 2004 20:14:17 +0100
 
-Hi Thor,
+Hi Zbyszek,
 
-> Thus meaning the device (and not Bluez) generates the continous stream
-> (of garbage), and then fills in my
-> SCO packets when I send them (encoded and all that)?
+> I have problem. This is my part of the simple program.
+>  
+> #include <netinet/in.h>
+> #include <arpa/inet.h>
+> #include <resolv.h>
+> #include <netdb.h>
+> #include <sys/socket.h>
+> 
+> #include <bluetooth/bluetooth.h>
+> #include <bluetooth/l2cap.h>
+> //Domyslne
+> bdaddr_t bdaddr;
+> int main()
+> {
+>     struct sockaddr_l2 addr;
+>     char buf[2048];
+>     char str[18];
+>     char *adres="00:10:60:A5:F4:4C";
+>     int s,i;
+>     uint8_t id;
+> 
+>     if (( s=socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)) < 0)
+>     {
+> 	perror("Can't create socket !!!");
+> 	exit(1);
+>     }
+> }
+> 
+> Exactly at this moment error appears.
+> Even when I try start the program "l2test" I see communique
+> l2test[4045]: Can't create socket. No such file or directory(2)
+> So I'm asking you, could you tell me where did I make mistake?
 
-it is not garbage, it would be silence ;) And your input must be a PCM
-stream according to the voice settings.
+load the L2CAP kernel module.
 
 Regards
 
