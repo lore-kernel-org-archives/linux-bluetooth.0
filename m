@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050317091358.63188.qmail@web52403.mail.yahoo.com>
-From: jose <twblr@yahoo.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <20050317060516.82046.qmail@web41129.mail.yahoo.com>
+From: jose pl <pl_jose@yahoo.com>
+To: bluez-devel@lists.sf.net
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] 'make' and 'make install' not working
+Subject: [Bluez-devel] bluez installation query
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,17 +16,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Mar 2005 01:13:58 -0800 (PST)
+Date: Wed, 16 Mar 2005 22:05:15 -0800 (PST)
 
 Hi,
 
-After downloadin the bluez files, i did './configure',
-but iam unable to 'make' or 'make install'.
+On suse linux 9.1, iam not able to make and make
+install the bluez install files 'utils, libs etc'.
+when i say ./configure, this is what is listed:
 
-this is what i got when i did ./configure
-
-
-jose:/home/jose/bluetooth/bluez-hcidump-1.18 #
+ose:/home/jose/bluetooth/bluez-hcidump-1.18 #
 ./configure --with-gcc --prefix=/usr
 --mandir=/usr/share/man
 checking for a BSD-compatible install...
@@ -42,18 +40,22 @@ checking for cc... no
 checking for cl... no
 configure: error: no acceptable C compiler found in
 $PATH
+See `config.log' for more details.
 
 
+how do i set the path to the gcc?
 
-now, how do i set the path to gcc?
+need help?
 
-Thanks in advance,
-Jose
+rgds,
+jose
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+
+		
+__________________________________ 
+Do you Yahoo!? 
+Yahoo! Small Business - Try our new resources site!
+http://smallbusiness.yahoo.com/resources/ 
 
 
 -------------------------------------------------------
