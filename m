@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <de33c8be0502010808e419a69@mail.gmail.com>
-From: =?ISO-8859-1?Q?Fl=E1vio?= <flavio.henriques@gmail.com>
+Message-ID: <41FF97A2.7080002@csr.com>
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Help - power control
+Subject: Re: [Bluez-devel] Hardware error
+References: <41FF6E2C.7040908@avantwave.com>
+In-Reply-To: <41FF6E2C.7040908@avantwave.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,26 +18,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 1 Feb 2005 16:08:20 +0000
+Date: Tue, 01 Feb 2005 14:52:18 +0000
 
-Hi people , i=B4m making a project with bluetooth and i need help!
-First:
-        I=B4m trying to make a program with the library BlueZ but
-without detailed information about the functions is very dificult
-(even reading the bluetooth specifications)! where i could find that
-information? BlueZ don=B4t have manual :( :(
-The tutorials indicated in www.bluez.org don=B4t give me any help since
-the program need to work in a low level (example, power control)!
+mike wrote:
+>  > HCI Event: Hardware Error(0x10) plen 1
 
-Second:
-        How can i make a dongle bluetooth comunicate always with the same p=
-ower?
-        The functions related with the power are:
-_read_rssi -> the power received;
-_transmit_power-> the power in transmition.
+If you find out what the parameter was to the hardware error event, you
+might get a clue as to what was going on.
 
-Thanks=20
-Flavio Henriques
+You can look up the hardware error codes for CSR chips in the document
+HQ Commands (bcore-sp-003Pc) on the CSR support web site if you have
+access (www.csrsupport.com).
+
+The most common hardware error emitted by CSR devices running the H4
+UART host transport is 0xfe. This indicates that the chip has lost HCI
+synchronisation with the host. This is caused either by the host sending
+invalid data or because of corruption of the UART traffic on the wire.
+
+Unfortunately, the H4 UART protocol does not support a proper error
+recovery procedure. The only option, once this error has occurred, is
+to issue an HCI_Reset which will, of course, tear down all existing
+links.
+
+	- Steven
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
+
 
 
 -------------------------------------------------------
