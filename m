@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Thor Egil Skaug" <paxtonrd@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Message-ID: <000501c40194$c308add0$9349edc7@thores>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: [Bluez-users] HCI_switch_role
+Subject: Re: [Bluez-users] D-Link DBT-120
+From: Gene Imes <ebi7@ozob.net>
+To: list-bluez <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1078322721.2787.86.camel@pegasus>
+References: <1078322158.11523.83.camel@go2>
+	 <1078322721.2787.86.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1078339075.8547.2.camel@go2>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,33 +18,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 3 Mar 2004 18:59:51 -0800
+Date: Wed, 03 Mar 2004 12:37:56 -0600
 
-Does anyone know why the HCI_switch_role command takes a BDADDR argument
-instead of
-a connectionhandle?
+Disregard my previous post. 2.6.4-rc1-mm2 has fixed this problem.
 
-The role_change event should be sent from both devices to their
-respective sw stacks after this.
+Thanks,
 
-I don't understand the following from the BT specification:
 
-1. Is the BDADDR the address of the remote device, or the local device
-(to the caller)?
-
-2. In the returned event, what bdaddr is returned to the
-(HCI_switch_role) calling stack, and what bdaddr
-   is returned to the stack on the remote device?
-3. What if there is more than one connection between two devices?
-
-Thor
+On Wed, 2004-03-03 at 08:05, Marcel Holtmann wrote:
+> Hi Gene,
+> 
+> > I have this dongle and after upgrading kernel 2.6.4-rc1-mm1 when I
+> > remove the dongle my laptop freezes.
+> > 
+> > This dongle has worked well before.
+> > 
+> > I can supply more information if necessary.
+> 
+> the DBT-120 exists as Broadcom and as CSR version. What version do you
+> have (hciconfig -a)? Is BT_HCIUSB_SCO enabled in your kernel config? If
+> yes, disable it. What USB host controller driver do you use?
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+> Build and deploy apps & Web services for Linux with
+> a free DVD software kit from IBM. Click Now!
+> http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
