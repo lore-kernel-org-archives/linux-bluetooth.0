@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <423987E2.20601@amplex.dk>
+Message-ID: <42398407.7000204@amplex.dk>
 From: Stephan Henningsen <sth@amplex.dk>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Error compiling bluez-utils for buildroot/ARM
-References: <4239536C.5030202@amplex.dk> <1111058060.11792.63.camel@pegasus> <423983A5.6010207@amplex.dk>
-In-Reply-To: <423983A5.6010207@amplex.dk>
+References: <4239536C.5030202@amplex.dk> <1111058060.11792.63.camel@pegasus>	 <4239711A.8070604@amplex.dk> <1111063118.11792.70.camel@pegasus>
+In-Reply-To: <1111063118.11792.70.camel@pegasus>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,16 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Mar 2005 14:36:34 +0100
+Date: Thu, 17 Mar 2005 14:20:07 +0100
 
-> Bluez-libs: --------------------------------------------------------
-> 
-> I cannot get bluez-libs installed where I want; The header files and the 
-> library files seem to install relative to different paths.
+> then you must find the library that provides _IO_getc() or replace yacc
+> or bison to generate correct code for your platform.
 
-This part works now.  Seems like I did mess up the parameters after 
-all.  So bluez-libs compiles and installes correctly now, ie. no 
-errors and the files appear in the tree as expected.
+Please se my other message.  I don't think the library is the 
+problem, as I can build without it, if I issue make manually.
+
+-- 
+Stephan.
 
 
 -------------------------------------------------------
