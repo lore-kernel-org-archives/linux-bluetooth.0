@@ -1,49 +1,58 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Peter Klausler <peter@klausler.com>
-To: Charles Bueche <charles@bueche.ch>
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Logitech MX900 mouse with Dell Inspiron 8600
-Message-ID: <20031201093804.A1281@schnell.us.cray.com>
-References: <1070201531.8187.20.camel@bluez.bueche.ch> <1070218289.8534.30.camel@bluez.bueche.ch>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] problems setting up an SPP profile connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Christian.Lessig@t-online.de
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>,
+   lessig@uni-weimar.de
+In-Reply-To: <1AbdUK-1W3pE80@cmpmail03.bbul.t-online.de>
+References: <1AbdUK-1W3pE80@cmpmail03.bbul.t-online.de>
+Content-Type: text/plain
+Message-Id: <1072869365.2949.3.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=ISO-8859-1
-In-Reply-To: <1070218289.8534.30.camel@bluez.bueche.ch>; from charles@bueche.ch on Sun, Nov 30, 2003 at 12:51:29 -0600
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 1 Dec 2003 09:38:04 -0600
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Wed, 31 Dec 2003 12:16:05 +0100
 
-On 2003.11.30 12:51 Charles Bueche wrote:
-> Hi again,
-> 
-> responding to my own email after studying fake.c : I got it to compile
-> on 2.6, but this code isn't able to run as module on 2.6 kernels,
-> which
-> changed the module format.
-> 
-> Peter : do you plan a 2.6 version anytime soon ?
+Hi Christian,
 
-For 2.6 the fake.o driver shouldn't be needed; I'm told that
-there's a legitimate driver in 2.6 that can be used to
-inject input events from user-land.  But I've been way
-too busy porting 2.6 to a new architecture to spend much
-time playing with it on i386, so I can't tell you how hard
-it would be to adjust bthid to use the new driver.
+> I've got problems to set up an SPP (serial port profile) connection. I
+> can connect and bind to the second device (a bluetooth chip for
+> industrial purpose) but I don't know how to receive messages. In the
+> assumption that rfcomm0 behaves like ttyS0 I wrote a little C programm
+> where I open the rfcomm0-file, set the parameter, write something and
+> wait for response. But I don't receive anything.
+
+you can look at attest.c for an example. It demonstrates how to use the
+RFCOMM socket and also the RFCOMM TTY to send AT commands.
+
+> I also tried to use the rfcommd. I thought propably I need the daemon to
+> receive messages, but direct after starting it exits. I found nowhere a
+> appropriate config file for rfcommd so I used this:
+
+The rfcommd is deprecated and replaced by our kernel RFCOMM
+implementation.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
-This SF.net email is sponsored by: SF.net Giveback Program.
-Does SourceForge.net help you be more productive?  Does it
-help you create better code?  SHARE THE LOVE, and help us help
-YOU!  Click Here: http://sourceforge.net/donate/
+This SF.net email is sponsored by: IBM Linux Tutorials.
+Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
+Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
+Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
