@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200403131347.50697.cijoml@volny.cz>
-Subject: [Bluez-users] BlueZ on iPAQ 2200 ???
+Subject: Re: [Bluez-users] hciconfig revision
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403122013.07865.cijoml@volny.cz>
+References: <200403122013.07865.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1079179824.1795.2.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,15 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 13 Mar 2004 13:47:50 +0100
+Date: Sat, 13 Mar 2004 13:10:24 +0100
 
-Hi Marcel,
+Hi Michal,
 
-I would like to buy iPAQ 2200. I looked at handhelds.org and there is 
-bluetooth for this device marked as non-working. Is there any progress on 
-this device to get BT work?
+> why man has to specify dongle, when he has only one? :(
 
-Michal
+this is the syntax of hciconfig and it is the same for ifconfig ;)
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
