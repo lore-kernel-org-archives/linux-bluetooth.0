@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de4657605011007106fbd81e8@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Kill l2test server
+Message-ID: <41E28999.9070005@cc.gatech.edu>
+From: Jay Summet <summetj@cc.gatech.edu>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net, panizzon@woody.ch
+References: <20050110040324.3E5548852B@sc8-sf-spam1.sourceforge.net>
+In-Reply-To: <20050110040324.3E5548852B@sc8-sf-spam1.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] Re: Accept incomming serial connection (palm hotsync)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,16 +18,64 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 Jan 2005 20:40:21 +0530
+Date: Mon, 10 Jan 2005 08:56:41 -0500
 
-Hi marcel,
-For the l2test, is there a cleaner method to kill the listening
-receiver. I am using CTRL+C right now. I am trying to kill the active
-socket....using close(s1)...but it doesn't seem to be working.
-I want a clean exit.
 
-Regards,
-Manjunath
+>    3. Accept incomming serial connection (palm hotsync) (Benoit Panizzon)
+
+> 
+> --__--__--
+> 
+> Message: 3
+> From: Benoit Panizzon <panizzon@woody.ch>
+> To: bluez-users@lists.sourceforge.net
+> Date: Sun, 9 Jan 2005 18:45:26 +0100
+> Subject: [Bluez-users] Accept incomming serial connection (palm hotsync)
+> Reply-To: bluez-users@lists.sourceforge.net
+> 
+> Hi all
+> 
+> I'm trying to be able to sync my palm zire via bluetooth.
+> 
+> As I understood from the ircomm or USBtty Connection the palm just wants to 
+> build a simple serial connection to the hotsync host.
+> 
+> Everything else via bluetooth works fine: obexpush, dund... (strange it does 
+> not recognize pand, but I assume palm only supports dund...)
+> 
+> But I don't manage to build a serial connection.
+> 
+> When I add bind yes into frcomm.conf then the computer initiates the 
+> connection and the palm of course rejects it...
+> 
+> So the solutions seamed to be to have an entry in rfcomm.conf with bind no and 
+> then use:
+> 
+> rfcomm list /dev/rfcomm1 8
+> 
+> To announce channel 8 as serial service and then have the palm connect to 
+> rfcomm1.
+> 
+> Unfortunately before the palm connects the rfcomm1 device is not availabe and 
+> without it being available the palm does not seam to want to connect...
+> 
+> Are there any 'undocummented' options to rfcomm to make the device show being 
+> present and waiting for the palm to connect? Like dund does?
+> 
+> Regards
+> -Benoit-
+> 
+
+I am able to sync my Palm T via bluetooth, but the way I do it is not by setting 
+up a serial connection. Instead, I set up a PAN connection (giving my palm pilot 
+a local ip address and my computer another) and then do a NETWORK hotsync (vs 
+serial over bluetooth) using the IP address of my computer. I tell Jpilot 
+(pilot-link) to listen to "net:all" (or is it "net:any"....)...
+
+I did this because I read (somewhere) that a plain serial over bluetooth 
+wouldn't work for some odd reason...
+
+Jay
 
 
 -------------------------------------------------------
