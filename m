@@ -1,102 +1,57 @@
-Return-Path: <juliencampana@yahoo.fr>
-Subject: Re: [Bluez-devel] Announce : BlueZ-based implemantation of JSR82
-From: Julien Campana <juliencampana@yahoo.fr>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ-devel List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1085497660.9779.139.camel@pegasus>
-References: <1085393268.892.40.camel@fischer>
-	 <1085487245.9779.89.camel@pegasus>  <1085489942.900.89.camel@fischer>
-	 <1085492205.9779.119.camel@pegasus>  <1085496174.900.127.camel@fischer>
-	 <1085497660.9779.139.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] pand + socket filtering on zaurus
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
+Cc: "'Bluez-devel@lists.sourceforge.net'" <Bluez-devel@lists.sourceforge.net>
+In-Reply-To: <AFE91B59A185A5439840B43AB7919047093974@mchp997a.mch.sbs.de>
+References: <AFE91B59A185A5439840B43AB7919047093974@mchp997a.mch.sbs.de>
 Content-Type: text/plain
-Message-Id: <1085653295.914.36.camel@fischer>
+Message-Id: <1085565600.27245.4.camel@pegasus>
 Mime-Version: 1.0
-Date: Thu, 27 May 2004 12:21:47 +0200
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 26 May 2004 12:00:01 +0200
 
-Am Di, den 25.05.2004 schrieb Marcel Holtmann um 17:07:
-> Hi Julien,
+Hi Matthias,
 
-Hi Marcel,
+> > you now that we are already at Linux kernel 2.6.6 ;) The 
+> > 2.4.6 is so old that I can't even tell you, if there are 
+> > problems with your combination. I stopped testing BNEP with 
+> > 2.4.18 and you should take an iPAQ with 2.4.19 to check if 
+> > your combination is there working, too. Maybe it is an ARM 
+> > related problem.
+> 
+> yeah. I hate my zaurus 2.4.6 kernel, too. do you know what the
+> latest linux kernel for zaurus is (and where to get the sources) ?
+> on the other hand, the latest linux kernels have also their disadvantages,
+> I read about the problems with the linux bridge few weeks ago.
 
-> 
-> > There are main reason why I rewrote some BlueZ functions is that:
-> > - Functions like "sdp_service_search_attr_req" return a list of
-> > sdp_record_t. If I had to parse these sdp_record_t  in order to
-> > construct the requested Java Objects, this would have been an amazing
-> > amount of switch or if statement. The best solution was therefore to
-> > directly send the bytes to the java implementation.
-> 
-> put this problem up in a seperate thread on the mailing list and tell
-> how the Java Objects have to look like. We should find a better solution
-> for that.
+you can take a look at www.openzaurus.org and I think they go with
+2.4.21, but I don't know what version of -mh patch they include.
 
-I will post this today or tomorrow. Furthermore, I will provide the
-HOW-TO help file next week (sorry for the delay, but I currently have a
-lot of work to do!). 
+The bridge problem you read about has been fixed.
+
+Regards
+
+Marcel
 
 
-> > > What I also don't wanna use is somekind of "de.avetana.bluetooth" vendor
-> > > extensions. If something is not possible in pure Java JSR-82, sorry not
-> > > my bad ;)
-> > 
-> > JSR-82 provides just the minimal amount of classes. It lets the
-> > programmer use "background classes" but this is transparent for the
-> > end-user (I will give some example of this transparency in the future
-> > how-to). These de.avetana.bluetooth.* classes are really needed to fully
-> > implement all javax.bluetooth.* classes.
-> 
-> You must explain this to me in detail, because I don't understand why.
-> Actually I think we should avoid this.
 
-In order to explain this, I will take an example:
-JSR-82 provides an interface called ServiceRecord. The role of the class
-could be compared with the role of the sdp_record_t of BlueZ: storing
-attributes and related DataElements. 
-But no implementation of ServiceRecord is provided, it is just an
-interface. 
-Moreover, a look at the description of some JSR82 methods like
-LocalDevice.getRecord() shows that two kinds of ServiceRecord are
-needed: a "local" ServiceRecord and a "remote" ServiceRecord. This two
-ServiceRecord must differ (for example, the "local" Service Record does
-not implement some methods like getConnectionURL()). 
-That's why I had to provide two different implementation of
-ServiceRecord (LocalServiceRecord and RemoteServiceRecord). 
-But if you use the javax.bluetooth.* api, you will mostly manipulate
-ServiceRecord objects without even knowing if they are instance of
-Local- or RemoteServiceRecord.
 
-> 
-> > > The native interface should only be a wrapper. Let's talk about the
-> > > stuff and put some of it back to the Bluetooth library where it should
-> > > belong.
-> > 
-> > I would say that 90% of the native interface is today a wrapper. Only
-> > the service search uses home-made-functions derived from the BlueZ code.
-> 
-> As said already, lets fix this in the Bluetooth library itself. I know
-> that SDP itself is a horrible mess of object oriented stuff, but I think
-> we will find a solution for it.
-
-Thanks!
-
-Regards, 
-
-Julien
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: Oracle 10g
-> Get certified on the hottest thing ever to hit the market... Oracle 10g. 
-> Take an Oracle 10g class now, and we'll give you the exam FREE.
-> http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-------------------------------------------------------
+This SF.Net email is sponsored by: Oracle 10g
+Get certified on the hottest thing ever to hit the market... Oracle 10g. 
+Take an Oracle 10g class now, and we'll give you the exam FREE.
+http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
