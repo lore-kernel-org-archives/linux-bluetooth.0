@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hid2hci not working with Logitech diNovo
+Subject: Re: [Bluez-devel] Ambicom BT2000C CF Card Driver
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Julian Scheel <julian@jusst.de>
+To: Colin Pinkney <bluez-devel@cpinkney.org.uk>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200404010050.30919.julian@jusst.de>
-References: <200404010024.48742.julian@jusst.de>
-	 <1080772414.2536.15.camel@pegasus>  <200404010050.30919.julian@jusst.de>
+In-Reply-To: <200403312311.00434.bluez-devel@cpinkney.org.uk>
+References: <200403312311.00434.bluez-devel@cpinkney.org.uk>
 Content-Type: text/plain
-Message-Id: <1080803843.2610.1.camel@pegasus>
+Message-Id: <1080772692.2536.21.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,20 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 01 Apr 2004 09:17:23 +0200
+Date: Thu, 01 Apr 2004 00:38:12 +0200
 
-Hi Julian,
+Hi Colin,
 
-> > I have seen this error with 2.6, but the switching still works. Check
-> > with hciconfig if you got your Bluetooth device.
+> I've got a contact at Ambicom now that is being quite helpful with technical 
+> questions and as I still have a BT2000C CF card on loan from someone I hope 
+> to push forward with writing a driver for it (or modify an existing driver).
 > 
-> thanks for your quick reply, but the device isn't listed with hciconfig, and 
-> it doesn't stops working, which I assume should happen after switching this, 
-> but before loading the bluetooth hid-drivers, shouldn't it?
+> The Ambicom BT2000C card still uses the OX16c950 UART chip like the BT2000E 
+> (which the bt950 driver is for), but now uses the CSR Bluetooth chip instead 
+> of the Ericsson chip.
+> 
+> So I was wondering if there might be a quick(er) way of developing a driver. 
+> Could I...
+> 
+> 1) Take the OX16c950 support from the bt950_cs and combine it with, say, the 
+> CSR support in btuart_cs?
+> 
+> or
+> 
+> 2) Add OX16c950 support to hciattach and use hci_uart as is?
 
-testing with the latest 2.6.5-rc3-bk1 it reports success, but after that
-my kernel freezes. I have not enough time to dig deep enough into it, so
-feel free to provide a patch if you found the problem.
+I really prefer method 2 and it could already work out of the box with
+2.6, because there is a new serial driver core. On the other hand we saw
+problems with some serial based cards and serial_cs. Some people should
+try it and see what happens.
 
 Regards
 
