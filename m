@@ -1,59 +1,48 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <415D2FA0.9060506@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
+Return-Path: <James@superbug.co.uk>
+Message-ID: <415D17EC.4040609@superbug.co.uk>
+Date: Fri, 01 Oct 2004 09:40:12 +0100
+From: James Courtier-Dutton <James@superbug.co.uk>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: jbarre <jbarre@biarritx.dyndns.org>, bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] [Fwd: Re: [Asterisk-Dev] New Bounty: Bluetooth
  Phone Support]
 References: <415C4A11.8070903@biarritx.dyndns.org> <1096617904.5403.11.camel@notepaq>
 In-Reply-To: <1096617904.5403.11.camel@notepaq>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 01 Oct 2004 12:21:20 +0200
-
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
 Marcel Holtmann wrote:
-| [...] However,
-| what you first need is correct ALSA-SCO-Bluetooth integration.
-|
+> Hi Jerome,
+> 
+> 
+>>The Asterisk-Dev list is talking about bt... ounce again...
+>>
+>>Since I'm (really) not an expert in this kind of stuff, I would like to 
+>>have your opinion.
+>>
+>>Here is a copy of my last reply to this list.
+>>
+>>Note: I'm not in the bluez-devel list. Too much mail... :-(
+>>
+>>Please don't forget to add my email address to your reply.
+> 
+> 
+> as long as there are no mobile phones with cordless telephony (CTP)
+> support I think it makes no sense to think about the integration into a
+> PBX. You will be hit by the restrictions of the headset/handsfree
+> profiles, because they are designed for a different approach. However,
+> what you first need is correct ALSA-SCO-Bluetooth integration.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-Just wanted to drop a note that we still try to improve things on this:
-http://sourceforge.net/projects/bluetooth-alsa/
+Just a bit of advice. If anyone does any contributions to Asterisk, for 
+those contributions to be accepted, one has to sign over one's copyright 
+to a single Asterisk developer.
+So, if one wishes to keep copyright over one's work, do not contribute 
+to Asterisk.
 
-We are still stuck with the not-that-good structures of snd-bt-sco, but
-I think this will improve eventually. If anyone wants to develop
-something in this direction, it would be great if you could team up with
-us :)
-
-cu,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFBXS+fQWC6DTWkDAoRAoF6AJ9p1QfdZIRH3DKeg2eoHv8n+43tegCfcm+M
-mIMwCFeqBdysKlyKUXimQP8=
-=8lIW
------END PGP SIGNATURE-----
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
-Use IT products in your business? Tell us what you think of them. Give us
-Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
-http://productguide.itmanagersjournal.com/guidepromo.tmpl
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+James
