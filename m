@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+To: "Xavier Garreau" <x.garreau@prim-time.fr>, Stephen Crane <steve.crane@rococosoft.com>
 Subject: Re: [Bluez-devel] [ANN] Zaurus BlueZ kernel packages for ROM v3.10
 References: <1054908696.4791.157.camel@baroque.rococosoft.com>
+	<1055156207.4791.301.camel@baroque.rococosoft.com>
 	<005f01c3302e$ca3537a0$0181a8c0@zaz1>
-	<200306282005.08403.justin-qt@affinix.com>
-In-Reply-To: <200306282005.08403.justin-qt@affinix.com>
-Cc: "Xavier Garreau" <x.garreau@prim-time.fr>, Stephen Crane <steve.crane@rococosoft.com>
+In-Reply-To: <005f01c3302e$ca3537a0$0181a8c0@zaz1>
+Cc: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Message-Id: <200306282117.57840.justin-qt@affinix.com>
+Message-Id: <200306282005.08403.justin-qt@affinix.com>
+Reply-To: Justin Karneges <justin-qt-dated-1058094956.869933@affinix.com>
 From: Justin Karneges <justin-qt@affinix.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,51 +22,58 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 28 Jun 2003 21:17:57 -0700
+Date: Sat, 28 Jun 2003 20:05:08 -0700
 Content-Type: text/plain; CHARSET=iso-8859-1
 
-Ok, I thought of a few more things, so to jumpstart the discussion I'll say 
-them now:
+Hi,
 
-> > It installs the files in the right directories, make the symlinks, try to
-> > guess what card it is and bring device up.
+I'm working towards easy Bluetooth on the Zaurus.  I have a bluez GUI tool and 
+qtopia dialer plugin in the works.
 
-First, what is this about card detection during ipk install?  I didn't have a 
-problem with that (I inserted my card after install), and IMO there should be 
-no such detection in the installer if there is.
+However, getting bluez installed was never easy.  In the past, I was using the 
+ipks available at bluez.sf.net, which were never very complete.
 
-Second, rfcomm is missing.
+Today, I sought to remedy this, and tried cross compiling modules and the 
+libs/utilities.  I ran into a heap of trouble, and then discovered this 
+thread.  I'm glad someone else is looking into this stuff too. :)
 
-Third, the /dev nodes are not created.  When they are, ensure that they can 
-survive a reboot.
+My original goal was to get this working with kernel 2.4.6, but I'm not sure 
+how realistic that is.  I didn't know about the new sharp ROM until today, 
+which I have now installed.  I guess it is acceptable to work with this as a 
+target, and considering it comes with kernel 2.4.18, it should make a lot of 
+things easier.
 
-For the future, I think hcid should be run on install and on future bootups, 
-as it is required to do anything useful.  I'm not sure about sdpd though (i 
-admit i'm not up on what sdp does, can someone shed some light if this is 
-needed?).  Whatever daemons are run should have proper pid accounting in 
-/var, so that front-ends can access them.  For instance, my GUI that modifies 
-/etc/bluetooth/hcid.conf will need a way to find hcid's pid so it can send 
-HUP.
+Xavier's package looks good.  The only flaw I think is that it does not set up 
+/etc/bluetooth.
 
-Then also pin handling:  There should be a /usr/bin/bluepin that does the 
-following:
-  - check to see if Qtopia is up.
-  - if not, echo ERR.
-  - else, call my qt btpin program (let's assume it is /usr/bin/btpin)
-
-This way the pin should properly work even during the moment where hcid is 
-running but qtopia is not fully booted yet.
-  
-I think this should do it.  Am I missing anything?
-
-By the way, you may see my GUI package here:
-
-  http://www.affinix.com/~justin/zaurus-bluetooth-0.6.tar.gz
-
-It is rather old, but works.  Unfortunately, it seems the dialer part does not 
-work on the new Sharp ROM.  Argh, I'll have to fix this ..
+I'd like to see some secrets shared.  Could Steve or Xavier respond to me here 
+or on the list, so that we can make something more official?
 
 -Justin
+
+On Wednesday 11 June 2003 08:33 am, Xavier Garreau wrote:
+> > > kernel modules into one big package. I like to see the kernel stuff
+> > > seperated from the userspace tools.
+> >
+> > Yeah me too. Particularly because it's much easier to build the
+> > user-space tools with a cross-compiler.
+>
+> Not in this release.
+>
+> > I will think about doing this if I get some time. For now, I have
+> > uploaded the latest basic user-space binaries separately to
+> > ftp://rococosoft.com/pub/zaurus with instructions for installing them in
+> > the right places. It would not be too hard to write packaging scripts
+> > for them --- indeed this is something anyone could do using the
+> > ipkg-build script; volunteers?
+>
+> I did it : http://fichiers.xgarreau.org/zaurus/bluez_2.4.18_arm.ipk
+>
+> It installs the files in the right directories, make the symlinks, try to
+> guess what card it is and bring device up.
+>
+> Please keep me informed of new builds so that i keep the package up to
+> date.
 
 
 -------------------------------------------------------
