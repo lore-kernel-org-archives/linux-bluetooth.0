@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Jesse Guardiani <jesse@wingnet.net>
-Message-ID: <ctqd54$geq$1@sea.gmane.org>
+Subject: Re: [Bluez-users] rfcomm question 3
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050202045415.51412.qmail@web60910.mail.yahoo.com>
+References: <20050202045415.51412.qmail@web60910.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1107322449.9276.13.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Enabling BT 1.2 features on Logitech Mobile Freedom Headset?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,38 +18,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 02 Feb 2005 06:23:07 -0500
+Date: Wed, 02 Feb 2005 06:34:09 +0100
 
-Hello,
+Hi Michael,
 
-My Anycom USB-240 dongle, marketed as BT 1.2 *ready*, despite
-containing BT 1.1 firmware, seems to be doing AFH by default:
+>     Acutally, this project is just related to
+> bluetooth. I've seen your reply, and then got through
+> rctest.c. I found that the part of receiving mobile
+> exists. Then I wish to know need I include the
+> rctest.c file in my main program with which header
+> files include in it? Or need I put the part in my
+> program? And about the part you said that is the
+> socket program, I wish to know is it ok if I just put
+> it in my main program with which header files include
+> in it? And as I need to accept all mobile, not the one
+> that the address has been set in the program, to
+> connect with PC and then access the program, how can I
+> do to make sure that my wish is possible? Thank you
+> very much.
 
-[5:55]jesse@trevarthan:[/home/jesse]# hciconfig hci0 afhmode
-hci0:   Type: USB
-        BD Address: 00:0B:0D:34:1F:E0 ACL MTU: 120:20  SCO MTU: 64:0
-        AFH mode: Enabled
+you need to include the listen part, because this one gives you a socket
+descriptor for the incoming connection in the end. From this descriptor
+you can read() and write(). If you wanna accept only specific devices
+then use getpeername() to get its address after they connected to you.
+You can then decide what to do. If you don't like that device simple
+close the connection.
 
-However, my Logitech Mobile Freedom Headset, also marketed
-as a BT 1.2 device, *isn't* doing AFH:
+The rctest.c is an example of how to do it. Don't include things that
+you don't understand. For using RFCOMM it is enough to include the
+bluetooth.h and rfcomm.h header files.
 
-[5:55]jesse@trevarthan:[/home/jesse]# hcitool afh 00:0D:44:36:E6:F4
-AFH disabled
+Regards
 
-Does anyone know how I might enable AFH on my headset? Without
-AFH, my 802.11b network is unusable while the headset is streaming
-audio...
-
-Any help appreciated!
-
-Thanks!
-
--- 
-Jesse Guardiani, Systems Administrator
-WingNET Internet Services,
-P.O. Box 2605 // Cleveland, TN 37320-2605
-423-559-LINK (v)  423-559-5145 (f)
-http://www.wingnet.net
+Marcel
 
 
 
