@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+From: Dave Henriksen <dhenriksen@optibrand.com>
+To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1107294719.9652.81.camel@pegasus>
+Message-Id: <1107278353.9064.2.camel@linux.site>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Initial support for the BPA 100/105 sniffers
+Subject: [Bluez-devel] btsco static
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,18 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Feb 2005 22:51:59 +0100
+Date: Tue, 01 Feb 2005 09:19:12 -0800
 
-Hi,
+I have just finished installing btsco for use with an HBH-35 Ericcson
+headset, many thanks for the help.
 
-I just committed the first version of the bpasniff utility to the
-hcidump repository in the CVS. Do anyone here still have one of the
-Digianswer/Tektronix BPA 100/105 Bluetooth protocol analyzers?
+Whenever I use the headset, there is a great deal of static and noise on
+the headset.   Is this normal ? The microphone and speaker are working
+well, the only annoyance is the static.
 
-Regards
+I am running 2.6.10-mh3 with the latest versions of everything.
 
-Marcel
-
+Dave
+-- 
+Dave Henriksen <dhenriksen@optibrand.com>
 
 
 
