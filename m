@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20040210175959.250411D05C8@sc8-sf-uberspam1.sourceforge.net>
-Message-Id: <10865.30319-12503-1360465066-1076449270@seznam.cz>
-Content-Type: text/plain;
-	charset="iso-8859-2"
+Subject: Re: [Bluez-users] i-Tec Bluetooth USB dongle
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rudolf Matousek <matousek@utia.cas.cz>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4028818C.1070109@utia.cas.cz>
+References: <4028818C.1070109@utia.cas.cz>
+Content-Type: text/plain
+Message-Id: <1076401303.32750.6.camel@pegasus>
 Mime-Version: 1.0
-Cc: 
-Reply-To: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
-Subject: [Bluez-users] =?us-ascii?Q?I=2DTec=20Bluetooth=20USB=20=2D=2D=20Same=20Problem=2E=2E=2E?=
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,21 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 10 Feb 2004 22:41:10 +0100 (CET)
+Date: Tue, 10 Feb 2004 09:21:43 +0100
 
-I'm having the same problem with the I-Tec device -- got it today, put =
-it in -- and nothing comes up with HCICONFIG -- if I take it out, and p=
-ut in the EPOX device -- the EPOX device works fine -- if I take it bac=
-k out, and put the I-Tec back in, nothing.
+Hi Rudolf,
 
-Let me know if (and how) I can get you info to get it working.
+> I've recently purchased i-Tec USB dongle. Before the purchase, I checked 
+> that the dongle is supported by linux Bluez.
+> 
+> Unfortunatelly, the dongle I purchased has different chipset from the 
+> dongle announced as functional. The chipset is Broadcom with Vendor Id: 
+> 0a5c and Product Id: 200a.
 
-Thanks.
-____________________________________________________________
-ADSL za korunu od Contactelu - nejp=F8=EDjemn=ECj=B9=ED ADSL na trhu do=
-ru=E8=EDme rychle a=BE k V=E1m!
-http://ad2.seznam.cz/redir.cgi?instance=3D70017%26url=3Dhttp://www.cont=
-actel.cz/adsl
+this is not a Broadcom dongle in firmware mode, because it must have id
+0a5c:2033. After the firmware was loaded the id is 0a5c:2001.
+
+What is the content of /proc/bus/usb/devices ?
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
