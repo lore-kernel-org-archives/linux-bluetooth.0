@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-From: "Simi Manuel" <roses_3@operamail.com>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <20041222012315.32170416118@ws5-2.us4.outblaze.com>
-Subject: [Bluez-users] help on project!!!!
+Subject: Re: [Bluez-users] help needed on bluetooth project....
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041221162543.14D2B23CF6@ws5-3.us4.outblaze.com>
+References: <20041221162543.14D2B23CF6@ws5-3.us4.outblaze.com>
+Content-Type: text/plain
+Message-Id: <1103666184.20258.11.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,27 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Dec 2004 02:23:15 +0100
+Date: Tue, 21 Dec 2004 22:56:24 +0100
 
-hello
+Hi,
 
-is there anyone interested in implementing bluetooth stack in C.i need cert=
-ain clareifications...
+> This is my first mail to the group.plz dont discard this mail....
+> 
+> i am planning to do a project on bluetooth protocol stack.
+> i wish to know how the stack is working right from the data coming from the application level,how it is assembled into packets and how it is then converted into bits....and how the reverse is happening at the receiver....
+> 
+> 
+> can anyone describe the above steps in simple words or can anyone suggest me a good book or material to follow...i'll be very grateful to you....
+
+as Gabriel already pointed out, there is the Bluetooth specification
+your should read first and after that I advice you to use the source,
+Luke ;)
+
+You expect any answer from us that will satisfy you. As specific
+questions and you will get answers that are helpful for you.
+
+Regards
+
+Marcel
 
 
-interseted ones,i mean those interseted in helping me out,plz reply to this=
- id....
-
-
-bye
-
-
---=20
-_____________________________________________________________
-Web-based SMS services available at http://www.operamail.com.
-=46rom your mailbox to local or overseas cell phones.
-
-Powered by Outblaze
 
 
 -------------------------------------------------------
