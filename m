@@ -1,71 +1,51 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <SRS0+cd78f81f0a36eea3fb57+355+infradead.org+dwmw2@baythorne.srs.infradead.org>
 Subject: RE: [Bluez-devel] Alignment issue
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Daryl Van Vorst <daryl@wideray.com>,
-   "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092315210.15466.220.camel@hades.cambridge.redhat.com>
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1092387952.28711.217.camel@pegasus>
 References: <001201c47fc2$7093e4a0$1301010a@baked>
 	 <1092252699.4564.238.camel@pegasus>
 	 <1092299689.4622.8.camel@imladris.demon.co.uk>
 	 <1092302834.28711.72.camel@pegasus>
 	 <1092304890.15466.44.camel@hades.cambridge.redhat.com>
 	 <1092306154.28711.85.camel@pegasus>
-	 <1092315210.15466.220.camel@hades.cambridge.redhat.com>
+	 <1092306935.15466.74.camel@hades.cambridge.redhat.com>
+	 <1092308407.28711.99.camel@pegasus>
+	 <1092310391.15466.178.camel@hades.cambridge.redhat.com>
+	 <1092311388.28711.117.camel@pegasus>
+	 <1092312127.15466.211.camel@hades.cambridge.redhat.com>
+	 <1092317787.28711.150.camel@pegasus>
+	 <1092384465.4186.37.camel@imladris.demon.co.uk>
+	 <1092387952.28711.217.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1092391122.28711.220.camel@pegasus>
+Message-Id: <1092388491.4186.103.camel@imladris.demon.co.uk>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 13 Aug 2004 11:58:42 +0200
+Date: Fri, 13 Aug 2004 10:14:51 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi David,
-
-> These should do it right on all architectures -- I've checked with a gcc
-> hacker and verified that at least the get_unaligned() version does the
-> right thing on both FR-V and i386. On FR-V it loads each byte and shifts
-> it into place, while on i386 it just loads it.
+On Fri, 2004-08-13 at 11:05 +0200, Marcel Holtmann wrote:
+> if this is true, then this makes your patch useless. However after doing
+> some research in this area it seems that I must use -fPIE and then link
+> with -pie. This actually only works for programs, because libtool don't
+> uses these extra flags.
 > 
-> #define get_unaligned(ptr)                      \
-> ({                                              \
->         struct __attribute__((packed)) {        \
->                 typeof(*(ptr)) __v;             \
->         }  *__p = (ptr);                        \
->         __p->__v;                               \
-> })
-> 
-> #define put_unaligned(ptr, val)			\
-> do {                                            \
->         struct __attribute__((packed)) {        \
->                 typeof(*(ptr)) __v;             \
->         }  *__p = (ptr);                        \
->         __p->__v = (val);			\
-> } while(0)
+> Check out the CVS. The patch for that is already included.
 
-is it verified that this works with every GCC release? Some people still
-use a 2.95 or older.
+OK, thanks. I'll try to put a package through the build system today.
 
-Regards
+> > > And please don't do this
+> > > 
+> > >         # Authentication and Encryption
+> > > -       #auth enable;
+> > > -       #encrypt enable;
+> > > +       auth enable;
+> > > +       encrypt enable;
+> > > 
+> > > in the bluez-utils-2.3-conf.patch. If you do that then you are going to
+> > > set your local device in security mode 3 and this is not what you want.
 
-Marcel
+Thanks for the explanation. I'll turn those off in the next build too.
 
-
-
-
--------------------------------------------------------
-SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
-100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
-Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
-http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+dwmw2
