@@ -1,10 +1,18 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Kyle Rose <krose+bluez@krose.org>
-Message-ID: <khnacuya23u.fsf@hunter-killer.kendall.corp.akamai.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] AMD64 HID pairing
+Subject: Re: [Bluez-users] Bluetooth on a MIPS-System
+From: Marcel Holtmann <marcel@holtmann.org>
+To: martin f krafft <madduck@madduck.net>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041007145542.GA15417@albatross.madduck.net>
+References: <41651D72.7040806@corscience.de>
+	 <1097147273.7325.26.camel@pegasus> <41652A40.4080209@corscience.de>
+	 <1097152912.7325.30.camel@pegasus> <41654062.5050009@corscience.de>
+	 <1097154841.7325.36.camel@pegasus> <41654D83.1090306@corscience.de>
+	 <1097158664.7325.38.camel@pegasus>
+	 <20041007145542.GA15417@albatross.madduck.net>
+Content-Type: text/plain
+Message-Id: <1097164916.7325.46.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,26 +23,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 07 Oct 2004 13:07:33 -0400
+Date: Thu, 07 Oct 2004 18:01:56 +0200
 
-On my AMD64 system (Tyan K8W, dual Opteron 244, logitech MX 900 mouse
-and bluetooth cradle, linux-2.6.8.1 with patch-2.6.8-mh2), I have to
-switch to VT, do "hidd --search", and hit both buttons (on the mouse
-and on the cradle) every time I either reboot the machine or let it
-sit for a while.  Needless to say, this is pretty irritating.
+Hi Martin,
 
-What really bugs me is that this exact same hardware configuration
-works in IA32 mode: when I reboot, I just hit the button on the mouse
-and a few seconds later the mouse comes alive; and when I leave it sit
-for a while, I just move it or hit a button and a few seconds later
-the mouse comes back.
+> > this rfcomm.o is not a kernel module. It is a compiled object file
+> > from the bluez-hcidump package.
+> 
+> It certainly is a kernel module in 2.6.8.1:
+> 
+>   /lib/modules/2.6.8-cirrus/kernel/net/bluetooth/rfcomm/rfcomm.ko
 
-I've confirmed I've got hidd --server running.
+but what Thomas tried to load into the kernel was not a kernel module
+and I never said that there is no kernel module named rfcomm ;)
 
-Any insight?
+Regards
 
-Cheers,
-Kyle
+Marcel
+
+
 
 
 -------------------------------------------------------
