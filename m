@@ -1,56 +1,69 @@
-Return-Path: <bluez-announce-admin@lists.sourceforge.net>
-From: Max Krasnyansky <maxk@qualcomm.com>
-To: bluez-devel@lists.sourceforge.net, bluez-users@lists.sourceforge.net,
-   bluez-announce@lists.sourceforge.net
-Cc: linux-kernel@vger.kernel.org
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Master, Slave and Maximal Peers Questions
+From: Marcel Holtmann <marcel@holtmann.org>
+To: ag@new-media-artists.de
+Cc: Bluez Devel <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <FJENILNPNAGPJMMDOKDCAEOCDLAA.ag@new-media-artists.de>
+References: <FJENILNPNAGPJMMDOKDCAEOCDLAA.ag@new-media-artists.de>
 Content-Type: text/plain
-Message-Id: <1074191225.2559.226.camel@localhost>
+Message-Id: <1074169363.2625.38.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-Announce] New maintainer for Bluetooth subsystem
-Sender: bluez-announce-admin@lists.sourceforge.net
-Errors-To: bluez-announce-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sf.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-announce>,
-	<mailto:bluez-announce-request@lists.sourceforge.net?subject=unsubscribe>
-List-Post: <mailto:bluez-announce@lists.sourceforge.net>
-List-Help: <mailto:bluez-announce-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-announce>,
-	<mailto:bluez-announce-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-announce>
-Date: Thu, 15 Jan 2004 10:27:06 -0800
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 15 Jan 2004 13:22:43 +0100
 
-Hi Folks,
+Hi Andreas,
 
-I'd like to announce new maintainer for Linux kernel Bluetooth subsystem
-and Linux Bluetooth user-space utilities (aka BlueZ project). I've been
-pretty busy lately (work, personal stuff, etc) and unfortunately I won't
-have enough time to do a good maintainer job in the near future. Hence
-my resignation :). But I'll try to contribute to the project as time
-permits, my TODO list is still pretty long.
+> Hm, so i got this wrong. But if i connect two different devices with rfcomm,
+> "hcitool con" gives me two lines that look like
+> "< ACL 00:0A:D9:37:11:29 handle 41 state 1 lm MASTER". Thats what i meant
+> talking about "master connections". If i start another rfcomm connect (the
+> third one)i get "Device or resource busy" and i assumed thats because the
+> chip i use (CSR, hci rev 16.4) can only handle two master connections. I
+> found this info, that a 16.x CSR can make 7 Connections, while 2 of them can
+> be Master on some web page that i remember to be on your server,
+> unfortunatelly i cant find it anymore.
+> 
+> Im just wondering what a line ending with MASTER from hcitool con actualy
+> means. IMHO it should mean that this is a peer is a slave in a piconet with
+> me as the master. But why does rfcomm than say that "Device or resource
+> busy" when i try to connect a third slave witch should be possible?
 
-Marcel Holtmann <marcel@holtmann.org> is going to assume primary
-maintainer role. Marcel has been one of the _most_ active contributors
-to the BlueZ. He wrote many pieces of the current Bluetooth kernel code
-and knows Bluetooth subsystem very very well. Actually he's already been
-handling a lot of the maintainer tasks, so it should come as no surprise
-to anybody.
+if you got something like this
 
-Thanks
-Max
+	# hcitool con
+	Connections:
+	        < ACL 00:04:61:xx:xx:xx handle 45 state 1 lm MASTER 
+	        < ACL 00:0A:D9:xx:xx:xx handle 42 state 1 lm MASTER 
 
-http://bluez.sf.net
-http://vacum.sf.net
-http://vtun.sf.net
+it means that you have a piconet with two slave devices and you as
+master.
+
+I don't see any reason why you can't connect a third device into this
+piconet. Run "hcidump -w <file>" for the third connection, so we can see
+what happens on the HCI layer.
+
+Regards
+
+Marcel
+
 
 
 
 -------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
+This SF.net email is sponsored by: Perforce Software.
+Perforce is the Fast Software Configuration Management System offering
+advanced branching capabilities and atomic changes on 50+ platforms.
+Free Eval! http://www.perforce.com/perforce/loadprog.html
 _______________________________________________
-Bluez-Announce mailing list
-Bluez-Announce@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-announce
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
