@@ -1,14 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth 1.2 and HID Proxy
-References: <1086429803.16316.44.camel@pegasus>
-In-Reply-To: <1086429803.16316.44.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200406052338.15162.cijoml@volny.cz>
+Subject: Re: [Bluez-users] Linux-2.6, Zaapa USB Dongle - can't find near
+	devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Filipe Veloza <fmvel@rnl.ist.utl.pt>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1086434351.6274.2.camel@castle.budism.pt>
+References: <1086372047.8985.14.camel@castle.budism.pt>
+	 <200406042022.58589.cijoml@volny.cz>  <1086374092.4424.24.camel@pegasus>
+	 <1086434351.6274.2.camel@castle.budism.pt>
+Content-Type: text/plain
+Message-Id: <1086434730.16316.82.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,73 +21,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 5 Jun 2004 23:38:14 +0200
+Date: Sat, 05 Jun 2004 13:25:30 +0200
 
-Marcel, 
+Hi Filipe,
 
-pls start new webpage on bluez which will collect all known doglech which we 
-know reflash with newer firmware and pls try describe step-by-step howto.
-
-Michal
-
-On Saturday 05 of June 2004 12:03, Marcel Holtmann wrote:
-> Hi Folks,
->
-> for everyone of you who is searching for a Bluetooth 1.2 capable USB
-> dongle or a dongle with HID Proxy support, there is now a way to getting
-> one with a minimum of costs. It is possible through the update efforts
-> of Apple. Before they equiped their machines with internal Bluetooth
-> adapters they sold (and I think still sell) a USB dongle from D-Link.
-> According to Apple every D-Link with hardware revision B2 and higher can
-> be updated through their firmware updater
->
-> http://www.apple.com/downloads/macosx/apple/bluetoothfirmwareupdater.html
->
-> So I bought myself a D-Link (Rev B3) and tried it. I used the DFU wizard
-> from CSR and after some time I got the new firmware on the dongle
->
+> here goes anyway :P
+> 
+> [~]hciconfig -a
 > hci0:   Type: USB
->         BD Address: 00:0D:88:xx:xx:xx ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:966 acl:0 sco:0 events:25 errors:0
->         TX bytes:333 acl:0 sco:0 commands:24 errors:0
->         Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
+>         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
+>         DOWN
+>         RX bytes:0 acl:0 sco:0 events:0 errors:0
+>         TX bytes:0 acl:0 sco:0 commands:0 errors:0
+>         Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DH1 HV1
+>         Link policy:
 >         Link mode: SLAVE ACCEPT
->         Name: 'D-Link DBT-120 (Rev B3)'
->         Class: 0x1c010c
->         Service Classes: Rendering, Capturing, Object Transfer
->         Device Class: Computer, Laptop
->         HCI Ver: 1.2 (0x2) HCI Rev: 0x4d9 LMP Ver: 1.2 (0x2) LMP Subver:
-> 0x4d9 Manufacturer: Cambridge Silicon Radio (10)
->
-> And now this dongle is not only capable of Bluetooth 1.2 it also uses
-> the HID Proxy feature. The HID mode is the default boot mode and you
-> need to use hid2hci to switch between the modes.
->
-> The bad news are that you must extract the file GenericCSR.dfu from the
-> Apple firmware update. Actually that is impossible without using Mac OS.
-> And the other problem is that you need a DFU Upgrade utility. The CSR
-> one is not for free and I never really finished the download code for
-> btdfu. Right now I don't know how to get these two thinks worked out.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by the new InstallShield X.
-> From Windows to Linux, servers to mobile, InstallShield X is the one
-> installation-authoring solution that does it all. Learn more and
-> evaluate today! http://www.installshield.com/Dev2Dev/0504
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+you said you've tried to bring up the device. Try again, because
+"hciconfig hci0 up" should bring it at least up.
+
+If it still fails look at dmesg or the syslog for any errors.
+
+> T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS= 8 #Cfgs=  1
+> P:  Vendor=0b7a ProdID=07d0 Rev= 1.34
+> S:  SerialNumber=3E402C78
+> C:* #Ifs= 2 Cfg#= 1 Atr=c0 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=00(>ifc ) Sub=00 Prot=00 Driver=hci_usb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=03(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:  If#= 1 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+
+You are right this is a Zeevo chip, but it is the old TC2001. I don't
+know if it helps, but try 2.6.6-mh3 or at 2.6.7-rc2-bk5.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
