@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Thor Egil Skaug" <paxtonrd@hotmail.com>
-To: "'Steven Singer'" <steven.singer@csr.com>
-Cc: "'BlueZ Mailing List'" <bluez-users@lists.sourceforge.net>
-Subject: RE: [Bluez-users] AUX1 packets
-Message-ID: <000401c3ffa7$5b52f310$46a57e40@thores>
+Message-ID: <40435E1B.7000900@gammah.com>
+From: TM <bluez@gammah.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <40435D9D.5020509@csr.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Socket permissions
+References: <000101c3ffa4$a060e550$46a57e40@thores>
+In-Reply-To: <000101c3ffa4$a060e550$46a57e40@thores>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,27 +17,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 1 Mar 2004 08:07:55 -0800
+Date: Mon, 01 Mar 2004 10:00:27 -0600
 
->If both ends of the link support CQDDR then the Link Managers will do
-this automatically.
->
->If you try to do this yourself, you'll just end up with the host and
-the controller fighting each other.
->
->	- Steven
+I did 
+# chown root hciconfig
+# chmod 4711 hciconfig 
 
-But the LM can only use packet types that I specified in
-create_connection or change_connection_packet_type,
-in addition to the mandatory DM1 type. Am I correct in assuming this?
+which sets that program setUID root. This should solve that problem, but setting programs setuid root *could* cause a problem for security. Since all my bluez stuff is on a laptop that's rarely online, the risk is negligible for me.
 
-Will the link manager notify me through events that CQDDR scheme has
-changed packet type?
+-t.
 
-How do I know whether CQDDR is supported, and is there any way of
-disabling this?
+Thor Egil Skaug wrote:
+> When I use the hciconfig, hcitool, etc. applications that depend on
+> raw-data hci-sockets,
+> I have to be logged in as root for it to work. If not I get a permission
+> denied error.
+> 
+> Which files do I have to alter permissions on in order for a normal user
+> to do this?
+> 
+> I am using Linux 2.4.25, hci_usb + usb-uhci, Belkin USB dongle (CSR).
+> 
+> Thor
+> 
+> 
+> -------------------------------------------------------
+> SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+> Build and deploy apps & Web services for Linux with
+> a free DVD software kit from IBM. Click Now!
+> http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-Thor
 
 
 -------------------------------------------------------
