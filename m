@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] callback for L2CAP disconnection
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Carmine Pirro <carrip@gmail.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <17ca747604072807081342839b@mail.gmail.com>
+Message-ID: <008601c474ae$20a3e540$0301a8c0@zazoumobile>
+From: "Xavier GARREAU" <x.garreau@prim-time.fr>
+To: <bluez-devel@lists.sourceforge.net>
 References: <17ca74760407280608573db26d@mail.gmail.com>
-	 <1091021474.3673.29.camel@notepaq>
-	 <17ca747604072807081342839b@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1091027744.4845.94.camel@pegasus>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] callback for L2CAP disconnection
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,23 +17,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 28 Jul 2004 17:15:45 +0200
+Date: Wed, 28 Jul 2004 16:21:02 +0200
 
-Hi Carmine,
-
+Carmine Pirro wrote:
 > The following is what i have to do:
 > a device A is connected to a device B.
 > When device A disconnects, a process on device B has to print the
 > device A bluetooth address on the screen with a appropriate message.
+> 
+> Thank you, Carmine.
 
-this is all about socket programming. Take a look at functions like
-poll(), getsockname(), getpeername() etc.
+Why don't you use select or poll as in any other socket based application ?
+You can also filter HCI disconnection events by using raw hci sockets ...
 
-Regards
-
-Marcel
-
-
+BR,
+--
+Xavier Garreau <xavier@xgarreau.org>
+http://www.xgarreau.org
 
 
 -------------------------------------------------------
