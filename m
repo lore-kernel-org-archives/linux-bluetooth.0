@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050331050155.47957.qmail@web8503.mail.in.yahoo.com>
-From: mahabaleshwara k <mahabaleshwara_k@yahoo.co.in>
+From: Francesco <guybrush.t@libero.it>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] file transfer from phone to PC
+Content-Type: text/plain
+Message-Id: <1112223455.7866.14.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-users] btsco + Plantronics headset + Trust bt dongle - stops after 1 sec
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,216 +16,123 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 31 Mar 2005 06:01:55 +0100 (BST)
+Date: Thu, 31 Mar 2005 00:57:35 +0200
 
-Mac address of phone(using hcitool scan) and channel
-numbers(8 and 9) for OBEX PUSH and file transfer
-respectively(using sdptool browse) were foundout. 
+Hi everybody and thanks for the help.
+I'm running ubuntu warty (kernel 2.6.8.1) compiled for K7, using
+bluez-utils 2.7.
+I've got a Plantronics M3000 headset and a Trust BT120 bluetooth USB
+dongle and i can't for my life get them to work together.
+I compiled btsco from CVS, kernel module included, the dongle's drivers
+get loaded (it works, at least partially, because i used it with my old
+nokia to browse the web), the snd-bt-sco module too, without warnings or
+errors. 
+Launching btsco, it seems to work, the RFCOMM connection works, clicks
+on the headset buttons are reported and acted upon, but any application
+trying to record from the headset gets only 1 second of (bad) audio and
+then stops, while playback never works, just gives background noise (but
+the headset actually becomes 'active' when an app tries to play
+something)
+Hcidump shows SCO packets from handset with voice in it (packets payload
+varies with audio in input in the microphone)
+I also failed when trying the same setup with chan_bluetooth in asterisk
+in more or less in the same way, so i suppose it's a matter of
+compatibility ?
 
-When using obexftp for getting files from cell
-phone(put is successful, get/list fails):
-[root@localhost root]# obexftp -b 00:0A:28:3E:52:B5 -B
-9 -p testimgp.jpg
-No custom transport
-Connecting...bt: 1
-done
-Sending testimgp.jpg...\done
-Disconnecting...done
-[root@localhost root]# obexftp -b 00:0A:28:3E:52:B5 -B
-9 -g testimgp.jpg
-No custom transport
-Connecting...bt: 1
-done
-Receiving testimgp.jpg... failed: testimgp.jpg
-Disconnecting...done
-(on cell phone it displays "operation no allowed
-....cancelling". I could not find any permissions
-settings on cell)
-[root@localhost root]# obexftp -b 00:0A:28:3E:52:B5 -B
-9 -l
-No custom transport
-Connecting...bt: 1
-done
-Disconnecting...done
-(on cell phone it displays "
-Failed...Disconnecting..")
+Only strange findings are the following:
+#1: output from "hciconfig hci0 revision"
 
-When trying sending from cell phone to linux box:
-on cell it gives "Could not connect"
-hcidump log:HCIDump - HCI packet analyzer ver 1.11
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request (0x04) plen 10
-  B5 52 3E 28 0A 00 04 22 52 01
-< HCI Command: Accept Connection Request (0x01|0x0009)
-plen 7
-  B5 52 3E 28 0A 00 01
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04
-> HCI Event: Connect Complete (0x03) plen 11
-  00 03 00 B5 52 3E 28 0A 00 01 00
-< HCI Command: Write Link Policy Settings
-(0x02|0x000d) plen 4
-  03 00 0F 00
-> HCI Event: Max Slots Change (0x1b) plen 3
-  03 00 05
-> HCI Event: Command Complete (0x0e) plen 6
-  01 0D 08 00 03 00
-< HCI Command: Change Connection Packet Type
-(0x01|0x000f) plen 4
-  03 00 18 CC
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 0F 04
-> HCI Event: Connection Packet Type Changed (0x1d)
-plen 5
-  00 03 00 18 CC
-> ACL data: handle 0x0003 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-< ACL data: handle 0x0003 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040
-result 0 status 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> ACL data: handle 0x0003 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x0000
-clen 4
-    MTU 1024
-< ACL data: handle 0x0003 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000
-result 0 clen 0
-< ACL data: handle 0x0003 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x0000
-clen 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> ACL data: handle 0x0003 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000
-result 0 clen 0
-> ACL data: handle 0x0003 flags 0x02 dlen 34
-    L2CAP(d): cid 0x0040 len 30 [psm 1]
-        SDP SSA Req: tid 0x1 len 0x19
-          pat uuid-16 0x1105 (OBEXObjPush)
-          max 0x80
-          aid(s) 0x0000 (SrvRecHndl) 0x0001
-(SrvClassIDList) 0x0002 (SrvRecState) 0x0006
-(LangBaseAttrIDList) 0x0009 (BTProfileDescList)
-          cont 00
-< ACL data: handle 0x0003 flags 0x02 dlen 45
-    L2CAP(d): cid 0x0040 len 41 [psm 1]
-        SDP SSA Rsp: tid 0x1 len 0x24
-          cnt 0x21
+root@franz:~ # hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:0B:0D:21:58:A4 ACL MTU: 339:4  SCO MTU: 64:0
+        Unsupported manufacturer
+
+
+#2: strange error in hcidump decode while running "sdptool search hs" :
+
+--------------------------------------------
+> ACL data: handle 0x0001 flags 0x02 dlen 27
+> ACL data: handle 0x0001 flags 0x01 dlen 25
+    L2CAP(d): cid 0x40 len 48 [psm 1]
+        SDP SSA Rsp: tid 0x0 len 0x2b
+          cnt 0x26
+ len 0x26 frm->len 0x26 n 0x54
           srv rec #0
             aid 0x0000 (SrvRecHndl)
-               uint 0x804eba8
+               uint 0x10000
             aid 0x0001 (SrvClassIDList)
-               < uuid-16 0x1105 (OBEXObjPush) >
-            aid 0x0009 (BTProfileDescList)
-               < < uuid-16 0x1105 (OBEXObjPush) uint
-0x100 > >
+               uuid-16 0x1108 (Headset) uuid-16 0x1203 (Audio)
+            aid 0x0004 (ProtocolDescList)
+               uuid-16 0x0100 (L2CAP)
+               uuid-16 0x0200 uint 0x200000000000000
 
-          cont 00
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> ACL data: handle 0x0003 flags 0x02 dlen 21
-    L2CAP(d): cid 0x0040 len 17 [psm 1]
-        SDP SA Req: tid 0x3 len 0xc
-          hndl 0x804eba8
-          max 0x80
-          aid(s) 0x0004 (ProtocolDescList)
-          cont 00
-< ACL data: handle 0x0003 flags 0x02 dlen 36
-    L2CAP(d): cid 0x0040 len 32 [psm 1]
-        SDP SA Rsp: tid 0x3 len 0x1b
-          cnt 0x18
-          aid 0x0004 (ProtocolDescList)
-             < < uuid-16 0x0100 (L2CAP) > <
-             uuid-16 0x0003 (RFCOMM) uint 0x2 > <
-             uuid-16 0x0008 (OBEX) > >
+ERROR: Unexpected syntax
 
-          cont 00
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> ACL data: handle 0x0003 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0041
-< ACL data: handle 0x0003 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041
-result 0 status 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> ACL data: handle 0x0003 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0041 flags 0x0000
-clen 4
-    MTU 2053
-< ACL data: handle 0x0003 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x0000
-result 0 clen 0
-< ACL data: handle 0x0003 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0041 flags 0x0000
-clen 4
-    MTU 1024
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> ACL data: handle 0x0003 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x0000
-result 0 clen 4
-    MTU 1024
-> ACL data: handle 0x0003 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs
-0x1c
-< ACL data: handle 0x0003 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> ACL data: handle 0x0003 flags 0x02 dlen 18
-  L2CAP(d): cid 0x0041 len 14 [psm 3]
-      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs
-0x70 mcc_len 8
-      dlci 4 frame_type 0 credit_flow 15 pri 0
-ack_timer 0
-      frame_size 667 max_retrans 0 credits 0
-< ACL data: handle 0x0003 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): DM: cr 1 dlci 4 pf 1 ilen 0 fcs 0xbc
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> ACL data: handle 0x0003 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-< ACL data: handle 0x0003 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> ACL data: handle 0x0003 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-< ACL data: handle 0x0003 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 03 00 01 00
-> HCI Event: Disconn Complete (0x05) plen 4
-  00 03 00 13 
+          srv rec #1
+
+ERROR: Unexpected syntax
+          srv rec #2
+
+[snip... get up to 35]
+
+ERROR: Unexpected syntax
+          cont 
+< ACL data: handle 0x0001 flags 0x02 dlen 26
+    L2CAP(d): cid 0x41 len 22 [psm 1]
+        SDP SSA Req: tid 0x1 len 0x11
+          pat uuid-16 0x1108 (Headset)
+          max 0xffff
+          aid(s) 0x0000 - 0xffff
+          cont 02 00 31 
+---------------------------------------------------
+
+#3 Tons of kernel messages when finished recording (btsco idle)
+
+Mar 31 00:21:19 localhost kernel: hci_scodata_packet: hci0 SCO packet
+for unknown connection handle 0
+Mar 31 00:21:27 localhost last message repeated 39430 times
+--------------------------------------------------
+
+I omitted the output that i thought was less important, hoping not to
+clutter the message too much.
+THANKS A LOT to anyone who can help me solve this problem,
+
+Francesco
 
 
->what have you done? what"s the error message? which
-part >failed?
 
-> Hi all,
-> I am trying for file transfer between PC and
-MOTOROLA
-> mobile-E398 over bluetooth.I am having linux-2.4.20
-> kernel with blueZ libs, utilis,openobex and obexftp
-> compiled. I am able to transfer(put) images from PC
-to
-> mobile using obexftp but NOT FROM MOBILE TO PC. Can
-> any one suggest me solution or where I went wrong?
+# follows the output from a couple of diag commands
+
+root@franz:~ # hciconfig hci0   
+hci0:   Type: USB
+        BD Address: 00:0B:0D:21:58:A4 ACL MTU: 339:4  SCO MTU: 64:0
+        UP RUNNING PSCAN ISCAN 
+        RX bytes:867 acl:10 sco:0 events:50 errors:0
+        TX bytes:849 acl:7 sco:0 commands:36 errors:0
+
+root@franz:~ # sdptool search hs
+Inquiring ...
+Searching for hs on 00:03:89:43:2A:58 ...
+Service Name: HS-Audio
+Service RecHandle: 0x10000
+Service Class ID List:
+  "Headset" (0x1108)
+  "Generic Audio" (0x1203)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 1
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Headset" (0x1108)
+    Version: 0x0100
 
 
-________________________________________________________________________
-Yahoo! India Matrimony: Find your life partner online
-Go to: http://yahoo.shaadi.com/india-matrimony
+
+
 
 
 -------------------------------------------------------
