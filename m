@@ -1,59 +1,49 @@
-Return-Path: <SRS0+9677ac3b03026936ed9b+262+infradead.org+dwmw2@pentafluge-190310.srs.infradead.org>
-Subject: Re: [Bluez-devel] autoconf breaks portability. Film at 11.
+Return-Path: <SRS0+a3816589f1f72d698319+262+infradead.org+dwmw2@pentafluge-185632.srs.infradead.org>
+Subject: Re: [Bluez-devel] bluez-utils 2.7 default configuration
 From: David Woodhouse <dwmw2@infradead.org>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1084382619.25099.81.camel@pegasus>
-References: <1084268833.11301.0.camel@hades.cambridge.redhat.com>
-	 <1084368666.25099.38.camel@pegasus>
-	 <1084369122.4426.106.camel@hades.cambridge.redhat.com>
-	 <1084369703.25099.56.camel@pegasus>
-	 <1084371089.4426.148.camel@hades.cambridge.redhat.com>
-	 <1084382619.25099.81.camel@pegasus>
+Cc: "Nicholas A. Preyss" <nalp@gmx.net>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1084383929.25099.94.camel@pegasus>
+References: <20040511192919.GB28581@gmx.net>
+	 <1084368229.25099.26.camel@pegasus>
+	 <1084371486.4426.156.camel@hades.cambridge.redhat.com>
+	 <1084382445.25099.77.camel@pegasus>
+	 <1084382743.4426.351.camel@hades.cambridge.redhat.com>
+	 <1084382951.25099.89.camel@pegasus>
+	 <1084383201.4426.374.camel@hades.cambridge.redhat.com>
+	 <1084383929.25099.94.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1084384989.4426.450.camel@hades.cambridge.redhat.com>
+Message-Id: <1084384590.4426.428.camel@hades.cambridge.redhat.com>
 Mime-Version: 1.0
-Date: Wed, 12 May 2004 19:03:09 +0100
+Date: Wed, 12 May 2004 18:56:31 +0100
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Wed, 2004-05-12 at 19:23 +0200, Marcel Holtmann wrote:
-> Hi David,
-> 
-> > I sent you proper Makefiles a long time ago. You didn't apply them :)
-> 
-> must have missed it. Please send it again.
+On Wed, 2004-05-12 at 19:45 +0200, Marcel Holtmann wrote:
+> I am thinking of a dynamic and generic config interface to every daemon,
+> but this is far from any real code at the moment. So feel free to do
+> what you think is the best for Fedora. But if you change too much, then
+> keep an eye on the BlueZ mailing lists for Fedora specific questions
+> that I can't and actually that I won't answer.
 
-It was October 2002. I don't seem to be able to find my list archives
-from then -- it's possible I wasn't subscribed at the time, although
-that surprises me.
+It's basically only the init scripts in which my packages differ now, I
+believe. Just about everything else I had in patches is now in CVS --
+most of it a long time ago; I don't know why the swave array overflow
+slipped through the cracks. 
 
-http://sourceforge.net/mailarchive/message.php?msg_id=2348496
-http://sourceforge.net/mailarchive/message.php?msg_id=2360924
+/me checks... oh, you probably want this one too...
 
-ftp://ftp.uk.linux.org/pub/people/dwmw2/random/bluez-makefiles-3.tar.gz
-
-I'd have to update them and there were a couple of missing features
-('make DESTDIR=xx install' comes to mind) but I'm more than happy to do
-so if you're interested. 
-
-> > configure.in:19: required file `./ltmain.sh' not found
-> > compat/Makefile.am: installing `./depcomp'
-> 
-> but this isn't a problem. It says something like that, but also creates
-> every file that it complains about.
-
-hades /hades/bluez/libs2 $ ./configure
--bash2: ./configure: No such file or directory
-
-> Actually I think I have fixed it in both packages. The different between
-> them is that the byteswap is done in libs2 and not utils2, while it is
-> done in utils and not libs. Please reinstall libs2 from CVS and check
-> again.
-
-'cvs up' shows no changes since I tested, in either libs2 or utils2.
-
-Will try again to eliminate user error in the morning. Three hours of
-phone conferences just melted my brain...
+--- bluez-utils-2.7/pcmcia/bluetooth.orig	2004-05-11 22:58:08.557536120 +0100
++++ bluez-utils-2.7/pcmcia/bluetooth	2004-05-11 22:57:03.442435120 +0100
+@@ -25,7 +25,7 @@
+     IRQ=`setserial /dev/$DEVICE | sed -e 's/.*IRQ: //'`
+     setserial /dev/$DEVICE irq 0 ; setserial /dev/$DEVICE irq $IRQ
+  
+-    /sbin/hciattach $DEVICE $MANFID > /tmp/pcmcia
++    /sbin/hciattach $DEVICE $MANFID
+ }
+ stop_serial() {
+     do_fuser -k -HUP /dev/$DEVICE > /dev/null
 
 
 -- 
