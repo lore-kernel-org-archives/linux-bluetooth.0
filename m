@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Florian Echtler <echtler@fs.tum.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.61.0501061130420.17785@block.bubble>
+Message-ID: <003701c4f3d9$fa562960$0300a8c0@supercomputer>
+From: "D.W." <sword@gmx.de>
+To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] Some general HID questions..
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0034_01C4F3E2.589C8E30"
+Subject: [Bluez-users] Who is master?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,35 +17,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 6 Jan 2005 12:05:31 +0100 (CET)
+Date: Thu, 6 Jan 2005 11:24:54 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+This is a multi-part message in MIME format.
 
-Hello everybody!
+------=_NextPart_000_0034_01C4F3E2.589C8E30
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-As it was recently discussed on this list, the newly released
-kernel 2.6.10 doesn't feature report mode support for BT HID devices
-any more, and neither do the -mh patches. I've just had a look at
-the vanilla sources, and they seem heavily stripped down compared
-to 2.6.9-mh1.
+My apoligies if this is not an appropriate question.
+Can I check who is master and who is slave during a connection?
+Regards Daniel
 
-Am I correct to assume that this happened because a universal HID
-parser (suitable for USB and Bluetooth and whatnot) will be introduced 
-in the near future? If so, I'd like to know more about that and would
-consider helping, too. Could somebody give me some pointers where
-to start (e.g. who's developing the universal parser)?
+------=_NextPart_000_0034_01C4F3E2.589C8E30
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks, yours, Florian
-- -- 
-Homo homini lupus.
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2600.0" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>My apoligies if this is not an =
+appropriate=20
+question.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>Can I check who is master and who is =
+slave during a=20
+connection?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>Regards =
+Daniel</FONT></DIV></BODY></HTML>
 
-iD8DBQFB3RuA7CzyshGvatgRAhyQAJ4zLUjzdDw/0KZoWa3dkKJt/E0nwwCdFfg3
-m/UzE8fVdnsr7L4kgHkLsZI=
-=tF5m
------END PGP SIGNATURE-----
+------=_NextPart_000_0034_01C4F3E2.589C8E30--
+
 
 
 -------------------------------------------------------
