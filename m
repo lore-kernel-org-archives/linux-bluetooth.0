@@ -1,6 +1,6 @@
 Return-Path: <maxk@qualcomm.com>
-Message-Id: <5.1.0.14.2.20030519141834.0951b330@unixmail.qualcomm.com>
-Date: Mon, 19 May 2003 14:19:22 -0700
+Message-Id: <5.1.0.14.2.20030519140835.050ef830@unixmail.qualcomm.com>
+Date: Mon, 19 May 2003 14:17:46 -0700
 To: "Daryl Van Vorst" <daryl@wideray.com>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
 From: Max Krasnyansky <maxk@qualcomm.com>
 Subject: RE: [Bluez-devel] Qualification Testing
@@ -11,35 +11,24 @@ Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-At 11:01 AM 5/16/2003, Daryl Van Vorst wrote:
->Max,
->
->> >> I sent the above quote to Cetecom last week. They responded
->> >> saying that MTU isn't the only negotiated parameter.
->> 
->> FlushTO _must_ be 0xffff for reliable ACL link. So far none 
->> of the profiles specified use of unreliable links. 
->> 
->> Support for QOS is totally optional. We're only required to 
->> support 'best effort'. Which means that even if they want 
->> something other than 'best effort' (i.e. they reject 
->> default settings) we won't be able to accept it simply 
->> because we don't support it.
->> 
->> So I'm not sure what can be negotiated there. 
->
->Ok. I'll see what they say about that too.
->
->> btw Can this fancy Merlin viewer export trace in plain text ? 
->> I'm too lazy to install that stuff. And it looks like I need to see 
->> what is it exactly that they request/reject.
->
->
->Before we start the test, we must specify to the tester the parameters that
->we'll accept. The tester will reject the first set of values, no matter what
->they are. In its response it will send new values (which we specify) that it
->expects to see in the next request from the IUT.
+We now have full support for SO_LINGER socket option (2.4 BK is already updated). 
+I also added -L option and some more error checking to l2test and rctest.
 
-Any updates on this one ?
+./l2test -L 60 -s -b 1000 -N 10 
+this will enabled SO_LINGER for 60 seconds and report an error if channel disconnect
+timed out or failed for any other reason.
+
+I tested it with HCIEmu and everything seems to work as expected.
+
+btw Regarding RFCOMM disconnect problem that Marcel mentioned. I check the spec again
+and it's indeed option to send DISC for DCL 0.
+
+"5.2.2 Close-down procedure
+The device closing the last connection (DLC) on a particular session is responsible
+for closing the multiplexer by closing the corresponding L2CAP channel.
+Closing the multiplexer by first sending a DISC command frame on DLCI 0 is
+optional, but it is mandatory to respond correctly to a DISC (with UA response)."
+
+So I think it's ok that we don't wait for UA response before closing L2CAP channel.
 
 Max
