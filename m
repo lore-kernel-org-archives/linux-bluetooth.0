@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <418B2B9F.7000703@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <00cc01c4c2a3$9f888a80$0300a8c0@supercomputer>
+From: "D.W." <sword@gmx.de>
+To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: Matthias Thomae <bluez@thomae-privat.de>
-CC: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] News: Stereo BT Headset from BlueTake
-References: <416D8520.5060102@thomae-privat.de>
-In-Reply-To: <416D8520.5060102@thomae-privat.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_00C9_01C4C2AC.00D44010"
+Subject: [Bluez-users] Fw: Network Access Point - pairing problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,53 +17,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Nov 2004 00:28:31 -0700
+Date: Thu, 4 Nov 2004 20:22:27 +0100
 
-Matthias
+This is a multi-part message in MIME format.
 
-FYI, I bought this headset at btboutique.com. It is pretty nice. There's 
-a perceptible delay in encoding, so you can't use the encoder dongle 
-plugged into a tv without some annoyance with lipsync problems. 
-Hopefully that would be improved with a computer doing the encoding.
+------=_NextPart_000_00C9_01C4C2AC.00D44010
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-I've been able to use the current bluetooth-alsa with the headset for 
-voice-quality audio. I've started reading about A2DP and would love to 
-get that working. (Interesting... no cellphone or version of Pocketpc or 
-windows xp has A2DP it seems. Who does have it?)
+Thank you again.
+Best regards,
+Daniel
 
-The multiple pairing is interesting. If you thought pairing a headset 
-with no display to ONE device was confusing, this is worse :) Clicking 
-the connect button seems to make it connect to the most recently used 
-device that is NOT the dongle. It usually does the right thing but if I 
-get a call while listening to music through the dongle, it takes a while 
-(and sometimes fiddling with buttons) after the call is over for the 
-headset to switch back to the dongle.
+------=_NextPart_000_00C9_01C4C2AC.00D44010
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Brad
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2600.0" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2><FONT face=3D"Times New Roman" =
+size=3D3>Thank you=20
+again.</FONT></FONT></DIV>
+<DIV style=3D"FONT: 10pt arial"><FONT face=3D"Times New Roman" =
+size=3D3>Best=20
+regards,</FONT></DIV>
+<DIV style=3D"FONT: 10pt arial"><FONT face=3D"Times New Roman"=20
+size=3D3>Daniel</FONT></DIV></BODY></HTML>
 
-> If anyone's interested in A2DP devices, I just came across this news (in 
-> German): http://www.heise.de/newsticker/meldung/52119
-> 
-> I couldn't find it at ARP, but at expansys:
-> http://www.expansys.de/product.asp?code=114076
-> 
-> This feature seems interesting:
-> "Multiple Pairing : Max. 5 different Bluetooth enabled devices"
-> Haven't seen this with any BT Headset before.
-> 
-> Regards
-> Matthias
-> 
-> 
-> -------------------------------------------------------
-> This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
-> Use IT products in your business? Tell us what you think of them. Give us
-> Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
-> http://productguide.itmanagersjournal.com/guidepromo.tmpl
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+------=_NextPart_000_00C9_01C4C2AC.00D44010--
+
 
 
 -------------------------------------------------------
