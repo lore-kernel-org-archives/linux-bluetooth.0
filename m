@@ -1,12 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: multi rfcomm/sco connection
+Subject: Re: [Bluez-devel] AVDTP socket?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <003101c4ca02$b9f20d90$6f04a8c0@ZBOX>
-References: <20041110041405.3CC331D4758@sc8-sf-uberspam1.sourceforge.net>
-	 <003101c4ca02$b9f20d90$6f04a8c0@ZBOX>
+In-Reply-To: <41970F25.4020902@xmission.com>
+References: <418DB442.2050801@uen.org> <1099830449.6896.14.camel@pegasus>
+	 <418E4E9C.8070100@xmission.com> <1099846462.6896.26.camel@pegasus>
+	 <418E6FBF.3090409@xmission.com> <1099863224.6896.57.camel@pegasus>
+	 <4191AB4B.8060701@xmission.com> <1100076431.25879.49.camel@pegasus>
+	 <41925793.3050404@xmission.com> <1100113055.25879.73.camel@pegasus>
+	 <419543B3.8050601@xmission.com> <1100306337.7349.29.camel@pegasus>
+	 <41957BC1.507@xmission.com> <1100351199.7349.50.camel@pegasus>
+	 <41970F25.4020902@xmission.com>
 Content-Type: text/plain
-Message-Id: <1100446527.21403.23.camel@pegasus>
+Message-Id: <1100446172.21403.16.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,63 +25,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 14 Nov 2004 16:35:27 +0100
+Date: Sun, 14 Nov 2004 16:29:32 +0100
 
-Hi Suriyan,
+Hi Brad,
 
-> I just found the way to work with three headsets over only one
-> Bluetooth dongle by a few hardcoded to BlueZ:-
+> Argh... I'm stuck again. the avdtp_set_configuration command goes out 
+> but reading the response just blocks. I'm not sure what is wrong... I send:
 > 
-> 1. force alternate setting of USB interface number 1, isochronous
->     endpoint to 5 (3 voice channels with 16 bit encoding)
-> 
-> when three SCO channels connected (by run three hsplay consecutively)
-> I found each incoming SCO HCI frame size up to 144 bytes (as I known
-> previously one voice channel with 16-bit encoding SCO HCI frame size
-> equals 48 bytes so that three channels 48 * 3 = 144 bytes)
-> 
-> This mean one HCI frame to transmit/receive for each SCO channel
-> over USB isochronous endpoint when three SCO channels were
-> connected have frame size equals 144 bytes + 3 bytes header
-> (handle and size) but I not sure this is CSR specific since Bluetooth
-> HCI USB transport specification (H:2) have not details in this point,
-> define only suggested Max Packet Size of each USB frame for transport
-> SCO HCI frame.
+>   00 -> header = request
+>   03 -> AVDTP_SET_CONFIGURATION
+>   04 -> acp_seid = 1
+>   04 -> int_seid = 1 (how should I choose the int_seid?)
+>   01 -> service category = media transport
+>   00 -> length of service capabilities = 0
+>   07 -> capability type = media codec
+>   06 -> bytes remaining? not sure if this is right.
+>   00 -> media type = audio media type
+>   00 -> media codec type = SBC
+>   22 -> 44.1khz stereo
+>   15 -> 16-byte blocks, 8 subbands, "loudness" allocation
+>   02 -> min bitpool
+>   fa -> max bitpool
 
-looks reasonable to me, but I've neever done this before.
+I think you really need to fill in the transaction number in the header
+byte. So it should be 0x00, 0x10, 0x20, 0x30 etc.
 
-> This cause I must do the second step,
-> 
-> 2. bypass checking (skb->len > hdev->sco_mtu) in function
->     hci_send_sco(...) [hci_core.c] and (len > conn->mtu) in
->     function sco_send_frame(...) [sco.c]
->     *** I just think, this step maybe change by hciconfig tool. ***
+The bytes remaining value is right.
 
-This is wrong. If the MTU increases with a different voice setting then
-you have to change the check to depend on the voice setting value.
-
-> Next step, I would like to fixed to dynamicaly change the alternate setting
-> by looking for previous thread "question about hci_usb endpoint
-> selection..." as you known in notify() cannot call usb_set_interface()
-> since always in_interrupt() so that I would like to purpose to add ioctl()
-> into hci_usb driver to do this or do you have others better approach?
-
-The ioctl() way is a no go. You have everything you must know inside the
-kernel. You know the number of SCO connections and the voice setting and
-the driver must be able to deal with this by itself.
-
-> Last, I found new problem when three SCO channels were connected
-> ACL links (RFCOMM) that also connected to three Headset for control have
-> very long response time (sometime up to 10 seconds or more to appear
-> after I pressed a button on Headset). What are the sources of this problem?
-> - Bandwidth limitation of Bluetooth and theirs packet type?
-> - Implementation of Bluetooth firmware on USB dongle?
-> - Implementation of USB stack on Linux?
-> - Implementation of BlueZ stack?
-
-It is maybe a firmware/chip limitation or a limitation of the piconet
-itself, because SCO channels have reserved bandwith and then may nothing
-is left for the ACL links.
+>>From sniffing the connection between the sender and receiver of my
+Aiptek devices I see that they use 0x22 0x46 for the SBC setting. And
+this is 44.1kHz, stereo, blocklen 64, 8 subbands, SNR if I decoded it
+correct.
 
 Regards
 
