@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Qualification testing.
+Subject: Re: [Bluez-devel] About rfcomm socket
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <002501c4d73d$2cd35200$1a01010a@baked>
-References: <002501c4d73d$2cd35200$1a01010a@baked>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41AD2B86.6010002@avantwave.com>
+References: <41AD2B86.6010002@avantwave.com>
 Content-Type: text/plain
-Message-Id: <1101883367.18840.31.camel@pegasus>
+Message-Id: <1101882506.18840.18.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,46 +19,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 07:42:46 +0100
+Date: Wed, 01 Dec 2004 07:28:26 +0100
 
-Hi Daryl,
+Hi Mike,
 
-> Another round of qualification testing has begun. The results so far seem
-> much less painful this time. :)
-> 
-> So far there is one definite failure. There are a couple others which are
-> being debated. All of these have appeared because the tests have changed
-> slightly since (or weren't required) the last time we tested.
+>     I have tried to fork two process, One use socket system call - 
+> accept at rfcomm channel 2, and another try to connect to a bluetooth 
+> device thought channel 3. But i found that i can not use a 3rd device to 
+> connect to the listen channel 2 at the same time.
 
-lets go ahead and fix them all.
+show us the source code for that.
 
-> Test COS/CFD/BV-12 fails because the IUT does not send result=3 in an l2cap
-> config response upon reception of an unknown option. Apparently we didn't
-> have to do this test last time. And it's clear in the code why it fails:
-> l2cap.c: /* FIXME: Reject unknown option */
-> 
-> I noticed in the spec that the response must contain the offending options:
-> 
-> "On an unknown option failure (Result=0x0003), the option types not
-> understood
-> by the recipient of the Request must be included in the Response.
-> Note that hints (defined in Section 6 on page 297), those options in the
-> Request that are skipped if not understood, must not be included in the
-> Response and must not be the sole cause for rejecting the Request."
-> 
-> I've been staring at the code pondering how to fix this cleanly. I've
-> attached an attempt at fixing it. The fix is not quite complete because I
-> believe it has a buffer overflow vulnerability. It is not fully tested
-> either. But I figured it was best to run it by you before going too far
-> because more than likely you'll want to change something. ;)
+>     I am using bluez-lib-2.6, utils-2.6. ,hci-uart and linux-2.4.18 
+> patched with patch-2.4.18-mh15.
 
-to be honest, I am already aware of this problem. I ran into it when I
-first started to look at the support for L2CAP retransmission and flow
-control. Our current way of handling the configuration must be changed
-to deal better with L2CAP 1.2 devices and their features. It is not that
-easy to change and my time was too limited for it. However I am open for
-any ideas and I am sorry to say that, but your patch looks like a dirty
-hack.
+The bluez-libs and bluez-utils are at version 2.11 and you should update
+both of them.
+
+>     My question is simple, Could bluez be multi-tasking?
+
+You may not be able to do some crazy things, but in general yes.
 
 Regards
 
