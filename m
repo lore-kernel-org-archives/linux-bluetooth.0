@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bt on acer problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41C38758.5030106@paranoici.org>
-References: <41C38758.5030106@paranoici.org>
-Content-Type: text/plain
-Message-Id: <1103473035.29892.16.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: Grzegorz <wolo@neostrada.pl>
+Message-ID: <loom.20041218T174605-875@post.gmane.org>
+References: <loom.20041216T200707-397@post.gmane.org>  <1103227435.6325.17.camel@notepaq> <loom.20041216T232049-49@post.gmane.org> <1103293823.28046.104.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: PAN connection: palmtop -> linux -> internet
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,22 +17,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 19 Dec 2004 17:17:15 +0100
+Date: Sat, 18 Dec 2004 16:51:52 +0000 (UTC)
 
-Hi,
+> 
+> Hi Grzegorz,
+> 
+> read our PAN howto or look at the bridge howto.
+> 
 
-> i still have problem detecting my bt on my acer tm 4501
-> i have installet the acerhk module, and echoed in blueled.. the output
-> on dmesg is  acerhk: enabling Bluetooth via EC variant 1
-> but i still didnt see anything in lsusb ...
-> loading bt modules is useless
+Thank You .. I dont know why I had not looked into those howtos ..
+but now I have another problem .. when my palmtop connects to Linux
+after a while I'm disconnected from internet on my palmtop and on my
+desktop computer .. when I try to ping my Linux server I have timeouts
+and only hard reset helps me. I looked in /var/log/messages .. errors
+and kernel and I couldnt find anything related to this problem .. this
+could be a problem with a iptables? My LAN network is 192.168.0.0 and
+network for palmtop is 192.168.1.0.
 
-what do you actually see in "/proc/bus/usb/devices"?
-
-Regards
-
-Marcel
-
+Thank You for Your time
 
 
 
