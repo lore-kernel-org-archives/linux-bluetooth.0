@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Daniel Haensse <haensse@swissembedded.com>
-Reply-To: Daniel Haensse <haensse@swissembedded.com>
-To: bluez-devel@lists.sourceforge.net
+Reply-To: <halam.rose@7layers-uk.com>
+From: "Halam Rose" <halam.rose@7layers-uk.com>
+Cc: <bluez-devel@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] CF cards capable of 1Mbps?
+Message-ID: <MGEGKHCLDAFHMAIHGKNCAEPGGBAA.halam.rose@7layers-uk.com>
 MIME-Version: 1.0
-Message-Id: <200309042240.32662.haensse@swissembedded.com>
-Subject: [Bluez-devel] Can't init device hci0. No such device(19)
+Content-Type: text/plain;
+	charset="iso-8859-1"
+In-Reply-To: <1063111685.32473.425.camel@hades.cambridge.redhat.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -12,83 +15,78 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 4 Sep 2003 22:40:32 +0200
-Content-Type: text/plain; CHARSET=us-ascii
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 9 Sep 2003 14:47:52 +0100
 
-Hi list,
+1 Mbps is the bulk data rate but there are overheads so only 723Kbps is
+possible with any Bluetooth link.
 
-I  have cross compiled bluez stack for uclinux on 68knommu platforms. So fa=
-r,=20
-the utils are "executable".=20
-I had to make a couple of changes (background):
-- I did subsitute fork with vfok which is not implemented on uclinux.
-- Totally ripped off all the make files to fit it into the distro tree
-- We have /dev read only on our romfs.
-- Made some entries for the conf files on the romfs
-- Enabled all kernel bluez stuff (without module support)
-- I use some Mitsumi modules, which use a csr chip. (The modules work fine =
-on=20
-my SuSE 8.0 notebook.)
+Halam
 
-The problem is now:
-I can start hcid, but when I try to start hciattach, I can see=20
-Can't init device hci0. No such device(19) in /var/log/messages (see below =
-the=20
-log)
+-----Original Message-----
+From: David Woodhouse [mailto:dwmw2@infradead.org]
+Sent: 09 September 2003 13:48
+To: Nils Faerber
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] CF cards capable of 1Mbps?
 
 
-any idea?
+On Tue, 2003-09-09 at 14:20 +0200, Nils Faerber wrote:
+> The fact that the UART of the CF card sais it would run at 115kbps does
+> not at all mean that the actual data throughput is only 115kbps.
+> For example we have a Brainboxes CF card which you set to 115kbps but
+> actually uses 1Mbps between the UART and the CSR chipset then. The UART
+> clock is simply higher so that a devider for 115kbps results in 1Mbps.
+> Only if your OS tries to setup something based on the baudrate you would
+> be in trouble here. Linux has no problems with the extra bitrate.
 
-regards
+This is true. Which is why I confirmed with BNEP bandwidth tests that I
+only get about 9-10Kbps transfer rate, and checked what speed the CSR
+chip thinks it's talking at too...
 
-Dani
+ # pskey -d /dev/tts/0 -b
+Physical device :/dev/tts/0
+Speed           :115200
+Use BCSP        :YES
+Initiating read thread
+BT SYS: Initializing BCSP
+BT SYS: BCSP initialized and syncronized
+Synchronized
+Successfully read firmware info.
+ Firmware version: 272
+pskey>191
+Key 0191 length 10
+01d8 0006 00fa 0014 0004 0000 0004 001e 0064 000a
+
+The information about the Brainboxes card is appreciated -- thanks.
+http://www.brainboxes.com/products/bluetooth/product.asp?id=BL-565
+says only 721Kbps, but that'll do me fine; I'll see if I can find one of
+those for slightly less than the insane amount of money they seem to
+claim is the recommended price.
+
+I had a Cyberblue BLUE-CF01 which had a baud_base of 1152000, but the
+first one went back due to radio-side reliability problems -- only about
+1 in 5 times would it detect and correctly get name from my phone which
+was sitting right next to it. The second one was better for a while, but
+then started to lose RX characters, until last week it finally gave up
+completely and I don't receive _anything_ from the CSR chip. I don't
+think I want another of those :)
+
+--
+dwmw2
 
 
----------------------------------------------------------------------------=
--------
-BlueZ HCI UART driver ver 2.1 Copyright (C) 2000,2001 Qualcomm Inc
-Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
-NET4: Linux TCP/IP 1.0 for NET4.0
-IP Protocols: ICMP, UDP, TCP
-kmem_create: Forcing size word alignment - ip_dst_cache
-IP: routing cache hash table of 512 buckets, 4Kbytes
-TCP: Hash tables configured (established 2048 bind 2048)
-NET4: Unix domain sockets 1.0/SMP for Linux NET4.0.
-BlueZ L2CAP ver 2.1 Copyright (C) 2000,2001 Qualcomm Inc
-Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
-BlueZ SCO ver 0.3 Copyright (C) 2000,2001 Qualcomm Inc
-Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
-BlueZ RFCOMM ver 1.0
-Copyright (C) 2002 Maxim Krasnyansky <maxk@qualcomm.com>
-Copyright (C) 2002 Marcel Holtmann <marcel@holtmann.org>
-BlueZ BNEP ver 1.1
-Copyright (C) 2001,2002 Inventel Systemes
-Written 2001,2002 by Clement Moreau <clement.moreau@inventel.fr>
-Written 2001,2002 by David Libault <david.libault@inventel.fr>
-Copyright (C) 2002 Maxim Krasnyanskiy <maxk@qualcomm.com>
-VFS: Mounted root (romfs filesystem) readonly.
-eth0: using half-duplex 10Base-T (RJ-45)
 
-dragonix login: root
-Password:
-# hcid -n &
-30
-# hcid[30]: HCI daemon ver 2.3 started
-
-# hciattach /dev/ttyS1 csr 115200 flow
-CSR build ID 0x01-0x75
-ttyS1 console mode off
-hcid[30]: HCI dev 0 registered
-hcid[32]: Can't init device hci0. No such device(19)
-
-hcid[30]: HCI dev 0 unregistered
-#
-
+-------------------------------------------------------
+This sf.net email is sponsored by:ThinkGeek
+Welcome to geek heaven.
+http://thinkgeek.com/sf
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
