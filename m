@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] RFCOMM Question
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Kasimir =?ISO-8859-1?Q?M=FCller?= <Kasimir.Mueller@t-online.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <403B7FA5.4050607@gmx.de>
-References: <403B7FA5.4050607@gmx.de>
-Content-Type: text/plain
-Message-Id: <1077642423.2919.18.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <403B7FA5.4050607@gmx.de>
+From: Kasimir.Mueller@t-online.de (=?ISO-8859-15?Q?Kasimir_M=FCller?=)
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Content-Type: multipart/mixed;
+ boundary="------------060906020308040502030500"
+Subject: [Bluez-users] RFCOMM Question
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,31 +16,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 24 Feb 2004 18:07:03 +0100
+Date: Tue, 24 Feb 2004 17:45:25 +0100
 
-Hi Kasimir,
+This is a multi-part message in MIME format.
+--------------060906020308040502030500
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> 1.) How many RFCOMM-Connections can be made to a single usb-Stick on Linux
+Hi Marcel,
+I two simple Questions :
+1.) How many RFCOMM-Connections can be made to a single usb-Stick on Linux
+2.) Is there a timeout which closes the connection, if there ist no 
+traffic for a certain time.
 
-you can have up to 30 connections per direction per ACL link.
+We plan to connect 10 devices via serial connections to a single server
+to transmit periodically data.
 
-> 2.) Is there a timeout which closes the connection, if there ist no 
-> traffic for a certain time.
+Thanks in advance,
 
-No.
+Kasimir
 
-> We plan to connect 10 devices via serial connections to a single server
-> to transmit periodically data.
+--------------060906020308040502030500
+Content-Type: text/x-vcard; charset=utf8;
+ name="Kasimir.Mueller.vcf"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="Kasimir.Mueller.vcf"
 
-This is different from the number of RFCOMM connections, because you can
-only connect up to 7 seven active slaves at the same time. But with each
-slave you can have 30 RFCOMM connection in each direction.
+begin:vcard
+fn;quoted-printable:Kasimir M=C3=BCller
+n;quoted-printable:M=C3=BCller;Kasimir
+email;internet:Kasimir.Mueller@gmx.de
+x-mozilla-html:FALSE
+version:2.1
+end:vcard
 
-Regards
 
-Marcel
-
-
+--------------060906020308040502030500--
 
 
 -------------------------------------------------------
