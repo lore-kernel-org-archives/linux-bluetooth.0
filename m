@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041016065031.39199.qmail@web60406.mail.yahoo.com>
-From: Murat Bog <murat_bog@yahoo.com>
-Reply-To: murat_bog@yahoo.com
+From: Matthias Albert <matthias@ma-c.de>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Packages to Use For Zaurus SL-6000L
+Content-Type: text/plain
+Message-Id: <1097845922.12708.16.camel@ringo.aicas.burg>
+Mime-Version: 1.0
+Subject: [Bluez-users] rfcomm pppd
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,31 +15,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 15 Oct 2004 23:50:31 -0700 (PDT)
+Date: 15 Oct 2004 15:12:02 +0200
 
 Hello,
 
-I am wondering which combination of Bluez packages I
-should be installing on a Zaurus 6000L with factory
-configuration(2.4.18-rml7-pxa3-embedix with ROM
-version 1.12) to work with an AmbiCom BT2000CF card.
+now I'm able to establish a connection from my ipaq (running familiar)
+to my notebook (linux, debian host).
 
-The latest set of packages do not seem to be working
-together.  When I install bluez-utils-2.10_arm.ipk, it
-reports a dependency error when used with
-bluez-kernel-2.4.18-mh15_arm.ipk and
-bluez-libs-2.10_arm.ipk.
+hcitool scan -> list of all available bluetooth devices
+ -> select the one I need
+sdptool browse <bluetoothadress> -> gives me list of all availble
+profiles
 
-I also see that when I run "/etc/rc.d/init.d/bluetooth
-start" command, I get the following message:
+rfcomm connect 0 <bluetoothadress> 1 -> do a serial connection to my bt
+device
 
-"Starting Bluetooth subsystem:/usr/sbin/hcid: error
-while loading shared libraries: libsdp.so.2: cannot
-load shared object file: No such file or directory"
+rfcomm show -> give me a list of established connections
 
-Thanks,
+So everytime I do this, the pppd is starting. If nothing happens the
+connection will be closed. Where can I define which program should be
+started? I don't want that pppd is starting. I want to see with minicom
+what happen on the device. Do you know what I mean?. So where can I
+define this?
 
-Murat Bog
+Kind regards,
+
+Matthias
 
 
 
