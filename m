@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050303141105.35566.qmail@web40610.mail.yahoo.com>
-From: Paolino paperino <vonzoltan@yahoo.it>
-Subject: Re: [Bluez-users] Zaurus SL6000 & Socket CF
+Message-ID: <20050304091649.92513.qmail@web60910.mail.yahoo.com>
+From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: 6667
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=big5
+Subject: [Bluez-users] Adding SDP profiles
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,89 +16,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 3 Mar 2005 15:11:05 +0100 (CET)
+Date: Fri, 4 Mar 2005 17:16:48 +0800 (CST)
+
+Hi all!
+    Now I got the way to do for connecting T610 to
+Linux PC. It is to add SDP profile for headset into a
+program including main function in sdptool.c. But I
+don't have any idea of how to do it i.e. add the
+profile. So, can anyone tell me how I can add the
+profile? Here is the information when I typed "sdptool
+browse" for T610.
+Service Name: Voice gateway
+Service RecHandle: 0x10002
+Service Class ID List:
+  "Headset Audio Gateway" (0x1112)
+  "Generic Audio" (0x1203)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 3
+Profile Descriptor List:
+  "Headset" (0x1108)
+    Version: 0x0100
 
 
---- Erwin Authried <eauth@softsys.co.at> wrote:
-> Am Don, den 03.03.2005 schrieb Paolino paperino um
-> 12:48:
-> > --- Erwin Authried <eauth@softsys.co.at> wrote:
-> > > Am Don, den 03.03.2005 schrieb Paolino paperino
-> um
-> > > 12:07:
-> > > > Hi!
-> > > > I've installed on my Zaurus this ipk from
-> Bluez
-> > > site:
-> > > > bluez-libs_2.8
-> > > > bluez-hcidump 1.9
-> > > > bluez-utils 2.8
-> > > > bluez-kernel-2.4.18-mh14
-> > > > 
-> > > > I've loaded the modules by hand with insmod
-> > > > hci_uart
-> > > > bluez
-> > > > l2cap
-> > > > 
-> > > > now i must  attach to the serial device:
-> > > > hciattach /dev/ttySX socket
-> > > > As X i tried 0 and 1 and this get me this
-> error:
-> > > "BCSP
-> > > > initialization timeout".
-> > > > 
-> > > > If as X i use 2, 3 i get "Can't open serial
-> port:
-> > > No
-> > > > such device"
-> > > > 
-> > > > without hciattaching i can't use Bluez,
-> anybody
-> > > could
-> > > > hilight me?
-> > > > Thannk's
-> > > > Best regards 
-> > > >  Andrea S.
-> > > have you loaded serial_cs first? The kernel will
-> > > report the tty that is
-> > > used for the CF card.
-> > > 
-> > > Regards,
-> > > Erwin
-> > 
-> > No but, my zaurus has got it insmod serial_cs
-> fails to
-> > find the module...where can i get it?
-> > 
-> > Andrea S.
-> > 
-> you have to enable standard (8250/16550) serial
-> support as well as
-> pcmcia serial support in the kernel. The module will
-> be placed into
-> modules/pcmcia.
-> 
-> Regards,
-> Erwin
-> 
-Thank's
-i think zaurus come with a kernel with serial support
-compiled into, my modules/pcmcia contains 3 object
-files:
-memory_cs.o
-prism2_cs.o
-sharpzdc_cs.o
-I loaded prism2 and also sharpzdc_cs but nothing
-change...exists a precompiled kernel in ipk form, or i
-should download , cross compile, make ipk and install?
-Thank's
-Andrea S.
 
-
-		
-___________________________________ 
-Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
-http://it.messenger.yahoo.it
+_______________________________________________________________________
+Yahoo! ¤u¨ã¦C - ¤º¸m¨¾¤î¼u¥Xµøµ¡¤u¯à¡I
+http://toolbar.yahoo.com.hk
 
 
 -------------------------------------------------------
