@@ -1,78 +1,54 @@
-Return-Path: <daryl@wideray.com>
-Errors-To: <daryl@wideray.com>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>,
-   "'Aaron Klish'" <aklish1@urbana.css.mot.com>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] New Bluetooth kernel patches available
-Date: Fri, 19 Dec 2003 10:00:00 -0800
-Message-ID: <000201c3c659$ecd16240$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1071764167.2866.75.camel@pegasus>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] New Bluetooth kernel patches available
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Aaron Klish <aklish1@urbana.css.mot.com>
+Cc: Aaron Klish <AKLISH1@motorola.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.GSO.4.20.0312181152220.13041-100000@wombat.urbana.css.mot.com>
+References: 
+	 <Pine.GSO.4.20.0312181152220.13041-100000@wombat.urbana.css.mot.com>
+Content-Type: text/plain
+Message-Id: <1071770615.2605.15.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 18 Dec 2003 19:03:35 +0100
 
-Marcel,
+Hi Aaron,
 
-WideRay will be using the 2.4.18 and 2.4.21 patches for some time. The
-2.4.21 patches are more important to us than the 2.4.18 patches. 2.4.21
-appears to be the latest 2.4 series kernel for which there are arm =
-(xscale)
-patches available.
+>   We have found a few problems through our initial qualification efforts and
+> hopefully we'll be able to release info/patches for those soon.  More of the
+> current problems stem from SDP and not the kernel though.  
 
-I realize the 2.4.18 kernel is getting pretty old...  But it doesn't =
-hurt to
-ask. ;)
+the SDP code will undergo a complete rewrite, but at the moment only the
+client side is ready. However we are also taking SDP patches for the
+current version, because I haven't set any date where the new Bluetooth
+library should be ready.
 
--Daryl.
+If you found bugs in the kernel layers, please go with them first and
+always include a binary hcidump, so we can check what was going on.
 
-> -----Original Message-----
-> From: bluez-devel-admin@lists.sourceforge.net=20
-> [mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of=20
-> Marcel Holtmann
-> Sent: December 18, 2003 8:16 AM
-> To: Aaron Klish
-> Cc: BlueZ Mailing List
-> Subject: Re: [Bluez-devel] New Bluetooth kernel patches available
->=20
->=20
-> Hi Aaron,
->=20
-> >   Motorola will use the 2.4.20 patches for sometime.  We'd=20
-> appreciate=20
-> > it if you could continue to maintain that line.  Thanks.
->=20
-> so what to do next?
->=20
-> 	Sharp Zaurus (ROM 3.10)		2.4.18
-> 	Familiar Linux v0.7.x		2.4.19
-> 	Motorola			2.4.20
-> 	OpenZaurus			2.4.21
-> 	Most desktops			2.4.22
-> 	Latest stable			2.4.23
->=20
-> For now the latest patch versions are proven to be rock solid=20
-> and I hope we don't need any further updates in future. But=20
-> as all of us already know, nobody is perfect.
->=20
-> Regards
->=20
-> Marcel
->=20
->=20
->=20
->=20
-> -------------------------------------------------------
-> This SF.net email is sponsored by: IBM Linux Tutorials.
-> Become an expert in LINUX or just sharpen your skills.  Sign=20
-> up for IBM's Free Linux Tutorials.  Learn everything from the=20
-> bash shell to sys admin. Click now!=20
-> http://ads.osdn.com/?ad_id=3D1278&alloc_id=3D3371> &op=3Dclick
->=20
-> _______________________________________________
->=20
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net=20
-> https://lists.sourceforge.net/lists/listinfo/b> luez-devel
->=20
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IBM Linux Tutorials.
+Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
+Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
+Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
