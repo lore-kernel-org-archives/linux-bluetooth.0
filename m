@@ -1,58 +1,36 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Documentation for hcid.conf ?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Edouard Lafargue <ELafargue@montrouge.sns.slb.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1080059454.7507.85.camel@gryffindor>
-References: <1080053029.7507.40.camel@gryffindor>
-	 <1080054257.2515.23.camel@pegasus>  <1080059454.7507.85.camel@gryffindor>
-Content-Type: text/plain
-Message-Id: <1080062945.2515.26.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Mar 2004 18:29:05 +0100
+Return-Path: <x.garreau@prim-time.fr>
+Message-ID: <030001c410f8$62945a80$b67ba8c0@zaz1>
+From: "Xavier Garreau" <x.garreau@prim-time.fr>
+To: "Stefan Mischke" <survivor@uni-paderborn.de>
+Cc: "Marcel Holtmann" <marcel@holtmann.org>,
+   "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+References: <405FFCB9.5050507@uni-paderborn.de> <1080040266.2663.317.camel@pegasus> <021901c410d8$724c2630$b67ba8c0@zaz1> <4060660E.5050004@uni-paderborn.de>
+Subject: Re: [Bluez-devel] Accessing HCI on Windows
+Date: Tue, 23 Mar 2004 18:00:46 +0100
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Edouard,
+> Do I understand correctly that an USB Bluetooth dongle can be treated as
+if it was connected to the serial port of the pc? In this case calling > the
+Windows API Function CreateFile(SymbolicName) and doing ReadFile() and
+WriteFile() according to H4 would do the job, wouldn't it?
 
->    Thanks! I wish I had enough time to take the job, unfortunately
-> this is not the case. On the other hand, if you accept informal
-> contributions I'm more than willing to send what I've been working on
-> so far to the community. I've got a nice NAP setup working (in DUN and
-> PAN mode), in a much more generic way than other examples I have found
-> so far.
+Yes ! That's it ! But Widcomm drivers do not work this way.
 
-go ahead and post them to the mailing list.
+> > You can download their drivers from their website et make it work with
+your
+> > dongle by editing the .inf file to add YOUR dongle vid&pid.
+> By "their" you mean Widcomm? Ok, my Dongles are shipped with Widcomm
+drivers, so I don't have to change the .inf file, correct?
 
->    Otherwise, I way that someone called Fredrik Noring is also working
-> on a hcid manpage, that looks fairly different from the current hcid
-> distributed on the bluez homepage: is this a code branch or something
-> ?
+No those from Com1 (http://www.com1.fr)
 
-At the moment it is some kind of branch, but my plan is to integrate
-most of his things into mainline.
+BTW, Widcomm documentation is very very good !
 
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+BR,
+-- 
+Xavier Garreau <x.garreau@prim-time.fr>
+Prim'Time Technology
+http://www.prim-time.fr/
