@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
+Message-ID: <20040921202342.64392.qmail@web53201.mail.yahoo.com>
+From: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] pairing with headset
-Cc: martin f krafft <madduck@madduck.net>
-References: <20040921190606.GA11925@cirrus.madduck.net>
 In-Reply-To: <20040921190606.GA11925@cirrus.madduck.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200409220107.46086.pavouk@pavouk.org>
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] suse9.1personal and bluetooth modprobe
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,35 +16,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Sep 2004 01:07:46 +0200
+Date: Tue, 21 Sep 2004 13:23:42 -0700 (PDT)
 
-Hi,
+Hi all,
+I'm new to linux and to bluetooth
+and I installed the suse 9.1 personal distro.
 
-> I am using a 2.6.8.1 kernel and successfully communicate with my
-> Nokia 6230. Today, I got a Jabra BT 250 headset, which also works
-> fine.
+the command
+modprobe -l | grep bluez
+does not report nothing
 
-I have Jabra BT250 too.
+so I think that there isn't any bluetooth support
 
-When you want to pair your Jabra in Bluez, you must set PIN to 0000, which
-is Jabras default.
-You must hold headset button for about 7 seconds, when blue LED on Jabra goes
-permanently ON. Now is headset in pairing mode, and you will see it in
-hcitool scan. Jabra BT250 is visible only in pairing mode. Probably due to
-security reasons.
+but the command 
+modprobe -l | grep bluetooth
+report a lot of voices
+and from the console (if I remember) I can start bt,
+so my phone (a Nokia 6600) can see my pc
 
-This headset can be paired only with one device.
-Do you have some other experience?
+this mean that there is something ... but what?
+if I try hciconfig or hciid or hciemu the system
+doesn't recognize the command
 
-Other problem is, that I don't know if there are some working bluez sound 
-driver. I doesn't test it.
+have I to install the bluez rpm modules?
+or I'm ready to use and develop with bt? (i think no)
 
-> What's going on? Can the phone only pair with one other device? Or
-> is the problem elsewhere?
+thanks
 
-Best regards,
 
-Pavel Ruzicka
+		
+_______________________________
+Do you Yahoo!?
+Declare Yourself - Register online to vote today!
+http://vote.yahoo.com
 
 
 -------------------------------------------------------
