@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1101592165.27074.31.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] SBC code cleanup
+Message-ID: <41A936C6.70209@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] encoding delay, librarifying a2play
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,34 +16,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 27 Nov 2004 22:49:25 +0100
+Date: Sat, 27 Nov 2004 19:24:06 -0700
 
-Hi Henryk,
+Hey guys
 
-I started with some cleaning up of the SBC code to better fit into
-current coding conventions. My focus was on the sbc_synthesize_audio()
-and sbc_analyze_audio() functions. While checking them and looking at
-the code I think we also need this patch:
+I was able to encode audio in real time with:
 
---- sbc/sbc.c   27 Nov 2004 21:39:38 -0000      1.23
-+++ sbc/sbc.c   27 Nov 2004 21:46:01 -0000
-@@ -523,7 +523,7 @@
-        int i, j, k;
- 
-        /* Input 8 New Subband Samples */
--       for (i = 0; i < 7; i++)
-+       for (i = 0; i < 8; i++)
-                state->S[ch][i] = frame->sb_sample[blk][ch][i];
- 
-        /* Shifting */
+arecord -c 2 -r 44100 -f S16_BE -t au /dev/stdout | ./sbc/sbcenc - | 
+./a2play 00:08:F4:30:05:BB
 
-Am I right, or do I miss something?
+But I estimate the delay is about 300ms. The bluetake encoder dongle was 
+bothering me with its delay which is probably under 200ms... I really 
+want to get our encoder under 100ms. I read somewhere that 60ms is 
+achievable.
 
-Regards
+I think the place to start to get shorter latency is to write something 
+that reads audio itself, uses the encoder library and writes out to the 
+headset. Context switches between the 3 userland apps could be wiped 
+out. I imagine the app will have command-line args for rate and mode, 
+will open/ioctl the audio device appropriately, and then write to the 
+headset.
 
-Marcel
+What's the ultimate destination for a2play? A library somewhere? I need 
+to break a2play into at least 3 files: headers, library, and a fairly 
+simple main(). Is this a good time?
 
+BTW, I did try a class 1 adapter this time and the usable range 
+increased from about 8 meters to about 16... it will be better still 
+when headsets have class 1.
 
+Brad
 
 
 -------------------------------------------------------
