@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41970F25.4020902@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <003101c4ca02$b9f20d90$6f04a8c0@ZBOX>
+From: "Suriyan" <suriyan@netgadgets.co.th>
+To: <bluez-devel@lists.sourceforge.net>
+References: <20041110041405.3CC331D4758@sc8-sf-uberspam1.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] AVDTP socket?
-References: <418DB442.2050801@uen.org> <1099830449.6896.14.camel@pegasus>	 <418E4E9C.8070100@xmission.com> <1099846462.6896.26.camel@pegasus>	 <418E6FBF.3090409@xmission.com> <1099863224.6896.57.camel@pegasus>	 <4191AB4B.8060701@xmission.com> <1100076431.25879.49.camel@pegasus>	 <41925793.3050404@xmission.com> <1100113055.25879.73.camel@pegasus>	 <419543B3.8050601@xmission.com> <1100306337.7349.29.camel@pegasus>	 <41957BC1.507@xmission.com> <1100351199.7349.50.camel@pegasus>
-In-Reply-To: <1100351199.7349.50.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain;
+	charset=windows-874
+Subject: [Bluez-devel] Re: multi rfcomm/sco connection
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,95 +18,56 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 14 Nov 2004 00:54:13 -0700
+Date: Sun, 14 Nov 2004 11:30:52 +0700
 
-Marcel
+Hi Marcel,
 
-Argh... I'm stuck again. the avdtp_set_configuration command goes out 
-but reading the response just blocks. I'm not sure what is wrong... I send:
+I just found the way to work with three headsets over only one
+Bluetooth dongle by a few hardcoded to BlueZ:-
 
-  00 -> header = request
-  03 -> AVDTP_SET_CONFIGURATION
-  04 -> acp_seid = 1
-  04 -> int_seid = 1 (how should I choose the int_seid?)
-  01 -> service category = media transport
-  00 -> length of service capabilities = 0
-  07 -> capability type = media codec
-  06 -> bytes remaining? not sure if this is right.
-  00 -> media type = audio media type
-  00 -> media codec type = SBC
-  22 -> 44.1khz stereo
-  15 -> 16-byte blocks, 8 subbands, "loudness" allocation
-  02 -> min bitpool
-  fa -> max bitpool
+1. force alternate setting of USB interface number 1, isochronous
+    endpoint to 5 (3 voice channels with 16 bit encoding)
 
-a2play.c in cvs contains the code I'm trying...
+when three SCO channels connected (by run three hsplay consecutively)
+I found each incoming SCO HCI frame size up to 144 bytes (as I known
+previously one voice channel with 16-bit encoding SCO HCI frame size
+equals 48 bytes so that three channels 48 * 3 = 144 bytes)
 
-Brad
+This mean one HCI frame to transmit/receive for each SCO channel
+over USB isochronous endpoint when three SCO channels were
+connected have frame size equals 144 bytes + 3 bytes header
+(handle and size) but I not sure this is CSR specific since Bluetooth
+HCI USB transport specification (H:2) have not details in this point,
+define only suggested Max Packet Size of each USB frame for transport
+SCO HCI frame.
 
-Marcel Holtmann wrote:
-> Hi Brad,
-> 
-> 
->>>>The accept looks like this byte-for-byte:
->>>>
->>>>02 -> response accept
->>>>02 -> AVDT_GET_CAPABILITIES
->>>>01 -> category = media transport
->>>>00 -> length of service capabilities = 0
->>>>07 -> 7 'elements' follow
->>>>06 -> elements[0]
->>>>00 ->
->>>>00 ->
->>>>ff ->
->>>>ff ->
->>>>02 ->
->>>>fa -> elements[6]
->>
->>>this should be the codec specific part. Look at A2DP for more details.
->>
->>It doesn't totally seem to match up. The last 4 bytes seem to be the 
->>capabilities of SBC (p.20 of a2dp)
->>
->>ff -> supports all sampling frequencies, channel modes
->>ff -> supports all block lengths, subbands, allocation methods
->>02 -> minimum bitpool val
->>fa -> max bitpool val
->>
->>I can't find where the first 06, 00, 00 fit. Also, does the seid=1 in 
->>the avdtp_discover accept correspond to only supporting SBC? I wasn't 
->>expecting to know the supported codecs until after the first 
->>avdt_get_capabilities.
-> 
-> 
-> I looked it up and the GET_CAPABILITIES response you get back contains
-> two block. The first is the "media transport" with 0 bytes of additional
-> information and the second is the "media codec" part with 6 bytes of
-> codec specific information.
-> 
-> 	0x01 = media transport
-> 	0x07 = media codec
-> 
-> The first 0x00 represents the "media type" and the second the "media
-> codec type". And this means "audio" and "SBC". And the rest is SBC
-> specific as you already recognized.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: InterSystems CACHE
-> FREE OODBMS DOWNLOAD - A multidimensional database that combines
-> robust object and relational technologies, making it a perfect match
-> for Java, C++,COM, XML, ODBC and JDBC. www.intersystems.com/match8
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel
+This cause I must do the second step,
+
+2. bypass checking (skb->len > hdev->sco_mtu) in function
+    hci_send_sco(...) [hci_core.c] and (len > conn->mtu) in
+    function sco_send_frame(...) [sco.c]
+    *** I just think, this step maybe change by hciconfig tool. ***
+
+Next step, I would like to fixed to dynamicaly change the alternate setting
+by looking for previous thread "question about hci_usb endpoint
+selection..." as you known in notify() cannot call usb_set_interface()
+since always in_interrupt() so that I would like to purpose to add ioctl()
+into hci_usb driver to do this or do you have others better approach?
+
+Last, I found new problem when three SCO channels were connected
+ACL links (RFCOMM) that also connected to three Headset for control have
+very long response time (sometime up to 10 seconds or more to appear
+after I pressed a button on Headset). What are the sources of this problem?
+- Bandwidth limitation of Bluetooth and theirs packet type?
+- Implementation of Bluetooth firmware on USB dongle?
+- Implementation of USB stack on Linux?
+- Implementation of BlueZ stack?
+
+Regards
+
+Suriyan.
+
+
 
 
 -------------------------------------------------------
