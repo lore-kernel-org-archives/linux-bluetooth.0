@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Tutorial programming with bluez?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: R.Schade@tu-braunschweig.de
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <517CF7F08A05D4118C380000E869BFA4BDED8B@emg_ntserv2>
-References: <517CF7F08A05D4118C380000E869BFA4BDED8B@emg_ntserv2>
-Content-Type: text/plain
-Message-Id: <1094822487.5311.0.camel@notepaq>
-Mime-Version: 1.0
+Message-ID: <517CF7F08A05D4118C380000E869BFA4BDED8C@emg_ntserv2>
+From: R.Schade@tu-braunschweig.de
+To: bluez-devel@lists.sourceforge.net
+Subject: RE: [Bluez-devel] Tutorial programming with bluez?
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,24 +16,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Sep 2004 15:21:27 +0200
+Date: Fri, 10 Sep 2004 13:34:55 +0200
 
-Hi Ralf,
+Hi,
 
-> I'm looking for a tutorial or an introduction about bluez-programming. The
-> internet search resulted in only hits over the installation of bluez :-/
-> My bluez-installation works fine and now I want to control the bluez-stack
-> with my own program and perhaps with my own profile. (I must implement a
-> bluetooth-server).
+> From: bluez-devel-admin@lists.sourceforge.net
+>
+> On Fri, 2004-09-10 at 10:02, R.Schade@tu-braunschweig.de wrote:
+> 
+> > I'm looking for a tutorial or an introduction about 
+> bluez-programming.
+> 
+> Cause you are from Germany you could try my tutorial located
+> at http://www.chaostal.de/cgi-bin/parser.cgi?input=article/bluetooth
 
-I hold an tutorial about BlueZ programming last year and my slides are
-available on the BlueZ talks page.
+Thank you. I'm reading...
 
-Regards
-
-Marcel
-
-
+Ciao, Ralf
 
 
 -------------------------------------------------------
