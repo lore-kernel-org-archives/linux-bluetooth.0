@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Network Access Point - pairing problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <6111.1099573173@www60.gmx.net>
-References: <7166.1099563749@www18.gmx.net>  <6111.1099573173@www60.gmx.net>
-Content-Type: text/plain
-Message-Id: <1099575388.7022.15.camel@pegasus>
-Mime-Version: 1.0
+From: "D.W." <sword@gmx.de>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+References: <7166.1099563749@www18.gmx.net>
+Message-ID: <6111.1099573173@www60.gmx.net>
+Content-Type: text/plain; charset="us-ascii"
+Subject: [Bluez-users] Network Access Point - pairing problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,22 +17,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 04 Nov 2004 14:36:28 +0100
+Date: Thu, 4 Nov 2004 13:59:33 +0100 (MET)
 
-Hi Daniel,
+Hi Marcel,
 
-> it works perfectly now. Thank you very much for your help.
-> Where can I change this pin?
-> I assumed the pin is determined in hcid.conf.
+it works perfectly now. Thank you very much for your help.
+Where can I change this pin?
+I assumed the pin is determined in hcid.conf.
+Regards Daniel
 
-for incoming connections it is read from /etc/bluetooth/pin and you have
-to restart hcid after that. Actually I like to change that and let hcid
-always read the PIN from that file if needed. So patches are welcome.
-
-Regards
-
-Marcel
-
+-- 
+NEU +++ DSL Komplett von GMX +++ http://www.gmx.net/de/go/dsl
+GMX DSL-Netzanschluss + Tarif zum supergünstigen Komplett-Preis!
 
 
 
