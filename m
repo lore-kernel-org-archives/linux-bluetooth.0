@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Message-ID: <A1F0D47583A2D711919F00600819B3A4028BAE@goofy.vitronics.com>
-From: "Williams, Richard" <Richard.Williams@VITRONICS.com>
-To: "Bluez-Devel (E-mail)" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] SCO question
+From: "Collin R. Mulliner" <collin@betaversion.net>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] RFComm dynamic channel allocation
+Message-Id: <20040708150256.242ad7f3@coredump>
+In-Reply-To: <1085138236.2777.10.camel@baroque.rococosoft.com>
+References: <1085138236.2777.10.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,55 +17,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 8 Jul 2004 09:12:51 -0400
-
+Date: Thu, 8 Jul 2004 15:02:56 +0200
 
 Hi,
 
-I'm getting back to a BT headset <-> LINUX project that I had abandoned =
-some months ago. I have an X-scale single board computer running Linux =
-2.4.26 with the latest Bluez patches. I have a Sony Ericsson HBH-35 =
-headset that I'm trying to get to work with my computer. I have an =
-Anycomm USB BT dongle.
+does the dynamic rfcomm channel allocation work? I'm running 2.6.7-mh1
+and I allways get channel 1, which is used (listend and connected) by a
+other process. I don't get any error it just binds and listens on
+channel 1.
 
-I have done the following:
-modprobe hci_usb
-modprobe rfcomm
-modprobe sco
-hcid
-hciconfig hci0 up
-hciconfig hci0 voice 0x0040
-.... My Pin file is set up for a pin of "0000" - required by the =
-headset.
+cat /proc/bluetooth/rfcomm/sock 
 
-hcitool scan works OK and finds the headset
+/* created thru: rfcomm listen /dev/rfcomm0 1 */
+00:00:00:00:00:00 00:00:00:00:00:00 4 1
+00:00:00:00:00:00 00:00:00:00:00:00 2 0
+/* created thru: running my server */
+xx:xx:xx:xx:xx:xx 00:00:00:00:00:00 4 1
 
-l2ping works OK and pairs with the headset.
+my code:
 
-hstest record t1.wav 00:0A:D9:74:97:19 1
-<<<This gives output:
-Voice setting: 0x0040
-RFCOMM channel connected
-Can't connect SCO audio channel: Connection refused.
+server_sa.rc_family = AF_BLUETOOTH;
+server_sa.rc_channel = channel;		
+server_sa.rc_bdaddr = self.addr;
 
-I know that the socket connect statement in sco_connect() in hstest is =
-failing.
-Any ideas of the cause of this ?
+if (bind(server, (struct sockaddr*) &server_sa, sizeof(server_sa)) < 0){
+ return(-1);
+}
+		
+if (listen(server, 1) < 0) {
+ return(-1);
+}
+	
+if (channel == 0) {
+ remote_len = sizeof(struct sockaddr_rc);
+ memset(&remote_sa, 0, sizeof(struct sockaddr_rc));
+ if (getsockname(server, (struct sockaddr*) &remote_sa, &remote_len) <
+	0) {
+  return(-1);
+ }
 
+ channel = remote_sa.rc_channel;
+ printf("bt_server(): channel %d\n", remote_sa.rc_channel);		}
+			
+thanks ... Collin
 
-thanks very much,
-
-Rich
-
-
-
-Richard B. Williams
-Vitronics, Inc.
-3 Corbett Way
-Eatontown, NJ 07724-2262
-732-389-0244 x29
-Richard.Williams@vitronics.com
-
+-- 
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+To know recursion, you must first know recursion.
 
 
 -------------------------------------------------------
