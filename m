@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4057094A.3040804@identisys.de>
+From: Thomas Eller <te@identisys.de>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200403171259.22015.cijoml@volny.cz>
-Subject: [Bluez-users] bthid and battery condition and syslog
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] Question regarding Rfcomm-Timeout
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,18 +15,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Mar 2004 12:59:22 +0100
+Date: Tue, 16 Mar 2004 15:03:54 +0100
 
-Hi Marcel,
+Hello, there !
 
-is there possible to switch off sysloging battery condition?
+I'm using the rfcomm executable from bluez-utils to connect to a 
+bluetooth device. It looks like this:
 
-bthid generates 2KB/10minutes into syslog
+rfcomm connect 0 xx:xx:xx:xx:xx:xx 1
 
-Maybe there should be in bthid some kind of condition as in nut - UPS battery 
-monitor and not to sysloging?
+If the remote device is not present the rfcomm-connect ends with a 
+timeout after ~20s with the error-message: "Can't connect..... ...Host 
+is down."
 
-Michal
+Where can i push this 20s-timeout down to a lower value ???
+
+I see in the source-code that a socket-connection is made, so possibly 
+there may be a parameter that can be configured through the 
+proc-filesystem ?!?
+
+
+Regards,
+
+Tom
+
+-- 
+---------------------------
+
+Thomas Eller
+te@identisys.de
 
 
 -------------------------------------------------------
