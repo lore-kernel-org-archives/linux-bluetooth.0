@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <408D61EA.2050200@grupopie.com>
-From: Paulo Marques <pmarques@grupopie.com>
+Message-ID: <007f01c42bc3$76b70720$fcca010a@firedrake>
+From: "zubiwat" <zubiwat@poczta.onet.pl>
+To: "bluez devel" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: zubiwat <zubiwat@poczta.onet.pl>
-Cc: bluez devel <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] problem with a speed
-References: <007f01c42bc3$76b70720$fcca010a@firedrake>
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_007C_01C42BD4.2A1D7050"
+Subject: [Bluez-devel] problem with a speed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,22 +16,56 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 26 Apr 2004 20:24:26 +0100
+Date: Mon, 26 Apr 2004 21:19:31 +0200
 
-zubiwat wrote:
+This is a multi-part message in MIME format.
 
-> I have a question what could be the cause of slow transfers through 
-> RFCOMM. I have rfcomm channel and I try to send a file but with a baud 
-> rate 115200 it is very slow comparing to those transfers through modem 
-> or sth like this with the same baud rate.
-> Why it is like this. I tried to change MTU while configuration process 
-> but it didn't work.Where can I change this speed to make it faster?
+------=_NextPart_000_007C_01C42BD4.2A1D7050
+Content-Type: text/plain;
+	charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 
-What is on the other end: a linux box, or a mobile phone?
+I have a question what could be the cause of slow transfers through =
+RFCOMM. I have rfcomm channel and I try to send a file but with a baud =
+rate 115200 it is very slow comparing to those transfers through modem =
+or sth like this with the same baud rate.=20
+Why it is like this. I tried to change MTU while configuration process =
+but it didn't work.Where can I change this speed to make it faster?=20
 
--- 
-Paulo Marques - www.grupopie.com
-"In a world without walls and fences who needs windows and gates?"
+Regards=20
+
+Maciej
+
+------=_NextPart_000_007C_01C42BD4.2A1D7050
+Content-Type: text/html;
+	charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-2">
+<META content=3D"MSHTML 5.50.4134.600" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>I have a question what could be =
+the&nbsp;cause of=20
+slow transfers through RFCOMM. I have rfcomm channel and I try to send a =
+file=20
+but with a baud rate 115200 it is very slow comparing to those transfers =
+through=20
+modem or sth like this with the same baud rate. <BR>Why it is like this. =
+I tried=20
+to change MTU while configuration process but it didn't work.Where can I =
+change=20
+this speed to make it faster? </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Regards </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Maciej</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_007C_01C42BD4.2A1D7050--
 
 
 
