@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] NEC usb bluetooth support
+Subject: Re: [Bluez-users] HOWTO: Logitech MX900 Bluetooth Optical Mouse on
+	Linux
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Mitch <Mitch@0Bits.COM>
+To: Charles Bueche <charles@bueche.ch>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3FE0E092.9060002@0Bits.COM>
-References: <3FE0E092.9060002@0Bits.COM>
-Content-Type: text/plain
-Message-Id: <1071739959.3873.17.camel@pegasus>
+In-Reply-To: <1071698686.6361.31.camel@bluez.bueche.ch>
+References: <1071698686.6361.31.camel@bluez.bueche.ch>
+Content-Type: text/plain; charset=iso-8859-15
+Message-Id: <1071699651.21803.83.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +19,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 18 Dec 2003 10:32:39 +0100
+Date: Wed, 17 Dec 2003 23:20:51 +0100
 
-Hi Mitch,
+Hi Charles,
 
-> you explained the errors well in your previous email. The error (-5) is
-> a EIO which is generated from the secondary config of the bluetooth device
-> which is the voice SCO config which doesn't have 3 bNumEndPoints and
-> fails the test in the hci_usb_probe()
-> 
->         if (intf->altsetting[0].desc.bNumEndpoints < 3)
->                  return -EIO;
-> 
-> The error happens in both 2.4.23 and 2.6.0-test11, but doesn't stop the
-> device working perfectly.
+> With the help of Marcel, Olivier and a few other =FCbergeeks of the
+> Bluez-devel mailing list, I have been able to get my Logitech MX900
+> mouse working with my Dell Inspiron 8600 equiped with internal
+> Bluetooth.
+>=20
+> I have made a small document to help other MX900 owners. It works for
+> me, but be prepared to suffer a bit :
+>=20
+> - it's probably buggy
+> - it run CVS code
+> - it run on Gentoo with 2.6test kernel
+> - my english is ashaming
+>=20
+> http://www.bueche.ch/comp/mx900/mx900.html
+>=20
+> Comments welcome. Regards,
 
-now I got it. We are the origin of this error and I think simply return
-zero is the better approch, because it is not an error on interface 1
-and 2 (if you have support for DFU). I put it on my TODO list for 2.6.
+very nice. I linked it.
+
+I am also near at the stage where I know how to switch the Logitech
+wirless hub from HID into HCI mode. They use a special HID report for
+the mouse (report ID 16) to switch the mode. My Linux USB HID driver
+presents me an extra hiddev node, but I haven't got success in using it
+to send these special report. Do anyone here know how to send HID
+reports through a hiddev device node?
 
 Regards
 
