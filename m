@@ -1,25 +1,31 @@
-Return-Path: <bluebee@gmail.com>
-From: Billy Pucyutan <bluebee@gmail.com>
-Reply-To: bluebee@gmail.com
-To: Marcel Holtmann <marcel@holtmann.org>,
+Return-Path: <SRS0+8aa17180e48eb1082b98+354+infradead.org+dwmw2@baythorne.srs.infradead.org>
+Subject: RE: [Bluez-devel] Alignment issue
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Daryl Van Vorst <daryl@wideray.com>,
    "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Subject: Presentation Slides
-Date: Thu, 12 Aug 2004 16:54:43 +0800
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200408121654.44052.bluebee@gmail.com>
+In-Reply-To: <1092252699.4564.238.camel@pegasus>
+References: <001201c47fc2$7093e4a0$1301010a@baked>
+	 <1092252699.4564.238.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1092299689.4622.8.camel@imladris.demon.co.uk>
+Mime-Version: 1.0
+Date: Thu, 12 Aug 2004 09:34:49 +0100
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Marcel and Edd,
-	I'm going to have a talk on bluetooth at the Philippine Open Source 
-Conference 2004 regarding bluetooth and linux. The title of my talk is 
-"Bluetooth and Linux: A Developer's Perspective". The focus of the talk is on 
-our experiences in BlueZ. I am asking permission if I can use some of your 
-slides in your previous presentations.  
+On Wed, 2004-08-11 at 21:31 +0200, Marcel Holtmann wrote:
+> this is what the Linux kernel is using and we will notice it if some
+> compiler version will optimize it in future. I committed that change to
+> CVS.
 
-Best Regards,
-Billy S. Pucyutan
-Advanced Science & Technology Institute
-Department of Science and Technology
-Philippines
+The Linux kernel isn't the best example to follow when it comes to
+relying on undocumented and unguaranteed compiler behaviour. Don't be so
+sure the kernel would notice -- we have to fix up alignment trap in the
+kernel _anyway_ so the use of get_unaligned() is only an optimisation
+there.
+
+I'd be more inclined to play with using char * pointers in the memcpy,
+and/or __attribute__((packed)).
+
+-- 
+dwmw2
