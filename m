@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] kernel configuration
+Subject: Re: [Bluez-users] SDP problems on embedded device
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Philip MacIver <philipmaciver@yahoo.co.uk>
+To: "Rolf E. Thorup" <rolft@daimi.au.dk>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040721111635.26295.qmail@web25407.mail.ukl.yahoo.com>
-References: <20040721111635.26295.qmail@web25407.mail.ukl.yahoo.com>
+In-Reply-To: <40FE4BC9.3050509@daimi.au.dk>
+References: <40FC2322.4060204@daimi.au.dk>
+	 <1090270387.4400.100.camel@pegasus>  <40FCF471.4010501@daimi.au.dk>
+	 <1090334863.4400.124.camel@pegasus>  <40FD5217.3060705@daimi.au.dk>
+	 <1090345399.21683.2.camel@pegasus>  <40FE3ACF.4030608@daimi.au.dk>
+	 <1090404291.21683.81.camel@pegasus>  <40FE4BC9.3050509@daimi.au.dk>
 Content-Type: text/plain
-Message-Id: <1090412369.21683.89.camel@pegasus>
+Message-Id: <1090412310.21683.87.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +22,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Jul 2004 14:19:30 +0200
+Date: Wed, 21 Jul 2004 14:18:31 +0200
 
-Hi Philip,
+Hi Rolf,
 
-> Hopefully this is a simple question with a simple
-> answer.
-> 
-> I have just installed kernel-2.6.8rc2
-> 
-> I would just like to know what bluetooth options
-> should be set in the kernel, I've read that there are
-> a couple that shouldn't be selected when selecting the
-> blueZ stuff. At the moment I have got all the
-> bluetooth options compiled into my kernel, but if this
-> is not neccessary I would rather have a smaller more
-> stable kernel.
+> The other dongle I have available has HCI 16.4 firmware. If it is of any 
+> help here's the output from "hcidump -x -t" from the laptop (browsing 
+> the Cerfcube using the HCI 16.4 firmware dongle). I'm still using the 
+> mh14 kernel patch.
 
-it should now be safe to select every option, but you should use them as
-modules.
+and it is still the same problem. One side sends the config request, but
+the other don't receives it. Try to browse from the Cerfcube a service
+on your laptop's SDP database.
 
 Regards
 
