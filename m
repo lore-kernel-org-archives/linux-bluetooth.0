@@ -1,14 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] pairing on x86_64
+Subject: Re: [Bluez-users] hcidump, was: rfcomm: permission denied
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Volker Fritzsch <kokor.hekkus@gmx.de>
+To: "Zbigniew Diaczyszyn (gmx)" <z.dia@gmx.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200402212100.12603.kokor.hekkus@gmx.de>
-References: <200402211252.15735.kokor.hekkus@gmx.de>
-	 <200402211648.16390.kokor.hekkus@gmx.de> <1077379873.2716.18.camel@pegasus>
-	 <200402212100.12603.kokor.hekkus@gmx.de>
-Content-Type: multipart/mixed; boundary="=-0DyHu4YLElEWZN6lYV0+"
-Message-Id: <1077416151.2716.29.camel@pegasus>
+In-Reply-To: <000601c3f8c9$98e2c820$3d4bb850@ULLA>
+References: <000d01c3f343$d89f1ad0$e04db850@ULLA>
+	 <1076855680.14758.55.camel@pegasus>  <000b01c3f599$04aaf520$de4bb850@ULLA>
+	 <1077058491.2665.131.camel@pegasus>  <003b01c3f65e$371ef400$dc4db850@ULLA>
+	 <1077147114.2685.11.camel@pegasus>  <000601c3f8c9$98e2c820$3d4bb850@ULLA>
+Content-Type: text/plain
+Message-Id: <1077415764.2716.21.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,84 +21,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 22 Feb 2004 03:15:51 +0100
+Date: Sun, 22 Feb 2004 03:09:25 +0100
 
+Hi Zbigniew,
 
---=-0DyHu4YLElEWZN6lYV0+
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-Hi Volker,
-
-> I couldn't understand too, but with your sizeof(char) question you made me 
-> curious.
+> Perhaps the following kernel warning in /var/log/messages can show the way to a solution:
 > 
-> On x86_64, int has a size of 4 and size_t takes 8 (while on x86 both have a 
-> size of 4).
-> By passing &len to g_io_channel_read (which takes a size_t *buffer_read as 
-> argument), we blank out the first four bytes of buf - which sits directly 
-> after len in memory ('oh wonderful world...').
-> 
-> > This can be a problem that the call of the PIN helper program fails.
-> This problem is also solved with the change from int len to size_t len.
-> 
-> So, please trash my first patch and take this instead.
+> Feb 19 22:22:54 linux su: (to root) dia on /dev/pts/1
+> Feb 19 22:22:54 linux su: pam_unix2: session started for user root, service su
+> Feb 19 22:30:11 linux pppd[3070]: Plugin passwordfd.so loaded.
+> Feb 19 22:30:11 linux pppd[3070]: pppd 2.4.1 started by root, uid 0
+> Feb 19 22:30:13 linux hcid[1307]: link_key_request (sba=8C:97:A6:60:10:00, dba=2C:AC:29:60:10:00)
 
-and here is the patch I am going to apply. Please test it.
+if you see this, there is something on the HCI layer.
+
+> Feb 19 22:30:13 linux pppd[3070]: Failed to open /dev/rfcomm0: Permission denied
+> Feb 19 22:30:13 linux pppd[3070]: Exit.
+
+The Bluetooth authorization failed, but I can tell you only more if you
+send me the dump from hcidump.
 
 Regards
 
 Marcel
 
-
---=-0DyHu4YLElEWZN6lYV0+
-Content-Disposition: attachment; filename=patch
-Content-Type: text/x-patch; name=patch; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
-
-Index: hcid/main.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/main.c,v
-retrieving revision 1.11
-diff -u -r1.11 main.c
---- hcid/main.c	17 Feb 2004 18:04:03 -0000	1.11
-+++ hcid/main.c	22 Feb 2004 02:09:29 -0000
-@@ -397,10 +397,11 @@
- 
- gboolean io_stack_event(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
--	char buf[HCI_MAX_FRAME_SIZE], *ptr;
-+	unsigned char buf[HCI_MAX_FRAME_SIZE], *ptr;
- 	evt_stack_internal *si;
- 	hci_event_hdr *eh;
--	int  len, type;
-+	int type;
-+	size_t len;
- 	GIOError err;
- 
- 	ptr = buf;
-Index: hcid/security.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/security.c,v
-retrieving revision 1.9
-diff -u -r1.9 security.c
---- hcid/security.c	17 Feb 2004 18:04:03 -0000	1.9
-+++ hcid/security.c	22 Feb 2004 02:09:29 -0000
-@@ -365,9 +365,10 @@
- 
- gboolean io_security_event(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
--	char buf[HCI_MAX_EVENT_SIZE], *ptr = buf;
-+	unsigned char buf[HCI_MAX_EVENT_SIZE], *ptr = buf;
- 	struct hci_dev_info *di = (void *) data;
--	int len, type, dev;
-+	int type, dev;
-+	size_t len;
- 	hci_event_hdr *eh;
- 	GIOError err;
- 
-
---=-0DyHu4YLElEWZN6lYV0+--
 
 
 
