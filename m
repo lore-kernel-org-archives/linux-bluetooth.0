@@ -1,115 +1,134 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: ilmari@ilmari.org (=?utf-8?b?RGFnZmlubiBJbG1hcmkg?=
- =?utf-8?b?TWFubnPDpWtlcg==?=)
-Message-ID: <d8jpt8413da.fsf@wirth.ping.uio.no>
-Mime-Version: 1.0
+Return-Path: <dyonutz@yahoo.com>
+Message-ID: <20040611091730.90395.qmail@web50907.mail.yahoo.com>
+Date: Fri, 11 Jun 2004 02:17:30 -0700 (PDT)
+From: ionut dediu <dyonutz@yahoo.com>
+Subject: Re: [Bluez-devel] L2Cap Connection problem : PC - Nokia 6600
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1086456578.16316.89.camel@pegasus>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] oops when playing audio
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 13 Jun 2004 06:36:01 +0200
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
+    Thank you very much for your fast reply. I have
+hcid running and my phone and the PC are indeed paired
+( as I can see from the phone ). 
+    I also tried establishing a RFCOMM connection, but
+that didn't work also. I guess the problem is from the
+bluetooth J2ME API implementation which doesn't
+establish the correct security parameters. Anyway, I
+did the same program on the phone in Symbian C++, and
+it works. If someone else tried programming in J2ME
+for bluetooth between a phone and a PC running BlueZ,
+please reply and tell me if you had the same
+authentication problems.
+     Thanks again. Best of luck.
 
-I was just playing around with hstest and my new Bluetooth headset (a
-Jabra BT250, to be precise) when I got this oops after a few minutes'
-playback:
-
-usb 1-1: new full speed USB device using address 3
-usb 1-1: USB disconnect, address 3
-__tx_submit: hci0 tx submit failed urb cff5a614 type 3 err -19
-__tx_submit: hci0 tx submit failed urb cff5a614 type 3 err -19
-usb 1-1: new full speed USB device using address 4
-Unable to handle kernel NULL pointer dereference at virtual address 00000000
- printing eip:
-c021d454
-*pde = 00000000
-Oops: 0000 [#1]
-PREEMPT 
-Modules linked in: sco hci_usb af_packet prism54 firmware_class nfs lockd sunrpc rfcomm l2cap bluetooth md5 ipv6 smsc_ircc2 ds iptable_nat ipt_state ip_conntrack iptable_mangle iptable_filter ip_tables e100 mii snd_maestro3 snd_ac97_codec snd_pcm_oss snd_mixer_oss snd_pcm snd_page_alloc snd_timer snd soundcore uhci_hcd usbcore yenta_socket pcmcia_core intel_agp agpgart ircomm_tty ircomm irda ide_cd cdrom mousedev joydev evdev psmouse apm i8k unix
-CPU:    0
-EIP:    0060:[<c021d454>]    Not tainted VLI
-EFLAGS: 00210287   (2.6.7-rc3-mm1) 
-EIP is at skb_release_data+0x34/0xa0
-eax: cffc7cd8   ebx: 00000000   ecx: cffc7cd8   edx: 00000000
-esi: c1d26560   edi: cbc9af38   ebp: cc9c57c0   esp: cbc9ae64
-ds: 007b   es: 007b   ss: 0068
-Process hstest (pid: 1437, threadinfo=cbc9a000 task=cf80f830)
-Stack: c1d26560 00000030 c021d4c8 00000000 c021d56c c1d26560 c1d26560 00000030 
-       c1d26560 c1d26560 d09d252e 00000030 00000000 00000000 d09fe660 cbc9aed8 
-       00000800 c0219f40 00000800 00000000 bfffee30 00000000 00000000 00000000 
-Call Trace:
- [<c021d4c8>] kfree_skbmem+0x8/0x20
- [<c021d56c>] __kfree_skb+0x8c/0x120
- [<d09d252e>] bt_sock_recvmsg+0x7e/0xb0 [bluetooth]
- [<c0219f40>] sock_aio_read+0xb0/0xd0
- [<c014e7ed>] do_sync_read+0x6d/0xb0
- [<c016007d>] sys_select+0x24d/0x4b0
- [<c014e917>] vfs_read+0xe7/0x110
- [<c014eb38>] sys_read+0x38/0x60
- [<c0103ef9>] sysenter_past_esp+0x52/0x71
-
-Code: 0f 8b 80 a8 00 00 00 ff 08 0f 94 c2 84 d2 74 7a 8b 8e a8 00 00 00 8b 51 04 89 c8 85 d2 74 38 31 db 39 d3 73 32 89 f6 8b 54 d8 10 <8b> 02 f6 c4 08 75 17 8b 42 04 40 74 48 83 42 04 ff 0f 98 c0 84 
- <3>hci_scodata_packet: hci0 SCO packet for unknown connection handle 43
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 43
-
-hsplay segfaulted, but I was able to start playing again afterwards.
-Also, the kernel disconnects and reconnects the device spontaneously
-every once in a while while playing (both before and after the oops),
-like this:
-
-Jun 13 06:13:22 galadriel kernel: usb 1-1: new full speed USB device using address 5
-Jun 13 06:15:19 galadriel kernel: usb 1-1: USB disconnect, address 5
-Jun 13 06:15:20 galadriel kernel: usb 1-1: new full speed USB device using address 6
-Jun 13 06:15:57 galadriel kernel: usb 1-1: USB disconnect, address 6
-Jun 13 06:15:57 galadriel kernel: usb 1-1: new full speed USB device using address 7
-
-I'm running 2.6.7-rc3-mm1 on a Dell Inspiron 4000 (P-III 800Mhz) and
-using an MSI USB Bluetooth dongle. The relevant .config snippet is:
-
-
-CONFIG_BT=m
-CONFIG_BT_L2CAP=m
-CONFIG_BT_SCO=m
-CONFIG_BT_RFCOMM=m
-CONFIG_BT_RFCOMM_TTY=y
-CONFIG_BT_BNEP=m
-CONFIG_BT_BNEP_MC_FILTER=y
-CONFIG_BT_BNEP_PROTO_FILTER=y
-#
-# Bluetooth device drivers
-#
-CONFIG_BT_HCIUSB=m
-CONFIG_BT_HCIUSB_SCO=y
-# CONFIG_BT_HCIUART is not set
-CONFIG_BT_HCIBCM203X=m
-CONFIG_BT_HCIBFUSB=m
-# CONFIG_BT_HCIDTL1 is not set
-# CONFIG_BT_HCIBT3C is not set
-# CONFIG_BT_HCIBLUECARD is not set
-# CONFIG_BT_HCIBTUART is not set
-# CONFIG_BT_HCIVHCI is not set
-
--- 
-ilmari
-
-
-
+--- Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi,
+> 
+> > I'm a newbie (big surprise :). I'm trying to make
+> a
+> > simple chat application between a Nokia 6600 phone
+> > (using j2me ) and my PC (using BlueZ) over L2CAP.
+> The
+> > problem is that I can't get the connection to
+> start.
+> > I'm guessing it's from connection parameters
+> > negotiation (probably imtu and omtu). First I
+> didn't
+> > supply any of the mtus, neither on pc nor phone,
+> then
+> > I used the same values (512). On both situations I
+> get
+> > the following error message from connect : Can't
+> > connect. Connection refused(111). The phone is the
+> > server, and the PC is the client. I don't specify
+> a
+> > psm on the connection string url on the phone
+> because
+> > I get an exception. Instead I let the BCC of the
+> phone
+> > supply me one. Then using the sdptool I find the
+> psm
+> > (which is allways 4097 <-> 0x1001) and use it in
+> the
+> > client application on the PC to connect. The code
+> is
+> > very simple. Here it is :
+> 
+> I can't tell you anything about J2ME programming,
+> but in general there
+> is no need to give the MTU values. The L2CAP will
+> negotiate the default
+> values. In most cases it is 672.
+> 
+> > HCIDump - HCI packet analyzer ver 1.8
+> > device: hci0 snap_len: 1028 filter: 0xffffffff
+> > < HCI Command: Create Connection(0x01|0x0005) plen
+> 13
+> > > HCI Event: Command Status(0x0f) plen 4
+> > > HCI Event: Connect Complete(0x03) plen 11
+> > < ACL data: handle 0x0029 flags 0x02 dlen 12
+> >     L2CAP(s): Connect req: psm 4097 scid 0x0040
+> > > HCI Event: Number of Completed Packets(0x13)
+> plen 5
+> > > HCI Event: Max Slots Change(0x1b) plen 3
+> > > ACL data: handle 0x0029 flags 0x02 dlen 16
+> >     L2CAP(s): Connect rsp: dcid 0x0056 scid 0x0040
+> > result 1 status 2
+> > > HCI Event: QoS Setup Complete(0x0d) plen 21
+> > > ACL data: handle 0x0029 flags 0x02 dlen 16
+> >     L2CAP(s): Connect rsp: dcid 0x0056 scid 0x0040
+> > result 3 status 0
+> > < HCI Command: Disconnect(0x01|0x0006) plen 3
+> > > HCI Event: Command Status(0x0f) plen 4
+> > > HCI Event: Disconn Complete(0x05) plen 4
+> > 
+> > What means result 3 status 0, from hcidump ? Sorry
+> I'm
+> > not familiar with hcidump. Thanks a lot in
+> advance.
+> 
+> You can open the Bluetooth specification and look it
+> up. However the
+> result 3 means "Connection refused - security
+> block". There is no
+> pairing between your devices or the hcid is not
+> running.
+> 
+> Some line above you have result 1 with status 2 and
+> this means
+> "Connection pending" with "Authorization pending".
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+>
 -------------------------------------------------------
-This SF.Net email is sponsored by the new InstallShield X.
->From Windows to Linux, servers to mobile, InstallShield X is the
-one installation-authoring solution that does it all. Learn more and
-evaluate today! http://www.installshield.com/Dev2Dev/0504
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
+> This SF.Net email is sponsored by the new
+> InstallShield X.
+> From Windows to Linux, servers to mobile,
+> InstallShield X is the one
+> installation-authoring solution that does it all.
+> Learn more and
+> evaluate today!
+> http://www.installshield.com/Dev2Dev/0504
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+>
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
+
+	
+		
+__________________________________
+Do you Yahoo!?
+Friends.  Fun.  Try the all-new Yahoo! Messenger.
+http://messenger.yahoo.com/ 
