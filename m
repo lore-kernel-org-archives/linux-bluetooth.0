@@ -1,15 +1,19 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guy Harris <guy@alum.mit.edu>
-To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Ethereal-dev] Re: [Bluez-devel] bluetooth ethereal dissector
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Guy Harris <guy@alum.mit.edu>
 Cc: Paul Ionescu <paul@acorp.ro>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
    ethereal-dev@ethereal.com
-Subject: Re: [Ethereal-dev] Re: [Bluez-devel] bluetooth ethereal dissector
-Message-ID: <20031030035431.A18203@quadrajet.sonic.net>
-References: <1067379074.2419.24.camel@paul> <1067425631.24043.224.camel@pegasus> <D4C83C06-0A45-11D8-B1BA-000A958097E4@alum.mit.edu> <1067482224.18114.6.camel@pegasus> <FBDCA88C-0A86-11D8-B1BA-000A958097E4@alum.mit.edu> <1067513580.18114.20.camel@pegasus>
+In-Reply-To: <81F98C36-0AA1-11D8-BD2F-000A958097E4@alum.mit.edu>
+References: <1067379074.2419.24.camel@paul>
+	<1067425631.24043.224.camel@pegasus>
+	<D4C83C06-0A45-11D8-B1BA-000A958097E4@alum.mit.edu>
+	<1067482224.18114.6.camel@pegasus>
+	<81F98C36-0AA1-11D8-BD2F-000A958097E4@alum.mit.edu>
+Content-Type: text/plain
+Message-Id: <1067516563.11791.23.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1067513580.18114.20.camel@pegasus>; from marcel@holtmann.org on Thu, Oct 30, 2003 at 12:39:46PM +0100
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -20,28 +24,37 @@ List-Id: <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 30 Oct 2003 03:54:31 -0800
+Date: 30 Oct 2003 13:22:38 +0100
 
-On Thu, Oct 30, 2003 at 12:39:46PM +0100, Marcel Holtmann wrote:
-> Attached is another patch against CVS, which re-introduces the byte
-> swapping,
+Hi Guy,
 
-I've checked in a change to replace g_ntohs with GUINT16_FROM_LE and to
-replace g_ntohl with GUINT32_FROM_LE.
+> > here is my patch that adds a Wiretap module for reading files created
+> > with "hcidump -w".
+> 
+> OK, it reads them - but it supplies a link-layer encapsulation type of 
+> WTAP_ENCAP_BLUETOOTH_H4, for which there isn't any dissector.  Do you 
+> have dissectors for various Bluetooth protocols, or should we take the 
+> ones from the affix patches to Ethereal and modify one of them (HCI?) 
+> to register for an encapsulation of WTAP_ENCAP_BLUETOOTH_H4?
 
-> I also use the macro _U_ for __attribute((packed))__
+it is the first step ;)
 
-The macro _U_ is defined as __attribute__((unused)), not
-__attribute((packed))__.
+Actually I don't want to use the Affix code, because I don't like the
+idea of using code that I don't understand. And at the moment I have
+limited knowlodge how the Ethereal dissectors work.
 
-If __attribute((packed))__ is *required* in order to make it work, then
-you need to find some *other* way to make it work - conditionally using
-__attribute((packed))__ or not depending on whether GCC is being used or
-not won't help.  For example, define the structure as an array of bytes,
-or as a sequence of arrays of bytes, and use the "pletoh" macros to
-extract values from them.
+However the Bluetooth H4 format is a standard definied in the Bluetooth
+specification and my plan is to write a packet-bt-hci.c dissector that
+can decode it. All other Bluetooth layers like L2CAP, RFCOMM, BNEP etc.
+should be done by someone else. The HCI dissector is the important one,
+because it can make it reusable for other Bluetooth protocol stacks and
+my plan is to do it from scratch and not hacking the current Affix code.
 
-However, I see nothing that would *require* __attribute((packed))__.
+Regards
+
+Marcel
+ 
+
 
 
 -------------------------------------------------------
