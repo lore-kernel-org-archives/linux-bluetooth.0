@@ -1,10 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <403E67E8.7080900@nist.gov>
-From: Ronan Daniellou <ronan.daniellou@nist.gov>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] Bluetooth and SSL
+Subject: RE: [Bluez-devel] Widcomm BlueConnect and Bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: dsas@rnl.ist.utl.pt
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1433.193.136.143.20.1077810927.squirrel@webmail.rnl.ist.utl.pt>
+References: <000f01c3fc6f$303ed760$318388c1@zedidas>
+	 <1077804727.2754.44.camel@pegasus>
+	 <1379.193.136.143.20.1077809745.squirrel@webmail.rnl.ist.utl.pt>
+	 <1077812590.2754.52.camel@pegasus>
+	 <1433.193.136.143.20.1077810927.squirrel@webmail.rnl.ist.utl.pt>
+Content-Type: text/plain
+Message-Id: <1077813676.2849.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,50 +22,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Feb 2004 16:40:56 -0500
+Date: Thu, 26 Feb 2004 17:41:16 +0100
 
+Hi Didier,
 
+> >> I use this version of bluez kernel because I need to make some changes
+> >> in bluez modules (qos parameters...). Can I make these changes with
+> >> mh?
+> >
+> > show us what you have changed.
+> 
+> Until know, nothing...
 
-Hello everybody,
+so go with my -mh patches and if you have changed something and you want
+me to include it into the mainstream kernel, post a patch to the mailing
+list.
 
-got stuck using SSL over Bluez, and I look for help.
-I try to use SSL (TLS precisely) over bluetooth. Foe those who do not 
-know much about SSL, you build a SSL structure, then a socket wich you 
-connect and then you set the socket to the SSL structure.
+Regards
 
-So first I used a socket (L2CAP, SOCK_SEQPACKET), following the how-to 
-of Bluez. I exchange data flawlessly.
-
-Then I wanted to use SSL over my socket. My problem is, the client sends 
-data to open the SSL channel, a hci dump shows that the packet actually 
-arrives on the server side, but the server does not react.
-
-Well the root example of the SSL part, was developped over usual TCP/IP 
-sockets. Then I set a BNEP connection, set the IP addresses and tried 
-it. I checked that the packets were actually going through the bluetooth 
-link.
-
-Then it is possible to do it. As it works over a TCP/IP layer, I thought 
-that maybe openssl, is actually developped for that kind of sockets 
-(even if the specification of SSL/TLS is supposed to work over any 
-protocol). Moreover some SSL functions ask not only an address, but a 
-port for parameter for example. But the socket structure of the L2CAP 
-layer of Bluez has no port field for example, but psm. Then maybe SSL 
-expect some fields that are not present...?
-
-What I would try is to "wrap" my L2CAP socket through a "fake" TCP/IP 
-one, so that SSL thinks it works with a TCP/IP connection, but I use a 
-L2CAP link. I think something in that way was done to carry on TCP/IP 
-over bluetooth?
-
-I also heard about the Nokia bluetooth stack Affix, which seems to have 
-a bluetooth stack which has the different fields like port, but with a 
-different meaning because of the protocol you are actually using 
-(RFCOMM, etc...).
-
-Thanks a lot for anyone who could help me.
-
-Ronan
+Marcel
 
 
 
