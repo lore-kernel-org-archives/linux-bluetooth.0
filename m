@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41AB9132.10609@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <41AB742F.7030807@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] encoding delay, librarifying a2play
-References: <41A936C6.70209@xmission.com> <1101624988.18467.32.camel@pegasus>
-In-Reply-To: <1101624988.18467.32.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] rctest.c : question about do_listen function
+References: <BAY102-F33BFE2838AD565BE5C0FE1D2BD0@phx.gbl>
+In-Reply-To: <BAY102-F33BFE2838AD565BE5C0FE1D2BD0@phx.gbl>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,39 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 29 Nov 2004 14:14:26 -0700
+Date: Mon, 29 Nov 2004 20:10:39 +0100
 
-Marcel
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> I propose a generic AVDTP library that will handle all AVDTP related
-> things. I checked in some basic code into the avdtp directory. My idea
-> is to make the library look like a socket interface so we can later move
-> things very easy to a kernel AVDTP implementation.
+|     if( listen(s, 10) ) {
+|         syslog(LOG_ERR,"Can not listen on the socket. %s(%d)",
+| strerror(errno), errno);
+|         exit(1);
+|     }
+|
+| I'm somewhat of a newbie to all this stuff (including sockets) so I
+| question why the listen return is being checked for a 1 for error when
+| the man pages say -1 is returned on error and 0 is returned on success.
 
-ok, the avdtp skeleton gives me a good starting point
+If I'm not totally wrong, only "0" is treated as false, why all non-zero
+values are treated as "true", so the comparison is true for -1...
 
-by the way, I was hoping to avoid monitoring but my headset gets very 
-confused when I interrupt the audio stream from linux with a cellphone 
-call. one time the headset locked up. I wish I knew exactly what was 
-happening when the dongle gets interrupted by a cell call and then resumes.
+greetings,
+~  Lars
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-> The a2play is then only a frontend for the AVDTP library, SBC library
-> and some audio input library (libmad for exmaple). And I think we should
-> also include the rcplay stuff into it and provide an alternate RFCOMM
-> streaming with an extra parameter.
-
-yes. I am interested in keeping something around that can do low-latency 
-encoding in userspace.
-
-> However the final goal should be an ALSA library extension like their
-> JACK plugin. But from my first tests I realized that it is impossible to
-> create such an extension outside the ALSA PCM directory. I must talk
-> with the ALSA developers about that issue.
-
-I am going to ask at alsa-devel about the userspace plugin. It's hard to 
-tell what is going on in alsa-lib.
-
-brad
+iD8DBQFBq3QvQWC6DTWkDAoRAgH6AJ497Ro9tyOh+VhCIli4T8kSo3IktQCgu9/r
+Al2nU6MplBDnok1+NKzhj3M=
+=z3q+
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
