@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] IOGear GBU301 and Kernel 2.4.20
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200408090833.40336.cijoml@volny.cz>
-References: <20040809050753.17815.qmail@web60801.mail.yahoo.com>
-	 <200408090811.14790.cijoml@volny.cz> <1092033015.21815.1.camel@pegasus>
-	 <200408090833.40336.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1092033656.21815.6.camel@pegasus>
-Mime-Version: 1.0
+References: <20040809050753.17815.qmail@web60801.mail.yahoo.com> <200408090811.14790.cijoml@volny.cz> <1092033015.21815.1.camel@pegasus>
+In-Reply-To: <1092033015.21815.1.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200408090833.40336.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,32 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 09 Aug 2004 08:40:56 +0200
+Date: Mon, 9 Aug 2004 08:33:40 +0200
 
-Hi Michal,
-
-> > > > you must install the development package of the USB library.
-> > >
-> > > Marcel shouldn't configure script find these missing libs?
+Dne po 9. srpna 2004 08:30 jste napsal(a):
+> Hi Michal,
+>
+> > > you must install the development package of the USB library.
 > >
-> > it does this, but of course you must have installed them. If not it will
-> > disable the compilation of that program.
-> 
-> He wrote, that he --enable-bcm203x - so configure should fail when by hand 
-> enabled and libs not available
+> > Marcel shouldn't configure script find these missing libs?
+>
+> it does this, but of course you must have installed them. If not it will
+> disable the compilation of that program.
 
-configure will not fail. It only fails when the Bluetooth library is not
-present. The point is even if configure won't compile a specific part,
-you still can do Makefile tricks to compile it (call "make bcm203x").
+He wrote, that he --enable-bcm203x - so configure should fail when by hand 
+enabled and libs not available
 
-On the other hand it can be possible that his USB library is simply too
-old. If this is the problem I must adjust the configure check.
+M.
 
-Regards
-
-Marcel
-
-
+>
+> Regards
+>
+> Marcel
 
 
 -------------------------------------------------------
