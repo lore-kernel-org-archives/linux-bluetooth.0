@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Taneli =?ISO-8859-1?Q?V=E4h=E4kangas?= <taneli.vahakangas@netsonic.fi>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] bluetooth - 6310i - iBook
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: Jan Sobek <honza@sis.vutbr.cz>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <20040702105653.GF13439@sis.vutbr.cz>
+References: <20040702105653.GF13439@sis.vutbr.cz>
 Content-Type: text/plain
-Message-Id: <1088782104.22055.7.camel@jumbo228.adsl.netsonic.fi>
+Message-Id: <1088774344.8000.20.camel@baroque.rococosoft.com>
 Mime-Version: 1.0
-Subject: [Bluez-users] Do bnep and obex work simultaneously?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,18 +18,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 02 Jul 2004 18:28:24 +0300
+Date: Fri, 02 Jul 2004 14:19:04 +0100
 
-Hello! I have a computer running kernel 2.6.7-mh1 and it is acting as a
-PANU (pand --connect ...), which works very well. The GN on the other end
-is a similarly configured computer. However, now I can't use ussp-push's
-obextool on the PANU computer to send files to the mobile phone. Is this
-expected or did I do something wrong? obextool push ... complains:
-Can't connect. Too many links (31)
-and fair enough, the connect() system call receives EMLINK. 
+Hi Jan,
+I use gammu which is better IMHO. Here is the relevant part of its
+config file:
 
-	Taneli
+port = 00:60:57:5B:36:AE # your phone's BDADDR
+model = 6310i
+connection = bluephonet
 
+Cheers,
+Steve
+
+On Fri, 2004-07-02 at 11:56, Jan Sobek wrote:
+> Hello,
+> 
+> I'm trying to connect ibook and nokia 6310 using bluetooth adapter by
+> microcom.
+> 
+> same configuration works for me on my desktop, but on ibook works
+> only.
+> 	hcitool scan
+> 	hcitool info xx.xx.xx.xx.xx.xx
+> 
+> gnokii --monitor
+> GNOKII 0.6.1
+> Couldn't open PHONET device: No such file or directory
+> Telephone interface init failed: Command failed.
+> Quitting
+> 
+> rfcomm connect rfcomm0 xx.xx.xx.xx.xx.xx
+> Can't connect RFCOMM socket: Connection refused
+> 
+> On phone is pin request.
+> 
+> 
+> can you help me?
+> 
+> thank you
+-- 
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
 
 
