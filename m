@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Mauro Tortonesi <mtortonesi@ing.unife.it>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200401281135.58062.mtortonesi@ing.unife.it>
-Subject: [Bluez-devel] l2cap xfer fails
+Subject: RE: [Bluez-devel] Windows Port
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+Cc: acr@acroberts.com, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <50BF37ECE4954A4BA18C08D0C2CF88CB04B83F@exmail1.se.axis.com>
+References: <50BF37ECE4954A4BA18C08D0C2CF88CB04B83F@exmail1.se.axis.com>
+Content-Type: text/plain
+Message-Id: <1075276388.12766.49.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,72 +18,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 28 Jan 2004 11:35:58 +0100
+Date: Wed, 28 Jan 2004 08:53:08 +0100
 
+Hi Peter,
 
-i've been testing bluetooth support for nc6. unfortunately, i couldn't=20
-transfer data. both kernels are 2.4.25-pre7.
+> I may be stating the obvious, but do not forget about the 
+> license issue. As far as I can tell from a quick search 
+> through the BlueZ repository, only the code in libs2/lib 
+> and utils2/lib is under LGPL, the rest (including the "old" 
+> libraries) are under GPL. This means that any program or
+> kernel driver that uses any of the GPLed parts need to be 
+> GPLed too. (This, btw, goes for Linux applications too that 
+> use or link with the GPLed parts.)
 
-1st test - client side:
+actually there is no problem with GPL or LGPL software on the Windows
+platform, but you are right that every kernel driver or program must be
+licensed under GPL, too.
 
-[mauro@daneel nc6]$ ./src/nc6 -b 00:0D:88:8E:CA:07 10
-erneuwenoun
-ervimn=F2orinw=F2trin=F2ri
-rtbon=F2reonb=F2obre=F2eorinrt
-weinbrt=F2oint=F2io1re
-trbon=F2beone=F2otrn=F2rtietr
-rin=F2eroinrt=F2inr=F2int
-rbn=F2on=F2rtibit
-rinr=F2tboinrt=F2inrirbtmrkimfr
-rebmrtmre=F2ireireo=F2
+The libs2 is not really LGPL at the moment (even if the header of the
+files say so). Max and I already agreed that we should make the new
+library LGPL, but there are still some code snippets that are copyright
+by Qualcomm. And this code is GPL only at the moment, which means that
+the complete code will be still under the GPL. Maybe it is a good time
+to discuss this now. Max, what is the current status on this?
 
-1st test - server side:
+Regards
 
-[mauro@giskard nc6]$ ./src/nc6 -vvv -b -l -p 10 > dump.bin
-nc6: listening on (null) psm 10 ...
-nc6: connect to (null) psm 10 from 00:0D:88:8E:CA:07 psm 10
-nc6: using seqpacket socket
-nc6: using buffer size of 8192
-nc6: read eof from remote
-nc6: closed local for write
-nc6: remote hold timed out
-nc6: closed local for read
-nc6: closed remote for write
-nc6: connection closed (sent 0, rcvd 182)
-
-
-2nd test - client side:
-
-[mauro@daneel nc6]$ cat src/main.c | ./src/nc6 -vvv -b 00:0D:88:8E:CA:07 10
-nc6: using buffer size of 8192
-nc6: error writing to remote: Invalid argument
-nc6: connessione terminata (inviati 0, ricevuti 0)
-nc6: closed local
-nc6: closed remote
-
-2nd test - server side:
-
-[mauro@giskard nc6]$ ./src/nc6 -vvv -b -l -p 10 > dump.bin
-nc6: listening on (null) psm 10 ...
-nc6: connect to (null) psm 10 from 00:0D:88:8E:CA:07 psm 10
-nc6: using seqpacket socket
-nc6: using buffer size of 8192
-nc6: read eof from remote
-nc6: closed local for write
-nc6: remote hold timed out
-nc6: closed local for read
-nc6: closed remote for write
-nc6: connection closed (sent 0, rcvd 0)
-
-=2D-=20
-Aequam memento rebus in arduis servare mentem...
-
-Mauro Tortonesi                 mtortonesi@ing.unife.it
-                                mauro@deepspace6.net
-                                mauro@ferrara.linux.it
-Deep Space 6 - IPv6 with Linux  http://www.deepspace6.net
-=46errara Linux User Group        http://www.ferrara.linux.it
-
+Marcel
 
 
 
