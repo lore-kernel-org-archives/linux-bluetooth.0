@@ -3,7 +3,7 @@ Subject: [Fwd: [Bluez-users] p3nfs drops connection]
 From: Dominik Blystak <Dominik.Blystak@pro-open.de>
 To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1090592384.2281.7.camel@localhost>
+Message-Id: <1090592384.2281.6.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -15,7 +15,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jul 2004 16:19:53 +0200
+Date: Fri, 23 Jul 2004 16:19:44 +0200
 
 
 Hi, 
