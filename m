@@ -1,54 +1,67 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Till Harbaum <harbaum@beecon.de>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Cc: Moritz Gmelin <moritz.gmelin@avetana.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200502101112.09602.harbaum@beecon.de>
-Subject: [Bluez-devel] Zero length L2CAP packets
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 10 Feb 2005 11:12:09 +0100
+Return-Path: <nacc@us.ibm.com>
+Date: Wed, 9 Feb 2005 11:39:29 -0800
+From: Nishanth Aravamudan <nacc@us.ibm.com>
+To: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
+Cc: gregkh@us.ibm.com, marcel@holtmann.org, maxk@qualcomm.com, jt@hpl.hp.com,
+   perex@suse.cz, linux-dvb-maintainer@linuxtv.org,
+   linux-usb-devel@lists.sourceforge.net, bluez-devel@lists.sourceforge.net,
+   irda-users@lists.sourceforge.net, alsa-devel@alsa-project.org,
+   linux-dvb@linuxtv.org, sensors@stimpy.netroedge.com
+Subject: Re: [PATCH 0/63] convert usb_control_msg() and usb_bulk_msg() to use msecs
+Message-ID: <20050209193929.GI3508@us.ibm.com>
+References: <20050209000212.GB5661@us.ibm.com> <20050209224144.66f0ed41@zanzibar.2ka.mipt.ru>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20050209224144.66f0ed41@zanzibar.2ka.mipt.ru>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
+On Wed, Feb 09, 2005 at 10:41:44PM +0300, Evgeniy Polyakov wrote:
+> On Tue, 8 Feb 2005 16:02:12 -0800
+> Nishanth Aravamudan <nacc@us.ibm.com> wrote:
+> 
+> > Hi,
+> > 
+> > The following patchset (affecting USB, Bluetooth, IrDA, Sound, DVB and W1 --
+> > hence the long To: an Cc: lists...) converts the usb_control_msg() and
+> > usb_bulk_msg() functions to use milliseconds in the timeout parameter instead
+> > of jiffies. This is not a problem for almost all cases, as the requested delays are usually quite long wrt. these two functions.
+> 
+> As for w1 - this changes do not break anything, but
+> I'm not sure that it will not break usb core code which can
+> depend on jiffies and thus arch specific timings.
+> 
+> So I have a question: is this change intentional and thus by design requires
+> milliseconds, or it just happens that HZ==1000 on the most of the platforms?
 
-while working on the avetana jsr82 implementation we discovered, that the bt 
-spec as well as jsr82 allow to transmit zero length l2cap packets. IMHO the 
-linux socket interface does not support zero length packets and a read 
-returning zero indicates an end of file (in this case meaning that the 
-connection has been closed).
+So the first check I did, at Greg's suggestion, was to verify the timing
+units for usbdevfs, which are milliseconds. So we should be ok there.
+Second, all of these patches don't change the fact that jiffies are
+used. They only move the usage of jiffies further into the usbcore, thus
+making the actual API be in human time-units and relying on correct
+translation from HZ-independent units (milliseconds) to HZ-dependent
+units (jiffies) in one place.
 
-What happens if the other side actually sends a zero length packet? Is this 
-dropped inside the kernel? Or will read return zero which i'll misinterpret 
-as the eof marker? How can i distinguish between eof and a zero length 
-packet?
+So the change is very much intentional, but it's an API change only. The
+timeout parameter is not even used until usb_start_wait_urb() and
+presuming msecs_to_jiffies() does what we want (and I've verified it
+does for the most common cases), then the timer in usb_start_wait_urb()
+will be set for the same number of jiffies.
 
-Regards,
-  Till
+Really, this just makes it easier for me later on to go through and
+re-audit timer usage :) If we do change the timer core (and I'm working
+on figuring out how exactly to do so), then only changing in one place
+down the road is better than all of these patches going out then *along
+with* a huge rework of core kernel code...
 
--- 
-Dr.-Ing. Till Harbaum                       Tel.:  +49 721 4998963
-BeeCon GmbH                                 Fax:   +49 721 4998962
-Haid-und-Neu Strasse 7, 76131 Karlsruhe     Mobil: +49 179 9087904
-harbaum@beecon.de                           http://www.beecon.de
+So, in conclusion, these patches shouldn't break anything for anyone, if
+I got my conversions correct. Most drivers were passing HZ * __some_var
+or HZ / 10, anyways, which is expressible easily in human time units via
+1000 * __some_var or 100, respectively. So it shouldn't change anything,
+except in what units we are dealing.
 
+Let me know if you see anything that points to the contrary (in USB core
+code, or anywhere else).
 
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Thanks for the feedback!
+
+-Nish
