@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5f30e261050110123968721dc4@mail.gmail.com>
-From: Jeff Wilson <jazzbotley@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] hciconfig question
-In-Reply-To: <1103931501.20258.94.camel@pegasus>
+Subject: Re: [Bluez-devel] baswap neccesity
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <cruhvs$fj5$1@sea.gmane.org>
+References: <cruhvs$fj5$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1105388822.8652.53.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <5f30e261041224131026cfa70a@mail.gmail.com>
-	 <1103931501.20258.94.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,29 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Jan 2005 14:39:30 -0600
+Date: Mon, 10 Jan 2005 21:27:02 +0100
 
-On Sat, 25 Dec 2004 00:38:21 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jeff,
-> 
-> you need a Bluetooth 1.2 device with inquiry with RSSI support.
-> 
-> Regards
-> 
-> Marcel
-> 
+Hi,
 
-The only 1.2 devices listed at
-http://www.holtmann.org/linux/bluetooth/devices.html are the Apple G4
-and the Lifetech BlueConnect (but then I saw Carlos say that isn't
-so).
+> I'm reading rctest.c:
+> In do_connect function, a call to bswap is used just before the connect 
+> call:
+> 	baswap(&rem_addr.rc_bdaddr, strtoba(svr));
+> 
+> In the server, baswap is again called just after the accept call
+> 
+> Why is it neccesary? Why does the server listening at the other side 
+> expect addresses in such byte ordering?
 
-I'm in the market for a couple of 1.2 USB dongles I can use with the
-latest BlueZ kernel.  Any suggestions?  I found "ANYCOM USB-120 USB
-Adapter" on Froogle.  Any comments about Anycom?
+this is part of the specification. The textual representation and the
+over-air BD_ADDR is swapped.
 
-       Thanks for your time,
-         jw
+However the code above has a memory leak. Where do you found it?
+
+> mmm, again thank you for your time (sometimes I feel like trying to slow 
+> down a bit your work would enable me to get up to date, but it's 
+> useless, the rate of events is dramatic and you always reemerge... ;-) )
+
+Sorry for that ;)
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
