@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] SuSE 9.1 Pro and Epox Barton wireless desktop
+Subject: Re: [Bluez-users] Multi-Thread Problem with BlueZ
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ulrich Wisser <u.wisser@publisher.de>
+To: Dave Dev <alwaysgone@seznam.cz>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1091737844.4179.46.camel@dorette.Entenhausen>
-References: <1091568946.3759.18.camel@dorette.Entenhausen>
-	 <1091569567.16182.36.camel@pegasus>
-	 <1091648489.4237.2.camel@dorette.Entenhausen>
-	 <1091661690.16182.74.camel@pegasus>
-	 <1091737844.4179.46.camel@dorette.Entenhausen>
+In-Reply-To: <12800.102184-5119-1899698199-1091734133@email.seznam.cz>
+References: <12800.102184-5119-1899698199-1091734133@email.seznam.cz>
 Content-Type: text/plain
-Message-Id: <1091739998.20839.56.camel@pegasus>
+Message-Id: <1091738430.20839.53.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -22,23 +18,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Aug 2004 23:06:38 +0200
+Date: Thu, 05 Aug 2004 22:40:30 +0200
 
-Hi Ulrich,
+Hi Dave,
 
-> > It should be possible to compile only hid2hci. Download bluez-utils-2.9
-> > and run configure. Make sure that the USB library is installed. Then
-> > change to the tools directory and type "make hid2hci". Then you should
-> > get the hid2hci binary that you can copy everywhere you like.
-> 
-> compiling did  work perfectly. Only when I tried to use the hid2hci the
-> problems started:
-> 
-> Switching device 0a12:1000 to HCI mode failed. (Invalid or incomplete
-> multibyte or wide character)
+> Just dropping a line to say that BlueZ (seemingly) has the same problem we had before -- we cannot connect two devices at once to the stack -- when BT is sending information (say, 10 - 100kb), we can't even discover the device it's sending over .... Have you tested it with mutliple socket connections?
 
-sometimes it works even if it reports an error. Check with hciconfig if
-you see a Bluetooth device now.
+I don't have any clue what you are talking about. Be more specific.
 
 Regards
 
