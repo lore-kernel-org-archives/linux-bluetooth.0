@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Thomas Arendsen Hein <thomas@intevation.de>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] File transfer
-Message-ID: <20040216100540.GA15985@intevation.de>
-References: <20040210093353.99692.qmail@web40701.mail.yahoo.com>
+Subject: Re: [Bluez-users] L2CAP connectionless
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Desai, Keyur Rajnikant" <kdesai@mail.smu.edu>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <38F76B90B82C0A4A822651EACE4FF8E9C23322@s31xs2>
+References: <38F76B90B82C0A4A822651EACE4FF8E9C23322@s31xs2>
+Content-Type: text/plain
+Message-Id: <1076922085.2840.46.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20040210093353.99692.qmail@web40701.mail.yahoo.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,28 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 16 Feb 2004 11:05:40 +0100
+Date: Mon, 16 Feb 2004 10:01:25 +0100
 
-On Tue, Feb 10, 2004 at 01:33:53AM -0800, Lalith Chakravarthi wrote:
-> If I want to transfer a file from the phone to my computer or
-> vice-versa, what are the various steps involved?? I mean, what are the
-> tools that I have to be running for that. Also what is the way to
-> transfer the data? Is there any difference in the way Audio / Video /
-> Text messages are transferred??
+Hi Desai,
 
-A short howto for sending files from the PC to a phone or palm:
-http://www.klings.org/nowires/main.php/How-To/OBEX/
-(Works fine for me)
+> I am  just wondering how L2CAP connectionless mode works
+>  
+> when i do a ./l2test -s -D BD_ADDR it has to use the connect method.
+>  
+> Also when the -D option causes the socket to be set to SOCK_DGRAM  I cannot understand what the 
+> handler (s) function does
+>  
+> I tried to single step using xxgdb but it would always skip the handler(s) function.
 
-And from phone or palm to the PC:
-http://oss.bdit.de/opd.html
-(Doesn't work for me, but maybe I haven't tried hard enough)
+no comments from me, because I never worked with L2CAP connectionless
+sockets. There was some discussion about it on the mailing list, so I
+think you should go through the archive.
 
-Thomas
+Regards
 
--- 
-Email: thomas@intevation.de
-http://intevation.de/~thomas/
+Marcel
+
+
 
 
 -------------------------------------------------------
