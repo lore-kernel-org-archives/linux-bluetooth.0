@@ -1,42 +1,49 @@
-Return-Path: <pb@nexus.co.uk>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] lmx9814
-From: Philip Blundell <pb@nexus.co.uk>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Philip Blundell <pb@nexus.co.uk>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076866147.2840.11.camel@pegasus>
+In-Reply-To: <1076865675.23437.73.camel@dixie.nexus.co.uk>
 References: <1076864335.23437.70.camel@dixie.nexus.co.uk>
 	 <1076865499.2840.8.camel@pegasus>
 	 <1076865675.23437.73.camel@dixie.nexus.co.uk>
-	 <1076866147.2840.11.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1076869842.23437.75.camel@dixie.nexus.co.uk>
+Message-Id: <1076866147.2840.11.camel@pegasus>
 Mime-Version: 1.0
-Date: Sun, 15 Feb 2004 18:30:42 +0000
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Sun, 15 Feb 2004 18:29:07 +0100
 
-On Sun, 2004-02-15 at 17:29, Marcel Holtmann wrote:
-> if you have a 5500 that runs Windows, check is with "hcitool info ..."
-> from another Linux machine. If it is a CSR chip, simply try to use the
-> BCSP method of hciattach.
+Hi Philip,
 
-Hi Marcel
+> The older 3000 series does use an ALPS module with a CSR chip, but I'm
+> fairly certain that the 5000 is using the National part.
 
-Here's what it says.  Can you interpret this for me?  :-)
+if you have a 5500 that runs Windows, check is with "hcitool info ..."
+from another Linux machine. If it is a CSR chip, simply try to use the
+BCSP method of hciattach.
 
-dixie:/home/pb/gpe/base# hcitool info 08:00:17:19:EE:71
-Requesting information ...
-        BD Address:  08:00:17:19:EE:71
-        Device Name: POCKET_PC
-        LMP Version: 1.1 (0x1) LMP Subversion: 0x180
-        Manufacturer: RTX Telecom A/S (21)
-        Features: 0xff 0x3b 0x05 0x00 0x00 0x00 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot
-offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <SCO link> <HV2 packets>
-                <HV3 packets> <CVSD> <power control>
-dixie:/home/pb/gpe/base#
+Regards
 
-Thanks
+Marcel
 
-p.
+
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
