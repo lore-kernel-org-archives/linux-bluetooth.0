@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <3F65E012.6060009@csr.com>
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-To: Chris Sterling <chris.sterling@blackbearconsulting.com>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] btuart_cs module freezes Zaurus SL5000D after 30
-    seconds
-References: <1063600741.9649.7.camel@dev.blackbear.com>
-In-Reply-To: <1063600741.9649.7.camel@dev.blackbear.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Matthias Thomae <thomae@ei.tum.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3F65DB01.9030802@ei.tum.de>
+References: <3F65D3E6.60307@ei.tum.de>  <3F65DB01.9030802@ei.tum.de>
+Content-Type: text/plain
+Message-Id: <1063639940.28891.510.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-users] Re: bfusb 1.1 firmware loading and rc-scripts
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -19,38 +18,33 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 15 Sep 2003 16:51:46 +0100
+Date: 15 Sep 2003 17:32:14 +0200
 
-Chris Sterling wrote:
-> btuart_cs: Unknown HCI packet with type 0xc0 received.
-> btuart_cs: Unknown HCI packet with type 0x00 received.
-> btuart_cs: Unknown HCI packet with type 0x41 received.
-> btuart_cs: Unknown HCI packet with type 0x00 received.
-[...]
+Hallo Matthias,
 
-Looks like your Bluetooth module uses the CSR chip set and is in BCSP
-mode. BlueZ hasn't been told this so it's trying to talk to it in H4
-mode.
+> since upgrading from bfusb 1.0 to 1.1 I have problems creating bluetooth 
+> connections at system start form the rc-scripts on a debian/unstable 
+> system, such as PAN or CMTP connections.
+> 
+> I think this is because the old bfusb version was returning only when 
+> the firmware has finished loading into the dongle (which takes a few 
+> seconds), whereas the new version returns immediately and loads the 
+> firmware in the background. Is this correct? When putting "sleep 10" in 
+> one of the rc scripts, it works as before.
 
-Tell BlueZ to use BCSP and everything should spring in to life (I think
-you just pass the bcsp option into hciattach).
+the firmware loading routine is the same and blocks until the firmware
+is loading. The only difference is where the firmware file comes from.
 
-	- Steven
--- 
+> Is there a way to detect when the firmware loading is finished, or would 
+> you consider to change back to the old behaviour?
 
+The current driver is working fine and the firmware loading is finished,
+when the HCI device is created.
 
+Regards
 
-**********************************************************************
-The information transmitted is intended only for the person or
-entity to which it is addressed and may contain confidential 
-and/or privileged material. 
-Any review, retransmission, dissemination or other use of, or
-taking of any action in reliance upon, this information by 
-persons or entities other than the intended recipient is 
-prohibited.  
-If you received this in error, please contact the sender and 
-delete the material from any computer.
-**********************************************************************
+Marcel
+
 
 
 
