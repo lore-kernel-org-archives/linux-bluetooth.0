@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4231ACAA.3050207@tomtom.com>
-From: Dimitry Andric <dimitry.andric@tomtom.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] SDP browsing inconsistency on Motorola A1000
-References: <423191C1.2020107@tomtom.com> <1110549590.32238.131.camel@baroque.rococosoft.com>
-In-Reply-To: <1110549590.32238.131.camel@baroque.rococosoft.com>
-Content-Type: multipart/mixed;
- boundary="------------070205070504010905040507"
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <423191C1.2020107@tomtom.com>
+References: <423191C1.2020107@tomtom.com>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-TJ/p8JtFQffND3mCE6yu"
+Message-Id: <1110549590.32238.131.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,143 +18,706 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 11 Mar 2005 15:35:22 +0100
+Date: Fri, 11 Mar 2005 13:59:50 +0000
 
-This is a multi-part message in MIME format.
---------------070205070504010905040507
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Stephen Crane wrote:
+--=-TJ/p8JtFQffND3mCE6yu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> I don't know what's causing your problem but I've had a look at the
-> dumps and it seems that the integer-sequence values being printed out in
-> error are in fact from the LANG_BASE_ATTR_ID_LIST, which occurs 44 bytes
-> after the SVCLASS_ID_LIST. 
+Hi Dimitry,
+I don't know what's causing your problem but I've had a look at the
+dumps and it seems that the integer-sequence values being printed out in
+error are in fact from the LANG_BASE_ATTR_ID_LIST, which occurs 44 bytes
+after the SVCLASS_ID_LIST.=20
 
-I didn't notice this earlier, but I'd say they are *before* the
-ServiceClassIDList:
+Can you step through this in a debugger on the ARM box? Also to check
+for memory corruption, can you run it under valgrind on the x86 box?
+
+Finally, are you sure that the text of your sdptool-arm dump is correct?
+The data for the record in question seems to be repeated:
 
 [...]
-Attribute Identifier : 0x0 - ServiceRecordHandle
-  Integer : 0x10003
-[...]
-Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
-  Data Sequence
-    Code ISO639 (Integer) : 0x656e
-    Encoding (Integer) : 0x6a
-    Base Offset (Integer) : 0x100
-[...]
-Attribute Identifier : 0x0 - ServiceRecordHandle
-  Integer : 0x10003
-Attribute Identifier : 0x1 - ServiceClassIDList
+Attribute Identifier : 0x301
+  Integer : 0x20
+Attribute Identifier : 0x311
+  Integer : 0x7
+
+ttribute Identifier : 0x1 - ServiceClassIDList
   Data Sequence
     Integer : 0x656e
     Integer : 0x6a
     Integer : 0x100
 [...]
 
-At least I've got a bit of a clue where to start looking now. :)
+Thanks,
+Steve
 
+On Fri, 2005-03-11 at 13:40 +0100, Dimitry Andric wrote:
+> Hi,
+>=20
+> I've just been asked to check out an SDP problem, which occurred with
+> a Motorola A1000 phone.  It seems like the phone doesn't return any
+> Service Class ID's for its Handsfree Audio Gateway profile.
+>=20
+> This turns out to be caused by sdp_get_service_classes() failing.  I
+> added some debug code to this function (see sdp-dtd-debug.patch, and
+> compile with -DSDP_DEBUG), to help diagnose the problem.
+>=20
+> For some reason, spd_get_service_classes thinks there's a SDP_UINT16
+> (0x09) instead of a SDP_UUID16 (0x19) in the Service Class ID list of
+> the HF AG record, but here hcidump and sdptool disagree.
+>=20
+> sdptool says (see sdptool-arm for full dump):
+>=20
+> Attribute Identifier : 0x0 - ServiceRecordHandle
+>   Integer : 0x10003
+> Attribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     Integer : 0x656e
+>     Integer : 0x6a
+>     Integer : 0x100
+>=20
+> while hcidump says (see hcidump-arm.raw):
+>=20
+>           record #4
+>               aid 0x0000 (SrvRecHndl)
+>                  uint 0x10003
+>               aid 0x0001 (SrvClassIDList)
+>                  < uuid-16 0x111f (Handsfree AG) uuid-16 0x1203 (Audio) >
+>=20
+> However, this is all on an ARM platform, while on an x86 platform it
+> DOES seem to work correctly!
+>=20
+> sdptool says on x86 (see sdptool-x86):
+>=20
+> Attribute Identifier : 0x0 - ServiceRecordHandle
+>   Integer : 0x10003
+> Attribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     UUID16 : 0x111f - HandsfreeAudioGateway
+>     UUID16 : 0x1203 - GenericAudio
+>=20
+> and hcidump says (see hcidump-x86.raw):
+>=20
+>           record #3
+>               aid 0x0000 (SrvRecHndl)
+>                  uint 0x10003
+>               aid 0x0001 (SrvClassIDList)
+>                  < uuid-16 0x111f (Handsfree AG) uuid-16 0x1203 (Audio) >
+>=20
+> So it seems to be another nice alignment problem somewhere in the SDP
+> library stuff! (Hi Marcel :P)  If anyone has an idea where this might
+> be, please let me know.
+> plain text document attachment (sdp-dtd-debug.patch)
+> =07&#0;=01&#0;=E2=82=AC=C3=A22Bf=CB=86=0C&#0;=04=0F=04&#0;=01=05=04=0E&#0=
+;=01&#0;=C5=A0=C3=A22Bk=C3=82=03&#0;=04=03=0B&#0;.&#0;o=1F=C2=90(
+> &#0;=01&#0;	&#0;=01&#0;=C5=A0=C3=A22BK=C3=B1=03&#0;=04=0E=06=01=08&#0;.&#=
+0;=07&#0;=01&#0;=C5=A1=C3=A22Bm3=08&#0;=04=0F=04&#0;=01=06=04=07&#0;=01&#0;=
+=C5=A1=C3=A22BMb=08&#0;=04=05=04&#0;.&#0;=16=11&#0;&#0;&#0;=C3=97=C3=A22B=
+=C3=AF\	&#0;=01=05=04o=1F=C2=90(
+> &#0;=18=C3=8C=01&#0;=C3=84=C5=BE=01=07&#0;=01&#0;=C3=97=C3=A22B=C2=90=C2=
+=81	&#0;=04=0F=04&#0;=01=05=04=0E&#0;=01&#0;=C3=98=C3=A22Bv=02=0C&#0;=04=03=
+=0B&#0;.&#0;o=1F=C2=90(
+> &#0;=01&#0;=11&#0;&#0;&#0;=C3=98=C3=A22B=C2=8D=02=0C&#0;=02. =0C&#0;=08&#=
+0;=01&#0;=02=01=04&#0;=01&#0;@&#0;=08&#0;&#0;&#0;=C3=98=C3=A22B=E2=80=9C=02=
+=0C&#0;=01=08=04.&#0;=0F&#0;=08&#0;=01&#0;=C3=98=C3=A22B=C3=A5=19=0C&#0;=04=
+=13=05=01.&#0;=01&#0;=06&#0;=01&#0;=C3=98=C3=A22B=C3=B7@=0C&#0;=04=1B=03.&#=
+0;=05	&#0;=01&#0;=C3=98=C3=A22B=C3=BEc=0C&#0;=04=0E=06=01=08&#0;.&#0;=15&#0=
+;=01&#0;=C3=98=C3=A22B=C3=A9=E2=80=93=0C&#0;=02. =10&#0;=0C&#0;=01&#0;=03=
+=01=08&#0;M&#0;@&#0;=01&#0;=02&#0;=15&#0;=01&#0;=C3=98=C3=A22B&=C2=B6=0C&#0=
+;=02. =10&#0;=0C&#0;=01&#0;=03=01=08&#0;M&#0;@&#0;&#0;&#0;&#0;&#0;=11&#0;&#=
+0;&#0;=C3=98=C3=A22B4=C2=B6=0C&#0;=02. =0C&#0;=08&#0;=01&#0;=04=02=04&#0;M&=
+#0;&#0;&#0;=11&#0;=01&#0;=C3=98=C3=A22B=C3=B6=C5=93=0C&#0;=02. =0C&#0;=08&#=
+0;=01&#0;=04=01=04&#0;@&#0;&#0;&#0;=13&#0;&#0;&#0;=C3=98=C3=A22B=04=C5=B8=
+=0C&#0;=02. =0E&#0;
+> &#0;=01&#0;=05=01=06&#0;M&#0;&#0;&#0;&#0;&#0;=08&#0;=01&#0;=C3=98=C3=A22B=
+=C3=85=C3=85=0C&#0;=04=13=05=01.&#0;=01&#0;=08&#0;=01&#0;=C3=98=C3=A22Bc=C3=
+=95=0C&#0;=04=13=05=01.&#0;=01&#0;=13&#0;=01&#0;=C3=98=C3=A22B4=C3=9D=0C&#0=
+;=02. =0E&#0;
+> &#0;=01&#0;=05=02=06&#0;@&#0;&#0;&#0;&#0;&#0;=1D&#0;&#0;&#0;=C3=98=C3=A22=
+B=C3=86=C3=9D=0C&#0;=02. =18&#0;=14&#0;M&#0;=06&#0;&#0;&#0;=0F5=03=19=10=02=
+=C3=BF=C3=BF5=05
+> &#0;&#0;=C3=BF=C3=BF&#0;=08&#0;=01&#0;=C3=98=C3=A22Bw=C3=BC=0C&#0;=04=13=
+=05=01.&#0;=01&#0;X=01=01&#0;=C3=98=C3=A22B=C3=B2e&#0;=02. S=01O=02@&#0;=07=
+&#0;&#0;=02J=02G6=02D5=E2=80=A2	&#0;&#0;
+> &#0;=01&#0;&#0;	&#0;=015=06=19=11=12=19=12=03	&#0;=02
+> &#0;&#0;&#0;
+> 	&#0;=045=0C5=03=19=01&#0;5=05=19&#0;=03=08=02	&#0;=055=03=19=10=02	&#0;=
+=065		en	&#0;j	=01&#0;	&#0;=08=08=C3=BF	&#0;	5=085=06=19=11=08	=01&#0;	=01&=
+#0;%=15Headset Audio Gateway	=01=01%=15Headset Audio Gateway	=01=02%=08Moto=
+rola5y	&#0;&#0;
+> &#0;=01&#0;=01	&#0;=015=03=19=11=05	&#0;=045=115=03=19=01&#0;5=05=19&#0;=
+=03=08=035=03=19&#0;=08	&#0;=055=03=19=10=02	&#0;	5=085=06=19=11=05	=01&#0;=
+	=01&#0;%=10OBEX Object Push	=01=01%=10OBEX Object Push	=01=02%=08Motorola	=
+=03=035=02=08=C3=BF5=C5=A0	&#0;&#0;
+> &#0;=01&#0;=02	&#0;=015=03=19=11=03	&#0;=02
+> &#0;&#0;&#0;		&#0;=045=0C5=03=19=01&#0;5=05=19&#0;=03=08=01	&#0;=055=03=
+=19=10=02=05=01=01&#0;=C3=98=C3=A22B=C2=A9q&#0;=02.=10&#0;=01	&#0;=065		en	=
+&#0;j	=01&#0;	&#0;=08=08=C3=BF	&#0;	5=085=06=19=11=03	=01&#0;	=01&#0;%=11Di=
+alup Networking	=01=01%=11Dialup Networking	=01=02%=08Motorola5=E2=82=AC	&#=
+0;&#0;
+> &#0;=01&#0;=03	&#0;=015=06=19=11=1F=19=12=03	&#0;=02
+> &#0;&#0;&#0;	&#0;=045=0C5=03=19=01&#0;5=05=19&#0;=03=08=04	&#0;=055=03=19=
+=10=02	&#0;=065		en	&#0;j	=01&#0;	&#0;=08=08=C3=BF	&#0;	5=085=06=19=11=1E	=
+=01&#0;	=01&#0;%=17Handsfree Audio Gateway	=01=01%=17Handsfree Audio Gatewa=
+y	=01=02%=08Motorola	=03=01=08 	=03=11	&#0;=07&#0;=11&#0;&#0;&#0;=C3=98=C3=
+=A22B=C6=92r&#0;=02. =0C&#0;=08&#0;=01&#0;=06=03=04&#0;M&#0;@&#0;=08&#0;=01=
+&#0;=C3=98=C3=A22B=1B=E2=80=B0&#0;=04=13=05=01.&#0;=01&#0;=11&#0;=01&#0;=C3=
+=98=C3=A22B=C3=BB4=0E&#0;=02. =0C&#0;=08&#0;=01&#0;=07=03=04&#0;M&#0;@&#0;=
+=07&#0;&#0;&#0;=C3=9A=C3=A22B=C2=B23=0E&#0;=01=06=04=03.&#0;=13=07&#0;=01&#=
+0;=C3=9A=C3=A22BvP=0E&#0;=04=0F=04&#0;=01=06=04=07&#0;=01&#0;=C3=9A=C3=A22B=
+$=E2=80=A1=0E&#0;=04=05=04&#0;.&#0;=16OBEXObjectPush
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x3
+>     Data Sequence
+>       UUID16 : 0x0008 - OBEX
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x1105 - OBEXObjectPush
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "OBEX Object Push"
+> Attribute Identifier : 0x101
+>   Text : "OBEX Object Push"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+> Attribute Identifier : 0x303
+>   Data Sequence
+>     Integer : 0xff
+>=20
+> Attribute Identifier : 0x0 - ServiceRecordHandle
+>   Integer : 0x10002
+> Attribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     UUID16 : 0x1103 - DialupNetworking (DUN)
+> Attribute Identifier : 0x2 - ServiceRecordState
+>   Integer : 0x9
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x1
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+>   Data Sequence
+>     Code ISO639 (Integer) : 0x656e
+>     Encoding (Integer) : 0x6a
+>     Base Offset (Integer) : 0x100
+> Attribute Identifier : 0x8 - ServiceAvailability
+>   Integer : 0xff
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x1103 - DialupNetworking (DUN)
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "Dialup Networking"
+> Attribute Identifier : 0x101
+>   Text : "Dialup Networking"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+>=20
+> Attribute Identifier : 0x0 - ServiceRecordHandle
+>   Integer : 0x10003
+> Attribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     UUID16 : 0x111f - HandsfreeAudioGateway
+>     UUID16 : 0x1203 - GenericAudio
+> Attribute Identifier : 0x2 - ServiceRecordState
+>   Integer : 0xd
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x4
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+>   Data Sequence
+>     Code ISO639 (Integer) : 0x656e
+>     Encoding (Integer) : 0x6a
+>     Base Offset (Integer) : 0x100
+> Attribute Identifier : 0x8 - ServiceAvailability
+>   Integer : 0xff
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x111e - Handsfree
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x101
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+> Attribute Identifier : 0x301
+>   Integer : 0x20
+> Attribute Identifier : 0x311
+>   Integer : 0x7
+>=20
+> ttribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     Integer : 0x656e
+>     Integer : 0x6a
+>     Integer : 0x100
+> Attribute Identifier : 0x2 - ServiceRecordState
+>   Integer : 0xd
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x4
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x8 - ServiceAvailability
+>   Integer : 0xff
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x111e - Handsfree
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x101
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+> Attribute Identifier : 0x301
+>   Integer : 0x20
+> Attribute Identifier : 0x311
+>   Integer : 0x7
+>=20
+> plain text document attachment (sdptool-arm)
+> =07&#0;=01&#0;=E2=82=AC=C3=A22Bf=CB=86=0C&#0;=04=0F=04&#0;=01=05=04=0E&#0=
+;=01&#0;=C5=A0=C3=A22Bk=C3=82=03&#0;=04=03=0B&#0;.&#0;o=1F=C2=90(
+> &#0;=01&#0;	&#0;=01&#0;=C5=A0=C3=A22BK=C3=B1=03&#0;=04=0E=06=01=08&#0;.&#=
+0;=07&#0;=01&#0;=C5=A1=C3=A22Bm3=08&#0;=04=0F=04&#0;=01=06=04=07&#0;=01&#0;=
+=C5=A1=C3=A22BMb=08&#0;=04=05=04&#0;.&#0;=16=11&#0;&#0;&#0;=C3=97=C3=A22B=
+=C3=AF\	&#0;=01=05=04o=1F=C2=90(
+> &#0;=18=C3=8C=01&#0;=C3=84=C5=BE=01=07&#0;=01&#0;=C3=97=C3=A22B=C2=90=C2=
+=81	&#0;=04=0F=04&#0;=01=05=04=0E&#0;=01&#0;=C3=98=C3=A22Bv=02=0C&#0;=04=03=
+=0B&#0;.&#0;o=1F=C2=90(
+> &#0;=01&#0;=11&#0;&#0;&#0;=C3=98=C3=A22B=C2=8D=02=0C&#0;=02. =0C&#0;=08&#=
+0;=01&#0;=02=01=04&#0;=01&#0;@&#0;=08&#0;&#0;&#0;=C3=98=C3=A22B=E2=80=9C=02=
+=0C&#0;=01=08=04.&#0;=0F&#0;=08&#0;=01&#0;=C3=98=C3=A22B=C3=A5=19=0C&#0;=04=
+=13=05=01.&#0;=01&#0;=06&#0;=01&#0;=C3=98=C3=A22B=C3=B7@=0C&#0;=04=1B=03.&#=
+0;=05	&#0;=01&#0;=C3=98=C3=A22B=C3=BEc=0C&#0;=04=0E=06=01=08&#0;.&#0;=15&#0=
+;=01&#0;=C3=98=C3=A22B=C3=A9=E2=80=93=0C&#0;=02. =10&#0;=0C&#0;=01&#0;=03=
+=01=08&#0;M&#0;@&#0;=01&#0;=02&#0;=15&#0;=01&#0;=C3=98=C3=A22B&=C2=B6=0C&#0=
+;=02. =10&#0;=0C&#0;=01&#0;=03=01=08&#0;M&#0;@&#0;&#0;&#0;&#0;&#0;=11&#0;&#=
+0;&#0;=C3=98=C3=A22B4=C2=B6=0C&#0;=02. =0C&#0;=08&#0;=01&#0;=04=02=04&#0;M&=
+#0;&#0;&#0;=11&#0;=01&#0;=C3=98=C3=A22B=C3=B6=C5=93=0C&#0;=02. =0C&#0;=08&#=
+0;=01&#0;=04=01=04&#0;@&#0;&#0;&#0;=13&#0;&#0;&#0;=C3=98=C3=A22B=04=C5=B8=
+=0C&#0;=02. =0E&#0;
+> &#0;=01&#0;=05=01=06&#0;M&#0;&#0;&#0;&#0;&#0;=08&#0;=01&#0;=C3=98=C3=A22B=
+=C3=85=C3=85=0C&#0;=04=13=05=01.&#0;=01&#0;=08&#0;=01&#0;=C3=98=C3=A22Bc=C3=
+=95=0C&#0;=04=13=05=01.&#0;=01&#0;=13&#0;=01&#0;=C3=98=C3=A22B4=C3=9D=0C&#0=
+;=02. =0E&#0;
+> &#0;=01&#0;=05=02=06&#0;@&#0;&#0;&#0;&#0;&#0;=1D&#0;&#0;&#0;=C3=98=C3=A22=
+B=C3=86=C3=9D=0C&#0;=02. =18&#0;=14&#0;M&#0;=06&#0;&#0;&#0;=0F5=03=19=10=02=
+=C3=BF=C3=BF5=05
+> &#0;&#0;=C3=BF=C3=BF&#0;=08&#0;=01&#0;=C3=98=C3=A22Bw=C3=BC=0C&#0;=04=13=
+=05=01.&#0;=01&#0;X=01=01&#0;=C3=98=C3=A22B=C3=B2e&#0;=02. S=01O=02@&#0;=07=
+&#0;&#0;=02J=02G6=02D5=E2=80=A2	&#0;&#0;
+> &#0;=01&#0;&#0;	&#0;=015=06=19=11=12=19=12=03	&#0;=02
+> &#0;&#0;&#0;
+> 	&#0;=045=0C5=03=19=01&#0;5=05=19&#0;=03=08=02	&#0;=055=03=19=10=02	&#0;=
+=065		en	&#0;j	=01&#0;	&#0;=08=08=C3=BF	&#0;	5=085=06=19=11=08	=01&#0;	=01&=
+#0;%=15Headset Audio Gateway	=01=01%=15Headset Audio Gateway	=01=02%=08Moto=
+rola5y	&#0;&#0;
+> &#0;=01&#0;=01	&#0;=015=03=19=11=05	&#0;=045=115=03=19=01&#0;5=05=19&#0;=
+=03=08=035=03=19&#0;=08	&#0;=055=03=19=10=02	&#0;	5=085=06=19=11=05	=01&#0;=
+	=01&#0;%=10OBEX Object Push	=01=01%=10OBEX Object Push	=01=02%=08Motorola	=
+=03=035=02=08=C3=BF5=C5=A0	&#0;&#0;
+> &#0;=01&#0;=02	&#0;=015=03=19=11=03	&#0;=02
+> &#0;&#0;&#0;		&#0;=045=0C5=03=19=01&#0;5=05=19&#0;=03=08=01	&#0;=055=03=
+=19=10=02=05=01=01&#0;=C3=98=C3=A22B=C2=A9q&#0;=02.=10&#0;=01	&#0;=065		en	=
+&#0;j	=01&#0;	&#0;=08=08=C3=BF	&#0;	5=085=06=19=11=03	=01&#0;	=01&#0;%=11Di=
+alup Networking	=01=01%=11Dialup Networking	=01=02%=08Motorola5=E2=82=AC	&#=
+0;&#0;
+> &#0;=01&#0;=03	&#0;=015=06=19=11=1F=19=12=03	&#0;=02
+> &#0;&#0;&#0;	&#0;=045=0C5=03=19=01&#0;5=05=19&#0;=03=08=04	&#0;=055=03=19=
+=10=02	&#0;=065		en	&#0;j	=01&#0;	&#0;=08=08=C3=BF	&#0;	5=085=06=19=11=1E	=
+=01&#0;	=01&#0;%=17Handsfree Audio Gateway	=01=01%=17Handsfree Audio Gatewa=
+y	=01=02%=08Motorola	=03=01=08 	=03=11	&#0;=07&#0;=11&#0;&#0;&#0;=C3=98=C3=
+=A22B=C6=92r&#0;=02. =0C&#0;=08&#0;=01&#0;=06=03=04&#0;M&#0;@&#0;=08&#0;=01=
+&#0;=C3=98=C3=A22B=1B=E2=80=B0&#0;=04=13=05=01.&#0;=01&#0;=11&#0;=01&#0;=C3=
+=98=C3=A22B=C3=BB4=0E&#0;=02. =0C&#0;=08&#0;=01&#0;=07=03=04&#0;M&#0;@&#0;=
+=07&#0;&#0;&#0;=C3=9A=C3=A22B=C2=B23=0E&#0;=01=06=04=03.&#0;=13=07&#0;=01&#=
+0;=C3=9A=C3=A22BvP=0E&#0;=04=0F=04&#0;=01=06=04=07&#0;=01&#0;=C3=9A=C3=A22B=
+$=E2=80=A1=0E&#0;=04=05=04&#0;.&#0;=16OBEXObjectPush
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x3
+>     Data Sequence
+>       UUID16 : 0x0008 - OBEX
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x1105 - OBEXObjectPush
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "OBEX Object Push"
+> Attribute Identifier : 0x101
+>   Text : "OBEX Object Push"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+> Attribute Identifier : 0x303
+>   Data Sequence
+>     Integer : 0xff
+>=20
+> Attribute Identifier : 0x0 - ServiceRecordHandle
+>   Integer : 0x10002
+> Attribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     UUID16 : 0x1103 - DialupNetworking (DUN)
+> Attribute Identifier : 0x2 - ServiceRecordState
+>   Integer : 0x9
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x1
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+>   Data Sequence
+>     Code ISO639 (Integer) : 0x656e
+>     Encoding (Integer) : 0x6a
+>     Base Offset (Integer) : 0x100
+> Attribute Identifier : 0x8 - ServiceAvailability
+>   Integer : 0xff
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x1103 - DialupNetworking (DUN)
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "Dialup Networking"
+> Attribute Identifier : 0x101
+>   Text : "Dialup Networking"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+>=20
+> Attribute Identifier : 0x0 - ServiceRecordHandle
+>   Integer : 0x10003
+> Attribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     UUID16 : 0x111f - HandsfreeAudioGateway
+>     UUID16 : 0x1203 - GenericAudio
+> Attribute Identifier : 0x2 - ServiceRecordState
+>   Integer : 0xd
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x4
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+>   Data Sequence
+>     Code ISO639 (Integer) : 0x656e
+>     Encoding (Integer) : 0x6a
+>     Base Offset (Integer) : 0x100
+> Attribute Identifier : 0x8 - ServiceAvailability
+>   Integer : 0xff
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x111e - Handsfree
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x101
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+> Attribute Identifier : 0x301
+>   Integer : 0x20
+> Attribute Identifier : 0x311
+>   Integer : 0x7
+>=20
+> ttribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     Integer : 0x656e
+>     Integer : 0x6a
+>     Integer : 0x100
+> Attribute Identifier : 0x2 - ServiceRecordState
+>   Integer : 0xd
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x4
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x8 - ServiceAvailability
+>   Integer : 0xff
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x111e - Handsfree
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x101
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+> Attribute Identifier : 0x301
+>   Integer : 0x20
+> Attribute Identifier : 0x311
+>   Integer : 0x7
+>=20
+> plain text document attachment (sdptool-x86)
+> =07&#0;=01&#0;=E2=82=AC=C3=A22Bf=CB=86=0C&#0;=04=0F=04&#0;=01=05=04=0E&#0=
+;=01&#0;=C5=A0=C3=A22Bk=C3=82=03&#0;=04=03=0B&#0;.&#0;o=1F=C2=90(
+> &#0;=01&#0;	&#0;=01&#0;=C5=A0=C3=A22BK=C3=B1=03&#0;=04=0E=06=01=08&#0;.&#=
+0;=07&#0;=01&#0;=C5=A1=C3=A22Bm3=08&#0;=04=0F=04&#0;=01=06=04=07&#0;=01&#0;=
+=C5=A1=C3=A22BMb=08&#0;=04=05=04&#0;.&#0;=16=11&#0;&#0;&#0;=C3=97=C3=A22B=
+=C3=AF\	&#0;=01=05=04o=1F=C2=90(
+> &#0;=18=C3=8C=01&#0;=C3=84=C5=BE=01=07&#0;=01&#0;=C3=97=C3=A22B=C2=90=C2=
+=81	&#0;=04=0F=04&#0;=01=05=04=0E&#0;=01&#0;=C3=98=C3=A22Bv=02=0C&#0;=04=03=
+=0B&#0;.&#0;o=1F=C2=90(
+> &#0;=01&#0;=11&#0;&#0;&#0;=C3=98=C3=A22B=C2=8D=02=0C&#0;=02. =0C&#0;=08&#=
+0;=01&#0;=02=01=04&#0;=01&#0;@&#0;=08&#0;&#0;&#0;=C3=98=C3=A22B=E2=80=9C=02=
+=0C&#0;=01=08=04.&#0;=0F&#0;=08&#0;=01&#0;=C3=98=C3=A22B=C3=A5=19=0C&#0;=04=
+=13=05=01.&#0;=01&#0;=06&#0;=01&#0;=C3=98=C3=A22B=C3=B7@=0C&#0;=04=1B=03.&#=
+0;=05	&#0;=01&#0;=C3=98=C3=A22B=C3=BEc=0C&#0;=04=0E=06=01=08&#0;.&#0;=15&#0=
+;=01&#0;=C3=98=C3=A22B=C3=A9=E2=80=93=0C&#0;=02. =10&#0;=0C&#0;=01&#0;=03=
+=01=08&#0;M&#0;@&#0;=01&#0;=02&#0;=15&#0;=01&#0;=C3=98=C3=A22B&=C2=B6=0C&#0=
+;=02. =10&#0;=0C&#0;=01&#0;=03=01=08&#0;M&#0;@&#0;&#0;&#0;&#0;&#0;=11&#0;&#=
+0;&#0;=C3=98=C3=A22B4=C2=B6=0C&#0;=02. =0C&#0;=08&#0;=01&#0;=04=02=04&#0;M&=
+#0;&#0;&#0;=11&#0;=01&#0;=C3=98=C3=A22B=C3=B6=C5=93=0C&#0;=02. =0C&#0;=08&#=
+0;=01&#0;=04=01=04&#0;@&#0;&#0;&#0;=13&#0;&#0;&#0;=C3=98=C3=A22B=04=C5=B8=
+=0C&#0;=02. =0E&#0;
+> &#0;=01&#0;=05=01=06&#0;M&#0;&#0;&#0;&#0;&#0;=08&#0;=01&#0;=C3=98=C3=A22B=
+=C3=85=C3=85=0C&#0;=04=13=05=01.&#0;=01&#0;=08&#0;=01&#0;=C3=98=C3=A22Bc=C3=
+=95=0C&#0;=04=13=05=01.&#0;=01&#0;=13&#0;=01&#0;=C3=98=C3=A22B4=C3=9D=0C&#0=
+;=02. =0E&#0;
+> &#0;=01&#0;=05=02=06&#0;@&#0;&#0;&#0;&#0;&#0;=1D&#0;&#0;&#0;=C3=98=C3=A22=
+B=C3=86=C3=9D=0C&#0;=02. =18&#0;=14&#0;M&#0;=06&#0;&#0;&#0;=0F5=03=19=10=02=
+=C3=BF=C3=BF5=05
+> &#0;&#0;=C3=BF=C3=BF&#0;=08&#0;=01&#0;=C3=98=C3=A22Bw=C3=BC=0C&#0;=04=13=
+=05=01.&#0;=01&#0;X=01=01&#0;=C3=98=C3=A22B=C3=B2e&#0;=02. S=01O=02@&#0;=07=
+&#0;&#0;=02J=02G6=02D5=E2=80=A2	&#0;&#0;
+> &#0;=01&#0;&#0;	&#0;=015=06=19=11=12=19=12=03	&#0;=02
+> &#0;&#0;&#0;
+> 	&#0;=045=0C5=03=19=01&#0;5=05=19&#0;=03=08=02	&#0;=055=03=19=10=02	&#0;=
+=065		en	&#0;j	=01&#0;	&#0;=08=08=C3=BF	&#0;	5=085=06=19=11=08	=01&#0;	=01&=
+#0;%=15Headset Audio Gateway	=01=01%=15Headset Audio Gateway	=01=02%=08Moto=
+rola5y	&#0;&#0;
+> &#0;=01&#0;=01	&#0;=015=03=19=11=05	&#0;=045=115=03=19=01&#0;5=05=19&#0;=
+=03=08=035=03=19&#0;=08	&#0;=055=03=19=10=02	&#0;	5=085=06=19=11=05	=01&#0;=
+	=01&#0;%=10OBEX Object Push	=01=01%=10OBEX Object Push	=01=02%=08Motorola	=
+=03=035=02=08=C3=BF5=C5=A0	&#0;&#0;
+> &#0;=01&#0;=02	&#0;=015=03=19=11=03	&#0;=02
+> &#0;&#0;&#0;		&#0;=045=0C5=03=19=01&#0;5=05=19&#0;=03=08=01	&#0;=055=03=
+=19=10=02=05=01=01&#0;=C3=98=C3=A22B=C2=A9q&#0;=02.=10&#0;=01	&#0;=065		en	=
+&#0;j	=01&#0;	&#0;=08=08=C3=BF	&#0;	5=085=06=19=11=03	=01&#0;	=01&#0;%=11Di=
+alup Networking	=01=01%=11Dialup Networking	=01=02%=08Motorola5=E2=82=AC	&#=
+0;&#0;
+> &#0;=01&#0;=03	&#0;=015=06=19=11=1F=19=12=03	&#0;=02
+> &#0;&#0;&#0;	&#0;=045=0C5=03=19=01&#0;5=05=19&#0;=03=08=04	&#0;=055=03=19=
+=10=02	&#0;=065		en	&#0;j	=01&#0;	&#0;=08=08=C3=BF	&#0;	5=085=06=19=11=1E	=
+=01&#0;	=01&#0;%=17Handsfree Audio Gateway	=01=01%=17Handsfree Audio Gatewa=
+y	=01=02%=08Motorola	=03=01=08 	=03=11	&#0;=07&#0;=11&#0;&#0;&#0;=C3=98=C3=
+=A22B=C6=92r&#0;=02. =0C&#0;=08&#0;=01&#0;=06=03=04&#0;M&#0;@&#0;=08&#0;=01=
+&#0;=C3=98=C3=A22B=1B=E2=80=B0&#0;=04=13=05=01.&#0;=01&#0;=11&#0;=01&#0;=C3=
+=98=C3=A22B=C3=BB4=0E&#0;=02. =0C&#0;=08&#0;=01&#0;=07=03=04&#0;M&#0;@&#0;=
+=07&#0;&#0;&#0;=C3=9A=C3=A22B=C2=B23=0E&#0;=01=06=04=03.&#0;=13=07&#0;=01&#=
+0;=C3=9A=C3=A22BvP=0E&#0;=04=0F=04&#0;=01=06=04=07&#0;=01&#0;=C3=9A=C3=A22B=
+$=E2=80=A1=0E&#0;=04=05=04&#0;.&#0;=16OBEXObjectPush
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x3
+>     Data Sequence
+>       UUID16 : 0x0008 - OBEX
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x1105 - OBEXObjectPush
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "OBEX Object Push"
+> Attribute Identifier : 0x101
+>   Text : "OBEX Object Push"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+> Attribute Identifier : 0x303
+>   Data Sequence
+>     Integer : 0xff
+>=20
+> Attribute Identifier : 0x0 - ServiceRecordHandle
+>   Integer : 0x10002
+> Attribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     UUID16 : 0x1103 - DialupNetworking (DUN)
+> Attribute Identifier : 0x2 - ServiceRecordState
+>   Integer : 0x9
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x1
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+>   Data Sequence
+>     Code ISO639 (Integer) : 0x656e
+>     Encoding (Integer) : 0x6a
+>     Base Offset (Integer) : 0x100
+> Attribute Identifier : 0x8 - ServiceAvailability
+>   Integer : 0xff
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x1103 - DialupNetworking (DUN)
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "Dialup Networking"
+> Attribute Identifier : 0x101
+>   Text : "Dialup Networking"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+>=20
+> Attribute Identifier : 0x0 - ServiceRecordHandle
+>   Integer : 0x10003
+> Attribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     UUID16 : 0x111f - HandsfreeAudioGateway
+>     UUID16 : 0x1203 - GenericAudio
+> Attribute Identifier : 0x2 - ServiceRecordState
+>   Integer : 0xd
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x4
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+>   Data Sequence
+>     Code ISO639 (Integer) : 0x656e
+>     Encoding (Integer) : 0x6a
+>     Base Offset (Integer) : 0x100
+> Attribute Identifier : 0x8 - ServiceAvailability
+>   Integer : 0xff
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x111e - Handsfree
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x101
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+> Attribute Identifier : 0x301
+>   Integer : 0x20
+> Attribute Identifier : 0x311
+>   Integer : 0x7
+>=20
+> ttribute Identifier : 0x1 - ServiceClassIDList
+>   Data Sequence
+>     Integer : 0x656e
+>     Integer : 0x6a
+>     Integer : 0x100
+> Attribute Identifier : 0x2 - ServiceRecordState
+>   Integer : 0xd
+> Attribute Identifier : 0x4 - ProtocolDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x0100 - L2CAP
+>     Data Sequence
+>       UUID16 : 0x0003 - RFCOMM
+>       Channel/Port (Integer) : 0x4
+> Attribute Identifier : 0x5 - BrowseGroupList
+>   Data Sequence
+>     UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+> Attribute Identifier : 0x8 - ServiceAvailability
+>   Integer : 0xff
+> Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+>   Data Sequence
+>     Data Sequence
+>       UUID16 : 0x111e - Handsfree
+>       Version (Integer) : 0x100
+> Attribute Identifier : 0x100
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x101
+>   Text : "Handsfree Audio Gateway"
+> Attribute Identifier : 0x102
+>   Text : "Motorola"
+> Attribute Identifier : 0x301
+>   Integer : 0x20
+> Attribute Identifier : 0x311
+>   Integer : 0x7
+>=20
 
-> Can you step through this in a debugger on the ARM box?
+--=-TJ/p8JtFQffND3mCE6yu
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
 
-I'll need to fix up some things for that, I'll get back about this
-later.  I tried debugging on the thing before, but there's some weird
-problems with gdb on it.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
 
-Usually I try to get by with inserting printfs in various strategic
-locations, but the problem here is that I'm not sure where to put
-them...
+iD8DBQBCMaRWlgMqgVzLyWcRAg2kAJ4jlJhFza9hRetsINiJauuutmnSYgCfRnep
+f1YAzcF9o2f0Ia4URyHmwYc=
+=mNDA
+-----END PGP SIGNATURE-----
 
+--=-TJ/p8JtFQffND3mCE6yu--
 
-> Also to check for memory corruption, can you run it under valgrind
-> on the x86 box?
-
-Valgrind reports no problems, at least as far as I can interpret its
-output.  (Attached as valgrind.dump.gz)
-
-
-> Finally, are you sure that the text of your sdptool-arm dump is correct?
-> The data for the record in question seems to be repeated:
-
-Hm, either my mail client or my mail server corrupted this specific
-file.  I'm sending it again as a .gz file.
-
-
---------------070205070504010905040507
-Content-Type: application/octet-stream;
- name="valgrind.dump.gz"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="valgrind.dump.gz"
-
-H4sIAAAAAAACC+1XTXPaMBC98ys0OSWHUskQAtwA54MZEpiQdHqV7TVRa6xUkkn495VsJxgH
-uxCcNsP0Znt3n3ZX+57kvuBPkoUzhHEX97pWu9vBXXLRbV2ger1e6yklmBMpQEMPQsV8BgJ1
-EX7G6AuaglgwF27B5cK7oqEXQA2hYahg9uJVDEBWAIOASjm0R0wqHW9TRbXlVwSha/AQur8f
-2qSVRGGcWdlm0uULEEvzDmIdDh1P7clJcQJWvoKpomqHApo6fiK44i4PbJCuYI+Ki8Ii3n5Z
-KwyTuLCRNehNitc81S59s2NwKXj0+Jc71jIJ0nAW0Rn0qYRXx5K9G3BP40zHrUYHHaedPUnQ
-TluJy3nocs+MYM5OY6tZCI19X4LKOejKinM9W9U8DH1+x+Zwx0dskd/gplMC0l6B9BaUBdRh
-AVPLHITvl0y5zhGhO3hW+vVItxcljT8qCyGZED1hC+aBRAF3aYBkkg1iuiYxp4rxEOknJGDO
-NZQHxirrpfBWNqPl3GE0RCPllQVZ8Qx9AyH1gjfR3IHiQc+2Jik//42ULZTRBYPt6O3fRMxm
-bV9tMsSoXp8IMbpyBdTTA9uLPMYvdfJPdPnG08IN7XkJIQjmxp57ahX9J1q1jT+OS729GIyv
-r1Pz4IGGIQRfJ1zkeW1VrX+me5PICZibiT0ksdtfpzqmsUEEinP1oCfFZwHsPyiE4PaKDak9
-VZFd6ltX0RQOxZxBKb22FtTdo7N6ea05JHhAjyqRH1K9/GBDkXH//PvY+QGumkTy4UBkobEl
-ZjttwKdQkQ/j1YZtroheBhUlsMjgbs2snQI3k6owoIEbf7xsaH2rgpTWB5DSzLnNaBA93oB6
-4uJnfALY9zf7/p90DoTc5P+Zfzhnfsm0V6RRCTpawW8tUrtFftzR36hEZbKor+O29pFu/Cfb
-T3S8AxGd5qcQnc9LZALm8q4nWPoCoLLr+wvgey/w74jf+bZBcu23SsprkLz3Wa32G5e8IPhY
-FQAA4x6kiFLxHE0tcvgic9r2NcmY3hIfjpCL4elbTg3nAL81oE+s0wHxN81LiketSrUXLJOY
-VmcDZHV/nQPgyJaNLG1vj+V4dPbp+vJsPAygEvC9oUdA0PW9ksY6wGtHuUN38JRil9iHFTvO
-+dlTiu8G7hGLXZcczp7haPTXCK5vrq7ORv8gzrqt2biBQKRvd3d4u2tsjxAaB2A563mr+cIw
-KiTDgNqrlg0wCih3k+QrWOfvpmPK2KOTv8ZnHua41bVneEEOtGgpMXAK6F2m0K6HzYiiUk9Y
-MEXBW2keU7ZtG6pv2cJ3C/QovnZtr9fZwFTTuD/FR5oZSUMkrlNDN1EFz9AZ6Bt0qwWMK0ND
-xgd4VJWBM5brO13HXls7YuNyePbnvf93kxgP5IxliqIHcy6Vjs798skBs/gUHA/56b0CnKAi
-VZbnmDVhlOo6et7L26eeEc+YGW3RN3PQUCm2FdqTyzSLUt3Err0LyxCTj5csburGULsZZMqX
-rA43xkOHonZK5y1kLkpWtUYBdiZa1rhfTNXuPOSlfsbj9nigCasIQXTDJ7H1kxE2tjoPdoU3
-j+13PVBqMsP2BOYZLlnWJZUImcwxjwJgdLnR8CxouN1Ozwfjd/Bc0vHttyD0GY5lgZ0JaR62
-teGCBBtEq5KtFtE6dbO4REwPhs0gNjie//DdQuWS3X/uLArhi1BF6KuOvmfDl3JeYDimU8Am
-TmRUNt/qTk67Fqyu7/rQcDovm1u8oy7qkrbT6VpYgl+4aM8zhgUjsQ5ioAvdHtbVBE2MqvSQ
-RNcBhfH6asgC07AFluVbbveN49s94CJL3lTjUGayddiw1fGIhYmkwtzQwBiL211JGWIRYVdf
-uYiG2Ec7uJ8UlMkMT4WqVuXeqqII+aFfLdLrEhhA9dmCjvsS0RZUvsG8x8zRW8iCZ5g46CXX
-x7azqoIjkbXcTqdT/cujhWoJELPXxRTEzh7LBrdICTptEQmz5kkg8hIibOmFjhKWbxjdopLt
-WeRJLddzeuh6hYc5EnAQBONceYwmMOeL2lpsPIG2WP8CFU1L4QQTAAA=
---------------070205070504010905040507
-Content-Type: application/octet-stream;
- name="sdptool-arm.gz"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="sdptool-arm.gz"
-
-H4sIAAAAAAACC+1XTXPaMBC98ys0OSWHUskQAtwA54MZEpiQdHqV7TVRa6xUkkn495VsJxgH
-uxCcNsP0Znt3n3ZX+57kvuBPkoUzhHEX97pWu9vBXXLRbV2ger1e6yklmBMpQEMPQsV8BgJ1
-EX7G6AuaglgwF27B5cK7oqEXQA2hYahg9uJVDEBWAIOASjm0R0wqHW9TRbXlVwSha/AQur8f
-2qSVRGGcWdlm0uULEEvzDmIdDh1P7clJcQJWvoKpomqHApo6fiK44i4PbJCuYI+Ki8Ii3n5Z
-KwyTuLCRNehNitc81S59s2NwKXj0+Jc71jIJ0nAW0Rn0qYRXx5K9G3BP40zHrUYHHaedPUnQ
-TluJy3nocs+MYM5OY6tZCI19X4LKOejKinM9W9U8DH1+x+Zwx0dskd/gplMC0l6B9BaUBdRh
-AVPLHITvl0y5zhGhO3hW+vVItxcljT8qCyGZED1hC+aBRAF3aYBkkg1iuiYxp4rxEOknJGDO
-NZQHxirrpfBWNqPl3GE0RCPllQVZ8Qx9AyH1gjfR3IHiQc+2Jik//42ULZTRBYPt6O3fRMxm
-bV9tMsSoXp8IMbpyBdTTA9uLPMYvdfJPdPnG08IN7XkJIQjmxp57ahX9J1q1jT+OS729GIyv
-r1Pz4IGGIQRfJ1zkeW1VrX+me5PICZibiT0ksdtfpzqmsUEEinP1oCfFZwHsPyiE4PaKDak9
-VZFd6ltX0RQOxZxBKb22FtTdo7N6ea05JHhAjyqRH1K9/GBDkXH//PvY+QGumkTy4UBkobEl
-ZjttwKdQkQ/j1YZtroheBhUlsMjgbs2snQI3k6owoIEbf7xsaH2rgpTWB5DSzLnNaBA93oB6
-4uJnfALY9zf7/p90DoTc5P+Zfzhnfsm0V6RRCTpawW8tUrtFftzR36hEZbKor+O29pFu/Cfb
-T3S8AxGd5qcQnc9LZALm8q4nWPoCoLLr+wvgey/w74jf+bZBcu23SsprkLz3Wa32G5e8IPhY
-FQAA4x6kiFLxHE0tcvgic9r2NcmY3hIfjpCL4elbTg3nAL81oE+s0wHxN81LiketSrUXLJOY
-VmcDZHV/nQPgyJaNLG1vj+V4dPbp+vJsPAygEvC9oUdA0PW9ksY6wGtHuUN38JRil9iHFTvO
-+dlTiu8G7hGLXZcczp7haPTXCK5vrq7ORv8gzrqt2biBQKRvd3d4u2tsjxAaB2A563mr+cIw
-KiTDgNqrlg0wCih3k+QrWOfvpmPK2KOTv8ZnHua41bVneEEOtGgpMXAK6F2m0K6HzYiiUk9Y
-MEXBW2keU7ZtG6pv2cJ3C/QovnZtr9fZwFTTuD/FR5oZSUMkrlNDN1EFz9AZ6Bt0qwWMK0ND
-xgd4VJWBM5brO13HXls7YuNyePbnvf93kxgP5IxliqIHcy6Vjs798skBs/gUHA/56b0CnKAi
-VZbnmDVhlOo6et7L26eeEc+YGW3RN3PQUCm2FdqTyzSLUt3Err0LyxCTj5csburGULsZZMqX
-rA43xkOHonZK5y1kLkpWtUYBdiZa1rhfTNXuPOSlfsbj9nigCasIQXTDJ7H1kxE2tjoPdoU3
-j+13PVBqMsP2BOYZLlnWJZUImcwxjwJgdLnR8CxouN1Ozwfjd/Bc0vHttyD0GY5lgZ0JaR62
-teGCBBtEq5KtFtE6dbO4REwPhs0gNjie//DdQuWS3X/uLArhi1BF6KuOvmfDl3JeYDimU8Am
-TmRUNt/qTk67Fqyu7/rQcDovm1u8oy7qkrbT6VpYgl+4aM8zhgUjsQ5ioAvdHtbVBE2MqvSQ
-RNcBhfH6asgC07AFluVbbveN49s94CJL3lTjUGayddiw1fGIhYmkwtzQwBiL211JGWIRYVdf
-uYiG2Ec7uJ8UlMkMT4WqVuXeqqII+aFfLdLrEhhA9dmCjvsS0RZUvsG8x8zRW8iCZ5g46CXX
-x7azqoIjkbXcTqdT/cujhWoJELPXxRTEzh7LBrdICTptEQmz5kkg8hIibOmFjhKWbxjdopLt
-WeRJLddzeuh6hYc5EnAQBONceYwmMOeL2lpsPIG2WP8CFU1L4QQTAAA=
---------------070205070504010905040507--
 
 
 -------------------------------------------------------
