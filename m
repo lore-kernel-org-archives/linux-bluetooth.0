@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41F781ED.2050704@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
+Subject: RE: [Bluez-devel] bluetooth socket + rfcomm tty
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluetooth headset - connects but no audio
-References: <41EE3974.1010604@fastwebnet.it> <41EE5112.1040502@dark-reality.de> <41EE4ACD.9070105@fastwebnet.it> <41EE66A2.1040106@dark-reality.de> <41EE69F3.1030401@fastwebnet.it> <41EE989A.7030206@dark-reality.de> <41EED6AE.1080205@fastwebnet.it> <41EF0C15.3040705@dark-reality.de> <41EF869D.8020705@fastwebnet.it> <41EFAE20.7010901@dark-reality.de> <41F74AC1.3010605@fastwebnet.it>
-In-Reply-To: <41F74AC1.3010605@fastwebnet.it>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain;
+	charset="us-ascii"
+Message-ID: <A4D3CD3715C9DD4089BFE00A7279399406EB@posthoorn.intra.local>
+From: "Victor Shcherbatyuk" <Victor.Shcherbatyuk@tomtom.com>
+To: <bluez-devel@lists.sourceforge.net>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,59 +17,86 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 26 Jan 2005 12:41:33 +0100
+Date: Wed, 26 Jan 2005 12:00:44 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hello Marcel,
 
-WiseLYNX wrote:
-| | | I'll do some more experiments on my own, and I'll let you know if I
-| | | understand something.
-| |
-| | Would be great. Good luck! I'm out of ideas :(
-|
-| alas, you where right. it was just a dongle issue - my friend's works
-| perfectly. my misfortune in buying hardware strikes back :(
-|
-| is there any way to "fix" the problem?
-|
+Now I close the socket after converting to TTY. After this I open
+"/dev/rfcomm0" with O_RDWR | O_NOCTTY and write ATD12345\n\r command to
+it, then read the response (receive echo), and sleep, meanwhile phone
+starts to dial the number, but then stops for no reason. If I do the
+same with original (non-converted) socket (skipping converting to TTY),
+everything is OK.
 
-I asked Marcel on this list, but I did not understand his answer...:
+I've taken a look at hcidump output and it looks rather strange if I
+compare it for both cases. In the case of file handle to converted TTY
+all the data looks fragmented between ACL packets (like ATD1234 is not
+sent in one packet, like in the case of non-converted socket, but piece
+by piece in a number of packets) + there is a lot of activity from the
+phone during the sleep phase when I do not do anything with the file
+handle.
 
-| the Silicon Wave chips are not the best ones. They have problems and it
-| seems that they are not going to fix them. Mostly because they sell ROM
-| chips are these ones can't be updated by a newer firmware. However if
-| this is the problem with SCO packets and handle 0 then the hci_usb
-| driver should simply drop these frames, because they are not valid SCO
-| payload.
+Regards,
+    Victor.
 
-...?
+P.S. I can send the output, but first check if it is really needed.
+P.S.S running 2.6.10
 
-I'm not sure if he means that there are to many packages recieved now,
-or that the packages are dropped because of the 0 handle. I think that
-might be hot-fixable somehow, at least for one connection. Of course
-this is ugly, but if it's optional just to make this broken chipsets work?
+-----Original Message-----
+From: bluez-devel-admin@lists.sourceforge.net
+[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Marcel
+Holtmann
+Sent: Monday, January 24, 2005 10:25 PM
+To: BlueZ Mailing List
+Subject: Re: [Bluez-devel] bluetooth socket + rfcomm tty
 
-best regards,
-~  Lars
+Hi Victor,
+
+> Could not find it through the archives...=20
+> I create a bluetooth socket and then create TTY (/dev/rfcomm0) based
+on it (like it is done in dund from bluez-utils).=20
+> Is it still allowed to use the descriptor of the open socket to
+send/receive data through the channel?=20
+> Cause when I send data to the _socket_ it looks like it is sent (like=20
+> ATD1234 command to the phone, I see the phone starting to dial, though
+it=20
+> stops half way for no reason), but when I'm trying to read from the
+socket=20
+> select() returns that there is data to be read, but then read()
+blocks.
+
+this is maybe possible, but it is not intended. When you converted a
+socket into a TTY the socket should be closed. Otherwise we must
+duplicate the incoming data and if one party is not reading the flow
+control will be brocken and both parties are blocked.
+
+> P.S. Is there any way to check if read() is non-blocking (like ioctl()
+
+> FIONREAD)?
+
+Check the fcntl() manpage.
+
+Regards
+
+Marcel
 
 
 
-- --
-Lars Grunewaldt
-* software development
-* multimedia design
-skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
-web: http://www.dark-reality.de
-mail: lgw@dark-reality.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFB94HsQWC6DTWkDAoRAroNAJ9E6fkzvN6D+gMJ8yz7FoDt+ks6LQCglOaY
-RcQ4UuGEIc2hhazxyQUbphU=
-=/OYs
------END PGP SIGNATURE-----
+-------------------------------------------------------
+This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+Tool for open source databases. Create drag-&-drop reports. Save time
+by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+Address change | On the 31st of January 2005 TomTom will be moving to | =
+Rembrandtplein 35 | 1017 CT Amsterdam | The Netherlands | T + 31 =
+(0)20-8500 800 | F + 31 (0)20-8501 099
+
 
 
 -------------------------------------------------------
