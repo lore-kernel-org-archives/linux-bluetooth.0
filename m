@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] kernel oops when usb dongle plugged in with
-	module loaded
+Subject: Re: [Bluez-devel] Oops with 2.6.5-mh3
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Nicholas A. Preyss" <nalp@gmx.net>
+To: Matthias Thomae <bluez@thomae-privat.de>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040415232702.GA24097@gmx.net>
-References: <20040415232702.GA24097@gmx.net>
+In-Reply-To: <407C4B88.1010102@thomae-privat.de>
+References: <407C4B88.1010102@thomae-privat.de>
 Content-Type: text/plain
-Message-Id: <1082161230.4489.36.camel@pegasus>
+Message-Id: <1082161132.4489.33.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,25 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 17 Apr 2004 02:20:30 +0200
+Date: Sat, 17 Apr 2004 02:18:52 +0200
 
-Hi Nicholas,
+Hi Matthias,
 
-> I face the same problem as Matthias Thomae with an Acer BT600 and
-> utils/libs 2.6. I investigated the Oops after reinserting usb dongle
-> problem a bit. And  noticed that it Oops only, when hci_usb module had
-> been loaded before the dongle was plugged in. So unloading the module
-> before plugging in the device and everthing works fine (of course only
-> when the module was loaded thereafter automaticalls or manually).
-> If you pull out the dongle and then unload the module, you can reinsert
-> the BT dongle. If you manually modprobe the module before plugging in
-> the device, it Oops too.
-> 
-> I tested  2.6.4 which doesn't seem to be affected, but 2.6.5 and
-> 2.6.5-mh3 show this behaviour.
+> I get a kernel Oops with 2.6.5-mh3 (with and without preempt) and an 
+> Acer BT-700 USB dongle on a Vaio Notebook, not when unplugging it, but 
+> when plugging it back in.
 
-check the latest 2.6.6-rc or better Bitkeeper snapshot and tell the USB
-guys if it still exists.
+check the latest 2.6.6-rc or Bitkeeper snapshots, because there are many
+USB patches that are not merged into 2.6.5. If it still fails send a
+report the USB mailing list, because I don't think that this is our
+fault.
 
 Regards
 
