@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Qualification - L2CA_DisconnectCfm
+Subject: RE: [Bluez-devel] Qualification Testing
 From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
 To: Max Krasnyansky <maxk@qualcomm.com>
 Cc: Daryl Van Vorst <daryl@wideray.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5.1.0.14.2.20030513105017.0d234df0@unixmail.qualcomm.com>
-References: <1052783343.1132.159.camel@pegasus.local>
-	<5.1.0.14.2.20030513105017.0d234df0@unixmail.qualcomm.com>
+In-Reply-To: <5.1.0.14.2.20030513095851.0d257510@unixmail.qualcomm.com>
+References: <000201c31771$70577930$6400a8c0@baked>
+	<5.1.0.14.2.20030513095851.0d257510@unixmail.qualcomm.com>
 Content-Type: text/plain
-Message-Id: <1052865860.4609.13.camel@pegasus.local>
+Message-Id: <1052865099.4608.9.camel@pegasus.local>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,24 +21,28 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 14 May 2003 00:44:13 +0200
+Date: 14 May 2003 00:31:32 +0200
 
 Hi Max,
 
-> What we need is SO_LINGER option support. Application doesn't care so much about
-> the disconnect itself but it does care if all the data that it had written to a 
-> socket has been sent.
-> i.e. 
->         connect(sk);
->         send(sk, stuff, sizeof(stuff));
->         close(sk);
+> Hmm, ok :). But after thinking more about this I think that we probably still need 
+> some way to tell the apps that link became unreliable. I mean parsing syslogs is 
+> not very elegant solution :). Also even though Cetecom accepted it as a solution 
+> other BQBs might not.
 > 
-> Some apps want close() to sleep until all data has been sent and connection was 
-> successfully closed.
+> Here is what I had in mind. We could add L2CAP socket option L2CAP_RELIABILITY,
+> which will be used by the apps that are "paranoid" :) about link reliability.
+> Then whenever we receive corrupted L2CAP frame we'd check connected sockets, attached
+> to this connection, that have this option enabled and signal error condition on them. 
+> i.e. read/recvmsg will return error. Application can then either clear that error with 
+> getsockopt(SO_ERROR) and continue or close the socket.
 
-I never have tought about it before, but SO_LINGER support seems useful.
-And with this passing the test will be easy. Did using shutdown() for
-disabling sending and receiving works?
+the idea itself sounds very good. But I see no advantage in implementing
+such kind of extra functionality. We can not detect if a frame is
+currupt or not, because we have no checksum mechanism. The only thing we
+can detect is a length mismatch. What about a corrupted cid? If you
+notify the wrong socket and the application on that socket can't deal
+with such an error.
 
 Regards
 
