@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Alex Holland <ah160@student.cs.york.ac.uk>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Compile bluez-bluefw-1.0 fails
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Alex Holland <ah160@student.cs.york.ac.uk>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404190935.34433.ah160@student.cs.york.ac.uk>
-References: <200404182321.55431.dvornheder@t-online.de>
-	 <1082325338.4403.27.camel@pegasus>
-	 <200404190935.34433.ah160@student.cs.york.ac.uk>
-Content-Type: text/plain
-Message-Id: <1082370224.4403.33.camel@pegasus>
-Mime-Version: 1.0
+References: <200404182321.55431.dvornheder@t-online.de> <1082325338.4403.27.camel@pegasus>
+In-Reply-To: <1082325338.4403.27.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200404190935.34433.ah160@student.cs.york.ac.uk>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,26 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 19 Apr 2004 12:23:45 +0200
+Date: Mon, 19 Apr 2004 09:35:34 +0100
 
-Hi Alex,
+On Sunday 18 Apr 2004 22:55, Marcel Holtmann wrote:
 
-> This module seems to have started working on Gentoo without oopsing, I 
-> think with the last hotplug update. Unfortunately, I can't remember 
-> where it expects to find the firmware, and I can't find any decent way 
-> of searching the mailing list archives.
-> 
-> Would it possible to have some info on the Kernel help page saying where 
-> the firmware can be downloaded, and where it should be put? As is, the 
-> only way to find out seems to be to ask here.
+> Use the bcm203x kernel driver instead for loading the firmware into a
+> Broadcom based USB dongle.
 
-you can find it at http://www.bluez.org/drivers.html
+This module seems to have started working on Gentoo without oopsing, I 
+think with the last hotplug update. Unfortunately, I can't remember 
+where it expects to find the firmware, and I can't find any decent way 
+of searching the mailing list archives.
 
-Regards
+Would it possible to have some info on the Kernel help page saying where 
+the firmware can be downloaded, and where it should be put? As is, the 
+only way to find out seems to be to ask here.
 
-Marcel
+Thanks.
 
-
+Alex Holland
 
 
 -------------------------------------------------------
