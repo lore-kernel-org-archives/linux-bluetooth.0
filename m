@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] CSR BlueCore02
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Mateo, Jose-Luis" <Jose-Luis.Mateo@t-systems.com>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <D971A27FCD3DE04689089E8A98D8AF710361C301@G9JJ1.mgb01.telekom.de>
-References: 
-	 <D971A27FCD3DE04689089E8A98D8AF710361C301@G9JJ1.mgb01.telekom.de>
-Content-Type: text/plain
-Message-Id: <1087477969.4968.0.camel@localhost>
-Mime-Version: 1.0
+Message-Id: <D971A27FCD3DE04689089E8A98D8AF710361C301@G9JJ1.mgb01.telekom.de>
+From: "Mateo, Jose-Luis" <Jose-Luis.Mateo@t-systems.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Subject: [Bluez-users] CSR BlueCore02
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,17 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Jun 2004 15:12:49 +0200
+Date: Thu, 17 Jun 2004 14:40:37 +0200
 
-Hi Jose,
+Hello,
+I can't install a Bluetooth CF Card in SuSE 9.0. The Card is from CC&C, =
+with the Chipset CSR BlueCore02. It is recognized as "Serial or Modem" =
+by SuSE. Which driver must I use?
 
-> I can't install a Bluetooth CF Card in SuSE 9.0. The Card is from CC&C, with the Chipset CSR BlueCore02. It is recognized as "Serial or Modem" by SuSE. Which driver must I use?
+Thanks
 
-use hci_uart and run hciattach with the correct settings.
+Jos=E9=20
 
-Regards
-
-Marcel
 
 
 
