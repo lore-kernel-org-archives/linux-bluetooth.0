@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] DiNovo and bluetooth-hub functionality
+Subject: Re: [Bluez-users] Logitech diNovo boot-protocol issue
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1111167187.8560.6.camel@localhost.localdomain>
-References: <1111167187.8560.6.camel@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1111171397.9600.29.camel@pegasus>
+In-Reply-To: <200503181208.01419.mh@intellinetservices.net>
+References: <200503181052.07265.mh@intellinetservices.net>
+	 <1111162920.9600.23.camel@pegasus>
+	 <200503181208.01419.mh@intellinetservices.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1111171119.9600.25.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,46 +20,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 18 Mar 2005 19:43:17 +0100
+Date: Fri, 18 Mar 2005 19:38:39 +0100
 
-Hi Mattias,
+Hi Manuel,
 
-> Let me start with saying that I only have been on a Linux system for
-> about 2 days, so please forgive me if I have made clumpsy assumptions or
-> similar.
-> 
-> However, I'm running Ubuntu Linux 5.04 (Hoary Hedgehog). I also got a
-> DiNovo set from Logitech that has been running fine since install. Now
-> I'd like to connect my phone to the computer for file exchange/sync and
-> it doesn't seem to be anything else to do than manually adjusting things
-> to get everything up and running.
-> 
-> I've installed all BlueZ-packages for Ubuntu using apt-get (graphical
-> version).
-> 
-> I can now, after having logged in at my computer using an extra keyboard
-> (connected on ps/2) do the following commands (sudo because of my using
-> of Ubuntu, won't have priviligies else);
-> 
-> 1. sudo hid2hci
-> 2. hcid
-> 3. sdpd
-> 4. hidd --server
-> 5. sudo hidd --search
+> And that=B4s why I love linux, thank you so much, it worked.
+>=20
+> I=B4ll request to have this merged into the current gentoo-dev kernel.
 
-you should run all of them as root. The "hidd --search" should btw only
-be needed once.
-
-> Now, my mouse, keyboard and mediapad gets connected and everything works
-> ok. My problem is that I would like this to be done automatically when I
-> start up my computer (in other words; start up bluetooth functionality
-> and let me use my bluetooth devices). Maybe the above can be done in
-> another way, I'm really a newbie trying to get it all together. It would
-> also be nice if I in Nautilus could view my bluetooth neighborhood using
-> "bluetooth:///" or something.
-
-You should talk to the Ubuntu package maintainer of the bluez-utils
-package, because it includes a boot script for this task.
+the generic HID driver is still on my todo list. Some big changes in the
+input subsystem kept me from finally doing the transition.
 
 Regards
 
