@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: jp-www@dcs.gla.ac.uk
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.54.999.0309150112530.29667@sibu.dcs.gla.ac.uk>
+From: Giannis Georgalis <jgeorgal@uoc.gr>
+Reply-To: jgeorgal@uoc.gr
+Message-ID: <874qzf3sav.fsf@hciat-16.ics.forth.gr>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] [ANNOUNCE] ALSA Bluetooth Headset Driver
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] command tx timeout and continuous inquiry.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -15,57 +16,49 @@ List-Id: <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 15 Sep 2003 01:21:39 +0100 (BST)
-
-Hi,
-
-Having recently got a Bluetooth headset (HBH-60), I've put together a
-preliminary ALSA driver which works with bluez.
-
-	http://www.dcs.gla.ac.uk/~jp/snd-bluez-sco/
-
-I'd appreciate any feedback on this. The code is a bit messy at the
-moment, but I've had fairly good results with it.
-
-No changes to bluez are required at the moment -- all the work is done
-through the SCO socket interface. Better performance could likely be
-obtained with a slightly different interface.
-
-This is a work-in-progress -- no guarantees that it will work!
+Date: 15 Sep 2003 01:43:04 +0300
 
 
-An excerpt from the small README file:
+Hello,
 
-ALSA Bluetooth Headset Driver
-=============================
+I have a thread doing an hci_inquiry() all the time, while at the same
+time another thread is talking to other bluetooth devices via l2cap
+connections. Additionally, I do an IREQ_CACHE_FLUSH every 20 - 30
+seconds.
 
-This is a preliminary driver for Bluetooth headsets. It has only been
-tested with the following configurations:
+This whole scheme works fine most of the time, but as the time passes
+I get a lot of:
 
-    USB Bluetooth adapter (Bluecore02 and 01b)
-    usb-ohci, usb-uhci and uhci driver (on a desktop and laptop)
-    kernel 2.4.20 single processor (there may be race conditions)
-    alsa-0.9.6
-    HBH-60 Bluetooth headset
-    recent bluez, hci_usb with my extra patches for SCO support (hciusb-isoc.patch)
+hci_acl_tx_to: hci0 ACL tx timeout
+hci_acl_tx_to: hci0 killing stalled ACL connection 36:55:05:02:90:00
+hci_cmd_task: hci0 command tx timeout
 
-Only 8-bit (8000hz) mode is supported at the moment. You must configure
-your hci device with 'hciconfig hci0 voice 0x0040'.
+and the hci_inquiry() fails with errno set to "Device or resource
+busy".
 
-The speaker and microphone volume levels are presented as ALSA mixer
-controls. The HBH-60 only supports speaker volume, so I haven't managed
-to test the microphone support.
+Additionaly, there are times that hci_inquiry() cannot discover the
+other bt devices (all running bluez). And even sometimes an l2cap
+connection cannot be established.
 
-The ALSA device doesn't produce or consume any audio data when the headset
-isn't connected via the bluezsco control program -- this will cause apps
-to time out after a few seconds.
+Note that I'm using a 3COM (3CREB96) usb bluetooth device, a vanilla
+2.4.22 kernel and libbluetooth 2.4-1 (debian unstable).
 
-Pressing the headset button while connected will disconnect. Pressing the
-headset button while disconnected (assuming the headset decides to connect
-to your PC rather than your phone) will not work, since the control
-program doesn't (yet) act as a server.
+Firstly, I want to ask whether this behavior should be "expected" in
+an environment that makes "heavy" use of the bluetooth resources. In
+any case, how can this effect be minimized ? Any hints/pointers are
+highly appreciated.
 
-Please get in touch if you manage to get it to work or have any questions.
+Secondly, I want to ask what the optimal call frequency (and
+arguments) of hci_inquiry() should be in order to obtain "consistent"
+results from it, when it is used in a while (1) {} loop.
+
+Thank you,
+Giannis
+
+-- 
+question = ( to ) ? be : ! be;
+                -- Wm. Shakespeare
+
 
 
 -------------------------------------------------------
