@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Charles Bueche <charles@bueche.ch>
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1071698686.6361.31.camel@bluez.bueche.ch>
-Mime-Version: 1.0
-Subject: [Bluez-users] HOWTO: Logitech MX900 Bluetooth Optical Mouse on Linux
+Message-ID: <3FE04C90.8050109@grupopie.com>
+From: Paulo Marques <pmarques@grupopie.com>
+MIME-Version: 1.0
+To: Marc Hansen <marc.hansen@gmx.net>
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Networkperformance
+References: <23028.1071640737@www51.gmx.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,31 +17,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Dec 2003 23:04:46 +0100
+Date: Wed, 17 Dec 2003 12:31:12 +0000
 
-Hi,
+Marc Hansen wrote:
 
-With the help of Marcel, Olivier and a few other =FCbergeeks of the
-Bluez-devel mailing list, I have been able to get my Logitech MX900
-mouse working with my Dell Inspiron 8600 equiped with internal
-Bluetooth.
+> Hi, 
+> my Networkconnection is now stable for ours. Max was right not to use the 
+> alternate usbdriver! :-) 
+>  
+> How fast could be network over bluetooth? 
+> I tried to see the performance with iptraf, but that does not work. 
 
-I have made a small document to help other MX900 owners. It works for
-me, but be prepared to suffer a bit :
+Best way to test it IMHO is to setup a BNEP (PAN) connection and measure the 
+speed of a FTP transfer over that link.
 
-- it's probably buggy
-- it run CVS code
-- it run on Gentoo with 2.6test kernel
-- my english is ashaming
+This will give you the "net" bandwidth an application is supposed to get over IP 
+over bluetooth.
 
-http://www.bueche.ch/comp/mx900/mx900.html
+Note that even BNEP as some overhead as the IP / Ethernet headers have to go 
+through the connection, even if they are compressed/simplified.
 
-Comments welcome. Regards,
-Charles
+I hope this helps,
 
---=20
-Charles Bueche <charles@bueche.ch>
-sand, snow, wave, wind and net -surfer
+-- 
+Paulo Marques
+Software Development Department - Restinfor, Lda.
+Phone: +351 252 290600, Fax: +351 252 290601
+Web: www.grupopie.com
+
+"In a world without walls and fences who needs windows and gates?"
 
 
 
