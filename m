@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Dave Mielke <dave@mielke.cc>
+Subject: Re: [Bluez-devel] [PATCH] - BT HID message parsing framework and
+	fixes for Keyboards in boot mode.
+From: Matthew Grant <grantma@anathoth.gen.nz>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20041219161903.GA3262@alpha.private.mielke.cc>
+In-Reply-To: <1103191308.28046.45.camel@pegasus>
+References: <1103056217.6424.23.camel@localhost>
+	 <1103112320.2143.228.camel@pegasus>  <1103139137.12839.53.camel@localhost>
+	 <1103191308.28046.45.camel@pegasus>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-YoRnpLloZPDn4/GZlA6A"
+Message-Id: <1103275257.6717.2.camel@localhost>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="UlVJffcvxoiEqYs2"
-Subject: [Bluez-devel] Text-mode Bluetooth PIN helper script. (fwd)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,226 +21,228 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 19 Dec 2004 11:19:03 -0500
+Date: Fri, 17 Dec 2004 22:20:57 +1300
 
 
---UlVJffcvxoiEqYs2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--=-YoRnpLloZPDn4/GZlA6A
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-Has anyone had an opportunity to look at this script yet? I've attached an
-updated version of it to this message so, if you're interested, please look=
- at
-this copy instead.
+Hi Marcel,
 
-I don't mean to nag, but the unfortunate fact is that blind users, especial=
-ly
-those with braille displays which connect via bluetooth, have a very diffic=
-ult
-time with the current bluepin helper script. This script, I believe, resolv=
-es
-their (our) problems while still remaining a reasonable solution for sighted
-users. As I mention below, I'll be glad to address any issues which any of =
-you
-feel might further improve its functionality.
+Thank you for this message.  It is good to know all the reasons, and
+have an explanation for what is going on.  Having the full picture like
+this averts a lot of the frustration and makes it all understandable.
 
------ Forwarded message from Dave Mielke <dave@mielke.cc> -----
+I do not have much time to respond fully now, but I will tomorrow.
 
-Date: Sun, 12 Dec 2004 02:33:54 -0500
-From: Dave Mielke <dave@mielke.cc>
-To: bluez-devel@lists.sourceforge.net
-Subject: Text-mode Bluetooth PIN helper script.
+It all looks really good on my first read.
 
-The PIN helper script which is currently being distributed, a python script
-named bluepin, uses an X dialog to prompt the user for a PIN. This poses a
-two-fold problem for blind users. Firstly, it's essentially unusable since X
-support for both speech and braille isn't yet at the point where blind users
-use the X environment on anything more than an experimental basis. Secondly,
-those using braille displays which connect via Bluetooth can't "see" the sc=
-reen
-in order to respond to the prompt so that their braille displays can become
-connected.
+Best Regards,
 
-I've written a script (attached to this message as "bluepin") which resolves
-both of these problems, and which, I think, is still a good solution for
-sighted users as well. It first searches the file /etc/bluetooth/pins for a
-line matching the Bluetooth address of the device. Each line in this file
-consists of the address and the PIN separated from one another by space. If=
- a
-matching line is found then the script responds automatically. If one can't=
- be
-found then a text-mode dialog is presented on a free virtual terminal. As s=
-oon
-as the PIN is entered, the console returns to the virtual terminal which was
-previously being used.
+Matthew Grant
 
-Would you people please have a look at the attached script and let me know =
-what
-you think of it and if you'd consider it for inclusion within the base
-Bluetooth software? I'll be glad to make any further enhancements to it whi=
-ch
-you feel would improve its functionality.
+Have a good weekend!
 
---=20
-Dave Mielke           | 2213 Fox Crescent | I believe that the Bible is the
-Phone: 1-613-726-0014 | Ottawa, Ontario   | Word of God. Please contact me
-EMail: dave@mielke.cc | Canada  K2A 1H7   | if you're concerned about Hell.
-http://familyradio.com/                   | http://mielke.cc/bible/
+On Thu, 2004-12-16 at 11:01 +0100, Marcel Holtmann wrote:
+> Hi Matthew,
+>=20
+> > > I only looked at the -rc3-bk6 patch, because as I said, this is what =
+we
+> > > gonna do first. I don't wanna see any debug specific changes in there=
+. I
+> > > will remove them anyway and this takes me only longer to merge this
+> > > patch into my tree.
+> >=20
+> > You have to appreciate this given that I will bw writing 500-1000 lines
+> > more of code for net/bluetooth/hidp/core.c (maybe a seperate file) for
+> > the control channel state machine:
+>=20
+> no need for an extra file. 500-1000 lines are not a lot of code.
+>=20
+> > o Your debug code in the hidp directory DOES NOT COMPILE!!!
+> > I need working debug for the amount of work I am doing.  Please read
+> > my patch and fix it!
+>=20
+> If my debug code doesn't compile then this is a bug. Why didn't you send
+> in a patch for this? Such a fix could already be merged mainline.
+>=20
+> > o The code I am writing needs debug code so I can write it and get it
+> > working.
+>=20
+> Fine with me, but before you submit it for inclusion remove this debug
+> code.
+>=20
+> > o Extra debug code is needed in other places in the hidp directory to
+> > support any general user debugging of the control channel state machine
+> > code.
+>=20
+> As I said before, I will only allow simple debug code in the Bluetooth
+> code that is off by default. I don't think that you can convince to add
+> deeper levels of debugging in the code. No extra debug code will make it
+> easy to merge your code back mainline. Otherwise we will be stuck here
+> and I have to remove everything by myself.
+>=20
+> > >  The rest of this patch looks fine and there is only
+> > > one coding style issues that I might not mentioned last time. In a
+> > > "switch" construct we normally add an empty line between "break" and =
+the
+> > > next "case".
+> > >=20
+> > > And another thing. What is the difference between ...ctrl_message()
+> > > and ...ctrl_byte()? We don't need that. If data is NULL then both is =
+the
+> > > same.
+> >=20
+> > ...ctrl_message() is needed latter in the state machine work as some
+> > control messages will be over 1 byte in size.  It will be used in phase
+> > 2.
+>=20
+> You don't get my point. You need only one of these functions to do the
+> job. What you did is code duplication:
+>=20
+> 	#define ...ctrl_byte() ...ctrl_message(a, b, NULL, 0)
+>=20
+> > You may also notice the 2 separate functions for queueing the sending o=
+f
+> > control bytes  (..ctrl_byte() and ...ctrl_reply()), one from within the
+> > hidp_session() kernel process, and one for use from the ioctl(s).  Here
+> > is my reasoning for it. I take it that you do not want to put extra
+> > schedule() calls in the middle of the hidp_session() while loop, betwee=
+n
+> > the processing of individual received control packets, before even
+> > processing the interrupt (high priority, basically  incoming HID events=
+)
+> > and the transmission queue.  Even if this inserted schedule() call is
+> > conditional, 2 extra context switches for the hidp_session() thread get
+> > introduced before received keystrokes/HID events are processed, and the
+> > transmit queue gets looked at.  The BT HID spec says that the interrupt
+> > channel should be processed at higher priority (and even before?) the
+> > control channel.  Both ..ctrl_byte() and ...ctrl_reply() are needed
+> > according to this.
+>=20
+> I haven't said anything about these two. I will look at it when I
+> applied the patch to me tree and started testing.
+>=20
+> > Now about us working together, from your replies and comments about my
+> > patches it has been obvious to me that you have not had much time to
+> > look them over and think about things.  You comments on coding style ar=
+e
+> > appreciated, and I myself don't like being sloppy, and I know that the
+> > netfilter people are way too sloppy for my own liking to.  But you are
+> > holding on too tightly to the control of the BT HID code.  I need the
+> > flexibility and autonomy of being the delegated lead developer there so
+> > that my development can be speed along.=20
+>=20
+> The coding style is important, because it makes it a lot easier to merge
+> your changes back mainline. I simply won't spent any time fixing coding
+> style mistakes of other people.
+>=20
+> And actually I looked in detail at your patches, but as I said only the
+> patch against the -rc3-bk6. We do this step by step and this is the one
+> that comes first. I will merge it back mainline after I tested it with
+> my devices. However this will be after 2.6.10 is out.
+>=20
+> There is no tight control on the BT HID code, but every patch goes
+> through my hands. I acknowlege it or reject it with a reason and an
+> advice on how to fix it. The BT HID is a little bit special, because we
+> don't have the generic HID parser at the moment. I am working on a final
+> Bitkeeper tree for mainline inclusion. This must be done this way,
+> because we must keep the revision history. If this is done and 2.6.10 is
+> finally out everything will be very easy.
+>=20
+> > Could you please freeze the BT HID code in the kernel for 3 months
+> > (apart from brown-paper bag stuff), and let me subsume the HID report
+> > code in your mh* patches, and strip the net/bluetooth/hidp code from
+> > your patches, and use my stuff instead so that I can efficiently get th=
+e
+> > work done on improving it rapidly.  If changes are needed to the in
+> > kernel stuff, please feed them my way and I will integrate them as
+> > quickly as I can.  This should not be too hard, as it looks like there
+> > has not been much activity in the BT HID area in the last few months
+> > apart from my work.
+>=20
+> The generic HID parser is the way to go.
+>=20
+> > I really want to work together with you on this, as cooperation will ge=
+t
+> > far more done in the bluetooth area of the kernel given the small user
+> > base.  If the above arrangement is not suitable to you, please come up
+> > with one that we do not have major code clashes when merging each other=
+s
+> > code.=20
+>=20
+> Since you don't use Bitkeeper, there can't be any easy working together
+> until I got the generic HID parser in the right shape. I am not willing
+> to loose the revision history of the current USB HID code. It documents
+> many reasons why decissions are made and why it is done this way. It is
+> way too important.
+>=20
+> > If you have doubts as to my ability, I am a professional router
+> > programmer who got fired because I insisted on making my work bug-free,
+> > robust, and high quality, with experience in OSPF, router device
+> > driveers and IPX code.  My early CV reads like that of Alan Cox, and I
+> > have been using Linux since 1993, with a bit work accepted into the
+> > 2.2.x kernel for ethernet bridging, 2.2.x security patches, and
+> > 2.2.x/2.4.x Sangoma driver fixes.  I will send you my resume if you wan=
+t
+> > to look it over (it is a little out of date).
+>=20
+> I have absolutly no doubts on your ability and actually I never read any
+> CVs, because I judge on the code people write.
+>=20
+> > My patience on this is starting to wear out.  If we can't work somethin=
+g
+> > out soon, I am going to go ahead anyhow, and the merits of the work by
+> > itself will warrant its inclusion in a few months time.
+>=20
+> I am sorry for that and I really appreciate your help. At the moment we
+> are in the final phase of 2.6.10 and so hoping that we get any stuff
+> into it is ridiculous (besides fixing my debug code bug maybe). So what
+> we can do is to get your patch against -rc3-bk6 ready for inclusion and
+> I will merge it mainline as soon as 2.6.10 is out.
+>=20
+> I can start with the merge tree of the generic HID parser tomorrow, but
+> actually there is one patch from the input subsystem tree that hasn't
+> been merged back mainline so far. It changes a lot of things and I
+> haven't looked at it in detail at the moment.
+>=20
+> If these two things happened I will remove my current report mode
+> support from the -mh patch and we will have a common base. Then you can
+> send in changes for the HID parser and/or for the HIDP code.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.=20
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>=20
 
-#!/bin/sh
-# This script has been written by Dave Mielke <dave@mielke.cc>. It's a ligh=
-t=20
-# weight, text mode, Bluetooth PIN helper script. Its dependencies are:
-# *  /bin/sh  The standard system command shell.
-# *  open     A command which opens a free virtual terminal.
-# *  dialog   A command which presents a text-mode dialog.
-#
-# The file /etc/bluetooth/pins is searched for a line corresponding to the=
-=20
-# Bluetooth address of the device. Each line of this file should contain the
-# address of a device and its PIN, in that order, separated by space. If the
-# address is found then the corresponding PIN is automatically supplied. If
-# it's not found then the user is prompted via a text-mode dialog in a free=
-=20
-# virtual terminal. The console automatically returns to the original virtu=
-al
-# terminal as soon as the PIN is entered.
+--=-YoRnpLloZPDn4/GZlA6A
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
 
-pinsFile=3D"/etc/bluetooth/pins"
-pinLimit=3D16
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
 
-[ "${#}" -gt 0 ] && {
-   direction=3D"${1}"
-   shift
+iD8DBQBBwqT5uk55Di7iAnARAqILAJ9YfLyv4YyF3peLeu5c1Rb6LqjPPQCfSYjN
+Q5HpxTMSCwAva6tEGD9Rtb0=
+=XLcK
+-----END PGP SIGNATURE-----
 
-   [ "${#}" -gt 0 ] && {
-      address=3D"${1}"
-      shift
+--=-YoRnpLloZPDn4/GZlA6A--
 
-      if [ "${#}" -gt 0 ]
-      then
-         name=3D"${1}"
-         shift
-      else
-         name=3D""
-      fi
-
-      [ -f "${pinsFile}" -a -r "${pinsFile}" ] && exec <"${pinsFile}" && {
-         while read a p x
-         do
-            [ "${a}" =3D "${address}" ] && {
-               echo "PIN:${p}"
-               exit 0
-            }
-         done
-      }
-
-      if [ "${direction}" =3D "out" ]
-      then
-         adjective=3D"outgoing"
-         preposition=3D"to"
-      else
-         adjective=3D"incoming"
-         preposition=3D"from"
-      fi
-
-      time=3D"$(date '+%Y-%m-%d@%H:%M:%S')"
-      pin=3D"$(open 3>&1 -s -w -- dialog --output-fd 3 --clear --cr-wrap --=
-title "Bluetooth PIN Prompt" --max-input "${pinLimit}" --inputbox "${time}\=
-n\nEnter PIN for ${adjective} Bluetooth connection ${preposition} ${name}[$=
-{address}]" 0 0 "")"
-      [ -n "${pin}" ] && {
-         echo "PIN:${pin}"
-	 exit 0
-      }
-   }
-}
-
-echo ERR
-exit 0
-
-
------ End forwarded message -----
-
---=20
-Dave Mielke           | 2213 Fox Crescent | I believe that the Bible is the
-Phone: 1-613-726-0014 | Ottawa, Ontario   | Word of God. Please contact me
-EMail: dave@mielke.cc | Canada  K2A 1H7   | if you're concerned about Hell.
-http://FamilyRadio.com/                   | http://Mielke.cc/bible/
-
---UlVJffcvxoiEqYs2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename=bluepin
-
-#!/bin/sh
-# This script has been written by Dave Mielke <dave@mielke.cc>. It's a light 
-# weight, text mode, Bluetooth PIN helper script. Its dependencies are:
-# *  /bin/sh  The standard system command shell.
-# *  open     A command which opens a free virtual terminal.
-# *  dialog   A command which presents a text-mode dialog.
-#
-# The file /etc/bluetooth/pins is searched for a line corresponding to the 
-# Bluetooth address of the device. Each line of this file should contain the
-# address of a device and its PIN, in that order, separated by space. If the
-# address is found then the corresponding PIN is automatically supplied. If
-# it's not found then the user is prompted via a text-mode dialog in a free 
-# virtual terminal. The console automatically returns to the original virtual
-# terminal as soon as the PIN is entered.
-
-pinsFile="/etc/bluetooth/pins"
-pinLimit=16
-
-[ "${#}" -gt 0 ] && {
-   direction="${1}"
-   shift
-
-   [ "${#}" -gt 0 ] && {
-      address="${1}"
-      shift
-
-      if [ "${#}" -gt 0 ]
-      then
-         name="${1}"
-         shift
-      else
-         name=""
-      fi
-
-      [ -f "${pinsFile}" -a -r "${pinsFile}" ] && exec <"${pinsFile}" && {
-         while read a p x
-         do
-            [ "${a}" = "${address}" ] && {
-               echo "PIN:${p}"
-               exit 0
-            }
-         done
-      }
-
-      if [ "${direction}" = "out" ]
-      then
-         adjective="outgoing"
-         preposition="to"
-      else
-         adjective="incoming"
-         preposition="from"
-      fi
-
-      title="Bluetooth PIN Prompt"
-      time="`date '+%Y-%m-%d@%H:%M:%S'`"
-      prompt="Enter PIN for ${adjective} Bluetooth connection ${preposition} ${name}[${address}]"
-      pin="`open 3>&1 -s -w -- dialog --output-fd 3 --clear --title "${title}" --cr-wrap --max-input "${pinLimit}" --inputbox "${time}\n\n${prompt}" 0 0 ""`"
-      [ -n "${pin}" ] && {
-         echo "PIN:${pin}"
-	 exit 0
-      }
-   }
-}
-
-echo ERR
-exit 0
-
---UlVJffcvxoiEqYs2--
 
 
 -------------------------------------------------------
