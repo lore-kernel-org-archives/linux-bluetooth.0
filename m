@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Schedule for HID
+Subject: Re: [Bluez-users] bluez freezes with 2.4.23
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Michael Lothian <mike@fireburn.co.uk>
+To: Charles@schwieters.org
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3FDAE93F.8030809@fireburn.co.uk>
-References: <3FDAE93F.8030809@fireburn.co.uk>
+In-Reply-To: <E1AVDaW-0000z8-00@oaf.localdomain>
+References: <E1AVDaW-0000z8-00@oaf.localdomain>
 Content-Type: text/plain
-Message-Id: <1071337490.27255.198.camel@pegasus>
+Message-Id: <1071336859.27252.190.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 13 Dec 2003 18:44:50 +0100
+Date: Sat, 13 Dec 2003 18:34:19 +0100
 
-Hi Michael,
+HI Charles,
 
-> Hi I was just wondering if there was any kind of release schedule or 
-> time frame for offical HID support in Bluez
+>   I'd like to report that I see bluetooth freezes with stock
+> linux-2.4.23. The freezes will occur either upon suspend/resume, or
+> immediately when one of the bluez modules is loaded (this seems to
+> depend on other modules loaded).  These are hard freezes of the whole
+> system. I do not have this problem with stock 2.4.22.
 > 
-> Even if it was only a rough guide it still would be nice.
+> The modules loaded are
+> hci_usb                 8120   1
+> rfcomm                 32128   0 (autoclean)
+> l2cap                  16816   1 (autoclean) [rfcomm]
+> bluez                  32644   3 (autoclean) [hci_usb rfcomm l2cap]
+> 
+> The hardware is: internal Toshiba laptop (Portege M100) bluetooth-
+> with usb interface.
 
-I don't have any special release schedule for it. The first pre releases
-will come if I think the library code is ready.
-
-> Does bluez have a wiki anywhere? Or somewhere where you can let us know 
-> what direction your taking the project in and what your plans are?
-
-There is no wiki that I know of. I post updated information to the BlueZ
-developer mailing list.
+if you have SCO support for HCI USB driver enabled, please disable it
+and try again. Is this a vanilla 2.4.23 or do you have applied any
+additional patches?
 
 Regards
 
