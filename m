@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] What's the best way to go about device detection?
+Subject: Re: [Bluez-users] /dev/rfcommX device not created in time
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Rob Raper <djrobx@hotmail.com>
+To: Steven Yap <syap@shaw.ca>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY14-F23luevz176Rb00048253@hotmail.com>
-References: <BAY14-F23luevz176Rb00048253@hotmail.com>
+In-Reply-To: <1084674433.3927.14.camel@obsolescence>
+References: <1084674433.3927.14.camel@obsolescence>
 Content-Type: text/plain
-Message-Id: <1084710239.4184.14.camel@pegasus>
+Message-Id: <1084708820.4184.9.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,37 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 May 2004 14:23:59 +0200
+Date: Sun, 16 May 2004 14:00:20 +0200
 
-Hi Rob,
+Hi Steven,
 
-> Sorry for the newbie questions or if I'm missing some obvious concepts, but 
-> I can't find any documentation for bluez, I've been primarily hacking 
-> samples and learning by experimentation.  My RFCOMM implementation from a 
-> single server to a single phone works perfectly, my problem has to do with 
-> detection of a bluetooth device and signal strengths.
+> I'm using Debian unstable with kernel 2.6.5, udev 0.024, bluez-pan
+> 1.1rel-3 and I'm observing a timing problem with udev and the rfcommX
+> device.
 > 
-> I'm writing an application that involves having cell phones that 
-> automatically attach to servers when they come into range; like a 'roaming' 
-> application.    When the phone gets closer to another server (when going 
-> from room to room), the previous server should detach from it and the next 
-> server will attach.  These servers are connected in their own way over 
-> ethernet and coordinate the hand-off.
+> I'm trying to network my Palm Tungsten T3 with my computer but pppd 
+> never gets call. When I click on the Network Services' "Connect" button
+> on the T3, I see from the log that dund complains about the failure to
+> create /dev/rfcommX device:
 > 
-> So, the server needs to look for available phones and report their signal 
-> strengths, even if they're connected to another server.   When one 
-> connection becomes significantly stronger, it will perform a coordinated 
-> hand off (coordated by ethernet, not bluetooth).
+> May 15 18:12:34 obsolescence hcid[2886]: link_key_request
+> (sba=00:02:72:B1:45:02, dba=00:07:E0:2E:28:9C) 
+> May 15 18:12:35 obsolescence dund[7424]: RFCOMM TTY creation failed. No
+> such file or directory(2)
+> May 15 18:12:36 obsolescence udev[7431]: creating device node
+> '/dev/rfcomm0'
+> May 15 18:13:07 obsolescence udev[7442]: removing device node
+> '/dev/rfcomm0'
+> 
+> However, udev does create the /dev/rfcomm0, just not fast enough
+> apparently. In a little experiment, as soon as I see the line:
+> 
+> udev[7431]: creating device node '/dev/rfcomm0' 
+> 
+> I run "sudo pppd /dev/rfcomm0 call btpalm" and this allows the T3
+> to grab an IP address and setup IP networking between the T3 and my
+> computer. From that point on, I can surf the Web from the T3 without
+> any problems.
+> 
+> Are there other Bluez users out there who are using udev who has 
+> managed to workaround/fix this problem? 
 
-without knowing the source code it is hard to say, but actually I think
-this is a Bluetooth topology problem. Looks like that you are builing
-complex scatternets and the master/slave roles and the role switch are
-going to hit you badly.
-
-You should start using RSSI for signal strength, because link quality is
-a vendor specific value and differ from Bluetooth chip manufacturer to
-the other. The other big advantage with RSSI is that with Bluetooth 1.2
-you get it for free from an inquiry.
+the bluez-utils-2.7 contains the pand and the dund and I already fixed
+that problem there.
 
 Regards
 
