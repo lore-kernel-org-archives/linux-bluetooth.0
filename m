@@ -1,11 +1,20 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Zia Syed <zs@comp.rgu.ac.uk>
-Reply-To: zs@comp.rgu.ac.uk
-To: jabwt@yahoogroups.com, bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Config for Socket CF card
+From: Marcel Holtmann <marcel@holtmann.org>
+To: digger vermont <dv_mlist@verizon.net>
+Cc: Max Krasnyansky <maxk@qualcomm.com>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>,
+   Benjamin Herrenschmidt <benh@kernel.crashing.org>
+In-Reply-To: <1074832340.3155.70.camel@myrna>
+References: <1074566227.3670.24.camel@myrna>
+	 <1074597777.7088.2.camel@pegasus>  <1074697933.3020.19.camel@myrna>
+	 <1074698544.7088.102.camel@pegasus>  <1074749699.2573.17.camel@myrna>
+	 <1074775827.3071.1.camel@pegasus>  <1074814697.3159.3.camel@myrna>
+	 <1074816664.3071.60.camel@pegasus>  <1074818667.1733.27.camel@localhost>
+	 <1074819483.3071.79.camel@pegasus>  <1074832340.3155.70.camel@myrna>
 Content-Type: text/plain
-Message-Id: <1074869859.22421.14.camel@zs>
+Message-Id: <1074865271.3071.128.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] PAND and Device Discovery
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,25 +25,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jan 2004 14:57:39 +0000
+Date: Fri, 23 Jan 2004 14:41:11 +0100
 
-Hi,
+Hi Digger,
 
-Until my device crashed last night, Zaurus was working fine with my
-Socket CF bluetooth card (G series) and bluez. Now when I've installed
-things back again, I got it working as i can scan for other devices.
-However, when I connect to NAP using "pand --connect bdaddrr" and after
-that when i try to run "hcitool scan" i get error saying device/resource
-busy! 
+> I should be capable of that. I was a bit worried when you suggested I
+> delve into the driver code itself :)
+> 
+>  Am I assuming correctly that the rmk in rmk@arm.linux.org.uk is Russell
+> King?  In any case it will have to wait till tommorrow.  The powerbook
+> battery is at 20% and mine is at less.
 
-Any idea what I've been missing out?
+look at the kernel MAINTAINERS file.
 
-I've tried packages from both
-http://community.zaurus/com/project/bluez and
-http://bluez.sf.net/download/zaurus/ 
+	8250/16?50 (AND CLONE UARTS) SERIAL DRIVER
+	P:      Russell King
+	M:      rmk+serial@arm.linux.org.uk
+	L:      linux-serial@vger.kernel.org
+	W:      http://serial.sourceforge.net
+	S:      Maintained
 
-Thanks
-Zia
+Regards
+
+Marcel
 
 
 
