@@ -1,87 +1,76 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: "Xavier Garreau" <x.garreau@prim-time.fr>, Stephen Crane <steve.crane@rococosoft.com>
-Subject: Re: [Bluez-devel] [ANN] Zaurus BlueZ kernel packages for ROM v3.10
-References: <1054908696.4791.157.camel@baroque.rococosoft.com>
-	<1055156207.4791.301.camel@baroque.rococosoft.com>
-	<005f01c3302e$ca3537a0$0181a8c0@zaz1>
-In-Reply-To: <005f01c3302e$ca3537a0$0181a8c0@zaz1>
-Cc: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Message-Id: <200306282005.08403.justin-qt@affinix.com>
-Reply-To: Justin Karneges <justin-qt-dated-1058094956.869933@affinix.com>
-From: Justin Karneges <justin-qt@affinix.com>
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 28 Jun 2003 20:05:08 -0700
-Content-Type: text/plain; CHARSET=iso-8859-1
+Return-Path: <maxk@qualcomm.com>
+Message-Id: <5.1.0.14.2.20030626094614.0dadee68@unixmail.qualcomm.com>
+Date: Thu, 26 Jun 2003 10:15:22 -0700
+To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+From: Max Krasnyansky <maxk@qualcomm.com>
+Subject: Re: Version 3 libs/utils
+Cc: Stephen Crane <steve.crane@rococosoft.com>, Philip Blundell <pb@nexus.co.uk>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1056543354.10001.136.camel@pegasus>
+References: <5.1.0.14.2.20030624102040.0de55858@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030620171218.0db953a8@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030620171218.0db953a8@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030624102040.0de55858@unixmail.qualcomm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
-
-I'm working towards easy Bluetooth on the Zaurus.  I have a bluez GUI tool and 
-qtopia dialer plugin in the works.
-
-However, getting bluez installed was never easy.  In the past, I was using the 
-ipks available at bluez.sf.net, which were never very complete.
-
-Today, I sought to remedy this, and tried cross compiling modules and the 
-libs/utilities.  I ran into a heap of trouble, and then discovered this 
-thread.  I'm glad someone else is looking into this stuff too. :)
-
-My original goal was to get this working with kernel 2.4.6, but I'm not sure 
-how realistic that is.  I didn't know about the new sharp ROM until today, 
-which I have now installed.  I guess it is acceptable to work with this as a 
-target, and considering it comes with kernel 2.4.18, it should make a lot of 
-things easier.
-
-Xavier's package looks good.  The only flaw I think is that it does not set up 
-/etc/bluetooth.
-
-I'd like to see some secrets shared.  Could Steve or Xavier respond to me here 
-or on the list, so that we can make something more official?
-
--Justin
-
-On Wednesday 11 June 2003 08:33 am, Xavier Garreau wrote:
-> > > kernel modules into one big package. I like to see the kernel stuff
-> > > seperated from the userspace tools.
-> >
-> > Yeah me too. Particularly because it's much easier to build the
-> > user-space tools with a cross-compiler.
+At 05:15 AM 6/25/2003, Marcel Holtmann wrote:
+>Hi Max,
+>Hi Stephen,
 >
-> Not in this release.
+>> I think branch is CVS branch is probably a bad idea. Because we want
+>> to change a lot of things like command names, etc. Which means lots 
+>> of file renames, CVS does not handle that.
+>> 
+>> How about creating completely new modules
+>>         libs2 
+>>         utils2
+>> and start with the clean history.
+>> We'll keep old ones around for a while but will only make minor fixes
+>> to them.
 >
-> > I will think about doing this if I get some time. For now, I have
-> > uploaded the latest basic user-space binaries separately to
-> > ftp://rococosoft.com/pub/zaurus with instructions for installing them in
-> > the right places. It would not be too hard to write packaging scripts
-> > for them --- indeed this is something anyone could do using the
-> > ipkg-build script; volunteers?
->
-> I did it : http://fichiers.xgarreau.org/zaurus/bluez_2.4.18_arm.ipk
->
-> It installs the files in the right directories, make the symlinks, try to
-> guess what card it is and bring device up.
->
-> Please keep me informed of new builds so that i keep the package up to
-> date.
+>we have already discussed this and starting with new modules seemed to
+>be the cleanest way. But we shouldn't name them libs2 and utils2,
+>because we are already at version 2.x with the others. We should use
+>libs3 and utils3 or maybe an unrelated to the version number suffix like
+>"-ng".
+I think version number of the current packages and '2' in libs2,utils2 are 
+unrelated. '2' just means second generation or something. New packages will 
+have new version numbers anyway.
 
+So I vote for utils2 and libs2. People are used to things like glib2, libxml2.
+libs3 would be something unusual :)
 
--------------------------------------------------------
-This SF.Net email sponsored by: Free pre-built ASP.NET sites including
-Data Reports, E-commerce, Portals, and Forums are available now.
-Download today and enter to win an XBOX or Visual Studio .NET.
-http://aspnet.click-url.com/go/psa00100006ave/direct;at.asp_061203_01/01
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>If we agree on the new name, I will start to create the framework for the new modules.
+Let's talk about the goals and objectives first.
+
+Here is the list of things that I have in mind
+
+1. API cleanup and redesign if necessary
+        Better function names, etc.
+
+2. Better hotplug support
+        Device initialization via hotplug scripts
+        /etc/hotplug/bluetooth.agent, /etc/sysconfig/bluetooth, etc.
+
+3. Neighborhood and security databases and API for them
+        Device names, PIN codes, Link keys, etc
+        Tools to access and modify those databases
+
+4. Integrated SDP.
+
+5. Better (more appropriate) names for Bluetooth command line utilities and daemons.
+        hciconfig -> btconfig
+        rfcomm -> btport
+        sdpd -> btsdpd
+        etc
+
+6. Improved PIN helper support
+        D-Bus or something similar.
+
+7. Improved documentation. 
+        At least DoxyGen on headers and sources.
+
+Comments ? Other ideas ?
+
+Max
