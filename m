@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Till Harbaum <harbaum@beecon.de>
-To: bluez-devel@lists.sf.net
 MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_110MBZHtqDKSMg9"
-Message-Id: <200408301753.25934.harbaum@beecon.de>
-Subject: [Bluez-devel] Small bugfix for hstest
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Subject: RE: [Bluez-devel] PAN profile of bluetooth
+Message-ID: <A1F0D47583A2D711919F00600819B3A45BDCF7@goofy.vitronics.com>
+From: "Williams, Richard" <Richard.Williams@VITRONICS.com>
+To: "blookk -" <blookk@hotmail.com>, <bluez-devel@lists.sf.net>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,78 +16,118 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 30 Aug 2004 17:53:25 +0200
+Date: Mon, 30 Aug 2004 11:51:08 -0400
+
+Hello,
+
+Did you make sure the /etc/bluetooth/pan/dev-up file is correct and =
+present=20
+on both your devices, master and slave ? If this file isn't there, you =
+won't=20
+get the bnep process started.
+
+Regard,
+
+Rich
+
+-----Original Message-----
+From: blookk - [mailto:blookk@hotmail.com]
+Sent: Monday, August 30, 2004 11:19 AM
+To: bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] PAN profile of bluetooth
 
 
---Boundary-00=_110MBZHtqDKSMg9
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-Hi,
 
-i have played around with hstest and some uart based hardware and found a 
-problem, that only seems to happen with uart based devices:
+Hello
 
-A client may receive sco data packets that are bigger than the sco mtu. hstest 
-returns packets of exactly the same size of the packets it received. If the 
-packet received is bigger then the sco mtu, then packets bigger than sco mtu 
-are being sent and being dropped in the kernel. As a result, no data is being 
-sent at all. Instead multiple smaller sco packets should be sent.
+I have made a new try and it don't work.
 
-The attached patch has to be applied to bluez-utils/test/hstest.c and fixes 
-the problem inside hstest. It would as well be possible to make the kernel 
-sco code detect this and fragment the payload accordingly. But imho this 
-should be done in the application.
+after  I do all things that you told me, when  I execute "ifconfig" the=20
+virtual interface Bnep0 don't appears.
 
-Regards,
-  Till
+Why  do these things happen?
 
--- 
-Dr.-Ing. Till Harbaum                       Tel.:  +49 721 4998963
-BeeCon GmbH                                 Fax:   +49 721 4998962
-Haid-und-Neu Strasse 7, 76131 Karlsruhe     Mobil: +49 179 9087904
-harbaum@beecon.de                           http://www.beecon.de
+How do  you make  this connection?
 
---Boundary-00=_110MBZHtqDKSMg9
-Content-Type: text/x-diff;
-  charset="us-ascii";
-  name="hstest-uart.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="hstest-uart.patch"
+Regards
 
---- hstest.c.old	2004-08-28 13:11:11.000000000 +0200
-+++ hstest.c	2004-08-28 13:14:45.000000000 +0200
-@@ -148,7 +148,7 @@
- 
- 	fd_set rfds;
- 	struct timeval timeout;
--	unsigned char buf[2048];
-+	unsigned char buf[2048], *p;
- 	int maxfd, sel, rlen, wlen;
- 
- 	bdaddr_t local;
-@@ -274,7 +274,15 @@
- 					switch (mode) {
- 					case PLAY:
- 						rlen = read(fd, buf, rlen);
--						wlen = write(sd, buf, rlen);
-+
-+						wlen = 0; 
-+						p = buf;
-+						while(rlen > sco_mtu) {
-+						        wlen += write(sd, p, sco_mtu);
-+						        rlen -= sco_mtu;
-+						        p += sco_mtu;
-+						}
-+						wlen += write(sd, p, rlen);
- 						break;
- 					case RECORD:
- 						wlen = write(fd, buf, rlen);
 
---Boundary-00=_110MBZHtqDKSMg9--
 
+&gt;From: Marcel Holtmann &lt;marcel@holtmann.org&gt;
+&gt;To: blookk - &lt;blookk@hotmail.com&gt;
+&gt;CC: bluez-devel@lists.sf.net
+&gt;Subject: Re: [Bluez-devel] PAN profile of bluetooth
+&gt;Date: Mon, 30 Aug 2004 13:30:52 +0200
+&gt;
+&gt;Hi,
+&gt;
+&gt; &gt; I want to connect 2 pc using the PAN profile. I do this =
+things:
+&gt; &gt;
+&gt; &gt; - In server and client:
+&gt; &gt;
+&gt; &gt; insmod rfcomm
+&gt; &gt; insmod l2cap
+&gt; &gt; insmod bnep
+&gt; &gt;
+&gt; &gt; hcid -n &amp;
+&gt; &gt; sdpd -n &amp;
+&gt; &gt; sdptool add LAN
+&gt;
+&gt;there is no &quot;sdptool add&quot;, because pand can do this by =
+itself.=20
+And btw
+&gt;you said you wanted PAN and not LAN access using PPP.
+&gt;
+&gt; &gt; - In the server:
+&gt; &gt; The file hcid.conf :    lm accept,master;
+&gt; &gt; in the console     :    pand --listen --role GN
+&gt; &gt;
+&gt; &gt; - In the client:
+&gt; &gt; The file hcid.conf :    lm accept,master;
+&gt; &gt; in the console     :    pand --connect 00:11:22:33:44:55
+&gt;
+&gt;This will never work, because only one can be the master. Don't use =
+the
+&gt;hcid.conf for setting the master role. Use --master on the server =
+side
+&gt;call of pand.
+&gt;
+&gt;Regards
+&gt;
+&gt;Marcel
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;-------------------------------------------------------
+&gt;This SF.Net email is sponsored by BEA Weblogic Workshop
+&gt;FREE Java Enterprise J2EE developer tools!
+&gt;Get your free copy of BEA WebLogic Workshop 8.1 today.
+&gt;http://ads.osdn.com/?ad_id=3D5047&amp;alloc_id=3D10808&amp;op=3Dclick=
+
+&gt;_______________________________________________
+&gt;Bluez-devel mailing list
+&gt;Bluez-devel@lists.sourceforge.net
+&gt;https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+_________________________________________________________________
+Hor=F3scopo, tarot, numerolog=EDa... Escucha lo que te dicen los astros. =
+
+http://astrocentro.msn.es/
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by BEA Weblogic Workshop
+FREE Java Enterprise J2EE developer tools!
+Get your free copy of BEA WebLogic Workshop 8.1 today.
+http://ads.osdn.com/?ad_id=3D5047&alloc_id=3D10808&op=3Dclick
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
