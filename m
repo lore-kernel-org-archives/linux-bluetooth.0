@@ -1,22 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <6.1.2.0.2.20050126191747.04a84710@pop.gmx.net>
-To: bluez-users@lists.sourceforge.net
-From: George <george.news@gmx.net>
-Subject: Re: [Bluez-users] Bluez BNEP connection close
-In-Reply-To: <1106656339.8058.143.camel@pegasus>
-References: <6.1.2.0.2.20050124165802.04168330@luna.tlmat.unican.es>
- <1106581771.8058.49.camel@pegasus>
- <6.1.2.0.2.20050124172931.041a03a0@pop.gmx.net>
- <1106583831.8058.52.camel@pegasus>
- <6.1.2.0.2.20050124180402.041c1eb0@pop.gmx.net>
- <1106585260.8058.56.camel@pegasus>
- <6.1.2.0.2.20050124182813.04216860@pop.gmx.net>
- <6.1.2.0.2.20050124192058.04bee240@pop.gmx.net>
- <1106589847.8058.90.camel@pegasus>
- <6.1.2.0.2.20050125092855.057821a0@pop.gmx.net>
- <1106656339.8058.143.camel@pegasus>
+Subject: Re: [Bluez-users] MX900 sometimes catalepsic
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1106681895.20288.0.camel@bluez.bueche.ch>
+References: <1106681895.20288.0.camel@bluez.bueche.ch>
+Content-Type: text/plain
+Message-Id: <1106761340.28444.46.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -28,62 +18,62 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 26 Jan 2005 19:18:51 +0100
+Date: Wed, 26 Jan 2005 18:42:20 +0100
 
-Hi again...
+Hi Charles,
 
-With the PCMCIA card is much more stable. For the moment it only has 
-crashed one or twice when stressing the channel throughput.
+> I'm running 2.6.10-gentoo-r4 with patch-2.6.10-mh1.gz. My hardware is a
+> Logitech MX900 mouse and a Dell Inspiron 8600 with a CSR chip :
+> 
+> hci0:   Type: USB
+>         BD Address: 00:10:C6:22:54:AF ACL MTU: 192:8  SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN 
+>         RX bytes:113629 acl:7992 sco:0 events:88 errors:0
+>         TX bytes:1043 acl:24 sco:0 commands:42 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+>         Link policy: RSWITCH HOLD SNIFF PARK 
+>         Link mode: SLAVE ACCEPT 
+>         Name: 'laptopcb (0)'
+>         Class: 0x100100
+>         Service Classes: Object Transfer
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x235 LMP Ver: 1.1 (0x1) LMP Subver: 0x235
+>         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> I'm not using the mouse bluetooth dock for any connection (only battery
+> loading).
+> 
+> Often, after unpacking my laptop and MX900 mouse from its bag, the mouse
+> appear to "hang". The laptop doesn't see it, and I have to open the
+> mouse battery location and quickly unplug one battery to reset the
+> mouse. After this treatment, the mouse announce itself and the laptop
+> sees it and create the devices with udev.
+> 
+> The problem happen about 1/4 of the time when unpacking the laptop, but
+> in a systematic way after a reboot (eg after upgrading my kernel). I
+> never boot my laptop under Windows, and I never use the mouse with other
+> machines. The "connect" button has no effect.
+> 
+> The problem has be present since a long time and several kernels and
+> bluez patches, maybe since always.
+> 
+> It would only be annoying, but the battery door of my mouse is starting
+> to present a bad shape after openning it with just about all the tools
+> that fits it, including cisors.
 
-Thanks for all the help.
+I have no idea what the problem is, but I assume that it is because of
+the reconnect feature of the mouse. I will always try to reconnect when
+you move your bag and after some failed retries it may deadlock itself.
+
+On the other hand there is maybe a small race when you shutdown the
+machine and disconnect every device. May a "hciconfig hci0 noscan"
+before calling "hidd -K" will help.
 
 Regards
 
-At 13:32 25/01/2005, Marcel Holtmann wrote:
- >Hi George,
- >
- >> In my code I have a reconnection capability once the bnep connection
- >> disappears.
- >> However doing some more tests I found that sometimes the interface 
-bnep0 is
- >> still there (in the laptop) although there is no connectivity.
- >> I mean, the interface exists but the channel or path is not more up.
- >> Therefore my reconnection capability doesn't work on this case.
- >
- >this is maybe a bug or a little race in the code. Include more details
- >and actually are way to reproduce it.
- >
- >> So... don't know what could happen. I have recompiled the kernel serveral
- >> times changing the UCHI, OHCI and EHCI supports but still happens the 
-same..
- >
- >Recompiling the kernel doesn't help here. You need to exchange the USB
- >host controller hardware for checking UHCI, OHCI or EHCI. I always have
- >a second PCI USB controller in my system for these tests.
- >
- >> I'm thinking on buying a PCMCIA Bluetooth card to have a try as Marcel
- >> thinks the problem is with the usb.
- >
- >It is worth testing, but don't ask for the best PCMCIA card. This is
- >always another story. In general every card is working, but you must now
- >the exact hciattach parameter to make them work.
- >
- >Regards
- >
- >Marcel
- >
- >
- >
- >
- >-------------------------------------------------------
- >This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
- >Tool for open source databases. Create drag-&-drop reports. Save time
- >by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
- >Download a FREE copy at http://www.intelliview.com/go/osdn_nl
- >_______________________________________________
- >Bluez-users mailing list
- >Bluez-users@lists.sourceforge.net
- >https://lists.sourceforge.net/lists/listinfo/bluez-users
+Marcel
+
 
 
 
