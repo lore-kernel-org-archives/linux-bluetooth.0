@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Timeout message from kernel
+Subject: Re: [Bluez-users] easier way to program ?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jeff Sutherland <jeffs@fairwayacademy.org>
+To: Oswaldo Seiji Morelli Sakai <oswaldo.sakai@poli.usp.br>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200402130917.46561.jeffs@fairwayacademy.org>
-References: <200402121636.02074.jeffs@fairwayacademy.org>
-	 <1076631244.2671.16.camel@pegasus>
-	 <200402130917.46561.jeffs@fairwayacademy.org>
+In-Reply-To: <4487C040D663894C961C8297CB8F62B81E6354@apl03.poli.usp.br>
+References: <4487C040D663894C961C8297CB8F62B81E6354@apl03.poli.usp.br>
 Content-Type: text/plain
-Message-Id: <1076682121.2671.53.camel@pegasus>
+Message-Id: <1076681858.2671.49.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,40 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 15:22:02 +0100
+Date: Fri, 13 Feb 2004 15:17:39 +0100
 
-Hi Jeff,
+Hi Oswaldo,
 
-> l2ping from either end works.  I didn't cross-compile hcidump for the ColdFire 
-> board, need to do some makefile wizardry in the parser subdir first.  l2test 
-> on both ends just sits there waiting for something, no doubt I'm not invoking 
-> it properly.  hcidump on the pc end shows the ping packets arriving from 
-> ColdFire.  I guess my connection is basically working.  On the ColdFire 
-> board:
-> /bin> hciconfig
-> hci0:   Type: UART
->         BD Address: 00:0A:4F:00:13:5F ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:289 acl:0 sco:0 events:14 errors:0
->         TX bytes:554 acl:0 sco:0 commands:14 errors:0
-> 
-> But invoking hcitool still yields:
-> /bin> hcitool info 00:0A:4F:00:09:5E
-> Requesting information ...
-> bcsp_timed_event: Timeout, retransmitting 1 pkts
-> Can't create connection: Input/output error
-> pid 54: failed 256
-> 
-> bcsp_timed_event: is a kernel error msg.  I should probably try to set up an 
-> l2test session properly next.  Any advice?
+> wich is the easier way to program hci commands?
 
-with the next update of the BCSP driver I will turn this into a debug
-message.
+using C/C++.
 
-Using l2test is easy and with -h you see all the options ;)
+> i have to student kits(ericson) and i want to program somethig simple(i think):
+> a automatic conection between them(inquire-create conection-accept conection) 
+> does someone works with something similar in C or VB? 
 
-	One side:	l2test -r	/* listen and receive */
-	Other side:	l2test -s	/* connect and send */
+Take a look at the source and the test programs. It is all C.
 
 Regards
 
