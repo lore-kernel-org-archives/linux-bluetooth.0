@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hcid vs. hciconfig hci0 up
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY102-F210C30E45F8EA3793EF85AD2BF0@phx.gbl>
-References: <BAY102-F210C30E45F8EA3793EF85AD2BF0@phx.gbl>
-Content-Type: text/plain
-Message-Id: <1101927915.15615.13.camel@pegasus>
-Mime-Version: 1.0
+From: Peter Wippich <pewi@gw-instruments.de>
+To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <Pine.LNX.4.33.0412011855510.2707-100000@redbean.intranet.gw-instruments.de>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-devel] Cross Compile Blues ....
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +16,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 20:05:15 +0100
+Date: Wed, 1 Dec 2004 19:08:12 +0100 (CET)
 
-Hi Theresa,
 
-> I got my server app running on an Axis developer's board  83 with the use of 
-> an RFCOMM socket on channel one for the BT comm.  After flashing my board 
-> w/the new kernel (for BlueZ to work) I noticed I could not run the hcid 
-> daemon w/out the board either giving msgs about no kernel access to the 
-> device or even kernel panics when i put the hcid in a startup script.  (For 
-> those familiar w/this board, I can do a network boot of the same image and 
-> it all works fine)
-> 
-> I know this issue has nothing to do w/this list, but I wanted to know:
-> 
-> What is the difference between running the hcid and using "hciconfig hci0 
-> up" to bring up the device.  Since I cannot use hcid, I just use hciconfig 
-> to manually bring up the device and my app works fine.  Whats the difference 
-> between the two?  And is it better to use the daemon?
+Dear All,
 
-the hcid brings the device up and sets some more settings based on its
-config file (for example name etc.).
+I'm trying to cross compile bluez-libs / utils (Vers. 2.11). Actually, I
+can compile fine, but I've the following problems:
 
-Regards
+a) when I compile the libraries I'm unable to find a configure which
+allows me to have the libraries installed on the the build system but with
+a load path of the target system (/usr/lib). Here is the configure I use
 
-Marcel
+./configure --prefix=$XPREFIX --host=$TARGET --build=i686-pc-linux-gnu \
+            --with-kernel=$LINUX_DIR \
+            --libdir=$XPREFIX/lib --includedir=$XPREFIX/include
+
+where XPREFIX is the path to the target root file system on my build
+system, TARGET is arm-linux  LINUX_DIR is the path to the linux sources
+for the target system. What I need is some configuration which installs
+the library files in $XPREFIX/lib and builds the libraries for RUN PATH
+/lib. Does anybody know how t get this working ????
+
+b) the same problem occurs with the CONFIGDIR define in config.h.
+It is always set to $XPREFIX/etc/bluetooth
+instead of just /etc/bluetooth
+
+Any help is very welcome !!!
+
+Thank you and best regards,
+
+Peter
+
+
+|	Peter Wippich 			Voice: +49 30 46776411		|
+|	G&W Instruments GmbH		fax:   +49 30 46776419		|
+|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
+|	D-13355 Berlin  / Germany					|
 
 
 
