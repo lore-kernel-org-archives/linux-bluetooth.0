@@ -1,38 +1,48 @@
-Return-Path: <james.cameron@hp.com>
-Date: Wed, 30 Jun 2004 10:15:35 +1000
-From: James Cameron <james.cameron@hp.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] how to do asynchronous device inquiry?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Albert Huang <ashuang@gmail.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] pand/main.c, restore signals for dev-up script
-Message-ID: <20040630001535.GH15948@hp.com>
-References: <20040628101927.GC8871@hp.com> <1088419197.3774.183.camel@pegasus> <20040628120612.GF8871@hp.com> <1088427271.3774.198.camel@pegasus> <20040628224803.GA20139@hp.com> <1088465177.6030.221.camel@pegasus> <20040629052317.GQ20139@hp.com> <1088499480.6030.239.camel@pegasus> <20040629105508.GC2133@hp.com> <1088508403.6030.265.camel@pegasus>
+In-Reply-To: <ef9938ec0406291130a9b3760@mail.gmail.com>
+References: <ef9938ec040628194321db5d9c@mail.gmail.com>
+	 <1088500888.6030.261.camel@pegasus>
+	 <ef9938ec0406291130a9b3760@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1088545801.6030.353.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1088508403.6030.265.camel@pegasus>
-Sender: james.cameron@hp.com
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 29 Jun 2004 23:50:02 +0200
 
-On Tue, Jun 29, 2004 at 01:26:43PM +0200, Marcel Holtmann wrote:
-> the anonymous CVS is not updated in real time. It is a Sourceforge
-> problem and the only thing you can do is wait :(
+Hi Albert,
 
-Ah, okay, I see your commit now, on 1.6 08:53:29 UTC.  SourceForge had
-told me they were updating anonymous CVS in real-time, and I thought I
-had observed it on my projects (pptpclient, poptop).  Maybe they haven't
-finished enabling it.
+> sorry, I'm having a tough time finding this piece of code you mention.
+>  The interface to sourceforge mailing list archives is terrible.  Do
+> you remember around when you posted it?
 
-I cross checked your patch and it looks fine.  When's the next release?
-;-)
+no I don't know when I posted it. Use the Gmane archive.
 
-> Or come up with a solution that makes the peer address available through
-> hotplug and net.agent.
+Regards
 
-Is the peer ba kept in bnep0 structure somewhere?  Isn't bnep0
-effectively a point to point link?  ppp0 for example, shows the peer IP
-address yet bnep0 doesn't.
+Marcel
 
-Yes, I can get the ba from "pand -l|grep bnep0", or broadcast pinging
-the bnep0 subnet and using "arp" to read the ba.
 
--- 
-James Cameron
+
+
+-------------------------------------------------------
+This SF.Net email sponsored by Black Hat Briefings & Training.
+Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
+digital self defense, top technical experts, no vendor pitches, 
+unmatched networking opportunities. Visit www.blackhat.com
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
