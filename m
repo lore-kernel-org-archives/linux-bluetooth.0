@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SBC code cleanup
-Message-Id: <20041128053245.4608f749.henryk@ploetzli.ch>
-In-Reply-To: <1101592165.27074.31.camel@pegasus>
-References: <1101592165.27074.31.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1101592165.27074.31.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Sun__28_Nov_2004_05_32_45_+0100_kHXpQTdShDHp9lvx"
+Subject: [Bluez-devel] SBC code cleanup
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,51 +16,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 28 Nov 2004 05:32:45 +0100
+Date: Sat, 27 Nov 2004 22:49:25 +0100
 
---Signature=_Sun__28_Nov_2004_05_32_45_+0100_kHXpQTdShDHp9lvx
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Henryk,
 
-Moin,
+I started with some cleaning up of the SBC code to better fit into
+current coding conventions. My focus was on the sbc_synthesize_audio()
+and sbc_analyze_audio() functions. While checking them and looking at
+the code I think we also need this patch:
 
-Am Sat, 27 Nov 2004 22:49:25 +0100 schrieb Marcel Holtmann:
+--- sbc/sbc.c   27 Nov 2004 21:39:38 -0000      1.23
++++ sbc/sbc.c   27 Nov 2004 21:46:01 -0000
+@@ -523,7 +523,7 @@
+        int i, j, k;
+ 
+        /* Input 8 New Subband Samples */
+-       for (i = 0; i < 7; i++)
++       for (i = 0; i < 8; i++)
+                state->S[ch][i] = frame->sb_sample[blk][ch][i];
+ 
+        /* Shifting */
 
-> I started with some cleaning up of the SBC code to better fit into
-> current coding conventions. My focus was on the sbc_synthesize_audio()
-> and sbc_analyze_audio() functions.=20
+Am I right, or do I miss something?
 
-I saw that and you're doing a good job there. I also saw that you
-registered sf.net/projects/sbc.
+Regards
 
-> -       for (i =3D 0; i < 7; i++)
-> +       for (i =3D 0; i < 8; i++)
+Marcel
 
-> Am I right, or do I miss something?
 
-No, you're absolutely right. Actually the decoder is broken currently
-(I swear it worked when I checked in rev 1.8 of sbclib.c). I'm
-investigating...
-
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
-
---Signature=_Sun__28_Nov_2004_05_32_45_+0100_kHXpQTdShDHp9lvx
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQFBqVTxIjWgKE0OA2gRAvSMAJ9otVBPbeM/8dyEEweyCaR2s/S3mQCfYJHc
-iNZ929izpYEiVkAh5WMSrLc=
-=LYy4
------END PGP SIGNATURE-----
-
---Signature=_Sun__28_Nov_2004_05_32_45_+0100_kHXpQTdShDHp9lvx--
 
 
 -------------------------------------------------------
