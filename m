@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <007101c33f05$99e146d0$0181a8c0@zaz1>
-From: "Xavier Garreau" <x.garreau@prim-time.fr>
-To: "Justin Karneges" <justin-qt@affinix.com>, "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-Cc: "Stephen Crane" <steve.crane@rococosoft.com>
+To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [ANN] Zaurus BlueZ kernel packages for ROM v3.10
 References: <1054908696.4791.157.camel@baroque.rococosoft.com>
 	<005f01c3302e$ca3537a0$0181a8c0@zaz1>
 	<200306282005.08403.justin-qt@affinix.com>
-	<200306282117.57840.justin-qt@affinix.com>
-Subject: Re: [Bluez-devel] [ANN] Zaurus BlueZ kernel packages for ROM v3.10
+In-Reply-To: <200306282005.08403.justin-qt@affinix.com>
+Cc: "Xavier Garreau" <x.garreau@prim-time.fr>, Stephen Crane <steve.crane@rococosoft.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Message-Id: <200306282117.57840.justin-qt@affinix.com>
+From: Justin Karneges <justin-qt@affinix.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -22,36 +21,51 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 30 Jun 2003 14:46:17 +0200
+Date: Sat, 28 Jun 2003 21:17:57 -0700
+Content-Type: text/plain; CHARSET=iso-8859-1
 
-> Subject: Re: [Bluez-devel] [ANN] Zaurus BlueZ kernel packages for ROM
-v3.10
+Ok, I thought of a few more things, so to jumpstart the discussion I'll say 
+them now:
 
-I'm still interrested in packaging bluez core, libs and apps for the zaurus.
-When all is compiled and ready to work, i'll make another package.
+> > It installs the files in the right directories, make the symlinks, try to
+> > guess what card it is and bring device up.
 
-I thought card detection during ipk install was a good thing to be done, if
-i'm the only one wanting it, it can be removed...
+First, what is this about card detection during ipk install?  I didn't have a 
+problem with that (I inserted my card after install), and IMO there should be 
+no such detection in the installer if there is.
 
-I'll put rfcomm and bluepin, as soon as they are available.
+Second, rfcomm is missing.
 
-> Third, the /dev nodes are not created.  When they are, ensure that they
-can
-> survive a reboot.
+Third, the /dev nodes are not created.  When they are, ensure that they can 
+survive a reboot.
 
-That's true...
+For the future, I think hcid should be run on install and on future bootups, 
+as it is required to do anything useful.  I'm not sure about sdpd though (i 
+admit i'm not up on what sdp does, can someone shed some light if this is 
+needed?).  Whatever daemons are run should have proper pid accounting in 
+/var, so that front-ends can access them.  For instance, my GUI that modifies 
+/etc/bluetooth/hcid.conf will need a way to find hcid's pid so it can send 
+HUP.
 
-> By the way, you may see my GUI package here:
->   http://www.affinix.com/~justin/zaurus-bluetooth-0.6.tar.gz
+Then also pin handling:  There should be a /usr/bin/bluepin that does the 
+following:
+  - check to see if Qtopia is up.
+  - if not, echo ERR.
+  - else, call my qt btpin program (let's assume it is /usr/bin/btpin)
 
-This can be added in the utils package. I think we need a kernel package, a
-libs package and a utils package. But it can be further discussed...
+This way the pin should properly work even during the moment where hcid is 
+running but qtopia is not fully booted yet.
+  
+I think this should do it.  Am I missing anything?
 
-BR,
--- 
-Xavier Garreau
-http://www.xgarreau.org/
+By the way, you may see my GUI package here:
 
+  http://www.affinix.com/~justin/zaurus-bluetooth-0.6.tar.gz
+
+It is rather old, but works.  Unfortunately, it seems the dialer part does not 
+work on the new Sharp ROM.  Argh, I'll have to fix this ..
+
+-Justin
 
 
 -------------------------------------------------------
