@@ -1,77 +1,61 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <406AB277.2030503@csr.com>
-From: Steven Singer <steven.singer@csr.com>
+Return-Path: <vogl@soft.uni-linz.ac.at>
+Message-ID: <406AAFFF.6040504@soft.uni-linz.ac.at>
+Date: Wed, 31 Mar 2004 13:48:15 +0200
+From: Simon Vogl <vogl@soft.uni-linz.ac.at>
 MIME-Version: 1.0
-To: paolo2278@freemail.it
-CC: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] absolute clock
-References: <20040331104607.18049.qmail@mail.supereva.it>
-In-Reply-To: <20040331104607.18049.qmail@mail.supereva.it>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 31 Mar 2004 12:58:47 +0100
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] sco / csr final notes
+References: <406A9E23.9000406@soft.uni-linz.ac.at> <1080730774.2674.6.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-paolo2278@freemail.it wrote:
-> I have a great problem, I'd like to know wich is the structure where I
-> can find the value of the bluetooth's absolute clock, or the function
-> that I could call for read this value.
-[...]
-> P.S. I have a CSR Bluetooth
+oh, sorry: well, after trying for weeks, I see always the same behavior of
+the sco data: after a connect of the sco channel, the data is either byte-swapped
+or offset by one byte, but no indication in any header etc. can be found why
+this is the case.
 
-As Marcel pointed out in another message, there's no standard HCI
-command to read the Bluetooth clock in BT 1.1 but there is in BT 1.2.
+The original assumption that there might be packets with a byte (or more)
+missing has not turned out to be right (could not find an indication of this).
 
-However, if you have a CSR BT 1.1 device there are vendor specific
-commands. If you use CSR's BCCMD mechanism then there are two IDs of
-interest: BCCMDVARID_BT_CLOCK (0x2c00) returns the local Bluetooth clock
-of the controller; BCCMDVARID_PICONET_INSTANT (0x3009) returns the
-current Bluetooth clock for the a given piconet (it expects you to pass
-in an ACL handle for any link on that piconet).
+Anyway, as a workaround, I have implemented a small signal analysis function that
+tests, in short, if the incoming signal is gaussian or even distributed (the latter
+is an indication for a byte swap) - upon which I adapt the output accordingly.
+(the code is at http://www.soft.uni-linz.ac.at/_wiki/tiki-index.php?page=ProjectBluezHandsfree)
 
-If you have access to the CSR support website (www.csrsupport.com) then
-it's all fully documented. Don't forget that you may need to tunnel the
-commands over HCI. Alternatively, you might find it easier to dig through
-the BlueZ source and find out where it sends the commands to change the
-uart baud rate - that should give you a good example to work from.
+Marcel, do you I can bug with this at csr?
+Simon
 
-I can't recall if BlueZ has a tool that allows you to send arbitrary
-BCCMDs to CSR chips - if not, it sounds like a good project for
-someone.
+Simon
 
-	- Steven
+Marcel Holtmann wrote:
+> Hi Simon,
+> 
+> 
+>>well now I have a heuristic that works most of the time. Looking at the
+>>transmitted data, I wonder if there could be a big endian/little endian
+>>switch that is toggled randomly in the firmware for the 16bit sco data.
+>>
+>>Is there a lucky person with a developer kit out there who is able
+>>to confirm this?
+> 
+> 
+> please remind us about what your are talking, because it seems that at
+> least I forgot it. If you think you found a bug and you are able to
+> reproduce it, you should make a detailed description, so the CSR guys
+> can fix it.
+> 
+> Regards
+> 
+> Marcel
+> 
+
+
 -- 
+_______________________________________________________________________
+Dr. Simon Vogl
+Institut für Pervasive Computing, Johannes Kepler Universität Linz
+Altenberger Straße 69, A-4040 Linz, Austria
 
-
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
+mailto: vogl@soft.uni-linz.ac.at,  http://www.soft.uni-linz.ac.at/
