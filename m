@@ -1,15 +1,20 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] bt3c_cs time out - no firmware loaded?
 From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: Krisztian Mark Szentes <office@produktivIT.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>, Edd Dumbill <ejad@debian.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
-In-Reply-To: <200305161622.47728.office@produktivIT.com>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Krisztian Mark Szentes <office@produktivIT.com>, BlueZ Mailing List <bluez-users@lists.sourceforge.net>, Edd Dumbill <ejad@debian.org>
+In-Reply-To: <1053094302.2561.99.camel@gaston>
 References: 
 	<53B03DA73719D5119E6A0008C71E1D78030EA9A3@svr-mail1.corp.home.nl>
-	<1053091452.2561.86.camel@gaston> <1053091839.26550.125.camel@pegasus>
-	<200305161622.47728.office@produktivIT.com>
+	<200305131047.39294.office@produktivIT.com>
+	<1053083095.26552.49.camel@pegasus>
+	<200305161438.08919.office@produktivIT.com>
+	<1053091452.2561.86.camel@gaston>  <1053091839.26550.125.camel@pegasus>
+	<1053091938.2978.88.camel@gaston>  <1053092394.26552.132.camel@pegasus>
+	<1053092826.2561.90.camel@gaston>  <1053093446.26552.137.camel@pegasus>
+	<1053094302.2561.99.camel@gaston>
 Content-Type: text/plain
-Message-Id: <1053095551.26552.146.camel@pegasus>
+Message-Id: <1053095112.26551.141.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -23,33 +28,45 @@ List-Unsubscribe:
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 16 May 2003 16:32:24 +0200
+Date: 16 May 2003 16:25:05 +0200
 
-Hi Kirsztian,
+Hi Ben,
 
-> I am fed up with the card, I bought it almost year ago and hoped it would 
-> some time become easier to use. I chose it over the Xircom and Anycom 
-> parts because its antenna looked neat. In the meantime, I also bought a 
-> USB device which explicitely stated Linux compatibility on the 
-> manufacturer's web site (Epox).
-> I'm thinking about 
+> > if you don't see any other solution to work around, this device will be
+> > not supported on the PowerPC platform.
 > 
-> (1) asking 3COM for permission, or 
-> (2) returning it to 3COM's headquarters or 
-> (3) publicly destroying it and putting up a video or
-> (4) sell it to a modern slave (Windoze user) and donating the money to 
-> Debian
+> And probably many others...
 > 
-> Marcel, can you give me a hint whom I should contact for (1)? 
+> direct IO port access is really an x86 thing... 
+> 
+> Note that if the cardbus bridge actually sits on the main PCI bus and uses
+> "legacy" PIO addresses, it is possible to do something, though I hate it ;)
+> 
+> You can call the sys_pciconfig_iobase syscall to retreive the physical base
+> address where the IO ports of a given PCI bus are mapped.
+> 
+> By passing that the bus number where the cardbus bridge lives on, you can
+> then use the resulting value to mmap /dev/mem and actually access those
+> IO ports.
+> 
+> When actually implementing inx/outx in userland, I strongly suggest you do
+> what the kernel does in asm/io.h for ld/st_le16, so you get byteswapped
+> access for 16 bits, and have proper eieio barriers.
+> 
+> That syscall should have the following syntax:
+> 
+> #define IOBASE_IO		2
+> 
+> syscall(200, IOBASE_IO, bus_number, 0);
 
-I got a contact at Cebit this year, but I never found the time to write
-an email to him according the firmware stuff and the new card Version
-3.0 (which is not working with this driver). You can contact him if you
-like. His name is Brent Nixon (brent_nixon(at)3com.com).
+I have not a PowerPC platform for testing, so I can't write any code at
+the moment. But your proposal looks very ugly and I don't want to go
+this way for 2.4. I will wait until the firmware stuff is accepted by
+Linus and then try to port the current driver to the new architecture.
 
 Regards
 
-marcel
+Marcel
 
 
 
