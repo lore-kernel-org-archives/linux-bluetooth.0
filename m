@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
-Reply-To: tim@birdsnest.maths.tcd.ie
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200405171427.30900.tim@birdsnest.maths.tcd.ie>
-Subject: [Bluez-users] Some queries on using Bluetooth with GPRS
+Subject: Re: [Bluez-users] What's the best way to go about device detection?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rob Raper <djrobx@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY14-F18SByh133tYw0004e544@hotmail.com>
+References: <BAY14-F18SByh133tYw0004e544@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1084791892.4109.5.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,72 +18,53 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 17 May 2004 14:27:30 +0100
+Date: Mon, 17 May 2004 13:04:52 +0200
 
-I've been playing with Bluetooth this morning,
-linking my Sony C1VFK Picturebook (with in-built Bluetooth)
-to my Nokia 6310.
+Hi Rob,
 
-A couple of things puzzle me.
+> Without involving any of my source code at alll, I can demonstrate one of my 
+> biggest problems.     I'll first create a connection to an existing 
+> bluetooth device.  It works fine.  I can get an RSSI value or link value.  
+> Then, I'lll try a non-existent device.   I get a connection timed out error 
+> fairly quickly.  Great, that's exactly what I want and what I expect.  What 
+> follows, however, is what is really causing me problems.  I can no longer 
+> connect to the valid bt device.   I just get errors for a long time.  I 
+> can't disconnect either.   How can I clear out the failed connection and 
+> move on without everything breaking down like this?
+> 
+> pluto62:~/bluez-utils-2.4/tools# hcitool cc 00:60:57:23:35:15
+> pluto62:~/bluez-utils-2.4/tools# hcitool rssi 00:60:57:23:35:15
+> RSSI return value: -1
+> pluto62:~/bluez-utils-2.4/tools# hcitool dc 00:60:57:23:35:15
+> 
+> So far so good...Now try an invalid address
+> 
+> pluto62:~/bluez-utils-2.4/tools# hcitool cc 00:60:57:23:35:14
+> Can't create connection: Connection timed out
+> 
+> As expected.
+> 
+> pluto62:~/bluez-utils-2.4/tools# hcitool dc 00:60:57:23:35:14
+> Disconnect failed: Input/output error
+> 
+> Why an input/output error?  It's on the con list, how do I get it off?
 
-(1) Each time I connect the channel number increases by 1.
-Eg on my fourth attemtp I used channel 4:
-=======================================
-Serial connection established.
-using channel 4
-Using interface ppp0
-Connect: ppp0 <--> /dev/rfcomm0
-rcvd [LCP ConfReq id=0x0 <auth pap> <mru 1500> <asyncmap 0xa0000>]
-...
-rcvd [IPCP ConfAck id=0x3 <addr 62.40.49.216>]
-local  IP address 62.40.49.216
-remote IP address 10.6.6.6
-=======================================
+if create_connection fails no ACL link is in the connection list and
+there is no need to disconnect it unless we have a bug in the Bluetooth
+core layer. However using the native HCI create_connection and
+disconnect functions is not a good idea and the timeout you see is not
+from the Bluetooth chip I think. If the create_connection process is
+still running you can't disconnect anything and in some cases you
+trouble the Bluetooth chip with such actions. Check with hcidump what is
+going on.
 
-(2) For some reason I only succeed in connecting every other try.
-On the odd attempts I get
-=======================================
-Script /etc/ppp/ip-up started (pid 6584)
-Script /etc/ppp/ip-up finished (pid 6584), status = 0x0
-Terminating on signal 2.
-=======================================
+What kind of Bluetooth modules are you using? Show us "hciconfig -a".
 
-(3) This is not really a Bluetooth query, I guess,
-but I'm slightly puzzled by the fact that I cannot ping
-the remote address, which is always 10.6.6.6
-=======================================
-[tim@martha 2004]$ ifconfig ppp0
-ppp0      Link encap:Point-to-Point Protocol
-          inet addr:62.40.49.19  P-t-P:10.6.6.6  Mask:255.255.255.255
-          UP POINTOPOINT RUNNING NOARP MULTICAST  MTU:1500  Metric:1
-          RX packets:86 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:108 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:3
-          RX bytes:35498 (34.6 Kb)  TX bytes:11851 (11.5 Kb)
-=======================================
+Regards
 
-(4) Also, I'm surprised I don't have to specify any nameservers
-(in my /etc/resolv.conf).
-Is that normal?
+Marcel
 
-(5) Incidentally, the last obstacle that stopped me connecting
-was that I needed "\r" in the ATD line of my chat-sequence
- ========================================
-OK              ATE0
-OK              ATV1
-OK              'AT+CGDCONT=1,"IP","open.internet","",0,0'
-OK              'ATD*99#\r\n'
-TIMEOUT         60
-CONNECT         ""
-========================================
 
-Any suggestions or advice gratefully received.
-
--- 
-Timothy Murphy  
-e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
-tel: +353-86-2336090, +353-1-2842366
-s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
 
 
 -------------------------------------------------------
