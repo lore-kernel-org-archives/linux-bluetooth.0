@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: mirko_3 <mirko_3@gmx.net>
+Message-ID: <41EE770F.8030302@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050119161516.5ab84510@mirko_3>
-In-Reply-To: <20050118195131.CD122EACF@sc8-sf-spam2.sourceforge.net>
-References: <20050118195131.CD122EACF@sc8-sf-spam2.sourceforge.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] Headset connected, respondig, but silent
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] A2DP vs. microphone
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,54 +16,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 19 Jan 2005 16:15:16 +0100
+Date: Wed, 19 Jan 2005 08:04:47 -0700
 
-Hi everyone,
-I've been trying to get my headset to work lately, with partial success: using the latest btsco-cvs, I manage to connect to the headset (a Jabra-250, I think), and pressing the volume/answer buttons is correctly detected by the program. I've unmuted everything in alsamixer, and set  snd cards_limit=2 in modules.conf (although I don't use modules for alsa...). Everything is as it should be, except I can neither record nor playback anything. Here's my dmesg after pressing the play button three times on xmms (the progress bar doesn't move, the song doesn't start):
+hi...
 
-snd-bt-sco revision 1.4 $
-snd-bt-sco: snd-bt-scod thread starting
-snd-bt-sco: playback_open
-snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
-snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
-snd-bt-sco: playback_trigger 1
-snd-bt-sco: setting playback to bspcm
-snd-bt-sco: playback_trigger 0
-snd-bt-sco: setting playback to NULL
-snd-bt-sco: playback_open
-snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
-snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
-snd-bt-sco: playback_trigger 1
-snd-bt-sco: setting playback to bspcm
-snd-bt-sco: playback_trigger 0
-snd-bt-sco: setting playback to NULL
-snd-bt-sco: playback_open
-snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
-snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
-snd-bt-sco: playback_trigger 1
-snd-bt-sco: setting playback to bspcm
-snd-bt-sco: playback_trigger 0
-snd-bt-sco: setting playback to NULL
+i just added this to our docs and I want to bounce it off you guys to 
+make sure I'm reading things right:
 
-Program output is normal: 
-Device is 1:0
-Voice setting: 0x0060
-RFCOMM channel 1 connected
-recieved AT+CKPD=200
-opened hwdep
-connected SCO channel
-Setting sco fd
-Done setting sco fd
-recieved AT+VGS=09
-Sending up speaker change 9
-recieved AT+VGS=08
-Sending up speaker change 8
+A2DP provides a way to send stereo high-quality audio to some of the
+newer headsets. This is one-way audio, so if you were expecting to get
+something like a gaming headset (talking to other players, getting
+stereo sound back from the game) I guess the spec is lacking. It might
+be theoretically possible for a headset to accept simultaneous SCO and
+A2DP connections to do this but even if it's possible, no headset
+allows it.
 
-
-I really hope you can help me, as I've tried for days. Thank you all.
-
--- 
-Dammit Jim, I'm an actor, not a doctor.
+brad
 
 
 -------------------------------------------------------
