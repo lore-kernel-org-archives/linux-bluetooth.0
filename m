@@ -1,37 +1,66 @@
-Return-Path: <crosser@average.org>
+Return-Path: <gnome-bluetooth-bounces@usefulinc.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Fredrik Noring <noring@nocrew.org>
+In-Reply-To: <1075486241.14644.34.camel@akka.yeti.nocrew.org>
+References: <1064593223.12843.127.camel@saag>
+	<200401291230.00801.bluez-devel@schaettgen.de>
+	<1075401893.22564.51.camel@akka.yeti.nocrew.org>
+	<200401292119.45926.bluez-devel@schaettgen.de>
+	<1075486241.14644.34.camel@akka.yeti.nocrew.org>
+Message-Id: <1075487167.26729.191.camel@pegasus>
+Mime-Version: 1.0
+Date: Fri, 30 Jan 2004 19:26:07 +0100
 Subject: Re: [gnome-bluetooth] Re: [Bluez-devel] What stuff in
 	gnome-bluetooth does, and ideas for its future
-From: Eugene Crosser <crosser@average.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Fredrik Noring <noring@nocrew.org>,
-   Fred =?ISO-8859-1?Q?Sch=E4ttgen?= <bluez-devel@schaettgen.de>,
-   GNOME Bluetooth Mailing List <gnome-bluetooth@usefulinc.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1075487167.26729.191.camel@pegasus>
-References: <1064593223.12843.127.camel@saag>
-	 <200401291230.00801.bluez-devel@schaettgen.de>
-	 <1075401893.22564.51.camel@akka.yeti.nocrew.org>
-	 <200401292119.45926.bluez-devel@schaettgen.de>
-	 <1075486241.14644.34.camel@akka.yeti.nocrew.org>
-	 <1075487167.26729.191.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1075488593.21795.37.camel@ariel.sovam.com>
-Mime-Version: 1.0
-Date: Fri, 30 Jan 2004 21:49:53 +0300
+Cc: Fred =?ISO-8859-1?Q?Sch=E4ttgen?= <bluez-devel@schaettgen.de>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   GNOME Bluetooth Mailing List <gnome-bluetooth@usefulinc.com>
+List-Unsubscribe: <http://lists.usefulinc.com/mailman/listinfo/gnome-bluetooth>,
+	<mailto:gnome-bluetooth-request@usefulinc.com?subject=unsubscribe>
+List-Archive: <http://lists.usefulinc.com/pipermail/gnome-bluetooth>
+List-Post: <mailto:gnome-bluetooth@usefulinc.com>
+List-Help: <mailto:gnome-bluetooth-request@usefulinc.com?subject=help>
+List-Subscribe: <http://lists.usefulinc.com/mailman/listinfo/gnome-bluetooth>,
+	<mailto:gnome-bluetooth-request@usefulinc.com?subject=subscribe>
+Sender: gnome-bluetooth-bounces@usefulinc.com
+Errors-To: gnome-bluetooth-bounces@usefulinc.com
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Fri, 2004-01-30 at 21:26, Marcel Holtmann wrote:
+Hi Fredrik,
 
-> the best place for Unix sockets is /tmp
+> Similar to the idea with /etc/bluetooth/keytab.socket, additional
+> sockets can be created for other Bluetooth interface services such
+> as name scans, lookups etc. Regular users have access to these
+> capabilities based on socket file permissions.
 
-Or /var/<something>, and not only sockets, but other variable data as
-well.  /etc may be on a read-only filesystem.  Imagine a bluetooth
-gadget based on Linux burnt in ROM.
+the best place for Unix sockets is /tmp
 
-(I continue to think that binary helper is a viable option for the low
-level interface.  It is very scalable: "lean" implementation for very
-simple environments may be cut down to just a few lines of shell
-script.  "Rich" implementation may use whatever database, and/or relay
-requests to other programs over D-BUS, or CORBA, or anything...)
+> Example:
+> 
+>    /etc/bluetooth/names          # The device name cache
+>    /etc/bluetooth/names.conf     # The device name configuration file
+>    /etc/bluetooth/names.socket   # The command socket
+> 
+> Command examples:
+> 
+>    SCAN            - Returns something similar to "hcitool scan"
+>    LOOKUP <bdaddr> - Returns the name if available in the names file
+>    DELETE <bdaddr> - Removes the name from the names file
+>    LIST            - Lists all names in the names file
+> 
+> The hcitool utility can be extended with these features too.
 
-Eugene
+If we do it, this should be part of the Bluetooth library itself, so
+programmers don't have to worry about it.
+
+Regards
+
+Marcel
+
+
+
+_______________________________________________
+gnome-bluetooth mailing list
+gnome-bluetooth@usefulinc.com
+http://lists.usefulinc.com/mailman/listinfo/gnome-bluetooth
