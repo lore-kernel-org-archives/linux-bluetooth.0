@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] BlueZ error in cc,cc,dc sequence
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404170957.35029.cijoml@volny.cz>
-References: <200404162339.01392.cijoml@volny.cz>
-	 <200404170937.46434.cijoml@volny.cz> <1082187953.4489.43.camel@pegasus>
-	 <200404170957.35029.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1082189235.4489.46.camel@pegasus>
-Mime-Version: 1.0
+References: <200404162339.01392.cijoml@volny.cz> <200404170937.46434.cijoml@volny.cz> <1082187953.4489.43.camel@pegasus>
+In-Reply-To: <1082187953.4489.43.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200404170957.35029.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,25 +19,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Apr 2004 10:07:15 +0200
+Date: Sat, 17 Apr 2004 09:57:35 +0200
 
-Hi Michal,
+Dne so 17. dubna 2004 09:45 Marcel Holtmann napsal(a):
+> Hi Michal,
 
-> > > when calling cc/dc/cc/dc/cc/dc it works like a charm
-> > > but cc/cc/dc makes problems - can't disconnect
-> >
-> > maybe the kernel or your Bluetooth chip don't really likes double
-> 
-> kernel 2.4.26-mh1 and CSR 16.1.1 - Microsoft wireless transceiver
+Hi Marcel,
 
-if it is really a kernel problem then it is present in every kernel,
-because I never worked on it.
+>
+> > when calling cc/dc/cc/dc/cc/dc it works like a charm
+> > but cc/cc/dc makes problems - can't disconnect
+>
+> maybe the kernel or your Bluetooth chip don't really likes double
 
-Regards
+kernel 2.4.26-mh1 and CSR 16.1.1 - Microsoft wireless transceiver
 
-Marcel
+> HCI_Create_Connection. If you use higher layers like L2CAP or RFCOMM
+> this can't happen.
+>
+> If I don't need the hcitool cc/dc functions for development I had
+> already removed them ;)
+>
+> Regards
+>
+> Marcel
 
-
+Michal
 
 
 -------------------------------------------------------
