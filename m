@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Question about the command hcitool -i hci0 cmd
-	<ogf><ocf>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001a01c500fc$a37ffdc0$a14c12ac@stu.nus.edu.sg>
-References: <001a01c500fc$a37ffdc0$a14c12ac@stu.nus.edu.sg>
-Content-Type: text/plain
-Message-Id: <1106460150.8118.5.camel@pegasus>
+To: bluez-devel@lists.sourceforge.net
+From: Matthias Brune <matthiasbrune@gmx.de>
+Message-ID: <loom.20050123T062904-951@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Compiling the bluetooth kernel part only
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,21 +16,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 23 Jan 2005 07:02:30 +0100
+Date: Sun, 23 Jan 2005 05:32:33 +0000 (UTC)
 
-Hi Teck,
-
-> Regarding the command hcitool -i hci0 cmd <ogf><ocf>, may I know if
-> there exists a full listing of all possible hex numbers for <ogf><ocf>
-> and their corresponding functions?
-
-check the HCI part of the Bluetooth specification and the implementation
-document for your Bluetooth chip.
-
-Regards
-
-Marcel
-
+Hi, 
+ 
+is it possible to compile the .../linux/net/bluetooth directory only? 
+I want to test some changes. 
+ 
+best regards 
+Matthias 
 
 
 
