@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] newbie fedora2 & bluez questions
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Zhu <saki96@yahoo.com>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <20040901183311.1763.qmail@web11601.mail.yahoo.com>
-References: <20040901183311.1763.qmail@web11601.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1094458705.5145.1.camel@notepaq>
+From: "Collin R. Mulliner" <collin@betaversion.net>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] no concurrent inquiry / inquiry scan and L2CAP
+ connection as slave
+Message-Id: <20040905105312.64316ddc@coredump>
+In-Reply-To: <413B18F9.6010101@nue.et-inf.uni-siegen.de>
+References: <413B18F9.6010101@nue.et-inf.uni-siegen.de>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,46 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Sep 2004 10:18:25 +0200
+Date: Sun, 5 Sep 2004 10:53:12 -0700
 
-Hi David,
+Hi Michael,
 
-> I tried following the many howto guides on the web but
-> I always seem to have problems after a certain step. 
-> So I hope I'm not offending anyone with what may be a
-> really simple issue.  Here we go...
+I have an application which connects 2 or mode nodes via rfcomm and all
+nodes still do inquirys all the time. Since rfcomm is build on top of
+l2cap your stuff should work. Maybe you like to verify it by looking at
+my code - http://www.mulliner.org/bluetooth/btchat/
+
+> I'm experiencing the following behavior with BlueZ and L2CAP:
 > 
-> I have a DLink DBT-120 Rev 4 USB Bluetooth adapter,
-> which I have confirmed is supported on the hardware
-> page.
+> After establishing an L2CAP connection between two nodes, only the 
+> master of this connection is still able to:
 > 
-> I've installed the necessary packages from the fedora
-> core 2:
+> - perform periodic device inquiries (i.e. search other devices
+>    in 'Periodic_Inquiry_Mode')	
+> - perform inquiry scans (i.e. be visible for other searching devices)
 > 
-> bluez-libs-2.5-2.1
-> bluez-utils-2.4-3
-> gnome-bluetooth-0.4.1-7
-> bluez-sdp-1.5-2.1
+> However, I would like to be able to do this as slave as well (at
+> least, to perform inquiry scans as slave).
 > 
-> I'm running kernel 2.6.8
+> Now I'm wondering whether:
 > 
-> so when I do a "hcitool scan" I am able to find:
-> 00:02:EE:E0:2A:E6       Nokia 6820
-> 
-> but when I do a "sdptool browse" I always get 
-> Inquiring ...
-> Failed to connect to SDP server on 00:02:EE:E0:2A:E6:
-> Function not implemented
-
-you enabled auth and encrypt and this means you set your device into
-security mode 3. Don't do this and check my previous mails in the
-mailing list archive for more details.
-
-Regards
-
-Marcel
+> - this is a restriction of BlueZ		or
+> - this is a restriction of my BT chipsets	or
+> - this is a restriction of Bluetooth		or
+> - I'm doing (configuring) something wrong...
 
 
+-- 
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+God is real, unless declared integer.
 
 
 -------------------------------------------------------
