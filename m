@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hidd
+Subject: Re: [Bluez-users] CSR firmware
 From: Marcel Holtmann <marcel@holtmann.org>
 To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405300200.53882.cijoml@volny.cz>
-References: <200405300037.53081.puggy@gentoo.org>
-	 <200405300200.53882.cijoml@volny.cz>
+In-Reply-To: <200405291108.06457.cijoml@volny.cz>
+References: <200405290256.06151.cijoml@volny.cz>
+	 <1085820898.3932.6.camel@pegasus>  <200405291108.06457.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1085901786.12117.122.camel@pegasus>
+Message-Id: <1085901284.12117.118.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,14 +19,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 May 2004 09:23:06 +0200
+Date: Sun, 30 May 2004 09:14:44 +0200
 
 Hi Michal,
 
-> You must modprobe hidp and uinput first
+> > The problem is not the vendor ID. It is the digital signature of the
+> > firmware file. You can download everything you want onto your dongle,
+> > but it can happen that the boot loader don't boot the other firmware. In
+> > that case it will stay in DFU mode. The boot loader can only be changed
+> > over a SPI connection.
+> 
+> That means, that if I download from dongle original firmware and then flash 
+> other one into dongle and it will not work I can't flash original fw back?
 
-if you use hidd then only hidp is needed. The uinput was only used by
-bthid and is no longer needed.
+this is not quite right. It can happen that the boot loader will load
+your current firmware, but in case of a DFU download it will not accept
+its own firmware. Now your dongle will stay in DFU mode and it is
+useless. The only way to get the firmware back it through SPI.
+
+> What is SPI connection?
+
+Besides UART and USB it is the third interface of the CSR chips. Mainly
+used for development and sometimes the only way to get a device working
+again.
+
+> Any related docs?
+
+Many of them, but not publicly available.
 
 Regards
 
