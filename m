@@ -1,80 +1,106 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <004a01c47dd4$45be1380$df0618ac@USI08844>
-From: "taylor" <taylor@ms.usi.com.tw>
-To: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
+Return-Path: <sdc695@yahoo.com>
+Message-ID: <20040809050753.17815.qmail@web60801.mail.yahoo.com>
+Date: Sun, 8 Aug 2004 22:07:53 -0700 (PDT)
+From: Tom Watson <sdc695@yahoo.com>
+Reply-To: tsw@johana.com
+Subject: Re: [Bluez-users] IOGear GBU301 and Kernel 2.4.20
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4116f4a0.johana@johana.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0047_01C47E17.53419110"
-Subject: [Bluez-users] Adpat PAN profile to Samba Server
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 9 Aug 2004 13:46:51 +0800
+Content-Type: text/plain; charset=us-ascii
+List-ID: <bluez-users.lists.sourceforge.net>
 
-This is a multi-part message in MIME format.
+Hello Marcel...
+The saga continues...
+--- Marcel Holtmann <marcel@holtmann.org> wrote:
 
-------=_NextPart_000_0047_01C47E17.53419110
-Content-Type: text/plain;
-	charset="big5"
-Content-Transfer-Encoding: quoted-printable
+> Hi Tom,
+> 
+> > > why don't include the content of /proc/bus/usb/devices?
+> > > 
+> > Your wish is my command....
+> > 
+> > >>>>>
+> > T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  5 Spd=12  MxCh= 0
+> > D:  Ver= 1.01 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> > P:  Vendor=0a5c ProdID=2033 Rev= 0.a0
+> > C:* #Ifs= 3 Cfg#= 1 Atr=a0 MxPwr=100mA
+> > I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+> > E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> > E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> > E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> > I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+> > E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> > E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> > I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+> > E:  Ad=83(I) Atr=01(Isoc) MxPS=  16 Ivl=1ms
+> > E:  Ad=03(O) Atr=01(Isoc) MxPS=  16 Ivl=1ms
+> > I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+> > E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+> > E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+> > I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+> > E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+> > E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+> > I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+> > E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+> > E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+> > I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+> > E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+> > E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+> > I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> > E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> > E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> > <<<<<
+> > 
+> > The above is just the part that is different between plugging in the IOGear
+> > adapter and not.  I didn't want to complicate things with too much clutter
+> 
+> this is a Broadcom BCM2033 dongle without firmware loaded. Install the
+> bluez-firmware package and use the bcm203x kernel driver from a recent
+> 2.6 kernel or compile bluez-utils-2.9 with bcm203x support.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-Dear,
-   Yesterday, an idea come to my mind. I adpat the Bluez Profile to =
-Samba server. Really, it could work. User could share the file and =
-printer from Samba server. IT is a good solution for me. We doesn't need =
-the wire more at office.
+OK, This ought to be simple but...
+[ bluez-utils-2.9]# ./configure --prefix=/usr --mandir=/usr/share/man
+--sysconfdir=/etc --enable-bcm203x
 
-Taylor Shieh
-Engineer, Bluetooth Module Section
-New Technology Development Dept., R&D Division
-Tel:886-49-2325876 Ext:2188
- =20
-   
-------=_NextPart_000_0047_01C47E17.53419110
-Content-Type: text/html;
-	charset="big5"
-Content-Transfer-Encoding: quoted-printable
+Then...
+make clean    {I hadn't done the 'enable-bcm...'}
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dbig5">
-<META content=3D"MSHTML 6.00.2800.1400" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT size=3D2>Dear,</FONT></DIV>
-<DIV><FONT size=3D2>&nbsp;&nbsp; Yesterday, an idea come to my mind. I =
-adpat the=20
-Bluez Profile to Samba server. Really, it could work. User could share =
-the file=20
-and printer from Samba server. IT is a good solution for me. We doesn't =
-need the=20
-wire more at office.</FONT></DIV>
-<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT size=3D2>Taylor Shieh<BR>Engineer, Bluetooth Module =
-Section<BR>New=20
-Technology Development Dept., R&amp;D Division<BR>Tel:886-49-2325876=20
-Ext:2188</FONT></DIV>
-<DIV><FONT size=3D2>&nbsp; </FONT></DIV>
-<DIV><FONT size=3D2>&nbsp; &nbsp;</FONT></DIV></BODY></HTML>
+and then
+make
 
-------=_NextPart_000_0047_01C47E17.53419110--
+But it goes for a while and I get...
+gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/include -Wall -g -O2 -c `test -f
+'bcm203x.c' || echo './'`bcm203x.c
+cc1: warning: changing search order for system directory "/usr/include"
+cc1: warning:   as it has already been specified as a non-system directory
+bcm203x.c: In function `load_firmware':
+bcm203x.c:118: warning: implicit declaration of function `usb_interrupt_read'
+gcc -I/usr/include -Wall -g -O2   -o bcm203x  bcm203x.o -L/usr/lib -lusb
+bcm203x.o: In function `load_firmware':
+...../bluez-utils-2.9/extra/bcm203x.c:118: undefined reference to
+`usb_interrupt_read'
+...../bluez-utils-2.9/extra/bcm203x.c:133: undefined reference to
+`usb_interrupt_read'
+
+This doesn't look too good.  Am I doing something wrong here??
+
+Thanks.
+
+=====
+-- 
+Tom Watson
+tsw@johana.com
 
 
-
--------------------------------------------------------
-This SF.Net email is sponsored by OSTG. Have you noticed the changes on
-Linux.com, ITManagersJournal and NewsForge in the past few weeks? Now,
-one more big change to announce. We are now OSTG- Open Source Technology
-Group. Come see the changes on the new OSTG site. www.ostg.com
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+		
+__________________________________
+Do you Yahoo!?
+Yahoo! Mail Address AutoComplete - You start. We finish.
+http://promotions.yahoo.com/new_mail 
