@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Bc. Michal Semler" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] hidp and hidd and MS keyboard hotkeys
-References: <200408012330.32328.cijoml@volny.cz> <200408020013.48105.cijoml@volny.cz> <1091412023.4279.13.camel@pegasus>
-In-Reply-To: <1091412023.4279.13.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200408021003.59124.cijoml@volny.cz>
+Subject: Re: [Bluez-users] bluez-utils 2.9
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Elimar Riesebieter <riesebie@lxtec.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040801225614.GB22083@aragorn.home.lxtec.de>
+References: <20040801225614.GB22083@aragorn.home.lxtec.de>
+Content-Type: text/plain
+Message-Id: <1091411747.4279.7.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,47 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 2 Aug 2004 10:03:58 +0200
+Date: Mon, 02 Aug 2004 03:55:47 +0200
 
-Dne po 2. srpna 2004 04:00 Marcel Holtmann napsal(a):
-> Hi Michal,
->
-> > Now I am writing from 2.6.7-mh4 and non hotkey works as soon as in 2.4.
-> >
-> > With bthid in 2.4 all works fine
-> > with 2.6.7-mh2 worked only few keys.
->
-> there can't be a difference between 2.6.7-mh2 and 2.6.7-mh4, because
-> both are using the same HID code base.
+Hi Elimar,
 
-But there is a difference. With mh2 worked 4 keys, with mh4 non of keys :)
+> why does hid2hci doesn't compile in bluez-utils 2.9?
+> 
+> Both --enable-hid2hci nor --enable-all built the binary hid2hci.
+> 
+> Tried the same on 2.8 where it works!
 
->
-> Has anyone used the hotkeys of a Microsoft USB keyboard? What is the
-> best way of accessing or mapping these keys?
+you need the USB library now to build hid2hci.
 
-using hotkeys when these keys are return reply into xev...
+Regards
 
->
-> Regards
->
-> Marcel
+Marcel
 
-M.
 
->
->
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by OSTG. Have you noticed the changes on
-> Linux.com, ITManagersJournal and NewsForge in the past few weeks? Now,
-> one more big change to announce. We are now OSTG- Open Source Technology
-> Group. Come see the changes on the new OSTG site. www.ostg.com
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
