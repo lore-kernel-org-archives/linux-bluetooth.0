@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Troy A. Griffitts" <scribe@crosswire.org>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] bluez nap problems
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041206200122.89431.qmail@web52006.mail.yahoo.com>
+References: <20041206200122.89431.qmail@web52006.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1102374899.3513.10.camel@charis.crosswire.org>
+Message-Id: <1102364164.8447.0.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] AmbiCom BT2000E
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,58 +18,66 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 16:14:59 -0700
+Date: Mon, 06 Dec 2004 21:16:04 +0100
 
-Hey guys.  Has anyone has success using and AmbiCom BT card with kernel
-2.6.9?  I just upgraded to FC3 from FC1, which was a 2.4.x to 2.6.x
-kernel upgrade.  I used to use the bt950 driver with this card just
-fine.  Now I can't seem to get anything to work.
+Hi,
 
+> I have problems setting up NAP.
+> 
+> Here are my configurations:
+> 
+> This is the NAP side
+> Linux version 2.4.27 (root@goner) (gcc version 3.3.4
+> 20040623 (Gentoo Linux 3.3.4-r1, ssp-3.3.2-2,
+> pie-8.7.6)) #1 Fri Dec 3 13:09:59 EET 2004
+>   
+> This is the PANU side
+> Linux version 2.4.26 (root@Knoppix) (gcc version
+> 2.95.4 20011002 (Debian prerelease)) #1 SMP Sa Apr 17
+> 19:33:42 CEST 2004
+> 
+> My Steps to setup NAP side:
+> root@goner ~ # hcid
+> root@goner ~ # hcitool dev
+> Devices:
+>         hci0    00:02:72:03:D3:F2
+> root@goner ~ # sdpd
+> root@goner ~ # pand --listen --master --nodetach
+> pand[11105]: Bluetooth PAN daemon
+> 
+> PANU side:
+> root@miniscule ~ # hcid
+> root@miniscule ~ # hcitool dev
+> Devices:
+>         hci0    00:0D:18:01:19:3B
+> root@miniscule ~ # sdpd
+> root@miniscule ~ # pand --search --persist --role PANU
+> --service NAP --nodetach
+> pand[1703]: Bluetooth PAN daemon
+> pand[1703]: Inquiring
+> pand[1703]: Searching for NAP on 00:02:72:03:D3:F2
+> pand[1703]: Failed to connect to the SDP server.
+> Function not implemented(38)
+> 
+> and this goes on and on...
+> If I run hcidump on the NAP side i get these:
+> > HCI Event: Connect Request (0x04) plen 10
+> < HCI Command: Accept Connection Request (0x01|0x0009)
+> plen 7
+> > HCI Event: Command Status (0x0f) plen 4
+> > HCI Event: Connect Complete (0x03) plen 11
+> 
+> I cant run hcidump on PANU side because i dont hcidump
+> on the laptop, and i dont have a means to tranfer
+> hcidump binary (at least not an easy means) to it.
+> This whole thing is really weird because I got bnep0
+> working twice. Now I can't. 
 
-card "AmbiCom BT2000E Bluetooth Card"
-  version "AmbiCom,Inc", "BT2000E"
-  bind "serial_cs" class "bluetooth"
-#  bind "btuart_cs"
-#  bind "bt950_cs"
+do it with "hcidump -x" and show us the output of "hciconfig -a".
 
-Here is the output with the serial_cs driver:
+Regards
 
-Dec  6 16:14:23 charis cardmgr[4396]: socket 0: AmbiCom BT2000E
-Bluetooth Card
-Dec  6 16:14:23 charis kernel: ttyS1 at I/O 0x2f8 (irq = 11) is a
-16C950/954
-Dec  6 16:14:28 charis cardmgr[4396]: executing: './bluetooth start
-ttyS1 2>&1'
-Dec  6 16:14:28 charis cardmgr[4396]: + Initialization timed out.
-
-
-
-
-Here is the output with the btuart_cs driver:
-
-Dec  6 16:05:54 charis cardmgr[4036]: socket 0: AmbiCom BT2000E
-Bluetooth Card
-Dec  6 16:05:56 charis hcid[3455]: HCI dev 0 registered
-Dec  6 16:05:56 charis kernel: btuart_interrupt: RLSI
-Dec  6 16:05:56 charis kernel: btuart_receive: Unknown HCI packet with
-type 0x00 received
-Dec  6 16:05:56 charis last message repeated 3 times
-Dec  6 16:05:56 charis kernel: btuart_receive: Unknown HCI packet with
-type 0x80 received
-Dec  6 16:05:56 charis kernel: btuart_receive: Unknown HCI packet with
-type 0x00 received
-Dec  6 16:05:56 charis last message repeated 2 times
-Dec  6 16:05:56 charis cardmgr[4036]: executing: './bluetooth start hci0
-2>&1'
-Dec  6 16:05:56 charis cardmgr[4036]: + /dev/hci0: No such file or
-directory
-Dec  6 16:05:56 charis last message repeated 2 times
-Dec  6 16:05:56 charis cardmgr[4036]: + Can't open serial port: No such
-file or directory
-Dec  6 16:05:56 charis cardmgr[4036]: + Can't initialize device: Invalid
-argument
-Dec  6 16:06:06 charis hcid[4213]: Can't init device hci0. Connection
-timed out(110)
+Marcel
 
 
 
