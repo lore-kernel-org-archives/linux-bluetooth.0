@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Ronan Naughton" <wadgienaughton@hotmail.com>
+From: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
 To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain;
+	charset="iso-8859-2"
+Message-Id: <37464.130448-26152-1782195973-1078755422@seznam.cz>
+Cc: 
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY10-F1216PYzDabig00010bb6@hotmail.com>
-Subject: [Bluez-users] bluez pan problem
+Reply-To: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
+Subject: [Bluez-users] =?us-ascii?Q?OBEX=20scripting?=
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,43 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 08 Mar 2004 15:51:18 +0000
+Date: Mon, 08 Mar 2004 15:17:02 +0100 (CET)
 
-Hi all,
-I am having a problem with setting up a bluez pan between three machines and 
-i don't know what I'm doing wrong.
+Group:
 
-I set one node ( say B )the GN to listen
+Trying to figure out:
 
-                                           pand --listen --master --role GN
+1) how hard would it be write up some script that would be registered a=
+s a RFCOMM service
+   a) and how hard would itbe write up some OBEX sender that we could u=
+se to send our symbian client application to another symbian phone?
+       a.1. this is sent only upon user request.... client sends someth=
+ing to server, server reads it and saves BT address, and then sends cli=
+ent back.
 
+Any suggstions?
 
-I then connect  the other two nodes ( A & C )
+Thanks in advanced,
 
-                                          pand --connect  mac_addr_of_master
-
-
-I then assign an ip address to A, C and then the master B:
-
-                                           ifconfig bnep0 10.0.0.1
-                                           ifconfig bnep0 10.0.0.3
-                                           ifconfig bnep0 10.0.0.2
-
-
-Then for some reason:
-The first pc (10.0.0.1) can ping the other PANU and the GN
-The second pc (10.0.0.3) cannot ping the other PANU or the GN
-The GN (10.0.0.2 ) can only ping the second pc (10.0.0.3)
-
-Why on earth is this happening. Ip forwarding is turned on on all machines. 
-I have no idea why it won't work-please help!!!!!!!!
-Regards,
-Ronan.
-
-_________________________________________________________________
-The new MSN 8: advanced junk mail protection and 2 months FREE* 
-http://join.msn.com/?page=features/junkmail
-
+Dave
+____________________________________________________________
+ADSL za korunu od Contactelu - nejp=F8=EDjemn=ECj=B9=ED ADSL na trhu do=
+ru=E8=EDme rychle a=BE k V=E1m!
+http://ad2.seznam.cz/redir.cgi?instance=3D70017%26url=3Dhttp://www.cont=
+actel.cz/adsl
 
 
 -------------------------------------------------------
