@@ -1,9 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: "soraberri" <malfonso@able.es>
-Message-ID: <cncqln$iuc$1@sea.gmane.org>
-References: <cncjb4$rrr$1@sea.gmane.org> <1100600361.7208.108.camel@pegasus>
-Subject: [Bluez-devel] Re: Bluetooth enabled products codes
+Subject: Re: [Bluez-devel] SOCK_STREAM behaving like SOCK_SEQPACKET?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.GSO.4.33.0411161011350.22188-100000@horus.imag.fr>
+References: <Pine.GSO.4.33.0411161011350.22188-100000@horus.imag.fr>
+Content-Type: text/plain
+Message-Id: <1100600455.7208.111.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -15,40 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 16 Nov 2004 13:05:08 +0100
+Date: Tue, 16 Nov 2004 11:20:55 +0100
 
-Hi Marcel,
+Hi Catalin,
 
-I appreciate very much your quick answer.
-There are a list of feature definitions in the link manager specification
-and it is also specified wich bit is notifying the presence of a given
-feature in terms of the position of this bit relative to the feature mask.
-The supported features are also numbered from 0 to 63 i.e. ox0 to ox3F  (
-though not all numbers defined), but anyway it's hard for me to perceive
-which is the relationship between these numbers/mask and the hexadecimal
-codes aforesaid
+> I have a small application that communicates over an L2CAP channel
+> (thus through a SOCK_SEQPACKET socket). The thread that does the
+> L2CAP communication has also some UNIX domain sockets open (AF_UNIX,
+> SOCK_STREAM) through which it communicates to other threads.
+> 
+> The trouble is that these latter sockets (UNIX domain, SOCK_STREAM) behave
+> like SOCK_SEQPACKET sockets, in that if I do not need read all the
+> available data at once, it is gone (a second call to read() blocks). As
+> far as I know this is not expected behavior for SOCK_STREAM sockets so I
+> have a couple of possible explanations:
+> 
+> 1. Linux kernel bug
+> 2. Bluez bug
+> 
+> which causes a SOCK_STREAM socket to act like a SOCK_SEQPACKET.
+> 
+> The system is a Fedora Core 2 with kernel 2.6.8-1.521. I have tried the
+> kernel 2.6.9-mh3 now and the problem still occurs.
 
-Thanks for your patience
+may you wanna try the AF_UNIX without the L2CAP socket and see if you
+can reproduce it without any Bluetooth involved. If yes, then it is
+definitiv a bug in the AF_UNIX implementation.
 
-> Hi,
->
-> > Refering to the page "Bluetooth adapters and Bluetooth enabled products"
-at
-> > http://www.holtmann.org/linux/bluetooth/features.html, I would like to
-know
-> > the meaning of those hexadecimal numbers for features and versions. In
-the
-> > Official BT assigned numbers I can't see the mapping.
->
-> the features numbers are explained in the link manager part of the
-> Bluetooth specification and the version numbers are manufacturer
-> specific.
->
-> Regards
->
-> Marcel
->
+Regards
 
+Marcel
 
 
 
