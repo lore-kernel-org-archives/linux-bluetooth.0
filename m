@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluez and threading
+Subject: Re: [Bluez-users] Toshiba and BT (SuSE 9.2)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20041216125827.GB24108@ee.oulu.fi>
-References: <20041216125827.GB24108@ee.oulu.fi>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAqEXdOIv5C0ypKYTFbykpjAEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAqEXdOIv5C0ypKYTFbykpjAEAAAAA@t-online.de>
 Content-Type: text/plain
-Message-Id: <1103227046.6325.8.camel@notepaq>
+Message-Id: <1103226781.6325.5.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,28 +19,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 16 Dec 2004 20:57:25 +0100
+Date: Thu, 16 Dec 2004 20:53:01 +0100
 
-Hi Jani,
+Hi Peter,
 
-> Is there support for threading in bluez?
+> very, very good news. I got the connection.
+> 
+> ##>
+> ##>	dund -n -D -P 1 -X -c 00:0B:CE:00:01:8F
+> ##>
+> 
+> Linux-Notebook:~ # dund -n -D -P 1 -X -c 00:0B:CE:00:01:8F
+> dund[8823]: Bluetooth DUN daemon
+> dund[8823]: Connecting to 00:0B:CE:00:01:8F channel 1
+> dund[8823]: Connection established
+> Linux-Notebook:~ # Using interface ppp0
+> Connect: ppp0 <--> /dev/rfcomm0
+> local  IP address 192.168.1.76
+> remote IP address 192.168.1.250
+> Script /etc/ppp/ip-up finished (pid 8862), status = 0x0
+> 
+> What is now to do in order to reach the router and by this the internet?
 
-the simple answer is yes.
-
-> For example, I have different threads for HCI inquering,
-> sending stuff via rfcomm socket and for listening incoming
-> rfcomm connections. Is it possible to do all this at the
-> same time in separate threads?
-
-The kernel will handle this. If not, it is a bug.
-
-> Right now, I have written C++ code using bluez libs for all
-> these threads but I get segmentation fault when I try to run
-> them at the same time. So, I wonder if it was possible to
-> thread these tasks at all.
-
-Check your own code first, because I don't think that it is a problem of
-the BlueZ library of kernel.
+you may need to tweak some PPP settings to get a defaultroute, but then
+it should work out of the box. Your router should do the NAT for you.
 
 Regards
 
