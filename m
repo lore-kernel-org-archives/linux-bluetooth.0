@@ -1,16 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Fehr <andreas@mrs.ch>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth serial vs. audio connection
-In-Reply-To: <1111939568.9195.236.camel@pegasus>
-Message-ID: <Pine.LNX.4.62.0503271813180.3135@ybpnyubfg.ybpnyqbznva>
-References: <Pine.LNX.4.62.0503271303450.3134@ybpnyubfg.ybpnyqbznva>
- <1111923433.9195.216.camel@pegasus>  <Pine.LNX.4.62.0503271357080.3134@ybpnyubfg.ybpnyqbznva>
-  <1111926923.9195.218.camel@pegasus>  <Pine.LNX.4.62.0503271736360.3135@ybpnyubfg.ybpnyqbznva>
-  <1111938339.9195.229.camel@pegasus>  <Pine.LNX.4.62.0503271751420.3135@ybpnyubfg.ybpnyqbznva>
- <1111939568.9195.236.camel@pegasus>
+From: tmp@nitwit.de
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] No working Bluetooth adapter found
+References: <200503271708.10663.tmp@nitwit.de> <200503271804.03641.tmp@nitwit.de> <1111939622.9195.238.camel@pegasus>
+In-Reply-To: <1111939622.9195.238.camel@pegasus>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200503271812.30938.tmp@nitwit.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,61 +19,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Mar 2005 18:21:06 +0200 (CEST)
+Date: Sun, 27 Mar 2005 18:12:30 +0200
 
-On Sun, 27 Mar 2005, 18:06, Marcel Holtmann (as MH) wrote:
+On Sunday 27 March 2005 18:07, Marcel Holtmann wrote:
+> so you can try "hciconfig hci0 up" and you should maybe activate the
 
->MH: > >MH: >   "RFCOMM" (0x00000003)
->MH: > >MH: >     Channel: 4
->MH: > >MH: > Segmentation fault
->MH: > >MH: > root@notebook:/home/andreas >
->MH: > >MH: > 
->MH: > >MH: > (note the last 'Segmentation fault', this might be the 
->MH: > >MH: > reason, the browse command does not work as expected)
->MH: > >MH: 
->MH: > >MH: what kind of phone is this?
->MH: > 
->MH: > If I just run sdptool browse 00:xx, I don't get any output, I'm 
->MH: > not sure, this is the normal behavior. I see this as a problem, 
->MH: > as there are some supported services. But then, I didn't check 
->MH: > the code of this tool.
->MH: 
->MH: this does not answer my question. What kind of phone is this? Does 
->MH: adding "--tree" before the "--bdaddr" parameter helps?
+Hey, great. Thanks a lot! However it didn't get that I changed the name of the 
+device and still displays the old vendor one. Hmm, some caching issue? I can 
+even access the device via the faulty name (?).
 
-Yes, I misread the question. This is a Samsung SGH-D500 (a nice phone 
-but crappy windows software...)
+> autostart function of the Bluetooth subsystem in YaST.
 
-No difference. With or without --tree, there is only one line of output 
-"Browsing 00:xx ...", nothing else
-
-
-
->MH: > >MH: > Thanks so far, but how to proceed? (I've still the same 
->MH: > >MH: > problem, connecting with bluez 'only' gives an 'audio' 
->MH: > >MH: > connection, not the expected 'serial' as I got from 
->MH: > >MH: > Windows).
->MH: > >MH: 
->MH: > >MH: What happens if you connect to channel 3 or channel 4?
->MH: > 
->MH: > Duh.... well... thanks for the hint... of course, if I use 
->MH: > channel 3 (as given in the output of "sdptool search .. sp" it 
->MH: > does work, I get a 'serial' connection. I'll test this with 
->MH: > minicom, whether I can use all the commands I need, but I'm 
->MH: > confident.
->MH: > 
->MH: > Now, I wonder, whether there is some information on service <=> 
->MH: > channel pairs that I should have read?
->MH: 
->MH: This phone have the serial port profile service on channel 3 and 
->MH: the dialup networking profile service on channel 4. You can see 
->MH: everything in the sdptool output.
-
-Yes, I see this now. But is it written somewhere in the documentation, 
-that these services are bound to different channels? I wasn't aware of 
-the fact.
-
-Thanks anyway, it works now.
+I apologize the stupid question but I don't see any autostart option in YaST..
 
 
 -------------------------------------------------------
