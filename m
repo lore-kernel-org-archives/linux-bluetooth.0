@@ -1,25 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SBC packer done, kind of
-Message-Id: <20041125060213.4c8c34d5.henryk@ploetzli.ch>
-In-Reply-To: <1101350953.7538.22.camel@pegasus>
-References: <20041123014732.3a03b10e.henryk@ploetzli.ch>
-	<1101191260.26578.43.camel@pegasus>
-	<20041123074829.7f978ce7.henryk@ploetzli.ch>
-	<1101201897.26578.54.camel@pegasus>
-	<20041123204901.776fe240.henryk@ploetzli.ch>
-	<1101243809.27351.18.camel@pegasus>
-	<20041124042114.5e1fee94.henryk@ploetzli.ch>
-	<1101272477.27351.67.camel@pegasus>
-	<41A43E8A.8030602@xmission.com>
-	<1101307146.27351.104.camel@pegasus>
-	<20041124213730.46aefcb7.henryk@ploetzli.ch>
-	<1101350953.7538.22.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Thu__25_Nov_2004_06_02_13_+0100_CfQBpBZzvNvse62D"
+Message-ID: <41A56774.1000308@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+CC: bmidgley@xmission.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] more encoder stuff
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -31,46 +17,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Nov 2004 06:02:13 +0100
+Date: Wed, 24 Nov 2004 22:02:44 -0700
 
---Signature=_Thu__25_Nov_2004_06_02_13_+0100_CfQBpBZzvNvse62D
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Guys,
 
-Moin,
+It was fantastic listening to my headset on the bus today. I didn't have 
+to deal with the bluetake dongle at all... very nice.
 
-Am Thu, 25 Nov 2004 03:49:13 +0100 schrieb Marcel Holtmann:
+I updated our project page http://bluetooth-alsa.sourceforge.net/
 
-> maybe you wanna try:
->=20
-> 	mpg321 --au /dev/stdout foo.mp3 | sbcenc - | a2play <bdaddr> -
+What should I be using if I want to encode live from the computer's 
+line-in? (I want to see if encoding on the computer results in shorter 
+latency than the bluetake dongle. Watching TV with the headset is 
+currently not all that fun because of the delay.)
 
-That works fine, too, and is a lot less to type, thanks. But now the 100
-Million Dollar question: When a2play is streaming my Microsoft Wireless
-IntelliMouse Explorer for Bluetooth can't connect to the hidd. And vice
-versa: If the mouse is connected a2play won't stream.
+Henryk, you were saying the reference encoder runs faster. Is there any 
+chance they are using vector processing like sse/sse2? Do projects like 
+xine and mplayer detect and use a vector processor through a library?
 
-Is this expected? Can it be fixed?
+We should get Sonorix to send us a headset for testing. Have you had 
+much luck with vendor cooperation, Marcel? Right now in a2play we sort 
+of assume the headset will only report one codec and I suspect they 
+support mp3 natively. (It's possible they are pulling tricks like 
+transcoding into SBC before uploading mp3's to the headset's flash 
+memory I guess.)
 
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
-
---Signature=_Thu__25_Nov_2004_06_02_13_+0100_CfQBpBZzvNvse62D
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQFBpWdaIjWgKE0OA2gRAmKyAKCDv2bEnjxK4ZRoauovrB5ziomcRQCgqX1y
-P/QfgGVr8b1JUDOh5n9lL/8=
-=vrhr
------END PGP SIGNATURE-----
-
---Signature=_Thu__25_Nov_2004_06_02_13_+0100_CfQBpBZzvNvse62D--
+Brad
 
 
 -------------------------------------------------------
