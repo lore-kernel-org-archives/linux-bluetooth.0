@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Reason to not enable encryption
+Subject: Re: [Bluez-users] bluetooth host required !!!!!
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1104257005.41d19fedcd4db@bluebottle.com>
-References: <1104257005.41d19fedcd4db@bluebottle.com>
+In-Reply-To: <20041228124352.D916D416118@ws5-2.us4.outblaze.com>
+References: <20041228124352.D916D416118@ws5-2.us4.outblaze.com>
 Content-Type: text/plain
-Message-Id: <1104316318.6319.23.camel@notepaq>
+Message-Id: <1104316017.6319.15.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,26 +18,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Dec 2004 11:31:57 +0100
+Date: Wed, 29 Dec 2004 11:26:57 +0100
 
-Hi,
+Hi Simi,
 
-> I seem to remember someone saying something like "Don't enable
-> encryption if you dual boot" but searched the list and could see why.
-> Maybe there was another reason to not use encryption
-> 
-> Am I mistaken?
-> 
-> Need to know because we have a new app born yesterday and it could
-> become encryption only:
-> 
-> http://www.symbianos.org/yabbse/index.php?board=2;action=display;threadid=7;start=15
-> 
-> Thanks for jogging my memory
+> i am new to this subject,bluetooth.....i am trying to implement LMP,baseband and simulate Radio...So will i get the Bluetooth Host as a chip so that i can use the important layers of the protocol stack ...if so how abt its cost and where is it available...
 
-the mailing list archive can also "jog" your memory. However the link
-key is stored on the host operation system and until you haven't a way
-to share this you always need to re-pair when booting the other OS.
+this is the wrong mailing list. BlueZ is about the host protocol part of
+Bluetooth and not the "hardware".
 
 Regards
 
