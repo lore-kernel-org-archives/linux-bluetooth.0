@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Inquiry Scan Window
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <BAY104-F166D6D1C3CDFCFCACBAA63C19A0@phx.gbl>
+In-Reply-To: <BAY12-DAV9D18C724C8B6018A26075AB9A0@phx.gbl>
+From: "blookk -" <blookk@hotmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20041227215813.51276.qmail@web51902.mail.yahoo.com>
-References: <20041227215813.51276.qmail@web51902.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1104315707.6319.6.camel@notepaq>
+Subject: RE: [Bluez-devel] HCI Monitoring
 Mime-Version: 1.0
+Content-Type: text/html; charset=iso-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +17,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 29 Dec 2004 11:21:47 +0100
+Date: Tue, 28 Dec 2004 20:24:29 +0000
 
-Hi Krishna,
-
-> How would increasing the inquiry scan window for a device ( say, x
-> times 18 out of 2048 time slots, where x >1) affect other devices
-> doing inquiry scan? Or, affect the response from the master?
-
-check the inqparams command of hciconfig and read its manpage or the
-corrospending part of the specification.
-
-Regards
-
-Marcel
-
+<html><div style='background-color:'><DIV class=RTE>
+<P>hello</P>
+<P>with hcidump command.<BR><BR></P></DIV>
+<DIV></DIV>&gt;From: "Pegasus" &lt;uwpegasus@hotmail.com&gt;
+<DIV></DIV>&gt;Reply-To: bluez-devel@lists.sourceforge.net
+<DIV></DIV>&gt;To: &lt;bluez-devel@lists.sourceforge.net&gt;
+<DIV></DIV>&gt;Subject: [Bluez-devel] HCI Monitoring
+<DIV></DIV>&gt;Date: Tue, 28 Dec 2004 13:50:39 -0500
+<DIV></DIV>&gt;
+<DIV></DIV>&gt;How can we monitor when a HCI connection is opened and closed?
+<DIV></DIV>&gt;
+<DIV></DIV>&gt;Which events I should look for?
+<DIV></DIV>&gt;
+<DIV></DIV>&gt;Sorry about these trivial questions and thanks for your time :-)
+<DIV></DIV>&gt;
+<DIV></DIV>&gt;
+<DIV></DIV>&gt;Keshav
+<DIV></DIV></div></html>
 
 
 
