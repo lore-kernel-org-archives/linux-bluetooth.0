@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: RE: [Bluez-devel] SCO question
-Message-ID: <A1F0D47583A2D711919F00600819B3A45BDC65@goofy.vitronics.com>
-From: "Williams, Richard" <Richard.Williams@VITRONICS.com>
-To: "Bluez-Devel (E-mail)" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] patch for: RFComm dynamic channel allocation
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Collin R. Mulliner" <collin@betaversion.net>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040708200805.7034024f@coredump>
+References: <20040708165219.16a1d6db@coredump>
+	 <1089308231.4857.45.camel@pegasus>  <20040708200805.7034024f@coredump>
+Content-Type: text/plain
+Message-Id: <1089311809.4857.53.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,106 +19,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 8 Jul 2004 16:11:43 -0400
+Date: Thu, 08 Jul 2004 20:36:49 +0200
 
-Arnaud, Thank you.
+Hi Collin,
 
-exactly right.... The channel for my headset is "2".
+> > I don't get the point of your fix, because bind() to a specific
+> > BD_ADDR and to BDADDR_ANY are totally different and can result in
+> > different dynamic channel allocations.
+> 
+> I understand why binding to BDADDR_ANY could lead to a different
+> channel, e.g. when having multiple BT devices but the current code
+> doesn't work when binding to a specific BD_ADDR. I only talk about
+> dynamic rfcomm channel allocation which takes place when calling
+> listen()! Not about the general bind().
 
-hstest record t1.wav 00:0A:D9:74:97:19 2
-sets up the SCO channel correctly, and rings the headset.
+the code works, because the scope of a specific BD_ADDR is different
+from BDADDR_ANY and both start with channel 1. I am not going to mix
+them two in the kernel, because this is an application specific problem
+you are trying to solve.
 
-And I can see the various "AT" commands coming from the headset for =
-volume control, etc.
+Regards
 
-However, there is no audio. Neither "record" nor "play" appears to do =
-anything.
+Marcel
 
-Next idea ??
-
-BTW: I am using Bluez-utils 2.3 and bluez-libs 2.4. I don't know if that =
-makes a difference.
-
-Best Regards,
-
-Rich
-
-
-
------Original Message-----
-From: Arnaud Mouiche [mailto:arnaud.mouiche@inventel.fr]
-Sent: Thursday, July 08, 2004 10:09 AM
-To: Williams, Richard; Bluez-Devel (E-mail)
-Subject: Re: [Bluez-devel] SCO question
-
-
-At 09:12 08/07/2004 -0400, Williams, Richard wrote:
-
->Hi,
->
->I'm getting back to a BT headset <-> LINUX project that I had abandoned =
-
->some months ago. I have an X-scale single board computer running Linux=20
->2.4.26 with the latest Bluez patches. I have a Sony Ericsson HBH-35=20
->headset that I'm trying to get to work with my computer. I have an =
-Anycomm=20
->USB BT dongle.
->
->I have done the following:
->modprobe hci_usb
->modprobe rfcomm
->modprobe sco
->hcid
->hciconfig hci0 up
->hciconfig hci0 voice 0x0040
->.... My Pin file is set up for a pin of "0000" - required by the =
-headset.
->
->hcitool scan works OK and finds the headset
->
->l2ping works OK and pairs with the headset.
->
->hstest record t1.wav 00:0A:D9:74:97:19 1
-
-are you sure than "1" is the correct rfcomm channel ?
-you should perform a SDP request to get the correct one.
-
-arnaud
-
-><<<This gives output:
->Voice setting: 0x0040
->RFCOMM channel connected
->Can't connect SCO audio channel: Connection refused.
->
->I know that the socket connect statement in sco_connect() in hstest is=20
->failing.
->Any ideas of the cause of this ?
->
->
->thanks very much,
->
->Rich
->
->
->
->Richard B. Williams
->Vitronics, Inc.
->3 Corbett Way
->Eatontown, NJ 07724-2262
->732-389-0244 x29
->Richard.Williams@vitronics.com
->
->
->
->-------------------------------------------------------
->This SF.Net email sponsored by Black Hat Briefings & Training.
->Attend Black Hat Briefings & Training, Las Vegas July 24-29 -
->digital self defense, top technical experts, no vendor pitches,
->unmatched networking opportunities. Visit www.blackhat.com
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
