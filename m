@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Guylhem Aznar <mutt-ibiblio@externe.net>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] a2dp timing
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050325172338.GB7214@externe.net>
-References: <42439ADA.5000006@xmission.com>
-	 <1111756476.9195.105.camel@pegasus> <20050325142241.GB8548@externe.net>
-	 <1111760772.9195.123.camel@pegasus>  <20050325172338.GB7214@externe.net>
-Content-Type: text/plain
-Message-Id: <1111771693.9195.130.camel@pegasus>
+Message-ID: <20050325172338.GB7214@externe.net>
+References: <42439ADA.5000006@xmission.com> <1111756476.9195.105.camel@pegasus> <20050325142241.GB8548@externe.net> <1111760772.9195.123.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1111760772.9195.123.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,24 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Mar 2005 18:28:13 +0100
+Date: Fri, 25 Mar 2005 12:23:38 -0500
 
-Hi Guylhem,
+On Friday, 25 March 2005 at 15:26:12 (+0100), Marcel Holtmann wrote:
+> > However I don't have the bluesoleil stack....
+>=20
+> do you have the Frontline FTS4BT or the CATC Merlin II sniffer?
 
-> > > However I don't have the bluesoleil stack....
-> > 
-> > do you have the Frontline FTS4BT or the CATC Merlin II sniffer?
-> 
-> Looks like it's dedicated hardware - nope. I though some software
-> sniffing was possible (ala tcpdump with hcidump)
+Looks like it's dedicated hardware - nope. I though some software
+sniffing was possible (ala tcpdump with hcidump)
 
-not for air sniffing and that is what you actually need in this case.
+--=20
+Bien =E0 vous - Best regards,
+Guylhem P. Aznar
 
-Regards
-
-Marcel
-
-
+--=20
+*@externe.net                                            http://externe.n=
+et
+P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
+un.org
+GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
+ey
 
 
 -------------------------------------------------------
