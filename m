@@ -1,82 +1,167 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Matthias Brune <matthiasbrune@gmx.de>
-Message-ID: <loom.20050121T013101-9@post.gmane.org>
-References: <loom.20050119T121309-507@post.gmane.org> <1106136563.8190.89.camel@pegasus>
+Return-Path: <nacc@us.ibm.com>
+Date: Thu, 20 Jan 2005 15:47:54 -0800
+From: Nishanth Aravamudan <nacc@us.ibm.com>
+To: marcel@holtmann.org, maxk@qualcomm.com
+Cc: bluez-devel@lists.sourceforge.net, kernel-janitors@lists.osdl.org
+Subject: [PATCH 17/39] net/capi: use wait_event_interruptible_timeout()
+Message-ID: <20050120234754.GE2600@us.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Re: Sending own L2CAP packets to HCI
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 21 Jan 2005 00:31:33 +0000 (UTC)
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Marcel, 
- 
-i tried to change the l2ping program by using another command header.  
-Instead of L2CAP_ECHO_REQ and L2CAP_ECHO_RES i used L2CAP_CONN_REQ and 
-L2CAP_CONN_RES, because i want to build a full connection with connect, 
-configure and disconnect later... 
-It seemed that it works, but hcidump said that the connect request is 
-rejected.  
-Is it in general possible to inject own L2CAP packets (with configure 
-requests) to a phone by using the l2ping programm. I mean is the socket setup 
-in this program for this use sufficient or do i have to inject the packets 
-directly to the usb driver? Because i think the command reject comes from the 
-Bluez stack and i have to inject the L2CAP packets without using the BlueZ 
-stack? 
- 
-HCI Command: Create Connection(0x01|0x0005) plen 13 
-65 CF 93 EE 02 00 18 CC 02 00 00 00 01 
-HCI Event: Command Status(0x0f) plen 4 
-00 01 05 04 
-HCI Event: Connect Complete(0x03) plen 11 
-00 29 00 65 CF 93 EE 02 00 01 00 
-HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4 
-29 00 0F 00 
-ACL data: handle 0x0029 flags 0x02 dlen 28 
-L2CAP(s): Connect req: psm 17989 scid 0x4847 
-HCI Event: Number of Completed Packets(0x13) plen 5 
-01 29 00 01 00 
-HCI Event: Command Complete(0x0e) plen 6 
-01 0D 08 00 29 00 
-HCI Event: Page Scan Repetition Mode Change(0x20) plen 7 
-65 CF 93 EE 02 00 01 
-HCI Event: Max Slots Change(0x1b) plen 3 
-29 00 05 
-ACL data: handle 0x0029 flags 0x02 dlen 16 
- 
-L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0000 result 2 status 0 
- 
-ACL data: handle 0x0029 flags 0x02 dlen 10 
-L2CAP(s): Command rej: reason 0 
- 
-HCI Event: Number of Completed Packets(0x13) plen 5 
-01 29 00 01 00 
-HCI Command: Disconnect(0x01|0x0006) plen 3 
-29 00 13 
-HCI Event: Command Status(0x0f) plen 4 
-00 01 06 04 
-HCI Event: Disconn Complete(0x05) plen 4 
-00 29 00 16 
- 
+Hi,
 
+Please consider applying.
 
+Description: Use wait_event_interruptible_timeout() instead of custom
+wait-queue code. The first replacement is the most complicated as the various
+return conditions each indicate different things, apparently. The same effects
+are made after wait_event_interruptible_timeout() returns.
 
--------------------------------------------------------
-This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
-Tool for open source databases. Create drag-&-drop reports. Save time
-by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
-Download a FREE copy at http://www.intelliview.com/go/osdn_nl
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Signed-off-by: Nishanth Aravamudan <nacc@us.ibm.com>
+
+--- 2.6.11-rc1-kj-v/net/bluetooth/cmtp/capi.c	2005-01-15 16:55:44.000000000 -0800
++++ 2.6.11-rc1-kj/net/bluetooth/cmtp/capi.c	2005-01-18 11:47:16.000000000 -0800
+@@ -35,6 +35,7 @@
+ #include <linux/socket.h>
+ #include <linux/ioctl.h>
+ #include <linux/file.h>
++#include <linux/wait.h>
+ #include <net/sock.h>
+ 
+ #include <linux/isdn/capilli.h>
+@@ -373,12 +374,11 @@ static void cmtp_reset_ctr(struct capi_c
+ 
+ static void cmtp_register_appl(struct capi_ctr *ctrl, __u16 appl, capi_register_params *rp)
+ {
+-	DECLARE_WAITQUEUE(wait, current);
+ 	struct cmtp_session *session = ctrl->driverdata;
+ 	struct cmtp_application *application;
+-	unsigned long timeo = CMTP_INTEROP_TIMEOUT;
+ 	unsigned char buf[8];
+ 	int err = 0, nconn, want = rp->level3cnt;
++	long ret;
+ 
+ 	BT_DBG("ctrl %p appl %d level3cnt %d datablkcnt %d datablklen %d",
+ 		ctrl, appl, rp->level3cnt, rp->datablkcnt, rp->datablklen);
+@@ -407,33 +407,15 @@ static void cmtp_register_appl(struct ca
+ 	cmtp_send_interopmsg(session, CAPI_REQ, 0x0000, application->msgnum,
+ 				CAPI_FUNCTION_REGISTER, buf, 6);
+ 
+-	add_wait_queue(&session->wait, &wait);
+-	while (1) {
+-		set_current_state(TASK_INTERRUPTIBLE);
+-
+-		if (!timeo) {
+-			err = -EAGAIN;
+-			break;
+-		}
+-
+-		if (application->state == BT_CLOSED) {
+-			err = -application->err;
+-			break;
+-		}
+-
+-		if (application->state == BT_CONNECTED)
+-			break;
+-
+-		if (signal_pending(current)) {
+-			err = -EINTR;
+-			break;
+-		}
+-
+-		timeo = schedule_timeout(timeo);
+-	}
+-	set_current_state(TASK_RUNNING);
+-	remove_wait_queue(&session->wait, &wait);
+-
++	ret = wait_event_interruptible_timeout(session->wait,
++		((application->state == BT_CLOSED) || (application->state == BT_CONNECTED)),
++		CMTP_INTEROP_TIMEOUT);
++	if (!ret)
++		err = -EAGAIN;
++	else if (application->state == BT_CLOSED)
++		err = -application->err;
++	else if (signal_pending(current))
++		err = -EINTR;
+ 	if (err) {
+ 		cmtp_application_del(session, application);
+ 		return;
+@@ -442,10 +424,8 @@ static void cmtp_register_appl(struct ca
+ 
+ static void cmtp_release_appl(struct capi_ctr *ctrl, __u16 appl)
+ {
+-	DECLARE_WAITQUEUE(wait, current);
+ 	struct cmtp_session *session = ctrl->driverdata;
+ 	struct cmtp_application *application;
+-	unsigned long timeo = CMTP_INTEROP_TIMEOUT;
+ 
+ 	BT_DBG("ctrl %p appl %d", ctrl, appl);
+ 
+@@ -460,20 +440,8 @@ static void cmtp_release_appl(struct cap
+ 	cmtp_send_interopmsg(session, CAPI_REQ, application->mapping, application->msgnum,
+ 				CAPI_FUNCTION_RELEASE, NULL, 0);
+ 
+-	add_wait_queue(&session->wait, &wait);
+-	while (timeo) {
+-		set_current_state(TASK_INTERRUPTIBLE);
+-
+-		if (application->state == BT_CLOSED)
+-			break;
+-
+-		if (signal_pending(current))
+-			break;
+-
+-		timeo = schedule_timeout(timeo);
+-	}
+-	set_current_state(TASK_RUNNING);
+-	remove_wait_queue(&session->wait, &wait);
++	wait_event_interruptible_timeout(session->wait, (application->state == BT_CLOSED),
++			CMTP_INTEROP_TIMEOUT);
+ 
+ 	cmtp_application_del(session, application);
+ }
+@@ -543,8 +511,7 @@ static int cmtp_ctr_read_proc(char *page
+ 
+ int cmtp_attach_device(struct cmtp_session *session)
+ {
+-	DECLARE_WAITQUEUE(wait, current);
+-	unsigned long timeo = CMTP_INTEROP_TIMEOUT;
++	long ret;
+ 	unsigned char buf[4];
+ 
+ 	BT_DBG("session %p", session);
+@@ -554,30 +521,17 @@ int cmtp_attach_device(struct cmtp_sessi
+ 	cmtp_send_interopmsg(session, CAPI_REQ, 0xffff, CMTP_INITIAL_MSGNUM,
+ 				CAPI_FUNCTION_GET_PROFILE, buf, 4);
+ 
+-	add_wait_queue(&session->wait, &wait);
+-	while (timeo) {
+-		set_current_state(TASK_INTERRUPTIBLE);
+-
+-		if (session->ncontroller)
+-			break;
+-
+-		if (signal_pending(current))
+-			break;
+-
+-		timeo = schedule_timeout(timeo);
+-	}
+-	set_current_state(TASK_RUNNING);
+-	remove_wait_queue(&session->wait, &wait);
++	ret = wait_event_interruptible_timeout(session->wait, session->ncontroller,
++			CMTP_INTEROP_TIMEOUT);
+ 
+ 	BT_INFO("Found %d CAPI controller(s) on device %s", session->ncontroller, session->name);
+ 
+-	if (!timeo)
++	if (!ret)
+ 		return -ETIMEDOUT;
+ 
+ 	if (!session->ncontroller)
+ 		return -ENODEV;
+ 
+-
+ 	if (session->ncontroller > 1)
+ 		BT_INFO("Setting up only CAPI controller 1");
+ 
