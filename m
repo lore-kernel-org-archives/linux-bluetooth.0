@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Adresse resolution in BlueZ
+Subject: Re: [Bluez-users] Has anyone seen these problems with the CSR
+	BlueCore and BlueZ before ?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050317161431.45633.qmail@web26607.mail.ukl.yahoo.com>
-References: <20050317161431.45633.qmail@web26607.mail.ukl.yahoo.com>
+In-Reply-To: <4239B037.4020803@csr.com>
+References: <E1DBv62-0004qg-Ld@sc8-sf-mx1.sourceforge.net>
+	 <4239B037.4020803@csr.com>
 Content-Type: text/plain
-Message-Id: <1111078607.9741.7.camel@pegasus>
+Message-Id: <1111078208.9741.2.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,26 +20,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Mar 2005 17:56:47 +0100
+Date: Thu, 17 Mar 2005 17:50:08 +0100
 
-Hi,
+Hi Steven,
 
-> Am I not undertandbale ?
-> Is there someone who can understand me? 
-> 
-> I know that BNEP know the BD_ADDR of the peer device.
-> But BNEP need to make a coresspondance beteewn the
-> peer BD_ADDR address and the peer IP adress. This
-> corespondance is made by ARP? how did bnep ask it from
-> ARP.
-> If you read all my example in my last mail you will
-> understand my question.
+> would it be a good idea to add reading of the panic and
+> fault codes to the CSR specific section of hcitool revision? Or,
+> get BlueZ to read the panic code when the inerface is brought up. If
+> it's non-zero and < 0x0100 write it to an event log and then zero it.
 
-you don't understand the working of ARP. Like IP and ICMP, the ARP
-protocol is on the same layer and thus only a different transport
-channel over BNEP is used. Inside the Linux kernel the network subsystem
-has enough information to handle the complete ARP stuff after you
-registered a new network device.
+the kernel code should be complete vendor independent and thus adding
+this to "hciconfig hci0 revsion" is the only option.
+
+Are both variables UINT16? If yes, then it will be quite easy to add
+this information to the hciconfig command. What document should I read
+for more information about the panic/fault code meanings?
 
 Regards
 
