@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <412DA511.9090309@lawatsch.at>
-From: Philip Lawatsch <philip@lawatsch.at>
+Message-ID: <412D99CA.5050209@nue.et-inf.uni-siegen.de>
+From: Michael Schmidt <schmidt@nue.et-inf.uni-siegen.de>
 MIME-Version: 1.0
-To: Michael Schmidt <schmidt@nue.et-inf.uni-siegen.de>
+To: philip@lawatsch.at
 CC: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Limit communication to serveral devices
-References: <412D99CA.5050209@nue.et-inf.uni-siegen.de>
-In-Reply-To: <412D99CA.5050209@nue.et-inf.uni-siegen.de>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,35 +16,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Aug 2004 10:53:37 +0200
+Date: Thu, 26 Aug 2004 10:05:30 +0200
 
-Michael Schmidt wrote:
-> Hi Philip,
+Hi Philip,
+
+> Call me paranoid but I would like to know if there is any way to limit 
+> all types of communication to just several devices by checking with the 
+> hardware addresses.
 > 
->> Call me paranoid but I would like to know if there is any way to limit 
->> all types of communication to just several devices by checking with 
->> the hardware addresses.
-
->> I do understand that even this is no guarantee for anything, but I'd 
->> for sure feel better  :) 
-
-> When assessing your level of security (and evaluating address 
-> filtering), keep in mind that it's not too difficult to masquerade BT 
-> device addresses. You only neeed to look up the Axis OpenBT stack source 
-> code to figure out how to adjust the device address of certain Ericsson 
-> and CSR-based modules.
+> I understand that in principle not being discoverable and the pin 
+> challenge should help you with being secure but to me this is not enough.
 > 
-> Clearly, your main line of defense should be a strong BT PIN.
+> I'm currently running 2 class 1 devices to serve my flat with rfcomm for 
+> dial in and I for sure do not want anyone besides me to get access to 
+> these com ports.
+> 
+> Is there anything I can do to tighten security and limit all 
+> communication to just some devices?
+> 
+> I do understand that even this is no guarantee for anything, but I'd for 
+> sure feel better  :) 
 
-Of course, I totally agree (and stated that in my previous mails).
+When assessing your level of security (and evaluating address 
+filtering), keep in mind that it's not too difficult to masquerade BT 
+device addresses. You only neeed to look up the Axis OpenBT stack source 
+code to figure out how to adjust the device address of certain Ericsson 
+and CSR-based modules.
 
-However, the last thing I want to see is some sort of warchalking (or 
-bluechalking?) outside my flat ...
-
-Next thing on the list is using vpn over ppp over bluetooth :)
+Clearly, your main line of defense should be a strong BT PIN.
 
 
-kind regards Philip
+Cheers,
+
+Michael
+
+
+-- 
+===========================================
+Michael Schmidt
+-------------------------------------------
+Institute for Data Communications Systems
+University of Siegen, Germany
+===========================================
 
 
 -------------------------------------------------------
