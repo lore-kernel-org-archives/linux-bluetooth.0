@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alain Volmat <avolmat@src.ricoh.co.jp>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] TPL is not changing
-Message-ID: <20050131015929.GC30604@snoopy.src.ricoh.co.jp>
-References: <20050130174730.3a78367f.j0006@stu.matsue-ct.jp> <1107095863.24890.0.camel@pegasus>
+From: Mathis <mathis_w@gmx.net>
+Message-ID: <ctjnsv$58q$1@sea.gmane.org>
+References: <loom.20050130T212956-606@post.gmane.org>	 <1107118147.8384.12.camel@pegasus>  <ctjjqm$2dp$1@sea.gmane.org> <1107121540.8384.23.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1107095863.24890.0.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <1107121540.8384.23.camel@pegasus>
+Subject: [Bluez-users] Re: F8T001 version 1 and SuSE 9.2
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,53 +18,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 Jan 2005 10:59:29 +0900
+Date: Sun, 30 Jan 2005 23:42:17 +0100
 
-Hi All,
+Marcel Holtmann schrieb:
 
-the HAGIWARE SYS-COM card is a pretty old Ericsson based card and it
-doesn't support TPL. See the output of hciconfig:
-
-hci0:   Type: PCCARD
-        BD Address: 00:90:02:05:1D:56 ACL MTU: 672:8 SCO MTU: 64:0
-        Features: 0xff 0xfb 0x01 0x00 0x00 0x00 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <SCO link> <HV2 packets> <HV3 packets>
-                <u-law log> <A-law log> <CVSD>
-
-Alain
-
-* Marcel Holtmann [Sun, 30 Jan 2005 at 15:37 +0100]
-<quote>
-> Hi Kazuhiro,
+> Hi,
 > 
-> > I've installed bluez-libs-2.8-1 and bluez-utils-2.8-1 on our linux 2.4.27 systems with 
-> > HAGIWARA SYS-COM HNT-CFBT Bluetooth cards.
-> > 
-> > I measured TPL on one computer and found that it was always 0 independently of the  
-> > distance between devices.
-> > 
-> > The following is the result of actual measurement.
-> > 
-> > [root@localhost root]# hcitool cc 00:90:02:XX:XX:XX
-> > [root@localhost root]# hcitool tpl 00:90:02:XX:XX:XX
-> > Current transmit power level: 0
-> > [root@localhost root]# hcitool rssi 00:90:02:XX:XX:XX
-> > RSSI return value: -3
-> > [root@localhost root]# hcitool tpl 00:90:02:XX:XX:XX
-> > Current transmit power level: 0
-> > [root@localhost root]# hcitool rssi 00:90:02:XX:XX:XX
-> > RSSI return value: -13
-> > [root@localhost root]# hcitool dc 00:90:02:XX:XX:XX
-> > 
-> > As you can see, RSSI is changing according to the distance between devices, but 
-> > TPL is not.
-> > 
-> > I would like to know the reason of this phenomenon.
 > 
-> this is maybe, because your card doesn't support it. What does
-> "hciconfig -a" say?
+>>T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+>>D:  Ver= 1.01 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+>>P:  Vendor=0a5c ProdID=2033 Rev= 0.a0
+>>C:* #Ifs= 3 Cfg#= 1 Atr=a0 MxPwr=100mA
+>>I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+>>E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+>>E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>>E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>>I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+>>E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>>E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>>I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+>>E:  Ad=83(I) Atr=01(Isoc) MxPS=  16 Ivl=1ms
+>>E:  Ad=03(O) Atr=01(Isoc) MxPS=  16 Ivl=1ms
+>>I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+>>E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+>>E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+>>I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+>>E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+>>E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
+>>I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+>>E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+>>E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+>>I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
+>>E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+>>E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
+>>I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+>>E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+>>E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> 
+> 
+> this is the Broadcom 2033 dongle that needs a firmware download before
+> it will work as H:2 dongle. You must install the bluez-firmware package
+> and make sure that the bcm203x kernel driver is loaded. You can also
+> call dmesg and check for an error message, because there must be one if
+> the firmware isn't found.
 > 
 > Regards
 > 
@@ -78,11 +74,11 @@ Alain
 > Tool for open source databases. Create drag-&-drop reports. Save time
 > by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
 > Download a FREE copy at http://www.intelliview.com/go/osdn_nl
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-</quote>
+
+thanx, this information did help alot
+
+Mathis
+
 
 
 -------------------------------------------------------
