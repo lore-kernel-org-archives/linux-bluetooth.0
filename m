@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT-PM01B. hidd --connect <non-advertising device>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <42231E6A.90500@rcs.ei.tum.de>
-References: <42231E6A.90500@rcs.ei.tum.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1109599532.17256.69.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <42231E6A.90500@rcs.ei.tum.de>
+From: Reinald Gfuellner <Reinald.Gfuellner@lpr.e-technik.tu-muenchen.de>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] BT-PM01B. hidd --connect <non-advertising device>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,33 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Feb 2005 15:05:32 +0100
+Date: Mon, 28 Feb 2005 14:36:42 +0100
 
-Hi Reinald,
+Epox Presenter BT-PM01B (with hid) works fine with bthid
+from http://klausler.com/msbtkb-linux.html
+(after puting uinput into modprobe.conf)
 
-> Epox Presenter BT-PM01B (with hid) works fine with bthid
-> from http://klausler.com/msbtkb-linux.html
-> (after puting uinput into modprobe.conf)
->=20
-> bthid however is not part of bluez-utils-2.15.rpm or any other
-> fc3-rpm that I know and seems to be depreciated (?)
->=20
-> Can the same job be done with standard-tools? how ?
->=20
-> Epox Presenter BT-PM01B works in non-advertising-mode
-> (unless 3 Buttons are pressed after poweron)
-> This means that hidd --connect xx:xx:xx... won=B4t work.
->=20
-> Can hidd be brought to the same listening mode like bthid ?
+bthid however is not part of bluez-utils-2.15.rpm or any other
+fc3-rpm that I know and seems to be depreciated (?)
 
-yes, it can and actually every distribution should have at least some
-config file for it. Make sure "hidd --server" is running. You've never
-been to any of my talks and see me using this toy ;)
+Can the same job be done with standard-tools? how ?
 
-Regards
+Epox Presenter BT-PM01B works in non-advertising-mode
+(unless 3 Buttons are pressed after poweron)
+This means that hidd --connect xx:xx:xx... won=B4t work.
 
-Marcel
+Can hidd be brought to the same listening mode like bthid ?
 
+Thanks from a bluetooth novice
+   Reinald
 
 
 
