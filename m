@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050203182345.4839.qmail@web26409.mail.ukl.yahoo.com>
-From: benbouzid imad <imad_benb@yahoo.fr>
-Subject: Re: [Bluez-users] USING PAN: PANU(desktop1) ->NAP(desktop2)->internet
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1107451291.11944.96.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+From: Sebastian Roth <sebastian.roth@esk.fhg.de>
+Message-ID: <cttbgv$knk$1@sea.gmane.org>
+References: <41FA06A5.3010904@tootai.net> <ctdn6n$sqs$1@sea.gmane.org> <41FE4744.5010804@tootai.net> <ctob73$ph0$1@sea.gmane.org> <4200D3B6.1050708@tootai.net> <ctqulk$ce4$1@sea.gmane.org> <420105F0.5030407@tootai.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+In-Reply-To: <420105F0.5030407@tootai.net>
+Subject: [Bluez-users] Re: Connection issue with headset
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,40 +18,91 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 3 Feb 2005 19:23:45 +0100 (CET)
+Date: Thu, 03 Feb 2005 15:13:23 +0100
 
-Hi, 
->>then check with sdptool what is running on your NAP
-machine.
-all is funny. 
-I did 
-#sdptool add NAP
-and I was able to find it and to connect to it.
-but if it's the sdptool which sets the services, what
-does it mean --role NAP in thes line :
-# pand --listen --role NAP
-
-and, other thing, annother computer which is in
-windows XP needs a PIN identifier to connect itself to
-my NAP.
-where I can find this PIN whereas the PANU in linux
-connected successfuly to my NAP without asking for any
-PIN.
-In windows I tried 0000 and and without any number but
-it did't connect.
-
-regards, 
-
-ps:Marcel you are the best i read a lot of mail by
-you. and sincerly, I admire you.
+Hi Daniel,
 
 
-	
+>> are the other things build into the kernel or loaded? (bluetooth,
+>> hci_usb, l2cap, rfcomm, sco)
+> 
+> all in modules
+Have you really loaded all of them?
 
-	
-		
-Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
-Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
+Your posted output of dmesg:
+Bluetooth: L2CAP ver 2.6
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: RFCOMM ver 1.3
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
+# where is SCO?
+snd-bt-sco revision 1.4 $
+snd-bt-sco: snd-bt-scod thread starting
+
+My output:
+Bluetooth: L2CAP ver 2.7
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: RFCOMM ver 1.5
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
+Bluetooth: SCO (Voice Link) ver 0.4
+Bluetooth: SCO socket layer initialized
+snd-bt-sco revision 1.4 $
+snd-bt-sco: snd-bt-scod thread starting
+
+
+Btw. what kernel version do you use? Please update the kernel to
+2.6.10-mh3 and the libs/utils to 2.15!!
+
+
+
+# sdptool search --bdaddr <bdaddr> 0x1108
+Class 0x1108
+Searching for 0x1108 on <bdaddr> ...
+Service Name: Headset
+Service RecHandle: 0x10000
+Service Class ID List:
+   "Headset" (0x1108)
+   "Generic Audio" (0x1203)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 1
+Profile Descriptor List:
+   "Headset" (0x1108)
+     Version: 0x0100
+
+What does this command show to you? Is the Channel the same when
+connecting with btsco?
+
+
+
+>> If you followed this and it does not work I have two ideas.
+>> 1. Is it possible that your headset does not send any AT commands
+>> over the connected RFCOMM channel? As far as I know btsco will never
+>> try to establish an SCO connection without having recived the cmd
+>> from your headset.
+> 
+>  From what I check nowhere I saw any AT command. That exactly what I'm 
+> looking for!
+
+Try hcidump -X (upper case). This is the part of my output:
+
+...
+ > ACL data: handle 0x0029 flags 0x01 dlen 3
+    L2CAP(d): cid 0x0041 len 16 [psm 3]
+     RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 12 fcs 0x40
+     0000: 41 54 2b 43 4b 50 44 3d  32 30 30 0d              AT+CKPD=200.
+< ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0087 len 10 [psm 3]
+     RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 6 fcs 0x9a
+     0000: 0d 0a 4f 4b 0d 0a                                 ..OK..
+...
+
+
+Regards,
+hecatomb
+
 
 
 -------------------------------------------------------
