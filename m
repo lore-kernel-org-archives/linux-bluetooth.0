@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Christian Schubert <mail@apexo.de>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200501151854.40656.mail@apexo.de>
-Subject: [Bluez-users] error attaching device
+Subject: Re: [Bluez-users] Microsoft bluetooth mouse - wheel support
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY101-F1422133B054DDDB019EEE9A78C0@phx.gbl>
+References: <BAY101-F1422133B054DDDB019EEE9A78C0@phx.gbl>
+Content-Type: text/plain
+Message-Id: <1105791873.8080.4.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,32 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 15 Jan 2005 18:54:40 +0100
+Date: Sat, 15 Jan 2005 13:24:33 +0100
 
-Hi there,
+Hi Russell,
 
-I'm using linux kernel 2.6.10 with the following debian bluez packages:
-bluez-bluefw            1.0-1
-bluez-hcidump           1.12-1
-bluez-pin               0.24-1
-bluez-utils             2.10-5
+>   I have successfully upgraded my Debian kernel to 2.6.10 (including the 
+> patch-2.6.10-mh1) and connected my mouse by
+> 
+> modprobe hidp
+> hidd --server
+> 
+> But no scroll wheel support! If I type "hidd --show" I get
+> 00:50:F2:E8:5E:FA HID Boot Device [045e:0098] connected [boot-protocol]
+> 
+> So it seems that I get only a boot-mode connection. If I run xev it shows no 
+> activity when I use the scroll-wheel.
+> 
+> Can anyone please help me about how I can get scroll-wheel support for my 
+> lovely blue mouse!
 
-my problem now is:
-I have a Acer Bluetooth USB Dongle which works correctly when plugged into 
-either one of the primary USB ports as well as within the Microsoft Natural 
-Keyboad USB Hub but NOT in my newly acquired Acer USB 2.0 Hub which leaves 
-the following error messages in the syslog:
+the patch-2.6.10-mh1 is missing the preliminary report mode protocol
+support. I had to drop it because of resync problems with the mainline
+kernel, but it will be back in 2.6.10-mh2.
 
-kernel: hci_usb_intr_rx_submit: hci0 intr rx submit failed urb c6586b74 err 
--28
-hcid[11781]: Can't init device hci0. Input/output error(5)
+Regards
 
-Any hints?
+Marcel
 
-Cheers,
-Christian
 
-p.s.: not subscribed to the list
 
 
 -------------------------------------------------------
