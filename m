@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Presentation slides are online
-Message-ID: <20040628135038.GA28640@gmx.net>
-References: <1088413405.3774.164.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1088413405.3774.164.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1088413405.3774.164.camel@pegasus>
+Subject: [Bluez-users] Presentation slides are online
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,24 +15,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Jun 2004 15:50:38 +0200
+Date: Mon, 28 Jun 2004 11:03:25 +0200
 
-On  0, Marcel Holtmann <marcel@holtmann.org> wrote:
-> I made the presentation slides of my talks at the LinuxTag 2004 and the
-> GUUG-Frühjahrsfachgespräch 2004 available as PDF. I collect all these
-> information on the BlueZ talks page at 
-> 
-> 	http://www.bluez.org/talks.html
-> 
-> Both talks were in German and so the slides are also in German, but the
-> slides from the LinuxTag contains many graphics and the GUUG-FFG talk
-> has some command outputs in it, too. Even if you are not a German native
-> speaker you will find them helpful, I think.
+Hi Folks,
 
-You now have some experience based data, which dongles accept the signed
-apple hciproxy firmware and which one render unusable?
+I made the presentation slides of my talks at the LinuxTag 2004 and the
+GUUG-Fr=FChjahrsfachgespr=E4ch 2004 available as PDF. I collect all these
+information on the BlueZ talks page at=20
 
-nicholas
+	http://www.bluez.org/talks.html
+
+Both talks were in German and so the slides are also in German, but the
+slides from the LinuxTag contains many graphics and the GUUG-FFG talk
+has some command outputs in it, too. Even if you are not a German native
+speaker you will find them helpful, I think.
+
+If there is anyone who is talking about Bluetooth and Linux or something
+that is BlueZ related I am happy to extend this list. Drop me a quick
+note with the details.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
