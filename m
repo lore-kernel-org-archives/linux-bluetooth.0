@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Question about dev/bluetooth/rfcomm/0
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001601c50210$feedd960$2bc212ac@stu.nus.edu.sg>
-References: <001601c50210$feedd960$2bc212ac@stu.nus.edu.sg>
-Content-Type: text/plain
-Message-Id: <1106570617.9269.81.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <001601c50210$feedd960$2bc212ac@stu.nus.edu.sg>
+From: "Khoo Teck Ping" <eng10166@nus.edu.sg>
+To: <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0013_01C50254.09CBB260"
+Subject: [Bluez-devel] Question about dev/bluetooth/rfcomm/0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,27 +17,59 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Jan 2005 13:43:37 +0100
+Date: Mon, 24 Jan 2005 20:34:01 +0800
 
-Hi Teck,
+This is a multi-part message in MIME format.
 
-> I do not currently have this folder on my file system. 
-> 
-> dev/bluetooth/rfcomm/0
-> 
-> I understand that it should have been created by the kernel drivers. 
->  
-> May I know how I can install this folder? This is required for
-> rfcomm. 
+------=_NextPart_000_0013_01C50254.09CBB260
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-if this is a 2.6 kernel then install udev and the device node will be
-created. However this can also be /dev/rfcomm0, because the other name
-was only used by devfs.
+Dear All
 
-Regards
+I do not currently have this folder on my file system.=20
+dev/bluetooth/rfcomm/0
 
-Marcel
+I understand that it should have been created by the kernel drivers.=20
 
+May I know how I can install this folder? This is required for rfcomm.=20
+
+Thank You
+
+Teck Ping
+------=_NextPart_000_0013_01C50254.09CBB260
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2523" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial>Dear All</FONT></DIV>
+<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial>I do not currently have this folder on my file =
+system.=20
+</FONT></DIV>
+<DIV><FONT face=3DArial>
+<P>dev/bluetooth/rfcomm/0</P>I understand that it should have been =
+created by=20
+the kernel drivers. </FONT></DIV>
+<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial>May I know how I can install this folder? This =
+is required=20
+for rfcomm. </FONT></DIV>
+<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial>Thank You</FONT></DIV>
+<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial>Teck Ping</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0013_01C50254.09CBB260--
 
 
 
