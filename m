@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Florian Echtler <echtler@fs.tum.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.62.0503032051240.10779@block>
+From: "Max M." <bluez-ml@maxim.comm2000.it>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] tx submit failed urb c4c6b014 type 3 err -19
+In-Reply-To: <1109702721.17256.178.camel@pegasus>
+Message-ID: <Pine.LNX.4.21.0503031418590.28800-100000@blomma.comm2000.it>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] Interference between btsco and hidd
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,40 +17,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 3 Mar 2005 20:58:08 +0100 (CET)
+Date: Thu, 3 Mar 2005 15:24:30 +0100 (MET)
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On Tue, 1 Mar 2005, Marcel Holtmann wrote:
+> this is weird. The first one is related to sysfs and actually these
+> should all be fixed by now. The others are also not quite clear.
+> 
+> How many dongles are you using at the same time? I saw hci2 and hci1 in
+> the logs. What does "hciconfig -a" say about them?
 
-Hello everyone, I've got a load of questions today:
+Yes, I'm using three dongles. See:
 
-1. While btsco works fine, I've just noticed that when it's running
-   and a connection is established to my headset, my other Bluetooth
-   devices (MS Optical Desktop) can't establish a connection by them-
-   selves anymore. After keyboard or mouse go to sleep mode with 
-   btsco running, they can only be reconnected with hidd --connect
-   or by killing btsco first.. Has anyone got an idea how to fix this?
+ http://cassandra.comm2000.it/~maxim/pub/bluez-oops/hciconfig.txt
 
-2. I had a look at the hcid source code, as I was thinking about
-   implementing a little function to call some script when a
-   connection request arrives. However, my understanding of BT
-   is still limited, so can somebody give me a hint where to start?
-   What kind of event is received when a connection request comes in?
+The reason I'm using multiple dongles is that I need to control more than
+one phone, and apparently I'm unable to open concurrent SCO links to
+different phones through the same dongle. 
 
-3. Again concerning btsco: has anybody tried to disconnect the SCO
-   channel while not in use? Maybe that would fix the problem with
-   hidd, too..
+Theoretically, this should be possible, shouldn't it? Nevertheless, if I
+connect through different dongles (by bind'ing each socket to the
+appropriate dongle address), everything works more or less as expected
+(except for occasional oops, and some infrequent errors during SCO
+connect's). If I try to use a single dongle, either not binding the
+sockets, or binding them to BDADDR_ANY, I always get "Too many links" on
+the second SCO connection I try to open. Am I possibly doing something
+wrong?
 
-Yours, Florian
-- -- 
-Preserve wildlife - pickle a squirrel today!
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
+Besides, warnings very often get logged mentioning SCO handle numbers
+which look bogus to me:
 
-iD8DBQFCJ2xU7CzyshGvatgRAiY8AJ4hFZph5+njRMNtijJga1WymoJMMACg0fqH
-wnFmxKDcWCvgmDG8PC7EbB4=
-=elqo
------END PGP SIGNATURE-----
+  hci_scodata_packet: hci0 SCO packet for unknown connection handle 65023
+  hci_scodata_packet: hci0 SCO packet for unknown connection handle 63231
+  hci_scodata_packet: hci0 SCO packet for unknown connection handle 65535
+  hci_scodata_packet: hci0 SCO packet for unknown connection handle 65280
+
+See here for more messages like the above:
+
+ http://cassandra.comm2000.it/~maxim/pub/bluez-oops/log-0.txt
+
+Max
+
+
+
 
 
 -------------------------------------------------------
