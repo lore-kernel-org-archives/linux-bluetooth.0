@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Gene Imes <ebi7@ozob.net>
-To: list-bluez <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] AVM AP-X and DUN profile
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bernd.Jucknischke@web.de
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403030832.19665.Bernd.Jucknischke@web.de>
+References: <200403030832.19665.Bernd.Jucknischke@web.de>
 Content-Type: text/plain
-Message-Id: <1078322158.11523.83.camel@go2>
+Message-Id: <1078320979.2787.68.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] D-Link DBT-120
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,18 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 03 Mar 2004 07:55:58 -0600
+Date: Wed, 03 Mar 2004 14:36:19 +0100
 
-I have this dongle and after upgrading kernel 2.6.4-rc1-mm1 when I
-remove the dongle my laptop freezes.
+Hi Bernd,
 
-This dongle has worked well before.
+> yesterday I have upgraded the firmware of my AP-X and tried to connect to the 
+> internet via the DUN service (They stated that the DUN part would have been 
+> improved...). I have proceeded according to Cees' HOWTO and made use of a 
+> working internet connection, which I normally use with my old modem (I've 
+> changed /dev/ttyS0 to /dev/rfcomm0). So far so good, dialling worked, but the 
+> connection got stuck in the LCP process. Here is the log output:
 
-I can supply more information if necessary.
+I never had real success with DUN and an AP-X device and actually I
+don't know where the problem is. However you can use CMTP and the CIP
+profile for dialin. Here are some details
 
-Thanks,
+	http://www.holtmann.org/linux/bluetooth/isdn.html
 
-Gene
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
