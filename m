@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Some questions
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Dirk Vornheder <DVornheder@t-online.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200406221724.44949.dvornheder@t-online.de>
-References: <1BYJR5-1Xq5q40@cmpmail07.bbul.t-online.de>
-	 <200406152223.33329.dvornheder@t-online.de>
-	 <1087339136.13792.96.camel@pegasus>
-	 <200406221724.44949.dvornheder@t-online.de>
-Content-Type: text/plain
-Message-Id: <1087939657.4209.8.camel@pegasus>
-Mime-Version: 1.0
+From: tOpSy TuRvY <topsyturvy@nemo.student.utwente.nl>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <E1BcqIi-0002cT-53@sc8-sf-list2.sourceforge.net>
+Message-ID: <Pine.BSO.4.58.0406222046050.9882@nemo.student.utwente.nl>
+References: <E1BcqIi-0002cT-53@sc8-sf-list2.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] Max Number of PANUs supported in PAN
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,34 +17,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Jun 2004 23:27:37 +0200
-
-Hi Dirk,
-
-> > > The entires in  cups are:
-> > >
-> > > bluetooth://00027244CF9F/spp
-> >
-> > I prefer only using the URI and you don't need to add spp or hcrp,
-> > because the backend with use HCRP if found and only fall back to RFCOMM
-> > printing in the other case.
-> >
-> > Use "hcidump -x" to check what is happening.
-> >
-> 
-> Here are the output from hcidump.
-> 
-> Hope you find the problem.
-
-I don't see any useful in it, but it looks very weird. Too much SDP
-traffic. Something must be screwed up. Make me a binary dump with -w and
-try to get the initial connection setup.
-
-Regards
-
-Marcel
+Date: Tue, 22 Jun 2004 20:57:46 +0200 (CEST)
 
 
+Hello,
+
+Can someone tell me the maximum number of users supported in one PAN?
+I guess this question boils down to:
+
+a) Are PANUs in Parked mode supported (i.e. 200+ PANUs in one PAN 
+possible).
+b) Is the PAN able to juggle PANUs between active and parked mode so 
+they all seem "connected" and are able to communicate with each 
+other.
+
+Also, can something tell me if something like above is possible in the BT 
+SIG PAN specification, or does it also support a maximum of 8 users in a 
+PAN.
+
+Thank you in advance.
+
+Regards,
+Assed
 
 
 -------------------------------------------------------
