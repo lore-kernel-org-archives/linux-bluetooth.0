@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] modify RFCOMM_DISC_TIMEOUT
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Carlos AM <Carlos@naxus.biz>
-Cc: lista bluez <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000a01c46ff6$f6013a10$5000005a@naxus>
-References: <000a01c46ff6$f6013a10$5000005a@naxus>
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1090517537.21828.26.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <000a01c46ff6$f6013a10$5000005a@naxus>
+From: "Carlos AM" <Carlos@naxus.biz>
+To: "lista bluez" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0007_01C47007.B91F1340"
+Subject: [Bluez-devel] modify RFCOMM_DISC_TIMEOUT
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,23 +16,57 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 22 Jul 2004 19:32:18 +0200
+Date: Thu, 22 Jul 2004 16:19:54 +0200
 
-Hi Carlos,
+This is a multi-part message in MIME format.
 
-> I am developing a GPS unit that communicates via RFCOMM and I noticed
-> that the timeout of the RFCOMM disconnection is 20 seconds.
-> =BFDoes exists a way to change this timeout from a rfcomm server progra=
-m
-> that uses sockets?
-> It seems that changing this #define in the rfcomm.h is not enough
+------=_NextPart_000_0007_01C47007.B91F1340
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-what do you expect that RFCOMM_DISC_TIMEOUT is doing?
+Hi
+
+I am developing a GPS unit that communicates via RFCOMM and I noticed =
+that the timeout of the RFCOMM disconnection is 20 seconds.
+=BFDoes exists a way to change this timeout from a rfcomm server program =
+that uses sockets?
+It seems that changing this #define in the rfcomm.h is not enough
 
 Regards
+Carlos AM
+Naxus Conectividad M=F3vil
+------=_NextPart_000_0007_01C47007.B91F1340
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Marcel
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2800.1106" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hi</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I am developing a GPS unit that =
+communicates via=20
+RFCOMM and I noticed that the timeout of the RFCOMM disconnection is 20=20
+seconds.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>=BFDoes exists a way to change this =
+timeout from a=20
+rfcomm server program that uses sockets?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>It seems that changing this #define in =
+the rfcomm.h=20
+is not enough</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Regards</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>Carlos AM<BR>Naxus Conectividad=20
+M=F3vil</FONT></DIV></BODY></HTML>
 
+------=_NextPart_000_0007_01C47007.B91F1340--
 
 
 
