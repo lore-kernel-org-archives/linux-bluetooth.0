@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Florian Beyer <florian.beyer@aei.mpg.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20040520090502.GA4352@mcmabrruq.sirius.net>
+Subject: Re: [Bluez-users] bthid,ppc,sdp
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ben Wilson <bwilson@yooser.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040519214238.GK15386@stag.mark-and-erika.com>
+References: <878yfp4bmz.fsf@handgranat.org>
+	 <20040519212124.GI15386@stag.mark-and-erika.com>
+	 <1085002651.4327.82.camel@pegasus>
+	 <20040519214238.GK15386@stag.mark-and-erika.com>
+Content-Type: text/plain
+Message-Id: <1085007918.4327.127.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; Format=Flowed; DelSp=Yes; charset=ISO-8859-15
-Subject: [Bluez-users] Unresolved Symbols
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,53 +21,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 20 May 2004 11:05:02 +0200
+Date: Thu, 20 May 2004 01:05:18 +0200
 
-Hello,
+Hi Ben,
 
-I have problems compiling the bluez-kernel-2.3-package with kernel  
-2.4.22 and the mh6-patch (with activated bluetooth support of course).  
-The same happens for kernel 2.4.26 and mh1-patch.
+> > build the hidp support as module, because it looks like that some
+> > function will collide with the usbhid driver.
+> 
+> Bingo! Thanks.
 
-After a
+I fixed this problem and with the next patch it should be possible to
+compile hidp and usbhid built-in.
 
-./configure --with-kernel=/usr/src/linux-2.4 --prefix=/usr
-make
-make install
+Regards
 
-I get
+Marcel
 
-/sbin/depmod -a
-depmod: *** Unresolved symbols in /lib/modules/2.4.22-mh6/kernel/net/ 
-bluetooth/bnep/bnep.o
-depmod: *** Unresolved symbols in /lib/modules/2.4.22-mh6/kernel/net/ 
-bluetooth/rfcomm/rfcomm.o
-
-Furthermore I have
-
-/sbin/modprobe bnep
-/lib/modules/2.4.22-mh6/kernel/net/bluetooth/bnep/bnep.o: unresolved  
-symbol l2cap_load_Rfc31fe88
-/lib/modules/2.4.22-mh6/kernel/net/bluetooth/bnep/bnep.o: insmod /lib/ 
-modules/2.4.22-mh6/kernel/net/bluetooth/bnep/bnep.o failed
-
-and
-
-/sbin/modprobe rfcomm
-/lib/modules/2.4.22-mh6/kernel/net/bluetooth/rfcomm/rfcomm.o:  
-unresolved symbol
-l2cap_load_Rfc31fe88
-/lib/modules/2.4.22-mh6/kernel/net/bluetooth/rfcomm/rfcomm.o:  
-unresolved symbol
-bluez_sock_wait_state_R12a89245
-/lib/modules/2.4.22-mh6/kernel/net/bluetooth/rfcomm/rfcomm.o: insmod / 
-lib/modules/2.4.22-mh6/kernel/net/bluetooth/rfcomm/rfcomm.o failed
-
-
-What can I do?
-
-Thanks for your help,
-Florian Beyer
 
 
 
