@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] problems with bytestream + rfcomm socket problems
-From: Diego Liziero <liziero.diego@unimore.it>
-Reply-To: diego.liziero@unimore.it
-To: Paolino paperino <vonzoltan@yahoo.it>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <20041013143813.89912.qmail@web40626.mail.yahoo.com>
-References: <20041013143813.89912.qmail@web40626.mail.yahoo.com>
+Subject: Re: [Bluez-users] News: Stereo BT Headset from BlueTake
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Brad Midgley <bmidgley@xmission.com>
+Cc: Matthias Thomae <bluez@thomae-privat.de>,
+   bluez-users@lists.sourceforge.net
+In-Reply-To: <416DA635.2070105@xmission.com>
+References: <416D8520.5060102@thomae-privat.de>
+	 <416DA635.2070105@xmission.com>
 Content-Type: text/plain
-Message-Id: <1097742403.20102.20.camel@igno>
+Message-Id: <1097741691.4640.19.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,33 +20,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Oct 2004 10:26:43 +0200
+Date: Thu, 14 Oct 2004 10:14:51 +0200
 
-Hello Andrea,
+Hi Brad,
 
-On Wed, 2004-10-13 at 16:38, Paolino paperino wrote:
-> Thanks Diego,
-> Now i've tested the rctest (without the usleep that
-> i've inserted) on a machine with kernel 2.4.18 and
-> bluez libs/utils 2.2(USB dongle digicom), and the
-> receive function doesn't give any prblems, work well,
-> doesn't loose any byte...is this a bug in the kernel i
-> use?!
+> I've seen this and I'm on the verge of buying... we need someone to try 
+> it out with the sco hacks... but then I'd need a bt1.2 adapter to do it 
+> justice.
 
-Here it works with kernels 2.6.7-2.tmb.6mdk (mandrake)
-and 2.6.9-rc3-mm3-ecn-retry (debian).
-Sorry, I don't have a RedHat.
+why do you need a Bluetooth 1.2 adapter?
 
-> PS The USB dongle i use with the kernel 2.6 is a Trust
-> BT180
+Regards
 
-Try to switch the Bluetooth dongle and see if it is
-it's fault.
+Marcel
 
-> Thanks 
-> Andrea S.
-
-Diego.
 
 
 
