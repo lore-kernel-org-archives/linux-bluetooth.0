@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: DVornheder@t-online.de (Dirk Vornheder)
+From: Jan Schermer <zviratko@n.cz>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200404182321.55431.dvornheder@t-online.de>
-Subject: [Bluez-users] Compile bluez-bluefw-1.0 fails
+Content-Type: text/plain
+Message-Id: <1082288518.30797.13.camel@localhost>
+Mime-Version: 1.0
+Subject: [Bluez-users] Connection times out after a while
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,57 +15,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 18 Apr 2004 23:21:55 +0200
+Date: Sun, 18 Apr 2004 13:41:58 +0200
 
-Hi !
+Hi,
 
-Compile bluez-bluefw-1.0 fails:
+I can pair the devices fine, RFCOMM opens connection and I can issue AT
+commands to my mobile phone via minicom. However at some point (few
+seconds from the opening of connection) the communication just hangs and
+I have to reconnect the device and reload hci_usb driver for another
+connection to be initiated (otherwise, all connections time out (I see
+the bt communication icon on my phone though).
 
-make[1]: Leaving directory `/privat/bluetooth/bluez-bluefw-1.0/hotplug'
-make[1]: Entering directory `/privat/bluetooth/bluez-bluefw-1.0'
-source='bluefw.c' object='bluefw.o' libtool=no \
-depfile='.deps/bluefw.Po' tmpdepfile='.deps/bluefw.TPo' \
-depmode=gcc3 /bin/sh ./depcomp \
-gcc -DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" 
--DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"bluez-bluefw\" 
--DVERSION=\"1.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 
--DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 
--DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DBT3C_SUPPORT=1  -I. 
--I. -I/usr/src/linux/include    -Wall -g -O2 -c `test -f 'bluefw.c' || echo 
-'./'`bluefw.c
-In file included from usblib.h:30,
-                 from bluefw.c:39:
-/usr/src/linux/include/linux/usbdevice_fs.h:49: error: variable or field 
-`__user' declared void
-/usr/src/linux/include/linux/usbdevice_fs.h:49: warning: no semicolon at end 
-of struct or union
-/usr/src/linux/include/linux/usbdevice_fs.h:49: error: parse error before '*' 
-token
-/usr/src/linux/include/linux/usbdevice_fs.h:56: error: variable or field 
-`__user' declared void
-/usr/src/linux/include/linux/usbdevice_fs.h:56: warning: no semicolon at end 
-of struct or union
-/usr/src/linux/include/linux/usbdevice_fs.h:56: error: parse error before '*' 
-token
-/usr/src/linux/include/linux/usbdevice_fs.h:100: error: variable or field 
-`__user' declared void
-/usr/src/linux/include/linux/usbdevice_fs.h:100: warning: no semicolon at end 
-of struct or union
-/usr/src/linux/include/linux/usbdevice_fs.h:100: error: parse error before '*' 
-token
-/usr/src/linux/include/linux/usbdevice_fs.h:109: error: parse error before '}' 
-token
-/usr/src/linux/include/linux/usbdevice_fs.h:116: error: variable or field 
-`__user' declared void
-/usr/src/linux/include/linux/usbdevice_fs.h:116: warning: no semicolon at end 
-of struct or union
-/usr/src/linux/include/linux/usbdevice_fs.h:116: error: parse error before '*' 
-token
-make[1]: *** [bluefw.o] Error 1
+I am using Billionton USB dongle and SonyEricsson T610, I also tried
+with XDA2 but the same problem occurs.
 
-I use kernel 2.6.6-rc1-bk2 !
+If I use the dongle and phone under VMWARE, everything works fine - so
+it must be something in the driver or my setup, but I have used it in
+the past and I'm almost sure that my setup is fine.
 
-Dirk
+I have tried kernels 2.6.5, 2.6.5-love[1-3], 2.6.5-gentoo-r1 without
+success. I even patched the third bluetooth patch in the kernel with no
+effect.
+
+Any way I can debug this? Has anyone had the same problems like me?
+
+Thx a lot
+
+Jan
+
 
 
 -------------------------------------------------------
