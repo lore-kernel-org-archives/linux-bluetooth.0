@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] BCSP not working
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Carlos AM <Carlos@naxus.biz>
-Cc: bluez-devel lista <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092837623.28955.120.camel@localhost.localdomain>
-References: <001201c48529$3b309710$5000005a@naxus>
-	 <1092837623.28955.120.camel@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1092850955.31651.111.camel@pegasus>
+From: Andreas Gaufer <Andreas.Gaufer@blue-cell-networks.com>
+To: Bluez Devel <bluez-devel@lists.sourceforge.net>
+Message-Id: <20040818193013.1ef8a79a.Andreas.Gaufer@blue-cell-networks.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] Sharp GX15 Info
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,37 +15,203 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 18 Aug 2004 19:42:35 +0200
+Date: Wed, 18 Aug 2004 19:30:13 +0200
 
-Hi Carlos,
+Hi,
 
-> The machine is an arm running uclinux. I used the linux kernel version
-> 2.4.22 and bluez-2.7. Yesterday I patched the kernel with this patch:
-> 
-> http://www.holtmann.org/linux/kernel/patch-2.4.22-mh7.gz
-> 
-> And got the following kernel log:
-> 
-> <3>bcsp_recv: Out-of-order packet arrived, got 1 expected 0
-> <3>bcsp_recv: Out-of-order packet arrived, got 1 expected 0
-> <4>Warning: kfree_skb passed an skb still on a list (from 00093a14).
-> <2>kernel BUG at skbuff.c:319!
-> (hanged)
-> 
-> The only difference with the last kernel messages was:
->  "<3>bcsp_recv: Short BCSP packet" that didn't appear anymore.
-> According to the kernel patch changelog this is normal.
+I got a Sharp GX15 (Vodafone Live Edition). It does nothing that needs a
+ACL without pairing (only remote name request is possible w/o pairing).
 
-I don't get your point, because I can't remember any change that implies
-this. Actually I care about the kfree_skb bug, because it seems that
-with ucLinux something works different. I am not an expert in that area,
-so I can't help you here. Have you tried a 2.6 kernel?
+Here are some details for your list Marcel:
 
-Regards
+Inq:
 
-Marcel
+ 08:00:1F:B7:EF:7A       clock offset: 0x7553    class: 0x500204
+
+Info:
+
+        BD Address:  08:00:1F:B7:EF:7A
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x460
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xef 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot
+offset>                 <role switch> <hold mode> <sniff mode> <park
+state> <RSSI>                 <channel quality> <SCO link> <HV2 packets>
+<HV3 packets>                 <u-law log> <A-law log> <CVSD> <paging
+scheme>                 <transparent SCO> 
+
+SDP:
+
+Browsing 08:00:1F:B7:EF:7A ...
+Attribute Identifier : 0x0 - ServiceRecordHandle
+  Integer : 0x10001
+Attribute Identifier : 0x1 - ServiceClassIDList
+  Data Sequence
+    UUID16 : 0x1105 - OBEXObjectPush
+Attribute Identifier : 0x4 - ProtocolDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x0100 - L2CAP
+    Data Sequence
+      UUID16 : 0x0003 - RFCOMM
+      Channel/Port (Integer) : 0x4
+    Data Sequence
+      UUID16 : 0x0008 - OBEX
+Attribute Identifier : 0x5 - BrowseGroupList
+  Data Sequence
+    UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+  Data Sequence
+    Code ISO639 (Integer) : 0x656e
+    Encoding (Integer) : 0x6a
+    Base Offset (Integer) : 0x100
+Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x1105 - OBEXObjectPush
+      Version (Integer) : 0x100
+Attribute Identifier : 0x100
+  Text : "OBEX Object Push"
+Attribute Identifier : 0x303
+  Data Sequence
+    Integer : 0xff
+
+Attribute Identifier : 0x0 - ServiceRecordHandle
+  Integer : 0x10002
+Attribute Identifier : 0x1 - ServiceClassIDList
+  Data Sequence
+    UUID16 : 0x1101 - SerialPort
+Attribute Identifier : 0x4 - ProtocolDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x0100 - L2CAP
+    Data Sequence
+      UUID16 : 0x0003 - RFCOMM
+      Channel/Port (Integer) : 0x5
+Attribute Identifier : 0x5 - BrowseGroupList
+  Data Sequence
+    UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+  Data Sequence
+    Code ISO639 (Integer) : 0x656e
+    Encoding (Integer) : 0x6a
+    Base Offset (Integer) : 0x100
+Attribute Identifier : 0x100
+  Text : "Serial Port"
+
+Attribute Identifier : 0x0 - ServiceRecordHandle
+  Integer : 0x10003
+Attribute Identifier : 0x1 - ServiceClassIDList
+  Data Sequence
+    UUID16 : 0x1103 - DialupNetworking (DUN)
+Attribute Identifier : 0x4 - ProtocolDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x0100 - L2CAP
+    Data Sequence
+      UUID16 : 0x0003 - RFCOMM
+      Channel/Port (Integer) : 0x3
+Attribute Identifier : 0x5 - BrowseGroupList
+  Data Sequence
+    UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+  Data Sequence
+    Code ISO639 (Integer) : 0x656e
+    Encoding (Integer) : 0x6a
+    Base Offset (Integer) : 0x100
+Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x1103 - DialupNetworking (DUN)
+      Version (Integer) : 0x100
+Attribute Identifier : 0x100
+  Text : "Dial-up networking"
+
+Attribute Identifier : 0x0 - ServiceRecordHandle
+  Integer : 0x10004
+Attribute Identifier : 0x1 - ServiceClassIDList
+  Data Sequence
+    UUID16 : 0x1112 - HeadsetAudioGateway
+    UUID16 : 0x1203 - GenericAudio
+Attribute Identifier : 0x4 - ProtocolDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x0100 - L2CAP
+    Data Sequence
+      UUID16 : 0x0003 - RFCOMM
+      Channel/Port (Integer) : 0x1
+Attribute Identifier : 0x5 - BrowseGroupList
+  Data Sequence
+    UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+  Data Sequence
+    Code ISO639 (Integer) : 0x656e
+    Encoding (Integer) : 0x6a
+    Base Offset (Integer) : 0x100
+Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x1108 - Headset
+      Version (Integer) : 0x100
+Attribute Identifier : 0x100
+  Text : "Voice gateway"
+
+Attribute Identifier : 0x0 - ServiceRecordHandle
+  Integer : 0x10005
+Attribute Identifier : 0x1 - ServiceClassIDList
+  Data Sequence
+    UUID16 : 0x111f - HandsfreeAudioGateway
+    UUID16 : 0x1203 - GenericAudio
+Attribute Identifier : 0x4 - ProtocolDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x0100 - L2CAP
+    Data Sequence
+      UUID16 : 0x0003 - RFCOMM
+      Channel/Port (Integer) : 0x2
+Attribute Identifier : 0x5 - BrowseGroupList
+  Data Sequence
+    UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
+  Data Sequence
+    Code ISO639 (Integer) : 0x656e
+    Encoding (Integer) : 0x6a
+    Base Offset (Integer) : 0x100
+Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x111e - Handsfree
+      Version (Integer) : 0x101
+Attribute Identifier : 0x100
+  Text : "Voice gateway"
+Attribute Identifier : 0x301
+  Integer : 0x1
+Attribute Identifier : 0x311
+  Integer : 0x1
+
+Let me know what else you want to know.
+
+Greetings
+
+Andy
 
 
+-- 
+Blue Cell Networks GmbH
+Industriestraße 1b
+96163 Gundelsheim
+
+Tel.: 0951-700 42 891 | Fax.: 0951-700 42 887
+
+Diese Email sowie sämtliche mit ihr übertragenen Dateien enthalten
+vertrauliche und/oder rechtlich geschützte Informationen, welche
+lediglich für den/die Adressaten bestimmt sind. Sollten Sie nicht der
+vorgesehene Empfänger sein, ist Ihnen der Gebrauch, die Verbreitung oder
+Vervielfältigung der darin enthaltenen Informationen nicht gestattet.
+Sollten Sie nicht der vorgesehene Empfänger sein, benachrichtigen Sie
+den Absender bitte umgehend per Email und vernichten Sie die
+Originalnachricht einschließlich etwaiger Kopien und angehängter
+Dateien. Vielen Dank.
 
 
 -------------------------------------------------------
