@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT 1.2
+Subject: Re: [Bluez-users] System Freeze....
 From: Marcel Holtmann <marcel@holtmann.org>
 To: cijoml@volny.cz
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <200409071949.51847.cijoml@volny.cz>
-References: <6.0.3.0.2.20040907153948.02edc8c8@box1.tin.it>
-	 <200409071949.51847.cijoml@volny.cz>
+In-Reply-To: <200409081101.59870.cijoml@volny.cz>
+References: <1aef6225040907130365c31e4c@mail.gmail.com>
+	 <1094627398.5384.0.camel@notepaq>
+	 <1aef6225040908015847961a8e@mail.gmail.com>
+	 <200409081101.59870.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1094636526.5384.19.camel@notepaq>
+Message-Id: <1094636440.5384.16.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,15 +21,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 08 Sep 2004 11:42:06 +0200
+Date: Wed, 08 Sep 2004 11:40:40 +0200
 
-Hi Michal,
+Hi David,
 
-> Only one  know is Dlink DBT-120 rev B3, you can flash it using Apple firmware 
-> to 1.2 standart
+> It looks like USB host driver problem - try ask usb guys
 
-you can also look at the latest dongles from Anycom. I think they
-started selling the Bluetooth 1.2 Silicon Wave based dongles.
+I agree with Michal and you maybe should give a 2.6 kernel a chance ;)
 
 Regards
 
