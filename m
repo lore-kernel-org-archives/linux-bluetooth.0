@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <200407231216.i6NCGiSw095359@www1.pochta.ru>
-From: Роман <papa@rbcmail.ru>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4100FF67.7020705@india.hp.com>
+From: Swarup Mohalik <mohalik@india.hp.com>
+Reply-To: mohalik@india.hp.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset="koi8-r"
-Subject: [Bluez-users] TECOM BT3035
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] rfcomm
+References: <200401302209.52396.raydar@nwlink.com>	 <4100F85D.5080200@india.hp.com> <1090583514.4791.42.camel@pegasus>
+Content-Type: multipart/alternative;
+ boundary="------------030608060906030303030606"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,53 +18,134 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jul 2004 16:16:44 +0400 (MSD)
-
-Is anybody solved it under kernel 2.4?
-
-I Have Tecom BT3035.
-It works easy and find under SuSE 9.1 with kernel 2.6..
-But I need to use it under kernel 2.4
-
-thats what I see from dmesg
-
-hub.c: new USB device 00:1f.2-2, assigned address 3
-hub.c: USB hub found
-hub.c: 3 ports detected
-hub.c: new USB device 00:1f.2-2.1, assigned address 4
-usb.c: USB device 4 (vend/prod 0xa5c/0x200a) is not
-claimed by any active driver.
-hub.c: new USB device 00:1f.2-2.2, assigned address 5
-usb.c: USB device 5 (vend/prod 0xa5c/0x3502) is not
-claimed by any active driver.
-hub.c: new USB device 00:1f.2-2.3, assigned address 6
-usb.c: USB device 6 (vend/prod 0xa5c/0x3503) is not
-claimed by any active driver.
-
-when I type lsusb i see
-Bus 001 Device 003: ID 0a5c:3535 Broadcom Corp.
-Bus 001 Device 004: ID 0a5c:200a Broadcom Corp.
-Bus 001 Device 005: ID 0a5c:3502 Broadcom Corp.
-Bus 001 Device 006: ID 0a5c:3503 Broadcom Corp.
+Date: Fri, 23 Jul 2004 17:37:03 +0530
 
 
-hciconfig displays 
+--------------030608060906030303030606
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 
-hci0:   Type: USB
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO
-MTU: 0:0
-        DOWN
-        RX bytes:0 acl:0 sco:0 events:0 errors:0
-        TX bytes:0 acl:0 sco:0 commands:0 errors:0
-        Features: 0x00 0x00 0x00 0x00
-        Packet type: DM1 DH1 HV1
-        Link policy:
-        Link mode: SLAVE ACCEPT
+Hello Marcel,
+    Our mails have crossed.
+
+    The machines are different and have two usb dongles from Bluegear
+    twin pack from Amazing Tech.
+
+    I will get the hcidump data and get back.
+
+Thx,
+Swarup
+Marcel Holtmann wrote:
+
+>Hi Swarup,
+>
+>  
+>
+>>I have bluez with bluez-utils-2.7 on two RH 8.0 systems (lx1 and lx2).
+>>    
+>>
+>
+>please upgrade to bluez-utils-2.8 first. What kernel do you use?
+>
+>  
+>
+>>When I start rctest -r on lx1 without starting rctest -s on lx2, lx2 hangs
+>>and I have to switch it off and on to restart. This happens EVERY TIME
+>>I try this.
+>>    
+>>
+>
+>I don't get the point how lx2 can hang when you listen at lx1. Are these
+>two different machines or two dongles connected to the same machine?
+>
+>  
+>
+>>This does not happen when I run l2test in any way. Does it prove that
+>>there is a problem with RFCOMM? I have not seen this problem in
+>>the mailing list. If I have missed it, please inform.
+>>    
+>>
+>
+>Actually I don't know. Show us "hcidump -x" from both machines.
+>
+>Regards
+>
+>Marcel
+>
+>
+>
+>  
+>
 
 
-Is there something that I can do to make it work?
+--------------030608060906030303030606
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-Thanks
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
+  <title></title>
+</head>
+<body>
+Hello Marcel,<br>
+&nbsp;&nbsp;&nbsp; Our mails have crossed. <br>
+<br>
+&nbsp;&nbsp;&nbsp; The machines are different and have two usb dongles from Bluegear <br>
+&nbsp;&nbsp;&nbsp; twin pack from Amazing Tech.<br>
+<br>
+&nbsp;&nbsp;&nbsp; I will get the hcidump data and get back.<br>
+<br>
+Thx,<br>
+Swarup<br>
+Marcel Holtmann wrote:<br>
+<blockquote type="cite" cite="mid1090583514.4791.42.camel@pegasus">
+  <pre wrap="">Hi Swarup,
+
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">I have bluez with bluez-utils-2.7 on two RH 8.0 systems (lx1 and lx2).
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+please upgrade to bluez-utils-2.8 first. What kernel do you use?
+
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">When I start rctest -r on lx1 without starting rctest -s on lx2, lx2 hangs
+and I have to switch it off and on to restart. This happens EVERY TIME
+I try this.
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+I don't get the point how lx2 can hang when you listen at lx1. Are these
+two different machines or two dongles connected to the same machine?
+
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">This does not happen when I run l2test in any way. Does it prove that
+there is a problem with RFCOMM? I have not seen this problem in
+the mailing list. If I have missed it, please inform.
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+Actually I don't know. Show us "hcidump -x" from both machines.
+
+Regards
+
+Marcel
+
+
+
+  </pre>
+</blockquote>
+<br>
+</body>
+</html>
+
+--------------030608060906030303030606--
+
 
 
 -------------------------------------------------------
