@@ -1,80 +1,43 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <004101c3a3b4$81f42dd0$dc01a8c0@alan>
-From: "Alan Huang" <alanh@tuks.co.za>
-To: <bluez-devel@lists.sourceforge.net>
-References: <200311050945.34166.sybren@thirdtower.com>
+Return-Path: <sybren@thirdtower.com>
+From: Sybren Stuvel <sybren@thirdtower.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Subject: Re: [Bluez-devel] rfcomm patch
+Date: Wed, 5 Nov 2003 16:00:39 +0100
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+References: <200311050945.34166.sybren@thirdtower.com> <1068027414.10388.149.camel@pegasus> <20031105121405.GA9763@sybren.thirdtower.com>
+In-Reply-To: <20031105121405.GA9763@sybren.thirdtower.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="iso-8859-1"
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 5 Nov 2003 17:50:16 +0200
+  charset="iso-8859-1"
+Message-Id: <200311051600.40995.sybren@thirdtower.com>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
-  Regarding this topic that rfcomm doesn't flush. I just want to ask that,
-I'm using an USB Bluetooth dongle that's connected to another Bluetooth
-device using the rfcomm program. This other Bluetooth device is connected to
-a Windows PC's COM1 port (RS-232) and connected/displayed by
-hyperterminal... For some unknown reason, what ever the hyperterminal sends
-on the Windows side can be shown
-"cat /dev/rfcomm0". But what ever the USB Bluetooth dongle sends (using
-"echo hello > /dev/rfcomm0") it can't be shown on the Windows
-hyperterminal...
+On Wednesday 05 November 2003 13:14, Sybren Stuvel wrote:
+> I tried dund, but I couldn't get it to work together with Affix on my
+> Sharp Zaurus (running OpenZaurus 3.2). I'll try again and come up with
+> some info that might actually be useful for solving the mistery ;-)
 
-On my Windows side, I have a embedded Bluetooth module (CSR's BC02) and the
-signal is connected to a MAX chip converting betweeen BC02's 3.3V and
-RS232's logic level.
+Apparently I didn't try dund, or I tried it the wrong way. Now that I'm 
+looking at it with a fresh mind it works like a charm:
 
-Regards,
+sybren root # dund --search --nodetach
+dund[10733]: DUN daemon ver 1.1
+dund[10733]: Inquiring
+dund[10733]: Searching for LAP on 00:10:7A:4C:23:02
+dund[10733]: Connecting to 00:10:7A:4C:23:02 channel 2
+dund[10733]: Connection established
+Using interface ppp0
+Connect: ppp0 <--> /dev/rfcomm0
+local  IP address 172.16.0.2
+remote IP address 172.16.0.1
+BSD-Compress (15) compression enabled
+ 
+Thank you very much! This saves me a lot of fuss!
+You made me a very happy man :)
 
-Alan
-
------ Original Message -----
-From: "Sybren Stuvel" <sybren@thirdtower.com>
-To: <bluez-devel@lists.sourceforge.net>
-Sent: Wednesday, November 05, 2003 10:45 AM
-Subject: [Bluez-devel] rfcomm patch
-
-
-Hi there,
-
-I've been working with bluetooth for a few months now, trying to let BlueZ
-(on
-my PC) talk to Affix (on my Zaurus). One difficulty is that rfcom doesn't
-flush it's stdout when a new (incoming and/or outgoing) connection has been
-made.
-
-With the attached patch, scripts can use rfcomm to connect via bluetooth and
-fork() the process in order to start using the connection (ie. by running
-pppd over it).
-
-Greetings,
-Sybren Stuvel
---
+Greetz,
+Sybren
+-- 
 (o_   Q: God, root, what is difference?
 //\   A: God can change the byte order on the CPU, root can't.
 V_/_
-
-
-
-
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: SF.net Giveback Program.
-Does SourceForge.net help you be more productive?  Does it
-help you create better code?   SHARE THE LOVE, and help us help
-YOU!  Click Here: http://sourceforge.net/donate/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
