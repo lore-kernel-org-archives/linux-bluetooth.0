@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040331100100.43642.qmail@web21001.mail.yahoo.com>
-From: =?iso-8859-1?q?Gary=20Martin?= <gary_martin_au@yahoo.com.au>
-Subject: Re: [Bluez-users] Desperate newbie
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200403301532.02494.thomas.chiverton@bluefinger.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Subject: Re: [Bluez-users] bug link_key: no connection after AP was once
+	accessed with Win XP AVM tools
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Achim Bohnet <ach@mpe.mpg.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403310134.14280.ach@mpe.mpg.de>
+References: <200403310134.14280.ach@mpe.mpg.de>
+Content-Type: text/plain
+Message-Id: <1080725493.2773.49.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,65 +19,70 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 31 Mar 2004 20:01:00 +1000 (EST)
+Date: Wed, 31 Mar 2004 11:31:33 +0200
 
-Thanks again Tom for replying to my questions. I'm a little
-hesitent about compiling software because:
-1 - I'm a nurse, not a computer programmer --- I wouldn't know
-where to start.
-2 - I use GNOME, so I imagine there would be a lot of new packages
-to incorporate (KDE?)
-3 - When it comes to Linux, what is "simple enough" on an x86
-desktop might not be simple on a PowerPC laptop
-4 - It seems to be a lot of work to find a class code that might
-not even be the problem
+Hi Achim,
 
-I have spent too much time on this problem already. I'm beginning
-to lose faith in Linux for "users" like me
-
-Cheers
-
-Gary
-
- --- Thomas Chiverton <thomas.chiverton@bluefinger.com> wrote: >
-On Tuesday 30 Mar 2004 11:56 am, you said:
-> > appear to be available for Debian PowerPC. I haven't been able
-> to
+> to explore my AVM AP-X I once used WinXP.  After rebooting into
+> linux.  ciptool was unable to connect to the AP.  Fix/hack was to
+> shutdown hcid, move /etc/bluetooth/link_key away and restart hcid.
+> (I'm proud of this wild guess that fixed it ;)
+> Then I got a pin prompt again and everything started working again.
 > 
-> You could always compile it up - it's simple enough.
+> With the 'unusable-after-winxp-usage' link_key file I get
 > 
-> -- 
-> Tom Chiverton 
-> Advanced ColdFusion Programmer
+> # ciptool connect 00:04:0E:85:34:F3
+> Can't connect L2CAP socket: Connection timed out
 > 
-> Tel: +44(0)1749 834997
-> email: tom.chiverton@bluefinger.com
-> BlueFinger Limited
-> Underwood Business Park
-> Wookey Hole Road, WELLS. BA5 1AF
-> Tel: +44 (0)1749 834900
-> Fax: +44 (0)1749 834901
-> web: www.bluefinger.com
-> Company Reg No: 4209395 Registered Office: 2 Temple Back East,
-> Temple
-> Quay, BRISTOL. BS1 6EG.
-> *** This E-mail contains confidential information for the
-> addressee
-> only. If you are not the intended recipient, please notify us
-> immediately. You should not use, disclose, distribute or copy
-> this
-> communication if received in error. No binding contract will
-> result from
-> this e-mail until such time as a written document is signed on
-> behalf of
-> the company. BlueFinger Limited cannot accept responsibility for
-> the
-> completeness or accuracy of this message as it has been
-> transmitted over
-> public networks.*** 
+> # hcidump -x gives:
+> HCIDump - HCI packet analyzer ver 1.5
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> < HCI Command: Create Connection(0x01|0x0005) plen 13
+>   F3 34 85 0E 04 00 18 CC 02 00 00 00 01
+> > HCI Event: Command Status(0x0f) plen 4
+>   00 01 05 04
+> > HCI Event: Link Key Request(0x17) plen 6
+>   F3 34 85 0E 04 00
+> < HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
+>   F3 34 85 0E 04 00 EE 90 55 76 1E 90 F2 DB 52 22 16 F7 5E 15
+>   A7 F5
+> > HCI Event: Connect Complete(0x03) plen 11
+>   05 00 00 F3 34 85 0E 04 00 01 00
+> 
+> I use debian testing with 2.6.4 and
+> ii  bluez-hcidump              1.5-2                      Analyses Bluetooth HCI packets
+> ii  bluez-pan                  1.1rel-3                   Personal area networking for Bluetooth devices
+> ii  bluez-pin                  0.22-1                     Bluetooth PIN helper with D-BUS support
+> ii  bluez-sdp                  1.5-2                      BlueZ Bluetooth SDP daemon and tool
+> ii  bluez-utils                2.4-6                      Utilities for controlling Bluetooth devices
+> 
+> Here's hcid.conf
+> 
+> allee(0) ~ $ tcgrep -v '^(\s*#|$)' /etc/bluetooth/hcid.conf
+> options {
+>         autoinit yes;
+>         security auto;
+>         pairing multi;
+>         pin_helper /usr/bin/bluepin.ach;
+> }
+> device {
+>         name "%h-%d";
+>         class 0x100;
+>         iscan enable; pscan enable;
+>         lm accept;
+>         lp rswitch,hold,sniff,park;
+>         auth enable;
+>         encrypt enable;
+> }
 
-Find local movie times and trailers on Yahoo! Movies.
-http://au.movies.yahoo.com
+don't enable auth and encrypt, because this means security mode 3. Leave
+it off and let the AP trigger the security mechanism.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
