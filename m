@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Billionton CF card (bt950)
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050307153436.GB13771@fuchi>
-References: <20050307153436.GB13771@fuchi>
+Subject: Re: [Bluez-users] Acquiring Bluetooth address of clients
+	connecting to a server
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20050309021836.11025.qmail@web20928.mail.yahoo.com>
+References: <20050309021836.11025.qmail@web20928.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1110392099.10620.272.camel@justakiss>
+Message-Id: <1110391163.5462.34.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,32 +19,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 09 Mar 2005 19:14:59 +0100
+Date: Wed, 09 Mar 2005 18:59:23 +0100
 
-Am Mon, den 07.03.2005 schrieb Sebastian Henschel um 16:34:
-> howdy folks...
-> 
-> i have a CF card from Billionton here with the P/N CFBT02-B2.
-> cardctl ident reveals:
->     product info: "Compact Flash", "Bluetooth Card", "", ""
->     manfid: 0x0279, 0x950b
->     function: 2 (serial)
-> 
-> /etc/pcmcia/bluetooth.conf reads:
->     card "Billionton Bluetooth Card"
->         version "Compact Flash", "Bluetooth Card"
->         bind "serial_cs"
-> 
-> having read in the archives, bt950_cs and btuart_cs should not be used
-> nowadays, but serial_cs with the combination of hciattach. you
-> should forget about the other two, right?
+Hi Arch,
+ 
+> I would like to ask if there is a way of acquiring the Bluetooth
+> address of client devices connecting to a server.
 
-Hi,
-your card has the same manufacturer/device id as the Conceptronic
-CBT100C. Try serial_cs and "hciattach ttyS.. bcsp"
+you should look at getpeername().
 
-Regards,
-Erwin
+Regards
+
+Marcel
+
 
 
 
