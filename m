@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <BAY102-F33BFE2838AD565BE5C0FE1D2BD0@phx.gbl>
-From: "theresa g." <tereza99@hotmail.com>
+Mime-Version: 1.0 (Apple Message framework v619)
+In-Reply-To: <1101332931.7538.8.camel@pegasus>
+References: <1C090C0C-3E51-11D9-950D-00039390D626@pepper.com> <1101332931.7538.8.camel@pegasus>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-Id: <38C6CE2C-421D-11D9-ADA9-00039390D626@pepper.com>
+From: Michael Frey <mfrey@pepper.com>
+Subject: Re: [Bluez-devel] hcitool scan problems....
 To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Subject: [Bluez-devel] rctest.c : question about do_listen function
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,30 +18,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 29 Nov 2004 11:00:30 -0800
+Date: Mon, 29 Nov 2004 10:42:05 -0500
 
-hello everyone,
+Thanks for the help.  The --scan helps.
 
-I have looked at the rctest.c file (inside the bluez-utils-2.11/test 
-directory) to get insight on how to write my own server app.  It all makes 
-sense, except for the listen() call inside the do_listen function, which 
-follows:
+I am using kernel 2.4.20
 
-	if( listen(s, 10) ) {
-		syslog(LOG_ERR,"Can not listen on the socket. %s(%d)", strerror(errno), 
-errno);
-		exit(1);
-	}
+Michael
 
-I'm somewhat of a newbie to all this stuff (including sockets) so I question 
-why the listen return is being checked for a 1 for error when the man pages 
-say -1 is returned on error and 0 is returned on success.
+On Nov 24, 2004, at 4:48 PM, Marcel Holtmann wrote:
 
-Insight to this would really be appreciated!
-
-Thanks in advance,
-Theresa
-
+> Hi Michael,
+>
+>> I am currently seeing strange behavior while doing "scans".
+>>
+>> It takes me several scans to see the devices I have in range.  Also,
+>> sometimes when I issue "hcitool scan" it does not even scan.  It just
+>> stops immediately after printing "Scanning ...".
+>
+> what kernel version is this? Try it with --flush.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real 
+> users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
