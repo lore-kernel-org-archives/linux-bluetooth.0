@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Stian Jordet <liste@jordet.nu>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] bthid cvs question
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jeffrey Arbuckle <jbarbuc@nmt.edu>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.44.0312091023470.6471-100000@speare5-1-11.nmt.edu>
+References: <Pine.LNX.4.44.0312091023470.6471-100000@speare5-1-11.nmt.edu>
 Content-Type: text/plain
-Message-Id: <1071170463.763.10.camel@chevrolet.hybel>
+Message-Id: <1071020597.10655.4.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Logitech diNovo/Desktop MX Bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,36 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 11 Dec 2003 20:21:03 +0100
+Date: Wed, 10 Dec 2003 02:43:17 +0100
 
-Hi,
+Hi Jeffrey,
 
-I've been searching the archives a bit. I found some references and talk
-about the diNovo, but no real answer, though I understand that work are
-progressing in this area.
+> I was wondering if anyone could direct me to the cleaned up bthid cvs code referenced
+> by Marcel Holtmann in this posting:
+> 
+> 3 Dec 21:12     Marcel Holtmann     The future of Bluetooth HID
 
-Since Greg KH is claiming that my keyboard/mouse are faulty (keeps
-reconnecting when using usb-serial adapter), I'm going to buy a new set
-during Christmas, and I'd like to have one of Logitechs BT sets. Thus I
-have some questions.
+the code is in CVS under utils2/hid/ now.
 
-Will it work with Linux? I'm running 2.6 kernels. If not, what will I
-need, and is this already developed? I saw something about a user-space
-daemon called bthid. Does that mean that the keyboard can't be used
-untill a user-space daemon has loaded? Can it be used with Grub, for
-instance?
+Regards
 
-And one last question, will I be able to sync my phone using the
-Logitech BT dongle, while both the keyboard and mouse is connected?
+Marcel
 
-Sorry for all these question, but it's a rather expensive toy if I can't
-use it :P Hope someone has any experience to share.
-
-Please cc me if anyone has anything clever to say, as I'm not
-subscribed.
-
-Best regards,
-Stian
 
 
 
