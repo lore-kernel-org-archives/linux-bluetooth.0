@@ -1,53 +1,52 @@
-Return-Path: <maxk@qualcomm.com>
-Message-Id: <5.1.0.14.2.20030730162942.053ff898@unixmail.qualcomm.com>
-Date: Wed, 30 Jul 2003 17:01:32 -0700
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>, Daryl Van Vorst <daryl@wideray.com>
-From: Max Krasnyansky <maxk@qualcomm.com>
-Subject: Re: [Bluez-devel] RE: Rfcomm qualification
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Basic Imaging  Profile support
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Ben Lau <benlau@linux.org.hk>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1059601432.1832.9.camel@pegasus>
-References: <000501c356b7$2887faf0$1a01010a@baked>
-	<000501c356b7$2887faf0$1a01010a@baked>
+In-Reply-To: <3F2739C5.5040503@linux.org.hk>
+References: <3F2739C5.5040503@linux.org.hk>
+Content-Type: text/plain
+Message-Id: <1059603308.1831.17.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 31 Jul 2003 00:15:00 +0200
 
-At 02:43 PM 7/30/2003, Marcel Holtmann wrote:
->Hi Daryl,
->
->> Will making the default value of credits zero break other things?
->
->I got some time to test this and it brings our RFCOMM code back to the
->behavior of 1.0b.
+Hi Ben,
 
->The session wide credits value is useless 
-No, it's not. 1.1 spec only mandates send PN for the _first_ DLC
-on that session. Which means that values negotiated in PN request are supposed 
-to be applied to the subsequent DLCs.  So we still need session wide settings.
-We just need to update them when we get PN req/rsp, which don't do.
+>     I need to do a project in a iPaq with bluetooth support. It required
+> the BIP(basic imaging profile) support.
+> Did bluez support this profile yet? Or any body are working on it? If it
+> is not  , do it difficult to write the profile
+> support for Bluez? I am interested to do so. Any documents in web can be
+> used for reference?
 
-Check this out:
-"
-6.5.1 Initial DLC Negotiation
-The use of credit based flow control is a session characteristic. Thus, it has to
-be negotiated with the PN multiplexor control command (see Section 5.5.3)
-before the first DLC is established.
-After the first successful negotiation and DLC establishment, all DLCs will be
-flow controlled with this scheme. PN negotiation at subsequent DLC establish-ments
-is optional, but recommended, since it also establishes initial credit
-count values on both sides for both sides.
-"
+the Basic Imaging Profile is very complex. What do you need? It exists
+an initial BIP push daemon and we have obex code in CVS.
 
->and the dlc credits value must be zero in the initial place. 
-Yep. But it doesn't really matter because we'll simply use session 
-value as default.
+Regards
 
->But we must make sure that we request 1.1 credit based 
->flow control for outgoing connections.
-That's why session has to have non zero value by default.
+Marcel
 
->The attached patch should solve all problems.
->Max, please review the patch to make sure I don't forget anything.
-It's incorrect.
 
-Max
+
+
+-------------------------------------------------------
+This SF.Net email sponsored by: Free pre-built ASP.NET sites including
+Data Reports, E-commerce, Portals, and Forums are available now.
+Download today and enter to win an XBOX or Visual Studio .NET.
+http://aspnet.click-url.com/go/psa00100003ave/direct;at.aspnet_072303_01/01
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
