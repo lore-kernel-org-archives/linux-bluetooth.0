@@ -1,149 +1,72 @@
-Return-Path: <andrew@radke.iig.com.au>
-Message-ID: <3F26FB4B.6060007@radke.iig.com.au>
-Date: Wed, 30 Jul 2003 08:55:07 +1000
-From: Andrew Radke <andrew@radke.iig.com.au>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] bluez and OBEX File Transfer
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Andrew Radke <andrew@radke.iig.com.au>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3F229216.3060000@radke.iig.com.au>
 References: <3F229216.3060000@radke.iig.com.au>
-	<1059380203.1015.80.camel@pegasus>
-In-Reply-To: <1059380203.1015.80.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1059380203.1015.80.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: 28 Jul 2003 10:16:36 +0200
 
-Marcel Holtmann wrote:
-[snip]
-> I have started a btftp client, which you can found in the BlueZ CVS in
-> the repository obex. But at the moment no btftpd exists.
+Hi Andrew,
 
-The client will be a nice addition. Any plans on the btftpd? Anything a 
-non-programmer can do to help? Write it in Perl maybe? :-)
-
-> BTW please send me "hcitool info <t610-bdaddr>" and the complete sdptool
-> browse for your phone.
+> I just got myself a nice new Ericsson T610 and would love to be able to 
+> use it's 'Browse files' funtion with bluez in the same way as with the 
+> iPaq. From doing a 'sdptool browse $ipaq' I found the following which I 
+> assume is what is handling this:
 > 
-> Regards
+> Service Name: OBEX File Transfer
+> Service RecHandle: 0x10002
+> Service Class ID List:
+>    "OBEX File Transfer" (0x1106)
+> Protocol Descriptor List:
+>    "L2CAP" (0x0100)
+>    "RFCOMM" (0x0003)
+>      Channel: 3
+>    "OBEX" (0x0008)
+> Language Base Attr List:
+>    code_ISO639: 0x656e
+>    encoding:    0x6a
+>    base_offset: 0x100
+> Profile Descriptor List:
+>    "OBEX File Transfer" (0x1106)
+>      Version: 0x0100
 > 
-> Marcel
+> Is there anything to handle the equivalent under Linux?
 
-# hcitool info 00:0a:**:**:**:**
-Requesting information ...
-         BD Address:  00:0a:**:**:**:**
-         Device Name: T610
-         LMP Version: 1.1 (0x1) LMP Subversion: 0x400
-         Manufacturer: Ericsson Mobile Comunications (0)
-         Features: 0x04 0xea 0x31 0x00
-                 <encryption> <RSSI> <SCO link> <HV3 packets>
-                 <u-law log> <A-law log> <CVSD>
+I have started a btftp client, which you can found in the BlueZ CVS in
+the repository obex. But at the moment no btftpd exists.
 
-# sdptool browse 00:0a:**:**:**:**
-Browsing 00:0A:**:**:**:** ...
-Service Name: Dial-up Networking
-Service RecHandle: 0x10000
-Service Class ID List:
-   "Dialup Networking" (0x1103)
-   "Generic Networking" (0x1201)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 1
-Profile Descriptor List:
-   "Dialup Networking" (0x1103)
-     Version: 0x0100
+BTW please send me "hcitool info <t610-bdaddr>" and the complete sdptool
+browse for your phone.
 
-Service Name: Voice gateway
-Service RecHandle: 0x10002
-Service Class ID List:
-   "Headset Audio Gateway" (0x1112)
-   "Generic Audio" (0x1203)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 3
-Profile Descriptor List:
-   "Headset" (0x1108)
-     Version: 0x0100
+Regards
 
-Service Name: Serial Port 1
-Service RecHandle: 0x10003
-Service Class ID List:
-   "Serial Port" (0x1101)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 4
+Marcel
 
-Service Name: Serial Port 2
-Service RecHandle: 0x10004
-Service Class ID List:
-   "Serial Port" (0x1101)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 5
 
-Service Name: OBEX Object Push
-Service RecHandle: 0x10005
-Service Class ID List:
-   "OBEX Object Push" (0x1105)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 10
-   "OBEX" (0x0008)
-Profile Descriptor List:
-   "OBEX Object Push" (0x1105)
-     Version: 0x0100
 
-Service Name: IrMC Synchronization
-Service RecHandle: 0x10006
-Service Class ID List:
-   "IrMCSync" (0x1104)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 11
-   "OBEX" (0x0008)
-Profile Descriptor List:
-   "IrMCSync" (0x1104)
-     Version: 0x0100
 
-Service Name: HF Voice gateway
-Service RecHandle: 0x10007
-Service Class ID List:
-   "" (0x111f)
-   "Generic Audio" (0x1203)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 6
-Profile Descriptor List:
-   "" (0x111e)
-     Version: 0x0100
-
-Service Name: OBEX Basic Imaging
-Service RecHandle: 0x1000b
-Service Class ID List:
-   "" (0x111b)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 15
-   "OBEX" (0x0008)
-Profile Descriptor List:
-   "" (0x111a)
-     Version: 0x0100
-
-Service Name: OBEX File Transfer
-Service RecHandle: 0x1000f
-Service Class ID List:
-   "OBEX File Transfer" (0x1106)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 7
-   "OBEX" (0x0008)
-Profile Descriptor List:
-   "OBEX File Transfer" (0x1106)
-     Version: 0x0100
+-------------------------------------------------------
+This SF.Net email sponsored by: Free pre-built ASP.NET sites including
+Data Reports, E-commerce, Portals, and Forums are available now.
+Download today and enter to win an XBOX or Visual Studio .NET.
+http://aspnet.click-url.com/go/psa00100003ave/direct;at.aspnet_072303_01/01
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
