@@ -1,19 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <57050.194.59.120.11.1103013222.squirrel@194.59.120.11>
-In-Reply-To: <1102590194.9988.121.camel@pegasus>
-References: <36763.194.59.120.11.1101982344.squirrel@thalreit.dyndns.org>
-    <1101987478.15615.112.camel@pegasus>
-    <48456.194.59.120.11.1102056209.squirrel@194.59.120.11>
-    <1102057135.7350.66.camel@pegasus>
-    <34315.194.59.120.11.1102057863.squirrel@194.59.120.11>
-    <1102060352.7350.68.camel@pegasus>
-    <58223.194.59.120.11.1102589549.squirrel@194.59.120.11>
-    <1102590194.9988.121.camel@pegasus>
-Subject: Re: [Bluez-users] Thinkpad 560x with pnpbios and bluez
-From: "Volker Jahns" <volker@thalreit.de>
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] more on rfcomm : function not implemented.
+References: <200412132014.18120.wim.delvaux@adaptiveplanet.com> <1102980691.2143.57.camel@pegasus>
+In-Reply-To: <1102980691.2143.57.camel@pegasus>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200412140233.12777.wim.delvaux@adaptiveplanet.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -25,86 +19,52 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Dec 2004 09:33:42 +0100 (CET)
+Date: Tue, 14 Dec 2004 02:33:12 +0100
 
-Marcel, can you help out on this one:
-
->> OK, here's what I did:
->> --
->> tar xvjf linux-2.4.22.tar.bz2
->> cd linux-2.4.22
->> zcat ../patch-2.4.22-ac4.gz |patch -p1
->> --
->> This is all good, and also leads to working kernel w/ pnpbios support
->> :-)
->>
->> But then:
->> --
->> zcat ../patch-2.4.22-mh7.gz |patch -p1
->> patching file arch/sparc64/kernel/ioctl32.c
->> patching file CREDITS
->> Hunk #2 succeeded at 2655 (offset 6 lines).
+On Tuesday 14 December 2004 00:31, Marcel Holtmann wrote:
+> Hi Wim,
 >
-> the CREDITS file can be ignored.
+> > I think it might have something to do with PAND --search --persist
+> > --cache
+> >
+> > If pand is NOT running i can perform hcitool scan and get
+> > response from my phone.
+> >
+> > When I start pand with above options, after it 'detects' my desktop's
+> > PAND hcitool scan fails and l2ping too
 >
+> is this still the iPAQ with build id 0x72? If yes, then this is the
+> reason, because you can't connect while you run an inquiry or start an
+> inquiry while you have a connection open. The second restriction is gone
+> with HCI 16.x firmwares.
 
+ yes it was the same Ipaq.  However
 
-...
+ pand --connect xxxx --persist does not have the same problem
+ as a --search.  It might be that the search 'locks' more resources
+ than the direct connect.
 
->> patching file net/bluetooth/af_bluetooth.c
->> patching file net/bluetooth/bnep/core.c
->> Hunk #12 FAILED at 472.
->> Hunk #13 succeeded at 494 (offset -2 lines).
->> Hunk #14 succeeded at 564 (offset -2 lines).
->> Hunk #15 succeeded at 585 (offset -2 lines).
->> 1 out of 15 hunks FAILED -- saving rejects to file
->> net/bluetooth/bnep/core.c.rej
+ I will see if I can find some upgrade ...
+
+ W
+
 >
-> This is a problem. Look at the net/bluetooth/bnep/core.c.rej file.
+> Regards
 >
-this is core.c.rej:
-***************
-*** 453,468 ****
-
-        BT_DBG("");
-
--         daemonize(); reparent_to_init();
-
--         sprintf(current->comm, "kbnepd %s", dev->name);
--
--         sigfillset(&current->blocked);
-        flush_signals(current);
-
-        current->nice = -15;
-
--         set_fs(KERNEL_DS);
-
-        init_waitqueue_entry(&wait, current);
-        add_wait_queue(sk->sleep, &wait);
---- 472,487 ----
-
-        BT_DBG("");
-
-+       daemonize(); reparent_to_init();
-
-+       sprintf(current->comm, "kbnepd %s", dev->name);
-+
-+       sigfillset(&current->blocked);
-        flush_signals(current);
-
-        current->nice = -15;
-
-+       set_fs(KERNEL_DS);
-
-        init_waitqueue_entry(&wait, current);
-        add_wait_queue(sk->sleep, &wait);
---
-I don't understand this syntax, sorry.
-
-
--- 
-Volker Jahns, volker@thalreit.de
-
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
