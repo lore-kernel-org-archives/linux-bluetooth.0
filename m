@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <002f01c4fd75$e647c280$19cb13ac@stu.nus.edu.sg>
-From: "Khoo Teck Ping" <eng10166@nus.edu.sg>
-To: <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_002A_01C4FDB8.F058FCB0"
-Subject: [Bluez-devel] Project about Bluetooth Security: Request for assistance
+From: Luca Capello <luca@pca.it>
+To: ML bluez-devel <bluez-devel@lists.sourceforge.net>
+Message-id: <41ED224E.9030702@pca.it>
+MIME-version: 1.0
+Content-type: multipart/mixed; boundary="Boundary_(ID_NltT+kIz6TqUkVjuh+TBfw)"
+Subject: [Bluez-devel] [btsco] automake error
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,147 +16,95 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 Jan 2005 23:53:42 +0800
+Date: Tue, 18 Jan 2005 15:50:54 +0100
 
 This is a multi-part message in MIME format.
 
-------=_NextPart_000_002A_01C4FDB8.F058FCB0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+--Boundary_(ID_NltT+kIz6TqUkVjuh+TBfw)
+Content-type: text/plain; charset=us-ascii
+Content-transfer-encoding: 7BIT
 
-Dear All
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-I am a newbie, please assist me if possible.=20
+Hello,
 
-I have some questions about bluetooth security.=20
+I'm new to the list, so hello to everyone :-)
 
-I am currently doing a project on bluetooth security and am required to =
-develop some software (with bluetooth hardware) which can demonstrate =
-bluetooth security weaknesses.=20
+I just bought a Bluetake i-Phono and I was trying to test it (Debian
+unstable, kernel 2.6.10, ALSA 1.0.8), but I got an automake error:
+=====
+luca@gismo:~/src/kernel/bluetooth$ cvs
+- -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa login
+Logging in to :pserver:anonymous@cvs.sf.net:2401/cvsroot/bluetooth-alsa
+CVS password:
+luca@gismo:~/src/kernel/bluetooth$ cvs
+- -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa co btsco
+cvs checkout: Updating btsco
+<cut>
+U btsco/sbc/sbcinfo.c
 
-Following are my ideas, please comment
+luca@gismo:~/src/kernel/bluetooth$ cd btsco/
+luca@gismo:~/src/kernel/bluetooth/btsco$ ./bootstrap
+automake: unrecognized option -- `--ignore-deps'
+Try `automake --help' for more information.
 
-1. I have a silicon wave Bluetooth USB dongle and a V3 headset, and a =
-Nokia 6600 smartphone. I desire to capture packets sent between the =
-phone and the headset, without a bluetooth protocol analyser (eg from =
-mobiwave), so that I can demostrate that a hacker can listen in to =
-unencrypted voice traffic. Is this possible at all?
+luca@gismo:~/src/kernel/bluetooth/btsco$ automake --help | grep ignore
+luca@gismo:~/src/kernel/bluetooth/btsco$ automake --version | grep automake
+automake (GNU automake) 1.4-p6
+=====
 
-hcidump is similar to a protocol analyser, but it can capture only high =
-level traffic. My guess is that I can use hcitool scan to get the =
-bluetooth address of the phone and the headset first, and then based on =
-the addresses attempt to calculate the pseudo random frequency hopping =
-sequence, so that I can stay in the same frequency as the phone and the =
-headset. Problem is i don't understand the output of hcidump. Can =
-hcidump capture traffic which does not belong to the host device?=20
+So, the attached patch check for automake-1.7 during the bootstrap
+process and add an info in the README.
 
-2. May I know the steps required to reproduce the work done by Adam =
-Laurie (bluesnarfing) or the Flexilis team(bluesniper)? Will the test =
-programs provided by the install of BlueZ be good as starting points? If =
-so, which test program should I focus on? Please provide details if =
-possible. This is purely for academic purposes.=20
+But I still have some compilation problems... (new post, IMHO it's better).
 
-3. For the program l2ping.c, what is the end result of the victim phone =
-of running the program? Does it cause the phone to malfunction?=20
+Thx, bye,
+Gismo / Luca
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+Comment: Using GnuPG with Debian - http://enigmail.mozdev.org
 
-I ran it and pinged my Sony Ericsson T630. Later my phone could not =
-initiate a bluetooth connection with my headset. Otherwise everything =
-else is fine.=20
+iD8DBQFB7R1mVAp7Xm10JmkRAsS6AJ0cJCqjyaxxDdVW2HafWJFWwJbatQCdF002
+OXtjJYOo4mfeYcpDZyGT9Y0=
+=eIey
+-----END PGP SIGNATURE-----
 
-I shall be grateful for any assistance.=20
+--Boundary_(ID_NltT+kIz6TqUkVjuh+TBfw)
+Content-type: text/plain; name=btsco_cvs-20050118-1520_automake1.7-check.diff;
+ CHARSET=us-ascii
+Content-transfer-encoding: BASE64
+Content-disposition: inline;
+ filename=btsco_cvs-20050118-1520_automake1.7-check.diff
 
-BlueZ is great software. Keep up the good work.=20
+ZGlmZiAtTmF1ciBidHNjb19jdnMtMjAwNTAxMTgtMTUyMC9ib290c3RyYXAgYnRz
+Y28vYm9vdHN0cmFwDQotLS0gYnRzY29fY3ZzLTIwMDUwMTE4LTE1MjAvYm9vdHN0
+cmFwCTIwMDUtMDEtMTggMTU6MjI6NDQuMDAwMDAwMDAwICswMTAwDQorKysgYnRz
+Y28vYm9vdHN0cmFwCTIwMDUtMDEtMTggMTU6MTk6MzguMDAwMDAwMDAwICswMTAw
+DQpAQCAtMSwyICsxLDEwIEBADQogIyEgL2Jpbi9zaA0KLWFjbG9jYWwgJiYgYXV0
+b2hlYWRlciAmJiBhdXRvbWFrZSAtLWFkZC1taXNzaW5nIC0tY29weSAtLWlnbm9y
+ZS1kZXBzICYmIGF1dG9jb25mDQorDQoraWYgWyAhIGB3aGljaCBhdXRvbWFrZS0x
+LjdgIF07IHRoZW4NCisgICAgZWNobyAtZSAiXG4qKiogWW91IG5lZWQgYXV0b21h
+a2UtMS43IHRvIGNvbXBpbGUgdGhpcyBzb2Z0d2FyZSAqKipcbiINCisgICAgZXhp
+dCAxDQorZWxpZiBbICEgYGF1dG9tYWtlIC0tdmVyc2lvbiB8IGdyZXAgLXEgMS43
+YCBdOyB0aGVuDQorICAgIEFVVE9NQUtFX1ZFUlNJT049Ii0xLjciDQorZmkNCisg
+DQorYWNsb2NhbCRBVVRPTUFLRV9WRVJTSU9OICYmIGF1dG9oZWFkZXIgJiYgYXV0
+b21ha2UkQVVUT01BS0VfVkVSU0lPTiAtLWFkZC1taXNzaW5nIC0tY29weSAtLWln
+bm9yZS1kZXBzICYmIGF1dG9jb25mDQpkaWZmIC1OYXVyIGJ0c2NvX2N2cy0yMDA1
+MDExOC0xNTIwL1JFQURNRSBidHNjby9SRUFETUUNCi0tLSBidHNjb19jdnMtMjAw
+NTAxMTgtMTUyMC9SRUFETUUJMjAwNS0wMS0xOCAxNToyMzozMi4wMDAwMDAwMDAg
+KzAxMDANCisrKyBidHNjby9SRUFETUUJMjAwNC0xMS0yNSAwMTo1MTo0MC4wMDAw
+MDAwMDAgKzAxMDANCkBAIC0zNyw3ICszNyw3IEBADQogICAgIDEuIFRoZSBDVlMg
+cmVwb3NpdG9yeSBtdXN0IGJlIGNoZWNrZWQgb3V0Og0KICAgICAgICAgY3ZzIC1k
+OnBzZXJ2ZXI6YW5vbnltb3VzQGN2cy5zZi5uZXQ6L2N2c3Jvb3QvYmx1ZXRvb3Ro
+LWFsc2EgbG9naW4NCiAgICAgICAgIGN2cyAtZDpwc2VydmVyOmFub255bW91c0Bj
+dnMuc2YubmV0Oi9jdnNyb290L2JsdWV0b290aC1hbHNhIGNvIGJ0c2NvDQotICAg
+IDIuIEFmdGVyIHRoYXQgaXQgbXVzdCBiZSBjb21waWxlZCwgeW91IG5lZWQgYXV0
+b21ha2UxLjcgdG8gZG8gaXQ6DQorICAgIDIuIEFmdGVyIHRoYXQgaXQgbXVzdCBi
+ZSBjb21waWxlZDoNCiAgICAgICAgIC4vYm9vdHN0cmFwDQogICAgICAgICAuL2Nv
+bmZpZ3VyZQ0KICAgICAgICAgbWFrZQ0K
 
-Teck Ping
-------=_NextPart_000_002A_01C4FDB8.F058FCB0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2900.2523" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Dear All</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I am a newbie, please assist me if =
-possible.=20
-</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I have some questions about bluetooth =
-security.=20
-</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I am currently doing a project on =
-bluetooth=20
-security and am required to develop some software (with bluetooth =
-hardware)=20
-which can demonstrate bluetooth security weaknesses. </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Following are my ideas, please =
-comment</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>1. I have a silicon wave Bluetooth USB =
-dongle and a=20
-V3 headset, and a Nokia 6600 smartphone. I desire to capture packets =
-sent=20
-between the phone and the headset, without a bluetooth protocol analyser =
-(eg=20
-from mobiwave), so that I can demostrate that a hacker can listen in to=20
-unencrypted voice traffic. Is this possible at all?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>hcidump is similar to a protocol =
-analyser, but it=20
-can capture only high level traffic. My guess is that I can use hcitool =
-scan to=20
-get the bluetooth address of the phone and the headset first, and then =
-based on=20
-the addresses attempt to calculate the pseudo random frequency hopping =
-sequence,=20
-so that I can stay in the same frequency as the phone and the headset. =
-Problem=20
-is i don't understand the output of hcidump. Can hcidump capture traffic =
-which=20
-does not belong to the host device? </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>2. May I know the steps required to =
-reproduce the=20
-work done by Adam Laurie (bluesnarfing) or the Flexilis =
-team(bluesniper)? Will=20
-the test programs provided by the install of BlueZ be good as starting =
-points?=20
-If so, which test program should I focus on? Please provide details if =
-possible.=20
-This is purely for academic purposes. </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>3. For the program l2ping.c, what is =
-the end result=20
-of the victim phone of running the program? Does it cause the phone to=20
-malfunction?&nbsp;</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I ran it and pinged my Sony Ericsson =
-T630. Later my=20
-phone could not initiate a bluetooth connection with my headset. =
-Otherwise=20
-everything else is fine. </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I shall be grateful for any assistance. =
-
-</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>BlueZ is great software. Keep up the =
-good work.=20
-</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Teck Ping</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_002A_01C4FDB8.F058FCB0--
-
+--Boundary_(ID_NltT+kIz6TqUkVjuh+TBfw)--
 
 
 -------------------------------------------------------
