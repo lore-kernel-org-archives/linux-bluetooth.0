@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Fwd: alsa bluetooth module
-From: Fredrik Tolf <fredrik@dolda2000.com>
+Subject: Re: [Bluez-devel] obex bluetooth - slightly off topic
+From: "Collin R. Mulliner" <collin@betaversion.net>
 To: bluez-devel@lists.sourceforge.net
-Cc: ms419@freezone.co.uk, durtro@ginnungagap.de
-In-Reply-To: <423B6547.5040001@email.it>
-References: <e36f1e61ac13a554d52d2f7b8d7a5df4@freezone.co.uk>
-	 <1111098892.19889.88.camel@pc7.dolda2000.com>  <423B6547.5040001@email.it>
+In-Reply-To: <1111142878.2085.28.camel@panic>
+References: <1111142878.2085.28.camel@panic>
 Content-Type: text/plain
-Message-Id: <1111241935.11381.3.camel@pc7.dolda2000.com>
+Message-Id: <1111203434.6713.14.camel@panic>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,24 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 19 Mar 2005 15:18:55 +0100
+Date: Fri, 18 Mar 2005 19:37:13 -0800
 
-On Sat, 2005-03-19 at 00:33 +0100, Antonio-Blasco Bonito wrote:
-> Fredrik Tolf ha scritto:
-> >By no means. kcalloc() is a core kernel function, defined in mm/slab.c.
-> >It's not an ALSA-specific routine.
-> >  
-> >
-> No kcalloc in there... see the appended file from kernel-source-2.6.8
+Hi folks,
 
-It does indeed seem that you're right. It seems the kcalloc was added in
-either 2.6.9 or 2.6.10 (which surprises me, because I believe that the
-snd-bt-sco module has been around longer than that). Now that I know
-that, the module should be changed to use kmalloc instead. I'll take
-care of that right now.
+I found the problem, the Pocket PC OBEX stack doesn't like the
+"connection id" header (0xCB) in OPUSH packets. I have to check if this
+is true for WinXP as well.
 
-Fredrik Tolf
+By the way, Marcel are you the current openobex maintainer? 
 
+
+... Collin
+
+--
+Collin R. Mulliner <collin@betaversion.net>
+BETAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+Just don't create a file called -rf. :-) --Larry Wall
 
 
 
