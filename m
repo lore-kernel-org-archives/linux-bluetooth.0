@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4152F5C6.8@daimi.au.dk>
-From: "Rolf E. Thorup" <rolft@daimi.au.dk>
-MIME-Version: 1.0
+Message-ID: <f64f4e8a04092306503e292111@mail.gmail.com>
+From: zhu yong <zhuyong0003@gmail.com>
+Reply-To: zhu yong <zhuyong0003@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] which compile option need cross compile bluez-libs
- and bluez-utis?
-References: <f64f4e8a04092306503e292111@mail.gmail.com>
-In-Reply-To: <f64f4e8a04092306503e292111@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] which compile option need cross compile bluez-libs and bluez-utis?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Sep 2004 18:11:50 +0200
+Date: Thu, 23 Sep 2004 21:50:19 +0800
 
-zhu yong wrote:
+hello,list
+my host platform is redhat9 and x86. want to cross compile bluez-libs
+and bluez-utils so that i can using bluez under arm platform.
+I want to know which options need cross compile these package?
+maybe these option is same, maybe have some howto artical?
+any advice will help me !
 
-> hello,list
-> my host platform is redhat9 and x86. want to cross compile bluez-libs
-> and bluez-utils so that i can using bluez under arm platform.
-> I want to know which options need cross compile these package?
-> maybe these option is same, maybe have some howto artical?
-> any advice will help me !
-
-I have actually written a howto for cross compiling to an Intrinsyc 
-Cerfcube (www.intrinsyc.com). It's an Arm based device so you should 
-have no problems following the guidelines.
-
-Regards
-
-Rolf
+best regards
+yong Zhu
 
 
 -------------------------------------------------------
