@@ -1,53 +1,57 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Rfcomm use count
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Daryl Van Vorst <daryl@wideray.com>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <002a01c499ed$143282d0$1a01010a@baked>
-References: <002a01c499ed$143282d0$1a01010a@baked>
-Content-Type: text/plain
-Message-Id: <1095153493.5695.129.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 14 Sep 2004 11:18:13 +0200
+Return-Path: <aklish1@urbana.css.mot.com>
+Date: Mon, 13 Sep 2004 19:14:54 -0500 (CDT)
+From: Aaron Klish <aklish1@urbana.css.mot.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] freeing skbuff in l2cap_chan_send
+In-Reply-To: <Pine.LNX.4.44.0409131849250.8777-100000@lemur.urbana.css.mot.com>
+Message-ID: <Pine.LNX.4.44.0409131914360.8777-100000@lemur.urbana.css.mot.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Daryl,
+I was mistaken.  This is not a bug.
 
-> I just noticed that bluez_accept_unlink() was called with a socked that was
-> in state BT_CLOSED, so it can't be the second if(). It would have been
-> called from the first if().
+Aaron
+
+On Mon, 13 Sep 2004, Aaron Klish wrote:
+
+> In l2cap_chan_send (l2cap.c), it appears as though the 
+> initial skbuff allocated to store data
+> passed in the msg parameter is not freed
+> if the buffer must be fragmented to send
+> to HCI.
 > 
-> Clearly, I'm on glue.
+> The skbuff and its associated fragment list
+> is passed to hci by calling hci_send_acl.
 > 
-> Still, does the order of bluez_accept_unlink() and sock_release() matter?
+> This in turn places all the individual fragments
+> on a tx queue.  
+> 
+> The individual fragment skbuffs are freed when they are written
+> to the tty device (I am looking at the case where HCI uart is used).
+> 
+> However, the original l2cap skbuff allocated to store the
+> entire l2cap frame never appears to be freed.
+> 
+> I am looking at mh17 on a 2.4.20 kernel.
+> 
+> Is this a bug or am I missing something here?
+> 
+> Thanks.
+> 
+> Aaron
+> 
+> 
 
-I haven't done a full audit yet, but try to switch the order and see
-what happens. From a first look at it it makes sense to only release the
-socket when all the work is done, because otherwise lock_sock() makes no
-sense.
+-- 
+------------
+Aaron Klish
+Bluetooth Software Engineer
+Motorola PCS
+PH# (217) 384-8598
+FX# (217) 384-8550
 
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
-Project Admins to receive an Apple iPod Mini FREE for your judgement on
-who ports your project to Linux PPC the best. Sponsored by IBM. 
-Deadline: Sept. 13. Go here: http://sf.net/ppc_contest.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+[X]  Motorola General Business Information
+[ ]  Motorola Internal Use Only
+[ ]  Motorola Confidential Proprietary
