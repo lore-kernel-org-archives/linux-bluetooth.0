@@ -1,15 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] how to do asynchronous device inquiry?
+Subject: Re: [Bluez-devel] [PATCH] pand/main.c, restore signals for dev-up
+	script
 From: Marcel Holtmann <marcel@holtmann.org>
 To: James Cameron <james.cameron@hp.com>
-Cc: Albert Huang <ashuang@gmail.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040630014836.GI15948@hp.com>
-References: <ef9938ec040628194321db5d9c@mail.gmail.com>
-	 <20040629043356.GK20139@hp.com> <1088545055.6030.339.camel@pegasus>
-	 <20040630014836.GI15948@hp.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040630001535.GH15948@hp.com>
+References: <20040628101927.GC8871@hp.com>
+	 <1088419197.3774.183.camel@pegasus> <20040628120612.GF8871@hp.com>
+	 <1088427271.3774.198.camel@pegasus> <20040628224803.GA20139@hp.com>
+	 <1088465177.6030.221.camel@pegasus> <20040629052317.GQ20139@hp.com>
+	 <1088499480.6030.239.camel@pegasus> <20040629105508.GC2133@hp.com>
+	 <1088508403.6030.265.camel@pegasus>  <20040630001535.GH15948@hp.com>
 Content-Type: text/plain
-Message-Id: <1088586574.22940.13.camel@pegasus>
+Message-Id: <1088586393.22940.9.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,38 +24,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 30 Jun 2004 11:09:34 +0200
+Date: Wed, 30 Jun 2004 11:06:33 +0200
 
 Hi James,
 
-> > > You could certainly fork() a process to exec() hcitool, and when it
-> > > finishes it could send the information to your program, through a pipe
-> > > that your program is select()ing on, or something similar.
-> > 
-> > very bad idea :(
-> 
-> Aww, it's just another way to do it, that doesn't require as much
-> dependency or learning.  ;-)
+> I cross checked your patch and it looks fine.  When's the next release?
+> ;-)
 
-It is not fork() that is bad. It the combination of exec() and hcitool
-you propose to use. If you fork or use a thread then use hci_inquiry().
+actually it is your patch. I only changed the check for a "non-valid"
+socket descriptor. It is a little bit more general this way.
 
-> > You don't looked into the details. The inquiry ioctl() is one way. The
-> > other one is the HCI raw socket. Open and bind a device and then set an
-> > event filter on it. Send an inquiry command according to the spec. and
-> > listen for the incoming inquiry result events.
-> 
-> I stand corrected.
-> 
-> Albert, there is a good example of this in src/btctl-discovery-source.c
-> in the libbtctl-0.4.1 package.
-> http://usefulinc.com/software/gnome-bluetooth/
-> 
-> btctl_discovery_source_new()
-> The hci device is opened, then set O_NONBLOCK, and the event filters are
-> set.  There's no sign of binding.
+Depends on how fast I am able to implement a quirk for the EPoX HID
+keyboard.
 
-If you use hci_open_dev() the binding is done by that call.
+> Is the peer ba kept in bnep0 structure somewhere?  Isn't bnep0
+> effectively a point to point link?  ppp0 for example, shows the peer IP
+> address yet bnep0 doesn't.
+
+It is in dst[] in the ioctl structures and we store it in eh.h_source of
+the session structure.
+
+The BNEP connections are really point-to-point, but they are still an
+ethernet emulation. So they must look like an ethernet card.
 
 Regards
 
