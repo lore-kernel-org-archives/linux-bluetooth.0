@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40327D70.8080003@vpop.net>
-From: Matthew Reimer <mreimer@vpop.net>
+Message-ID: <40327430.2090807@grupopie.com>
+From: Paulo Marques <pmarques@grupopie.com>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net, pmarques@grupopie.com
+To: grpmind+bluez.users@boromir.vpop.net
+Cc: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] How to configure a 723kbps connection?
-References: <lists.bluez.users.40327430.2090807@grupopie.com>
-In-Reply-To: <lists.bluez.users.40327430.2090807@grupopie.com>
+References: <200402160913.i1G9DCP02222@webserver.restinfor.pt>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -17,46 +17,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Feb 2004 14:45:36 -0600
+Date: Tue, 17 Feb 2004 20:06:08 +0000
 
-Paulo Marques wrote:
-> grpmind+bluez.users@boromir.vpop.net wrote:
-> 
->>
->> For a poor man's throughput test I'm downloading a 7M mpeg file, both
->> through Pocket IE and by having Pocket TV stream it from my 100Mbps LAN.
->> I'm running "nload -o 800 -t 250 xl0" and watching the outgoing avg in
->> kbit/s.
->>
->> No matter what I do, the average caps out at about 265kbps. I've tried 
->> all
->> the following in various combinations:
-> 
-> 
-> 
-> What profile are you using? LAN or PAN?
+grpmind+bluez.users@boromir.vpop.net wrote:
 
-I think I'm using PAN (what PPC2003 and sdptool call "Network Access 
-Point"). Is that what you mean?
+> 
+> For a poor man's throughput test I'm downloading a 7M mpeg file, both
+> through Pocket IE and by having Pocket TV stream it from my 100Mbps LAN.
+> I'm running "nload -o 800 -t 250 xl0" and watching the outgoing avg in
+> kbit/s.
+> 
+> No matter what I do, the average caps out at about 265kbps. I've tried all
+> the following in various combinations:
 
 
-> If you're using LAN you should really try using PAN. I don't trust the 
-> micro$oft stack at all. The simpler the profile, the most likely it is 
-> to work ok.
-> 
->> Does all this mean that my ipaq has a slow UART
-> 
-> 
-> It's strange... a slow UART should be 230400 or 460800 baud. If it were 
-> 230400 you shouldn't get a bandwidth as high as you're getting. If it 
-> were 460800 you'd probably be a little higher.
-> 
-> Of course, this is no proof that the UART is in fact the culprit.
+What profile are you using? LAN or PAN?
 
-Yes, it is perplexing. I'm waiting to hear back from knowledgeable 
-people about how the bluetooth chip is connected.
+If you're using LAN you should really try using PAN. I don't trust the micro$oft 
+stack at all. The simpler the profile, the most likely it is to work ok.
 
-Matt
+> Does all this mean that my ipaq has a slow UART
+
+It's strange... a slow UART should be 230400 or 460800 baud. If it were 230400 
+you shouldn't get a bandwidth as high as you're getting. If it were 460800 you'd 
+probably be a little higher.
+
+Of course, this is no proof that the UART is in fact the culprit.
+
+-- 
+Paulo Marques
+Software Development Department - Restinfor, Lda.
+Phone: +351 252 290600, Fax: +351 252 290601
+Web: www.grupopie.com
+
+"In a world without walls and fences who needs windows and gates?"
+
 
 
 -------------------------------------------------------
