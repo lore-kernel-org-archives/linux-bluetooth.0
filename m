@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41AB742F.7030807@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
+Message-ID: <BAY102-F33BFE2838AD565BE5C0FE1D2BD0@phx.gbl>
+From: "theresa g." <tereza99@hotmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] rctest.c : question about do_listen function
-References: <BAY102-F33BFE2838AD565BE5C0FE1D2BD0@phx.gbl>
-In-Reply-To: <BAY102-F33BFE2838AD565BE5C0FE1D2BD0@phx.gbl>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Subject: [Bluez-devel] rctest.c : question about do_listen function
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,34 +16,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 29 Nov 2004 20:10:39 +0100
+Date: Mon, 29 Nov 2004 11:00:30 -0800
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+hello everyone,
 
-|     if( listen(s, 10) ) {
-|         syslog(LOG_ERR,"Can not listen on the socket. %s(%d)",
-| strerror(errno), errno);
-|         exit(1);
-|     }
-|
-| I'm somewhat of a newbie to all this stuff (including sockets) so I
-| question why the listen return is being checked for a 1 for error when
-| the man pages say -1 is returned on error and 0 is returned on success.
+I have looked at the rctest.c file (inside the bluez-utils-2.11/test 
+directory) to get insight on how to write my own server app.  It all makes 
+sense, except for the listen() call inside the do_listen function, which 
+follows:
 
-If I'm not totally wrong, only "0" is treated as false, why all non-zero
-values are treated as "true", so the comparison is true for -1...
+	if( listen(s, 10) ) {
+		syslog(LOG_ERR,"Can not listen on the socket. %s(%d)", strerror(errno), 
+errno);
+		exit(1);
+	}
 
-greetings,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+I'm somewhat of a newbie to all this stuff (including sockets) so I question 
+why the listen return is being checked for a 1 for error when the man pages 
+say -1 is returned on error and 0 is returned on success.
 
-iD8DBQFBq3QvQWC6DTWkDAoRAgH6AJ497Ro9tyOh+VhCIli4T8kSo3IktQCgu9/r
-Al2nU6MplBDnok1+NKzhj3M=
-=z3q+
------END PGP SIGNATURE-----
+Insight to this would really be appreciated!
+
+Thanks in advance,
+Theresa
+
+
 
 
 -------------------------------------------------------
