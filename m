@@ -1,50 +1,77 @@
-Return-Path: <Steven.Singer@csr.com>
-Message-ID: <404749F3.9090006@csr.com>
-Date: Thu, 04 Mar 2004 15:23:31 +0000
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] First HCI command sent to a device
-References: <1078411850.5347.43.camel@pegasus>
-In-Reply-To: <1078411850.5347.43.camel@pegasus>
-Content-Type: text/plain; charset="us-ascii"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1078411850.5347.43.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] First HCI command sent to a device
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 04 Mar 2004 15:50:50 +0100
 
-Marcel Holtmann wrote:
->                                        Will adding a HCI_Reset break any
-> other Bluetooth adapter?
+Hi Folks,
 
-Sending an HCI_Reset to a CSR device running firmware earlier than 12.0
-will cause the device to perform a full system reset. This means that
-the host transport will be reset (USB devices will drop off the bus and
-reattach, BCSP devices will need to perform link establishment) and it
-means that settings will be reloaded from persistent store (so the baud
-rate will reset).
+while debugging the i-Tec dongle with Broadcom HID proxy support I saw
+that this dongle expects that the first command is a HCI_Reset. I can't
+remember any time where BlueZ has used this command. Our command
+sequence on initialization can be found in hci_core.c:hci_init_req() and
+it looks like this:
 
-Firmware version 12.0 and later are better behaved and will reset all
-the LM and LC settings (drop all links etc.) but leave the host
-transport up and running.
+/* Mandatory initialization */
 
-[For the reasons behind this, see my posting to bluez-devel on 9th
-October 2003 in the thread "hciconfig":
+        /* Read Local Supported Features */
+        hci_send_cmd(hdev, OGF_INFO_PARAM, OCF_READ_LOCAL_FEATURES, 0, NULL);
 
-  http://sourceforge.net/mailarchive/message.php?msg_id=6262255
-]
+        /* Read Buffer Size (ACL mtu, max pkt, etc.) */
+        hci_send_cmd(hdev, OGF_INFO_PARAM, OCF_READ_BUFFER_SIZE, 0, NULL);
 
-	- Steven
--- 
+        /* Read BD Address */
+        hci_send_cmd(hdev, OGF_INFO_PARAM, OCF_READ_BD_ADDR, 0, NULL);
+
+        /* Read Voice Setting */
+        hci_send_cmd(hdev, OGF_HOST_CTL, OCF_READ_VOICE_SETTING, 0, NULL);
+
+/* Optional initialization */
+
+        /* Clear Event Filters */
+        cp.flt_type  = HCI_FLT_CLEAR_ALL;
+        hci_send_cmd(hdev, OGF_HOST_CTL, OCF_SET_EVENT_FLT, sizeof(cp), &cp);
+
+        /* Page timeout ~20 secs */
+        param = __cpu_to_le16(0x8000);
+        hci_send_cmd(hdev, OGF_HOST_CTL, OCF_WRITE_PG_TIMEOUT, 2, &param);
+
+        /* Connection accept timeout ~20 secs */
+        param = __cpu_to_le16(0x7d00);
+        hci_send_cmd(hdev, OGF_HOST_CTL, OCF_WRITE_CA_TIMEOUT, 2, &param);
+
+Until the i-Tec dongle this worked perfect, but now my question is what
+is the prefered init sequence? How do other stacks do it? Acutally how
+do Microsoft or Widcomm init a device? Will adding a HCI_Reset break any
+other Bluetooth adapter? Feedback from everyone is welcome before I am
+going to make a decission on adding HCI_Reset or not.
+
+Regards
+
+Marcel
 
 
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
 
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
