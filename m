@@ -1,55 +1,62 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] ms explorer for bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: neoclust <n1c0l4s.l3@wanadoo.fr>
+Return-Path: <matthias@ma-c.de>
+Subject: Re: [Bluez-users] rfcomm pppd
+From: Matthias Albert <matthias@ma-c.de>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200410141347.28109.n1c0l4s.l3@wanadoo.fr>
-References: <200410122022.30501.n1c0l4s.l3@wanadoo.fr>
-	 <200410140042.12450.n1c0l4s.l3@wanadoo.fr>
-	 <1097753159.4640.43.camel@notepaq>
-	 <200410141347.28109.n1c0l4s.l3@wanadoo.fr>
+In-Reply-To: <1097927566.4911.7.camel@pegasus>
+References: <1097845922.12708.16.camel@ringo.aicas.burg>
+	 <1097927566.4911.7.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1098014506.4911.53.camel@pegasus>
+Message-Id: <1097945209.20193.1.camel@fragger>
 Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 17 Oct 2004 14:01:46 +0200
+Date: Sat, 16 Oct 2004 18:46:50 +0200
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Nicholas,
-
-> > > I use a mdk kernel can it be a mdk bug ?
-> > >
-> > > but i mh patches wasn't include in the kernel the mouse would not work
-> > > isn't it ?
-> >
-> > As long as it is 2.6.8 or later you will have some basic HID support.
+Hi Marcel,
+> Hi Matthias,
 > 
-> maybe so my kernel haven't mh patches  so how can i see if there are 
-> installed ?
+>> now I'm able to establish a connection from my ipaq (running
+familiar)
+>> to my notebook (linux, debian host).
+>>
+>> hcitool scan -> list of all available bluetooth devices
+>>  -> select the one I need
+>> sdptool browse <bluetoothadress> -> gives me list of all availble
+>> profiles
+>>
+>> rfcomm connect  <bluetoothadress> 1 -> do a serial connection to my
+bt
+>> device
+>>
+>> rfcomm show -> give me a list of established connections
+>>
+>> So everytime I do this, the pppd is starting. If nothing happens the
+>> connection will be closed. Where can I define which program should be
+>> started? I don't want that pppd is starting. I want to see with
+minicom
+>> what happen on the device. Do you know what I mean?. So where can I
+>> define this?
+> 
+> I don't understand what you mean. Do you establish the connection from
+> your iPAQ or from your notebook?
+Now I know how it works :). Im sorry for my not clear question.
+Everytime I started "rfcomm connect" from my ipaq to establish a
+connection to my notebook -> the ppp daemon on my notebook was starting
+and using the rfcomm device. So I was not able to use minicom for the
+rfcomm device. My question obtained how I can configure or choose the
+program that should be started on my client (in this case notebook =
+client).
 
-call "modinfo hidp" and check the output.
+But I learned that I can do "rfcomm bind" and after that I can use the
+device with any program I want. If so I had to establish a serial
+bluetooth  connection between the ipaq and a linux client and after that
+I have to run a little java program to test javax.com.  And it works
+perfectly :). Marcel thx a lot for your clear and excellent
+documentation at 
 
-Regards
+http://www.holtmann.org/papers/bluetooth/uptimes2003.html
 
-Marcel
+Have a nice time and a nice weekend.
 
-
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
-Use IT products in your business? Tell us what you think of them. Give us
-Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
-http://productguide.itmanagersjournal.com/guidepromo.tmpl
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Kind regards,
+Matthias
