@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200412291951.31412.cijoml@volny.cz>
-Subject: [Bluez-users] CSR guys, which is difference??
+From: soraberri <421246@posta.unizar.es>
+Message-ID: <cqunik$ule$1@sea.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] rctest[3790]: Can't set L2CAP link mode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,14 +16,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Dec 2004 19:51:31 +0100
+Date: Wed, 29 Dec 2004 17:55:13 +0100
 
-Hi CSR guys,
-which is difference between BlueCore02-External and BlueCore02??
+This is part of my lsmod output:
 
-Thanks
+[soraberri@castejon temp]$ lsmod
+Module                  Size  Used by
+hci_usb                15041  3
+rfcomm                 36701  2
+l2cap                  25285  7 rfcomm
+bluetooth              46917  11 hci_usb,rfcomm,l2cap
 
-Michal
+sdpd and hcid are running
+
+I think all the important stuff is there, and then why am I getting the 
+following error?
+
+[soraberri@castejon temp]$rctest -r
+rctest[3790]: Can't set L2CAP link mode. Protocol not available(92)
+
+Well it seems that the error is born within the call to
+setsockopt(s, SOL_RFCOMM, RFCOMM_LM, &opt, sizeof(opt))
+in rctest.c
+
+If you could give me a clue, pleease..
+
+thanks for your time.
+
 
 
 -------------------------------------------------------
