@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040227045005.36897.qmail@web40710.mail.yahoo.com>
-From: Lalith Chakravarthi <lalithvc@yahoo.com>
-To: Bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Emulator
+Subject: Re: [Bluez-users] Problem with pppd through bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+To: igorluiz@magiclink.com.br
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1077831499.7219.34.camel@emerald>
+References: <1077831499.7219.34.camel@emerald>
+Content-Type: text/plain
+Message-Id: <1077843554.2843.19.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,28 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Feb 2004 20:50:05 -0800 (PST)
+Date: Fri, 27 Feb 2004 01:59:14 +0100
 
-Hi
+Hi Igor,
 
-I want to know how to get the emulator working. I dont have any real
-bluetooth hardware. I want to simulate both a local device and a remote
-device. I could emulate two local devices with 
+> I'm experimenting a problem trying to connect internet via GRPS through
+> bluetooth using my Nokia 3650 and a Linux Box with a usb-dongle
+> bluetooth BT3030, via pppd.
+> 
+> The connection between the mobile and the PC via bluetooth is working
+> fine. I can transfer data in the two ways: PC->mobile , mobile->PC,
+> using the bluez driver.
+> So, now when I try to access the internet via GPRS a got this message
+> when I call "pppd"
+> 
+> root@emerald:~# rfcomm 1 xx:xx:xx:xx:xx:xx 9
+> Connected /dev/ttyU1 to xx:xx:xx:xx:xx:xx on channel 9
+> rfcomm_send_data: DLCI 18 not connected
+> rfcomm_send_data: DLCI 18 not connected
+> rfcomm_send_data: DLCI 18 not connected
+> rfcomm_send_data: DLCI 18 not connected
 
->>hciemu localhost:10
->>hciemu localhost:20
+use the kernel RFCOMM layer.
 
-But I want to know how to emulate a remote device and establish a link
-between them... I would like to have the exact commands for doing so
-and to send/recieve files between them. And since I am more of a
-beginner, could you add some more details in it?
+Regards
 
--- Lalith
+Marcel
 
-__________________________________
-Do you Yahoo!?
-Get better spam protection with Yahoo! Mail.
-http://antispam.yahoo.com/tools
+
 
 
 -------------------------------------------------------
