@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] hidp report mode in 2.6.10?
+References: <1102459374.10705.2.camel@saag.bunker.heddley.com>
+In-Reply-To: <1102459374.10705.2.camel@saag.bunker.heddley.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200412080123.07501.wim.delvaux@adaptiveplanet.com>
-Subject: [Bluez-users] valgrind complains
+  charset="iso-8859-2"
+Message-Id: <200412072348.46144.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,21 +19,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Dec 2004 01:23:07 +0100
+Date: Tue, 7 Dec 2004 23:48:46 +0100
 
-about unintialized values in the following code
+Yes,
 
- struct hci_dev_info di;
+it should be finally released as Marcel 2 mounths ago promised...
+for 2.4 too! :)
 
-         di.dev_id = dev_id;
+Marcel? :)
 
-         if( ioctl( fd, HCIGETDEVINFO, (void*)&di) != 0 )
-              continue;  // uh ?
+Michal
 
- printf( "%s\n", di.name ); // here valgrind complains on the third character
-
-
-Should I perhaps memset ? is name field null terminated ?
+Dne =FAt 7. prosince 2004 23:42 Edd Dumbill napsal(a):
+> Hi Marcel,
+>
+> It doesn't look like hid report mode made it into 2.6.10-rc3.  Are you
+> planning for it to be part of 2.6.10?
+>
+> -- Edd
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
