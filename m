@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <27251cb805011005263325ddce@mail.gmail.com>
-From: ajpearce <ajpearceuk@gmail.com>
+Message-ID: <2de4657605011005167be988d5@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: rfcomm -> /dev/dsp? (phone as headset)
-In-Reply-To: <crtlh0$lg8$1@sea.gmane.org>
+Subject: Re: [Bluez-users] l2test error
+In-Reply-To: <1105360635.8652.3.camel@pegasus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-References: <27251cb805010914064780a27a@mail.gmail.com>
-	 <200501092323.50090.cijoml@volny.cz> <crtlh0$lg8$1@sea.gmane.org>
+References: <2de46576050110025214118b21@mail.gmail.com>
+	 <1105360635.8652.3.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,66 +19,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 Jan 2005 13:26:05 +0000
+Date: Mon, 10 Jan 2005 18:46:05 +0530
 
-I can't see many people interested in exactly this, but it would be
-useful to make a wireless phone call without buying a wireless phone
-or buying expensive VoIP hardware.
+Hi marcel,
+i found the bug, in my function i was returning the rssi value(return
+rp.rssi) before i did a close(dd)........i just swaped the 2 lines and
+the code works fine.......
 
-Doing the same using a Bluetooth headset is more useful but less
-people have these. More people have bluetooth phones than headsets I
-believe - because Bluetooth headsets have only been marketed for use
-with mobiles and not PCs, landlines, as walkie talkies or anything
-else for some strange reason (the world is useless).
+when u pumped 5000 packets continously .....didn't the connection
+close down after some 2000 odd packets ......i found that it does
+....must be because of hci buffer getting full and some kind of queue
+or buffer overflow??
 
-You shouldn't have to buy a headset for say, gaming communication with
-say, a program like Teamspeak if you already have a bluetooth headset.
+Regards,
+Manjunath
 
-And seeing as I need a mic headset I'd like to be able to use the
-bluetooth dongle I've already bought and kill 3 birds with one stone.
-
-p.s. using the PC for audio interface is interesting though.
-
-
-On Mon, 10 Jan 2005 11:30:13 +0100, soraberri <421246@posta.unizar.es> wrote:
-> Michal Semler wrote:
-> > Dne ne 9. ledna 2005 23:06 jago25_98 / ajpearce napsal(a):
-> >
-> >>How do I use my phone as a microphone input? It has the "Voice
-> >>gateway" bluetooth profile on channel 1, which is bound to
-> >>/dev/rfcomm1
-> >>
-> >>Maybe there's something in the kbluetoothd (KDE) that can help?
-> >>
-> >>hmm... I see there is the alsa-bluetooth project but I'm not sure how
-> >>to use it, and not sure if it will work with my phone.
-> >
-> >
-> > Project you are looking for is:
-> >
-> > http://www.crazygreek.co.uk/content/chan_bluetooth
-> >
-> > Michal
-> >
-> >
+On Mon, 10 Jan 2005 13:37:15 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Manjunath,
 > 
-> The project you mention is about 'Bluetooth HandsFreeProfile support for
-> Asterisk'. Then, you can use the computer as a handsfree device: you
-> carry the phone in your briefcase and the laptop in the desk, so you can
->  make/receive calls without speaking to the phone -you speak to the
-> laptop.
-> A different thing is to use the phone as audio input: in this case you
-> want to speak to your phone, but you want the streaming audio to reach
-> the computer via bluetooth in order to use VoIP there (for example). So
-> you use the phone just like a headset, the difference is that you have
-> to hold it by hand instead of hook it in the ear. This way, all you need
-> in the Linux point is Bluez and btsco (bluetooth-alsa) in order to have
-> AudioGateway support. The problem is what you need in the phone end: I
-> think at least Symbian, and the possibility to "read/write" from/to the
-> phone audio device and implement the headset profile.
+> > i am running the l2test with some modifications to the code, the
+> > connection reset  i am getting after 512 packets is because of this
+> > new code,
+> >
+> > You suggested that it could be an endian bug and asked me to check the
+> > hardware.
+> > so this is not the problem.....I have added a new function to measure
+> > RSSI values along with the throughput l2test measures. The RSSI part
+> > of the code is the same as used in 'hcitool'. The 'connection reset by
+> > peer' is because on the receiver side i see another error in this RSSI
+> > fuction, which resets the connection.
+> >
+> > the error i get is ,
+> > "HCI device open failed:Too many open files"...
+> >
+> > This is because to get dd i use hci_open_dev (dev_id) fuction, and at
+> > the end of the function i close(dd) or hci_close_dev(dd)....but i
+> > still get the same error. After 512 packets i don't get the dev_id or
+> > dd and hence the error.
 > 
-> Do you think is it possible? Has it been managed anywhere?
-> I guess many people wouldn't like the idea at all...
+> why don't you open dd once at the beginning of your program and use it
+> every time? On exit you close dd. Show me your code.
+> 
+> Regards
+> 
+> Marcel
 > 
 > -------------------------------------------------------
 > The SF.Net email is sponsored by: Beat the post-holiday blues
