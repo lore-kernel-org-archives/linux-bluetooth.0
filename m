@@ -1,75 +1,66 @@
-Return-Path: <ach@mpe.mpg.de>
-From: Achim Bohnet <ach@mpe.mpg.de>
-To: sjoerd@spring.luon.net (Sjoerd Simons)
-Subject: Re: [Bluez-devel] D-BUS fixes for hcid
-Date: Fri, 18 Jun 2004 09:30:32 +0200
-Cc: bluez-devel@lists.sourceforge.net, Marcel Holtmann <marcel@holtmann.org>
-References: <20040616112702.GA898@kone> <20040616141845.GA8921@kone> <20040617072748.GA3775@spring.luon.net>
-In-Reply-To: <20040617072748.GA3775@spring.luon.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200406180930.32342.ach@mpe.mpg.de>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] question: what does this patch from snd-bt-sco
+	do?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lars Grunewaldt <lgw@dark-reality.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <40D1FA27.20407@dark-reality.de>
+References: <40A9E6CB.4010505@dark-reality.de>
+	 <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk>
+	 <40A9EE51.2080102@dark-reality.de> <1084881439.5833.108.camel@pegasus>
+	 <40AA11AB.6010307@dark-reality.de> <1084888843.4327.1.camel@pegasus>
+	 <40D0CE71.2010208@dark-reality.de> <1087427168.4309.30.camel@pegasus>
+	 <40D0DFFE.7020701@dark-reality.de> <1087431863.4309.39.camel@pegasus>
+	 <E1B5DFDA-C050-11D8-9772-000A95A4D990@dcs.gla.ac.uk>
+	 <40D19E13.9070005@dark-reality.de> <1087487912.4309.69.camel@pegasus>
+	 <40D1FA27.20407@dark-reality.de>
+Content-Type: text/plain
+Message-Id: <1087504096.4309.76.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 17 Jun 2004 22:28:16 +0200
 
-On Thursday 17 June 2004 09:27, Sjoerd Simons wrote:
-> On Wed, Jun 16, 2004 at 05:18:45PM +0300, Johan Hedberg wrote:
-> > On Wed, Jun 16, 2004, Achim Bohnet wrote:
-> > > On debian, dbus-1-utils installs a xsession startup script
-> > > that checks for use-session-dbus in /etc/X11/Xsession.options
-> > > Therefore dbus daemon knows the $DISPLAY.
-> 
-> $DISPLAY is indeed in the enviroment when started by the debian x-session. But
-> dbus doesn't (and shouldn't) care about it. There is nothing that says
-> that a dbus session bus is connected to an X session (could be console
-> only session just as well)..
+Hi Lars,
 
-As long is dbus does not delete DISPLAY it's okay ;)  Child processes
-inherit DISPLAY (if available) and that's the important point.  In
-hotplug scripts you have to hardcode :0 (almost always wrong when
-someone works in a second session on :1) or implement hack to find
-out the right display.
-> 
-> > However, hcid uses the system D-BUS which knows nothing about the
-> > session (system D-BUS and session D-BUS are run as two separate
-> > processes). This is an interesting problem, because from a lowlevel
-> > (BT-stack) standpoint we want to use the system bus, but from a higher
-> > level (pin-code dialog) standpoint the session bus would be apropriate.
-> 
->  From both standpoints you'll want to use the system bus. A bluetooth pin query
->  is not linked to a specific users session, but to complete system.
-> 
->  The current sollution is correct imho, when a users wants to answer pin
->  queries he/she should have something running that monitors the system bus for
->  them.  That something could be a gnome applet/notification icon, a kde
->  thingie or a simple command line program that doesn't really matter.
+> you could as well say "an elephant won't fit into a mousewhole until it
+> get's a dynamic interface". Of course mulaw and alaw differ from pcm/16
+> bit only because they are 8bit/sample. so what. Would not work if it
+> would be 7 or 9 bit, either. Also it's not likely that the bit count
+> will change sooner or later :)
 
-That does not scale well.  Why does inetd exist? Just to not waste
-resources.  Something similar for the desktop should exist!  We
-have hotplug, on the one side and the desktop session on the other
-side.  Maybe the design of dbus is too limited (or simply not designed
-for it).  But AFAIK dbus can start apps on demand.   So
+that is not the point here. The H:2 alternate setting for ISOC interface
+only differs between 8bit or 16bit and the number of SCO connections.
 
-   hotplug -> system dbus -> session dbus -> desktop tool/applet
+> Suggestions are welcome. If anyone has an idea how to improve this
+> "alternate setting" handling, i.e. make it possible for an
+> application/driver to set the setting in runtime without rewriting the
+> whole code, that would be a great thing.
 
-was (one of) my expectation of dbus.  Makes no sense that every
-app needs to know about dbus protocol, when all that's needed is
-just a 'desktop inetd' that start or notifies, e.g. via DCOP, an
-application off a certain hotplug event.
+Only the hci_usb driver has to take care of it and the needed notify()
+framework from the BlueZ core is already in place.
 
-But this get's off really topic, I'll check the dbus mailing
-lists ...
+Regards
 
-Achim
-> 
->  The activation stuff could be nice for non-interactive pin handlers, but you
->  can already use the ``old'' pin_helper option of hcid for that.
-> 
->   Sjoerd
-> -- 
-> Men love to wonder, and that is the seed of science.
--- 
-  To me vi is Zen.  To use vi is to practice zen. Every command is
-  a koan. Profound to the user, unintelligible to the uninitiated.
-  You discover truth everytime you use it.
-                                      -- reddy@lion.austin.ibm.com
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by The 2004 JavaOne(SM) Conference
+Learn from the experts at JavaOne(SM), Sun's Worldwide Java Developer
+Conference, June 28 - July 1 at the Moscone Center in San Francisco, CA
+REGISTER AND SAVE! http://java.sun.com/javaone/sf Priority Code NWMGYKND
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
