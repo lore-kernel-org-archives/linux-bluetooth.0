@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050314132045.61026.qmail@web50610.mail.yahoo.com>
-From: Miron Cristian <cris_miron@yahoo.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <423589B1.6000403@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Support for Adaptor Bluetooth USB Trust BT180  ?
+To: Fredrik Tolf <fredrik@dolda2000.com>
+Cc: bluez-devel@lists.sourceforge.net
+References: <1110683934.5056.43.camel@pc7.dolda2000.com>	 <4233C663.80109@xmission.com> <1110762698.5056.73.camel@pc7.dolda2000.com>
+In-Reply-To: <1110762698.5056.73.camel@pc7.dolda2000.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] Re: [Patch] Some btsco modifications
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,31 +19,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 14 Mar 2005 05:20:45 -0800 (PST)
+Date: Mon, 14 Mar 2005 05:55:13 -0700
 
-Hi everybody,
+Fredrik
 
-I just bought this device and it seems to be different
-then my old DBT-120 device:
-- hcitool with lq option allways reports me the
-quality link = 255, no matter how far I go, until I am
-out of range
-- the communication with my phone application is 2-3
-times slower then the case when I use DBT-120
-bluetooth dongle.
+>>> * Instead of (dis)connecting with the headset button, the driver
+>>>notifies userspace when it is in use, and the userspace program connects
+>>>accordingly.
+>>> * Send SIGUSR1 to the userspace program to make the headset ring.
+>>> * The userspace program now reads a config file, ~/.btscorc, which
+>>>contains alternating lines of regexes and shell commands. Everything
+>>>that the headset sends is matched against these regexes, and if a match
+>>>if found, the shell command is run (with any back references replaced).
+>>>This, of course, is primarily intended to "do stuff" with the headset
+>>>button(s). Send SIGHUP to re-read the config file.
 
-Is there any now driver for this new BT180 in order to
-have it working as it show be? 
+Can you comment on what the implications are for supporting multiple 
+headsets simultaneously with a single btsco daemon? Would the kernel 
+interaction need to be changed again or could it be limited to the daemon?
 
-Thank you.
-Cristian Miron
-
-
-		
-__________________________________ 
-Do you Yahoo!? 
-Yahoo! Small Business - Try our new resources site!
-http://smallbusiness.yahoo.com/resources/ 
+Brad
 
 
 -------------------------------------------------------
