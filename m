@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bluez + USB2Serial Adaptor + UART CSR BC02 ==
-	Data at 20 kBps??
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Daniel Moraes <ra002890@itelefonica.com.br>
-Cc: Bluez Devel <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4092AACD.4040303@itelefonica.com.br>
-References: <4092AACD.4040303@itelefonica.com.br>
-Content-Type: text/plain
-Message-Id: <1083686654.4666.45.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <40967A41.9070308@grupopie.com>
+From: Paulo Marques <pmarques@grupopie.com>
+MIME-Version: 1.0
+To: Alexandre Monteiro <coser10@hotmail.com>
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] how install BlueZ on iPAQ ?
+References: <BAY9-F66ORQzzeOApac00031623@hotmail.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,26 +17,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 04 May 2004 18:04:14 +0200
+Date: Mon, 03 May 2004 17:58:41 +0100
 
-Hi Daniel,
+Alexandre Monteiro wrote:
 
-> Is the combination above possible?!? How can I do to increase my UART 
-> CSR troughtput?!?   In my linux doesn't matter if I stablish one  
-> conection at 57600 or 460800, my bluetooth works at the same rate... 
-> why?!? My speed are so slowly, I calculate then using l2ping is it 
-> right?!? And they are about 3kBps...
-> If anybody can solve one of my problems I will be much more happier....  
-> hehehe...
+> Hi
+> 
+>  Could anyone help me get BlueZ installed and configured on Familiar 
+> 0.7.2.  Ideally the latter I have a 3970 iPAQ which has hcitool v2.2 and 
+> I need to install the hcitool v2.6. Anyone knows how can I do it ? Which 
+> files I have to install on iPAQ ?
 
-in theory this is possible. Actually I tried to get a high speed serial
-card working, but without luck. If you found a USB<->serial converter
-which is working also at 920KB let me know.
+Last time I did it, there was a bluez package on the Familiar project that 
+installed all the necessary packages.
 
-Regards
+This was a long time ago, so maybe you should try to find information on the 
+www.handhelds.org website, or ask the ipaq@handhelds.org mailing list.
 
-Marcel
-
+-- 
+Paulo Marques - www.grupopie.com
+"In a world without walls and fences who needs windows and gates?"
 
 
 
