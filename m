@@ -1,37 +1,46 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Return-Path: <Somil.Asthana@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Subject: RE: [Bluez-users] Re: virus via bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Somil.Asthana@nokia.com
-Cc: bluekarthik@yahoo.com, philipmaciver@yahoo.co.uk,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E320A8529CF07E4C967ECC2F380B0CF903062340@bsebe001.americas.nokia.com>
-References: 
-	 <E320A8529CF07E4C967ECC2F380B0CF903062340@bsebe001.americas.nokia.com>
-Content-Type: text/plain
-Message-Id: <1090421167.21683.114.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Jul 2004 16:46:07 +0200
+Date: Wed, 21 Jul 2004 10:38:32 -0400
+Message-ID: <E320A8529CF07E4C967ECC2F380B0CF903062340@bsebe001.americas.nokia.com>
+From: <Somil.Asthana@nokia.com>
+To: <marcel@holtmann.org>, <bluekarthik@yahoo.com>
+Cc: <philipmaciver@yahoo.co.uk>, <bluez-users@lists.sourceforge.net>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Somil,
+Hello Marcel=20
+   I agree BTH operations cannot be altered by any virus / worm (maybe =
+they can we haven't explored yet) but virus / worm can definitely use =
+BTH in some malicious way . Pls checkout this article =
+http://slashdot.org/articles/04/06/15/1244248.shtml?tid=3D126&tid=3D1722.=
+=20
 
->    I agree BTH operations cannot be altered by any virus / worm (maybe they can we haven't explored yet) but virus / worm can definitely use BTH in some malicious way . Pls checkout this article http://slashdot.org/articles/04/06/15/1244248.shtml?tid=126&tid=1722. 
+regards
+Somil
 
-I was aware of that virus, but this virus can be also work over IrDA or
-with OBEX over TCP/IP, WAP etc ;)
+-----Original Message-----
+From: bluez-users-admin@lists.sourceforge.net
+[mailto:bluez-users-admin@lists.sourceforge.net]On Behalf Of ext Marcel
+Holtmann
+Sent: Wednesday, July 21, 2004 10:14 AM
+To: karthik bala guru
+Cc: Philip MacIver; BlueZ Mailing List
+Subject: [Bluez-users] Re: virus via bluetooth
 
-A Bluetooth protocol stack btw can't be infected by a virus. You can
-exploit it of course, but how should a virus survive? It is not an
-operating system.
+
+Hi Karthik,
+
+>         I have an interesting question .
+>        =20
+>         How much percentage will the Bluetooth be infected by virus ?
+>        =20
+>         Is there such a chance ?
+>        =20
+>         Is there some anti-virus steps for Bluetooth ?
+
+Bluetooth is only a transport medium. You can't infect it.
 
 Regards
 
@@ -44,7 +53,7 @@ Marcel
 This SF.Net email is sponsored by BEA Weblogic Workshop
 FREE Java Enterprise J2EE developer tools!
 Get your free copy of BEA WebLogic Workshop 8.1 today.
-http://ads.osdn.com/?ad_id=4721&alloc_id=10040&op=click
+http://ads.osdn.com/?ad_id=3D4721&alloc_id=3D10040&op=3Dclick
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
