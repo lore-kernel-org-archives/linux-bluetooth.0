@@ -2,39 +2,39 @@ Return-Path: <noring@nocrew.org>
 Subject: Re: [gnome-bluetooth] Re: [Bluez-devel] What stuff in
 	gnome-bluetooth does, and ideas for its future
 From: Fredrik Noring <noring@nocrew.org>
-To: Eugene Crosser <crosser@average.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Fred =?ISO-8859-1?Q?Sch=E4ttgen?= <bluez-devel@schaettgen.de>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1075488593.21795.37.camel@ariel.sovam.com>
+In-Reply-To: <1075487167.26729.191.camel@pegasus>
 References: <1064593223.12843.127.camel@saag>
 	 <200401291230.00801.bluez-devel@schaettgen.de>
 	 <1075401893.22564.51.camel@akka.yeti.nocrew.org>
 	 <200401292119.45926.bluez-devel@schaettgen.de>
 	 <1075486241.14644.34.camel@akka.yeti.nocrew.org>
 	 <1075487167.26729.191.camel@pegasus>
-	 <1075488593.21795.37.camel@ariel.sovam.com>
 Content-Type: text/plain
-Message-Id: <1075495308.14644.60.camel@akka.yeti.nocrew.org>
+Message-Id: <1075494959.14644.53.camel@akka.yeti.nocrew.org>
 Mime-Version: 1.0
-Date: Fri, 30 Jan 2004 21:41:48 +0100
+Date: Fri, 30 Jan 2004 21:35:59 +0100
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Eugene,
+Hi Marcel,
 
-fre 2004-01-30 klockan 19.49 skrev Eugene Crosser:
-> /etc may be on a read-only filesystem.  Imagine a bluetooth gadget based 
-> on Linux burnt in ROM.
+fre 2004-01-30 klockan 19.26 skrev Marcel Holtmann:
+> the best place for Unix sockets is /tmp
 
-I suppose this easily can solved with a symlink? (Although I agree
-with Marcel that /tmp is a better place.)
+Agreed. Perhaps we can have a directory structure similar to this:
 
-> (I continue to think that binary helper is a viable option for the low
-> level interface.  It is very scalable: "lean" implementation for very
-> simple environments may be cut down to just a few lines of shell
-> script.  "Rich" implementation may use whatever database, and/or relay
-> requests to other programs over D-BUS, or CORBA, or anything...)
+   /tmp/hcid/keytab.socket
+   /tmp/hcid/nametab.socket
+   ...
 
-How are you going to setup access permissions for the services with
-your binary helpers? That's easy using sockets.
+and so on for each kind of service. This will allow flexible user
+access permissions.
+
+> If we do it, this should be part of the Bluetooth library itself, so
+> programmers don't have to worry about it.
+
+Good idea.
 
 Fredrik
