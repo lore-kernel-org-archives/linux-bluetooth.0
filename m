@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Shell script during bluetooth connection
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Lalith Chakravarthi <lalithvc@yahoo.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040310124449.40181.qmail@web40704.mail.yahoo.com>
-References: <20040310124449.40181.qmail@web40704.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1078923303.2537.33.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20040310124449.40181.qmail@web40704.mail.yahoo.com>
+From: Lalith Chakravarthi <lalithvc@yahoo.com>
+To: bluez-users <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Shell script during bluetooth connection
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,26 +15,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 10 Mar 2004 13:55:04 +0100
+Date: Wed, 10 Mar 2004 04:44:49 -0800 (PST)
 
-Hi Lalith,
+Hi...
 
-> I want to execute a shell script whenever a bluetooth connection is
-> established. I am connecting between two computers using USB Dongles. I
-> have RedHat Linux 9 with 2.4.20-8 kernel. I am using the bnep
-> interface. I have already set up the ifcfg-bnepX files for that... but
-> I can't put the script there as it wont be an executable file there...
+I want to execute a shell script whenever a bluetooth connection is
+established. I am connecting between two computers using USB Dongles. I
+have RedHat Linux 9 with 2.4.20-8 kernel. I am using the bnep
+interface. I have already set up the ifcfg-bnepX files for that... but
+I can't put the script there as it wont be an executable file there...
 
-I don't use RedHat, but in general there is not a big difference between
-an executable file and an executable shell script. It is important that
-the script is mode 755. However you can also put your script directly
-into /etc/hotplug/net.agent.
+So cud you help me out with the files that will be called when a
+connection using bnepX interface is created so that I can put my shell
+script there..
 
-Regards
+thanks
+Lalith
 
-Marcel
-
-
+__________________________________
+Do you Yahoo!?
+Yahoo! Search - Find what you’re looking for faster
+http://search.yahoo.com
 
 
 -------------------------------------------------------
