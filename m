@@ -3,12 +3,12 @@ From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
 Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] FujitsuSiemens BT USB Adapter
-References: <12696405.1079094466421.JavaMail.ngmail@webmail05.arcor-online.net>
-In-Reply-To: <12696405.1079094466421.JavaMail.ngmail@webmail05.arcor-online.net>
+References: <200403112106.31567.cijoml@volny.cz> <1079086957.740.7.camel@merlin>
+In-Reply-To: <1079086957.740.7.camel@merlin>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200403122001.57999.cijoml@volny.cz>
+Message-Id: <200403121935.33877.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,48 +19,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 12 Mar 2004 20:01:57 +0100
+Date: Fri, 12 Mar 2004 19:35:33 +0100
 
-And what
-hciconfig hci0 revision
-says?
+Marcel about 900 Kc its about 30 euro
 
 Michal
 
-Dne p=E1 12. b=F8ezna 2004 13:27 damou@nexgo.de napsal(a):
-> Hi,
+Dne p=E1 12. b=F8ezna 2004 11:22 Marcel Holtmann napsal(a):
+> Hi Michal,
 >
 > > is this dongle supported? If so, I'll buy it imeditially, coz its SO
-> > small!!
+> > small!! http://pcshop.pells.cz/img.asp?stiid=3D3483
 >
-> Yes this dongle is working.
+> it looks like the Sony dongle and this is CSR based. So I think it
+> should work. What is the price?
 >
-> Here is the output of hciconfig -a:
-> hci0:	Type: USB
-> 	BD Address: 00:30:C2:08:51:57 ACL MTU: 192:8  SCO MTU: 64:8
-> 	UP RUNNING PSCAN ISCAN
-> 	RX bytes:370 acl:0 sco:0 events:15 errors:0
-> 	TX bytes:305 acl:0 sco:0 commands:15 errors:0
-> 	Features: 0xff 0xff 0x0f 0x00
-> 	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-> 	Link policy: HOLD SNIFF PARK
-> 	Link mode: SLAVE ACCEPT
-> 	Name: 'BlueZ (0)'
-> 	Class: 0x000100
-> 	Service Classes: Unspecified
-> 	Device Class: Computer, Uncategorized
-> 	HCI Ver: 1.1 (0x1) HCI Rev: 0x150 LMP Ver: 1.1 (0x1) LMP Subver: 0x150
-> 	Manufacturer: Cambridge Silicon Radio (10)
+> Regards
 >
->
-> cu
-> Martl
->
->
->
->
->
->
+> Marcel
 >
 >
 >
