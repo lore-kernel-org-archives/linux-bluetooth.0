@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY104-F21F148B2D4DCA90524B510C1930@phx.gbl>
-In-Reply-To: <1105050548.4299.95.camel@pegasus>
-From: "blookk -" <blookk@hotmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Keyboard & mouse operate in boot protocol mode
+	causing extra keyboard events with 2.6.10-mh1 and bluez-libs/utils 2.13
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1105049361.6048.9.camel@pc.vesuri.net>
+References: <1105049361.6048.9.camel@pc.vesuri.net>
+Content-Type: text/plain
+Message-Id: <1105050548.4299.95.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/html; charset=iso-8859-1; format=flowed
-Subject: [Bluez-users] [Bluez-users]OBEX application
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,15 +19,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 06 Jan 2005 22:45:57 +0000
+Date: Thu, 06 Jan 2005 23:29:08 +0100
 
-<html><div style='background-color:'><DIV class=RTE>
-<P><BR>Hello.</P>
-<P>I have used obextool application to send a file from PC to phone, but if I want to send a file from phone to PC I can't, because I need some application that acts as a server.</P>
-<P>I use Red Hat 9&nbsp; without graphical Bluetooth Interfaz.</P>
-<P>I found in the web a daemon called "opd", but with this daemon I can't send files to PC. It seem that doesn't work correctly.</P>
-<P>Is there a application for solve this? </P>
-<P>Thanks and regards.</P></DIV></div></html>
+Hi Vesa,
+
+> a couple of months back I had a problem with extraneous keyboard events;
+> when I typed "sources" I got "sourceces" and so on. This was fixed by
+> applying an -mh kernel patch that had HID report protocol mode support.
+> 2.6.9-mh3 and bluez-libs/utils 2.10 worked fine but now I upgraded to
+> 2.6.10-mh1 and bluez-libs/utils 2.13 and this problem is back again.
+> 
+> hidd --list gives me
+> 
+> 00:07:61:19:9E:A9 HID Boot Device [046d:b301] connected [boot-protocol]
+> 00:07:61:19:FA:68 HID Boot Device [046d:b001] connected [boot-protocol]
+> 
+> so it seems it's not using the HID report protocol but the boot
+> protocol. hidd --list also used to show the correct names of the devices
+> (Logitech MX900 Mouse etc.) instead of just HID Boot Device.
+> 
+> What can I do to make hidd use the HID report protocol mode (or whatever
+> is necessary to fix this problem)?
+
+go back to 2.6.9-mh3 or wait until the HID report protocol support is
+back in the -mh patch. I removed it for the final transition into a
+generic HID parser.
+
+Regards
+
+Marcel
+
 
 
 
