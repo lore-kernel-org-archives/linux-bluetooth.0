@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Documentation for hcid.conf ?
+Subject: Re: [Bluez-devel] Please help me
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Collin R. Mulliner" <collin@betaversion.net>
+To: zubiwat <zubiwat@poczta.onet.pl>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040323225438.6b7bb3ee@coredump>
-References: <1080053029.7507.40.camel@gryffindor>
-	 <20040323183818.3d21f901@coredump> <1080064121.2515.35.camel@pegasus>
-	 <20040323225438.6b7bb3ee@coredump>
+In-Reply-To: <001701c41123$058cfd30$fcca010a@lysydziadek>
+References: <001701c41123$058cfd30$fcca010a@lysydziadek>
 Content-Type: text/plain
-Message-Id: <1080081387.2515.58.camel@pegasus>
+Message-Id: <1080081124.2515.55.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,33 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Mar 2004 23:36:27 +0100
+Date: Tue, 23 Mar 2004 23:32:04 +0100
 
-Hi Collin,
+Hi Maciej,
 
-> using:
-> 
-> device hci0 {
->  ...
->  copy of default section (from hcid.conf)
->  ...
-> }
-> 
-> OR
-> 
-> device 00:11:22:33:44:55 {
->  ...
->  copy of default section (from hcid.conf)
->  ...
-> }
-> 
-> gives me a syntax error for the line containing "device hci0 {" and for
-> all following lines within the section, same goes for 
-> "device 00:11:22.33.44:55 {"
-> 
-> I have bluez-utils-2.4 (btw. hcid reports 2.4)
+> I need help with some programming. If someone knows the table of bits
+> who are as hci commands I would be greatfull because I'm programming
+> microchip to work as a bluez under linux and I get some bits from BT
+> device but howto interprete them.
 
-try bluez-utils-2.5
+read the Bluetooth HCI specification. Everything you need to know can be
+found in it.
 
 Regards
 
