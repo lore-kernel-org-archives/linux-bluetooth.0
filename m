@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] mRouter and sx1
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Dominik Blystak <Dominik.Blystak@pro-open.de>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <1091009362.2389.16.camel@localhost>
-References: <1091009362.2389.16.camel@localhost>
+From: Dominik Blystak <Dominik.Blystak@pro-open.de>
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1091011259.3673.5.camel@notepaq>
+Message-Id: <1091009362.2389.16.camel@localhost>
 Mime-Version: 1.0
+Subject: [Bluez-users] mRouter and sx1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +15,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jul 2004 12:40:59 +0200
+Date: Wed, 28 Jul 2004 12:09:22 +0200
 
-Hi Dominik,
+Hello all, 
 
-> I got a Siemens sx1 phone, which uses some kind of mRouter software
-> (windows). After browsing through the mailing list archives I tried the
-> setup described here:
-> http://mobile.linux.pt/p800
 
-the mRouter is a callback mechanism and I prefer if someone implement a
-method for that directly into dund. I would have done that already, but
-I don't own a Symbian based mobile phone.
+I got a Siemens sx1 phone, which uses some kind of mRouter software
+(windows). After browsing through the mailing list archives I tried the
+setup described here:
+http://mobile.linux.pt/p800
 
-Regards
+The bluetooth connection works (e.g. p3nfs) but I guess that the sx1
+needs another chat file. Thats the output / error I get:
 
-Marcel
+#sdptool browse 
+Service Name: Bluetooth Serial Port
+Service Description: Bluetooth Serial Port
+Service Provider: Symbian Ltd.
+Service RecHandle: 0x10026
+Service Class ID List:
+  "Serial Port" (0x1101)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 2
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
 
+
+
+#rfcomm
+rfcomm1: 00:01:E3:2E:91:81 channel 2 clean
+
+
+(changed /dev/ttyS1 in "/etc/ppp/peers/sx1-local" to /dev/rfcomm1)
+
+#pppd call sx1-local debug nodetach
+Connect script failed
+
+
+As mentioned before I guess that the chat script needs to be modified. I
+would like to know how the communication through the serial port in
+windows can be dumped, so I could check that chat script.
+
+
+Thank you
+Dominik Blystak
 
 
 
