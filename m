@@ -3,11 +3,10 @@ Subject: Re: [Bluez-users] l2test problem
 From: Marcel Holtmann <marcel@holtmann.org>
 To: mohalik@india.hp.com
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <405EBCDD.3090402@india.hp.com>
+In-Reply-To: <405E6C9E.1030600@india.hp.com>
 References: <405E6C9E.1030600@india.hp.com>
-	 <1079937432.2663.78.camel@pegasus>  <405EBCDD.3090402@india.hp.com>
 Content-Type: text/plain
-Message-Id: <1079951177.2663.90.camel@pegasus>
+Message-Id: <1079937432.2663.78.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,33 +18,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Mar 2004 11:26:17 +0100
+Date: Mon, 22 Mar 2004 07:37:12 +0100
 
 Hi Swarup,
 
-> > may you wanna take a look at the Bluetooth specification and search for
-> > result code 2 of the L2CAP connect response ;)
-> > 
-> > 	0x0002 Connection refused - PSM not supported.
-> >   
+> I have BlueZ on a red hat 8 linux kerner 2.6.0.
+> I have built all the modules for bluetooth (I believe so).
 > 
-> Yes, I saw that earlier. But how do I get the supported PSM's?
-> Are they available from the SDP records one gets from the output of
-> "sdptool browse"?
-> (are they the numbers beside L2CAP in the records?)
+> I am able to send and receive to/from a Nokia 3650 via Obex Push.
+> I can establish a ppp connection as well and browse the web.
+> 
+> After all this, when I ran
+>     l2test -s <phone bt address>,
+> 
+> I get the following output
+> [root@lx98218 tools]# cd ../test;./l2test -s 00:60:57:4A:25:DB
+> l2test[11744]: Can't connect. Connection refused(111)
+> 
+> hcidump data
+> 
+> [root@lx98218 bluetooth]# hcidump
+> HCIDump - HCI packet analyzer ver 1.6
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+>  > HCI Event: Link Key Notification(0x18) plen 23
+>  > HCI Event: Connect Complete(0x03) plen 11
+> < ACL data: handle 0x0028 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 4097 scid 0x0040
+> < HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+>  > HCI Event: Command Complete(0x0e) plen 6
+>  > HCI Event: Number of Completed Packets(0x13) plen 5
+>  > HCI Event: Max Slots Change(0x1b) plen 3
+>  > ACL data: handle 0x0028 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 2 status 0
+>  > HCI Event: QoS Setup Complete(0x0d) plen 21
+> < HCI Command: Disconnect(0x01|0x0006) plen 3
+>  > HCI Event: Command Status(0x0f) plen 4
+>  > HCI Event: Disconn Complete(0x05) plen 4
+> 
+> The original l2test.c uses PSM 10, which gives identical failure.
 
-yes, they are the uint16 numbers besides the uuid16 protocol UUID for
-L2CAP, but why do you want them? You asked about a mobile phone and most
-of them are based on the higher layer RFCOMM. So far I haven't seen any
-phone that support BNEP, HID or HCRP. And this means that in your case
-only two PSM's are supported. PSM 1 for the SDP requests and PSM 3 for
-the RFCOMM protocol.
+may you wanna take a look at the Bluetooth specification and search for
+result code 2 of the L2CAP connect response ;)
 
-> In case of l2test, which PSM (psm of which record) should it use?
-
-The l2test program is for Linux-to-Linux testing and not really meant
-for testing other devices. You should ask yourself what you are trying
-to do.
+	0x0002 Connection refused - PSM not supported.
 
 Regards
 
