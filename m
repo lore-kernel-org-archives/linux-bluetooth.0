@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: <bluez-users@lists.sourceforge.net>
-From: <bluez@hippie-online.de>
-Message-Id: <5725483$1095842295415139f78ba4b0.63992150@config17.schlund.de>
-Content-Type: text/plain;
-	charset="iso-8859-1"
+From: martin f krafft <madduck@madduck.net>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] pairing with headset
+Message-ID: <20040922075030.GC8233@cirrus.madduck.net>
+References: <20040921190606.GA11925@cirrus.madduck.net> <200409220107.46086.pavouk@pavouk.org>
 Mime-Version: 1.0
-Subject: [Bluez-users] =?iso-8859-1?Q?Bluetooth_modem_under_SuSE_9=2E1?=
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="b5gNqxB1S1yM7hjW"
+In-Reply-To: <200409220107.46086.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,45 +18,64 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Sep 2004 10:40:01 +0200
+Date: Wed, 22 Sep 2004 09:50:30 +0200
 
 
-Hello,
+--b5gNqxB1S1yM7hjW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I am looking for a solution to use my bluetooth modem without root
-permissions.
+also sprach Pavel Ruzicka <pavouk@pavouk.org> [2004.09.22.0107 +0200]:
+> You must hold headset button for about 7 seconds, when blue LED on
+> Jabra goes permanently ON. Now is headset in pairing mode, and you
+> will see it in hcitool scan. Jabra BT250 is visible only in
+> pairing mode. Probably due to security reasons.
 
-The modem is a "Trust 56k v92 bluetooth wireless modem" which I use in
-connection with a "Trust BT180 USB bluetooth adapter". The behaviour
-described in the following is identical for two different boxes, a
-desktop and a notebook machine, running under SuSE 9.1 (kernel 2.6.4).
-I installed the packages bluez-libs (2.5-43), bluez-sdp (1.5-59),
-bluez-utils (2.4-65) and kdebluetooth (0.0.cvs20040216-42).
+Oh, okay; now I got it working.
 
-I modified two config files: In /etc/bluetooth/pin I entered the
-12-digit PIN printed at the bottom of the modem. In /etc/rfcomm.conf I
-replaced the default entries "device" and "comment" by the modem's
-address (determined by the command "hcitool scan") and name.
+> This headset can be paired only with one device.
 
-So far everything works fine as described in the helpful online
-documentations of Marcel Holtmann and Jochen Lillich (except for
-"sdptool browse <address>" which does not return any information).
+That's really annoying.
 
-There are no rfcomm devices defined by SuSE. So I created one by the
-command "mknod -m 666 /dev/rfcomm0 c 216 0". After this I can connect
-to the modem by "rfcomm connect 0 <address> 1" and use it like a normal
-modem via /dev/rfcomm0 (I use wvdial/kinternet for this).
+> Do you have some other experience?
 
-My problem occurs when terminating the internet connection: At the same
-time the bluetooth connection is disconnected and /dev/rfcomm0 is
-deleted! So I need root permissions to recreate the device file every
-time I want to connect to the modem. :-(
+No, but I will let you know.
 
-Can anybody give me a solution or workaround for this disturbing
-behaviour?
+> Other problem is, that I don't know if there are some working bluez sound=
+=20
+> driver. I doesn't test it.
 
-Best regards,
- HippiE
+It is being worked on.
+
+http://sourceforge.net/projects/bluetooth-alsa
+http://www.gargan.org/linux/snd-bt-sco/
+
+--=20
+martin;              (greetings from the heart of the sun.)
+  \____ echo mailto: !#^."<*>"|tr "<*> mailto:" net@madduck
+=20
+invalid/expired pgp subkeys? use subkeys.pgp.net as keyserver!
+spamtraps: madduck.bogus@madduck.net
+=20
+"twenty-four hour room-service must be one of the
+ premiere achievements of modern civilization."
+                                          -- special agent dale cooper
+
+--b5gNqxB1S1yM7hjW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+
+iD8DBQFBUS7GIgvIgzMMSnURAkqJAJ98lMVR/mtsaX3naaiMiJUGNWfiewCdHC1b
+ofYOcMyHdn1XUnqZlzRSXKc=
+=5aYZ
+-----END PGP SIGNATURE-----
+
+--b5gNqxB1S1yM7hjW--
 
 
 -------------------------------------------------------
