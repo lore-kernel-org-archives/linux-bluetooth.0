@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Accessing HCI on Windows
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Stefan Mischke <survivor@uni-paderborn.de>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <405FFCB9.5050507@uni-paderborn.de>
-References: <405FFCB9.5050507@uni-paderborn.de>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1080040266.2663.317.camel@pegasus>
+Message-Id: <1080039360.2663.310.camel@pegasus>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Kernel 2.6 and 64-bit machines
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,22 +15,13 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Mar 2004 12:11:06 +0100
+Date: Tue, 23 Mar 2004 11:56:00 +0100
 
-Hi Stefan,
+Hi Folks,
 
-> I'm writing a little "Location Awareness using Bluetooth"-thing for my 
-> Bachelor of CS degree. On Linux, everything is fine and I just have to 
-> look into the  BlueZ code. But it would be nice if there was a 
-> possibility to port my work to Windows. Unfortunately I have found no 
-> documentation about how to access the HCI on Windows. All I need would 
-> be a simple "SendHCICommand()" or something. My Question: Does anyone 
-> know how to do this? Do I have to deal with the Widcomm drivers (seem to 
-> be monopolists) or is there a common way?
-
-as I know there is no Windows stack that provides full access to the HCI
-layer as BlueZ do. Actually it must be possible in some kind of way, but
-in most cases you have to pay for their development kit.
+is anyone using Bluetooth with the 2.6 kernel on a 64-bit machine? I
+know that it don't work on a Sun UltraSPARC, but I like to hear from
+people with x86-64, IA64 or PowerPC64 machines.
 
 Regards
 
