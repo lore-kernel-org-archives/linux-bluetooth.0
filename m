@@ -3,7 +3,7 @@ Subject: Re: [Bluez-devel] D-Bus interfaces
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Fredrik Noring <noring@nocrew.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076542884.31726.50.camel@akka.yeti.nocrew.org>
+In-Reply-To: <1076542183.31726.44.camel@akka.yeti.nocrew.org>
 References: <1076265358.2670.36.camel@pegasus>
 	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
 	 <1076267396.2670.58.camel@pegasus>
@@ -28,10 +28,8 @@ References: <1076265358.2670.36.camel@pegasus>
 	 <1076540221.31726.39.camel@akka.yeti.nocrew.org>
 	 <1076541281.3041.38.camel@pegasus>
 	 <1076542183.31726.44.camel@akka.yeti.nocrew.org>
-	 <1076542568.3041.45.camel@pegasus>
-	 <1076542884.31726.50.camel@akka.yeti.nocrew.org>
 Content-Type: text/plain
-Message-Id: <1076543179.3041.48.camel@pegasus>
+Message-Id: <1076542568.3041.45.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -43,15 +41,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 12 Feb 2004 00:46:20 +0100
+Date: Thu, 12 Feb 2004 00:36:08 +0100
 
 Hi Fredrik,
 
-> I see. Yes, that would be better. When the device is reattached, this
-> info may need to be updated in case something has changed though. But
-> it's great to have it available "off-line" as read-only device metadata.
+> > I don't think so, because instead of (1) and (2) we need only a method
+> > that returns the current attached devices.
+> > 
+> > 	hci0 -> 11:22:33:44:55:66
+> > 	hci2 -> aa:bb:cc:dd:ee:ff
+> > 
+> > With this mapping the UI can do the rest.
+> 
+> But device info like manufacturer isn't stored in the configuration, 
+> so you'll need the actual device for this. That's why both (1) and (2)
+> are needed. (1) provides the list you gave above. (2) provides device
+> info which isn't configurable. Yes?
 
-don't care about the update, because this is so easy :)
+No, we can store manufacturer, version, features etc. along with all
+other device information. It is very easy to keep track of these. The
+only difference with such informations is that they are read-only.
 
 Regards
 
