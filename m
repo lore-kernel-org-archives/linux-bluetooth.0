@@ -1,17 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] snd-bt-sco development teamup | ALSA connection
+Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Lars Grunewaldt <lgw@dark-reality.de>
+To: Carl Orsborn <cjo@csr.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4118D9ED.4030705@dark-reality.de>
+In-Reply-To: <4118DAF9.2080204@csr.com>
 References: <4117AB9A.9010909@dark-reality.de>
-	 <1092071356.4564.12.camel@pegasus>  <4117B098.5020805@dark-reality.de>
+	 <1092071356.4564.12.camel@pegasus> <4117B098.5020805@dark-reality.de>
 	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>
 	 <1092090364.4564.46.camel@pegasus> <41180E64.1010007@dark-reality.de>
-	 <1092140041.4564.96.camel@pegasus>  <4118C5FC.1050502@dark-reality.de>
-	 <1092145515.4564.143.camel@pegasus>  <4118D9ED.4030705@dark-reality.de>
+	 <1092140041.4564.96.camel@pegasus> <4118C562.1050300@superbug.demon.co.uk>
+	 <Pine.LNX.4.59.9999.0408101435250.22497@brava.dcs.gla.ac.uk>
+	 <4118DAF9.2080204@csr.com>
 Content-Type: text/plain
-Message-Id: <1092150078.4564.178.camel@pegasus>
+Message-Id: <1092149315.4564.166.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -23,82 +24,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 17:01:18 +0200
+Date: Tue, 10 Aug 2004 16:48:35 +0200
 
-Hi Lars,
+Hi Carl,
 
-> Please, let me try it again:
+thanks for this additional information.
 
-ok, lets start over ;)
+> Much of this is discussed in CSR's "HCI Implementation" document,
+> bcore-me-026, though this is normally only made available to
+> CSR's (direct) customers.
 
-> [STRUCTURE]
-> 
-> so we get three parts, bluez kernel (BZ), user space daemon (USD) and
-> alsa driver (AD).
-> 
-> kernel/bluez kernel stuff (BZ):
-> This part resides in the kernel. It already does. It handles what
-> happens to the devices, i.e. converts the SCO device into an alsa device
-> node on request. It builds (not requests!) the connections for RFCOMM
-> and SCO (of course, that is what it does now too).
-> 
-> user space daemon (USD):
-> requests headset RFCOMM connect (from the user, like "bthsd --connect
-> <BTADDR>" or something alike, just an example) and handles the AT
-> commands. This is what our btsco program does right now, but I'd like to
-> have a real daemon here that is once started and then runs totally in
-> the background. Most AT handling that is needed is already implemented.
-> 
-> alsa driver (AD):
-> the alsa-specific stuff, like reporting to alsa applications what
-> channels exist, what audio props they have and so on
+If this moves forward and we get a little group of people that are
+looking at the ALSA driver and how we must extend the hci_usb driver and
+maybe the BlueZ core, can we make this document available to them?
 
-actually only two parts are needed. The SCO kernel driver and a headset
-userspace daemon.
-
-The SCO module register the SCO socket and register for handling SCO
-packets with the BlueZ core. The SCO raw socket can be used for control
-other things. It can also register the ALSA device, because most stuff
-will be only moving data packets from the BlueZ core to ALSA and vice
-versa. So the SCO module will depend on the ALSA and BlueZ core.
-
-The other part is the userspace daemon that includes the SDP, RFCOMM, AT
-handling, ALSA setup etc.
-
-> [INTEROPERABILITY]
-> 
-> There are two main sources that may demand things and that must be
-> supported:
-> 1. the headset: if the user presses the button, an AT is send. This must
-> be caught by USD, that opens the SCO connection in the usual way. Now
-> some ioctl kernel mojo happens to make the SCO connection usable for
-> alsa programs (I'm not sure how it works, but is sounds easy)
-> 
-> 2. the AD itself: a program might open the audio channel, than the AD
-> must notice the USD (or BZ?) to ring the headset bell so the user
-> notices, or open the SCO channel directly, depending on configuration;
-> also we must be able to change volume and stuff.
-> 
-> those two must be able to communicate in some way. The HS sends AT
-> commands that are handled by the USD, but how can the alsa driver i.e.
-> request an channel open? Or, from whom (USD or BZ?)
-
-If it is possible to poll the ALSA hwdep in some way this will be
-possible, but you must remeber that every kernel releated stuff will
-never be profile related. The kernel stuff is about protocol and all
-profile specific parts are done in userspace.
-
-> Of course it's not that easy, but concerning the device existing problem
-> the device is reported by the alsa driver, and that one does not depend
-> on an existing RFCOMM connection or something, so it should be possible
-> to load the "snd-bt-sco" alsa module (like it is now) so the program
-> thinks that the driver exists. Audio data should be taken from /dev/null
-> or something alike to make sure the application does not break when
-> trying to access the dummy device.
-
-Every SCO link depend on an existing ACL connection. In case of the
-headset and handsfree profiles these means no SCO link without the
-RFCOMM connection.
+I also suggest to everyone who will work on this, that he buys himself a
+D-Link DBT-120 (Rev. B2 or B3, but not B4) dongle and update it with the
+Apple firmware to HCI 18.1 to get a newer firmware.
 
 Regards
 
