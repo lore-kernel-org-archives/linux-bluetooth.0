@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluepin bash script with immediate pin response
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Burkhard Fischer <b.fi2@web.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <400D599B.3070004@web.de>
-References: <400D599B.3070004@web.de>
+From: Igor Luiz Oliveira de Souza <igorluiz@magiclink.com.br>
+Reply-To: igorluiz@magiclink.com.br
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1074648240.7088.30.camel@pegasus>
+Message-Id: <1074635052.4824.10.camel@emerald>
 Mime-Version: 1.0
+Subject: [Bluez-users] BT3030...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,75 +16,66 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Jan 2004 02:24:00 +0100
+Date: 20 Jan 2004 19:44:12 -0200
 
-Hi Burkhard,
+Hello all,
 
-> I am using BlueFRITZ! USB Bluetooth dongle, the BlueFRITZ
-> AP-ISDN and ciptool for establishing a connection.
-> 
-> I want to replace the python script bluepin with a simple shell script 
-> to avoid interactive authentication. A simple echo should do this, 
-> however I found out that a connection is only established when the 
-> bluepin bash script doesn't answer immediately.
-> 
-> Here is the syslog:
-> 
-> Jan 20 16:59:02 magito hcid[544]: pin_code_request 
-> (sba=00:04:0E:82:F9:74, dba=00:04:0E:84:06:CA)
-> Jan 20 16:59:02 magito hcid[1088]: hci_send_cmd 6bkgLuRqDpSIYZgP
-> Jan 20 16:59:02 magito hcid[544]: pin_code_request 
-> (sba=00:04:0E:82:F9:74, dba=00:04:0E:84:06:CA)
-> Jan 20 16:59:02 magito hcid[1091]: hci_send_cmd 6bkgLuRqDpSIYZgP
-> Jan 20 16:59:34 magito kernel: hci_cmd_task: hci0 command tx timeout
-> 
-> and with "sleep 1" before echoing the pin everything goes well (besides 
-> the occasional tx timeout):
-> 
-> Jan 20 17:14:35 magito hcid[544]: pin_code_request 
-> (sba=00:04:0E:82:F9:74, dba=0
-> 0:04:0E:84:06:CA)
-> Jan 20 17:14:36 magito hcid[1577]: hci_send_cmd 6bkgLuRqDpSIYZgP
-> Jan 20 17:14:38 magito kernel: hci_cmd_task: hci0 command tx timeout
-> Jan 20 17:15:10 magito hcid[544]: pin_code_request 
-> (sba=00:04:0E:82:F9:74, dba=0
-> 0:04:0E:84:06:CA)
-> Jan 20 17:15:11 magito hcid[1596]: hci_send_cmd 6bkgLuRqDpSIYZgP
-> Jan 20 17:15:11 magito hcid[544]: pin_code_request 
-> (sba=00:04:0E:82:F9:74, dba=0
-> 0:04:0E:84:06:CA)
-> Jan 20 17:15:12 magito kernel: hci_cmd_task: hci0 command tx timeout
-> Jan 20 17:15:12 magito hcid[1602]: hci_send_cmd 6bkgLuRqDpSIYZgP
-> Jan 20 17:15:12 magito hcid[544]: link_key_notify (sba=00:04:0E:82:F9:74)
-> Jan 20 17:15:12 magito hcid[544]: Saving link key 00:04:0E:82:F9:74 
-> 00:04:0E:84:
-> 06:CA
-> Jan 20 17:15:12 magito hcid[544]: link_key_notify (sba=00:04:0E:82:F9:74)
-> Jan 20 17:15:12 magito hcid[544]: Replacing link key 00:04:0E:82:F9:74 
-> 00:04:0E:
-> 84:06:CA
-> Jan 20 17:15:12 magito kernel: Found 1 CAPI controller(s) on device 
-> 00:04:0E:84:
-> 06:CA
-> Jan 20 17:15:12 magito kernel: kcapi: Controller 1: 00:04:0E:84:06:CA 
-> attached
-> Jan 20 17:15:12 magito kernel: kcapi: card 1 "00:04:0E:84:06:CA" ready.
-> Jan 20 17:15:12 magito kernel: kcapi: notify up contr 1
-> Jan 20 17:15:12 magito kernel: capi: controller 1 up
-> 
-> I am using 2.4.24 kernel with the mh1-Patch and the source 
-> bluez-libs-2.5.tar.gz
-> bluez-utils-2.4.tar.gz
-> bluez-sdp-1.5.tar.gz
-> 
-> Is there a reason for this behavior
+I'm trying to make my USB Dongle BT3030 works on linux...
+I'm almost getting crazy trying this without success...
+Can you give me some help?
 
-show us the dump (hcidump -w <file>) for a connection setup.
+I'm using slackware 9.0, kernel 2.4.20 (have tried 2.4.24 too, no
+success)... 
+I've download all the bluez packages, configured the kernel, recompile
+it...
+So, the modules seems to load correctly... see what I get after this
+loading modules sequence:
 
-Regards
+usbcore
+bluez
+hci_usb
+uhci
 
-Marcel
+in /var/log/syslog:
 
+Jan 14 15:13:42 emerald kernel: usb.c: USB device 2 (vend/prod
+0xa5c/0x2033) is not claimed by any active driver.
+
+in /var/log/messages:
+
+Jan 14 15:13:42 emerald kernel: hub.c: 2 ports detected
+Jan 14 15:13:42 emerald kernel: hub.c: new USB device 00:07.2-1,
+assigned address 2
+Jan 14 15:13:45 emerald /etc/hotplug/usb.agent: ... no modules for USB
+product 0/0/0
+Jan 14 15:13:45 emerald /etc/hotplug/usb.agent: ... no modules for USB
+product 0/0/0
+Jan 14 15:13:45 emerald /etc/hotplug/usb.agent: Setup hci_usb for USB
+product a5c/2033/a0
+Jan 14 15:13:45 emerald /etc/hotplug/usb.agent: Setup bluefw for USB
+product a5c/2033/a0
+Jan 14 15:13:45 emerald /etc/hotplug/usb.agent: Module setup bluefw for
+USB product a5c/2033/a0
+
+After that, that is no /proc/bus/usb...
+
+Trying hciconfig, I've got nothing... just like this:
+root@emerald:/usr/src/linux# hciconfig -a
+root@emerald:/usr/src/linux#
+root@emerald:/usr/src/linux# hcitool dev
+Devices:
+root@emerald:/usr/src/linux#
+
+Sorry about the big mail...
+So, can you give me some help... 
+What can I be forgetting or any special detail?
+
+Thanks in advance!
+-- 
+Igor Luiz Oliveira de Souza
+Magiclink Solucoes Internet
+Analista de TI - 88657412
+Salvador / BA   -  Brasil
 
 
 
