@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Talks at GUADEC, OSCON
+Subject: Re: [Bluez-users] Debian packages updated
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Edd Dumbill <edd@usefulinc.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1085586900.18009.14.camel@saag>
-References: <1085586900.18009.14.camel@saag>
+In-Reply-To: <1085586569.18009.7.camel@saag>
+References: <1085586569.18009.7.camel@saag>
 Content-Type: text/plain
-Message-Id: <1085594047.8896.32.camel@pegasus>
+Message-Id: <1085593355.8896.20.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,31 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 26 May 2004 19:54:07 +0200
+Date: Wed, 26 May 2004 19:42:35 +0200
 
 Hi Edd,
 
-> I'll be giving two talks related to BlueZ in the near future;:
+> I uploaded new experimental packages for BlueZ 2.7 to Debian
+> experimental (expect them there in a week or so, as bluez-cups is NEW),
+> and to the http://bluez.sf.net/download/debian/ repository.  This build
+> has DBUS and CUPS enabled.  More details are available in the
+> README.Debian file in the bluez-utils package.
 > 
-> GNOME Bluetooth support
->   GUADEC 2004: http://2004.guadec.org/
->   (Kristiansand, Norway, 28-30 June 2004)
+> Fuller details available on my blog at
+> http://usefulinc.com/edd/blog/contents/2004/05/26-bluez/read
 > 
-> Linux and Bluetooth
->   O'Reilly Open Source Convention 
->   http://conferences.oreillynet.com/os2004/
->   (July 26 - 30, 2004,  Portland, OR, USA)
+> I'd welcome feedback from users of the older packages, particularly in
+> how the 2.4 -> 2.7 upgrade goes, as the bluez-pan and bluez-sdp packages
+> have all been subsumed into bluez-utils.
 
-this is great. I like to see more talks about Bluetooth and Linux. If
-you make your papers and talks public after your talk, I am happy to
-link them from the BlueZ website.
+may you wanna add fixes for two of my stupid mistakes :(
 
-Btw you forgot to mention your book "Linux Unwired", which contains a
-great chapter about BlueZ. Oh and I am the responsible person that
-should be blamed that some of the stuff is already outdated. Sorry for
-that ;)
+http://cvs.sourceforge.net/viewcvs.py/bluez/libs/include/hci.h?r1=1.35&r2=1.36
+http://cvs.sourceforge.net/viewcvs.py/bluez/utils/hidd/main.c?r1=1.3&r2=1.4
 
-I should ask O'Reilly for a free copy for my next lecture.
+Please test these packages and give Edd feedback, so they can move very
+soon to unstable.
 
 Regards
 
