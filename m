@@ -1,59 +1,44 @@
-Return-Path: <steve.crane@rococosoft.com>
-Subject: Re: [Bluez-users] How do I obtain a free PSM automatically?
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-Cc: Alexandros Karypidis <karypid@inf.uth.gr>, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1044653120.32671.4.camel@pegasus.local>
-References: <200302071951.35073.karypid@inf.uth.gr>
-	<1044653120.32671.4.camel@pegasus.local>
-Content-Type: text/plain
-Message-Id: <1044704544.2164.1436.camel@baroque.rococosoft.com>
+Return-Path: <maxk@qualcomm.com>
+Message-Id: <5.1.0.14.2.20030324174756.0f0efff8@unixmail.qualcomm.com>
+Date: Mon, 24 Mar 2003 17:51:21 -0800
+To: david.libault@inventel.fr, Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+From: Max Krasnyansky <maxk@qualcomm.com>
+Subject: Re: [Bluez-devel] BlueZ Qualification
+Cc: Daryl Van Vorst <dvpub@telus.net>, bluez-devel@lists.sourceforge.net, Halam.Rose@7layers-UK.com
+In-Reply-To: <3E26CE2101C0104A@mel-rta6.wanadoo.fr> (added by
+	postmaster@wanadoo.fr)
+References: <5.1.0.14.2.20030306133725.025f46d8@mail1.qualcomm.com>
+	<1046706518.14907.133.camel@linux>
+	<5.1.0.14.2.20030306133725.025f46d8@mail1.qualcomm.com>
 Mime-Version: 1.0
-Date: 08 Feb 2003 11:42:24 +0000
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain; charset="us-ascii"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Fri, 2003-02-07 at 21:25, Marcel Holtmann wrote:
-> Hi Alexandros,
-> 
-> > I was assuming that the setting the psm field to zero would get you a 
-> > dynamically assigned free PSM on the local host:
-> > 
-> >   addr.l2_family = AF_BLUETOOTH;
-> >   bacpy(&addr.l2_bdaddr, BDADDR_ANY);  
-> >   addr.l2_psm = htobs(0);
-> > 
-> > Calling bind() for this address succeeds.
-> > Calling listen() afterwards fails and perror() gives: "Invalid argument"
-> 
-> you can't listen on PSM 0, because such PSM did not exists. You have to
-> choose one.
+At 12:47 AM 3/7/2003, David LIBAULT wrote:
+>This ACLsession program will help us do the L2CAP MTU negotiation test and 
+>we'll all see if fixing it in the main stream code is that much of a big 
+>deal, and what the 7layers BQB can reasonably accept.
+>
+>>
+>> >        2) write a script for each test case
+>>
+>> Anybody willing to contribute that ?
+>>
+>
+>Inventel can contribute with some test cases scripts using l2capsession. 
+>We'll do that if l2capsession "kind of way to do things" is retained. For the 
+>L2CAP tests (ACLsession) we have nothing yet.
+>
+>> It sounds like we need to create a module in CVS and start putting things
+>> that we need together. Any suggestion for a name ? "qube" ?
 
-It would be nice if it had the expected semantics (i.e., those of IP sockets).
-I think this is a bug.
+Here you go. 
+I implemented aclsession and created one common build tree for
+qualification utils.
 
-In the meantime, here is some code:
+QUBE - Qualification Utilities for BluEz
+http://bluez.sourceforge.net/download/bluez-qube-0.1.tar.gz
 
-   for (;;) {
-      while (psm++ < 0xffff)
-         if ((psm & 0x0001) && !(psm & 0x0100))
-            break;
-      if (psm == 0x10000) {
-         // no resources
-         close(s);
-         return -EBUSY;
-      }
-      addr.l2_psm = htobs(psm);
-      if (0 == bind(s, (struct sockaddr *)&addr, sizeof(addr)))
-         break;
-      if (errno != EADDRINUSE) {
-         int e = -errno;
-         close(s);
-	 return e;
-      }
-   }
+(it has your l2session thing in there).
 
-Enjoy,
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+Max
