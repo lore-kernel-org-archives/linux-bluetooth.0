@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hci_uart and Ambicom BT2000E
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Daniel Jimenez <djimenez@pobox.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4076FAC5.3060409@pobox.com>
-References: <40743AAE.4070808@pobox.com> <1081418373.2970.6.camel@pegasus>
-	 <4075EAF9.8060801@pobox.com> <1081534461.26610.15.camel@pegasus>
-	 <4076FAC5.3060409@pobox.com>
-Content-Type: text/plain
-Message-Id: <1081545879.26610.37.camel@pegasus>
+From: Elimar Riesebieter <riesebie@lxtec.de>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] hid2hci
+Message-ID: <20040409193454.GA2187@aragorn.home.lxtec.de>
+References: <20040409153508.GA2123@aragorn.home.lxtec.de> <1081531882.21596.23.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="uAKRQypu60I7Lcqm"
+In-Reply-To: <1081531882.21596.23.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,24 +18,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 09 Apr 2004 23:24:39 +0200
-
-Hi Daniel,
-
-> > I tested a Pretec card with an Ericsson chip on it and the card don't
-> > works either, but sometimes I get some bytes. I don't have enough time
-> > to dig deeper into it, but it must be possible to use these cards with
-> > serial_cs and hci_uart.
-> 
-> Know any PCMCIA cards that DO work in Linux?
-
-my COM One Bluetooth PCMCIA card (MC310) works.
-
-Regards
-
-Marcel
+Date: Fri, 9 Apr 2004 21:34:54 +0200
 
 
+--uAKRQypu60I7Lcqm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, 09 Apr 2004 the mental interface of
+Marcel Holtmann told:
+
+> Hi Elimar,
+[...]
+> looks like another USB problem. Maybe the USB guys already have a fix
+> for it. Ask them.
+
+hci_usb was loaded while running hid2hci. Unloading that module
+solves the prob. hci_usb is loaded from hotplug after changing to
+hci by hid2hci.
+
+Ciao
+
+Elimar
+
+--=20
+  >what IMHO then?
+  IMHO - Inhalation of a Multi-leafed Herbal Opiate ;)
+              --posting from alex in debian-user--
+
+--uAKRQypu60I7Lcqm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFAdvre3Ig8bsVPf7ARAhu8AJ9rn1O2Hhm/1NyW2AgrkklGgumstgCfV+dq
+IdC6MLpwUmpFk/C14FW2CEs=
+=lNcc
+-----END PGP SIGNATURE-----
+
+--uAKRQypu60I7Lcqm--
 
 
 -------------------------------------------------------
