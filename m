@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Message-Id: <v04020a1bbe030b55cc3a@[192.168.49.19]>
+Message-ID: <41DD67DC.5090803@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-From: Bob Gustafson <bobgus@rcn.com>
-Subject: Re: [Bluez-devel] btsco under FC3
+References: <v04020a1ebe030f7ac594@[192.168.49.19]>
+In-Reply-To: <v04020a1ebe030f7ac594@[192.168.49.19]>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] btsco cleanups - thanks a lot!
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,48 +18,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 6 Jan 2005 09:36:23 -0600
+Date: Thu, 06 Jan 2005 17:31:24 +0100
 
-Whoops - no tarball - loaded from CVS
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-BobG
+Dear Marcel (and all others who did it of course),
 
+I just wanted to say thanks again for cleaning the btsco stuff up so well!
 
-Hi Marcel
+the configure stuff is great and everything got a lot simplified, and
+there's even more stuff in it now :))
 
-Yes, I did that too. @AO.... did not seem to disappear from the Makefile
-without help from 'vim'
+just to give some credits and stuff.
 
-Will build from tarball again to see if my libtool is necessary.
+best regards
+- - Lars
 
-BobG
+- --
+Lars Grunewaldt
+* software development
+* multimedia design
+skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+web: http://www.dark-reality.de
+mail: lgw@dark-reality.de
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
->Hi Bob,
->
->> Yes, I did that too.
->>
->> something like 'up2date libao-devel', but the @AO. symbols were still in
->> the Makefile. I did lots of things, so need to do a clean install and
->> update to make certain what needs to be done to what.
->
->you need to ./bootstrap and ./configure again.
->
->Regards
->
->Marcel
->
->
->
->
->-------------------------------------------------------
->The SF.Net email is sponsored by: Beat the post-holiday blues
->Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
->It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
+iD8DBQFB3WfbQWC6DTWkDAoRAruAAJwPWKneWHvp+w5WJRp/PRq1MY44ZQCePLJ1
+3V5+ueIUiTpII22fhfY/UKs=
+=QdVB
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
