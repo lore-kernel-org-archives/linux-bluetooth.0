@@ -1,17 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Greg KH <greg@kroah.com>
-Cc: g@kroah.com, Alan Stern <stern@rowland.harvard.edu>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   USB development list <linux-usb-devel@lists.sourceforge.net>
-In-Reply-To: <20040428181808.GA15218@kroah.com>
-References: <Pine.LNX.4.44L0.0404281321520.1238-100000@ida.rowland.org>
-	 <20040428174325.GG32040@kroah.com> <1083175733.4000.67.camel@pegasus>
-	 <20040428181808.GA15218@kroah.com>
-Content-Type: text/plain
-Message-Id: <1083189940.4000.78.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: PATCH: (as265) Fix bluetooth driver's wait_for_urb()
+From: Nikita Tovstoles <Nikita.Tovstoles@Sun.COM>
+To: bluez-devel@lists.sourceforge.net
+Message-id: <40902623.8060509@sun.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] syntax for advertising a service with specific uuid
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,59 +15,60 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Apr 2004 00:05:40 +0200
+Date: Wed, 28 Apr 2004 14:46:11 -0700
 
-Hi Greg,
+Hello,
 
-> > I know that Max accepted this. So I also have to accept this, but this
-> > doesn't count for the bfusb driver and inserting this hack prevents it
-> > from oopsing on a UHCI controller, too.
-> 
-> If you unlink the urb synchronously there should be no more problems, as
-> Alan has fixed this in the UHCI driver, right?
+I'd like to create a client-server application in which a linux box 
+(running bluez) will advertise a service by declaring a specific service 
+uuid. the service needs to only be capable of sending / receiving 
+strings so i'm assuming declaring a btspp service should be enough. that 
+specific uuid will be embedded into a j2me midlet running on nokia 6600 
+(implementing jsr-82). the midlet will then search for service using url 
+of format:
 
-last time I checked Alan's disable_endpoint patch it still crashes both
-drivers and as you see the bfusb uses usb_free_urb().
+"btspp://1234567890123456789012" (uuid *has* to be chars long - nokia's 
+apparent implementation limitation).
+so (correct me if i'm wrong )what i need is:
+1.add Serial Port service via "sdptool add SP"
+2.set attributeID 0x0003 (ServiceID) for the above Service Record to 
+"1234567890123456789012"
 
-> > Right now I don't have enough time to rewrite the hci_usb driver, but it
-> > is on my todo list. Actually the bulk and isoc URB's should only be
-> > started when they are needed. This means when an ACL or SCO link is
-> > really established. However I think we should go back to the discussion
-> > how we can combine an URB with a SKB in a nice way. This would also be
-> > helpful for the bfusb driver.
-> 
-> What's wrong with just a pointer to the urb in the skb?
+correct?
+i'm not sure of the sdptool syntax for step 2.
 
->>From my point the URB should be central point in an USB driver. The SKB
-is only used as data buffer and if we use a SKB in the first place we
-don't have to copy the data twice to send it to the HCI layer. I really
-like to point to the SKB inside the URB, because otherwise I am still
-playing tricks to combine these two data types.
+problem:
+1.when i do step 1, i get "Serial Port registered". but, if i issue 
+"sdptool get SP" afterwards, i get description of
+"SDP Server" (0x1000). shouldn't it return something like "SerialPort" 
+(0x1101)  - service class id for SerialPort per bt spec?
+note: actually even if i issue "sdptool add LAN", subsequent "sdptool 
+get LAN" returns same description as above.
 
-> Some of the main reason I want to do this (becides all of the reference
-> counting stuff) is to see if a separate pool of urbs could increase
-> throughput any.  If we change the usb core to do this, and there is a
-> speed increase, then the bluetooth drivers would also see this
-> improvement.  But by trying to manage the memory yourself, you wouldn't
-> :)
-> 
-> Good enough bribe?
+2. also, i couldn't figure out exact syntax to accomplish step 2 above 
+(set attribute):
+sdptool setattr --help returns
 
-I always got your point over a year ago, but the world is not perfect
-and the lack of time keeps me from writing a new hci_usb driver from
-scratch so it will working nicely with dynamic creation for the URB's
-for the Bluetooth data and audio links links.
+"usage: sdptool get rec_handle attrib_id attrib_value", which seems not 
+to be what i need to do...
 
-> Hey, I'll even write the patch for the hci_usb driver :)
+thanks
 
-I am glad to test every patch you send me, but it may take some days. I
-still have another patch from Alan that is in my queue and he expects an
-answer.
+-nikita
 
-Regards
-
-Marcel
-
+-- 
+===================================
+Nikita Tovstoles, MTS
+Demolab (Executive Communications)
+Sun Microsystems, Inc.
+4170 Network Circle
+USCA17, Office 3705
+Mailstop USCA17-205
+Santa Clara CA 95054
+e-mail: nikita.tovstoles@sun.com
+office: 408-276-5348 / x15348
+cell: 650-996-8173
+===================================
 
 
 
