@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Trouble pairing with new phone...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.GSO.4.58.0502111016380.16262@gaia3.cc.gatech.edu>
-References: <Pine.GSO.4.58.0502111016380.16262@gaia3.cc.gatech.edu>
-Content-Type: text/plain
-Message-Id: <1108148960.18099.47.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <420CF980.1090004@thomae-privat.de>
+From: Matthias Thomae <bluez@thomae-privat.de>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: multipart/mixed;
+ boundary="------------080906020305060701070006"
+Subject: [Bluez-users] For device database: Siemens S65
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,71 +17,206 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Feb 2005 20:09:20 +0100
+Date: Fri, 11 Feb 2005 19:29:20 +0100
 
-Hi Jay,
+This is a multi-part message in MIME format.
+--------------080906020305060701070006
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> >you set yourself into security mode 3 by using auth and encrypt. Are you
-> >sure that you know what you are doing?
-> 
-> I'm not sure of anything, but it has worked for me in the past, and I get
-> the exact same results if I comment out the auth and encrypt commands in
-> the hcid.conf file. I've left them commented out for the rest of my
-> debugging.
+Hi Marcel,
 
-The default hcid.conf is quite good and you should only change the name
-or class of device.
+here is some info about the Siemens S65v (I guess 'v' stands for the 
+Vodafone-branded edition) for your device database.
 
-> >The PIN helper can't provide a PIN as it seems. Fix this.
-> >
-> 
-> I don't think the answer is quite this simple for the following reasons:
-> 
-> 1) my hcid.conf file has
->  security auto;
-> which if I understand it correctly is supposed to use the
-> /etc/bluetooth/pin file as opposed to the pin_helper application.
-> 
-> 1a) If I change this to "security user" the bluez-pin helper launches (but
-> my Palm T times out before I can enter the PIN on the laptop!) If I try to
-> pair the T610 phone with the laptop when "security user" is set, the
-> bluez-pin helper program DOES NOT LAUNCH, and hcidump -X says the
-> following:
-> 
-> HCIDump - HCI packet analyzer ver 1.12
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> > HCI Event: Connect Request (0x04) plen 10
->   B2 E6 1D D9 0A 00 04 02 52 01
-> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
->   B2 E6 1D D9 0A 00 00
+Does LMP version 1.2 mean it's a Bluetooth 1.2 device?
 
-You will only accept this connection if you become the master of the
-piconet.
+Greets
+Matthias
 
-> > HCI Event: Command Status (0x0f) plen 4
->   00 01 09 04
-> > HCI Event: Connect Complete (0x03) plen 11
->   1A 29 00 B2 E6 1D D9 0A 00 01 00
+--------------080906020305060701070006
+Content-Type: text/plain;
+ name="s65info.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="s65info.txt"
 
-This mean unsupported remote feature which may lead to that the phone
-does not support the role switch. Check with "hcitool info ..." and
-report.
+Requesting information ...
+	BD Address:  00:01:E3:xx:xx:xx
+	Device Name: S65
+	LMP Version: 1.2 (0x2) LMP Subversion: 0x750
+	Manufacturer: Infineon Technologies AG (9)
+	Features: 0xff 0xff 0x1d 0xc0 0x18 0x18 0x00 0x00
+		<3-slot packets> <5-slot packets> <encryption> <slot offset> 
+		<timing accuracy> <role switch> <hold mode> <sniff mode> 
+		<park state> <RSSI> <channel quality> <SCO link> <HV2 packets> 
+		<HV3 packets> <u-law log> <A-law log> <CVSD> <power control> 
+		<transparent SCO> <inquiry with RSSI> <extended SCO> 
+		<AFH cap. slave> <AFH class. slave> <AFH cap. master> 
+		<AFH class. master> 
 
-> >Even an application with L2CAP_LM_MASTER set can force the role switch
-> >at connection creation.
-> 
-> The only applications I'm running are hcid, sdpd and rfcomm which are
-> started in my bluetooth services (rc.d) file. I even commented out the
-> "rfcomm bind all" command from my /etc/rc.d/init.d/bluetooth file, but it
-> didn't change anything.
+--------------080906020305060701070006
+Content-Type: text/plain;
+ name="s65sdp.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="s65sdp.txt"
 
-And how is the sdpd started? Do you use the -m switch?
+Browsing 00:01:E3:xx:xx:xx ...
+Service Name: SerialPort
+Service RecHandle: 0x11101
+Service Class ID List:
+  "Serial Port" (0x1101)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 1
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Serial Port" (0x1101)
+    Version: 0x0100
 
-Regards
+Service Name: Dial-up networking
+Service RecHandle: 0x11103
+Service Class ID List:
+  "Dialup Networking" (0x1103)
+  "Generic Networking" (0x1201)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 1
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Dialup Networking" (0x1103)
+    Version: 0x0100
 
-Marcel
+Service Name: Fax
+Service RecHandle: 0x11111
+Service Class ID List:
+  "Fax" (0x1111)
+  "Generic Telephony" (0x1204)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 1
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Fax" (0x1111)
+    Version: 0x0100
+
+Service Name: OBEX File Transfer
+Service RecHandle: 0x11106
+Service Class ID List:
+  "OBEX File Transfer" (0x1106)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 5
+  "OBEX" (0x0008)
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "OBEX File Transfer" (0x1106)
+    Version: 0x0100
+
+Service Name: OBEX Object Push
+Service RecHandle: 0x11105
+Service Class ID List:
+  "OBEX Object Push" (0x1105)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 4
+  "OBEX" (0x0008)
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "OBEX Object Push" (0x1105)
+    Version: 0x0100
+
+Service Name: OBEX Synchronisation
+Service RecHandle: 0x11104
+Service Class ID List:
+  "IrMCSync" (0x1104)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 5
+  "OBEX" (0x0008)
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "IrMCSync" (0x1104)
+    Version: 0x0100
+
+Service Name: Voice gateway
+Service RecHandle: 0x11112
+Service Class ID List:
+  "Headset Audio Gateway" (0x1112)
+  "Generic Audio" (0x1203)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 2
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Headset" (0x1108)
+    Version: 0x0100
+
+Service Name: Voice gateway
+Service RecHandle: 0x1111f
+Service Class ID List:
+  "" (0x111f)
+  "Generic Audio" (0x1203)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 3
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "" (0x111e)
+    Version: 0x0101
+
+Service Name: SIM Access
+Service RecHandle: 0x1112d
+Service Class ID List:
+  "" (0x112d)
+  "Generic Telephony" (0x1204)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 6
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "" (0x112d)
+    Version: 0x0100
 
 
+--------------080906020305060701070006--
 
 
 -------------------------------------------------------
