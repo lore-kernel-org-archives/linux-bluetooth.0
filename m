@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: James Cameron <james.cameron@hp.com>
-To: 256436@bugs.debian.org, bluez-devel@lists.sourceforge.net
-Message-ID: <20040627133325.GA23996@hp.com>
+From: "Nicholas A. Preyss" <nalp@gmx.net>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Questions about BlueZ in  commercial use
+Message-ID: <20040627125235.GA15938@gmx.net>
+References: <003401c45c2b$b6eab240$0364a8c0@haruo>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="f2QGlHpHGjS2mn6Y"
-Subject: [Bluez-devel] [PATCH] pand/main.c, restore signals for dev-up script
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <003401c45c2b$b6eab240$0364a8c0@haruo>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,143 +17,69 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Jun 2004 23:33:25 +1000
+Date: Sun, 27 Jun 2004 14:52:35 +0200
 
+On  0, KeiHachi <keihachi@swissinfo.org> wrote:
+> I have some questions about BlueZ.
+> 
+> Our company is investigating now about BlueZ,
+> to determine whether it is useful to use in our commercial product, or not.
 
---f2QGlHpHGjS2mn6Y
-Content-Type: multipart/mixed; boundary="pWyiEgJYm5f9v55/"
-Content-Disposition: inline
+If this is the first GPL software you are using, please read and 
+understand the implications of this license. This is no offense, but i
+think some DVD and Router manufacturer didn't do this before integrating
+linux code in their products.
 
+> Q1. development schedule in the future
+> I saw  "http://www.bluez.org/todo.html"
+> But there is no information I want to know.
+> Please tell me the following things.
+> 
+> - eSCO (enhanced SCO) in Bluetooth 1.2
+> Do you have any plan to develop these?
 
---pWyiEgJYm5f9v55/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I am not Marcel and not writing any kernel code, but i listened his talk
+at Linuxtag Karlsruhe. I think the problem is the lack of the end-user
+products already supporting this. But it is on his plan:
 
-Problem: pand dev-up script on Debian fails to "ifup bnep0", the error
-is "Failed to bring up bnep0".
+http://www.holtmann.org/papers/bluetooth/lt2004_slides.pdf
 
-Diagnosis: dev-up script inherits the SIG_IGN of SIGCHLD and SIGPIPE
-done by pand/main.c, in addition to some open sockets.  The ifup program
-requires signals in default state.
+> - Audio/Video related profiles
+> Do you have any plan to develop these(A2DP, AVRCP)?
 
-Solution: restore signals to SIG_DFL, close some of the sockets.  A
-patch for this is attached, less comments.  The patch applies cleanly to
-both the Debian revision of pand/main.c 1.3, and to the current revision
-1.4 in CVS.
+He posted some time ago a request, that if people supply him such
+hardware he would implent those support.
 
+> Q2. maintenance/support
+> I found some examples about the support of open-source that
+> companies which want to use such a open-source software,
+> pay some maintenance fee to the community or some companies which
+> provide the service to maintain it, so that
+> the community or such companies ensure the quality of their software is a certain level.
+> For example, MySQL, JBoss, etc.
+> These open-sources are maintained to ensure the quality,
+> by some kind of organizations which get the maintenance fee.
+> 
+> Does BlueZ allow such a business model?
 
-Discussion:
+I don't understand, are you looking for a company that provides such
+support or you want to start a business providing such support?
+I don't know of the first, but contacting the developer directly, one
+may provide such support. The second is of course possible.
 
-Restoring the signals takes a call to sigaction() after fork() but
-before exec().  This call undoes the initialisation call in main().
+> Q3. version control
+> Many open-sources are composed of two versions,
+> one is a "testing version", and another is a "stable version". 
+> But I think BlueZ has only a "testing version".
+> 
+> Why doesn't BlueZ have a "stable version"?
+> Do you have any plan to have a "stable version" of BlueZ?
 
-Closing the sockets can be done automatically on fork(), or manually.
-My patch does it manually.
+It is so stable, you don't need one, ;) Just kidding. Why do you think,
+there is no stable version? I think the releases are considered stable
+and the CVS stuff and the utils2/libs2 are the testing branch.
 
-Closing the sockets automatically would require setting FD_CLOEXEC on
-them after they are created.  fcntl(sk, F_SETFD, FD_CLOEXEC);
-
-Closing the sockets manually requires the socket file descriptors to be
-sent to run_devup(); this seems ugly to me, I'm not altogether happy
-with the way I've done it and I hope the maintainer will rethink this
-for me.  Perhaps making the socket numbers global would make more sense.
-
-Even then, tests show that there are *three* file descriptors inherited
-by the dev-up script, and I've only been able to find two.  Hopefully
-the maintainer knows where the other one is; bnep_init()?
-
-Here's how I found the open sockets ... (a) place a "sleep 30m" in
-dev-up, (b) cause pand to run dev-up, (c) find pid of sleep, (d) run
-lsof -p ...
-
-sleep   16393 root    0u   CHR    1,3         163834 /dev/null
-sleep   16393 root    1w   REG    3,4     258  48965 /tmp/dev-up.16391.log
-sleep   16393 root    2w   REG    3,4     258  48965 /tmp/dev-up.16391.log
-sleep   16393 root    3u  sock    0,4           4477 can't identify protocol
-sleep   16393 root    5u  sock    0,4           4480 can't identify protocol
-sleep   16393 root    6u  sock    0,4          27277 can't identify protocol
-
-The signals were found using "cat /proc/${pid}/status", and confirmed
-with strace.
-
-Please let me know if my patch is applied.  Thanks!
-
---=20
-James Cameron                         http://quozl.netrek.org/
-HP Open Source, Volunteer             http://opensource.hp.com/
-PPTP Client Project, Release Engineer http://pptpclient.sourceforge.net/
-
---pWyiEgJYm5f9v55/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="pand-256436.patch"
-Content-Transfer-Encoding: quoted-printable
-
---- bluez-utils-2.7/pand/main.c	2004-05-09 20:39:43.000000000 +1000
-+++ bluez-utils-2.7-4-jc1/pand/main.c	2004-06-27 23:02:00.000000000 +1000
-@@ -84,9 +84,10 @@
- 	KILL
- } modes;
-=20
--static void run_devup(char *dev, char *dst)
-+static void run_devup(char *dev, char *dst, int sk, int nsk)
- {
- 	char *argv[4], prog[40];
-+	struct sigaction sa;
-=20
- 	sprintf(prog, "%s/%s", PAND_CONFIG_DIR, PAND_DEVUP_CMD);
-=20
-@@ -96,6 +97,15 @@
- 	if (fork())
- 		return;
-=20
-+	close(sk);
-+	if (nsk !=3D -1)
-+		close(nsk);
-+=09
-+	memset(&sa, 0, sizeof(sa));
-+	sa.sa_handler =3D SIG_DFL;
-+	sigaction(SIGCHLD, &sa, NULL);
-+	sigaction(SIGPIPE, &sa, NULL);
-+
- 	argv[0] =3D prog;
- 	argv[1] =3D dev;
- 	argv[2] =3D dst;
-@@ -184,7 +194,7 @@
-=20
- 			syslog(LOG_INFO, "New connection from %s %s", str, netdev);
-=20
--			run_devup(netdev, str);
-+			run_devup(netdev, str, sk, nsk);
- 		} else {
- 			syslog(LOG_ERR, "Connection failed. %s(%d)",
- 					strerror(errno), errno);
-@@ -274,7 +284,7 @@
-=20
- 		syslog(LOG_INFO, "%s connected", netdev);
-=20
--		run_devup(netdev, dst);
-+		run_devup(netdev, dst, sk, -1);
-=20
- 		if (persist)
- 			w4_hup(sk);
-
---pWyiEgJYm5f9v55/--
-
---f2QGlHpHGjS2mn6Y
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQFA3sylIiWKUhK+Mj4RAligAKCQwMBeTT0A+4kSjq/uDgZtkYX0+wCggCZ9
-wv5XKsw886KBCvzuqvDvauU=
-=PQ1W
------END PGP SIGNATURE-----
-
---f2QGlHpHGjS2mn6Y--
+nicholas
 
 
 -------------------------------------------------------
