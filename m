@@ -1,9 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <310519989.15540@bjut.edu.cn>
-From: "=?gb2312?B?ufnI8A==?=" <rguo@emails.bjut.edu.cn>
+From: Fred Schaettgen <bluez-user@schaettgen.de>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Subject: [Bluez-users] (no subject)
+Subject: Re: [Bluez-users] Use of /etc/bluetooth/link-key Bug or Feature ??
+References: <422DF27C.8080301@bjitodc.com> <200503090001.00828.jschindele@arcor.de>
+In-Reply-To: <200503090001.00828.jschindele@arcor.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200503110207.08959.bluez-user@schaettgen.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -15,17 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Mar 2005 13:46:29 +0800
+Date: Fri, 11 Mar 2005 02:07:06 +0100
 
-I have read the RFCOMM protocol of Bluetooth Specification,and want to read the
-source code of the rfcomm in  Bluez,but I don't find it in the bluez-kernel-2.2
-packet.Where is it? 
+On Wednesday 09 March 2005 00:01, J=FCrgen Schindele wrote:
+=2E..
+>  If this is a feature how can i delete a unique entry for one device
+> and not delete the whole file content because the content is not ascii ?
 
-	thanks in advance.
-                 
+In case you use KDE, you can use the "Paired devices" control center module=
+ of=20
+kdebluetooth to list and remove paired devices.
 
+=46red
 
-
+=2D-=20
+=46red Schaettgen
+bluez-devel@schaettgen.de
 
 
 -------------------------------------------------------
