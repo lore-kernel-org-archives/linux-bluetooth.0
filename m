@@ -1,20 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] PAN and kernel 2.4.26
+Subject: Re: [Bluez-devel] [PATCH] pand/main.c, restore signals for dev-up
+	script
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastian Ballmann <Crazydj@chaostal.de>
+To: James Cameron <james.cameron@hp.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1088423529.2513.15.camel@espy.crazydj.de>
-References: <1088271695.29447.5.camel@espy.crazydj.de>
-	 <1088364052.3774.67.camel@pegasus>
-	 <1088372482.2430.4.camel@espy.crazydj.de>
-	 <1088406110.3774.91.camel@pegasus>
-	 <1088413956.2508.3.camel@espy.crazydj.de>
-	 <1088414347.3774.170.camel@pegasus>
-	 <1088418472.2513.6.camel@espy.crazydj.de>
-	 <1088419003.3774.179.camel@pegasus>
-	 <1088423529.2513.15.camel@espy.crazydj.de>
+In-Reply-To: <20040628120612.GF8871@hp.com>
+References: <20040627133325.GA23996@hp.com>
+	 <1088366793.3774.70.camel@pegasus> <20040627233437.GD28828@hp.com>
+	 <1088408656.3774.136.camel@pegasus> <20040628085356.GA8871@hp.com>
+	 <1088413518.3774.167.camel@pegasus> <20040628095541.GB8871@hp.com>
+	 <1088417629.3774.177.camel@pegasus> <20040628101927.GC8871@hp.com>
+	 <1088419197.3774.183.camel@pegasus>  <20040628120612.GF8871@hp.com>
 Content-Type: text/plain
-Message-Id: <1088427485.3774.203.camel@pegasus>
+Message-Id: <1088427271.3774.198.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -26,63 +24,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Jun 2004 14:58:05 +0200
+Date: Mon, 28 Jun 2004 14:54:31 +0200
 
-Hi Bastian,
+Hi James,
 
-> > remove the security patch and try again.
+> > [...] The remote address is available via "pand -l".
 > 
-> Same effect.
+> Neat.  Another way to get it.  ;-)  But this way activates pand again,
+> so dev-up remains the most efficient way to get this address.
 
-I don't think so, because I looked at the patch and this seems to
-introducing the problem:
-
-diff -urPX nopatch linux-2.4.26/net/socket.c linux/net/socket.c
---- linux-2.4.26/net/socket.c   Fri Feb 20 10:07:45 2004
-+++ linux/net/socket.c  Sat Apr 17 02:13:55 2004
-@@ -1307,10 +1307,18 @@
- asmlinkage long sys_getsockopt(int fd, int level, int optname, char *optval, int *optlen)
- {
-        int err;
-+       int len;
-        struct socket *sock;
- 
-        if ((sock = sockfd_lookup(fd, &err))!=NULL)
-        {
-+               /* XXX: insufficient for SMP, but should be redundant anyway */
-+               if (get_user(len, optlen))
-+                       err = -EFAULT;
-+               else
-+               if (len < 0)
-+                       err = -EINVAL;
-+               else
-                if (level == SOL_SOCKET)
-                        err=sock_getsockopt(sock,level,optname,optval,optlen);
-                else
-
-And here is the fix for pand to also work with the patch:
-
-diff -u -r1.4 main.c
---- main.c      31 May 2004 22:21:42 -0000      1.4
-+++ main.c      28 Jun 2004 10:56:35 -0000
-@@ -136,6 +136,7 @@
-        }
- 
-        /* Setup L2CAP options according to BNEP spec */
-+       olen = sizeof(l2o);
-        if (getsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, &l2o, &olen) < 0) {
-                syslog(LOG_ERR, "Failed to get L2CAP options. %s(%d)",
-                                strerror(errno), errno);
-@@ -257,6 +258,7 @@
-        }
- 
-        /* Setup L2CAP options according to BNEP spec */
-+       olen = sizeof(l2o);
-        getsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, &l2o, &olen);
-        l2o.imtu = l2o.omtu = BNEP_MTU;
-        setsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, &l2o, sizeof(l2o));
-
-I committed this one already to CVS, because it is an obvious fix.
+what do you wanna do with that information? Actually I never needed it.
 
 Regards
 
