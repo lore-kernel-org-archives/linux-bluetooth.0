@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: Re: [Bluez-users] rfcomm problem
+Subject: Re: [Bluez-users] bluez-utils2: Bluetooth header files not found
 From: Marcel Holtmann <marcel@holtmann.org>
-To: giochi@telvia.it
+To: Pierre N <pierren@mac.com>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <1971820044523102014464@telvia.it>
-References: <1971820044523102014464@telvia.it>
+In-Reply-To: <1082711899.23022.10.camel@localhost>
+References: <1082711899.23022.10.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1082721131.1843.4.camel@merlin>
+Message-Id: <1082721025.1843.1.camel@merlin>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,16 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Apr 2004 13:52:12 +0200
+Date: Fri, 23 Apr 2004 13:50:26 +0200
 
-Hi Fabrizio,
+Hi Pierre,
 
-> rfcomm that I use is the right one: it comes from bluez-utils...
+> Trying to compile bluez-utils2 out from CVS. I get this error message on
+> ./configure:
+> 
+> checking for unistd.h... yes
+> checking bluetooth/bluetooth.h usability... no
+> checking bluetooth/bluetooth.h presence... no
+> checking for bluetooth/bluetooth.h... no
+> configure: error: Bluetooth header files not found
+> 
+> I tried ./configure --without-bluetooth
+> ./configure --with-bluetooth=/usr/src/kernel-headers-2.4.22 I always get
+> the same error message.
+> 
+> Using 2.4.22 on powerpc. What else do you guys need?
 
-I don't think so ;)
-
-Try "which rfcomm" to find the whole path of the program. Maybe you have
-both installed and the wrong one is the first in your search path.
+you must not specify the path of the kernel includes, because userspace
+programs should never include kernel header files. It is the prefix of
+your previous installed libs2 from CVS.
 
 Regards
 
