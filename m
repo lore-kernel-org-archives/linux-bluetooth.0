@@ -1,69 +1,57 @@
-Return-Path: <SRS0+7abe75bf9b19a3b2e46b+354+infradead.org+dwmw2@pentafluge.srs.infradead.org>
-Subject: RE: [Bluez-devel] Alignment issue
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Daryl Van Vorst <daryl@wideray.com>,
-   "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092308407.28711.99.camel@pegasus>
-References: <001201c47fc2$7093e4a0$1301010a@baked>
-	 <1092252699.4564.238.camel@pegasus>
-	 <1092299689.4622.8.camel@imladris.demon.co.uk>
-	 <1092302834.28711.72.camel@pegasus>
-	 <1092304890.15466.44.camel@hades.cambridge.redhat.com>
-	 <1092306154.28711.85.camel@pegasus>
-	 <1092306935.15466.74.camel@hades.cambridge.redhat.com>
-	 <1092308407.28711.99.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1092310391.15466.178.camel@hades.cambridge.redhat.com>
-Mime-Version: 1.0
-Date: Thu, 12 Aug 2004 12:33:11 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <20040812111537.27087.qmail@webmail27.rediffmail.com>
+MIME-Version: 1.0
+From: "abhay b" <abhay7182@rediffmail.com>
+Reply-To: "abhay b" <abhay7182@rediffmail.com>
+To: bluez-devel@lists.sourceforge.net
+Content-type: multipart/alternative;
+	boundary="Next_1092309337---0-203.199.83.37-27048"
+Subject: [Bluez-devel] (no subject)
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 12 Aug 2004 11:15:37 -0000
 
-On Thu, 2004-08-12 at 13:00 +0200, Marcel Holtmann wrote:
-> I am not familiar with PIE. Is it correct that it stands for "position
-> independent executables"?
+ This is a multipart mime message
 
-Indeed -- and that's about as much as I know too, I'm afraid. It's to
-allow random load addresses, to reduce the chance of successful buffer
-overflow attacks -- if the executable is loaded at a random address, you
-don't have known functions at known addresses which the shellcode can
-call. I think.
 
-> Do you have a link to the source and binary RPM's for me?
+--Next_1092309337---0-203.199.83.37-27048
+Content-type: text/html;
+	charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-http://download.fedora.redhat.com/pub/fedora/linux/core/development/i386/SRPMS/
-http://download.fedora.redhat.com/pub/fedora/linux/core/development/i386/Fedora/RPMS/
+<P>=0A&nbsp; <BR>=0Ahi<BR>=0Ai want to know abt the BT 1.2 support and SDIO=
+ support in BlueZ.<BR>=0Aplz mail me back if anyone has any info..<BR>=0Ath=
+anks <BR>=0Aabhay=0A</P>=0A<br><br>=0A<A target=3D"_blank" HREF=3D"http://c=
+lients.rediff.com/signature/track_sig.asp"><IMG SRC=3D"http://ads.rediff.co=
+m/RealMedia/ads/adstream_nx.cgi/www.rediffmail.com/inbox.htm@Bottom" BORDER=
+=3D0 VSPACE=3D0 HSPACE=3D0></a>=0A
+--Next_1092309337---0-203.199.83.37-27048
+Content-type: text/plain;
+	charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> Looks fine so far. I hope you checked the new --enable commands in
-> bluez-utils-2.9, because I made many stuff optional.
+ =A0=0Ahi=0Ai want to know abt the BT 1.2 support and SDIO support in BlueZ=
+.=0Aplz mail me back if anyone has any info..=0Athanks =0Aabhay
+--Next_1092309337---0-203.199.83.37-27048--
 
-Briefly. I think I enabled everything, and made a note to look closer at
-the firmware stuff.
 
-> The bluez-bluefw is deprecated. Please use bluez-firmware instead and
-> enable bcm203x program in bluez-utils if you need it (for 2.4 kernels
-> only). Splitting up a bluez-utils-bcm203x could be useful.
 
-I looked very briefly at that -- does it also support loading firmware
-in the PCMCIA cards? Is this the future instead of request_firmware()?
-Why so?
-
-> Actually even Debian and SuSE ship other init scripts and that is fine
-> for me. Do you think a --disable-initscripts option would make the life
-> of the package maintainers easier?
-
-I don't think it makes a lot of difference, to be honest -- although if
-so many distributions are shipping separate initscripts perhaps we
-should collaborate a bit more closely?
-
-> > /me shudders. Autocrap considered harmful. You break cross-compilation
-> > if you try to do that. I'd much prefer just to write portable code.
-> 
-> You are right. I forgot to think about cross-compilation.
-
-Users of autoconf often do -- when porting the distro to embedded
-machines and trying to cross-build it, autoconf was the single largest
-problem I encountered. 
-
--- 
-dwmw2
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
