@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200408050214.25654.wim.delvaux@adaptiveplanet.com>
-Subject: [Bluez-users] Some BT problems connecting between Ipaq and USB dongle
+Subject: Re: [Bluez-users] Question for the Mailing List
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Monika Hubrich <monikahubrich@aol.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <001601c47a50$36024fb0$8b1cb7ac@monika>
+References: <001601c47a50$36024fb0$8b1cb7ac@monika>
+Content-Type: text/plain
+Message-Id: <1091662770.16182.91.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,107 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 5 Aug 2004 02:14:25 +0200
+Date: Thu, 05 Aug 2004 01:39:30 +0200
 
-Am I having problems setting up a bluetooth connection between my Ipaq 3870 
-Fam 0.7.2 and my debian sid desktop.
+Hi Monika,
 
-I tried 
+> I use suse linux 8.2 since one week.
+> 
+> Can anybody help me, to go online with the pcmcia-card from pico
+> (sphinx) and the bluetooth-modem (sphinx-electronics).
+> There are lots of questions:
+> works the connection between the pcmcia-card (pico) and the
+> bluetooth-modem (pico-sphinx)?
+> My modem requires the pin 12345 for the first connection between the
+> pcmcia-card and the modem. 
+> How can I send this pin to the modem? (How can I communicate between
+> the pcmcia-Card and the modem? e.a. for the internet-connection)
+>   
+> I've already added my pico-card to the file /etc/pcmcia/config.
+> 
+> But what must I do now?
 
-clean reboot.
+check that your card works correctly. Do this with "hciconfig -a". If it
+is shown, then start "hcid" and call "rfcomm connect 0 <bdaddr> 1".
 
-	Server runs pand --listen --role NAP
+For more information look at the mailing list archives and check my
+articles and slides:
 
-client
-	
-	pand --search --cache --persist
+	http://www.holtmann.org/papers/bluetooth/uptimes2003.html
+	http://www.bluez.org/talks.html
 
-RESULT
+Regards
 
-	I do see a bluepin dialog on my desktop, I see the PIN code being sent
-	but then I get as result 
-
-> HCI Event: PIN Code Request(0x16) plen 6
-  . . . . . .
-> HCI Event: Connect Complete(0x03) plen 11
-  . ) . . . . . . . . .
-< HCI Command: PIN Code Request Reply(0x01|0x000d) plen 23
-  . . . . . . . 1 2 3 4 . . . . . . . . .
-  . . .
-> HCI Event: Command Complete(0x0e) plen 10
-  . . . . . . . . . .
-> HCI Event: Connect Request(0x04) plen 10
-  . . . . . . . . . .
-< HCI Command: Accept Connection Request(0x01|0x0009) plen 7
-  . . . . . . .
-> HCI Event: Command Status(0x0f) plen 4
-  . . . .
-
-	the PIN code is correct.
-	Normally should also get a dialog box on the Ipaq for the same PIN code
-
-I tried also running sdptool
-
-	Then I also get the PIN code dialog box but with following sequence
-	and output of command
-
-OUTPUT
-Inquiring ...
-Failed to connect to SDP server on 00:60:57:35:81:B6: Permission denied
-Failed to connect to SDP server on 00:60:57:02:71:A2: Permission denied
-
-DUMP
-> HCI Event: Connect Request(0x04) plen 10
-  . . . . . . . . . .
-< HCI Command: Accept Connection Request(0x01|0x0009) plen 7
-  . . . . . . .
-> HCI Event: Command Status(0x0f) plen 4
-  . . . .
-> HCI Event: Link Key Request(0x17) plen 6
-  . . . . . .
-< HCI Command: Link Key Request Negative Reply(0x01|0x000c) plen 6
-  . . . . . .
-> HCI Event: Role Change(0x12) plen 8
-  . . . . . . . .
-> HCI Event: Command Complete(0x0e) plen 10
-  . . . . . . . . . .
-> HCI Event: PIN Code Request(0x16) plen 6
-  . . . . . .
-> HCI Event: Connect Complete(0x03) plen 11
-  . ( . . . . . . . . .
-< HCI Command: PIN Code Request Reply(0x01|0x000d) plen 23
-  . . . . . . . 1 2 3 4 . . . . . . . . .
-  . . .
-> HCI Event: Command Complete(0x0e) plen 10
-  . . . . . . . . . .
-
-or RAW
-
-> 04 04 0A 96 85 0D C7 02 00 12 01 12 01
-< 01 09 04 07 96 85 0D C7 02 00 00
-> 04 0F 04 00 01 09 04
-> 04 17 06 96 85 0D C7 02 00
-< 01 0C 04 06 96 85 0D C7 02 00
-> 04 12 08 00 96 85 0D C7 02 00 00
-> 04 0E 0A 01 0C 04 00 96 85 0D C7 02 00
-> 04 16 06 96 85 0D C7 02 00
-> 04 03 0B 18 28 00 96 85 0D C7 02 00 01 00
-< 01 0D 04 17 96 85 0D C7 02 00 04 31 32 33 34 00 00 00 00 00
-  00 00 00 00 00 00 00
-> 04 0E 0A 01 0D 04 02 96 85 0D C7 02 00
-
-hcitool properly scans the devices.
-
-pinging yiels (with dialog )
-
-~ # l2ping 00:60:57:02:71:A2
-Can't connect.: Permission denied
-
-HELP !
-
-
-
-
+Marcel
 
 
 
