@@ -1,11 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Audio & Bluetooth
+Subject: Re: [Bluez-users] Re: PROBLEM: Apple powerbook, Apple BT keyboard,
+	keyboard does not reconnect on reboot
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <418FC205.7070102@tootai.net>
-References: <418FC205.7070102@tootai.net>
+To: Matthew Grant <grantma@anathoth.gen.nz>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1099942733.5806.7.camel@localhost>
+References: <1098654320.4635.16.camel@localhost>
+	 <1098676528.6465.68.camel@pegasus>  <1099721547.5132.70.camel@localhost>
+	 <1099744491.6919.39.camel@pegasus>  <1099771915.4563.9.camel@localhost>
+	 <1099776680.6919.104.camel@pegasus>  <1099788984.4543.5.camel@localhost>
+	 <1099795084.6896.3.camel@pegasus>  <1099942733.5806.7.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1099943857.29330.27.camel@pegasus>
+Message-Id: <1099943605.29330.21.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,27 +24,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 08 Nov 2004 20:57:37 +0100
+Date: Mon, 08 Nov 2004 20:53:25 +0100
 
-Hi Daniel,
+Hi Matthew,
 
-> I have a question: for my mobile I use an HAMA Bluetooth headset. If I 
-> buy a bluetooth PCMCIA card for my notebook, will I be able to use this 
-> headset with this card? recognized as a second soundcard? as a normal 
-> headset for my integrate soundcard? recognized by my software phone 
-> clients? If I buy an USB bluetooth device, would it be the same? better?
+> Just got debug going.  Going to put printks into hidp_get_connlist to
+> see what is happening.
+> 
+> Your comment on the big endian bug in the L2CAP you noticed below, and
+> some of the debug I have seen with the other BT problems make it look
+> like I am having endianess issues. 
+> 
+> I am going to print the kernel code tonight and read it through as it is
+> obvious I have to understand the stack if I am get things fixed - you
+> don't have access to an Apple machine to test things on.  In the past I
+> was a commercial router programmer, doing OSPF and IPX development.
+> 
+> Any good places to find protocol specs?  I especially need
+> specifications on the endianess of the incoming BT data so I can audit
+> and check the debug for that sort of thing.
 
-actually this is not an easy to answer question. First thing is that you
-should get a Bluetooth device with a CSR chip and at least HCI 16.x
-firmware on it. The second is that it must route the SCO traffic through
-the HCI and via a PCM. Then it should be possible.
+everything is in the Bluetooth core and HID profile specification.
 
-I would prefer a USB dongle, but there are problems with the driver that
-are not finally solved yet. PCMCIA cards may have the problem that the
-bandwith is not high enough or you may get bit errors.
-
-Look at bluetooth-alsa.sourceforge.net and the mailing list archives for
-more details.
+It must not be an endian problem, because other people with Apple
+machines are using HID. May you wanna try another compiler.
 
 Regards
 
