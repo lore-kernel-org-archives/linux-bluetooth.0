@@ -1,63 +1,64 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] RE: Recent CSR BlueCore2 firmware
-From: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <Steven.Singer@csr.com>
+Message-ID: <40892042.2030605@csr.com>
+Date: Fri, 23 Apr 2004 14:55:14 +0100
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
 To: "Rybalkin, Albert" <Albert.Rybalkin@Fiserv.com>
-Cc: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>,
+CC: "'Marcel Holtmann'" <marcel@holtmann.org>,
+   "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>,
    "'albertr@iral.com'" <albertr@iral.com>
-In-Reply-To: <CF8C38B8FA1ED511A92400508BE37F0B0A961D3B@exchange_corp.bhcsecurities.COM>
+Subject: Re: [Bluez-devel] RE: Recent CSR BlueCore2 firmware
 References: 
-	 <CF8C38B8FA1ED511A92400508BE37F0B0A961D3B@exchange_corp.bhcsecurities.COM>
-Content-Type: text/plain
-Message-Id: <1082730057.23959.110.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 23 Apr 2004 16:20:57 +0200
+    <CF8C38B8FA1ED511A92400508BE37F0B0A961D3B@exchange_corp.bhcsecurities.COM>
+In-Reply-To: 
+    <CF8C38B8FA1ED511A92400508BE37F0B0A961D3B@exchange_corp.bhcsecurities.COM>
+Content-Type: text/plain; charset="us-ascii"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Albert,
-
-> Well, I guess it wouldn't be hard to figure out that I don't 
-> "have the right permissions"...
-
-I guessed that, but you can't ask other people than the guys from CSR to
-send you this tool ;)
-
+Rybalkin, Albert wrote:
 > Anyway, is there any way to get a hold of PSTool besides paying
 > mega-bucks to CSR for their BlueSuite/BlueLab SDKs? All I need is
-> to be able to change persistent store settings in my
-> BlueCore2-external
+> to be able to change persistent store settings in my BlueCore2-external
 > module (which I've already paid for).
+> 
+> I have a small hobby project (noncommercial, of course) to implant
+> a bluetooth module into my aging Psion 5mx running linux 2.4.19.
+> Is there any way for me to get PSTool without spending big bucks
+> on SDK which I don';t need and can't afford? Or CSR only favors
+> large customers who pay big bucks for support? If so, it's really
+> a sad situation for non-commercial bluetooth developers...
 
-Actually you can use Linux and BlueZ to change every PS key. There is no
-real utility like the PS tool from CSR, but with some coding experience
-this is also possible. I personally don't provide a way of changing the
-PS keys with any of the BlueZ utilities, because it is easy to set your
-module into a non working state. Actually it is not really hard to write
-a PS tool for Linux/BlueZ, but someone has to do it. If you expect me to
-do it then you must found somebody who pays me for doing it, because
-otherwise I won't find time for it.
+CSR run some support newsgroups. They're open to everyone including
+hobby developers. Instructions on using them are are:
 
-Regards
+  http://www.csr.com/forum.htm
 
-Marcel
+Use the same etiquette as you would for an open source development
+mailing list (such as bluez-devel). That is, read the FAQ, post
+polite but detailed questions, and remember that the support on those
+newsgroups is free so it may take time for someone to get round to
+answering your question and stupid, frequently asked or RTFM questions
+may be ignored. If you mention you've been told to forward your question
+there, then you're more likely to get a prompt response.
+
+Explain on the newsgroup what it is you're trying to do rather than
+just stating that you need PSTool. Depending on the precise nature of
+the problem there may be other solutions and the more interesting the
+problem the more likely you are to get a reply.
+
+	- Steven
+-- 
 
 
 
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
 
--------------------------------------------------------
-This SF.net email is sponsored by: The Robotic Monkeys at ThinkGeek
-For a limited time only, get FREE Ground shipping on all orders of $35
-or more. Hurry up and shop folks, this offer expires April 30th!
-http://www.thinkgeek.com/freeshipping/?cpg=12297
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
