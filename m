@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Q: bluetooth dongle for Linux/Sparc?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <32746.192.35.17.15.1107943529.squirrel@buci.de>
-References: <32746.192.35.17.15.1107943529.squirrel@buci.de>
-Content-Type: text/plain
-Message-Id: <1107944385.13863.17.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <32746.192.35.17.15.1107943529.squirrel@buci.de>
+From: "Raimund Steger" <rs@mytum.de>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;charset=iso-8859-1
+Subject: [Bluez-users] Q: bluetooth dongle for Linux/Sparc?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,34 +16,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 09 Feb 2005 11:19:45 +0100
+Date: Wed, 9 Feb 2005 11:05:29 +0100 (CET)
 
-Hi Raimund,
+Hello,
 
-> can anyone recommend a particular bluetooth device that will expectedly
-> work with little problems on my Sun Ultra10 (Linux 2.4)?
-> 
-> Searching in the mailing list archives, I discovered that
-> 
-> 1) Kernel post-2.4.19 is required for serial devices
-> 2) generally, a USB interface card in conjunction with a USB
->    device is recommended
-> 
-> I would generally prefer to use the machine's serial ('sunsab') interface.
-> But I will in fact switch to the USB solution if that will work
-> more reliably.
-> 
-> The compatibility list linked on the Bluez website lists a few
-> serial devices. Can all these be used on Sparc?
+can anyone recommend a particular bluetooth device that will expectedly
+work with little problems on my Sun Ultra10 (Linux 2.4)?
 
-I never tested any serial Bluetooth device with my Ultra 10, but the USB
-approach is working fine.
+Searching in the mailing list archives, I discovered that
 
-Regards
+1) Kernel post-2.4.19 is required for serial devices
+2) generally, a USB interface card in conjunction with a USB
+   device is recommended
 
-Marcel
+I would generally prefer to use the machine's serial ('sunsab') interface.
+But I will in fact switch to the USB solution if that will work
+more reliably.
+
+The compatibility list linked on the Bluez website lists a few
+serial devices. Can all these be used on Sparc?
+
+Thank you!
+
+-Raimund
 
 
+
+-- 
+R.Steger Tel. +49-179-2981642 mailto:rs@mytum.de
 
 
 -------------------------------------------------------
