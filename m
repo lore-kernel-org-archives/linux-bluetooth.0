@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <416D23A6.3010904@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] question about hci_usb endpoint selection...
+Subject: Re: [Bluez-devel] how to do inquiry with RSSI in bluetooth 1.2
+	devices?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: albert@csail.mit.edu
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <ef9938ec041012125930f0b8e3@mail.gmail.com>
+References: <ef9938ec041012125930f0b8e3@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1097658003.4643.17.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,60 +19,110 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 13 Oct 2004 14:46:30 +0200
+Date: Wed, 13 Oct 2004 11:00:03 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Albert,
 
-Hi there,
+> I'd like to use bluez to perform a device inquiry with RSSI using a
+> bluetooth 1.2 device.  Currently, I'm using an Anycom USB-120
+> bluetooth adapter with the latest firmware installed.
+> 
+> I want to check the inquiry mode of the bluetooth device first and
+> then change it if needed.  Based on my reading of the bluez headers
+> and the bluetooth spec, this is what I came up with.
+> 
+>         // first read the current mode and see if we need to change it
+>         {
+>             struct hci_request req;
+>             char raw_rp[EVT_CMD_COMPLETE_SIZE + READ_INQUIRY_MODE_RP_SIZE];
+>             read_inquiry_mode_rp *rp;
+> 
+>             req.ogf = OGF_LINK_CTL;
+>             req.ocf = OCF_READ_INQUIRY_MODE;
+>             req.cparam = 0;
+>             req.clen = 0;
+>             req.rparam = &raw_rp;
+>             req.rlen = READ_INQUIRY_MODE_RP_SIZE;
+> 
+>             err = hci_send_req( sock, &req, 0 );
+>             if( err ) {
+>                 if( errno == EPERM ) {
+>                     fprintf(stderr, "permission denied while reading inquiry "
+>                             "mode.  Are you sure you're superuser?\n");
+>                 }
+>                 return -1;
+>             }
+> 
+>             rp = (read_inquiry_mode_rp*)(raw_rp + EVT_CMD_COMPLETE_SIZE);
+>             if( rp->status != 0 ) {
+>                 fprintf(stderr, "error 0x%x reading inquiry mode\n", 
+>                         rp->status);
+>                 return -1;
+>             }
+>             change_inquiry_mode = (! rp->mode);
+> 
+>             fprintf(stderr, "done reading inquiry mode.  %s to set\n",
+>                     change_inquiry_mode?"Need":"Do not need");
+>         }
+> 
+>         // set the inquiry mode (use RSSI or not) if needed
+>         if( change_inquiry_mode )
+>         {
+>             write_inquiry_mode_cp wim_cp;
+>             struct hci_request req;
+>             char raw_rp[EVT_CMD_COMPLETE_SIZE + WRITE_INQUIRY_MODE_RP_SIZE];
+>             write_inquiry_mode_rp *rp;
+>             wim_cp.mode = do_inquiry_with_rssi;
+> 
+>             req.ogf = OGF_LINK_CTL;
+>             req.ocf = OCF_WRITE_INQUIRY_MODE;
+>             req.event = EVT_CMD_COMPLETE;
+>             req.cparam = &wim_cp;
+>             req.clen = WRITE_INQUIRY_MODE_CP_SIZE;
+>             req.rparam = &raw_rp;
+>             req.rlen = EVT_CMD_COMPLETE_SIZE + WRITE_INQUIRY_MODE_RP_SIZE;
+> 
+>             err = hci_send_req( sock, &req, 0 );
+>             if( err ) { 
+>                 fprintf(stderr, "error while setting inquiry mode.  errno %d\n",
+>                         errno);
+>                 perror("hci_send_cmd"); 
+>                 return -1;
+>             }
+> 
+>             rp = (write_inquiry_mode_rp*)(raw_rp + EVT_CMD_COMPLETE_SIZE);
+>             if( rp->status != 0 ) {
+>                 fprintf(stderr, "error 0x%x setting inquiry mode\n",
+>                         rp->status);
+>                 return -1;
+>             }
+> 
+>             fprintf(stderr, "Done setting inquiry mode\n");
+>         }
+> 
+> My first question is - is this the correct way to do it?
 
-I already asked this before, but I want to "nail down" this problem now,
-so I'm asking again and hope that someone can give some suggestions that
-even my stupid brain can understand. If this is the wrong list to ask,
-just point me to the correct one, and I'll post again there.
+looks like it is correct. Send me a patch for the Bluetooth library to
+include this as API functions.
 
-The problem is this:
-when using sco and using different voice modes (0x0060 for 16bit/8kHz,
-0x0040 for 8bit/8kHz), different "alternate settings" have to be used on
-hci_usb.
+> When I run this with the anycom bluetooth device, the very first
+> hci_send_req never returns.  I expected the READ_INQUIRY_MODE command
+> to generate a CMD_COMPLETE event, but no event is ever generated (I
+> tested this separately).  Also, when hcidump is run concurrently with
+> this program, it doesn't pick anything up (no events are read by
+> hcidump)  The same happens if I try to set the inquiry mode directly
+> without reading it first (the WRITE_INQUIRY_MODE command never
+> returns)
 
-The former answer was:
-"Don't use this patch [changing the "alternate settings" selection
-hardcodedly] and accept the default voice setting of 0x0060."
+I never saw that on my dongle. Please recompile your kernel without the
+SCO audio support for the hci_usb driver. What kind of USB host
+controller are you using? What kernel version do you use?
 
-We really don't want to. There are MANY people out there who want to use
-16 bit audio, and MANY who want to use 8bit MU_LAW. What has to be done
-to make it possible to change this "alternate setting" when we actually
-*need* not alternate setting "2" (16bit), but use alternate setting "1"
-when needed?
+Regards
 
-Marcel pointed out that:
-"You can make use of the notify() callback and adjust the alternate
-setting as needed. Maybe you have to unlink and re-submit the ISOC
-URB's, but the best way is to start the ISOC URB's only when a SCO
-connection is created."
+Marcel
 
-Uhm, sorry. What? Yes, I'm not firm in kernel hacking, yes, I did not
-RTFM, please just push me into the right direction here. Either API
-documentation href and/or "use this and that function", or just dump
-some lines of pseudo code with "what function comes from what API" so
-that I can get a basic understanding what's going on in hci_usb. What
-notify callback? How to register? Where can I find an example of someone
-else doing this? Where can I find out what an ISOC URB really is?
 
-I really don't want someone else to do my work, I just don't know where
-to begin :'(
-
-thanks very much in advance,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFBbSOlQWC6DTWkDAoRAvCeAJ0dVdrxZQLICG+YWblj66AV13L2CQCfUy0t
-Ik0eK8//nhu6vUssynVgT74=
-=+L+B
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
