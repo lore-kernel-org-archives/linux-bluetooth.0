@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Davide Rizzo <rizzo@eidosspa.it>
-Message-ID: <loom.20041110T131444-132@post.gmane.org>
-References: <4190FB84.1040000@eidosspa.it>  <1100023997.6866.16.camel@pegasus>  <loom.20041110T091344-899@post.gmane.org>  <1100078284.25879.61.camel@pegasus>  <loom.20041110T103214-10@post.gmane.org> <1100080758.25879.66.camel@pegasus>
+Subject: Re: [Bluez-users] Re: How to emulate slave serial ports ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <loom.20041110T103214-10@post.gmane.org>
+References: <4190FB84.1040000@eidosspa.it>
+	 <1100023997.6866.16.camel@pegasus>
+	 <loom.20041110T091344-899@post.gmane.org>
+	 <1100078284.25879.61.camel@pegasus>
+	 <loom.20041110T103214-10@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1100080758.25879.66.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: How to emulate slave serial ports ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,30 +22,59 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 10 Nov 2004 12:17:48 +0000 (UTC)
+Date: Wed, 10 Nov 2004 10:59:17 +0100
 
-Hi Marcel,
+Hi Davide,
 
-I solved (almost) all problems !
+> Let me start from the outside.
+> 
+> The final result I want to obtain is:
+> 
+> From a PC running Windows (master):
+> 1) I scan the bluetooth devices, and find one (or more) my linux devices
+> 2) I pair the device with the correct PIN code
+> 3) I browse the device's services and find one communication ports
+> 4) I establish a Link with that comm port to a Windows virtual COMx port
+> 5) I use the connected COMx port like any other "true" COMx port, sending
+> inquiries and reading results in a proprietary format.
+> Until now I succeeded in points 1) and 2)
+> 
+> From the target running linux 2.6.9 on an ARM9 (slave):
+> 1) I run hciconfig
+> 2) I start hcid
+> 3) I start sdpd
+> 4) My application opens /dev/rfcomm0 and keeps it opened
+> 5) My application polls with read() on /dev/rfcomm0 for incoming messages
 
-The correct solution is:
+point 4 and 5 don't work this way on the server side, because you need
+to listen on incoming connections first before you can use the device
+node. What is the program on the ARM9 (slave) doing? I think you need to
+rewrite it and add native RFCOMM support.
 
-hciconfig hci0 up
-hcid
-sdpd &
-sdptool add SP
-rfcomm listen /dev/rfcomm0 &
+> Question 1:
+> Is necessary to have on the target my application running with /dev/rfcomm0
+> opened for the Windows PC to look at the exported serial port ?
 
-... and now the program on the target can use /dev/rfcomm0 exactly like
-before it worked with /dev/TTYSACx !
+No. You need to setup a service record for the serial port profile and
+listen on incoming connection on the RFCOMM channel.
 
-The only problem is that rfcomm exits when windows closes the connection,
-so I need to run it again to be ready to listen for the next connection.
-But this is a minor problem, I'll investigate in the rfcomm code to get the
-parts I need, so I'll be able also to understand if the connection is on or
-not.
+> Question 2:
+> I setted up /usr/local/etc/bluetooth/pin and /usr/local/etc/bluetooth/hcid.conf
+> for hcid, and it works OK. Does sdpd needs any configuration file ? Where is
+> stored the sdpd configuration ? Where is stored the fact that I want to export
+> one virtual serial port ?
 
-Thank you very much for your precious effort.
+The SDP records are runtime records.
+
+> Question 3:
+> If I run sdpd without any flags, it doesn't fork() because getppid()==1. Why ?
+> Which is the correct mode of starting sdpd like a daemon ?
+
+Maybe this is problem with your ARM platform or your compiler.
+
+Regards
+
+Marcel
 
 
 
