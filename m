@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluez library questions
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41EB6ACB.5050305@gmx.ch>
-References: <41EB6ACB.5050305@gmx.ch>
-Content-Type: text/plain
-Message-Id: <1105960682.8080.23.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41EB8C5C.2090708@cc.hut.fi>
+From: Heikki Vuolteenaho <hvuoltee@cc.hut.fi>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Receiving multiple (>2) incoming rfcomm connections?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +16,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 17 Jan 2005 12:18:02 +0100
+Date: Mon, 17 Jan 2005 11:58:52 +0200
 
-Hi Marco,
+Hi all,
 
-> The bluez library (to create bluetooth programs), is it in only in c?
-> Or does a c++ library exist?
+I'm trying to create a simple application that receives incoming rfcomm 
+connections from Nokia Series60 phones and listens for incoming data.
 
-you can use the library from C and C++ programs.
+This is how I'm doing it currently:
 
-> What about documentation?
-> I searched the archive and my conclusion is that there is no 
-> documentation. The only starting help is:
-> - bluez-utils-2.14/test
-> - the slides from "Bluetooth programming for Linux"
+for (i = 1...n) {
+   Listen on channel 1, rfcomm port i (rfcomm listen i)
+   Wait until incoming connection received
+   Start a new thread that handles incoming data on /dev/rfcomm<i>
+}
 
-there is no real library documentation. Feel free to start with it.
 
-Regards
+For one or two connections, it works ok. However, when I try to connect 
+a third device, nothing happens. Nothing shows up even on hcidump when I 
+try to connect the third phone. On the phone I receive error 
+EPageTimedOut(-6004), which according to my friend means that the phone 
+could not get any kind of connection.
 
-Marcel
+Any ideas why it's not working? Thanks in advance,
 
+-Hege-
+
+
+
+Setup details:
+-Compaq Evo laptop with Debian
+-Conceptronic USB BT (CSR)
+-Various Nokia phones (6630, 6600, Ngage, 3650)
+-Python pyserial module for reading the serial port
 
 
 
