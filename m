@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Re: MS Optical Desktop Elite for BT; can"t
-	reconnect after idle
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.GSO.4.58.0502112202380.29873@frodo.dd.chalmers.se>
-References: <Pine.GSO.4.58.0502112202380.29873@frodo.dd.chalmers.se>
-Content-Type: text/plain
-Message-Id: <1108163705.18099.72.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <420D3997.9040406@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] btsco and headsets questions
+References: <20050211223950.23217.qmail@web50203.mail.yahoo.com>
+In-Reply-To: <20050211223950.23217.qmail@web50203.mail.yahoo.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,61 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 12 Feb 2005 00:15:05 +0100
+Date: Fri, 11 Feb 2005 16:02:47 -0700
 
-Hi Tomas,
+Paul
 
-> Yes it's the second version. As I see it the transciever seems to be
-> working (had to upgrade the kernel to 2.6.10 though). Except the mouse and
-> keyboard I have managed to recieve an image from my Sony Ericsson T630
-> cellphone via "Bluetooth File Sharing". The cellphone doesn't see any
-> services on the computer but that could very well be because I haven't
-> even tried configuring any yet.
+> I did some hacks on btsco2 and now I can press connect button on my HS and it disconnects the SCO
+> channel. Then I press it again twice, and it connects the SCO channel again.
 
-please try 2.6.11-rc3-bk8, because I pushed some changes for this device
-into mainline. Can you send me /proc/bus/usb/devices with the dongle
-attached to your machine?
+you mean twice in a row means you want to connect? why not have it 
+toggle like most phones do?
 
-> A strange thing is that in /dev/input I get a few (1-2) keyboard entries
-> (which are not outputing anything when I 'cat' them) on top of the normal
-> keyboard and bluetooth-keyboard. These all are removed when the keyboard
-> goes into idle state.
-> 
-> To get the mouse and keyboard working I used the following steps (I
-> havn't touched any scipt- or configfiles yet except bluetooth/pin):
-> 1. "hciconfig hci0 up"
-> 2. Pressing the buttons underneath the mouse and keyboard for a few
-> seconds.
-> 3. "hcitool scan"
-> 4. "hidd --connect mAddr"
-> 5. "hidd --connect kAddr"
-> 
-> In the use of hidd I feel quite lost. It seems to be living it's own life.
-> It can add devices by just searching for them and sometimes killall
-> doesn't kill all connections for example. So if I'm doing something wrong,
-> it might be there.
-> 
-> And to reconnect it after it becomes idle I repeat steps 2 though 5. OK,
-> that's the complete background, now over to the output you requested.
+as long as your patch doesn't introduce a dependency on the kde stuff, 
+we should have a serious look.
 
-There should be a "hidd --server" running to catch the re-connect
-attempts of the mouse and the keyboard. Otherwise it can't work.
+i'd rather have a context diff than the complete file. (use cvs diff -u)
 
-> Didn't know exactly what you where looking for in sdptool so I am sending
-> the whole output. I strange thing I noticed when using hcidump was that
-> the scroll-wheel and the special buttons (not the left, scroll-wheel and
-> right buttons) only generated output when the mouse was in idle mode. The
-> extra keys (or the scroll-wheel) on the keyboard never generated any
-> output.
-
-The optimal is the output of "sdptest records" from the libs2 CVS
-repository, because it tries to get every information available.
-
-Regards
-
-Marcel
-
-
+brad
 
 
 -------------------------------------------------------
