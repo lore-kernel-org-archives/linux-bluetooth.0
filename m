@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <404DA19C.304@lnt.uni-saarland.de>
-From: Eric Chapman <eric@lnt.uni-saarland.de>
+From: "franz keuner" <franz_keuner@gmx.net>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-References: <404C38C7.5040805@soft.uni-linz.ac.at> <404C64E9.7080106@superbug.demon.co.uk> <404D6D91.9050602@soft.uni-linz.ac.at>
-In-Reply-To: <404D6D91.9050602@soft.uni-linz.ac.at>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] USB Device hangs
+Message-ID: <1366.1078828940@www52.gmx.net>
+Content-Type: text/plain; charset="iso-8859-1"
+Subject: [Bluez-devel] rfcomm connection send data
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,35 +15,89 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 09 Mar 2004 11:51:08 +0100
+Date: Tue, 9 Mar 2004 11:42:20 +0100 (MET)
 
-Hi List,
+hello,
 
-I am currently using a Axis Developer Board (Embedded Linux), for which=20
-I have cross-compiled parts of BlueZ. I am using 2 Bluettooth dongles,=20
-one serial and on USB. Both have a CSR BC02 chip and are rev. 16.4.
-I can "hciconfig up" and "down" them, inquire via "hcitool inq". But as=20
-soon as I do a "hcitool scan" or a "l2ping" using the USB dongle, the=20
-whole box freezes up. With the serial one (which I have to activate=20
-first using "hciattach") everything works just fine. Unfortunately I=20
-need the USB for matters of speed.
+i´m trying to develop an application using the bluezstack (usb dongle)  and
+the sonyericsson p900.
+i´m able to connect the two devices via rfcomm.
 
-Anyone got a hint where to start lookin, or how to maybe get some=20
-debugging info out of hcitool (for ex.) before it crashes?
+rfcomm connect 0 00:00:00:00:00:00  5
+Connected /dev/rfcomm0 to 00:00:00:00:00:00  on channel 5
+Press CTRL-C for hangup
 
-Eric
+now i want to send data(string) from one device to the other.
+on the p900 i use MIDlets and the java bluetooth api. 
 
---=20
-Eric Chapman
+if i start listening and dump with ./rctest -d and trying to connect the
+p900 the following message returns:
+./rctest -d
+rctest: Waiting for connection on channel 10 ...
+rctest: Connect from 00:00:00:00:00:00 (p900 adress)
+rctest: Receiving ...
 
------------------
-Lehrstuhl f=FCr Nachrichtentechnik
-Universit=E4t des Saarlandes
-Postfach 15 11 50
-D-66041 Saarbr=FCcken
-Tel: +49 681 302 3975
-Fax: +49 681 302 3972
-Web: www.lnt.uni-saarland.de
+an nothing happens...
+i use in the MIDlet the command: connector client = (StreamConnection)
+Connector.open(btspp://dongle adress and channel));
+
+so the connection seems to work alright.
+
+the data i want to send is a string saved in content:
+output = client.openOutputStream();
+byte[] data = content.getBytes();
+output.write(data);
+
+the p900 confirms it sended the data and rctest gives no error message or
+anything.
+
+i hope somebody can help me.
+
+regards,
+
+franzhello,
+
+i´m trying to develop an application using the bluezstack (usb dongle)  and
+the sonyericsson p900.
+i´m able to connect the two devices via rfcomm.
+
+rfcomm connect 0 00:00:00:00:00:00  5
+Connected /dev/rfcomm0 to 00:00:00:00:00:00  on channel 5
+Press CTRL-C for hangup
+
+now i want to send data(string) from one device to the other.
+on the p900 i use MIDlets and the java bluetooth api. 
+
+if i start listening and dump with ./rctest -d and trying to connect the
+p900 the following message returns:
+./rctest -d
+rctest: Waiting for connection on channel 10 ...
+rctest: Connect from 00:00:00:00:00:00 (p900 adress)
+rctest: Receiving ...
+
+an nothing happens...
+i use in the MIDlet the command: connector client = (StreamConnection)
+Connector.open(btspp://dongle adress and channel));
+
+so the connection seems to work alright.
+
+the data i want to send is a string saved in content:
+output = client.openOutputStream();
+byte[] data = content.getBytes();
+output.write(data);
+
+the p900 confirms it sended the data and rctest gives no error message or
+anything.
+
+i hope somebody can help me.
+
+regards,
+
+franz
+
+-- 
++++ NEU bei GMX und erstmalig in Deutschland: TÜV-geprüfter Virenschutz +++
+100% Virenerkennung nach Wildlist. Infos: http://www.gmx.net/virenschutz
 
 
 
