@@ -1,7 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: grpmind+bluez.users@boromir.vpop.net
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] How to configure a 723kbps connection?
+Message-ID: <000d01c3f343$d89f1ad0$e04db850@ULLA>
+From: "Zbigniew Diaczyszyn (gmx)" <z.dia@gmx.de>
+To: <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Subject: [Bluez-users] rfcomm: permission denied
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -12,20 +16,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat Feb 14 17:06:12 2004
-Message-Id: <20040215000300.0C48932D37@mail.rvs.uni-bielefeld.de>
+Date: Sat, 14 Feb 2004 22:45:19 +0100
 
-I'd like to configure a linux box using a USB bt dongle to talk to an ipaq    
-at 723kbps for streaming video. So two questions:
+Hi Marcel,
 
-1. How can I tell at what rate the two bluetooth devices are talking? I could   
-use l2test if I could run linux on the ipaq, but I can't (yet).
+sorry, but the file is empty :-(
 
-2. How can I configure the two to talk at the assymetric 723kbps rate? 
- 
-Thanks for any help you can give.
- 
-Matt
+Zbigniew
+
+---------------------------------------------------------------
+
+linux:/home/dia # hcidump -w hcidump.log
+HCIDump - HCI packet analyzer ver 1.5
+device: hci0 snap_len: 1028 filter: 0xffffffff
+
+linux:/home/dia # ls -l hcidump.log
+-rw-rws---    1 root     root            0 Feb 13 23:32 hcidump.log
+
+
+
+
 
 
 -------------------------------------------------------
