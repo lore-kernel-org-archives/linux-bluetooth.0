@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050317161431.45633.qmail@web26607.mail.ukl.yahoo.com>
-From: BZ Benny <bennybbz@yahoo.fr>
-Subject: Re: [Bluez-users] Adresse resolution in BlueZ
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: 6667
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Subject: Re: [Bluez-users] Has anyone seen these problems with the CSR
+	BlueCore and BlueZ before ?
+From: Erwin Authried <eauth@softsys.co.at>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E1DBv62-0004qg-Ld@sc8-sf-mx1.sourceforge.net>
+References: <E1DBv62-0004qg-Ld@sc8-sf-mx1.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1111073754.1547.9.camel@justakiss>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,51 +19,53 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Mar 2005 17:14:31 +0100 (CET)
+Date: Thu, 17 Mar 2005 16:35:55 +0100
+
+Am Don, den 17.03.2005 schrieb Han Hoekstra um 14:30:
+> Hey All,
+>  
+> I'm developping an application on an ARM-7 based platform which is
+> running Linux 2.4.18 with the latest BlueZ version for that platform.
+> In this application there is a master device that can connect to up to
+> 7 slaves (master and slave devices are all the same, the external
+> controller determines which is master).
+>  
+> The application does the following, the external controller on the
+> master can send a single command to the Linux application, in the
+> command is an address field identifying to which slaves the command
+> must be passed on. A slave will pass the command on to its external
+> controller, which will respond to the command by sending a reply back
+> to the Linux slave, which in turn passes it on to the Linux master and
+> is then handed over to the external controller again. As soon as all
+> addressed slaves have responded, the sequence is repeated.
+>  
+> Now to what I see happening, when I run this with 5 slaves, I don't
+> see any problems for more than an hour, but when I run it with 6 or 7
+> slaves, I see that the BlueCore resets itself, with 6 slaves after
+> about 40 minutes and with 7 slaves already after 5 to 10 minutes. When
+> I eliminate the CRC check I can run the 7 slaves configuration for up
+> to about 40 minutes after it crashes.
+>  
+> What I think happens is that the BlueCore receives data to fast over
+> the air and can not pass it on to the Linux CPU quick enough, so there
+> is an internal overflow in the BlueCore.
+> Communication between the BlueCore and the Linux CPU is done via BCSP
+> at a speed of 921600 baud.
+>  
+> Has anybody seen behaviour like this before and is there something I
+> can do about it ???
+>  
+Hi,
+I had  problems with uart overruns on an embedded ARM7 system that could
+be solved by optimisations in the serial driver and hci_bcsp.c. You
+should take a look at /proc/tty/driver to see if you get a lot of
+overrun errors. What is your cpu, how many Bogomips does the kernel
+show?
+
+Regards,
+Erwin
 
 
-Hi all.
-
-
-> Hi Benny,
-> 
-> > > This BNEP virtual network card is as dumb as a
-> > normal 
-> > > Ethernet network card. The networklayer knows
-> our
-> > MAC
-> > > address (BD_ADDR) and 
-> > 
-> > Actually I'm talking about the peer MAC address.
-> 
-> you know that even BNEP is point-to-point and so you
-> know the MAC
-> address of the peer, because it is the remote
-> BD_ADDR of the underlaying
-> ACL link.
->
-Am I not undertandbale ?
-Is there someone who can understand me? 
-
-I know that BNEP know the BD_ADDR of the peer device.
-But BNEP need to make a coresspondance beteewn the
-peer BD_ADDR address and the peer IP adress. This
-corespondance is made by ARP? how did bnep ask it from
-ARP.
-If you read all my example in my last mail you will
-understand my question.
-
-regards,
-imad.
-
-
-
-	
-
-	
-		
-Découvrez nos promotions exclusives "destination de la Tunisie, du Maroc, des Baléares et la Rép. Dominicaine sur Yahoo! Voyages :
-http://fr.travel.yahoo.com/promotions/mar14.html
 
 
 -------------------------------------------------------
