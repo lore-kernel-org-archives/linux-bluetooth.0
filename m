@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jeff Sutherland <jeffs@fairwayacademy.org>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200402121636.02074.jeffs@fairwayacademy.org>
-Subject: [Bluez-users] Timeout message from kernel
+Subject: Re: [Bluez-users] Problem with connection between two pc using
+	bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+To: DVornheder@t-online.de
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1ArCh7-0SGjjc0@cmpmail09.bbul.t-online.de>
+References: <1ArCh7-0SGjjc0@cmpmail09.bbul.t-online.de>
+Content-Type: text/plain
+Message-Id: <1076585404.2671.2.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,55 +19,65 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 12 Feb 2004 16:36:02 -0500
+Date: Thu, 12 Feb 2004 12:30:04 +0100
 
-Some newbie bluetooth questions: I'm running the latest bluez-utils on a 
-2.4.24 uClinx kernel on a Moto ColdFire 5282 processor.  It's sort of 
-working, but having a bit of trouble trying to connect between a brain box 
-serial dongle on the ColdFire board and a brainbox usb dongle on a pc.  
-'hcitool info from the pc yields:
+Hi Dirk,
 
-[root@Arwen bluetooth]# hcitool info 00:0A:4F:00:13:5F
-Requesting information ...
-        BD Address:  00:0A:4F:00:13:5F
-        Device Name: BlueZ (0)
-        LMP Version: 1.1 (0x1) LMP Subversion: 0x175
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link>
-                <HV2 packets> <HV3 packets> <u-law log> <A-law log>
-                <CVSD> <paging scheme> <power control> <transparent SCO>
+> I try to get a connection between two pc using bluetooth.
+> 
+> My hardware: AVM Fritz AP-X ISDN and two AVM BlueFritz USB Sticks.
+> 
+> At the first pc i start pand --search and get a connection to AP-X
+> without any problems.
+> 
+> At the second pc i start pand --search but the connection fails:
+> 
+> Feb 11 18:44:03 pclap hcid[1290]: link_key_request
+> (sba=00:04:0E:85:B2:C0, dba=0
+> 0:04:0E:85:35:15)                                                       
+>        
+> Feb 11 18:44:03 pclap hcid[1290]: link_key_notify
+> (sba=00:04:0E:85:B2:C0)       
+> Feb 11 18:44:03 pclap hcid[1290]: Replacing link key 00:04:0E:85:B2:C0
+> 00:04:0E:
+> 85:35:15                                                                
+>        
+> Feb 11 18:44:03 pclap kernel: Bluetooth: Found 1 CAPI controller(s) on
+> device 00
+> :04:0E:85:35:15                                                         
+>        
+> Feb 11 18:44:03 pclap kernel: kcapi: Controller 1: 00:04:0E:85:35:15
+> attached   
+> Feb 11 18:44:03 pclap kernel: kcapi: card 1 "00:04:0E:85:35:15" ready.  
+>        
+> Feb 11 18:44:03 pclap kernel: kcapi: notify up contr 1                  
+>        
+> Feb 11 18:44:03 pclap kernel: Bluetooth: BNEP (Ethernet Emulation) ver
+> 1.0      
+> Feb 11 18:44:03 pclap kernel: Bluetooth: BNEP filters: protocol
+> multicast       
+> Feb 11 18:44:03 pclap pand[3561]: PAN daemon ver 1.1                    
+>        
+> Feb 11 18:44:03 pclap pand[3561]: Inquiring                             
+>        
+> Feb 11 18:44:03 pclap pand[3561]: Searching for NAP on 00:04:0E:85:2E:9A
+>        
+> Feb 11 18:44:43 pclap pand[3561]: Failed to connect to the SDP server.
+> Connectio
+> n timed out(110)                                                        
+>        
+> Feb 11 18:44:43 pclap pand[3561]: Searching for NAP on 00:04:0E:85:35:15
+>        
+> Feb 11 18:45:23 pclap pand[3561]: Failed to connect to the SDP server.
+> Connectio
+> n timed out(110)                                                        
 
-so it looks like the ColdFire dongle is alive and responding to the pc.  A 
-'hcitool scan' from the ColdFire board yields:
+make a dump with "hcidump -w <file>".
 
-/> hcitool scan
-Scanning ...
-bcsp_timed_event: Timeout, retransmitting 1 pkts
-bcsp_timed_event: Timeout, retransmitting 1 pkts
-bcsp_timed_event: Timeout, retransmitting 1 pkts
-        00:0A:4F:00:09:5E       BlueZ (0)
-/>
+Regards
 
-and hcitool info on the ColdFire board yields:
+Marcel
 
-/> hcitool info 00:0A:4F:00:09:5E
-Requesting information ...
-bcsp_timed_event: Timeout, retransmitting 1 pkts
-Can't create connection: Input/output error
-pid 52: failed 256
-/>
-
-Anyone have an idea of what the kernel is complaining about?  My thoughts are 
-there might still be some serial port issues on the ColdFire board...
-
--Jeff
--- 
-Secure your email with Gnu Privacy Guard and Mozilla, the open source
-cross platform solution for Windows, Linux, and Mac OS X.
-See http://enigmail.mozdev.org/
 
 
 
