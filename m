@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset="us-ascii"
-Message-Id: <18254.476735-32120-513904206-1062794584@seznam.cz>
-Cc: 
-Mime-Version: 1.0
-Reply-To: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
-Subject: [Bluez-users] =?us-ascii?Q?Errror=20=23=2021?=
+To: Leos Literak <leos.literak@systinet.com>
+Cc: Bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] phillips fisio 825
+References: <3F4F32E0.7050802@systinet.com>
+From: Olivier Berger <olberger@club-internet.fr>
+In-Reply-To: <3F4F32E0.7050802@systinet.com> (Leos Literak's message of
+	"Fri, 29 Aug 2003 13:02:56 +0200")
+Message-ID: <87smnbzk6i.fsf@club-internet.fr>
+MIME-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -19,27 +20,44 @@ List-Unsubscribe:
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Sep 2003 22:43:04 +0200 (CEST)
+Date: Fri, 05 Sep 2003 10:57:57 +0200
+Content-Type: text/plain; CHARSET=iso-8859-1
 
-Anyone know what this error "21" is at the bottom and why role-switching is refusing to take place?  Can you tell if it's the host (USB dongle) or remote device (client/7650) that is refusing to role-switch?
+Leos Literak <leos.literak@systinet.com> writes:
 
-Thanks in advance.  D.
+> Hi,
+>
+> I have mandrake 9.1 with latest kernel 2.4.21 and latest bluez
+> utilities. I try to connect phone $SUBJECT to my PC using
+> USB BT card. After some experimantation I succeeded.
+> But there are still some errors. So treat this as bugreport :-)
+>
+> sdptool browse - > segfaults
+>
+> rfcomm bind - it depends on order, in which I start BT / Receive
+> on phone and invoke rfcomm bind. I have to run command on PC
+> and then immediatelly start BT/Receive on phone. Usually it
+> takes me many attempts, before I catch correct timing and these
+> two devices become connected.
+>
+> I attach log, as I invoke commands command with hcidump.
+>
 
+I used to have a Fisio 820 (probably similar) and had some trouble too
+sometimes.
 
-root@localhost jds]# /usr/sbin/hcidump -x -t
-HCIDump - HCI packet analyzer ver 1.5
-device: hci0 snap_len: 1028 filter: 0xffffffff
-1062687133.011099 > HCI Event: Connect Request(0x04) plen 10
-B8 50 30 EE 02 00 04 22 50 01
-1062687133.011643 < HCI Command: Accept Connection Request(0x01|0x0009) plen 7
-B8 50 30 EE 02 00 00
-1062687133.026095 > HCI Event: Command Status(0x0f) plen 4
-00 01 09 04
-1062687133.104082 > HCI Event: Connect Complete(0x03) plen 11 
-21 28 00 B8 50 30 EE 02 00 01 00
+In cas it would be usefull, you may still be able to find usefull
+information in the docs I wrote (now updated for my new T68i) :
 
-____________________________________________________________
-WWW stranky zdarma na http://www.sweb.cz
+http://perso.club-internet.fr/olberger/btgprsfisio820orangefr.html
+
+Hope this helps.
+
+Regards,
+-- 
+Olivier BERGER (OpenPGP: 1024D/B4C5F37F)
+APRIL (http://www.april.org) - Vive python (http://www.python.org)
+Pétition contre les brevets logiciels : http://petition.eurolinux.org
 
 
 -------------------------------------------------------
