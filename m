@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200404100030.49916.pavouk@pavouk.org>
-Subject: [Bluez-users] Pretec and Ambicom BT2000E driver
+Subject: Re: [Bluez-users] hci_uart and Ambicom BT2000E
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daniel Jimenez <djimenez@pobox.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4076FAC5.3060409@pobox.com>
+References: <40743AAE.4070808@pobox.com> <1081418373.2970.6.camel@pegasus>
+	 <4075EAF9.8060801@pobox.com> <1081534461.26610.15.camel@pegasus>
+	 <4076FAC5.3060409@pobox.com>
+Content-Type: text/plain
+Message-Id: <1081545879.26610.37.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,20 +20,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 10 Apr 2004 00:30:49 +0200
+Date: Fri, 09 Apr 2004 23:24:39 +0200
 
-Hello,
+Hi Daniel,
 
-yesterday somebody talks about BT2000E CF card.
-I have Pretec BT2000E CF card.
-I found new version of alternative driver which probably fix resume problems 
-and 2.6 kernel compiling.
-I found changelog here:
-http://www.iral.com/~albertr/linux/bt2000e/ChangeLog
+> > I tested a Pretec card with an Ericsson chip on it and the card don't
+> > works either, but sometimes I get some bytes. I don't have enough time
+> > to dig deeper into it, but it must be possible to use these cards with
+> > serial_cs and hci_uart.
+> 
+> Know any PCMCIA cards that DO work in Linux?
 
-Best regards,
+my COM One Bluetooth PCMCIA card (MC310) works.
 
-Pavel Ruzicka
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
