@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] About rfcomm socket
+Subject: Re: [Bluez-devel] A2DP working :-) , voice not :-(
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41AD867D.2060609@avantwave.com>
-References: <41AD2B86.6010002@avantwave.com>
-	 <1101882506.18840.18.camel@pegasus>  <41AD867D.2060609@avantwave.com>
+In-Reply-To: <200412010943.33419.mail@sebastian-eichner.de>
+References: <200412010839.06669.mailsp@sebastian-eichner.de>
+	 <200412010907.09587.mail@sebastian-eichner.de>
+	 <1101889919.18840.40.camel@pegasus>
+	 <200412010943.33419.mail@sebastian-eichner.de>
 Content-Type: text/plain
-Message-Id: <1101894514.18840.50.camel@pegasus>
+Message-Id: <1101894192.18840.44.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,25 +21,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 10:48:34 +0100
+Date: Wed, 01 Dec 2004 10:43:12 +0100
 
-Hi Mike,
+Hi Sebastian,
 
-you posted your request to both mailing lists. Don't do any cross
-posting.
+> > this should work. Do you enabled CONFIG_BT_HCIUSB_SCO in your
+> > kernel?
+> 
+> cat /proc/config.gz |gunzip -|grep CONFIG_BT_HCIUSB_SCO
+> CONFIG_BT_HCIUSB_SCO=y
+> 
+> Yes, it's enabled. Hmm, tricky thing...
+> Generally it should work with kernel 2.6.9, right?
 
->     Here is code fragment. I use usual fork practise to run these two 
-> func do_connect and do_listen.  I hard code the bluetooth device to be 
-> connected just because code is under testing.
->     And these two func are using different channel, it can be connected 
-> when do_connect retry more than 3 times.
->     So i do not why it can not be connected when it is trying to connect 
-> another device.
-
-I don't get your point. Make it clear who is connecting to whom.
-
-And if you don't set your socket to non-blocking the use of select makes
-no sense. Show us the full code.
+yes, and last time I tested this, it worked for me.
 
 Regards
 
