@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Message-ID: <45A1F95BB9D7D84FAB0A1EB4D67EEF9601665B5F@is01ex01.ittiam.com>
-From: "Ritesh Ramesh Parekh" <riteshramesh.parekh@ittiam.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Help Needed - Ritesh
+Subject: Re: [Bluez-users] Nokia 7610 phone & logitech DiNovo keyboard /
+	MX900 mouse
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1102291223.4219.3.camel@localhost>
+References: <1102035154.4258.14.camel@localhost>
+	 <1102042749.7350.33.camel@pegasus>  <1102291223.4219.3.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1102315314.8510.57.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,18 +20,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 6 Dec 2004 16:40:14 +0530
+Date: Mon, 06 Dec 2004 07:41:54 +0100
 
-Hello,
+Hi Laurence,
 
-I am implementing a Bluetooth application for portable players. My =
-application uses ARM926EJ host processor interfaced to Bluetooth =
-baseband processor. I am looking for linux profiles RFCOMM, L2CAP, SDP, =
-HCI driver, file transfer profile and TCP/IP application on ARM9 =
-processor. Can anyone throw some light and help me in this regard.
+> I have now upgraded to Fedora Core 3
+> kernel-2.6.9-1.667
+> bluez-bluefw-1.0-6
+> bluez-hcidump-1.11-1
+> bluez-utils-2.10-2
+> bluez-libs-2.10-2
+> bluez-libs-devel-2.10-2
+> 
+> the problem more or less is the same, start Bluetooth, keyboard & mouse
+> stop working.
+> 
+> Same question as before, how do I set it up so the system will recognise
+> my phone, keyboard & mouse.
 
-Thanks & Regards,
-Ritesh
+make sure that "hidd --server" is started somewhere in the boot script.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
