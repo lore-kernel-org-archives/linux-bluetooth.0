@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Fred Schaettgen <buez-devel@schaettgen.de>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200410181951.02650.buez-devel@schaettgen.de>
-Subject: [Bluez-devel] Sharing link keys with windows?
+Subject: Re: [Bluez-devel] Piconet Routing
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stefan Mischke <survivor@uni-paderborn.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4173F86A.3050801@uni-paderborn.de>
+References: <4173F86A.3050801@uni-paderborn.de>
+Content-Type: text/plain
+Message-Id: <1098120822.11765.5.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,21 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 18 Oct 2004 19:51:02 +0200
+Date: Mon, 18 Oct 2004 19:33:42 +0200
 
-Hi,
+Hi Stefan,
 
-If I switch between Windows and Linux I have to re-pair devices each time I 
-boot the other system and try to use a service that requires authentication. 
-Is there a utility to copy the link keys from Linux to Windows, so that both 
-BlueZ and the MS-Stack use the same keys? 
+> Since Bluetooth uses Time Division Duplex, a slave is not allowed to 
+> talk to another slave in the same Piconet. The logical consequence must 
+> be that the data is routed over the master. I've used l2test to check if 
+> l2cap does this kind of routing automatically. It doesn't but rather 
+> creates a new, direct acl link to the remote slave device (scatternet). 
+> I don't know how it is with rfcomm, but I suppose it's the same. My 
+> question: Is there any automatic Piconet Routing inside BlueZ or does 
+> one have to implement it by oneself?
 
-greetings
-Fred
+you must do it by yourself, because even if the master manages to put
+all devices into the same piconet the connections are point to point.
 
--- 
-Fred Schaettgen
-bluez-devel@schaettgen.de
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
