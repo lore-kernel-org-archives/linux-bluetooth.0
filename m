@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Serial Port
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Neil Fenemor <Neil@OnDrugs.co.nz>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1088044859.3703.55.camel@localhost.localdomain>
-References: <1088044859.3703.55.camel@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1088068518.4296.31.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <40DA45E0.9000207@popak.myftp.org>
+From: Ramin Rezaiifar <ramin@popak.myftp.org>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Low bit rate
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,26 +15,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Jun 2004 11:15:18 +0200
+Date: Wed, 23 Jun 2004 20:09:20 -0700
 
-Hi Neil,
 
-> how do I fake my laptop as being a serial port? As thats what my phone
-> needs to be able to see for a its Active Sync to work, and in turn,
-> its synce/multisync...
+I use the bluetooth link between a Palm T3 and a Linux machine.
+The data rate seems to be noticeably lower than the rate when I use the 
+Palm device with a Windows XP machine.  In both cases I use a Linksys 
+USB dongle.
 
-aren't there are any SynCE + BlueZ howtos? However the easiest way is to
-use something like this:
+The following is the hciconfig output.  Has anyone else experienced such 
+a difference between windows and Linux?
+Can I increase the rate with the hcitool by changing the pcacket type 
+for the connection?
 
-	sdptool add --channel=12 sp
-	rfcomm listen 0 12
+thanks,
 
-If I remeber correct the ActiveSync over Bluetooth means PPP over RFCOMM
-so you should better use dund instead of rfcomm.
+-Ramin
 
-Regards
 
-Marcel
+[root@popak root]# hciconfig -a
+hci0:   Type: USB
+       BD Address: 00:0C:41:E1:E9:E1 ACL MTU: 192:8  SCO MTU: 64:8
+       UP RUNNING PSCAN ISCAN AUTH
+       RX bytes:1554350 acl:33441 sco:0 events:55264 errors:0
+       TX bytes:9553470 acl:66586 sco:0 commands:160 errors:0
+       Features: 0xff 0xff 0x0f 0x00
+       Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+       Link policy: HOLD SNIFF PARK
+       Link mode: SLAVE ACCEPT
+       Name: 'popak.myftp.org-0'
+       Class: 0x120104
+       Service Classes: Networking, Object Transfer
+       Device Class: Computer, Desktop workstation
+       HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 
+0x20d
+       Manufacturer: Cambridge Silicon Radio (10)
 
 
 
