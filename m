@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Kernel 2.6.8 final and AVM BlueFritz
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Sigrid Kronenberger <skronenberger@web.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040815222056.2160d599@localhost>
-References: <20040815222056.2160d599@localhost>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1092645125.4375.83.camel@pegasus>
+Message-Id: <1092644976.4375.79.camel@pegasus>
 Mime-Version: 1.0
+Subject: [Bluez-users] HID support and Linux 2.4
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,25 +15,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 16 Aug 2004 10:32:05 +0200
+Date: Mon, 16 Aug 2004 10:29:36 +0200
 
-Hi Sigrid,
+Hi Folks,
 
-> [root@localhost sigrid]# ciptool search
-> Searching ...
->         Checking service for 00:04:0E:81:71:87
->         Connecting to device 00:04:0E:81:71:87
-> Local device is not accepting role switch
-> Can't connect L2CAP socket: Connection refused
-> [root@localhost sigrid]#
-> 
-> How can I change the last point? My AP don't accept the role switch. 
-
-Take a look at my Bluetooth ISDN howto:
-
-	http://www.holtmann.org/linux/bluetooth/isdn.html
-
-And of course make sure that hcid is running.
+my latest -mh patches for the 2.4 kernel series contained the HIDP boot
+protocol support and I want submit this for inclusion into 2.4.28. So
+please send me feedback if it works for you or not.
 
 Regards
 
