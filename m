@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Sebastian =?iso-8859-15?q?Clau=DF?= <sc2@inf.tu-dresden.de>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Message-Id: <200502141659.45030.sc2@inf.tu-dresden.de>
-Content-Type: text/plain;
-  charset="iso-8859-15"
-Subject: [Bluez-users] Encrypted and unencrypted connections at the same time
+Subject: Re: [Bluez-users] Higher throughput with larger UDP packet size 
+In-Reply-To: Message from Sean Loh <blaze_wk@yahoo.com>
+   of "Mon, 14 Feb 2005 03:47:07 PST." <20050214114707.9429.qmail@web41104.mail.yahoo.com>
+References: <20050214114707.9429.qmail@web41104.mail.yahoo.com> 
+Message-ID: <14994.1108382316@csr.com>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,35 +17,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Feb 2005 16:59:43 +0100
+Date: Mon, 14 Feb 2005 11:58:36 +0000
 
-Hi,
+Sean Loh wrote:
+> I have established an IP network over the BlueZ stack
+> and have transmitted UDP packets at varying sizes. I
+> then  assessed the throughput using the different
+> datagram packets sizes. Why is it that the larger UDP
+> packets obtain higher throughputs than the smaller UDP
+> packets (eg. 60,000 bytes vs 5000 bytes)? Shouldn't
+> the smaller UDP packets obtain an overall higher
+> througput since less time is spent for segmentation
+> and reassembly?
 
-I have a MS optical desktop elite (mouse and keyboard).
-The keyboard supports an encrypted connection, but the mouse doesn't.
-So, I want to enable encryption and authentication by default,
-but want to disable it for the mouse.
-When I enable authentication/encryption, the laptop wants to make a secure=
-=20
-connection also to the mouse, but obviously this does not work. So, I have =
-to=20
-switch authentication/encryption off temporarily to connect to the mouse, a=
-nd=20
-then enable it again.
+CPU time is not an important factor; the big difference is the time
+to send packets over the air.  The shorter packets have extra headers
+to encapsulate them at the lower levels, which makes all the difference.
 
-Is there a way configure hcid or hidd in a way, e.g. by hcid.conf,
-so that this setting is recognized automatically (i.e. a special configurat=
-ion=20
-for the mouse)?
+At the Bluetooth baseband level, by the way, 5000 bytes already counts
+as "large" and will have to be fragmented into quite a lot of packets
+transmitted over the air.  However, I certainly don't recommend using
+smaller packets at the UDP level for the reason I've given.
 
-Sebastian
+pws
 
 
-=2D-=20
-=2D---------------------------------------------------
-Sebastian Clau=DF
-E-Mail: sc2@inf.tu-dresden.de
-=2D---------------------------------------------------
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+**********************************************************************
+
 
 
 -------------------------------------------------------
