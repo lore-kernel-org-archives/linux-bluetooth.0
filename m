@@ -1,11 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Markus Kohli <kohli@webdeko.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200502120858.46323.kohli@webdeko.com>
-Subject: [Bluez-devel] DiNovo in Bluetooth-Mode
+Subject: Re: [Bluez-devel] dd - device descriptor HELP :)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <de33c8be0502111358420c770b@mail.gmail.com>
+References: <de33c8be05021107172b943a1e@mail.gmail.com>
+	 <1108149073.18099.50.camel@pegasus>
+	 <de33c8be050211121066edf6c1@mail.gmail.com>
+	 <1108155254.18099.62.camel@pegasus>
+	 <de33c8be0502111358420c770b@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1108160249.18099.68.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,54 +22,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 12 Feb 2005 08:58:46 +0100
+Date: Fri, 11 Feb 2005 23:17:29 +0100
 
-Hi
+Hi Flavio,
 
-I read some posts in the archives, because I was trying to get my DiNovo 
-working under SuSE 9.2, and found this here:
+>  I know that "work" with the level HCI is more dificult but the
+> information that i need is rssi and transmit power level (tpl) :( in a
+> connection! In l2cap that information isn=B4t given right?
 
->  > I tested it with SuSE 9.2, Fedora Core 3 and Ubuntu. The only thing you 
-have 
->  > to do, is to call
->  > 
->  > hid2hci
->  > 
->  > Then you should see a message, like
->  > 
->  > Switching device XXXX:XXXX to HCI mode was successful
->  > 
->  > Now check with
->  > 
->  > hcitool dev
->  > 
->  > if it sees the bluetooth hub.
->  > 
->  
->  yes it did that, said it was successful, 
->  BUT the keyboard & mouse stopped responding! 
->  The only way to get them working again was to reboot.
->  
->  Laurence
+when you create a L2CAP connection you can retrieve the ACL handle of
+the used underlaying link. So where is the problem?
 
-Now, I found out how to get this working... Only enable the following 
-bluetooth-services:
-HCI
-SDP 
-HID 
-HID2HCI
+> I need to create a software that creates a connection between my
+> computer (hci0) and a mobile phone (that don=B4t have any software mine=
+,
+> so isn=B4t listenning for connections l2cap) that only accepts
+> connections so i think that l2cap isn=B4t a solution! it=B4s necessary
+> that in the mobile phone a program waiting for a connection l2cap (on
+> the right psm ) right?
 
-If you have any others, like obex stuff enabled, that'll block the keyboard 
-and the mouse. With SuSE you can easily configure that by help of yast2, or 
-by hand in /etc/sysconfig/bluetooth. 
-Then additionaly, once I had this working, the F-keys had gone missing, but an 
-update to the latest kernel-of-the-day also fixed that (I'm running on 
-2.6.11rc3 now, that's probably got the -mh patch included).
+What about PSM 1. The SDP is listening on this PSM.
 
-Hope this helps anyone.
+> So i need to work in HCI!
+>=20
+> For the people like me :) "role" in hci_creat_connection() :
+> role=3D1 ->SLAVE
+> role=3D0 -> MASTER
 
-Kind regards
-Markus
+Not quite right. It stands for "allow role switch". This is a different
+meaning.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
