@@ -1,23 +1,39 @@
-Return-Path: <r.pruen@btinternet.com>
-Message-Id: <200405200952.i4K9qQ8s002281@mail.holtmann.net>
-From: "Richard Pruen" <r.pruen@btinternet.com>
-To: <marcel@holtmann.org>, <a5a33956@telus.net>
-Cc: <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm confusion
-Date: Thu, 20 May 2004 10:52:01 +0100
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="iso-8859-1"
-List-ID: <bluez-users.lists.sourceforge.net>
+  charset="iso-8859-2"
+Message-Id: <200405201140.40527.cijoml@volny.cz>
+Subject: [Bluez-users] Build your own BT car :)
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 20 May 2004 11:40:40 +0200
 
-Hello Marcel, and Ken,
+Hi,
 
-  >> Or is it the case that I need an application on the iPAQ side to be 
-   >> listening for data before it will show any bytes received or transfered?
-   >
-   >I think so, but I don't have any knowledge about Windows operating
-   >systems.
+look at this :)
 
-You are correct, there needs to be some aplication on the Win CE device to receive the data.
+http://www.oefai.at/~alexsee/BlueCar/
 
-Richard
+Michal
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: Oracle 10g
+Get certified on the hottest thing ever to hit the market... Oracle 10g. 
+Take an Oracle 10g class now, and we'll give you the exam FREE.
+http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
