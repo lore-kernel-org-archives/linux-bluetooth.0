@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Low bit rate
+Subject: Re: [Bluez-users] Serial Port
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ramin Rezaiifar <ramin@popak.myftp.org>
+To: Neil Fenemor <Neil@OnDrugs.co.nz>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40DA45E0.9000207@popak.myftp.org>
-References: <40DA45E0.9000207@popak.myftp.org>
+In-Reply-To: <1088044859.3703.55.camel@localhost.localdomain>
+References: <1088044859.3703.55.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1088068716.4296.35.camel@pegasus>
+Message-Id: <1088068518.4296.31.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Jun 2004 11:18:37 +0200
+Date: Thu, 24 Jun 2004 11:15:18 +0200
 
-Hi Ramin,
+Hi Neil,
 
-> I use the bluetooth link between a Palm T3 and a Linux machine.
-> The data rate seems to be noticeably lower than the rate when I use the 
-> Palm device with a Windows XP machine.  In both cases I use a Linksys 
-> USB dongle.
+> how do I fake my laptop as being a serial port? As thats what my phone
+> needs to be able to see for a its Active Sync to work, and in turn,
+> its synce/multisync...
 
-actually I don't use Windows, so I can't tell. In general the BlueZ is
-as fast as possible. Maybe it is a RFCOMM flow control problem. Make
-sure that you use the latest Linux kernel.
+aren't there are any SynCE + BlueZ howtos? However the easiest way is to
+use something like this:
 
-> Can I increase the rate with the hcitool by changing the pcacket type 
-> for the connection?
+	sdptool add --channel=12 sp
+	rfcomm listen 0 12
 
-No. Changing the packet types makes it only worse. Let the link manager
-be able to use every packet type and let it choose the best for your
-current connection.
+If I remeber correct the ActiveSync over Bluetooth means PPP over RFCOMM
+so you should better use dund instead of rfcomm.
 
 Regards
 
