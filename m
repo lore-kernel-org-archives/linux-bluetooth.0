@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-From: DVornheder@t-online.de
-Content-Type: text/plain; charset="ISO-8859-1"
-Message-ID: <1ArCh7-0SGjjc0@cmpmail09.bbul.t-online.de>
-Subject: [Bluez-users] Problem with connection between two pc using bluetooth
+Subject: Re: [Bluez-users] Re: Limitation of emulator ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Varat Chaikasetsin <varat_c@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <loom.20040212T074333-984@post.gmane.org>
+References: <loom.20040210T083307-660@post.gmane.org>
+	 <1076401392.32750.9.camel@pegasus>
+	 <loom.20040212T074333-984@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1076573478.3041.51.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,62 +20,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 12 Feb 2004 09:59:37 +0100
+Date: Thu, 12 Feb 2004 09:11:18 +0100
 
+Hi Varat,
 
-Hi !
+>      I've tried to change the HCI_MAX_DEV parameter in " bluez-libs-
+> 2.4/include/hci.h " before reinstalling it as your suggestion.After that, I 
+> intalled these utilities
+> 
+> bluez-utils-2.3
+> bluez-pan-1.1
+> bluez-sdp-1.5
+> bluez-bluefw-1.0
+> bluez-hcidump-1.5
+> bluez-hciemu-1.0  
+> 
+>      first time that I changed it's max number to 8 it worked. I can simulate 
+> only 8 device but later, when I try to change it to other value and reintall 
+> all of libraries and uitilities the way I did before ,it doesn't work !.
+>      What am I doing wrong ? or Do I have to install libraries and utilities in 
+> order ?
 
-I try to get a connection between two pc using bluetooth.
+maybe you have to recompile everything. The install order is bluez-libs,
+bluez-utils and then the rest.
 
-My hardware: AVM Fritz AP-X ISDN and two AVM BlueFritz USB Sticks.
+Regards
 
-At the first pc i start pand --search and get a connection to AP-X
-without any problems.
-
-At the second pc i start pand --search but the connection fails:
-
-Feb 11 18:44:03 pclap hcid[1290]: link_key_request
-(sba=00:04:0E:85:B2:C0, dba=0
-0:04:0E:85:35:15)                                                       
-       
-Feb 11 18:44:03 pclap hcid[1290]: link_key_notify
-(sba=00:04:0E:85:B2:C0)       
-Feb 11 18:44:03 pclap hcid[1290]: Replacing link key 00:04:0E:85:B2:C0
-00:04:0E:
-85:35:15                                                                
-       
-Feb 11 18:44:03 pclap kernel: Bluetooth: Found 1 CAPI controller(s) on
-device 00
-:04:0E:85:35:15                                                         
-       
-Feb 11 18:44:03 pclap kernel: kcapi: Controller 1: 00:04:0E:85:35:15
-attached   
-Feb 11 18:44:03 pclap kernel: kcapi: card 1 "00:04:0E:85:35:15" ready.  
-       
-Feb 11 18:44:03 pclap kernel: kcapi: notify up contr 1                  
-       
-Feb 11 18:44:03 pclap kernel: Bluetooth: BNEP (Ethernet Emulation) ver
-1.0      
-Feb 11 18:44:03 pclap kernel: Bluetooth: BNEP filters: protocol
-multicast       
-Feb 11 18:44:03 pclap pand[3561]: PAN daemon ver 1.1                    
-       
-Feb 11 18:44:03 pclap pand[3561]: Inquiring                             
-       
-Feb 11 18:44:03 pclap pand[3561]: Searching for NAP on 00:04:0E:85:2E:9A
-       
-Feb 11 18:44:43 pclap pand[3561]: Failed to connect to the SDP server.
-Connectio
-n timed out(110)                                                        
-       
-Feb 11 18:44:43 pclap pand[3561]: Searching for NAP on 00:04:0E:85:35:15
-       
-Feb 11 18:45:23 pclap pand[3561]: Failed to connect to the SDP server.
-Connectio
-n timed out(110)                                                        
-       
-
-Dirk
+Marcel
 
 
 
