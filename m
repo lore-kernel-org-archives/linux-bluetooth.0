@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluez+2.6+Logitech bluetooth
-From: Di Pietro Nicolas <potens@swing.be>
-To: bluez <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1084708456.4184.0.camel@pegasus>
-References: <20040515163903.CB06543F94@rekin8.go2.pl>
-	 <20040516081059.46f1904b@bluez.bueche.ch> <1084708456.4184.0.camel@pegasus>
-Content-Type: text/plain; charset=iso-8859-15
-Message-Id: <1084826611.10503.23.camel@darthvader.linuxkot.kap>
+Subject: Re: [Bluez-users] What's the best way to go about device detection?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rob Raper <djrobx@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY14-F125F0uTDF1cy000524f0@hotmail.com>
+References: <BAY14-F125F0uTDF1cy000524f0@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1084813510.5833.23.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,135 +18,59 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 17 May 2004 22:43:31 +0200
+Date: Mon, 17 May 2004 19:05:10 +0200
 
-Le dim 16/05/2004 =E0 13:54, Marcel Holtmann a =E9crit :=20
-> Hi Charles,
->=20
-> > you may want to try my cookbook at
-> > http://www.bueche.ch/comp/mx900/mx900.html
->=20
-> maybe you wanna play with the new hidd from bluez-utils-2.7 and the hidp
-> kernel module from patch-2.6.6-mh1 ;)
->=20
-> Regards
->=20
-> Marcel
+Hi Rob,
 
-Hi all,
-Just to say to you that, I've tried the new hidd and hidp modules
-(from a patched against patch-2.6.6-mh1 2.6.6 kernel)
-but it change a few (the only thing that has changed is when I halt
-or reboot the computer after have done hid2hci, there is no more
-Ooops when stopping usb
+> I have two CSR based dongles (one D-Link DBt120 rev B3) and one Microsoft 
+> dongle from their wireless keyboard & mouse pack.   They both operate pretty 
+> much identically.   If I can obtain a 1.2 dongle that supports getting rssi 
+> on a scan it's probably a better solution anyway.   Your hardware support 
+> list shows all 1.1, however, do you know which dongles can support 1.2?
 
-darthvader root # hidd
-Can't open HIDP control socket: Address family not supported by protocol
-darthvader root # modprobe hidp
-darthvader root # May 17 22:19:41 darthvader Bluetooth: Core ver 2.4
-May 17 22:19:41 darthvader NET: Registered protocol family 31
-May 17 22:19:41 darthvader Bluetooth: HCI device and connection manager
-initialized
-May 17 22:19:41 darthvader Bluetooth: HCI socket layer initialized
-May 17 22:19:41 darthvader Bluetooth: L2CAP ver 2.1
-May 17 22:19:41 darthvader Bluetooth: L2CAP socket layer initialized
-May 17 22:19:41 darthvader Bluetooth: HIDP (Human Interface Emulation)
-ver 0.1
-=20
-darthvader root # hidd --server
-darthvader root # May 17 22:33:48 darthvader hidd[14177]: Bluetooth HID
-daemon
-darthvader root #
-darthvader root # lsmod
+in general every CSR BlueCore02 based dongle with 8-Mbit flash can be
+updated to Bluetooth 1.2 support with HCI 18.x firmware. This has to be
+done by the module/dongle manufacturers.
 
-hidp                   24000  0
-l2cap                  20676  1 hidp
-bluetooth              41124  2 hidp,l2cap
-nvidia               2074376  12
-(...) net modules
-usbhid                 29952  0
-ohci1394               30532  0
-ieee1394              293688  2 eth1394,ohci1394
-snd_intel8x0           29060  0
-snd_mpu401_uart         6144  1 snd_intel8x0
-ehci_hcd               24324  0
-ohci_hcd               16644  0
-evdev                   7360  0
-(...) sound modules
-usbcore                91932  5 usbhid,ehci_hcd,ohci_hcd
-processor              13872  0
-fan                     2828  0
-button                  4760  0
+Another Bluetooth 1.2 solution is the Zeevo ZV4002, but there is no
+dongle available right now. I am using the Matsushita Bluetooth Module
+which is based on that chip.
 
-darthvader root # hid2hci
-Switching device 046d:c704 to HCI mode was successful
-darthvader root # May 17 22:26:22 darthvader usb 2-2.2: new full speed
-USB device using address 5
+The third is Silicon Wave based and I expect that Anycom will sell their
+dongles with Bluetooth 1.2 support very soon. The new BlueFRITZ! USB 2.0
+is also SiW based and the prototype that I use already supports Inquiry
+with RSSI.
 
-<I switch to another keyboard>
-darthvader root # lsmod
-Module                  Size  Used by
-hci_usb                11456  0
-hidp                   24000  0
-l2cap                  20676  1 hidp
-bluetooth              41124  2 hidp,l2cap
-nvidia               2074376  12
+> Also just FYI, the phones we're connecting to at the moment are Nokia 3650s.
 
-usbhid                 29952  0
-ohci1394               30532  0
-ieee1394              293688  2 eth1394,ohci1394
-snd_intel8x0           29060  0
-snd_mpu401_uart         6144  1 snd_intel8x0
-ehci_hcd               24324  0
-ohci_hcd               16644  0
-evdev                   7360  0
-(...)
-soundcore               7456  3 snd
-usbcore                91932  5 usbhid,ehci_hcd,ohci_hcd
-processor              13872  0
-fan                     2828  0
-button                  4760  0
+Run a "hcitool info <bdaddr>" against your 3650 and see what features it
+supports. Hopefully it has role switch support.
 
-darthvader bluetooth # lsusb
-Bus 003 Device 001: ID 0000:0000
-Bus 002 Device 005: ID 046d:c707 Logitech, Inc.
-Bus 002 Device 004: ID 046d:c704 Logitech, Inc.
-Bus 002 Device 003: ID 045e:0040 Microsoft Corp. Wheel Mouse Optical
-Bus 002 Device 002: ID 0451:2036 Texas Instruments, Inc. TUSB2036 Hub
-Bus 002 Device 001: ID 0000:0000
-Bus 001 Device 001: ID 0000:0000
+> The D-link that I do most of the testing on shows:
+> 
+> hci0:   Type: USB
+>         BD Address: 00:0F:3D:0B:FB:45 ACL MTU: 192:8  SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:3686 acl:0 sco:0 events:273 errors:0
+>         TX bytes:2832 acl:0 sco:0 commands:205 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy:
+>         Link mode: MASTER
+>         Name: 'Embt'
+>         Class: 0x000000
+>         Service Classes: Unspecified
+>         Device Class: Miscellaneous,
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 
+> 0x20d
+>         Manufacturer: Cambridge Silicon Radio (10)
 
+You can also try "hciconfig hci0 revision" and you see some manufacturer
+specific information.
 
-darthvader bluetooth # hcitool hci0 up
-darthvader bluetooth # hidd -i hci0
-darthvader bluetooth # hidd --search
-Searching ...
-darthvader bluetooth #
-darthvader bluetooth # hidd --show
-darthvader bluetooth # hcitool dev
-Devices:
-darthvader bluetooth # hcitool scan
-Device is not available: Success
-darthvader bluetooth #
+Regards
 
-Don't know what to do now... :'(
-Any idea ??? Suggestions ?
-It seems that the new hidp is not used...
-Thanks in advance
-Nicolas
-
-PS:Thank a lot for the bluez stack under Linux...
-  :Is it something right tha when I switch to hci the blue button on  =20
-   the bt hub doesn't work anymore ??? Until I disconnect the hub and=20
-   reboot the computer
-
-
-
-
-
-
-
-
+Marcel
 
 
 
