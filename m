@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] SCO link
+Subject: Re: [Bluez-users] How to initiate a Pin-Exchange?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Julius Loman <lomo@mailbox.sk>
+To: "Nicholas A. Preyss" <nalp@gmx.net>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040414090858.GL10652@kyberia.net>
-References: <20040414090858.GL10652@kyberia.net>
+In-Reply-To: <20040415202106.GA17934@gmx.net>
+References: <200404142203.21126.panizzon@woody.ch>
+	 <200404142211.55534.cijoml@volny.cz> <200404151149.35989.panizzon@woody.ch>
+	 <200404151729.32798.cijoml@volny.cz>  <20040415202106.GA17934@gmx.net>
 Content-Type: text/plain
-Message-Id: <1082160929.4489.27.camel@pegasus>
+Message-Id: <1082160503.4489.25.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,16 +20,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Apr 2004 02:15:29 +0200
+Date: Sat, 17 Apr 2004 02:08:23 +0200
 
-Hi Julius,
+Hi Nicholas,
 
-> is there a solution how to establish a SCO link (voice) between mobile phone and 
-> PC in the way, that PC with soundcard will act as bluetooth handset ? 
-> I've found an alsa driver, but this works in opposite direction (BT handset
-> acts as soundcart to PC). 
+> If you try to connect from a bluez-computer to any other device, it
+> should etablish a connection. The stack should notice that there is need
+> for a link key and if none exists it requests a pin. 
+> 
+> < HCI Command: Create Connection(0x01|0x0005) plen 13
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Link Key Request(0x17) plen 6
+> < HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
+> > HCI Event: Command Complete(0x0e) plen 10
+> > HCI Event: PIN Code Request(0x16) plen 6
+> < HCI Command: PIN Code Request Reply(0x01|0x000d) plen 23
+> > HCI Event: Command Complete(0x0e) plen 10
+> > HCI Event: Link Key Notification(0x18) plen 23
+> > HCI Event: Connect Complete(0x03) plen 11
+> < HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+> > HCI Event: Command Complete(0x0e) plen 6
 
-not that I know of. Start writing it ;)
+this is security mode 3 ;)
+
+> I etablished the connection with hcitool. Which prints an timeout but
+> completes the connection as requested.
+
+And the create connection command of hcitool is for low level testing
+only. You should better use l2ping or sdptool/rfcomm for testing.
+
+> P.S.: I noticed that bluez-pin only get the correct xauth credentials
+> when the bluetooth userland daemons are restarted after X is up.
+> Unfortunately I understand nothing from the X Authentication system, so
+> i have no clue why or how to fix it.
+
+You can use the D-Bus enabled hcid and bluez-pin package.
 
 Regards
 
