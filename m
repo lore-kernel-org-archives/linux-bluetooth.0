@@ -1,10 +1,9 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <5.2.1.1.2.20040309150546.02e414a0@po14.mit.edu>
+Message-ID: <20040309181554.11682.qmail@mail.supereva.it>
+From: paolo2278@freemail.it
+Reply-To: paolo2278@freemail.it
 To: bluez-devel@lists.sourceforge.net
-From: Jessica Huang <jessieh@MIT.EDU>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; format=flowed
-Subject: [Bluez-devel] bd_addr question
+Subject: [Bluez-devel] OGF and OCF
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,16 +14,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 09 Mar 2004 15:12:10 -0500
+Date: 9 Mar 2004 18:15:54 -0000
 
-Hi,
-I'm not sure if this is the right place to ask, but I had a question about 
-the Bluetooth Device Address.  From my understanding, the BD_ADDR is stored 
-on the Bluetooth transmitter.  I was wondering if it is possible to 
-intercept that address and provide some arbitrary one.  Could someone 
-please explain how this address is accessed and by what modules?
-Thanks,
-Jessica  
+
+Hi!
+
+
+
+I am using a commercial USB BT that have a CSR's chip.
+
+I wuold like to extract the native clock from the chip, and I used the hcitool cmd as described in HCI Extention, in BCCMD basic Command and BCCMD Protocol, more over I read the hciconfig source code, where is reported an example of a vendor packet but only for the eicsson chip.
+
+I would like to know wich are the OGF and OCF of the CSR module for vendor specific commands (I used respectively 0x3f and 0x0000, are they correct?).
+
+P.S. the structure of the packet that I realized but I can't send with the hcitool cmd (because the sysem say that 0x3f and0x000 are Unknown commands) is:
+
+
+
+OGF    OCF        TYPE       LENGTH      VARID      STATUS
+
+
+
+0x3f   0x0000     0x0000     0x0001      0x2c00     0x0000  
+
+
+
+and at the end there are 4 packets of 0x0000 to complete the length of the minimum packet that can be realized. There something wrong in it?
+
+
+
+Bests regards and thanks in advance Paolo Sperandio
+
+-----------------------------------------------------------
+Spazio ILLIMITATO per la tua Email, Scanner Antivirus,
+Antispam, Backup e POP3. Prova la nuova Email di superEva:
+http://webmail.supereva.it/
+-----------------------------------------------------------
 
 
 
