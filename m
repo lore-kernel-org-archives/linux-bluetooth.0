@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Fehr <andreas@mrs.ch>
+Subject: Re: [Bluez-users] No working Bluetooth adapter found
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth serial vs. audio connection
-In-Reply-To: <Pine.LNX.4.62.0503271751420.3135@ybpnyubfg.ybpnyqbznva>
-Message-ID: <Pine.LNX.4.62.0503271810570.3135@ybpnyubfg.ybpnyqbznva>
-References: <Pine.LNX.4.62.0503271303450.3134@ybpnyubfg.ybpnyqbznva>
- <1111923433.9195.216.camel@pegasus>  <Pine.LNX.4.62.0503271357080.3134@ybpnyubfg.ybpnyqbznva>
-  <1111926923.9195.218.camel@pegasus>  <Pine.LNX.4.62.0503271736360.3135@ybpnyubfg.ybpnyqbznva>
- <1111938339.9195.229.camel@pegasus> <Pine.LNX.4.62.0503271751420.3135@ybpnyubfg.ybpnyqbznva>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <200503271804.03641.tmp@nitwit.de>
+References: <200503271708.10663.tmp@nitwit.de>
+	 <200503271732.30911.tmp@nitwit.de> <1111937935.9195.227.camel@pegasus>
+	 <200503271804.03641.tmp@nitwit.de>
+Content-Type: text/plain
+Message-Id: <1111939622.9195.238.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,28 +20,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Mar 2005 18:12:26 +0200 (CEST)
+Date: Sun, 27 Mar 2005 18:07:02 +0200
 
-On Sun, 27 Mar 2005, 17:56, Andreas Fehr (as AF) wrote:
+Hi Timo,
 
->AF: >MH: > Thanks so far, but how to proceed? (I've still the same 
->AF: >MH: > problem, connecting with bluez 'only' gives an 'audio' 
->AF: >MH: > connection, not the expected 'serial' as I got from 
->AF: >MH: > Windows).
->AF: >MH: 
->AF: >MH: What happens if you connect to channel 3 or channel 4?
->AF: 
->AF: Duh.... well... thanks for the hint... of course, if I use channel 
->AF: 3 (as given in the output of "sdptool search .. sp" it does work, I 
->AF: get a 'serial' connection. I'll test this with minicom, whether I 
->AF: can use all the commands I need, but I'm confident.
+> > hciconfig -a
+> 
+> # hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
+>         DOWN
+>         RX bytes:0 acl:0 sco:0 events:0 errors:0
+>         TX bytes:0 acl:0 sco:0 commands:0 errors:0
+>         Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DH1 HV1
+>         Link policy:
+>         Link mode: SLAVE ACCEPT
+> 
+> Hmm. Ok, I also only did a hcitool dev.
 
-Hi Marcel
+so you can try "hciconfig hci0 up" and you should maybe activate the
+autostart function of the Bluetooth subsystem in YaST.
 
-Ok, the first test showed positive results! Great, thanks for the Easter 
-support!
+Regards
 
-:-)
+Marcel
+
+
 
 
 -------------------------------------------------------
