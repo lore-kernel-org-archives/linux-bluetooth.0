@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Christopher =?ISO-8859-1?Q?Bergstr=F6m?= <christopher@netsyncro.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+From: "Simi Manuel" <roses_3@operamail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050108192216.D6A50416118@ws5-2.us4.outblaze.com>
-References: <20050108192216.D6A50416118@ws5-2.us4.outblaze.com>
-Content-Type: multipart/alternative; boundary="=-9tyMScWykRiYEmtWVBry"
-Message-Id: <1105222194.27527.12.camel@linux.site>
-Mime-Version: 1.0
-Subject: [Bluez-users] Missing sndmagic.h for btsco kernel patch
+Subject: Re: [Bluez-users] LMP format(no h/w)
+Message-Id: <20050108192216.D6A50416118@ws5-2.us4.outblaze.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,43 +16,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 08 Jan 2005 23:09:54 +0100
+Date: Sat, 08 Jan 2005 20:22:16 +0100
 
+i am not using any h/w ..i am simulating the bluetooth controller part..is =
+ther any such stacks available for free...
+----- Original Message -----
+From: "Marcel Holtmann" <marcel@holtmann.org>
+To: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] LMP format
+Date: Sat, 08 Jan 2005 19:48:02 +0100
 
---=-9tyMScWykRiYEmtWVBry
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+>=20
+> Hi Simi,
+>=20
+> > i am trying to implement a link manager in C...
+> > i want to know whether LMP PDUs are generated and sent by the=20
+> > link manager itself or is it a part of the message sent by the=20
+> > Host.
+> >
+> >
+> > what i know about the LMP format is that it has fields like=20
+> > opcode,tranaction id and a message.
+> > plz correct me if i am wrong...
+> >
+> >
+> > will the link manger respond to the layers above, if it gets any=20
+> > message, inorder to take some actions???
+>=20
+> the host part of the protocol stack don't deal with LMP. It uses HCI and
+> everything down HCI is part of the Bluetooth chip/module/dongle.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> The SF.Net email is sponsored by: Beat the post-holiday blues
+> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-Trying to get my bluetooth headset to work and so I'm going through the
-steps..
+--=20
+_____________________________________________________________
+Web-based SMS services available at http://www.operamail.com.
+=46rom your mailbox to local or overseas cell phones.
 
-I applied the kernel-2.6.7-8.24-08-04.patch for the btsco driver, but I
-realized I'm missing sndmagic.h file.  I'm running Suse 9.2 with the
-alsa-devel installed..  I think I noticed that RH/Fedora had a rpm
-alsa-lib-devel that included this file, but wasn't sure if I could just
-ignore this missing file, most likely not, or if I should give rpm in
-the RH/Fedora a shot.  Or is this something simple like copying the
-missing file?  First post and help is appreciated.
-
---=-9tyMScWykRiYEmtWVBry
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: 7bit
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
-<HTML>
-<HEAD>
-  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=UTF-8">
-  <META NAME="GENERATOR" CONTENT="GtkHTML/3.2.4">
-</HEAD>
-<BODY>
-Trying to get my bluetooth headset to work and so I'm going through the steps..<BR>
-<BR>
-I applied the kernel-2.6.7-8.24-08-04.patch for the btsco driver, but I realized I'm missing sndmagic.h file.&nbsp; I'm running Suse 9.2 with the alsa-devel installed..&nbsp; I think I noticed that RH/Fedora had a rpm alsa-lib-devel that included this file, but wasn't sure if I could just ignore this missing file, most likely not, or if I should give rpm in the RH/Fedora a shot.&nbsp; Or is this something simple like copying the missing file?&nbsp; First post and help is appreciated.
-</BODY>
-</HTML>
-
---=-9tyMScWykRiYEmtWVBry--
-
+Powered by Outblaze
 
 
 -------------------------------------------------------
