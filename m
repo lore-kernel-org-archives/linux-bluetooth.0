@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] SCO route way!!
+Subject: Re: [Bluez-users] Connect printer via bluetooth printer adaper
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Chen Bin <binch@mobilesoft.com.cn>
+To: Michael Klose <mk@pottklose.de>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <1096360479.2115.9.camel@debian>
-References: <1096249564.1725.0.camel@debian>
-	 <1096359291.4684.26.camel@notepaq>  <1096360479.2115.9.camel@debian>
+In-Reply-To: <loom.20040926T103741-961@post.gmane.org>
+References: <loom.20040926T103741-961@post.gmane.org>
 Content-Type: text/plain
-Message-Id: <1096360690.4684.33.camel@notepaq>
+Message-Id: <1096359475.4684.31.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,22 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Sep 2004 10:38:10 +0200
+Date: Tue, 28 Sep 2004 10:17:55 +0200
 
-Hi Chen,
+Hi Michael,
 
-> If the SCO is over PCM, what should I do before I write data from the
-> codec to the chip, just establish the connection is enough?
+> I use Debian 3.1. The connection between usb bt dongle and bt printer adapter
+> works. (hcitool scan delivers correct address of bt printer adapter, l2ping
+> works alls well).
+> 
+> How do I set up the printer (cups), so that bt connection will be used.
 
-in general, yes.
-
-> I mean, I use HCI ACL to add a SCO link with the chip, then I write the
-> voice data from the codec to the chip. I wonder if there are several SCO
-> connections over the chip, how can the chip determine which connection
-> will be used to send the voice? Should I do more steps to specify which
-> connection to use?
-
-This depends on your chip manufacturer. Ask them.
+install the bluez-cups package and then setup a printer with your CUPS
+manager or whatever you use and type in the URI for that. For example to
+use a printer with BD_ADDR aa:bb:cc:dd:ee:ff the URI will be
+bluetooth://aabbccddeeff/
 
 Regards
 
