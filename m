@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <008601c4200c$4c75ee30$0000fea9@RICHARDP>
-From: "Richard Pruen" <r.pruen@btinternet.com>
-To: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] Using BlueZ for network access via ppp does not work, nothing at all in log files
+From: Elimar Riesebieter <riesebie@lxtec.de>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Can't compile utils2
+Message-ID: <20040411205300.GE13892@aragorn.home.lxtec.de>
+References: <200404112025.35020.sergiofernandes@clix.pt> <20040411201712.GD13892@aragorn.home.lxtec.de> <200404112138.57311.sergiofernandes@clix.pt>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ZRyEpB+iJ+qUx0kp"
+In-Reply-To: <200404112138.57311.sergiofernandes@clix.pt>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,31 +18,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 11 Apr 2004 22:31:02 +0100
+Date: Sun, 11 Apr 2004 22:53:00 +0200
 
-Hello everyone,
 
-Hope you can help, because this has got me stumped.
+--ZRyEpB+iJ+qUx0kp
+Content-Type: text/plain; charset=iso-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I am trying to use dund to allow my pocket pc 2003 device to connect to my
-home network. And it won't work, having checked all the log files there is
-nothing in them at all relating to this. If I remove rfcomm tty support from
-the kernel, then I do get entries saying that rfcomm can't connect. But with
-it enabled there isn't a peep out of anything at all, dund, rfcomm and pppd
-are all silent.
+On Sun, 11 Apr 2004 the mental interface of
+S=E9rgio Fernandes told:
 
-rfcomm can be connected to serial ports on my other pc, so everything seems
-to work ok.
+[...]
 
-I have a Belken USB dongle, and slackware 9.1 with the 2.6.4 kernel, I have
-the latest BlueZ packages.
+> I forgot to mention that i compiled libs2 with prefix=3D/opt/bluetooth...=
+=2E..
 
-Hope someone has some ideas of what to try to find the problem.
+/opt/bluetooth/lib is not a usual place for libs. Do
 
-Thanks
+$ echo /opt/bluetooth/lib >> /etc/ld.so.conf
 
-Richard
+and run ldconfig. utils2 will then search for libs in
+/opt/bluetooth/lib as well ;-)
 
+HANN
+
+Elimar
+
+
+--=20
+  Do you smell something burning or ist it me?
+
+--ZRyEpB+iJ+qUx0kp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFAebAs3Ig8bsVPf7ARAm2uAKC9ClhLsToopsbhLaoNIxrkydyd7ACgtmsr
+nI5DbvESBtdxNM4OclXjYxk=
+=RFzM
+-----END PGP SIGNATURE-----
+
+--ZRyEpB+iJ+qUx0kp--
 
 
 -------------------------------------------------------
