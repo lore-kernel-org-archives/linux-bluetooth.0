@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <4239711A.8070604@amplex.dk>
+From: Stephan Henningsen <sth@amplex.dk>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Error compiling bluez-utils for buildroot/ARM
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4239711A.8070604@amplex.dk>
 References: <4239536C.5030202@amplex.dk> <1111058060.11792.63.camel@pegasus>
-	 <4239711A.8070604@amplex.dk>
-Content-Type: text/plain
-Message-Id: <1111063118.11792.70.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <1111058060.11792.63.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,62 +18,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Mar 2005 13:38:38 +0100
+Date: Thu, 17 Mar 2005 12:59:22 +0100
 
-Hi Stephan,
+Hi,
 
-> > this looks like we have a problem with the generated code for the
-> > parser. Try to remove parser.[ch] and lexer.c. Maybe you need to add
-> > another library for the target platform to provide _IO_getc().
-> 
-> I am not sure what you mean, but I did the following with the same 
-> unsuccessful result:
-> 
->  From buildroot/ I did:
-> 
-> sth@speedball:~/au/buildroot$ make bluez-utils-cleandir \
-> 				bluez-utils-configure
-> <blahblah..successful>
-> sth@speedball:~/au/buildroot$ rm \
-> 			build_arm/bluez-utils-2.15/*/parser.[ch] \
-> 			build_arm/bluez-utils-2.15/*/lexer.c -fv
-> removed `build_arm/bluez-utils-2.15/hcid/parser.c'
-> removed `build_arm/bluez-utils-2.15/hcid/parser.h'
-> removed `build_arm/bluez-utils-2.15/rfcomm/parser.c'
-> removed `build_arm/bluez-utils-2.15/rfcomm/parser.h'
-> removed `build_arm/bluez-utils-2.15/hcid/lexer.c'
-> removed `build_arm/bluez-utils-2.15/rfcomm/lexer.c'
-> sth@speedball:~/au/buildroot$ make bluez-utils 
-> 
-> <blahblah>
-> /home/sth/au/buildroot/build_arm/staging_dir/bin/arm-linux-uclibc-gcc 
-> -I/usr/include -DDBUS_API_SUBJECT_TO_CHANGE  -Os -pipe 
-> -L/home/sth/au/buildroot/build_arm/root/usr/lib -o hcid  main.o 
-> security.o storage.o lib.o parser.o lexer.o kword.o glib-ectomy.o 
->    -lbluetooth
-> lexer.o(.text+0x7e0): In function `yy_get_next_buffer':
-> : undefined reference to `_IO_getc'
-> collect2: ld returned 1 exit status
-> make[3]: *** [hcid] Error 1
-> make[3]: Leaving directory 
-> `/home/sth/au/buildroot/build_arm/bluez-utils-2.15/hcid'
-> make[2]: *** [all-recursive] Error 1
-> make[2]: Leaving directory 
-> `/home/sth/au/buildroot/build_arm/bluez-utils-2.15'
-> make[1]: *** [all] Error 2
-> make[1]: Leaving directory 
-> `/home/sth/au/buildroot/build_arm/bluez-utils-2.15'
-> make: *** 
-> [/home/sth/au/buildroot/build_arm/bluez-utils-2.15/src/l2ping.o] Error 2
-> sth@speedball:~/au/buildroot$
+Marcel Holtmann wrote:
+> this looks like we have a problem with the generated code for the
+> parser. Try to remove parser.[ch] and lexer.c. Maybe you need to add
+> another library for the target platform to provide _IO_getc().
 
-then you must find the library that provides _IO_getc() or replace yacc
-or bison to generate correct code for your platform.
+I am not sure what you mean, but I did the following with the same 
+unsuccessful result:
 
-Regards
+ From buildroot/ I did:
 
-Marcel
+sth@speedball:~/au/buildroot$ make bluez-utils-cleandir \
+				bluez-utils-configure
+<blahblah..successful>
+sth@speedball:~/au/buildroot$ rm \
+			build_arm/bluez-utils-2.15/*/parser.[ch] \
+			build_arm/bluez-utils-2.15/*/lexer.c -fv
+removed `build_arm/bluez-utils-2.15/hcid/parser.c'
+removed `build_arm/bluez-utils-2.15/hcid/parser.h'
+removed `build_arm/bluez-utils-2.15/rfcomm/parser.c'
+removed `build_arm/bluez-utils-2.15/rfcomm/parser.h'
+removed `build_arm/bluez-utils-2.15/hcid/lexer.c'
+removed `build_arm/bluez-utils-2.15/rfcomm/lexer.c'
+sth@speedball:~/au/buildroot$ make bluez-utils 
 
+<blahblah>
+/home/sth/au/buildroot/build_arm/staging_dir/bin/arm-linux-uclibc-gcc 
+-I/usr/include -DDBUS_API_SUBJECT_TO_CHANGE  -Os -pipe 
+-L/home/sth/au/buildroot/build_arm/root/usr/lib -o hcid  main.o 
+security.o storage.o lib.o parser.o lexer.o kword.o glib-ectomy.o 
+   -lbluetooth
+lexer.o(.text+0x7e0): In function `yy_get_next_buffer':
+: undefined reference to `_IO_getc'
+collect2: ld returned 1 exit status
+make[3]: *** [hcid] Error 1
+make[3]: Leaving directory 
+`/home/sth/au/buildroot/build_arm/bluez-utils-2.15/hcid'
+make[2]: *** [all-recursive] Error 1
+make[2]: Leaving directory 
+`/home/sth/au/buildroot/build_arm/bluez-utils-2.15'
+make[1]: *** [all] Error 2
+make[1]: Leaving directory 
+`/home/sth/au/buildroot/build_arm/bluez-utils-2.15'
+make: *** 
+[/home/sth/au/buildroot/build_arm/bluez-utils-2.15/src/l2ping.o] Error 2
+sth@speedball:~/au/buildroot$
 
 
 
