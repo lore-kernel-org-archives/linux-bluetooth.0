@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-In-Reply-To: <e1effdeb050401095655ff4e1d@mail.gmail.com>
+From: Michael Mauch <michael.mauch@gmx.de>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] NAP service records attributes
-MIME-Version: 1.0
-Message-ID: <OFF9322AD8.00D92B2E-ON85256FD7.001D7911-85256FD7.001E1496@alps.com>
-From: scott.meesseman@alpsautomotive.com
-Content-Type: multipart/alternative; boundary="=_alternative 001E149385256FD7_="
+Message-ID: <20050401225851.GC13074@elmicha.333200002251-0001.dialin.t-online.de>
+References: <2e973d2e05032514275d90da67@mail.gmail.com> <42449273.2030103@xmission.com> <200503252344.53258.cijoml@volny.cz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <200503252344.53258.cijoml@volny.cz>
+Subject: [Bluez-users] Re: How to set up a PAN using my laptop and cellphone
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,55 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 2 Apr 2005 00:28:12 -0500
+Date: Sat, 2 Apr 2005 00:58:51 +0200
 
-This is a multipart message in MIME format.
---=_alternative 001E149385256FD7_=
-Content-Type: text/plain; charset="US-ASCII"
+Michal Semler wrote:
 
-Hello all,
+> Worse problem probably is, that there is not any cell phone with PAN support 
+> on market ;-D
 
-A while back I wrote an application that syncs my Sony Ericcson phone via 
-IrMC synchronization.  Recently I purchased a Nokia 3650 thinking that it 
-supported same IrMC Synchronization profile over Bluetooth (I guess I just 
-based that thinking on Apple iSync supporting the 3650, because I though 
-that iSync only used IrMC sync).  Well I was wrong :-) ...
+Yes, but some can use dund.
 
-Does anyone know how synchronization is done over bluetooth on this nokia 
-3650 (and other symbian nokias?).  It must be possible, iSync is doing 
-it...  some kind of OBEX command ? or something over tcp/ip/network ?
+> Dne pá 25. b?ezna 2005 23:36 Brad Midgley napsal(a):
+> > It sounds like a very twisted idea but there's a flaw: most/all
+> > cellphones have a bluetooth radio that can only deal with one connection
+> > at a time. So your laptop can't be NATting the connection and the
+> > cellphone certainly won't.
 
-Thank you very much for your time ....
+I can't see why there should be two Bluetooth connections involved.
 
-Regards,
-Scott Meesseman
+> > WEI LI wrote:
+> > > I have a laptop : linux 2.4.10,  with bluez-libs, bluez-utils
+> > > installed, and internet access.
 
+So the laptop has internet access on its own (through WLAN, LAN or a
+modem)? 
 
---=_alternative 001E149385256FD7_=
-Content-Type: text/html; charset="US-ASCII"
+As Brad pointed out, you cannot connect the laptop via Bluetooth to the
+phone and then surf the web with the phone and the laptop.
 
+> > > and a cell phone: Nokia 6620.
+> > > Can I set up a PAN  between this two devices  and enable the cellphone
+> > > to browser webs sharing internet access with the laptop? How to do?
 
-<br><font size=2 face="sans-serif">Hello all,</font>
-<br>
-<br><font size=2 face="sans-serif">A while back I wrote an application
-that syncs my Sony Ericcson phone via IrMC synchronization. &nbsp;Recently
-I purchased a Nokia 3650 thinking that it supported same IrMC Synchronization
-profile over Bluetooth (I guess I just based that thinking on Apple iSync
-supporting the 3650, because I though that iSync only used IrMC sync).
-&nbsp;Well I was wrong :-) ...</font>
-<br>
-<br><font size=2 face="sans-serif">Does anyone know how synchronization
-is done over bluetooth on this nokia 3650 (and other symbian nokias?).
-&nbsp;It must be possible, iSync is doing it... &nbsp;some kind of OBEX
-command ? or something over tcp/ip/network ?</font>
-<br>
-<br><font size=2 face="sans-serif">Thank you very much for your time ....</font>
-<br>
-<br><font size=2 face="sans-serif">Regards,<br>
-Scott Meesseman<br>
-<br>
-</font>
---=_alternative 001E149385256FD7_=--
+See
+<http://xoomer.virgilio.it/eim/stuff/text/notes/devices/nokia_6600.txt>
+and google for "Nokia 6620 Linux dund" or something like that.
+
+Regards...
+		Michael
 
 
 -------------------------------------------------------
