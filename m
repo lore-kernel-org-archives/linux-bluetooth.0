@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41F7D274.4030208@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] partly OT: pipe sound from Headset to soundcard
-References: <41F7CEF6.1050508@webstuhl.net>
-In-Reply-To: <41F7CEF6.1050508@webstuhl.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] problems with patch for 2.6.10...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1106739703.6665.5.camel@localhost.localdomain>
+References: <1106739703.6665.5.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1106760809.28444.39.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,55 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 26 Jan 2005 10:25:08 -0700
+Date: Wed, 26 Jan 2005 18:33:29 +0100
 
-Ben
+Hi Rob,
 
-I had the same thought.
+> I've just applied the latest patch ( 2.6.10-mh2 ) to the latest
+> available kernel source for Fedora Core 3 from their update site (2.6.10
+> with a few patches applied).  All was well except that a patch for the
+> Makefile was rejected due to the EXTRAVERSION flag being different.
+> Everything built and installed perfectly, but now I'm getting the
+> following on bootup.  I've also upgraded the stock bluez-libs and bluez-
+> utils rpms for FC3 with the latest from the bluez.org site.
 
-We have a way to send line in to a stereo headset but there is a delay. 
-(see bluetooth-alsa.sf.net)
+use a vanilla 2.6.10, because the -mh patches are not made to work with
+any distribution kernels. If they do feel happy, if not, blame them.
 
-You could write something similar that runs in userspace and copies 
-audio streams around using sco.
+Regards
 
-Brad
+Marcel
 
-Ben Pezzei wrote:
-> Hi again,
-> 
-> Apologies if my question is a bit OT, but no one on the alsa
-> list had an answer for this one:
-> 
-> I try to pipe the sound from the headset to line in of the
-> soundcard. something like:
-> /dev/snd/pcmC1D0c -> /dev/snd/pcmC0D0p
-> and vice versa:
-> /dev/snd/pcmC0D0c -> /dev/snd/pcmC1D0p
-> 
-> So everything which comes through the soundcard mic should
-> be "forwarded" to the headset earphone, and everything
-> which comes from the headset mic should land at the
-> soundcards line in.
-> 
-> is there a way to accomplish this?
-> 
-> any hint would be great
-> 
-> greetings
-> ben
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
-> Tool for open source databases. Create drag-&-drop reports. Save time
-> by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
-> Download a FREE copy at http://www.intelliview.com/go/osdn_nl
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
 
 
 -------------------------------------------------------
