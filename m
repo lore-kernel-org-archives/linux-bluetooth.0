@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Support for Adaptor Bluetooth USB Trust BT180  ?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050314132045.61026.qmail@web50610.mail.yahoo.com>
-References: <20050314132045.61026.qmail@web50610.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1110807175.629.11.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20050314132045.61026.qmail@web50610.mail.yahoo.com>
+From: Miron Cristian <cris_miron@yahoo.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Support for Adaptor Bluetooth USB Trust BT180  ?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,29 +16,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 14 Mar 2005 14:32:55 +0100
+Date: Mon, 14 Mar 2005 05:20:45 -0800 (PST)
 
-Hi Christian,
+Hi everybody,
 
-> I just bought this device and it seems to be different
-> then my old DBT-120 device:
-> - hcitool with lq option allways reports me the
-> quality link = 255, no matter how far I go, until I am
-> out of range
-> - the communication with my phone application is 2-3
-> times slower then the case when I use DBT-120
-> bluetooth dongle.
-> 
-> Is there any now driver for this new BT180 in order to
-> have it working as it show be? 
+I just bought this device and it seems to be different
+then my old DBT-120 device:
+- hcitool with lq option allways reports me the
+quality link = 255, no matter how far I go, until I am
+out of range
+- the communication with my phone application is 2-3
+times slower then the case when I use DBT-120
+bluetooth dongle.
 
-show us the content of /proc/bus/usb/devices.
+Is there any now driver for this new BT180 in order to
+have it working as it show be? 
 
-Regards
-
-Marcel
+Thank you.
+Cristian Miron
 
 
+		
+__________________________________ 
+Do you Yahoo!? 
+Yahoo! Small Business - Try our new resources site!
+http://smallbusiness.yahoo.com/resources/ 
 
 
 -------------------------------------------------------
