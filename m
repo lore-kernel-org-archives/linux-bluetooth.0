@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluecore3-based usb dongles
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mauro Tortonesi <mtortonesi@ing.unife.it>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200407161615.20726.mtortonesi@ing.unife.it>
-References: <200407161615.20726.mtortonesi@ing.unife.it>
-Content-Type: text/plain
-Message-Id: <1089991518.5119.13.camel@pegasus>
-Mime-Version: 1.0
+From: Mauro Tortonesi <mtortonesi@ing.unife.it>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200407161615.20726.mtortonesi@ing.unife.it>
+Subject: [Bluez-users] bluecore3-based usb dongles
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 16 Jul 2004 17:25:19 +0200
+Date: Fri, 16 Jul 2004 16:15:20 +0200
 
-Hi Mauro,
 
-> i would like to buy a couple of usb dongles based on the bluecore 3 chip to 
-> use them with bluez. 
-> 
-> has anyone of you already tried one of those dongles? do you have any buying 
-> suggestions?
+hi to everybody,
 
-do you know any BlueCore3 based USB dongles? I haven't seen any of them
-on the market so far. However I tested a BlueCore3 chip within a Casira
-and it works as good as a BlueCore02 chip.
+i would like to buy a couple of usb dongles based on the bluecore 3 chip to 
+use them with bluez. 
 
-Regards
+has anyone of you already tried one of those dongles? do you have any buying 
+suggestions?
 
-Marcel
+-- 
+Aequam memento rebus in arduis servare mentem...
+
+Mauro Tortonesi                 mtortonesi@ing.unife.it
+                                mauro@deepspace6.net
+                                mauro@ferrara.linux.it
+Deep Space 6 - IPv6 with Linux  http://www.deepspace6.net
+Ferrara Linux User Group        http://www.ferrara.linux.it
 
 
 
