@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: nicolas <n1c0l4s.l3@wanadoo.fr>
+Message-ID: <20040318065836.9531.qmail@web40704.mail.yahoo.com>
+From: Lalith Chakravarthi <lalithvc@yahoo.com>
 To: bluez-users <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200403180820.29734.n1c0l4s.l3@wanadoo.fr>
-Subject: [Bluez-users] little pb with my bluetooth
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Data across Bluetooth Connection - Not file transfer
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,29 +15,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 18 Mar 2004 08:20:29 +0100
+Date: Wed, 17 Mar 2004 22:58:36 -0800 (PST)
 
-Hi,=20
+Hi...
 
-I am underMandrake 10.0 and kernel 2.6.2-3mdk and Kde 3.2
+I want to know how data maybe sent across an established bluetooth
+connection? 
 
-when i plug my Bluetooth, Kbluetooth tell me:
+I actually want to keep checking if a particular message  (possibly in
+the header or something) has been recieved over the bluetooth
+connection and do a corresponding action (possibly run a program) when
+that happens. 
 
+Could anyone help me out with this? I dont want to read a file and
+implement the program after reading it, as this will be a high traffic
+utilisation. Please do advise...
 
-=46ailed to connect =A0to the SDP server
+Regards
+Lalith
 
-
-but  Bluetooth Service is on :-(
-
-
-
-I wanna use Microsoft wirelless IntelliMouse Explorer fr Bluetooth and the=
-=20
-keyboard associated
-
-
-
-Who could help me?  thanks :)
+__________________________________
+Do you Yahoo!?
+Yahoo! Mail - More reliable, more storage, less spam
+http://mail.yahoo.com
 
 
 -------------------------------------------------------
