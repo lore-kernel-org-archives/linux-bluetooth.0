@@ -1,21 +1,19 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] a2play and Toshiba SR-1 Bluetooth Headset
-Message-Id: <20041127020418.4f679924.henryk@ploetzli.ch>
-In-Reply-To: <1101490174.6514.39.camel@pegasus>
-References: <20041125091124.GA19805@snoopy.src.ricoh.co.jp>
-	<20041125112509.75347786.henryk@ploetzli.ch>
-	<20041125105615.GA19821@snoopy.src.ricoh.co.jp>
-	<1101440449.6465.64.camel@pegasus>
-	<20041126045659.6a3291f5.henryk@ploetzli.ch>
-	<1101442380.6465.77.camel@pegasus>
-	<41A6F09C.5000801@parrot.fr>
-	<1101490174.6514.39.camel@pegasus>
+Subject: Re: [Bluez-devel] BT-Sco
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41A75ABD.2050605@suche.org>
+References: <41A22C0B.4050008@xmission.com>	<41A234FA.7020303@xmission.com>
+	 <20041123033429.132bf84b.henryk@ploetzli.ch>
+	 <41A2B331.4010001@xmission.com>
+	 <20041123070621.50569968.henryk@ploetzli.ch>
+	 <41A3471C.4000602@xmission.com>
+	 <20041123203836.046fb4f4.henryk@ploetzli.ch>
+	 <41A3ACE2.4030501@xmission.com>  <41A74FE0.6020006@suche.org>
+	 <1101481147.6514.10.camel@pegasus>  <41A75ABD.2050605@suche.org>
+Content-Type: text/plain
+Message-Id: <1101489555.6514.22.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Sat__27_Nov_2004_02_04_18_+0100_QFVDe59hm=6Q3LFa"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -27,43 +25,71 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 27 Nov 2004 02:04:18 +0100
+Date: Fri, 26 Nov 2004 18:19:15 +0100
 
---Signature=_Sat__27_Nov_2004_02_04_18_+0100_QFVDe59hm=6Q3LFa
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Thomas,
 
-Moin,
+> For the current version the size is to large but i thought of extending 
+> the source to allow multiple Headsets.
+> Than it does not grow much since it already use an record and no static 
+> variables.
 
-Am Fri, 26 Nov 2004 18:29:34 +0100 schrieb Marcel Holtmann:
+actually your record is global. And here again are again some comments
+about coding. Defines and constants are in upper case, but not variable
+names. So SND is the wrong name. This is C and not C++ or Jave and so
+sSound is also a wrong. Use only lower case names and separate them with
+a underscore.
 
-> this don't answers my question. If we don't use it in set
-> configuration then we don't have add the content protection header?
+> >Don't use {{{ and include some newlines. Actually follow the kernel
+> >coding style.
+> >  
+> >
+> The {{{ i use for folding marks they can be replaced with { same as with 
+> }}} and }.
 
-Yes. Because if we don't set it in the configuration how should the
-other device know that we were using it and with which configuration?
-After all there are at least two content protection mechanisms
-available.
+Really bad coding style.
 
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+> >Why do you rewrite the function from libbluetooth and libasound. Simply
+> >use them, because these are shared library and they are loaded anyway.
+> >  
+> >
+> 1. What function of libbluetooth ? The only bluetooth function in wich 
+> would be useable is geting
+> the local mac and the remove channel and string2adress conversion. wich 
+> is in no relation to the
+> size the binary would grow.
 
---Signature=_Sat__27_Nov_2004_02_04_18_+0100_QFVDe59hm=6Q3LFa
-Content-Type: application/pgp-signature
+The first thing is that these function are for easy handling of address
+conversion and so use them. What you do is totally ugly. And what about
+the size? How do you link the library? It is a dynamic library.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
+>  With the same ground you could ask why i 
+> rewrite the asound part.
+> Here the ground is even more interesting.
+> 1. I save many file open / close
+> 2. It run faster
+> 3. If the sound device support async io or even only signaling if there 
+> are new mixer data it can be done without
+> poll.
 
-iD8DBQFBp9KWIjWgKE0OA2gRArG4AJ9t6zMceGmK8elSJnZDUI3erALurACfahi5
-74L/jDGcrI8K+rmgyIXBexM=
-=Krhy
------END PGP SIGNATURE-----
+I don't know enough about the ALSA part, but actually your way is not
+portable enough. The ALSA people may change interals, but they will keep
+the API and so this is the way to go. If you think the ALSA library is
+doing something wrong, then get in touch with them and clean it up.
 
---Signature=_Sat__27_Nov_2004_02_04_18_+0100_QFVDe59hm=6Q3LFa--
+> The ground i rewrite the original was so that i can use these code more 
+> easy to add it so other programms like kphone
+> and use the button with switch sco on/off for accepting phone calls.
+
+You can write whatever code you want and use it, but from a maintainer
+perspective I will never add such code. And I don't see any problems
+with linking some extra libraries.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
