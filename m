@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Catalin Drula <Catalin.Drula@imag.fr>
 To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <Pine.GSO.4.33.0410141441210.15261-100000@horus.imag.fr>
+Message-ID: <Pine.GSO.4.33.0410141340520.15261-100000@horus.imag.fr>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 Subject: [Bluez-devel] (dtl1_cs) Problems with Socket CF card on HP Jornada
@@ -15,7 +15,7 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Oct 2004 14:41:34 +0200 (CEST)
+Date: Thu, 14 Oct 2004 13:42:09 +0200 (CEST)
 
 Hi everyone,
 
@@ -64,7 +64,6 @@ Bluetooth: Nokia control data = 07 00
 Any ideas/help are most appreciated, thanks in advance,
 
 Catalin
-
 
 
 
