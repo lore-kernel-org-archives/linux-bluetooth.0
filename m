@@ -1,16 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problems with RS232 and BT - Can't init device
-	hci0
-From: Marcel Holtmann <marcel@holtmann.org>
-To: zubiwat@poczta.onet.pl
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403022357.51574.zubiwat@poczta.onet.pl>
-References: <200403021801.11637.zubiwat@poczta.onet.pl>
-	 <1078257013.1942.200.camel@pegasus>
-	 <200403022357.51574.zubiwat@poczta.onet.pl>
-Content-Type: text/plain
-Message-Id: <1078269173.2787.10.camel@pegasus>
-Mime-Version: 1.0
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: "Ronan Naughton" <wadgienaughton@hotmail.com>,
+   bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Setting up a bluetooth network
+References: <BAY10-F29zjmbgGHk7s000090c8@hotmail.com>
+In-Reply-To: <BAY10-F29zjmbgGHk7s000090c8@hotmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200403022300.27228.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,30 +19,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 03 Mar 2004 00:12:53 +0100
+Date: Tue, 2 Mar 2004 23:00:27 +0100
 
-Hi Maciej
+Hello,
 
-> I think that it is not capable but how to check it?
-> I think that this chip default is set to 921600 bauds. How can I cope with it, 
-> how to change it to 115200. How could I check what's wrong and why it doesn't 
-> want to hciattach. How to make it work with my PC. On the chip it is written 
-> sth like this:
-> CSR
-> BC212
-> 015BD
-> 345AC
-> 
-> Please tell me why it doesn't work. I have to connect 2 PC's together to 
-> communicate each other with this chip.
+> I am having some trouble. I want to set up a little bluetooth LAN say
+> between 4 computers with bluetooth dongles and a pda. I don't know which to
+> use PAN or LAN access profile and I am having trouble setting up both.
 
-try to run "hciattach ttyS0 csr". If your Bluetooth chip really boots
-with 921600 baud you have to buy a serial card that is capable of it.
+For your network will be great solution with PAN network.
+You will setup one computer like a "master".
+ pand --listen --master --role=NAP
 
-Regards
+Other computers and PDA will be a "slaves".
 
-Marcel
+Maybe this document is best for you:
+http://www.cs.ucla.edu/~cclljj/interest/notes/bluez/pand_bridge_nap.html
 
+> Also is LAN acces profile just for say accesing a LAN rather than setting
+> up a LAN. All the LAN how-to's show how to set up a PPP connection between
+> ur pc and your phone, and that is even causing me trouble. It trys to make
+> a PPP over rfcomm but fails to connect.
+
+I use PPP through rfcomm only for GPRS dial-up with my mobile phone.
+
+> both computers can ping the master but
+> cannot ping each other and the master can only ping one pc, even though it
+> seems that the connection is there and the pc's are beside each other.
+> I assigned the master by un-commenting the config file ( at lm accept,
+> master ).
+
+If you have devices in same address space, you will need to configure
+bridge on master.
+
+If you have devices in different address spaces, you will need to setup
+default gateway on slaves and enable routing in kernel on master:
+echo "1" > /proc/sys/net/ipv4/ip_forward
+
+But I don't have experience with more than two devices.
+
+Best regards,
+
+Pavel Ruzicka
 
 
 
