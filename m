@@ -3,11 +3,10 @@ Subject: Re: [Bluez-users] mRouter and sx1
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Dominik Blystak <Dominik.Blystak@pro-open.de>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <1091012405.2389.67.camel@localhost>
+In-Reply-To: <1091009362.2389.16.camel@localhost>
 References: <1091009362.2389.16.camel@localhost>
-	 <1091011259.3673.5.camel@notepaq>  <1091012405.2389.67.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1091013446.3673.21.camel@notepaq>
+Message-Id: <1091011259.3673.5.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,24 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jul 2004 13:17:26 +0200
+Date: Wed, 28 Jul 2004 12:40:59 +0200
 
 Hi Dominik,
 
-> where do I get infos about how mRouter works?
-> Do you know how they figured out at http://mobile.linux.pt/p800 that the
-> phone sends a string to communicate through mRoute? I think it would be
-> really nice to have dund supporting mRoute but atm I would like to just
-> get it working, even with pppd ;)
+> I got a Siemens sx1 phone, which uses some kind of mRouter software
+> (windows). After browsing through the mailing list archives I tried the
+> setup described here:
+> http://mobile.linux.pt/p800
 
-the page you mentioned was the only page I read about mRouter so far and
-I think that it contains all needed information. In general it is all
-about SPP service records, RFCOMM connections and PPP. You have to do it
-in the right order for getting a TCP/IP between your phone and the PC
-working.
-
-As I said, I don't own a Symbian based phone and so I am the wrong
-person for talking about mRouter.
+the mRouter is a callback mechanism and I prefer if someone implement a
+method for that directly into dund. I would have done that already, but
+I don't own a Symbian based mobile phone.
 
 Regards
 
