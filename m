@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f54d8640503160704bbbd53b@mail.gmail.com>
-From: Benny <bennyvasanth@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] USSP compilation problem for linux 2.6
-In-Reply-To: <1110981332.11792.32.camel@pegasus>
+Subject: Re: [Bluez-users] adding sdp service record attributes
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050316135754.58091.qmail@web60909.mail.yahoo.com>
+References: <20050316135754.58091.qmail@web60909.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1110982133.11792.35.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <d1f423d30503071045794c487e@mail.gmail.com>
-	 <f54d86405030903455bf71640@mail.gmail.com>
-	 <1110391057.5462.30.camel@notepaq>
-	 <f54d8640503160537449496dd@mail.gmail.com>
-	 <1110981332.11792.32.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,49 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Mar 2005 20:34:08 +0530
+Date: Wed, 16 Mar 2005 15:08:53 +0100
 
-Thanks Marcel for your information. So I should not use the ussp for linux 2.6.
+Hi Michael,
 
-How I need to connect to the BT Serial port adapter from the PC host
-using the BT USB dongle? (ie) that is the command settings.
+>     Thanks for your reply. But I wish to know that from the result
+> I've put in the last email, which belong to attrib_id and attrib_value
+> respectively? I just want to know about this and then I'll put the
+> correspnding values in my program to add it.  You can find the result
+> of "sdptool get --tree " from last email. Thank you very much.
 
-Which device node I need to open for writing a serial port application
-on host to send data to the target PC with BT serial port adapter?
+I don't get it. The attribute id the UINT16 value with an optional
+textual representation and the indent stuff under it are the attribute
+values. You should read the SDP part of the specification.
 
-Thanks & Regards,
-Benny
+Regards
 
-On Wed, 16 Mar 2005 14:55:32 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Benny,
-> 
-> > We have purchased a BT Serial port adapter. I am now involved in
-> > testing this. To one PC I am connecting a Standard BT USB dongle and
-> > to another PC I am connecting the BT Serial port adaptor.
-> >
-> > I am facing some problems while compiling(On fedora 3 - linux kernel -
-> > 2.6.9-1.667) the "ussp" source found in the "rfcomm-0.10" source
-> > downloaded from the
-> > http://www.holtmann.org/linux/bluetooth/rfcomm.html site.
-> 
-> don't even try to deal the the old RFCOMM implementation. The new one is
-> inside the kernel and directly integrated into the network socket and
-> the TTY layer.
-> 
-> Regards
-> 
-> Marcel
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+Marcel
+
+
 
 
 -------------------------------------------------------
