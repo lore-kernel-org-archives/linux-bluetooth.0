@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1069670448.16352.151.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] HID kernel modification
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Message-ID: <C1B29E01A9B748458D51DBBE04E4B9EA080CB5@7layers.7layers-uk.com>
+From: "Halam Rose" <Halam.Rose@7layers-uk.com>
+To: "BlueZ-devel Mailing List (E-mail)" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] TCRL updated
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -15,58 +16,73 @@ List-Id: <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Nov 2003 11:40:48 +0100
+Date: Fri, 14 Nov 2003 11:04:58 -0000
 
-Hi Folks,
+The TCRL was updated on 11 November, the new version can be found at =
+http://qualweb.bluetooth.org/Template2.cfm?LinkID=3D4
 
-the kernel side HID parser from the USB subsystem is working very good
-with almost every USB input device. The current transport layer for the
-parser is USB and this is hardcoded into the complete driver. Starting
-with Bluetooth HID this limitation should be removed, because Bluetooth
-and USB can share the same HID parser.
+The TCRL tells us the status of each test case, that is whether the test =
+has to be done at all and if it has to be carried out whether it must be =
+done at a BQTF or if you can do it yourselves.  The TCRL also shows =
+which errata should be applied.
 
-The Bluetooth HID implementation can't be in the kernel only, because we
-need information from the SDP records of the HID device. And pushing SDP
-into the kernel is not a good idea. So all SDP stuff and connection
-handling is being done in the userspace program bthid. The underlaying
-transport protocol HIDP is also handled by this program. The code for
-bthid already exists in the CVS repository utils2 and is built on top of
-the new Bluetooth library and the new SDP code. We have now the HID
-descriptor and the HID reports and we must feed these into the kernel
-side HID parser to generate the input events. The HID descriptor has
-only to be send once, while a HID report is generated on every key
-click, mouse movement etc.
+Key to the Categories=09
+Cat.	Short description
+A	Validated and commercially available at BQTF
+B	Declaration with evidence
+C	Declaration without evidence
+D	Informative
+	Detailed description in current Program Reference Document (PRD) =
+section 5.3.2.
+=09
 
-My idea is to build up a general interface for writing HID drivers in
-userspace and then use it for the Bluetooth HID. I like to establish a
-HID control character device (/dev/hidctl c 10 224) that have two modes.
-After opening this device, it is in HID descriptor mode and every write
-operation will set the HID descriptor. The read operation does nothing
-and in normal cases only one write is needed. After that we issue a
-create ioctl to register to the HID parser with the HID descriptor and
-the device is switched to HID report input mode. Now every write will be
-a report from a Bluetooth device for example and every read gives us an
-report that we have to send back to the Bluetooth device. With a release
-ioctl we can switch the device back into HID descriptor input mode. The
-parameters for the create ioctl should contain name, vendor, product and
-version information which can be retrieved from the SDP records and
-pushed into the HID parser and input subsystem to let the already known
-quirks work if some devices have broken HID implementations.
+As a quick overview you can expect B, C & D category tests at all levels =
+of the stack but generally the following applies
+RF Cat A
+BB Cat A
+LM Cat A
+GAP Cat A
+SDP Cat A
+L2CAP Cat B
+RFCMM/SPP CAT B
+Profiles CAT B apart from SDAP which id all D
 
-Comments?
+BW
 
-Regards
+Halam
 
-Marcel
+--------------------------------------------
+Halam Rose
+Bluetooth Specialist
+7 layers UK Ltd
+BQTF: RF, Protocol and Profile=20
 
+Tel: +44 (0)1763 262524=20
+Fax: +44 (0)1763 261177=20
+Mob: +44 (0)7876 560922
+Halam.Rose@7layers-UK.com=20
+www.7layers-UK.com=20
 
+Melbourn Science Park
+Cambridge Road
+Melbourn
+Hertfordshire SG8 6HB=20
+
+--------------------------------------------
+The information contained in this message
+is confidential and should not be disclosed
+to any third party whether or not you are the=20
+intended addressee indicated in the message.
+Addressees of this email may exercise their
+rights under the 1988 Data Protection Act.=20
+--------------------------------------------
 
 
 -------------------------------------------------------
-This SF.net email is sponsored by: SF.net Giveback Program.
-Does SourceForge.net help you be more productive?  Does it
-help you create better code?  SHARE THE LOVE, and help us help
-YOU!  Click Here: http://sourceforge.net/donate/
+This SF.Net email sponsored by: ApacheCon 2003,
+16-19 November in Las Vegas. Learn firsthand the latest
+developments in Apache, PHP, Perl, XML, Java, MySQL,
+WebDAV, and more! http://www.apachecon.com/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
