@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Carlos Azevedo <carlosarazevedo@netcabo.pt>
-To: bluez-devel@lists.sourceforge.net
+Message-Id: <200412142326.iBENQd906771@services110.cs.uwaterloo.ca>
+From: "Krishna K Bhoutika" <kkbhouti@cs.uwaterloo.ca>
+To: <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200412150010.05507.carlosarazevedo@netcabo.pt>
-Subject: [Bluez-devel] Lifetech BlueConnect DOES NOT work with bluez
+	charset="us-ascii"
+Subject: [Bluez-devel] Bi-directional Inquiry
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,13 +17,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Dec 2004 00:10:05 +0000
+Date: Tue, 14 Dec 2004 18:26:37 -0500
 
-The "Bluetooth hardware support for BlueZ" page was prematurely updated by 
-Marcel to reflect an incorrect status. The Lifetech BlueConnect USB dongle 
-DOES NOT work properly with 2.6.9-mh5, so the page should reflect that.
+Is there any way to do bi-directional Inquiry so that both the inquiring and
+inquired (inquiry scanning) device/s get each others address and clock.
+ 
+ 
+Thanks in advance
 
-Carlos A. R. Azevedo
+Krishna Bhoutika 
+kkb25@hotmail.com
+
+
 
 
 -------------------------------------------------------
