@@ -1,22 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] D-Bus interfaces
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Philip Blundell <pb@nexus.co.uk>
-Cc: Fred Sch??ttgen <bluez-devel@schaettgen.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1077061750.685.3.camel@dixie.nexus.co.uk>
-References: <1076265358.2670.36.camel@pegasus>
-	 <1076278554.14742.112.camel@akka.yeti.nocrew.org>
-	 <1076279508.6869.54.camel@pegasus>
-	 <200402090015.24318.bluez-devel@schaettgen.de>
-	 <20040216144615.GA318@nexus.co.uk> <1076945776.17824.6.camel@merlin>
-	 <20040216154155.GB32285@nexus.co.uk>  <1077058771.2665.134.camel@pegasus>
-	 <1077061102.685.0.camel@dixie.nexus.co.uk>
-	 <1077061494.2665.148.camel@pegasus>
-	 <1077061750.685.3.camel@dixie.nexus.co.uk>
-Content-Type: text/plain
-Message-Id: <1077062239.2665.153.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <4032AA5C.3060505@plausible.org>
+From: Andy Ross <andy@plausible.org>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] RFCOMM bug?
+References: <40329CA6.7080302@mdolabs.com> <1077060827.2665.137.camel@pegasus>
+In-Reply-To: <1077060827.2665.137.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -27,25 +17,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 18 Feb 2004 00:57:19 +0100
+Date: Tue, 17 Feb 2004 15:57:16 -0800
 
-Hi Philip,
+Marcel Holtmann wrote:
+> set the RFCOMM terminal device into raw mode and everything works
+> fine.
 
-> > I prefer something like "org.bluetooth.pin.request".
-> 
-> I don't think it'd be a good idea to use "org.bluetooth", unless you can
-> get the bluetooth SIG to endorse the interface.  But we could certainly
-> use "org.bluez".
+Duh, dunno why I didn't try that.  A simple stty -cooked indeed fixes
+the problem.
 
-actually I don't care about the Bluetooth SIG. This interface is not
-really BlueZ and Linux specific, because the FreeBSD stack can also make
-use of it.
+That said: isn't this still a bug?  Serial ports don't behave this way
+by default, and an rfcomm device is supposed to look like an RS232
+device.  Certainly a hardware tty *can* be made to echo to the remote
+device, but that's the job of programs like getty to set up properly.
+Something seems backwards here, is there a reason for making
+/dev/rfcomm* work differently from /dev/ttyS*?
 
-Regards
-
-Marcel
-
-
+Andy
 
 
 -------------------------------------------------------
