@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Serial(HCI-UART) Bluetooth Module -
-	Initialization timeout error
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <f54d8640503240350250aae5e@mail.gmail.com>
-References: <f54d8640503240350250aae5e@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1111666515.1916.62.camel@pegasus>
+Message-ID: <f54d8640503240350250aae5e@mail.gmail.com>
+From: Benny <bennyvasanth@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Serial(HCI-UART) Bluetooth Module - Initialization timeout error
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,46 +16,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Mar 2005 13:15:15 +0100
+Date: Thu, 24 Mar 2005 17:20:33 +0530
 
-Hi Benny,
+Dear all,
+            
+We are now working with a RFMD Silicon wave based serial(hci-uart)
+bluetooth module.  We are trying to test for its working under linux
+2.6.  We have installed the Bluetooth stack (bluetooth.o) module and
+the HCI Uart (hci_uart.ko ) module.
+We have tested for the working under windows.
 
-> We are now working with a RFMD Silicon wave based serial(hci-uart)
-> bluetooth module.  We are trying to test for its working under linux
-> 2.6.  We have installed the Bluetooth stack (bluetooth.o) module and
-> the HCI Uart (hci_uart.ko ) module.
-> We have tested for the working under windows.
-> 
-> When we try to do hciattach the device with Serial port using the
-> following command.
-> 
->              hciattach  /dev/ttyS0 swave 115200 flow
-> 
-> we are getting the INITIALIAZATION TIME OUT error. And it is the same
-> result with the following commands also:
-> 
->              hciattach ttyS0 swave 115200 flow
->              hciattach  -s 115200 ttyS0  swave 115200 flow
->              hciattach /dev/ttyS0 swave 115200
->                       
-> Has anyone faced this problem before. Any pointers? Please advice.
+When we try to do hciattach the device with Serial port using the
+following command.
 
-Silicon Wave or now RFMD never send me a development kit to improve the
-support for it. I only have Silicon Wave based USB dongles and most
-people I know uses the USB interface to attach a Bluetooth module with
-this chip.
+             hciattach  /dev/ttyS0 swave 115200 flow
 
-Look at the hciattach source code and see where this error occurs. Check
-your kernel config and make sure that H4 is really configured:
+we are getting the INITIALIAZATION TIME OUT error. And it is the same
+result with the following commands also:
 
-	CONFIG_BT_HCIUART=m
-	CONFIG_BT_HCIUART_H4=y
+             hciattach ttyS0 swave 115200 flow
+             hciattach  -s 115200 ttyS0  swave 115200 flow
+             hciattach /dev/ttyS0 swave 115200
+                      
+Has anyone faced this problem before. Any pointers? Please advice.
 
-Regards
-
-Marcel
-
-
+Thanks and regards
+Benny
 
 
 -------------------------------------------------------
