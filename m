@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <405638DD.2080000@handgranat.org>
-From: Sunnan <sunnan@handgranat.org>
-MIME-Version: 1.0
+From: "João Santos" <jsantos_pt@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bthid on ppc
-References: <20040307221349.GA1930@stag.mark-and-erika.com> <1078704798.15279.3.camel@pegasus> <20040308054000.GB1930@stag.mark-and-erika.com>
-In-Reply-To: <20040308054000.GB1930@stag.mark-and-erika.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Message-ID: <Sea2-F42TuLCBnwNLh1000006b9@hotmail.com>
+Subject: [Bluez-users] audio links problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,32 +15,70 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 16 Mar 2004 00:14:37 +0100
+Date: Mon, 15 Mar 2004 16:45:31 +0000
 
-Ben Wilson wrote:
-> Does this mean this is a known issue? The HID program from
-> http://www.visi.com/~pmk/msbtkb-linux.html wouldn't even compile
-> for me, I figured it may be the same type of issue.
+Hi all,
+I'm working with sco links and i had found a strange problem, and i don't 
+have any idea who it appears and who to fix it.
+i'm using a Nokia 6310i phone, a casira module and the bluez stack.
+linux-kernel 2.4.25-mh1
+In the hcidump appears:
 
-Seeing this thread made me take up my old efforts to get my Apple
-wireless mouse to work on my Debian-running iBook g4 (with built-in bt),
-but it can't be the same type of issue since I did get Peter's bthid
-mentioned above (same name, different program than in BlueZ cvs) to
-compile (had to change some includes and so on) and work, it doesn't
-crash but I could only use the mouse for a few seconds at a time, then
-it would freeze for a few seconds, then work a few seconds, and so on
-(and I mean full seconds, not figuratively speaking).
-That was yesterday. Today I didn't even get that working, I managed to
-move the cursor for just a short blink, maybe half a second or so.
+>##SCO data: handle 0x002b dlen 144
+>##SCO data: handle 0x002b dlen 144
+>##SCO data: handle 0x002b dlen 144
+>HCI Event: Disconn Complete(0x05) plen 4
+>##SCO data: handle 0x002b dlen 144
+>##SCO data: handle 0x002b dlen 144
+>##SCO data: handle 0x002b dlen 144
+< HCI Command: Reset(0x03|0x0003) plen 0
+>>>Receive failed: Broken pipe
 
-That error could be in sdpd (that's what Peter's bthid's error messages
-hint at, or so I interpret them) or in that bthid, or somewhere else, I
-don't know.
+i think that the disconn appends because the phone enter in park mode, but 
+the reset command i don't have any idea why this appends.
 
-So, anyway, it's not the same issue. BlueZ cvs bthid just dies silently
-for me (even though the other tools, sdptool, hcitool etc works fine).
 
-one love sunnan
+[root@olivia jsantos]# hciconfig -a
+hci0: Type: USB
+BD Address: 00:02:5B:FF:05:AC ACL MTU: 192:8 SCO MTU: 64:8
+UP RUNNING PSCAN ISCAN AUTH ENCRYPT
+RX bytes:2481 acl:0 sco:0 events:56 errors:0
+TX bytes:522 acl:0 sco:0 commands:33 errors:0
+Features: 0xff 0xff 0x0d 0x00 0x00 0x00 0x00 0x00
+Packet type: DM1 DH1 HV1
+Link policy: HOLD SNIFF PARK
+Link mode: MASTER
+Name: 'Olivia'
+Class: 0x200404
+Service Classes: Audio
+Device Class: Audio/Video, Device conforms to the Headset profile
+HCI Ver: 1.1 (0x1) HCI Rev: 0xbc LMP Ver: 1.1 (0x1) LMP Subver: 0xbc
+Manufacturer: Cambridge Silicon Radio (10)
+
+[root@olivia jsantos]# hciconfig hci0 revision
+hci0: Type: USB
+BD Address: 00:02:5B:FF:05:AC ACL MTU: 192:8 SCO MTU: 64:8
+HCI 12.7
+Chip version: BlueCore01b (ES)
+SCO mapping: HCI
+
+
+
+This is strange to append, i thing that the last command that should appears 
+in the hcidump was:
+
+>HCI Event: Disconn Complete(0x05) plen 4
+
+But he continue receiving sco data and then he make a reset, that causes a 
+broken pipe.
+
+
+Thanks
+
+_________________________________________________________________
+Help STOP SPAM with the new MSN 8 and get 2 months FREE*  
+http://join.msn.com/?page=features/junkmail
+
 
 
 -------------------------------------------------------
