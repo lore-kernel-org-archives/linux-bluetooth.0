@@ -1,42 +1,44 @@
-Return-Path: <thomas.chiverton@bluefinger.com>
-From: Thomas Chiverton <thomas.chiverton@bluefinger.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-users] Host is down
-Date: Fri, 2 Apr 2004 14:23:12 +0100
-References: <918378fefe.8fefe91837@estudiants.urv.es> <1080894681.2774.56.camel@pegasus>
-In-Reply-To: <1080894681.2774.56.camel@pegasus>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <406C1E19.7090003@ntlworld.com>
+From: Oli Ellis <oliver.ellis@ntlworld.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200404021423.12793.thomas.chiverton@bluefinger.com>
-List-ID: <bluez-users.lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] RE: Logitech multimedia keys off by one
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 01 Apr 2004 14:50:17 +0100
 
-On Friday 02 Apr 2004 09:31 am, you said:
-> why can't you post your answer as an answer to my mail? 
-> > X-Mailer: iPlanet Messenger Express 5.2 HotFix 1.18 (built Jul 28 2003
+Yes, I tried the same -1 trick, but it seems more complicated than that. 
+The event should tally with what is written on the keyboard, and I don't 
+think that bluetooth devices can be released unless they are fully 
+compliant (I have been reading up!). Plus, if Logitech can't get it 
+right, who can? Marcel suggested it could be an error with the parser, 
+but this looks to be beyond my programming expertise.
 
-I think that's the answer :-)
+Also, a question to Mr Holtmann: The latest release of the Bluez package 
+with bluez-libs-2.6 and bluez-utils-2.6 - does this negate the need for 
+the CVS version for tools like hid2hci and bthid?
 
--- 
-Tom Chiverton 
-Advanced ColdFusion Programmer
+Thanks
 
-Tel: +44(0)1749 834997
-email: tom.chiverton@bluefinger.com
-BlueFinger Limited
-Underwood Business Park
-Wookey Hole Road, WELLS. BA5 1AF
-Tel: +44 (0)1749 834900
-Fax: +44 (0)1749 834901
-web: www.bluefinger.com
-Company Reg No: 4209395 Registered Office: 2 Temple Back East, Temple
-Quay, BRISTOL. BS1 6EG.
-*** This E-mail contains confidential information for the addressee
-only. If you are not the intended recipient, please notify us
-immediately. You should not use, disclose, distribute or copy this
-communication if received in error. No binding contract will result from
-this e-mail until such time as a written document is signed on behalf of
-the company. BlueFinger Limited cannot accept responsibility for the
-completeness or accuracy of this message as it has been transmitted over
-public networks.***
+- Oli
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
