@@ -1,15 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Matthew Grant <grantma@anathoth.gen.nz>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>,
-   David Woodhouse <dwmw2@infradead.org>
-In-Reply-To: <1098654320.4635.16.camel@localhost>
-References: <1098654320.4635.16.camel@localhost>
-Content-Type: text/plain
-Message-Id: <1098676528.6465.68.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-users] Re: PROBLEM: Apple powerbook, Apple BT keyboard, keyboard does not
- reconnect on reboot
+Message-ID: <E337F6C8A5154F4C8E95349BA276D63008FBB4@zrtphxm0.corp.nortel.com>
+From: "KEYUR DESAI" <keyurde@nortelnetworks.com>
+To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C4BA44.F3D1AC2C"
+Subject: [Bluez-users] Connection failed error (110)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,48 +16,193 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 25 Oct 2004 05:55:28 +0200
+Date: Sun, 24 Oct 2004 23:44:38 -0400
 
-Hi Matthew,
+This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
 
-> Running 2.6.8 mh2, bluz-utils 2.10 on Debian Sarge.  Marcel, please
-> excuse me for mailing you directly as wellas the list, as I want to send
-> you a binary hcidump output so you can get maximum debug info.
+------_=_NextPart_001_01C4BA44.F3D1AC2C
+Content-Type: text/plain
 
-don't care about that. If you exceed the mailing list limited I will
-accept the post manually and let it through.
+Hi,
 
-> I am having problems with the keyboard not reconnecting on reboot when
-> hciattach switches the internal dongle from USB HID emulation to HCI.
+ 
 
-It is not hciattach that is switching, it is hid2hci.
+Here is my current scenario
 
-> The Lower level layer is definitely connected, but the keyboard events
-> are not generating keyboard input at all.  I have to switch the keyboard
-> off, and then switch it back on, and it renegotiates, and it all starts
-> working.
+ 
 
-What does "hidd --show" tell you when the keyboard is connected, but not
-working?
+Hardware: Belkin Dongle
 
-> This test is not using security mode 3 yet, though I will be doing this
-> to prevent people sniffing passwords.... but the same problem happens
-> then.
+O.S.: Fedora Core 2 Kernel 2.6.5-1.358
 
-Actually I thought, that the Apple keyboard is always in security mode
-three, but from your dumps it looks like that this is not true when it
-reconnects. What does "hcitool con" say about the reconnect ACL link?
+ 
 
-> When I boot from OS X back into Linux, the problem does not occur.
+ 
 
-This is strange and actually I never had any problems with the Apple HID
-stuff, but I used it on a normal Intel machine.
+Here is the problem:
 
-Regards
+ 
 
-Marcel
+When I do 
+
+#hciconfig hci0 up The device works fine.
+
+ 
+
+However on doing a hciconfig hci0 down followed by a hciconfig hci0 up . The
+dongle does not work.
+
+It gives an error 
+
+Can't init device hci0. Connection timed out (110).
+
+ 
+
+Regards,
+Keyur Desai 
+ESN 352-8467 (919-992-8467)
+ keyurde@nortelnetworks.com <mailto:keyurde@nortelnetworks.com> 
+
+ 
+
+ 
+
+ 
 
 
+------_=_NextPart_001_01C4BA44.F3D1AC2C
+Content-Type: text/html
+
+<html>
+
+<head>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=us-ascii">
+
+
+<meta name=Generator content="Microsoft Word 10 (filtered)">
+
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:SimSun;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+@font-face
+	{font-family:"Arial Black";
+	panose-1:2 11 10 4 2 1 2 2 2 4;}
+@font-face
+	{font-family:"\@SimSun";
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+p
+	{margin-right:0in;
+	margin-left:0in;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+span.EmailStyle17
+	{font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=EN-US link=blue vlink=purple>
+
+<div class=Section1>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>Hi,</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>&nbsp;</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>Here is my current scenario</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>&nbsp;</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>Hardware: Belkin Dongle</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>O.S.: Fedora Core 2 Kernel 2.6.5-1.358</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>&nbsp;</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>&nbsp;</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>Here is the problem:</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>&nbsp;</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>When I do </span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>#hciconfig hci0 up The device works fine.</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>&nbsp;</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>However on doing a hciconfig hci0 down followed by a
+hciconfig hci0 up . The dongle does not work.</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>It gives an error </span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>Can&#8217;t init device hci0. Connection timed out (110).</span></font></p>
+
+<p class=MsoNormal><font size=2 face=Arial><span style='font-size:10.0pt;
+font-family:Arial'>&nbsp;</span></font></p>
+
+<p><font size=3 color="#333399" face="Arial Black"><span style='font-size:12.0pt;
+font-family:"Arial Black";color:#333399'>Regards,<br>
+Keyur Desai <br>
+</span></font><font size=2 color="#333399" face=Arial><span style='font-size:
+10.0pt;font-family:Arial;color:#333399'>ESN 352-8467 (919-992-8467)</span></font><br>
+<font size=2 color="#333399" face=Arial><span style='font-size:10.0pt;
+font-family:Arial;color:#333399'>&nbsp;<a
+href="mailto:keyurde@nortelnetworks.com">keyurde@nortelnetworks.com</a></span></font></p>
+
+<p><font size=3 face="Times New Roman"><span style='font-size:12.0pt'>&nbsp;</span></font></p>
+
+<p><font size=3 face="Times New Roman"><span style='font-size:12.0pt'>&nbsp;</span></font></p>
+
+<p class=MsoNormal><font size=3 face="Times New Roman"><span style='font-size:
+12.0pt'>&nbsp;</span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------_=_NextPart_001_01C4BA44.F3D1AC2C--
 
 
 -------------------------------------------------------
