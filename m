@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: zubiwat@poczta.onet.pl
-Reply-To: zubiwat@poczta.onet.pl
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200403041257.28768.zubiwat@poczta.onet.pl>
-Subject: [Bluez-users] Changing default baud in CSR BT
+Subject: Re: [Bluez-users] AVM AP-X and DUN profile
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bernd.Jucknischke@web.de
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403040924.58522.Bernd.Jucknischke@web.de>
+References: <200403030832.19665.Bernd.Jucknischke@web.de>
+	 <1078320979.2787.68.camel@pegasus>
+	 <200403040924.58522.Bernd.Jucknischke@web.de>
+Content-Type: text/plain
+Message-Id: <1078398559.5347.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,20 +20,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 4 Mar 2004 12:57:28 +0100
+Date: Thu, 04 Mar 2004 12:09:19 +0100
 
-Can any one help me?
-I have to change the default baud base in chip because it is set to 921600 and 
-I have to use microchip to translate this 921600 to 115200. Now it is the 
-only way for me to connect to my BT through RS232. I want to change this 
-default baud to be able to connect directly to my BT through RS232 without 
-any microchip between them.
-Please help to find a command or sth to change this - offcourse if it's 
-possible.
+Hi Bernd,
 
-Regards 
+> Thanks for the fast reply. I know that page already. I'm running the 2.6 
+> kernel series and haven't been able to find a working capi, yet. I guess I'll 
+> have to wait until it's (capi) supported for 2.6...
 
-Maciej Zubilewicz
+you can search for a patch named i4l-t9bk22 or use 2.6.4-rc1 which
+already includes every ISDN update that is needed. However you must make
+sure that the module capi.ko is loaded and that /dev/capi is mounted,
+because capiinit sometimes forget about it.
+
+Regards
+
+Marcel
+
 
 
 
