@@ -1,17 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] NAT connection established but no data transport
-From: Marcel Holtmann <marcel@holtmann.org>
-To: skrzypek-piotr@o2.pl
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041102074127.9B9CAD0B0F@rekin6.o2.pl>
-References: <20041101214200.C1E5BD0B0C@rekin6.o2.pl>
-	 <1099347952.10948.19.camel@pegasus>
-	 <20041101235513.2017B3816E@rekin11.go2.pl>
-	 <1099362451.10948.22.camel@pegasus>
-	 <20041102074127.9B9CAD0B0F@rekin6.o2.pl>
-Content-Type: text/plain
-Message-Id: <1099392282.10948.25.camel@pegasus>
-Mime-Version: 1.0
+From: Trejkaz Xaoza <trejkaz@trypticon.org>
+Reply-To: trejkaz@trypticon.org
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart1470818.Ys251amHFU";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <200411021947.00702.trejkaz@trypticon.org>
+Subject: [Bluez-users] Re: Device class resetting itself after device is removed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,37 +19,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 02 Nov 2004 11:44:42 +0100
+Date: Tue, 2 Nov 2004 19:46:54 +1100
 
-Hi Pete,
+--nextPart1470818.Ys251amHFU
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-> >> >try to activate bnep0 and set an IP address.
-> >> i set: ifconfig bnep0 192.168.0.1
-> >> and when i type ifconfig there is nothing about bnep0, but when i
-> type
-> >> ifconfig bnep0
-> >> i can see everything just like it should be: the same mac adress
-> >> (read from cover of usb device), ip 192.168.0.1, appropriate mask
-> >> etc. but still it doesn`t send/recieve data. 
-> >> 
-> >> Maybe it can help somehow:
-> >> I checked the transmission status on the notebook and it says that
-> >> the device is transmitting (especially while pinging) but not
-> reciving.
-> >
-> >are you sure that you are using the latest -mh patch for your kernel?
-> 
-> There is only one patch for kernel 2.4.27 and i`m using it.
+Marcel Holtmann wrote:
+>> Yup, looks healthy so far:
+>>=20
+>> [100] trejkaz@raven:~> ps -ef|grep hcid
+>> root      6821     1  0 Nov01 ?        00:00:00 hcid: processing events =
+                =20
+>=20
+> if it still doesn"t work, you may have to restart it to use your new
+> settings.
 
-do you have some firewall rules activated? Check the syslog for more
-information and check with "hcidump -X" as root what goes over the
-Bluetooth interface.
+Okay, I just solved it.
 
-Regards
+I was missing a semicolon somewhere at the end of the options section of th=
+e=20
+configuration file.  For some reason hcid didn't see this as an error, but=
+=20
+just plodded on without the configuration set.  *facepalm*
 
-Marcel
+My bad.
 
+TX
 
+=2D-=20
+             Email: Trejkaz Xaoza <trejkaz@xaoza.net>
+          Web site: http://xaoza.net/
+         Jabber ID: trejkaz@jabber.xaoza.net
+   GPG Fingerprint: 9EEB 97D7 8F7B 7977 F39F  A62C B8C7 BC8B 037E EA73
+
+--nextPart1470818.Ys251amHFU
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+
+iD8DBQBBh0mEuMe8iwN+6nMRAtmFAJ0SDGX225FVLjJVVgEeMReq61T8DwCdFl+8
+zv7IqLXdEkIrxrT1O68a0Yw=
+=Y4br
+-----END PGP SIGNATURE-----
+
+--nextPart1470818.Ys251amHFU--
 
 
 -------------------------------------------------------
