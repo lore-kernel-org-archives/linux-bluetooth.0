@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1038260639.772.57.camel@pegasus.local>
+Message-Id: <5.1.0.14.2.20021122141044.0771f3f0@mail1.qualcomm.com>
+To: avolmat@src.ricoh.co.jp, bluez-devel@lists.sourceforge.net
+From: Max Krasnyansky <maxk@qualcomm.com>
+Subject: Re: [Bluez-devel] bluez-kernel: endian problem in hci_core
+In-Reply-To: <MJEAZA9US53D8PKVPMIS85DCBA64.3ddb1d27@CASSOULET>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Reuse of H4 and BCSP code
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -17,61 +17,111 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 25 Nov 2002 22:43:53 +0100
+Date: Fri, 22 Nov 2002 14:18:52 -0800
+Content-Type: text/plain; CHARSET=us-ascii
 
-Hi,
+Hi Alain,
 
-the current hci_uart.o driver supports H4 and BCSP HCI protocols and the
-code from it should be reusable by the other drivers two. For example
-most PCMCIA cards are a kind of serial cards with an UART on it. The
-only difference is how the UART would be used to talk to the Bluetooth
-chips and many times you need some extra code. If this Bluetooth chip is
-one from CSR their are two protocols available two use and you can
-switch between them if you like (and autodetection would be great). So
-it should be possible to reuse the H4 and the BCSP code, which will make
-some PCCARD drivers a little bit smaller.
+Good catch. 
 
-The current driver which can reuse the code are:
+The fix is very very simple
 
-bluecard_cs:	H4
-bt3c_cs:	H4
-btuart_cs:	H4 and BCSP
-bt950_cs:	H4 and BCSP
-hci_uart:	H4 and BCSP
+****
+--- 1.11/net/bluetooth/hci_core.c       Mon Oct 21 08:33:01 2002
++++ 1.12/net/bluetooth/hci_core.c       Fri Nov 22 11:34:54 2002
+@@ -717,7 +717,7 @@
+        if (!dev_num)
+                return -EINVAL;
+        
+-       size = dev_num * sizeof(struct hci_dev_req) + sizeof(__u16);
++       size = dev_num * sizeof(*dr) + sizeof(*dl);
+ 
+        if (verify_area(VERIFY_WRITE, (void *) arg, size))
+                return -EFAULT;
+@@ -738,7 +738,7 @@
+        read_unlock_bh(&hdev_list_lock);
+ 
+        dl->dev_num = n;
+-       size = n * sizeof(struct hci_dev_req) + sizeof(__u16);
++       size = n * sizeof(*dr) + sizeof(*dl);
+ 
+        copy_to_user((void *) arg, dl, size);
+        kfree(dl);
+****
 
-At the moment I see two ways of doing this, but maybe there are more of
-them.
+I also fixed hci_for_each_dev() (in CVS) and tested it on my sparc64 machine. 
+'hcitool dev' works fine now and it was indeed broken before. Turns out I 
+never used hci_for_each_dev() on Sparc and PPC and therefor didn't noticed 
+that bug.
 
-1. Let the hci_uart driver export some function to let the drivers
-register. Maybe something like:
+Max
 
-	hci_register_uart	(which later calls hci_register_dev)
-	hci_unregister_uart	(which later calls hci_unregister_dev)
-
-2. Make the code in hci_h4.c and hci_bcsp.c linkable against the driver.
-
-Both versions have advantages and disadvantages. The first one keeps the
-size of the driver module small, but you always need another module to
-interface with the HCI core. The second one need no other modules, but
-the code for the UART protocols are in every driver.
-
->From me personal view of it I don't like to have too much modules and I
-would go with the second possibility. But anyway for both methods some
-parts of the BCSP init code have to be moved to the kernel space.
-
-Please comment on this. Anyone who will start with this?
-
-Regards
-
-Marcel
-
+>I'd like to notify you a problem I've just found in hci_core.c
+>Well it source of the problem is no endianness but sizeof.
+>The problem occurs when using BlueZ on a BIG ENDIAN machine.
+>Due to this problem it, "hcitool dev" doesn't work properly.
+>
+>When running "hcitool dev", the function
+>        int hci_get_dev_list(unsigned long arg)
+>is called in order to fill the hci_dev_list_req structure.
+>The problem is located at the end, when checking the size 
+>of data to be copied to user space:
+>        dl->dev_num = n;
+>->      size = n * sizeof(struct hci_dev_req) + sizeof(__u16);
+>
+>        copy_to_user((void *) arg, dl, size);
+>
+>The function copy_to_user copy dl (struct hci_dev_list_req) to user space.
+>Since dl can actually contains several hci_dev_req structure the amount
+>of data to copy is calculated that way:
+>                size = n * sizeof(struct hci_dev_req) + sizeof(__u16);
+>The last sizeof(__u16) gives the size of dev_num.
+>
+>struct hci_dev_req {
+>        __u16 dev_id;
+>        __u32 dev_opt;
+>};
+>
+>struct hci_dev_list_req {
+>        __u16  dev_num;
+>        struct hci_dev_req dev_req[0];  /* hci_dev_req structures */
+>};
+>
+>
+>But in fact, due to alignment, event on i386 dev_num will use 4 bytes (not 2 
+>bytes). The structure hci_dev_req will also use 4 bytes. Which makes that
+>for example in case of there is only 1 device the size will becomes:
+>        4 + 8 = 12.
+>But the variable size is actually set to 10 (8 + 2). (of course sizeof(__u16) is 
+>2).
+>In case of little endian, it doesn't make any problem since the LSB is first,
+>but in case of BIG ENDIAN, the MSB is first so finally the flag indicating that
+>the device is UP is lost.
+>As a result, "hcitool dev" will never display devices.
+>
+>I patched my local code, but in a very dirty way, so please keep me informed
+>about this issue.
+>
+>Alain Volmat
+>
+>
+>
+>
+>-------------------------------------------------------
+>This sf.net email is sponsored by: To learn the basics of securing 
+>your web site with SSL, click here to get a FREE TRIAL of a Thawte 
+>Server Certificate: http://www.gothawte.com/rd524.html
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
 -------------------------------------------------------
-This SF.net email is sponsored by: Get the new Palm Tungsten T 
-handheld. Power & Color in a compact size! 
-http://ads.sourceforge.net/cgi-bin/redirect.pl?palm0002en
+This sf.net email is sponsored by:ThinkGeek
+Welcome to geek heaven.
+http://thinkgeek.com/sf
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
