@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] News: Stereo BT Headset from BlueTake
+Subject: Re: [Bluez-users] Packages to Use For Zaurus SL-6000L
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Brad Midgley <bmidgley@xmission.com>
+To: murat_bog@yahoo.com
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <416EE163.1050605@xmission.com>
-References: <416D8520.5060102@thomae-privat.de>
-	 <416DA635.2070105@xmission.com> <1097741691.4640.19.camel@notepaq>
-	 <416E8560.3070801@xmission.com> <1097762684.4640.49.camel@notepaq>
-	 <416EE163.1050605@xmission.com>
+In-Reply-To: <20041016065031.39199.qmail@web60406.mail.yahoo.com>
+References: <20041016065031.39199.qmail@web60406.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1097927962.4911.16.camel@pegasus>
+Message-Id: <1097927722.4911.10.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,30 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 16 Oct 2004 13:59:22 +0200
+Date: Sat, 16 Oct 2004 13:55:22 +0200
 
-Hi Brad,
+Hi Murat,
 
-> I must not have understood the distinction. I've seen stuff 
-> (http://www.ericsson.com/bluetooth/files/newsletter5_0403_lores.pdf) 
-> that suggests 1.2 brings with it higher-quality audio through new 
-> profiles (A2DP, AVRCP, GAVDP) and stuff 
-> (http://www.wordiq.com/definition/Bluetooth#Bluetooth_1.2) that says it 
-> gives us better transfer heuristics (eSCO).
+> I am wondering which combination of Bluez packages I
+> should be installing on a Zaurus 6000L with factory
+> configuration(2.4.18-rml7-pxa3-embedix with ROM
+> version 1.12) to work with an AmbiCom BT2000CF card.
 > 
-> Are the profiles purely a function of the software stack? What about eSCO?
+> The latest set of packages do not seem to be working
+> together.  When I install bluez-utils-2.10_arm.ipk, it
+> reports a dependency error when used with
+> bluez-kernel-2.4.18-mh15_arm.ipk and
+> bluez-libs-2.10_arm.ipk.
+> 
+> I also see that when I run "/etc/rc.d/init.d/bluetooth
+> start" command, I get the following message:
+> 
+> "Starting Bluetooth subsystem:/usr/sbin/hcid: error
+> while loading shared libraries: libsdp.so.2: cannot
+> load shared object file: No such file or directory"
 
-I checked the articles above and no one said, that you need Bluetooth
-1.2 for A2DP. It might be confusing, but A2DP uses the ACL data link for
-high quality audio and not SCO/eSCO links like the headset/handsfree or
-cordless telephony/intercom profiles.
-
-> I'd love to hear that the 1.1 adapter hardware is not being obsoleted by 
-> 1.2. I don't mind having to get a new headset like the bluetake.
-
-Everything should be backward compat as long as it based on the ACL data
-links. If you like, you can use a Bluetooth 1.0b device like the old
-Nokia DTL-1 Bluetooth card.
+you need an updated kernel, because the Bluetooth support of the 2.4.18
+kernel is outdated. However I don't own a Zaurus and I have no idea how
+to fix this the right way.
 
 Regards
 
