@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-To: <bluez-users@lists.sourceforge.net>
-Subject: AW: [Bluez-users] Re: Toshiba and BT (SuSE 9.2)
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAB+zXWiodQU+C/XbHBBtz8gEAAAAA@t-online.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1102968227.2143.16.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: soraberri <421246@posta.unizar.es>
+Message-ID: <cpmeu8$9qu$1@sea.gmane.org>
+References: <cpk3v3$4bb$1@sea.gmane.org> <1102948606.8750.159.camel@pegasus> <cpkc1i$tpn$1@sea.gmane.org> <cpkdsa$3qu$1@sea.gmane.org> <cpkf63$8up$1@sea.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <cpkf63$8up$1@sea.gmane.org>
+Subject: [Bluez-users] Re: [bluetooth-alsa] and [libao-devel]
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,31 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Dec 2004 11:28:15 +0100
+Date: Tue, 14 Dec 2004 11:22:14 +0100
 
-Hi Marcel,
+Sebastian Roth wrote:
+> Hi soraberri,
+> 
+>  > I actually con load sco (modprobe sco) but not snd_bt_sco as indicated
+>  > in http://bluetooth-alsa.sourceforge.net/
+> modprobe just searches the regular directory (/lib/modules/`uname -r`)
+> for the module. Try insmod /full/path/to/snd-bt-sco.ko instead.
+> 
+> Best regards,
+> Sebastian
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now. 
+> http://productguide.itmanagersjournal.com/
 
-##>maybe it is not a good idea to configure bnep0 with YaST at 
-##>the moment and actually I never tried this. If your AP is 
-##>configured in router mode then you should simply run "pand 
-##>-n -c <bdadd>" and then "dhcpcd bnep0".
+I migth be doing something wrong... It should be easier to load it. I've 
+checked the path and the snd_bt_sco.ko file is placed at 
+/lib/modules/`uname -r`/extra. Why in extra?
 
-and here is the result
+If I use insmod /lib/modules/`uname -r`/extra/snd_bt_sco.k, it claims 
+for dependencies, and well, I have seen in some thread that someone just 
+  use modprobe snd_bt_sco.
 
-Linux-Notebook:~ # hcitool scan
-Scanning ...
-        00:0B:CE:00:01:8F       Bluetooth-Modul
-Linux-Notebook:~ # pand -n -c 00:0B:CE:00:01:8F
-pand[8102]: Bluetooth PAN daemon
-pand[8102]: Connecting to 00:0B:CE:00:01:8F
-pand[8102]: Connect to 00:0B:CE:00:01:8F failed. Connection refused(111)
-Linux-Notebook:~ #
+thanks sebastian
 
-What means this, espacially refused(111)?
-
-Regards
-Peter
-
+regards
 
 
 
