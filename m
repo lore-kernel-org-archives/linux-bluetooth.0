@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "pat" <pat@xvalheru.org>
-To: "BlueZ" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] newbe: rfcomm_recv_frame: bad checksum in packet
-Message-Id: <20040913151758.M47235@xvalheru.org>
-In-Reply-To: <1094997603.5695.9.camel@pegasus>
-References: <20040910155027.M37511@xvalheru.org> <1094997603.5695.9.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset=iso-8859-1
+From: Matthias Albert <matthias@ma-c.de>
+To: bluez-users@lists.sourceforge.net
+Message-Id: <1095082582.2191.35.camel@ringo.aicas.burg>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] bluetooth ipaq familiar
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,34 +15,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Sep 2004 17:20:24 +0200
+Date: 13 Sep 2004 15:36:22 +0200
 
-Hi Marcel,
+Hello together,
 
-Thanks for your answer, but same problem is with Windows, so the problem is
-with the cell phone - it needs new firmware (Nokia 6230). I'll update the
-firmware and let you know the result.
+I have a iPAQ 5550 running with Familiar unstable 0.7.2 and Opie 1.1.4.
+I can establish a connection over pand between a pc and the ipaq.
 
-Thanks once again.
+After that I have a device called bnep0 which I can configure with
+ifconfig bnep0 and so on.
 
-     Pat
+Now I would like to have a serial bluetooth connection between the pc
+and the ipaq.
+How can I do this?
 
-On Sun, 12 Sep 2004 16:00:03 +0200, Marcel Holtmann wrote
-> Hi Pat,
-> 
-> > I have installed the BlueZ to my laptop because I want to use GPRT through the
-> > Bluetooth. I have scripts and the rest configured and I'm able to connect and
-> > upload some data, but within 30 seconds the connection go down. The system log
-> > contains only this line "rfcomm_recv_frame: bad checksum in packet". Could
-> > someone help me ???
-> 
-> actually this should never happen, because the underlaying L2CAP 
-> layer is reliable. Try to use the latest 2.6 kernel and run "hcidump 
-> -X" as root and show the output to us.
-> 
-> Regards
-> 
-> Marcel
+Is it possible with a serial bluetooth connection, that I can go outside
+the frequency with my ipaq and go back and the connection is there? (I'm
+sorry for by bad english, I hope that's ok for reading).
+
+
+I'm happy about any experience with your ipaq and bluetooth.
+
+
+Many greets from Germany Karlsruhe,
+
+Matthias
+
+
+-- 
+Matthias Albert <matthias@ma-c.de>
+ma-c
 
 
 
