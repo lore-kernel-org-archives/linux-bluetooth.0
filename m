@@ -1,77 +1,77 @@
-Return-Path: <daryl@wideray.com>
-Errors-To: <daryl@wideray.com>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Rfcomm use count
-Date: Tue, 14 Sep 2004 14:58:57 -0700
-Message-ID: <000f01c49aa6$0958f510$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1095153493.5695.129.camel@pegasus>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] L2CAP: One failing connection hurts others?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stefan Mischke <survivor@uni-paderborn.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41475033.3030209@uni-paderborn.de>
+References: <41470C59.2050909@uni-paderborn.de>
+	 <1095186861.5695.193.camel@pegasus>  <41474247.8090602@uni-paderborn.de>
+	 <1095189878.5695.201.camel@pegasus>  <41474870.3020204@uni-paderborn.de>
+	 <1095191352.5695.205.camel@pegasus>  <41475033.3030209@uni-paderborn.de>
+Content-Type: text/plain
+Message-Id: <1095196325.5263.3.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 14 Sep 2004 23:12:06 +0200
 
-Marcel,
+Hi Stefan,
 
-That didn't work, but I think I found the problem. Not sure what the =
-correct
-solution is though.
+> > your firmware is HCI 16.4 which is good, but you are going to create a
+> > scatternet on your client and that can be the problem. Looks like this
+> > is an internal problem of the CSR firmware. 
+> You mean the dongles try to create a scatternet (with packet routing
+> and so on) on their own? I always thought a scatternet has to be
+> implemented outside the hard-/firmware.
 
-Rfcomm_sock_cleanup_listen() calls bluez_accept_dequeue() in a loop =
-until
-bluez_accept_dequeue() has no more sockets to return. For each socket =
-that
-bluez_accept_dequeue() returns, rfcomm_sock_cleanup_listen() closes and
-kills it. Killing it unlinks it from rfcomm_sk_list.
+no, you only create a scatternet. This means when one device must be
+member of two different piconets.
 
-But if the socket is already closed (sk->state =3D=3D BT_CLOSED), then
-bluez_accept_dequeue() does not return the socket (it just continues to =
-the
-next one in the queue). Bluez_accept_dequeue() does unlink it from the
-accept queue, but not from rfcomm_sk_list.
+> Is there a way to upgrade it? Are there better dongles the University
+> could buy?
 
-I suppose the first question is: Is the bug in cleanup/dequeue, or is =
-the
-bug elsewhere (i.e.: things shouldn't ever be in quite that state when
-cleanup_listen is called)?
+You can upgrade the D-Link DBT-120 Rev. B3 with the Apple firmware
+update package to HCI 18.1.
 
-Also, should rfcomm_sock_destruct() be called to decrement the use =
-count?
+> > Try to introduce some delays
+> > between the connections and see if that helps.
+> >   
+> I'm experimenting with delays and timeouts for three days now. It
+> helps... a bit, but not really good. I just tried to switch
+> master-slave, but it doesn't really help. 
 
--Daryl.
+I think you should avoid the role-switching and keep the listening
+applications as slaves. In this case the client creates the piconet and
+can keep both servers in the same piconet.
 
-> -----Original Message-----
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]=20
-> Sent: September 14, 2004 2:18 AM
-> To: Daryl Van Vorst
-> Cc: 'BlueZ Mailing List'
-> Subject: RE: [Bluez-devel] Rfcomm use count
->=20
->=20
-> Hi Daryl,
->=20
-> > I just noticed that bluez_accept_unlink() was called with a=20
-> socked that was
-> > in state BT_CLOSED, so it can't be the second if(). It=20
-> would have been
-> > called from the first if().
-> >=20
-> > Clearly, I'm on glue.
-> >=20
-> > Still, does the order of bluez_accept_unlink() and=20
-> sock_release() matter?
->=20
-> I haven't done a full audit yet, but try to switch the order and see
-> what happens. From a first look at it it makes sense to only=20
-> release the
-> socket when all the work is done, because otherwise=20
-> lock_sock() makes no
-> sense.
->=20
-> Regards
->=20
-> Marcel
->=20
->=20
->=20
+> One year ago, I wrote another Location Awareness App on top of a
+> modified JBlueZ and it just used ACL links to measure RSSI and LQ. It
+> worked. I probably have to take care of the ACLs myself (does L2CAP
+> use existing ACLs?). The only drawback: The App has to run as root :(.
+
+The L2CAP creates the same ACL links, so this can't be the problem.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: thawte's Crypto Challenge Vl
+Crack the code and win a Sony DCRHC40 MiniDV Digital Handycam
+Camcorder. More prizes in the weekly Lunch Hour Challenge.
+Sign up NOW http://ad.doubleclick.net/clk;10740251;10262165;m
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
