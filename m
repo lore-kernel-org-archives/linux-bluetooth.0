@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Gene Imes <ebi7@ozob.net>
-To: list bluez <bluez-users@lists.sf.net>
-In-Reply-To: <Pine.OSF.4.10.10406121321460.6753-100000@speed.seas.smu.edu>
-References: <Pine.OSF.4.10.10406121321460.6753-100000@speed.seas.smu.edu>
-Content-Type: text/plain
-Message-Id: <1087078183.9717.22.camel@tr1a.ozob.net>
-Mime-Version: 1.0
-Subject: [Bluez-users] bluepin
+From: Thea <thea@m-net.arbornet.org>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20040612150207.T12604-100000@m-net.arbornet.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] Can ping, nothing else
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,24 +15,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 12 Jun 2004 17:09:43 -0500
+Date: Sat, 12 Jun 2004 15:10:12 -0400 (EDT)
 
-Anyone know how to fix this:
 
-gene@tr1a:~> bluepin
-Xlib: connection to ":0.0" refused by server
-Xlib: No protocol specified
- 
-Traceback (most recent call last):
-  File "/usr/bin/bluepin", line 39, in ?
-    import gtk
-  File "/usr/lib/python2.3/site-packages/gtk-2.0/gtk/__init__.py", line
-43, in ?    from _gtk import *
-RuntimeError: could not open display
+Forgive me if this question has been asked before. I've gotten pppd to
+establish a connection to my t610 mobile phone through bluez. I get pair
+of addresses and can properly ping and resolve hosts. Nice, but I can't
+actually connect to hosts. This is something I don't know how to deal
+with. If I telnet to <nameserver> 53, it times-out; if I telnet to
+www.google.com 80, it times-out; if I ping www.altavista.com, it works
+fine. What's happening here?
 
-Thanks,
+I'm running linux 2.6, stock-generic on an ibook.
+Just ask if you want to see any configuration files
 
-Gene
+-Thea DeSilva
 
 
 
