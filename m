@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BlueFritz! AP-x working as a Bluetooth device?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200503261218.00580.ch.schuetz@addcom.de>
-References: <200503261218.00580.ch.schuetz@addcom.de>
-Content-Type: text/plain
-Message-Id: <1111836216.9195.162.camel@pegasus>
-Mime-Version: 1.0
+From: Christoph =?iso-8859-15?q?Sch=FCtz?= <ch.schuetz@addcom.de>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200503261218.00580.ch.schuetz@addcom.de>
+Subject: [Bluez-users] BlueFritz! AP-x working as a Bluetooth device?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,41 +17,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 26 Mar 2005 12:23:36 +0100
+Date: Sat, 26 Mar 2005 12:18:00 +0100
 
-Hi Christoph,
+ Hi !
+ 
+ I try to get a connection between two pc using bluetooth.
+ My hardware: AVM Fritz AP-X ISDN and one AVM BlueFritz USB Stick.
+The AVM-Web-Page says that it is possible on Windows so perhaps it is possible 
+on linux as well?
 
->  I try to get a connection between two pc using bluetooth.
->  My hardware: AVM Fritz AP-X ISDN and one AVM BlueFritz USB Stick.
-> The AVM-Web-Page says that it is possible on Windows so perhaps it is possible 
-> on linux as well?
+I have Suse Linux 9.1. The USB Stick is working under linux. I get internet 
+connection and can see the access point with hcitool scan. 
+As I connect just the AP-x to my computer hcitool scan finds no device. 
 
-how should this work if you only have one BlueFRITZ! USB? To connect two
-machines you need at least a second USB adapter.
+Perhaps my question is answered in the feature page of holtmann.org but I 
+don't really understand it. The following information is given there:
 
-> I have Suse Linux 9.1. The USB Stick is working under linux. I get internet 
-> connection and can see the access point with hcitool scan. 
-> As I connect just the AP-x to my computer hcitool scan finds no device. 
+Vendor  	Model  			Type  	Features  			HCI Ver	LMP Version  	Manufacturer
+AVM  	BlueFRITZ! AP-X  	ISDN  	0x2f 0x06 0x04 0x00  	   	1.1  (0x0001)  	AVM
+AVM 	BlueFRITZ! AP-X 	ISDN 	0x2f 0xbe 0x05 0x00 	  		1.1  (0x0001) 	AVM
 
-If you are connected then sometimes no other devices are shown. This
-depends on the link manager firmware inside the dongle.
+What does the numbers for "Featrues" mean? And what is LMP?
 
-> Perhaps my question is answered in the feature page of holtmann.org but I 
-> don't really understand it. The following information is given there:
-> 
-> Vendor  	Model  			Type  	Features  			HCI Ver	LMP Version  	Manufacturer
-> AVM  	BlueFRITZ! AP-X  	ISDN  	0x2f 0x06 0x04 0x00  	   	1.1  (0x0001)  	AVM
-> AVM 	BlueFRITZ! AP-X 	ISDN 	0x2f 0xbe 0x05 0x00 	  		1.1  (0x0001) 	AVM
-> 
-> What does the numbers for "Featrues" mean? And what is LMP?
+Perhaps someone can help me. Thanks
 
-Check the Bluetooth specification for more details about LMP.
-
-Regards
-
-Marcel
-
-
+Christoph Schuetz
 
 
 -------------------------------------------------------
