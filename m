@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Eduardo Moreno A <emoreno@dim.uchile.cl>
-To: "Nicholas A. Preyss" <nalp@gmx.net>
-Cc: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] hci_acldata_packet error in a Palm connection.
-In-Reply-To: <20040610130139.GA7833@gmx.net>
-Message-ID: <Pine.LNX.4.60.0406101556500.10156@cain.borelian.dns2go.com>
-References: <40C85761.4060201@dim.uchile.cl> <20040610130139.GA7833@gmx.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Eduardo Moreno A <emoreno@dim.uchile.cl>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.60.0406101528420.10156@cain.borelian.dns2go.com>
+References: <40C85761.4060201@dim.uchile.cl>
+	 <1086873349.7930.2.camel@pegasus>
+	 <Pine.LNX.4.60.0406101528420.10156@cain.borelian.dns2go.com>
+Content-Type: text/plain
+Message-Id: <1086874967.7930.19.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,163 +20,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Jun 2004 16:01:39 +0200 (CEST)
+Date: Thu, 10 Jun 2004 15:42:47 +0200
 
-First of all, thanks for this help.
+Hi Eduardo,
 
-> Post a hcidump of the connection, while this appears. You are not so
-> clear about, how dund behaves. Does it exit? What does it show if you
-> don't detach the daemon.
-Here it goes:
+> I have a "freeControl" usb dongle using chipset Broadcom (it's supported 
+> in http://www.holtmann.org/linux/bluetooth/devices.html using 
+> hci_usb+bluefw). I tried using bluefw and bcm203x module but I don't know 
+> if the firmware was loaded (there is  no message in any log, how can I 
+> see if it was loaded or not?), and if it  was loaded, I still have the 
+> same problem.
+> 
+> My hciconfig -a:
+> 
+> hci0:   Type: USB
+>          BD Address: 00:0A:9A:00:68:AC ACL MTU: 339:4  SCO MTU: 64:0
+>          UP RUNNING PSCAN ISCAN
+>          RX bytes:3203 acl:69 sco:0 events:171 errors:0
+>          TX bytes:2658 acl:65 sco:0 commands:56 errors:0
+>          Features: 0xff 0xff 0x3d 0x00 0x00 0x00 0x00 0x00
+>          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>          Link policy: RSWITCH HOLD SNIFF PARK
+>          Link mode: ACCEPT MASTER
+>          Name: 'BlueZ (0)'
+>          Class: 0x000100
+>          Service Classes: Unspecified
+>          Device Class: Computer, Uncategorized
+>          HCI Ver: 1.1 (0x1) HCI Rev: 0x8a LMP Ver: 1.1 (0x1) LMP Subver: 
+> 0x8a
+>          Manufacturer: Transilica, Inc. (24)
 
-> HCI Event: Max Slots Change(0x1b) plen 3
-> ACL data: handle 0x0001 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 1 scid 0x0040
-> HCI Event: Connect Complete(0x03) plen 11
-< HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
-> HCI Event: Max Slots Change(0x1b) plen 3
-> HCI Event: Command Complete(0x0e) plen 6
-< HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Connection Packet Type Changed(0x1d) plen 5
+this is not a Broadcom dongle and so it don't need bluefw. I must update
+my devices list, because it seems freeControl has changed the Bluetooth
+chip on their dongles. Do you have some more information about your
+device for me?
 
-# In this step, it's stay 1-2 minutes...
-# then, the connection fails at the palm.
-# and this is the hcidump continuation
+Try to buy yourself CSR based dongle. You will have less problems,
+because this Transilicia chip are not so good.
 
-> ACL data: handle 0x0001 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 1 scid 0x0040
-< ACL data: handle 0x0001 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0001 flags 0x02 dlen 12
-     L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 0
-< ACL data: handle 0x0001 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
-< ACL data: handle 0x0001 flags 0x02 dlen 12
-     L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0001 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
-> ACL data: handle 0x0001 flags 0x02 dlen 17
-     L2CAP(d): cid 0x40 len 13 [psm 1]
-         SDP SS Req: tid 0x0 len 0x8
-           pat uuid-16 0x1103 (DUN)
-           max 0x1
-           cont 00
-< ACL data: handle 0x0001 flags 0x02 dlen 14
-     L2CAP(d): cid 0x40 len 10 [psm 1]
-         SDP SS Rsp: tid 0x0 len 0x5
-           tot 0x0 cur 0x0
-           cont 00
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0001 flags 0x02 dlen 21
-     L2CAP(d): cid 0x40 len 17 [psm 1]
-         SDP SA Req: tid 0x1 len 0xc
-           hndl 0x0
-           max 0xffff
-           aid(s) 0x0004 (ProtocolDescList)
-           cont 00
-< ACL data: handle 0x0001 flags 0x02 dlen 30
-     L2CAP(d): cid 0x40 len 26 [psm 1]
-         SDP SA Rsp: tid 0x1 len 0x15
-           cnt 0x12
-           aid 0x0004 (ProtocolDescList)
-              < < uuid-16 0x0100 (L2CAP) uint 0x1 uint 0x1 > >
+Regards
 
-           cont 00
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0001 flags 0x02 dlen 21
-     L2CAP(d): cid 0x40 len 17 [psm 1]
-         SDP SA Req: tid 0x2 len 0xc
-           hndl 0x0
-           max 0xffff
-           aid(s) 0x0004 (ProtocolDescList)
-           cont 00
-< ACL data: handle 0x0001 flags 0x02 dlen 30
-     L2CAP(d): cid 0x40 len 26 [psm 1]
-         SDP SA Rsp: tid 0x2 len 0x15
-           cnt 0x12
-           aid 0x0004 (ProtocolDescList)
-              < < uuid-16 0x0100 (L2CAP) uint 0x1 uint 0x1 > >
+Marcel
 
-           cont 00
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0001 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-< ACL data: handle 0x0001 flags 0x02 dlen 12
-     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0001 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 1 scid 0x0040
-< ACL data: handle 0x0001 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0001 flags 0x02 dlen 12
-     L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 0
-< ACL data: handle 0x0001 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
-< ACL data: handle 0x0001 flags 0x02 dlen 12
-     L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0001 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
-> ACL data: handle 0x0001 flags 0x02 dlen 17
-     L2CAP(d): cid 0x40 len 13 [psm 1]
-         SDP SS Req: tid 0x3 len 0x8
-           pat uuid-16 0x1101 (SP)
-           max 0x1
-           cont 00
-< ACL data: handle 0x0001 flags 0x02 dlen 14
-     L2CAP(d): cid 0x40 len 10 [psm 1]
-         SDP SS Rsp: tid 0x3 len 0x5
-           tot 0x0 cur 0x0
-           cont 00
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0001 flags 0x02 dlen 21
-     L2CAP(d): cid 0x40 len 17 [psm 1]
-         SDP SA Req: tid 0x4 len 0xc
-           hndl 0x0
-           max 0xffff
-           aid(s) 0x0004 (ProtocolDescList)
-           cont 00
-< ACL data: handle 0x0001 flags 0x02 dlen 30
-     L2CAP(d): cid 0x40 len 26 [psm 1]
-         SDP SA Rsp: tid 0x4 len 0x15
-           cnt 0x12
-           aid 0x0004 (ProtocolDescList)
-              < < uuid-16 0x0100 (L2CAP) uint 0x1 uint 0x1 > >
-
-           cont 00
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0001 flags 0x02 dlen 21
-     L2CAP(d): cid 0x40 len 17 [psm 1]
-         SDP SA Req: tid 0x5 len 0xc
-           hndl 0x0
-           max 0xffff
-           aid(s) 0x0004 (ProtocolDescList)
-           cont 00
-< ACL data: handle 0x0001 flags 0x02 dlen 30
-     L2CAP(d): cid 0x40 len 26 [psm 1]
-         SDP SA Rsp: tid 0x5 len 0x15
-           cnt 0x12
-           aid 0x0004 (ProtocolDescList)
-              < < uuid-16 0x0100 (L2CAP) uint 0x1 uint 0x1 > >
-
-           cont 00
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0001 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-< ACL data: handle 0x0001 flags 0x02 dlen 12
-     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Disconn Complete(0x05) plen 4
-
-
-
-THANKS!
 
 
 
