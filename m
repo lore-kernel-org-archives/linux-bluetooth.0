@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
 From: Sebastian Roth <sebiroth@web.de>
-Message-ID: <cvael0$d6q$1@sea.gmane.org>
-References: <20050219182455.68861.qmail@web53009.mail.yahoo.com>
+Message-ID: <cvad1d$8tb$1@sea.gmane.org>
+References: <Pine.LNX.4.61.0502191116450.10610@block.bubble> <cv89g9$399$1@sea.gmane.org> <Pine.LNX.4.61.0502200852440.15784@block.bubble>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <20050219182455.68861.qmail@web53009.mail.yahoo.com>
-Subject: [Bluez-users] Re: USB Bluetooth works manually, but won't hotplug with the SAME
- script
+In-Reply-To: <Pine.LNX.4.61.0502200852440.15784@block.bubble>
+Subject: [Bluez-users] Re: strange btsco error
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,46 +18,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 20 Feb 2005 17:45:48 +0100
+Date: Sun, 20 Feb 2005 17:18:16 +0100
 
-Hi Alfredo,
+Hi Florian,
 
-I can't say what exactly the problem is but IMHO the script
-is not structured very wise. Maybe the script is executed before
-the needed modules are loaded when used for hotplugging.
-Here is my suggestion for a script:
+I think your answer is a bit confusing.
 
-#!/bin/sh
-# get the bluetooth things ready
-PATH=/bin:/sbin:/usr/bin:/usr/sbin
+> 1. No, it isn't. However, this should not matter, as I stated that this
+>    error happens _before_ any bluetooth specific code is executed, in
+>    btsco.c, line 356: snd_hwdep_open().
+> 
+> 2. cat /proc/asound/cards:
+> 
+> 0 [CK8            ]: NFORCE - NVidia CK8
+>                      NVidia CK8 with ALC650F at 0xe8000000, irq 21
+> 1 [U0x46d0x8b0    ]: USB-Audio - USB Device 0x46d:0x8b0
+>                      USB Device 0x46d:0x8b0 at usb-0000:00:02.0-2.4, full speed
+> 2 [Headset        ]: Bluetooth SCO - BT Headset
+>                      BT Headset 1
 
-# load all modules
-modprobe bluetooth
-modprobe hci_usb
-modprobe l2cap
-modprobe rfcomm
+As your output of 2. shows it _is_ in the list. That's good!
 
-# start the deamons
-# AFAIK the configfile paths are default
-# so there is no need to specify these
-hcid
-sdpd
-rfcomm bind all
+I found a thread in the mailing list:
+http://thread.gmane.org/gmane.linux.bluez.devel/4000
 
-# this is done by hcid!
-# hciconfig hci0 up
-
-# don't really know what these
-# commands do but seems ok to me
-sdptool add --channel=3 SP
-dund --listen --channel 3 --msdun noauth
-:192.168.1.240 crtscts 115200 ms-dns 192.168.1.1 lock
-
-
-I have not tested this script but it _should_ work.
+Are you able to open the device using alsamixer as suggested by Lars
+Grunewaldt?
 
 Best regards,
 Sebastian
+
 
 
 
