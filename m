@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b0501061930711f3884@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] btsco under FC3
-In-Reply-To: <1105032390.4299.92.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <v04020a1dbe030e257568@[192.168.49.19]>
+References: <v04020a1dbe030e257568@[192.168.49.19]>
+Content-Type: text/plain
+Message-Id: <1105032390.4299.92.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <v04020a1dbe030e257568@192.168.49.19>
-	 <1105032390.4299.92.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,29 +18,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 7 Jan 2005 11:30:20 +0800
+Date: Thu, 06 Jan 2005 18:26:30 +0100
 
-> and again, the development files from the AO library are missing. Check
-> your Fedora Core 3 distribution.
+Hi Bob,
 
-as soon as I read this I knew what the problem was.
+> OK, from scratch - get @AO.. problem
+> 
+> [root@hoho2 blue]# mv btsco btsco.save
+> [root@hoho2 blue]# mkdir btsco
+> [root@hoho2 blue]# cp -r btsco.save/CVS btsco
+> [root@hoho2 blue]# cd btsco
+> [root@hoho2 btsco]# cvs update -d
+> ...
+> [root@hoho2 btsco]# ./bootstrap 2>&1 | tee bootstrap.out
+> configure.in: installing `./install-sh'
+> configure.in: installing `./missing'
+> [root@hoho2 btsco]# ./configure 2>&1 | tee config.out
+> checking for a BSD-compatible install... /usr/bin/install -c
+> checking whether build environment is sane... yes
+> checking for gawk... gawk
+> checking whether make sets $(MAKE)... yes
+> checking for gcc... gcc
+> checking for C compiler default output file name... a.out
+> checking whether the C compiler works... yes
+> checking whether we are cross compiling... no
+> checking for suffix of executables...
+> checking for suffix of object files... o
+> checking whether we are using the GNU C compiler... yes
+> checking whether gcc accepts -g... yes
+> checking for gcc option to accept ANSI C... none needed
+> checking for style of include used by make... GNU
+> checking dependency style of gcc... none
+> checking for a BSD-compatible install... /usr/bin/install -c
+> checking for ranlib... ranlib
+> checking for ALSA CFLAGS...
+> checking for ALSA LDFLAGS...  -lasound -lm -ldl -lpthread
+> checking for libasound headers version >= 1.0.3... found.
+> checking for snd_ctl_open in -lasound... yes
+> ./configure: line 3249: XIPH_PATH_AO: command not found
 
-a up2date -i libao-devel followed by removing the install and
-downloading the CVS version again and it built straight up :-)
-
-Time to do some testing...
-
-Not exactly related but what is the current supported Bluetooth
-version in the Linux stack. Does the stack change at all to support BT
-1.0, 1.1 or 1.2 or is it all Firmware/Hardware Changes. If support is
-required in the stack what is the current bt version implemented as of
-2.6.10? In particular wondering about the freq hopping and the voice
-improvements in v1.2
-
-I'll let you know how I go with the Headset.
+and again, the development files from the AO library are missing. Check
+your Fedora Core 3 distribution.
 
 Regards
-Peter
+
+Marcel
+
+
 
 
 -------------------------------------------------------
