@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Mr Jie Liu <s4048156@student.uq.edu.au>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <1afc401b1d89.1b1d891afc40@uq.edu.au>
+From: Hedin <hedin@hiervard.ru>
+To: bluez-users@lists.sf.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] hstest.c could not work
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200405150903.23338.hedin@hiervard.ru>
+Subject: [Bluez-users] BT3030
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,12 +16,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 15 May 2004 14:00:07 +1000
+Date: Sat, 15 May 2004 09:03:23 +0700
 
-I am trying to use hstest of bluez to test the sco connection. But I can't hear anything when I use "hstest play xx x:x:x:x:x x"
-I can establish rfcom and sco connection and send AT command through the ACL link. but I can't hear anything in the headset. I try to record a file from the headset by "hstest record xx x:x:x:x:x x",and then try to play it by "hstest play xx x:x:x:x:x x",i still can't hear anything. Has anyone used this test program to test the headset profile? 
-The voice setting in hstest is 0x0060,but in Jonathan Paisley's ALSA Bluetooth Headset Driver it says the voice setting should be set to 0x0040. I don't know if it is because of this.
+Here is my `dmesg` log after I load my modules after connecting the dongle:
 
+usb 1-1: new full speed USB device using address 3
+Bluetooth: Core ver 2.4
+NET: Registered protocol family 31
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: L2CAP ver 2.1
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: HCI USB driver ver 2.5
+usbcore: registered new driver hci_usb
+Bluetooth: Broadcom Blutonium firmware driver ver 1.0
+bcm203x_probe: Mini driver request failed
+bcm203x: probe of 1-1:1.0 failed with error -5
+usbcore: registered new driver bcm203x
+
+It fails with and doesn't appear in `hcitool dev` list. What's wrong with it? 
+Where to look
 
 
 -------------------------------------------------------
