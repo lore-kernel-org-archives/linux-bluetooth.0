@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: RE: [Bluez-users] Using my linux box as an internet gateway
+	formyi-mate/xda
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+To: Mark Coetser <mark@thummb.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <000501c4b9ca$5a65cd50$f500000a@citadel>
+References: <000501c4b9ca$5a65cd50$f500000a@citadel>
 Content-Type: text/plain
-Message-Id: <1098629993.6465.37.camel@pegasus>
+Message-Id: <1098624154.6465.29.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Linux-Kernel for TomTom-Go
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,19 +19,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 24 Oct 2004 16:59:53 +0200
+Date: Sun, 24 Oct 2004 15:22:34 +0200
 
-Hi Folks,
+Hi Mark,
 
-as the German Heise newsticker reported today, the TomTom-Go device uses
-Linux and they put their modifications as required by GPL for download:
+> I am trying to build new bluez debian packages and when trying to
+> install the new bluez-utils deb that I have created it is giving me a
+> dependency problem saying that it cant find bluez-pin package, I
+> downloaded the source packages for all the other bluez apps from
+> http://bluez.sourceforge.net/download/debian/ but I cant find the source
+> for the bluz-pin package ? 
 
-	http://www.tomtom.com/page.php?Page=gpl
-
-If you look at the ttlinux194.patch.gz file you will find one of my -mh
-patches for 2.4.18 kernel in there. I think these devices don't have any
-Bluetooth chip in it, but it is somekind funny that they care about an
-up to date Bluetooth subsystem ;)
+The latest source packages are at www.bluez.org/download.html
 
 Regards
 
