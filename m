@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: urb timeout with bluetooth USB HCI on
-	ARM	(2.6.11-rc3)
-From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-devel] Code questions
+From: zze-COLBUS Emmanuel RD-MAPS-GRE <emmanuel.colbus@rd.francetelecom.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <loom.20050222T133749-241@post.gmane.org>
-References: <7d01f9f00502210904ac37fae@mail.gmail.com>
-	 <1109025926.7626.2.camel@pegasus> <loom.20050222T133749-241@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1109241498.5645.1.camel@notepaq>
+In-Reply-To: <1109027849.7626.38.camel@pegasus>
+References: <1108566885.11909.29.camel@g-necml5-146.rd.francetelecom.fr>
+	 <1109027849.7626.38.camel@pegasus>
+Content-Type: text/plain; charset=iso-8859-15
+Message-Id: <1109175241.4458.40.camel@g-necml5-146.rd.francetelecom.fr>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,108 +19,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Feb 2005 11:38:18 +0100
+Date: Wed, 23 Feb 2005 17:14:01 +0100
 
-Hi Thibaut,
+Hello,
 
-> Me again, forgot to paste that info:
-> 
-> # cat /proc/bus/usb/devices
-> 
-> T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
-> B:  Alloc= 22/900 us ( 2%), #Int=  1, #Iso=  0
-> D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-> P:  Vendor=0000 ProdID=0000 Rev= 2.06
-> S:  Manufacturer=Linux 2.6.11-rc3-usbtest ohci_hcd
-> S:  Product=AT91RM9200 OHCI
-> S:  SerialNumber=at91rm9200-ohci
-> C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
-> I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-> E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
-> 
-> T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0a12 ProdID=0001 Rev= 5.25
-> C:* #Ifs= 3 Cfg#= 1 Atr=c0 MxPwr=  0mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-> 
-> 
-> Damn, I think that's a hint. Here's what it looks like on a x86 machine:
-> 
-> 
-> $ cat /proc/bus/usb/devices
-> 
-> T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
-> B:  Alloc= 27/900 us ( 3%), #Int=  1, #Iso=  2
-> D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-> P:  Vendor=0000 ProdID=0000 Rev= 2.06
-> S:  Manufacturer=Linux 2.6.8.1-4-686 uhci_hcd
-> S:  Product=Intel Corp. 82801AA USB
-> S:  SerialNumber=0000:00:1f.2
-> C:* #Ifs= 1 Cfg#= 1 Atr=c0 MxPwr=  0mA
-> I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-> E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
-> 
-> T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  9 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0a12 ProdID=0001 Rev= 5.25
-> C:* #Ifs= 3 Cfg#= 1 Atr=c0 MxPwr=  0mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-> 
-> 
-> Notice the "Driver=" field differences. Maybe that'd explain the symptoms?
+>[...] 
 
-the extra endpoints are for the SCO support. See the specification for
-more details.
+Thank you for the previous answers, now the stack has become clearer to
+me :) .
 
-Regards
+> 
+> > - I've noticed the same for other events (that they were not treated).
+> > Are they also just masked away, and, if yes, were in the code do this
+> > masking happens?
+> 
+> Explain what you mean.
 
-Marcel
+I was especially thinking about the hardware_error event : I haven't
+found any place were he was handled. Is it masked away, ignored, or
+treated, and, if yes, where in the code?
 
+Regards,
+
+Emmanuel
+
+-- 
+Please don't care about this useless mail signature:
+
+M. Emmanuel Colbus de l'ENSIMAG intervenant à FTRD/MAPS/AMS du 01/02/05 
+au 30/06/05 sous la responsabilité de M. Tahar Jarboui dans le cadre 
+d'un stage de fin d'études.
 
 
 
