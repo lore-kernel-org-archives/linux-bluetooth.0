@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Matthias =?utf-8?b?QnJ1bsOp?= <matthiasbrune@gmx.de>
-Message-ID: <loom.20050125T171228-190@post.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Re: Bypass for L2CAP packets
+Message-ID: <000a01c502eb$5e72f750$798815ac@stu.nus.edu.sg>
+From: "Khoo Teck Ping" <eng10166@nus.edu.sg>
+To: <bluez-devel@lists.sourceforge.net>
+References: <001601c50210$feedd960$2bc212ac@stu.nus.edu.sg> <1106570617.9269.81.camel@pegasus>
+Subject: Re: [Bluez-devel] Question about dev/bluetooth/rfcomm/0
+MIME-Version: 1.0
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,93 +20,75 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 25 Jan 2005 16:25:45 +0000 (UTC)
+Date: Tue, 25 Jan 2005 22:37:11 +0800
 
-Hi, 
+Hi Marcel
 
-I removed the the l2cap module by using:
-1. rmmod -w (-f) l2cap
-2. modprobe -r l2cap
+Thank you for your help. I have a few more related questions:
 
-But after starting my program it is always reloaded.
-Is there any other command that prevents this reloading permanently?
+1. I issue the following commands with a Sony Ericsson 
+T630(a1:b2:c3:d4:e5:f6) nearby
+# rfcomm bind rfcomm0 a1:b2:c3:d4:e5:f6
+# rfcomm connect rfcomm0 a1:b2:c3:d4:e5:f6
 
-Many thanks
+The T630 asked for a pin. I have previously editted the pin file in 
+/etc/bluetooth/pin to be 0000. I entered 0000 into the T630 and it rejected 
+it with error passkey mismatch. May I know how to resolve this?
 
-Matthias
+However, when I issued the following command
+# hcitool cc a1:b2:c3:d4:e5:f6
+The connection proceeded successfully immediately, without the phone asking 
+for a pin.
+
+May I know the difference between the two cases?
+
+2. I desire to use AT commands on my Fedora, via cu (call up). May I know 
+how I can get cu installed? Can minicom be used for similar purpose?
+
+Thank You.
+Teck Ping
 
 
-The Trace:
-L2CAP
-In/Out: From own program to mobile phone
-L2CAP: (Logical Link Control and Adaptation Protocol)
-	Length: 0x0008 (8 bytes)
-	CID: 0x0001 (Signalling Channel)
-	Code: 0x02 (Connection Request)
-		Identifier: 0x01
-		Length: 0x0004 (4 bytes)
-		PSM: 0x0003 (RFCOMM)
-		Source CID: 0x005d (Connection-oriented Data Channel)
-	DataDump:
-	08 00 01 00 02 01 04 00 03 00 5d 00               ..........].
 
-L2CAP
-In/Out: Incoming from phone
-L2CAP: (Logical Link Control and Adaptation Protocol)
-	Length: 0x000c (12 bytes)
-	CID: 0x0001 (Signalling Channel)
-	Code: 0x03 (Connection Response)
-		Identifier: 0x01
-		Length: 0x0008 (8 bytes)
-		Destination CID: 0x0040 (Connection-oriented Data Channel)
-		Source CID: 0x005d (Connection-oriented Data Channel)
-		Result: 0x0000 (Connection successful)
-		Status: 0x0000 (No further information available)
-	DataDump:
-	0c 00 01 00 03 01 08 00 40 00 5d 00 00 00 00 00   ........@.].....
 
-L2CAP
-In/Out: Incoming from phone
-L2CAP: (Logical Link Control and Adaptation Protocol)
-	Length: 0x000c (12 bytes)
-	CID: 0x0001 (Signalling Channel)
-	Code: 0x04 (Configuration Request)
-		Identifier: 0x0e
-		Length: 0x0008 (8 bytes)
-		Destination CID: 0x005d (Connection-oriented Data Channel)
-		Flags: .... ...0 [Not set] (Continuation flag not set)
-		Option Type: .000 0001 [0x1] (Maximum Transmission Unit (MTU))
-			Option Type: 0... .... [Not set] (Option must be 
-recognized; refuse the configuration request)
-			Length: 0x02 (2 bytes)
-			Maximum Transmission Unit: 0x8004 (32772 bytes)
-	DataDump:
-	0c 00 01 00 04 0e 08 00 5d 00 00 00 01 02 04 80   ........].......
+----- Original Message ----- 
+From: "Marcel Holtmann" <marcel@holtmann.org>
+To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+Sent: Monday, January 24, 2005 8:43 PM
+Subject: Re: [Bluez-devel] Question about dev/bluetooth/rfcomm/0
 
-L2CAP
-In/Out: From BlueZ to mobile phone
-L2CAP: (Logical Link Control and Adaptation Protocol)
-	Length: 0x0006 (6 bytes)
-	CID: 0x0001 (Signalling Channel)
-	Code: 0x01 (Command Reject)
-		Identifier: 0x01
-		Length: 0x0002 (2 bytes)
-		Reason: 0x0000 (Command not understood)
-	DataDump:
-	06 00 01 00 01 01 02 00 00 00                     ..........
 
-L2CAP
-In/Out: From BlueZ to mobile phone
-L2CAP: (Logical Link Control and Adaptation Protocol)
-	Length: 0x0006 (6 bytes)
-	CID: 0x0001 (Signalling Channel)
-	Code: 0x01 (Command Reject)
-		Identifier: 0x0e
-		Length: 0x0002 (2 bytes)
-		Reason: 0x0000 (Command not understood)
-	DataDump:
-	06 00 01 00 01 0e 02 00 00 00                     ..........
-
+> Hi Teck,
+>
+>> I do not currently have this folder on my file system.
+>>
+>> dev/bluetooth/rfcomm/0
+>>
+>> I understand that it should have been created by the kernel drivers.
+>>
+>> May I know how I can install this folder? This is required for
+>> rfcomm.
+>
+> if this is a 2.6 kernel then install udev and the device node will be
+> created. However this can also be /dev/rfcomm0, because the other name
+> was only used by devfs.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+> Tool for open source databases. Create drag-&-drop reports. Save time
+> by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+> Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel 
 
 
 
