@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm: permission denied
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Zbigniew Diaczyszyn (gmx)" <z.dia@gmx.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <000d01c3f343$d89f1ad0$e04db850@ULLA>
-References: <000d01c3f343$d89f1ad0$e04db850@ULLA>
-Content-Type: text/plain
-Message-Id: <1076855680.14758.55.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <402F917D.2050905@itelefonica.com.br>
+From: "Daniel Moraes(BotuRoot)" <ra002890@itelefonica.com.br>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] Rfcomm not found
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,28 +15,12 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 Feb 2004 15:34:40 +0100
+Date: Sun, 15 Feb 2004 12:34:21 -0300
 
-Hi Zbigniew,
-
-> sorry, but the file is empty :-(
-> 
-> ---------------------------------------------------------------
-> 
-> linux:/home/dia # hcidump -w hcidump.log
-> HCIDump - HCI packet analyzer ver 1.5
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> 
-> linux:/home/dia # ls -l hcidump.log
-> -rw-rws---    1 root     root            0 Feb 13 23:32 hcidump.log
-
-if this happens then there was no traffic on the HCI layer. Check again,
-because this can't be true.
-
-Regards
-
-Marcel
-
+I'm trying to install Bluez over my Conectiva Linux 9 with kernel 2.4.21 
+Cl9 but It doesn't find the rfcomm module!! I cant load it with modprobe 
+   rfcomm. I have already done the alias in the modules.conf. Anyone can 
+help me?!? Thanks a lot.    Daniel Moraes
 
 
 
