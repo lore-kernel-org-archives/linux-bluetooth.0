@@ -1,16 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <40A9F4F4.4080601@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] question: what does this patch from snd-bt-sco
-	do?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Lars Grunewaldt <lgw@dark-reality.de>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+ do?
+References: <40A9E6CB.4010505@dark-reality.de> <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk> <40A9EE51.2080102@dark-reality.de>
 In-Reply-To: <40A9EE51.2080102@dark-reality.de>
-References: <40A9E6CB.4010505@dark-reality.de>
-	 <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk>
-	 <40A9EE51.2080102@dark-reality.de>
-Content-Type: text/plain
-Message-Id: <1084881439.5833.108.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,29 +18,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 May 2004 13:57:19 +0200
+Date: Tue, 18 May 2004 13:35:16 +0200
 
-Hi Lars,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> I already looked up the voice number stuff in the core docs, and was
-> able to find out that 0x0140 is ideal right now (MU_LAW encoded). Works
-> here, already.
+just wanted to mention that one single SCO connection at a time is
+sufficent right now, IMO; I don't think that most people will need more
+than one (open) connection for audio right now. Of course, if the core
+definition says there must be more than one, we have to implement it.
 
-for this you must use alternate setting 1, because it is 8 bit.
+Or is SCO used for anything else but audio?
 
-> Hm, is there any chance to get this implemented "the proper" way, so all
-> audio codecs (8bit 8kHz and 16bit 8kHz) can be used with hci_usb?
+cu,
+~  Lars
 
-You can make use of the notify() callback and adjust the alternate
-setting as needed. Maybe you have to unlink and re-submit the ISOC
-URB's, but the best way is to start the ISOC URB's only when a SCO
-connection is created.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-Regards
-
-Marcel
-
-
+iD8DBQFAqfT0QWC6DTWkDAoRAk1hAJ9jKGqBmKGaffY4wJfy+d0T9phZ4ACgoaaL
+GL7p+eYbE7YPM4kgocamyqU=
+=IiOx
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
