@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Philip Barnes <phil@trig222.f9.co.uk>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1105899721.5669.12.camel@localhost.localdomain>
-Mime-Version: 1.0
-Subject: [Bluez-users] Securing my bluetooth connection
+From: Michal Semler <cijoml@volny.cz>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Microsoft Bluethooth "Elite" Keyboard & Mouse
+References: <20050116174616.GA2201@virgilio.it> <200501161851.01291.cijoml@volny.cz> <1105898506.8080.20.camel@pegasus>
+In-Reply-To: <1105898506.8080.20.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200501161912.06252.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,100 +19,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 Jan 2005 18:22:01 +0000
+Date: Sun, 16 Jan 2005 19:12:06 +0100
 
-Hi
-I have set up my bluetooth connection on Fedora core 3 so that I can
-connect my Palm Pilot. I just needed to add the sdpd line to rc.local
-after moving from core 2.
+So Francesco send your dongle to Marcel for a while and he will fix it :)
 
-My configuration is below.
+Michal
 
-A couple of questions
-How do I configure it so that only my palm pilot can connect, I have
-tried putting my mac address into rfcomm.conf, but I can still connect
-when I set it wrong.
+Dne ne 16. ledna 2005 19:01 Marcel Holtmann napsal(a):
+> Hi Michal,
+>
+> > You should use 2.6.10-mh1 and latest firmware for Digianswer dongle
+> > (adapter use it I think)
+>
+> using the 2.6.10-mh1 is a good idea, but it is a Broadcom dongle with
+> HID proxy and this don't need any extra firmware. However since the
+> other Broadcom HID proxy that I have does the switch into HCI mode when
+> you send a HCI_Reset (CSR HID Proxy needs an extra tool btw), the one
+> from Microsoft may need some extra magic to fully work without problems.
+> I need someone to donate one of these, because there is no way to buy
+> only the dongle and I am not going to buy another Bluetooth keyboard. I
+> have enough.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> The SF.Net email is sponsored by: Beat the post-holiday blues
+> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-How do I make the PC not discoverable, I know the chances of being
-scanned by someone standing on the pavement outside is not as likely as
-being bluejacked in Tescos or the pub, but it could happen.
+-- 
+S pozdravem
 
-Thanks Phil
-
-
-rc.local --
-#
-# Start configuration of Bluetooth network
-/usr/sbin/hciconfig hci0 up
-/usr/sbin/hcid
-/usr/sbin/sdpd
-/sbin/modprobe rfcomm
-dund --listen --msdun 10.2.0.1:10.2.0.10
-echo '1' > /proc/sys/net/ipv4/ip_forward
-/sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-/sbin/iptables -A FORWARD -i ppp0 -j ACCEPT
-/sbin/iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-rfcomm.conf --
-rfcomm0 {
-        # Automatically bind the device at startup
-        bind no;
-
-        # Bluetooth address of the device
-        device 00:07:E0:xx:xx:xx;
-
-        # RFCOMM channel for the connection
-        channel 1;
-
-        # Description of the connection
-        comment "Slartibartfast";
-}
-hcid.conf --
-# Default settings for HCI devices
-device {
-        # Local device name
-        #   %d - device id
-        #   %h - host name
-        name "fordprefect";
-
-        # Local device class
-        class 0x120104;
-
-        # Default packet type
-        #pkt_type DH1,DM1,HV1;
-
-        # Inquiry and Page scan
-        iscan enable; pscan enable;
-
-        # Default link mode
-        #   none   - no specific policy
-        #   accept - always accept incoming connections
-        #   master - become master on incoming connections,
-        #            deny role switch on outgoing connections
-        #
-        #lm accept,master;
-        #
-        lm accept;
-
-        # Default link policy
-        #   none    - no specific policy
-        #   rswitch - allow role switch
-        #   hold    - allow hold mode
-        #   sniff   - allow sniff mode
-        #   park    - allow park mode
-        #
-        #lp hold,sniff;
-        #
-        lp rswitch,hold,sniff,park;
-
-        # Authentication and Encryption
-        #auth enable;
-        #encrypt enable;
-}
-
-
-
-
+Michal Semler
 
 
 -------------------------------------------------------
