@@ -1,88 +1,69 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41FEB971.7060302@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <4223E423.4030603@cloutier-vilhuber.net>
+From: Lars Vilhuber <lists.all@cloutier-vilhuber.net>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] btsco
-References: <1107212460.6703.9.camel@linux.site>	 <1107209370.8848.4.camel@pegasus>  <1107214572.4223.1.camel@linux.site> <1107212183.8848.6.camel@pegasus>
-In-Reply-To: <1107212183.8848.6.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+References: <20050228143635.6E7668844B@sc8-sf-spam1.sourceforge.net>
+In-Reply-To: <20050228143635.6E7668844B@sc8-sf-spam1.sourceforge.net>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Feb 2005 00:04:17 +0100
+Subject: [Bluez-users] Report of working dongle: IOGear GBU311 and question
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 28 Feb 2005 22:40:19 -0500
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+I can happily report that my new IOGear GBU311 works under stock SuSE 
+9.2 (connections tested with Palm T3 and Sony-Ericsson T610, using 
+OBEX-FTP, OBEX-transfer, DUN).
 
-are the docs THAT bad?
-
-*needtosleepmuchlessworkmuchmore*
-- -Lars
-
-Marcel Holtmann wrote:
-| Hi Dave,
-|
-|
-|>Thanks, I think that I have everything that I need now.   I just can't
-|>get past the following error:
-|>
-|>./bootstrap
-|>aclocal: configure.in: 21: macro `AM_PATH_ALSA' not found in library
-|
-|
-| install the alsa-devel package.
-|
-| Regards
-|
-| Marcel
-|
-|
-|
-|
-| -------------------------------------------------------
-| This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
-| Tool for open source databases. Create drag-&-drop reports. Save time
-| by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
-| Download a FREE copy at http://www.intelliview.com/go/osdn_nl
-| _______________________________________________
-| Bluez-devel mailing list
-| Bluez-devel@lists.sourceforge.net
-| https://lists.sourceforge.net/lists/listinfo/bluez-devel
-|
+However, I am curious: when plugging it in, the logs show a USB *HUB*, 
+and registers keyboard and mouse drivers. Is this something SuSE 
+specific, something driver-specific? Is SuSE misconfigured? or what does 
+it mean when the USB dongle registers as a keyboard/mouse?
 
 
-- --
-Lars Grunewaldt
-* software development
-* multimedia design
-skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
-web: http://www.dark-reality.de
-mail: lgw@dark-reality.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+iveshall kernel: hub 1-2:1.0: USB hub found
+iveshall kernel: hub 1-2:1.0: 3 ports detected
+iveshall kernel: usb 1-2.1: new full speed USB device using address 3
+iveshall kernel: usb 1-2.1: Product: BCM92035DGL
+iveshall kernel: usb 1-2.1: Manufacturer: Broadcom
+iveshall kernel: usb 1-2.1: SerialNumber: 000272C09F18
+iveshall kernel: usb 1-2.2: new full speed USB device using address 4
+iveshall kernel: usb 1-2.2: SerialNumber: 000272C09F18
+iveshall kernel: usb 1-2.3: new full speed USB device using address 5
+iveshall kernel: usb 1-2.3: SerialNumber: 000272C09F18
+iveshall kernel: Bluetooth: HCI USB driver ver 2.7
+iveshall kernel: usbcore: registered new driver hci_usb
+iveshall hcid[4926]: HCI dev 0 registered
+iveshall kernel: usbcore: registered new driver hiddev
+iveshall kernel: evdev_connect: evdev e4fffe60 handle e4fffe7c name event4
+iveshall kernel: input: USB HID v1.11 Keyboard [0a5c:3502] on 
+usb-0000:00:1d.0-2.2
+iveshall kernel: evdev_connect: evdev e6ae45c0 handle e6ae45dc name event5
+iveshall kernel: input: USB HID v1.11 Mouse [0a5c:3503] on 
+usb-0000:00:1d.0-2.3
+iveshall kernel: usbcore: registered new driver usbhid
+iveshall kernel: drivers/usb/input/hid-core.c: v2.0:USB HID core driver
 
-iD8DBQFB/rlxQWC6DTWkDAoRAhyvAKCUQ7A0fe88zckUa0csLuFyRQg8CQCdH5xk
-gnmreGj0wDz7Q3MXD41EzK0=
-=dJ8l
------END PGP SIGNATURE-----
+
+-- 
+Lars Vilhuber                    lists.all@cloutier-vilhuber.net
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
-Tool for open source databases. Create drag-&-drop reports. Save time
-by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
-Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now.
+http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
