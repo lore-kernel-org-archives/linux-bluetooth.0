@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41AAD7D2.4000902@avantwave.com>
-From: mike <mikelee@avantwave.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] about link key
+Subject: Re: [Bluez-users] Setting up an hotplug connection with USB dongles
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200411282132.37941.rdorsch@web.de>
+References: <200411282132.37941.rdorsch@web.de>
+Content-Type: text/plain
+Message-Id: <1101692311.9527.10.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,46 +18,78 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Nov 2004 16:03:30 +0800
+Date: Mon, 29 Nov 2004 02:38:31 +0100
 
-Dear all
+Hi Rainer,
 
-    I am new to this place, if i make anything wrong please fix me. And 
-thanks for any help.
+> I am wondering, if there is a way to setup a hotplug connection between two 
+> Linux machines using two bluetooth dongles. One of them is a NAP (with 
+> Internet access) and booted first, the other box a PANU.
+> 
+> My problem is that I need the pand running on both sides first before I can do 
+> an ifconfig for the bnep0 interface on the NAP.
+> 
+> 
+> 
+> What I did on both Debian Linux systems is:
+> 
+> Add a file
+> 
+> /etc/hotplug/usb/libbt.usermap
+> 
+> The file contains a line for an epox DG02A dongle
+> 
+> epoxbt                0x0003 0x0a12   0x0001    0x0000       0x0000       0x00         
+> 0x00            0x00            0x00            0x00            0x00            
+> 0x00000000
+> 
+> with the vendor ID (here 0x0a12) and the product ID (here 0x0001).
+> 
+> Then add the script epoxbt to the same directory:
+> 
+> # cat epoxbt
+> echo "Load epox bluetooth dongle..."
+> 
+> modprobe bnep
+> pand --master --listen --role NAP
+> #
+> 
+> and 
+> 
+> topsi:~# cat /etc/hotplug/usb/epoxbt
+> #!/bin/bash
+> 
+> echo "Load epox bluetooth dongle..."
+> modprobe bnep
+> pand --role PANU --connect <BT-ID>
+> topsi:~#
+> 
+> 
+> Then I do on the NAP an 
+> 
+> # ifconfig 192.128.2.1
+> 
+> and on the PANU
+> 
+> # dhclient
+> 
+> This works fine, I can access the Internet from the PANU.
+> 
+> 
+> The problem is that the ifconfig on the NAP fails when I do not have the PANU 
+> connected before....thus I can't add the network configuration part into the 
+> expobt scripts.
+> 
+> Does anyone have an idea or pointer for that problem.
 
-    I am using bluez lib-2.6 util-2.6 hcidump-1.8 in ARM9 platiform. 
-Because of my devel-board with no input device, so i hardcode the pin 
-"0000" to /etc/bluetooth/pin,  and bluepin script with echo "PIN:0000" 
-only. When i pair the device with my computer USB dongle, it goes no 
-problems. Pin code passed and link_key saved
-    But when i use rfcomm connect to my computer from the device, 
-hcidump state that link_key_negative_reply and ask for pin code again, 
-then i input the pin code in my computer . Finally , rfcomm output 
-"Can't connect RFCOMM socket: Connection refused"
+since this is Debian, don't do it like this. Use /etc/network/interfaces
+and add up and down rules.
 
-This is linkkey generated in etc/bluetooth/link_key, the first 12 bytes 
-is the device bdaddr and computer bdaddr.
-0000000 496a e001 0008 1568 07cb 000e 3eef 19bf
-0000010 02fd b3df 7994 db7d d26a 17f3 fc00 bfff
-0000020 13ed 0000
+Regards
 
-hcidump
- > HCI Event: PIN Code Request(0x16) plen 6
-  68 15 CB 07 0E 00
-< HCI Command: PIN Code Request Reply(0x01|0x000d) plen 23
-  68 15 CB 07 0E 00 04 30 30 30 30 00 00 00 00 00 00 00 00 00
-  00 00 00
- > HCI Event: Command Complete(0x0e) plen 10
-  01 0D 04 00 68 15 CB 07 0E 00
- > HCI Event: Link Key Notification(0x18) plen 23
-  68 15 CB 07 0E 00 EF 3E BF 19 FD 02 DF B3 94 79 7D DB 6A D2
-  F3 17 00
- > HCI Event: Connect Complete(0x03) plen 11
-  00 2A 00 68 15 CB 07 0E 00 01 00
+Marcel
 
 
-best regard
-Mike,Lee
 
 
 -------------------------------------------------------
