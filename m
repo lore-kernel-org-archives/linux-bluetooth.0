@@ -1,21 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [snd-bt-sco] Re: [Bluez-devel] snd-bt-sco development teamup |
-	ALSA connection
+Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jonathan Paisley <jp-www@dcs.gla.ac.uk>
-Cc: Lars Grunewaldt <lgw@dark-reality.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   snd-bt-sco@corinis.net
-In-Reply-To: <Pine.LNX.4.59.9999.0408101448200.22497@brava.dcs.gla.ac.uk>
+To: James Courtier-Dutton <James@superbug.demon.co.uk>
+Cc: Jonathan Paisley <jp-www@dcs.gla.ac.uk>,
+   Lars Grunewaldt <lgw@dark-reality.de>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4118D6B9.3090708@superbug.demon.co.uk>
 References: <4117AB9A.9010909@dark-reality.de>
 	 <1092071356.4564.12.camel@pegasus> <4117B098.5020805@dark-reality.de>
 	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>
 	 <1092090364.4564.46.camel@pegasus> <41180E64.1010007@dark-reality.de>
-	 <1092140041.4564.96.camel@pegasus>  <4118C5FC.1050502@dark-reality.de>
-	 <1092145515.4564.143.camel@pegasus>
-	 <Pine.LNX.4.59.9999.0408101448200.22497@brava.dcs.gla.ac.uk>
+	 <1092140041.4564.96.camel@pegasus>
+	 <Pine.LNX.4.59.9999.0408101355310.22497@brava.dcs.gla.ac.uk>
+	 <1092143505.4564.117.camel@pegasus> <4118D049.9060000@superbug.demon.co.uk>
+	 <1092145771.4564.148.camel@pegasus> <4118D6B9.3090708@superbug.demon.co.uk>
 Content-Type: text/plain
-Message-Id: <1092148605.4564.159.camel@pegasus>
+Message-Id: <1092148473.4564.156.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -27,35 +27,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 16:36:45 +0200
+Date: Tue, 10 Aug 2004 16:34:33 +0200
 
-Hi Jonathan,
+Hi James,
 
-> > If you mean with that when someone opens the DSP device we should create
-> > the connection, then this will fail. The RFCOMM channel must be created
-> > first and this is part of the connection handling from userspace. The
-> > kernel can't do anything here.
-> 
-> A user space daemon can, however, keep a file descriptor open on the ALSA 
-> device's hwdep interface. The kernel driver could notify the daemon when 
-> an app opens the device, at which point the daemon can take a policy 
-> decision about attempting to connect to some default headset device (which 
-> eventually results in binding the SCO socket to the device).
-> 
-> > The general workflow should be something like this:
-> >
-> > 	- create RFCOMM channel and start AT handling
-> > 	- create SCO socket if needed
-> > 	- issue ioctl to make SCO socket an ALSA device
-> 
-> I think that the creation of ALSA devices and binding of SCO socket to an 
-> ALSA device should be separate operations. That way, an ALSA device can 
-> exist with no attached headset. Using the technique described above, that
-> device can be demand-connected to a particular SCO socket.
+> I can get modules added to the alsa cvs. I would think that newly 
+> developed modules should go into cvs first, and then backported to older 
+> kernel versions. After all, the only way to get snd-bt-sco into the 
+> linux kernel proper, is via the alsa cvs.
+> There are various staging steps in the alsa cvs, before a module in the 
+> alsa cvs gets into the linux kernel proper.
 
-if this works we may can implement something like "rfcomm bind ...". The
-creation of the ALSA device can be handled through a SCO raw socket like
-we did it for RFCOMM.
+why should this be? ALSA is part of the Linux 2.6 kernel and so I would
+submit a BlueZ ALSA driver for kernel inclusion only. I don't care about
+the ALSA CVS, because the ALSA CVS must track the kernel and not vice
+versa.
+
+> Of course the snd-bt-sco module will just be a bit of shim code between 
+> alsa and blues. With the major work done in a user space bluetooth profile.
+> 
+> One advantage of alsa, is that once a module is in the alsa cvs, it will 
+> will always function correctly on all kernel versions, so back porting 
+> is not an issue with alsa.
+
+Maybe I have to repeat it, but I don't care about the ALSA CVS and any
+older kernel versions. The current mainline kernel is the only base.
 
 Regards
 
