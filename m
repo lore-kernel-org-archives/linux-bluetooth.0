@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4114D840.2090609@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
+From: Douglas Russell <puggy@gentoo.org>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Logiteh MX900 / USB Bluetooth "dongle" support?
-References: <4114CE58.5070302@dark-reality.de> <1091883214.2773.0.camel@pegasus> <200408071412.54806.puggy@gentoo.org>
-In-Reply-To: <200408071412.54806.puggy@gentoo.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+References: <4114CE58.5070302@dark-reality.de> <1091883214.2773.0.camel@pegasus>
+In-Reply-To: <1091883214.2773.0.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200408071412.54806.puggy@gentoo.org>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,41 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 07 Aug 2004 15:25:20 +0200
+Date: Sat, 7 Aug 2004 14:12:54 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On Saturday 07 August 2004 13:53, Marcel Holtmann wrote:
+> Hi Lars,
+>
+> > I just bought a Logitech MX900 - works fine with the dongle, as it
+> > registers as a native USB HID.
+> >
+> > But as the USB "dongle" that comes with the mouse also works as a
+> > bluetooth device, it would be nice to have support for this.
+> >
+> > I'm not sure if there already is support, if not, I'd like to have a
+> > look at it myself. The thingy reports as two USB devices,
+> > "Logitech Inc." and "Texas Instruments, Inc. TUSB2036 HUB". I think the
+> > second one might be the Bluetooth device.
+> >
+> > Any experiences with ti chipsets?
+> >
+> > or maybe I just overlooked something and everything is already "there"...
+>
+> I think so, because hid2hci should already support switching it into HCI
+> mode.
+>
+> Regards
+>
+> Marcel
+>
+Yeah, that works.
 
-Douglas Russell wrote:
-
-|>>or maybe I just overlooked something and everything is already "there"...
-|>
-|>I think so, because hid2hci should already support switching it into HCI
-|>mode.
-|>
-|>Regards
-|>
-|>Marcel
-|>
-|
-| Yeah, that works.
-
-Hm I just tried
-| hid2hci -0
-Switching device 046d:c705 to HCI mode failed (no such file or directory)
-
-:/
-
-any ideas?
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFBFNg/QWC6DTWkDAoRAn1KAKC8ZyTLau6rrlPugMNiKAdFw4Dh0QCePmKm
-wpLcIxhrU8kI8273HaWiM9s=
-=RzX5
------END PGP SIGNATURE-----
+Puggy
 
 
 -------------------------------------------------------
