@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <420BB138.1080201@web.de>
-From: Andreas Millinger <andreas.millinger@web.de>
+Message-ID: <420BB12D.8010107@csr.com>
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-devel] Re: Re: hciattach problem
+Subject: Re: [Bluez-devel] Lower granularity for INQUIRY interval
+References: <Pine.GSO.4.33.0502101901380.11531-100000@horus.imag.fr>
+In-Reply-To: <Pine.GSO.4.33.0502101901380.11531-100000@horus.imag.fr>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,32 +18,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 10 Feb 2005 20:08:40 +0100
+Date: Thu, 10 Feb 2005 19:08:29 +0000
 
-Hello Marcel,
+Catalin Drula wrote:
+> Is there a way to perform INQUIRY for intervals with
+> a lower granularity than 1.28 seconds? I know the Bluetooth
+> specification says no.
 
->actually I asked you to test 2.6.11-rc3 and not the -mh3. I want to be
->sure that the latest testing kernel before the final 2.6.11 has no
->problems with it. So grab 2.6.11-rc3-bk3 and test it please.
->  
-I now have tested with 2.6.11-rc3-bk3 and the freez is back.
-The last message in /var/log/messages is:
-Feb 10 19:38:59 tuxlaptop exiting on signal 15
+To inquire for less than 10.24 seconds is a bad idea. Unless you
+inquire for a single contiguous block lasting 10.24 seconds you do not
+have a good probability of picking up all devices.
 
-The messages at shutdown are:
+Note that, for example, 8 consecutive 1.28 second inquiries is not
+guaranteed to work.
 
-Shuting down PCMCIA cardmgr [3595]: check cmd exited with status 1
-cardmgr[3595]: exiting: `./serial stop ttyS16 2>&1`
-cardmgr[3595]: +/dev/ttyS16:
+> Could we potential have a new function in the API, say
+> hci_inquiry_fine_granularity, that does exactly what I described
+> above?
 
-The system hangs at this point. Only a power off does help. It seams, 
-that there have been changes in PCMCIA or serial, because the messages 
-with 2.6.10-mh3 look different. When I dont attach the card with 
-hciattach the system shuts down, but there's also a error.
-The last message in the log is also "exiting on signal 15".
+I don't think that it's a good idea to add an API to make it easy to
+perform actions that are bad ideas.
 
-Best regards
-Andreas
+> At the Bluetooth hardware level (if there is anyone that has such
+> knowledge) does my solution of issuing an INQUIRY CANCEL command before
+> the expiration of the INQUIRY interval really work? (I have a hunch
+> that the hardware might stay in INQUIRY mode anyway until the end of the
+> current 1.28sec time slot).
+
+CSR devices will stop inquiring straight away (give or take a few
+milliseconds). I can't comment on what other manufacturers will do.
+
+	- Steven
+-- 
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+**********************************************************************
+
 
 
 -------------------------------------------------------
