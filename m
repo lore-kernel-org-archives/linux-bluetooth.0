@@ -1,13 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <40D19E13.9070005@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] question: what does this patch from snd-bt-sco
- do?
-References: <40A9E6CB.4010505@dark-reality.de> <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk> <40A9EE51.2080102@dark-reality.de> <1084881439.5833.108.camel@pegasus> <40AA11AB.6010307@dark-reality.de> <1084888843.4327.1.camel@pegasus> <40D0CE71.2010208@dark-reality.de> <1087427168.4309.30.camel@pegasus> <40D0DFFE.7020701@dark-reality.de> <1087431863.4309.39.camel@pegasus> <E1B5DFDA-C050-11D8-9772-000A95A4D990@dcs.gla.ac.uk>
-In-Reply-To: <E1B5DFDA-C050-11D8-9772-000A95A4D990@dcs.gla.ac.uk>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] D-BUS fixes for hcid
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@nokia.com>
+Cc: Achim Bohnet <ach@mpe.mpg.de>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040617094802.GA4566@kone>
+References: <20040616112702.GA898@kone> <20040616124541.GA8629@kone>
+	 <1087391183.4309.13.camel@pegasus> <200406161558.56578.ach@mpe.mpg.de>
+	 <20040616141845.GA8921@kone> <1087399222.4309.26.camel@pegasus>
+	 <20040617094802.GA4566@kone>
+Content-Type: text/plain
+Message-Id: <1087473910.23809.14.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,57 +22,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Jun 2004 15:35:15 +0200
+Date: Thu, 17 Jun 2004 14:05:10 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Johan,
 
-Jonathan Paisley wrote:
-| On 17 Jun 2004, at 1:24, Marcel Holtmann wrote:
-|
-|>> To make my headset work for now (need my "phone") I used that bad kernel
-|>> patch again, but I'll try to do everything to avoid that in the release.
-|>> I just have to understand what's going on...
-|>
-|>
-|> I don't see your problem. Simply use 16bit PCM in the ALSA code.
-|
-|
-| This should work fine. Reconfigure the sound format descriptors in the
-| ALSA driver to describe 16 bit audio instead of 8 bit.
+> > > It would be nice to know how the D-BUS designers have thought about
+> > > this kinds of problems.
+> > 
+> > feel free to come up with a solution for this.
+> 
+> Unfortunately I don't have one. Would it still be possible to add the
+> dbus_message_set_auto_activation function call to the code? This will
+> not change the behaviour in any way if the service is already aquired
+> (i.e. bluez-pin is running), but will allow more flexibility if someone
+> decides that they want to use D-BUS activation (for example in an
+> embeded system where you only have one display and don't want to have
+> unecessary processes taking up memory all the time).
 
-won't be a problem. I know what to do because I changed them before,
-from S8 to MULAW_8 :)
+right now I don't see where this helps. If you work embedded, you don't
+need the D-Bus support. Use the old PIN helper stuff and write a shell
+script or program that handles the input of the PINs.
 
-My only problem/wish is that I'd like to support all three audio
-encodings, but I understand this is impossible right now.
+Regards
 
-What exactly are the influences of the "alternate setting"? Does this
-only change SCO/Audio behaviour, or is the whole bluez stack affected by
-this (if hci_usb is used, of course). I just want to understand the
-pros/cons of 8bit/16bit setting.
+Marcel
 
-[listOT]
-There's one more (alsa-related) issue I have with the alsa driver. The
-problem is that, if there's no open sco channel, the audio application
-accessing the interface is stalled because the buffer is never read. It
-would be better if the data could be "dumped" or something.
 
-Is this possible in an easy way, or do I have to look for audio
-sync/timing and stuff instead of just writing the data to /dev/null and
-tell the app "go for the next buffer".
-[/listOT]
-
-thanks,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFA0Z4TQWC6DTWkDAoRAusPAKCaEozsMCgE38q4Ki+wHBcVoYu/RwCgjbPn
-6NmfwP1Qxbvgrg3tMkPQdtg=
-=AMrl
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
