@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
+From: nicolas <n1c0l4s.l3@wanadoo.fr>
 To: bluez-users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Data across Bluetooth Connection - Not file transfer
-References: <20040318065836.9531.qmail@web40704.mail.yahoo.com>
-In-Reply-To: <20040318065836.9531.qmail@web40704.mail.yahoo.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-1"
-Message-Id: <200403180939.06022.pavouk@pavouk.org>
+Message-Id: <200403180820.29734.n1c0l4s.l3@wanadoo.fr>
+Subject: [Bluez-users] little pb with my bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,26 +16,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 18 Mar 2004 09:39:05 +0100
+Date: Thu, 18 Mar 2004 08:20:29 +0100
 
-Hello,
+Hi,=20
 
-> I want to know how data maybe sent across an established bluetooth
-> connection?
-> I actually want to keep checking if a particular message  (possibly in
-> the header or something) has been recieved over the bluetooth
-> connection and do a corresponding action (possibly run a program) when
-> that happens.
+I am underMandrake 10.0 and kernel 2.6.2-3mdk and Kde 3.2
 
-I don't know if I exactly understand your needs.
-When you have running PAND server and other side try to make PAN connection,
-that kernel calls HOTPLUG with NET ADD action and you can automatically 
-configure BNEP0 interface or do some other action, what do you want.
+when i plug my Bluetooth, Kbluetooth tell me:
 
-Best regards,
 
-Pavel Ruzicka
+=46ailed to connect =A0to the SDP server
 
+
+but  Bluetooth Service is on :-(
+
+
+
+I wanna use Microsoft wirelless IntelliMouse Explorer fr Bluetooth and the=
+=20
+keyboard associated
+
+
+
+Who could help me?  thanks :)
 
 
 -------------------------------------------------------
