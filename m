@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41B6D872.6050308@suche.org>
-From: "suche.org" <admin@suche.org>
-MIME-Version: 1.0
+From: Chris Boyle <bluez-devel@cmb.is-a-geek.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] CVS doubles
-References: <20041206225609.GA1177@zeus.galaxy.org.uk>	 <cp3mkk$m7t$1@sea.gmane.org> <1102407664.8447.20.camel@pegasus>	 <cp3rr7$1vv$1@sea.gmane.org> <1102411047.8447.28.camel@pegasus>	 <cp4a8v$959$1@sea.gmane.org> <1102425729.8447.41.camel@pegasus>	 <cp4df4$i6l$1@sea.gmane.org> <1102439143.8447.47.camel@pegasus>	 <cp6fpq$167$1@sea.gmane.org> <1102496771.9988.35.camel@pegasus>	 <41B6CBDC.4010802@suche.org> <1102499338.9988.44.camel@pegasus>
-In-Reply-To: <1102499338.9988.44.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: Re: [Bluez-devel] snd-bt-sco problem
+Message-ID: <20041208102606.GB2258@zeus.galaxy.org.uk>
+References: <20041206225609.GA1177@zeus.galaxy.org.uk> <41B670A9.4030804@xmission.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <41B670A9.4030804@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 08 Dec 2004 11:33:22 +0100
+Date: Wed, 8 Dec 2004 10:26:06 +0000
 
+On Tue, Dec 07, 2004 at 08:10:33PM -0700, Brad Midgley wrote:
+> Did it start working when you clicked the 'connect' button on the 
+> headset? Sebastian pointed out that this was something one might miss so 
+> I highlighted it recently in the docs.
 
->the bluez-pan and bluez-sdp packages were deprecated a long time ago and
->I will delete the CVS repositories once I checked that we don't any code
->from them anymore. Use bluez-libs and bluez-utils. Everything you need
->is in there.
->  
->
-Hi,
-ok i done an error with libdsp installed i run configure and before 
-running make i delete the old.
-And so he seek for it. Maybe bluez-utils should remove the check for 
-libsdp ? Becasue as you say
-it in compleate in libbluez now.
+Almost, but not quite. btsco looked more successful, and with hcidump I
+could see a lot of SCO data flowing, but still audio apps would hang. I
+could however press the volume buttons on the headset and see the mixer
+change, so there was definitely a connection.
 
-Cu Thomas
+-- 
+Chris Boyle - http://cmb.is-a-geek.org/
+GPG: B7D86E0F, MSN: shortcipher@hotmail.com, ICQ: 24151961,
+AIM: kerneloops, Yahoo: kerneloops, IRC: cmb on irc.uwcs.co.uk
 
 
 -------------------------------------------------------
