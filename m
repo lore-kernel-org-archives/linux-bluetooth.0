@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Sebastian Eichner <mail@sebastian-eichner.de>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] A2DP working :-) , voice not :-(
-References: <200412010839.06669.mailsp@sebastian-eichner.de> <200412010907.09587.mail@sebastian-eichner.de> <1101889919.18840.40.camel@pegasus>
-In-Reply-To: <1101889919.18840.40.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200412010943.33419.mail@sebastian-eichner.de>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200412010907.09587.mail@sebastian-eichner.de>
+References: <200412010839.06669.mailsp@sebastian-eichner.de>
+	 <1101887686.18840.38.camel@pegasus>
+	 <200412010907.09587.mail@sebastian-eichner.de>
+Content-Type: text/plain
+Message-Id: <1101889919.18840.40.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,19 +20,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 1 Dec 2004 09:43:33 +0100
+Date: Wed, 01 Dec 2004 09:31:59 +0100
 
-On Wednesday, 1. December 2004 09:31, Marcel Holtmann wrote:
-> this should work. Do you enabled CONFIG_BT_HCIUSB_SCO in your
-> kernel?
+Hi Sebastian,
 
-cat /proc/config.gz |gunzip -|grep CONFIG_BT_HCIUSB_SCO
-CONFIG_BT_HCIUSB_SCO=y
+> "hciconfig hci0 revision" gives me:
+> 
+> hci0:   Type: USB
+>         BD Address: 00:0F:B3:17:3E:D0 ACL MTU: 192:8  SCO MTU: 64:8
+>         HCI 18.2
+>         Chip version: BlueCore02
+>         Max key size: 128 bit
+>         SCO mapping:  HCI
 
-Yes, it's enabled. Hmm, tricky thing...
-Generally it should work with kernel 2.6.9, right?
+this should work. Do you enabled CONFIG_BT_HCIUSB_SCO in your kernel?
 
-Sebastian
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
