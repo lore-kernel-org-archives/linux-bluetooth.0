@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Paul Ionescu <i_p_a_u_l@yahoo.com>
-Message-ID: <pan.2005.01.12.07.34.39.13819@yahoo.com>
+Message-ID: <b8950797050111232241c3de8b@mail.gmail.com>
+From: Weston Weems <wweems@gmail.com>
+To: Bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] bluetooth headsets
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] replicate hcitool scan using bluez libs
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +16,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 Jan 2005 08:34:39 +0100
+Date: Tue, 11 Jan 2005 23:22:59 -0800
 
-Hi all,
+I am a little new to the bluez libs etc, and am trying to essentiall
+call functions in the bluez libs to simulate "scan" behaviour of
+hcitool.
 
-Does anyone knows any studies regarding health dangers using bluetooth
-headsets ?
-Something like for mobile phones ?
-I am planning to buy a BT headset and I want to know if is dangerous for
-my brain to use something like this.
-I know it uses much less power than a mobile phone, but the usage is also
-different, while we use our phones only when speaking, we tend to keep the
-headset on for longer periods, and if it used also for listening to music,
-then it will be even longer periods.
+At first I thought it was inquiry in hci.h but after running the
+tools, seems like they yeild different results. Also, device_id is id
+of the bluetooth radio in the system?
 
-Thanks,
-Paul
+Anyway I'd appreciate any guidance on the issue... 
 
-
+many thanks in advance
+Weston Weems
 
 
 -------------------------------------------------------
