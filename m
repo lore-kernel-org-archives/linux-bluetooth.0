@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Re: Re: Re: hciattach problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <42051547.5030301@web.de>
-References: <42051547.5030301@web.de>
-Content-Type: text/plain
-Message-Id: <1107631098.6921.187.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <42051547.5030301@web.de>
+From: Andreas Millinger <andreas.millinger@web.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: [Bluez-devel] Re: Re: Re: Re: hciattach problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,29 +16,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 05 Feb 2005 20:18:18 +0100
+Date: Sat, 05 Feb 2005 19:49:43 +0100
 
-Hi Andreas,
+Hello Marcel,
 
-> > please check 2.6.10-mh1 against 2.6.10-mh2, because otherwise we can't
-> > find the problem. All your other kernels differ too much. The "csr"
-> > option indicates H:4.
-> 
-> I have compiled a kernel 2.6.10-mh1 and a -mh2. I have tested it, and
-> now there's no problem. I don't know why, but now there is no freez. 
-> Maybe I have done something wrong with the compiling. Or do I have to 
-> compile the bluez-utils/libs now with each kernel?
+> please check 2.6.10-mh1 against 2.6.10-mh2, because otherwise we can't
+> find the problem. All your other kernels differ too much. The "csr"
+> option indicates H:4.
 
-no. The libs and utils will not change the behaviour of your kernel. I
-think you had an experimental patch in one of the kernels that causes
-your problem. May you wanna also check the 2.6.11-rc3 to be sure that
-everything is fine.
+I have compiled a kernel 2.6.10-mh1 and a -mh2. I have tested it, and
+now there's no problem. I don't know why, but now there is no freez. 
+Maybe I have done something wrong with the compiling. Or do I have to 
+compile the bluez-utils/libs now with each kernel?
 
-Regards
+Best regards
 
-Marcel
-
-
+Andreas
 
 
 -------------------------------------------------------
