@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <BAY12-F96C49A8056B58A97FFE7BAB9F0@phx.gbl>
+In-Reply-To: <1104622566.8286.2.camel@pegasus>
+From: "Pegasus ..." <uwpegasus@hotmail.com>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Continuous Inquiry
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY12-F96C49A8056B58A97FFE7BAB9F0@phx.gbl>
-References: <BAY12-F96C49A8056B58A97FFE7BAB9F0@phx.gbl>
-Content-Type: text/plain
-Message-Id: <1104696717.8894.28.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,22 +17,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 02 Jan 2005 21:11:57 +0100
+Date: Sun, 02 Jan 2005 19:37:36 +0000
 
-Hi,
+Hi Marcel:
 
-> I am a bit lost here.
-> 
-> I looked at the code for hic_inquiry and hci_send_req... still not sure how 
-> to read raw socket event for inquiry.  Any other pointer to look at?
+>From: Marcel Holtmann <marcel@holtmann.org>
+>Reply-To: bluez-devel@lists.sourceforge.net
+>To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+>Subject: Re: [Bluez-devel] Continuous Inquiry
+>Date: Sun, 02 Jan 2005 00:36:06 +0100
+>
+>Hi,
+>
+> > If I do Inquiry in batches of  1.28 seconds, will that affect Inquiry
+> > response from other devices? ...due to the Inquiry Scan Window 
+>traversing
+> > the same frequencies again !
+> >
+> > I tested the batch approach with the two Socket CF+PCMCIA cards I have 
+>and
+> > seem to work fine... but maybe it wont work when there are more devices 
+>from
+> > different vendors ?
+>
+>I think this will lead into problems some time. Use the HCI raw socket
+>directly and read every inquiry result event.
+>
+>Regards
+>
+>Marcel
 
-th point is using the HCI raw socket directly. Sending the HCI inquiry
-command and then reading the inquiry results events. There is example
-code for that in the mailing list archive.
 
-Regards
+I am a bit lost here.
 
-Marcel
+I looked at the code for hic_inquiry and hci_send_req... still not sure how 
+to read raw socket event for inquiry.  Any other pointer to look at?
+
+Thanks for your time and help...
 
 
 
