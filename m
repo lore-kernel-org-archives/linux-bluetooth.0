@@ -1,5 +1,5 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050222120541.95523.qmail@web26610.mail.ukl.yahoo.com>
+Message-ID: <20050222120225.46790.qmail@web26601.mail.ukl.yahoo.com>
 From: BZ Benny <bennybbz@yahoo.fr>
 To: bluez maillinglist <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
@@ -16,7 +16,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Feb 2005 13:05:41 +0100 (CET)
+Date: Tue, 22 Feb 2005 13:02:24 +0100 (CET)
 
 Hi all,
 
@@ -25,7 +25,7 @@ and we see with lsmod by which other modules it is
 used.
 i want the remove bluetooth with 
 #rmmod bluetooth
-but before I remove other modules that use bluetooth
+but before a remove other modules that use bluetoth
 like hci_usb, l2cap and others.
 but how could I remove daemons and how could I see
 daemons that I'm runing and that use bluetooth module
@@ -34,9 +34,6 @@ such as hcid daemon?
 tanks
 regards,
 benny
-
-
-
 
 
 	
