@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bluez-devel]
-From: Marcel Holtmann <marcel@holtmann.org>
-To: blookk - <blookk@hotmail.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY1-F42k6kvXsn2Yf00002fe32@hotmail.com>
-References: <BAY1-F42k6kvXsn2Yf00002fe32@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1096917898.20349.57.camel@pegasus>
+From: "blookk -" <blookk@hotmail.com>
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Message-ID: <BAY1-F42k6kvXsn2Yf00002fe32@hotmail.com>
+Subject: [Bluez-devel] Bluez-devel]
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,23 +15,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 04 Oct 2004 21:24:59 +0200
+Date: Mon, 04 Oct 2004 17:13:09 +0000
 
-Hi,
 
-> When I load with "insmod" rfcomm, the kernel give me this error:
-> "
-> Oct  4 19:03:22 clavijo modprobe: modprobe: Can't locate module bt-proto-0
-> Oct  4 19:03:22 clavijo kernel: rfcomm_add_listener: Create socket failed -2
-> "
-> Which is the solution?
+Rfcomm problem
 
-do a "modprobe l2cap" first.
+Hello:
 
-Regards
+When I load with "insmod" rfcomm, the kernel give me this error:
+"
+Oct  4 19:03:22 clavijo modprobe: modprobe: Can't locate module bt-proto-0
+Oct  4 19:03:22 clavijo kernel: rfcomm_add_listener: Create socket failed -2
+"
+Which is the solution?
 
-Marcel
+thanks and regards
 
+_________________________________________________________________
+La información más fresca desde diferentes puntos de vista en la Revista de 
+Prensa de MSN. http://es.newsbot.msn.com/
 
 
 
