@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4242D12A.3070802@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+From: Ruben Jenster <rjenster@web.de>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] iTech A2DP anyone?
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200503241706.45605.rjenster@web.de>
+Subject: [Bluez-devel] usb-2.0 hub problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,38 +17,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Mar 2005 07:39:38 -0700
+Date: Thu, 24 Mar 2005 17:06:45 +0000
 
-Hi
+Trying to transmit some audio data to my headset fails, when the bluetooth 
+dongle is attached to a usb-2.0 hub. I allready commited a bug to the kernel 
+bugtracker but there no one is able to help me.
 
-I just ordered an iTech A2DP/HF/HS headset on ebay (see 
-http://cgi.ebay.com/ws/eBayISAPI.dll?ViewItem&item=5757990112 )
+http://bugme.osdl.org/show_bug.cgi?id=4358
 
-I got a strange email back from them claiming the manufacturer says A2DP 
-only works with bluetooth 1.2 hardware and that I can get my money back 
-if I prefer:
+The dongle works perfectly when attached directly to the motherbord.
+When attaching it to the usb-2.0 hub I get the following message:
 
-====================================
-Today, we have received an update from the Manufacturer regarding the
-compability of the Bluetooth Stereo Headset which you have purchased.
-This headset is not able to listen to music played by Mobile Phone or
-PDA unless the Mobile Phone or PDA supports Bluetooth v1.2 (not v1.1)
-and the media player program itself is able to channel the audio
-output via Bluetooth.
+usb 3-3.1: new full speed USB device using ehci_hcd and address 5
+Bluetooth: Core ver 2.7
+NET: Registered protocol family 31
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: HCI USB driver ver 2.8
+usbcore: registered new driver hci_usb
+Bluetooth: L2CAP ver 2.7
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: RFCOMM ver 1.5
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
+hci_cmd_task: hci0 command tx timeout
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb cf315c14 err -12
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb cf315c14 err -12
 
-We have tested the headset with Treo650 and no music could be heard
-via the headset, although it functions normally like a general headset
-(since Treo650 does not support Bluetooth v1.2)
-====================================
 
-Has anyone tried this headset? It seems strange they'd make that claim. 
-I can see them saying it doesn't work with very many devices since 
-hardly anyone supports A2DP, but 1.2 only??
+Maybe someone here is able to help me.
 
-The fact that the treo 650 doesn't appear to support A2DP at all 
-confuses things more.
+Regards
 
-Brad
+Ruben
 
 
 -------------------------------------------------------
