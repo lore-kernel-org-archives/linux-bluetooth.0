@@ -1,66 +1,84 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <40E0500A.6080001@conectiva.com.br>
-From: "Ademar de Souza Reis Jr." <ademar@conectiva.com.br>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Max Krasnyansky <maxk@qualcomm.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Return-Path: <keihachi@swissinfo.org>
+Message-ID: <002c01c45d2d$b0f3dda0$0364a8c0@haruo>
+From: "KeiHachi" <keihachi@swissinfo.org>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+References: <003401c45c2b$b6eab240$0364a8c0@haruo> <20040627125235.GA15938@gmx.net>  <001101c45c55$7803b160$0364a8c0@haruo> <1088360970.3774.39.camel@pegasus>
 Subject: Re: [Bluez-devel] Questions about BlueZ in  commercial use
-References: <003401c45c2b$b6eab240$0364a8c0@haruo>	 <20040627125235.GA15938@gmx.net>  <40E02D93.8090305@conectiva.com.br>	 <1088434128.4614.27.camel@pegasus>  <40E03705.5040403@conectiva.com.br> <1088437134.6030.7.camel@pegasus>
-In-Reply-To: <1088437134.6030.7.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Jun 2004 13:06:18 -0400
+Date: Tue, 29 Jun 2004 01:33:45 +0900
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-2022-jp"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Marcel Holtmann wrote:
-> Hi Ademar,
+Hi Marcel, thanks for your reply, again.
+ 
+> I think Nicholas answered most of your questions quite well, but I must
+> comment on this part.
+
+Thank you.
+
+> > For example, Affix provides us these two versions software,
+> > the testing version and the stable version.
+> > http://affix.sourceforge.net/#download
+> > 
+> > I suppose such version control or management like Affix.
 > 
+> What you really wan"t doesn"t exists in the real world. Most Open Source
+> projects differ between stable and unstable/testing trees, but how do
+> you define the difference between them? The general problem is that they
+> think their API is not sufficient and so they are going to redesign it
+> and use the next major version for it. We will do actually the same, but
+> as long as we don"t break any backward compatible there is no need to do
+> this.
+
+Yes, I understand what you mean.
+
+
+> If you wanna choose a Bluetooth stack that has a clear stable and
+> testing version then go with the Affix and use it.
+
+Of course I think we should also investigate about Affix as well,
+but that will be done in near future.
+
+
+> I am not going to provide such version control, because I doesn"t work out for us.
+> What I can give is a clear statement about what protocols (or profiles) are
+> stable within the complete BlueZ stack. So you should know what you need
+> and I can give you a more detailed answer about it.
+
+Thank you very much.
+I understand your thought about version control.
+And I also understand BlueZ codes in the kernel are always stable (as enough as I expect) .
+
+
+> > > If a new profile is testing or has been released immediately after the development,
+> > > probably some bugs are still included.
+> > 
+>  I don"t take this point for sure, because even software declared as
+>  stable has bugs ;)
+
+Yes, of course I agree what you said :-).
+
+ 
+> > So we think if BlueZ is used for the commercial use, the stable version is necessary,
+> > because a commercial product is required to be a high quality.
 > 
->>>For the BlueZ library and the utilities we can talk about it. Some time
->>>ago people asked for a LGPL version of the library and actually I tend
->>>to agree with that. However this can't be decided by me alone, because
->>>part of the code is copyright by Qualcomm and also by Maxim Krasnyansky
->>>himself.
->>
->>That would be something really interesting to hear about and I guess it's 
->>important to define as soon as possible (to avoid including more people with 
->>copyright code in the ring, for example).
-> 
-> 
-> start asking Max about it. Since he is still working for Qualcomm we may
-> resolve this issue very soon. If Qualcomm and Max agree on LGPL for the
-> library I will also agree on it.
+> Bugs are bugs. Even if I declare a BlueZ version as stable, I can"t
+> assure that I don"t overlooked something. This is the human part of
+> software engineering. Lets talk about details and not esoteric needs.
 
-Added him to CC: just in case he is not following the thread.
+I think probably my explanation is unclear, because my English is poor (I'm sorry).
 
-Max, could you give us your view about that?
+What I want to say isn't such a strict high quality that means there are no bugs in it.
 
-Thanks and best regards,
-   - Ademar
+The stable version that I wrote before means that
+modifications for new features will not be added in principle.
+This means modifications for only bug fix will be allowed.
+That is the stable version that I want to say.
 
--- 
-Ademar de Souza Reis Jr. <ademar@conectiva.com.br>
-Conectiva S.A. - http://www.conectiva.com.br
+It will give me much pleasure if my intention will be shared with you properly.
+Thank you.
 
-^[:wq!
-
-
-
--------------------------------------------------------
-This SF.Net email sponsored by Black Hat Briefings & Training.
-Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
-digital self defense, top technical experts, no vendor pitches, 
-unmatched networking opportunities. Visit www.blackhat.com
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Regards,
+KeiHachi
