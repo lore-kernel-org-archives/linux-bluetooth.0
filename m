@@ -1,22 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] AVDTP socket?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20041123015309.7fde73e7.henryk@ploetzli.ch>
-References: <418DB442.2050801@uen.org> <41925793.3050404@xmission.com>
-	 <1100113055.25879.73.camel@pegasus> <419543B3.8050601@xmission.com>
-	 <1100306337.7349.29.camel@pegasus> <41957BC1.507@xmission.com>
-	 <1100351199.7349.50.camel@pegasus> <41970F25.4020902@xmission.com>
-	 <1100446172.21403.16.camel@pegasus> <419B7292.9080706@xmission.com>
-	 <cbf0aec9041118052714481128@mail.gmail.com>
-	 <20041121064655.0b04dd8a.henryk@ploetzli.ch>
-	 <1101059050.7250.39.camel@pegasus> <1101093515.7250.97.camel@pegasus>
-	 <20041122053213.2685bedd.henryk@ploetzli.ch>
-	 <1101130102.15086.9.camel@pegasus>
-	 <20041123015309.7fde73e7.henryk@ploetzli.ch>
-Content-Type: text/plain
-Message-Id: <1101190933.26578.37.camel@pegasus>
+From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] audio problems with a2play
+Message-Id: <20041123070621.50569968.henryk@ploetzli.ch>
+In-Reply-To: <41A2B331.4010001@xmission.com>
+References: <41A22C0B.4050008@xmission.com>
+	<41A234FA.7020303@xmission.com>
+	<20041123033429.132bf84b.henryk@ploetzli.ch>
+	<41A2B331.4010001@xmission.com>
 Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="pgp-sha1";
+ boundary="Signature=_Tue__23_Nov_2004_07_06_21_+0100_aeW86bgW=fHFMPJR"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -28,23 +23,59 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Nov 2004 07:22:13 +0100
+Date: Tue, 23 Nov 2004 07:06:21 +0100
 
-Hi Henryk,
+--Signature=_Tue__23_Nov_2004_07_06_21_+0100_aeW86bgW=fHFMPJR
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > And we need to add a clear license statement to the source files. I
-> > like to put the SBC library under LGPL and the programs under GPL. Is
-> > this fine with you?
-> 
-> Absolutely, that's what I wanted to do anyways.
+Moin,
 
-I added the license statement to all files now.
+Am Mon, 22 Nov 2004 20:49:05 -0700 schrieb Brad Midgley:
 
-Regards
+> Are you saying the problem is in a2play or in hcidump?
 
-Marcel
+Both are doing the same wrong thing.
 
+> I don't know the "real" mapping between the indexed settings in the
+> sbc file format and the bitmapped settings/capabilities we use with
+> the a2dp protocol.
 
+It's on page 20 of the A2DP spec where it says, for example, that the
+first byte of the codec specific information elements for SBC encodes
+the sampling frequency in the upper half of the byte and the channel
+mode in the lower half. The first byte that a2play sends for
+sbc_test_01.sbc (which is 48 kHz mono) is 0x81, so bits 7 (0x80) and 0
+(0x01) are set. Bit 7 set means 16 kHz (section 4.3.2.1), bit 0 set
+means joint stereo (section 4.3.2.2). The correct value for this byte
+would be 0x18 (bits 4 and 3 set).=20
+
+Similarly the second byte (currently 0x86) should be 0x1a (bits 4, 3 and
+1 set).
+
+> Are these backwards then?
+
+Most of them are, with the notable exception of the allocation_method.
+
+--=20
+Henryk Pl=F6tz
+Gr=FC=DFe aus Berlin
+~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
+~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+
+--Signature=_Tue__23_Nov_2004_07_06_21_+0100_aeW86bgW=fHFMPJR
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+
+iD8DBQFBotNjIjWgKE0OA2gRAgNmAJ0cgR3mlTsUJ6FMJ6taEGF9BzduCACaA5+0
+HcOh8hZjrn76bNxiohyfTg8=
+=0p4u
+-----END PGP SIGNATURE-----
+
+--Signature=_Tue__23_Nov_2004_07_06_21_+0100_aeW86bgW=fHFMPJR--
 
 
 -------------------------------------------------------
