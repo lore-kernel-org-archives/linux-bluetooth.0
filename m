@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth 2.0 EDR new SCO and ACL packets
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050209123431.60154.qmail@web41110.mail.yahoo.com>
-References: <20050209123431.60154.qmail@web41110.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1107953404.13863.22.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20050209123431.60154.qmail@web41110.mail.yahoo.com>
+From: Sean Loh <blaze_wk@yahoo.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Bluetooth 2.0 EDR new SCO and ACL packets
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,42 +16,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 09 Feb 2005 13:50:04 +0100
+Date: Wed, 9 Feb 2005 04:34:31 -0800 (PST)
 
-Hi Sean,
+Hi,
 
-> I am intending to write applications to take advantage
-> of the new Bluetooth 2.0 EDR throughput. I have got a
-> couple of questions that I can't seem to find through
-> the mailing list.
-> 
-> 1. Since there are new packets with the new Bluetooth
-> spec, will we just have to type in the command through
-> hcitool to use the new packets (eg. hcitool -i hci0
-> -cpt <Target Bluetooth Address> <New ACL packet
-> acronym>?
+I am intending to write applications to take advantage
+of the new Bluetooth 2.0 EDR throughput. I have got a
+couple of questions that I can't seem to find through
+the mailing list.
 
-that is wrong and actually you should re-read that part of the EDR
-specification. Setting the new packet types disable them.
+1. Since there are new packets with the new Bluetooth
+spec, will we just have to type in the command through
+hcitool to use the new packets (eg. hcitool -i hci0
+-cpt <Target Bluetooth Address> <New ACL packet
+acronym>?
 
-The EDR stuff works out of the box. I already verfied that.
+2. I seem a bit confused about the usage of the 'PAN'
+profile with the new Bluetooth spec. How does the
+BlueZ 'PAN' take advantage of the new throughputs?
+Will we just have to modify the packets like 'question
+1' via hcitool and immediately all IP applications
+over Bluetooth will take advantage of the new
+throughputs? Or does the BlueZ 'pan' itself behave
+differently upon Bluetooth 2.0 EDR?
 
-> 2. I seem a bit confused about the usage of the 'PAN'
-> profile with the new Bluetooth spec. How does the
-> BlueZ 'PAN' take advantage of the new throughputs?
-> Will we just have to modify the packets like 'question
-> 1' via hcitool and immediately all IP applications
-> over Bluetooth will take advantage of the new
-> throughputs? Or does the BlueZ 'pan' itself behave
-> differently upon Bluetooth 2.0 EDR?
-
-You don't have to do anything. Simply use two EDR capable devices.
-
-Regards
-
-Marcel
+Lastly, thanks for the help once again!! BlueZ as
+always is organised greatlky and promptly!!
 
 
+		
+__________________________________ 
+Do you Yahoo!? 
+All your favorites on one personal page – Try My Yahoo!
+http://my.yahoo.com 
 
 
 -------------------------------------------------------
