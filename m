@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Nokia 7610 phone & logitech DiNovo keyboard /
 	MX900 mouse
-From: Laurence Orchard <laurence@orchards.org.uk>
+From: Laurence Orchard <Laurence.Orchard@tesco.net>
 To: bluez-users@lists.sourceforge.net
 In-Reply-To: <1102315314.8510.57.camel@pegasus>
 References: <1102035154.4258.14.camel@localhost>
 	 <1102042749.7350.33.camel@pegasus>  <1102291223.4219.3.camel@localhost>
 	 <1102315314.8510.57.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1102639996.4112.10.camel@localhost>
+Message-Id: <1102639908.4112.7.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,7 +21,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Dec 2004 00:53:15 +0000
+Date: Fri, 10 Dec 2004 00:51:48 +0000
 
 On Mon, 2004-12-06 at 07:41 +0100, Marcel Holtmann wrote:
 > Hi Laurence,
@@ -56,7 +56,6 @@ still the same problem, debugging is very difficult without a mouse or
 keyboard. Can't query system, all I can do is press the reset button!
 
 laurence
--- 
 
 
 
