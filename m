@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Connection with a phone stays open
-	afterclosingRFCOMM channel
+Subject: Re: [Bluez-devel] GBU311 Support under 2.4.x
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Victor Shcherbatyuk <Victor.Shcherbatyuk@tomtom.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <C70061B183DE09419568AB2060C52A9518EE74@arion.intra.local>
-References: <C70061B183DE09419568AB2060C52A9518EE74@arion.intra.local>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1109707752.8365.6.camel@linux.site>
+References: <1109707752.8365.6.camel@linux.site>
 Content-Type: text/plain
-Message-Id: <1109773181.8284.16.camel@pegasus>
+Message-Id: <1109772789.8284.8.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,40 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 02 Mar 2005 15:19:41 +0100
+Date: Wed, 02 Mar 2005 15:13:09 +0100
 
-Hi Victor,
+Hi Dave,
 
-> Don't know if I have to post it on the mailing list (with binary
-> files)...
+> I was wondering if there is any possibility of releasing a kernel patch
+> for the latest 2.4 kernel that would support the IOGear GBU311.
+> 
+> We are still using the 2.4 kernel on an embedded Geode GX1 device, and
+> can't upgrade to the 2.5 kernel for quite some time.
+> 
+> If not, are there any other 1.2 USB bluetooth dongles that may work
+> under the 2.4 kernel?
 
-if I ask for it, it is always fine ;)
-
-> I can not try 2.11 rc5 cause it is not an option for the current project
-> and I do not have time to try it at home at the moment.
-
-Using a 2.6.10-mh4 is also possible, but you should at least try it with
-my kernel patch.
-
-> At the moment it is not clear from the protocol (at least for me) who is
-> responsible for terminating connection. It may be as well a bug in
-> SE630, cause Nokia 7650 for instance takes initiative to terminate the
-> connection after DISC on dlci6 (but from another side Nokias do not take
-> initiative to reconnect to HF device when call is received when
-> bluetooth connection is broken, as SE phones do...)
-
-You won't find any written words or hints inside the specification who
-is responsible for terminating a connection. I discussed this problem
-with a lot of people so far and there is no solution besides accepting
-bad implementations.
-
-Actually I asked you for the contents of
-
-	/proc/bluetooth/rfcomm/{dlc|sock}
-
-after you ran into the stalled connection. They are really needed,
-because it might be a bug with our code that we don't cleanup the mess
-of the SE 630.
+besides the IOGear GBU311 support there are a lot more things that are
+missing and the answer is still the same as the last time such a
+question came up on the mailing list. Do it by yourself or pay someone
+to do it for you.
 
 Regards
 
