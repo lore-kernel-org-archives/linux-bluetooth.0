@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] SDP service
+Subject: Re: [Bluez-users] BT-PM01B. hidd --connect <non-advertising device>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050228120815.30584.qmail@web60901.mail.yahoo.com>
-References: <20050228120815.30584.qmail@web60901.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1109599768.17256.72.camel@pegasus>
+In-Reply-To: <42231E6A.90500@rcs.ei.tum.de>
+References: <42231E6A.90500@rcs.ei.tum.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1109599532.17256.69.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,28 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Feb 2005 15:09:28 +0100
+Date: Mon, 28 Feb 2005 15:05:32 +0100
 
-Hi Michael,
+Hi Reinald,
 
->     I'm configuring BlueZ's SDP. But when I searched
-> my home's and lab's Linux PC respectively, the
-> services provided by my lab's PC is more than that by
-> my home one, with the following that my home's PC
-> doesn't apply: SAP (SIM Access) and HF (Handsfree).
-> Also, I doesn't find any service that represents
-> "synchronization". Therefore, even though I added T610
-> as "handsfree device", and the "connect" item is
-> displayed in my home's PC's   selection list, when I
-> tried to connect to my PC, the "Bluetooth connection
-> failed" dialog appeared. The tools and libraries
-> installed in my home's and lab's PCs are the same,
-> with utils, libs, pan rpm, sdp rpm, and hcidump all
-> most updated version. What is the problem, and how can
-> I do?
+> Epox Presenter BT-PM01B (with hid) works fine with bthid
+> from http://klausler.com/msbtkb-linux.html
+> (after puting uinput into modprobe.conf)
+>=20
+> bthid however is not part of bluez-utils-2.15.rpm or any other
+> fc3-rpm that I know and seems to be depreciated (?)
+>=20
+> Can the same job be done with standard-tools? how ?
+>=20
+> Epox Presenter BT-PM01B works in non-advertising-mode
+> (unless 3 Buttons are pressed after poweron)
+> This means that hidd --connect xx:xx:xx... won=B4t work.
+>=20
+> Can hidd be brought to the same listening mode like bthid ?
 
-if you use the old bluez-{sdp|pan} packages then this is your first
-mistake. They are no longer supported and not needed anymore.
+yes, it can and actually every distribution should have at least some
+config file for it. Make sure "hidd --server" is running. You've never
+been to any of my talks and see me using this toy ;)
 
 Regards
 
