@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] mh3 not in 2.4.26-pre6
+Subject: Re: [Bluez-users] usb dongle problem
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
+To: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403251849.21765.cijoml@volny.cz>
-References: <200403251849.21765.cijoml@volny.cz>
+In-Reply-To: <7234973362.7336272349@estudiants.urv.es>
+References: <7234973362.7336272349@estudiants.urv.es>
 Content-Type: text/plain
-Message-Id: <1080258240.2283.48.camel@pegasus>
+Message-Id: <1080258192.2283.46.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,13 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Mar 2004 00:44:00 +0100
+Date: Fri, 26 Mar 2004 00:43:12 +0100
 
-Hi Michal,
+Hi Albert,
 
-> why is not mh3 in 2.4.26-pre6 included?
+> I'm still working on the problem I have with my usb
+> dongle.
+> In a red hat 7.3 with kernel 2.4.18 (i know it's
+> deprecated) I install bluez-kernel 2.3, bluez-libs,
+> bluez-utils, bluez-sdp and bluez-pan, but when I do
+> hciconfig, there is no output.
 
-I noticed it, but I don't know why. I will ask Dave what was wrong.
+show me /proc/bus/usb/devices and tell me what dongle did you bought.
 
 Regards
 
