@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] L2Ping / Rfcomm connect : Function not
-	implemented
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200412122356.09617.wim.delvaux@adaptiveplanet.com>
-References: <200412122356.09617.wim.delvaux@adaptiveplanet.com>
-Content-Type: text/plain
-Message-Id: <1102924939.8750.84.camel@pegasus>
+Message-ID: <2de465760412122003779e7efa@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] l2test
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,39 +16,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Dec 2004 09:02:19 +0100
+Date: Mon, 13 Dec 2004 09:33:24 +0530
 
-Hi Wim,
+Hi marcel,
+i am conduting a l2test between 2 devices, say A and B, using fixed
+packet types (i.e) i am setting  the packet type to say DM1 on both
+sides. Now when A sends data, does it send during all the 6 slots or
+does it send in alternate slots as the receiver is just listening(not
+sending)?? I want to know in which slots the packets are transmitted??
+ I am conducting the same tests for other packet types too.
 
-> If I  execute on my 3870 Ipaq
-> 
-> l2ping 00:60:57:35:81:B6
-> 
-> Where the BDAddr is of a Nokial 6310 telephone 
-> 
-> I get the above error. 
-> 
-> Hcidump -x shows
-> 
-> 
-> < HCI Command: Create Connection(0x01|0x0005) plen 13
->   B6 81 35 57 60 00 18 CC 02 00 00 00 01
-> > HCI Event: Command Status(0x0f) plen 4
->   00 01 05 04
-> > HCI Event: Connect Complete(0x03) plen 11
->   1F 00 00 B6 81 35 57 60 00 01 00
-> 
-> If I read the specs properly 0x1f is a 'unspecified error' ;-(
-> 
-> What could be wrong ?
+In l2test, is the method of calculating the throughput correct??? It
+is calculating the  time as
+time=time at which last byte is received - time at which first byte is
+received.
 
-show us "hciconfig -a" from the iPAQ.
+Does this give an accurate measure of l2cap throughput??
 
-Regards
-
-Marcel
-
-
+Thanks,
+Regards,
+Manjunath
 
 
 -------------------------------------------------------
