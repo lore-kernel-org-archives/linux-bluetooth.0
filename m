@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] pand freezes upon disconnect
+Subject: Re: [Bluez-users] connectionless l2cap within PAN implementation
 From: Marcel Holtmann <marcel@holtmann.org>
-To: bora@ai.com.tr
+To: Sean Loh <blaze_wk@yahoo.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E1CAAVj-0004z7-KX@paris.servershost.net>
-References: <E1CAAVj-0004z7-KX@paris.servershost.net>
+In-Reply-To: <20040922154930.77624.qmail@web41121.mail.yahoo.com>
+References: <20040922154930.77624.qmail@web41121.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1095874557.6223.76.camel@pegasus>
+Message-Id: <1095869928.6223.58.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Sep 2004 19:35:57 +0200
+Date: Wed, 22 Sep 2004 18:18:48 +0200
 
-Hi,
+Hi Sean,
 
-> kernel version is 2.6.8.1 on slackware 9.1
-> these are the installed packages :
-> bluez-libs-2.10.tar.gz 
-> bluez-utils-2.10.tar.gz 
-> bluez-pin-0.24.tar.gz 
-> bluez-firmware-1.0.tar.gz 
+> I'm sorry but I can't seem to find this information.
+> I'm utilising the PAN specification to stream audio
+> over Bluez PAN and I was wondering is there any way
+> for me to switch the l2cap packets to being
+> connectionless ones (like from a command line)? If it
+> can't be done from a command line, then what other
+> ways are there? 
 > 
-> bluez-hcidump-1.11.tar.gz 
-> bluez-hciemu-1.0.tar.gz 
+> Because, if I'm right, the default l2cap packets are
+> connection oriented within the pan profile, isn't it?
 
-this looks very good and I tried to reproduce it, but using Debian Sid
-with kernel 2.6.9-rc2 I am unable to create a PAN connection from a
-Windows XP SP2 machine using your pand command line. What must I do to
-reproduce it?
+nobody really used the connectionless L2CAP with success I think and I
+can't remember that BNEP is defined for connectionless L2CAP.
 
 Regards
 
