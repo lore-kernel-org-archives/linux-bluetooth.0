@@ -1,119 +1,48 @@
-Return-Path: <d_gujarathi@hotmail.com>
-From: "Deepesh S Gujarathi" <d_gujarathi@hotmail.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Cc: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-References: <Law11-OE56C4Mkg3fDM00007728@hotmail.com> <1071150458.27256.16.camel@pegasus>
-Subject: Re: [Bluez-devel] HID testing
-Date: Fri, 12 Dec 2003 17:18:13 +0530
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1252"
-Message-ID: <Law11-OE38c8X3gjv5O000087de@hotmail.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] multiple connections on rfcomM?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Anthony Yulo <strikewing16th@hotmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Law11-F23jdb5IBf53a00030f69@hotmail.com>
+References: <Law11-F23jdb5IBf53a00030f69@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1071219318.27256.106.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 12 Dec 2003 09:55:19 +0100
 
-Hi Marcel,
+Hi Anthony,
 
-thanks for the detailed reply
+> 1st pda initiates connection to the desktop server.. and then remain 
+> connected for a while.. My Question is would the desktop server still be 
+> searchable/discoverable by other devices while its
+> connected to the 1st pda?
 
-> What kind of Bluetooth chip do you use?
+this depends on the Bluetooth chip you are using on your server. If it
+is CSR based it must be HCI 16.x firmware or higher.
 
-I am using the Ericsson Bluetooth module on a custom made eval board...
+Regards
 
-> Please use "sdptest" from libs2/test CVS to show us the SDP record of
-> your HID device.
-currently I donot have the sdptest program, but I have pasted below the
-output
-from the sdptool, dunno whether it would be of any help.
+Marcel
 
-------------------------------------------------------
-Searching for HID on 00:50:F2:E5:89:15 ...
- ID------------> 0
-Attribute Identifier : 0x0 - ServiceRecordHandle
-  Integer : 0x10000
- ID------------> 1
-Attribute Identifier : 0x1 - ServiceClassIDList
-  Data Sequence
-    UUID16 : 0x1124
- ID------------> 4
-Attribute Identifier : 0x4 - ProtocolDescriptorList
-  Data Sequence
-    Data Sequence
-      UUID16 : 0x0100 - L2CAP
-      Channel/Port (Integer) : 0x11
-    Data Sequence
-      UUID16 : 0x0011 - HIDP
- ID------------> 6
-Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
-  Data Sequence
-    Integer : 0x656e
-    Integer : 0x6a
-    Integer : 0x100
- ID------------> 9
-Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
-  Data Sequence
-    Data Sequence
-      UUID16 : 0x1124
-      Version (Integer) : 0x100
- ID------------> d
-Attribute Identifier : 0xd - AdditionalProtocolDescriptorLists
-  Data Sequence
-    Data Sequence
-      Data Sequence
-        UUID16 : 0x0100 - L2CAP
-        Integer : 0x13
-      Data Sequence
-        UUID16 : 0x0011 - HIDP
-Attribute Identifier : 0x100
-Text as STring:----------> 0xAVALENT MOUSE
-Attribute Identifier : 0x101
-Text as STring:----------> 0xTHREE BUTTON MOUSE
-Attribute Identifier : 0x102
-Text as STring:----------> 0xAVALENT
-Attribute Identifier : 0x200
-  Integer : 0x100
- ID------------> 201
-Attribute Identifier : 0x201 - HIDProfileVersion
-  Integer : 0x111
- ID------------> 202
-Attribute Identifier : 0x202 - HIDDeviceSubClass
-  Integer : 0x80
- ID------------> 203
-Attribute Identifier : 0x203 - HIDCountryCode
-  Integer : 0x33
- ID------------> 204
-Attribute Identifier : 0x204 - HIDVirtualCable
-  Integer : 0x1
- ID------------> 205
-Attribute Identifier : 0x205 - HIDReconnectInitiate
-  Integer : 0x1
- ID------------> 206
-Attribute Identifier : 0x206 - HIDDescriptorList
-  Data Sequence
-    Data Sequence
-      Integer : 0x22
-Attribute Identifier : 0x207
- Data Sequence
-  Data Sequence
-      Integer : 0x409
-      Integer : 0x100
-ID------------> 208
-Attribute Identifier : 0x208 - HIDSDPDisable
-  Integer : 0x0
- ID------------> 209
-Attribute Identifier : 0x209 - HIDBatteryPower
-  Integer : 0x1
- ID------------> 20a
-Attribute Identifier : 0x20a - HIDRemoteWake
-  Integer : 0x1
- ID------------> 20b
-Attribute Identifier : 0x20b - HIDParserVersion
-  Integer : 0x100
- ID------------> 20e
-Attribute Identifier : 0x20e - HIDBootDevice
-  Integer : 0x1
-------------------------------------------------------
 
-I will post the results of sdptest soon
 
-thanks
-Saturn
+
+-------------------------------------------------------
+This SF.net email is sponsored by: SF.net Giveback Program.
+Does SourceForge.net help you be more productive?  Does it
+help you create better code?  SHARE THE LOVE, and help us help
+YOU!  Click Here: http://sourceforge.net/donate/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
