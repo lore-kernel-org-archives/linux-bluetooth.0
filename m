@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Pairing fails with RFCOMM
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andi Kleen <ak@suse.de>
-Cc: bluez-devel@lists.sf.net, netdev@oss.sgi.com,
-   viro@parcelfarce.linux.org.uk
-In-Reply-To: <20040206050042.20a2b3b0.ak@suse.de>
-References: <20040206050042.20a2b3b0.ak@suse.de>
+To: Nils Faerber <nils.faerber@kernelconcepts.de>
+Cc: bluez-devel@lists.sf.net
+In-Reply-To: <1076087010.964.75.camel@localhost>
+References: <1076087010.964.75.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1076110207.14418.53.camel@pegasus>
+Message-Id: <1076097441.14418.40.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: some bluetooth fixes
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,27 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 07 Feb 2004 00:30:08 +0100
+Date: Fri, 06 Feb 2004 20:57:21 +0100
 
-Hi Andi,
+Hi Nils,
 
-> diff -u linux-2.6.2-work32/net/bluetooth/rfcomm/tty.c-o linux-2.6.2-work32/net/bluetooth/rfcomm/tty.c
-> --- linux-2.6.2-work32/net/bluetooth/rfcomm/tty.c-o	2003-09-28 10:53:25.000000000 +0200
-> +++ linux-2.6.2-work32/net/bluetooth/rfcomm/tty.c	2004-02-06 04:58:28.000000000 +0100
-> @@ -549,8 +549,10 @@
->  
->  	BT_DBG("dev %p dst %s channel %d opened %d", dev, batostr(&dev->dst), dev->channel, dev->opened);
->  
-> -	if (dev->opened++ != 0)
-> +	if (dev->opened++ != 0) {
-> +		rfcomm_dev_put(dev);
->  		return 0;
-> +	}
->  
->  	dlc = dev->dlc;
+> I think I found a small problem with rfcomm concerning pairing.
+> The problem is that if you try to connect to a "new" device which
+> requires pairing using rfcomm you will be queried for y pin on both
+> sides. But it seems that a connect timeout in rfcomm is way too short
+> for being able to input the pin.
+> It happened to me while trying to connect to a Siemens S55 mobile.
+> I did a "rfcomm bind" and then opened minicom on the port. After that
+> the mobile requests the pin. But before you can even start to input the
+> pin minicom exits with an error.
+> If I start another connection first, like with multisync, the whole
+> connection process waits until the pin has been entered on both sides.
 
-this part is wrong, because it is not an error case. It is success and
-the refcount must stay increased.
+there is a difference between "rfcomm bind ..." and "rfcomm conn ...",
+because on the "bind" case the connection is established by the TTY part
+of the RFCOMM layer. In the case of "connect" the socket is creating the
+connection and MultiSync is using the socket. Please try to reproduce
+this behaviour with only using the rfcomm program and cat instead of
+minicom to trigger this behaviour. Please include the binary hcidump.
+
+And the important thing, what kernel are you using?
 
 Regards
 
