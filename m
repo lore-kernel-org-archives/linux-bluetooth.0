@@ -1,15 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Fehr <andreas@mrs.ch>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] bluetooth serial vs. audio connection
-In-Reply-To: <1111938339.9195.229.camel@pegasus>
-Message-ID: <Pine.LNX.4.62.0503271751420.3135@ybpnyubfg.ybpnyqbznva>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.62.0503271736360.3135@ybpnyubfg.ybpnyqbznva>
 References: <Pine.LNX.4.62.0503271303450.3134@ybpnyubfg.ybpnyqbznva>
- <1111923433.9195.216.camel@pegasus>  <Pine.LNX.4.62.0503271357080.3134@ybpnyubfg.ybpnyqbznva>
-  <1111926923.9195.218.camel@pegasus>  <Pine.LNX.4.62.0503271736360.3135@ybpnyubfg.ybpnyqbznva>
- <1111938339.9195.229.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+	 <1111923433.9195.216.camel@pegasus>
+	 <Pine.LNX.4.62.0503271357080.3134@ybpnyubfg.ybpnyqbznva>
+	 <1111926923.9195.218.camel@pegasus>
+	 <Pine.LNX.4.62.0503271736360.3135@ybpnyubfg.ybpnyqbznva>
+Content-Type: text/plain
+Message-Id: <1111938339.9195.229.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,50 +22,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Mar 2005 17:56:27 +0200 (CEST)
+Date: Sun, 27 Mar 2005 17:45:39 +0200
 
-On Sun, 27 Mar 2005, 17:45, Marcel Holtmann (as MH) wrote:
+Hi Andreas,
 
->MH: > root@notebook:/home/andreas > sdptool search --bdaddr 00:xx dun
->MH: > Searching for dun on 00:xx ...
->MH: > Service Name: Dial-up networking
->MH: > Service RecHandle: 0x10002
->MH: > Service Class ID List:
->MH: >   "Dialup Networking" (0x00001103)
->MH: > Protocol Descriptor List:
->MH: >   "L2CAP" (0x00000100)
->MH: >   "RFCOMM" (0x00000003)
->MH: >     Channel: 4
->MH: > Segmentation fault
->MH: > root@notebook:/home/andreas >
->MH: > 
->MH: > (note the last 'Segmentation fault', this might be the reason, the 
->MH: > browse command does not work as expected)
->MH: 
->MH: what kind of phone is this?
+> >MH: then do "sdptool search --bdaddr <bdaddr> {sp|dun}".
+> 
+> 
+> Ok, I see... this could lead to something. I've the following output:
+> 
+> root@notebook:/home/andreas > sdptool search --bdaddr 00:xx sp
+> Searching for sp on 00:xx ...
+> Service Name: Serial Port
+> Service RecHandle: 0x10003
+> Service Class ID List:
+>   "Serial Port" (0x1101)
+> Protocol Descriptor List:
+>   "L2CAP" (0x0100)
+>   "RFCOMM" (0x0003)
+>     Channel: 3
+> 
+> root@notebook:/home/andreas > sdptool search --bdaddr 00:xx dun
+> Searching for dun on 00:xx ...
+> Service Name: Dial-up networking
+> Service RecHandle: 0x10002
+> Service Class ID List:
+>   "Dialup Networking" (0x00001103)
+> Protocol Descriptor List:
+>   "L2CAP" (0x00000100)
+>   "RFCOMM" (0x00000003)
+>     Channel: 4
+> Segmentation fault
+> root@notebook:/home/andreas >
+> 
+> (note the last 'Segmentation fault', this might be the reason, the 
+> browse command does not work as expected)
 
-If I just run sdptool browse 00:xx, I don't get any output, I'm not 
-sure, this is the normal behavior. I see this as a problem, as there 
-are some supported services. But then, I didn't check the code of this 
-tool.
+what kind of phone is this?
+
+> Thanks so far, but how to proceed? (I've still the same problem, 
+> connecting with bluez 'only' gives an 'audio' connection, not the 
+> expected 'serial' as I got from Windows).
+
+What happens if you connect to channel 3 or channel 4?
+
+Regards
+
+Marcel
 
 
->MH: > Thanks so far, but how to proceed? (I've still the same problem, 
->MH: > connecting with bluez 'only' gives an 'audio' connection, not the 
->MH: > expected 'serial' as I got from Windows).
->MH: 
->MH: What happens if you connect to channel 3 or channel 4?
-
-Duh.... well... thanks for the hint... of course, if I use channel 3 (as 
-given in the output of "sdptool search .. sp" it does work, I get a 
-'serial' connection. I'll test this with minicom, whether I can use all 
-the commands I need, but I'm confident.
-
-Now, I wonder, whether there is some information on service <=> channel 
-pairs that I should have read?
-
-Thanks!
-Andreas
 
 
 -------------------------------------------------------
