@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1111660850.1916.49.camel@pegasus>
+From: Guylhem Aznar <bluez-devel@externe.net>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20050323235401.GA4662@externe.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Feature mask retrieval for L2CAP RFC
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-devel] hidd\hidp on a 2.4.18 kernel
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,40 +16,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Mar 2005 11:40:50 +0100
+Date: Wed, 23 Mar 2005 18:54:01 -0500
 
-Hi,
+Hello
 
-to fully support the L2CAP 1.2 retransmission and flow control (RFC) you
-need to send an info request first to request the extended feature mask.
-The part of the the specification when to request this information is
-quite lame. It actually says only you have to do so before configuring
-for any RFC settings (volume 3, part A, chapter 8.1).
+I am trying to use hidd on a 2.4.18 kernel
+(externe.net/zaurus/kernel) and I am encoutering a strange problem.
 
-The extended feature mask is a global value and thus it should be enough
-to request it once for the underlaying ACL link. This means that we may
-should request this value before creating any L2CAP channel. The problem
-is that older BlueZ L2CAP implementations send wrong responses for an
-info request. This may result into problems with L2CAP 1.1 (SEQPACKET)
-only connections and so I don't wanna do that until we really need to
-configure RFC.
+hidd connect works, the device is listed as connected, but when I
+press the keys nothing happens at all.
 
-My idea is to send the request for the extended feature mask only once
-before we try to open the first L2CAP 1.2 channel. This means before we
-send the connection request for that channel. The mask should be stored
-in the l2cap_conn structure and then used for further channel requests.
-Using such a scheme means that no info requests will be sent if only
-L2CAP 1.1 channels are used and using a L2CAP 1.2 channel will result in
-only one info request/response transaction from our side. This looks to
-me like the most sane approach.
+Basically, the keyboard input is not bound to the standard input.
+because when I insmod evdev and cat /dev/input/event0, I see some activit=
+y
+when I press the keys, but nothing happens on the console (!!)
 
-Comments?
+The keyboard works fine on my other linux computers. I can not use 2.6
+on my handheld (6000W) because all the drivers haven't been ported
+yet, so I'm a bit stuck.
 
-Regards
+I was wondering if it was a known problem, and what I could do to fix
+that? I think it's just a problem of having that input dev. bound
+correctly.
 
-Marcel
+If nothing can be done, I can still hack a /dev/input/event0 reader
+which will inject back keys through VNC /dev/kbdsim, but I'd rather
+do a clean fix :-)
 
+--=20
+Bien =E0 vous - Best regards,
+Guylhem P. Aznar
 
+--=20
+*@externe.net                                            http://externe.n=
+et
+P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
+un.org
+GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
+ey
 
 
 -------------------------------------------------------
