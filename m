@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] baseband characteristics
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de46576041118021674822573@mail.gmail.com>
-References: <2de46576041118021674822573@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1100774178.7164.20.camel@pegasus>
+Message-ID: <2de46576041118021674822573@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] baseband characteristics
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,31 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 18 Nov 2004 11:36:18 +0100
+Date: Thu, 18 Nov 2004 15:46:06 +0530
 
-Hi Manjunath,
+hi marcel,
+is it possible to study the frequency hopping pattern........i mean,
+if i could  some way dump the changing channel numbers into a log
+file.???
 
-> is it possible to study the frequency hopping pattern........i mean,
-> if i could  some way dump the changing channel numbers into a log
-> file.???
+i also want to understand the baseband throughput.....can i get the
+bit error rate before FEC is applied....is it possible????
 
-you can't do this without a protocol analyzer.
+hope u can suggest something...
 
-> i also want to understand the baseband throughput.....can i get the
-> bit error rate before FEC is applied....is it possible????
+also, what does a transmit power level of 4 mean??
 
-No. You can only do things that are defined in the HCI part of the
-Bluetooth specification.
-
-> also, what does a transmit power level of 4 mean??
-
-Check the HCI commands description for that.
-
-Regards
-
-Marcel
-
-
+regards,
+manjunath
 
 
 -------------------------------------------------------
