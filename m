@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: steeters@wideopenwest.com
-To: bluez-users@lists.sourceforge.net
-Message-Id: <20040308191954.M78716@wideopenwest.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset=iso-8859-1
-Subject: [Bluez-users] Bluetooth/Zaurus question
+Subject: Re: [Bluez-users] bluez pan problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ronan Naughton <wadgienaughton@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY10-F1216PYzDabig00010bb6@hotmail.com>
+References: <BAY10-F1216PYzDabig00010bb6@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1078765164.10671.11.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,22 +18,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 8 Mar 2004 13:22:33 -0600
+Date: Mon, 08 Mar 2004 17:59:24 +0100
 
-I've been using my Zaurus for a couple years now, and have just recently
-bought a bluetooth card for it. I've been trying to sync my PIM data to my
-Palm Desktop, but having no luck at all.
+Hi Ronan,
 
-I am using an AmbiCom BT2000-CF card for the Zaurus and an AmbiCom BT2000D-USB
-for my laptop.  When I search for devices from my laptop, it will detect my
-Zaurus, but says there are no services available.
+> I am having a problem with setting up a bluez pan between three machines and 
+> i don't know what I'm doing wrong.
+> 
+> I set one node ( say B )the GN to listen
+> 
+>                                            pand --listen --master --role GN
+> 
+> 
+> I then connect  the other two nodes ( A & C )
+> 
+>                                           pand --connect  mac_addr_of_master
+> 
+> 
+> I then assign an ip address to A, C and then the master B:
+> 
+>                                            ifconfig bnep0 10.0.0.1
+>                                            ifconfig bnep0 10.0.0.3
+>                                            ifconfig bnep0 10.0.0.2
+> 
+> 
+> Then for some reason:
+> The first pc (10.0.0.1) can ping the other PANU and the GN
+> The second pc (10.0.0.3) cannot ping the other PANU or the GN
+> The GN (10.0.0.2 ) can only ping the second pc (10.0.0.3)
 
-Can anyone help me? I must be doing something wrong in the setup or something.
-Any and all help would be appreciated.
+from your setup the master must be have to BNEP connection bnep0 and
+bnep1. You must bring both up and assign an IP to them. Actually you
+will ran into problems with PANU to PANU connections over the GN. I
+propose that you build a bridge above every bnepX connection on the
+master. See the PAN HOWTO and the mailing list archive for more details.
 
-Sincerely,
+Regards
 
-steeters@wowway.com
+Marcel
+
 
 
 
