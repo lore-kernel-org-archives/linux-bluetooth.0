@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] sniffing others devices - noob
+Subject: Re: [Bluez-users] pin code problem - noob
 From: Marcel Holtmann <marcel@holtmann.org>
 To: tpeyrin@cpe.fr
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040408114459.19348.qmail@web60309.mail.yahoo.com>
-References: <20040408114459.19348.qmail@web60309.mail.yahoo.com>
+In-Reply-To: <20040408114053.4136.qmail@web60304.mail.yahoo.com>
+References: <20040408114053.4136.qmail@web60304.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1081425612.2970.25.camel@pegasus>
+Message-Id: <1081425562.2970.23.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,17 +18,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Apr 2004 14:00:12 +0200
+Date: Thu, 08 Apr 2004 13:59:22 +0200
 
 Hi Thomas,
 
-> i'm would like to get the random values (in_rand) and
-> all the other data (Ca - Cb) sent while the
-> authentification of two devices. Can hcidump get these
-> values if he runs on a different machine than the two
-> ones authentificating ?? how so ??
+> i'm trying to do the authentification between a palm
+> m515 and my laptop with linux (suse 8.2) and a usb
+> dongle (acer). But that doesn't work (the palm work
+> with others devices for authentification) because it
+> seems that bluez can't find the pin code. Here's the
+> dump :
+> 
+> HCIDump - HCI packet analyzer ver 1.7
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> > HCI Event: Connect Request(0x04) plen 10
+> < HCI Command: Accept Connection Request(0x01|0x0009)
+> plen 7
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Link Key Request(0x17) plen 6
+> < HCI Command: Link Key Request Negative
+> Reply(0x01|0x000c) plen 6
+> > HCI Event: Command Complete(0x0e) plen 10
+> > HCI Event: PIN Code Request(0x16) plen 6
+> < HCI Command: PIN Code Request Negative
+> Reply(0x01|0x000e) plen 6
+> > HCI Event: Command Complete(0x0e) plen 10
+> > HCI Event: Connect Complete(0x03) plen 11
+> 
+> and my hciconfig :
+> 
+> hci0:   Type: USB
+>         BD Address: 00:02:72:B2:0E:C4 ACL MTU: 192:8 
+> SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN AUTH ENCRYPT
+>         RX bytes:235 acl:0 sco:0 events:26 errors:0
+>         TX bytes:348 acl:0 sco:0 commands:17 errors:0
+> 
+> but i don't understant why the palm doesn't even ask
+> me for the pin code ...
 
-hcidump only sniffs on HCI level. What you need is a protocol analyser.
+don't enable auth and encrypt in hcid.conf, because this sets your
+device into security mode 3 and this is not needed. Check that the PIN
+helper script is working. If not replace it with a simple shell script.
+Look in the mailing list archive for more details.
 
 Regards
 
