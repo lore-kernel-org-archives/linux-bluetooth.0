@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Hi there! ... and my first question
+Subject: Re: [Bluez-users] Presentation slides are online
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Torsten E." <linux-user@gmx.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <011e01c45d24$fbbf2370$640aa8c0@frodo>
-References: <011e01c45d24$fbbf2370$640aa8c0@frodo>
+To: Diego Liziero <diego.liziero@unimore.it>
+Cc: "Nicholas A. Preyss" <nalp@gmx.net>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1088441350.2987.26.camel@tarta>
+References: <1088413405.3774.164.camel@pegasus>
+	 <20040628135038.GA28640@gmx.net>  <1088431331.4614.6.camel@pegasus>
+	 <1088441350.2987.26.camel@tarta>
 Content-Type: text/plain
-Message-Id: <1088465542.6030.230.camel@pegasus>
+Message-Id: <1088465296.6030.226.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,45 +21,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Jun 2004 01:32:22 +0200
+Date: Tue, 29 Jun 2004 01:28:16 +0200
 
-Hi Thorsten,
+Hi Diego,
 
-> well, after reading some docs regarding PAN I wasn't able to manage the
-> problem.
-> I'd like to attach my iPaq 3970 via BlueTooth to my Linuxbox (SuSE 9.1,
-> with SuSE kernel 2.6.5-7.75-default).
+> I've upgraded D-Link revision B3 and B2 with a iMac
+> and both of them seem to work fine.
 
-right now I don't installed SuSE on any of my machines.
-
-> I configured the Linuxbox so I'm able to l2ping the iPaq, but right when
-> using DUND I get errors in /var/log/messages like:
-> Jun 28 17:01:09 gandalf /etc/hotplug/tty.agent[6372]: TTY try 1 while
-> waiting for /class/tty/rfcomm0's bus_id
-> Jun 28 17:01:10 gandalf /etc/hotplug/tty.agent[6372]: TTY try 2 while
-> waiting for /class/tty/rfcomm0's bus_id
-> Jun 28 17:01:11 gandalf /etc/hotplug/tty.agent[6372]: TTY try 3 while
-> waiting for /class/tty/rfcomm0's bus_id
-> Jun 28 17:01:11 gandalf dund[6371]: RFCOMM TTY creation failed. No such
-> file or directory(2)
-> Jun 28 17:01:12 gandalf /etc/hotplug/tty.agent[6389]: remove tty device
-> /class/tty/rfcomm0
-> Jun 28 17:01:12 gandalf /etc/hotplug/tty.agent[6372]: TTY try 4 while
-> waiting for /class/tty/rfcomm0's bus_id
-> Jun 28 17:01:13 gandalf /etc/hotplug/tty.agent[6372]: TTY try 5 while
-> waiting for /class/tty/rfcomm0's bus_id
-> Jun 28 17:01:24 gandalf /etc/hotplug/tty.agent[6372]: add tty device
-> /class/tty/rfcomm0
-
-I don't know anything about tty.agent. It is not part of the hotplug
-package.
-
-> As there's no directory /class onmy box, but /sys/classm I guess that's
-> the correct one.
-> But I'm not able to create any file or directory there ... what does I
-> have to do?
-
-Nothing. This is sysfs related and is ok.
+but the update of B4 is not working for me.
 
 Regards
 
