@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alexander Holler <holler@ahsoftware.de>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: RE: [Bluez-users] disappointed with my MX900 battery life
-Message-ID: <49080000.1073606572@[192.168.207.2]>
-In-Reply-To: <7D3093619D15A841A322413C3F138E0855C305@exchange02.csr.com>
-References: <7D3093619D15A841A322413C3F138E0855C305@exchange02.csr.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] phone+heaset
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?ISO-8859-1?Q?Jo=E3o?= Santos <jsantos_pt@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <SEA2-F33wlVZmSox9fS00030187@hotmail.com>
+References: <SEA2-F33wlVZmSox9fS00030187@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1073588371.2563.69.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,24 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 09 Jan 2004 01:02:52 +0100
+Date: Thu, 08 Jan 2004 19:59:31 +0100
 
-Hello,
+Hi Joao,
 
---On Donnerstag, Januar 08, 2004 10:24:03 +0000 Chris Hubball 
-<Chris.Hubball@csr.com> wrote:
+> I already had read the hset profile specification and i had change the 
+> program hstest.c to send at+ckpd=200 instead of ring (used if i want to make 
+> a sco link between the pc and a bluetooth headset), and nothing, i dont 
+> receve any sco data.
 
-> I'm using the CVS version of libs2 and utils2, with my MX900. I have the
-> impression that the MX900 batteries don't last very long between two
-> charging cycles (2-3 days). Can other here confirm this ?
+read it again, because if I am not wrong only the headset can send
++ckpd=200. And you also have to answer any command from the headset with
+ok or error.
 
-I can confirm that. I'm using both win (bt-stack) and linux (up to now 
-usb-hid). I haven't tried it using only bt over a few days (i haven't had 
-the time, configuring the bluez-hid under linux for every-day-operation).
+Regards
 
-Regards,
+Marcel
 
-Alexander
 
 
 
