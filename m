@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Triona Ryan <triona.ryan@nuigalway.ie>
 To: bluez-users@lists.sourceforge.net
-Message-id: <01LKRITSDX9I0036OM@beacon.nuigalway.ie>
-MIME-version: 1.0
-Content-type: text/plain
-Subject: [Bluez-users] Can't connect.: Function not implemented
+Subject: Re: [Bluez-users] Re: Re: MS Optical Desktop Elite for BT; can"t reconnect after idle
+Message-ID: <20050212151444.GA2769@virgilio.it>
+References: <Pine.GSO.4.58.0502112202380.29873@frodo.dd.chalmers.se> <1108163705.18099.72.camel@pegasus> <Pine.GSO.4.58.0502120440100.648@frodo.dd.chalmers.se>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <Pine.GSO.4.58.0502120440100.648@frodo.dd.chalmers.se>
+From: Francesco Bochicchio <bockman@virgilio.it>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,34 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 13 Feb 2005 17:38:31 +0000
+Date: Sat, 12 Feb 2005 16:14:44 +0100
 
-Hi all,
+On Sat, Feb 12, 2005 at 05:00:52AM +0100, Tomas Bj=F6rklund wrote:
+> Hi Marcel!
+>=20
+> So what's left is really all the extra buttons. I haven't updated the
+> kernel yet so when I get time we'll see if that solves it then.
+>=20
 
-I'm new to this mailing list, but have been experimenting with bluetoot
-h over linux for a few months now. I've had a look at the archive, and saw an en
-try very similar to mine, which was unresolved. I'm hoping there are more recent
- insights to help me!!
+Hi, I have the same keyboard of yours anf managed to have the scrollweeel=
+s
+and extra buttons (most of them) working by patching the kernel 2.6.10 wi=
+th
+the mh-2 patch that you can find at Bluez sourceforge site.
 
-I've bluez installed on Fedora Core 2, and until a few w
-eeks ago, when I started to try and get rfcomm to work, I could l2ping, pair to 
-several devices and connect using hcitool with no problem. Recently however, I c
-an no longer l2ping certain modules. I now get 
+Uou then have to do some userland work (e.g. X configuration and install =
+some
+app that listen those button) to actually use it.
 
-Can't connect.: Function not im
-plemented
-
-As an error. I can still l2ping select devices.
-
-I saw that encrypt a
-nd authentication must be commented out in /etc/bluetooth/hcid.conf which I have
- always had. 
-
-Can anyone recognise any problem there?
-
-Thanks very much,
-Triona
-
+Ciao
+----
+FB
 
 
 
