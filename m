@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] position of multiple bluetooth dongles
+Subject: RE: [Bluez-users] BT programming
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <420B9860.8000400@c-s.fr>
-References: <420B9635.6020701@gmx.ch>  <420B9860.8000400@c-s.fr>
+In-Reply-To: <E73D9A5BC4A2D711BBC600065BF3595F1C66CF8D@il06exm10>
+References: <E73D9A5BC4A2D711BBC600065BF3595F1C66CF8D@il06exm10>
 Content-Type: text/plain
-Message-Id: <1108057121.15974.88.camel@pegasus>
+Message-Id: <1108056789.15974.82.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Feb 2005 18:38:41 +0100
+Date: Thu, 10 Feb 2005 18:33:09 +0100
 
-Hi Gabriel,
+Hi Hiren,
 
-> As there is a very few chance that the use the same frequency at the 
-> same time and send the same data, I think (hope?) there is no problem :)
+> > the profiles are implemented in applications. Either you find a
+> > application that fits your needs or you have to write one. Be more
+> > specific about what profiles and what roles do you wanna support.
+> 
+> I was assuming that some of the profiles are already implemented and can easily be re-used for your application. If I were to write my own profiles is there any book/reference that can guide me? I'm planning to write applications to build PAN, exchange objects and IM chat...
 
-this might be one of 1600 per second. It is unlikely that the clock and
-the device address will be the same.
+stop thinking in profiles. Profiles are applications and since we are in
+the Linux world, yes, there are already some applications do deal with
+certain profile definitions from the specification.
+
+For PAN you can use pand and for object exchange there are lot of them,
+but none of it is the default one. The IM chat would be tricky, because
+there is no standard for it. However as Michal already posted, there is
+a project for it.
+
+> > Check with "hcidump -X" what's the error code, but as I always say there
+> > is no need to establish an ACL link by hand. The kernel core will do it
+> > when one is needed.
+> 
+> Hcidump -x gives me something like..
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> 
+> and the process does not exit, unless I suspend it explicitly. 
+
+Of course. It will show you the HCI packets when you establish a
+connection from another terminal. If the device is idle you will see
+nothing and if you run it a non-root you will see only a few packets.
 
 Regards
 
