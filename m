@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Juha =?iso-8859-1?B?WXJq9mzk?= <juha.yrjola@iki.fi>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050120003408.GA8619@salvia.homeip.net>
-References: <20050119224400.GA7881@salvia.homeip.net> <1106180379.8190.146.camel@pegasus>
+Subject: Re: [Bluez-devel] Bluetooth and HAL
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: hal@freedesktop.org
+In-Reply-To: <pan.2005.01.19.22.54.29.108027@yahoo.com>
+References: <pan.2005.01.19.22.54.29.108027@yahoo.com>
+Content-Type: text/plain
+Message-Id: <1106180785.8190.151.camel@pegasus>
 Mime-Version: 1.0
-In-Reply-To: <1106180379.8190.146.camel@pegasus>
-Subject: Re: [Bluez-devel] [PATCH] Fix too-many-keys-pressed error in hidp/core.c
-Content-Type: text/plain; charset=us-ascii
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,43 +19,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 02:34:08 +0200
+Date: Thu, 20 Jan 2005 01:26:25 +0100
 
-Hi Marcel,
+Hi Paul,
 
-On Thu, Jan 20, 2005 at 01:19:38AM +0100, Marcel Holtmann wrote:
+> I want to add bluetooth devices in HAL (Hardware Abstraction Layer).
+> This way all programs interesting in bluetooth devices can be notified of
+> the addition or removal of a bluetooth device.
+> What should we export about a bluetooth device that might be
+> of interest for userspace programs ?
+> I think of the following, but I don't know if we really need all of them:
+> 
+> bluetooth.address	string (ex: 00:0d:33:44:33:c6)
+> bluetooth.interface	string  (ex: hci0)
+> bluetooth.interface_up	int
+> bluetooth.linux.driver	string   (ex: hci_usb)
+> bluetooth.linux.ifindex		int
+> bluetooth.linux.sysfs_path	string
+> bluetooth.HCI_version		int
+> bluetooth.HCI_revision		int
+> bluetooth.LMP_version		int
+> bluetooth.LMP_version		int
+> bluetooth.Manufacturer	string
+> bluetooth.ChipVersion	string
+> Maybe :
+> bluetooth.features	?
+> bluetooth.packet_types	?
+> 
+> Corrections, comments and suggestions are appreciate.
 
-> can you point me to the part of the HID specification that defines this
-> behaviour? And show me an extract from hcidump when this happens.
+looks fine so far, but ChipVersion is vendor specific and not really of
+interest. For interface_up you may should simply take all flags and then
+the userspace application can decode it like hciconfig does. You may
+wanna include the features, but be aware of the extended features from
+the Bluetooth 1.2 specification. The packet_types are useless and I am
+going to remove that support at some point. Maybe you wanna add the
+class of device value.
 
-I don't know if this is in the spec, or if it is just a quirk of some
-Logitech keyboards.  However, it shouldn't cause any trouble to check
-for it as a special case, since that kind of data packet is clearly
-invalid, no?
+Regards
 
-Here's the dump of me pressing 'qwert', and then releasing 't':
+Marcel
 
-1106180982.868085 > ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      A1 01 00 00 14 00 00 00 00 00 
-1106180982.927077 > ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      A1 01 00 00 14 1A 00 00 00 00 
-1106180982.967071 > ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      A1 01 00 00 14 1A 08 00 00 00 
-1106180983.027061 > ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      A1 01 00 00 14 1A 08 15 00 00 
-1106180983.047059 > ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      A1 01 00 00 01 01 01 01 01 01 
-1106180983.267020 > ACL data: handle 0x0029 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0041 len 10 [psm 0]
-      A1 01 00 00 14 1A 08 15 00 00 
 
-Cheers,
-Juha
 
 
 -------------------------------------------------------
