@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Problems connecting to multiple rfcomm sockets 
-In-reply-to: <1099591273.7022.70.camel@pegasus> 
-References: <0DD4EA5DCF754A409C4E182C758C37F38231@tigris.i.empics.co.uk> <1099591273.7022.70.camel@pegasus>
-Message-ID: <14361.1099592129@csr.com>
-From: Peter Stephenson <pws@csr.com>
+Subject: RE: [Bluez-users] Problems connecting to multiple rfcomm sockets
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Steve Drew <steve.drew@empics.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <0DD4EA5DCF754A409C4E182C758C37F38231@tigris.i.empics.co.uk>
+References: <0DD4EA5DCF754A409C4E182C758C37F38231@tigris.i.empics.co.uk>
+Content-Type: text/plain
+Message-Id: <1099591273.7022.70.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,27 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 04 Nov 2004 18:15:29 +0000
+Date: Thu, 04 Nov 2004 19:01:13 +0100
 
-Marcel Holtmann wrote:
-> The 6230 contains a CSR chip, right?
+Hi Steve,
 
-Oh, yes.
+> 	I've tried increasing the page timeout and the error still
+> remains. 
 
-pws
+two more options left to try.
 
+> 	I have found that the problem is due to the mobile handsets we
+> were      using (3x Nokia 6310i). Using a different handsets (Nokia
+> 6230's) we were able to get bluetooth connections to 3 6230s (on top of
+> this we could also have 2 6310s connected).
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
+Yeah, the old Nokia Bluetooth chips are not quite the best for such
+scenarios. The 6230 contains a CSR chip, right?
 
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
+Regards
 
-www.mimesweeper.com
-**********************************************************************
+Marcel
+
 
 
 
