@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Re: BlueZ AVDTP
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: Aarti Kumar <akmr2000@yahoo.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20031022002527.52839.qmail@web10204.mail.yahoo.com>
+References: <20031022002527.52839.qmail@web10204.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1066890614.16179.37.camel@pegasus>
+Message-Id: <1066889295.18920.33.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Jack SP320 Service Point
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -15,14 +18,17 @@ List-Id: <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 23 Oct 2003 08:30:08 +0200
+Date: 23 Oct 2003 08:08:09 +0200
 
-Hi Folks,
+Hi Aarti,
 
-if I'm not wrong, this is the first qualified product, that uses the
-BlueZ protocol stack ;)
+> That will be nice. Right now I am still on the basic
+> stage, as soon as I am done i will send you the code.
+> Right now I am just working on audio transfer but
+> would try to extend it to video trasfer too. 
 
-http://qualweb.bluetooth.org/Template2.cfm?LinkQualified=QualifiedProducts&Details=Yes&ProductID=1401
+what kind of audio codec do you use? Do you have an implementation of
+the subband codec (SBC)?
 
 Regards
 
