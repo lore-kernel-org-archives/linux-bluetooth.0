@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20041111114420.3497.qmail@webmail2.aruba.it>
-References: <20040727145602.30665.qmail@webmail.aruba.it>
-            <1090940808.4845.21.camel@pegasus>
-In-Reply-To: <1090940808.4845.21.camel@pegasus>
-From: "ubaldo" <ubaldo@eja.it>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Help needed with getting Bluez on Axis Dev Board
+	82
+From: Roderick Taylor <rtaylor@hcvwireless.com>
+To: tereza99@hotmail.com
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1094997879.5695.16.camel@pegasus>
+References: <BAY2-F7xJagXTi8M19V0000e6e7@hotmail.com>
+	 <1094997879.5695.16.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1100164121.8079.24.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="iso-8859-1"
-Subject: [Bluez-devel] Re: Re: siemens s55
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,159 +21,86 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 11 Nov 2004 12:44:20 +0100
+Date: Thu, 11 Nov 2004 09:08:42 +0000
 
-Ciao Brad, 
+Hi Theresa,
 
-> we have wacky problems with bluetooth-alsa when you connect to the 
-> handsfree rather than the headset profile. does sdptool show you are 
-> connecting to the channel for the phone"s headset profile?
+I=B4ve done this for a different Dev board.  Not an Axis one.
 
-this is what I get with "sdptool browse 00:01:E3:6F:7E:55", I try both 
-channel 2 and channel 3, 
+To do this, I
 
-Browsing 00:01:E3:6F:7E:55 ...
-Service Name: SerialPort
-Service RecHandle: 0x11101
-Service Class ID List:
- "Serial Port" (0x1101)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 1
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "Serial Port" (0x1101)
-   Version: 0x0100 
+1. Patched the supplied kernel (mine was 2.4.19) source with Marcel=B4s
+patch. "patch -p1 < patchfile.patch" for example
 
-Service Name: Dial-up networking
-Service RecHandle: 0x11103
-Service Class ID List:
- "Dialup Networking" (0x1103)
- "Generic Networking" (0x1201)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 1
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "Dialup Networking" (0x1103)
-   Version: 0x0100 
+2. Configured the kernel kernel as per dev board instructions
+instructions
 
-Service Name: Fax
-Service RecHandle: 0x11111
-Service Class ID List:
- "Fax" (0x1111)
- "Generic Telephony" (0x1204)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 1
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "Fax" (0x1111)
-   Version: 0x0100 
+3. Added Bluetooth support to the kernel using "make xconfig".
 
-Service Name: OBEX File Transfer
-Service RecHandle: 0x11106
-Service Class ID List:
- "OBEX File Transfer" (0x1106)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 5
- "OBEX" (0x0008)
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "OBEX File Transfer" (0x1106)
-   Version: 0x0100 
+4. Compiled the kernel using the supplied cross compiler "make zImage"=20
 
-Service Name: OBEX Object Push
-Service RecHandle: 0x11105
-Service Class ID List:
- "OBEX Object Push" (0x1105)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 4
- "OBEX" (0x0008)
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "OBEX Object Push" (0x1105)
-   Version: 0x0100 
+5. Put the new kernel on the Dev board (My dev board has Flash ROM)
 
-Service Name: OBEX Synchronisation
-Service RecHandle: 0x11104
-Service Class ID List:
- "IrMCSync" (0x1104)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 5
- "OBEX" (0x0008)
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "IrMCSync" (0x1104)
-   Version: 0x0100 
+6. Cross Compiled the bz libs and bz utils. These didn=B4t cleanly cross
+compile.  I had to twiddle with the bluez=B4s makefiles and stuff to get
+it to work properly.
 
-Service Name: Voice gateway
-Service RecHandle: 0x11112
-Service Class ID List:
- "Headset Audio Gateway" (0x1112)
- "Generic Audio" (0x1203)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 2
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "Headset" (0x1108)
-   Version: 0x0100 
+7. Added the kernel modules, libraries and utils to the filesystem image
+(you can copy then with ssh or ftp or whatever if you don't want to
+flash a new image, although I recommend doing it this way)
 
-Service Name: Voice gateway
-Service RecHandle: 0x1111f
-Service Class ID List:
- "" (0x111f)
- "Generic Audio" (0x1203)
-Protocol Descriptor List:
- "L2CAP" (0x0100)
- "RFCOMM" (0x0003)
-   Channel: 3
-Language Base Attr List:
- code_ISO639: 0x656e
- encoding:    0x6a
- base_offset: 0x100
-Profile Descriptor List:
- "" (0x111e)
-   Version: 0x0100 
+I did it a while ago and other things have taken precedence since so I
+am sketchy on the details. Hope this helps.
 
-and this is what I get with "hcitool con" while the connection is on (with 
-"hstest record ...") 
+Rod.
 
-Connections:
-       < SCO 00:01:E3:6F:7E:55 handle 44 state 1 lm SLAVE
-       < ACL 00:01:E3:6F:7E:55 handle 41 state 1 lm MASTER ENCRYPT 
+
+On Sun, 2004-09-12 at 15:04, Marcel Holtmann wrote:
+> Hi Theresa,
+>=20
+> > I am a desperate newbie in need of help getting Bluez working on my Axi=
+s Dev=20
+> > board 82.  I have seen some posts by others implying they somehow got t=
+hings=20
+> > working on their boards.
+> >=20
+> > For those who dont know much about kernels and writing patches, is ther=
+e a=20
+> > "how to" or list of instructions to help us get going.  For instance, w=
+hat=20
+> > do I do first?  The latest version for the board is 2.4.26 - so am I=20
+> > supposed to apply Marcel's patch for that kernel from the Bluez site?  =
+If=20
+> > so, are there any special things that I am to do in addition?
+> >=20
+> > I also saw a post that said someone had cross compiled bluez...does tha=
+t=20
+> > mean i have to put that into my makefile for the board?
+> >=20
+> > Please forgive me for not knowing much, as I am still learning about th=
+ings.
+>=20
+> I have never done this before. Ask the Axis guys directly to provide you
+> with more information. They should drop their OpenBT in favour of BlueZ
+> and help people using it or ask them to send me a bunch of their boards
+> for testing.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
+> Project Admins to receive an Apple iPod Mini FREE for your judgement on
+> who ports your project to Linux PPC the best. Sponsored by IBM.=20
+> Deadline: Sept. 13. Go here: http://sf.net/ppc_contest.php
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
