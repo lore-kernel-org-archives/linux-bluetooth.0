@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: David Mackie <d.mackie@ru.ac.za>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20040606162154.GA94074@rucus.ru.ac.za>
+Subject: Re: [Bluez-users] Bluetooth 1.2 and HID Proxy
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200406061210.52170.cijoml@volny.cz>
+References: <1086429803.16316.44.camel@pegasus>
+	 <200406052338.15162.cijoml@volny.cz> <1086476014.16316.129.camel@pegasus>
+	 <200406061210.52170.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1086536540.4765.35.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Can you spoof/forge Bluetooth Devices/Address?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,34 +20,79 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 6 Jun 2004 18:21:54 +0200
+Date: Sun, 06 Jun 2004 17:42:20 +0200
 
-Hi,
+Hi Michal,
 
-Does anyone know if you are able to spoof or forge a Bluetooth Device
-Address? I am wanting to pick up Bluetooth comms at one point and forward it
-on to another device but I am wanting the repeating devices to act like the
-original sending devices. Eg. If I have a phone that wants to communicate
-with my PC, I can have 2 repeaters, one spoofed as the PC and one as the
-phone.
+> > currently I am preparing a site with notes about firmware upgrade and
+> > DFU. I will also summarize the public statements of the CSR signature
+> 
+> Site is nice, but you should provide screenshoots of steps how to use MacOS to 
+> extract that firmware. Many people (including me) don't know how to work with 
+> MacOS :)
 
-phone <-BT-> Repeater(spoof PC) <-Not BT-> Repeater(spoof phone) <-BT-> PC
+I don't either. Can anyone with Mac OS X write some small words how to
+extract GenericCSR.dfu from the BluetoothFWUpdate1.1.dmg file?
 
-More information on why I want to do this can be found at
-http://www.cs.ru.ac.za/research/students/g99m0302/masters/
+Btw the best way is to reverse engineer the Apple UDIF disk image format
+and provide an open source tool for it.
 
-Any comment of suggestions will be greatly appreciated
+> > and so on. However don't expect a howto for getting firmware from one
+> > device into another. I am not concerned in upgrading of any dongle,
+> > because today an USB Bluetooth dongle is so cheap that you can buy
+> > yourself a new one if the firmware is too old. I paid 14 EUR for my
+> > D-Link dongle at eBay. 
+> 
+> This is bad way. We as customers should make a preasure to vendors to allow us 
+> upgrade our devices for free! I better spend my 14 euros in cinema with my 
+> girl :) When device allow me to upgrade it's functionality, vendors should 
+> allow us to do it. And if not, other vendors will support us and then we 
+> should make preasure to vendors via market to allow us upgrading our devices.
+> And those how will block us to do it, we should turn them bankrupt via market.
 
-David
+You can't look at it with this naive view. The problem is much more
+complex. I have contacts to many "Bluetooth companies" here in Germany,
+but most of their products are build in Japan, Taiwan etc. The European
+headquarters are better support and sales centers, because in most cases
+they can't influence any decisions. Most companies I talked to are
+willing to help, but actually they can't, because they don't have the
+resources to do so.
+
+My resources are limited, too. Only asking for firmware upgrade and
+other information doesn't help. Start doing something and I mean start
+writing code that allows us to work with. We still miss the DFU download
+functionality and a PS Tool program for Linux.
+
+> To firmware licencing. I think you can share your extracted firmware, because 
+> of this:
+> 
+> Re: [Bluez-users] CSR firmware
+> From:
+> Carl Orsborn <cjo@csr.com>
+> To: 
+> cijoml@volny.cz
+> Date: 
+> 30.5.2004 09:58
+> 
+> SNIP
+> >This is great on Intersil. They allow users to upgrade their firmwares in 
+> >their wifi cards.
+> >
+> We also allow it, but we have provided the means to prevent it.
+> 
+> Carl
+> SNIP
+
+I don't get that point, but of course you can upload the firmware from
+an already updated dongle. Actually I don't think that I am going to
+provide such a firmware file. Maybe someone else and then I will link,
+but without written permission from Apple I don't think so.
+
+Regards
+
+Marcel
 
 
-
--- 
- David Mackie
- MSc Student, Department of Computer Science
- Rhodes University, Grahamstown, South Africa
- Email: d.mackie@ru.ac.za 
- Web: http://www.cs.ru.ac.za/research/students/g99m0302/
 
 
 -------------------------------------------------------
