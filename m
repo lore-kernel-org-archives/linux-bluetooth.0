@@ -1,5 +1,5 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4043932E.4040501@superbug.demon.co.uk>
+Message-ID: <404392DE.2010500@superbug.demon.co.uk>
 From: James Courtier-Dutton <James@superbug.demon.co.uk>
 MIME-Version: 1.0
 To: "Williams, Richard" <Richard.Williams@VITRONICS.com>
@@ -18,7 +18,7 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 01 Mar 2004 19:46:54 +0000
+Date: Mon, 01 Mar 2004 19:45:34 +0000
 
 Williams, Richard wrote:
 > James,
@@ -36,9 +36,10 @@ Williams, Richard wrote:
 > Rich
 > 
 
-Which type of bluetooth interface do you have on the PC?
-I currently use a USB CSR based bluetooth device and a Sony-Ericsson 
-HBH-30 headset.
+So, you have applied this patch to the kernel ?
+http://www.holtmann.org/linux/kernel/patch-2.4.19-mh14.gz
+
+To test it use the hstest program in bluez-utils/test
 
 Cheers
 James
