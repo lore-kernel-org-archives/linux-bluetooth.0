@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Nokia 7610 phone & logitech DiNovo keyboard /
-	MX900 mouse
+Subject: Re: [Bluez-users] Bluetooth EDR implementation
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1102291223.4219.3.camel@localhost>
-References: <1102035154.4258.14.camel@localhost>
-	 <1102042749.7350.33.camel@pegasus>  <1102291223.4219.3.camel@localhost>
+In-Reply-To: <20041206001815.2043.qmail@web41121.mail.yahoo.com>
+References: <20041206001815.2043.qmail@web41121.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1102315314.8510.57.camel@pegasus>
+Message-Id: <1102315082.8510.52.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,25 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 07:41:54 +0100
+Date: Mon, 06 Dec 2004 07:38:02 +0100
 
-Hi Laurence,
+Hi Sean,
 
-> I have now upgraded to Fedora Core 3
-> kernel-2.6.9-1.667
-> bluez-bluefw-1.0-6
-> bluez-hcidump-1.11-1
-> bluez-utils-2.10-2
-> bluez-libs-2.10-2
-> bluez-libs-devel-2.10-2
-> 
-> the problem more or less is the same, start Bluetooth, keyboard & mouse
-> stop working.
-> 
-> Same question as before, how do I set it up so the system will recognise
-> my phone, keyboard & mouse.
+> Great work with the BlueZ stack!!A couple of
+> questions.
 
-make sure that "hidd --server" is started somewhere in the boot script.
+thanks and no problem.
+
+> 1. Is the Bluetooth EDR a software implementation or a
+> hardware implementation?
+
+The higher bandwith of EDR is done by the hardware.
+
+> 2. Does the BlueZ stack have to be specifically
+> written to include the EDR even if it's a software or
+> hardware implementation?
+
+The only bits that needed to be included was the decoding of the EDR
+features and this is already there. BlueZ is EDR ready and it should
+work out of the box.
 
 Regards
 
