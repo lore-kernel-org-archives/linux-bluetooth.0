@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <4210B13D.9080209@symlabs.com>
+From: Antonio Navarro <antonio.navarro@symlabs.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-From: Sebastian Roth <sebastian.roth@esk.fhg.de>
-Message-ID: <cuqd9c$e7k$1@sea.gmane.org>
-References: <42109EB0.9090506@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-In-Reply-To: <42109EB0.9090506@gmail.com>
-Subject: [Bluez-devel] Re: btsco (and SuSE 9.2)
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Re: btsco
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +16,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 14 Feb 2005 15:43:05 +0100
+Date: Mon, 14 Feb 2005 15:10:05 +0100
 
-Hi Alberto
+  Hi Dave,
 
-> I tried with insmod, but it says "error inserting 'snd-bt-sco.ko': -1 
-> Unknown symbol in module"
-You should be able to solve it following this:
-http://thread.gmane.org/gmane.linux.bluez.devel/3892
+  I had an error similar to yours. It was due to the fact that version 1.7 of automake was not
+looking into /usr/share/aclocal, but instead it was using /usr/local/share/aclocal. I was having
+the same error as you, and got around it by symlinking 
+/usr/local/share/aclocal -> /usr/share/aclocal
 
-> I tried with "modprobe snd-bt-sco" but it says always "FATAL: Module 
-> snd_bt_sco not found".
-http://article.gmane.org/gmane.linux.bluez.user/5609
+HTH
 
-Hope you get it up!
+Antonio Navarro
 
-Best regards,
-Sebastian
+>Hi Dave,
+> 
+> > I think the docs a pretty good, it just would help a bit if they made
+> > reference to where the dependent packages could be downloaded from.
+> 
+> maybe we should adjust the names according to the distribtuion, because
+> all of them tend to name development packages different.
+> 
+> > Wih my problem specifically, alsa-devel-1.0-6.8 is installed, so I"m not
+> > sure what the problem is.
+> 
+> The alsa-devel package contains /usr/share/aclocal/alsa.m4 and so
+> everything should work.
+> 
+> Regards
+> 
+> Marcel
+
 
 
 
