@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041223141028.61563.qmail@web11602.mail.yahoo.com>
-From: "Bhaskar S. Manda" <bhaskar_manda@yahoo.com>
+Message-ID: <2de465760412230418552a4af6@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Anybody using Socket CF Bluetooth version F on Zaurus
+Subject: Re: [Bluez-users] get remote bt address
+In-Reply-To: <1103803109.20258.79.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <2de4657604122303546f813ecf@mail.gmail.com>
+	 <1103803109.20258.79.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,37 +19,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Dec 2004 06:10:28 -0800 (PST)
+Date: Thu, 23 Dec 2004 17:48:53 +0530
 
->From /etc/pcmcia/bluetooth.conf:
+Hi marcel,
+yup, getpeername() works.....had done something silly.
+i have 2 questions about BT products, 
+the csr press release says BT-EDR chips are in market......have BT
+dongles with EDR come into the market???
+Also, which would be the best Bluetooth PCMCIA card , the ones with
+linux drivers , for 2.6 kernels?
 
-device "dtl1_cs"
-  class "bluetooth" module "dtl1_cs"
-<...>
-card "Socket Bluetooth Card"
-  version "Socket", "CF+ Personal Network Card"
-  bind "dtl1_cs"
+thanx once again,
+regards,
+manjunath
 
-
-# dump_cis
-Socket 0:
-  dev_info
-   NULL 0ns, 512b
-  vers_1_7.0, "Socket", "CF+ Personal Network Card"
-  manfid 0x0104, 0x009f
-  funcid unknown [post]
-  config base 0x01f6 mask 0x0011 last_index 0x24
-  cftable_entry 0x04 [default]
-    Vcc Vnom 3300mV Vmin 3140mV Vmax 3470mV Istatic 25mA
-      Iavg 55mA Ipeak 120mA
-    io 0x0000-0x001f [lines=5] [8bit] [range]
-    irq mask 0xffff [level]
-  cftable_entry 0x24
-    Vcc Vnom 5V Vmin 4500mV Vmax 5500mV Istatic 25mA
-      Iavg 55mA Ipeak 120mA
-
-
-Thanks!
+On Thu, 23 Dec 2004 12:58:29 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Manjunath,
+> 
+> > I am using l2cap sockets. On the receiving side, i want to find out
+> > the remote (sender's) bluetooth address. i do not have the dev_id or
+> > handle of the sender which has already established a connection. I
+> > want to get it in my c code, not using hcitool con or other means.
+> > I am trying getpeername, but it doesn't seem to work. Hope you can
+> > suggest something.
+> 
+> the getpeername() is the right function and it works. If not, then your
+> code is wrong.
+> 
+> Regards
+> 
+> Marcel
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
