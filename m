@@ -1,20 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Fred =?utf-8?q?Sch=C3=A4ttgen?= <bluez-devel@schaettgen.de>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] D-Bus interfaces
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076280612.14742.147.camel@akka.yeti.nocrew.org>
-References: <1076265358.2670.36.camel@pegasus>
-	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
-	 <1076267396.2670.58.camel@pegasus>
-	 <1076275689.14742.93.camel@akka.yeti.nocrew.org>
-	 <1076277250.6869.24.camel@pegasus>
-	 <1076278554.14742.112.camel@akka.yeti.nocrew.org>
-	 <1076279508.6869.54.camel@pegasus>
-	 <1076280612.14742.147.camel@akka.yeti.nocrew.org>
-Content-Type: text/plain
-Message-Id: <1076282343.6869.65.camel@pegasus>
-Mime-Version: 1.0
+References: <1076265358.2670.36.camel@pegasus> <1076278554.14742.112.camel@akka.yeti.nocrew.org> <1076279508.6869.54.camel@pegasus>
+In-Reply-To: <1076279508.6869.54.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200402090015.24318.bluez-devel@schaettgen.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,54 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 09 Feb 2004 00:19:03 +0100
+Date: Mon, 9 Feb 2004 00:15:24 +0100
 
-Hi Fredrik,
+On Sunday 08 February 2004 23:31, Marcel Holtmann wrote:
+> Do we need a special datatype for the BD_ADDR or is string the best?
 
-> I'm talking about the DBus specification. See:
-> http://freedesktop.org/Software/dbus/doc/dbus-specification.html
-> 
-> Excerpt: "Before an application is able to send messages to other
-> applications it must send the org.freedesktop.DBus.Hello message to 
-> the message bus service."     ^^^^^^^^^^^^^^^^^^^^^^^^^^
-> 
-> I.e. the name is more about who implemented it than what it tries
-> to implement.
+I can only speak from my experience with dcop, but I would try to use standard 
+types whereever it's possible. In case that there exists a d-bus counterpart 
+to the dcop command line utility (dbus-send maybe?), it would make the bluez 
+interface more accessible for scripts.
+This (besides flexibility issues) is also the reason why I agree with Marcel 
+that "simple" return values, but more methods are better than one method that 
+returns all the information at once, using nested dictionaries or whatever.
 
-We try to implement Bluetooth so "org.bluetooth" is ok ;)
-
-> > This is about objects. It is an object oriented interface. You have
-> > objects like "device", "nametab", keytab" etc. with their methods. What
-> > we don't have is instances like "hci0", so we have to carry the device
-> > as an parameter.
-> 
-> But objects carry contexts. These modular interfaces carry no contexts,
-> and therefore cannot possibly be objects. Modular interfaces is about
-> keeping name spaces apart.
-
-Do you mean contexts or contents?
-
-> > Do we really need this? What are the advantages of objects? I prefer
-> > differencing with the method names. For example like "get_local_name"
-> > and "get_remote_name".
-> 
-> Modules is the way to extend applications. Say someday somebody decides
-> to do loadable modules in hcid, implementing completely new services.
-> Naturally, these modules ought to have their own name spaces. That's
-> what these interfaces are used for.
-
-I am not really convinced about your argument, because I prefer to have
-more in common with the HCI specification. But the HCI don't have any
-namespace. Let me think about.
-
-Lets talk about the namespaces you are thinking of. What makes sense to
-separate?
-
-Regards
-
-Marcel
-
-
+greetings
+Fred
 
 
 -------------------------------------------------------
