@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Suspend/resume issues with bluez
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
-To: Mitsu Hadeishi <mitsu@syntheticzero.com>
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200403091754.52270.mitsu@syntheticzero.com>
-References: <200403022202.19259.mitsu@syntheticzero.com>
-	 <200403032224.08229.bluez-devel@cpinkney.org.uk>
-	 <200403091754.52270.mitsu@syntheticzero.com>
-Content-Type: text/plain
-Message-Id: <1078918707.26239.129.camel@localhost>
-Mime-Version: 1.0
+Message-ID: <404EFA72.4090205@csr.com>
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
+To: Michael Schmidt <schmidt@nue.et-inf.uni-siegen.de>
+CC: jessieh@MIT.EDU, bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] bd_addr question
+References: <404EC780.4070609@nue.et-inf.uni-siegen.de>
+In-Reply-To: <404EC780.4070609@nue.et-inf.uni-siegen.de>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,58 +18,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 10 Mar 2004 12:38:27 +0100
+Date: Wed, 10 Mar 2004 11:22:26 +0000
 
-Am Di, den 09.03.2004 schrieb Mitsu Hadeishi um 23:54:
-> Hi,
-Hi!
+Michael Schmidt wrote:
+> Keep in mind that you break some of the BT functionality when you use 
+> variable BD_ADDRs: The pairing-based security mechanisms (authentication 
+> and encryption) rely on a constant BD_ADDR. I guess there is more 
+> functionality that is affected by the change.
 
-> Just a note to the list regarding suspend/resume.  I have a Thinkpad T40p 
-> which was having problems with bluez and suspend/resume.  I just tried 
-> installing the Affix drivers on my Thinkpad T40p; but I had the same problem 
-> (well, it was slightly different, but the upshot was, Bluetooth didn't work 
-> when I came back from suspend).
-> 
-> So I tried a suggestion written by someone else on this list, which was not 
-> only to unload all of the Bluetooth modules, but also unload and reload the 
-> USB modules.  This DID work, at least with the Affix drivers.  Perhaps the 
-> same trick would work with the bluez drivers.
+Don't forget that Bluetooth addresses must be unique otherwise unpleasant
+things happen.
 
->>From my experience simply unloading the USB host controller driver
-should be fully sufficient!
-What happens is that the host controller is first removed. With removing
-the host all devices disappear and are freed automatically.
-When the system comes back simply insmod the host controller driver
-again. The host will come back up and all devices are discovered as new
-devices and will be initialised properly.
+Bluetooth addresses come out of the same address space as MAC addresses,
+if you want to use your own then you need to get an OUI or IAB allocation
+from the IEEE.
 
-It may be though that you have to wait a moment after removing the host
-controller driver module, like "sleep 1" before going to sleep. The 2.4.
-kernel still has some problems to identify in some circumstances if all
-pre-suspend actions have been performed properly.
+The BD ADDR <-> MAC point is important. If you start running BNEP
+(Bluetooth Network Encapsulation Protocol = Ethernet over Bluetooth)
+then the Bluetooth device will use its Bluetooth address as its Ethernet
+MAC address. This means that you can't simply take the MAC address from
+another device on your system (say an Ethernet card) and use it as your
+Bluetooth address.
 
-On Debian I do on suspend
-
-	/etc/hotplug/usb.rc stop
-	sleep 1
-
-and of course the inverse on resume
-
-	/etc/hotplug/usb.rc start
-
-without sleeping.
-
-Works really good and also prevents some other nasty USB problems.
-
-> Mitsu
-CU
-  nils faerber
-
+	- Steven
 -- 
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          D1 : +49-170-2729106
---
+
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
