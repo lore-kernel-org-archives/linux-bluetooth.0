@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PANU and "ACL tx timeout"
+Subject: Re: [Bluez-users] Bluetooth Scatternet
 From: Marcel Holtmann <marcel@holtmann.org>
-To: peter@legio.mine.nu
+To: Ronan Naughton <wadgienaughton@hotmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1789.192.168.1.253.1080351984.squirrel@legio.mine.nu>
-References: <1789.192.168.1.253.1080351984.squirrel@legio.mine.nu>
+In-Reply-To: <BAY10-F36jyAG8SjQhX00018932@hotmail.com>
+References: <BAY10-F36jyAG8SjQhX00018932@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1080418966.2281.82.camel@pegasus>
+Message-Id: <1080397614.2281.52.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 27 Mar 2004 21:22:46 +0100
+Date: Sat, 27 Mar 2004 15:26:55 +0100
 
-Hi Peter,
+Hi Ronan,
 
-> I am trying to set up a pan network between two usb dongles (belkin FT001
-> and bluetake BT007SV). The belkin dongle is run as the network access
-> point (NAP) and the bluetake dongle is run as a client. Connecting the two
-> devices works just fine. Just browsing around an ftp works fine, the
-> trouble is when i try to send/recive 'larger amounts' of data, eg files
-> larger than 10k the connection hangs. (I have listed the output from
-> /var/log/messages below.) Filetransfer with obex push works flawless. As a
-> test i transfered a four megabyte file (with object push) back and fourth
-> between the computers without trouble. Just to clearify, the problems
-> occur on the computer running as NAP using the belkin FT001 dongle.
+> Ya, I can do that. I can connect to one pan using bnep0 acting as a slave. 
+> Then I can make it a master on bnep1 and conncet to it form another pc. When 
+> I do "pand --show", it shows both interfaces bnep0 and bnep1 and their 
+> connections.
+> However, I cannot communicate between the two networks. When I even try to 
+> ping the master of the other network it comes up host unreachable. I don't 
+> know why this is?
 
-exchange the Broadcom based dongle with a CSR based dongle or try to get
-a newer firmware for your adapter. It seems that nobody really got PAN
-working very stable with a Broadcom adapter. Look at the mailing list
-archive for previous posts about this topic.
+this is not a Bluetooth problem, because this is TCP/IP stuff. You
+should read somehting about IP forwarding, bridging, routing etc.
 
 Regards
 
