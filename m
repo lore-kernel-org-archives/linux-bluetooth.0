@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4086DDFC.5000107@over-here.org>
-From: Eran <eran_l@over-here.org>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Ambicom BT2000E card, can't get hciattach to work
+Subject: Re: [Bluez-users] Problem with kernel-2.6.5
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Nicholas A. Preyss" <nalp@gmx.net>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040421194424.GA26270@gmx.net>
+References: <200404210427.29406.tim@birdsnest.maths.tcd.ie>
+	 <1082550752.23959.34.camel@pegasus>  <20040421194424.GA26270@gmx.net>
+Content-Type: text/plain
+Message-Id: <1082575338.23959.59.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,42 +19,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Apr 2004 23:47:56 +0300
+Date: Wed, 21 Apr 2004 21:22:18 +0200
 
-Hello,
-I recently purchased at BT2000E card and tried making it work with bluez.
-I have installed bluetooth drivers and according to the instructions 
-from this page 
-(http://www.zaurususergroup.com/modules.php?op=modload&name=phpWiki&file=index&pagename=Bluetooth) 
-and I had to mess around a bit with the /etc/init.d/bluetooth file in 
-order to make things work.
-I can get an RFCOMM to work, but when trying to work with hci I fail:
-1) on /etc/init.d/bluetooth I have a line that does hciattach:
-root@thumper:/etc/pcmcia# /usr/sbin/hciattach /dev/ttyS3 bcsp 57600
-Can't get port settings: Input/output error
-Can't initialize device: Input/output error
+Hi Nicholas,
 
-2) hcitool scan and cc <phone> works, but hci lq fails:
-root@thumper:/etc/pcmcia# hcitool lq 00:80:37:D6:93:D5
-HCI get_link_quality cmd failed (0x01)
+> > give 2.6.6-rc2 a shot, because it includes the outstanding Bluetooth and
+> > USB updates. If it still oopses report it on the USB mailing list.
+> 
+> It should solve his problem, as it it possible too connect the dongle,
+> when hci_usb already loaded. Unfortunately it seems to contain a bunch
+> of new problems. 
+> You can't unplug the dongle or unload the hci_usb module anymore, without 
+> crashing the usb subsystem.
 
-This command worked for me with another bluetooth card (those cheap 
-mavin cards) and I assume it has something to do with the hciattach failing.
+there are some outstanding USB patches. Report all problems to the USB
+mailing list or try the 2.6.6-rc2-mmX if available.
 
-Extra info:
-I'm on sharp zarusu SL-5500 with OZ 3.3.5 and kernel  
-2.4.18-rmk7-pxa3-embedix (default OZ).
-cardctl ident output:
-root@thumper:/etc/pcmcia# cardctl ident
-Socket 0:
-  product info: "AmbiCom,Inc", "BT2000E", "Bluetooth PC/CF Card"
-  manfid: 0x022d, 0x2000
-  function: 2 (serial)
-dmesg of bluez drivers doesn't show anything special, And before I 
-installed bluetooth drivers the card showed as serial device on /dev/ttyS3.
+Regards
 
-Thank you all and keep up the good work,
-ERan
+Marcel
+
 
 
 
