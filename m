@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050217140257.16874.qmail@web60903.mail.yahoo.com>
-From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
-Subject: Re: [Bluez-users] Re: Trouble pairing with new phone... (FIXED!)
+From: Triona Ryan <triona.ryan@nuigalway.ie>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1108409220.7780.15.camel@notepaq>
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-880580346-1108648977=:16442"
+Message-id: <01LKWW9DRTXK00DE35@beacon.nuigalway.ie>
+MIME-version: 1.0
+Content-type: text/plain
+Subject: [Bluez-users] local device class...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,108 +16,168 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Feb 2005 22:02:57 +0800 (CST)
+Date: Thu, 17 Feb 2005 13:56:59 +0000
 
---0-880580346-1108648977=:16442
-Content-Type: text/plain; charset=big5
-Content-Transfer-Encoding: 8bit
+Hi all,
 
-Hi Jay!
-    Sorry to interrupt. In order that SE T610 can search and add PC into "My device list", you should do like this:
-# Authentication and Encryption
-# auth enable;
-# encrypt enable
-    Or you can never let your T610 to search for and add your PC into the list.
-    But then, do you know how to connect T610 to PC instead of from PC to T610 (as I know that the method is typing "rfcomm connect 0 <address>").
-    Hope that this can help you and then you can have method to do the connection from T610 to PC as I wish to do it in a short time.
-Cherrs,
-Michael
-Marcel Holtmann <marcel@holtmann.org> wrote:
-Hi Jay,
+I'm having difficulty transfering files between 2 FC2 Bluez enabled PCs
+. I'm using the exact same dongles, but installed the bluez packages on my maste
+r PC following a howto as ./configure, make, make install. On the servant I inst
+alled them as the README's directed. (with various prefixs etc.) However, on the
+ hcid.conf file for the master I originally got local device class as 0x100, and
+ on the servant as 0x3e0100. 
+As I couldn't establish a connection to transfer f
+iles using OBEX, I ploughed through google and saw that local device class must 
+be 0x100100 for object trnasfer to work. However, changing this on the master PC
+ worked, and change the advertised services in hciconfig -a from nothing to "Obj
+ect Transfer", and now I can transfer files to and from my mobile phone. On the 
+servant PC however, it had no effect, and just changed the advertised Service cl
+asses in the hciconfig -a from "Networking, rendering, Capturing" to nothing. 
 
-> I figured out how to pair with my T610 phone.
-> 
-> Point 1: The computer must initiate the connection. (If you attempt to scan for 
-> new devices on your phone and add it there, apparently bluez will not accept 
-> incoming pairing requests. Something to do with roleswitch and bluez wanting to 
-> be the master? Perhaps...)
-> 
-> Point 2: My version of blueZ ignores the /etc/bluetooth/pin file (even when in 
-> "auto" mode) and I HAD to replace the pin_helper with a link to a script which 
-> simply printed "PIN:1234" (replace number with your pin).
-> 
-> So, once I replace "pin_helper /usr/bin/bluepin" with "pin_helper /sbin/pintest" 
-> (where the pintest file contained "echo "PIN:1234") and initiated an rfcomm 
-> connection to the phone with my pppd chat script, I was able to type the pin 
-> into my phone and pair.
-> 
-> [(going the other way, from the phone to the computer, didn't work...possibly a 
-> problem with the phone, possibly a problem with bluez (as it works under 
-> windows...)]
-> 
-> My hcid.conf options are as follows:
-> Options:
-> autoinit yes;
-> security auto;
-> pairing multi;
-> pin_helper /sbin/pintest
-> 
-> Device:
-> name "BlueZ (%d)";
-> class 0x100;
-> iscan enable;
-> pscan enable;
-> lp rswitch,hold,sniff,park;
-> lm accept,master;
-> # Authentication and Encryption
-> auth enable;
-> encrypt enable;
+Why would these hcid.conf's differ in the first place? And how do I fix it?? rec
+onfiguring the bluez packages on the servant?? I was using different dongles but
+ getting two the same had no effect. How can I fix this, as I think it is a Blue
+z problem rather than an obex or anything else problem.
 
-if you still wanna use security mode 3 then go with it. If you set
-yourself to master then go with it. These are not defaults settings and
-there is a reason why.
+The following is the ou
+tput of my  hciconfig -a on the master, and after that the hcid.conf on the mast
+er:
 
-Regards
+hci0:   Type: USB
+        BD Address: 00:0B:0D:33:CE:93 ACL MTU: 120:20  SC
+O MTU: 64:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:4605409 acl:18677 sc
+o:0 events:22852 errors:0
+        TX bytes:5369351 acl:50797 sco:0 commands:188 
+errors:0
+        Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00 0x00
+        Packe
+t type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SN
+IFF PARK
+        Link mode: MASTER
+        Name: 'Trionas PC (0)'
+        Class:
+ 0x100100
+        Service Classes: Object Transfer
+        Device Class: Compute
+r, Uncategorized
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP 
+Subver: 0x757
+        Manufacturer: Silicon Wave (11)
+ 
+[root@lab103-106 root]# 
+more /etc/bluetooth/hcid.conf
+#
+# HCI daemon configuration file.
+#
+# $Id: hcid.c
+onf,v 1.4 2004/04/29 20:14:21 holtmann Exp $
+#
+ 
+# HCId options
+options {
+      
+  # Automatically initialize new devices
+        autoinit yes;
+ 
+        # Secur
+ity Manager mode
+        #   none - Security manager disabled
+        #   auto -
+ Use local PIN for incoming connections
+        #   user - Always ask user for a
+ PIN
+        #
+        security auto;
+ 
+        # Pairing mode
+        #   none 
+ - Pairing disabled
+        #   multi - Allow pairing with already paired device
+s
+        #   once  - Pair once and deny successive attempts
+        pairing mul
+ti;
+                                                                            
+    
+        # PIN helper
+        pin_helper /usr/bin/bluepin;
+                 
+                                                               
+        # D-Bus 
+PIN helper
+        #dbus_pin_helper;
+}
+                                         
+                                       
+# Default settings for HCI devices
+devic
+e {
+        # Local device name
+        #   %d - device id
+        #   %h - host
+ name
+        name "Trionas PC (%d)";
+                                          
+                                      
+        # Local device class
+        clas
+s 0x100100;
+                                                                    
+            
+        # Default packet type
+        #pkt_type DH1,DM1,HV1;
+      
+                                                                          
+     
+   # Inquiry and Page scan
+        iscan enable; pscan enable;
+                 
+                                                               
+        # Defaul
+t link mode
+        #   none   - no specific policy
+        #   accept - always 
+accept incoming connections
+        #   master - become master on incoming conne
+ctions,
+        #            deny role switch on outgoing connections
+        #
+        lm master;
+        #
+        #lm accept;
+                               
+                                                 
+        # Default link policy
+        #   none    - no specific policy
+        #   rswitch - allow role switch
 
-Marcel
+        #   hold    - allow hold mode
+        #   sniff   - allow sniff mode
+  
+      #   park    - allow park mode
+        #
+        #lp hold,sniff;
+        #
+        lp rswitch,hold,sniff,park;
+                                            
+                                    
+        # Authentication and Encryption
+   
+     #auth enable;
+        #encrypt enable;
+}
 
 
+Please help me if you can. Someb
+ody must know!
+Thanks very much,
+Regards,
+Triona
 
 
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-
-
-
----------------------------------
-新年願望第一位 :  找到友緣人 
-
---0-880580346-1108648977=:16442
-Content-Type: text/html; charset=big5
-Content-Transfer-Encoding: 8bit
-
-<DIV>
-<DIV>Hi Jay!</DIV>
-<DIV>&nbsp;&nbsp;&nbsp; Sorry to interrupt. In order that SE T610 can search and add PC into "My device list", you should do like this:</DIV>
-<DIV># Authentication and Encryption<BR># auth enable;<BR># encrypt enable<BR>&nbsp;&nbsp;&nbsp; Or you can never let your T610 to search for and add your PC into the list.</DIV>
-<DIV>&nbsp;&nbsp;&nbsp; But then, do you know how to connect T610 to PC instead of from PC to T610 (as I know that the method is typing "rfcomm connect 0 &lt;address&gt;").</DIV>
-<DIV>&nbsp;&nbsp;&nbsp; Hope that this can help you and then you can have method to do the connection from&nbsp;T610 to PC as I wish to do it in a short time.</DIV>
-<DIV>Cherrs,</DIV>
-<DIV>Michael<BR><B><I>Marcel Holtmann &lt;marcel@holtmann.org&gt;</I></B> wrote:</DIV>
-<BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">Hi Jay,<BR><BR>&gt; I figured out how to pair with my T610 phone.<BR>&gt; <BR>&gt; Point 1: The computer must initiate the connection. (If you attempt to scan for <BR>&gt; new devices on your phone and add it there, apparently bluez will not accept <BR>&gt; incoming pairing requests. Something to do with roleswitch and bluez wanting to <BR>&gt; be the master? Perhaps...)<BR>&gt; <BR>&gt; Point 2: My version of blueZ ignores the /etc/bluetooth/pin file (even when in <BR>&gt; "auto" mode) and I HAD to replace the pin_helper with a link to a script which <BR>&gt; simply printed "PIN:1234" (replace number with your pin).<BR>&gt; <BR>&gt; So, once I replace "pin_helper /usr/bin/bluepin" with "pin_helper /sbin/pintest" <BR>&gt; (where the pintest file contained "echo "PIN:1234") and initiated an rfcomm <BR>&gt; connection to the phone with my pppd chat script, I was able to type the
-  pin
- <BR>&gt; into my phone and pair.<BR>&gt; <BR>&gt; [(going the other way, from the phone to the computer, didn't work...possibly a <BR>&gt; problem with the phone, possibly a problem with bluez (as it works under <BR>&gt; windows...)]<BR>&gt; <BR>&gt; My hcid.conf options are as follows:<BR>&gt; Options:<BR>&gt; autoinit yes;<BR>&gt; security auto;<BR>&gt; pairing multi;<BR>&gt; pin_helper /sbin/pintest<BR>&gt; <BR>&gt; Device:<BR>&gt; name "BlueZ (%d)";<BR>&gt; class 0x100;<BR>&gt; iscan enable;<BR>&gt; pscan enable;<BR>&gt; lp rswitch,hold,sniff,park;<BR>&gt; lm accept,master;<BR>&gt; # Authentication and Encryption<BR>&gt; auth enable;<BR>&gt; encrypt enable;<BR><BR>if you still wanna use security mode 3 then go with it. If you set<BR>yourself to master then go with it. These are not defaults settings and<BR>there is a reason why.<BR><BR>Regards<BR><BR>Marcel<BR><BR><BR><BR><BR>-------------------------------------------------------<BR>SF email is sponsored by - The IT Pro
- duct
- Guide<BR>Read honest &amp; candid reviews on hundreds of IT Products from real users.<BR>Discover which products truly live up to the hype. Start reading now.<BR>http://ads.osdn.com/?ad_id=6595&amp;alloc_id=14396&amp;op=click<BR>_______________________________________________<BR>Bluez-users mailing list<BR>Bluez-users@lists.sourceforge.net<BR>https://lists.sourceforge.net/lists/listinfo/bluez-users<BR></BLOCKQUOTE></DIV><p><br><hr size=1>新年願望第一位 :  <a href=http://hk.personals.yahoo.com>找到友緣人 </a><br>
---0-880580346-1108648977=:16442--
 
 
 -------------------------------------------------------
