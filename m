@@ -1,58 +1,63 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Diego Liziero <liziero.diego@unimore.it>
-To: Stephen Hemminger <shemminger@osdl.org>
-Cc: bridge@lists.osdl.org, bluez-devel@lists.sourceforge.net
-In-Reply-To: <20040513111904.6001c62a@dell_ss3.pdx.osdl.net>
-References: <1084467136.3083.27.camel@igno>
-	 <20040513102829.5d5e1484@dell_ss3.pdx.osdl.net>
-	 <1084472140.3354.9.camel@igno>
-	 <20040513111904.6001c62a@dell_ss3.pdx.osdl.net>
-Content-Type: text/plain
-Message-Id: <1084526845.6774.55.camel@igno>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: [Bridge] bridging bluetooth bnep devices with kernel 2.6.6-*
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 14 May 2004 11:27:25 +0200
+Return-Path: <bluez@thomae-privat.de>
+Message-ID: <40A480B8.2050400@thomae-privat.de>
+Date: Fri, 14 May 2004 10:18:00 +0200
+From: Matthias Thomae <bluez@thomae-privat.de>
+MIME-Version: 1.0
+To: Christoph Scholz <scholz@cs.uni-bonn.de>
+CC: bluez-devel@lists.sourceforge.net, marcel@holtmann.org
+Subject: Re: [Fwd: Re: [Bluez-devel] PAN and bridge problem when bnep0	disconnects
+ before bnep1]
+References: <1084467658.2322.37.camel@willie.informatik.uni-bonn.de>
+In-Reply-To: <1084467658.2322.37.camel@willie.informatik.uni-bonn.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Thu, 2004-05-13 at 20:19, Stephen Hemminger wrote:
-> I do think each bluetooth device should have a different hardware
-> address to keep themselves sane.
+Hi Christoph, Marcel, all,
 
-Things are not so easy.
+Christoph Scholz wrote:
+>>Aha. These MAC addresses seem to be used in the forwarding database. 
+>>Maybe setting the ageing time to 0 (man brctl) would help...
+> 
+> 
+> I don't think so. The problem is that the code assumes that MAC
+> addresses are unique. Even if there are multiple Bluetooth BNEP devices,
+> there will only be one entry in the forwarding database. When one of the
+> devices is removed, this entry in the forwarding database is also
+> removed.
 
-Each bluetooth dongle has it's own harware address (MAC)
-and in a piconet (one master and up to 7 slaves)
-at each PAN connection a device called bnep0, ... bnep6
-is created on the master PC by bluez with the same MAC of the dongle.
+You are right, setting ageing 0 doesn't help.
 
-Each device bnep? for each maste-slave point to point connection.
+>><shemminger@osdl.org>
+>>	[BRIDGE]: Forwarding database changes.
+>>	
+>>	Make forwarding database more robust.
+>>	  + Don't insert invalid ether address,
+>>	  + Report errors back so adding an interface to bridge can fail
+>>	  + get rid of unneeded explicit pads in data structure
+>>	  + replace bitfields with byte's for simple booleans.
+>>
+>>Maybe that fixes our problem? I might be able to try 2.6.6 and the 
+>>ageing timer tonight...
 
-And the bad thing is that when one of these connection is
-closed, its relative device (bnep?) cease to exist.
+2.6.6 (-mh1) didn't help either...
 
-And this create serious problems with things like
-a dhcp server and a bridge.
+> I am not sure but I would guess that the problem is still there. The
+> same warning can be found in br_fdb.c in 2.6.6:
+> 
+> printk(KERN_INFO "%s: attempt to add" " interface with same source add
+> ress.\n", source->dev->name);
 
-Regards,
-Diego
+I also tried the patch that Diego Liziero mentioned in his post, but it 
+didn't help either...
 
+> I have not written to to the bridge people. My personal opinion is that
+> BlueZ should do the forwarding (like Affix does). You can argue about
+> that of course.
 
+I don't have a competent opinion about that (except: it's not only the 
+forwarding problem, but also DHCP, right?), and don't know what Affix does.
 
--------------------------------------------------------
-This SF.Net email is sponsored by: SourceForge.net Broadband
-Sign-up now for SourceForge Broadband and get the fastest
-6.0/768 connection for only $19.95/mo for the first 3 months!
-http://ads.osdn.com/?ad_id=2562&alloc_id=6184&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Marcel, what do you think? Is there any sense to contact the bridge people?
+
+Regards.
+Matthias
