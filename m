@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040922145957.58897.qmail@web41110.mail.yahoo.com>
-From: Sean Loh <blaze_wk@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] PAN implementation version
+Subject: Re: [Bluez-users] pand freezes upon disconnect
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bora@ai.com.tr
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E1CA5Ze-0006Iu-R6@paris.servershost.net>
+References: <E1CA5Ze-0006Iu-R6@paris.servershost.net>
+Content-Type: text/plain
+Message-Id: <1095856614.6223.19.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,28 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Sep 2004 07:59:57 -0700 (PDT)
+Date: Wed, 22 Sep 2004 14:36:55 +0200
 
-Hi!
+Hi,
 
-Starting from bluez-pan version 1 up to bluez-pan
-version 1.1, what are the conformance of the different
-bluez-pans to the bnep specifications?  For example,
-does bluez-pan 1.1 conform to bnep version 0.95a or
-bnep version 1?
+> My bluetooth server is Slackware 9.1 and my client is WindowsXp.I 
+> perfectly share the internet connection between them.My pand command 
+> is 'pand -s -M --role NAP -z' , but when i close the connection from 
+> windows, i see that slackware freezes.
 
-Is there much of a difference between bnep0.95a and
-bnep version 1?
+what kernel version is this? What version of the BlueZ packages are
+installed? Are there any oopses?
 
-thanks!!
+Regards
+
+Marcel
 
 
-	
-		
-__________________________________
-Do you Yahoo!?
-New and Improved Yahoo! Mail - 100MB free storage!
-http://promotions.yahoo.com/new_mail 
 
 
 -------------------------------------------------------
