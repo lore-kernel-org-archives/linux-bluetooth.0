@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42406D46.10804@rz-zw.fh-kl.de>
-From: Timo Veith <tv@rz-zw.fh-kl.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Problem with BlueLogic WingKey Keyboard
-References: <200503202301.49376.tv@rz-zw.fh-kl.de>	 <1111408373.22872.54.camel@pegasus> <423F5B7F.9060200@rz-zw.fh-kl.de>	 <423F5E1C.8030301@rz-zw.fh-kl.de> <1111453185.22872.84.camel@pegasus>
-In-Reply-To: <1111453185.22872.84.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: Re: [Bluez-devel] RFCOMM connection loss on SCO disconnect
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <C70061B183DE09419568AB2060C52A952465AC@arion.intra.local>
+References: <C70061B183DE09419568AB2060C52A952465AC@arion.intra.local>
+Content-Type: text/plain
+Message-Id: <1111481265.22872.96.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,29 +18,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Mar 2005 20:08:54 +0100
+Date: Tue, 22 Mar 2005 09:47:45 +0100
 
-Marcel Holtmann wrote:
-> a clash with the Makefile is fine. If you look at Makefile.rej you will
-> see why this must happen ;)
-> 
+Hi Victor,
 
-Hello Marcel,
+> In the attachment there is complete log (right from the establishment of
+> the very first connection), looks like the phone issues DISC for RFCOMM.
+> This happens only if SCO connection is there. Disabling SCO ( when we
+> ignore connect request) "fixes" the problem, but unfortunatelly this is
+> not acceptable. I'm going to check if it can be fixed in some way or
+> another...
 
-I applied your patch and it works now. Thanks a lot! :)
+if the phone says DISC we can't do anything. Maybe that is their way of
+interpreting the handsfree profile. I think you have to live with it and
+simply reconnect the RFCOMM channel after the disconnect.
 
-Will your patch be integrated into the offical kernel and if yes when?
+Regards
 
-Kind regards and thanks again
+Marcel
 
-Timo
+
 
 
 -------------------------------------------------------
-This SF.net email is sponsored by: 2005 Windows Mobile Application Contest
-Submit applications for Windows Mobile(tm)-based Pocket PCs or Smartphones
-for the chance to win $25,000 and application distribution. Enter today at
-http://ads.osdn.com/?ad_id=6882&alloc_id=15148&op=click
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now.
+http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
