@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <407174BC.8020503@uni-paderborn.de>
-From: Stefan Mischke <survivor@uni-paderborn.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] L2CAP and SDP interface specification?
+Subject: RE: [Bluez-devel] Recent CSR BlueCore2 firmware
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Rybalkin, Albert" <Albert.Rybalkin@Fiserv.com>
+Cc: "'albertr@iral.com'" <albertr@iral.com>,
+   "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <CF8C38B8FA1ED511A92400508BE37F0B0A961D1A@exchange_corp.bhcsecurities.com>
+References: 
+	 <CF8C38B8FA1ED511A92400508BE37F0B0A961D1A@exchange_corp.bhcsecurities.com>
+Content-Type: text/plain
+Message-Id: <1081150592.2835.3.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,18 +20,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Apr 2004 17:01:16 +0200
+Date: Mon, 05 Apr 2004 09:36:32 +0200
 
-Hello,
+Hi Albert,
 
-where can I find the specification of the BlueZ L2CAP and SDP API? I 
-hope there ist any.
-And how can I register my application for getting HCI events, so that I 
-don't have to poll? hcid? API/specs?
+> Already tried it. Of course, they don't have any firmware
+> updates. In fact, they seem to use a generic bluecore2
+> firmware in their usb dongle, since it has generic CSR
+> vendor/product ids.
 
-Thanks!
+even if it is has a CSR chip in it does not mean it will accept every
+firmware. Your firmware must be signed with the right key otherwise the
+bootloader won't boot it.
 
-Stefan
+> It's probably a moot point, but just wondering why CSR
+> seems to be so restrictive about letting people update
+> firmware in their products? For instance, later releases
+> supposed to confirm to 1.2 specs, why not allowing free
+> access to it? 
+
+Take a look at the mailing list archive. There is a detailed description
+why they did it this way.
+
+Regards
+
+Marcel
 
 
 
