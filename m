@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Can't compile utils2
+Subject: Re: [Bluez-users] Using BlueZ for network access via ppp does not
+	work, nothing at all in log files
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?S=E9rgio?= Fernandes <sergiofernandes@clix.pt>
+To: Richard Pruen <r.pruen@btinternet.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404112025.35020.sergiofernandes@clix.pt>
-References: <200404112025.35020.sergiofernandes@clix.pt>
+In-Reply-To: <008601c4200c$4c75ee30$0000fea9@RICHARDP>
+References: <008601c4200c$4c75ee30$0000fea9@RICHARDP>
 Content-Type: text/plain
-Message-Id: <1081777198.5398.119.camel@pegasus>
+Message-Id: <1081777025.5398.115.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,18 +19,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 12 Apr 2004 15:39:59 +0200
+Date: Mon, 12 Apr 2004 15:37:05 +0200
 
-Hi Sergio,
+Hi Richard,
 
-> I followed the directions in http://www.bueche.ch/comp/mx900/mx900.html but i 
-> get this error, after the ./configure. I created a new user account fetched 
-> all from cvs but ..... I think i'll give up for now ....
+> I am trying to use dund to allow my pocket pc 2003 device to connect to my
+> home network. And it won't work, having checked all the log files there is
+> nothing in them at all relating to this. If I remove rfcomm tty support from
+> the kernel, then I do get entries saying that rfcomm can't connect. But with
+> it enabled there isn't a peep out of anything at all, dund, rfcomm and pppd
+> are all silent.
 
-I am going to repeat myself. The problem is that your make process tries
-to link against the old -lbluetooth in /usr/lib. I don't know why, but I
-also don't know anything about your system. Maybe this is a bug in the
-current build system. If yes, try to fix it and send me a patch.
+dund needs the RFCOMM TTY support. No matter what.
+
+> rfcomm can be connected to serial ports on my other pc, so everything seems
+> to work ok.
+> 
+> I have a Belken USB dongle, and slackware 9.1 with the 2.6.4 kernel, I have
+> the latest BlueZ packages.
+> 
+> Hope someone has some ideas of what to try to find the problem.
+
+Without any logfiles or hcidump or any other clues, how should we find
+your problem.
 
 Regards
 
