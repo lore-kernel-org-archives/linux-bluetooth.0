@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] more encoder stuff
-Message-Id: <20041126000655.1a762210.henryk@ploetzli.ch>
-In-Reply-To: <1101365484.7538.74.camel@pegasus>
-References: <41A56774.1000308@xmission.com>
-	<20041125071423.10e449c3.henryk@ploetzli.ch>
-	<1101365484.7538.74.camel@pegasus>
+Subject: Re: [Bluez-devel] Hi all !
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41A6046D.30800@xgarreau.org>
+References: <41A6046D.30800@xgarreau.org>
+Content-Type: text/plain
+Message-Id: <1101423126.6465.19.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Fri__26_Nov_2004_00_06_55_+0100_GZtiHJpqwx=fBx/j"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,51 +18,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Nov 2004 00:06:55 +0100
+Date: Thu, 25 Nov 2004 23:52:06 +0100
 
---Signature=_Fri__26_Nov_2004_00_06_55_+0100_GZtiHJpqwx=fBx/j
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Xavier,
 
-Moin,
+> I'm currently teaching some students the bluetooth protocol stack
+> 
+> Next wednesday, we'll talk about bluetooth programming.
+> 
+> I have no problem with HCI, L2CAP or RFCOMM programming but I would like 
+> to advertise a custom service using sdp calls.
+> 
+> I never used sdp api, did any of you wrote some white paper about 
+> bluetooth programming involving sdp (i found 
+> http://www.holtmann.org/papers/bluetooth/wtc2003_slides.pdf but it's not 
+> dealing with sdp)
+> 
+> My sample app for the session will be a time server working on top of 
+> l2cap (PSM ccee) and I'd like to advertise it on sdp server. We'll also 
+> be talking of rfcomm stream sockets.
 
-Am Thu, 25 Nov 2004 07:51:24 +0100 schrieb Marcel Holtmann:
+the programs dund and pand show you how to advertise a SDP record.
 
-> The MAD library (www.underbit.com/products/mad/) is using fixed-point
-> integer computation. Do you think it is possible to do the same thing
-> for SBC? Will it give us some extra performance?
+Regards
 
-Unfortunately I'm not familiar with fixed-point arithmetics, especially
-with how to handle multiplication. So if anyone who has done this before
-would step forward ...
+Marcel
 
-Well, I did some naive tests: I probably did something wrong, but I'm
-not seeing any significant difference between floating point and fixed
-point (that is: integer). For multiplication the difference is not
-noticeable (1.38s vs. 1.36s in my test program) and for addition it is
-not that big (0.77s vs. 0.47s).
 
-I guess we'll be fine using floating point as long as there is an FPU.
-
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
-
---Signature=_Fri__26_Nov_2004_00_06_55_+0100_GZtiHJpqwx=fBx/j
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQFBpmWTIjWgKE0OA2gRApBoAKCEVD0AxvCa1UTzLFt4HI2HDxzkWQCfWmX8
-OIRHinW2MnhdLlmGEWnLIIE=
-=cGdz
------END PGP SIGNATURE-----
-
---Signature=_Fri__26_Nov_2004_00_06_55_+0100_GZtiHJpqwx=fBx/j--
 
 
 -------------------------------------------------------
