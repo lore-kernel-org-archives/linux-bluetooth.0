@@ -1,45 +1,49 @@
-Return-Path: <bluekarthik@yahoo.com>
-Message-ID: <20040804151707.27838.qmail@web90107.mail.scd.yahoo.com>
-Date: Wed, 4 Aug 2004 08:17:07 -0700 (PDT)
-From: karthik bala guru <bluekarthik@yahoo.com>
-Subject: Getting the image !!
-To: Marcel Holtmann <marcel@holtmann.org>,
-   David Mezkiriz <dmezkiriz@yahoo.com>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] SuSE 9.1 Pro and Epox Barton wireless desktop
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ulrich Wisser <u.wisser@publisher.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1090518368.21828.37.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-35612950-1091632627=:26617"
-List-ID: <bluez-users.lists.sourceforge.net>
+In-Reply-To: <1091568946.3759.18.camel@dorette.Entenhausen>
+References: <1091568946.3759.18.camel@dorette.Entenhausen>
+Content-Type: text/plain
+Message-Id: <1091569567.16182.36.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 03 Aug 2004 23:46:07 +0200
 
---0-35612950-1091632627=:26617
-Content-Type: text/plain; charset=us-ascii
+Hi Ulrich,
+
+> has anybody got that combination running?
+> When I plug in my BT-DG03BF USB bluetooth dongle "hcitool dev" does not
+> show any device. Please find the /var/log/messages below.
+> 
+> Any idea how to get the dongle working? The keyboard and mouse?
+
+the dongle of the Barton desktop is a HID proxy dongle. You must run
+hid2hci first before you will see it with hciconfig.
+
+Regards
+
+Marcel
 
 
-Hi,
-
-I have pushed an image and infact plain-text and XHTML using OPP to another device.
-
-But, Now i wouls like to know if i could get in the image that is present in the client(mobile) from the server using OPP .
-
-kindly give enough info, regards,
-
-karthik bala guru
 
 
-		
----------------------------------
-Do you Yahoo!?
-New and Improved Yahoo! Mail - Send 10MB messages!
---0-35612950-1091632627=:26617
-Content-Type: text/html; charset=us-ascii
-
-<DIV>
-<BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">
-<P>Hi,</P>
-<P>I have pushed an image and infact plain-text and XHTML using OPP to another device.</P>
-<P>But, Now i wouls like to know if i could get in the image that is present in the client(mobile) from the server using OPP .</P>
-<P>kindly give enough info, regards,</P>
-<P>karthik bala guru</P></BLOCKQUOTE></DIV><p>
-		<hr size=1>Do you Yahoo!?<br>
-<a href="http://us.rd.yahoo.com/mail_us/taglines/10/*http://promotions.yahoo.com/new_mail/static/efficiency.html">New and Improved Yahoo! Mail</a> - Send 10MB messages!
---0-35612950-1091632627=:26617--
+-------------------------------------------------------
+This SF.Net email is sponsored by OSTG. Have you noticed the changes on
+Linux.com, ITManagersJournal and NewsForge in the past few weeks? Now,
+one more big change to announce. We are now OSTG- Open Source Technology
+Group. Come see the changes on the new OSTG site. www.ostg.com
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
