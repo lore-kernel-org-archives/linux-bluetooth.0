@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Krause <Andreas.Krause@web.de>
+Message-ID: <20040723020716.88264.qmail@web40806.mail.yahoo.com>
+From: Scott Mace <scottymace@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] ISSC USB Dongle does not work with current bluez?
-References: <200407222124.44032.Andreas.Krause@web.de> <1090529272.21828.41.camel@pegasus>
-In-Reply-To: <1090529272.21828.41.camel@pegasus>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-15"
-Message-Id: <200407230649.28305.Andreas.Krause@web.de>
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] New Device that works
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,56 +15,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jul 2004 06:49:28 +0200
+Date: Thu, 22 Jul 2004 19:07:16 -0700 (PDT)
 
-> > I've got a Bluetooth USB Dongle, Vendor ID 0x1131 (ISSC, Integrated
-> > System Solution Corp.), Product ID 0x1001, Revision 3.115. 
-> where do you got these dongle?
+I didn't see this on your list of working hardware. 
+It's a USB bluetooth dongle branded CompUSA.  It sells
+for around $30  Anyway, here are the outputs:
+hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:10:60:A4:CB:33 ACL MTU: 192:8 
+SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:282820 acl:1988 sco:4638 events:1935
+errors:0
+        TX bytes:538062 acl:2788 sco:4295 commands:98
+errors:0
+        Features: 0xff 0xff 0x0f 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2
+HV3
+        Link policy: HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'Bluez (0)'
+        Class: 0x000100
+        Service Classes: Unspecified
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1
+(0x1) LMP Subver: 0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
 
-http://cgi.ebay.de/ws/eBayISAPI.dll?ViewItem&item=5709740304
-
-
-> you only need bluez-libs-2.8, bluez-utils-2.8 and bluez-hcidump-1.9. The
-> rest of the BlueZ packages are deprecated and you will run into trouble
-> installing them.
-
-OK, unmerged all ebuilds and just installed these three from tarball.
-
-hciconfig -a says the same as in my original posting.
-
-> Run "hcidump -x" and show it to us while executing these commands.
-
-The following dump is the output of 'hcidump -x' while running 'hciconfig -a'. 
-Running 'hcitool inq' or 'hcitool scan' does not trigger any output from 
-'hcidump -x'!
-
-sweethome root # hcidump -x
-HCIDump - HCI packet analyzer ver 1.9
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Read Local Name (0x03|0x0014) plen 0
-> HCI Event: Command Complete (0x0e) plen 252
-  01 14 0C 00 42 6C 75 65 5A 20 28 30 29 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00
-< HCI Command: Read Class of Device (0x03|0x0023) plen 0
-> HCI Event: Command Complete (0x0e) plen 7
-  01 23 0C 00 00 01 00
-< HCI Command: Read Local Version Information (0x04|0x0001) plen 0
-> HCI Event: Command Complete (0x0e) plen 12
-  01 01 10 00 01 72 01 01 39 00 72 01
+hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:10:60:A4:CB:33 ACL MTU: 192:8 
+SCO MTU: 64:8
+        HCI 16.4 (bc02x)
 
 
-CU - nak
+It worked with no fiddling in Gentoo using
+kbluetoothd.
+Scott
+
+
+	
+		
+__________________________________
+Do you Yahoo!?
+Vote for the stars of Yahoo!'s next ad campaign!
+http://advision.webevents.yahoo.com/yahoo/votelifeengine/
 
 
 -------------------------------------------------------
