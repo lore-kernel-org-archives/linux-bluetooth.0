@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: snik1 <mathias@mammoth.se>
+From: Christopher =?ISO-8859-1?Q?Bergstr=F6m?= <christopher@netsyncro.com>
 To: bluez-users@lists.sourceforge.net
-Cc: mathias@mammoth.se
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-  boundary="Boundary-00=_LFc5BuXWmBg3KKy"
-Message-Id: <200501130131.07302.mathias@mammoth.se>
-Subject: [Bluez-users] Apple BT connection problem
+In-Reply-To: <cru52v$3da$1@sea.gmane.org>
+References: <27251cb805011005263325ddce@mail.gmail.com>
+	 <OFFD66E982.58D7AFC3-ONC1256F85.004A0E9B-C1256F85.004BE1D7@isbac.com>
+	 <cru52v$3da$1@sea.gmane.org>
+Content-Type: multipart/alternative; boundary="=-SMfM/1AdGUploUdlxMGz"
+Message-Id: <1105491866.6665.11.camel@linux.site>
+Mime-Version: 1.0
+Subject: [Bluez-users] Success with Qware headset and quick q...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,146 +20,68 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Jan 2005 01:31:06 +0100
+Date: Wed, 12 Jan 2005 02:04:25 +0100
 
---Boundary-00=_LFc5BuXWmBg3KKy
-Content-Type: text/plain;
-  charset="us-ascii"
+
+--=-SMfM/1AdGUploUdlxMGz
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
+Using..
+Suse 9.2 (kernel 2.6.8-24.10-default, I know I should have renamed to
+custom, but I'm lazy)
+Conceptronics CBT100U
+Qware Bluetooth headset
 
-Hi,
-I've searched the archive but didn't really hit the spot there... ...so I 
-guess I need some help.
+(Most of this I bought while in Spain, for those in Europe.)
 
-I'm running SuSE9.2 and trying to connect a Apple BT keyboard and mouse, this 
-what's happends:
+I have yet to test range and reliability, but that'll come soon.
+Quality sounded better with .wav file than when I used this with
+Windows.  (Tried MP3 file and it didn't work..  I'll read up on this.)
 
-1, If I reset the mouse and keyboard and do a server side connect it works 
-just fine. After I changed to "lm master" in hcid.conf I also could reconnect 
-after a sleep without a problem, so far so good, see the output.
-"keyboard reset (off/on)"
-# hidd --connect 00:0A:95:3B:1B:6E
+Everything moved to Linux and since then I've been looking for a good
+VoIP client.. (prefer gnome)  A bit off subject, but any suggestions
+would be appreciated and how well it works with btsco.
 
-New HID device 00:0A:95:3B:1B:6E (Apple Wireless Keyboard)
-Jan 12 22:30:57 linux kernel: evdev_connect: evdev cddd3b40 handle cddd3b5c 
-name event3
+If it would help I'm more than willing to write a quick howto even
+though everything went smoothly minus a few snags..
 
-# hcitool con
-Connections:
-        lt; ACL 00:0A:95:3B:1B:6E handle 41 state 1 lm MASTER
+Many thanks!
 
-hidd --show
-00:0A:95:3B:1B:6E HID Boot Device [05ac:0209] connected [boot-protocol]
+Christopher
 
-
-
-
-2, Now, if I reboot or some how looses the connection and then initiate the 
-connection from the keyboard or mouse the following happends:
-
-Keaboard reset (on/off)
-(tap keaboard)
-# hcitool con
-Connections:
-        > ACL 00:0A:95:3B:1B:6E handle 42 state 1 lm MASTER
-# hidd --show
-<nothing>
-
-output from messages
-Jan 12 22:29:10 linux hidd[7815]: New HID device 00:0A:95:3B:1B:6E (Apple 
-Wireless Keyboard)
-Jan 12 22:29:10 linux hidd[7815]: HID create error 25 (Inappropriate ioctl for 
-device)
-
-And when I try to connect from the server side:
-# hidd --connect 00:0A:95:3B:1B:6E
-Can't create HID control channel: Device or resource busy
-
-# hidd --connect 00:0A:95:3B:1B:6E
-Can't create HID control channel: Connection refused
-
-And the log shows:
-Jan 12 22:36:35 linux hcid[7808]: link_key_request (sba=00:0F:3D:39:02:19, 
-dba=00:0A:95:3B:1B:6E)
-Jan 12 22:36:35 linux kernel: hci_acldata_packet: hci0 ACL packet for unknown 
-connection handle 42
-
-
-The only way to get it to work again is to reset the keyboard and mouse and 
-connect from the serverside. This means it always fail after a reboot.
-
-Can anyone give me a pointer in right direction...?!
-
-regards
-Mathias
-
-
---Boundary-00=_LFc5BuXWmBg3KKy
-Content-Type: text/html;
-  charset="us-ascii"
+--=-SMfM/1AdGUploUdlxMGz
+Content-Type: text/html; charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-<html><head><meta name="qrichtext" content="1" /></head><body style="font-size:10pt;font-family:Sans Serif">
-<p></p>
-<p>Hi,</p>
-<p>I've searched the archive but didn't really hit the spot there... ...so I guess I need some help.</p>
-<p></p>
-<p>I'm running SuSE9.2 and trying to connect a Apple BT keyboard and mouse, this what's happends:</p>
-<p></p>
-<p>1, If I reset the mouse and keyboard and do a server side connect it works just fine. After I changed to &quot;lm master&quot; in hcid.conf I also could reconnect after a sleep without a problem, so far so good, see the output.</p>
-<p>&quot;keyboard reset (off/on)&quot;</p>
-<p># hidd --connect 00:0A:95:3B:1B:6E</p>
-<p></p>
-<p>New HID device 00:0A:95:3B:1B:6E (Apple Wireless Keyboard)</p>
-<p>Jan 12 22:30:57 linux kernel: evdev_connect: evdev cddd3b40 handle cddd3b5c name event3</p>
-<p></p>
-<p># hcitool con</p>
-<p>Connections:</p>
-<p>        lt; ACL 00:0A:95:3B:1B:6E handle 41 state 1 lm MASTER</p>
-<p></p>
-<p>hidd --show</p>
-<p>00:0A:95:3B:1B:6E HID Boot Device [05ac:0209] connected [boot-protocol]</p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p>2, Now, if I reboot or some how looses the connection and then initiate the connection from the keyboard or mouse the following happends:</p>
-<p></p>
-<p>Keaboard reset (on/off)</p>
-<p>(tap keaboard)</p>
-<p># hcitool con</p>
-<p>Connections:</p>
-<p>        &gt; ACL 00:0A:95:3B:1B:6E handle 42 state 1 lm MASTER</p>
-<p># hidd --show</p>
-<p>&lt;nothing&gt;</p>
-<p></p>
-<p>output from messages</p>
-<p>Jan 12 22:29:10 linux hidd[7815]: New HID device 00:0A:95:3B:1B:6E (Apple Wireless Keyboard)</p>
-<p>Jan 12 22:29:10 linux hidd[7815]: HID create error 25 (Inappropriate ioctl for device)</p>
-<p></p>
-<p>And when I try to connect from the server side:</p>
-<p># hidd --connect 00:0A:95:3B:1B:6E</p>
-<p>Can't create HID control channel: Device or resource busy</p>
-<p></p>
-<p># hidd --connect 00:0A:95:3B:1B:6E</p>
-<p>Can't create HID control channel: Connection refused</p>
-<p></p>
-<p>And the log shows:</p>
-<p>Jan 12 22:36:35 linux hcid[7808]: link_key_request (sba=00:0F:3D:39:02:19, dba=00:0A:95:3B:1B:6E)</p>
-<p>Jan 12 22:36:35 linux kernel: hci_acldata_packet: hci0 ACL packet for unknown connection handle 42</p>
-<p></p>
-<p></p>
-<p>The only way to get it to work again is to reset the keyboard and mouse and connect from the serverside. This means it always fail after a reboot.</p>
-<p></p>
-<p>Can anyone give me a pointer in right direction...?!</p>
-<p></p>
-<p>regards</p>
-<p>Mathias</p>
-<p></p>
-<p></p>
-</body></html>
---Boundary-00=_LFc5BuXWmBg3KKy--
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
+<HTML>
+<HEAD>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=UTF-8">
+  <META NAME="GENERATOR" CONTENT="GtkHTML/3.2.4">
+</HEAD>
+<BODY>
+Using..<BR>
+Suse 9.2 (kernel 2.6.8-24.10-default, I know I should have renamed to custom, but I'm lazy)<BR>
+Conceptronics CBT100U<BR>
+Qware Bluetooth headset<BR>
+<BR>
+(Most of this I bought while in Spain, for those in Europe.)<BR>
+<BR>
+I have yet to test range and reliability, but that'll come soon.&nbsp; Quality sounded better with .wav file than when I used this with Windows.&nbsp; (Tried MP3 file and it didn't work..&nbsp; I'll read up on this.)<BR>
+<BR>
+Everything moved to Linux and since then I've been looking for a good VoIP client.. (prefer gnome)&nbsp; A bit off subject, but any suggestions would be appreciated and how well it works with btsco.<BR>
+<BR>
+If it would help I'm more than willing to write a quick howto even though everything went smoothly minus a few snags..<BR>
+<BR>
+Many thanks!<BR>
+<BR>
+Christopher
+</BODY>
+</HTML>
+
+--=-SMfM/1AdGUploUdlxMGz--
+
 
 
 -------------------------------------------------------
