@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1100206677.4193d255a3140@support.tuxbox.dk>
-From: Martin List-Petersen <martin@list-petersen.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Audio & Bluetooth
-References: <418FC205.7070102@tootai.net> <1099943857.29330.27.camel@pegasus>
-In-Reply-To: <1099943857.29330.27.camel@pegasus>
+From: "Rodrigo Serra" <rmserra@fibertel.com.ar>
+To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+	charset="us-ascii"
+Message-Id: <S1212517AbUKJXaC/20041110233010Z+222887@avas-mr07.fibertel.com.ar>
+Subject: [Bluez-users] Zaurus SL6000L + CF+ Personal Network Card Rev 2.5 Rev H
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +17,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 11 Nov 2004 20:57:57 +0000
+Date: Wed, 10 Nov 2004 20:30:00 -0300
 
-Citat Marcel Holtmann <marcel@holtmann.org>:
+Hello
 
-> actually this is not an easy to answer question. First thing is that you
-> should get a Bluetooth device with a CSR chip and at least HCI 16.x
-> firmware on it. The second is that it must route the SCO traffic through
-> the HCI and via a PCM. Then it should be possible.
+I have a problem to configure bluez on my SL6000L with Socket Bluetooth card
+Rev H.
+I downloaded and install from http://bluez.sourceforge.net/download/zaurus/
+the following packages:
 
-Getting back to this (and just to clarify this exactly).
+bluez-kernel-2.4.18-mh15_arm.ipk 
+bluez-libs_2.10_arm.ipk
+bluez-utils_2.10_arm.ipk
 
-on hciconfig hci0 revision: "SCO mapping:  PCM" is good ? And "SCO mapping: 
-HCI" is bad ? 
+When i try to run: hciattach /dev/ttyS3 socket 230400 the following error is
+occurred:
 
-Is there anyway that can be done to this in regards to audio ?
+Can't set device: Protocol not supported
+Can't initialize device: Protocol not supported
 
-Kind regards,
-Martin List-Petersen
--- 
-Violence in reality is quite different from theory.
-		-- Spock, "The Cloud Minders", stardate 5818.4
+Somebody know what happen? Please help me.
+
+SL6000L ROM Version 1.12, USA.
+CODE on card back: 8510-00159H
+
+Output of cardctl status command:
+Socket 0:
+  3.3V 16-bit PC Card
+  function 0: [ready]
+
+Output of card ident command:
+Socket 0:
+  product info: "Socket", "CF+ Personal Network Card Rev 2.5"
+  manfid: 0x0104, 0x0096
+  function: 2 (serial)
+
+Output of lsmod command:
+Module                  Size  Used by
+hci_uart                3760   0 
+rfcomm                 33664   0 
+l2cap                  16352   2  [rfcomm]
+bluez                  32896   1  [hci_uart rfcomm l2cap]
+pxa_bi                 21728   0  (unused)
+net_fd                 25024   1 
+usbdcore               34544   0  [pxa_bi net_fd]
+usbdmonitor             5248   0 
+sharp_mmcsd_m          31520   2 
+vtty                    7920   0  (unused)
+usb_ohci_tc6393        24544   0  (unused)
+usbcore                52048   1  [usb_ohci_tc6393]
 
 
 
