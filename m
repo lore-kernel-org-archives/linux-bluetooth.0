@@ -1,10 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Gareth Reakes <gareth@apache.org>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20031128011412.C61007@minotaur.apache.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] Bthid question
+Subject: Re: [Bluez-users] Problems with MS mouse and keyboard
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: Gareth Reakes <gareth@apache.org>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200311262320.14302.cijoml@volny.cz>
+References: <20031105093947.J63252@minotaur.apache.org>
+	 <1069884432.9032.65.camel@pegasus>
+	 <20031126141037.D25686@minotaur.apache.org>
+	 <200311262320.14302.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1069885778.9032.69.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -15,37 +22,26 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Nov 2003 01:24:00 -0800 (PST)
+Date: Wed, 26 Nov 2003 23:29:38 +0100
 
-Hey,
-	in Marcels version of bthid it seem we go around the while in the
-worker method until __io_canceled. At this point we then close the sockets
-with a sleep in between them to avoid the ACL connection problem. I added
-in some sleeps into Peters code and this made no difference. After looking
-into this further (by putting debug at every close statement), a close is
-not called after
+Hi Michal,
 
-} else if (!nbytes) {
-syslog (LOG_NOTICE, "EOF on Interrupt channel");
-shut_down (EXIT_SUCCESS);
-}
+> maybe Marcel should fetch and release from CVS his 
+> 
+> hid-0.0.0.1-verysoon-notstable-onlyforinsane-prealfa version :)
+> 
+> Then will much more people test it and we'll get more feedback from users...
+> 
+> Marcel what do you think about it? :)
 
+I won't do this, because the code depends on the new Bluetooth library
+and this is not released.
 
-and my mouse thinks this ACL connection is still open. I have 2 questions:
+Regards
 
-
-1)When __io_canceled is true, is this the same as (or at least a case of)
-when the above code is called (IE when the mouse goes to sleep)?
-
-2)Why is it in Marcels bthid code that the control and interrupt channels
-are shut down in different a order depending on if __io_canceled is true
-or not?
+Marcel
 
 
-
-Cheers,
-
-Gareth
 
 
 -------------------------------------------------------
