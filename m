@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] apple wireless mouse on apple ibook (g4, builtin
-	usb)
+Subject: Re: [Bluez-users] Logitech DiNovo?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Sunnan <sunnan@handgranat.org>
+To: Dominik Behr <dominikbehr@yahoo.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <402D1E8C.6020301@handgranat.org>
-References: <402D07B8.8030504@handgranat.org>
-	 <1076694675.2671.191.camel@pegasus>  <402D1E8C.6020301@handgranat.org>
+In-Reply-To: <20040213105658.5dcd32b7@localhost>
+References: <20040209034835.15ac7289@localhost>
+	 <1076686208.2671.86.camel@pegasus>  <20040213105658.5dcd32b7@localhost>
 Content-Type: text/plain
-Message-Id: <1076702197.18588.11.camel@pegasus>
+Message-Id: <1076701321.2671.236.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,84 +19,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 20:56:37 +0100
+Date: Fri, 13 Feb 2004 20:42:01 +0100
 
-Hi Sunnan,
+Hi Dominik,
 
-> I don't know how to show how it was before. Now it shows:
+> This is sourceforge lists managing program finally passing my first email that I sent from an account not registered on the mailing list. 
 > 
-> slowstorm/home/sunnan% sudo hciconfig -a
-> hci0:   Type: USB
->           BD Address: 00:0D:93:04:19:15  ACL MTU: 192:8  SCO MTU: 64:8
->           UP RUNNING PSCAN ISCAN
->           RX bytes:6963 acl:399 sco:0 events:198 errors:0
->           TX bytes:2109 acl:66 sco:0 commands:62 errors:0
->           Features: 0xff 0xff 0x0f 0x00 0x18 0x18 0x00 0x00
->           Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->           Link policy: RSWITCH HOLD SNIFF PARK
->           Link mode: SLAVE ACCEPT
->           Name: 'slowstorm-0'
->           Class: 0x000100
->           HCI Ver: 1.1 (0x1) HCI Rev: 0x8503  LMP Ver: 1.1 (0x1) LMP
-> Subver: 0x8503
->           Manufacturer: not assigned (2560)
+> I have 2.4.24-mh2 patch applied, is that enough?
+> Or is the patch in cvs?
 
-I don't know what kind of module this is. Please run "hcidump -w <file>"
-before running "hciconfig -a" and send us the dump. Maybe we have a big
-endian problem here. What bluez-utils version do you have installed?
-
-> One of the more interesting(?) entries in my /var/log/daemon.log after
-> doing this was:
-> 
-> Feb 13 19:38:29 slowstorm sdpd[25047]: init_server: binding L2CAP
-> socket: Address already in use
-
-You can't rund sdpd twice, but for HID support this is irrelevant.
-
-> hcidump -w dump.data
-> 
-> printed:
-> HCIDump - HCI packet analyzer ver 1.5
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> 
-> but never quit. I checked dump.data with wc from time to time but it
-> never appeared to get any largers.
-> 
-> I got childishly impatient after a couple of minutes and hit C-c. I
-> attached the file anyway. Is it supposed to take very long time? If so,
-> I could give it another go. Thanks for your patience.
-
-This is correct, because you have to terminate it with CTRL-C.
-
-> T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=05ac ProdID=8203 Rev= 9.01
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-
-Reboot your machine and show me this file before you run hid2hci.
+it doesn't contain the final patch that will go into 2.5.26-pre, but it
+will work.
 
 Regards
 
