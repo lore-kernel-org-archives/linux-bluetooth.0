@@ -1,73 +1,53 @@
-Return-Path: <nhogg@whoi.edu>
-Message-ID: <4090F914.6050103@whoi.edu>
-Date: Thu, 29 Apr 2004 08:46:12 -0400
-From: Nelson Hogg <nhogg@whoi.edu>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] cups (non)printing
-References: <408FDFFD.2090904@whoi.edu> <1083172830.4000.52.camel@pegasus>
-In-Reply-To: <1083172830.4000.52.camel@pegasus>
-Content-Type: text/html; charset=us-ascii
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Nicholas =?iso-8859-1?Q?A=2E_Prey=DF?= <nicholas@insolent.de>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Problem with Logitech MX 900 and Apple keyboard
+Message-ID: <20040429093614.GA3992@gmx.net>
+References: <200404282247.31825.matiasbrutti@ciudad.com.ar>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200404282247.31825.matiasbrutti@ciudad.com.ar>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 29 Apr 2004 11:36:14 +0200
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
-  <title></title>
-</head>
-<body bgcolor="#ffffff" text="#000000">
-Marcel Holtmann wrote:
-<blockquote cite="mid1083172830.4000.52.camel@pegasus" type="cite">
-  <pre wrap="">Hi Nelson,
+On  0, Matias Pablo Brutti <matiasbrutti@ciudad.com.ar> wrote:
+> I'm running Mandrake 10.0 official with a 2.6.3-7 ... I just bougth a MX900 
+> and the apple bluetooth keyboard .. the mouse ... was working when I 
+> plugged .. like if was a plug and play devide . I didn't have to install 
+> anything .. although .. i did not have any bluetooth installatin and if I 
+> serch for bluetooth devices . it says that I have no devides .. I'm pretty 
+> new on the subject .. and I think I have to load modules to the kernel .. 
+> which ones should I load for my Logitech hub .. so It will be able to 
+> recognize all my bluetooth .. When I try to start bthid it says that I have 
+> no uimput .. or some modules .. what should I do .. or where should I read .. 
+> to get my thing working ... I really like bluetooth .. and I would like to 
+> work on linux too 
+> if you need more info so you can help please email me ...
+> Thanks a lot 
 
-  </pre>
-  <blockquote type="cite">
-    <pre wrap="">I have a canon i80 printer equipped with a bluetooth receiver which 
-prints properly under cups and a usb connection. I've compiled the 
-cups-bluetooth package and transfered the 2 files manually to their 
-appropriate locations. I edited the printer.conf file to put in the 
-device address that I had determined from looking at the winxp 
-configuration (where bluetooth does work). However, I can't get any 
-response from trying to set the printer up in cups using the second 
-method described in the install instructions. I am not sure where to 
-look for it in the device list. I have a "zoom pccard" bluetooth device 
-that flashes and is listed as running in the services. It seems to 
-attach itself to ttyS4. I am running Mandrake 10.0 with the 2.6.3 
-kernel. Thanks for any help, Nelson Hogg
-    </pre>
-  </blockquote>
-  <pre wrap=""><!---->
-actually I think the problem is to get your card running. What is the
-output of dump_cis? Do hciconfig shows a HCI device?
+It sounds like your bluetooth chip is equipped with a hid proxy. 
+Look here:
+http://www.holtmann.org/linux/bluetooth/hid.html
+Look in the CVS "bluez/utils2/hid/" there is a hid service utility.
 
-  </pre>
-</blockquote>
-Here is the listing from dump_cis:<br>
-<br>
-Socket 0:<br>
-&nbsp; dev_info<br>
-&nbsp;&nbsp;&nbsp; NULL 0ns, 512b<br>
-&nbsp; manfid 0x0279, 0x950b<br>
-&nbsp; funcid serial_port [post]<br>
-&nbsp; serial_interface<br>
-&nbsp;&nbsp;&nbsp; uart 16550 [space/mark/odd/even] [5/6/7/8] [1/1.5/2]<br>
-&nbsp; vers_1 7.1, "PCMCIA", "Bluetooth Card", "", ""<br>
-&nbsp; config base 0x00f8 mask 0x000f last_index 0x04<br>
-&nbsp; cftable_entry 0x01 [default]<br>
-&nbsp;&nbsp;&nbsp; [rdybsy]<br>
-&nbsp;&nbsp;&nbsp; Vcc Vnom 3300mV<br>
-&nbsp;&nbsp;&nbsp; io 0x03f8-0x0407 [lines=8] [8bit] [range]<br>
-&nbsp;&nbsp;&nbsp; irq mask 0xffff [level] [shared]<br>
-&nbsp; cftable_entry 0x02<br>
-&nbsp;&nbsp;&nbsp; io 0x0000-0x7fff [lines=15] [8bit]<br>
-<br>
-Socket 1:<br>
-&nbsp; no CIS present<br>
-<br>
-which I guess to indicate problems. hciconfig returns nothing. Is there
-any hope?<br>
-Thanks, Nelson Hogg<br>
-</body>
-</html>
+nicholas
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: Oracle 10g
+Get certified on the hottest thing ever to hit the market... Oracle 10g. 
+Take an Oracle 10g class now, and we'll give you the exam FREE.
+http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
