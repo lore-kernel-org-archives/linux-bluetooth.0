@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050222120225.46790.qmail@web26601.mail.ukl.yahoo.com>
-From: BZ Benny <bennybbz@yahoo.fr>
-To: bluez maillinglist <bluez-users@lists.sourceforge.net>
+From: Florian Echtler <echtler@fs.tum.de>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: strange btsco error
+In-Reply-To: <Pine.LNX.4.61.0502221045530.11660@block.bubble>
+Message-ID: <Pine.LNX.4.61.0502221238490.11660@block.bubble>
+References: <Pine.LNX.4.61.0502191116450.10610@block.bubble> <cv89g9$399$1@sea.gmane.org>
+ <Pine.LNX.4.61.0502200852440.15784@block.bubble> <cvad1d$8tb$1@sea.gmane.org>
+ <Pine.LNX.4.61.0502221045530.11660@block.bubble>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Removing hcid daemon
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,32 +20,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Feb 2005 13:02:24 +0100 (CET)
+Date: Tue, 22 Feb 2005 12:41:45 +0100 (CET)
 
-Hi all,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-every time I run hcid  the bluetooth module is used
-and we see with lsmod by which other modules it is
-used.
-i want the remove bluetooth with 
-#rmmod bluetooth
-but before a remove other modules that use bluetoth
-like hci_usb, l2cap and others.
-but how could I remove daemons and how could I see
-daemons that I'm runing and that use bluetooth module
-such as hcid daemon?
+> Any experiences with that? Better kernel ALSA or standalone ALSA?
 
-tanks
-regards,
-benny
+Well, I solved that one by myself (see also 
+http://thread.gmane.org/gmane.linux.bluez.devel/3790). Obviously,
+kernel ALSA is necessary (I'm using 2.6.10-mh2).
 
+Two things therefore:
+1. the B-Speech Elect Headset works fine (now ;)
+2. on the bluetooth-alsa site, you should really mention that external
+   ALSA drivers (at least 1.0.8) won't work! (as already asked for in 
+   the above thread)
 
-	
+Yours, Florian
+- -- 
+Preserve wildlife - pickle a squirrel today!
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
 
-	
-		
-Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
-Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
+iD8DBQFCGxp+7CzyshGvatgRAsMOAKDlUbCE1vJw3zB2W/w4bYa2/6dg+ACcDdvW
+HO16/AOvfxJu+Bw5x/flhPg=
+=5mjw
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
