@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Send voice packets over bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de4657604110503294e6f6465@mail.gmail.com>
-References: <2de4657604110503294e6f6465@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1099656148.6919.1.camel@pegasus>
+Message-ID: <2de4657604110503294e6f6465@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] Send voice packets over bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Nov 2004 13:02:28 +0100
+Date: Fri, 5 Nov 2004 16:59:22 +0530
 
-Hi Manjunath,
+hi guys,
+i am  trying a scenario where i can send voice packets(generated
+through some application) over bluetooth. I want my 2  machines which
+have USB bluetooth dongles attached, to communicate  with voice
+packets.
+hope some of u can suggest some application. I am using linux boxes.
 
-> i am  trying a scenario where i can send voice packets(generated
-> through some application) over bluetooth. I want my 2  machines which
-> have USB bluetooth dongles attached, to communicate  with voice
-> packets.
-> hope some of u can suggest some application. I am using linux boxes.
-
-check out the scotest program, but be aware of that you can only send
-voice data in the correct format over the Bluetooth SCO links.
-
-Regards
-
-Marcel
-
-
+regards,
+manjunath
 
 
 -------------------------------------------------------
