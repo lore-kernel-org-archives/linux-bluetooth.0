@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth 2.0 compact flash cards
+Subject: Re: [Bluez-users] ambicom bt2000e (ericsson) compact flash card
+	compatibility
 From: Marcel Holtmann <marcel@holtmann.org>
 To: g m <nyc2kiev@yahoo.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041019181658.83192.qmail@web61205.mail.yahoo.com>
-References: <20041019181658.83192.qmail@web61205.mail.yahoo.com>
+In-Reply-To: <20041019180219.36126.qmail@web61206.mail.yahoo.com>
+References: <20041019180219.36126.qmail@web61206.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1098211967.12620.9.camel@pegasus>
+Message-Id: <1098210360.12620.6.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,16 +19,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Oct 2004 20:52:47 +0200
+Date: Tue, 19 Oct 2004 20:26:00 +0200
 
 Hi,
 
-> does anyone know of any CF cards other than Brainboxes (they are only
-> about 10Xs as much as my old ambicom) that use the BlueCore02 chip?
+> *highfives* marcel
+>  
+> you are the man!!!
+>  
+> thanks for all your hard work!
 
-there are many of them, but you need the right firmware and the flash
-size must be 8 Mbit to update them. However most companies don't care
-after they sold them.
+does this mean, that your card works with 2.6.9? If yes, please post the
+output from "hciconfig -a" and "dump_cis" and tell us what hciattach
+parameters you used.
 
 Regards
 
