@@ -1,20 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Apple bluetooth mouse
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Elimar Riesebieter <riesebie@lxtec.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>,
+From: Elimar Riesebieter <riesebie@lxtec.de>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>,
    debian-powerpc <debian-powerpc@lists.debian.org>
-In-Reply-To: <20031230221526.GD946@samweis.home.lxtec.de>
-References: <20031228012502.GA16798@samweis.home.lxtec.de>
-	 <20031228170349.GA1460@samweis.home.lxtec.de> <m3fzf47oa3.fsf@neo.loria>
-	 <20031230182456.GA3035@samweis.home.lxtec.de>
-	 <1072813766.2542.28.camel@pegasus>
-	 <20031230205918.GA946@samweis.home.lxtec.de>
-	 <1072818406.2542.33.camel@pegasus>
-	 <20031230221526.GD946@samweis.home.lxtec.de>
-Content-Type: multipart/mixed; boundary="=-kFBwy83UdveKwsHoMi2Q"
-Message-Id: <1072857870.26925.3.camel@pegasus>
+Subject: Re: [Bluez-users] Apple bluetooth mouse
+Message-ID: <20031230221526.GD946@samweis.home.lxtec.de>
+References: <20031228012502.GA16798@samweis.home.lxtec.de> <20031228170349.GA1460@samweis.home.lxtec.de> <m3fzf47oa3.fsf@neo.loria> <20031230182456.GA3035@samweis.home.lxtec.de> <1072813766.2542.28.camel@pegasus> <20031230205918.GA946@samweis.home.lxtec.de> <1072818406.2542.33.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="xA/XKXTdy9G3iaIz"
+In-Reply-To: <1072818406.2542.33.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,70 +19,73 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 31 Dec 2003 09:04:30 +0100
+Date: Tue, 30 Dec 2003 23:15:26 +0100
 
 
---=-kFBwy83UdveKwsHoMi2Q
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+--xA/XKXTdy9G3iaIz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hi Elimar,
+On Tue, 30 Dec 2003 the mental interface of=20
+Marcel Holtmann told:
 
-> > 	T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-> > 	D:  Ver= 1.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-> > 	P:  Vendor=05ac ProdID=1000 Rev= 9.01
-> > 	C:* #Ifs= 2 Cfg#= 1 Atr=c0 MxPwr=100mA
-> > 	I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=hid
-> > 	E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> > 	I:  If#= 1 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=hid
-> > 	E:  Ad=82(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> > 
-> > this looks like a Bluetooth HID proxy device from CSR. You can use the
-> > hid2hci program to switch it into HCI mode. However it seems that Apple
-> > is using its own vendor id, so you must change this in the source code.
-> 
-> Where in the source code? This should be a useful info for Benjamin
-> Herrenschmidt as well.
-> 
-> I found hid2hci In the CVS sourcecode from bluez-utils2.
-> hid2hci -(0|1) gives me 
-> No devices in H(CI|DI) mode found ;-(
+> Hi Elimar,
+>=20
+> > Neither OHCI nor EHCI was enabled in my kernel. Changed that and the
+> > mouse works like a charm at console and X ;-)
+> >=20
+> > Thank you for that hint!
+> >=20
+> > But anyway: hcitool inq like shown at
+> > http://www.holtmann.org/linux/bluetooth/hid.html tells:
+> > Inquiring ...
+> > Inquiry failed.: No such device
+>=20
+> 	T:  Bus=3D02 Lev=3D01 Prnt=3D01 Port=3D00 Cnt=3D01 Dev#=3D  2 Spd=3D12  =
+MxCh=3D 0
+> 	D:  Ver=3D 1.10 Cls=3D00(>ifc ) Sub=3D00 Prot=3D00 MxPS=3D 8 #Cfgs=3D  1
+> 	P:  Vendor=3D05ac ProdID=3D1000 Rev=3D 9.01
+> 	C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3Dc0 MxPwr=3D100mA
+> 	I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D03(HID  ) Sub=3D01 Prot=3D01 Drive=
+r=3Dhid
+> 	E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
+> 	I:  If#=3D 1 Alt=3D 0 #EPs=3D 1 Cls=3D03(HID  ) Sub=3D01 Prot=3D02 Drive=
+r=3Dhid
+> 	E:  Ad=3D82(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
+>=20
+> this looks like a Bluetooth HID proxy device from CSR. You can use the
+> hid2hci program to switch it into HCI mode. However it seems that Apple
+> is using its own vendor id, so you must change this in the source code.
 
-you have to change the vendor id. The hid2hci.c source is not very
-complex and I thought it is easy to see where to change the vendor id.
-However the attached patch changes it for you. If it works I will write
-a version of hid2hci that will also find the Apple dongle.
+Where in the source code? This should be a useful info for Benjamin
+Herrenschmidt as well.
 
-Regards
+I found hid2hci In the CVS sourcecode from bluez-utils2.
+hid2hci -(0|1) gives me=20
+No devices in H(CI|DI) mode found ;-(
 
-Marcel
+HANN
 
+Elimar
 
---=-kFBwy83UdveKwsHoMi2Q
-Content-Disposition: attachment; filename=patch
-Content-Type: text/x-patch; name=patch; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
+--=20
+  Learned men are the cisterns of knowledge,=20
+  not the fountainheads ;-)
 
-diff -urN utils2/hid/hid2hci.c utils2-mh/hid/hid2hci.c
---- utils2/hid/hid2hci.c	2003-12-05 12:10:28.000000000 +0100
-+++ utils2-mh/hid/hid2hci.c	2003-12-31 08:59:17.000000000 +0100
-@@ -249,11 +249,11 @@
- 	switch (mode) {
- 	default:
- 	case 0:
--		vendor  = 0x0a12;
-+		vendor  = 0x05ac;
- 		product = 0x1000;
- 		break;
- 	case 1:
--		vendor  = 0x0a12;
-+		vendor  = 0x05ac;
- 		product = 0x0001;
- 		break;
- 	}
+--xA/XKXTdy9G3iaIz
+Content-Type: application/pgp-signature
+Content-Disposition: inline
 
---=-kFBwy83UdveKwsHoMi2Q--
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
 
+iD8DBQE/8fj+3Ig8bsVPf7ARAt+lAKC6z7+EhRzR1uu3oAahDPALxAasbQCfWlj/
+kxFFbfj+/BgXnzc0JskDhZE=
+=0VyV
+-----END PGP SIGNATURE-----
+
+--xA/XKXTdy9G3iaIz--
 
 
 -------------------------------------------------------
