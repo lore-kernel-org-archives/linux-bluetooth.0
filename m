@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] CAD library for BT carrier socket
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Przemek Hausman <aquamala@o2.pl>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040302190149.GA12430@mech.pw.edu.pl>
-References: <20040302190149.GA12430@mech.pw.edu.pl>
-Content-Type: text/plain
-Message-Id: <1078256656.1942.197.camel@pegasus>
+From: Przemek Hausman <aquamala@o2.pl>
+To: bluez-users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] CAD library for BT carrier socket 
+Message-ID: <20040302190149.GA12430@mech.pw.edu.pl>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-2
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,26 +15,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 02 Mar 2004 20:44:16 +0100
+Date: Tue, 2 Mar 2004 20:01:49 +0100
 
-Hi Przemek,
+Hi Folks!
 
-> I'm afraid it's not a good place to ask but I have no idea where else can I try.
-> 
-> I am looking for a library for CAD software (e.g. Eagle od Protel) which contains a package 
-> and PCB layout for Suyin's Bluetooth Carrier Socket for Ericsson Module ROK101007.
-> 
-> If you have such library I would like to kindly ask you for it. Please, make it available on
-> some www site or send it here. Of corse you can push in to my priv `aquamala [in domain] o2
-> [dot] pl'.
+I'm afraid it's not a good place to ask but I have no idea where else can I try.
 
-I don't know of any, but I am only a software engineer ;)
+I am looking for a library for CAD software (e.g. Eagle od Protel) which contains a package 
+and PCB layout for Suyin's Bluetooth Carrier Socket for Ericsson Module ROK101007.
 
-Regards
+If you have such library I would like to kindly ask you for it. Please, make it available on
+some www site or send it here. Of corse you can push in to my priv `aquamala [in domain] o2
+[dot] pl'.
 
-Marcel
-
-
+Best regards, 
+Przemek Hausman
 
 
 -------------------------------------------------------
