@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Sigrid Kronenberger <skronenberger@web.de>
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20040815222056.2160d599@localhost>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Kernel 2.6.8 final and AVM BlueFritz
+Subject: Re: [Bluez-users] MS multimedia keys
+References: <411EF7C7.10900@hotmail.com> <1092590175.4375.59.camel@pegasus> <20040815190508.GC2321@ucw.cz>
+In-Reply-To: <20040815190508.GC2321@ucw.cz>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200408152127.44433.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,137 +19,52 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 Aug 2004 22:20:56 +0200
+Date: Sun, 15 Aug 2004 21:27:43 +0200
 
-Hello :)
+Marcel, 
 
-I've changed my Kernel from 2.6.3-15mdk to the 2.6.8 final
-(Vanilla-Kernel) with Mandrake 10.0 Official. 
+so you must remap it to lower numbers first before you'll send it into 
+keyboard.c???
 
-Now, the firmware request for my USB-Bluetooth-Dongle is ok :) I'm using
-the AVM-Firmware-Version 3-18-39.
+Michal
 
-
-[root@localhost sigrid]# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:04:0E:81:F3:12 ACL MTU: 672:6  SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:119 acl:0 sco:0 events:8 errors:0
-        TX bytes:63 acl:0 sco:0 commands:8 errors:0
-        Features: 0x2f 0xbe 0x05 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'Bluetooth Device'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x1227 LMP Ver: 1.1 (0x1) LMP
-Subver: 0x1
-        Manufacturer: AVM Berlin (31)
-
-[root@localhost sigrid]#
-
-
-[root@localhost sigrid]# sdptool browse
-Inquiring ...
-Browsing 00:04:0E:81:71:87 ...
-[root@localhost sigrid]#
-
-
-[root@localhost sigrid]# ciptool search
-Searching ...
-        Checking service for 00:04:0E:81:71:87
-        Connecting to device 00:04:0E:81:71:87
-Local device is not accepting role switch
-Can't connect L2CAP socket: Connection refused
-[root@localhost sigrid]#
-
-How can I change the last point? My AP don't accept the role switch. 
-
-
-My /etc/bluetooth/hcid.conf looks like this: 
-
-#
-# HCI daemon configuration file.
-#
-# $Id: hcid.conf,v 1.4 2004/04/29 20:14:21 holtmann Exp $
-#
-
-# HCId options
-options {
-	# Automatically initialize new devices
-	autoinit yes;
-
-	# Security Manager mode
-	#   none - Security manager disabled
-	#   auto - Use local PIN for incoming connections
-	#   user - Always ask user for a PIN
-	#
-	security auto;
-
-	# Pairing mode
-	#   none  - Pairing disabled
-	#   multi - Allow pairing with already paired devices
-	#   once  - Pair once and deny successive attempts
-	pairing multi;
-
-	# PIN helper
-	pin_helper /usr/bin/bluepin;
-
-	# D-Bus PIN helper
-	#dbus_pin_helper;
-}
-
-# Default settings for HCI devices
-device {
-	# Local device name
-	#   %d - device id
-	#   %h - host name
-	name "BlueZ (%d)";
-
-	# Local device class
-	class 0x100;
-
-	# Default packet type
-	#pkt_type DH1,DM1,HV1;
-
-	# Inquiry and Page scan
-	iscan enable; pscan enable;
-
-	# Default link mode
-	#   none   - no specific policy 
-	#   accept - always accept incoming connections
-	#   master - become master on incoming connections,
-	#            deny role switch on outgoing connections
-	#
-	#lm accept,master;
-	#
-	lm accept;
-
-	# Default link policy
-	#   none    - no specific policy
-	#   rswitch - allow role switch
-	#   hold    - allow hold mode
-	#   sniff   - allow sniff mode
-	#   park    - allow park mode
-	#
-	#lp hold,sniff;
-	#
-	lp rswitch,hold,sniff,park;
-
-	# Authentication and Encryption
-	#auth enable;
-	#encrypt enable;
-}
-
-
-So, I think, it should work with the role switch. Or do I have to change
-another entry in this file?
-
-Regards
-
-Sigrid
+Dne ne 15. srpna 2004 21:05 Vojtech Pavlik napsal(a):
+> On Sun, Aug 15, 2004 at 07:16:15PM +0200, Marcel Holtmann wrote:
+> > Hi Vojtech,
+> >
+> > > > > Eigene Musik
+> > > > > keyboard.c: can't emulate rawmode for keycode 255
+> > > > > keyboard.c: can't emulate rawmode for keycode 255
+> > > > > Messenger
+> > > > > keyboard.c: can't emulate rawmode for keycode 252
+> > > > > keyboard.c: can't emulate rawmode for keycode 252
+> > > > > Abmelden
+> > > > > keyboard.c: can't emulate rawmode for keycode 248
+> > > > > keyboard.c: can't emulate rawmode for keycode 248
+> > > >
+> > > > this problem is because in drivers/char/keyboard.c the
+> > > > x86_keycodes[256] array miss the line for the last 16 keycode
+> > > > translations.
+> > > >
+> > > > Vojtech, any reason why they are not filled in?
+> > >
+> > > Because rawmode only can express 240 different scancodes.
+> >
+> > may you explain this a little bit. I found a posting from you on the
+> > LKML where you said this has something do to with the PS/2 protocol, but
+> > I still can't follow it.
+>
+> The PS/2 protocol has valid keycodes in these two ranges:
+>
+> 	00 to 5f and e0 00 to e0 5f
+>
+> The first is the classic XT set and the other is the extended set. Of
+> course there are exceptions and also some of the 60-7f and e060-e07f can
+> be used. This gives approximately 240 possible scancodes.
+>
+> The table maps those 240 scancodes to the first 240 Linux keycodes.
+> Keycodes above this limit don't have any mapping, because it'd have to
+> be identical with some already used, or cause a protocol violation.
 
 
 -------------------------------------------------------
