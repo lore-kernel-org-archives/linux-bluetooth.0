@@ -1,11 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hcitool scan problems....
-From: Diego Liziero <liziero.diego@unimore.it>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1C090C0C-3E51-11D9-950D-00039390D626@pepper.com>
-References: <1C090C0C-3E51-11D9-950D-00039390D626@pepper.com>
+Subject: Re: [Bluez-devel] audio problems with a2play
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41A3FD27.6060400@xmission.com>
+References: <41A22C0B.4050008@xmission.com>	<41A234FA.7020303@xmission.com>
+	 <20041123033429.132bf84b.henryk@ploetzli.ch>
+	 <41A2B331.4010001@xmission.com>
+	 <20041123070621.50569968.henryk@ploetzli.ch>
+	 <41A3471C.4000602@xmission.com>
+	 <20041123203836.046fb4f4.henryk@ploetzli.ch>
+	 <41A3ACE2.4030501@xmission.com> <1101246735.27351.45.camel@pegasus>
+	 <41A3FD27.6060400@xmission.com>
 Content-Type: text/plain
-Message-Id: <1101371373.11603.24.camel@igno>
+Message-Id: <1101272951.27351.76.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,31 +25,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Nov 2004 09:29:32 +0100
+Date: Wed, 24 Nov 2004 06:09:11 +0100
 
-On Wed, 2004-11-24 at 14:43 -0500, Michael Frey wrote:
-> I am currently seeing strange behavior while doing "scans".
-> 
-> It takes me several scans to see the devices I have in range.  Also,  
-> sometimes when I issue "hcitool scan" it does not even scan.  It just 
-> stops immediately after printing "Scanning ...".
-> 
-> Can anyone explain this?
-Maybe,
-the default option is to search other bluetooth devices
-for 8 windows (about 10 seconds).
+Hi Brad,
 
-Try to wait 10 seconds or decrease the scanning length
-with option --length=how_many_win_to_use_for_searching
+> If I'm understanding right, the payload should include the sbc_info 
+> header. I thought all along that was just for the purpose of storing the 
+> sbc in a file, but it sounds like the headset needs it.
 
-When you see the devices printed immediately,
-it could be because they are discovered during the first
-window, or because they are already in the cache,
-due to a previous scan.
+I also don't see any reason why we need to store a SBC configuration and
+then submit the same values with every frame. However without the header
+it is impossible to get the SBC frame size.
 
-Regards,
--- 
-Diego Liziero <diego.liziero@unimore.it>
+> Is this closer? It doesn't sound right yet, but maybe we really do need 
+> to load up the packet to be closer to the mtu in order for the headset 
+> to be happy.
+
+Do you mean you get some working sound with the specification conform
+payload?
+
+Regards
+
+Marcel
+
 
 
 
