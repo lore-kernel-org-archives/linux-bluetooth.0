@@ -3,12 +3,14 @@ Subject: Re: [Bluez-users] sniffing others devices - noob
 From: Marcel Holtmann <marcel@holtmann.org>
 To: tpeyrin@cpe.fr
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1081425934.4075400e59f4f@webmail.cpe.fr>
+In-Reply-To: <1081426638.407542ce468c7@webmail.cpe.fr>
 References: <20040408114459.19348.qmail@web60309.mail.yahoo.com>
 	 <1081425612.2970.25.camel@pegasus>
 	 <1081425934.4075400e59f4f@webmail.cpe.fr>
+	 <1081426395.2970.27.camel@pegasus>
+	 <1081426638.407542ce468c7@webmail.cpe.fr>
 Content-Type: text/plain
-Message-Id: <1081426395.2970.27.camel@pegasus>
+Message-Id: <1081426854.2970.31.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,16 +22,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Apr 2004 14:13:15 +0200
+Date: Thu, 08 Apr 2004 14:20:54 +0200
 
 Hi Thomas,
 
-> on the net I saw example of output of hcidump and after a link key request, the
-> response is a 16 bytes value ... this is not the in_rand value in the
-> authentification ??
+> well i've already read it ... but i thought that the link key was not
+> transmitted in clear. The first data transmitted is in_rand the first random
+> value. hcidump doesn't display data transmitted ?? 
 
-the 16 bytes you have seen must be the 128 bit link key. Read the
-Bluetooth HCI specification.
+you should read it again. The link key and also the pin code are never
+transmitted in clear over the air.
+
+hcidump displays all data on the HCI level. Use the -x switch to look
+into some packets.
+
+> if not, do you know a free software that can allow me to catch those data.
+
+On lower levels than HCI you only get the information with a protocol
+analyser.
 
 Regards
 
