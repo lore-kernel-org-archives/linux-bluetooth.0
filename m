@@ -1,79 +1,71 @@
-Return-Path: <Carl.Orsborn@csr.com>
-Message-ID: <411C9CC0.90507@csr.com>
-Date: Fri, 13 Aug 2004 11:49:36 +0100
-From: Carl Orsborn <cjo@csr.com>
-MIME-Version: 1.0
-To: jt@hpl.hp.com
-CC: Marcel Holtmann <marcel@holtmann.org>,
-   BlueZ mailing list
-    <bluez-devel@lists.sourceforge.net>,
-   Steven Singer
-    <steven.singer@csr.com>
-Subject: Re: [Bluez-devel] CSR firmware question...
-References: <20040813002514.GA21388@bougret.hpl.hp.com>
-In-Reply-To: <20040813002514.GA21388@bougret.hpl.hp.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Alignment issue
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Daryl Van Vorst <daryl@wideray.com>,
+   "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1092315210.15466.220.camel@hades.cambridge.redhat.com>
+References: <001201c47fc2$7093e4a0$1301010a@baked>
+	 <1092252699.4564.238.camel@pegasus>
+	 <1092299689.4622.8.camel@imladris.demon.co.uk>
+	 <1092302834.28711.72.camel@pegasus>
+	 <1092304890.15466.44.camel@hades.cambridge.redhat.com>
+	 <1092306154.28711.85.camel@pegasus>
+	 <1092315210.15466.220.camel@hades.cambridge.redhat.com>
+Content-Type: text/plain
+Message-Id: <1092391122.28711.220.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 13 Aug 2004 11:58:42 +0200
 
-Hi, Jean,
+Hi David,
 
-Can you reveal what you're doing with the CSR device when
-you suffer deadlock?  We may recognise the symptoms, and possibly
-know of a workaround or of fixed firmware.
-
-Build 0x1bb is "HCI 15.3", released in August 2002.  Build 0x20e
-is "HCI 16.4", released in October 2002.  HCI 16.4 introduced
-basic scatternet support and fixed some issues in HCI 15.3.
-
-HCI 16.14 (build 0x33d) was published to product manufacturers
-in April 2003.  This fixed a handful of issues in HCI 16.4.  You
-may be able to get hold of this, but I have no knowledge of
-what firmware D-Link have tested with their hardware and have
-subsequently (signed and?) published.
-
-If your hardware is suitable (i.e., if it has an 8 Mbit flash
-device), you may be able to load HCI 18.1 or HCI 18.2; these
-support BT 1.2.
-
-Carl
-
-
-Jean Tourrilhes wrote:
-
-> 	Hi guys,
+> These should do it right on all architectures -- I've checked with a gcc
+> hacker and verified that at least the get_unaligned() version does the
+> right thing on both FR-V and i386. On FR-V it loads each byte and shifts
+> it into place, while on i386 it just loads it.
 > 
-> 	A few questions regarding CSR firmware : what's a commonly
-> available BT USB dongle with a recent CSR firmware.
+> #define get_unaligned(ptr)                      \
+> ({                                              \
+>         struct __attribute__((packed)) {        \
+>                 typeof(*(ptr)) __v;             \
+>         }  *__p = (ptr);                        \
+>         __p->__v;                               \
+> })
 > 
-> 	Long story :
-> 	I'm hitting various bugs with the CSR firmware in my D-Link
-> USB dongles (0x1bb), where I can easilly deadlock the dongle. My 3Com
-> dongle, which has a more recent firmware (0x20e), behave much better,
-> but not perfect.
-> 	D-Link doesn't provide a firmware updater, but, beeing
-> fearless, I tried to firmware upgrade a D-Link dongle and ended up
-> with a dead dongle (can't even put back the original firmware on it).
-> 	From the release notes, the latest CSR firmwares have zillions
-> of bug fixes. I really wonder how I can enjoy the bug fixes.
-> 
-> 	Thanks in advance...
-> 
-> 	Jean
-> 
-> P.S. : Marcel, do you have a version of btdfu that can write the
-> firmware image to the dongle ? Or some documentation ?
+> #define put_unaligned(ptr, val)			\
+> do {                                            \
+>         struct __attribute__((packed)) {        \
+>                 typeof(*(ptr)) __v;             \
+>         }  *__p = (ptr);                        \
+>         __p->__v = (val);			\
+> } while(0)
+
+is it verified that this works with every GCC release? Some people still
+use a 2.95 or older.
+
+Regards
+
+Marcel
 
 
 
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
