@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2F8E7538CA01D711BC5900B0D079E7100394F3D0@zin03exm01.corp.mot.com>
-From: Chakravarthi Lalith-A5259C <A5259C@motorola.com>
-To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
+Message-ID: <20040225093953.42411.qmail@web41309.mail.yahoo.com>
+From: comp sci <compsci10hyd@yahoo.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] Time out!!
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] obex file transfer..!
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,15 +15,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Feb 2004 16:40:29 +0530
+Date: Wed, 25 Feb 2004 01:39:53 -0800 (PST)
 
+Sir,
+     I was able to do Obex file transfer to other PC
+from my PC using ussp-push as specified in
+http://www.klings.org/nowires/main.php/How-To/OBEX/
+     Now if I want to recieve the file from other
+device what should I.Is there any Obex server included
+in the bluez stack or apps,which can waiting for files
+etc.
+     Hope to hear from you in this regard.
+Thank you.
 
-Hi...
-
-I have a USB Dongle that has a time out period of 20000.00 msecs. So could you suggest what the method of increasing the time out period is??
-I am a beginner and would appreciate any step-by-step approach towards establishing a two-way connection with a motorola V-600 phone
-
--- Lalith
+__________________________________
+Do you Yahoo!?
+Yahoo! Mail SpamGuard - Read only the mail you want.
+http://antispam.yahoo.com/tools
 
 
 -------------------------------------------------------
