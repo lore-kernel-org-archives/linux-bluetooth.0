@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bthid and 2.4.25-mh2
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403182342.04788.cijoml@volny.cz>
-References: <200403171304.37863.cijoml@volny.cz>
-	 <200403182250.03678.cijoml@volny.cz> <1079648978.3301.84.camel@pegasus>
-	 <200403182342.04788.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1079654494.3301.93.camel@pegasus>
-Mime-Version: 1.0
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200403182352.18923.cijoml@volny.cz>
+Subject: [Bluez-users] bthid and standby button
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,29 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 19 Mar 2004 01:01:34 +0100
+Date: Thu, 18 Mar 2004 23:52:18 +0100
 
-Hi Michal,
+Hi Marcel,
 
-> It would be nice if other projects fix their bugs so quick :)
-> I think you, Marcel, are one of the best mainteiners :)
+I looked through my keyboard because of hotkeys and find out, that 
 
-thanks :)
+StandBy button is not recognized well - xev doesn't return key code.
 
-I have a high priority on kernel bugs, but this means that the userspace
-stuff has to wait. Actually we have so many outstanding patches for the
-hcid from Fredrik and most of them should be integrated, but I didn't
-found the time to review them. Sorry for that :(
+Stand by
+> ACL data: handle 0x0029 flags 0x02 dlen 7
+    L2CAP(d): cid 0x41 len 3 [psm 0]
+      A1 03 02
 
-Right now I have a very big problem with Bluetooth and a 2.6 kernel on
-the sparc64 platform. I have no idea what's going wrong, but every 2.4
-works like a charm. Do anyone have this combination running?
-
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
