@@ -1,67 +1,78 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Newbie problem: can't open HIDP control socket
-	-?-
-From: Marcel Holtmann <marcel@holtmann.org>
-To: emile castelnuovo <emile.castelnuovo@tin.it>
+Return-Path: <charles@bueche.ch>
+Date: Thu, 16 Sep 2004 10:31:27 +0200
+From: Charles Bueche <charles@bueche.ch>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <002d01c49c37$d3ab26c0$4d982001@porty>
-References: <002d01c49c37$d3ab26c0$4d982001@porty>
-Content-Type: text/plain; charset=windows-1251
-Message-Id: <1095404950.19426.69.camel@pegasus>
+Subject: Re: [Bluez-users] USB/bluetooth crash at boot-time
+Message-ID: <20040916103127.4f97fac5@bluez.bueche.ch>
+In-Reply-To: <1095188536.5695.197.camel@pegasus>
+References: <20040914203859.028fe83a@bluez.bueche.ch>
+	<1095188536.5695.197.camel@pegasus>
 Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Sep 2004 09:09:10 +0200
+Content-Type: text/plain; charset=US-ASCII
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Emile,
+Hi Marcel and list,
 
-> Hi all, I=92m new to this list and bluetooth in general. I=92m trying t=
-o
-> make a DUN connection using my phone.
->=20
-> I=92ve installed packages found in the bluez.org site rpms for the Red
-> Hat and followed some tutorials.
->=20
-> Everything works quite fine=85 I connect to the device, and set up a pp=
-p
-> connection.
->=20
-> I have one only problem. When I start the Bluetooth service
-> =93/etc/init.d/Bluetooth start=94 I get this error message:
->=20
-> Can=92t open HIDP control socket: Invalid argument.
+thanks for your hint. After 3 cold boots with wireless "on", no Oops to
+report. However, I'm now running the vanilla 2.6.9rc2, and my bug was
+previously happening under gentoo-dev-sources, which is heavily
+patched.
 
-use a 2.6.8 or newer kernel or at least on with a -mh patch and activate
-the HIDP support.
+I will have to wait for gentoo-dev-sources-2.6.9 to see if the bug is
+really gone.
 
-> Can anybody help me find a solution?
->=20
-> I=92m not sure is this, but when I connect with my phone modem, after a
-> little time it does not work anymore.
+Meanwhile, I like the boot without stack dumps. Thanks for your support
+!
 
-This is another problem and unrelated to the error message above.
+Regards,
+Charles
 
-Regards
+On Tue, 14 Sep 2004 21:02:16 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-Marcel
+> Hi Charles,
+> 
+> > I have a Dell Inspiron 8600, with the integrated bluetooth module,
+> > which I see as usb device. I run gentoo, kernel 2.6.7-gentoo-r11
+> > (sys-kernel/gentoo-dev-sources).
+> > 
+> > lspci -v -v -v result is attached, the full boot log as well.
+> > 
+> > I can enable/disable the wireless parts (bluetooth and IPW2200
+> > mini-pci card) using a hotkey (Fn-F2). A blue led shows the status.
+> > 
+> > If I boot with it disabled (eg I hotkey it to off during grub
+> > countdown), and I enable it afterwards, everything is OK, I can use
+> > bluez with hci and friends fine.
+> > 
+> > If I boot it with the wireless stuff enabled, I get a sort of oops,
+> > below is the partial log, see attachment for unwrapped log.
+> > 
+> > I suspect either bluez or USB subsystems, but you guys will probably
+> > be able to help me. The whole things appeared a few kernel version
+> > ago, but I can reproduce this history. Thanks for hints.
+> 
+> please check out 2.6.9-rc2 and also try if disabling preempt helps.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: thawte's Crypto Challenge Vl
+> Crack the code and win a Sony DCRHC40 MiniDV Digital Handycam
+> Camcorder. More prizes in the weekly Lunch Hour Challenge.
+> Sign up NOW http://ad.doubleclick.net/clk;10740251;10262165;m
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
-Project Admins to receive an Apple iPod Mini FREE for your judgement on
-who ports your project to Linux PPC the best. Sponsored by IBM.
-Deadline: Sept. 24. Go here: http://sf.net/ppc_contest.php
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+-- 
+Charles Bueche <charles@bueche.ch>
+sand, snow, wave, wind and net -surfer
