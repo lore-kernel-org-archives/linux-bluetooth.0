@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-users] Serial connection between two Linux machines
+Subject: Re: [Bluez-users] Update on sending from K700i
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Thomas.Luby@nokia.com
+To: niklas adolfsson <niklas.adolfsson@home.se>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <37AD475D23C5D0469726DD437E59714151177E@esebe022.ntc.nokia.com>
-References: <37AD475D23C5D0469726DD437E59714151177E@esebe022.ntc.nokia.com>
+In-Reply-To: <40FEC2CC.8050504@home.se>
+References: <40FEC2CC.8050504@home.se>
 Content-Type: text/plain
-Message-Id: <1090479270.21828.20.camel@pegasus>
+Message-Id: <1090479153.21828.17.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,21 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Jul 2004 08:54:30 +0200
+Date: Thu, 22 Jul 2004 08:52:33 +0200
 
-Hi Thomas,
+Hi Niklas,
 
-> Sorry to trouble you again.
+> I have tried the sending from my K700i a bit more now. First of all it 
+> seems that the problem lies on the phone side. I have used two different 
+> Z600 and the can send picture after picture, the are very stable and can 
+> use everything avaliable in bluez that i have tried without problems. 
+> The K700i though is instable, it looses the connection, it just stands 
+> ant chews at "connecting" and i have to turn it off to get it to stop, 
+> then it won't start for about 30 seks it is as if  the battery was taken 
+> out. When i send somethings from the phone it connects sometimes and 
+> sometimes not, when i can send something it hangs and won't release from 
+> the bluetooth connection making it impossible to send anything more. If 
+> i am able to disconnect the connection using for example "hcitool" then 
+> if i try to go back on it won't work.
 > 
-> Quite simply, the connection remains open until I send something over the serial port. Then it closes
+> I have to see if i can update the software in the phone i guess, if 
+> there are any updates considering bluetooth that is, otherwise it seems 
+> that the bluetooth implementation in K700i is done badly by SonyEricsson.
 > 
-> There must be some character that causes this like eof
-> 
-> Is this normal? Has you experienced this behaviour before?
+> Does anoyone know if the K700i can have some kind of new or different 
+> bluetooth implementation model that bluez won't handle yet or is it as i 
+> think that bluetooth is bluetooth and this phone is bad at it?
 
-this can be possible, but I've never seen it so far. Setting the RFCOMM
-TTY into raw mode before using it is maybe a good idea. Otherwise you
-should check with strace and hcidump what is really going on.
+please try to update your phone, because I don't think that this is a
+BlueZ problem. The RFCOMM layer is known to work with a big number of
+phones without any problems. If SonyEricsson don't have a firmware
+update for this problem, I need a K700i so I can change the RFCOMM layer
+to get this phone working. However I will only do that if I have real
+hardware to test against.
 
 Regards
 
