@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michael Mauch <michael.mauch@gmx.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20040104192319.GB2787@elmicha.333200002251-0001.dialin.t-online.de>
-References: <1073239248.2928.18.camel@localhost>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Bluez-users] Problem "coldplugging"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Oguzhan Eris <eris3@ekls.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <1073239248.2928.18.camel@localhost>
-Subject: [Bluez-users] Re: Problem "coldplugging"
+References: <1073239248.2928.18.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1073243976.25261.160.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,57 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 4 Jan 2004 20:23:19 +0100
+Date: Sun, 04 Jan 2004 20:19:36 +0100
 
-Oguzhan Eris wrote:
+Hi,
 
 > Hi, I was wondering if someone could help me out with a problem using
 > the IOGEAR GBU301 device which requires bluefw.
+> 
+> Everything works fine if I hotplug the device with the device matching
+> bluefw.usermap and running the appropriate bluefw command.  
+> 
+> I have kernel 2.6.0   (now upto  rc1-mm1)  with the bluetooth matches
+> from patch-2.6.0-mh1   (it applied cleanly to 2.6.0-rc1)  I have tried
+> ALL combinations.
 
-I have two Tecom BT-3030 here, and the same problem, both with a desktop
-and with a laptop. It worked in the past, but at the moment it's rather
-flaky. Alas I changed too much in between, so I can't tell when the
-problems started.
+the patch-2.6.0-mh1 don't apply cleanly to 2.6.0-rc1 :(
 
-> When I do modprobe hci_usb however, it doesn't work.  I've added a lot
-> of debugging to bluefw and found that "sometimes" it thinks the vendor
-> id of the dongle is  0x2000  instead of  0x2033  I can confirm this
-> right now even.  Here's the lines from /proc/bus/usb/devices
+Try to use 2.6.0-mh2 and don't install bluefw. The new bcm203x provides
+the same functionalty and uses the firmware.agent hotplug script for
+firmware loading.
 
-Same here. Sometimes it's even 0x2001.
- 
-> T:  Bus=02 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-> D:  Ver= 1.01 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0a5c ProdID=2000 Rev= 0.a0
-> S:  Manufacturer=Broadcom Corp.
-> S:  Product=BCM2033
-> S:  SerialNumber=2033B1100001
+Regards
 
-On the desktop:
+Marcel
 
-T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  5 Spd=12  MxCh= 0
-D:  Ver= 1.01 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0a5c ProdID=2000 Rev= 0.a0
-S:  Manufacturer=Broadcom Corp.??????
-S:  Product=BCM2033?????????????
-S:  SerialNumber=2033B1100001????
 
-On the laptop:
-
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-D:  Ver= 1.01 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0a5c ProdID=2001 Rev= 0.a0
-S:  Manufacturer=Broadcom Corp.
-S:  Product=BCM2033
-S:  SerialNumber=20330003C92AB320
-
-> This second usb port is handled via uhci-hcd
-
-I'm using usb-ohci on the desktop, and uhci or usb-uhci on the laptop
-(both with vanilla 2.4.23). 
-
-Regards...
-		Michael
 
 
 -------------------------------------------------------
