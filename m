@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Edd Dumbill <edd@usefulinc.com>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Message-Id: <1098722840.6927.4.camel@saag>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Evolution 2 and Multisync
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andy Beuth <bluez@beuth.info>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1098697111.3801.3.camel@localhost>
+References: <1098697111.3801.3.camel@localhost>
 Content-Type: text/plain
-Subject: [Bluez-users] Linux 2.6.10-rc1 HID problems
+Message-Id: <1098698800.24932.23.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,22 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 25 Oct 2004 17:47:20 +0100
+Date: Mon, 25 Oct 2004 12:06:40 +0200
 
-Hi Marcel,
+Hi Andy,
 
-Running Linux 2.6.10-rc1 I've got the following HID related problems:
+> is there any Plan to release Multisync evolution2 plugin??
 
-* the multimedia keys on my Apple Bluetooth keyboard no longer work
-(showkey shows nothing)
+this is the wrong mailing list. Look at www.multisync.org
 
-* the microsoft bluetooth mouse no longer generates scroll wheel events
-(xev shows nothing)
+Regards
 
-hidd is running with --master (the apple keyboard won't successfully
-reconnect otherwise).
+Marcel
 
--- Edd
 
 
 
