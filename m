@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20040223213658.GA1453@encephalon.dk>
+Subject: Re: [Bluez-users] Selection of PtP connection type
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: Pavel Ruzicka <pavouk@pavouk.org>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <200402230026.24596.pavouk@pavouk.org>
+References: <200402230026.24596.pavouk@pavouk.org>
+Content-Type: text/plain
+Message-Id: <1077531397.1949.33.camel@baroque.rococosoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-From: klaus@encephalon.dk (Klaus Holst)
-Subject: [Bluez-users] dund never activates pppd
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,87 +18,72 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 Feb 2004 22:36:58 +0100
+Date: Mon, 23 Feb 2004 10:16:37 +0000
 
-I have just installed bluez with partial success. I am using a belkin usb adaptor
-and linux 2.4.25 with the latest bluez installed. The adaptor is recognized and 
-I am able to connect a Pocket PC (WM2003) to the linux-machine using "Network Access Service". 
-However pppd is never started and I am not able to transmit any packets from the PPC.
+Hi Pavel,
+Check out this page http://my-zaurus.narod.ru/bluetooth.html
 
-[syslog message when 'hotplugging' the device]:
-Feb 23 18:51:13 mini kernel: usb.c: USB disconnect on device 00:10.0-2 address 3
-Feb 23 18:51:15 mini kernel: hub.c: new USB device 00:10.0-2, assigned address 4
-Feb 23 18:51:15 mini kernel: usb.c: USB device 4 (vend/prod 0xa5c/0x2033) is not claimed by any active driver.
-Feb 23 18:51:19 mini bluefw[5776]: Loading firmware to usb device 0a5c:2033
-Feb 23 18:51:19 mini bluefw[5776]: FW loaded
+I use the network applets: they work well.
 
-Then I run
-/usr/bin/pand --listen --role NAP
-/usr/bin/dund --listen --msdun call dun
+Cheers,
+Steve
 
-Starting pand,dund etc:
-Feb 23 18:51:28 mini hcid[5972]: HCI daemon ver 2.4 started
-Feb 23 18:51:28 mini hcid[5972]: Starting security manager 0
-Feb 23 18:51:28 mini bluetooth: hcid startup succeeded
-Feb 23 18:51:28 mini sdpd[5978]: sdpd v1.5 started
-Feb 23 18:51:28 mini bluetooth: sdpd startup succeeded
-Feb 23 18:51:34 mini pand[5986]: PAN daemon ver 1.1
-Feb 23 18:51:34 mini pan: pand startup succeeded
-Feb 23 18:51:34 mini dund[5990]: DUN daemon ver 1.1
-Feb 23 18:51:34 mini pan: dund startup succeeded
-Feb 23 18:52:13 mini hcid[5972]: link_key_request (sba=00:03:C9:2E:6C:F6, dba=00:04:3E:A2:2D:C9)
-Feb 23 18:52:16 mini pand[5997]: New connection from 00:04:3E:A2:2D:C9 bnep0
+On Sun, 2004-02-22 at 23:26, Pavel Ruzicka wrote:
+> Hello,
+> 
+> I want to connect my Desktop Mandrake linux with my Sharp Zaurus.
+> On desktop side I want automatic solution. Only insert USB dongle.
+> 
+> On Zaurus side I have network connector with PPP connection support,
+> (it's works with my Nokia 6310i phone), and with PAN support.
+> I want only click "connect" on Zaurus side.
+> 
+> I read many FAQ, but many of them are outdated or not complete.
+> I know, there are ppp over rfcomm, ppp over bnep, bridge over bnep, or 
+> anything else? I'am a little confused about it.
+> 
+> What is the preferred way of connecting two devices today?
+> 
+> ----------------------------------------------------------------------
+> Other problem is with automatic configuring. For autoloading
+> of kernel modules I have in kernel 2.6.3 autoloader, and in /etc/modprobe.conf
+> I have this:
+> # bluetooth stuff
+> alias net-pf-31 bluez
+> alias bt-proto-0 l2cap
+> alias bt-proto-2 sco
+> alias bt-proto-3 rfcomm
+> alias bt-proto-4 bnep
+> alias tty-ldisc-11 hci_usb
+> 
+> This works for me, but Is it the right way?
+> 
+> I'am a little confused from hotplug. Must I start some daemon, or this makes 
+> kernel?
+> Where can I place configuration for automatic configuring and removing 
+> interface?
+> This will probably depends on first question about connection type.
+> For example, on my Zaurus is cardctl daemon, which operates CF slot.
+> 
+> Please give me some answers or links to documents.
+> Best regards,
+> Pavel Ruzicka
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+> Build and deploy apps & Web services for Linux with
+> a free DVD software kit from IBM. Click Now!
+> http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+-- 
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
-And pppd is never started as I suppose it should?
-
-
-
-My current setup:
------------------------------------------------
-/etc/ppp/peers/dun:
-115200
-192.168.1.240:192.168.1.241
-local
-ms-dns 192.168.1.1
-noauth
-debug
-passive
-silent
-
-
------------------------------------------------
-/etc/bluetooth/rfcomm:
-rfcomm0 {
-        bind yes;
-        device 00:04:3E:A2:2D:C9;
-        channel 1;
-        comment "PPC DEVICE";
-}
-
------------------------------------------------
-/etc/bluetooth/hcid.conf:
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        pin_helper /bin/bluepin;
-}
-
-device {
-        name "MINI (linux)";
-        class 0x100;
-        iscan enable; pscan enable;
-        lm accept,master;
-        lp hold,sniff,park;
-        auth enable;
-        encrypt enable;
-}
------------------------------------------------
-
-
-
-Best regards
-Klaus Holst
 
 
 -------------------------------------------------------
