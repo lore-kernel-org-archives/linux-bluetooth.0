@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41A3471C.4000602@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] audio problems with a2play
-References: <41A22C0B.4050008@xmission.com>	<41A234FA.7020303@xmission.com>	<20041123033429.132bf84b.henryk@ploetzli.ch>	<41A2B331.4010001@xmission.com> <20041123070621.50569968.henryk@ploetzli.ch>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <20041123070621.50569968.henryk@ploetzli.ch>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+References: <41A22C0B.4050008@xmission.com> <41A234FA.7020303@xmission.com>
+	 <20041123033429.132bf84b.henryk@ploetzli.ch>
+	 <41A2B331.4010001@xmission.com>
+	 <20041123070621.50569968.henryk@ploetzli.ch>
+Content-Type: text/plain
+Message-Id: <1101202495.26578.58.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,25 +21,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Nov 2004 07:20:12 -0700
+Date: Tue, 23 Nov 2004 10:34:55 +0100
 
-Henryk,
+Hi Henryk,
 
- >>Are these backwards then?
- >
- > Most of them are, with the notable exception of the allocation_method.
+> > I don't know the "real" mapping between the indexed settings in the
+> > sbc file format and the bitmapped settings/capabilities we use with
+> > the a2dp protocol.
+> 
+> It's on page 20 of the A2DP spec where it says, for example, that the
+> first byte of the codec specific information elements for SBC encodes
+> the sampling frequency in the upper half of the byte and the channel
+> mode in the lower half. The first byte that a2play sends for
+> sbc_test_01.sbc (which is 48 kHz mono) is 0x81, so bits 7 (0x80) and 0
+> (0x01) are set. Bit 7 set means 16 kHz (section 4.3.2.1), bit 0 set
+> means joint stereo (section 4.3.2.2). The correct value for this byte
+> would be 0x18 (bits 4 and 3 set). 
+> 
+> Similarly the second byte (currently 0x86) should be 0x1a (bits 4, 3 and
+> 1 set).
 
-I changed how the sbc_info values are translated into sbc_elements and I 
-think we're getting the right values now:
+may you check the hcidump from CVS again if it is now correct? If yes,
+then I will release another version.
 
-	s_config.sbc_elements.channel_mode = 8 >> sbc_info.channel_mode;
-	s_config.sbc_elements.frequency = 8 >> sbc_info.sampling_frequency;
-	s_config.sbc_elements.allocation_method =
-	    1 << sbc_info.allocation_method;
-	s_config.sbc_elements.subbands = 2 >> sbc_info.subbands;
-	s_config.sbc_elements.block_length = 8 >> sbc_info.blocks;
+Regards
 
-Brad
+Marcel
+
 
 
 
