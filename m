@@ -8,17 +8,12 @@ In-Reply-To: <1098380504.4885.18.camel@pegasus>
 References: <1098352217.1912.4.camel@debian>
 	 <1098380504.4885.18.camel@pegasus>
 Content-Type: text/plain; charset=gb2312
-Message-Id: <1098408690.1404.2.camel@debian>
+Message-Id: <1098408465.898.15.camel@debian>
 Mime-Version: 1.0
-Date: Fri, 22 Oct 2004 09:31:30 +0800
+Date: Fri, 22 Oct 2004 09:27:45 +0800
 List-ID: <bluez-users.lists.sourceforge.net>
 
-Oh I have made a mistake in my previous mail, the hcitool con 's output
-is right for when I press a button in headset, the headset is automatic 
-connected to my BT device, the link_key is requested so I can avoid
-enter PIN code.
-
-Chen
+HI Marcel,
 在2004年10月22日的01:41，Marcel Holtmann写道：
 > Hi Chen,
 > 
@@ -33,6 +28,12 @@ Chen
 > you will see it when a remote device requests a connection. However we
 > don't really store these information together with the connection to
 > make them available afterwards. Any patch is welcome.
+
+Can you tell me exactly how I can obtain the class of device, including
+using which API or tool or which C file I need to check? I only know the
+sdp approach (code in sdptool.c) to check the services provided by
+device.
+ 
 > 
 > What I don't get is why you can't browse when the device is connected?
 > Run "hcidump -X" as root and show it to us so we can see what happens.
@@ -42,9 +43,10 @@ Chen
 > 
 > What does this mean? Is it good or is it bad? And btw my first name is
 > Marcel and not Holtmann.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+Sorry,Marcel. What I am anxious about is this task is very urgent, the
+bluetooth feature is very important(my boss says), if I can't
+complish...
+
+Sorry for expressing my individual trifle in this list...
+
+Chen
