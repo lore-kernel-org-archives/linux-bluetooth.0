@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200402151519.55271.pavouk@pavouk.org>
-Subject: [Bluez-users] Bluetooth CF card i-Tec
+Subject: Re: [Bluez-users] Re: 2.6.2 errors with DBT-120 (B2)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Todd E. Johnson" <tejohnson@yahoo.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <402E4E02.9020600@yahoo.com>
+References: <402E2E29.7040207@yahoo.com> <1076769794.14758.2.camel@pegasus>
+	 <402E4E02.9020600@yahoo.com>
+Content-Type: text/plain
+Message-Id: <1076851622.14758.22.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,54 +19,79 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 Feb 2004 15:19:55 +0100
+Date: Sun, 15 Feb 2004 14:27:08 +0100
 
-Hello,
+Hi Todd,
 
-I was testing other new Bluetooth CF card i-Tec.
-I was discovering, that this card is exactly same like Billionton card.
+> I am attempting a simple proof of concept at the moment using the KDE 
+> Bluetooth Framework.
+> 
+> I have configured  the local device class in hcid.conf to: "class 0x700408"
+> 
+> Then the KDE BTDialer needs the following set prior to using the app:
+> 
+> 'hciconfig hci0 voice 0x0060'
+> 
+> Once the app launches it connects via rfcomm to the phone and initiates 
+> the followin AT commands (Here are the commands, with phone response)
+> 
+> AT+CIND=?
+> +CIND: 
+> ("battchg",(0-5)),("signal",(0-5)),("batterywarning",(0,1)),("chargerconnected",(0,1)),("service",(0,1)),("call",(0,1)),("roam",(0,1))
+> OK
+> AT+CIND?
+> +CIND: 2,5,0,0,1,0,0
+> OK
+> AT+CMER=3,0,0,1
+> OK
+> AT+CLIP=1
+> OK
+> AT+CIND=?
+> +CIND: 
+> ("battchg",(0-5)),("signal",(0-5)),("batterywarning",(0,1)),("chargerconnected",(0,1)),("service",(0,1)),("call",(0,1)),("roam",(0,1))
+> OK
+> AT+CIND?
+> +CIND: 2,5,0,0,1,0,0
+> OK
+> AT+CMER=3,0,0,1
+> OK
+> AT+BVRA=1
+> 
+> (As you can probably see above, the phone needs charging)
+> 
+> Upon initiation of 'AT+BVRA=1' the phone will ask "Say a Name or a 
+> Command", which I can not hear, nor can it hear me.
+> 
+> And I am attempting to use the "Hands Free" dialer.  Vox seemed to work 
+> with 2.4, but a new 2.6.2 kernel seems to break this.  I would assume 
+> that this means it is using SCO over HCI since I no longer hear the 
+> voice prompts from my phone, and the phone can not hear me.
 
-This is dump_cis of i-Tec card:
----------------------------------------------------------------
-  dev_info
-    no_info
-  vers_1 7.1, "Compact Flash", "Bluetooth Card", "", ""
-  manfid 0x022d, 0x2000
-  funcid serial_port
-  serial_interface
-    uart 16550 [space/mark/odd/even] [5/6/7/8] [1/1.5/2]
-  config base 0x00f8 mask 0x000f last_index 0x03
-  cftable_entry 0x01 [default]
-    [rdybsy] [audio] [pwrdown]
-    Vcc Vnom 3300mV Vmin 3V Vmax 3600mV Iavg 300mA
-    Ipeak 300mA Idown 10mA
-    io 0x02f8-0x02ff [lines=3] [8bit] [range]
-    irq mask 0x86bc [level] [pulse] [shared]
-  cftable_entry 0x02
-    io 0x03e8-0x03ef [lines=3] [8bit] [range]
-  cftable_entry 0x03
-    io 0x02e8-0x02ef [lines=3] [8bit] [range]
-------------------------------------------------------------------
+I don't know what the problem with 2.6.2 and SCO over HCI and at the
+moment I have no time to investigate. If your Bluetooth chip is CSR
+based you can check the SCO mapping with "hciconfig hci0 revision".
 
+> Ultimately I wish to use the phone for hands free calls, but  I will 
+> also use the phone for vehicle offboard connectivity using the "Dial-Up 
+> Networking" to obtain data for the vehicle.  For example, Navigation 
+> data, E-Mail, Calendar, etc.
+> 
+> I am testing with a Sony Ericsson T608 (from Sprint).  The phone works 
+> fine with a Jabra BT-200.
+> 
+> I'm moving towards following specifications defined at 
+> http://www.ami-c.org/, but I am a little ways from achieving my final goal.
+> 
+> Sorry to seem completely clueless, but I am just beginning to use this 
+> functionality within my setup, and I'm still learning.  Thanks for the 
+> information so far!
 
-This card is very cheap in our country and it is distributed in Czech 
-republic, Slovakia and Poland.
-Link to informations in czech language:
-http://www.i-tec.cz/bt_cf.htm
+Go ahead and start playing with BlueZ :)
 
-Link to Billionton card:
-http://www.billionton.com/website/product/doc/CFBT02.htm
+Regards
 
-I have one other speculation. I look at web of Ambicom, and their card
-BT2000-CF has new design. Old card was like Pretec BT2000E,
-but this new card looks like Billionton :-(
-http://www.ambicom.com/products/air2net/bt2000cf.html
+Marcel
 
-Have somebody working this i-Tec (Billionton) card?
-
-Best regards,
-
-Pavel Ruzicka
 
 
 
