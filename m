@@ -1,44 +1,38 @@
-Return-Path: <rickysoh@gmail.com>
-Message-ID: <db972f43040912183766fef4f9@mail.gmail.com>
-Date: Mon, 13 Sep 2004 09:37:50 +0800
-From: Ricky Soh <rickysoh@gmail.com>
-Reply-To: Ricky Soh <rickysoh@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-users] Help needed (Fedora Core 2)
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1094997279.5695.2.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <db972f43040909203314e6825d@mail.gmail.com>
-	 <20040910034429.37672.qmail@web11605.mail.yahoo.com>
-	 <db972f43040909223675a4a082@mail.gmail.com>
-	 <1094997279.5695.2.camel@pegasus>
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200409130234.18019.cijoml@volny.cz>
+Subject: [Bluez-users] hidp in 2.4.28??
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 13 Sep 2004 02:34:17 +0200
 
-hi Marcel,
+Hi Marcel,
 
-If bluez is installed properly, i should be able to see bluez under
-lsmod right? And l2test and scotest command are bluez command too, why
-are they missing? Please help.
+when will you put into 2.4.28 hidp support? You announced it few weeks ago, 
+but in pre3 it is still not present
 
-Ric
+Michal
 
 
-On Sun, 12 Sep 2004 15:54:39 +0200, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Ricky,
-> 
-> > when i couldn't get bluez on lsmod and l2test and scotest command,
-> > does it mean my bluez is not installed properly? If so, how do i get
-> > it done?
-> >
-> > I understand that fedora core 2 is preinstalled with bluez, how do i
-> > get it loaded then instead of the bluetooth?
-> 
-> I don't understand what you mean. If you have the command hciconfig and
-> if it shows an adapter then BlueZ is installed and working.
-> 
-> Regards
-> 
-> Marcel
-> 
->
+-------------------------------------------------------
+This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
+Project Admins to receive an Apple iPod Mini FREE for your judgement on
+who ports your project to Linux PPC the best. Sponsored by IBM. 
+Deadline: Sept. 13. Go here: http://sf.net/ppc_contest.php
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
