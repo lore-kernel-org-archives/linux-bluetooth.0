@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <40376D2B.1060904@superbug.demon.co.uk>
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
-MIME-Version: 1.0
-To: =?ISO-8859-1?Q?Fred_Sch=E4ttgen?= <bluez-devel@schaettgen.de>
-CC: bluez-devel@lists.sourceforge.net, Simon Vogl <vogl@soft.uni-linz.ac.at>
-Subject: Re: [Bluez-devel] sco link help needed
-References: <4034CA08.50500@soft.uni-linz.ac.at> <200402191629.38846.bluez-devel@schaettgen.de>
-In-Reply-To: <200402191629.38846.bluez-devel@schaettgen.de>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] Changing transmit power level of bluetootht
+	device - how to?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: filipe_abrantes <filipe_abrantes@netcabo.pt>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <5CD2BD8F1F23A943BAEBE96AB20C24980549DD3A@VS1.hdi.tvcabo>
+References: <5CD2BD8F1F23A943BAEBE96AB20C24980549DD3A@VS1.hdi.tvcabo>
+Content-Type: text/plain
+Message-Id: <1077297968.2714.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,62 +19,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 21 Feb 2004 14:37:31 +0000
+Date: Fri, 20 Feb 2004 18:26:08 +0100
 
-Fred Schättgen wrote:
-> On Thursday 19 February 2004 15:36, Simon Vogl wrote:
-> 
->>Hi,
->>I desparately need some help with audio links:
->>I have written two small programs that use my pc to emulate a headset
->>and a handsfree device. Both work quite nicely, the rfcomm-based
->>initialization takes place, and I get an SCO connection, but mysteriously,
->>I don't get a single byte of audio data (I don't see it with hcidump
->>neither).
->>
->>my setup:
->>* Acer usb bluetooth dongle
->>* test phones used: p800 (headset), p6600/ngage/3650 (handsfree) with no
->>luck... * kernel 2.4.23
->>* bluez utils&lib from cvs
->>* and yes, i did register hset profile via sdptool....
->>
->>I had the program running perfectly already with a T68i....
->>Any help appreciated heavily (for example a traace of a successful
->>connection...), Simon
-> 
-> 
-> I wrote a small handsfree application as a part of the KDE Bluetooth 
-> Framework. It basically worked, even though it had problems with an ever 
-> increasing lag, which has probably nothing to do with bluez. But at the 
-> moment it's broken and it's not very high priority, since my microphone is 
-> also broken ;)
-> But you might take a look at it.. it's in kdeextragear-3:
-> http://webcvs.kde.org/cgi-bin/cvsweb.cgi/kdeextragear-3/kdebluetooth/handsfree/
-> I'll try to fix it during the next days.
-> 
-> Btw. I'm not sure if the sound doesn't work currently because of a kernel 
-> problem. Maybe I should try with an older kernel.. It used to work with 
-> 2.4.24 if I remember correctly.
-> 
-> greetings
-> Fred
-> 
-For those interested, I am planning to write an alsa driver for 
-bluetooth headsets.
-The alsa driver module would load into kernel, but not present any sound 
-devices.
-Once a pairing had been set up (a small tool will be used for the 
-pairing), the alsa driver module would then dynamically add a sound card 
-to the kernel device list, and this sound card would work just like any 
-other sound device in linux.
-The alsa driver would handle both iso and rfcomm connections, iso for 
-the sound, rfcomm for mixer volume etc.
+Hi Filipe,
 
-Is anyone else working on this, or shall I start alone?
+> I'm new to this mailing list, so im not so sure if this is the right place to post this, anyway, my question is - is there any way (c function?) to change the level of power of transmission of a bluetooth device?
 
-Cheers
-James
+no, because this is a job of the Bluetooth chip. The host stack can only
+read the actual transmit power level of a connection.
+
+Regards
+
+Marcel
+
 
 
 
