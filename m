@@ -1,60 +1,72 @@
-Return-Path: <greg@kroah.com>
-Date: Wed, 28 Apr 2004 10:43:25 -0700
-From: Greg KH <greg@kroah.com>
-To: Alan Stern <stern@rowland.harvard.edu>, bluez-devel@lists.sourceforge.net
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-   USB development list <linux-usb-devel@lists.sourceforge.net>
-Subject: Re: PATCH: (as265) Fix bluetooth driver's wait_for_urb()
-Message-ID: <20040428174325.GG32040@kroah.com>
-References: <Pine.LNX.4.44L0.0404281321520.1238-100000@ida.rowland.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] What Bluetooth CF cards do developers use?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: kyler-dated-1083420652.dfd739@lairds.com
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040428141637.GE1862@snout>
+References: <20040428135604.GD1862@snout> <1083161388.4000.40.camel@pegasus>
+	 <20040428141637.GE1862@snout>
+Content-Type: text/plain
+Message-Id: <1083162180.4000.45.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <Pine.LNX.4.44L0.0404281321520.1238-100000@ida.rowland.org>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 28 Apr 2004 16:23:00 +0200
 
-On Wed, Apr 28, 2004 at 01:25:08PM -0400, Alan Stern wrote:
-> Greg:
+Hi Kyler,
+
+> > someone just asked me the same question. Actually I don't know what's
+> > the best CF card so far. The non working Socket 2.5 is very bad, but it
+> > is not the fault of the Bluetooth developers, because I think the
+> > problem is in the serial subsystem.
 > 
-> Your recent change to struct urb broke this function in the bluetooth 
-> driver.
+> Has that been noted anywhere useful?
 
-I know.  I really hate what the Bluetooth driver does, and it's up to
-them to keep up with the changes in urbs due to them statically
-including a urb in their structures.  That is what they agreed to when
-they did this a while ago.  They are on their own here...
+it has been raised on the serial mailing list, but the problem is that
+nobody really knows where the problem is, because some cards are still
+working.
 
-> You know, I think usb_wait_for_urb() would make an excellent 
-> addition to usbcore.
+> > Starting with 2.6.6-rc2 the Anycom
+> > CF-300 is finally supported. Actually the card works in my development
+> > machine.
+> 
+> Sounds like a winner.  I'll look for it.
 
-No, no one should do that.  Just use the proper usb_alloc_urb() and
-usb_free_urb() and you will be fine.
+Don't blame me if it don't works in a Zaurus ;)
 
-> At some future time we could consider replacing 
-> synchronous unlink_urb with asynchronous unlink plus wait_for_urb.
+> > And actually I don't use any CF card for development. I do everything
+> > with Bluetooth development boards with USB and serial connectors.
+> 
+> I thought USB might be the answer so last week I bought two USB Bluetooth
+> adapters (Belkin and Kensington).  Only one (barely) fits in the USB slot
+> of my Toughbook.  The other fits enough to make contact but if I happen
+> to bump either one out of the socket the kernel crashes.  That's not
+> what I need when I'm on the road.
 
-Why?  Does it cause undue hardship in the host controllers to have a
-synchronous unlink_urb?
+The USB related kernel oopses should all be fixed with the upcoming
+2.6.6, I hope.
 
-> ===== drivers/bluetooth/hci_usb.c 1.43 vs edited =====
-> --- 1.43/drivers/bluetooth/hci_usb.c	Wed Apr 21 01:11:06 2004
-> +++ edited/drivers/bluetooth/hci_usb.c	Wed Apr 28 13:20:22 2004
-> @@ -342,7 +342,7 @@
->  
->  static inline void hci_usb_wait_for_urb(struct urb *urb)
->  {
-> -	while (atomic_read(&urb->count) > 1) {
-> +	while (atomic_read(&urb->kref.refcount) > 1) {
->  		current->state = TASK_UNINTERRUPTIBLE;
->  		schedule_timeout((5 * HZ + 999) / 1000);
->  	}
+Regards
 
-I really just hate that whole function, it's such a hack.
+Marcel
 
-So, Bluetooth developers, have you reconsidered your "need" to put a
-static urb in your structure?  Are you convinced yet of the wrongness of
-your ways?  Do you want a patch to change your subsystem to follow the
-rest of the kernel with regards to USB?
 
-thanks,
 
-greg k-h
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: Oracle 10g
+Get certified on the hottest thing ever to hit the market... Oracle 10g. 
+Take an Oracle 10g class now, and we'll give you the exam FREE.
+http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
