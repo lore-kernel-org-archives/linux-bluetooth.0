@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42445509.4050201@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: btlog anyone? Re: [Bluez-devel] a2dp timing
-References: <42439ADA.5000006@xmission.com> <1111756476.9195.105.camel@pegasus> <20050325142241.GB8548@externe.net> <1111760772.9195.123.camel@pegasus> <20050325172338.GB7214@externe.net>
-In-Reply-To: <20050325172338.GB7214@externe.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] a2dp timing
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <42443FDB.3070205@xmission.com>
+References: <42439ADA.5000006@xmission.com>
+	 <1111756476.9195.105.camel@pegasus>  <42443FDB.3070205@xmission.com>
+Content-Type: text/plain
+Message-Id: <1111771895.9195.133.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,29 +19,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Mar 2005 11:14:33 -0700
+Date: Fri, 25 Mar 2005 18:31:35 +0100
 
-Guylhem
+Hi Brad,
 
-I suspect this is a dead end, but maybe someone on the list has access 
-to btlog to sniff the traffic headed out the pocketpc:
-
-http://66.45.42.84/Support/bTW_CE_faq.asp
-http://66.45.42.84/Support/btw_ce_DK_index.asp
-http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wcecomm5/html/wce50howHowToCaptureLogDataUsingBTLogTool.asp
-
-Brad
-
-> On Friday, 25 March 2005 at 15:26:12 (+0100), Marcel Holtmann wrote:
+> > In the case of an ALSA plugin, we may simple use the timing of the ALSA
+> > system itself. However it would be great if the SBC encoder would also
+> > calculate the time of the PCM fragment.
 > 
->>>However I don't have the bluesoleil stack....
->>
->>do you have the Frontline FTS4BT or the CATC Merlin II sniffer?
+> ok, I will look at the plugin again. I was discouraged before by the 
+> complexity and by the fact that a lot of alsa clients won't let you 
+> choose a userspace plugin device (and even with those that do, you have 
+> to remember and type in an alsa device name to reach a userspace plugin)
+
+the flag for that is there, but the ALSA core does not use it. Seems
+like I need to remind Takashi to add it.
+
+> >>	frame_len = read_header(fd, &sbc_info);
+> >>	bytes_read = read(fd, killbuffer, frame_len);
+> > 
+> > And then you need to sleep some time before reading/dropping the next
+> > SBC frame.
 > 
-> 
-> Looks like it's dedicated hardware - nope. I though some software
-> sniffing was possible (ala tcpdump with hcidump)
-> 
+> of course from the plugin, these won't be read() calls, they will be 
+> calls into the sbc lib.
+
+In case of the plugin you can simply drop the PCM fragment.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
