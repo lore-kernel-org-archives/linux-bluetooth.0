@@ -1,28 +1,51 @@
-Return-Path: <oscarp@acay.com.au>
-Message-ID: <415F42F8.80305@acay.com.au>
-Date: Sun, 03 Oct 2004 10:08:24 +1000
-From: O Plameras <oscarp@acay.com.au>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: pand freezes upon disconnect
-References: <E1CA5Ze-0006Iu-R6@paris.servershost.net>	 <cjad82$qji$1@sea.gmane.org> <1096371695.4950.2.camel@notepaq>	 <cje512$kj5$1@sea.gmane.org> <1096494023.6380.0.camel@pegasus>	 <415C8B5B.3060400@acay.com.au>  <1096617235.5403.3.camel@notepaq>	 <1096655305.20029.22.camel@localhost.localdomain> <1096701740.4809.4.camel@notepaq>
-In-Reply-To: <1096701740.4809.4.camel@notepaq>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Jouni.Lohikoski@iki.fi" <jlohikos@cc.hut.fi>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] linux kernel to compile bluez
+Message-ID: <20041002151642.GA299597@kosh.hut.fi>
+Reply-To: Jouni.Lohikoski@iki.fi
+References: <1096701740.4809.4.camel@notepaq> <20041002135954.91937.qmail@web53209.mail.yahoo.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20041002135954.91937.qmail@web53209.mail.yahoo.com>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 2 Oct 2004 18:16:42 +0300
 
-Marcel Holtmann wrote:
-> Hi Stephen,
-> 
-> 
->>Fixed in current 2.6 tree (on 7 Sep)
-> 
-> 
-> thanks for looking at it. Folks, please retest your setups with
-> 2.6.9-rc3-bk1.
-> 
+On Sat, Oct 02, 2004 at 06:59:54AM -0700, Massimiliano Cuccia wrote:
+> I installed linux suse 9.1 professional
+> it ships the kernel 2.6.4-52
+> Have I to update the kernel to version 2.6.5-7.108
+> (from suse archive)?
+> Or other patch/versions are available?
 
-Updating to the above kernel release has fixed bluez server's
-problem of freezing when client disconnects disappeared.
+(other version of OS)
+After I installed Fedora core 2, the bluetooth stuff worked out of the
+box. The latest kernel FC2 has is 2.6.8
 
-Thanks.
+Also someone there on the list told he installed fresh RedHat9. Not very good
+move, unless there were some other important reasons why RH9. RH9 is not
+supported by RedHat anymore and most of the rpm-packaging volunteers
+has changed to Fedora and "supports" it.
+
+// jouni
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
