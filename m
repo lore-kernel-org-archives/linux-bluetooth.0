@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Oops in hci_usb
+Subject: Re: [Bluez-users] /usr/include/bluetooth/bnep.h
 From: Marcel Holtmann <marcel@holtmann.org>
 To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405062128.42044.cijoml@volny.cz>
-References: <20040501173626.GA3866@kos.to>
-	 <1083785352.4420.33.camel@pegasus> <20040506184816.GA7468@kos.to>
-	 <200405062128.42044.cijoml@volny.cz>
+In-Reply-To: <200405062127.11184.cijoml@volny.cz>
+References: <1083857533.16650.25.camel@saag>
+	 <1083862218.4420.62.camel@pegasus>  <200405062127.11184.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1083877415.4420.75.camel@pegasus>
+Message-Id: <1083877306.4420.72.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,19 +19,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 06 May 2004 23:03:35 +0200
+Date: Thu, 06 May 2004 23:01:47 +0200
 
 Hi Michal,
 
-> Send us 
-> 
-> hciconfig -a
-> hciconfig hci0 revision.
-> 
-> Possibly it is not CSR based dongle. We prefer using CSR based dongles
+> will it include bthid and my script?? 
 
-please check the thread, because Riku already sent this information. It
-is an IBM ThinkPad X40 and it includes a CSR chip.
+not quite exactly. The init script looks a little bit different to
+better blend in and to keep the stuff from bluez-pan. You can take a
+look at it in CVS. However your question reminds me that I have to fix
+up the install routine for that script.
+
+The bthid will not be included. I already included the first rough steps
+of the new hidd, which is going to depend on the hidp kernel module.
+Right now I marked it as "noinst" and I am not quite sure if I am going
+to change that before bluez-utils-2.8. However the code is there and I
+think that I am going to release 2.6.6-mh1 with a prototype of that
+kernel module.
 
 Regards
 
