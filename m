@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040721114733.48802.qmail@web90102.mail.scd.yahoo.com>
-From: karthik bala guru <bluekarthik@yahoo.com>
-To: Philip MacIver <philipmaciver@yahoo.co.uk>,
-   bluez-users@lists.sourceforge.net
-In-Reply-To: <20040721111651.71823.qmail@web25403.mail.ukl.yahoo.com>
+Message-ID: <20040721111635.26295.qmail@web25407.mail.ukl.yahoo.com>
+From: =?iso-8859-1?q?Philip=20MacIver?= <philipmaciver@yahoo.co.uk>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-854221554-1090410453=:48250"
-Subject: [Bluez-users] RCOMM_SendData
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] kernel configuration
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,55 +15,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Jul 2004 04:47:33 -0700 (PDT)
+Date: Wed, 21 Jul 2004 12:16:35 +0100 (BST)
 
---0-854221554-1090410453=:48250
-Content-Type: text/plain; charset=us-ascii
+Hi,
 
+Hopefully this is a simple question with a simple
+answer.
 
-Hi, 
+I have just installed kernel-2.6.8rc2
 
-I am using Bluez .
+I would just like to know what bluetooth options
+should be set in the kernel, I've read that there are
+a couple that shouldn't be selected when selecting the
+blueZ stuff. At the moment I have got all the
+bluetooth options compiled into my kernel, but if this
+is not neccessary I would rather have a smaller more
+stable kernel.
 
-I am into sending some document and hence analysing the RFCOMM 
-
-segment .
-
-And I find that RFCOMM.H has RFCOMM_SendData function.
-
-But, i would like to know the function definition and not just the declaration.
-
-Could anyone tell me the file which has the RFCOMM_SendData Definition.
-
- 
-
-Thanx & Regards,
-
-karthik bala guru
+Thanks.
 
 
+	
+	
 		
----------------------------------
-Do you Yahoo!?
-Yahoo! Mail is new and improved - Check it out!
---0-854221554-1090410453=:48250
-Content-Type: text/html; charset=us-ascii
-
-<DIV>
-<BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">
-<P>Hi, </P>
-<P>I am using Bluez .</P>
-<P>I am into sending some document and hence analysing the RFCOMM </P>
-<P>segment .</P>
-<P>And I find that RFCOMM.H has RFCOMM_SendData function.</P>
-<P>But, i would like to know the function definition and not just the declaration.</P>
-<P>Could&nbsp;anyone tell me the file which has the RFCOMM_SendData Definition.</P>
-<P>&nbsp;</P>
-<P>Thanx &amp; Regards,</P>
-<P>karthik bala guru</P></BLOCKQUOTE></DIV><p>
-		<hr size=1>Do you Yahoo!?<br>
-Yahoo! Mail is new and improved - <a href="http://us.rd.yahoo.com/mail_us/taglines/new/*http://promotions.yahoo.com/new_mail">Check it out!</a>
---0-854221554-1090410453=:48250--
+___________________________________________________________ALL-NEW Yahoo! Messenger - sooooo many all-new ways to express yourself http://uk.messenger.yahoo.com
 
 
 -------------------------------------------------------
