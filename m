@@ -1,9 +1,9 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <SRS0+568a86f7f2f31b2d34f2+355+infradead.org+dwmw2@pentafluge.srs.infradead.org>
 Subject: RE: [Bluez-devel] Alignment issue
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Woodhouse <dwmw2@infradead.org>
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092397956.10618.102.camel@hades.cambridge.redhat.com>
+In-Reply-To: <1092387952.28711.217.camel@pegasus>
 References: <001201c47fc2$7093e4a0$1301010a@baked>
 	 <1092252699.4564.238.camel@pegasus>
 	 <1092299689.4622.8.camel@imladris.demon.co.uk>
@@ -18,71 +18,58 @@ References: <001201c47fc2$7093e4a0$1301010a@baked>
 	 <1092317787.28711.150.camel@pegasus>
 	 <1092384465.4186.37.camel@imladris.demon.co.uk>
 	 <1092387952.28711.217.camel@pegasus>
-	 <1092397956.10618.102.camel@hades.cambridge.redhat.com>
 Content-Type: text/plain
-Message-Id: <1092400824.28711.226.camel@pegasus>
+Message-Id: <1092397956.10618.102.camel@hades.cambridge.redhat.com>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 13 Aug 2004 14:40:24 +0200
+Date: Fri, 13 Aug 2004 12:52:36 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi David,
-
-> I was overriding CFLAGS when I invoked make, because otherwise other
-> stuff (like -m32) gets omitted. Can we do this in acinclude.m4?
+On Fri, 2004-08-13 at 11:05 +0200, Marcel Holtmann wrote:
+> > You also need -fpic in CFLAGS, I believe.
 > 
-> -	CFLAGS="-Wall -O2"
-> +	if (test "${CFLAGS}" = ""); then
-> +		CFLAGS="-Wall -O2"
-> +	fi
-> +
+> if this is true, then this makes your patch useless. 
 
-I was thinking of something like that, but actually never included it
-until now. Fix is in CVS for libs, utils and hcidump.
+I was overriding CFLAGS when I invoked make, because otherwise other
+stuff (like -m32) gets omitted. Can we do this in acinclude.m4?
 
-> OK. I think I'm not supposed to ship a cvs snapshot -- I have to wait
-> for 2.10. But I've isolated just the patch in question and added it into
-> the bluez-utils-2.9-2 RPM, with the above change to inherit CFLAGS if
-> they're already set.
+-	CFLAGS="-Wall -O2"
++	if (test "${CFLAGS}" = ""); then
++		CFLAGS="-Wall -O2"
++	fi
++
 
-I will use memmove for unaligned access and release libs and utils
-tomorrow or the day after tomorrow. I like to test your unaligned code a
-little bit more before making a release with it.
+> However after doing some research in this area it seems that I must
+> use -fPIE and then link with -pie. This actually only works for
+> programs, because libtool don't uses these extra flags.
 
-> > I did it this way, but there were reports of Sparc platforms where the
-> > resulting binary should be run-tested.
+You can also use -fpic instead of -fPIE, apparently.
+
+> Check out the CVS. The patch for that is already included.
+
+OK. I think I'm not supposed to ship a cvs snapshot -- I have to wait
+for 2.10. But I've isolated just the patch in question and added it into
+the bluez-utils-2.9-2 RPM, with the above change to inherit CFLAGS if
+they're already set.
+
+The SRPM and ppc build are already at
+ftp://ftp.uk.linux.org/pub/people/dwmw2/fc2-mac/ and the builds for
+other less interesting architectures will turn up in rawhide in the
+morning.
+
+> > > What is the best way to detect PIE support in the compiler?
+> > 
+> > I hate myself for saying it, but possibly just test whether you can
+> > actually build an executable that way?
 > 
-> Hmmm. Can I revise my original answer.... don't. If the user asks for
-> it, do it. Else don't.
-> 
-> Random behavioural changes based on the characteristics of the system we
-> _happen_ to build on today are probably a bad thing. Just build as
-> configured and don't try to auto-adapt to _anything_ :)
+> I did it this way, but there were reports of Sparc platforms where the
+> resulting binary should be run-tested.
 
-Don't worry. You still have to use --enable-pie to activate it even if
-configure finds out that the compile supports it.
+Hmmm. Can I revise my original answer.... don't. If the user asks for
+it, do it. Else don't.
 
-Regards
+Random behavioural changes based on the characteristics of the system we
+_happen_ to build on today are probably a bad thing. Just build as
+configured and don't try to auto-adapt to _anything_ :)
 
-Marcel
-
-
-
-
--------------------------------------------------------
-SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
-100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
-Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
-http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+dwmw2
