@@ -1,18 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <41A3ACE2.4030501@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] audio problems with a2play
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41A3ACE2.4030501@xmission.com>
-References: <41A22C0B.4050008@xmission.com>	<41A234FA.7020303@xmission.com>
-	 <20041123033429.132bf84b.henryk@ploetzli.ch>
-	 <41A2B331.4010001@xmission.com>
-	 <20041123070621.50569968.henryk@ploetzli.ch>
-	 <41A3471C.4000602@xmission.com>
-	 <20041123203836.046fb4f4.henryk@ploetzli.ch>
-	 <41A3ACE2.4030501@xmission.com>
-Content-Type: text/plain
-Message-Id: <1101246735.27351.45.camel@pegasus>
-Mime-Version: 1.0
+References: <41A22C0B.4050008@xmission.com>	<41A234FA.7020303@xmission.com>	<20041123033429.132bf84b.henryk@ploetzli.ch>	<41A2B331.4010001@xmission.com>	<20041123070621.50569968.henryk@ploetzli.ch>	<41A3471C.4000602@xmission.com> <20041123203836.046fb4f4.henryk@ploetzli.ch>
+In-Reply-To: <20041123203836.046fb4f4.henryk@ploetzli.ch>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -24,62 +18,57 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Nov 2004 22:52:15 +0100
+Date: Tue, 23 Nov 2004 14:34:26 -0700
 
-Hi Brad,
+Henryk
 
-> > I also saw that you were modifying the way a2play packs its frame though
-> > that still doesn't look right to me. Maybe we should talk about our
-> > interpretation of the specs in this case.
+> Yupp, looks correct to me. So does the new hcidumps's job of decoding
+> it.
+
+good
+
+>>	s_config.sbc_elements.channel_mode = 8 >> sbc_info.channel_mode;
 > 
-> yes, exactly. Marcel got it to work by tracing the (non-spec!) traffic 
-> produced by using his headset's transmitter. We don't have the luxury of 
-> capturing the traffic but we should try to follow the spec as well as we 
-> can.
+> Heh, that's a clever way of doing this. 
 
-we should follow the specification, but I also like to get my Aiptek
-phone working without the sender device. So we already need the first
-workaround/quirk for the not finished A2DP support ;)
+I am willing to do something more conventional if this method breaks :)
 
-The only good thing is that GCT puts in a device id SDP record with the
-id value of 1310:0100 (from the USB vendor ist). I tried to look this up
-at www.linux-usb.org/usb.ids if 1310 is assigned to GCT, but haven't
-found anything so far.
+> I also saw that you were modifying the way a2play packs its frame though
+> that still doesn't look right to me. Maybe we should talk about our
+> interpretation of the specs in this case.
 
-So what we must do is read the device id SDP record (PNP Information,
-service class 0x1200) and check for the product and vendor ids and if
-they match set a flag to use their specific media payload header.
+yes, exactly. Marcel got it to work by tracing the (non-spec!) traffic 
+produced by using his headset's transmitter. We don't have the luxury of 
+capturing the traffic but we should try to follow the spec as well as we 
+can.
 
-> > Next thing should be media payload header from A2DP which is 1 octet in
-> > length and correct, too.
-> > 
-> > Then there should be an SBC frame as per A2DP p. 53 just like my code
-> > produces them. That should start with 0x9C which I can't see anywhere in
-> > the a2play output.
+> Next thing should be media payload header from A2DP which is 1 octet in
+> length and correct, too.
 > 
-> we just send one sbc frame then? I was assuming that but not sure.
+> Then there should be an SBC frame as per A2DP p. 53 just like my code
+> produces them. That should start with 0x9C which I can't see anywhere in
+> the a2play output.
 
-With the GCT stuff you can break the frame at any point you like. For me
-this looks like the RFCOMM stream. However my device doesn't work if the
-frame size is too short, so we should put as much frames into the L2CAP
-payload as the MTU allows.
+we just send one sbc frame then? I was assuming that but not sure.
 
->>From the other trace of the Impulsesoft stack I saw that they put 5 SBC
-frames into one AVDTP media packet. They use 0x22 0x16 0x33 0x33 for the
-media specific settings of the SBC, while my Aiptek headphone sets them
-to 0x22 0x46 0x02 0xfa.
+Are you saying we should put 0x9c in the stream or it should be in the 
+stream already? The SBC-specific stuff is definitely where my 
+understanding ends.
 
-> Are you saying we should put 0x9c in the stream or it should be in the 
-> stream already? The SBC-specific stuff is definitely where my 
-> understanding ends.
+> Now I saw Marcel tried adding a timestamp (which I did, too, without
+> any effects, sadly). The way I read section 4.3.3.1 of A2DP would be
+> that there should be an imaginary clock counting at the sampling
+> frequency of the SBC frames and whose value should then be put into the
+> timestamp field. Or, simply put: Count the samples sent so far. 
+> 
+> I've modified the CVS to my beliefs. Please correct me if you think I'm
+> wrong.
 
-No, this must come from the SBC encoder.
+I think what we have in CVS looks better but it doesn't sound better :(
 
-Regards
+Are you using the bluetake too?
 
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
