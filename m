@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Steven Yap <syap@shaw.ca>
-Subject: Re: [Bluez-users] Trouble connecting to a Sony Ericsson T610 phone.
-In-reply-to: <cone.1089163591.829830.5657.500@commodore.email-scan.com>
-To: bluez-users@lists.sourceforge.net
-Message-id: <1089275408.4954.39.camel@obsolescence>
-MIME-version: 1.0
-Content-type: text/plain
-References: <cone.1089163591.829830.5657.500@commodore.email-scan.com>
+Message-ID: <005001c464c2$4e347430$0c000f0a@matrix>
+From: "Virat Gohil" <virat4lug@hotpop.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] rfcomm0: connection refused
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,24 +16,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Jul 2004 01:30:08 -0700
+Date: Thu, 8 Jul 2004 13:35:07 +0530
 
-On Tue, 2004-07-06 at 18:26, Sam Varshavchik wrote:
-> I'm using a Belkin USB dongle to try to connect to my T610 phone.  I'm 
-> running bluez 2.5 on Fedora Core 2 x86_64.
+ > Hi Virat,
+ >
+ > > > the hostname doesn't matter, but if you dual-boot your machine then
+you
+ > > > always have to pair again.
 
-I have a T616 and running Debian "sid" with bluez 2.7 on x86.
+ > > it asked me to pair once, I did pair, then after restart whenever I try
+to
+ > > connect my phone says invalid passcode and my pc says connection
+refused! my
+ > > phone no longer asks me for pairing under Linux.
+ > >
+ > > will play around a  bit longer with the new kernel that you suggested,
+going
+ > > thru patch howto and kernel docs currently. I am enjoying this.
+ >
+ > may the new kernel helps, but I think it is a phone related problem.
+ >
+ > Regards
+ >
+ > Marcel
 
-> "hcitool scan" does list the phone.  And the "Add New Device" option on the 
-> phone does show the PC, after a brief delay.  But if I tell the phone to go 
-> ahead and connect to the PC, enter a PIN, the phone spins for a while, then 
-> reports "Bluetooth connection failed" .  On the PC side nothing happens.
+ Thanks for all your help, the problem was not on my m/c or Linux, it was on
+my phone, it automatically tried to connect and did not ask me PIN, so now
+what I  do is every time I start Linux, I  delete the paired device (my PC),
+everytime I start windoj it automatically asks me for  PIN. now I can surf
+The Internet on Linux  my fav. OS.
 
-Did you install a PIN helper like bluez-pin to let you enter a PIN
-value for pairing? 
+ btw, I am using Nokia 6820.
 
--- 
-Steven Yap <syap@shaw.ca>
+ Thanks once again.
+
+ Virat
+
+
+
 
 
 -------------------------------------------------------
