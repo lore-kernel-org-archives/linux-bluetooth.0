@@ -1,31 +1,67 @@
-Return-Path: <SRS0+8aa17180e48eb1082b98+354+infradead.org+dwmw2@baythorne.srs.infradead.org>
-Subject: RE: [Bluez-devel] Alignment issue
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Daryl Van Vorst <daryl@wideray.com>,
-   "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092252699.4564.238.camel@pegasus>
-References: <001201c47fc2$7093e4a0$1301010a@baked>
-	 <1092252699.4564.238.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] HIDP backport for 2.4
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Michael Frey <mfrey@pepper.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <225072EC-EBDC-11D8-B1A2-00039390D626@pepper.com>
+References: <1090054739.4558.2.camel@pegasus>
+	 <1090759952.4791.91.camel@pegasus>
+	 <9A44A69C-DF28-11D8-B83A-00039390D626@pepper.com>
+	 <1090864026.29589.1.camel@pegasus>
+	 <5F07F140-DF2E-11D8-B83A-00039390D626@pepper.com>
+	 <1090865790.29589.5.camel@pegasus>
+	 <76F28965-DF34-11D8-B83A-00039390D626@pepper.com>
+	 <1090875679.10807.1.camel@pegasus>
+	 <4B8C0D08-DF64-11D8-95A4-003065B218E0@pepper.com>
+	 <1090916301.4650.9.camel@pegasus>
+	 <ABD9E52C-DFDC-11D8-BE76-00039390D626@pepper.com>
+	 <1090940516.4845.19.camel@pegasus>
+	 <A9BDE398-DFDF-11D8-BE76-00039390D626@pepper.com>
+	 <1090941847.4845.29.camel@pegasus>
+	 <86089F56-DFE5-11D8-BE76-00039390D626@pepper.com>
+	 <1091375871.27018.18.camel@pegasus>
+	 <225072EC-EBDC-11D8-B1A2-00039390D626@pepper.com>
 Content-Type: text/plain
-Message-Id: <1092299689.4622.8.camel@imladris.demon.co.uk>
+Message-Id: <1092262282.4564.256.camel@pegasus>
 Mime-Version: 1.0
-Date: Thu, 12 Aug 2004 09:34:49 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 12 Aug 2004 00:11:22 +0200
 
-On Wed, 2004-08-11 at 21:31 +0200, Marcel Holtmann wrote:
-> this is what the Linux kernel is using and we will notice it if some
-> compiler version will optimize it in future. I committed that change to
-> CVS.
+Hi Michael,
 
-The Linux kernel isn't the best example to follow when it comes to
-relying on undocumented and unguaranteed compiler behaviour. Don't be so
-sure the kernel would notice -- we have to fix up alignment trap in the
-kernel _anyway_ so the use of get_unaligned() is only an optimisation
-there.
+> OK -- I am using the new patches and all is well except for one thing.  
+> My keyboard seems to not be able to re-connect after it goes to sleep 
+> about 5 times.  It is almost like connections are left open and the 
+> hidd server does not allow the keyboard to re-connect.
+> 
+> The only way I get it back is to restart hidd.
 
-I'd be more inclined to play with using char * pointers in the memcpy,
-and/or __attribute__((packed)).
+this sounds very weird. Please run "hcidump -x" as root and show it to
+us. What is the content of /proc/bluetooth/l2cap at that time? Do
+"hcitool con" show any connections?
 
--- 
-dwmw2
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
