@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: Stephen Crane <steve.crane@rococosoft.com>
-Cc: Max Krasnyansky <maxk@qualcomm.com>, Philip Blundell <pb@nexus.co.uk>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1057134871.523.123.camel@baroque.rococosoft.com>
-References: <5.1.0.14.2.20030630170200.0e4c3e28@unixmail.qualcomm.com>
-	<1057107686.15797.101.camel@pegasus>
-	<1057134871.523.123.camel@baroque.rococosoft.com>
-Message-Id: <1057163407.963.122.camel@pegasus>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1057160821.963.76.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: Version 3 libs/utils
+Subject: [Bluez-devel] Problem with security mode 3
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -21,84 +17,42 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 02 Jul 2003 18:29:55 +0200
-Content-Type: text/plain
+Date: 02 Jul 2003 17:46:55 +0200
 
-Hi Stephen,
+Hi Max,
 
-> > I prefer using the -ng suffix for the CVS repositories, so we can decide
-> > later how we proceed with the name/version of the packages.
-> 
-> How about the suffix "+"? This isn't rocket science you know :-) I
-> really don't care what is used.
+there is a little problem with local devices in security mode 3
+(hciconfig hci0 auth). If you have already paired two devices, but you
+have used your dongle within another OS and paired it again to the same
+remote device. The local link key stored by the hcid is outdated. But
+this can not be known by the hcid and so it sends it on the next
+connection request. The remote device will deny the connection because
+of the wrong link key, but the error you get is not an authentication
+failure. You get the timeout error from the L2CAP layer.
 
-it isn't important, but we should take care of not confusing the people.
-And this is the only argument against the "2" suffix, because non
-developer tend to mix module name with version number :(
+	< HCI Command: Write Authentication Enable(0x03|0x0020) plen 1
+	  01 
+	> HCI Event: Command Complete(0x0e) plen 4
+	  01 20 0C 00 
+	< HCI Command: Create Connection(0x01|0x0005) plen 13
+	  FD 06 81 0E 04 00 18 CC 01 00 00 00 01 
+	> HCI Event: Command Status(0x0f) plen 4
+	  00 01 05 04 
+	> HCI Event: Link Key Request(0x17) plen 6
+	  FD 06 81 0E 04 00 
+	< HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
+	  FD 06 81 0E 04 00 38 06 D7 5D E2 DD FD 10 88 EF 5A 65 66 C2 
+	  80 26 
+	> HCI Event: Connect Complete(0x03) plen 11
+	  05 00 00 FD 06 81 0E 04 00 01 00 
 
-And about the "+" - no special chars please, because they always cause
-troubles you don't think of at the moment.
+I have looked at hci_conn_complete_evt() and l2cap_connect_cfm() and the
+code seems correct to me.
 
-> > I already started to implement the missing HCI defines and functions.
-> > And we should clean this up and check the ordering. With Bluetooth 1.2
-> > we will get some more.
-> 
-> Yeah perhaps we could do a cleanup of the names along the lines of SDP.
-> (Then again maybe that's not needed but if it is it should happen at the
-> start.)
+If you try to connect again after the timeout, you will get a "Operation
+already in progress" error.
 
-So maybe this is a good starting point. After I included all HCI
-definition into the current CVS, we can fork and start the new version.
-
-Everybody can help here. If you found a HCI command or event definition
-which is not in the current CVS version of the libs package. Please send
-me a patch and save me some time.
-
-> > The "timeout" parameter is not needed by many functions. Kill it and use
-> > some global timeout settings. But functions like the name resolv need a
-> > bigger timeout, so we must take care of this.
-> > 
-> > The inquiry must be rewritten to take care of Bluetooth devices that
-> > report BDADDR more than once.
-> 
-> Asynchronous interface to inquiry?
-
-Yes, of course. I forgot this point. A common inquiry interface can
-maybe also included into btmgr and forward inquiry event to the
-application. Any ideas how to implement this in a clean way?
-
-> > What about a Bluetooth daemon (for exmaple btmgr) which integrates the
-> > security manager and the sdpd. It can also store an userspace Bluetooth
-> > inquiry cache, name database and remote SDP cache. The local
-> > configuration (like local device name) for example can also modified
-> > through this daemon and restored on next boot, which is good for
-> > handheld devices. The access can be done through a defined protocol over
-> > unix sockets.
-> 
-> I quite like this idea, except the SDP server functionality won't be
-> needed for some devices (e.g., handhelds).
-
-This is not the truth. If you want to connect from a Windows based iPAQ
-to a Bluetooth enabled Zaurus and transfer files over OBEX you need a
-SDP server on your Zaurus.
-
-But an option to disable it for people who know what they are doing
-seems to be a good idea.
-
-> > The SDP API should be get more shortcuts for often needed routines, like
-> > getting service name and PSM number or RFCOMM channel. Maybe it is a
-> > good idea to have some profile specific SDP functions, which get the
-> > most needed information for a profile and stores them in its own data
-> > structure.
-> 
-> I would like to see C++ wrappers around the commonly used functions.
-> Much though I loathe the language itself, the SymbianOS code for
-> manipulating data-elements is quite succinct.
-
-I don't know much about C++, but we don't want to use C++ in any core
-library or tool. The Bluetooth library itself should be usable with C++
-(as it is today), but if you need extra stuff it must be included in an
-extra library.
+Where is the problem?
 
 Regards
 
