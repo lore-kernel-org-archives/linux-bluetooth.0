@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: "Thor Egil Skaug" <paxtonrd@hotmail.com>
-To: "'TM'" <bluez@gammah.com>, <bluez-users@lists.sourceforge.net>
-Subject: RE: [Bluez-users] Socket permissions
-Message-ID: <000501c3ffa8$255baee0$46a57e40@thores>
+To: "'Steven Singer'" <steven.singer@csr.com>
+Cc: "'BlueZ Mailing List'" <bluez-users@lists.sourceforge.net>
+Subject: RE: [Bluez-users] AUX1 packets
+Message-ID: <000401c3ffa7$5b52f310$46a57e40@thores>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="us-ascii"
-In-Reply-To: <40435E1B.7000900@gammah.com>
+In-Reply-To: <40435D9D.5020509@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,28 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 1 Mar 2004 08:13:34 -0800
+Date: Mon, 1 Mar 2004 08:07:55 -0800
 
->I did 
-># chown root hciconfig
-># chmod 4711 hciconfig 
+>If both ends of the link support CQDDR then the Link Managers will do
+this automatically.
 >
->which sets that program setUID root. This should solve that problem,
-but setting programs setuid root *could* cause a problem for security.
-Since all my bluez stuff is on a laptop that's rarely online, the risk
-is negligible for me.
+>If you try to do this yourself, you'll just end up with the host and
+the controller fighting each other.
 >
->-t.
+>	- Steven
 
-Thanks, but this is not what I meant. The application that I am writing
-(using raw-data hci sockets) should not require any
-different permissions or owner. What I am looking for is a way to let a
-normal user run my application that has normal permissions and
-open a BlueZ hci socket.
+But the LM can only use packet types that I specified in
+create_connection or change_connection_packet_type,
+in addition to the mandatory DM1 type. Am I correct in assuming this?
 
-An example is using the serial port in an application. To allow users to
-run such a program, one would have to set permissions
-on /dev/ttyS*.
+Will the link manager notify me through events that CQDDR scheme has
+changed packet type?
+
+How do I know whether CQDDR is supported, and is there any way of
+disabling this?
 
 Thor
 
