@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Daniel Haensse <haensse@swissembedded.com>
-Reply-To: Daniel Haensse <haensse@swissembedded.com>
-To: uclinux-dev <uclinux-dev@uclinux.org>
-Cc: bluez-users@lists.sourceforge.net
+Message-ID: <41570BC9.6090109@pallit.lhi.is>
+From: Pall Thayer <palli@pallit.lhi.is>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200409262123.50707.haensse@swissembedded.com>
-Subject: [Bluez-users] GSM Multiplexer Protocol
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] accessing info on paired devices
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,38 +15,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 26 Sep 2004 21:23:50 +0200
+Date: Sun, 26 Sep 2004 18:34:49 +0000
 
-Hi lists,
+Hi,
+I'm working on a little project that would have to automatically scan 
+for bluetooth devices (using a little perl script) and then attempt to 
+connect to them. However, I would prefer if it would only attempt to 
+connect to devices that have already been paired with the computer (via 
+bluetooth usb-dongle) and ignore discovered devices that have not been 
+paired. So, how can I find out which of the discovered devices have been 
+paired?
 
-we need GPRS and SMS services at the same time. For this reason a multiplexer 
-protocol is supported in GSM 07.10 which creates several virtual serial ports 
-which can be controlled with normal AT commands. The AT commands are routed 
-through a software multiplexer circuit which on the other end is connected to 
-the real GSM modem's tty.
-
-Is there any GSM multiplexer protocol for linux available?
-
-Unfortunately, I did not find any driver in the kernel or userland to support 
-this. I did find out so far that RFCOMM might be a good point to start 
-writing virtual tty ports as bluetooth also supports GSM 07.10 in connection 
-with the RFCOMM protocol. The basic idea behind it is to interface the sock 
-to a the GSM modem TTY instead of L2CAP. Any hints?
-
-Thanks
-
-regards
-
-Dani
+Pall Thayer
 
 -- 
-swissEmbedded GmbH
-Daniel Haensse, Dipl. El. Ing. ETH
-Zuercherstrasse 12, 5400 Baden, Switzerland
-Phone ++41562100158
-Fax: ++41562100157
-Mobile: ++41763207732
-Email: haensse@swissembedded.com
+_______________________________
+Pall Thayer
+artist/teacher
+http://www.this.is/pallit
+http://pallit.lhi.is/panse
+_______________________________
 
 
 -------------------------------------------------------
