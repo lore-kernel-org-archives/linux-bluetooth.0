@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Handsfree
-From: Marcel Holtmann <marcel@holtmann.org>
-To: georgesak@spymac.com
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200408261425.58063.georgesak@spymac.com>
-References: <200408261425.58063.georgesak@spymac.com>
-Content-Type: text/plain
-Message-Id: <1093549450.2581.58.camel@pegasus>
-Mime-Version: 1.0
+From: "Georges A.K." <georgesak@spymac.com>
+To: bluez-users@lists.sourceforge.net
+Reply-to: georgesak@spymac.com
+Message-id: <200408261425.58063.georgesak@spymac.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Handsfree
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,22 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Aug 2004 21:44:10 +0200
+Date: Thu, 26 Aug 2004 14:25:57 -0400
 
-Hi Georges,
+Hi everyone, I'm new to this mailing list.
+I have a question, and hope to get an answer ! I'm trying to use my bluetrek 
+B2 headset with my computer. The problem I have is that the headset keeps 
+sending me the command AT+CIND=? which is a command in the handsfree profile. 
+But I want to use the headset in the headset profile. How can I force it ?
 
-> I have a question, and hope to get an answer ! I'm trying to use my bluetrek 
-> B2 headset with my computer. The problem I have is that the headset keeps 
-> sending me the command AT+CIND=? which is a command in the handsfree profile. 
-> But I want to use the headset in the headset profile. How can I force it ?
-
-check with sdptool if your Bluetrek really supports the headset profile.
-
-Regards
-
-Marcel
-
-
+Thanks.
+Georges
 
 
 -------------------------------------------------------
