@@ -1,32 +1,50 @@
-Return-Path: <massimiliano_cuccia@yahoo.com>
-Message-ID: <20041002135954.91937.qmail@web53209.mail.yahoo.com>
-Date: Sat, 2 Oct 2004 06:59:54 -0700 (PDT)
-From: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
-Subject: linux kernel to compile bluez
-To: bluez-users@lists.sourceforge.net
-Cc: marcel@holtmann.org
-In-Reply-To: <1096701740.4809.4.camel@notepaq>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Standard Redhat 9 kernel (2.4.20-8)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Chris Dawson <chrisdawsonuk@lycos.co.uk>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <20041001165819.22F8BAB201@lmcodec03.st1.spray.net>
+References: <20041001005608.063171D1857@sc8-sf-uberspam1.sourceforge.net>
+	 <20041001010049.B3D54AD701@lmcodec01.st1.spray.net>
+	 <1096617385.5403.7.camel@notepaq>
+	 <20041001165819.22F8BAB201@lmcodec03.st1.spray.net>
+Content-Type: text/plain
+Message-Id: <1096708722.4809.7.camel@notepaq>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 02 Oct 2004 11:18:42 +0200
 
-Hi all
-I installed linux suse 9.1 professional
-it ships the kernel 2.6.4-52
+Hi Chris,
 
-I can't compile bluez (other message posted to the
-users and developer's list), so I'm thinking that the
-problem could be the kernel version 
+> Regarding the kernel updates... could I just keep my kernel at 2.4.20-8 and 
+> install your patch (patch-2.4.20-mh18.gz)? Or do I need to update the kernel 
+> to 2.4.27 then install that patch (patch-2.4.27-mh1.gz).
 
-Have I to update the kernel to version 2.6.5-7.108
-(from suse archive)?
+my patches are only for vanilla kernels. I don't know if they work with
+Redhat kernels and actually I don't really care.
 
-Or other patch/versions are available?
+Regards
+
+Marcel
 
 
-thanks
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
