@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Paul Hedderly <bulkpaul@mjr.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Message-ID: <20040915090305.GL26469@wacka.mjr.org>
+Subject: Re: [Bluez-users] USB/bluetooth crash at boot-time
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Charles Bueche <charles@bueche.ch>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040914203859.028fe83a@bluez.bueche.ch>
+References: <20040914203859.028fe83a@bluez.bueche.ch>
+Content-Type: text/plain
+Message-Id: <1095188536.5695.197.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Unidentified Bluetooth CF card
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,80 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 15 Sep 2004 10:03:05 +0100
+Date: Tue, 14 Sep 2004 21:02:16 +0200
 
-Ok I got a cheap CF Bluetooth card from ebay. I got it a while ago and
-keep trying to make it work... but can't (all the others I have no
-problem with...)
+Hi Charles,
 
-I think it's a 'Mavin' - there are pictures of the front and back at:
-	http://mjr.org/bt/front.jpg
-	http://mjr.org/bt/back.jpg
-	http://mjr.org/bt/inside.jpg
-	http://mjr.org/bt/closeup.jpg
+> I have a Dell Inspiron 8600, with the integrated bluetooth module, which
+> I see as usb device. I run gentoo, kernel 2.6.7-gentoo-r11
+> (sys-kernel/gentoo-dev-sources).
+> 
+> lspci -v -v -v result is attached, the full boot log as well.
+> 
+> I can enable/disable the wireless parts (bluetooth and IPW2200 mini-pci
+> card) using a hotkey (Fn-F2). A blue led shows the status.
+> 
+> If I boot with it disabled (eg I hotkey it to off during grub
+> countdown), and I enable it afterwards, everything is OK, I can use
+> bluez with hci and friends fine.
+> 
+> If I boot it with the wireless stuff enabled, I get a sort of oops,
+> below is the partial log, see attachment for unwrapped log.
+> 
+> I suspect either bluez or USB subsystems, but you guys will probably be
+> able to help me. The whole things appeared a few kernel version ago, but
+> I can reproduce this history. Thanks for hints.
 
-The main chips inside (to save you needing to to the pics :O) are:
-	OXCF950
-	BC212
-	29LV800BA-90
+please check out 2.6.9-rc2 and also try if disabling preempt helps.
 
-And the markings are:
-	Model No.:MCF-M2.1
-	60m
-	S/N:MCF 0001773
-	Made in Taiwan
+Regards
 
-I've tried various conf definitions and drivers but get nothing.
-
-weeblu:/etc/bluetooth# cardctl ident 1
-  product info: "CF CARD", "GENERIC", "", ""
-  manfid: 0x0279, 0x950b
-  function: 2 (serial)
-
-I've tried stuff like:
-	
-card "Noname... Compact Flash Card"
-  manfid 0x0279, 0x950b
-  bind "btuart_cs"
-and
-  bind "bt950_cs"
-
-Also tried the bt950 driver and tried to compile the bt2000e driver
-(Since this card seems to have the Oxford Semi CS950 chip in it)
-
-All I get are lines like:
-
-Sep 15 09:36:11 weeblu kernel: bt950_cs: Unknown HCI packet with type 0x70 received.
-Sep 15 09:36:11 weeblu kernel: bt950_cs: Unknown HCI packet with type 0xFD received.
-Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0x60 received.
-Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0xFD received.
-Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0x70 received.
-Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0xFD received.
-Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0x60 received.
-Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0xFD received.
-Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0x00 received.
-
-and:
-
-Sep 15 09:42:30 weeblu kernel: btuart_cs: RLSI
-Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xc0 received.
-Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0x00 received.
-Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0x41 received.
-Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0x00 received.
-Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xbe received.
-Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xda received.
-Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xdc received.
-Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xed received.
-Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xed received.
-Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0x00 received.
-Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xff received.
+Marcel
 
 
-Any ideas?
-
---
-Cheers
-Paul
 
 
 -------------------------------------------------------
