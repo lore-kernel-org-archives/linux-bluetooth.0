@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Zbyszek <dzidoz@poczta.fm>
-To: mailing list <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: TEXT/plain; CHARSET=ISO-8859-2
-Message-Id: <20040228173402.ECDBD1EC7AB@front.interia.pl>
-Subject: [Bluez-users] Problem with l2test
+Subject: Re: [Bluez-users] hotplug USB dongle problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pavel Ruzicka <pavouk@pavouk.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200402281549.59370.pavouk@pavouk.org>
+References: <200402281424.55149.pavouk@pavouk.org>
+	 <1077976353.2843.82.camel@pegasus>  <200402281549.59370.pavouk@pavouk.org>
+Content-Type: text/plain
+Message-Id: <1077981557.2843.89.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,45 +19,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 28 Feb 2004 18:34:02 +0100
+Date: Sat, 28 Feb 2004 16:19:17 +0100
 
-Hi all
+Hi Pavel,
 
-I have problem. This is my part of the simple program.
-=20
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <resolv.h>
-#include <netdb.h>
-#include <sys/socket.h>
+> I start hcid, sdpd, pand from init script.
+> 
+> What is the right sequence for killing these daemons?
+> Original script kills hcid and sdpd.
+> I'am killing in reverse sequence:
+> pand, sdpd, hcid.
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/l2cap.h>
-//Domyslne
-bdaddr_t bdaddr;
-int main()
-{
-    struct sockaddr_l2 addr;
-    char buf[2048];
-    char str[18];
-    char *adres=3D"00:10:60:A5:F4:4C";
-    int s,i;
-    uint8_t id;
+it don't really matters, but in general using a reverse sequence is the
+best way.
 
-    if (( s=3Dsocket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)) < 0)
-    {
-=09perror("Can't create socket !!!");
-=09exit(1);
-    }
-}
+Regards
 
-Exactly at this moment error appears.
-Even when I try start the program "l2test" I see communique
-l2test[4045]: Can't create socket. No such file or directory(2)
-So I'm asking you, could you tell me where did I make mistake?
+Marcel
 
-regards
-Zbyszek
+
 
 
 -------------------------------------------------------
