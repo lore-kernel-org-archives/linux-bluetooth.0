@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42148DDB.2010002@gmx.net>
-From: Marcel Partap <mpartap@gmx.net>
-MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-References: <20050217040417.615C2133CC@sc8-sf-spam2.sourceforge.net>
-In-Reply-To: <20050217040417.615C2133CC@sc8-sf-spam2.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] Re: possible to use phone itself as headset?
+From: Matthias =?utf-8?b?QnJ1bsOp?= <matthiasbrune@gmx.de>
+Message-ID: <loom.20050217T125538-559@post.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] RFCOMM: UIH response is splitted into 3 packets
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,48 +16,60 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Feb 2005 13:28:11 +0100
+Date: Thu, 17 Feb 2005 11:57:20 +0000 (UTC)
 
-> From: Lars Grunewaldt <lgw@dark-reality.de>
-> Bluetooth-alsa is about supporting the BT headset profile, and the phone
-> won't implement it. Phones support the handsfree profile, you can find a
-> link to two projects on our homepage that might be usefull, i.e.
-> http://www.soft.uni-linz.ac.at/_wiki/tiki-index.php?page=ProjectBluezHandsfree
-you're right, thx. And the link has this! It needs CVS sdp and stuff, 
-and I have no clue how to use it, but it seems to work.
+Hi,
+
+i wrote a programm for testing the RFCOMM layer and during a connection
+i observed a strange behaviour that could be an implementation error within 
+BlueZ?!
+My connection is always broken at this point.
+The scenario is decsribed during the traces below.
+I hope somebody can help me with this problem, because i need a solution 
+urgently.
+
+regards
+Matthias
 
 
-From: soraberri <421246@posta.unizar.es>
- > As far as I know, we would only need to implement headset profile in
- > the phone side. I think this shouldn't be impossible, after all
- > SymbianOS has public API for RFCOMM, L2CAP and SDP socket connection,
-Nope, somebody has done it already. Look at the link Lars gave.
- > and I think it is also possible to create SCO connections in a socket
- > basis... So, what is the problem then? Even in the assumption that we
- > managed to develop the headset profile I think NONE actual mobile
- > phone would let us hook the audio streaming from/to the
- > microphone/speaker to/into a SCO channel. It is physically posible, of
- > course because the AudioGateway profile embedded in the phone just do
- > it, but I'm afraid we have no public interface to get this
- > functionality (I'm not Symbian developer, let's hope somebody tell
- > this is not true!).
-IIUC, not true. C link.
+command 1 (Request): Set Asynchronous Balanced Mode (SABM)
+20050217 12:34:09 port 1047 --> 127.0.0.1 port 8000 4 octet(s)
+20050217 12:34:09 000000 03 3f 01 1c                 
 
- > Maybe phone manufacturers are too dependent on the Telephony Companies
- > requirements to allow this nice functionality which would lead us
- > without doubt to make VoIP calls from the phone if it detects the
- > presence of the appropiate service running in our home's box.
-Guess what. Think about it. Doom - for them. Goodbye to insane 
-telecommunication costs. KILLER linux feature. Wooooooooow, awesome ;==)
-For that, please someone who can actually code talk to them, merge it 
-into bluez and so. As said, I have absolutely no clue how to just use 
-it, so I won't be even taking the time to compile it. I'll wait till 
-it's covered by the bluez-utils ebuild + deps. :==P
+command 2 (Response): Unnumbered Acknowledgement (UA)
+20050217 12:34:13 port 1047 <-- 127.0.0.1 port 8000 4 octet(s)
+20050217 12:34:13 000000 03 73 01 d7             
 
-Oh yeah, stop.. all the euphory - but still the audio stream needs to be 
-grabbed without the /phone/ actually opening a connection. Hope this is 
-hackable.
-so long guys.
+command 3 (Request): Unnumbered Information with Header Check (UIH)
+20050217 12:34:13 port 1047 --> 127.0.0.1 port 8000 14 octet(s)
+20050217 12:34:13 000000 03 ef 15 83 11 1c f0 00 ........
+20050217 12:34:13 000008 00 9a 02 00 04 70       .....p  
+
+
+so far so good, but now i get 3 packets response back instead of one with 
+14Bytes length:
+4 Bytes, 6Bytes and 4 Bytes
+
+command 4_1 (Response): Unnumbered Information with Header Check (UIH)
+20050217 12:34:13 port 1047 <-- 127.0.0.1 port 8000 4 octet(s)
+20050217 12:34:13 000000 01 ef 15 81             ....    
+
+After the first response, the next request for further connection is made.
+But because of the missing 10 Bytes from command 4 the conection is broken down.
+Could this be an implementation error within BlueZ?
+
+command 5 (Request): Set Asynchronous Balanced Mode (SABM)
+20050217 12:34:13 port 1047 --> 127.0.0.1 port 8000 4 octet(s)
+20050217 12:34:13 000000 73 00 00 28            
+
+command 4_2: (Response): Unnumbered Information with Header Check (UIH)
+20050217 12:34:13 port 1047 <-- 127.0.0.1 port 8000 6 octet(s)
+20050217 12:34:13 000000 11 1c e0 00 00 9a       ......  
+
+command 4_3: (Response): Unnumbered Information with Header Check (UIH)
+20050217 12:34:14 port 1047 <-- 127.0.0.1 port 8000 4 octet(s)
+20050217 12:34:14 000000 02 00 00 aa             ....  
+
 
 
 -------------------------------------------------------
