@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1025.200.207.51.132.1090605410.squirrel@webmail.ic.unicamp.br>
-From: ra002890@ic.unicamp.br
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Subject: [Bluez-users] RFCOMM error message
+Subject: Re: [Bluez-users] TECOM BT3035
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?ISO-8859-1?Q?=F2=CF=CD=C1=CE?= <papa@rbcmail.ru>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200407231440.i6NEeI5l048844@www1.pochta.ru>
+References: <200407231440.i6NEeI5l048844@www1.pochta.ru>
+Content-Type: text/plain
+Message-Id: <1090594196.4791.52.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,33 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jul 2004 14:56:50 -0300 (BRT)
+Date: Fri, 23 Jul 2004 16:49:57 +0200
 
-Hello everybody;
+Hi,
 
- I'm back again...
- Now I'm trying to put bluez to work with my embedded linux aplication in
-a ppc cpu. I have already recompiled it and tested it with l2ping and
-l2test, but when I try to use rfcomm I receive this message:
+> Thank you for you answer.
+> But I use SuSE 9.0 with 2.4 kernel. They patch their
+> kernel very often.. And I have very recent version of
+> this..
+> It looks like they didn't apply this patch??
+> 
+> So where can I find the patch?
 
-/mnt/flash/validador/aplicativo # rfcomm connect rfcomm1 00:01:24:00:30:de
-1 &
-/mnt/flash/validador/aplicativo # bcsp_timed_event: Timeout,
-retransmitting 1 pkts
-Can't create RFCOMM TTY: Operation not supported
+I can't help you with a SuSE 9.0 kernel, but you can use a vanilla from
+www.kernel.org and apply my latest -mh patch for that kernel version.
+Look at BlueZ patches page (www.bluez.org/patches.html).
 
-Does anybody knows why it sends me this error?
-And why I'm receiving a bcsp_timed_event warning?
-My bluez version are:
-utils 2.4
-libs  2.5
+Regards
 
-I tryed to xcompile the 2.8 version but I couldn't do it, it does not
-work. I had problems in the compilation. Have anyone had this problem?
-Could you help me?
+Marcel
 
-                                Thanks in advance by Daniel Moraes from   
-                                  Brasil.
 
 
 
