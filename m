@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040806073201.50482.qmail@web51810.mail.yahoo.com>
-From: shukri <matrix230@yahoo.com>
+From: Pavel Ruzicka <pavouk@pavouk.org>
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] PAN,just one connected line???
+Cc: "Sammy" <sammy@autumn.ccl.itri.org.tw>
+References: <00be01c47b6a$e84062a0$7053608c@ccl.itri.org.tw>
+In-Reply-To: <00be01c47b6a$e84062a0$7053608c@ccl.itri.org.tw>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-230321692-1091777521=:49708"
-Subject: [Bluez-users] it is possible to change the N inquiry <256
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200408060930.08633.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,32 +19,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 6 Aug 2004 00:32:01 -0700 (PDT)
+Date: Fri, 6 Aug 2004 09:30:08 +0200
 
---0-230321692-1091777521=:49708
-Content-Type: text/plain; charset=us-ascii
+Hello,
 
-hello there,
- 
-im quite new to this BlueZ... i would like to ask is it possible to change the Ninquiry to less than 256..?
- 
-thx.
+> There are four nodes had been connected by pand.
+> but after i assign the static IP to every interface,
+> the 'ping' command can't work normally besides the line between PANU1 and
+> GN(the first connection). I don't know it is normal or i loss some
+> configuration ...
 
-		
----------------------------------
-Do you Yahoo!?
-New and Improved Yahoo! Mail - Send 10MB messages!
---0-230321692-1091777521=:49708
-Content-Type: text/html; charset=us-ascii
+this will not work, because your BNEP interfaces are in independent networks
+with same IP space. You ha two choices:
+1. Routing
+----------------
+You can give independent IP spaces for BNEP interfaces.
+10.0.0.0/30
+10.0.0.4/30
+10.0.0.8/30
+...
+It means 10.0.0.1 on BNEP0 on GN, 10.0.0.2 on BNEP0 on PANU1
+with mask 255.255.255.252
 
-<DIV>hello there,</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>im quite new to this BlueZ... i would like to ask is it possible to change the Ninquiry to less than 256..?</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>thx.</DIV><p>
-		<hr size=1>Do you Yahoo!?<br>
-<a href="http://us.rd.yahoo.com/mail_us/taglines/10/*http://promotions.yahoo.com/new_mail/static/efficiency.html">New and Improved Yahoo! Mail</a> - Send 10MB messages!
---0-230321692-1091777521=:49708--
+You must have enabled IP forwarding on GN for connecting between PANUs.
+On PANUs it's great to set default gateway to GNs IP address.
+
+2. Bridging
+-------------------
+You must enable bridge support on GN.
+Complete manual is here:
+http://bluez.sourceforge.net/contrib/HOWTO-PAN
+
+Best regards,
+
+Pavel Ruzicka
 
 
 -------------------------------------------------------
