@@ -1,16 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] RFCOMM service level security testing
+Subject: Re: [Bluez-devel] re: UART-based bluetooth stuff / serial_cs
+	problems solved?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Stephen Crane <steve.crane@rococosoft.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1099497364.3261.64.camel@baroque.rococosoft.com>
-References: <1099151759.16247.18.camel@pegasus>
-	 <1099433039.7125.13.camel@pegasus>
-	 <1099495689.3265.44.camel@baroque.rococosoft.com>
-	 <1099496238.6330.2.camel@notepaq>
-	 <1099497364.3261.64.camel@baroque.rococosoft.com>
+To: Kevin Page <bluez-devel@krp.org.uk>
+Cc: bluez-devel@lists.sourceforge.net, rmk@arm.linux.org.uk
+In-Reply-To: <Pine.LNX.4.58.0411031120260.18518@moog.ecs.soton.ac.uk>
+References: <Pine.LNX.4.58.0411031120260.18518@moog.ecs.soton.ac.uk>
 Content-Type: text/plain
-Message-Id: <1099498137.6330.29.camel@notepaq>
+Message-Id: <1099496495.6330.7.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -22,45 +19,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 03 Nov 2004 17:08:57 +0100
+Date: Wed, 03 Nov 2004 16:41:35 +0100
 
-Hi Steve,
+Hi Kevin,
 
-> > thanks for testing and what do you think, should I put this feature into
-> > the next stable kernel?
+> I have a IBM Thinkpad X31 with a CF Socket bluetooth card (rev. G),
+> which has been one of the serial PCMCIA/CF bluetooth cards which
+> mysteriously haven't worked since 2.6. Just done a periodic scan of 
+> the list archives, and thought I'd give the latest kernel at try, 
+> as changes to serial/UART have been mentioned (I'm normally running
+> Fedora Core 2 with 2.6.8).
 > 
-> Yes: definitely!
+> Anyway, basically, it seems to fix things.
 
-does anyone tested this on a SMP system, a 64 bit box or big endian
-machine?
+this will be perfect and I am going to test my cards that stopped
+working. I don't have the Socket one, but some others.
 
-> > Another question is what should we do when the encryption on a link with
-> > RFCOMM_ENCRYPT is switched off? At the moment L2CAP keeps works, but in
-> > the RFCOMM layer I drop the connection by sending DM.
+> With linux-2.6.10-rc1-mm2:
 > 
-> Yeah I thought I saw something like this happen. I don't think it is 
-> correct behaviour. My reasoning would go something like this:
+> hciattach /dev/ttyS3 socket
 > 
-> * If encryption on a link is switched off at the HCI level, _all_ of the
-> connections (L2CAP and RFComm) which required it should be closed
-> shouldn't they? 
+> seems to complete ok (none of the "BCSP initialization timed out" 
+> messages I was seeing before). I do get a lone:
 > 
-> * Conversely, encryption should be automatically turned off on a link
-> when the last connection which required encryption is closed.
+> hcid[2543]: HCI dev 0 registered
+> kernel: bcsp_recv: Out-of-order packet arrived, got 1 expected 0
+> hcid[2543]: HCI dev 0 up
 > 
-> * Owners of a connection should be able to indicate that they're no
-> longer interested in encryption by an ioctl on the L2CAP or RFComm
-> socket.
-> 
-> * Connections which were created without the encryption requirement
-> should be able to ask for it by a similar ioctl.
-> 
-> I imagine this behaviour would be required only very rarely but it seems
-> the most intuitive to me. What do you think?
+> but then I can successfully hcitool scan etc.
 
-Actually I have no real meaning about it a the moment. There are pros
-and cons and I like to follow some written specification or erratum. Is
-there something that tells us exactly what to do in these cases?
+The ouf-of-order packet is ok, because BCSP can deal with these things
+by itself. Maybe I have to change that message into a debug message.
+ 
+> I don't know what's changed, but thanks! This seems to be good news.
+> Unfortunately I haven't had the chance to do more rigorous testing as
+> the new kernel either doesn't like something else in the thinkpad, or
+> I screwed up the config :-/
+
+Can you retest it with 2.6.10-rc1-bk13 and see if these patches are
+already merged back mainline.
 
 Regards
 
