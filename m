@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Adpat PAN profile to Samba Server
-From: Marcel Holtmann <marcel@holtmann.org>
-To: taylor <taylor@ms.usi.com.tw>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <004a01c47dd4$45be1380$df0618ac@USI08844>
-References: <004a01c47dd4$45be1380$df0618ac@USI08844>
-Content-Type: text/plain
-Message-Id: <1092071688.4564.20.camel@pegasus>
+From: Patrick Duchstein <patrick-bluez.org@prote.st>
+To: bluez-users@lists.sourceforge.net
+Message-Id: <20040809164445.4c304eb5.patrick-bluez.org@prote.st>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] Bluetooth transmission rates
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +15,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 09 Aug 2004 19:14:48 +0200
+Date: Mon, 9 Aug 2004 16:44:45 +0200
 
-Hi Taylor,
+Hi,
 
->    Yesterday, an idea come to my mind. I adpat the Bluez Profile to
-> Samba server. Really, it could work. User could share the file and
-> printer from Samba server. IT is a good solution for me. We doesn't
-> need the wire more at office.
+I did some timing measurements for packet round-trips between two
+Bluetooth hosts comparing the different ACL packet types, resulting in
+the plot located at http://www.duchstein.com/perf-packettype-kbu.eps
+One side is linux with the BlueZ stack and a CSR chip, other side is my
+own stack using an Ericsson ROK 101 007.
 
-I don't get the point behind your email. Do you wanna say that using
-Samba services over BNEP is working fine for you or would you ask if
-such scenario is possible with BlueZ?
+I now have some trouble interpreting these measurements, two facts I
+cannot explain:
+1. why is the transmission rate for packets with very small payload so
+low among all packet types? Shouldn't it be equal to larger payload
+sizes, as long as the packet type is the same?
+2. the raise in transmission rate starting at a payload size of 192
+bytes stems from fragmentation due to a limited buffer size of one of
+the host controllers (CSR:192 bytes). But shouldn't it be a big step
+instead of a slow increase then?
 
-Regards
-
-Marcel
-
-
+Thanks in advance for any help,
+Patrick
 
 
 -------------------------------------------------------
