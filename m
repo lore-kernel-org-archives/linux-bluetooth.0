@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1aef622504083013322eccbeb4@mail.gmail.com>
-From: David Stennett <praefectus@gmail.com>
-Reply-To: David Stennett <praefectus@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Problems with InputStream and OutputStream
+From: Marcel Holtmann <marcel@holtmann.org>
+To: john <john281198@gmx.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41331EBB.9000606@gmx.de>
+References: <1324.1093866265@www49.gmx.net>
+	 <1093867195.5620.16.camel@pegasus>  <41331EBB.9000606@gmx.de>
+Content-Type: text/plain
+Message-Id: <1093869614.5620.24.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Modifying Device Class....
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,16 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 30 Aug 2004 22:32:58 +0200
+Date: Mon, 30 Aug 2004 14:40:14 +0200
 
-Gentlemen:
+Hi Johannes,
 
-I know that the Bluetooth spec has different devices classes (0x100,
-etc...) ... my question is, can we create our own?  That way, if I
-created a client to find only (0x12345), my BlueZ box could have a
-device class of 0x12345 or something) .... or, is this not possible?
+> the relevant parts of the sources are attached (the important parts are 
+> the BTMidServ.java and the method doConnect() in BTServiceSearchUI.java).
+> I hope the comments and Info-Messages will be enough declarations.
+> 
+> I use Debian Linux with a 2.6.7 Kernel and KDE version 3.2.3.
+> The phone is a Siemens SX1 with firmwareversion 10. It uses a Symbian OS 
+> Serie 60.
+> The USB-dongle is from Acer and should be supported from BlueZ.
 
-David
+and what do you use on the Linux side? Please run a "hcitool info ..."
+as root for me.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
