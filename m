@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] how to interpret 'link quality' value
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <2de46576041203223817d0cc34@mail.gmail.com>
+References: <200412031515.02372.wim.delvaux@adaptiveplanet.com>
+	 <1102084671.8479.18.camel@pegasus>
+	 <2de46576041203223817d0cc34@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1102167592.8510.9.camel@pegasus>
+Message-Id: <1102142794.8479.38.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Subscription to the announce mailing list
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,26 +20,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 04 Dec 2004 14:39:52 +0100
+Date: Sat, 04 Dec 2004 07:46:34 +0100
 
-Hi Folks,
+Hi Manjunath,
 
-since I don't like postings across different mailing list, I am not
-posting any announcement of a new releases or important news to the
-bluez-users or bluez-devel mailing lists. The bluez-announce mailing
-list should be and is used for this.
+> I am using anycom dongle (so SiW chipset)........can i consider the
+> same approximation for the link quality as u have  mentioned for the
+> CSR chipset.........
 
->>From the Sourceforge statistics I saw that only a small number of people
-have subscribed to the announce mailing list:
+no. As I said it is manufacturer specific.
 
-	bluez-announce	subscriber count: 249
-	bluez-users	subscriber count: 746
-	bluez-devel	subscriber count: 460
+> Also, I am using usb-120 which is a class-2 device. I see the power
+> control feature .....if i enable communication between 2 devices which
+> are in Line of sight and short distance apart....shouldn't the
+> transmit power level decrease??? It is not decreasing. Is this feature
+> the same as  adpative power control feature????
 
-What I suppose is that everyone on this mailing list should subscribe to
-bluez-announce, too. The highest number of post per month over the last
-two years was 5 and I think all of you will be able to handle 5 more
-emails a month.
+The power control is not always mandatory. Check the specification and
+ask the manufacturer. What do you mean by "adaptive power control"? I
+never heard of this.
 
 Regards
 
