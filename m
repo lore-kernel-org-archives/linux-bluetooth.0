@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+Message-Id: <200412011028.iB1ASZIk030820@news01.csr.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] convert sdp browse list to icons`
-References: <200412010157.11129.wim.delvaux@adaptiveplanet.com> <1101882358.18840.16.camel@pegasus>
-In-Reply-To: <1101882358.18840.16.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200412011245.29059.wim.delvaux@adaptiveplanet.com>
+Subject: Re: [Bluez-users] Test Mode 
+In-reply-to: <1101882666.18840.23.camel@pegasus> 
+References: <2de4657604113010234e4e3a3f@mail.gmail.com> <1101882666.18840.23.camel@pegasus>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,49 +16,53 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 1 Dec 2004 12:45:28 +0100
+Date: Wed, 01 Dec 2004 10:28:34 +0000
 
-On Wednesday 01 December 2004 07:25, Marcel Holtmann wrote:
-> Hi Wim,
->
-> > Can anybody point me to a document describing how to map an sdp service
-> > entry to the 'class' of a service.
->
-> as far as I know there exists no mapping for that.
->
-> > I.e. if the 'text'  field (attribute 0x100) shows 'dialup networking'
-> > then connecting to this service provides just that.  However could this
-> > string be different from device to device ? If so is there a CODE
-> > somewhere in that sdp record that says the same but does not change ?
->
-> The text field can be freely choosen.
->
-> > I thing the attribute 0x9 (BluetoothProfileDescriptorList) can be used
-> > for that but it is a LIST meaning multiple values are allowed to there
-> > might be different values in that entry ...
->
-> You should use the "Service class ID list" (attribute 0x0001) list.
+> The LMP specification speaks about the Test Mode and Methodology
+> saying that Adaptive power control, adaptive freq hopping scenarios
+> can be imitated provided the respective LMP PDU's are sent.
+> 
+> How do I make the HCI commands initiate these LMP PDU's? The HCI
+> specification have only the "Test Enable" and "Read and Write
+> Loopback"  test commands but other no commands which will result in
+> inititating the LM to the testing modes. How do i conduct these
+> adaptive tests?
 
- Is there any table i could refer to to find out which ID maps to which 
-feature ?
+It's quite deliberate that the only thing you can do with a production
+device is put it into test mode as a slave
+(HCI_Enable_Device_Under_Test_Mode), requiring all test instructions to
+be sent from the master.  To do the test end you need a specialist
+tester.  These tend to be expensive since they're aimed at manufacturers
+doing a lot of testing.
 
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://productguide.itmanagersjournal.com/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+You can use local and remote loopback without any extra hardware
+support, however.  They are completely separate from the test modes you
+are talking about.
+
+Since the features aren't available over HCI, you need to ask somewhere
+else.  However, if you're looking for a cheap way of using the Bluetooth
+test modes you're probably out of luck.  Most manufacturers (including
+us) provide some simplified but non-standard test commands you can run
+between two modules for RF testing and characterisation.
+
+-- 
+Peter Stephenson <pws@csr.com>                  Software Engineer
+CSR PLC, Churchill House, Cambridge Business Park, Cowley Road
+Cambridge, CB4 0WZ, UK                          Tel: +44 (0)1223 692070
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
+
 
 
 -------------------------------------------------------
