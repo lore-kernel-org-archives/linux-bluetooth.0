@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Piconet problems
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <I92JZQ$4438CF5CD46EDB224256583706BE5074@libero.it>
-References: <I92JZQ$4438CF5CD46EDB224256583706BE5074@libero.it>
-Content-Type: text/plain
-Message-Id: <1103627796.15574.1.camel@pegasus>
-Mime-Version: 1.0
+Message-Id: <I92JZQ$4438CF5CD46EDB224256583706BE5074@libero.it>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+From: "jers@inwind.it" <jers@inwind.it>
+To: "bluez-users" <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Piconet problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,30 +16,77 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 21 Dec 2004 12:16:36 +0100
+Date: Tue, 21 Dec 2004 12:02:14 +0100
 
-Hi Jers,
-
-> I'm trying to create a simple piconet consisting of a master and two slaves. I'm using three Digicom Palladio 
-> dongles. 
-> My packages list is: 
->  - bluez-libs-2.8-1.i386.rpm 
->  - bluez-bluefw-1.0-1.i386.rpm 
->  - bluez-hcidump-1.10-1.i386.rpm 
->  - bluez-sdp-1.5-1.i386.rpm 
->  - bluez-pan-1.1-1.i386.rpm 
->  - bluez-utils-2.8-1.i386.rpm 
->  - bridge-utils-0.9.6-1.i386.rpm 
-
-the bluez-sdp, bluez-pan and bluez-bluefw packages are deprecated. Get
-yourself newer versions of bluez-libs and bluez-utils.
-
-What is the output of "hciconfig -a" for these dongles?
-
-Regards
-
-Marcel
-
+Hi, 
+ 
+I'm trying to create a simple piconet consisting of a master and=
+ two slaves. I'm using three Digicom Palladio 
+dongles. 
+My packages li=
+st is: 
+ - bluez-libs-2.8-1.i386.rpm 
+ - bluez-bluefw-1.0-1.i386.rpm =0D
+=
+ - bluez-hcidump-1.10-1.i386.rpm 
+ - bluez-sdp-1.5-1.i386.rpm 
+ - bluez=
+-pan-1.1-1.i386.rpm 
+ - bluez-utils-2.8-1.i386.rpm 
+ - bridge-utils-0.9=
+.6-1.i386.rpm 
+ 
+ On master side I type: 
+ # hciconfig hci0 up 
+ # pa=
+nd --listen --master --role GN 
+ 
+ On the first slave I type: 
+ # hcic=
+onfig hci0 up 
+ # hcitool inq 
+ # pand --connect <master_bt_addr> 
+ # =
+ifconfig bnep0 10.10.10.2 broadcast 10.10.10.255 netmask 255.255.255.0 =0D
+=
+ 
+ if I type 
+ # hcitool inq 
+ I obtain: 
+ 
+ Inquiry failed.: Device=
+ or resource busy 
+ 
+ On the second slave I type: 
+ # hciconfig hci0 u=
+p 
+ # hcitool inq 
+ I only obtain the master bt_addr. 
+ # pand --conne=
+ct <master_bt_addr> 
+ 
+ and 
+ # ifconfig bnep0 10.10.10.3 broadcast 10=
+.10.10.255 netmask 255.255.255.0 
+ 
+ Unfortunally I obtain: 
+ 
+ SIOCS=
+IFADDR: No such device 
+ bnep0: unknown interface: No such device 
+ SIO=
+CSIFBRDADDR: No such device 
+ bnep0: unknown interface: No such device =0D
+=
+ SIOCSIFNETMASK: No such device 
+ 
+ Can someone tell me what is wrong? =
+Thanks. 
+ Jers 
+ =0A=0A=0A=0A__________________________________________=
+__________________=0ARegala e regalati Libero ADSL: 3 mesi gratis e navig=
+hi veloce. 1.2 Mega di musica, film, video e sport. =0AAbbonati subito se=
+nza costi di attivazione su http://www.libero.it=0A=0A
 
 
 
