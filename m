@@ -1,16 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] non-blocking device discovery
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Edd Dumbill <edd@usefulinc.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1073438965.3116.3.camel@saag>
-References: <1073041104.25261.15.camel@pegasus>
-	 <1073132228.8729.39.camel@saag>  <1073141037.8729.47.camel@saag>
-	 <1073420681.27652.20.camel@saag>  <1073428132.2508.106.camel@pegasus>
-	 <1073433290.2674.2.camel@saag>  <1073438965.3116.3.camel@saag>
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: Fred =?ISO-8859-1?Q?Sch=E4ttgen?= <bluez-devel@schaettgen.de>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1073403253.26243.1099.camel@baroque.rococosoft.com>
+References: <1073308932.26243.1058.camel@baroque.rococosoft.com>
+	 <200401052012.34307.bluez-devel@schaettgen.de>
+	 <1073403253.26243.1099.camel@baroque.rococosoft.com>
 Content-Type: text/plain
-Message-Id: <1073451456.2508.124.camel@pegasus>
+Message-Id: <1073450652.2508.116.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: Lockups
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,28 +21,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Jan 2004 05:57:37 +0100
+Date: Wed, 07 Jan 2004 05:44:13 +0100
 
-Hi Edd,
+Hi Stephen,
 
-> > >From hcidump, the lockup appears to happen before ever I see any traffic
-> > from the dump: so it's as the connection is established from the remote
-> > device (yes, my trusty P800!).  I've tried with and without PREEMPT set.
+> Now onto my new question, what are the semantics of OCF_INQUIRY? I seem
+> to be getting one unique device per inquiry call. That is I get one
+> EVT_INQUIRY_RESULT event with a bdaddr I haven't seen before and then it
+> terminates with an EVT_INQUIRY_COMPLETE. For example:
 > 
-> This wasn't quite accurate.
-> To clear this up, here's a screen capture (taken the only way I could :)
+> inquiry
+> found 00:aa:bb:cc:dd:ee
+> inquiry complete
+> ...
+> inquiry
+> found 00:aa:bb:cc:dd:ee
+> found 00:aa:bb:cc:dd:ef
+> inquiry complete
 > 
-> http://heddley.com/edd/2004/01/bluez-crash.jpg
-> 
-> The red outlined bit is what happens on the connection that locks up the
-> system.
+> ...and so on. It seems that when it finds a new device, it passes that
+> back up and exits inquiry mode. Can this be right (or have I fscked
+> up)?  It only stays in inquiry mode for the specified length of time
+> when there are no new devices to be found.
 
-we must hunt this bug, because from your screenshot I see that it is in
-the HCI core layer and that is really bad. Do you know the platform of
-the other guy? Maybe it is an endian bug.
-
-And to sum this up. It only happens with 2.6 and it freezes your machine
-without any oops? Do the keyboard leds are blinking?
+this is not the whole story. What you see is the behaviour of the CSR,
+Ericsson and ST based devices, which filter out duplicates. The devices
+from Nokia, Broadcom and AVM report every device and it is possible that
+you see some bdaddr's more than once.
 
 Regards
 
