@@ -1,58 +1,69 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: nicolas <n1c0l4s.l3@wanadoo.fr>
+Return-Path: <n1c0l4s.l3@wanadoo.fr>
+From: nicolas <n1c0l4s.l3@wanadoo.fr>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: inactivity of my Bt
+Date: Thu, 24 Jun 2004 00:28:07 +0200
+References: <200406232055.06709.n1c0l4s.l3@wanadoo.fr> <1088028819.4296.7.camel@pegasus>
+In-Reply-To: <1088028819.4296.7.camel@pegasus>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200406240028.07415.n1c0l4s.l3@wanadoo.fr>
-References: <200406232055.06709.n1c0l4s.l3@wanadoo.fr>
-	 <1088028819.4296.7.camel@pegasus>
-	 <200406240028.07415.n1c0l4s.l3@wanadoo.fr>
-Content-Type: text/plain
-Message-Id: <1088029418.4296.9.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: inactivity of my Bt
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Jun 2004 00:23:38 +0200
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Message-Id: <200406240028.07415.n1c0l4s.l3@wanadoo.fr>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Nicolas,
-
-> > > i have with your advices installed my bluetooth  but i have a big
-> > > problem, if i let my bluetooth alone a time too long 10-15 min   i lost
-> > > my bluetooth and i have to use a ps/2 or usb keyboard/ mouse to reinstall
-> > >  ( hcitool inq  scan and hidd -c )
-> > >
-> > > there is a way to keep it alive ?
+Le jeudi 24 Juin 2004 00:13, vous avez =E9crit=A0:
+> Hi Nicolas,
+>
+> > i have with your advices installed my bluetooth  but i have a big
+> > problem, if i let my bluetooth alone a time too long 10-15 min   i lost
+> > my bluetooth and i have to use a ps/2 or usb keyboard/ mouse to reinsta=
+ll
+> >  ( hcitool inq  scan and hidd -c )
 > >
-> > mostly every HID will disconnect after some time. Start "hidd --server"
-> > at boot time and your mouse or keyboard will reconnect after a keypress.
+> > there is a way to keep it alive ?
+>
+> mostly every HID will disconnect after some time. Start "hidd --server"
+> at boot time and your mouse or keyboard will reconnect after a keypress.
+>
+
+and how can i start "hidd --server" at boot time?
+
+> > i hava a second question which is there is a way to have my bluetooth
+> > launch when my kernel is launch?  ( like in windows)
+>
+> Not needed, because HID devices will reconnect.
+>
+> > i mail to you directly because when i post in the Ml i receive this mai=
+l:
 > >
-> 
-> and how can i start "hidd --server" at boot time?
+> > his is the SMTP Server program at host wanadoo.fr.
+> >
+> > I'm sorry to have to inform you that the message returned
+> > below could not be delivered to one or more destinations.
+> >
+> > For further assistance, please send mail to <postmaster>
+> >
+> > If you do so, please include this problem report. You can
+> > delete your own text from the message returned below.
+> >
+> >                         The SMTP Server program
+> > <bluez-users@lists.sourceforge.net>: host
+> > mail.sourceforge.net[66.35.250.206] said: 550 "rejected because your SM=
+TP
+> > server, 193.252.22.26,is in the SF.net RBL.
+>
+> The error message is clear. Get this fixed, because I want to see such
+> questions on the mailing list and thus in its archive.
+>
+> Regards
+>
+> Marcel
 
-the bluez-utils-2.7 (and also the Debian package) contains an init
-script that will do this for you.
+=2D-=20
+Ce mail a =E9t=E9 =E9crit sous linux mandrake cooker (www.linux-mandrake.co=
+m/fr)
+avec KMail 1.6.2 (www.kde.org)
 
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.Net email sponsored by Black Hat Briefings & Training.
-Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
-digital self defense, top technical experts, no vendor pitches, 
-unmatched networking opportunities. Visit www.blackhat.com
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Kernel: 2.6.7-2mdk
+Kde 3.2.3
