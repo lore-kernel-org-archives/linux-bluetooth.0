@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-From: "anisha neena" <roses_3@operamail.com>
+Message-ID: <20041221154332.68125.qmail@web11602.mail.yahoo.com>
+From: "Bhaskar S. Manda" <bhaskar_manda@yahoo.com>
+Subject: Re: [Bluez-users] Socket version F not recognized on SL-6000
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20041221162543.14D2B23CF6@ws5-3.us4.outblaze.com>
-Subject: [Bluez-users] help needed on bluetooth project....
+Cc: "Bhaskar S. Manda" <bhaskar_manda@yahoo.com>
+In-Reply-To: <200412202116.57743.pavouk@pavouk.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,29 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 21 Dec 2004 17:25:43 +0100
-
-friends...
-
-This is my first mail to the group.plz dont discard this mail....
-
-i am planning to do a project on bluetooth protocol stack.
-i wish to know how the stack is working right from the data coming from the=
- application level,how it is assembled into packets and how it is then conv=
-erted into bits....and how the reverse is happening at the receiver....
+Date: Tue, 21 Dec 2004 07:43:32 -0800 (PST)
 
 
-can anyone describe the above steps in simple words or can anyone suggest m=
-e a good book or material to follow...i'll be very grateful to you....
+--- Pavel Ruzicka <pavouk@pavouk.org> wrote: 
+> > cardctl ident shows product info matching that in
+> > /etc/pcmcia/bluetooth.conf, but doesn't load dtl1_cs.
+> I have identical card on SL-C860. I must make "hciconfig hci0 up" for
+> functionality.
 
+Says "Can't get device info: No such device."
 
-bye
---=20
-_____________________________________________________________
-Web-based SMS services available at http://www.operamail.com.
-=46rom your mailbox to local or overseas cell phones.
-
-Powered by Outblaze
 
 
 -------------------------------------------------------
