@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [OT] Someone has a virus...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Keith Pemberton <kbpember@cox.net>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <002001c41b4f$3d31b290$0200a8c0@wincomp>
-References: <002001c41b4f$3d31b290$0200a8c0@wincomp>
-Content-Type: text/plain
-Message-Id: <1081198969.2843.13.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <002001c41b4f$3d31b290$0200a8c0@wincomp>
+From: "Keith Pemberton" <kbpember@cox.net>
+To: <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Subject: [Bluez-devel] [OT] Someone has a virus...
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,20 +16,14 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Apr 2004 23:02:49 +0200
+Date: Mon, 5 Apr 2004 15:47:41 -0500
 
-Hi Keith,
+I have been continually getting email viruses as a result of people posting
+messages to this list.  Could everyone please make sure to run their virus
+scanner with all the current updates?  Hope that this isn't too much to ask!
+It would really help out a lot.
 
-> I have been continually getting email viruses as a result of people posting
-> messages to this list.  Could everyone please make sure to run their virus
-> scanner with all the current updates?  Hope that this isn't too much to ask!
-> It would really help out a lot.
-
-ask the Sourceforge guys, because the mailing list are run by SF.net.
-
-Regards
-
-Marcel
+Keith
 
 
 
