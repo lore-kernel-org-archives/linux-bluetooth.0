@@ -1,74 +1,60 @@
-Return-Path: <Steven.Singer@csr.com>
-Message-ID: <4064174E.1050409@csr.com>
-Date: Fri, 26 Mar 2004 11:43:10 +0000
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: zubiwat <zubiwat@poczta.onet.pl>,
-   BlueZ Mailing List
-    <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Strange answer from HCI
-References: <000a01c41299$f48241d0$fcca010a@lysydziadek>
-    <1080258434.2283.52.camel@pegasus>
-In-Reply-To: <1080258434.2283.52.camel@pegasus>
-Content-Type: text/plain; charset="us-ascii"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] rfcomm receive problem and success
+From: Marcel Holtmann <marcel@holtmann.org>
+To: franz keuner <franz_keuner@gmx.net>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <18344.1080206436@www52.gmx.net>
+References: <1080129568.2515.100.camel@pegasus>
+	 <18344.1080206436@www52.gmx.net>
+Content-Type: text/plain
+Message-Id: <1080259105.2283.65.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 26 Mar 2004 00:58:25 +0100
 
-Marcel Holtmann wrote:
-> Maciej Zubilewicz wrote:
->> I'm programming a microchip to work with BT and when I send some bits
->> I get in the answer sth like this: 04 10 01 FE.
->
-> it is all in the Bluetooth HCI specification. You should really read and
-> understand it. Your bytes mean
->
-> 	HCI event, hardware error, error code 0xfe
->
-> The error codes are vendor specific, so I don't know what 0xfe means.
+Hi Franz,
 
-I'm going to take a wild stab in the dark. On CSR devices, hardware
-error code 0xfe is used only with the H4 (UART) host transport. It means
-that the chip received a message from the host that it couldn't
-understand. Typically, it means the message didn't start with 0x01, 0x02
-or 0x03. The most common causes of this are a miscalculated (or
-mis-encoded) length inside the previous PDU or failing to put the
-appropriate H4 prefix on this PDU.
+> that's maybe a stupid question:
+> but why is there a error message if the bytes are received?
 
-If you were unable to decode even a simple four byte message from the
-chip then that indicates you're failing to understand even the basics of
-how the protocol works. You need to reread the Bluetooth specifications
-for the UART host transport and for the HCI. Until you understand those
-you're going to get nowhere.
+actually these is a test program and not for normal use. Maybe the code
+is simply wrong. I never checked it and I don't really care. If you
+fixed it, send me a patch.
 
->> How to set parameteres like pscan or read BD ADDR by sending bits to
->> BT dongle. Does any one knows what bits are coresponding to what
->> commends while setting parameteres of BT because I know bits for
->> transmition from Specification.
+> when i use the dump function i can work in my program with the data sended
+> by the phone and no error.
+> 
+> when i try to use the receive function there's this error.
+> 
+> is the fault on the phone side and what can i do about it?
+> does the receive function needs any additional information compared to the
+> dump(read) function?
 
-This is all completely defined in the Bluetooth specification. The
-part you need is only about 250 pages (in the 1.1 spec - you'll
-probably get away with just 1.1 at the moment). The full spec is
-available for download from https://www.bluetooth.org/spec/ and is
-about 7 MB.
+Compare the code of the recv and the dump functions and check what
+happens. Look at it with hcidump to see if it is really an error.
 
-Are these really BlueZ questions? It looks to me like you're trying
-to write your own host stack. I think you'd be better off finding
-another forum.
+Regards
 
-	- Steven
--- 
+Marcel
 
 
 
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
