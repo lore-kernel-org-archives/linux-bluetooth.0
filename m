@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4214A5E1.4090207@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+Message-ID: <20050217140257.16874.qmail@web60903.mail.yahoo.com>
+From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
+Subject: Re: [Bluez-users] Re: Trouble pairing with new phone... (FIXED!)
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] rfcomm question 3
-References: <20050217135456.6070.qmail@web60907.mail.yahoo.com>
-In-Reply-To: <20050217135456.6070.qmail@web60907.mail.yahoo.com>
-Content-Type: text/plain; charset=Big5
+In-Reply-To: <1108409220.7780.15.camel@notepaq>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-880580346-1108648977=:16442"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,169 +17,108 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Feb 2005 15:10:41 +0100
+Date: Thu, 17 Feb 2005 22:02:57 +0800 (CST)
 
-Ka Kin Cheung wrote:
-> Hi Marco!
->     I've put some functions you posted before into my main program. As I 
-> wish to write the program to act as server, I wrote like this:
-> int main (int argc, char **argv)
-> {
->  //variable declaration...
->  addr.rc_family = AF_BLUETOOTH;
->  bacpy(&addr.rc_bdaddr, BDADDR_ANY);
->  addr.rc_channel = 4;
->  alen = sizeof(addr);
->  //mysql initialization....
->  while (1)
->  {
->   // request a socket from the operating system
->   if((sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < 0)
->   {
->    printf("socket(...) failed");
->    exit(1);
->    }
->   // bind the socket to the system
->   if(bind(sock, (struct sockaddr *)&addr, alen) < 0)
->   {
->    printf("bind(...) failed\n");
->    exit(2);
->    }
->   // set the socket into listen mode. handle 10 (QUEUE) connections.
->   if(listen(sock, 10) < 0)
->   {
->    printf("listen(...) failed\n");
->    exit(3);
->    }
->   while(client = accept(sock, (struct sockaddr *)&addr, &alen))
->   {
->    char remoteAddr[18];
->    ba2str(&addr.rc_bdaddr, remoteAddr);
->    printf("connection from %s:\n", remoteAddr);
->    // send a "hello from server" to client
->    char out[] = "hello from server";
->    send(client, out, strlen(out), 0);
->    printf("> %s\n", out);
->    // read the answer
->    char buffer[101]; // buffer size 100, 1 for '\0'
->    int noReadChars = recv(client, buffer, sizeof(buffer)-1, 0);
->    buffer[noReadChars] = '\0'; // here the received answer ends
->    printf("< %s\n", buffer);
->    while (1)
->    {
->           .......
->  
-> After I ran it, the sock, bind and listen functions were all passed. But 
-> after that, I couldn't see any result about it.
+--0-880580346-1108648977=:16442
+Content-Type: text/plain; charset=big5
+Content-Transfer-Encoding: 8bit
 
-question: what do you expect? my pc usually starts a britney spears mp3 and
-makes a couple of somersaults...
-no, serious: what do you expect??? nothing will happen after that because
-the pc waits for a client connection.
+Hi Jay!
+    Sorry to interrupt. In order that SE T610 can search and add PC into "My device list", you should do like this:
+# Authentication and Encryption
+# auth enable;
+# encrypt enable
+    Or you can never let your T610 to search for and add your PC into the list.
+    But then, do you know how to connect T610 to PC instead of from PC to T610 (as I know that the method is typing "rfcomm connect 0 <address>").
+    Hope that this can help you and then you can have method to do the connection from T610 to PC as I wish to do it in a short time.
+Cherrs,
+Michael
+Marcel Holtmann <marcel@holtmann.org> wrote:
+Hi Jay,
 
-please - really -  read a couple of tutorials about socket programming and
-try to understand what the codes does that you write.
-as already was said: this list is not here to explain you how socket
-programming works...
+> I figured out how to pair with my T610 phone.
+> 
+> Point 1: The computer must initiate the connection. (If you attempt to scan for 
+> new devices on your phone and add it there, apparently bluez will not accept 
+> incoming pairing requests. Something to do with roleswitch and bluez wanting to 
+> be the master? Perhaps...)
+> 
+> Point 2: My version of blueZ ignores the /etc/bluetooth/pin file (even when in 
+> "auto" mode) and I HAD to replace the pin_helper with a link to a script which 
+> simply printed "PIN:1234" (replace number with your pin).
+> 
+> So, once I replace "pin_helper /usr/bin/bluepin" with "pin_helper /sbin/pintest" 
+> (where the pintest file contained "echo "PIN:1234") and initiated an rfcomm 
+> connection to the phone with my pppd chat script, I was able to type the pin 
+> into my phone and pair.
+> 
+> [(going the other way, from the phone to the computer, didn't work...possibly a 
+> problem with the phone, possibly a problem with bluez (as it works under 
+> windows...)]
+> 
+> My hcid.conf options are as follows:
+> Options:
+> autoinit yes;
+> security auto;
+> pairing multi;
+> pin_helper /sbin/pintest
+> 
+> Device:
+> name "BlueZ (%d)";
+> class 0x100;
+> iscan enable;
+> pscan enable;
+> lp rswitch,hold,sniff,park;
+> lm accept,master;
+> # Authentication and Encryption
+> auth enable;
+> encrypt enable;
 
-> Then I wish to fiind out
-> how to connect SE T610 to bluez in my PC, but I couldn't find the 
-> method.
+if you still wanna use security mode 3 then go with it. If you set
+yourself to master then go with it. These are not defaults settings and
+there is a reason why.
 
-you've to write a client program for that runs on the mobile phone.
-if i remember right, the T610 hasn't support for jsr82. I don't know if
-you're able to do c programming on it and have access to the bluetooth system.
-i use a nokia 6230, there you have mdip2.0 and jsr83. so it's no problem at
-all...
+Regards
 
-regards
-Marco
+Marcel
 
 
-> And the strange thing is that the phone could search my PC and
-> then added it on the "My device" list, I was wondering why couldn't the 
-> phone initialize the connection to PC. I'm very surprising that Jay 
-> Summet said that T610 cannot connect to bluez in Linux PC. So I wish Jay 
-> also to explain why, and does it mean that there is no method that T610 
-> can really initialize the connection to PC?
-> By the way, after I looked at the specification of the bluetooth system, 
-> I could not find any way to write sdp program. So, can you and other 
-> mail users suggest a method for me to do? I really thank you very much 
-> for your kindness.
-> Michael
->  
-> */Marco Trudel <mtrudel@gmx.ch>/* wrote:
-> 
->     Ka Kin Cheung wrote:
->      > Hi all!
->      > I'm still doing my project. Now I face a problem
->      > that the T610 still cannot connect to PC. Then my
->      > tutor said that I have to write a sdp program to let
->      > the phone to connect to PC.
-> 
->     this has nothing to do with it. i think you tutor is wrong...
->     if your pc is listening on a rfcomm channel, then you can connect with a
->     url like btspp://0123456789AB:4
->     the first part is the protocol, the second the mac address, the last one
->     the channel number.
->     have you tried/understood my last post to you:
->     http://sourceforge.net/mailarchive/message.php?msg_id=10756581
-> 
->     you need a sdp-entry only if the mobile phone wants to do a service
->     search
->     (paging) what's not needed. a inquiry could get you the mac address
->     and you
->     then can connect to the listening port in your program.
-> 
->     if it still doesn' t work, please send a description of what you
->     exactly do
->     and what the exact results are. please use hcidump as well...
-> 
->     regards
->     Marco
-> 
-> 
->      > I wish to know that is
->      > there any guideline or even the source code for sdp
->      > programming? It is urgent as my tutor said he used two
->      > months to do it before.
->      > Thank you very much for your kindness.
->      > Michael
->      >
->      >
->      >
->     _______________________________________________________________________
->      > 新年願望第一位 : 找到友緣人
->      > http://personals.yahoo.com.hk
->      >
->      >
->      > -------------------------------------------------------
->      > SF email is sponsored by - The IT Product Guide
->      > Read honest & candid reviews on hundreds of IT Products from real
->     users.
->      > Discover which products truly live up to the hype. Start reading now.
->      > http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
->      > _______________________________________________
->      > Bluez-users mailing list
->      > Bluez-users@lists.sourceforge.net
->      > https://lists.sourceforge.net/lists/listinfo/bluez-users
->      >
->      >
-> 
-> 
->     -------------------------------------------------------
->     SF email is sponsored by - The IT Product Guide
->     Read honest & candid reviews on hundreds of IT Products from real users.
->     Discover which products truly live up to the hype. Start reading now.
->     http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
->     _______________________________________________
->     Bluez-users mailing list
->     Bluez-users@lists.sourceforge.net
->     https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
-> 
-> ------------------------------------------------------------------------
-> 新年願望第一位 : 找到友緣人 <http://hk.personals.yahoo.com>
+
+
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now.
+http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+
+
+
+---------------------------------
+新年願望第一位 :  找到友緣人 
+
+--0-880580346-1108648977=:16442
+Content-Type: text/html; charset=big5
+Content-Transfer-Encoding: 8bit
+
+<DIV>
+<DIV>Hi Jay!</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; Sorry to interrupt. In order that SE T610 can search and add PC into "My device list", you should do like this:</DIV>
+<DIV># Authentication and Encryption<BR># auth enable;<BR># encrypt enable<BR>&nbsp;&nbsp;&nbsp; Or you can never let your T610 to search for and add your PC into the list.</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; But then, do you know how to connect T610 to PC instead of from PC to T610 (as I know that the method is typing "rfcomm connect 0 &lt;address&gt;").</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; Hope that this can help you and then you can have method to do the connection from&nbsp;T610 to PC as I wish to do it in a short time.</DIV>
+<DIV>Cherrs,</DIV>
+<DIV>Michael<BR><B><I>Marcel Holtmann &lt;marcel@holtmann.org&gt;</I></B> wrote:</DIV>
+<BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">Hi Jay,<BR><BR>&gt; I figured out how to pair with my T610 phone.<BR>&gt; <BR>&gt; Point 1: The computer must initiate the connection. (If you attempt to scan for <BR>&gt; new devices on your phone and add it there, apparently bluez will not accept <BR>&gt; incoming pairing requests. Something to do with roleswitch and bluez wanting to <BR>&gt; be the master? Perhaps...)<BR>&gt; <BR>&gt; Point 2: My version of blueZ ignores the /etc/bluetooth/pin file (even when in <BR>&gt; "auto" mode) and I HAD to replace the pin_helper with a link to a script which <BR>&gt; simply printed "PIN:1234" (replace number with your pin).<BR>&gt; <BR>&gt; So, once I replace "pin_helper /usr/bin/bluepin" with "pin_helper /sbin/pintest" <BR>&gt; (where the pintest file contained "echo "PIN:1234") and initiated an rfcomm <BR>&gt; connection to the phone with my pppd chat script, I was able to type the
+  pin
+ <BR>&gt; into my phone and pair.<BR>&gt; <BR>&gt; [(going the other way, from the phone to the computer, didn't work...possibly a <BR>&gt; problem with the phone, possibly a problem with bluez (as it works under <BR>&gt; windows...)]<BR>&gt; <BR>&gt; My hcid.conf options are as follows:<BR>&gt; Options:<BR>&gt; autoinit yes;<BR>&gt; security auto;<BR>&gt; pairing multi;<BR>&gt; pin_helper /sbin/pintest<BR>&gt; <BR>&gt; Device:<BR>&gt; name "BlueZ (%d)";<BR>&gt; class 0x100;<BR>&gt; iscan enable;<BR>&gt; pscan enable;<BR>&gt; lp rswitch,hold,sniff,park;<BR>&gt; lm accept,master;<BR>&gt; # Authentication and Encryption<BR>&gt; auth enable;<BR>&gt; encrypt enable;<BR><BR>if you still wanna use security mode 3 then go with it. If you set<BR>yourself to master then go with it. These are not defaults settings and<BR>there is a reason why.<BR><BR>Regards<BR><BR>Marcel<BR><BR><BR><BR><BR>-------------------------------------------------------<BR>SF email is sponsored by - The IT Pro
+ duct
+ Guide<BR>Read honest &amp; candid reviews on hundreds of IT Products from real users.<BR>Discover which products truly live up to the hype. Start reading now.<BR>http://ads.osdn.com/?ad_id=6595&amp;alloc_id=14396&amp;op=click<BR>_______________________________________________<BR>Bluez-users mailing list<BR>Bluez-users@lists.sourceforge.net<BR>https://lists.sourceforge.net/lists/listinfo/bluez-users<BR></BLOCKQUOTE></DIV><p><br><hr size=1>新年願望第一位 :  <a href=http://hk.personals.yahoo.com>找到友緣人 </a><br>
+--0-880580346-1108648977=:16442--
 
 
 -------------------------------------------------------
