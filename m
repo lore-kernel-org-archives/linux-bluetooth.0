@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Message-ID: <EFCD68F7BFDB06468769D4D9EAAA938705EE4718@scsmsx401.amr.corp.intel.com>
-From: "Pering, Trevor" <trevor.pering@intel.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] PAN and DUN
+Subject: Re: [Bluez-users] Permissions on Sockets
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <6DD9FBCE-69DB-11D9-A39A-000D9348D4BE@magnifeye.com>
+References: <41B8A67C.3060608@paytec.com> <1102627652.7962.4.camel@pegasus>
+	 <8EEDF252-6988-11D9-A39A-000D9348D4BE@magnifeye.com>
+	 <1106092579.8190.81.camel@pegasus>
+	 <6DD9FBCE-69DB-11D9-A39A-000D9348D4BE@magnifeye.com>
+Content-Type: text/plain
+Message-Id: <1106167261.8190.138.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,34 +21,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 Jan 2005 20:29:15 -0800
+Date: Wed, 19 Jan 2005 21:41:01 +0100
 
-I'm confused by the how-to at
-http://www.cs.ucla.edu/~cclljj/interest/notes/bluez/pand_dund.html --
-which is linked from the BlueZ how-to page.
-=20
-It does a fair bit of setup, and then has the instructions:
+Hi Jonathan,
 
-13. on master side:=20
-sdpd
-pand --listen --master --service --sdp --role NAP
-dund --listen --sdp
+> I am doing an inquiry of all devices, finding our device, connecting to 
+> it and the reading bytes via a rawsocket.
+> 
+> The only issue I see so far is the writev command (I copied the code 
+> from hci_send_cmd).
+> 
+> How do I assign root rights for this?
 
-14. on slave side=20
-sdpd
-pand --connect <bt_addr> --sdp
-dund --connect <bt_addr> --sdp
+you need to change the HCI security filter inside the kernel or make
+your application setuid root or adapt the capabilities of your program.
 
-Which, is far as I can tell, is setting up both a dun and pan connection
-between the two devices -- which seems very redundant to me. The DUN
-link will set up an IP link over RFCOMM using PPP, while PAN will set up
-a direct IP link.
+Regards
 
-Is this correct?  Wouldn't it be sufficient to either dun or pan, but
-not both?
+Marcel
 
-Thanks,
-	Trevor
+
 
 
 -------------------------------------------------------
