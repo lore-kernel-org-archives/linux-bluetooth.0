@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] keys under 2.6.5 and bthid
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404200032.51458.cijoml@volny.cz>
-References: <200404200032.51458.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1082414314.4403.84.camel@pegasus>
-Mime-Version: 1.0
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200404200032.51458.cijoml@volny.cz>
+Subject: [Bluez-users] keys under 2.6.5 and bthid
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,26 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 20 Apr 2004 00:38:34 +0200
+Date: Tue, 20 Apr 2004 00:32:51 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> Now I looked into dmesg and thereis:
-> 
-> atkbd.c: Unknown key released (translated set 2, code 0x7a on isa0060/serio0).
-> atkbd.c: This is an XFree86 bug. It shouldn't access hardware directly.
-> atkbd.c: Unknown key released (translated set 2, code 0x7a on isa0060/serio0).
-> atkbd.c: This is an XFree86 bug. It shouldn't access hardware directly.
-> 
-> Maybe this will help?
+Now I looked into dmesg and thereis:
 
-as the error says, this is a XFree86 bug and not a kernel bug ;)
+atkbd.c: Unknown key released (translated set 2, code 0x7a on isa0060/serio0).
+atkbd.c: This is an XFree86 bug. It shouldn't access hardware directly.
+atkbd.c: Unknown key released (translated set 2, code 0x7a on isa0060/serio0).
+atkbd.c: This is an XFree86 bug. It shouldn't access hardware directly.
 
-Regards
+Maybe this will help?
 
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
