@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: James Cameron <james.cameron@hp.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Switching class II to class III?
-Message-ID: <20040914234710.GD30188@hp.com>
-References: <41478230.7030800@uni-paderborn.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <41478230.7030800@uni-paderborn.de>
+Message-ID: <41478230.7030800@uni-paderborn.de>
+From: Stefan Mischke <survivor@uni-paderborn.de>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] Switching class II to class III?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,19 +15,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Sep 2004 09:47:10 +1000
+Date: Wed, 15 Sep 2004 01:43:44 +0200
 
-On Wed, Sep 15, 2004 at 01:43:44AM +0200, Stefan Mischke wrote:
-> Stupid question: Is there a way to make a class II dongle (Acer BT600, 
-> CSR) behave like class III (no signal strength adjustment, 1 mW, 10 m 
-> range)? I mean without modifying the firmware. Just by HCI command.
+Hello!
 
-The only method I know is to ensure that the peer dongle is close by.
+Stupid question: Is there a way to make a class II dongle (Acer BT600, 
+CSR) behave like class III (no signal strength adjustment, 1 mW, 10 m 
+range)? I mean without modifying the firmware. Just by HCI command.
 
--- 
-James Cameron
-Software Security Response Team, Linux Backline, Tru64 Backline
-HP Services, Asia Pacific
+kind regards
+Stefan
+
+
 
 
 -------------------------------------------------------
