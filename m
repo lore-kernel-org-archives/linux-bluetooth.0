@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20041227215813.51276.qmail@web51902.mail.yahoo.com>
-From: Krishna Bhoutika <kkbhoutika@yahoo.ca>
+Message-ID: <5f30e261041227130239c3db17@mail.gmail.com>
+From: Jeff Wilson <jazzbotley@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1361199905-1104184693=:50685"
-Subject: [Bluez-devel] Inquiry Scan Window
+Subject: Re: [Bluez-devel] hciconfig question
+In-Reply-To: <1103931501.20258.94.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <5f30e261041224131026cfa70a@mail.gmail.com>
+	 <1103931501.20258.94.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,31 +19,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 27 Dec 2004 16:58:13 -0500 (EST)
+Date: Mon, 27 Dec 2004 15:02:13 -0600
 
---0-1361199905-1104184693=:50685
-Content-Type: text/plain; charset=us-ascii
+On Sat, 25 Dec 2004 00:38:21 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Jeff,
+> 
+> > I'm studying hciconfig.c to learn how to set inquiry mode and
+> > parameters.  As I play with the binary to understand the source, I get
+> > the following error on "hciconfig hci0 inqmode":
+> >
+> > Can't read inquiry mode on hci0. Input/output error(5)
+> >
+> > The "inqparms" command reads from hci0 just fine, with no errors.  I
+> > have "iscan enable" set in /etc/bluetooth/hcid.conf ... what else
+> > should I check?
+> 
+> you need a Bluetooth 1.2 device with inquiry with RSSI support.
 
-How would increasing the inquiry scan window for a device ( say, x times 18 out of 2048 time slots, where x >1) affect other devices doing inquiry scan? Or, affect the response from the master?
- 
-Thanks
- 
-Krishna
+What about older devices without RSSI?
 
-
-
----------------------------------
-Post your free ad now! Yahoo! Canada Personals
-
---0-1361199905-1104184693=:50685
-Content-Type: text/html; charset=us-ascii
-
-<DIV>How would increasing the inquiry scan window for a device ( say, x times 18 out of&nbsp;2048 time slots, where x &gt;1) affect other devices doing inquiry scan? Or, affect the response from the master?</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Thanks</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>Krishna</DIV><p><br><hr size=1>Post your free ad now! <a href="http://ca.personals.yahoo.com/"><b>Yahoo! Canada Personals</b></a><br>
---0-1361199905-1104184693=:50685--
+          thanks,
+           jw
 
 
 -------------------------------------------------------
