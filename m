@@ -1,31 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Source sample custom Bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <C17DB8CE-5E1A-11D9-8017-000D9348D4BE@magnifeye.com>
-References: <4dfd570904122402134ec2fd32@mail.gmail.com>
-	 <4dfd570904122509237f2a2f48@mail.gmail.com>
-	 <1103995727.8758.31.camel@pegasus>
-	 <4dfd570904122509451e811d7a@mail.gmail.com>
-	 <1103996976.8758.34.camel@pegasus>
-	 <4dfd5709041225095410f71a46@mail.gmail.com>
-	 <1103997529.8758.36.camel@pegasus>
-	 <4dfd570904122510081a9bfa7@mail.gmail.com>
-	 <4dfd570904122510085371c17b@mail.gmail.com>
-	 <4dfd57090412251011705f52be@mail.gmail.com>
-	 <4dfd5709041225103246f6934c@mail.gmail.com>
-	 <1104000494.8758.46.camel@pegasus> <002601c4ebb8$4de24200$020ba8c0@heejune>
-	 <1104125195.9393.12.camel@pegasus>
-	 <BEB39C04-5B6A-11D9-8017-000D9348D4BE@magnifeye.com>
-	 <1104604846.4253.1.camel@pegasus>
-	 <FA69107A-5DAA-11D9-8017-000D9348D4BE@magnifeye.com>
-	 <1104776407.8894.53.camel@pegasus>
-	 <AFDBF1EE-5DB6-11D9-8017-000D9348D4BE@magnifeye.com>
-	 <1104778613.8894.62.camel@pegasus>
-	 <C17DB8CE-5E1A-11D9-8017-000D9348D4BE@magnifeye.com>
-Content-Type: text/plain
-Message-Id: <1104839435.8894.86.camel@pegasus>
-Mime-Version: 1.0
+From: "Jose Bernardo Silva" <jbs@bandos.homelinux.com>
+To: bluez-users@lists.sourceforge.net
+Message-Id: <20050104110418.M39860@bandos.homelinux.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset=iso-8859-1
+Subject: [Bluez-users] Dongle firmware
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -37,43 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 04 Jan 2005 12:50:35 +0100
+Date: Tue, 4 Jan 2005 11:09:32 +0000
 
-Hi Jonathan,
+I've seen recently a few messages about new firmwares, is there a list of
+dongles and firmwares available?
+I have a Acer BT-500 and a MSI MS-6967, and I'd like to update these two.
 
-> The stack that I am talking to only supports raw packets.
-> 
-> So far I am able to do an inquiry and see the device and get its 
-> address, type and name. I am unable to connect to it.
-> 
-> I create a socket
-> 
-> s = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-> 
-> then I set up the parameters for the addr
-> 
-> sockaddr_hci addr
-> addr.hci family =  AF_BLUETOOTH;
-> addr.hci_dev = 0;
-> 
-> I then do a bind
-> 
-> bind(s, (struct sockaddr *)&addr, sizeof(addr));
-> 
-> I then try a connect
-> 
-> connect(s, (struct sockaddr *) &addr, sizeof(addr)) and it fails
-> 
-> What might I be missing here? I cannot find any samples
+Thanks!
 
-the HCI raw socket doesn't support connect(). It is not meant for doing
-actual data transmission. You must do this all by yourself. Look at the
-source code of the hci*.c tools.
-
-Regards
-
-Marcel
-
+-- 
+Jose Bernardo B R Silva             | Source Mage GNU/Linux Section Guru
+jbernardo@sourcemage.org            | http://www.sourcemage.org
+http://counter.li.org #245602
+http://cosmos.oninetspeed.pt/jose.bernardo
+jbs@bandos.homelinux.com
 
 
 
