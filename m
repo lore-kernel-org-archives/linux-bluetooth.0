@@ -1,30 +1,44 @@
-Return-Path: <aklish1@urbana.css.mot.com>
-Date: Mon, 23 Feb 2004 10:35:40 -0600 (CST)
-From: Aaron Klish <aklish1@urbana.css.mot.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: libs2 and utils2
-In-Reply-To: <1077487791.2832.35.camel@pegasus>
-Message-ID: <Pine.GSO.4.20.0402231031470.11242-100000@wombat.urbana.css.mot.com>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <403A1ECE.6030005@superbug.demon.co.uk>
+From: James Courtier-Dutton <James@superbug.demon.co.uk>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] Inquiry scans.
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Mon, 23 Feb 2004 15:39:58 +0000
 
-Hi Marcel,
-  What are your plans for officially releasing the code in libs2 and utils2 
-currently in CVS?  Do you have a target date sometime in the future?
-At what point will you stop supporting the current libraries and utilities?
-Thanks for any info.
+I have a Nokia 6310i mobile phone.
+It has a bluetooth menu item that says: -
+"Search for audio accessories"
 
-Aaron
+If I activate this on the Nokia, it finds the Bluetooth headset.
 
-------------
-Aaron Klish
-Bluetooth Software Engineer
-Motorola PCS
-PH# (217) 384-8598
-FX# (217) 384-8550
+In Bluez, in hcidump, I would expect to see these requests/responds 
+between those two devices, but I see nothing.
 
-[X]  Motorola General Business Information
-[ ]  Motorola Internal Use Only
-[ ]  Motorola Confidential Proprietary
+If bluez never sees the Inquiry scan from the Nokia, how will bluez ever 
+be able to respond?
+
+Cheers
+James
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
