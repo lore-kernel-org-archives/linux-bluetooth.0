@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] uinput and modules.conf
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403160905.27291.cijoml@volny.cz>
-References: <200403160905.27291.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1079426897.3307.64.camel@pegasus>
-Mime-Version: 1.0
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200403160905.27291.cijoml@volny.cz>
+Subject: [Bluez-users] uinput and modules.conf
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,19 +17,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 16 Mar 2004 09:48:17 +0100
+Date: Tue, 16 Mar 2004 09:05:27 +0100
 
-Hi Michal,
+Hi Marcel,
 
-> what should I add to modules.conf to get uinput module autoload?
+what should I add to modules.conf to get uinput module autoload?
 
-	alias char-major-10-223 uinput
+Thanks
 
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
