@@ -1,12 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <423850C6.9080109@sinister.cz>
-From: Trekie <trekie@sinister.cz>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] MS-6871 isn't working
-References: <42381514.3070701@sinister.cz>	 <1110971745.9818.131.camel@pegasus>  <423818DE.1060909@sinister.cz>	 <1110973336.9818.141.camel@pegasus>  <42381DAA.20703@sinister.cz> <1110974114.9818.147.camel@pegasus>
-In-Reply-To: <1110974114.9818.147.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] USSP compilation problem for linux 2.6
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <f54d8640503160704bbbd53b@mail.gmail.com>
+References: <d1f423d30503071045794c487e@mail.gmail.com>
+	 <f54d86405030903455bf71640@mail.gmail.com>
+	 <1110391057.5462.30.camel@notepaq>
+	 <f54d8640503160537449496dd@mail.gmail.com>
+	 <1110981332.11792.32.camel@pegasus>
+	 <f54d8640503160704bbbd53b@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1110986803.11792.39.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,28 +23,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Mar 2005 16:29:10 +0100
+Date: Wed, 16 Mar 2005 16:26:43 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Benny,
 
-Hi Marcel,
+> Thanks Marcel for your information. So I should not use the ussp for linux 2.6.
+> 
+> How I need to connect to the BT Serial port adapter from the PC host
+> using the BT USB dongle? (ie) that is the command settings.
+> 
+> Which device node I need to open for writing a serial port application
+> on host to send data to the target PC with BT serial port adapter?
 
-|
-| simply give the 2.6.11 or 2.6.12-bkX kernel a try.
-|
+maybe you should read the rfcomm manual page and look at the rfcomm
+program.
 
-I tried 2.6.11.4 and it works! Thank you for your quick responses.
+Regards
 
-David
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+Marcel
 
-iD8DBQFCOFDGMcA3II2AlaIRAm4LAKCGMWdQhp3UalZb7D/uOZQd45qDCgCggCIq
-gmQsaXS2X/JBISiE9XZeFZo=
-=ic+s
------END PGP SIGNATURE-----
+
 
 
 -------------------------------------------------------
