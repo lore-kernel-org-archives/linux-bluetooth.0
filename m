@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] A2DP vs. microphone
+Subject: Re: [Bluez-devel] [btsco] configure/make errors
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41EE770F.8030302@xmission.com>
-References: <41EE770F.8030302@xmission.com>
+In-Reply-To: <41EE6C49.7090908@pca.it>
+References: <41ED7E8D.8030709@pca.it> <1106136920.8190.96.camel@pegasus>
+	 <41EE6C49.7090908@pca.it>
 Content-Type: text/plain
-Message-Id: <1106151937.8190.126.camel@pegasus>
+Message-Id: <1106151718.8190.121.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,27 +19,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 19 Jan 2005 17:25:37 +0100
+Date: Wed, 19 Jan 2005 17:21:58 +0100
 
-Hi Brad,
+Hi Luca,
 
-> i just added this to our docs and I want to bounce it off you guys to 
-> make sure I'm reading things right:
+> > And again. The bootstrap thing is for making the developer happy,
+> > because he must call only one program/script for getting the repository
+> > ready. It is not for others ;)
+> I know this, but the problem here is that if someone like me (not a
+> developer, not really a newbie) wants to try his Bluetake BT420EX with
+> the bluetooth-alsa project, he should go with the CVS (no other released
+> versions). And so he has some problem, because there're no info about
+> the requirements (automake-1.7, the Audio Output libraries and the
+> Bluetooth libraries, even if the last one was my fault, it's quite
+> obvious that for a Bluetooth project you need the Bluetooth libraries).
 > 
-> A2DP provides a way to send stereo high-quality audio to some of the
-> newer headsets. This is one-way audio, so if you were expecting to get
-> something like a gaming headset (talking to other players, getting
-> stereo sound back from the game) I guess the spec is lacking. It might
-> be theoretically possible for a headset to accept simultaneous SCO and
-> A2DP connections to do this but even if it's possible, no headset
-> allows it.
+> So, IMHO also for developers, at least a 'required packages' section
+> should be added to the README.
 
-SCO is bidirectional and thus using a Bluetooth headset for gaming is
-possible. The A2DP is a distribution service and you can have multiple
-sink and source combination. So a headphone can also have a microphone
-channel to send high quality voice (for voice recognition) back. However
-I haven't seen such a product so far, but it seems that the Toshiba SR-1
-may is capable of something like that. Check my webpage.
+I don't lead this project and so these are only my two cents. Brad is
+responsible and it is actually his decision.
+
+Maybe doing a release once in a while is a good idea, but the problem is
+the kernel module is not in that shape that I would accept it. However I
+like the idea of doing everything in userspace as an ALSA plugin and
+that should be the way to go.
+
+> Ok, I'll add this ASAP, but ATM Debian unstable still has 2.11 and I
+> should prepare my own Debian bluez-2.13 packages.
+
+Yeah, we really need new packages (btw 2.14) for Debian Sid.
 
 Regards
 
