@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Detecting RSSI without connecting
-References: <qszactrj3c5.fsf@timepilot.gpcc.itd.umich.edu>
-	<1099960170.29330.43.camel@pegasus>
-	<qszu0rfnfil.fsf@mspacman.gpcc.itd.umich.edu>
-	<1101413321.6465.6.camel@pegasus>
-From: Scott W Gifford <gifford@umich.edu>
-In-Reply-To: <1101413321.6465.6.camel@pegasus> (Marcel Holtmann's message of
- "Thu, 25 Nov 2004 21:08:41 +0100")
-Message-ID: <qszzn10q72i.fsf@timepilot.gpcc.itd.umich.edu>
+Message-ID: <41AB9BB2.1070603@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] RE[2]: inquiry scan problems
+References: <41AB96DF.4080405@zhwin.ch> <1101765045.7562.48.camel@pegasus>
+In-Reply-To: <1101765045.7562.48.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,31 +18,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Nov 2004 23:44:37 -0500
+Date: Mon, 29 Nov 2004 22:59:14 +0100
 
-Marcel Holtmann <marcel@holtmann.org> writes:
+Hello Marcel
 
-[...]
+what do you mean by "job periodic inquiry"?
+what is this? i don't know what this means...
 
-> If you buy a CSR based Bluetooth 1.2 device it will support inquiry with
-> RSSI. Also the 1.2 Silicon Wave based and the AVM BlueFRITZ! USB v2.0
-> have this support. However both have a bug, but you can work around it.
-> Maybe the easiest way is a D-Link DBT-120 Rev. B3 and then put the Apple
-> firmware update on it.
+kind regards
+Marco Trudel
 
-Thanks for the advice, I got a DBT-120 and put the Apple firmware on
-it (yet another reason I'm glad we bought a Mac for my wife), and I
-can now get the RSSI from an inquiry!
 
-That is to say, I can see it in hcidump.  I don't see the results in
-"hcitool inq", and from a quick look at the source code it looks like
-that information isn't returned from the kernel.  Are there plans to
-provide this information via the kernel and libraries, or should I
-plan on hacking something up with hcidump?
-
-Thanks again!
-
-----ScottG.
+Marcel Holtmann wrote:
+> Hi Marco,
+> 
+> 
+>>yes. i tried the inquiries with "hcitool scan".
+>>again, i do 5 and more inquiries in a row with one second sleep between 
+>>inquiries single "hcitool scan"'s...
+>>
+>>here what i noted:
+>>- it needs in average 4 inquiries to get a new device after it's in 
+>>rainge (4 single "hcitool scan" until it's visible).
+>>- it needs in average 2 inquiries to see that a device is no longer in 
+>>rainge (or has bluetooth disabled). the first new inquiry usually gives 
+>>"n/a" as the friendlyName, the second one doesn't list it again.
+>>does maybe bluez or my bluetooth dongle cache old inquiries or is there 
+>>still radiation in the air :-) ?
+> 
+> 
+> for me this sounds more like a job periodic inquiry.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now. 
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+> 
 
 
 -------------------------------------------------------
