@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] L2CAP & HCI trace
+Subject: Re: [Bluez-devel] RFCOMM: UIH response is splitted into 3 packets
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050217111414.40743.qmail@web53202.mail.yahoo.com>
-References: <20050217111414.40743.qmail@web53202.mail.yahoo.com>
+In-Reply-To: <loom.20050217T125538-559@post.gmane.org>
+References: <loom.20050217T125538-559@post.gmane.org>
 Content-Type: text/plain
-Message-Id: <1109027746.7626.35.camel@pegasus>
+Message-Id: <1109027604.7626.32.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,34 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Feb 2005 00:15:46 +0100
+Date: Tue, 22 Feb 2005 00:13:24 +0100
 
-Hi Filipa,
+Hi Matthias,
 
-> > Try recompilating your kernel with the
-> > CONFIG_BT_HCI_SOCK_DEBUG, CONFIG_BT_L2CAP_DEBUG,
-> > etc... (All the options
-> > mentionned at the beginning of the files, in a block
-> > like : 
-> > 
-> > #ifndef CONFIG_BT_L2CAP_DEBUG
-> > #undef  BT_DBG
-> > #define BT_DBG(D...)
-> > #endif
-> > 
-> > ) enabled.
-> I am a newbie in Linux/BlueZ matters and I am not sure
-> how to do this. Could you please explain?
+> i wrote a programm for testing the RFCOMM layer and during a connection
+> i observed a strange behaviour that could be an implementation error within 
+> BlueZ?!
 
-add a line with "#define CONFIG_BT_L2CAP_DEBUG" before this block and
-recompile the module.
-
-> By the way, does anybody has the l2cap and hci layers
-> implemented im User Space? I need to have those layers
-> running without OS... 
-
-Actually it is possible to do this, but you are on the wrong mailing
-list for this question ;)
+this is not an implementation error on the BlueZ side, because RFCOMM is
+a stream and fragementation must be handled nicely. You must fix your
+application to deal with it.
 
 Regards
 
