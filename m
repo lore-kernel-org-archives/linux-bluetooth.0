@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v619)
-Message-Id: <9DCE2262-6326-11D9-95C8-00039390D626@pepper.com>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-From: Michael Frey <mfrey@pepper.com>
-Subject: [Bluez-devel] How to trigger an event after hidd connect/disconnect
+Message-ID: <41E2A9FC.2010405@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Multiple Headsets
+References: <41E25ECD.2000505@fcse.co.uk> <41E267C4.5030906@dark-reality.de> <1105362147.8652.10.camel@pegasus>
+In-Reply-To: <1105362147.8652.10.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,19 +18,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Jan 2005 11:42:29 -0500
+Date: Mon, 10 Jan 2005 17:14:52 +0100
 
-Is there a way to trigger an event based on a hidd connect / disconnect 
-event?
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-In other words I would like to run a specified script when the event 
-occurs. similar to the linux hotplug events.
+Marcel Holtmann wrote:
+|
+| starting with 2.6.10 the hci_usb got a module parameter "isoc". This
+| controls the alternate setting when plugging in a dongle. The default
+| value is 2 (or 0 if it is blacklisted device). Check the Bluetooth
+| specification what value you have to choose for 2 x 16-bit SCO channels.
+|
 
-Is this possible using hidd?
+nice, did not know this yet. Should be added to the btsco documentation
+*cough*
 
-Thanks,
-Michael
+thanks for the remark,
+~  Lars
 
+
+- --
+Lars Grunewaldt
+* software development
+* multimedia design
+skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+web: http://www.dark-reality.de
+mail: lgw@dark-reality.de
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFB4qn7QWC6DTWkDAoRAkWXAJ0U0TDWnqjPDn1liNLOX4FEHgGSXwCfUnvO
+olUo1KgMjDR1gfLomfjWHWQ=
+=Jpbt
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
