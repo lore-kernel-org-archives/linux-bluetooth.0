@@ -1,18 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Jonathan Paisley <jp-www@dcs.gla.ac.uk>
-To: Carl Orsborn <cjo@csr.com>
-cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
-In-Reply-To: <4118DAF9.2080204@csr.com>
-Message-ID: <Pine.LNX.4.59.9999.0408101615190.22497@brava.dcs.gla.ac.uk>
-References: <4117AB9A.9010909@dark-reality.de>     <1092071356.4564.12.camel@pegasus>
- <4117B098.5020805@dark-reality.de>     <1092073167.4564.26.camel@pegasus>
-    <4117C0AB.2010609@superbug.demon.co.uk>     <1092090364.4564.46.camel@pegasus>
- <41180E64.1010007@dark-reality.de>     <1092140041.4564.96.camel@pegasus>
-    <4118C562.1050300@superbug.demon.co.uk>    
- <Pine.LNX.4.59.9999.0408101435250.22497@brava.dcs.gla.ac.uk> <4118DAF9.2080204@csr.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: James Courtier-Dutton <James@superbug.demon.co.uk>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4118E6A1.4030709@superbug.demon.co.uk>
+References: <4117AB9A.9010909@dark-reality.de>
+	 <1092071356.4564.12.camel@pegasus> <4117B098.5020805@dark-reality.de>
+	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>
+	 <1092090364.4564.46.camel@pegasus> <41180E64.1010007@dark-reality.de>
+	 <1092140041.4564.96.camel@pegasus>
+	 <Pine.LNX.4.59.9999.0408101355310.22497@brava.dcs.gla.ac.uk>
+	 <1092143505.4564.117.camel@pegasus> <4118D049.9060000@superbug.demon.co.uk>
+	 <1092145771.4564.148.camel@pegasus> <4118D6B9.3090708@superbug.demon.co.uk>
+	 <1092148473.4564.156.camel@pegasus> <4118E6A1.4030709@superbug.demon.co.uk>
+Content-Type: text/plain
+Message-Id: <1092151554.4564.188.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,43 +26,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 16:31:54 +0100 (BST)
+Date: Tue, 10 Aug 2004 17:25:54 +0200
 
-Hi Carl,
+Hi James,
 
-Thanks for adding your info to the discussion - much appreciated.
+> I thought that if you wished to submit a BlueZ ALSA driver, you would be 
+> submitting it to the person mentioned in this record.
+> SOUND
+> P:      Jaroslav Kysela
+> M:      perex@suse.cz
+> L:      alsa-devel@alsa-project.org
+> S:      Maintained
+> 
+> I did not know that you could bypass that person to get a SOUND related 
+> item into the kernel.
 
-On Tue, 10 Aug 2004 3:26pm +0100, Carl Orsborn wrote:
+the point is in writing an ALSA driver and not changing the ALSA
+subsystem. The SCO driver is part of the Bluetooth subsystem and so it
+will go in by me. The ALSA subsystem provides an in-kernel API and that
+can be used without any acknowledge of the ALSA maintainer.
 
-> I can't find anything in this thread that reveals whether you're
-> trying to send SCO traffic over USB or UART.  The data handling
-> for the two cases have subtle differences.
+> I was just offering to help with the submission.
 
-As far as I'm aware, we're dealing with USB only.
+Thanks, but going through the ALSA CVS won't give me any advantage. I
+hope that I can talk with Jaroslav about the Bluetooth issue at the
+Linux-Kongress next month.
 
-> Over USB, there's an isochronous connection - the bus provides
-> capacity for 8 ksamples/second in each direction.  If a CSR
-> device somehow fails to receive SCO traffic from air it fills
-> the embarrassing gap in the USB to-host flow with dummy
-> data.  Thus, the host continues to receive 8 ksamples/second.
->
-> Over UART, the same compensation mechanism applies - the CSR
-> device makes up data for any from-air gaps.  This allows the
-> host to match its tx sample rate to the connection's rx
-> sample rate, and so removes the need for the host to maintain
-> an accurate 8 kHz clock.
->
-> As I noted above, the USB/SCO path is isochronous.  This means
-> packets can be lost silently.  If the path is carrying 16-bit
+Regards
 
-Does this mean that it is sufficient to clock the outgoing data (with a 
-packet or two of buffering) according to the data received on the SCO 
-connection over USB? I suppose any dropouts due to the isochronous nature 
-of the (incoming) link will complicate this...
+Marcel
 
-This is what the current (hack of a) driver does at the moment, minus the 
-extra buffering. Since the buffering is missing, there are dropouts which 
-I assume are being caused by data not being provided in time.
 
 
 
