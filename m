@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4060C608.6070206@uni-paderborn.de>
-From: Stefan Mischke <survivor@uni-paderborn.de>
-MIME-Version: 1.0
-To: "Antony C. Roberts" <acr@acroberts.com>
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] RE: Accessing HCI on Windows
-References: <20040323183316.0D30C5EE02E@pfepb.post.tele.dk>
-In-Reply-To: <20040323183316.0D30C5EE02E@pfepb.post.tele.dk>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] Documentation for hcid.conf ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Collin R. Mulliner" <collin@betaversion.net>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040323225438.6b7bb3ee@coredump>
+References: <1080053029.7507.40.camel@gryffindor>
+	 <20040323183818.3d21f901@coredump> <1080064121.2515.35.camel@pegasus>
+	 <20040323225438.6b7bb3ee@coredump>
+Content-Type: text/plain
+Message-Id: <1080081387.2515.58.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,31 +20,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Mar 2004 00:19:36 +0100
+Date: Tue, 23 Mar 2004 23:36:27 +0100
 
-Thanks! This is exactly what I was looking for. I've tested it and ist 
-works.
-I've seen FreeBT before (in January), but at that time they had no 
-working USB support.
-As for me, this thread is closed.
-Again: Thanks to all contributors!
+Hi Collin,
 
-Kind regards
-Stefan
+> using:
+> 
+> device hci0 {
+>  ...
+>  copy of default section (from hcid.conf)
+>  ...
+> }
+> 
+> OR
+> 
+> device 00:11:22:33:44:55 {
+>  ...
+>  copy of default section (from hcid.conf)
+>  ...
+> }
+> 
+> gives me a syntax error for the line containing "device hci0 {" and for
+> all following lines within the section, same goes for 
+> "device 00:11:22.33.44:55 {"
+> 
+> I have bluez-utils-2.4 (btw. hcid reports 2.4)
 
-Antony C. Roberts schrieb:
+try bluez-utils-2.5
 
->Check out FreeBT (www.freebt.net) it's open source and includes the full
->source code to a Generic Windows Bluetooth USB Driver as well as various
->levels of HCI abstraction (with full access to the HCI layer) in C++.
->
->Regards,
->Antony C. Roberts.
->
->  
->
->  
->
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
