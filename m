@@ -1,17 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] question: what does this patch from snd-bt-sco
-	do?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Lars Grunewaldt <lgw@dark-reality.de>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <40AA11AB.6010307@dark-reality.de>
-References: <40A9E6CB.4010505@dark-reality.de>
-	 <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk>
-	 <40A9EE51.2080102@dark-reality.de> <1084881439.5833.108.camel@pegasus>
-	 <40AA11AB.6010307@dark-reality.de>
-Content-Type: text/plain
-Message-Id: <1084888843.4327.1.camel@pegasus>
+From: Andreas Gaufer <Andreas.Gaufer@blue-cell-networks.com>
+To: bluez-devel@lists.sourceforge.net
+Message-Id: <20040518154926.4522519c.Andreas.Gaufer@blue-cell-networks.com>
+In-Reply-To: <E1BQ0K1-0000wa-00@intern.SerNet.DE>
+References: <1084868892.5833.45.camel@pegasus>
+	<E1BQ0K1-0000wa-00@intern.SerNet.DE>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-devel] Nokia 6230 info
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,21 +18,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 May 2004 16:00:43 +0200
+Date: Tue, 18 May 2004 15:49:26 +0200
 
-Hi Lars,
+On Tue, 18 May 2004 10:51:37 +0200 (CEST)
+Lutz Pressler <Lutz.Pressler@SerNet.DE> wrote (on BlueZ-Users):
+> > please run "hcitool info <bdaddr-6230>" for me, so I can put this phone
+> > on my list.
+> >
+> Requesting information ...
+>         BD Address:  00:E0:03:39:C9:AB
+>         Device Name: Nokia 6230 LP
+>         LMP Version: 1.1 (0x1) LMP Subversion: 0x380
+>         Manufacturer: Cambridge Silicon Radio (10)
+>         Features: 0xbf 0xee 0x00 0x09
+>                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
+>                 <timing accuracy> <role switch> <sniff mode> <RSSI>
+>                 <channel quality> <SCO link> <HV3 packets> <u-law log>
+>                 <A-law log>
+> 
 
-> um, sorry - what's an alternate setting? I mean, what exactly is "set" here?
+Hi Marcel,
 
-this has nothing to do with ALSA or BlueZ. It is a USB specific
-definition of having alternate settings for an interface. Look at
-/proc/bus/usb/devices for your USB Bluetooth dongle.
+just looked into the data from our field tests. We saw something that had the 
+Device Name "Nokia 6230 Ir" and it had a diffrent feature list. Just thought 
+this might be intresting for you :
 
-Regards
+1080041406|dn|Nokia 6230 iR
+1080041406|fea|0xbf 0xee 0x0f 0x00
+1080041406|lmpsv|0x380
+1080041406|lmpv|1.1 (0x1)
+1080041406|mf|NokiaDanmarkAS
 
-Marcel
+Since the Mac-Adress was 00:02:EE:x:x:x this was maby a prototype of that 
+phone. We spotted it in March in Hannover ;)
 
+Greetings
 
+Andy
 
 
 -------------------------------------------------------
