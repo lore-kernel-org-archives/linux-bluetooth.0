@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Where does the L2CAP FCS was checked?
+Subject: Re: [Bluez-devel] Sdp
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Wang Haiguang <wanghg@i2r.a-star.edu.sg>
-Cc: bluez devel <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <LMEOKMJFKNFFHEAEDGDEGELLCGAA.wanghg@i2r.a-star.edu.sg>
-References: <LMEOKMJFKNFFHEAEDGDEGELLCGAA.wanghg@i2r.a-star.edu.sg>
+To: Jorge =?ISO-8859-1?Q?Gonz=E1lez?= <jorge@naxus.biz>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1083853467.28356.18.camel@pancho>
+References: <1083853467.28356.18.camel@pancho>
 Content-Type: text/plain
-Message-Id: <1083878149.4420.88.camel@pegasus>
+Message-Id: <1083877519.4420.78.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,21 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 06 May 2004 23:15:49 +0200
+Date: Thu, 06 May 2004 23:05:19 +0200
 
-Hi Haiguang,
+Hi Jorge,
 
-please stop sending emails in blue. Keep it plain 7 bit ASCII.
+> I am trying to get working the sdp tools in order to make the PDA know
+> what services are provided by a linux machine.
+> 
+> But I get this when I try to compile:
+> -----------------------------------------
+> /bin/sh ../libtool --mode=link gcc  -Wall -g -O2   -o sdptool  sdptool.o
+> listattr.o setattr.o -L../libs -lsdp /usr/lib/libbluetooth.la
+> libtool: link: cannot find the library `'
+> -----------------------------------------
+> 
+> I think the problem is -lsdp which is not found. How could I get this
+> library??
 
-> I read the bluetooth specification of L2CAP. There is a FCS at the end
-> of a L2CAP frame.
->  
-> Could you please tell me in which fucntion this FCS is checked. 
+if you use bluez-libs prior 2.6 than install bluez-sdp.
 
-the FCS is for L2CAP with retransmission and flow control which is part
-of Bluetooth 1.2 and currently this feature is not supported by BlueZ.
-And actually not by any other Bluetooth stack that I know of. So it is
-checked nowhere.
+> I dont know if this type questions are supposed to be in bluez-users or
+> bluez-devel. If this is no the appropiate list for this questions I
+> would be appreciate to know :D
+
+For me it doesn't matter as long as you don't start cross-posting ;)
 
 Regards
 
