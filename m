@@ -4,12 +4,12 @@ Subject: Re: [Bluez-devel] question: what does this patch from snd-bt-sco
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Lars Grunewaldt <lgw@dark-reality.de>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <40A9F4F4.4080601@dark-reality.de>
+In-Reply-To: <40A9EE51.2080102@dark-reality.de>
 References: <40A9E6CB.4010505@dark-reality.de>
 	 <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk>
-	 <40A9EE51.2080102@dark-reality.de>  <40A9F4F4.4080601@dark-reality.de>
+	 <40A9EE51.2080102@dark-reality.de>
 Content-Type: text/plain
-Message-Id: <1084881575.5833.112.camel@pegasus>
+Message-Id: <1084881439.5833.108.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,21 +21,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 May 2004 13:59:35 +0200
+Date: Tue, 18 May 2004 13:57:19 +0200
 
 Hi Lars,
 
-> just wanted to mention that one single SCO connection at a time is
-> sufficent right now, IMO; I don't think that most people will need more
-> than one (open) connection for audio right now. Of course, if the core
-> definition says there must be more than one, we have to implement it.
+> I already looked up the voice number stuff in the core docs, and was
+> able to find out that 0x0140 is ideal right now (MU_LAW encoded). Works
+> here, already.
 
-the difference is 8-bit, 16-bit and the number of SCO connections.
+for this you must use alternate setting 1, because it is 8 bit.
 
-> Or is SCO used for anything else but audio?
+> Hm, is there any chance to get this implemented "the proper" way, so all
+> audio codecs (8bit 8kHz and 16bit 8kHz) can be used with hci_usb?
 
-With Bluetooth 1.2 and eSCO it will be possible to use it for data
-transmission. We have to adapt full eSCO support at some time.
+You can make use of the notify() callback and adjust the alternate
+setting as needed. Maybe you have to unlink and re-submit the ISOC
+URB's, but the best way is to start the ISOC URB's only when a SCO
+connection is created.
 
 Regards
 
