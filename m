@@ -1,54 +1,70 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Gentoo compile error: `HANDSFREE_SVCLASS_ID'
-	undeclared (first use in this function)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Sven Ehret <sven.ehret@gmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3eef79ed04100219111bcee37d@mail.gmail.com>
-References: <3eef79ed04100219111bcee37d@mail.gmail.com>
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1096833441.20349.0.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 03 Oct 2004 21:57:21 +0200
+Return-Path: <snd-bt-sco-return-49-marcel=holtmann.org@corinis.net>
+List-Post: <mailto:snd-bt-sco@corinis.net>
+List-Help: <mailto:snd-bt-sco-help@corinis.net>
+List-Unsubscribe: <mailto:snd-bt-sco-unsubscribe@corinis.net>
+List-Subscribe: <mailto:snd-bt-sco-subscribe@corinis.net>
+Reply-To: snd-bt-sco@corinis.net
+Message-ID: <41604792.8030309@xmission.com>
+Date: Sun, 03 Oct 2004 12:40:18 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: snd-bt-sco@corinis.net,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <41603BF5.9030405@superbug.co.uk>
+In-Reply-To: <41603BF5.9030405@superbug.co.uk>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [snd-bt-sco] bluetooth headset profile with alsa in user space.
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Sven,
+James,
 
-> I am unable to compile any version of bluez-utils I could get my hand o=
-n.
->=20
-> Using Gentoo, compiling portage-versions 2.7, 2.10, 2.10-r1 and newest
-> version from sf.net breaks with:
->=20
->      [some lines]
-> sdptool.c: In Funktion =BBadd_handsfree=AB:
-> sdptool.c:1130: error: `HANDSFREE_SVCLASS_ID' undeclared (first use in
-> this function)
+I've looked at this too. I'm crossposting to see if Marcel wants to comment.
 
-read the ChangeLog file for the bluez-libs requirement.
+Some people think bluetooth-alsa should have a smaller kernel footprint 
+and some people think it's the userspace component that needs to be 
+eliminated. The bottom line is that it needs to go in a direction that 
+is acceptable to bluez and alsa but doesn't leave so much to be desired 
+by the bluez group that they feel like reimplementing/rejecting it.
 
-Regards
+the less-kernel-space argument
 
-Marcel
+- alsa would not be affected [much]
+- bluez would only be affected in that we may want hooks to go into 
+libbluetooth
+- userspace stuff is easier to debug and develop
+- supporting multiple headsets simultaneously should be more straightforward
+- kernel developers won't be questioning it
+- adding it to a linux distro that has bluez already would be easier
 
+The more-kernel-space argument:
 
+- alsa has said they would consider patches that don't have the 
+userspace entanglements
+- the bluez project leaders may decide that in-kernel is the way audio 
+has to be done
+- dbus/hotplug may play nicer with an in-kernel driver
 
+I think now the less-kernel-space is safer. Regardless of our approach, 
+apps that want bluetooth-alsa like asterisk will have to be linked with 
+a new library so there's not a disadvantage there with another build 
+requirement. There's probably just too much uncertainty with the 
+in-kernel approach.
 
--------------------------------------------------------
-This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
-Use IT products in your business? Tell us what you think of them. Give us
-Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
-http://productguide.itmanagersjournal.com/guidepromo.tmpl
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Brad
+
+James Courtier-Dutton wrote:
+> It is possible to implement an alsa device is user space, without 
+> requiring any kernel modules. An example of this the the pcm_jack.c file 
+> in:
+> ./alsa-lib/src/pcm/ext/pcm_jack.c
+> 
+> It basically makes jackd look like a sound card to any alsa application.
+> 
+> This should help, because the bluetooth profile code is in user space as 
+> well, so we could make the bluetooth profile look like an alsa sound card.
+> 
+> Any comments?
+> 
+> James
+> 
+> 
