@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] disappointed with my MX900 battery life
+Subject: Re: [Bluez-users] phone+heaset
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Charles Bueche <charles@bueche.ch>
+To: =?ISO-8859-1?Q?Jo=E3o?= Santos <jsantos_pt@hotmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1073636191.8413.743.camel@bluez.bueche.ch>
-References: <1073555620.5632.8.camel@bluez.bueche.ch>
-	 <1073583568.2563.29.camel@pegasus>
-	 <1073636191.8413.743.camel@bluez.bueche.ch>
+In-Reply-To: <Sea2-F55rqLvw2FZ8ZX00039a1b@hotmail.com>
+References: <Sea2-F55rqLvw2FZ8ZX00039a1b@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1073657745.2563.85.camel@pegasus>
+Message-Id: <1073657615.2563.81.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,29 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 09 Jan 2004 15:15:45 +0100
+Date: Fri, 09 Jan 2004 15:13:35 +0100
 
-Hi Charles,
+Hi Joao,
 
-> > On the other hand the Apple Bluetooth
-> > mouse never uses sniff mode to save power. Run a hcidump and check what
-> > your mouse is doing.
+> >read it again, because if I am not wrong only the headset can send
+> >+ckpd=200. And you also have to answer any command from the headset with
+> >ok or error.
 > 
-> I left hcidump running for a while (~15 min) and I saw it doing a change
-> mode :
-> 
-> 1073632217.880298 > HCI Event: Mode Change(0x14) plen 6
-> 1073632217.892269 > HCI Event: Mode Change(0x14) plen 6
-> 
-> ....time goes a bit
-> 
-> 1073632832.674873 > HCI Event: Mode Change(0x14) plen 6
-> 1073632832.688834 > HCI Event: Mode Change(0x14) plen 6
-> 
-> Can you interpret this ? Looks like Klingon to me :-)
+> i think i'm doing it right, because is the pc, that i want to work like a 
+> headset of the phone, who send the +ckpd=200, and receve a ok from the 
+> phone.
 
-run the hcidump with "-x" to see that packet content, but in general it
-changes to sniff mode and so power saving works.
+in that case you have to wait for the incoming SCO connection from your
+phone. I have not so much time to read the headset profile again, but
+from what I remember is that the phone have to establish the SCO link if
+the headset sends +ckpd=200. Check the specification by yourself.
 
 Regards
 
