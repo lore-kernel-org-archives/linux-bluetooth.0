@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Bc. Michal Semler" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
+From: "Jurgens du Toit" <dutoitjj@yahoo.co.uk>
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] ipaq 1945
+Message-Id: <20040928112643.M59598@modiredi.co.za>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200409281043.57935.cijoml@volny.cz>
-Subject: [Bluez-users] 2.6.8-mh2 hotkeys not working and hcidump freezes laptop
+	charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,15 +16,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Sep 2004 10:43:57 +0200
+Date: Tue, 28 Sep 2004 13:28:51 +0200
 
-Hi Marcel,
+Is ip forwarding turned on?
 
-I tried your latest mh patch in 2.6.9-rc2 and hotkeys stopped working. I tried 
-to run hcidump 1.12 to get whats happens when key is pressed and then laptop 
-totally freezes.
+cat /proc/sys/net/ipv4/ip_forward
+if this returns zero, it's turned off
 
-M.
+echo "1" > /proc/sys/net/ipv4/ip_forward
+to turn it on
+
+Jrgns
+
+--
+Sent by Jurgens du Toit (083-511-7932)
+Hosted by Modiredi (http://www.modiredi.co.za)
+Powered By Bizmail (http://www.bizmail.co.za)
+
+
+-- 
+This message has been scanned for viruses and
+dangerous content by MailScanner.
+
+Modiredi Internet Services cc
+postmaster@modiredi.co.za
+
 
 
 -------------------------------------------------------
