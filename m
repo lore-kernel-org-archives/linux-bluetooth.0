@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth and gps
-From: Gene Imes <ebi7@ozob.net>
-To: list-bluez <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40B67EB9.7080102@connectingyou.com.au>
-References: <40B67EB9.7080102@connectingyou.com.au>
-Content-Type: text/plain
-Message-Id: <1085799548.31067.50.camel@go2>
-Mime-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200405290256.06151.cijoml@volny.cz>
+Subject: [Bluez-users] CSR firmware
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,71 +17,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 May 2004 21:59:08 -0500
+Date: Sat, 29 May 2004 02:56:05 +0200
 
-On Thu, 2004-05-27 at 18:50, Joseph Sirucka wrote:
-> Hi All
-> 
-> I have a bluetooth gps unit and would like to know how do I get about 
-> connecting the unit to my linux machine.
-> 
-> I can get the usb bluetooth working with
-> 
-> bfusb and hci_usb drivers with others like l2cap, bluez etc
-> 
-> I can hcitool scan the bluetooth unit.
-> 
-> what do I need to make a connection to the unit.
-> 
-> regards
-> 
-> Joseph
+Hi,
 
-rfcomm -h shows the following:
+have anybody downloaded firmware from csr dongle? I would like to make 
+research if is possible to change vendor ID in it and then flash it back. I 
+think it is possibly way to upgrade firmware in old dongles.
 
-rfcomm bind <dev> <bdaddr> <channel>
+Can somebody give me help how download it? I have now access to 14 different 
+csr based dongles from different wendors, which have same firmware version. 
+So I'll try find differences in firmware.
 
-<dev> is rfcommX where X is 0,1,2... probably 0
-
-<bdaddr> is the output of your device determined by hcitool scan. In my
-case is:
-root@tr1a:~# hcitool scan
-Scanning ...
-        00:02:C7:15:7A:2F       BTGPS 157A2F
-
-<channel> is 0-13 depending on your location
-
-So the command for me would be
-
-rfcomm bind 0 00:02:C7:15:7A:2F 1
-
-My /etc/bluetooth rfcomm.conf looks thus:
-
-rfcomm0 {
-        # Automatically bind the device at startup
-        bind yes;
- 
-        # Bluetooth address of the device
-        #device 11:22:33:44:55:66;
-        device 00:02:C7:15:7A:2F;
- 
-        # RFCOMM channel for the connection
-        channel 1;
- 
-        # Description of the connection
-        comment "Example Bluetooth device";
-}
-
-So if you type 'rfcomm bind 0' your device should be connected. Then say
-perhaps you have gpsdrive. Click the 'Start GPSD' button and you should
-be connected.
-
-Good luck.
-
-Ciao,
-
-Gene
-
+Michal
 
 
 -------------------------------------------------------
