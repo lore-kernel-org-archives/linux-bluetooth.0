@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050322150335.73224.qmail@web60910.mail.yahoo.com>
-From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <424032ED.5070401@db.db>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=big5
-Subject: [Bluez-users] connect T610 to PC problem
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+From: db <davide.brunelli@gmail.com>
+Subject: [Bluez-users] 4 connection on PDA
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,30 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Mar 2005 23:03:35 +0800 (CST)
+Date: Tue, 22 Mar 2005 15:59:57 +0100
 
-Hi all!
-    I can connect T610 from PC successfully! The key
-point is: you have to set the same channel of SDP and
-rfcomm, and set the class in hciconfig as 0x200404
-i.e. headset. Then after typing "rfcomm listen 0
-<channel>", the phone can connect to Pc successfully.
-But then, I face a new problem. When I put the socket
-programming part in my main program, after I
-successfully connect T610 to the PC, it showed
-"dev/rfcomm0: no such device". Why is that?
-    Then I looked at rfcomm/main.c, and put the
-cmd_listen part in my main program, but after that,
-when I tried to connect T610 to PC, the T610 always
-showed "Bluetooth connection failed". Why is that?
-Please give any suggestion about it. If neccessary,
-any user can ask me to send my programs to you to have
-a look. Thank you very much for your kindness.
-Michael 
+Hi,
 
-_______________________________________________________________________
-Yahoo! 工具列 - 內置防止彈出視窗工能！
-http://toolbar.yahoo.com.hk
+I'm using bluez 2.4 on ipaq H3970 with Familiar 0.7.1 .
+
+I can't obtain more than 4 simultaneous connections to other devices.
+
+Could anyone explain me why PDA can't pair up to 7 devices?
+Are there any limitations in bluez stack for PDA?
+
+Regards
+--
+dB
+
+
 
 
 -------------------------------------------------------
