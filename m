@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] /usr/include/bluetooth/bnep.h
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405062353.34156.cijoml@volny.cz>
-References: <1083857533.16650.25.camel@saag>
-	 <200405062127.11184.cijoml@volny.cz> <1083877306.4420.72.camel@pegasus>
-	 <200405062353.34156.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1083918055.4420.100.camel@pegasus>
-Mime-Version: 1.0
+References: <1083857533.16650.25.camel@saag> <200405062127.11184.cijoml@volny.cz> <1083877306.4420.72.camel@pegasus>
+In-Reply-To: <1083877306.4420.72.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200405070028.06843.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,29 +19,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 07 May 2004 10:20:55 +0200
+Date: Fri, 7 May 2004 00:28:06 +0200
 
-Hi Michael,
+On Thursday 06 of May 2004 23:01, Marcel Holtmann wrote:
+> hidp module
 
-> > The bthid will not be included. I already included the first rough steps
-> > of the new hidd, which is going to depend on the hidp kernel module.
-> > Right now I marked it as "noinst" and I am not quite sure if I am going
-> > to change that before bluez-utils-2.8. However the code is there and I
-> > think that I am going to release 2.6.6-mh1 with a prototype of that
-> > kernel module.
-> 
-> PLS release it in 2.7. We will happily wait for it. Longer waiting is killing 
-> us at all :)
+Marcel,
 
-it is in there, but it is not installed by default. The worst case will
-be you have to compile it by yourself and copy the binary. However you
-need special kernel support for it and that will be the other problem.
+can you write more info about this module? What will it take care of?
+Only Human Interface Device Protocol? And hidd will serve events to it to 
+decode them instead of doing it by hidd?
 
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
