@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Can't connect.: Function not implemented
+Subject: Re: [Bluez-users] Bluez tools
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <01LKSFUD1WC0003PT2@beacon.nuigalway.ie>
-References: <01LKSFUD1WC0003PT2@beacon.nuigalway.ie>
+In-Reply-To: <E73D9A5BC4A2D711BBC600065BF3595F1C66CF94@il06exm10>
+References: <E73D9A5BC4A2D711BBC600065BF3595F1C66CF94@il06exm10>
 Content-Type: text/plain
-Message-Id: <1108408616.7780.9.camel@notepaq>
+Message-Id: <1108408399.7780.6.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +18,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Feb 2005 20:16:56 +0100
+Date: Mon, 14 Feb 2005 20:13:19 +0100
 
-Hi Triona,
+Hi Hiren,
 
-> Ok now I can l2ping any module once I hcitool cc it. 
+> I would like to know where can I get Bluez tools/libraries for profiles like Obj push (OPD) and others ... my OS is FC3
 
-you are doing something wrong. There is no problem like this.
-
-> Ok, I think my problem is
->  to do with the sdp modules. I know they're supposed to be included in the bluez
-> -utils package, and when I type sdpd, l2cap appears in lsmod. However, Between l
-> inux modules, it seems as if sdpd is not present. 
-> 
-> I've been searching google, 
-> and have seen the same error, always with, "sdpd is not installled" as a solutio
-> n.  Is there any way I could have unsuitable packages installed?
-
-You only need to install bluez-libs and bluez-utils.
+look at the BlueZ CVS repositories and check out the link list of BlueZ
+related websites at my page.
 
 Regards
 
