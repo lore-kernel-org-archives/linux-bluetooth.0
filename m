@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Fehr <andreas@mrs.ch>
+Subject: Re: [Bluez-users] No working Bluetooth adapter found
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth serial vs. audio connection
-In-Reply-To: <1111926923.9195.218.camel@pegasus>
-Message-ID: <Pine.LNX.4.62.0503271736360.3135@ybpnyubfg.ybpnyqbznva>
-References: <Pine.LNX.4.62.0503271303450.3134@ybpnyubfg.ybpnyqbznva>
- <1111923433.9195.216.camel@pegasus>  <Pine.LNX.4.62.0503271357080.3134@ybpnyubfg.ybpnyqbznva>
- <1111926923.9195.218.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <200503271732.30911.tmp@nitwit.de>
+References: <200503271708.10663.tmp@nitwit.de>
+	 <1111937018.9195.224.camel@pegasus>  <200503271732.30911.tmp@nitwit.de>
+Content-Type: text/plain
+Message-Id: <1111937935.9195.227.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,64 +19,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Mar 2005 17:40:59 +0200 (CEST)
+Date: Sun, 27 Mar 2005 17:38:55 +0200
 
-On Sun, 27 Mar 2005, 14:35, Marcel Holtmann (as MH) wrote:
+Hi Timo,
 
-Hi Macel,
+> > what does "/proc/bus/usb/devices" contain?
+> 
+> Hmm, no bluetooth dongle, is there? BTW if I run suseplugger and plugin the 
+> dongle (BTW same effect with another dongle) it hogs the CPU forever.
+> 
+> T:  Bus=02 Lev=01 Prnt=01 Port=03 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0db0 ProdID=1967 Rev= 5.25
+> C:* #Ifs= 3 Cfg#= 1 Atr=80 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
 
->MH: > >MH: 	rfcomm connect 0 <bdaddr> <channel>
->MH: > >MH: 
->MH: > >MH: and then /dev/rfcomm0 is your serial port of the phone. 
->MH: > >MH: However you may have to check with "sdptool browse <bdaddr>" 
->MH: > >MH: what's the channel for the serial port or dialup networking 
->MH: > >MH: profile.
->MH: > 
->MH: > Hmm, in theory... yes. But as soon as rfcomm comes up, my phone 
->MH: > asks me, if I want an 'audio' connection. If I connect with the 
->MH: > windows software, the mobile asks me, if I want a 'serial' 
->MH: > connection.
->MH: > 
->MH: > sdptool browse 00:xx gives no information. Just the line 
->MH: > "Browsing 00:xx ..." Any idea on that?
->MH: 
->MH: then do "sdptool search --bdaddr <bdaddr> {sp|dun}".
+this is your Bluetooth dongle (CSR based it seems) and it looks fine to
+me. Check what "hciconfig -a" says.
+
+Regards
+
+Marcel
 
 
-Ok, I see... this could lead to something. I've the following output:
-
-root@notebook:/home/andreas > sdptool search --bdaddr 00:xx sp
-Searching for sp on 00:xx ...
-Service Name: Serial Port
-Service RecHandle: 0x10003
-Service Class ID List:
-  "Serial Port" (0x1101)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 3
-
-root@notebook:/home/andreas > sdptool search --bdaddr 00:xx dun
-Searching for dun on 00:xx ...
-Service Name: Dial-up networking
-Service RecHandle: 0x10002
-Service Class ID List:
-  "Dialup Networking" (0x00001103)
-Protocol Descriptor List:
-  "L2CAP" (0x00000100)
-  "RFCOMM" (0x00000003)
-    Channel: 4
-Segmentation fault
-root@notebook:/home/andreas >
-
-(note the last 'Segmentation fault', this might be the reason, the 
-browse command does not work as expected)
-
-Thanks so far, but how to proceed? (I've still the same problem, 
-connecting with bluez 'only' gives an 'audio' connection, not the 
-expected 'serial' as I got from Windows).
-
-Thanks, Andreas
 
 
 -------------------------------------------------------
