@@ -1,8 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <BasiliX-1.1.0-110650969041f3ff7a67af4@postaci.ug.bilkent.edu.tr>
-From: <farukk@ug.bilkent.edu.tr>
+Message-ID: <41F3E469.3020306@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] help probable l2cap problems
+Subject: Re: [Bluez-devel] Re: Again: Problems with Dongle, Headset or btsco
+References: <41F0EB0A.1020302@webstuhl.net> <41F0FE84.8030401@dark-reality.de> <41F128F4.2020006@webstuhl.net> <41F13638.1080207@dark-reality.de> <41F25C4B.6040709@webstuhl.net> <csts46$p5n$1@sea.gmane.org> <41F29274.3020909@webstuhl.net>
+In-Reply-To: <41F29274.3020909@webstuhl.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -14,22 +18,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 23 Jan 2005 21:48:10 EET
+Date: Sun, 23 Jan 2005 18:52:41 +0100
 
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-im really sorry if this is a duplicate but i could not find anything on the web about my problem,
-my main aim is to send a few bytes of data over bluetooth and decided to use Bluez. i am using mandrake 9.2 (kernel 2.4.22) and downloaded the bluez libs utils and everything from www.bluez.org, installed them regarding the README files included in the packages. now i have two Ericsson BT development Kits attached via usb to my toshiba satellite a15. hciconfig tells that both of them are up and i can connect them to eachother using hcitool. to accomplish my main goal, i decided to use the l2test.c file in the directory bluez-utils-2.14/test. The file first did not compile (with error undefined ref. to str2ba) but i did a gcc l2test.c -lbluetooth and it did compile. now when i try to run the executable i get the following error:
+Ben Pezzei wrote:
+| Hi Sebastian,
+|
+| Sebastian Roth schrieb:
+|
+|>> unfortunately
+|>> arecord -D plughw:Headset z1.out
+|>> Recording WAVE 'z1.out' : Unsigned 8 bit, Rate 8000 Hz, Mono
 
-l2test[3255]: Can't create socket: No such file or directory (2)
+uhm, this is wrong. If you are using the "actual" btsco package from CVS
+- - and you should be - it must record as signed 16 bit if I'm not
+mistaken (possibly unsigned 16B, but in no case 8 bit)
 
-why does this happen and can anybody help me please.
+best regards,
+~  Lars
 
-Another thing is that i need a beginner's guide to programming with bluez, if any of you have any link for such a source(examples) please inform me, i would be grateful.
-Sorry for being a newbie :)
---  
-Ömer Faruk KAYA
-Bilkent University
-EE - 4
+- --
+Lars Grunewaldt
+* software development
+* multimedia design
+skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+web: http://www.dark-reality.de
+mail: lgw@dark-reality.de
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFB8+RoQWC6DTWkDAoRAo4rAJ4r9GbBnH1eUtDQ08ngF6UyXeX0lgCgpdlx
+Hn7p+uz6pWQTIRA3jPF0e28=
+=Wgk/
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
