@@ -1,13 +1,21 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hci0 problem after timeout
+Subject: Re: [Bluez-users] Logitech Bluetooth  Mx900+keyboard support.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Rafael Vidal Aroca <rafael@3WT.com.br>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4017D6E9.6030700@3WT.com.br>
-References: <40170986.70105@3WT.com.br> <1075276651.12766.52.camel@pegasus>
-	 <4017D6E9.6030700@3WT.com.br>
+To: Terence Rudkin <trexx@pobox.com>
+Cc: Olivier Bornet <Olivier.Bornet@puck.ch>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1075306699.1793.38.camel@localhost.localdomain>
+References: <1074457244.3254.17.camel@localhost.localdomain>
+	 <1074458664.6070.73.camel@pegasus>
+	 <1074480891.2817.10.camel@localhost.localdomain>
+	 <1074514935.6070.80.camel@pegasus>
+	 <1074568150.7831.5.camel@localhost.localdomain>
+	 <20040120081245.GA1871@smartdata.ch>  <1074597908.7088.5.camel@pegasus>
+	 <1075234547.3064.13.camel@localhost.localdomain>
+	 <1075276833.12766.56.camel@pegasus>
+	 <1075306699.1793.38.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1075306737.26729.3.camel@pegasus>
+Message-Id: <1075307541.26729.18.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,31 +27,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jan 2004 17:18:57 +0100
+Date: Wed, 28 Jan 2004 17:32:21 +0100
 
-Hi Rafael,
+Hi Terence,
 
-> root@gemini:~# hciconfig -a    
-> hci0:   Type: USB
->         BD Address: 00:80:C8:50:F2:D5 ACL MTU: 377:10  SCO MTU: 16:0
->         UP RUNNING PSCAN ISCAN
->         RX bytes:63 acl:0 sco:0 events:7 errors:0
->         TX bytes:27 acl:0 sco:0 commands:7 errors:0
->         Features: 0xff 0xfd 0x05 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy:
->         Link mode: SLAVE ACCEPT
->         Name: 'Broadcom BCM2033'
->         Class: 0x000000
->         Service Classes: Unspecified
->         Device Class: Miscellaneous,
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x2 LMP Ver: 1.1 (0x1) LMP Subver: 
-> 0x1007
->         Manufacturer: Broadcom Corporation (15)
+> I reviewed the code.  I focused on this section of code in
+> switch_logitech(...)
+> {
+>     char devname[PATH_MAX + 1];
+>     int i, fd, err = 0;
+>     for (i = 0; i < 16; i++) {
+> ...
+> 	sprintf(devname, "%s/hiddev%d", hidpath, i);
+> 	fd = open(devname, O_RDWR);
+> 	if (fd < 0)
+> 		continue;
+> ...
+> It occurred to me that open() could fail the 16 times and not report
+> that to the caller.  So i init'ed err to -1.  This is fine because  if
+> the open() works then err will be set based on the ioctl() or
+> send_report() calls.  But if open() fails all 16 time then the caller is
+> advised that something is wrong. 
+> 
+> Once I confirmed that in fact I was failing when I called hid2hci  I
+> went to understand why.  This was I had for dev dirtree. 
+>    /dev/usb/hiddev 
+> not
+>    /dev/usb/hid/hiddev 
+> as set in hidpath. So to work on my system I needed to change the
+> hidpath.   
+> 
+> While this works on my system.  What other systems might it break?   A
+> dynamic function to pull the correct value? Or is there a naming
+> authority, a header file, where this can be found?
 
-maybe it is this Broadcom device or maybe it is your USB chipset. What
-host driver do you use? usb-uhci or uhci? Try the other one. If you have
-access to a CSR donlge please try this.
+I used the devfs path, because my Debian Sid has no default device node
+for it. What is your system?
 
 Regards
 
