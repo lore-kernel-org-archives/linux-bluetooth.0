@@ -1,47 +1,47 @@
-Return-Path: <sgodsell@hotmail.com>
-From: "Sean Godsell" <sgodsell@hotmail.com>
-To: marcel@holtmann.org
-Cc: bluez-users@lists.sourceforge.net
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Anonying PIN
-Date: Tue, 30 Mar 2004 14:12:49 -0500
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Sean Godsell <sgodsell@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY12-F11Y5z4IssCQq0001e47a@hotmail.com>
+References: <BAY12-F11Y5z4IssCQq0001e47a@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1080671355.2773.23.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY12-F716TQ4rGTOlF0001e2a9@hotmail.com>
-List-ID: <bluez-users.lists.sourceforge.net>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 30 Mar 2004 20:29:15 +0200
 
-Hi Marcel,
+Hi Sean,
 
-Okay you mentioned security mode 1.   So are you saying that I can get rid 
-of that pin request on the connecting devices?  If so what do I have to do?  
-If you could point me in the right direction, I would really appreciate it.
+> Is there any way that you can avoid using the pin?  In other words have 
+> users connect to your PC without being prompted on the connecting device for 
+> a pin.   This would be a real blessing.  Any help on this would really be 
+> appreciated.
 
-Thank you
-Sean
+by default your local device is in security mode 1.
+
+Regards
+
+Marcel
 
 
->From: Marcel Holtmann <marcel@holtmann.org>
->To: Sean Godsell <sgodsell@hotmail.com>
->CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
->Subject: Re: [Bluez-users] Anonying PIN
->Date: Tue, 30 Mar 2004 20:29:15 +0200
->
->Hi Sean,
->
-> > Is there any way that you can avoid using the pin?  In other words have
-> > users connect to your PC without being prompted on the connecting device 
->for
-> > a pin.   This would be a real blessing.  Any help on this would really 
->be
-> > appreciated.
->
->by default your local device is in security mode 1.
->
->Regards
->
->Marcel
->
->
 
-_________________________________________________________________
-Add photos to your messages with MSN Premium. Get 2 months FREE*  
-http://join.msn.com/?pgmarket=en-ca&page=byoa/prem&xAPID=1994&DI=1034&SU=http://hotmail.com/enca&HL=Market_MSNIS_Taglines
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
