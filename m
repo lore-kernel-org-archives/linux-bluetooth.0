@@ -1,53 +1,39 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5f30e261041227130239c3db17@mail.gmail.com>
-From: Jeff Wilson <jazzbotley@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] hciconfig question
-In-Reply-To: <1103931501.20258.94.camel@pegasus>
+Return-Path: <netdev-bounce@oss.sgi.com>
+Subject: Re: [2.6 patch] net/bluetooth/: misc possible cleanups
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Adrian Bunk <bunk@stusta.de>
+Cc: Max Krasnyansky <maxk@qualcomm.com>, bluez-devel@lists.sourceforge.net,
+   Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+   Network Development Mailing List <netdev@oss.sgi.com>
+In-Reply-To: <20041219160758.GY21288@stusta.de>
+References: <20041214041352.GZ23151@stusta.de>
+	 <1103009649.2143.65.camel@pegasus>  <20041219160758.GY21288@stusta.de>
+Content-Type: text/plain
+Date: Sun, 26 Dec 2004 12:20:18 +0100
+Message-Id: <1104060018.8758.51.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <5f30e261041224131026cfa70a@mail.gmail.com>
-	 <1103931501.20258.94.camel@pegasus>
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 27 Dec 2004 15:02:13 -0600
+Sender: netdev-bounce@oss.sgi.com
+Errors-to: netdev-bounce@oss.sgi.com
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Sat, 25 Dec 2004 00:38:21 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jeff,
+Hi Adrian,
+
+> > > Please comment on which of these changes are correct and which conflict 
+> > > with pending patches.
+> > 
+> > Please send a separate patch for all the RFCOMM changes, because these
+> > conflicts with some pending patches and then it will make it easier for
+> > me to merge them.
+> > 
+> > The rest of the changes are fine with me, but I like to see also a
+> > separate patch for the CMTP stuff and cmtp_send_capimsg() don't need a
+> > forward declaration. Simply move the function to another place in the
+> > source code.
 > 
-> > I'm studying hciconfig.c to learn how to set inquiry mode and
-> > parameters.  As I play with the binary to understand the source, I get
-> > the following error on "hciconfig hci0 inqmode":
-> >
-> > Can't read inquiry mode on hci0. Input/output error(5)
-> >
-> > The "inqparms" command reads from hci0 just fine, with no errors.  I
-> > have "iscan enable" set in /etc/bluetooth/hcid.conf ... what else
-> > should I check?
-> 
-> you need a Bluetooth 1.2 device with inquiry with RSSI support.
+> splitted patches follow as reply to this email.
 
-What about older devices without RSSI?
+all of them are applied to my tree now. Thanks.
 
-          thanks,
-           jw
+Regards
 
-
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now. 
-http://productguide.itmanagersjournal.com/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Marcel
