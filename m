@@ -3,30 +3,18 @@ In-Reply-To: <1090759952.4791.91.camel@pegasus>
 References: <1090054739.4558.2.camel@pegasus> <1090759952.4791.91.camel@pegasus>
 Mime-Version: 1.0 (Apple Message framework v618)
 Content-Type: text/plain; charset=US-ASCII; format=flowed
-Message-Id: <9A44A69C-DF28-11D8-B83A-00039390D626@pepper.com>
+Message-Id: <BE6E7EC0-DE5B-11D8-8E7F-003065B218E0@pepper.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 From: Michael Frey <mfrey@pepper.com>
 Subject: Re: [Bluez-devel] HIDP backport for 2.4
-Date: Mon, 26 Jul 2004 13:24:08 -0400
+Date: Sun, 25 Jul 2004 12:57:42 -0400
 To: Marcel Holtmann <marcel@holtmann.org>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 Marcel,
 
-I get the following build errors.  I am using MontaVista Linux 2.4.20
-
-In file included from core.c:46:
-hidp.h:72: warning: no semicolon at end of struct or union
-hidp.h:72: error: parse error before '*' token
-core.c: In function `hidp_session':
-core.c:344: error: structure has no member named `nice'
-core.c: In function `hidp_get_connlist':
-core.c:598: error: dereferencing pointer to incomplete type
-core.c:603: error: dereferencing pointer to incomplete type
-core.c:606: error: dereferencing pointer to incomplete type
-core.c:608: error: dereferencing pointer to incomplete type
-
-Any ideas?
+I am interested.  However I have not had time to apply and test the 
+patch.
 
 Michael
 
