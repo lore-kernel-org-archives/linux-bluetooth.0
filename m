@@ -1,66 +1,129 @@
-Return-Path: <adq_dvb@lidskialf.net>
-From: Andrew de Quincey <adq_dvb@lidskialf.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] rfcomm problems
-Date: Thu, 25 Nov 2004 01:31:50 +0000
-Cc: Marcel Holtmann <marcel@holtmann.org>
-References: <200411241854.13007.adq_dvb@lidskialf.net> <1101325813.7538.6.camel@pegasus>
-In-Reply-To: <1101325813.7538.6.camel@pegasus>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <41A53075.4090003@phaldor.co.uk>
+From: Dave Givens <dave.givens@phaldor.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200411250131.50765.adq_dvb@lidskialf.net>
-List-ID: <bluez-users.lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth Printing (Belkin Print Server)
+References: <41A2089D.5030100@phaldor.co.uk> <1101139759.15086.14.camel@pegasus> <41A21EE3.5060408@phaldor.co.uk> <20041123091654.GB16952@suse.de> <1101202810.26578.61.camel@pegasus> <41A35BFE.9000507@phaldor.co.uk> <20041123161157.GK16952@suse.de> <41A387FD.2050909@phaldor.co.uk> <20041124101828.GN16952@suse.de>
+In-Reply-To: <20041124101828.GN16952@suse.de>
+Content-Type: multipart/alternative;
+ boundary="------------050007060607010607020100"
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 25 Nov 2004 01:08:05 +0000
 
-On Wednesday 24 Nov 2004 19:50, Marcel Holtmann wrote:
-> Hi Andrew,
+This is a multi-part message in MIME format.
+--------------050007060607010607020100
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Stefan,
+    The TSP700 is an 80mm wide thermal receipt or voucher printer, no it 
+cannot handle postscript. But I have tried with other printers that can 
+and it makes no difference. It works  fine with the belkin print server 
+under windows but not under Linux. The problem seems to lie with the 
+print server.
+
+Dave Givens
+
+Stefan Behlert wrote:
+
+>Moin,
 >
-> > Hi, I'm using linux kernel 2.6.9, gentoo, bluez-utils/libs 2.10.
-> > I have a Nokia 3650, with firmware 3.16.
-> >
-> > I've initially been just trying to connect to the phone using rfcomm...
-> >
-> > rfcomm connect 0 MACADDR 1
-> >
-> > this works - I get the "Press Ctrl-C to hangup" and /dev/rfcomm0 appears
-> > (using udev BTW).
-> >
-> > I then try to use minicom on /dev/rfcomm0. It opens it OK, but nothing
-> > happens... I mean, I send AT commands at it, but I get no response. Do I
-> > have to use a certain set of serial port settings (I've tried quite a
-> > few)?
+>On Nov 23, 04 18:57:01 +0000, Dave Givens wrote:
+>  
 >
-> No. This should simply work.
+>>Stefan,
+>>   Yes I did configure it the way you have suggested, but when it comes 
+>>to the uri, I entered bluetooth://0002724080A3 as per instructions. This 
+>>does not allow me to specify that the printer is a Star TSP700 or 
+>>install the specific drivers for the model.
+>>    
+>>
 >
-> However some people complained about that minicom and RFCOMM TTY do not
-> work very good together. The BlueZ utils packages contains test/attest.c
-> and you should give it a try.
+>Hm. I still think that that's  the problem so I'm going to stress that
+>issue a little bit more...sorry :)
+>I'm not sure what of the printer model mentioned in the Yast-modul is
+>compatible to the TSP700. Can the TSP handle postscript?
 >
-> > I also tried running hcidump whilst typing stuff in minicom - nothing was
-> > logged.
+>        Stefan
+> 
+>  
 >
-> Do you started hcidump as root? You must see at least the RFCOMM channel
-> setup.
+>>Dave Givens
+>>    
+>>
 
-Nice one! I've now got GPRS and everything working. I can confirm minicom just 
-does not work with it.
+--------------050007060607010607020100
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
+  <title></title>
+</head>
+<body>
+Stefan,<br>
+&nbsp;&nbsp;&nbsp; The TSP700 is an 80mm wide thermal receipt or voucher printer, no
+it cannot handle postscript. But I have tried with other printers that
+can and it makes no difference. It works&nbsp; fine with the belkin print
+server under windows but not under Linux. The problem seems to lie with
+the print server.<br>
+<br>
+Dave Givens<br>
+<br>
+Stefan Behlert wrote:<br>
+<blockquote type="cite" cite="mid20041124101828.GN16952@suse.de">
+  <pre wrap="">Moin,
+
+On Nov 23, 04 18:57:01 +0000, Dave Givens wrote:
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">Stefan,
+   Yes I did configure it the way you have suggested, but when it comes 
+to the uri, I entered bluetooth://0002724080A3 as per instructions. This 
+does not allow me to specify that the printer is a Star TSP700 or 
+install the specific drivers for the model.
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+Hm. I still think that that's  the problem so I'm going to stress that
+issue a little bit more...sorry :)
+I'm not sure what of the printer model mentioned in the Yast-modul is
+compatible to the TSP700. Can the TSP handle postscript?
+
+        Stefan
+ 
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">Dave Givens
+    </pre>
+  </blockquote>
+</blockquote>
+</body>
+</html>
+
+--------------050007060607010607020100--
 
 
-OK: my next question is about the "Bluetooth serial port" on the phone. When I 
-connect to it with:
 
-rfcomm connect 0 00:60:57:7C:31:49 2
-
-It connects, but then the phone immediately disconnects. A short time later,  
-the phone connects back to my computer on seemingly the service with the 
-highest channel id - in my case kbemusedsrv (from kdebluetooth - an XMMS 
-control service for the phone).
-
-kbemused handily has a raw data dump option, and I can see the phone sending 
-what are obviously PPP LCP packets at it.
-
-How do I get the phone to connect to something sensible - e.g. to dund. I 
-found various sets of instructions on the web, but the damn thing keeps 
-connecting to kbedmused. 
-
-Is this connect-disconnect-reconnect behaviour normal?
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now. 
+http://productguide.itmanagersjournal.com/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
