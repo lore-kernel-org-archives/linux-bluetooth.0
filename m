@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alberto Garcia Hierro <tcpdevil@linuxlover.org>
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] FrogPad Bluetooth keyboard - arrived+working well with BlueZ
+References: <Pine.LNX.4.58.0408132340500.22327@shofar.kom.e-technik.tu-darmstadt.de>
+In-Reply-To: <Pine.LNX.4.58.0408132340500.22327@shofar.kom.e-technik.tu-darmstadt.de>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-1"
-Message-Id: <200408140030.10263.tcpdevil@linuxlover.org>
-Subject: [Bluez-users] Can't get BT working on an iBook G4
+Message-Id: <200408140011.33218.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,69 +19,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 14 Aug 2004 00:30:09 +0200
+Date: Sat, 14 Aug 2004 00:11:32 +0200
 
-Hi all list,
-	I'm trying to setup BT on my iBook G4 (builtin BT), but i can't. As far as=
- I=20
-know, it's a usb device, so i modprobe hci_usb. Then, i tryed with hcitool,=
-=20
-but it doesn't show any device:
+Uff crazy keyboard! This can be effectively used for typing?!
 
+Michal
 
-americana ~ $ modprobe hci_usb
-americana ~ $ /etc/init.d/bluetooth start
- * Starting Bluetooth...                                                [ o=
-k ]
-americana ~ $ hcitool dev
-Devices:
-
-	hcid and sdpd are running:
-
-americana ~ $ ps aux |egrep "hcid|sdpd"
-root      8905  0.0  0.0  1656  612 ?        Ss   00:27   0:00 hcid:=20
-processing events
-root      8907  0.0  0.0  1640  584 ?        Ss   00:27   0:00 /usr/sbin/sd=
-pd
-root      8921  0.0  0.0  1568  528 pts/0    S+   00:28   0:00 egrep hcid|s=
-dpd
-
-
-	The most strange think it's i got it working some months ago, and i think =
-i=20
-did the same things. Here is the relevant part of my .config
-
-
-	CONFIG_BT=3Dm
-	CONFIG_BT_L2CAP=3Dm
-	# CONFIG_BT_SCO is not set
-	CONFIG_BT_RFCOMM=3Dm
-	CONFIG_BT_RFCOMM_TTY=3Dy
-	CONFIG_BT_BNEP=3Dm
-	CONFIG_BT_BNEP_MC_FILTER=3Dy
-	CONFIG_BT_BNEP_PROTO_FILTER=3Dy
-
-	#
-	# Bluetooth device drivers
-	#
-	CONFIG_BT_HCIUSB=3Dm
-	# CONFIG_BT_HCIUSB_SCO is not set
-	CONFIG_BT_HCIUART=3Dm
-	CONFIG_BT_HCIUART_H4=3Dy
-	CONFIG_BT_HCIUART_BCSP=3Dy
-	CONFIG_BT_HCIUART_BCSP_TXCRC=3Dy
-	CONFIG_BT_HCIBCM203X=3Dm
-	CONFIG_BT_HCIBFUSB=3Dm
-	CONFIG_BT_HCIVHCI=3Dm
-
-	I've spent three hours searching on google, bluez.org and the list archive=
-s=20
-and i can't find any solution. I'll be very happy is someone can't help me.=
-=20
-TIA.=09
-
-=2D-=20
-/* Alberto Garc=EDa Hierro (Skyhusker) */
+Dne p=E1 13. srpna 2004 23:47 Ralf Ackermann napsal(a):
+> Hello,
+>
+> since we had the discussion about its actual availability a few months ago
+> - my Bluetooth FrogPad
+> 	http://www.frogpad.com/
+> arrived today and works perfectly with the BlueZ
+> stack (hidp module + hidd).
+>
+> I've tested on an x86 system so far but will later also try on several ARM
+> machines (ipaq with either PCMCIA/CF or integrated BT module).
+>
+> regards
+>  Ralf
+>
+> ---------------------------------------------------------------
+> Dr. Ralf Ackermann            _         rac@KOM.tu-darmstadt.de
+> Multimedia Communications |/ | | |\/|           Merckstrasse 25
+>
+>                           |\ |_| |  |  64283 Darmstadt, Germany
+>
+> Tel.: (+49) 6151 16-6138                Fax: (+49) 6151 16-6152
+> ---------------------------------------------------------------
+>              http://www.kom.tu-darmstadt.de/~rac
+> ---------------------------------------------------------------
+>
+>
+> -------------------------------------------------------
+> SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+> 100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+> Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+> http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
