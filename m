@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Acquiring Bluetooth address of clients
-	connecting to a server
+Subject: Re: [Bluez-users] Adresse resolution in BlueZ
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050309021836.11025.qmail@web20928.mail.yahoo.com>
-References: <20050309021836.11025.qmail@web20928.mail.yahoo.com>
+In-Reply-To: <20050309162812.75343.qmail@web26603.mail.ukl.yahoo.com>
+References: <20050309162812.75343.qmail@web26603.mail.ukl.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1110391163.5462.34.camel@notepaq>
+Message-Id: <1110391204.5462.36.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,14 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 09 Mar 2005 18:59:23 +0100
+Date: Wed, 09 Mar 2005 19:00:04 +0100
 
-Hi Arch,
- 
-> I would like to ask if there is a way of acquiring the Bluetooth
-> address of client devices connecting to a server.
+Hi Benny,
 
-you should look at getpeername().
+> The Adresse resolution in bluez is done in the BNEP
+> isn"t it?
+> 
+> But I see in the specification of BNEP that the
+> adresse resolution may be handled by PAN layer. Is
+> BlueZ like that because it was the best solution for
+> implementing PAN on linux.
+
+since BNEP is a virtual network, it has nothing to do with DNS.
 
 Regards
 
