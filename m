@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Collin R. Mulliner" <collin@betaversion.net>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Problems while sending and receiving with rfcomm
- sockects
-Message-Id: <20040601145616.3419c335@coredump>
-In-Reply-To: <1086093267.4702.20.camel@pegasus>
+	sockects
+From: Marcel Holtmann <marcel@holtmann.org>
+To: dsas@mega.ist.utl.pt
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1086088581.40bc65850efcf@webmail.rnl.ist.utl.pt>
 References: <1086088581.40bc65850efcf@webmail.rnl.ist.utl.pt>
-	<1086093267.4702.20.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1086093267.4702.20.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,31 +19,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 1 Jun 2004 14:56:16 +0200
+Date: Tue, 01 Jun 2004 14:34:27 +0200
 
-Hi,
+Hi Didier,
 
-> I never used RFCOMM in a multi-threaded program. Actually I avoid to
-> use threads wherever possible. However sending and receiving at the
-> same time should work. Maybe there is a kernel bug, what version do
-> you use?
+> I'm writting a server-client application over bluez using rfcomm sockets. I've
+> created two threads: one for sending and the other for receiving. The problem
+> occurs sometimes (sporadical) and only when I'm sending and receiving data at
+> the same time: The received data seems to be corrupt... Do I have to use
+> mutexes or other synchronizing method? The error ocurrs more often if I execute
+> more than one server at the same time.
 
-I allways thought one should ONLY use a socket within a single thread
-at the same time. I write my programs in that way that I never call
-read() and write() on a specific socket at the "same time" also I
-only access each socket within a single thread.
+I never used RFCOMM in a multi-threaded program. Actually I avoid to use
+threads wherever possible. However sending and receiving at the same
+time should work. Maybe there is a kernel bug, what version do you use?
 
-Somehting else: I need a UUID for my application - any hints on where to
-find some information/instructions?
+Regards
+
+Marcel
 
 
-... Collin
-
--- 
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-Sun light is good, if it stays outside of my room!
 
 
 -------------------------------------------------------
