@@ -1,72 +1,67 @@
-Return-Path: <pomac@vapor.com>
-Subject: Re: [Bluez-devel] [2.6.8 ->] Problems, hci_usb dosn't work.
-From: Ian Kumlien <pomac@vapor.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1095842833.5762.27.camel@pegasus>
-References: <1095807044.3211.9.camel@big> <1095842833.5762.27.camel@pegasus>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-SUZlsYQbkGtN/x4v9r1M"
-Message-Id: <1095877600.3211.15.camel@big>
-Mime-Version: 1.0
-Date: Wed, 22 Sep 2004 20:26:40 +0200
-List-ID: <bluez-devel.lists.sourceforge.net>
-
-
---=-SUZlsYQbkGtN/x4v9r1M
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Rfcomm Use Count
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daryl Van Vorst <daryl@wideray.com>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <002d01c4a0cd$a7888b60$1a01010a@baked>
+References: <002d01c4a0cd$a7888b60$1a01010a@baked>
 Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Message-Id: <1095876765.6223.85.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 22 Sep 2004 20:12:45 +0200
 
-On Wed, 2004-09-22 at 10:47, Marcel Holtmann wrote:
-> Hi Ian,
->=20
-> > Since some kernel version i can't exactly remember which, i have been
-> > unable to use usb, i have tested with with 2.6.8 -> 2.6.9-rc2-bk7 and i
-> > also applied your patches for 2.6.8.
-> >=20
-> > I have 2 usb dongles, one old that did work once, and one new that seem=
-s
-> > to be working like the older but it doesn't work with linux.
-> >=20
-> > Both are based on the CSR chipset, here is the new ones entry from the
-> > hw support list:
-> > MSI MS-6967 CSR 1.1 hci_usb working Dave Beckett
-> >=20
-> > Som logs from insertions:
-> > usb 1-3.4: new full speed USB device using address 12
-> > ehci_hcd 0000:00:02.2: qh f7e54780 (#0) state 1
-> > hci_usb_intr_rx_submit: hci0 intr rx submit failed urb d968cd74 err -28
-> >=20
-> > usb 1-4.4: new full speed USB device using address 13
-> > ehci_hcd 0000:00:02.2: qh f7e54900 (#0) state 1
-> > hci_usb_intr_rx_submit: hci1 intr rx submit failed urb d315eef4 err -28
-> >=20
-> > both of these are connected to usb 2.0 hubs (this machine does usb 2.0)
->=20
-> this looks like an USB problem to me. Try to connect it to USB 1.1 ports
-> and see if this works.
+Hi Daryl,
 
-The problem is, this computer doesn't have a usb 1.1 port.
-But it should basically fallback, and afair it worked with a cable
-direct to the computer, i haven't tested that since... because i need
-the hubs.
+> I manually applied your patch to my 2.4 kernel, and it seems to work fine. I
+> haven't been able to break it yet. Looks good. I will keep trying.
 
-But if it indeed is a usb 1.1  vs 2.0 problem then it has to be
-something broken in the kernel... Anyone else using this with usb 2.0?
+try to test your normal stuff to make sure that it doesn't break
+anything else.
 
---=20
-Ian Kumlien <pomac () vapor ! com> -- http://pomac.netswarm.net
+> Does this change make the "if (sk->state == BT_CLOSED)" statement in
+> bluez_accept_dequeue() redundant?
 
---=-SUZlsYQbkGtN/x4v9r1M
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
+I think so. Haven't thought about it so far.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.5 (GNU/Linux)
+> This is important because if somehow a socket is in BT_CLOSED state and is
+> in the accept queue during shutdown, then rfcomm_cleanup_listen() can't
+> clean it up (because bluez_accept_dequeue() won't return it). I think your
+> changes make it impossible for there to ever be an rfcomm socket (or l2cap
+> socket) in the BT_CLOSED state in the accept queue. If that's true, then
+> this isn't an issue. Thoughts?
 
-iD8DBQBBUcPg7F3Euyc51N8RAu4dAJ9XQpnqkIbM0MESri4Gbo06n7HzBgCglM6+
-Z0SBjyltc+6qus+v2WNBq5Y=
-=Ob7Y
------END PGP SIGNATURE-----
+Sorry, but I can't follow your point here. Please explain it again.
 
---=-SUZlsYQbkGtN/x4v9r1M--
+> Do you think we've covered the case where there are incomming connections
+> while things are at various stages of being shut down? I think we're ok, but
+> I wanted to bring it up.
+
+Actually I don't know. In general we should be protected against that
+with our locking.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
+Project Admins to receive an Apple iPod Mini FREE for your judgement on
+who ports your project to Linux PPC the best. Sponsored by IBM.
+Deadline: Sept. 24. Go here: http://sf.net/ppc_contest.php
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
