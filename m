@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] News: Stereo BT Headset from BlueTake
-References: <416D8520.5060102@thomae-privat.de> <416E8560.3070801@xmission.com> <1097762684.4640.49.camel@notepaq>
-In-Reply-To: <1097762684.4640.49.camel@notepaq>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200410141701.46958.wim.delvaux@adaptiveplanet.com>
+Subject: Re: [Bluez-users] Various questions
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Christoph Torens <c.torens@web.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <opsf3esskzeocfdv@debian>
+References: <opsf3esskzeocfdv@debian>
+Content-Type: text/plain
+Message-Id: <1098183563.24465.4.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Oct 2004 17:01:46 +0200
+Date: Tue, 19 Oct 2004 12:59:23 +0200
 
-On Thursday 14 October 2004 16:04, Marcel Holtmann wrote:
-> Hi Brad,
->
-> > I'm not saying bt1.2 is required to use the new headsets, but I'd want
-> > to experiment with the a2dp profile for higher-fidelity audio.
->
-> you don't need Bluetooth 1.2 for A2DP either.
+Hi Christoph,
 
- What is the state of bt a2dp anyway ?
+> PAN uses the bnep protocol layer. Is bnep based on rfcomm?
+> I think not, because I don't need to load rfcomm.o when using pand.
+> But looking at the figure from
+> http://www.rvs.uni-bielefeld.de/~heiko/bluetooth/bluetooth.pdf
+> (page 6) you can get this idea. (From  
+> http://www.holtmann.org/linux/bluetooth/)
+> (There are some other sources, too)
 
- Linux drivers ?
- USB Dongles ?
- PDA ...
- 
- Wim
+this graphic is wrong. The BNEP layer is on top of L2CAP and not on top
+of RFCOMM. Take a look at my slides from www.bluez.org/talks.html for a
+correct protocol stack overview.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
