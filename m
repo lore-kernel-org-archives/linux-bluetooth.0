@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Mysterious problem with l2test on Coldfire 5282
+Subject: Re: [Bluez-users] How to configure a 723kbps connection?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jeff Sutherland <jeffs@fairwayacademy.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200402171126.46462.jeffs@fairwayacademy.org>
-References: <200402170924.31121.jeffs@fairwayacademy.org>
-	 <1077032602.2665.12.camel@pegasus>
-	 <200402171126.46462.jeffs@fairwayacademy.org>
+To: Steven Singer <steven.singer@csr.com>
+Cc: grpmind+bluez.users@boromir.vpop.net,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40323EC2.8080203@csr.com>
+References: <200402171142.i1HBgRV5023132@mail.holtmann.net>
+	 <1077018777.2841.5.camel@pegasus>  <40323EC2.8080203@csr.com>
 Content-Type: text/plain
-Message-Id: <1077042956.2665.85.camel@pegasus>
+Message-Id: <1077037423.2665.72.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,28 +20,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Feb 2004 19:35:56 +0100
+Date: Tue, 17 Feb 2004 18:03:43 +0100
 
-Hi Jeff,
+Hi Steven,
 
-> > maybe this code in send_mode() is the problem
-> >
-> > 	*(uint32_t *) buf = htobl(seq++);
-> > 	*(uint16_t *)(buf+4) = htobs(data_size);
-> >
-> > Replace it with
-> >
-> > 	*(uint32_t *) buf = htobl(seq);
-> > 	*(uint16_t *)(buf+4) = htobs(data_size);
-> > 	seq++;
-> >
-> > I am not a uClinux or compiler expert, so this is only guess.
+> >> # hcitool rssi 00:04:3E:81:90:E0
+> >> RSSI return value: 0
+> >> # hcitool lq 00:04:3E:81:90:E0
+> >> Link quality: 255
+> >> # hcitool tpl 00:04:3E:81:90:E0
+> >> Current transmit power level: -8
+> >> 
+> >> 
+> >> Does all this mean that my ipaq has a slow UART?
+> > 
+> > No, because the link quality and the RSSI has nothing to do with the
+> > choosen packet type.
 > 
-> Oh, Doh!  I'm sure this is it (haven't tried it yet, though) because of the 
-> way the byteswap_32() macro expands!  No fair doing increment/decrement ops 
-> on variables inside macros :-)
+> Marcel, I don't think this is what Matt meant. I think he was asking
+> that given that the link quality and power levels are good and given
+> that he can't get more that 265 kbps regardless of packet type, is it
+> likely that he's being limited by some component of the system other
+> than the Bluetooth link - such as the UART baud rate on the Ipaq.
 
-I applied the fix for l2test, rctest and scotest. Should be in CVS now.
+no I don't missed the point here. But the thread was broken and if you
+look at the beginning you see that I already told him that it can be a
+problem with a too slow UART. This is true for the 3870.
+
+> Is there an easy way to find out what baud rate the Ipaq is using?
+> That would answer the question straight away. 265 kbps over the air
+> is equivalent to roughly 350 kbps over the UART (assuming one start bit,
+> one stop bit, no parity and large HCI packets).
+
+He said that it run Windows, so I can't tell :(
+
+> Also, although you're right that the RSSI has nothing to do with the
+> chosen packet type, the link quality has a big effect. As the link
+> quality falls, devices will tend to switch automatically from DH
+> packets to the more robust DM packets.
+
+The link quality is problematic, because every chip manufacturer can
+interpret this value different. For CSR this is bound to the BER. Had
+you ever run any test with your chips against the old Zeevo TC2001
+generation?
 
 Regards
 
