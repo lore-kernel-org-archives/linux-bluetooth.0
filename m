@@ -1,90 +1,33 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <40D0CE71.2010208@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] question: what does this patch from snd-bt-sco
- do?
-References: <40A9E6CB.4010505@dark-reality.de>	 <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk>	 <40A9EE51.2080102@dark-reality.de> <1084881439.5833.108.camel@pegasus>	 <40AA11AB.6010307@dark-reality.de> <1084888843.4327.1.camel@pegasus>
-In-Reply-To: <1084888843.4327.1.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Jun 2004 00:49:21 +0200
+Return-Path: <Johan.Hedberg@nokia.com>
+Date: Wed, 16 Jun 2004 17:18:45 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Achim Bohnet <ach@mpe.mpg.de>
+Cc: bluez-devel@lists.sourceforge.net, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-devel] D-BUS fixes for hcid
+Message-ID: <20040616141845.GA8921@kone>
+References: <20040616112702.GA898@kone> <20040616124541.GA8629@kone> <1087391183.4309.13.camel@pegasus> <200406161558.56578.ach@mpe.mpg.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200406161558.56578.ach@mpe.mpg.de>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On Wed, Jun 16, 2004, Achim Bohnet wrote:
+> On debian, dbus-1-utils installs a xsession startup script
+> that checks for use-session-dbus in /etc/X11/Xsession.options
+> Therefore dbus daemon knows the $DISPLAY.
 
-Hi again,
+However, hcid uses the system D-BUS which knows nothing about the
+session (system D-BUS and session D-BUS are run as two separate
+processes). This is an interesting problem, because from a lowlevel
+(BT-stack) standpoint we want to use the system bus, but from a higher
+level (pin-code dialog) standpoint the session bus would be apropriate.
 
-I hope you can remember the issue we had a few weeks ago about
-snd-bt-sco/bt-headset stuff.
+It would be nice to know how the D-BUS designers have thought about
+this kinds of problems.
 
-I'm right now moving it from alsa 1.0.3 to 1.0.5a and kernel 2.6.7, and
-I want to get rid of this patch (as it seems you all don't like it).
+> Johan:  When  2 xservers are running on vt7 as :0 and vt8 as :1
+> respectively.   Do the 2 dbus daemons know which one is active?
 
-But I still don't understand, and can't find out, what I have to do to
-set the dubious "alternate" setting of the hci_usb you spoke of. I'm
-totally lost here, and I hope you can help me out easily :)
+No idea. But probably not.
 
-I understand what it does, but I don't have *any* clue right now what I
-have to do to set the usb alternate setting.
-
-- - parameter to hci_usb on module load or some other CL stuff?
-- - changing something in the btsco userspace daemon that handles the
-rfcomm/sco-stuff?
-
-If you could just supply a short code snippet that shows how to handle
-this stuff. Right now it does not look very wise to reduce support to
-audio 0x0060, because it seems that not many headsets support that audio
-encoding.
-
-As soon as this works again, I'll put a new patch together and make it
-available.
-
-thanks for helping out,
-~  Lars
-
-Marcel Holtmann wrote:
-| Hi Lars,
-|
-|
-|>um, sorry - what's an alternate setting? I mean, what exactly is "set"
-here?
-|
-|
-| this has nothing to do with ALSA or BlueZ. It is a USB specific
-| definition of having alternate settings for an interface. Look at
-| /proc/bus/usb/devices for your USB Bluetooth dongle.
-|
-| Regards
-|
-| Marcel
-|
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFA0M5wQWC6DTWkDAoRAlK5AJ94SZEYK4UTgem1AwCFWBpaCCQ9OwCfZjUu
-wM24Y3tNEwcKkL6UO24qQgY=
-=MKIj
------END PGP SIGNATURE-----
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by The 2004 JavaOne(SM) Conference
-Learn from the experts at JavaOne(SM), Sun's Worldwide Java Developer
-Conference, June 28 - July 1 at the Moscone Center in San Francisco, CA
-REGISTER AND SAVE! http://java.sun.com/javaone/sf Priority Code NWMGYKND
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Johan
