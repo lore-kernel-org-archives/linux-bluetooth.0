@@ -1,14 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] CSR firmware
-References: <200405290256.06151.cijoml@volny.cz> <200405301229.25546.cijoml@volny.cz> <1085914997.5925.1.camel@pegasus>
-In-Reply-To: <1085914997.5925.1.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200405301317.45481.cijoml@volny.cz>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200405301229.25546.cijoml@volny.cz>
+References: <200405290256.06151.cijoml@volny.cz>
+	 <200405291108.06457.cijoml@volny.cz> <1085901284.12117.118.camel@pegasus>
+	 <200405301229.25546.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1085914997.5925.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,38 +20,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 May 2004 13:17:45 +0200
+Date: Sun, 30 May 2004 13:03:17 +0200
 
-Do you plan to add this tool to bluez-utils?
+Hi Michal,
 
-M.
+> Did you write some tool for linux to communicate via SPI?
 
-On Sunday 30 of May 2004 13:03, Marcel Holtmann wrote:
-> Hi Michal,
->
-> > Did you write some tool for linux to communicate via SPI?
->
-> do you know any dongle with SPI ;)
+do you know any dongle with SPI ;)
 
-No, and you? :)
+> I tried your btdfu-0.2 and I was not allowed to dowload firmware to it :(
 
->
-> > I tried your btdfu-0.2 and I was not allowed to dowload firmware to it :(
->
-> I never released a version with download support. Currently only upload
-> is supported.
->
-> > and archive with 2 dongles doesn't work too.
-> > notas:/usr/src/btdfu-0.2/src# ./btdfu -d 03ee:641f archive test
-> > Searching for devices ...
-> >         002/002 03ee:641f 114
-> >         004/002 045e:007e 505
->
-> I know. Unplug one of your dongles and try again ;)
+I never released a version with download support. Currently only upload
+is supported.
 
-I did it :) This was only bugreport :)
+> and archive with 2 dongles doesn't work too.
+> notas:/usr/src/btdfu-0.2/src# ./btdfu -d 03ee:641f archive test
+> Searching for devices ...
+>         002/002 03ee:641f 114
+>         004/002 045e:007e 505
 
-M.
+I know. Unplug one of your dongles and try again ;)
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
