@@ -1,38 +1,52 @@
-Return-Path: <lgaga@freemail.hu>
-Message-ID: <3F7C6888.5050107@freemail.hu>
-Date: Thu, 02 Oct 2003 20:03:52 +0200
-From: Lengyel Gabor <lgaga@freemail.hu>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: bluez-users@lists.sourceforge.net
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] fujitsu-siemens pc card
-References: <3F7BF2EC.2080000@freemail.hu> <1065090512.1733.75.camel@pegasus>
-In-Reply-To: <1065090512.1733.75.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lengyel Gabor <lgaga@freemail.hu>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3F7BF2EC.2080000@freemail.hu>
+References: <3F7BF2EC.2080000@freemail.hu>
+Content-Type: text/plain
+Message-Id: <1065090512.1733.75.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: 02 Oct 2003 12:28:26 +0200
 
-Hi,
+Hi Gabor,
 
-> it seems that this is a serial cardbus card with a Bluetooth chip on it.
-> So please use the yenta_socket PCMCIA bridge driver and you must find
-> out which Bluetooth chip they are using.
+> I recently obtained a Fujitsu-Siemens Bluetooth PC Card and tried a lot 
+> but could not make it work. I tried with debian sid, kernel 2.4.22 (from 
+> kernel.org, not the debian one), on an Asus L3400Tp notebook.
 
-I did have yenta compiled in the kernel, but I recompiled the whole 
-pcmcia support as a module, so now I have a yenta_socket module 
-(loaded). Searching through the net with google, I found somewhere that 
-in /etc/default/pcmcia I probably should have PCIC=yenta_socket, so I 
-changed that (it was PCIC=i82365 before).
-However, nothing changed. :( It still does exactly the same I tried to 
-explain in my previous post. Maybe I should add some parameters to 
-yenta_socket? I am not very familiar with pcmcia, should I do anything 
-besides these to "use the yenta_socket PCMCIA bridge driver" as you said?
+it seems that this is a serial cardbus card with a Bluetooth chip on it.
+So please use the yenta_socket PCMCIA bridge driver and you must find
+out which Bluetooth chip they are using.
 
-> Do you got this card working with Windows? If yes, please try to get
-> access to another machine with Bluetooth running Linux and run
-> 
-> 	hcitool info <bdaddr>
+Do you got this card working with Windows? If yes, please try to get
+access to another machine with Bluetooth running Linux and run
 
-I might be able to do this next Tuesday, but not until then. :(
+	hcitool info <bdaddr>
 
-Thank You very much,
-Gabor Lengyel (Lgaga)
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This sf.net email is sponsored by:ThinkGeek
+Welcome to geek heaven.
+http://thinkgeek.com/sf
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
