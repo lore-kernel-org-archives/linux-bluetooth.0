@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Edd Dumbill <edd@usefulinc.com>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Message-Id: <1085586900.18009.14.camel@saag>
+Message-Id: <1085586569.18009.7.camel@saag>
 Mime-Version: 1.0
 Content-Type: text/plain
-Subject: [Bluez-users] Talks at GUADEC, OSCON
+Subject: [Bluez-users] Debian packages updated
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,18 +15,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 26 May 2004 16:55:00 +0100
+Date: Wed, 26 May 2004 16:49:29 +0100
 
-I'll be giving two talks related to BlueZ in the near future;:
+I uploaded new experimental packages for BlueZ 2.7 to Debian
+experimental (expect them there in a week or so, as bluez-cups is NEW),
+and to the http://bluez.sf.net/download/debian/ repository.  This build
+has DBUS and CUPS enabled.  More details are available in the
+README.Debian file in the bluez-utils package.
 
-GNOME Bluetooth support
-  GUADEC 2004: http://2004.guadec.org/
-  (Kristiansand, Norway, 28-30 June 2004)
+Fuller details available on my blog at
+http://usefulinc.com/edd/blog/contents/2004/05/26-bluez/read
 
-Linux and Bluetooth
-  O'Reilly Open Source Convention 
-  http://conferences.oreillynet.com/os2004/
-  (July 26 - 30, 2004,  Portland, OR, USA)
+I'd welcome feedback from users of the older packages, particularly in
+how the 2.4 -> 2.7 upgrade goes, as the bluez-pan and bluez-sdp packages
+have all been subsumed into bluez-utils.
 
 -- Edd
 
