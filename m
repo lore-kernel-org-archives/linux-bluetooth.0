@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Benoit Panizzon <panizzon@woody.ch>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Accept incomming serial connection (palm hotsync)
-Cc: Jay Summet <summetj@cc.gatech.edu>
-References: <20050110040324.3E5548852B@sc8-sf-spam1.sourceforge.net> <41E28999.9070005@cc.gatech.edu>
-In-Reply-To: <41E28999.9070005@cc.gatech.edu>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200501111023.18859.panizzon@woody.ch>
+From: George Fankhauser <gfa@sensaco.com>
+Message-ID: <loom.20050110T223207-471@post.gmane.org>
+References: <loom.20050109T210055-110@post.gmane.org> <1105305890.8637.5.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: Issues with multiple (concurrent) rfcomm connections
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,37 +17,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 11 Jan 2005 10:23:18 +0100
+Date: Mon, 10 Jan 2005 21:41:17 +0000 (UTC)
 
-Hi Jay
+Marcel Holtmann <marcel <at> holtmann.org> writes:
 
-> I am able to sync my Palm T via bluetooth, but the way I do it is not by
-> setting up a serial connection. Instead, I set up a PAN connection (giving
-> my palm pilot a local ip address and my computer another) and then do a
-> NETWORK hotsync (vs serial over bluetooth) using the IP address of my
-> computer. I tell Jpilot (pilot-link) to listen to "net:all" (or is it
-> "net:any"....)...
+> 
+> Hi George,
+> 
+> > I just ran across an issue with setting up multiple rfcomm connections 
+from a 
+> > linux laptop with kernel 2.4.28-mh1 using an Anycom USB-120 dongle with 
+Silicon 
+> > Wave chipset.
+> > 
+> > I just tried to maintain 2 connections to 2 seperate commercial rs232 
 
-Yup, kpilot also is able to listen to net:any
+[...]
 
-But... I never managed to get a PAN Bluetooth Network Connection from my palm.
+> > 
+> > I wonder whether this problem is known, or related to Silicon Wave. Could 
+> > anyone try this with a CSR based system?
+> 
+> try to reproduce it with a 2.6.10-mh1 kernel.
+> 
 
-PAN with pand between two Linux Boxes work (one as NAP the other as PANU) 
-works, so I assume by Linux Bluetooth Setup is correct.
+Marcel
 
-What works is a dund connection via bluetooth an ppp.
+you're right, 2.6.10-mh works fine; no problems and reasonably fast 
+reconnects after all kinds of reset, power loss, etc. Very well done!
 
-But my Zire 72 does not offer to do a 'hotsync' via this ppp connection. Only 
-'serial' aka 'local' or 'modem' connections are selectable from hotsync.
+also, it seems to be independent of SiW or CSR chip set... (changed the bt
+adapter too...)
 
-How did you manage to sync via IP?
+Is there a chance to seperate this issue and have it back-ported to 2.4?
 
-Regards
--Benoit-
--- 
-SPAM SPAM SPAM SPAM / Hormel's new miracle meat in a can
-Tastes fine, saves time. / If you want something grand, / Ask for SPAM!
-  - Hormel's 1937 jingle for SPAM
+best regards
+George
+
 
 
 -------------------------------------------------------
