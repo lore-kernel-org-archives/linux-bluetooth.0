@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] managing pairing
-References: <200412030025.02336.wim.delvaux@adaptiveplanet.com> <1102042677.7350.31.camel@pegasus>
-In-Reply-To: <1102042677.7350.31.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200412030443.52876.wim.delvaux@adaptiveplanet.com>
+Subject: Re: [Bluez-users] Nokia 7610 phone & logitech DiNovo keyboard /
+	MX900 mouse
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1102035154.4258.14.camel@localhost>
+References: <1102035154.4258.14.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1102042749.7350.33.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,55 +19,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 3 Dec 2004 04:43:52 +0100
+Date: Fri, 03 Dec 2004 03:59:09 +0100
 
-On Friday 03 December 2004 03:57, Marcel Holtmann wrote:
-> Hi Wim,
->
-> > another question.  I suppose the link_key file can contain link keys to
-> > multiple remove BT devices (e.g a USB BT dongle and a BT Phone)
-> >
-> > I also presume that each link_key is associated to the bdaddress of the
-> > remote device it relates to.
-> >
-> > so
-> >
-> > 1. can the link_key file be browsed to find all the devices a link_key
-> > exists for
-> >
-> > 2. can one 'remove' one such record from the link_key file and assume
-> > that the pairing will retry once removed (much like removing the link_key
-> > file completely)
->
-> there were plans to move this file into a text file, but no code has
-> been written so far. However you can do your modification by hand, but
-> at the moment after each change the hcid must be restarted.
+Hi Laurence,
 
- restarting is doable.  
- If I understand properly, the file is binary. Can you point me to the
- source file where the IO to the link_key file is written ? For the time being
- I could use that code to load the link_key file and later use the proper 
-ASCII format.
+> I am using a Logitech DiNovo keyboard & MX900 mouse with the DiNovo
+> wireless hub / mouse charger.
+> 
+> My problem is that I can't get my machine to connect to my phone.
+> 
+> As far as I can tell the system has set up the keyboard etc as hid
+> devices, so when I run hid2hci to try to get the phone recognised, the
+> keyboard & mouse stop working which needs a reboot to correct.
+> 
+> Easy question.... how do I fix this.
+> 
+> I am running Fedora Core 2, 
+> kernel-2.6.5-1.358
+> bluez-utils-2.4-3
+> bluez-libs-2.5-2.1
+> bluez-hcidump-1.5-4
+> bluez-sdp-1.5-2.1
+> bluez-bluefw-1.0-2
+> bluez-libs-devel-2.5-2.1
+> 
+> Difficult question.... I need easy steps please!
 
- W
+not with this kernel and these packages. Go with Fedora Core 3, SuSE 9.2
+or Debian Sarge/Sid.
 
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://productguide.itmanagersjournal.com/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
