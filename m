@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: hcid config
+Subject: Re: [Bluez-users] obexserver and t68i problem?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Chris Searle <usenet@chrissearle.org>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <87acxo48c4.fsf@alice.chrissearle.org>
-References: <lgk6wvgqax.fsf@montgomery.empolis.no>
-	 <1090572097.21828.53.camel@pegasus> <lg8ydbgliv.fsf@montgomery.empolis.no>
-	 <1090572685.21828.58.camel@pegasus> <lg4qnzgkuz.fsf@montgomery.empolis.no>
-	 <1090573758.4791.1.camel@pegasus>  <87acxo48c4.fsf@alice.chrissearle.org>
+In-Reply-To: <200407251403.50608.cijoml@volny.cz>
+References: <200407251403.50608.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1090758202.4791.83.camel@pegasus>
+Message-Id: <1090758097.4791.81.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,24 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 25 Jul 2004 14:23:22 +0200
+Date: Sun, 25 Jul 2004 14:21:38 +0200
 
-Hi Chris,
+Hi Michal,
 
-> Still not getting any further. autoinit is already yes in the config
-> file (see other post).
+> after a long time I needed send photos from my phone to bluez box.
 > 
-> Some more info: on hcitool inq that both devices are reporting class
-> 0x000000.
+> sdpd
+> sdptool add --channel=10 OPUSH
+> obexserver
 > 
-> Manually restarting hcid makes no difference (same result as using the
-> /etc/init.d script). Stopping all other bluez things (sdp, dund etc)
-> then just starting hcid - no change.
+> Mobile finds bluez box, try send, but writes connection problem:
 > 
-> Not sure how to follow this further.
+> here is output of hcidump
+> 
+> # hcidump -x
+> HCIDump - HCI packet analyzer ver 1.9
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> > HCI Event: Connect Request (0x04) plen 10
+>   51 EC FC D9 0A 00 04 02 52 01
+> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+>   51 EC FC D9 0A 00 00
+> > HCI Event: Command Status (0x0f) plen 4
+>   00 01 09 04
+> > HCI Event: Connect Complete (0x03) plen 11
+>   1A 2F 00 51 EC FC D9 0A 00 01 00
 
-what version of bluez-utils are you using? Try a newer or an older one
-and see if the problem still exists.
+you can easily look up the error code in the Bluetooth spec. part D. It
+says that 0x1a means "unsupported remote feature":
+
+	The Unsupported Remote Feature error code indicates that the
+	remote device does not support the feature associated with the
+	issued command or LMP PDU.
+
+If I remember correctly then there was an email from a CSR guy that
+explained how to interpret these LMP related error messages.
+
+Frist guess is that it is a role switch or scatternet problem.
 
 Regards
 
