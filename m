@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] documentation question
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Jack Jia <jjia@cs.ubc.ca>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.GSO.4.60.0502070037090.27664@columbia.cs.ubc.ca>
+In-Reply-To: <1107714956.12834.72.camel@pegasus>
+Message-ID: <Pine.GSO.4.60.0502070037090.27664@columbia.cs.ubc.ca>
 References: <42065FAA.8030309@web.de> <1107714956.12834.72.camel@pegasus>
-	 <Pine.GSO.4.60.0502070037090.27664@columbia.cs.ubc.ca>
-Content-Type: text/plain
-Message-Id: <1107775357.7327.99.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Subject: [Bluez-devel] documentation question
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,37 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 07 Feb 2005 12:22:37 +0100
+Date: Mon, 7 Feb 2005 00:58:37 -0800 (PST)
 
-Hi Jack,
+Hi, Marcel:
 
-> Could you or someone else take one or two hours to give us newcomers a 
-> brief updated tutorial on how to make generic things running, especially 
-> hciemu (because it is hardware independent)? I couldn't find updated 
-> documentation and felt very hard to start. The mailing list is great, but 
-> it is pain to search the whole list for a basic start point from scattered 
-> information. I know I shouldn't ask more but think about this may help 
-> thousands of newcomers like me.
+Could you or someone else take one or two hours to give us newcomers a 
+brief updated tutorial on how to make generic things running, especially 
+hciemu (because it is hardware independent)? I couldn't find updated 
+documentation and felt very hard to start. The mailing list is great, but 
+it is pain to search the whole list for a basic start point from scattered 
+information. I know I shouldn't ask more but think about this may help 
+thousands of newcomers like me.
 
-you are kidding me, right? Take one or two hours? Please read the paper
-from Eric S. Raymond on what you can expect:
-
-http://www.catb.org/~esr/faqs/smart-questions.html
-
-> I am following http://www.hanscees.com/bluezhowto.html, is that ok? If 
-> this is ok for current version of Bluez too, please ignore the previous 
-> paragraph.
-
-This might be outdated, but you will get the basic things. You can of
-course still buy a book:
-
-http://www.bluez.org/books.html
-
-Regards
-
-Marcel
+I am following http://www.hanscees.com/bluezhowto.html, is that ok? If 
+this is ok for current version of Bluez too, please ignore the previous 
+paragraph.
 
 
+Regards,
+Jack
 
 
 -------------------------------------------------------
