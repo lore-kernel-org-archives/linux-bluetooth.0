@@ -1,30 +1,47 @@
-Return-Path: <jsantos_pt@hotmail.com>
-From: "João Santos" <jsantos_pt@hotmail.com>
-To: marcel@holtmann.org
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] phone+heaset
-Date: Thu, 08 Jan 2004 13:36:58 +0000
-Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <Sea2-F62gC2DWpmy20h00009644@hotmail.com>
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Nosve" <nosve@libero.it>
+To: <bluez-users@lists.sourceforge.net>
+Message-ID: <AGELIJDLJNOPFNMOHHIFAECHCAAA.nosve@libero.it>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+In-Reply-To: <AGELIJDLJNOPFNMOHHIFKECGCAAA.nosve@libero.it>
+Subject: [Bluez-users] New bc203x driver (forget previous email with wrong subject :-)
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 8 Jan 2004 14:10:48 +0100
 
-Hi Marcel,
+Hi all,
 
->check SCO mapping of your Casira.
+excuse the easy questions but i never use usb devices with linux and
+hotplug; how it is intended to use the bcm203x driver? Has the firmware to
+be put in some particular location?
 
-I think you are talking about this:
+Also, the hotplug configuration which started the bluefw program has to be
+removed? And how?
 
-[root@olivia scoinfo-0.1]# ./scoinfo -i hci0
-PSKEY_HOSTIO_MAP_SCO_PCM: 0x00
+Am I missing some documentation? Or I'm i the wrong place? :-)
 
-and this means that the SCO traffic goes over HCI, as you already told me.
+Using Gentoo and kernel 2.6.0-mh2
 
-So what is the problem.
+Thanks
 
-thanks,
-João Santos.
 
-_________________________________________________________________
-MSN 8 with e-mail virus protection service: 2 months FREE* 
-http://join.msn.com/?page=features/virus
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Perforce Software.
+Perforce is the Fast Software Configuration Management System offering
+advanced branching capabilities and atomic changes on 50+ platforms.
+Free Eval! http://www.perforce.com/perforce/loadprog.html
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
