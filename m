@@ -1,10 +1,27 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <410E51C9.1020401@celar.fr>
-From: =?ISO-8859-1?Q?J=E9r=F4me_LECOMTE?= <lecomte@celar.fr>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] IPv6 Bluez and Router Advertissement
+Subject: Re: [Bluez-devel] HIDP backport for 2.4
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Michael Frey <mfrey@pepper.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <86089F56-DFE5-11D8-BE76-00039390D626@pepper.com>
+References: <1090054739.4558.2.camel@pegasus>
+	 <1090759952.4791.91.camel@pegasus>
+	 <9A44A69C-DF28-11D8-B83A-00039390D626@pepper.com>
+	 <1090864026.29589.1.camel@pegasus>
+	 <5F07F140-DF2E-11D8-B83A-00039390D626@pepper.com>
+	 <1090865790.29589.5.camel@pegasus>
+	 <76F28965-DF34-11D8-B83A-00039390D626@pepper.com>
+	 <1090875679.10807.1.camel@pegasus>
+	 <4B8C0D08-DF64-11D8-95A4-003065B218E0@pepper.com>
+	 <1090916301.4650.9.camel@pegasus>
+	 <ABD9E52C-DFDC-11D8-BE76-00039390D626@pepper.com>
+	 <1090940516.4845.19.camel@pegasus>
+	 <A9BDE398-DFDF-11D8-BE76-00039390D626@pepper.com>
+	 <1090941847.4845.29.camel@pegasus>
+	 <86089F56-DFE5-11D8-BE76-00039390D626@pepper.com>
+Content-Type: text/plain
+Message-Id: <1091375871.27018.18.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,28 +32,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 02 Aug 2004 16:38:01 +0200
+Date: Sun, 01 Aug 2004 17:57:51 +0200
 
-Hi,
+Hi Michael,
 
-I'm having a problem concerning IPv6 autoconfiguration over Bluetooth 
-with Bluez Stack.
-I set up a PICONET architecture like described in the "PAN How to". A 
-bridgde is taking care of all point-to-point bnep interfaces between the 
-master node and the slaves.
-This master node acts like a router to provide access to a MANET 802.11b 
-network and implements IPV6 technology. Ipv4 configuration works well.
-My aim is to provide IPv6 autoconfiguration to the BT slaves nodes.
-I installed RADVD on the router in order to broadcast an ipv6 prefix to 
-BT nodes but they can't achieve to auto-configure.
-The auto configuration is working through an ethernet link so the 
-problem comes from Bluetooth  I think.
-With a sniffer, router sollicication are going well from the slave to 
-the router but router advertisement (with ipv6 prefix) can't go through 
-Bluetooth links (sniffer on slaves shows that) and I don't understand why.
-Experience about this would be welcome
+> That worked..  I can now use both mouse and keyboard.
+> 
+> You asked if I tried 2.6.7-mh2.  I assume you mean the back-ported 
+> patch?  If so, that is what I am using.
 
-Cheers.
+I've now put out another bunch of -mh patches for the 2.4 series. They
+include all updates and also the HIDP support. May you wanna try them
+out. Besides this the hidd from bluez-utils-2.9 got an extra option
+--subclass for overriding the subclass value.
+
+Regards
+
+Marcel
 
 
 
