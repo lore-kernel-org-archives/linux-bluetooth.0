@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Manuel Harnisch <mh@intellinetservices.net>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200503181052.07265.mh@intellinetservices.net>
-Subject: [Bluez-users] Logitech diNovo boot-protocol issue
+Subject: Re: [Bluez-users] Re: adding sdp service record attributes
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <loom.20050318T140410-908@post.gmane.org>
+References: <20050318104405.27323.qmail@web60903.mail.yahoo.com>
+	 <loom.20050318T140410-908@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1111160030.9600.18.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,40 +19,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 18 Mar 2005 10:52:07 -0500
+Date: Fri, 18 Mar 2005 16:33:50 +0100
 
-Hi,
+Hi Andreas,
 
-this is my first time posting on this ML and I am not sure whether my probl=
-em=20
-isn=B4t more of a developer issue, if it is, please point it out and I will=
-=20
-post it on the other ML.
+> > 1.Is there any extra thing I have to put so that the
+> > service record and attributes are set in my PC
+> > permanently and not being erased after reboot?
+> 
+> Small shell script ?
 
-I recently got a Logitech diNovo and am running a Gentoo installation, kern=
-el=20
-2.6.11 with -mh patch. I=B4ve tried 2.6.10, bluez 2.10 and 2.15, all have t=
-he=20
-same issue.
-The bluetooth transmitter (Logitech) is recognized and I can connect to=20
-devices, including all of the diNovo parts (keyboard, media pad, mouse). Th=
-e=20
-problem is that neither of the devices seems to support their enhanced key=
-=20
-functions, they are all in boot-protocol mode, and I don=B4t know how to ge=
-t=20
-them to work with their full capacity.
-Here is some system feedback:
-# hidd
-00:07:61:1E:04:CE HID Boot Device [046d:b3e1] connected [boot-protocol]
-00:07:61:1D:3E:C3 HID Boot Device [046d:b001] connected [boot-protocol]
-00:07:61:1C:EA:04 HID Boot Device [046d:b303] connected [boot-protocol]
-=2D--
-I can use all tree devices, but only in their basic configuration, non of t=
-he=20
-media keys are seen by xev.
+there is no shell script needed, because if you wanna run a server then
+you need to write a program (and start it) that fulfils this job. The
+same program can create the SDP record when it starts.
 
-Manuel
+> > 2.After I add the service record and attribute, I wish
+> > to let T610 to search my PC as headset. So, is there
+> > any extra thing that I have to put in my code?
+> 
+> I guess you has to change your device class of your BT-device to phone. Please 
+> have a look into the hcid config file.
+
+You must set yourself to the headset class of device (0x200404).
+
+> > 3.Is it possible that to browse the services in T610,
+> > and even other mobile devices, and then add the
+> > service records and attributes automatically?
+> 
+> Where? In our own SDP database? What would you like to reach with those?
+
+No it is not possible and it also makes no sense at all.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
