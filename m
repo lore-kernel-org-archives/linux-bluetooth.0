@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <200412011028.iB1ASZIk030820@news01.csr.com>
+Message-ID: <41AD867D.2060609@avantwave.com>
+From: mike <mikelee@avantwave.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Test Mode 
-In-reply-to: <1101882666.18840.23.camel@pegasus> 
-References: <2de4657604113010234e4e3a3f@mail.gmail.com> <1101882666.18840.23.camel@pegasus>
-From: Peter Stephenson <pws@csr.com>
+Subject: Re: [Bluez-users] Re: [Bluez-devel] About rfcomm socket
+References: <41AD2B86.6010002@avantwave.com> <1101882506.18840.18.camel@pegasus>
+In-Reply-To: <1101882506.18840.18.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,52 +18,144 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 01 Dec 2004 10:28:34 +0000
+Date: Wed, 01 Dec 2004 16:53:17 +0800
 
-> The LMP specification speaks about the Test Mode and Methodology
-> saying that Adaptive power control, adaptive freq hopping scenarios
-> can be imitated provided the respective LMP PDU's are sent.
-> 
-> How do I make the HCI commands initiate these LMP PDU's? The HCI
-> specification have only the "Test Enable" and "Read and Write
-> Loopback"  test commands but other no commands which will result in
-> inititating the LM to the testing modes. How do i conduct these
-> adaptive tests?
-
-It's quite deliberate that the only thing you can do with a production
-device is put it into test mode as a slave
-(HCI_Enable_Device_Under_Test_Mode), requiring all test instructions to
-be sent from the master.  To do the test end you need a specialist
-tester.  These tend to be expensive since they're aimed at manufacturers
-doing a lot of testing.
-
-You can use local and remote loopback without any extra hardware
-support, however.  They are completely separate from the test modes you
-are talking about.
-
-Since the features aren't available over HCI, you need to ask somewhere
-else.  However, if you're looking for a cheap way of using the Bluetooth
-test modes you're probably out of luck.  Most manufacturers (including
-us) provide some simplified but non-standard test commands you can run
-between two modules for RF testing and characterisation.
-
--- 
-Peter Stephenson <pws@csr.com>                  Software Engineer
-CSR PLC, Churchill House, Cambridge Business Park, Cowley Road
-Cambridge, CB4 0WZ, UK                          Tel: +44 (0)1223 692070
+Dear Marcel
+    Thanks for helping.
+    Here is code fragment. I use usual fork practise to run these two 
+func do_connect and do_listen.  I hard code the bluetooth device to be 
+connected just because code is under testing.
+    And these two func are using different channel, it can be connected 
+when do_connect retry more than 3 times.
+    So i do not why it can not be connected when it is trying to connect 
+another device.
 
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
+int *do_connect*(TPVSerial_State_t *stateData)
+{
+    struct sockaddr_rc sa;
+    int sk,retry;
+    // Create RFCOMM socket
+    sk = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+   
+    sa.rc_family  = AF_BLUETOOTH;
+    sa.rc_channel = 3;
+    str2ba("00:e0:07:cb:15:68",&sa.rc_bdaddr);
 
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
+    retry = 3;   
+    while(retry--)
+    {
+        int ret, alen = sizeof(sa);
+        DEBPRINT("Conecting...\n");
+        ret = connect(sk, (struct sockaddr *) &sa, alen);
+        DEBPRINT("Connected\n");
+        ba2str(&sa.rc_bdaddr, ba);
+        syslog(LOG_INFO, "New connection from %s", ba);
+        // to handle the SPP connection
+        sp_open_connection(sk, stateData);
+        close(sk);
+    }
+    return 0;
+}
 
-www.mimesweeper.com
-**********************************************************************
+int *do_listen*(TPVSerial_State_t *stateData)
+{
+    struct sockaddr_rc sa;
+    int sk;
+    fd_set netfd;
+
+
+    // Create RFCOMM socket
+    sk = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+   
+    sa.rc_family  = AF_BLUETOOTH;
+    sa.rc_channel = 2
+    sa.rc_bdaddr  = src_addr;
+
+    if (bind(sk, (struct sockaddr *) &sa, sizeof(sa)))
+    {
+        syslog(LOG_ERR, "Bind failed. %s(%d)", strerror(errno), errno);
+        return -1;
+    }
+    listen(sk, 10);
+    FD_ZERO(&netfd);
+    terminate = 0;
+    while(!terminate)
+    {
+        int  alen = sizeof(sa), nsk;
+         FD_SET(sk,&netfd);
+        syslog(LOG_INFO, "Waiting for connection...");
+        DEBPRINT("wait Accept\n");
+        select(sk+1,&netfd,NULL,NULL,NULL)
+
+        if(FD_ISSET(sk,&netfd)){       
+            nsk = accept(sk, (struct sockaddr *) &sa, &alen);
+            DEBPRINT("Accepted\n");
+   
+            ba2str(&sa.rc_bdaddr, ba);
+            syslog(LOG_INFO, "New connection from %s", ba);
+
+            // to handle the SPP connection
+            sp_open_connection(nsk, stateData);
+            close(nsk);
+        }
+    }
+    return 0;
+}
+
+
+Marcel Holtmann wrote:
+
+>Hi Mike,
+>
+>  
+>
+>>    I have tried to fork two process, One use socket system call - 
+>>accept at rfcomm channel 2, and another try to connect to a bluetooth 
+>>device thought channel 3. But i found that i can not use a 3rd device to 
+>>connect to the listen channel 2 at the same time.
+>>    
+>>
+>
+>show us the source code for that.
+>
+>  
+>
+>>    I am using bluez-lib-2.6, utils-2.6. ,hci-uart and linux-2.4.18 
+>>patched with patch-2.4.18-mh15.
+>>    
+>>
+>
+>The bluez-libs and bluez-utils are at version 2.11 and you should update
+>both of them.
+>
+>  
+>
+>>    My question is simple, Could bluez be multi-tasking?
+>>    
+>>
+>
+>You may not be able to do some crazy things, but in general yes.
+>
+>Regards
+>
+>Marcel
+>
+>
+>
+>
+>-------------------------------------------------------
+>SF email is sponsored by - The IT Product Guide
+>Read honest & candid reviews on hundreds of IT Products from real users.
+>Discover which products truly live up to the hype. Start reading now. 
+>http://productguide.itmanagersjournal.com/
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>  
+>
 
 
 
