@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <404DDFD6.4000204@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: damou@nexgo.de, bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Toshiba Portege M200 internal bluetooth adapter
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Brad Midgley <bmidgley@xmission.com>
-Cc: damou@nexgo.de, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <404DDFD6.4000204@xmission.com>
-References: 
-	 <32766726.1078835177020.JavaMail.ngmail@webmail06.arcor-online.net>
-	 <404DDFD6.4000204@xmission.com>
-Content-Type: text/plain
-Message-Id: <1078846234.10671.53.camel@pegasus>
-Mime-Version: 1.0
+References: <32766726.1078835177020.JavaMail.ngmail@webmail06.arcor-online.net>
+In-Reply-To: <32766726.1078835177020.JavaMail.ngmail@webmail06.arcor-online.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,26 +17,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 09 Mar 2004 16:30:35 +0100
+Date: Tue, 09 Mar 2004 08:16:38 -0700
 
-Hi Brad,
+martl
 
-> > Here 
-> > http://www.sfires.net/toshiba/
-> > you can find how to enable Bluetooth with an ACPI enabled Kernel
-> 
-> that did it. internal bluetooth--wooooo! :)
-> 
-> too bad the patch wasn't accepted upstream...
+> Here 
+> http://www.sfires.net/toshiba/
+> you can find how to enable Bluetooth with an ACPI enabled Kernel
 
-actually nobody sent it upstream. Tell the toshiba_acpi maintainer to
-include it.
+that did it. internal bluetooth--wooooo! :)
 
-Regards
+too bad the patch wasn't accepted upstream...
 
-Marcel
-
-
+brad
 
 
 -------------------------------------------------------
