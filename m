@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Juha =?iso-8859-1?B?WXJq9mzk?= <juha.yrjola@iki.fi>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050119224400.GA7881@salvia.homeip.net>
+From: Paul Ionescu <i_p_a_u_l@yahoo.com>
+Message-ID: <pan.2005.01.19.22.10.39.649619@yahoo.com>
+References: <20050118195131.CD122EACF@sc8-sf-spam2.sourceforge.net> <20050119161516.5ab84510@mirko_3>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="opJtzjQTFsWo+cga"
-Subject: [Bluez-devel] [PATCH] Fix too-many-keys-pressed error in hidp/core.c
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] Re: Headset connected, respondig, but silent
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,57 +17,70 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 00:44:00 +0200
-
-
---opJtzjQTFsWo+cga
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Date: Thu, 20 Jan 2005 00:10:43 +0200
 
 Hi,
 
-Attached is a patch which fixes the problem of keys repeating when too many
-keys pressed at the same time (e.g. when typing quickly).  This often
-results in "mount" becoming "mouount". =)
+When you assume you are connected (with btsco), can you check that you
+have SCO packets in and out your BT adapter (with hcidump) ?
+The direction is marked with > and < in hcidump.
+Also you can try to connect with btsco2.
+I also have a jabra but a bt110, and btsco2 gives better results.
+Then try to connect to the handsfree profile, not the default headset
+profile.
+If your jabra is like mine, then you should append channel 2 on the btsco2
+command-line.
 
-It seems that the BT keyboard sends a HID report with the keys all set to
-0x01 if too many keys were pressed at the same time.  This confused the
-previous report handling logic.
+Best regards,
+Paul
 
-Verified working on a Logitech diNovo keyboard.
+On Wed, 19 Jan 2005 16:15:16 +0100, mirko_3 wrote:
 
-Signed-off-by: Juha Yrjölä <juha.yrjola@iki.fi>
+> Hi everyone,
+> I've been trying to get my headset to work lately, with partial success:
+> using the latest btsco-cvs, I manage to connect to the headset (a
+> Jabra-250, I think), and pressing the volume/answer buttons is correctly
+> detected by the program. I've unmuted everything in alsamixer, and set 
+> snd cards_limit=2 in modules.conf (although I don't use modules for
+> alsa...). Everything is as it should be, except I can neither record nor
+> playback anything. Here's my dmesg after pressing the play button three
+> times on xmms (the progress bar doesn't move, the song doesn't start):
+> 
+> snd-bt-sco revision 1.4 $
+> snd-bt-sco: snd-bt-scod thread starting snd-bt-sco: playback_open
+> snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800 snd-bt-sco:
+> prepare ok bps: 16000 size: 8000 count: 800 snd-bt-sco: playback_trigger 1
+> snd-bt-sco: setting playback to bspcm snd-bt-sco: playback_trigger 0
+> snd-bt-sco: setting playback to NULL
+> snd-bt-sco: playback_open
+> snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800 snd-bt-sco:
+> prepare ok bps: 16000 size: 8000 count: 800 snd-bt-sco: playback_trigger 1
+> snd-bt-sco: setting playback to bspcm snd-bt-sco: playback_trigger 0
+> snd-bt-sco: setting playback to NULL
+> snd-bt-sco: playback_open
+> snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800 snd-bt-sco:
+> prepare ok bps: 16000 size: 8000 count: 800 snd-bt-sco: playback_trigger 1
+> snd-bt-sco: setting playback to bspcm snd-bt-sco: playback_trigger 0
+> snd-bt-sco: setting playback to NULL
+> 
+> Program output is normal:
+> Device is 1:0
+> Voice setting: 0x0060
+> RFCOMM channel 1 connected
+> recieved AT+CKPD=200
+> opened hwdep
+> connected SCO channel
+> Setting sco fd
+> Done setting sco fd
+> recieved AT+VGS=09
+> Sending up speaker change 9
+> recieved AT+VGS=08
+> Sending up speaker change 8
+> 
+> 
+> I really hope you can help me, as I've tried for days. Thank you all.
 
-Oh yeah, the patch is against 2.6.10-mh1.
 
-Cheers,
-Juha
-
---opJtzjQTFsWo+cga
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="too-many-keys-patch.diff"
-
---- net/bluetooth/hidp/core.c.old	2005-01-20 00:08:05.000000000 +0200
-+++ net/bluetooth/hidp/core.c	2005-01-20 00:32:18.000000000 +0200
-@@ -175,6 +175,15 @@
- 		for (i = 0; i < 8; i++)
- 			input_report_key(dev, hidp_keycode[i + 224], (udata[0] >> i) & 1);
- 
-+		/* If all the key codes have been set to 0x01, it means
-+		 * too many keys were pressed at the same time */
-+		for (i = 2; i < 8; i++) {
-+			if (udata[i] != 0x01)
-+				break;
-+		}
-+		if (i == 8)
-+			break;
-+
- 		for (i = 2; i < 8; i++) {
- 			if (keys[i] > 3 && memscan(udata + 2, keys[i], 6) == udata + 8) {
- 				if (hidp_keycode[keys[i]])
-
---opJtzjQTFsWo+cga--
 
 
 -------------------------------------------------------
