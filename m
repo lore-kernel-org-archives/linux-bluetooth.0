@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040327112504.49783.qmail@web21002.mail.yahoo.com>
-From: =?iso-8859-1?q?Gary=20Martin?= <gary_martin_au@yahoo.com.au>
+Message-ID: <1789.192.168.1.253.1080351984.squirrel@legio.mine.nu>
+From: "Peter Andersson" <peter@legio.mine.nu>
 To: bluez-users@lists.sourceforge.net
+Reply-To: peter@legio.mine.nu
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Desperate newbie
+Content-Type: text/plain;charset=iso-8859-1
+Subject: [Bluez-users] PANU and "ACL tx timeout"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,117 +16,99 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 27 Mar 2004 22:25:04 +1100 (EST)
+Date: Sat, 27 Mar 2004 02:46:24 +0100 (CET)
 
-Hi all
+Hi!
+I am trying to set up a pan network between two usb dongles (belkin FT001
+and bluetake BT007SV). The belkin dongle is run as the network access
+point (NAP) and the bluetake dongle is run as a client. Connecting the tw=
+o
+devices works just fine. Just browsing around an ftp works fine, the
+trouble is when i try to send/recive 'larger amounts' of data, eg files
+larger than 10k the connection hangs. (I have listed the output from
+/var/log/messages below.) Filetransfer with obex push works flawless. As =
+a
+test i transfered a four megabyte file (with object push) back and fourth
+between the computers without trouble. Just to clearify, the problems
+occur on the computer running as NAP using the belkin FT001 dongle.
 
-I'm a Linux user trying to sync my mobile phone with
-my computer in desperate need of help. I'm running
-Debian testing/unstable on a Apple PowerBook G3. I
-have researched as much as I can, but I can't get
-bluetooth to work with Linux.
+I initialize the dongle in the following manner:
 
-My phone (Sonyericsson T628) can pair with the
-PowerBook, but it says that the only service available
-is "object push" and I can send files to the
-PowerBook.
+modprobe bluez
+modprobe hci_usb
+modprobe l2cap
+modprobe bnep
+then i connect the usb dongle (belkin FT001)
+hciconfig hci0 up
+hcid -f /etc/bluetooth/hcid.conf
+sdpd
+pand --listen --role NAP
 
-Multisync cannot find the phone.
+I am using a box running redhat 9.0, kernel 2.4.25 with the latest bluez
+patches (mh3). I am also running the latest stable libraries and tools
+( bluez-libs-2.5.tar.gz, bluez-utils-2.5.tar.gz, bluez-sdp-1.5.tar.gz,
+bluez-pan-1.1.tar.gz, bluez-hcidump-1.8.tar.gz, bluez-hciemu-1.0.tar.gz
+and bluez-bluefw-1.0.tar.gz).
 
-Everything works perfectly in Mac OS X without any
-configuration
+any help would be most appreciated!
 
-I'm beginning to suspect it is a hci_usb -- hciattach
-problem. But I don't understand hciattach.
+regards
 
-Below are some diagnostics/output. Hopefully someone
-can help
+/peter
 
+Output from /var/log/messages:
 
-Debian:~# modinfo bfusb
-filename:   
-/lib/modules/2.4.25-powerpc/kernel/drivers/bluetooth/bfusb.o
-description: "BlueFRITZ! USB driver ver 1.1"
-author:      "Marcel Holtmann <marcel@holtmann.org>"
-license:     "GPL"
-
-debian:~# lsmod
-Module                  Size  Used by    Not tainted
-rfcomm                 35640   1  (autoclean)
-l2cap                  18900   2  (autoclean) [rfcomm]
-af_packet              15112   1  (autoclean)
-hid                    23108   0  (unused)
-sco                    10308   0  (unused)
-hfs                    81196   0  (unused)
-dmasound_pmac          65424   1
-dmasound_core          12848   1  [dmasound_pmac]
-soundcore               4200   3  [dmasound_core]
-i2c-core               14532   0  [dmasound_pmac]
-hci_usb                 9152   1
-bluez                  36332   3  [rfcomm l2cap sco
-hci_usb]
-
-debian:~# hcitool scan
-Scanning ...
-        00:0E:07:54:32:0B       T628
-
-debian:~# hcitool info 00:0E:07:54:32:0B
-Requesting information ...
-Can't create connection: Input/output error
-
-debian:~# hcitool inq
-Inquiring ...
-        00:0E:07:54:32:0B       clock offset: 0x747b  
- class: 0x520204
-
-debian:~# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:0D:88:AC:D1:EE ACL MTU: 192:8 
-SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:388 acl:0 sco:0 events:18 errors:0
-        TX bytes:333 acl:0 sco:0 commands:15 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00
-0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2
-HV3
-        Link policy: HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'debian-0'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x1bb LMP Ver: 1.1
-(0x1) LMP Subver: 0x1bb
-        Manufacturer: Cambridge Silicon Radio (10)
-
-debian:~# l2ping 00:0E:07:54:32:0B
-Ping: 00:0E:07:54:32:0B from 00:0D:88:AC:D1:EE (data
-size 20) ...
-0 bytes from 00:0E:07:54:32:0B id 200 time 56.94ms
-0 bytes from 00:0E:07:54:32:0B id 201 time 32.72ms
-0 bytes from 00:0E:07:54:32:0B id 202 time 44.73ms
-0 bytes from 00:0E:07:54:32:0B id 203 time 38.74ms
-0 bytes from 00:0E:07:54:32:0B id 204 time 38.74ms
-0 bytes from 00:0E:07:54:32:0B id 205 time 48.77ms
-0 bytes from 00:0E:07:54:32:0B id 206 time 41.79ms
-0 bytes from 00:0E:07:54:32:0B id 207 time 42.79ms
-0 bytes from 00:0E:07:54:32:0B id 208 time 39.81ms
-0 bytes from 00:0E:07:54:32:0B id 209 time 44.83ms
-0 bytes from 00:0E:07:54:32:0B id 210 time 42.83ms
-0 bytes from 00:0E:07:54:32:0B id 211 time 41.84ms
-0 bytes from 00:0E:07:54:32:0B id 212 time 39.85ms
-13 sent, 13 received, 0% loss
-
-debian:~# lsusb
-Bus 002 Device 001: ID 0000:0000
-Bus 002 Device 002: ID 0a12:0001 Cambridge Silicon
-Radio, Ltd Bluetooth Dongle
-Bus 001 Device 001: ID 0000:0000
+Mar 26 23:24:52 legio kernel: hub.c: new USB device 00:0c.0-2, assigned
+address 2
+Mar 26 23:24:52 legio kernel: usb.c: USB device 2 (vend/prod 0xa5c/0x2033=
+)
+is not claimed by any active driver.
+Mar 26 23:24:56 legio bluefw[2252]: Loading firmware to usb device 0a5c:2=
+033
+Mar 26 23:24:56 legio bluefw[2280]: Loading firmware to usb device 0a5c:2=
+033
+Mar 26 23:24:56 legio bluefw[2280]: Can't claim interface 0. Device or
+resource busy (16)
+Mar 26 23:24:56 legio bluefw[2252]: FW loaded
+Mar 26 23:24:57 legio kernel: usb.c: USB disconnect on device 00:0c.0-2
+address 2
+Mar 26 23:24:58 legio kernel: hub.c: new USB device 00:0c.0-2, assigned
+address 3
+Mar 26 23:26:05 legio hcid[2444]: HCI daemon ver 2.5 started
+Mar 26 23:26:05 legio hcid[2444]: Starting security manager 0
+Mar 26 23:26:10 legio sdpd[2448]: sdpd v1.5 started
+Mar 26 23:26:17 legio kernel: BlueZ BNEP ver 1.1
+Mar 26 23:26:17 legio kernel: Copyright (C) 2001,2002 Inventel Systemes
+Mar 26 23:26:17 legio kernel: Written 2001,2002 by Clement Moreau
+<clement.moreau@inventel.fr>
+Mar 26 23:26:17 legio kernel: Written 2001,2002 by David Libault
+<david.libault@inventel.fr>
+Mar 26 23:26:17 legio kernel: Copyright (C) 2002 Maxim Krasnyanskiy
+<maxk@qualcomm.com>
+Mar 26 23:26:17 legio pand[2452]: PAN daemon ver 1.1
+Mar 26 23:26:38 legio hcid[2444]: link_key_request (sba=3D00:03:C9:2E:48:=
+E9,
+dba=3D00:08:F4:00:6F:AB)
+Mar 26 23:26:38 legio hcid[2444]: pin_code_request (sba=3D00:03:C9:2E:48:=
+E9,
+dba=3D00:08:F4:00:6F:AB)
+Mar 26 23:26:46 legio hcid[2444]: link_key_notify (sba=3D00:03:C9:2E:48:E=
+9)
+Mar 26 23:26:46 legio hcid[2444]: Replacing link key 00:03:C9:2E:48:E9
+00:08:F4:00:6F:AB
+Mar 26 23:26:57 legio hcid[2444]: link_key_request (sba=3D00:03:C9:2E:48:=
+E9,
+dba=3D00:08:F4:00:6F:AB)
+Mar 26 23:26:58 legio pand[2454]: New connection from 00:08:F4:00:6F:AB b=
+nep0
+Mar 26 23:28:09 legio kernel: hci_acl_tx_to: hci0 ACL tx timeout
+Mar 26 23:28:09 legio kernel: hci_acl_tx_to: hci0 killing stalled ACL
+connection AB:6F:00:F4:08:00
 
 
-Find local movie times and trailers on Yahoo! Movies.
-http://au.movies.yahoo.com
+(sometimes the "hci_acl_tx_to: hci0 ACL tx timeout" message keeps
+repeating until i remove the usb dongle.)
+
 
 
 -------------------------------------------------------
