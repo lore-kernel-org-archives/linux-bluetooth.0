@@ -1,9 +1,9 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <noring@nocrew.org>
 Subject: Re: [Bluez-devel] D-Bus interfaces
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Fredrik Noring <noring@nocrew.org>
+From: Fredrik Noring <noring@nocrew.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076536853.31726.3.camel@akka.yeti.nocrew.org>
+In-Reply-To: <1076538582.3041.15.camel@pegasus>
 References: <1076265358.2670.36.camel@pegasus>
 	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
 	 <1076267396.2670.58.camel@pegasus>
@@ -24,52 +24,23 @@ References: <1076265358.2670.36.camel@pegasus>
 	 <1076508315.6281.131.camel@kalkyl.roxen.com>
 	 <1076517913.2696.39.camel@pegasus>
 	 <1076536853.31726.3.camel@akka.yeti.nocrew.org>
+	 <1076538582.3041.15.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1076538582.3041.15.camel@pegasus>
+Message-Id: <1076538795.31726.31.camel@akka.yeti.nocrew.org>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 Feb 2004 23:29:42 +0100
+Date: Wed, 11 Feb 2004 23:33:15 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Fredrik,
+Marcel,
 
-> > do we really need to store configurations based on the device id? I
-> > think we should store them all based on the device address only.
+On Wed, 2004-02-11 at 23:29, Marcel Holtmann wrote:
+> I like to keep it, because it can be useful for embedded devices where
+> you have two or more Bluetooth dongles. However I started using it on
+> one of my test machines that have many dongles attached.
 > 
-> My opinion is that we can drop support for the "device hci0 { ... }"
-> syntax since it's a bit confusing - Bluetooth devices are very address
-> oriented so "device { ... }" and "device 00:00:00:00:00:00 { ... }"
-> are enough. This would also simplify the configuration code in hcid,
-> i.e. less risk for bugs.
+> For the D-Bus interface and the Gnome or KDE frontend we should use
+> BD_ADDR based settings only.
 
-I like to keep it, because it can be useful for embedded devices where
-you have two or more Bluetooth dongles. However I started using it on
-one of my test machines that have many dongles attached.
+That's OK with me.
 
-For the D-Bus interface and the Gnome or KDE frontend we should use
-BD_ADDR based settings only.
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Fredrik
