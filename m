@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <20041217141809.62713.qmail@web40605.mail.yahoo.com>
+From: Paolino paperino <vonzoltan@yahoo.it>
 Subject: Re: [Bluez-users] passive inquiry
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041217141809.62713.qmail@web40605.mail.yahoo.com>
-References: <20041217141809.62713.qmail@web40605.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1103293492.28046.97.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <2de4657604121705486b925ee0@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +17,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Dec 2004 15:24:52 +0100
+Date: Fri, 17 Dec 2004 15:18:09 +0100 (CET)
 
-Hi Andrea,
+Hi,
+i want to know if it is possible to make a "passive
+inquiry", i explain better, a device A do an inquiry
+no find their neighbours, it is possible for a device
+B (in the reachability field) to know that was
+inquiried by device A? The applican can receive an
+event each time the device is inquiried?
 
-> i want to know if it is possible to make a "passive
-> inquiry", i explain better, a device A do an inquiry
-> no find their neighbours, it is possible for a device
-> B (in the reachability field) to know that was
-> inquiried by device A? The applican can receive an
-> event each time the device is inquiried?
-
-I am going to feel stupid. The answer is no (as before).
-
-Regards
-
-Marcel
+Thank's a lot
+Andrea S.
 
 
+		
+___________________________________ 
+Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
+http://it.messenger.yahoo.it
 
 
 -------------------------------------------------------
