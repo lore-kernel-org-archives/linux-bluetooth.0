@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth clock and security manager
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <312616200.24329@bjut.edu.cn>
-References: <312616200.24329@bjut.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1112618303.8263.92.camel@pegasus>
+Message-ID: <312616200.24329@bjut.edu.cn>
+From: "Jin Pu" <jpu@emails.bjpu.edu.cn>
+To: "bluez-users@lists.sourceforge.ne" <bluez-users@lists.sourceforge.net>
 Mime-Version: 1.0
+Content-Type: text/plain;
+      charset="GB2312"
+Subject: [Bluez-users] bluetooth clock and security manager
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,32 +17,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 04 Apr 2005 14:38:23 +0200
+Date: Mon, 4 Apr 2005 20:20:53 +0800
 
-Hi,
+  Hi,
+  I want to read local bluetooth clock with hcitool. But when I=
+ use the command "hcitool clock XX:XX:XX:XX:XX:XX=A3=A8local=
+ bd_addr)",the return message is "not connected",and I am sure=
+ that I have created one ACL link.
+  So, I use "hcitool clock  XX:XX:XX:XX:XX:XX=A3=A8remote=
+ bd_addr)",the reture message is "read failed,Input/output=
+ error",but the command "hcitool clkoff" works good.
+  Now,I have to read the local device clock or the remote=
+ clock,what shall I do?
+  There is another question about security mananger within=
+ BlueZ.
+  I have paired my pda with BlueZ successfully,but I want to make=
+ it clearly that how to add authenticated device into the=
+ security manager in programming ,and where do these=
+ authenticated device go?
+  Thanks.  
 
->   I want to read local bluetooth clock with hcitool. But when I use the=
- command "hcitool clock XX:XX:XX:XX:XX:XX=EF=BC=88local bd_addr)",the ret=
-urn message is "not connected",and I am sure that I have created one ACL =
-link.
->   So, I use "hcitool clock  XX:XX:XX:XX:XX:XX=EF=BC=88remote bd_addr)",=
-the reture message is "read failed,Input/output error",but the command "h=
-citool clkoff" works good.
+=09
 
-the clock reading is a Bluetooth 1.2 feature. So make sure that you use
-Bluetooth 1.2 device that supports this HCI command.
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=D6=C2
+=C0=F1=A3=A1
+ =09=09=09=09
 
->   There is another question about security mananger within BlueZ.
->   I have paired my pda with BlueZ successfully,but I want to make it cl=
-early that how to add authenticated device into the security manager in p=
-rogramming ,and where do these authenticated device go?
-
-The current security manager is inside hcid. The link keys are stored
-at /etc/bluetooth/link_key.
-
-Regards
-
-Marcel
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1Jin Pu
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1jpu@emails.bjpu.edu.cn
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A12005-04-04
 
 
 
