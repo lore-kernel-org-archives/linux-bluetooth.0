@@ -1,16 +1,20 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Diego Liziero <liziero.diego@unimore.it>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1101413321.6465.6.camel@pegasus>
-References: <qszactrj3c5.fsf@timepilot.gpcc.itd.umich.edu>
-	 <1099960170.29330.43.camel@pegasus>
-	 <qszu0rfnfil.fsf@mspacman.gpcc.itd.umich.edu>
-	 <1101413321.6465.6.camel@pegasus>
+Subject: Re: [Bluez-users] Bluez-sdp depreciated? Was Which fedora core?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1101415238.3485.10.camel@localhost.localdomain>
+References: <cnhnd6$toe$1@sea.gmane.org>  <1100769119.7164.17.camel@pegasus>
+	 <1100798738.3439.4.camel@localhost.localdomain>
+	 <1100803683.7164.74.camel@pegasus>
+	 <1100808919.3433.12.camel@localhost.localdomain>
+	 <1100813353.7164.87.camel@pegasus>
+	 <1100861560.7136.49.camel@baroque.rococosoft.com>
+	 <1101329008.3773.10.camel@localhost.localdomain>
+	 <1101350779.7538.19.camel@pegasus>
+	 <1101415238.3485.10.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1101460561.11603.89.camel@igno>
+Message-Id: <1101423315.6465.25.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Firmware update & HID profile (Was: Detecting RSSI without
- connecting)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,30 +26,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Nov 2004 10:16:01 +0100
+Date: Thu, 25 Nov 2004 23:55:15 +0100
 
-On Thu, 2004-11-25 at 21:08 +0100, Marcel Holtmann wrote:
->[...]
-> Maybe the easiest way is a D-Link DBT-120 Rev. B3 and then put the Apple
-> firmware update on it.
+Hi Phil,
 
-BTW, any improvements in the new Apple firmware update?
+> I have got bluez working with the rpms from Fedora core 2 and have gone
+> back to trying the later rpms.
+> 
+> I now have the following installed 
+> bluez-bluefw-1.0-6.i386.rpm       
+> bluez-pin-0.23-3.i386.rpm
+> bluez-hcidump-1.11-1.i386.rpm     
+> bluez-utils-2.10-2.i386.rpm
+> bluez-libs-2.10-2.i386.rpm        
+> bluez-utils-cups-2.10-2.i386.rpm
+> 
+> and I am back more or less where I started and running dund with the
+> command
+> dund --listen --msdun --channel 1 10.2.0.1:10.2.0.10
+> 
+> The logs return the error
+> localhost dund[3561]: Failed to connect to the local SDP server. No such
+> file or directory(2)
+> 
+> In the /usr/lib there are two files
+> libbluetooth.so.1       
+> libbluetooth.so.1.0.10
+> 
+> I have tried symbolic linking them both to various combinations of
+> libsdp.so, libsdp.so.1
+> 
+> Dund seems to be searching for sdp, and cannot find it.
+> 
+> Anyone any ideas how I make dund work again?
 
-I used the previous one on two BT-120 (H/W: B2 and H/W: B3)
-and both of them now start with HID profile.
+this sound like you are mixing library version and programs. Check if
+the previous packages are fully installed and the old ones are removed.
+Maybe they are still there, but in a different location. And check if
+sdpd is running.
 
-I know that to have them back starting with hci I should change a PS key
-setting, but the only linux program I found is for serial modules only.
+Regards
 
-Is the new update behaving the same way?
+Marcel
 
-(I know that I can use hid2hci each time I use them, but, unfortunately,
-I don't use Bluetooth _only_ with Linux and with my up-to-date Linux
-box).
-
-Regards,
--- 
-Diego Liziero <diego.liziero@unimore.it>
 
 
 
