@@ -1,16 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] non-blocking device discovery
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Stephen Crane <steve.crane@rococosoft.com>
-Cc: Fred =?ISO-8859-1?Q?Sch=E4ttgen?= <bluez-devel@schaettgen.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1073403253.26243.1099.camel@baroque.rococosoft.com>
-References: <1073308932.26243.1058.camel@baroque.rococosoft.com>
-	 <200401052012.34307.bluez-devel@schaettgen.de>
-	 <1073403253.26243.1099.camel@baroque.rococosoft.com>
-Content-Type: text/plain
-Message-Id: <1073450652.2508.116.camel@pegasus>
-Mime-Version: 1.0
+From: Alexander Holler <holler@ahsoftware.de>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Success: switching the Logitech-Hub
+Message-ID: <13690000.1073440312@[192.168.207.2]>
+In-Reply-To: <1073411335.2508.96.camel@pegasus>
+References: <9810000.1073197538@[192.168.207.2]>
+ <1073267036.3804.4.camel@pegasus>  <20040106171510.GE15149@smartdata.ch>
+ <1073411335.2508.96.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,38 +19,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 07 Jan 2004 05:44:13 +0100
+Date: Wed, 07 Jan 2004 02:51:52 +0100
 
-Hi Stephen,
+Hello,
 
-> Now onto my new question, what are the semantics of OCF_INQUIRY? I seem
-> to be getting one unique device per inquiry call. That is I get one
-> EVT_INQUIRY_RESULT event with a bdaddr I haven't seen before and then it
-> terminates with an EVT_INQUIRY_COMPLETE. For example:
-> 
-> inquiry
-> found 00:aa:bb:cc:dd:ee
-> inquiry complete
-> ...
-> inquiry
-> found 00:aa:bb:cc:dd:ee
-> found 00:aa:bb:cc:dd:ef
-> inquiry complete
-> 
-> ...and so on. It seems that when it finds a new device, it passes that
-> back up and exits inquiry mode. Can this be right (or have I fscked
-> up)?  It only stays in inquiry mode for the specified length of time
-> when there are no new devices to be found.
+--On Dienstag, Januar 06, 2004 18:48:55 +0100 Marcel Holtmann 
+<marcel@holtmann.org> wrote:
 
-this is not the whole story. What you see is the behaviour of the CSR,
-Ericsson and ST based devices, which filter out duplicates. The devices
-from Nokia, Broadcom and AVM report every device and it is possible that
-you see some bdaddr's more than once.
+>> One question: I can't switch back to USB mode. Is this not supported at
+>> this time ?
+>
+> No. I think it is possible, but at the moment we don't understand how
+> the Logitech protocol works. I have some written notes about it on my
+> desktop, because they also use the same protocol framework for driving
+> the display of the mediapad. But I haven't found the time to setup a
+> webpage about it.
 
-Regards
+I don't know if Logitech knows how to switch back. ;)
 
-Marcel
+At least I've send them a bug report, that the widcomm-stack should switch 
+back to usb-mode when deinstalling the stack.
 
+I've discovered that because I've got the answer "reinstall all" 2 times 
+for a problem. But deinstalling the stack leaves me with a box, I could 
+only reset using a hw-switch, which isn't that fine. The problem I now 
+have, is to explain this to help desk. The first time they didn't 
+understand what I mean. ;)
+
+When they will fix that, I will try to log the usb-communication while 
+deinstalling the stack, which should give me the correct sequence of 
+reports for switching back.
+
+Regards,
+
+Alexander
 
 
 
