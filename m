@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] a2play and Toshiba SR-1 Bluetooth Headset
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Cc: Henryk =?ISO-8859-1?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-In-Reply-To: <20041125105615.GA19821@snoopy.src.ricoh.co.jp>
-References: <20041125091124.GA19805@snoopy.src.ricoh.co.jp>
-	 <20041125112509.75347786.henryk@ploetzli.ch>
-	 <20041125105615.GA19821@snoopy.src.ricoh.co.jp>
-Content-Type: text/plain
-Message-Id: <1101440449.6465.64.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41A67F77.3040501@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] more encoder stuff
+References: <41A56774.1000308@xmission.com>	 <20041125071423.10e449c3.henryk@ploetzli.ch>	 <1101365484.7538.74.camel@pegasus>	 <20041126000655.1a762210.henryk@ploetzli.ch>	 <1101425014.6465.39.camel@pegasus>  <41A67548.90805@dark-reality.de> <1101429888.6465.47.camel@pegasus>
+In-Reply-To: <1101429888.6465.47.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,66 +18,59 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Nov 2004 04:40:49 +0100
+Date: Fri, 26 Nov 2004 01:57:27 +0100
 
-Hi Alain,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> actually I was just about to send a new mail to the mailing list.
-> Just looking at the BlueZ page, I saw that there is a new hcidump 
-> package so after updating I clearly saw the bitpool thing. I just
-> replaced the two hardcoded bitpool min and max by the one supported
-> by my headset and I got .....
-> 
-> hum ... weird sound :-(
-> 
-> well I can recognize my music but sometimes it's going faster, slower
-> then faster again .... 
-> 
-> seems also right and left channel are not same ... well can't be sure
-> about that because the sound is very weird ... 
-> 
-> I don't know what I can do else ... just let me know.
-> 
-> did you made any other modification to the CVS ? Just got it few hours ago 
-> so I think except this min/max thing nothing has changed.
+Marcel Holtmann wrote:
+| Hi Lars,
+|
+|
+|>| we can optimize at any time if needed, because the SBC API should hide
+|>| this stuff. For me this sounds perfect for a diploma thesis for someone
+|>| interested in audio codec stuff and Bluetooth.
+|>
+|>*raising hand*
+|>
+|>thing is, on modern CPU you won't get much speedup with fixed point
+|>stuff, because the main advantage was eliminated by Intel when they
+|>build the pseudo-pipes into their FPU's.
+|>But of course there are still some cycles to kill in audio processing
+|>always. I'll advertise this project to my professor...
+|
+|
+| a non floating point version is interesting for embedded platforms
 
-actually the discover shows more than one endpoint:
+good argument
 
-      AVDTP(s): Discover rsp: transaction 0
-        ACP SEID 1 - Audio Sink
-        ACP SEID 3 - Audio Sink
-        ACP SEID 4 - Audio Source
+| and
+| not all desktops are running with a 3 GHz processor. I think what the
+| MAD library does is very good and their MP3 decoding is fast.
 
-But we only request information about the first SEID. We need to change
-the code to actually request the capabilities of all endpoints so that
-they at least show up in a hcidump.
+Depending on the purpose of the calculations fixed point calculations
+add an overhead that can - in some situations - eat up the speed gain
+compared to true fpu.
 
-You can try to hack the a2play.c to use SEID 3 instead of 1 and see what
-the audio sink on SEID 3 offers you. Run the hcidump 1.15.
+But as you said, not all systems run on CPU/FPU combinations with the
+specs of a modern desktop computer, and in fact this is important for
+bluetooth stuff as many portable devices also use linux nowadays.
 
-However the capabilities of SEID 1 shows the content protection:
+So I think we both have a point, but yours matches the BlueZ situation
+much better than mine :)
 
-      AVDTP(s): Capabilities rsp: transaction 1
-        Media Transport
-        Media Codec - SBC
-          44.1kHz 48kHz 
-          Mono DualChannel Stereo JointStereo 
-          4 8 12 16 Blocks
-          4 8 Subbands
-          SNR Loudness 
-          Bitpool Range 4-64
-        Content Protection
-          02 00 
+Not used to it. Strange enough, as I program for PalmOS quite a lot...
 
-For me it is not clear if we have to set them, ignore them or what to do
-with them. Do we have to insert the content protection header in the
-media payload if these capability is present?
+cu,
+~  Lars
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-Regards
-
-Marcel
-
-
+iD8DBQFBpn93QWC6DTWkDAoRAhETAJ9dthtjsNEM0Acxt3GSDVmzg8g/kACgg644
+eNFC/R0TmjKb9hKu0Y5fR00=
+=2HW2
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
