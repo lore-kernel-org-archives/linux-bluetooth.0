@@ -1,55 +1,50 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
-From: Roderick Taylor <rtaylor@hcvwireless.com>
-Reply-To: rtaylor@hcvwireless.com
-To: Jonathan Paisley <jp-www@dcs.gla.ac.uk>, bluez-devel@lists.sourceforge.net
-In-Reply-To: <Pine.LNX.4.59.9999.0408101615190.22497@brava.dcs.gla.ac.uk>
-References: <4117AB9A.9010909@dark-reality.de>
-	 <1092071356.4564.12.camel@pegasus> <4117B098.5020805@dark-reality.de>
-	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>
-	 <1092090364.4564.46.camel@pegasus> <41180E64.1010007@dark-reality.de>
-	 <1092140041.4564.96.camel@pegasus> <4118C562.1050300@superbug.demon.co.uk>
-	 <Pine.LNX.4.59.9999.0408101435250.22497@brava.dcs.gla.ac.uk>
-	 <4118DAF9.2080204@csr.com>
-	 <Pine.LNX.4.59.9999.0408101615190.22497@brava.dcs.gla.ac.uk>
-Content-Type: text/plain
-Message-Id: <1092214694.12197.14.camel@localhost>
+Return-Path: <jt@bougret.hpl.hp.com>
+Date: Tue, 10 Aug 2004 16:37:01 -0700
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Michal Semler <cijoml@volny.cz>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [PATCH 2.6] link trigger for AODV and +
+Message-ID: <20040810233701.GB16435@bougret.hpl.hp.com>
+Reply-To: jt@hpl.hp.com
+References: <20040805013335.GA13608@bougret.hpl.hp.com> <1091976547.2773.29.camel@pegasus> <20040809185159.GA21899@bougret.hpl.hp.com> <1092078516.4564.40.camel@pegasus> <20040809195448.GA24140@bougret.hpl.hp.com> <1092125599.4564.76.camel@pegasus> <20040810163203.GA1963@bougret.hpl.hp.com> <1092178402.4564.204.camel@pegasus>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 Aug 2004 09:58:15 +0100
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1092178402.4564.204.camel@pegasus>
+From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Tue, 2004-08-10 at 16:31, Jonathan Paisley wrote:
-
+On Wed, Aug 11, 2004 at 12:53:23AM +0200, Marcel Holtmann wrote:
+> Hi Jean,
 > 
-> > I can't find anything in this thread that reveals whether you're
-> > trying to send SCO traffic over USB or UART.  The data handling
-> > for the two cases have subtle differences.
+> you are right, but there are pros and cons on both sides and I like to
+> find the best solution. However I never looked at RtNetlink before. I
+> think that I should educate myself a little bit more.
+
+	Netlink is a generic socket between the kernel and user space,
+RtNetlink is a API using Netlink to manipulate IP routes and a few
+other stuff.
+	Start with the iproute package, which is an user interface to
+RtNetlink (the command part). Then, look at iwevent, that make use of
+various RtNetlink events.
+	Note that you can't migrate the HCI events to RtNetlink,
+because RtNetlink expect a real netdev. You could migrate to Netlink,
+defining you own API over Netlink, but I don't see what would be the
+gain.
+
+> > 	The bug is obvious, you forgot that in 2.4.X the list doesn't
+> > point to struct sock but to struct bluez_pinfo. Compare your patch to
+> > the version below.
 > 
-> As far as I'm aware, we're dealing with USB only.
+> What a stupid mistake. I must been blind at that time :(
+
+	It happens to all of us ;-) I'm glad I started with my own
+backport and had my own separate patch, because otherwise I would not
+have find this bug...
+
+> Regards
 > 
+> Marcel
 
-I am researching BlueZ application in Embedded applcations.
+	Have fun...
 
-Having UART support would be useful for embedded processors that don't
-have USB host support.  Please don't disregard it completely
-
-
-
--------------------------------------------------------
-SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
-100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
-Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
-http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+	Jean
