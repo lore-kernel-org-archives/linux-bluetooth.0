@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <36738.192.168.1.248.1079199852.squirrel@legio.mine.nu>
-From: "Peter Andersson" <peter@legio.mine.nu>
+From: Simone Gotti <motaboy80@supereva.it>
 To: bluez-users@lists.sourceforge.net
-Reply-To: peter@legio.mine.nu
+Subject: Re: [Bluez-users] crash on remove
+References: <20040310182158.GA9279@naginata.ccs.neu.edu> <20040311024720.GA3297@omocha.vort.org> <4050323B.1030307@ei.tum.de>
+In-Reply-To: <4050323B.1030307@ei.tum.de>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Subject: [Bluez-users] Any suggestions on good usb dongle?
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200403131626.07124.motaboy80@supereva.it>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,25 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 13 Mar 2004 18:44:12 +0100 (CET)
+Date: Sat, 13 Mar 2004 16:26:06 +0100
 
-Hi!
+On Thursday 11 March 2004 10:32, Matthias Thomae wrote:
 
-I am in the progress of buying a new usb dongle to setup wireless
-networking between my laptop and stationary computer. I currently own a
-belkin F8T001 which works fine but it is hell to get it initialized
-properly. Usually i have to connect and re-connect it a couple of times
-before the computer recognize it. So what i want is a dongle that works
-perfect without huzzle. Does anyone have any suggestions?
+Hi,
+you were right.
+I've installed the 2.6.4 and I have the same problem too, this happens only 
+with 2.6.4 and not with 2.6.3.
 
-Another question i have is if it is possible to setup "pan" without a
-access point? And what about security issues? If i setup pan are there
-ways for me to control who gets access to the network? Something similar
-to mac addresses in "regular networking".
+Someone wrote to the kernel mailing list too:
+http://www.ussg.iu.edu/hypermail/linux/kernel/0403.1/1519.html
 
-Regards
-
-Peter
+Bye!
+-- 
+Simone Gotti
+<motaboy80@supereva.it>
 
 
 -------------------------------------------------------
