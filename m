@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] autoconf breaks portability. Film at 11.
+Subject: Re: [Bluez-devel] Inquiry result with rssi in bluez libs 2.7
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Woodhouse <dwmw2@infradead.org>
+To: Rognlien Dag Kristian <Dag.K.Rognlien@sintef.no>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1084268833.11301.0.camel@hades.cambridge.redhat.com>
-References: <1084268833.11301.0.camel@hades.cambridge.redhat.com>
+In-Reply-To: <26AF0D77A98E09478A577B2248F72338413FF2@sintefxch1-netapp.sintef.no>
+References: 
+	 <26AF0D77A98E09478A577B2248F72338413FF2@sintefxch1-netapp.sintef.no>
 Content-Type: text/plain
-Message-Id: <1084368666.25099.38.camel@pegasus>
+Message-Id: <1084368560.25099.35.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,19 +19,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 May 2004 15:31:06 +0200
+Date: Wed, 12 May 2004 15:29:20 +0200
 
-Hi David,
+Hi Dag,
 
-> I cannot build libs2. The autoconf stuff is broken. The last thing it
-> says is this:
+> I see that hci.h has
 > 
-> configure.in:19: required file `./ltmain.sh' not found
+> #define EVT_INQUIRY_RESULT_WITH_RSSI  0x02
 > 
-> Please can we ditch this crap and use sane makefiles instead?
+> The bluetooth 1.2 spec defines this event code as 0x22
+> 
+> Is this a typo, or is there a reason why it is set as 0x02 in hci.h?
 
-I heard of that problem, but I can't reproduce it. If you call
-"./bootstrap" every that is necessary should be created.
+this was a stupid typo and fixed in CVS now. Thanks for finding it.
 
 Regards
 
