@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Catalin Drula <catalin.drula@imag.fr>
-Message-ID: <loom.20050325T100311-440@post.gmane.org>
-References: <loom.20050324T175954-608@post.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Re: Host to Host Controller flow control
+Message-ID: <42439ADA.5000006@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] a2dp timing
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,30 +16,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Mar 2005 09:11:23 +0000 (UTC)
+Date: Thu, 24 Mar 2005 22:00:10 -0700
 
-Catalin Drula <catalin.drula <at> imag.fr> writes:
+Hi
 
-> I wanted to take a shot at implementing host-to-controller flow control for
-> Bluez. Before I start, it'd be great to have your thoughts on this.
+We've had problems with a2dp timing that I've been ignoring.
 
-Hi Marcel,
+For one, a2play crams frames into the headset just as fast as it can. 
+Sometimes this is too fast. So we need to clock it so things are 
+staggered properly. Does the SBC encoder give us a clue about timing 
+between frames?
 
-I've been looking over the code in hci_core.c and hci_event.c, in particular,
-hci_tx_task, hci_sched_acl, hci_sched_sco, hci_low_sent and 
-hci_num_comp_pkts_evt.
+Second, if the headset wanders out of range, the player stops and starts 
+up where it left off when the headset is back. If we're pacing things 
+properly, we need to drop frames instead when this happens. I'm thinking 
+if it results in a legal SBC stream that I'll drop entire SBC frames in 
+the main loop with something like:
 
-It seems like we're already doing host to host controller flow control, 
-as far as I could tell. At the very least, we're correctly keeping track 
-of the number of free slots in the controller's buffers and we're never
-overflowing it. Also hci_low_sent always selects the connection with the
-most completed packets so there seems to be some balancing done there. 
-Could you point out what is missing (the reason this item is on the TODO list)?
+	frame_len = read_header(fd, &sbc_info);
+	bytes_read = read(fd, killbuffer, frame_len);
 
-Thanks,
+Are there other timing issues I need to think about? Does it get so 
+messy that I need to watch jitter? I can only vaguely remember this 
+stuff from my networking classes...
 
-Catalin
-
+Brad
 
 
 -------------------------------------------------------
