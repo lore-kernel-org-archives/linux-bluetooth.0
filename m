@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bd_addr question
+Subject: Re: [Bluez-devel] rfcomm connection send data
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jessica Huang <jessieh@MIT.EDU>
+To: franz keuner <franz_keuner@gmx.net>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5.2.1.1.2.20040309190444.02e6e250@po14.mit.edu>
-References: <5.2.1.1.2.20040309150546.02e414a0@po14.mit.edu>
-	 <5.2.1.1.2.20040309150546.02e414a0@po14.mit.edu>
-	 <5.2.1.1.2.20040309190444.02e6e250@po14.mit.edu>
-Content-Type: text/plain
-Message-Id: <1078878227.30990.17.camel@pegasus>
+In-Reply-To: <1366.1078828940@www52.gmx.net>
+References: <1366.1078828940@www52.gmx.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1078877588.30990.11.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,23 +18,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 10 Mar 2004 01:23:47 +0100
+Date: Wed, 10 Mar 2004 01:13:08 +0100
 
-Hi Jessica,
+Hi Franz,
 
-> Sorry, I worded it poorly.  I'm a graduate student researching privacy 
-> issues related to Bluetooth, which I'm pretty new to.  I'm trying to work a 
-> way around the fact that each device address is unique therefore 
-> trackable.  I was wondering if I were to buy a Bluetooth transmitter and 
-> build my own device, can I change the bd_addr that is stored by the chip's 
-> manufacturer?  Which layer/module is in charge of reading that unique 
-> bd_addr?  I hope that makes more sense!
+> i=B4m trying to develop an application using the bluezstack (usb dongle=
+)  and
+> the sonyericsson p900.
+> i=B4m able to connect the two devices via rfcomm.
+>=20
+> rfcomm connect 0 00:00:00:00:00:00  5
+> Connected /dev/rfcomm0 to 00:00:00:00:00:00  on channel 5
+> Press CTRL-C for hangup
+>=20
+> now i want to send data(string) from one device to the other.
+> on the p900 i use MIDlets and the java bluetooth api.=20
+>=20
+> if i start listening and dump with ./rctest -d and trying to connect th=
+e
+> p900 the following message returns:
+> ./rctest -d
+> rctest: Waiting for connection on channel 10 ...
+> rctest: Connect from 00:00:00:00:00:00 (p900 adress)
+> rctest: Receiving ...
+>=20
+> an nothing happens...
+> i use in the MIDlet the command: connector client =3D (StreamConnection=
+)
+> Connector.open(btspp://dongle adress and channel));
+>=20
+> so the connection seems to work alright.
+>=20
+> the data i want to send is a string saved in content:
+> output =3D client.openOutputStream();
+> byte[] data =3D content.getBytes();
+> output.write(data);
+>=20
+> the p900 confirms it sended the data and rctest gives no error message =
+or
+> anything.
 
-the Bluetooth SIG is working on something that is called Anonymity Mode
-and this should be present in Bluetooth 1.2, but it got removed from the
-final specification. So actually devices are trackable. And there is no
-default way of changing the BD_ADDR, but some manufacturers provides
-vendor specific HCI commands to change the Bluetooth address.
+run "hcidump -x" (as root) and see what happens on the Linux side.
 
 Regards
 
