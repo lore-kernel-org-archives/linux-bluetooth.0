@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <403B95A0.8080203@superbug.demon.co.uk>
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
-MIME-Version: 1.0
-To: Ibrahim El-Shafei <shaffei@softhome.net>
-CC: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluepin error
-References: <1077275969.1396.8.camel@shafei.eth>
-In-Reply-To: <1077275969.1396.8.camel@shafei.eth>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] sdp patch
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Simon Vogl <vogl@soft.uni-linz.ac.at>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <403B5BB2.4060306@soft.uni-linz.ac.at>
+References: <403B08B4.1000602@soft.uni-linz.ac.at>
+	 <1077624690.2880.40.camel@pegasus>  <403B471D.7080908@soft.uni-linz.ac.at>
+	 <1077628380.2880.84.camel@pegasus>  <403B5BB2.4060306@soft.uni-linz.ac.at>
+Content-Type: text/plain
+Message-Id: <1077632076.2880.96.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,33 +20,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 Feb 2004 18:19:12 +0000
+Date: Tue, 24 Feb 2004 15:14:36 +0100
 
-Ibrahim El-Shafei wrote:
-> Dear Sir,
-> 
-> I'm trying to run the bluepin command but I receive an error saying
-> GtkDialog not defined.
-> 
-> I've checked the python script at line 39 but I see that everything is
-> ok.
-> 
-> Another question: Do I type --> bluepin /etc/bluetooth/pin devicename?
-> or deviceaddress?
-> 
-> Thank you for your help in advance.
-> 
-> Best regards,
+Hi Simon,
 
-http://bluez.sourceforge.net/download/bluepin
+> hmm, I tested with
+> cd sdp; patch -p1 <../foo
+> and it worked like a charm.
+> 
+> Are there different branches in the sourceforge cvs? (nb that i am only 
+> an anonymous user ;)
 
-Overwrite /usr/bin/bluepin with it and don't edit /etc/bluetooth/pin
+we don't use any branches and I always apply it to an anonymous checkout
+first, before I commit it. Please do a new and clean checkout.
 
-The problem is dependent on which gtk version you have.
-Older versions of gtk use GtkDialog, newer versions use gtk.Dialog
+Regards
 
-Cheers
-James
+Marcel
+
+
 
 
 -------------------------------------------------------
