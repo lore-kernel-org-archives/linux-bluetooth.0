@@ -2,14 +2,13 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Problems while sending and receiving with rfcomm
 	sockects
 From: Marcel Holtmann <marcel@holtmann.org>
-To: dsas@mega.ist.utl.pt
+To: "Collin R. Mulliner" <collin@betaversion.net>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1086094626.40bc7d22eab66@webmail.rnl.ist.utl.pt>
+In-Reply-To: <20040601145616.3419c335@coredump>
 References: <1086088581.40bc65850efcf@webmail.rnl.ist.utl.pt>
-	 <1086093267.4702.20.camel@pegasus>
-	 <1086094626.40bc7d22eab66@webmail.rnl.ist.utl.pt>
+	 <1086093267.4702.20.camel@pegasus>  <20040601145616.3419c335@coredump>
 Content-Type: text/plain
-Message-Id: <1086100358.4702.25.camel@pegasus>
+Message-Id: <1086100267.4702.23.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,13 +20,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Jun 2004 16:32:38 +0200
+Date: Tue, 01 Jun 2004 16:31:07 +0200
 
-Hi Didier,
+Hi Collin,
 
-> I use RedHat 9.0 (2.4.20-8) with bluez RPM packages (libs 2.7.1, utils 2.7.1).
+> > I never used RFCOMM in a multi-threaded program. Actually I avoid to
+> > use threads wherever possible. However sending and receiving at the
+> > same time should work. Maybe there is a kernel bug, what version do
+> > you use?
+> 
+> I allways thought one should ONLY use a socket within a single thread
+> at the same time. I write my programs in that way that I never call
+> read() and write() on a specific socket at the "same time" also I
+> only access each socket within a single thread.
 
-try the latest 2.4 or 2.6 kernel or change to one thread per socket.
+this is why we have select() and poll().
+
+> Somehting else: I need a UUID for my application - any hints on where to
+> find some information/instructions?
+
+You must create a UUID-128. There was note in the specification about
+that, but I can't remember it.
 
 Regards
 
