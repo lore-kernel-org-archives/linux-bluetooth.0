@@ -1,38 +1,52 @@
-Return-Path: <maxk@qualcomm.com>
-Message-Id: <5.1.0.14.2.20031009104846.0591fb08@unixmail.qualcomm.com>
-Date: Thu, 09 Oct 2003 10:58:11 -0700
-To: Stephen Crane <steve.crane@rococosoft.com>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-Id: <5.1.0.14.2.20031009104727.059fba78@unixmail.qualcomm.com>
+To: Alexandros Karypidis <karypid@inf.uth.gr>,
+   bluez-devel@lists.sourceforge.net
 From: Max Krasnyansky <maxk@qualcomm.com>
-Subject: Re: [Bluez-devel] RFComm channel allocation
-Cc: bluez-devel@lists.sourceforge.net, marcel@rvs.uni-bielefeld.de
-In-Reply-To: <1065696705.30376.257.camel@baroque.rococosoft.com>
-References: <5.1.0.14.2.20031008174223.058f41d8@unixmail.qualcomm.com>
- <5.1.0.14.2.20031008174223.058f41d8@unixmail.qualcomm.com>
+Subject: Re: [Bluez-devel] hci_conn_info struct
+In-Reply-To: <200310092019.16955.karypid@inf.uth.gr>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 09 Oct 2003 10:48:39 -0700
 
-At 03:51 AM 10/9/2003, Stephen Crane wrote:
->On Thu, 2003-10-09 at 01:52, Max Krasnyansky wrote:
->> >On a related matter (and I'm pretty sure this /has/ come up before),
->> >would it be possible to perform automatic channel allocation in the
->> >kernel? 0 would be a good distinguishing value for this (since it is
->> >reserved to the RFComm multiplexer).
->> It's possible but does not seem to be needed. I mean so far nobody had
->> a strong argument why we need to support it.
+At 10:19 AM 10/9/2003, Alexandros Karypidis wrote:
+>Hi all,
 >
->It seems to me that we're moving towards a more service-oriented view
->where Bluetooth services are discovered by UUID rather than assuming
->they live at a fixed port/channel number. 
+>I am using hci_conn_info to obtain a list of devices I am connected to. I 
+>"stole" the code from looking at what "hcitool con" does. What I want to do 
+>now is figure out what the CoD of the peer device is. I would like to do that 
+>in a smart way.
 >
->If this is the case, servers shouldn't have to care what port/channel is
->used, they just bind to any and use getsockname() to find out the actual
->one allocated by the kernel, for subsequent advertisement by SDP. (Also
->this is possible for AF_INET sockets, so it wouldn't violate the
->principle of least surprise.)
+>I tried doing an inquiry for devices, but I never receive the device I am 
+>connected to in the returned list of devices! Is this a limitation of 
+>Bluetooth or coincidence?
+>
+>In any case, it seems a little silly to scan for devices in order to find out 
+>the CoD of a device I am already connected to. Is there a way to achive this? 
 
-Well the thing is PSM 0 and Channel 0 are already used for bind() on the 
-client side. It means "I do not need a port". Unlike IP clients Bluetooth 
-clients do not need unique port.
+Actually if you don't specify IREQ_CACHE_FLUSH flag to hci_inquiry() it will
+return cached results and device you're connected too will be on the list for sure.
 
 Max
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: SF.net Giveback Program.
+SourceForge.net hosts over 70,000 Open Source Projects.
+See the people who have HELPED US provide better services:
+Click here: http://sourceforge.net/supporters.php
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
