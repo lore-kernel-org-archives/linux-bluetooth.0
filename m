@@ -1,15 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <5.1.0.14.2.20031009102229.05a801a0@unixmail.qualcomm.com>
-To: Steven Singer <steven.singer@csr.com>
-From: Max Krasnyansky <maxk@qualcomm.com>
-Subject: Re: [Bluez-devel] hciconfig
-Cc: Christian Eiselt <c.eiselt@gmx.de>,
-   bluez Dev <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3F854DE3.9090001@csr.com>
-References: <5.1.0.14.2.20031008175536.0241e658@unixmail.qualcomm.com>
- <5.1.0.14.2.20031008175536.0241e658@unixmail.qualcomm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Alexandros Karypidis <karypid@inf.uth.gr>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200310092019.16955.karypid@inf.uth.gr>
+Subject: [Bluez-devel] hci_conn_info struct
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -20,21 +16,29 @@ List-Id: <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 09 Oct 2003 10:25:33 -0700
+Date: Thu, 9 Oct 2003 20:19:16 +0300
 
-At 05:00 AM 10/9/2003, Steven Singer wrote:
->Max Krasnyansky wrote:
->>In older HCI implementation HCI_Reset used to reset USB transport even
->>though spec clearly states that it shouldn't. This may cases all sorts of problems. Looks like you got one of those dongle with buggy HCI implementation.
->
->I'd like to pick you up on the words "clearly" and "buggy". This is an
->example of how the Bluetooth spec has been tightened to avoid ambiguity.
-:)
+Hi all,
 
-Thanks for clarification Steven. I didn't know that 1.0b allowed complete
-reset and I was referring to 1.1.
+I am using hci_conn_info to obtain a list of devices I am connected to. I 
+"stole" the code from looking at what "hcitool con" does. What I want to do 
+now is figure out what the CoD of the peer device is. I would like to do that 
+in a smart way.
 
-Max
+I tried doing an inquiry for devices, but I never receive the device I am 
+connected to in the returned list of devices! Is this a limitation of 
+Bluetooth or coincidence?
+
+In any case, it seems a little silly to scan for devices in order to find out 
+the CoD of a device I am already connected to. Is there a way to achive this? 
+
+-- 
+In theory, there is no difference between theory and practice.
+In practice, there is. -- Yogi Berra.
+
+Alexandros Karypidis
+University of Thessaly
+Computer & Communications Engineering dept.
 
 
 
