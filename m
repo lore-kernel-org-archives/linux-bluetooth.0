@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Peter Wippich <pewi@gw-instruments.de>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Information on Scatternet
-In-Reply-To: <Pine.GSO.4.43.0502242320200.3601-100000@gatekeeper.ececs.uc.edu>
-Message-ID: <Pine.LNX.4.33.0502251621120.12798-100000@redbean.intranet.gw-instruments.de>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Bluez-devel] BlueZ on CSR ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20050224231044.13234.qmail@web51608.mail.yahoo.com>
+References: <20050224231044.13234.qmail@web51608.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1109340985.5908.1.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,94 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Feb 2005 16:30:18 +0100 (CET)
+Date: Fri, 25 Feb 2005 15:16:25 +0100
 
+Hi Parsanna,
 
-Hello Qihe,
+> I am doing a project at Bournemouth University, UK. I am using Gennum
+> corporations GR2320 bluetooth modules.  These modules have BlueCore
+> HCI software stack embedded onto the module.
+>  
+> I have installed BlueZ on linux (mandrake 10.0 official). My host PC
+> is a laptop - HP NX9005. But i am not able to connect to the module
+> via the RS232 interface (UART)..... Is it because blueZ does not yet
+> support CSR?
+>  
+> Please can any one answer my query, coz i am very desperate to
+> demonstrate bluetooth connection between two bluetooth devices using
+> the GR2320 Bluetooth module
 
-from the Bluetooth Specification 1.2:
+the CSR chips are fully supported on the UART with H:4 and BCSP as host
+transport protocol. I don't see your problem and unless you don't give
+more information nobody will be able to help you.
 
-"A Bluetooth device that is a member of two or more piconets is said to be
-involved in a scatternet. Involvement in a scatternet does not necessarily
-imply any network routing capability or function in the Bluetooth device.
-The Bluetooth core protocols do not, and are not intended to offer such
-functionality, which is the responsibility of higher level protocols and
-is outside the scope of the Bluetooth core specification."
+Regards
 
-So, in fact, if you want to implement a scatternet with bridging it has to
-be done on the profile layer. Maybe the PAN profile with bridging is a
-good point to start.
-
-Good luck,
-
-Peter
-
-On Thu, 24 Feb 2005, Qihe Wang wrote:
-
-> Hello,
->
-> I'm looking at this information too.  With 300 nodes, it almost impossible
-> to do manual set up.  I know there are several CSR engineers on this
-> mailing.  Would you like give us some information about how big a
-> scatternet can be built and what is the bridge scheduling algorithm?  Are
-> you have R&D interest in this kind of things?
->
-> Regards, Qihe
->
-> On Thu, 3 Feb 2005, Marcel Holtmann wrote:
->
-> > Hi Elisabetta,
-> >
-> > > I would like to know if it's possible to realize a BT scatternet made
-> > > by some hundreds (300 for example) of piconets. Each node of the
-> > > piconet (max 5) has to connect only with the master of the piconet
-> > > itself, and each piconet has to send and receive data, via BT, with a
-> > > PC that has to  collect and manage the data of all the piconets. The
-> > > distance between the majority of the piconets and the PC is greater
-> > > than the max possible for a BT class 1 device, so it's necessary that
-> > > the master of each piconet work as a gateway for the other piconets.
-> >
-> > this is possible, but you need at scatternet capable Bluetooth chip (for
-> > example a CSR BlueCore with HCI 16.4 firmware or newer). What you really
-> > need to make sure is that the roles are switched correctly. Remember
-> > that the device that initiates a connection is the master of a piconet
-> > in the first place.
-> >
-> > Regards
-> >
-> > Marcel
-> >
-> >
-> >
-> >
-> > -------------------------------------------------------
-> > This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
-> > Tool for open source databases. Create drag-&-drop reports. Save time
-> > by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
-> > Download a FREE copy at http://www.intelliview.com/go/osdn_nl
-> > _______________________________________________
-> > Bluez-devel mailing list
-> > Bluez-devel@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> >
->
->
->
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-
-|	Peter Wippich 			Voice: +49 30 46776411		|
-|	G&W Instruments GmbH		fax:   +49 30 46776419		|
-|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
-|	D-13355 Berlin  / Germany					|
+Marcel
 
 
 
