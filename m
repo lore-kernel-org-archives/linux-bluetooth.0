@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re:cross compilation of BlueZ for MIPS
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050322042925.87922.qmail@web8508.mail.in.yahoo.com>
-References: <20050322042925.87922.qmail@web8508.mail.in.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1111481027.22872.91.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20050322070534.8383.qmail@web8502.mail.in.yahoo.com>
+From: mahabaleshwara k <mahabaleshwara_k@yahoo.co.in>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] same problem in bluez-utilis cross compilation
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Mar 2005 09:43:47 +0100
+Date: Tue, 22 Mar 2005 07:05:34 +0000 (GMT)
 
-Hi,
-
-> when i compile i get error like non structure member
-> "nice" in core.c file.
-
-the Bluetooth kernel source code uses more than one core.c and I only
-that it must be the kernel source, because a nice member doesn't exists
-inside the userspace code.
-
-Provide a the full error message and explain what you are doing, because
-otherwise such posts are useless.
-
-Regards
-
-Marcel
+Hi all,
+I have also tried cross compilation of blueZ-utilis
+for MIPS. I am getting same problem and even error as
+Stephan is mentioned on 16th. No error in Bluez-lib
+compilation but during utilis, library is not found
+error.
+Can any one help me out in this problem?
+Thanking you all.
+Regards,
+Maha.
 
 
+________________________________________________________________________
+Yahoo! India Matrimony: Find your life partner online
+Go to: http://yahoo.shaadi.com/india-matrimony
 
 
 -------------------------------------------------------
