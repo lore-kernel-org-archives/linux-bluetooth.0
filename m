@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40AB4D9F.7010307@telus.net>
-From: Ken <a5a33956@telus.net>
-MIME-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] rfcomm confusion
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200405191405.41365.cijoml@volny.cz>
+Subject: [Bluez-users] Final sound support in BlueZ
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,28 +17,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 May 2004 05:05:51 -0700
+Date: Wed, 19 May 2004 14:05:41 +0200
 
-I am trying to create a bluetooth serial connection between my linux 
-laptop and iPAQ pda.
-I'm using the command "rfcomm connect hci0 00:11:22:33 1" and it appears 
-to work.
-the connection shows up on the iPAQ and when I go to the status it 
-displays 0 bytes transfered - 0 bytes received.
+Hi Marcel,
 
-so, now i'm trying to send some data over this connection. my 
-expectation was that i could do something like:
-echo "test" > /dev/rfcomm0
-and then see 4 bytes received on the iPAQ interface, however the byte 
-counts on the ipaq remain 0.
+do you work on sco support for BlueZ which will allow us finally talk to BT 
+headsets? In our market are selled BT enabled repros too.
 
-does it make sense to try and send data this way? if not, can anybody 
-suggest how i should be trying to send data over an rfcomm connection?
-
-thanks!
-ken
-
-
+Michal
 
 
 -------------------------------------------------------
