@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
+Message-ID: <20040305094657.98433.qmail@web40713.mail.yahoo.com>
+From: Lalith Chakravarthi <lalithvc@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Message-id: <13c0fd76e.d76e13c0f@estudiants.urv.es>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Subject: [Bluez-users] problem on make install
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] USB Dongle to Dongle -- Connection
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,68 +15,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Mar 2004 10:54:10 +0100
+Date: Fri, 5 Mar 2004 01:46:57 -0800 (PST)
 
-Hello all
+Hi
 
-I'm working in a Red Hat with kernel 2.4.18, so I've
-downloaded bluez-kernel-2.3 , untared it, and
-./configure. Until there there is no problem, but
-when I do make, I need to comment line 461 on core.c
-to skip the error:
+I have two USB dongles... One on a laptop and other on my PC... I have
+linux running on both the machines. I have installed all the necessary
+packages. 
 
-core.c: In function `bnep_session':
-core.c:461: structure has no member named `nice'
-make[2]: *** [core.o] Error 1
-make[1]: *** [bnep.o] Error 2
+I can even ping between the two. But I dont understand how I can
+transfer files between the two computers. I checked using the sdptool
+but the only service that can be found on the other computer is the sdp
+server running. 
 
-when I comment that line there is no problem on
-doing the 'make', but on make install I get the next
-messages:
+Could someone please advise me as to how to make a file transfer
+between these two computers. I am not using a GUI for this. So, I would
+appreciate it if the procedure can be told as command line arguments.
 
-make[1]: Leaving directory
-`/root/testings/bluez-kernel-2.3/doc'
-/sbin/depmod -a
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/bluecard_cs.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/bt3c_cs.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/btuart_cs.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/dtl1_cs.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/hci_uart.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/hci_usb.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/hci_vhci.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/misc/ksock_multi.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/misc/ksock_single.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/net/bluetooth/bluez.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/net/bluetooth/bnep.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/net/bluetooth/l2cap.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/net/bluetooth/rfcomm.o
-depmod: *** Unresolved symbols in
-/lib/modules/2.4.18-4custom/kernel/net/bluetooth/sco.o
-make: *** [install] Error 1
+Regards
+Lalith
 
-
-can anybody help me on this? I'm new on BlueZ so
-please be gentle!! ;)
-
-
-Thanks
-
-
-Albert
-
+__________________________________
+Do you Yahoo!?
+Yahoo! Finance: Get your refund fast by filing online.
+http://taxes.yahoo.com/filing.html
 
 
 -------------------------------------------------------
