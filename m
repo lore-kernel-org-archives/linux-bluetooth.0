@@ -1,10 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3F02DBA9.1060305@superbug.demon.co.uk>
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
-MIME-Version: 1.0
-To: bluez Dev <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] Bluetooth headset problems.
+Subject: Re: [Bluez-devel] [ANN] Zaurus BlueZ kernel packages for ROM v3.10
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Xavier Garreau <x.garreau@prim-time.fr>
+Cc: Justin Karneges <justin-qt-dated-1058334576.aa81a3@affinix.com>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <005b01c34067$f5469a80$0181a8c0@zaz1>
+References: <1054908696.4791.157.camel@baroque.rococosoft.com>
+	<200306301314.25320.justin-qt@affinix.com>
+	<1057064408.15797.20.camel@pegasus>
+	<200307011438.34033.justin-qt@affinix.com>
+	<005b01c34067$f5469a80$0181a8c0@zaz1>
+Content-Type: text/plain
+Message-Id: <1057135055.8782.3.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -17,30 +24,27 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 02 Jul 2003 14:18:33 +0100
+Date: 02 Jul 2003 10:37:28 +0200
 
-Hi,
+Hi Xavier,
 
-I am using the hstest program to try to send and receive sound from the 
-headset.
-I can record sound, but it seems that only half the sound samples are 
-getting through.
-E.g. Through the headset microphone, I could seconds in time with my watch.
-I then play the recorded sound stream.
-If I play at 8000hz, My voice is at the correct pitch, but the counting 
-is every 0.5 seconds, instead of 1 seconds.
-If I play at 4000hz, My voice is very low and sounds slow, but the 
-seconds are counted at the correct speed.
-I conclude that the bluez sco driver is only sending us half the samples.
+> > Do you have any hint about where it may be?  Maybe the Zaurus does not
+> send
+> > appropriate signals to the driver that it is shutting down?  I'd like to
+> look
+> > into this, but I need some direction first.  For instance, if it affects
+> all
+> > drivers, not just dtl1_cs, then either all drivers have the same "bug", or
+> > the bug is in the bluez core, right?
+> 
+> Laptops are affected as well, at least those using bc3c_cs...
 
-Can anyone help ?
+the bt3c_cs is another story due the needed firmware load :(
 
-I am using kernel 2.4.21-mh2 (kernel.org kernel patched with mh2 
-patches.) and the latest hstest etc. from bluez cvs, as of a few days ago.
+Regards
 
+Marcel
 
-Cheers
-James
 
 
 
