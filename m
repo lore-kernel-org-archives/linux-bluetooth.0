@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hidd :)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405092044.51226.cijoml@volny.cz>
-References: <200405092044.51226.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1084129392.9269.106.camel@pegasus>
-Mime-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200405092044.51226.cijoml@volny.cz>
+Subject: [Bluez-users] hidd :)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,22 +17,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 09 May 2004 21:03:12 +0200
+Date: Sun, 9 May 2004 20:44:51 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> thanks for a GREAT work :) Now I can't stand for new kernel module which let 
-> me use hidd :)
+thanks for a GREAT work :) Now I can't stand for new kernel module which let 
+me use hidd :)
 
-you are welcome. If I find time to extend my patch script to deal with
-external patches I am ready to go. However I think that I will wait
-until Linus releases the 2.6.6, so we have a clean start ;)
-
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
