@@ -1,53 +1,51 @@
-Return-Path: <SRS0+bb95d8377eff4cb4d0f0+262+infradead.org+dwmw2@pentafluge-151130.srs.infradead.org>
-Subject: Re: [Bluez-devel] autoconf breaks portability. Film at 11.
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1084369703.25099.56.camel@pegasus>
-References: <1084268833.11301.0.camel@hades.cambridge.redhat.com>
-	 <1084368666.25099.38.camel@pegasus>
-	 <1084369122.4426.106.camel@hades.cambridge.redhat.com>
-	 <1084369703.25099.56.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <26AF0D77A98E09478A577B2248F72338413FF3@sintefxch1-netapp.sintef.no>
+From: Rognlien Dag Kristian <Dag.K.Rognlien@sintef.no>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Inquiry result with rssi in bluez libs 2.7
+MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <1084371089.4426.148.camel@hades.cambridge.redhat.com>
-Mime-Version: 1.0
-Date: Wed, 12 May 2004 15:11:29 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 12 May 2004 15:54:41 +0200
 
-On Wed, 2004-05-12 at 15:48 +0200, Marcel Holtmann wrote:
-> if you can tell me how to disable C++ and Fortran checking I am glad to
-> include it ;)
+Hi,
 
-I sent you proper Makefiles a long time ago. You didn't apply them :)
-
-This is what I get on Fedora Core 2 on both i386 and PPC, btw:
-
-hades /hades/bluez/libs2 $ ./bootstrap
-configure.in: installing `./install-sh'
-configure.in: installing `./missing'
-configure.in:19: installing `./config.guess'
-configure.in:19: installing `./config.sub'
-configure.in:19: required file `./ltmain.sh' not found
-compat/Makefile.am: installing `./depcomp'
-
-
-> > Btw, swave() in hciattach still uses 10 characters of a 9-char array. 
+> -----Original Message-----
+> From: Marcel Holtmann [mailto:marcel@holtmann.org] 
 > 
-> Fixed in CVS now.
+> this was a stupid typo and fixed in CVS now. Thanks for finding it.
+> 
 
-OK, you can have another one then :)
+While I have your attention on this subject...
 
-On PPC, the HCI/LMP version numbers and manufacturer code are
-byte-swapped in hciconfig from utils2. hciconfig from bluez-utils-2.7
-gives:
+In the hci_event.c in net/bluetooth the hci_inquiry_result_with_rssi_evt
+function just ignores the rssi value, and files the values of a normal
+inquiry_info struct. Is there a plan for how the rssi values should be made
+available to the user mode application calling ioctl with HCIINQURY? As far
+as I can see there are now way for an application to get this value now.
 
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x4d9 LMP Ver: 1.2 (0x2) LMP Subver: 0x4d9
-        Manufacturer: Cambridge Silicon Radio (10)
- 
-... while hciconfig from utils2 gives:
+Regards,
+Dag K. W. Rognlien
+M.Sc. Computer Engineering
+SINTEF ICT
+Communication Systems
 
-        HCI Ver: 1.2 (0x2) HCI Rev: 0xd904  LMP Ver: 1.2 (0x2) LMP Subver: 0xd904
-        Manufacturer: not assigned (2560)
 
--- 
-dwmw2
+-------------------------------------------------------
+This SF.Net email is sponsored by Sleepycat Software
+Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to deliver
+higher performing products faster, at low TCO.
+http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
