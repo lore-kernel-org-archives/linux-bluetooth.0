@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1100949891.419f2983a8527@www.bluebottle.com>
-From: jago25_98 <jago25_98@bluebottle.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Can l2ping phone but can't `sdptool browse` or discover?
+Subject: Re: [Bluez-users] Re: re: Bluetooth scan & inq finds no devices -
+	windows causing problems?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1100905623.419e7c972d0b9@www.bluebottle.com>
+References: <1100905623.419e7c972d0b9@www.bluebottle.com>
+Content-Type: text/plain
+Message-Id: <1100909057.7213.103.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,55 +19,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 20 Nov 2004 05:24:51 -0600
+Date: Sat, 20 Nov 2004 01:04:17 +0100
 
-Well I don't know. I can ping bond to the P800 now my initiating it
-from the phone end but can't discover the phone from the bluez end. I
-can even send files but I can't `sdptool browse` or `hcitool scan`:
+Hi,
 
----
-root@betty.net[/dev] # hcitool scan
-Scanning ...
-root@betty.net[/dev] # hcitool scan
-Scanning ...
-root@betty.net[/dev] # l2ping 00:0A:D9:5E:FB:FE
-Ping: 00:0A:D9:5E:FB:FE from 00:0C:41:E2:0D:BE (data size 20) ...
-0 bytes from 00:0A:D9:5E:FB:FE id 200 time 59.90ms
-0 bytes from 00:0A:D9:5E:FB:FE id 201 time 42.98ms
-0 bytes from 00:0A:D9:5E:FB:FE id 202 time 28.93ms
-0 bytes from 00:0A:D9:5E:FB:FE id 203 time 48.91ms
-4 sent, 4 received, 0% loss
-root@betty.net[/dev] # 
----
+> I dual boot windows. Could this be causing the problem?
 
-This is a problem because I can't use "sdptool browse":
+no it can't. Check if the other device is in discoverable mode.
 
----
-root@betty.net[/dev] # sdptool  browse
-Inquiring ...
-root@betty.net[/dev] # 
----
+> How do I set
+> the PIN in Windows (equivilent to /etc/bluetooth /pin) ?
 
-Again, I don't know how to get more verbose output:
----
-sdptool - SDP Tool v1.5
-Usage:
-        sdptool [options] <command> [command parameters]
-Options:
-        --help          Display help
-        --source        Specify source interface
-Commands:
-        search          Search for a service
-        browse          Browse all available services
-        add             Add local service
-        del             Delete local service
-        get             Get local service
-        setattr         Set/Add attribute to a SDP record
-        setseq          Set/Add attribute sequence to a SDP record
+The PIN helper will do this. Look at the mailing list archive for
+details.
 
-Services:
-        SP DUN LAN HSET FAX OPUSH FTRN NAP GN HID CIP CTP 
----
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
