@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] paging/inquiry during inquiry
+Subject: Re: [Bluez-users] getting bluetooth v1.2
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <30791.1111942436@www59.gmx.net>
-References: <30791.1111942436@www59.gmx.net>
+In-Reply-To: <25911.1111942263@www59.gmx.net>
+References: <25911.1111942263@www59.gmx.net>
 Content-Type: text/plain
-Message-Id: <1111943377.9195.253.camel@pegasus>
+Message-Id: <1111943294.9195.250.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,16 +18,66 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Mar 2005 19:09:37 +0200
+Date: Sun, 27 Mar 2005 19:08:14 +0200
 
 Hi Marco,
 
-> what are the requirements that remote devices can page/inquire my dongle
-> when my dongle is in a inquiry?
+> I've a couple of questions regarding bluetooth v1.2:
+> 
+> - Does the bluetooth version only depend on the firmware or the hardware
+> too?
+> Following the page http://www.holtmann.org/linux/bluetooth/csr.html I need
+> a HCI 18.x firmware to have bluetooth 1.2 support. That would mean it's
+> hardware independent.
 
-as far as I know, you can't page when you run an inquiry. But when a
-connection is established you can hold this and then page and inquire
-again.
+this depends on the features of Bluetooth 1.2 that you need. For example
+eSCO is only working with a BlueCore3 and BlueCore4 in the CSR case.
+
+> - How to upgrade a csr chip? I've d-link DBT-120 revision4. Following the
+> page http://www.holtmann.org/linux/bluetooth/features.html I need a
+> downgrade
+> to revision3 which supports bluetooth 1.2. why switched d-link back to
+> bluetooth 1.1 when they already had 1.2 on revision3?
+
+The revision on a D-Link DBT-120 is a hardware revision. It is possible
+to update the Rev. 4 dongles, but not with the btdfu program. The flash
+timing are not correct.
+
+> I read the page http://www.holtmann.org/linux/bluetooth/dfu.html and my
+> conclusion is, that there's no way to upgrade/downgrade the firmware.
+> (Because apple explains that after upgrading a device, it will no longer
+> work with non apple computers and the windows firmware upgrader is no longer
+> available.)
+
+This is non-sense. You simply need to run hid2hci if you upgrade with
+the Apple Bluetooth 1.2 firmware.
+
+> Is there another way to upgrade the firmware? I could do it with linux,
+> windows and mac, but the dongle should still work with linux afterwards...
+
+The best way is to use the CSR tools, but these tools are not public
+available. You can update a D-Link DBT-120 with a MacOS X of course. And
+if you are lucky the Linux btdfu also works.
+
+> - actually i'm interested in the inquiry with rssi.
+> marcel told in a recent email in the mailinglist that silicon dongles
+> might return wrong values (or don't support it). So, which dongles
+> do support that and are they already buyable? Currently there are only
+> bluetooth 1.1 dongles in the stores I know...
+
+The CSR BlueCore02/BlueCore3/BlueCore4 chips support inquiry with RSSI,
+but the Silicon Wave ROM chips I have seen so far have a problem with
+inquiry with RSSI event size. The Broadcom chips don't support inquiry
+with RSSI (this includes the Microsoft 2.0 dongle).
+
+> Is it still to early for bluetooth v1.2?
+
+It is actually too late, because we are moving to Bluetooth 2.0 with EDR
+support.
+
+> - what are the other benefits of bluetooth v1.2?
+
+Mostly AFH, Fast Connect and eSCO.
 
 Regards
 
