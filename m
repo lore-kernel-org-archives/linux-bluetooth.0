@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Roalt dot Com <roaltcom@xs4all.nl>
+Message-ID: <421CC068.3050202@futurlink.com>
+From: Pedro Monjo Florit <pedro.monjo@futurlink.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1109194045.3700.8.camel@archer.roalt.com>
-Mime-Version: 1.0
-Subject: [Bluez-users] MyCom dongle with Broadcom ID 0a5c:2009 works now
+Content-Type: multipart/alternative;
+ boundary="------------050400050100090203010409"
+Subject: [Bluez-users] Detect the type of remote device
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,65 +17,72 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Feb 2005 22:27:24 +0100
+Date: Wed, 23 Feb 2005 18:42:00 +0100
 
-Hi All,
+This is a multi-part message in MIME format.
+--------------050400050100090203010409
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-After some of the message in the devel-mailing list, I tried to get my
-Bluetooth USB dongle, bought at a dutch computer store 'mycom', working
-again. (In december it was not yet supported). This dongle is probably
-the same inside as the recent iogear 311 usb dongle discussed in bluez-
-devel
+Hi everybody:
 
-With Marcel Hotmann's patch 2.6.10-mh4 applied on a Fedora Core 3's
-2.6.10-1.766_FC3 kernel sources, it works! So maybe it can be added to
-the supported hardware list (Marcel?).
+While using the BlueZ API's we have discovered that it's difficult to 
+find which kind of device (brand and model) we are talking to. We are 
+writing an application that delivers an image to any device passing by, 
+taking into account its screen width, height and color depth, but 
+without any prior knowledge of the device.
 
-I can now use my Palm to view webpages via the bluetooth dongle!
+Using WAP we have access to the HTTP headers from where you can parse 
+the User Agent Profile (UAProf), but we have not found any similar 
+function in Bluetooth. In fact, there is the PnPInformation Profile, but 
+nowadays is supported in very few devices.
 
-I'm not sure why, but the hciconfig -a command does a segmentation dump
-at the end. Here is the trace when I run it from gdb:
+Is there any function or mechanism to retrieve the UAProf data (or 
+anything similar) using the BlueZ library?
 
-(gdb) run -a
-Starting program: /usr/sbin/hciconfig -a
-(no debugging symbols found)...(no debugging symbols found)...(no
-debugging symb ols found)...(no debugging symbols found)...hci0:
-Type: USB
-        BD Address: 00:02:72:C0:23:70 ACL MTU: 377:10  SCO MTU: 16:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:381671 acl:11367 sco:0 events:6509 errors:0
-        TX bytes:2103547 acl:10988 sco:0 commands:91 errors:0
-        Features: 0xff 0xff 0x0d 0x38 0x08 0x08 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'archer.roalt.com-0'
-        Class: 0x120104
+Thanks & regards,
 
-Program received signal SIGSEGV, Segmentation fault.
-0x0000002a957d3b6c in __find_specmb () from /lib64/tls/libc.so.6
-(gdb) bt
-#0  0x0000002a957d3b6c in __find_specmb () from /lib64/tls/libc.so.6
-#1  0x0000002a957ba6d2 in vfprintf () from /lib64/tls/libc.so.6
-#2  0x0000002a957c3048 in printf () from /lib64/tls/libc.so.6
-#3  0x000000552aaaee88 in ?? () from /usr/sbin/hciconfig
-#4  0x000000552aaaf8a9 in ?? () from /usr/sbin/hciconfig
-#5  0x000000552aaaf959 in ?? () from /usr/sbin/hciconfig
-#6  0x000000552aaafbfd in main () from /usr/sbin/hciconfig
+Pedro Monjo
 
-Oh, by the way, as you can see, I run 64-bit linux on an Athlon 64
-system.
 
-Thanks for the work, so far.
+--------------050400050100090203010409
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-Roalt
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Hi everybody:<br>
+<br>
+<meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+<title></title>
+While using the BlueZ API's we have discovered that it's difficult to
+find which kind of device (brand and model) we are talking to. We are
+writing an application that delivers an image to any device passing by,
+taking
+into account its screen width, height and color depth, but without any
+prior knowledge of the device.<br>
+<br>
+Using WAP we have access to the HTTP headers from where you can parse
+the User Agent Profile (UAProf), but we have not found any similar
+function in Bluetooth. In fact, there is the PnPInformation Profile,
+but nowadays is supported in very few devices.<br>
+<br>
+Is there any function or mechanism to retrieve the UAProf data
+(or anything similar) using the BlueZ library?<br>
+<br>
+Thanks &amp; regards,<br>
+<br>
+Pedro Monjo<br>
+<br>
+</body>
+</html>
 
--- 
-
------------------------------------------------------
-ATDOR Software:  atdor@atdor.com        www.atdor.com
------------------------------------------------------
-
+--------------050400050100090203010409--
 
 
 -------------------------------------------------------
