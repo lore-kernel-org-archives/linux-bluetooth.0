@@ -3,10 +3,10 @@ Subject: Re: [Bluez-users] pand freezes upon disconnect
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bora@ai.com.tr
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E1CACyf-0001js-SO@paris.servershost.net>
-References: <E1CACyf-0001js-SO@paris.servershost.net>
+In-Reply-To: <E1CABHg-0000WA-SN@paris.servershost.net>
+References: <E1CABHg-0000WA-SN@paris.servershost.net>
 Content-Type: text/plain
-Message-Id: <1095882382.6223.120.camel@pegasus>
+Message-Id: <1095876433.6223.79.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Sep 2004 21:46:22 +0200
+Date: Wed, 22 Sep 2004 20:07:13 +0200
 
 Hi,
 
-> ok, my windows client works very well after disconnect, but linux 
-> freezes.any other comments marcel? thanks very much.
+> when i use sdpd && sdptool add NAP && pand -s -M --role NAP --autozap , 
+> I search for bluetooth services from my WinXp client(with sp2).It finds 
+> linux, and then connects and bla bla bla.So, what can be the problem, 
+> why does linux freezes after windows disconnects????
 
-switch to the console or use netconsole and see if there are any oopses
-on your Linux machine. Update to the 2.6.9-rc2-bk8 kernel.
+it got a connection between the Windows machine and my Debian Laptop and
+I don't see any freezes. The laptop keeps working.
+
+And btw the command "sdptool add NAP" is not needed. The pand will
+register the SDP service record by itself.
 
 Regards
 
