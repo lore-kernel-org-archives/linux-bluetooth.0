@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: pand connection to XP SP2 fails
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1103036073.4095.101.camel@justakiss>
-References: <1103024795.4097.65.camel@justakiss>
-	 <1103024932.2143.156.camel@pegasus> <1103025459.4095.68.camel@justakiss>
-	 <cpmnro$2p5$1@sea.gmane.org>  <1103036073.4095.101.camel@justakiss>
-Content-Type: text/plain
-Message-Id: <1103107355.2143.185.camel@pegasus>
-Mime-Version: 1.0
+From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
+To: <bluez-users@lists.sourceforge.net>
+Subject: AW: [Bluez-users] Re: Toshiba and BT (SuSE 9.2)
+Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAA6tqE7hLQa0S+aqgtmuHzUAEAAAAA@t-online.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <1103024865.2143.154.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,19 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 15 Dec 2004 11:42:34 +0100
+Date: Wed, 15 Dec 2004 09:33:52 +0100
 
-Hi Erwin,
+Hi Marcel,
+I doesn't hear anything about the problem that I described.
 
-> Thanks a lot, I found out now that XP SP2 is obviously always configured
-> as PANU, I didn't find any way to change that. Maybe a different driver
-> would help to be able to configure it as NAP, I don't know.
+The AP is dund related, but I'm not able to connect via dund internet.
+What's about rfcomm? Does rfcomm understand LAP or how have I to combine
+rfcomm with dund?
 
-so doing a PANU (Linux) <-> PANU (XP SP2) connection works?
+Pleas give me a hint!!!
 
 Regards
-
-Marcel
+Peter
 
 
 
