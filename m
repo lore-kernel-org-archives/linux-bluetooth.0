@@ -1,12 +1,8 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] connection_handle info
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <cnsd34$7uc$1@sea.gmane.org>
-References: <cnsd34$7uc$1@sea.gmane.org>
-Content-Type: text/plain
-Message-Id: <1101119012.7250.98.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+From: "Sonia A." <sonia_abos@yahoo.es>
+Message-ID: <cnsd34$7uc$1@sea.gmane.org>
+Subject: [Bluez-users] connection_handle info
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +14,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Nov 2004 11:23:32 +0100
+Date: Mon, 22 Nov 2004 10:57:39 +0100
 
-Hi Sonia,
+Hi everybody!
 
-> One of the parameters in the HCI_DISCONNECT primitive is the
-> Connection_handle which should identify which connection we are trying to
-> disconnect. Does somebody know where and how I can find this
-> connection_handle
-> value?
+One of the parameters in the HCI_DISCONNECT primitive is the
+Connection_handle which should identify which connection we are trying to
+disconnect. Does somebody know where and how I can find this
+connection_handle
+value?
 
-take a look at hcitool.c and check cmd_info().
+Thanx in advance,
 
-Regards
+Sonia
 
-Marcel
 
 
 
