@@ -1,56 +1,41 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] D-BUS fixes for hcid
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@nokia.com>
+Return-Path: <Johan.Hedberg@nokia.com>
+Date: Wed, 16 Jun 2004 15:45:41 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040616124541.GA8629@kone>
-References: <20040616112702.GA898@kone> <1087385828.4309.3.camel@pegasus>
-	 <20040616115718.GA8420@kone> <1087388298.4309.10.camel@pegasus>
-	 <20040616124541.GA8629@kone>
-Content-Type: text/plain
-Message-Id: <1087391183.4309.13.camel@pegasus>
+Subject: Re: [Bluez-devel] D-BUS fixes for hcid
+Message-ID: <20040616124541.GA8629@kone>
+References: <20040616112702.GA898@kone> <1087385828.4309.3.camel@pegasus> <20040616115718.GA8420@kone> <1087388298.4309.10.camel@pegasus>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 16 Jun 2004 15:06:23 +0200
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1087388298.4309.10.camel@pegasus>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Johan,
+Hi Marcel,
 
-> I must admit that I hadn't looked into how the bluez-pin program works
-> in D-BUS mode. It seems it should be running all the time to be able to
-> receive any D-BUS requests, correct?
+I must admit that I hadn't looked into how the bluez-pin program works
+in D-BUS mode. It seems it should be running all the time to be able to
+receive any D-BUS requests, correct?
+
+The service activation feature of D-BUS which I have talked about is
+designed to solve the problem where some D-BUS service should be
+launched on-demand. I think the pin-helper falls exactly into this
+category, and would be IMHO more elegant if it wouldn't have to be
+running all the time but would be automatically launched by D-BUS daemon
+when needed.
+
+On Wed, Jun 16, 2004, ext Marcel Holtmann wrote:
+> > The second part (dbus_message_set_auto_activation) enables service
+> > activation if the PinAgent service isn't aquired by any process (i.e.
+> > the D-BUS daemon will execute the pin-helper program if needed).
 > 
-> The service activation feature of D-BUS which I have talked about is
-> designed to solve the problem where some D-BUS service should be
-> launched on-demand. I think the pin-helper falls exactly into this
-> category, and would be IMHO more elegant if it wouldn't have to be
-> running all the time but would be automatically launched by D-BUS daemon
-> when needed.
+> The hcid shouldn't execute the D-Bus PIN helper.
 
-if we change it this way, then how do the D-Bus PIN Helper get its
-information about the running X server?
+Not hcid, but the D-BUS daemon.
 
-Regards
+> From my local .xession I start "bluez-pin --dbus &" and everything works
+> fine.
 
-Marcel
+Ok. But by using D-BUS service activation, you wouldn't need to do this.
 
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by The 2004 JavaOne(SM) Conference
-Learn from the experts at JavaOne(SM), Sun's Worldwide Java Developer
-Conference, June 28 - July 1 at the Moscone Center in San Francisco, CA
-REGISTER AND SAVE! http://java.sun.com/javaone/sf Priority Code NWMGYKND
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Johan
