@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3F062FF5.7020703@superbug.demon.co.uk>
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
-MIME-Version: 1.0
-To: Cozza <ac2crp@blueyonder.co.uk>
-CC: bluez Dev <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bluetooth headset problems.
-References: <3F02DBA9.1060305@superbug.demon.co.uk>
-	<004701c34153$0e650ba0$fd02a8c0@troll>
-In-Reply-To: <004701c34153$0e650ba0$fd02a8c0@troll>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] Problem with security mode 3
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Max Krasnyansky <maxk@qualcomm.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <5.1.0.14.2.20030703173538.063183a8@unixmail.qualcomm.com>
+References: <5.1.0.14.2.20030703173538.063183a8@unixmail.qualcomm.com>
+Content-Type: text/plain
+Message-Id: <1057279722.27638.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -21,43 +20,52 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 05 Jul 2003 02:55:01 +0100
+Date: 04 Jul 2003 02:48:35 +0200
 
-Cozza wrote:
-> Hi,
-> 
-> I believe that there is a problem with the hci-usb driver. I performed some
-> brief investigations which I posted earlier to this mailing list.
-> 
-> Are you using a USB device? I've used the same code and Bluetooth headset
-> with a PC card Bluetooth adaptor and everything worked fine.
-> 
-> Both Bluetooth devices use the CSR chipset, but the UART one using the BCSP
-> protocol works whereas the USB one misses half the data packets, as you
-> suggest.
-> 
-> My earlier message was posted on 20th June, entitled "SCO problem with USB
-> devices" - I'd be interested to see if your problem looks the same. I think
-> it possibly is, from what you've posted.
-> 
-> I haven't yet got around to investigating the problem with the USB stack -
-> but I have the same problem, if it helps! If you are in a rush, then PC card
-> devices seem to work at the moment...
-> 
-> Regards,
-> 
-> Colin
-> 
-> 
-> 
-> 
-I have made some progress. I can now record audio from the headset 
-without it loosing any samples. I.e. I can record 8 bit PCM at 8000hz 
-and it sounds fine. Before it was loosing samples and recording at more 
-like 4000hz.
-Once I get playback to work, I will post a patch to this list.
-Cheers
-James
+Hi Max,
+
+> >there is a little problem with local devices in security mode 3
+> >(hciconfig hci0 auth). If you have already paired two devices, but you
+> >have used your dongle within another OS and paired it again to the same
+> >remote device. The local link key stored by the hcid is outdated. But
+> >this can not be known by the hcid and so it sends it on the next
+> >connection request. The remote device will deny the connection because
+> >of the wrong link key, but the error you get is not an authentication
+> >failure. You get the timeout error from the L2CAP layer.
+> >
+> >        < HCI Command: Write Authentication Enable(0x03|0x0020) plen 1
+> >          01 
+> >        > HCI Event: Command Complete(0x0e) plen 4
+> >          01 20 0C 00 
+> >        < HCI Command: Create Connection(0x01|0x0005) plen 13
+> >          FD 06 81 0E 04 00 18 CC 01 00 00 00 01 
+> >        > HCI Event: Command Status(0x0f) plen 4
+> >          00 01 05 04 
+> >        > HCI Event: Link Key Request(0x17) plen 6
+> >          FD 06 81 0E 04 00 
+> >        < HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
+> >          FD 06 81 0E 04 00 38 06 D7 5D E2 DD FD 10 88 EF 5A 65 66 C2 
+> >          80 26 
+> >        > HCI Event: Connect Complete(0x03) plen 11
+> >          05 00 00 FD 06 81 0E 04 00 01 00 
+> >
+> >I have looked at hci_conn_complete_evt() and l2cap_connect_cfm() and the
+> >code seems correct to me.
+> >
+> >If you try to connect again after the timeout, you will get a "Operation
+> >already in progress" error.
+> >
+> >Where is the problem?
+> Did you pull all of my latest fixes ? That bug was introduced by 
+> SO_LINGER patch (bt_sock_wait_state() to be more specific). I fixed it 
+> some time ago (should be in -pre2). The bug is unrelated to security 
+> and stuff and affects connect in general (ie it'd timeout instead of an error).
+
+it is still present in 2.4.22-pre2 :(
+
+Regards
+
+Marcel
 
 
 
