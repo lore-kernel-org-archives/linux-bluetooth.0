@@ -1,14 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] new bthid and switching off sensor in mouse???
-References: <200404021906.54779.cijoml@volny.cz> <200404030054.21634.cijoml@volny.cz> <1080964638.3456.8.camel@pegasus>
-In-Reply-To: <1080964638.3456.8.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200404031108.59037.cijoml@volny.cz>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200404030054.21634.cijoml@volny.cz>
+References: <200404021906.54779.cijoml@volny.cz>
+	 <200404022335.41175.cijoml@volny.cz> <1080945468.3456.1.camel@pegasus>
+	 <200404030054.21634.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1080964638.3456.8.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,29 +20,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 3 Apr 2004 11:08:58 +0200
+Date: Sat, 03 Apr 2004 05:57:18 +0200
 
-Dne so 3. dubna 2004 05:57 Marcel Holtmann napsal(a):
-> Hi Michal,
->
-> > cvs up -D "23 days ago" libs2 utils2
->
-> the time range of 23 days was here important, because I didn't know
-> about what source you were talking ;)
+Hi Michal,
 
-OK :)
+> cvs up -D "23 days ago" libs2 utils2
 
->
-> Actually I diffed them and for the library the only change I see is the
-> support for big endian. The change in the bthid program was only for the
-> udev created device node of uinput.
->
-> You don't tried the bthidd or bthidc program, do you?
+the time range of 23 days was here important, because I didn't know
+about what source you were talking ;)
 
-No. It strange, I tried it again and problem is still here? Can't it be 
-problem in endian changes in libs?
+Actually I diffed them and for the library the only change I see is the
+support for big endian. The change in the bthid program was only for the
+udev created device node of uinput.
 
-Michal
+You don't tried the bthidd or bthidc program, do you?
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
