@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pierre N <pierren@mac.com>
-To: bluez-users@lists.sourceforge.net
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-m/gl3xKX49HU+TSjVJd0"
-Message-Id: <1082711899.23022.10.camel@localhost>
+Subject: Re: [Bluez-users] sonyericsson t630 info
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Thomas Chiverton <thomas.chiverton@bluefinger.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200404230941.21139@moveAlongNothingToSeeHere>
+References: <200404142157.41467.cijoml@volny.cz>
+	 <200404230941.21139@moveAlongNothingToSeeHere>
+Content-Type: text/plain
+Message-Id: <1082710253.23959.102.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] bluez-utils2: Bluetooth header files not found
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,47 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Apr 2004 11:18:19 +0200
+Date: Fri, 23 Apr 2004 10:50:53 +0200
 
+Hi Thomas,
 
---=-m/gl3xKX49HU+TSjVJd0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+> > sending info from SE t630 for including into your list:
+> 
+> There is a list somewhere ?
 
-Hi,
+http://www.holtmann.org/linux/bluetooth/features.html
 
-Trying to compile bluez-utils2 out from CVS. I get this error message on
-./configure:
+Regards
 
-checking for unistd.h... yes
-checking bluetooth/bluetooth.h usability... no
-checking bluetooth/bluetooth.h presence... no
-checking for bluetooth/bluetooth.h... no
-configure: error: Bluetooth header files not found
+Marcel
 
-I tried ./configure --without-bluetooth
-./configure --with-bluetooth=3D/usr/src/kernel-headers-2.4.22 I always get
-the same error message.
-
-Using 2.4.22 on powerpc. What else do you guys need?
-
---
-Pierre
-
-
---=-m/gl3xKX49HU+TSjVJd0
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQBAiN9bZkVEuKKlE7gRApyqAKDMWy7VI2Zd+VfnPU34OzUZHYQ9wgCgrvWr
-N0CD6/hjUtL79+its/Xvq28=
-=hL5U
------END PGP SIGNATURE-----
-
---=-m/gl3xKX49HU+TSjVJd0--
 
 
 
