@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
+Message-ID: <406C8B62.4000802@netpeople.ch>
+From: Thomas Lenherr <lenherr@netpeople.ch>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200404020850.11459.cijoml@volny.cz>
-Subject: [Bluez-users] can't compile bluez-utils-2.6
+To: bluez-users@lists.sourceforge.net
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigC6BD34895AF36B14F4BF4222"
+Subject: [Bluez-users] Once again some media-keys from logitech...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,27 +17,60 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 2 Apr 2004 08:50:10 +0200
+Date: Thu, 01 Apr 2004 23:36:34 +0200
 
-Hi Marcel,
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigC6BD34895AF36B14F4BF4222
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-make uninstall in bluez-sdp-1.5 and then make in bluez utils-2.6 causes=20
-errors:
+Hi,
+because quite all of my media-keys from my logitech elite keyboard did 
+not work,
+I started googling and found ... nothing (almost). So I started 
+searching the sources
+and came to parser.c where I found the producer of these nice "unknown 
+consumer"
+messages. As somebody else already told in this forum, the keyboard 
+seems to
+have all the codes wrong by 1 (or there's something wrong with the 
+source, but
+that doesn't matter), so I just decided to place a nice -1 at the right 
+place et voila,
+all these messages where gone in the log (except for FLock and the 
+change user-button,
+but that's something else). After that I lived happily ever after.
 
-gcc -DPACKAGE_NAME=3D\"\" -DPACKAGE_TARNAME=3D\"\" -DPACKAGE_VERSION=3D\"\"=
-=20
-=2DDPACKAGE_STRING=3D\"\" -DPACKAGE_BUGREPORT=3D\"\" -DPACKAGE=3D\"bluez-ut=
-ils\"=20
-=2DDVERSION=3D\"2.6\" -DYYTEXT_POINTER=3D1  -I. -I.    -I/usr/include  -Wal=
-l -g -O2=20
-=2Dc sdptool.c
-sdptool.c:36:27: bluetooth/sdp.h: nen=ED souborem ani adres=E1=F8em
-sdptool.c:37:31: bluetooth/sdp_lib.h: nen=ED souborem ani adres=E1=F8em
-sdptool.c:38:36: bluetooth/sdp_internal.h: nen=ED souborem ani adres=E1=F8em
-sdptool.c:45: error: parse error before "bdaddr_t"
+Not really... Well, the messages in the log were gone, but neither 
+"scankey -s" nor "xev"
+were somehow interested in my banging actions on my keyboard.
 
+So, once for short, here are my three questions:
+1) Why are these keys lost somewhere in the kernel? (At least I think 
+it's there)
+2) If I'd like a working FLock-LED, how should I do this?
+3) And why the hell is my key for the "anti-{" not working (although 
+this one IS
+generating an event, but "xev" tells me, this button is for printing...)
 
-Michal
+Thanks a lot and good night
+    Thomas Lenherr
+
+--------------enigC6BD34895AF36B14F4BF4222
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iD8DBQFAbItz3E1pPHX30VoRAjXaAJ0ftjFISLIy5iBBTQBJvB3EDyZ6HgCePMcA
+SES1AlIOeaD4T8bEqnrKAd0=
+=xO55
+-----END PGP SIGNATURE-----
+
+--------------enigC6BD34895AF36B14F4BF4222--
 
 
 -------------------------------------------------------
