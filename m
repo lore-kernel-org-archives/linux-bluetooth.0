@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Mauro Tortonesi <mtortonesi@ing.unife.it>
-To: jt@hpl.hp.com, Jean Tourrilhes <jt@bougret.hpl.hp.com>
-Subject: Re: [Bluez-devel] Re: bluez & qos
-Cc: BlueZ mailing list <bluez-devel@lists.sourceforge.net>
-References: <20040204015825.GA2217@bougret.hpl.hp.com> <200402041223.29088.mtortonesi@ing.unife.it> <20040204174648.GA16590@bougret.hpl.hp.com>
-In-Reply-To: <20040204174648.GA16590@bougret.hpl.hp.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200402051146.55939.mtortonesi@ing.unife.it>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jean Tourrilhes <jt@hpl.hp.com>
+Cc: Max Krasnyansky <maxk@qualcomm.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040204175832.GB16590@bougret.hpl.hp.com>
+References: <20040204015825.GA2217@bougret.hpl.hp.com>
+	 <1075879044.13285.151.camel@pegasus>
+	 <20040204175832.GB16590@bougret.hpl.hp.com>
+Content-Type: text/plain
+Message-Id: <1075924727.2783.47.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: L2CAP non-blocking socket nasty race conditions
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,51 +21,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 5 Feb 2004 11:46:55 +0100
+Date: Wed, 04 Feb 2004 20:58:47 +0100
 
-On Wednesday 04 February 2004 18:46, Jean Tourrilhes wrote:
-> On Wed, Feb 04, 2004 at 12:23:29PM +0100, Mauro Tortonesi wrote:
-> > hi to everybody,
-> >
-> > 	i was trying to do some qos setup tests with bluez and i have seen that
-> > there is barely no qos support in bluez. it would be nice to develop an
-> > ioctl(2)-based extension to set up qos on bluez sockets. i have just
-> > started working on the code. marcel, would you be intested in having qos
-> > support for bluez?
-> >
-> > BTW: i have seen that Jean Tourrilhes (included in cc) has been working
-> > on qos with CSR chips a while ago. jean, since i have seen no
-> > announcements on this list i suppose that you haven't production-quality
-> > code adding qos support for bluez...
->
-> 	My code just open a HCI socket and send HCI commands. The HCI
-> commands are pretty straightforward, well documented and do everything
-> you want, so I don't see the point in adding weird ioctls. The main
-> issue I have with ioctls is that they are blocking, so that's why my
-> code use HCI socket for everything (including Inquiry).
+Hi Jean,
 
-i think the "open a HCI socket and send HCI commands" approach (which indeed 
-has many advantages) is a bit too low-level to be used in standard 
-applications as a way for setting QoS over Bluez.
-since QoS is semantically an attribute of a connection, it would be nice to 
-have ioctl(2) commands for setting QoS parameters on a given connection.
+> 	No, the code is not that simple and I don't really want it
+> out. However, I think any trivial program using non-blocking sockets
+> will show that.
+> 	Anyway, I think the bug report was detailed enough.
 
-> 	Not that the main issue will be firware support. For example
-> the QoS feature I needed is not implemented in the CSR firmware.
+code is always better ;) I have written some stuff by myself now.
 
-do you mean that most of the firmware of the Bluetooth chips in commerce do 
-not support/implement HCI QoS commands (such as OGF 0x0002 OCF 0x0007)? what 
-version of CSR firmware are you talking about?
+> 	After around 500 iterations, it will succeed. I guess it
+> depend on your CPU speed.
 
--- 
-Aequam memento rebus in arduis servare mentem...
+It seems that we signal the socket readable after the L2CAP connect
+req/resp is handled. But the socket is first usable after we had a
+two-way L2CAP config req/resp for MTU negotiation. And this takes some
+time depending on if we have to do a role change, authenticate etc.
 
-Mauro Tortonesi                 mtortonesi@ing.unife.it
-                                mauro@deepspace6.net
-                                mauro@ferrara.linux.it
-Deep Space 6 - IPv6 with Linux  http://www.deepspace6.net
-Ferrara Linux User Group        http://www.ferrara.linux.it
+> 	Yes, listen() will not block. However I also want the accept()
+> to be non-blocking, because I don't want it to prevent it servincing
+> my other socekts. What's the point of writting all the rest of my code
+> non-blocking if accept() take 100ms to complete ? The only way to get
+> a non-blocking accept() is to have the listen socket in non-blocking
+> mode.
 
+Actually I don't know how to change this and I even don't know if this
+is a good idea, because the return code of accept() seems right.
+
+Comments?
+
+> 	The sendmsg() problem is on the other side, the client, so a
+> simply connected socket. But I've got a much harder time to reproduce
+> it.
+
+Haven't looked at it. We need a reliable way do reproduce it.
+
+Regards
+
+Marcel
 
 
 
