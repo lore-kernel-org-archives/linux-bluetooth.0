@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Ben Wilson <bwilson@yooser.org>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] bthid,ppc,sdp
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ben Wilson <bwilson@yooser.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040519212124.GI15386@stag.mark-and-erika.com>
+Message-ID: <20040519212124.GI15386@stag.mark-and-erika.com>
 References: <878yfp4bmz.fsf@handgranat.org>
-	 <20040519212124.GI15386@stag.mark-and-erika.com>
-Content-Type: text/plain
-Message-Id: <1085002651.4327.82.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <878yfp4bmz.fsf@handgranat.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,31 +17,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 May 2004 23:37:32 +0200
+Date: Wed, 19 May 2004 17:21:24 -0400
 
-Hi Ben,
-
-> I did try patch-2.6.6-mh1, but get the following errors:
+* On Wed, May 19, 2004 at 12:24:20AM +0200, I received from Sunnan:
+> I've been away from the "under-the-cover" part of geekdom for a while,
+> including bluez-user, but on whim decided to check out the new sdp
+> from cvs.
 > 
-> net/built-in.o(.text+0x71360): In function `hid_output_report':
-> : multiple definition of `hid_output_report'
-> drivers/built-in.o(.text+0xf23c0): first defined here
-> net/built-in.o(.text+0x715f0): In function
-> `hid_find_field_in_report':
-> : multiple definition of `hid_find_field_in_report'
-> drivers/built-in.o(.text+0xf2650): first defined here
-> net/built-in.o(.text+0x714a8): In function `hid_find_field':
-> : multiple definition of `hid_find_field'
-> ...(etc.)
+> I just wanted to say that my mouse (Apple Wireless Mouse) works fine
+> on my iBook now, and I wanted to say thanks, and I wanted to say that
+> I'm sorry that I couldn't be of more help.
 
-build the hidp support as module, because it looks like that some
-function will collide with the usbhid driver.
+What kernel and bluez-libs/utils are you using?
 
-Regards
+I am still having the same problem with bthid dying when I try and
+connect my MS bluetooth mouse with a PowerBook running
+2.6.6-rc2.
 
-Marcel
+I did try patch-2.6.6-mh1, but get the following errors:
 
+net/built-in.o(.text+0x71360): In function `hid_output_report':
+: multiple definition of `hid_output_report'
+drivers/built-in.o(.text+0xf23c0): first defined here
+net/built-in.o(.text+0x715f0): In function
+`hid_find_field_in_report':
+: multiple definition of `hid_find_field_in_report'
+drivers/built-in.o(.text+0xf2650): first defined here
+net/built-in.o(.text+0x714a8): In function `hid_find_field':
+: multiple definition of `hid_find_field'
+...(etc.)
 
+Any ideas?
+ 
+> Thanks a bunch!
+> 
+> Sunnan
+
+Thanks!
+Ben
 
 
 -------------------------------------------------------
