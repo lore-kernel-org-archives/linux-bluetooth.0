@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: dwillis@stx.rr.com
-To: bluez-users@lists.sourceforge.net
-Message-ID: <6605513.1079531506650.JavaMail.teamon@b112.teamon.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] network quits working with x
+Subject: Re: [Bluez-users] bthid and battery condition and syslog
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403171320.24816.cijoml@volny.cz>
+References: <200403171259.22015.cijoml@volny.cz>
+	 <1079525750.3301.14.camel@pegasus>  <200403171320.24816.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1079527136.3301.21.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,85 +19,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Mar 2004 07:52:57 -0600 (CST)
+Date: Wed, 17 Mar 2004 13:38:56 +0100
 
-can anyone help me?  i sent this saturday and haven't had any 
-responses.  thanks.
+Hi Michal,
 
-i have a sony ericsson t610 phone from t-mobile (usa) and the 
-internet works just fine, but only as long as i'm at the console.
-when i use netscape, mozilla, konquerer, or anything else i soon loose 
-the ability to transmit and receive any data, even though the 
-connection is still there.  anyone have any clues?
+> I better prefer to be bthid abble receive tcp connections a reports via it and 
+> not into syslog.
+> It would be used then with some kind of graphical output like mrtg or rrdtool
+> as soon as I monitor UPS battery
 
-facts about my system:
+the full plan is to have a kernel integration into hiddev and then you
+can hook up to specific HID reports and do what you want with it. But I
+don't think this would ever be possible with the current bthid.
 
-Linux version 2.4.20-highmem-ll-pe-mh14-xp (root@tiburon) (gcc version 
-3.2.3 20030422 (Gentoo Linux 1.4 3.2.3-r1, propolice)) #2 Sat Feb 14 
-14:25:30 CST 2004
+Regards
 
-XFree86 Version 4.3.0
+Marcel
 
-d-link dbt-120 bluetooth usb dongle.
 
-AMD Athlon(tm) XP 2400+
-
-how i connect:
-# modprobe hci_usb
-# modprobe uhci
-# hciconfig hci0 up
-# hciconfig
-# rfcomm bind 0 00:0A:D9:7B:1F:EA 1
-# pppd call gprs2
-
-pppd scripts:
-
-/etc/ppp/peers/gprs2:
---
-/dev/rfcomm0 57600
-connect '/usr/sbin/chat -v -f /etc/ppp/peers/chat-gprs2'
-noauth
-defaultroute
-debug
---
-
-/etc/ppp/peers/chat-gprs2:
---
-TIMEOUT         5
-ECHO            ON
-ABORT           '\nBUSY\r'
-ABORT           '\nERROR\r'
-ABORT           '\nNO ANSWER\r'
-ABORT           '\nNO CARRIER\r'
-ABORT           '\nNO DIALTONE\r'
-ABORT           '\nRINGING\r\n\r\nRINGING\r'
-#''              \rAT
-#TIMEOUT         20
-#OK              ATE1
-#OK              'AT+cgdcont=1,"IP","internet2.voicestream.com"'
-#OK              ATD*99***2#
-#CONNECT
-
-'' AT
-TIMEOUT 240
-OK ATE0
-OK ATV1
-OK AT+CGMI
-OK AT+CIMI
-#OK 'AT+CGDCONT=1,"IP","216.155.175.170"'
-OK AT+CGQREQ=1,0,0,0,0,0
-OK AT+CGQMIN=1,0,0,0,0,0
-OK ATDT*99***2#
-TIMEOUT 22
-CONNECT ""
---
-
-thanks.
-
--dave
--- 
-(I*NT*p)    42.99803% - Major Geek    102 of 114:
-computers let you take laziness to a whole new level. - mrak
 
 
 -------------------------------------------------------
