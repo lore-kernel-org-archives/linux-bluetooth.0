@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Achim Bohnet <ach@mpe.mpg.de>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200404292230.08106.ach@mpe.mpg.de>
-Subject: [Bluez-users] ciptool setuid
+From: "Nicholas A. Preyss" <nalp@gmx.net>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Problem with Logitech MX 900 and Apple keyboard
+Message-ID: <20040429205222.GA8324@gmx.net>
+References: <200404282247.31825.matiasbrutti@ciudad.com.ar> <20040429093614.GA3992@gmx.net> <200404291209.16830.matiasbrutti@ciudad.com.ar>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <200404291209.16830.matiasbrutti@ciudad.com.ar>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,40 +17,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 29 Apr 2004 22:30:07 +0200
+Date: Thu, 29 Apr 2004 22:52:22 +0200
 
-Hi,
+On  0, Matias Pablo Brutti <matiasbrutti@ciudad.com.ar> wrote:
+> On Thursday 29 April 2004 06:36, Nicholas A. Preyß wrote:
+> > On  0, Matias Pablo Brutti <matiasbrutti@ciudad.com.ar> wrote:
+> > > I'm running Mandrake 10.0 official with a 2.6.3-7 ... I just bougth a
+> > > MX900 and the apple bluetooth keyboard .. the mouse ... was working when
+> > > I plugged .. like if was a plug and play devide . I didn't have to
+> > > install anything .. although .. i did not have any bluetooth installatin
+> > > and if I serch for bluetooth devices . it says that I have no devides ..
+> > > I'm pretty new on the subject .. and I think I have to load modules to
+> > > the kernel .. which ones should I load for my Logitech hub .. so It will
+> > > be able to recognize all my bluetooth .. When I try to start bthid it
+> > > says that I have no uimput .. or some modules .. what should I do .. or
+> > > where should I read .. to get my thing working ... I really like
+> > > bluetooth .. and I would like to work on linux too
+> > > if you need more info so you can help please email me ...
+> >
+> > It sounds like your bluetooth chip is equipped with a hid proxy.
+> > Look here:
+> > http://www.holtmann.org/linux/bluetooth/hid.html
+> > Look in the CVS "bluez/utils2/hid/" there is a hid service utility.
+> 
+> Thanks for.. the info is very helpful Now I understand a little more on the 
+> HID implementation . that should be step 2  I think .. .. the problems .. is 
+> that ... I haven been able to figure out .. step one . load some module . so 
+> when I do hcitool scan .... or  use some tool for scanning .  It will 
+> actually appear something . rigth now .. nothing appears not even the mouse 
+> that is working ... 
+> Thanks a lot . Nicholas . the info was extremelly helpful .. now I get a lot 
+> more than before .. :)
 
-In debian members of group dip and dialout and use modem/isdn devices.
-Unfortunately it looks like that one need to be root to run ciptool
-and make the isdn controler via bluetooth available.
+I have no clue which of your problems are solved, but at least you seem
+more happy :). Maybe you can give me a some more consistent and ordered summary 
+of what problems you still face. And we will be glad to help you.
 
-Question: Are there other methods to enable members of group dialout
-to use ciptool that making it setuid root?  If not is it safe to
-install ciptool by default like
+nicholas
 
-=2Drwsr-x---    1 root     dialout      8368 2004-01-26 23:22 /usr/bin/cipt=
-ool
-
-So all group member of dialout can run it.  All capi devices are
-accessible by dialout members:
-
-# l /dev/capi*
-crw-rw----    1 root     dialout   68,   0 2004-03-22 14:00 /dev/capi20
-crw-rw----    1 root     dialout   68,   1 2004-03-22 14:00 /dev/capi20.00
-crw-rw----    1 root     dialout   68,   2 2004-03-22 14:00 /dev/capi20.01
-
-=46rom a look at the usage/source it seem that ciptool really only allows
-to 'create'/'release' a capi controlers.
-
-Achim
-=2D-=20
-  To me vi is Zen.  To use vi is to practice zen. Every command is
-  a koan. Profound to the user, unintelligible to the uninitiated.
-  You discover truth everytime you use it.
-                                      -- reddy@lion.austin.ibm.com
-
-
+P.S.: Output of lsmod and hciconfig would be helpful. 
 
 
 -------------------------------------------------------
