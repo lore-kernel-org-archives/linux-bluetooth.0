@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth Synchronization on Nokia (3650)
+Subject: Re: [Bluez-users] Pin helper modified but RFCOMM Cannot connect
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <OF5B3D8884.B77486D9-ON85256FD7.007C2BAB-85256FD7.007C5FC0@alps.com>
-References: 
-	 <OF5B3D8884.B77486D9-ON85256FD7.007C2BAB-85256FD7.007C5FC0@alps.com>
+In-Reply-To: <f16b04cf05033023575eec1542@mail.gmail.com>
+References: <f16b04cf05033023575eec1542@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1112554808.8263.15.camel@pegasus>
+Message-Id: <1112554449.8263.5.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,25 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 03 Apr 2005 21:00:08 +0200
+Date: Sun, 03 Apr 2005 20:54:09 +0200
 
-Hi Scott,
+Hi Hariharan,
 
-> A while back I wrote an application that syncs my Sony Ericcson phone
-> via IrMC synchronization.  Recently I purchased a Nokia 3650 thinking
-> that it supported same IrMC Synchronization profile over Bluetooth (I
-> guess I just based that thinking on Apple iSync supporting the 3650,
-> because I though that iSync only used IrMC sync).  Well I was
-> wrong :-) ...
+> Pin helper is modified as
 > 
-> Does anyone know how synchronization is done over bluetooth on this
-> nokia 3650 (and other symbian nokias?).  It must be possible, iSync is
-> doing it...  some kind of OBEX command ? or something over
-> tcp/ip/network ? 
+> #!./bin/sh
+> PIN:1324
+> 
+> Now i try to connect with RFCOMM 
+> getting error of
+> Cannot connect RFCOMM socket: connection refused
+> 
+> please advise to fix it 
 
-as far as I know, you need the mRouter (PPP over RFCOMM) for syncing the
-old Symbian based phones via SyncML. For the newer ones it seems that
-they started using SyncML over OBEX.
+see previous email and use sdptool to find the correct channel number.
 
 Regards
 
