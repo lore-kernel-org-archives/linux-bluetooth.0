@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41FD9B51.2090306@cloutier-vilhuber.net>
-From: Lars Vilhuber <lists.all@cloutier-vilhuber.net>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] experience with TDK PCMCIA Bluetooth Card (goBlue)?
+Subject: Re: [Bluez-users] TPL is not changing
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050131015929.GC30604@snoopy.src.ricoh.co.jp>
+References: <20050130174730.3a78367f.j0006@stu.matsue-ct.jp>
+	 <1107095863.24890.0.camel@pegasus>
+	 <20050131015929.GC30604@snoopy.src.ricoh.co.jp>
+Content-Type: text/plain
+Message-Id: <1107139071.8384.42.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,38 +20,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 21:43:29 -0500
+Date: Mon, 31 Jan 2005 03:37:51 +0100
 
-Question:
-    after searching the list, I see few comments on the TDK PCMCIA 
-Bluetooth card. Currently, mine is *not* working, but before I go 
-through (upgrade kernel, patch kernel, etc.) sequence, I would like to 
-know if anybody has actually got it working.
+Hi,
 
-Symptoms are a collection of
+> the HAGIWARE SYS-COM card is a pretty old Ericsson based card and it
+> doesn't support TPL. See the output of hciconfig:
+> 
+> hci0:   Type: PCCARD
+>         BD Address: 00:90:02:05:1D:56 ACL MTU: 672:8 SCO MTU: 64:0
+>         Features: 0xff 0xfb 0x01 0x00 0x00 0x00 0x00 0x00
+>                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
+>                 <timing accuracy> <role switch> <hold mode> <sniff mode>
+>                 <park state> <RSSI> <SCO link> <HV2 packets> <HV3 packets>
+>                 <u-law log> <A-law log> <CVSD>
 
-bcsp_recv: Short BCSP packet
-bcsp_recv: Out-of-order packet arrive
-bcsp_recv: Error in BCSP hdr checksum
+if anyone owns this card and doesn't need it anymore, please donate it
+to me. I collect these old Bluetooth devices. This applies to any old
+Bluetooth hardware that is no longer in use.
 
-which I have seen reported for some cards before, but for which I 
-haven't a solution reported.
+Regards
 
-The above occurs for any data transfer (OBEX or PPP) of any considerable 
-size, and culminates in the driver "resetting" the card, and the 
-transfer failing.
-
-This is irrespective of using 'hciattach ttyS14 <speed>' or 'hciattach 
-ttyS14 bcsp' or 'hciattach ttyS14 tdk'.
-
-OS/Version:
-SuSE 9.2, kernel 2.6.8-24.11-default #1 Fri Jan 14 13:01:26
-bluez-utils-2.10-15
-bluez-libs-2.10-2
+Marcel
 
 
--- 
-Lars Vilhuber                    lists.all@cloutier-vilhuber.net
 
 
 -------------------------------------------------------
