@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problem with read on RFCOMM Sockets
-From: Marcel Holtmann <marcel@holtmann.org>
-To: ionut dediu <dyonutz@yahoo.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040616111157.53863.qmail@web50904.mail.yahoo.com>
-References: <20040616111157.53863.qmail@web50904.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1087385534.4309.0.camel@pegasus>
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20040616112702.GA898@kone>
 Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="4Ckj6UjgE2iN1+kY"
+Subject: [Bluez-devel] D-BUS fixes for hcid
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,25 +15,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 16 Jun 2004 13:32:15 +0200
+Date: Wed, 16 Jun 2004 14:27:02 +0300
+
+
+--4Ckj6UjgE2iN1+kY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
 Hi,
 
-> Here is the source code. For testing the receiving of
-> data I tried commenting the select loop, and do just
-> receiveData, and I get the same results: read returns
-> the correct number of bytes, but in the buffer is
-> copied just one byte of data. Please tell me if I'm
-> doing smth wrong. Thanks a lot.
+There are some problems with the current D-BUS pin-request handling in
+hcid. The attached patch tries to address those.
 
-your buffer should be "unsigned char" and you shouldn't use strlen() to
-check to length of your buffer. Rely on the return value of read().
+Also, the bluez-pin package will need to provide a D-BUS service file
+(bluez.service) so that the D-BUS daemon can activate it when needed.
+This file goes usually in /usr/lib/dbus-1.0/services and it's contents
+should be something like the following:
 
-Regards
+[D-BUS Service]
+Name=org.bluez.PinAgent
+Exec=/usr/bin/bluez-pin
 
-Marcel
+You'll also need the following line in /etc/dbus-1/system.conf (at least
+the debian package of D-BUS doesn't have it):
+<servicedir>/usr/lib/dbus-1.0/services</servicedir>
 
+br,
+Johan
 
+--4Ckj6UjgE2iN1+kY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="hcid-dbus.diff"
+
+--- dbus.c.orig	2004-06-16 13:57:51.000000000 +0300
++++ dbus.c	2004-06-16 14:05:51.000000000 +0300
+@@ -75,7 +75,8 @@
+ 
+ 	message = dbus_pending_call_get_reply(call);
+ 
+-	if (dbus_message_is_error(message, WRONG_ARGS_ERROR))
++	if (message == NULL ||
++	    dbus_message_get_type(message) == DBUS_MESSAGE_TYPE_ERROR)
+ 		goto error;
+ 
+ 	dbus_message_iter_init(message, &iter);
+@@ -131,6 +132,8 @@
+ 	dbus_message_iter_append_byte_array(&iter,
+ 			(unsigned char *) &ci->bdaddr, sizeof(ci->bdaddr));
+ 
++	dbus_message_set_auto_activation(message, TRUE);
++
+ 	if (dbus_connection_send_with_reply(connection, message,
+ 						&pending, TIMEOUT) == FALSE) {
+ 		syslog(LOG_ERR, "D-BUS send failed");
+
+--4Ckj6UjgE2iN1+kY--
 
 
 -------------------------------------------------------
