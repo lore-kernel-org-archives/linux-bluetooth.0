@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <OF0770A93A.BF533453-ONC1256F64.002DB738-C1256F64.002F0A9E@isbac.com>
-From: Marius Schaefer/Camberg/ISBAC <Marius.Schaefer@ISBAC.COM>
-Content-Type: text/plain; charset="US-ASCII"
-Subject: [Bluez-users] remove pairing with device?
+Subject: Re: [Bluez-users] HCI send and receive
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <2de46576041207221162e8ba29@mail.gmail.com>
+References: <2de46576041207211852e826cc@mail.gmail.com>
+	 <1102484088.9988.24.camel@pegasus>
+	 <2de46576041207221162e8ba29@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1102491144.9988.28.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +20,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Dec 2004 09:33:49 +0100
+Date: Wed, 08 Dec 2004 08:32:24 +0100
 
-Hello list, 
+Hi Manjunath,
 
-I've gotten BlueZ and OpenObex to work, so I can send files from my phone 
-to my linux box. I read the pin from /etc/bluetooth/pin. 
-That works very well. But once the phone is paired with Bluez, I can 
-change the pin of BlueZ, but the phone stays paired and won't ever ask for 
-the new pin. When I delete the pairing on the phone, it will ask for the 
-new pin, I need to delete the pairing on the BlueZ side. Is that possible?
+> > > I want to set up an HCI connection between 2 dongles, see the default
+> > > packet type at connection, then send data. Now keeping the existing
+> > > connection, I want to change packet type and  then send data....Is
+> > > this possible????
+> > 
+> > I don't see what you expect from this, but it is possible.
+> 
+> What i am expecting is a measure of varying throughput with change in
+> packet type.
 
-Thanks
-Marius
+I don't see for what this will be good, but you can simply set the same
+packet type on both sides with hciconfig and then use l2test or rctest
+for measuring. Or create a PAN and use standard IP tools.
+
+> > > Should I write small programs just to send and receive data with known
+> > > payload....then I can establish a connection using hcitool and use
+> > > these programs to send and receive data passing the connection handle
+> > > as the parameter. Is this right??
+> > 
+> > All API commands you need are there and you can always use the HCI raw
+> > socket. It is a H:4 based, one command or data packet per read/write
+> > interface. 
+> I am ignorant about this.....are you saying HCI raw socket provides
+> the one command or data packet per read/write interface....can you
+> elaborate...
+
+It is as I said. You can write/read H:4 on a HCI raw socket.
+ 
+> And it is a good idea to send L2CAP conform ACL data packets.
+> Does this mean it would be a L2CAP connection as you send some chips
+> expect L2CAp frames???
+
+I think some chips do and actually also the remote Bluetooth stack might
+expect L2CAP.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
