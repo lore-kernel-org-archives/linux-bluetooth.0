@@ -1,9 +1,9 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050129055215.33954.qmail@web60901.mail.yahoo.com>
+Message-ID: <20050129053222.47103.qmail@web60910.mail.yahoo.com>
 From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
-Subject: Re: [Bluez-users] rfcomm question 2-AT command
+Subject: Re: [Bluez-users] rfcomm question 1
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1106940245.10580.2.camel@pegasus>
+In-Reply-To: <1106933775.9644.0.camel@pegasus>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=big5
 Sender: bluez-users-admin@lists.sourceforge.net
@@ -17,201 +17,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 Jan 2005 13:52:15 +0800 (CST)
+Date: Sat, 29 Jan 2005 13:32:22 +0800 (CST)
 
 Hi Marcel!
-    When I ran my main program with "hcidump -t"
-running in other terminal, the following occurs:
-When I choose an item and then the other menu, for
-which the items are found in MySQL DB, is generated,
-the hcidump -t shows
-1106977607.097970 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977607.099967 > ACL data: handle 0x0029 flags 0x01
-dlen 5
-    L2CAP(d): cid 0x0040 len 18 [psm 0]
-1106977607.668238 < ACL data: handle 0x0029 flags 0x02
-dlen 38
-    L2CAP(d): cid 0x0040 len 34 [psm 0]
-1106977607.690862 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977607.716864 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977607.718855 > ACL data: handle 0x0029 flags 0x01
-dlen 17
-1106977607.719863 > ACL data: handle 0x0029 flags 0x01
-dlen 6
-    L2CAP(d): cid 0x0040 len 36 [psm 0]
-1106977608.216723 < ACL data: handle 0x0029 flags 0x02
-dlen 15
-    L2CAP(d): cid 0x0040 len 11 [psm 0]
-1106977608.221762 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977608.246760 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-    L2CAP(d): cid 0x0040 len 13 [psm 0]
-1106977608.766719 < ACL data: handle 0x0029 flags 0x02
-dlen 18
-    L2CAP(d): cid 0x0040 len 14 [psm 0]
-1106977608.772661 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977608.798667 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977608.800657 > ACL data: handle 0x0029 flags 0x01
-dlen 3
-    L2CAP(d): cid 0x0040 len 16 [psm 0]
-1106977608.800702 < ACL data: handle 0x0029 flags 0x02
-dlen 9
-    L2CAP(d): cid 0x0040 len 5 [psm 0]
-1106977608.806656 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977609.316716 < ACL data: handle 0x0029 flags 0x02
-dlen 14
-    L2CAP(d): cid 0x0040 len 10 [psm 0]
-1106977609.330564 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977609.356569 > ACL data: handle 0x0029 flags 0x02
-dlen 16
-    L2CAP(d): cid 0x0040 len 12 [psm 0]
-1106977609.866708 < ACL data: handle 0x0029 flags 0x02
-dlen 20
-    L2CAP(d): cid 0x0040 len 16 [psm 0]
-1106977609.877461 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977609.903469 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977609.905483 > ACL data: handle 0x0029 flags 0x01
-dlen 5
-    L2CAP(d): cid 0x0040 len 18 [psm 0]
-1106977610.416722 < ACL data: handle 0x0029 flags 0x02
-dlen 16
-    L2CAP(d): cid 0x0040 len 12 [psm 0]
-1106977610.433359 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977610.459367 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977610.461362 > ACL data: handle 0x0029 flags 0x01
-dlen 1
-    L2CAP(d): cid 0x0040 len 14 [psm 0]
-1106977610.966700 < ACL data: handle 0x0029 flags 0x02
-dlen 18
-    L2CAP(d): cid 0x0040 len 14 [psm 0]
-1106977610.976260 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977611.002265 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977611.004283 > ACL data: handle 0x0029 flags 0x01
-dlen 3
-    L2CAP(d): cid 0x0040 len 16 [psm 0]
-1106977611.516716 < ACL data: handle 0x0029 flags 0x02
-dlen 17
-    L2CAP(d): cid 0x0040 len 13 [psm 0]
-1106977611.537162 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977611.561163 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977611.563188 > ACL data: handle 0x0029 flags 0x01
-dlen 2
-    L2CAP(d): cid 0x0040 len 15 [psm 0]
-1106977611.789114 > ACL data: handle 0x0029 flags 0x02
-dlen 16
-    L2CAP(d): cid 0x0040 len 12 [psm 0]
-Then when I choose other item and wait for generating
-other menu, where  the items are also found from MySQL
-DB, the hcidump -t shows
-1106977778.719674 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977778.721671 > ACL data: handle 0x0029 flags 0x01
-dlen 5
-    L2CAP(d): cid 0x0040 len 18 [psm 0]
-1106977779.157250 < ACL data: handle 0x0029 flags 0x02
-dlen 38
-    L2CAP(d): cid 0x0040 len 34 [psm 0]
-1106977779.178591 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977779.202585 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977779.204592 > ACL data: handle 0x0029 flags 0x01
-dlen 17
-1106977779.206614 > ACL data: handle 0x0029 flags 0x01
-dlen 6
-    L2CAP(d): cid 0x0040 len 36 [psm 0]
-1106977779.706707 < ACL data: handle 0x0029 flags 0x02
-dlen 18
-    L2CAP(d): cid 0x0040 len 14 [psm 0]
-1106977779.717489 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977779.742486 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977779.744493 > ACL data: handle 0x0029 flags 0x01
-dlen 3
-    L2CAP(d): cid 0x0040 len 16 [psm 0]
-1106977780.256721 < ACL data: handle 0x0029 flags 0x02
-dlen 17
-    L2CAP(d): cid 0x0040 len 13 [psm 0]
-1106977780.280395 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977780.306385 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977780.308392 > ACL data: handle 0x0029 flags 0x01
-dlen 2
-    L2CAP(d): cid 0x0040 len 15 [psm 0]
-1106977780.806713 < ACL data: handle 0x0029 flags 0x02
-dlen 18
-    L2CAP(d): cid 0x0040 len 14 [psm 0]
-1106977780.823288 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977780.851297 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977780.853290 > ACL data: handle 0x0029 flags 0x01
-dlen 3
-    L2CAP(d): cid 0x0040 len 16 [psm 0]
-1106977781.356790 < ACL data: handle 0x0029 flags 0x02
-dlen 17
-    L2CAP(d): cid 0x0040 len 13 [psm 0]
-1106977781.364188 > HCI Event: Number of Completed
-Packets (0x13) plen 5
-1106977781.391194 > ACL data: handle 0x0029 flags 0x02
-dlen 17
-1106977781.393193 > ACL data: handle 0x0029 flags 0x01
-dlen 2
-    L2CAP(d): cid 0x0040 len 15 [psm 0]
-1106977781.573153 > ACL data: handle 0x0029 flags 0x02
-dlen 16
-    L2CAP(d): cid 0x0040 len 12 [psm 0]
-    Then does it mean that the items are too much that
-the sending of AT command from PC to T610 has delay?
-And what is the cause of the delay?
+    Of course, hcid is running. Then when I typed
+"hcidump -x", and then choose the computer in mobile
+phone, after I entered the PIN, the following occurs:
+[root@cm218-253-8-120 root]# hcidump -x
+HCIDump - HCI packet analyzer ver 1.16
+device: hci0 snap_len: 1028 filter: 0xffffffff
+> HCI Event: Connect Request (0x04) plen 10
+  A8 D8 DD D9 0A 00 04 02 52 01
+< HCI Command: Accept Connection Request (0x01|0x0009)
+plen 7
+  A8 D8 DD D9 0A 00 01
+> HCI Event: Command Status (0x0f) plen 4
+  00 01 09 04
+> HCI Event: PIN Code Request (0x16) plen 6
+  A8 D8 DD D9 0A 00
+< HCI Command: PIN Code Request Reply (0x01|0x000d)
+plen 23
+  A8 D8 DD D9 0A 00 05 42 6C 75 65 5A 00 00 00 00 00
+00 00 00
+  00 00 00
+> HCI Event: Command Complete (0x0e) plen 10
+  01 0D 04 00 A8 D8 DD D9 0A 00
+> HCI Event: Connect Complete (0x03) plen 11
+  05 29 00 A8 D8 DD D9 0A 00 01 00
+But the mobile shows "PIN not match". So how can I do?
 Michael
 
  --- Marcel Holtmann <marcel@holtmann.org> ¤º®e¡G
 > Hi Michael,
 > 
-> > I have written a program that the menu can be sent
-> to T610 by AT
-> > command. However, I face a problem. When I send
-> one menu to the
-> > mobile, there is 4-5 seconds delay. The syntax of
-> my program is:
-> > sprintf(command,
-> "AT*EASM=\"Bt-IrConverter\",1,1,%d", item_brand+1);
-> >   ret_code=put_command (command, answer, sizeof
-> (answer), 5, 0);
-> >   for (j=0; j<item_brand; j++)
-> >   {
-> >    sprintf(command, ",\"%s\"", device[j]);
-> >    ret_code=put_command (command, answer, sizeof
-> (answer), 5, 0);
-> >    }
-> >   sprintf(command, ",\"quit\",\r");
-> > where the variable device[j] stores the string
-> extracted from MySQL
-> > db. So, why is that? And how can I reduce the
-> delay?
+> > I'm doing a project using bluetooth. But I have
+> something to ask.
+> > Now, I make the connection between Linux PC and
+> Sony Ericsson T610 by
+> > typing "rfcomm connect 0 <adress>", and it was
+> success. Then, I wish
+> > to make the connection in this way: let T610 be
+> the client and PC be
+> > the server. When T610 searched the PC, I wish to
+> connect them by
+> > selecting the PC in the mobile. But when I entered
+> the PIN, the mobile
+> > always showed "PIN not match". Why is that? And
+> how can I do so that
+> > the connection can be created by mobile phone?
 > 
-> check with hcidump if there is really a delay or if
-> the phone simply
-> needs that long to execute that command.
+> do you have hcid running? What does "hcidump -x" as
+> root shows when you
+> connect from the mobile phone?
 > 
 > Regards
 > 
