@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Millinger <andreas.millinger@web.de>
+Message-ID: <20041222161314.65249.qmail@web11610.mail.yahoo.com>
+From: "Bhaskar S. Manda" <bhaskar_manda@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1103732215.5300.6.camel@tuxlaptop.site>
-Mime-Version: 1.0
-Subject: [Bluez-users] 3com bluetooth card
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Anybody using Socket CF Bluetooth version F on Zaurus
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,20 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Dec 2004 17:16:54 +0100
+Date: Wed, 22 Dec 2004 08:13:14 -0800 (PST)
 
-Hello,
+Hi,
 
-I have bought a 3com bluetooth card Version 3. How can I use it? I have
-Suse 9.2 on my Laptop. I read that I must use hciattach. But which
-parameter do I have to use (dev, speed, ...)? Do I have to change the
-bluetooth.conf in /etc/pcmcia/ ? I didnt find the card there. And if
-yes, what do I have to write? Is there a howto for this? I searched the
-mailinglist and the Internet, but I didn't find a answer.
+Has anyone gotten this card (Socket CF Bluetooth, version F) to work on
+a Zaurus. If so, please post what ROM, kernel version, and Bluez or
+Affix  packages you are using. My card is detected by PCMCIA, but the
+dtl1_cs modules doesn't see it. So I can see it in "cardctl ident", but
+no driver is loaded, and hciconfig doesn't see it.
 
-best regards
-Andreas
-
+Thanks.
 
 
 -------------------------------------------------------
