@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Questions about correctness of hci_usb
-	sco	support.
+Subject: Re: [Bluez-devel] [PATCH] Fix to enable bluez SCO USB urbs.
 From: Marcel Holtmann <marcel@holtmann.org>
 To: James Courtier-Dutton <James@superbug.demon.co.uk>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4041509E.9000402@superbug.demon.co.uk>
-References: <403F8EAC.40701@superbug.demon.co.uk>
-	 <1077973622.2843.75.camel@pegasus>  <4041509E.9000402@superbug.demon.co.uk>
+In-Reply-To: <4041512B.6050703@superbug.demon.co.uk>
+References: <403FD968.6010004@superbug.demon.co.uk>
+	 <1077972736.2843.60.camel@pegasus>  <4041512B.6050703@superbug.demon.co.uk>
 Content-Type: text/plain
-Message-Id: <1078022529.1942.6.camel@pegasus>
+Message-Id: <1078022369.1942.2.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,33 +19,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 29 Feb 2004 03:42:09 +0100
+Date: Sun, 29 Feb 2004 03:39:29 +0100
 
 Hi James,
 
-> __recv_frame()  receives a frame from the USB interface.
-> It then joins up frames to create a full HCI packet to send to higher 
-> layers.
-> "struct sk_buff *skb = __reassembly(husb, type);"
-> 
-> So we have a skb for each HCI type.
-> The skb will not exist the first time we receive an frame of a 
-> particular type.
-> The current code always assumes that the first frame it receives of a 
-> particular type will always be the first frame of an HCI packet that 
-> might consist of multiple frames.
-> I can't understand how we can be 100% that the first frame seen is 
-> always the first frame of the HCI packet.
-> I can't see why we cannot ever see a situation where the first frame 
-> received of a particular type might instead be the second frame of the 
-> HCI packet. As the __recv_frame() uses the contents of that first frame 
-> to control the reassembly process. How can we be sure that that first 
-> frame does in fact contain the first frame of a valid HCI packet?
-> E.g. If a remote bluetooth device somehow creates an HCI packet with 
-> bogus HCI header, surely this could (worst case) crash the kernel?
+> Where do I get the most up to date bluetooth kernel modules?
+> I cannot find them in the sf.net CVS.
+> I also cannot find any info on where to get them on the www.bluez.org
+> web site.
 
-I don't really see a problem here, because remote devices has nothing do
-to with the local HCI. We can only be in trouble if we lost an URB.
+as soon as I have a set of three or more full tested patches, I push
+them for inclusion into 2.6 and I update the latest 2.6 -mh patch at
+http://www.bluez.org/patches.html
 
 Regards
 
