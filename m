@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Sebastian Roth <sebastian.roth@esk.fhg.de>
-Message-ID: <cut6je$4g1$3@sea.gmane.org>
-References: <cusgdr$4g1$1@sea.gmane.org> <4211C910.1020204@dark-reality.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <4211C910.1020204@dark-reality.de>
-Subject: [Bluez-devel] Re: snd-bt-sco built-in (solved)
+From: Catalin Drula <Catalin.Drula@imag.fr>
+To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <Pine.GSO.4.33.0502151510240.1694-100000@horus.imag.fr>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-devel] hci_cmd_task: hci0 command tx timeout
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,35 +16,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 15 Feb 2005 17:07:33 +0100
+Date: Tue, 15 Feb 2005 15:19:21 +0100 (CET)
 
 Hi,
 
-I found the problem! To built it into the kernel I added a directory
-under sound called bluetooth. Getting the make-system to compile the
-module you have to add this path to sound/Makefile:
+While using a COM One Bluetooth USB dongle, after a random
+amount of time, the device becomes unresponsive (no HCI
+commands are accepted). The only solution is to physically
+remove the dongle and re-insert it.
 
-cat /usr/src/linux/sound/Makefile
-...
-obj-$(CONFIG_SND) += bluetooth/ core/ i2c/ drivers/ isa/ pci/ ppc/ arm/
-synth/ usb/ sparc/ parisc/ pcmcia/
-...
+The system is Fedora Core 3, kernel version 2.6.10-1.741_FC3.
 
-Really don't know why but I've put it in the first position (before
-core). This leads to the problem that on bootup ALSA isn't initialized
-yet when snd_bt_sco is trying to use it. oops...
+These are the relevant messages from /var/log/messages:
 
+Feb 15 14:20:22 corse kernel: usb 2-2: new full speed USB device using
+uhci_hcd and address 7
+Feb 15 14:22:02 corse kernel: hci_cmd_task: hci0 command tx timeout
 
-cat /usr/src/linux/sound/Makefile #(correct one!)
-...
-obj-$(CONFIG_SND) += core/ i2c/ drivers/ isa/ pci/ ppc/ arm/ synth/
-usb/ sparc/ parisc/ pcmcia/ bluetooth/
-...
+Also, here is the output of hcidump -i hci0 -x before the crash occurs:
 
-Now the kernel boots up! A brief test with one of the headsets was ok!
+> HCI Event: Connect Complete (0x03) plen 11
+  00 28 00 3E 17 39 EE 02 00 01 00
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 4097 scid 0x0041
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 4097 scid 0x0040
+< HCI Command: Inquiry Cancel (0x01|0x0002) plen 0
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+  28 00 13
+< HCI Command: Write Scan Enable (0x03|0x001a) plen 1
+  00
 
-Best regards,
-Sebastian
+As you can see the last three commands get no answers.
+
+Here's (the relevant parts of) the output of lsmod:
+
+Module                  Size  Used by
+dtl1_cs                11845  3
+l2cap                  26053  3
+pcmcia                 20805  5 dtl1_cs
+dm_mod                 55509  0
+ac                      4805  0
+joydev                  9217  0
+hci_usb                15041  3
+bluetooth              48069  7 dtl1_cs,l2cap,hci_usb
+yenta_socket           19137  1
+pcmcia_core            50817  3 dtl1_cs,pcmcia,yenta_socket
+uhci_hcd               31321  0
+hw_random               5717  0
+
+I have read that this behavior might be caused by the loss of
+syncronization between the host and the device. Is there any way to fix this?
+
+Thanks,
+Catalin
+
 
 
 
