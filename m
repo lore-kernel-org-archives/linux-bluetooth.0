@@ -10,10 +10,10 @@ References: <khnacuya23u.fsf@hunter-killer.kendall.corp.akamai.com>
 	<87ekk82ar4.fsf@nausicaa.krose.org> <1097342518.12972.3.camel@pegasus>
 	<87zn2v1xry.fsf@nausicaa.krose.org> <1097359976.12972.5.camel@pegasus>
 From: Kyle Rose <krose+bluez@krose.org>
-Date: Sun, 10 Oct 2004 00:00:58 -0400
+Date: Sat, 09 Oct 2004 22:19:27 -0400
 In-Reply-To: <1097359976.12972.5.camel@pegasus> (Marcel Holtmann's message of
 	"Sun, 10 Oct 2004 00:12:57 +0200")
-Message-ID: <877jpz1ath.fsf@nausicaa.krose.org>
+Message-ID: <87brfb1fio.fsf@nausicaa.krose.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Sender: Kyle Rose <krose@nausicaa.valley-of-wind.krose.org>
@@ -22,8 +22,10 @@ List-ID: <bluez-users.lists.sourceforge.net>
 > why do you enabled auth and encrypt? This is security mode 3. Disable it
 > and try again.
 
-I just tried this with no auth or encrypt, and the same behavior
-ensues.
+I guess my rebuttal is, "Why shouldn't it work with auth and encrypt
+in 64 bit mode only?" :)
+
+But, for sake of completeness I will try this with both turned off.
 
 Cheers,
 Kyle
