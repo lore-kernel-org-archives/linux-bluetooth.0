@@ -2,11 +2,11 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] BNEP kernel oops
 From: Marcel Holtmann <marcel@holtmann.org>
 To: "Williams, Richard" <Richard.Williams@VITRONICS.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <A1F0D47583A2D711919F00600819B3A45BDCD4@goofy.vitronics.com>
-References: <A1F0D47583A2D711919F00600819B3A45BDCD4@goofy.vitronics.com>
+Cc: "Bluez-Devel (E-mail)" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <A1F0D47583A2D711919F00600819B3A4028BB9@goofy.vitronics.com>
+References: <A1F0D47583A2D711919F00600819B3A4028BB9@goofy.vitronics.com>
 Content-Type: text/plain
-Message-Id: <1092426641.4501.39.camel@pegasus>
+Message-Id: <1092424437.4501.31.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,58 +18,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 13 Aug 2004 21:50:41 +0200
+Date: Fri, 13 Aug 2004 21:13:57 +0200
 
 Hi Richard,
 
-> The single board computer I'm using comes from Applied Data Systems (ADS)- its called a 
-> BitsyX. I get my kernel from kernel.org and patches from ADS, and use their 
-> patches. From the instructions on  ADS web site: (http://www.applieddata.net/support/)
+> I had been using PAN with a 2.4.19 kernel on my embedded system, and this worked somewhat. 
+> I could usually get the PAN up and running but I'd get a kernel panic after a few minutes. 
+> Since my group had lots of other application problems, we decided to concentrate the group 
+> effort to correct all our applications problems. Now our system is quite stable and we have 
+> many BT devices connected and sending/receiving data via rfcomm. But we want to have PAN 
+> running so we can use some common TCP applications.
 > 
+> Last week a 2.4.26 kernel became available for my embedded board, so I upgraded to 2.4.26, 
+> and today I decided to look at PAN again. I tried plain 2.4.26 this morning, with the oops
+> behavior. 
 > 
-> <<<<<<<<<<<<<<<<<<<<<<<<
-> Kernel source and patches
+> It was then that I discovered the 2.4.26-mh2 patch, applied the patch and retried. 
+> But the same thing happens.
 > 
-> linux-2.4.26.tar.bz2 (~30MB)
-> Download from the link above or from kernel.org and make a base directory.
-> 
-> bzcat < linux-2.4.26.tar.bz2 | tar -xf -
-> 
-> 
-> patch-2.4.26-vrs1.gz (~595kB)
-> Download from the link above or from arm.linux.org.uk.
-> Change to the linux directory and apply the patch using patch level "-p1".
-> 
-> cd linux-2.4.26
-> zcat patch-2.4.26-vrs1.gz | patch -p1
-> 
-> 
-> linux-2.4.26-vrs1-pxa1.patch.gz (~250kB)
-> Download from the link above or (uncompressed) from Robert Schwebel.
-> Remain in the linux directory and apply the patch using patch level "-p1".
-> 
-> zcat linux-2.4.26-vrs1-pxa1.patch.gz | patch -p1
-> 
-> 
-> diff-2.4.26-vrs1-pxa1-adsx2.gz (~220kB)
-> Download from the link above and apply the patch using patch level "-p1".
-> 
-> zcat diff-2.4.26-vrs1-pxa1-adsx2.gz | patch -p1
-> 
-> >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-> 
-> 
-> The two patch files and the diff file will show the differences between
-> plain vanilla 2.4.26 and my embedded ARM kernel.
+> If you think it will help, I can try the 2.4.26-mh1 patch and give you the results.
 
-they are touching to many files as I can tell you where the problem can
-be. Please make sure that a 2.4.26 is working fine for you on a desktop
-machine and ask ADS for help. If a plain vanilla is working, then they
-broke something with their patches.
+so I assume that it is not my patch that causes this oops and so testing
+-mh1 will not give us more information. The problem is that you are not
+using a vanilla 2.4.26 and this could cause the oops. Please make a diff
+between your embedded kernel and the vanilla one. We must check what
+they've changed.
 
 Regards
 
-Marcel
+MArcel
 
 
 
