@@ -2,11 +2,11 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Mathias Adam <a2@adamis.de>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Once again: Socket CF card and Kernel 2.6
-Message-ID: <20050305144205.GC21208@adamis.de>
-References: <20050226031901.GL11723@adamis.de> <1109578431.17256.9.camel@pegasus> <20050228220209.GA8151@adamis.de> <1109665776.17256.122.camel@pegasus> <42294598.6010004@adamis.de> <1110014266.13601.10.camel@kabel>
+Message-ID: <20050305143520.GB21208@adamis.de>
+References: <20050226031901.GL11723@adamis.de> <1109578431.17256.9.camel@pegasus> <20050228220209.GA8151@adamis.de> <1109665776.17256.122.camel@pegasus> <42294598.6010004@adamis.de> <1110021859.8058.111.camel@pegasus> <20050305141858.GA21208@adamis.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1110014266.13601.10.camel@kabel>
+In-Reply-To: <20050305141858.GA21208@adamis.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,33 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 5 Mar 2005 15:42:05 +0100
+Date: Sat, 5 Mar 2005 15:35:20 +0100
 
-On 05.03.05 10:17:46, Erwin Authried wrote:
-> > seems to initialize the actual UART with only 230400 baud. Is this 
-> > really the case or are those UARTs clocked at nonstandard (higher) 
-> > frequencies so that this setting does result in a higher real baud rate?
-> 
-> I can't say for sure if that applies to your specific CF card, but
-> usually PCMCIA/CF uarts are just register-compatible emulations of a
-> standard uart, and the clockrate doesn't matter at all. The actual data
-> rate can be very high.
+On 05.03.05 15:18:58, Mathias Adam wrote:
+> +		unsigned int baud_base = port->uartclk/16;
 
-Hmm, I don't know... as the card didn't work with the wrong baud rate
-programmed in its UART I think it does use the selected clock rate - ok, at
-least the divisor must be right, the UART might be clocked internally at
-much more than the standard ~1.8MHz giving a higher real baud rate.
+OK, this line can be removed...
+
 
 Regards
+
 Mathias
-
-
-
--- 
-Twenty years from now you will be more disappointed by the things that
-you didn't do than by the ones you did do. So throw off the bowlines.
-Sail away from the safe harbor. Catch the trade winds in your sails.
-Explore. Dream. Discover.  (Mark Twain)
 
 
 -------------------------------------------------------
