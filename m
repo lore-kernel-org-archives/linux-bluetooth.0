@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Dongle firmware
-References: <20050104110418.M39860@bandos.homelinux.com>
-In-Reply-To: <20050104110418.M39860@bandos.homelinux.com>
+Message-ID: <20050104152233.17839.qmail@DEFAULT-ID0.IPLNet>
+From: "Nuno Cruz" <ncruz@isel.ipl.pt>
+To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200501042139.33241.cijoml@volny.cz>
+	charset="us-ascii"
+Subject: [Bluez-users] AMBIT T60M665 Firmware Upgrade
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,33 +17,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 4 Jan 2005 21:39:32 +0100
+Date: Tue, 4 Jan 2005 15:22:33 -0000
 
-I prepare this site with howto backup, upgrade and send me firmware from=20
-dongles using Marcel's btdfu and Widcomm stack's utility to share them with=
-=20
-others.
+Hi all,
 
-It will be up in mid-February starting with about 20 firmwares from differe=
-nt=20
-dongles I have access for now.
+I have an internal AMBIT T60M665 Bluecore2-Ext on my laptop, and I tried to
+upgrade it since it had an old version (16.4), with the genericcsr file (the
+dongle is recognized as a CSR generic device), the update went fine but I
+lost the blue light on the laptop so I decided to go back and tried to
+downgrade, but since I din't the backup I just tried some firmware that I
+supposed to be the same as mine from an epox BT-DG02A dongle (the header is
+the same - "LOADER=bc02x_hci_1v1_16.4_56, STACK=bc02x_hci_1v1_16.4_56" and
+the VID+PID also)
+Well doing this reduced the range of my device to 1m, my bluetooth mouse
+that sits on the side of the laptop has a realy bad reception. So I got an
+identical laptop from work and got the firmware from it to put in mine, but
+I can't do the upgrade I always get an error at the middle of the upgrade
+about the device not being ready... This happens at byte 2046 if I try with
+my backup but with genericcsr.dfu I get this error at byte ~ 613000.
 
-So people SEND ME YOUR'S FIRMWARES!
+Does anyone have a hint on how to resolve this?
+I've tried this with dfu update from marcel and also with the widcomm tools
+in windows...
 
-Still hope this doesn't violate any licence I know...
+Thanks!
 
-It is better to have list with info this dongle work with this this and thi=
-s=20
-firmware to prevent destroyed devices
+--
+Regards,
 
-Michal
+Nuno Cruz 
 
-Dne =FAt 4. ledna 2005 12:09 Jose Bernardo Silva napsal(a):
-> I've seen recently a few messages about new firmwares, is there a list of
-> dongles and firmwares available?
-> I have a Acer BT-500 and a MSI MS-6967, and I'd like to update these two.
->
-> Thanks!
 
 
 -------------------------------------------------------
