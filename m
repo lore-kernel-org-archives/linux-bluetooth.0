@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] extracted apple firmware
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <1104257005.41d19fedcd4db@bluebottle.com>
+From: jago25_98 <jago25_98@bluebottle.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200412271341.10149.cijoml@volny.cz>
-References: <200412271341.10149.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1104315512.6319.1.camel@notepaq>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Reason to not enable encryption
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,30 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Dec 2004 11:18:32 +0100
-
-Hi Michal,
-
-> I finally got Dlink DBT-120 rev B3, so I would like upgrade it. Can anybody 
-> send me extracted apple's firmware?
-
-I have a link to one somewhere on my page.
-
-> Marcel is this options for flash OK?
-> 
-> src/btdfu -d hci0 archive dlink.dfu
-> To backup existing FW,
-> src/btdfu -d hci0 upgrade dlink.dfu
-> To flash a new one?
-
-It is fine, but the -d option is not really supported. You will get a
-menu. And btw you should choose two different names.
-
-Regards
-
-Marcel
+Date: Tue, 28 Dec 2004 12:03:25 -0600
 
 
+I seem to remember someone saying something like "Don't enable
+encryption if you dual boot" but searched the list and could see why.
+Maybe there was another reason to not use encryption
+
+Am I mistaken?
+
+Need to know because we have a new app born yesterday and it could
+become encryption only:
+
+http://www.symbianos.org/yabbse/index.php?board=2;action=display;threadid=7;start=15
+
+Thanks for jogging my memory
 
 
 -------------------------------------------------------
