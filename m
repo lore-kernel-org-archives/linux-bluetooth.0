@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041220180425.9191.qmail@web11601.mail.yahoo.com>
-From: "Bhaskar S. Manda" <bhaskar_manda@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
+From: Hannes Reiff <faster10@gmx.net>
+Message-ID: <loom.20041220T180020-785@post.gmane.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Socket version F not recognized on SL-6000
+Subject: [Bluez-users] File Transfer via Bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 20 Dec 2004 10:04:25 -0800 (PST)
+Date: Mon, 20 Dec 2004 17:08:48 +0000 (UTC)
 
-cardctl ident shows product info matching that in
-/etc/pcmcia/bluetooth.conf, but doesn't load dtl1_cs.
+Hi All,
 
-# cardctl ident
-Socket 0:
-  product info: "Socket", "CF+ Personal Network Card"
-  manfid: 0x0104, 0x009f
-  function: 254 ((null))
+I'm using two pcs to create a pan connection so that both have access to the
+web. No problems. But when it comes to exchange files between the the two pcs -
+what has to be done? Is it possible to establish NFS over bluetooth? (I know
+there are some threads - but no solutions).
 
-And apparently because of this hciconfig has no output. The only other
-postings I've seen related to this had at least the card's function
-identified as "serial", but mine isn't getting even to that point, as
-the driver dtl1_cs for this card isn't being associated with the
-physical card being inserted.
+Hope you can help me!
 
-All suggestions appreciated, thanks.
+Thanks,
+
+Hannes
+
 
 
 -------------------------------------------------------
