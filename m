@@ -1,10 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Charles Bueche <charles@bueche.ch>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <20040817123228.2d896a07@bluez.bueche.ch>
+Subject: Re: [Bluez-users] can't establish a connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: ben4fun <ben_4_fun@freenet.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1092728742.12606.5.camel@localhost>
+References: <1091742606.6143.17.camel@localhost>
+	 <1091747064.6143.25.camel@localhost> <1091748133.20839.63.camel@pegasus>
+	 <200408060216.05030.cijoml@volny.cz>  <1091810383.4570.14.camel@localhost>
+	 <1092727197.12606.1.camel@localhost>  <1092728177.31651.6.camel@pegasus>
+	 <1092728742.12606.5.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1092729673.31651.11.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] OT: SonyEricsson K700i addressbook and OBEX over Bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,40 +22,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Aug 2004 12:32:28 +0200
+Date: Tue, 17 Aug 2004 10:01:13 +0200
 
-Hi,
+Hi Ben,
 
-sorry if this a bit off-topic, but I didn't find help elsewhere and I
-thought someone here might have seen the same problems.
+> > install a kernel where this problem is fixed.
+> > 
+> Thanks marcel for your quick answer as usual. I have the 2.6.8-0rc2.1mdk kernel, 
+> what kernel would be the good?
 
-I just got my SonyEricsson K700i from Swisscom, and I'm experimenting
-with bluez and user-space tools (kde-bluetooth).
+that kernel may work, but it is not a vanilla kernel, so I can't tell
+you if all patches are included or not. However you can also try to
+compile a kernel without CONFIG_BT_HCIUSB_SCO option set. May this
+helps.
 
-It works quite well, I can send VCARD's using the OBEX Object Push, and
-the phone gets them well. The only glitch is that the file must me named
-*.vcf for the phone to consider it as address records.
+Regards
 
-I have two problems left : 
-
-1. OBEX File Transfer (eg to get pictures from the pone) : in Konqueror,
-using kde-buetooth, the selection of "obex://[btaddr]:7/" brings up
-"Authentication Required". From my analysis of the source code, it might
-be caused by the transport layer (bluez), but not sure.
-
-2. UID field in VCARD's : if I send a single VCARD in a file for a
-record already present in the phone, it asks "overwrite y/n ?". If I
-send a file containing two or more VCARD's for records already present
-in the phone, it duplicate them. I added a UID fields as recommended by
-the Vcard spec, the phone seem to ignore it.
-
-Hints welcome, regards,
-Charles
+Marcel
 
 
--- 
-Charles Bueche <charles@bueche.ch>
-sand, snow, wave, wind and net -surfer
 
 
 -------------------------------------------------------
