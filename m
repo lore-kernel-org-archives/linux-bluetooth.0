@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michael Neumeier <dennismail@gmx.net>
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1075019314.2741.5.camel@matos.local>
-Mime-Version: 1.0
-Subject: [Bluez-users] Cannot start bluepin
+Message-ID: <401267F8.9080308@Fampeeters.com>
+From: Francesco Peeters <Francesco@Fampeeters.com>
+MIME-Version: 1.0
+To: Bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [Bluez-users] hci_cmd_task: hci0 command tx timeout
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,21 +15,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 25 Jan 2004 09:28:34 +0100
+Date: Sat, 24 Jan 2004 13:41:28 +0100
 
-When I try to start bluepin (only for testing purposes, no device
-connected) I get follwoing message:
+I am running Fedora Core 1 now, with all BlueZ RPMs installed.
 
-  File "/bin/bluepin", line 34, in ?
-    from gtk import *
-  File "/usr/lib/python2.3/site-packages/gtk-2.0/gtk/__init__.py", line
-43, in ?
-    from _gtk import *
-RuntimeError: could not open display
+My Sitecom BT (CN-500) dongle is recognized and my laptop and T|T3 are 
+paired.
+When I do a hcitool scan and hcitool info, I see the T|T3.
 
-I tried to update the python.packages, but this didn´t solve the
-problem. 
-Any ideas?
+I have hci and sdpd running, and dund --listen --msdun --channel 1 
+10.50.164.3:10.50.164.4
+
+I have sucessfully created the connection setup and network setup on the 
+T|T3, but whenever I press the connect button, the T|T3 times out and 
+the linux machine gives an error:
+hci_cmd_task: hci0 command tx timeout
+
+Any idea what to look for, or is this old laptop just *too* slow?
+
+TIA!
+
+--FP
+PalmOS user since Pilot1000
+ Tungsten|T3 owner, still learning new DateBK5 tricks every day!
+Linux user since RedHat 4.0
+ Just started playing with Fedora Core 1
 
 
 
