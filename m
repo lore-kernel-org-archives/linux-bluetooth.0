@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hcidump and l2cap questions
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Sean Loh <blaze_wk@yahoo.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041017151430.12721.qmail@web41129.mail.yahoo.com>
-References: <20041017151430.12721.qmail@web41129.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1098026437.4911.91.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20041017151430.12721.qmail@web41129.mail.yahoo.com>
+From: Sean Loh <blaze_wk@yahoo.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] hcidump and l2cap questions
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,36 +15,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 17 Oct 2004 17:20:37 +0200
+Date: Sun, 17 Oct 2004 08:14:30 -0700 (PDT)
 
-Hi Sean,
+Hi,
 
-> I'm streaming audio from one computer to another
-> computer  using the pan profile.
-> 
-> 1. I would like to see bnep packets being filtered
-> through hcidump. But when i put the bnep filter on,
-> hcidump does not print out anything. It only seems to
-> print out acl and l2cap data. Why is that? How am I
-> able to see bnep packet info?
+I'm streaming audio from one computer to another
+computer  using the pan profile.
 
-simply call "hcidump -x" and be happy. However if you miss the initial
-l2cap_connect_req the dynamic channel assignment don't works.
+1. I would like to see bnep packets being filtered
+through hcidump. But when i put the bnep filter on,
+hcidump does not print out anything. It only seems to
+print out acl and l2cap data. Why is that? How am I
+able to see bnep packet info?
 
-> 2. I notice that even if i send udp packets that have
-> 55000 bytes. The maximum packet length that turns up
-> on hcidump is 1500 bytes. Shouldn't it be 55000 bytes
-> because the max mtu for an l2cap packet is 65535
-> bytes?
+2. I notice that even if i send udp packets that have
+55000 bytes. The maximum packet length that turns up
+on hcidump is 1500 bytes. Shouldn't it be 55000 bytes
+because the max mtu for an l2cap packet is 65535
+bytes?
 
-The L2CAP uses segmentation and we use a MTU of 1691. Start thinking a
-little bit about the Ethernet frame size and so on.
+thanks
 
-Regards
-
-Marcel
+bluez rules
 
 
+
+		
+__________________________________
+Do you Yahoo!?
+Yahoo! Mail - Helps protect you from nasty viruses.
+http://promotions.yahoo.com/new_mail
 
 
 -------------------------------------------------------
