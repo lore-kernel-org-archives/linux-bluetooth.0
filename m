@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Ned Lowe" <ned@nedlowe.co.uk>
-To: <bluez-users@lists.sourceforge.net>
-Message-ID: <000101c44b92$64dcb1f0$0202a8c0@chumpi>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: [Bluez-users] Connects... Then disconnects
+Subject: Re: [Bluez-users] Bluetooth 1.2 and HID Proxy
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200406052338.15162.cijoml@volny.cz>
+References: <1086429803.16316.44.camel@pegasus>
+	 <200406052338.15162.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1086476014.16316.129.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,38 +19,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 6 Jun 2004 07:49:17 +0100
+Date: Sun, 06 Jun 2004 00:53:34 +0200
 
-Dear all,
+Hi Michal,
 
-I was hoping you could help me with a rather annoying problem I am
-experiencing.
+> pls start new webpage on bluez which will collect all known doglech which we 
+> know reflash with newer firmware and pls try describe step-by-step howto.
 
-I have just set up the Belkin F8T003 Bluetooth USB Adapter under
-Mandrake 10.0.  I am trying to connect (not simultaneously) to two
-machines, one XP and the other an Apple PowerBook.
+currently I am preparing a site with notes about firmware upgrade and
+DFU. I will also summarize the public statements of the CSR signature
+and so on. However don't expect a howto for getting firmware from one
+device into another. I am not concerned in upgrading of any dongle,
+because today an USB Bluetooth dongle is so cheap that you can buy
+yourself a new one if the firmware is too old. I paid 14 EUR for my
+D-Link dongle at eBay. The problem what I see is that the dongle
+manufacturers are too lazy to get out the Bluetooth 1.2 capable dongles.
+For the CSR based BlueCore02 based dongles they only have to change
+their firmware and can sell it as a complete new product. If they
+started with a 8 Mbit flash from the beginning they don't even have to
+change their design.
 
-I can connect from Linux to my XP box no problem:
+The other point is the HID Proxy support. Actually people are asking me
+where they can buy such dongles. I can't tell them, because I don't
+know. And again, every BlueCore02 with 8 Mbit flash can use HID Proxy.
+So where is the problem? I think Apple is doing this the right way. They
+really support their hardware. The question is why D-Link can't provide
+an update for the dongle ;)
 
-rfcomm connect rfcomm0 xx:xx:xx...
+Regards
 
-I can *see* my Apple PowerBook Bluetooth adapter from Linux and
-vice-versa, and can pair from the PowerBook.  However if I run the above
-command:
+Marcel
 
-rfcomm connect rfcomm0 yy:yy:yy...
-
-for the PowerBook connection, then I get:
-
-Can't connect RFCOMM socket: Connection refused
-
-The funny thing is that the PowerBook connection listing shows a
-connection being established for about one second, then loses it.
-
-Any ideas?
-
-Thanks a lot,
-Ned Lowe
 
 
 
