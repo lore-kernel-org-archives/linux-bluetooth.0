@@ -1,21 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluez-utils 2.7 default configuration
+Subject: Re: [Bluez-devel] autoconf breaks portability. Film at 11.
 From: Marcel Holtmann <marcel@holtmann.org>
 To: David Woodhouse <dwmw2@infradead.org>
-Cc: "Nicholas A. Preyss" <nalp@gmx.net>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1084384590.4426.428.camel@hades.cambridge.redhat.com>
-References: <20040511192919.GB28581@gmx.net>
-	 <1084368229.25099.26.camel@pegasus>
-	 <1084371486.4426.156.camel@hades.cambridge.redhat.com>
-	 <1084382445.25099.77.camel@pegasus>
-	 <1084382743.4426.351.camel@hades.cambridge.redhat.com>
-	 <1084382951.25099.89.camel@pegasus>
-	 <1084383201.4426.374.camel@hades.cambridge.redhat.com>
-	 <1084383929.25099.94.camel@pegasus>
-	 <1084384590.4426.428.camel@hades.cambridge.redhat.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1084384989.4426.450.camel@hades.cambridge.redhat.com>
+References: <1084268833.11301.0.camel@hades.cambridge.redhat.com>
+	 <1084368666.25099.38.camel@pegasus>
+	 <1084369122.4426.106.camel@hades.cambridge.redhat.com>
+	 <1084369703.25099.56.camel@pegasus>
+	 <1084371089.4426.148.camel@hades.cambridge.redhat.com>
+	 <1084382619.25099.81.camel@pegasus>
+	 <1084384989.4426.450.camel@hades.cambridge.redhat.com>
 Content-Type: text/plain
-Message-Id: <1084398630.25099.122.camel@pegasus>
+Message-Id: <1084398405.25099.118.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -27,21 +24,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 May 2004 23:50:30 +0200
+Date: Wed, 12 May 2004 23:46:45 +0200
 
 Hi David,
 
-> It's basically only the init scripts in which my packages differ now, I
-> believe. Just about everything else I had in patches is now in CVS --
-> most of it a long time ago; I don't know why the swave array overflow
-> slipped through the cracks. 
+> It was October 2002. I don't seem to be able to find my list archives
+> from then -- it's possible I wasn't subscribed at the time, although
+> that surprises me.
+> 
+> http://sourceforge.net/mailarchive/message.php?msg_id=2348496
+> http://sourceforge.net/mailarchive/message.php?msg_id=2360924
+> 
+> ftp://ftp.uk.linux.org/pub/people/dwmw2/random/bluez-makefiles-3.tar.gz
+> 
+> I'd have to update them and there were a couple of missing features
+> ('make DESTDIR=xx install' comes to mind) but I'm more than happy to do
+> so if you're interested. 
 
-actually I only wanna make sure that the Fedora guys are looking at the
-postings on the list, because I am using a vanilla kernel and Debian ;)
+I am not interested in this way. I am interested in fixing this the
+autoconf/automake way.
 
-> /me checks... oh, you probably want this one too...
+> > > configure.in:19: required file `./ltmain.sh' not found
+> > > compat/Makefile.am: installing `./depcomp'
+> > 
+> > but this isn't a problem. It says something like that, but also creates
+> > every file that it complains about.
+> 
+> hades /hades/bluez/libs2 $ ./configure
+> -bash2: ./configure: No such file or directory
 
-Applied.
+There must be another problem. Please do a clean CVS checkout.
 
 Regards
 
