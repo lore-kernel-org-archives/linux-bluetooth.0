@@ -2,13 +2,13 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: "Bc. Michal Semler" <cijoml@volny.cz>
 Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: FrogPad Bluetooth keyboard - arrived+working well with BlueZ
-References: <Pine.LNX.4.58.0408132340500.22327@shofar.kom.e-technik.tu-darmstadt.de> <1092434684.4501.56.camel@pegasus>
-In-Reply-To: <1092434684.4501.56.camel@pegasus>
+Subject: Re: [Bluez-users] Can't get BT working on an iBook G4
+References: <200408140030.10263.tcpdevil@linuxlover.org> <1092439865.4501.68.camel@pegasus> <200408140147.07139.tcpdevil@linuxlover.org>
+In-Reply-To: <200408140147.07139.tcpdevil@linuxlover.org>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200408140158.05133.cijoml@volny.cz>
+  charset="iso-8859-15"
+Message-Id: <200408140156.49256.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,23 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 14 Aug 2004 01:58:05 +0200
+Date: Sat, 14 Aug 2004 01:56:49 +0200
 
-Dne so 14. srpna 2004 00:04 Marcel Holtmann napsal(a):
-> Hi Ralf,
+Dne so 14. srpna 2004 01:47 Alberto Garcia Hierro napsal(a):
+> El S=E1bado, 14 de Agosto de 2004 01:31, Marcel Holtmann escribi=F3:
+> > Hi Alberto,
+> >
+> > > 	I'm trying to setup BT on my iBook G4 (builtin BT), but i can't. As
+> > > far as I know, it's a usb device, so i modprobe hci_usb. Then, i tryed
+> > > with hcitool, but it doesn't show any device:
+> >
+> > show us the content of /proc/bus/usb/devices and we can tell you more.
+> >
+> > Regards
+> >
+> > Marcel
 >
-> > since we had the discussion about its actual availability a few months
-> > ago - my Bluetooth FrogPad
-> > 	http://www.frogpad.com/
-> > arrived today and works perfectly with the BlueZ
-> > stack (hidp module + hidd).
->
-> you are a lucky man, because my promised FrogPad for testing still
-> hasn't arrived :(
+> 	Many thanks for the quick response, but thanks to Michal it's already
+> working :)
 
-Marcel, could you pls to send me some of your tested devices? I would like 
-test them too and write howto in czech for our czech people. We have HW 
-database too.
+:))) Marcel usually makes a long research before sending a valid reply :)
+I only tried, coz many of apple devices needs this :)
 
 Michal
 
