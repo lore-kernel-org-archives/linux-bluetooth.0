@@ -1,48 +1,36 @@
-Return-Path: <wim.delvaux@adaptiveplanet.com>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+Return-Path: <mcq@cacr.caltech.edu>
+Date: Sun, 7 Mar 2004 16:48:11 -0800
+From: John McCorquodale <mcq@cacr.caltech.edu>
 To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: bnep and refcnt
-Date: Mon, 8 Mar 2004 02:02:24 +0100
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-References: <200403071625.01627.wim.delvaux@adaptiveplanet.com> <1078705651.15279.20.camel@pegasus>
-In-Reply-To: <1078705651.15279.20.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200403080202.24547.wim.delvaux@adaptiveplanet.com>
+Cc: John McCorquodale <mcq@cacr.caltech.edu>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Socket G card newbie Q
+Message-ID: <20040308004811.GA19145@viz.cacr.caltech.edu>
+References: <20040307214224.GB18481@viz.cacr.caltech.edu> <1078704901.15279.6.camel@pegasus> <20040308002100.GA19049@viz.cacr.caltech.edu> <1078705579.15279.18.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1078705579.15279.18.camel@pegasus>
 List-ID: <bluez-users.lists.sourceforge.net>
 
-On Monday 08 March 2004 01:27, Marcel Holtmann wrote:
-> Hi Wim,
->
-> > after browsing the Linux 2.6 code there is a remark in net/core/dev.c
-> > that state what the problem with the following message that I get is
-> >
-> > unregister_netdevice: waiting for bnep0 to become free. Usage count = 6
-> >
-> > The comment with the function in dev.c states that this error is caused
-> > by buggy protocols that should unregister after receiving notification
-> > that the devices they are using has been unregistered.  They should call
-> > unregister_netdev which decreases the refcnt.
->
-> looks like we need a more detailed audit for the BNEP module and some of
-> the 2.6 changes in the network device layer.
+> May this is the problem with some serial cards and 2.6. Try 2.4 instead.
 
-	I tried that but did not find anything usefull.
+Progress.  2.4.25 produces different behavior:
 
-	I noticed (after GREP) that the BNEP module does not have a notify function
-	(does it need one ?).
+First time loading it says:
+bcsp_recv: Out-of-order packet arrived, expected 1 got 0
 
-	Hence I think we need to look for those systems (HCID?) that have a
-	reference to the bnep module.  Probably those do not unregister properly
+Second time loading it says:
+Unknown device type or id
 
-	How can I compile them in debug ?
+In 2.4.20, it always says "Unknown device type or id".
 
-	Thanx
+So two questions:
 
-	W
+  1) Is there maybe a new G card device id out there, or should I be using
+     some other bluez than that which ships with 2.4.25?
 
->
-> Regards
->
-> Marcel
+  2) Is there a patch for the 2.6 serial problem?
+
+Thanks,
+
+-mcq
