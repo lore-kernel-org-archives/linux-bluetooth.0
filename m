@@ -1,23 +1,51 @@
-Return-Path: <postfix@gmx.com>
-Date: Sat, 14 Feb 2004 01:24:14 +0100
-From: Radu Maurer <a400@gmx.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Apple keyboard
-Message-ID: <20040214002414.GA14384@mail.gmx.de>
-References: <20040210175802.GA17705@mail.gmx.de> <1076451979.2777.21.camel@pegasus> <20040211151146.GA19818@mail.gmx.de> <1076515215.2696.36.camel@pegasus> <20040213105035.GA10464@mail.gmx.de> <1076669640.2671.27.camel@pegasus> <20040213113749.GA13481@mail.gmx.de> <1076673365.2671.30.camel@pegasus> <20040213225030.GA10502@mail.gmx.de> <1076714070.18588.87.camel@pegasus>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Timeout message from kernel
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jeff Sutherland <jeffs@fairwayacademy.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200402131858.51524.jeffs@fairwayacademy.org>
+References: <200402121636.02074.jeffs@fairwayacademy.org>
+	 <200402131819.10939.jeffs@fairwayacademy.org>
+	 <1076715629.18588.103.camel@pegasus>
+	 <200402131858.51524.jeffs@fairwayacademy.org>
+Content-Type: text/plain
+Message-Id: <1076717197.18588.109.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1076714070.18588.87.camel@pegasus>
-List-ID: <bluez-users.lists.sourceforge.net>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 14 Feb 2004 01:06:37 +0100
 
-> > now I wonder: how do I use the keyboard with X11 (and possibly at the
-> > console), i.e. which device do I have to enter in the "InputDevice"
-> > section of XFree86Config?
-> 
-> you only have to load the keybdev kernel module.
+Hi Jeff,
 
-it works like a charm. I am typing this on the Apple keyboard.
-thanks for your help & patience!
+> I've tried the l2test -s from Coldfire several times, doing 'hciconfig hci0 
+> reset' in between for good measure, always get the same results on the pc 
+> end.  This looks suspiciously like an endian problem somewhere, but why would 
+> receive work ok?
 
-Radu
+the endian stuff looks fine in the l2test.c source. What endian do the
+Coldfire processor use?
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
