@@ -1,12 +1,20 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41F53A2B.5020200@eridani.co.uk>
-From: Michael McConnell <mike@eridani.co.uk>
-MIME-Version: 1.0
+Message-Id: <6.1.2.0.2.20050124193611.04bc6790@pop.gmx.net>
 To: bluez-users@lists.sourceforge.net
+From: George <george.news@gmx.net>
 Subject: Re: [Bluez-users] Bluez BNEP connection close
-References: <6.1.2.0.2.20050124165802.04168330@luna.tlmat.unican.es>	 <1106581771.8058.49.camel@pegasus>	 <6.1.2.0.2.20050124172931.041a03a0@pop.gmx.net> <1106583831.8058.52.camel@pegasus>
-In-Reply-To: <1106583831.8058.52.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <1106589847.8058.90.camel@pegasus>
+References: <6.1.2.0.2.20050124165802.04168330@luna.tlmat.unican.es>
+ <1106581771.8058.49.camel@pegasus>
+ <6.1.2.0.2.20050124172931.041a03a0@pop.gmx.net>
+ <1106583831.8058.52.camel@pegasus>
+ <6.1.2.0.2.20050124180402.041c1eb0@pop.gmx.net>
+ <1106585260.8058.56.camel@pegasus>
+ <6.1.2.0.2.20050124182813.04216860@pop.gmx.net>
+ <6.1.2.0.2.20050124192058.04bee240@pop.gmx.net>
+ <1106589847.8058.90.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,56 +26,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 24 Jan 2005 18:10:51 +0000
+Date: Mon, 24 Jan 2005 19:37:32 +0100
 
-Marcel Holtmann wrote:
-> Hi George,
-> 
-> 
->>The fact is that I have copy pand code to automate them into my 
->>application. My application makes a bridge in order to communicate WIFI and 
->>BlueTooth.
->>
->>The traffic is not too much.. when I run a ping -s 50000 it crashes and 
->>hangs. The result is that some packets are transmitted correctly while 
->>others doesn't.
->>The bnep0 connection disappears and then both ends are no more connected.
->>
->>After happening all that things I have to restart everything as the sdpd 
->>and also the bluetooth devices on both ends are hanged.
->>
->>For giving more information, one of the ends is a Sharp Zaurus 5500 and the 
->>other is a Laptop using and AnyCom usb dongle
->>
->>By having a look at /var/log/messages I have one messge that is:
->>
->>Kernel: NETDED WATCHDOG: bnep0: transmit timed out
->>
->>and also in other parts
->>
->>Jan 24 17:14:35 kernel: hci_acl_tx_to: hci0 ACL tx timeout
->>Jan 24 17:14:35 kernel: hci_acl_tx_to: hci0 killing stalled ACL connection 
->>BA:D4:09:EE:02:00
->>Jan 24 17:14:35 kernel: hci_acl_tx_to: hci0 ACL tx timeout
->>Jan 24 17:14:35 kernel: hci_acl_tx_to: hci0 killing stalled ACL connection 
->>BA:D4:09:EE:02:00
-> 
-> 
-> I actually expected to see this kind of messages. Seems like you should
-> replace the hardware. What does "hciconfig hci0 version" say about your
-> Bluetooth adapters?
-> 
-> Regards
-> 
-> Marcel
+So then the problem is not the Bluez Stack but the USB.
 
-I'm also seeing these issues - and it trips up when I transmit a bit of data 
-(amount variable :( )  including (but seemingly not limited to) SSH, VNC, FTP 
-and Samba.
+Ok... Thanks very very much for your help... I will try that last thing you 
+suggest and hope it works ;)
 
--- 
--- Michael McConnell
-Eridani MailStripper - www.eridani.co.uk/MailStripper - SMTP-layer spam filter
+Regards.
+
+
+
+At 19:04 24/01/2005, Marcel Holtmann wrote:
+ >Hi George,
+ >
+ >> OOpssss ... It wasn't the solution
+ >>
+ >> I have remove the SCO totally removed and still facing the same problem.
+ >> Thanks for your help and sorry for bothering all of you, but I have to 
+show
+ >> my application in a short while and I want it to be as stable as possible.
+ >
+ >try to swap your UHCI host controller with an OHCI one or move to a 2.6
+ >kernel. If the USB subsystem is the problem I can't help you.
+ >
+ >Regards
+ >
+ >Marcel
+ >
+ >
+ >
+ >
+ >-------------------------------------------------------
+ >This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+ >Tool for open source databases. Create drag-&-drop reports. Save time
+ >by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+ >Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+ >_______________________________________________
+ >Bluez-users mailing list
+ >Bluez-users@lists.sourceforge.net
+ >https://lists.sourceforge.net/lists/listinfo/bluez-users
+
 
 
 -------------------------------------------------------
