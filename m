@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] setting inquiry and inquiry_scan parameters
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5f30e26104120912237f20ea80@mail.gmail.com>
-References: <5f30e26104120912237f20ea80@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1102624670.9988.243.camel@pegasus>
+Message-ID: <5f30e26104120912237f20ea80@mail.gmail.com>
+From: Jeff Wilson <jazzbotley@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-devel] setting inquiry and inquiry_scan parameters
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +16,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 09 Dec 2004 21:37:50 +0100
+Date: Thu, 9 Dec 2004 14:23:33 -0600
 
-Hi Jeff,
+Browsing through the gmane archives, I found this nugget of wisdom:
 
-> I realize this post is over 9 months old, but I'm trying to write an
-> application that does these very kinds of things.  Can someone tell me
-> more about the specifics of how to tweak these numbers?  I'm guessing
-> it's related to HCI ... ?
+<quote url=http://article.gmane.org/gmane.linux.bluez.devel/1696>
+From: Steven Singer <steven.singer <at> csr.com>
+Subject: Re: Parameters of the Bluetooth standard in BlueZ...
+Date: Fri, 27 Feb 2004 11:58:04 +0000
 
-nothing has changed since then. You can only tweak things you find an
-HCI command for.
+... <snip> ...
 
-Regards
+BlueZ does have control over the total inquiry length and, on the
+scanning side, the time between entering inquiry scans and the amount
+of time spend in a scan each time.
 
-Marcel
+</quote>
 
+I realize this post is over 9 months old, but I'm trying to write an
+application that does these very kinds of things.  Can someone tell me
+more about the specifics of how to tweak these numbers?  I'm guessing
+it's related to HCI ... ?
 
+     Thanks,
+       jw
 
 
 -------------------------------------------------------
