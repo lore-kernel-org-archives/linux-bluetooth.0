@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Need help with PAND between 2  linux boxes
+Subject: Re: [Bluez-users] Kernel 2.6.8 final and AVM BlueFritz
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Paul Ionescu <i_p_a_u_l@yahoo.com>
+To: Sigrid Kronenberger <skronenberger@web.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <pan.2004.08.14.22.56.57.538948@yahoo.com>
-References: <pan.2004.08.14.22.56.57.538948@yahoo.com>
+In-Reply-To: <20040815222056.2160d599@localhost>
+References: <20040815222056.2160d599@localhost>
 Content-Type: text/plain
-Message-Id: <1092645247.4375.86.camel@pegasus>
+Message-Id: <1092645125.4375.83.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,35 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 16 Aug 2004 10:34:07 +0200
+Date: Mon, 16 Aug 2004 10:32:05 +0200
 
-Hi Paul,
+Hi Sigrid,
 
-> I have two linux boxes with FedoraCore 2 installed on both.
-> Both of them have USB bluetooth adapters.
-> I have tried to connect them in a NAP - PANU config, as indicated in
-> http://bluez.sourceforge.net/contrib/HOWTO-PAN, but something is not
-> working and I can't figure out what.
-> Here are the details:
-> service bluetooth start
-> Then I check with hciconfig that both BT are UP.
-> Then, on both computers I modprobe bnep.
-> (one note here, ifconfig -a does not show any bnep0 at this moment)
-> On both of them launch
-> hcidump in separate windows to see what is going on. 
+> [root@localhost sigrid]# ciptool search
+> Searching ...
+>         Checking service for 00:04:0E:81:71:87
+>         Connecting to device 00:04:0E:81:71:87
+> Local device is not accepting role switch
+> Can't connect L2CAP socket: Connection refused
+> [root@localhost sigrid]#
 > 
-> On one I launch 
-> pand --listen --role NAP -n --master
-> and on the other
-> pand -c 00:20:E0:73:EB:F7 -n --role PANU
-> 
-> and after some messages in hcidump on both sides, I receive:
-> pand[1431]: Bluetooth PAN daemon
-> pand[1431]: Connecting to 00:20:E0:73:EB:F7
-> pand[1431]: Connect to 00:20:E0:73:EB:F7 failed. Function not implemented(38)
+> How can I change the last point? My AP don't accept the role switch. 
 
-try it without the --master and --role parameters. I think you forgot to
-enable the role switch (rswitch) on both sides.
+Take a look at my Bluetooth ISDN howto:
+
+	http://www.holtmann.org/linux/bluetooth/isdn.html
+
+And of course make sure that hcid is running.
 
 Regards
 
