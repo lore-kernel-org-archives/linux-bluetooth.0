@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jonathan McDowell <noodles@earth.li>
-To: David@vitrant.org
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: Fwd: [Bluez-users] bluez and billionton pcbtc1
-Message-ID: <20050329223648.GR20882@earth.li>
-References: <b5c638dc05032815321b2739c5@mail.gmail.com> <1112075117.9016.60.camel@pegasus> <b5c638dc05032907582bf771dc@mail.gmail.com> <200503292303.38682.pavouk@pavouk.org> <b5c638dc05032914296f02255e@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <b5c638dc05032914296f02255e@mail.gmail.com>
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] bluez and billionton pcbtc1
+Cc: David Vitrant <prussia@gmail.com>
+References: <b5c638dc05032815321b2739c5@mail.gmail.com> <1112075117.9016.60.camel@pegasus> <b5c638dc05032907582bf771dc@mail.gmail.com>
+In-Reply-To: <b5c638dc05032907582bf771dc@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200503292303.38682.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,52 +20,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Mar 2005 23:36:48 +0100
+Date: Tue, 29 Mar 2005 23:03:38 +0200
 
-On Tue, Mar 29, 2005 at 05:29:57PM -0500, David Vitrant wrote:
-> hey.. i was referred to your post on your CF billionton card.. seems
-> to have much of the same info asm ine (i attached the other posts ..
-> do you have anymore insights.. i used your instructions
-> 
-> but when i did the hciattach it gave me this error bcsp timed out.. 
-> 
-> thanks.. i could certainly use the help
+Hello,
 
-What kernel version? Have you applied the patch at:
+before few days 17.3.2005 writes Jonathan McDowell message about
+success with Billionton card with identical ID:
+  product info: "Compact Flash", "Bluetooth Card", "", ""
+  manfid: 0x0279, 0x950b
 
-http://www.summet.com/x31/8250_patch_CFcard.txt
+He suggests these commands:
+setserial /dev/ttyS0 baud_base 912600
+hciattach -s 912600 /dev/ttyS0 bcsp
 
-if it's 2.6? I haven't had any luck with 2.4.20 (as on my Zaurus) yet.
+(His baudrate is probably wrong. 921600 instead 912600 can be).
+But his mail have many additional informations.
+Please look at archive of mailing-list and search for message with subject:
+"Billionton(?) CF card - success".
+ 
+>   manfid 0x0279, 0x950b
+>   funcid serial_port [post]
+>   serial_interface
+>     uart 16550 [space/mark/odd/even] [5/6/7/8] [1/1.5/2]
+>   vers_1 7.1, "PCMCIA", "Bluetooth Card", "", ""
 
-> On Tue, 29 Mar 2005 23:03:38 +0200, Pavel Ruzicka <pavouk@pavouk.org> wrote:
-> > Hello,
-> > 
-> > before few days 17.3.2005 writes Jonathan McDowell message about
-> > success with Billionton card with identical ID:
-> >   product info: "Compact Flash", "Bluetooth Card", "", ""
-> >   manfid: 0x0279, 0x950b
-> > 
-> > He suggests these commands:
-> > setserial /dev/ttyS0 baud_base 912600
-> > hciattach -s 912600 /dev/ttyS0 bcsp
-> > 
-> > (His baudrate is probably wrong. 921600 instead 912600 can be).
-> > But his mail have many additional informations.
-> > Please look at archive of mailing-list and search for message with subject:
-> > "Billionton(?) CF card - success".
-> > 
-> > >   manfid 0x0279, 0x950b
-> > >   funcid serial_port [post]
-> > >   serial_interface
-> > >     uart 16550 [space/mark/odd/even] [5/6/7/8] [1/1.5/2]
-> > >   vers_1 7.1, "PCMCIA", "Bluetooth Card", "", ""
+Best regards,
 
-J.
-
--- 
-/-\                             | No thanks, I'm already having one.
-|@/  Debian GNU/Linux Developer |
-\-                              |
+Pavel Ruzicka
 
 
 -------------------------------------------------------
