@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Dimitry Andric <dimitry@andric.com>
-Message-ID: <381006269.20050404171656@andric.com>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="----------66EE1FABF462D5"
-Subject: [Bluez-devel] [PATCH] Add sdptool option for browsing with L2CAP_UUID
+From: zze-COLBUS Emmanuel RD-MAPS-GRE <emmanuel.colbus@rd.francetelecom.com>
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-15
+Message-Id: <1112624867.4782.27.camel@g-xw4200-6.rd.francetelecom.fr>
+Mime-Version: 1.0
+Subject: [Bluez-devel] [PATCH] /include/net/bluetooth/hci.h : modify ACL_PTYPE_MASK
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,58 +16,60 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 4 Apr 2005 17:16:56 +0200
+Date: Mon, 04 Apr 2005 16:27:47 +0200
 
-------------66EE1FABF462D5
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Hello,
 
-Some phones (e.g. Samsung D500, Motorola MPx220, and possibly some
-other Windows Mobile models) don't return any services if you ask them
-for the public browse group.  You notice this, when "sdptool browse
-xx:xx:xx:xx:xx:xx" returns immediately, without any output.
+I've noticed that ACL_PTYPE_MASK is defined as the binary negation of
+SCO_PTYPE_MASK in /include/net/bluetooth/hci.h .
 
-It turns out that the Windows XP Bluetooth browser asks for
-L2CAP_UUID, which *does* work for all the phones I've tested.
+Although this happens to be not wrong currently, because none of the
+values (0x0020, 0x0040, 0x0080) used by HV1, HV2 and HV3 have a meaning
+for ACL packets, there is AFAIK no norm stating that this won't change
+(these values are just marked as "Reserved for future use" in the
+Bluetooth Specification version 2.0).
 
-So I've made this simple patch, that adds a `-l' or `--l2cap' command
-line option to sdptool, to use the L2CAP_UUID for browsing, instead of
-PUBLIC_BROWSE_GROUP.
+Furthermore, value 0x0001 is marked as "Reserved for future use" for
+both ACL and SCO packets. Therefore, by forbidding their use for SCO
+packets, and defining the ACL mask as the SCO mask's negation, we are
+allowing it's use for ACL packets, which could have unspecified results
+on any hardware using a future Bluetooth Specification version.
 
-------------66EE1FABF462D5
-Content-Type: text/plain; name="bluez-utils-2.15-sdpbrowse-l2cap.patch"
-Content-transfer-encoding: base64
-Content-Disposition: attachment; filename="bluez-utils-2.15-sdpbrowse-l2cap.patch"
+I suggest the following patch : 
 
-IyBibHVlei11dGlscy0yLjE1LXNkcGJyb3dzZS1sMmNhcC5wYXRjaAojCiMgU29tZSBwaG9u
-ZXMgZG9uJ3QgcmV0dXJuIGFueSBzZXJ2aWNlcyBpZiB5b3UgYXNrIHRoZW0gZm9yIHRoZSBw
-dWJsaWMKIyBicm93c2UgZ3JvdXAuICBJdCB0dXJucyBvdXQgdGhhdCB0aGUgV2luZG93cyBY
-UCBCbHVldG9vdGggYnJvd3NlcgojIGFza3MgZm9yIEwyQ0FQX1VVSUQsIHdoaWNoIHNlZW1z
-IHRvIHdvcmsgZm9yIGFsbCBwaG9uZXMuCiMKIyBUaGlzIHBhdGNoIGFkZHMgYSBgLWwnIG9y
-IGAtLWwyY2FwJyBjb21tYW5kIGxpbmUgb3B0aW9uIHRvIHNkcHRvb2wsCiMgdG8gdXNlIHRo
-ZSBMMkNBUF9VVUlEIGZvciBicm93c2luZywgaW5zdGVhZCBvZiBQVUJMSUNfQlJPV1NFX0dS
-T1VQLgojCiMgRGltaXRyeSBBbmRyaWMgPGRpbWl0cnlAYW5kcmljLmNvbT4sIDIwMDUtMDQt
-MDQgMTY6Mzk6MzMKCmRpZmYgLXVyTmQgYS91dGlscy90b29scy9zZHB0b29sLmMgYi91dGls
-cy90b29scy9zZHB0b29sLmMKLS0tIGEvdXRpbHMvdG9vbHMvc2RwdG9vbC5jCTIwMDQtMTIt
-MjUgMTk6MDY6MDIuMDAwMDAwMDAwICswMTAwCisrKyBiL3V0aWxzL3Rvb2xzL3NkcHRvb2wu
-YwkyMDA1LTA0LTA0IDE2OjM1OjAxLjAwMDAwMDAwMCArMDIwMApAQCAtMjAxNiwxMiArMjAz
-MywxMyBAQAogc3RhdGljIHN0cnVjdCBvcHRpb24gYnJvd3NlX29wdGlvbnNbXSA9IHsKIAl7
-ICJoZWxwIiwgICAgMCwwLCAnaCcgfSwKIAl7ICJ0cmVlIiwgICAgMCwwLCAndCcgfSwKKwl7
-ICJsMmNhcCIsICAgMCwwLCAnbCcgfSwKIAl7IDAsIDAsIDAsIDAgfQogfTsKIAogc3RhdGlj
-IGNoYXIgKmJyb3dzZV9oZWxwID0gCiAJIlVzYWdlOlxuIgotCSJcdGJyb3dzZSBbLS10cmVl
-XSBbYmRhZGRyXVxuIjsKKwkiXHRicm93c2UgWy0tdHJlZV0gWy0tbDJjYXBdIFtiZGFkZHJd
-XG4iOwogCiAvKgogICogQnJvd3NlIHRoZSBmdWxsIFNEUCBkYXRhYmFzZSAoaS5lLiBsaXN0
-IGFsbCBzZXJ2aWNlcyBzdGFydGluZyBmcm9tIHRoZQpAQCAtMjA0Miw2ICsyMDYwLDEzIEBA
-CiAJCWNhc2UgJ3QnOgogCQkJY29udGV4dC50cmVlID0gMTsKIAkJCWJyZWFrOworCQljYXNl
-ICdsJzoKKwkJCS8qIFNvbWUgcGhvbmVzIGRvbid0IHJldHVybiBhbnkgc2VydmljZXMgaWYg
-eW91IGFzayB0aGVtIGZvciB0aGUKKwkJCSAqIHB1YmxpYyBicm93c2UgZ3JvdXAuICBJdCB0
-dXJucyBvdXQgdGhhdCB0aGUgV2luZG93cyBYUCBCbHVldG9vdGgKKwkJCSAqIGJyb3dzZXIg
-YXNrcyBmb3IgTDJDQVBfVVVJRCwgd2hpY2ggc2VlbXMgdG8gd29yayBmb3IgYWxsIHBob25l
-cy4KKwkJCSAqLworCQkJc2RwX3V1aWQxNl9jcmVhdGUoJihjb250ZXh0Lmdyb3VwKSwgTDJD
-QVBfVVVJRCk7CisJCQlicmVhazsKIAkJZGVmYXVsdDoKIAkJCXByaW50Zihicm93c2VfaGVs
-cCk7CiAJCQlyZXR1cm4gLTE7Cg==
 
-------------66EE1FABF462D5--
+--- old/include/net/bluetooth/hci.h       2005-03-26 04:28:36.000000000
++0100
++++ new/include/net/bluetooth/hci.h      2005-04-04 16:08:24.372117996
++0200
+@@ -124,7 +124,8 @@
+ #define HCI_HV3                0x0080
+
+ #define SCO_PTYPE_MASK (HCI_HV1 | HCI_HV2 | HCI_HV3)
+-#define ACL_PTYPE_MASK (~SCO_PTYPE_MASK)
++#define ACL_PTYPE_MASK (HCI_DM1 | HCI_DM3 | HCI_DM5 \
++		| HCI_DH1 | HCI_DH3 | HCI_DH5)
+
+ /* ACL flags */
+ #define ACL_CONT               0x01
+
+
+Note that this patch has the side effect of blocking any flag that is
+not defined in hci.h for ACL packets (like 0x0002 : "2-DH1 may not be
+used"), but I assume that using such a flag somewhere would just be a
+bug.
+
+Regards,
+
+Emmanuel
+
+--
+Emmanuel Colbus
+Club GNU/Linux
+ENSIMAG - Departement telecoms
+
+M. Emmanuel COLBUS intervenant à France Télécoms dans le cadre d'un
+stage de fin d'études sous la responsabilité de M. Tahar Jarboui.
 
 
 
