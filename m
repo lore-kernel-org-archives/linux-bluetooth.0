@@ -1,85 +1,65 @@
-Return-Path: <johnpol@2ka.mipt.ru>
-Date: Wed, 9 Feb 2005 22:41:44 +0300
-From: Evgeniy Polyakov <johnpol@2ka.mipt.ru>
-To: Nishanth Aravamudan <nacc@us.ibm.com>
-Cc: gregkh@us.ibm.com, marcel@holtmann.org, maxk@qualcomm.com, jt@hpl.hp.com,
-   perex@suse.cz, linux-dvb-maintainer@linuxtv.org,
-   linux-usb-devel@lists.sourceforge.net, bluez-devel@lists.sourceforge.net,
-   irda-users@lists.sourceforge.net, alsa-devel@alsa-project.org,
-   linux-dvb@linuxtv.org, sensors@stimpy.netroedge.com
-Subject: Re: [PATCH 0/63] convert usb_control_msg() and usb_bulk_msg() to
- use msecs
-Message-ID: <20050209224144.66f0ed41@zanzibar.2ka.mipt.ru>
-In-Reply-To: <20050209000212.GB5661@us.ibm.com>
-References: <20050209000212.GB5661@us.ibm.com>
-Reply-To: johnpol@2ka.mipt.ru
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Re: Re: Re: Re: Re: Re: hciattach problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <420A5CDE.80201@web.de>
+References: <420A5CDE.80201@web.de>
+Content-Type: text/plain
+Message-Id: <1107975765.13863.96.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 09 Feb 2005 20:02:45 +0100
 
-On Tue, 8 Feb 2005 16:02:12 -0800
-Nishanth Aravamudan <nacc@us.ibm.com> wrote:
+Hi Andreas,
 
-> Hi,
+> >> I have checked with -mh3, too, and it does also work. I have no 
+> >> But I think, I have done something wrong in the config or so. Thanks for 
+> >> your help.
+> >
+> >actually I asked you to test 2.6.11-rc3 and not the -mh3. I want to be
+> >sure that the latest testing kernel before the final 2.6.11 has no
+> >problems with it. So grab 2.6.11-rc3-bk3 and test it please.
+> >
+> Sorry for my late post, but I was on holiday the last days. I have tried to compile 2.6.11-rc3-bk3, but the compiling breaks with an error:
+> drivers/char/vt.c: In function `set_cursor':
+> drivers/char/vt.c:560: error: structure has no member named `vc_vt'
+> drivers/char/vt.c: In function `vc_allocate':
+> drivers/char/vt.c:731: error: structure has no member named `vc_vt'
+> drivers/char/vt.c:747: warning: `pm_register' is deprecated (declared at include/linux/pm.h:106)
+> drivers/char/vt.c: In function `con_init':
+> drivers/char/vt.c:2569: error: structure has no member named `vc_vt'
+> make[2]: *** [drivers/char/vt.o] Fehler 1
+> make[1]: *** [drivers/char] Fehler 2
+> make: *** [drivers] Fehler 2
 > 
-> The following patchset (affecting USB, Bluetooth, IrDA, Sound, DVB and W1 --
-> hence the long To: an Cc: lists...) converts the usb_control_msg() and
-> usb_bulk_msg() functions to use milliseconds in the timeout parameter instead
-> of jiffies. This is not a problem for almost all cases, as the requested delays are usually quite long wrt. these two functions.
+> What should I do now? I'm not an linux expert.
 
-As for w1 - this changes do not break anything, but
-I'm not sure that it will not break usb core code which can
-depend on jiffies and thus arch specific timings.
+see if it is fixed in 2.6.11-rc3-bk6 and if not, post a problem report
+to the linux-kernel mailing list.
 
-So I have a question: is this change intentional and thus by design requires
-milliseconds, or it just happens that HZ==1000 on the most of the platforms?
- 
-> I see several reasons for committing these changes:
-> 
-> 1) Expressing time in milliseconds makes the code cleaner and easier to
-> understand. It also makes the delay independent (from a code perspective) of
-> HZ's value, which would be important for dynamic-HZ or tickless systems.
-> 
-> 2) Also for dynamic-HZ/tickless systems, it becomes unclear what exactly HZ
-> represents. Milliseconds have meaning in the human world beyond the kernel. This
-> ties in pretty strongly with 1)'s point about understanding.
-> 
-> 3) As the time/timer subsystem evolves and changes, the overall message I am
-> seeing is that jiffies are not a proper expression of time. Thus, I am hoping
-> these patches minimize this particular interface's usage of jiffies in this
-> way; while, in the end, the call to usb_start_wait_for_urb ends up with the
-> same jiffies-based time, if the timer subsystem were to, for instance, convert
-> to nanoseconds, we could instead pass on the parameter multiplied by a million.
-> It simply makes adjusting to any new time system that much easier.
-> 
-> Exceptions do exist, of course, and the following files do not use a
-> HZ-relative timeout variable; thus I was unsure how exactly to proceed.
-> Given that HZ==1000 in i386, the constants used technically correspond
-> directly to milliseconds. I am unsure if that is the intent of the author
-> in all cases, though. I left the hard-coded non-HZ related values alone in all
-> cases.
-> 
-> drivers/isdn/hisax/hfc_usb.c
-> drivers/usb/media/dabusb.c
-> drivers/usb/media/dsbr100.c
-> drivers/usb/media/stv680.c
-> drivers/usb/media/w9968cf.c
-> drivers/usb/misc/emi26.c
-> drivers/usb/misc/emi62.c
-> drivers/usb/serial/cypress_m8.c
-> drivers/usb/serial/ftdi_sio.c
-> drivers/usb/serial/io_edgeport.c
-> drivers/usb/serial/kobil_sct.c
-> drivers/usb/serial/pl2303.c
-> drivers/media/dvb/dibusb/dvb-dibusb-usb.c
-> drivers/usb/media/dabusb.c
-> drivers/w1/dscore.c
-> 
-> As always, any comments or suggestions are greatly appreciated.
-> 
-> -Nish
+Regards
+
+Marcel
 
 
-	Evgeniy Polyakov
 
-Only failure makes us experts. -- Theo de Raadt
+
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now.
+http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
