@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluez freezes kernel on Ipaq
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200412091507.44608.wim.delvaux@adaptiveplanet.com>
-References: <200412091507.44608.wim.delvaux@adaptiveplanet.com>
-Content-Type: text/plain
-Message-Id: <1102602141.9988.219.camel@pegasus>
-Mime-Version: 1.0
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200412091507.44608.wim.delvaux@adaptiveplanet.com>
+Subject: [Bluez-users] bluez freezes kernel on Ipaq
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,20 +17,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 09 Dec 2004 15:22:21 +0100
+Date: Thu, 9 Dec 2004 15:07:44 +0100
 
-Hi Wim,
+Hi all,
 
-> it looks like if you perform bluez actions (which I do not know) from two 
-> different applications at the same time, there are chances that the kernel 
-> freezes (i.e. complete hang of the system even with serial console connected.
+it looks like if you perform bluez actions (which I do not know) from two 
+different applications at the same time, there are chances that the kernel 
+freezes (i.e. complete hang of the system even with serial console connected.
 
-may you tell us of what kernel and what version of BlueZ we are talking?
-
-Regards
-
-Marcel
-
+W
 
 
 
