@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <404A2A86.2090706@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <1078599102.404a1dbeb9063@webmail.auth.gr>
+From: pbeli@math.auth.gr
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Toshiba Portege M200 internal bluetooth adapter
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-7
+Subject: [Bluez-users] PAN multicast and protocol filters
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,26 +15,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 06 Mar 2004 12:46:14 -0700
+Date: Sat,  6 Mar 2004 20:51:42 +0200
 
-Hi
+Hi,
 
-I'm not totally sure how to use the internal bluetooth on my toshiba
-portege m200. I saw reports of "hci_usb + toshiba" for similar models
-but I have no idea what that means. usbfs doesn't show anything that
-looks like bluetooth but lspci -v reports one device I'm not sure about.
-Maybe that's it...
+I've seen in the kernel options that BlueZ supports multicast and protocol 
+filtering in the bnep interfaces. However, I couldn't find any more information 
+in the BlueZ web pages.
+Can any one send me more details? Which tools do you use to set those filters? 
+Examples?
 
-02:0d.0 System peripheral: Toshiba America Info Systems: Unknown device
-0805 (rev 05)
-	Subsystem: Toshiba America Info Systems: Unknown device 0001
-	Flags: medium devsel, IRQ 11
-	Memory at 20000c00 (32-bit, non-prefetchable) [disabled] [size=512]
-	Capabilities: [80] Power Management version 2
+Br,
+petros
 
-Does anyone know if there's a chance it's supported?
-
-Brad
 
 
 
