@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] snd-bt-sco - unknown symbol snd_hwdep_new
-	undefined!
+Subject: Re: [Bluez-devel] a2play and Toshiba SR-1 Bluetooth Headset
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200411270038.51554.ruben@hotheads.de>
-References: <200411270038.51554.ruben@hotheads.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1101524868.6514.67.camel@pegasus>
+In-Reply-To: <41A6F09C.5000801@parrot.fr>
+References: <20041125091124.GA19805@snoopy.src.ricoh.co.jp>
+	 <20041125112509.75347786.henryk@ploetzli.ch>
+	 <20041125105615.GA19821@snoopy.src.ricoh.co.jp>
+	 <1101440449.6465.64.camel@pegasus>
+	 <20041126045659.6a3291f5.henryk@ploetzli.ch>
+	 <1101442380.6465.77.camel@pegasus>  <41A6F09C.5000801@parrot.fr>
+Content-Type: text/plain
+Message-Id: <1101490174.6514.39.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,43 +23,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 27 Nov 2004 04:07:47 +0100
+Date: Fri, 26 Nov 2004 18:29:34 +0100
 
-Hi Ruben,
+Hi Sebastien,
 
-> I have problems compiling the snd-bt-sco module aginst
-> gentoo-dev-sources-2.6.9-r6.
-> Does anyone knows what's the reason for this warning?
-> - Is it due to a change in the kernel or in the btsco sources?
->=20
->=20
-> >> modprobe snd-bt-sco
->=20
-> FATAL: Error inserting snd_bt_sco=20
-> (/lib/modules/2.6.9-gentoo-r6/extra/snd-bt-sco.ko): Unknown symbol in m=
-odule,=20
-> or unknown parameter (see dmesg)
->=20
->=20
-> >>dmesg:
->=20
-> snd_bt_sco: Unknown symbol snd_hwdep_new
+> > actually for me it is not clear if we have to insert that header (even
+> > with no content protection information) when the capabilities shows that
+> > record. Maybe I missed something in the specification.
+> 
+> In fact you have to insert the content protection header only if you 
+> want to use it.
+> 
+> This capablity is optional, so you can skip it during the stream 
+> configuration process.
 
-you may need to make "depmod -e" first or simply load the "snd-hwdep"
-kernel module.
-
-> >>compile process of the kernel module:
->=20
-> 22:57 root [/home/ruben/temp/btsco/btsco/kernel] : make
-> make[1]: Entering directory `/usr/src/linux-2.6.9-gentoo-r6'
->   CC [M]  /home/ruben/temp/btsco/btsco/kernel/btsco.o
-> /home/ruben/temp/btsco/btsco/kernel/btsco.c: In Funktion=20
-> =BBsnd_card_bt_sco_thread=AB:
-> /home/ruben/temp/btsco/btsco/kernel/btsco.c:809: Warnung: ISO C90 forbi=
-ds=20
-> mixed declarations and code
-
-This one is now fixed in CVS.
+this don't answers my question. If we don't use it in set configuration
+then we don't have add the content protection header?
 
 Regards
 
