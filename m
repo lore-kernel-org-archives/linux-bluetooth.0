@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <50142.195.22.30.15.1108037990.squirrel@195.22.30.15>
-From: schnelte@uni-paderborn.de
-To: bluez-devel@lists.sourceforge.net
+From: Till Harbaum <harbaum@beecon.de>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: Moritz Gmelin <moritz.gmelin@avetana.de>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Subject: [Bluez-devel] Several bluetooth dongles at time
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200502101112.09602.harbaum@beecon.de>
+Subject: [Bluez-devel] Zero length L2CAP packets
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,82 +18,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 10 Feb 2005 13:19:50 +0100 (CET)
+Date: Thu, 10 Feb 2005 11:12:09 +0100
 
-Hi there,
+Hi,
 
-I am runnning a rfcomm server on a linux pc and want mobile phones to
-connect to it.
-I need some clearence about the following questions:
+while working on the avetana jsr82 implementation we discovered, that the bt 
+spec as well as jsr82 allow to transmit zero length l2cap packets. IMHO the 
+linux socket interface does not support zero length packets and a read 
+returning zero indicates an end of file (in this case meaning that the 
+connection has been closed).
 
-1) As the phone is connecting to the pc and not the other way around, the
-pc is the slave at first. As far as I know a slave cannot connect to more
-than one device at time. So I force a role switch to master after
-connection. What happend when another phone will connect? The PC will be
-master from the beginning and no role switch is needed? (I don't have a
-second mobile to test, at the moment)
+What happens if the other side actually sends a zero length packet? Is this 
+dropped inside the kernel? Or will read return zero which i'll misinterpret 
+as the eof marker? How can i distinguish between eof and a zero length 
+packet?
 
-2) Can i have multiple connections on the same rfcomm channel? So more
-than one mobile can connect to my server at time or only one device per
-channel and i have to open more than one channel?
+Regards,
+  Till
 
-3) If I have more than one bluetooth dongle how can I say which dongle to
-use for the connections? At the moment I am setting the field rc_bdaddr to
-the address of the bluetooth dongle I am willing to use. Is that about
-right? What happens if I am using BDADDR_ANY, BDADDR_ALL or BDADDR_LOCAL
-instead? Is there any convinient way that bluez automatically chooses
-another dongle if all connections on one dongle are full?
-
-Tnx very much in advance for your answers.
-
-Matthias
-
-This is the code I am using:
-
-  int sock, client, alen;
-  int dev;
-
-  struct sockaddr_rc addr;
-  if( (sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < 0)
-    {
-      perror("socket");
-      exit(1);
-    }
-
-  addr.rc_family = AF_BLUETOOTH;
-  bdaddr_t local;
-  str2ba("00:10:60:A4:03:01", &local);
-  bacpy(&addr.rc_bdaddr, &local);
-  addr.rc_channel = htobs(channel);
-  alen = sizeof(addr);
-
-  if(bind(sock, (struct sockaddr *)&addr, alen) < 0)
-    {
-      perror("bind");
-      exit(1);
-    }
-
-  listen(sock,10);
-  printf("%d Waiting for connections...\n\n",channel);
-
-  if(client = accept(sock, (struct sockaddr *)&addr, &alen))
-    {
-      printf("%d Got a connection attempt!\n",channel);
-    }
-
-  dev=hci_open_dev(0);
-  if (dev<0) {
-    printf("Error opening hci dev");
-    exit(1);
-
-    }
-
-  if (hci_switch_role(dev, &addr.rc_bdaddr, 0, 10000) <0) {
-    printf("Role switch failed!");
-    }
-  close(dev);
-
-
+-- 
+Dr.-Ing. Till Harbaum                       Tel.:  +49 721 4998963
+BeeCon GmbH                                 Fax:   +49 721 4998962
+Haid-und-Neu Strasse 7, 76131 Karlsruhe     Mobil: +49 179 9087904
+harbaum@beecon.de                           http://www.beecon.de
 
 
 -------------------------------------------------------
