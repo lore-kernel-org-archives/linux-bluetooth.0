@@ -1,50 +1,55 @@
-Return-Path: <nish.aravamudan@gmail.com>
-Message-ID: <29495f1d050206141977a6b4fa@mail.gmail.com>
-Date: Sun, 6 Feb 2005 14:19:29 -0800
-From: Nish Aravamudan <nish.aravamudan@gmail.com>
-Reply-To: Nish Aravamudan <nish.aravamudan@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [KJ] Re: [PATCH 19/20] bluetooth/bluecard_cs: remove interruptible_sleep_on_timeout() usage
-Cc: Nishanth Aravamudan <nacc@us.ibm.com>, kernel-janitors@lists.osdl.org,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Max Krasnyansky <maxk@qualcomm.com>
-In-Reply-To: <1107562301.6921.115.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Re: Re: Re: Re: Re: hciattach problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <42065FAA.8030309@web.de>
+References: <42065FAA.8030309@web.de>
+Content-Type: text/plain
+Message-Id: <1107714956.12834.72.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <20050202225855.GY2546@us.ibm.com>
-	 <1107386189.11944.21.camel@pegasus> <20050203002502.GB2546@us.ibm.com>
-	 <1107562301.6921.115.camel@pegasus>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Sun, 06 Feb 2005 19:35:56 +0100
 
-On Sat, 05 Feb 2005 01:11:41 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Nish,
-> 
-> > > > Please consider applying.
-> > > >
-> > > > Description: Remove deprecated interruptible_sleep_on_timeout() function calls
-> > > > and replace with direct wait-queue usage. Some naming conflicts occurred, which
-> > > > I tried to resolve appropriately. Patch is compile-tested.
-> > >
-> > > you introduce more code than you remove. Is our code a special case or
-> > > why don't exists a simple API function as replacement?
+Hi Andreas,
+
+> >no. The libs and utils will not change the behaviour of your kernel. I
+> >think you had an experimental patch in one of the kernels that causes
+> >your problem. May you wanna also check the 2.6.11-rc3 to be sure that
+> >everything is fine.
 > >
-> > Yes, I do. *sleep_on*() was the API, which has been replaced with wait_event*().
-> > However, wait_event*() explicitly needs a condition (the "event"), which in
-> > thise case does not exist. If I had more background, I would have gone the
-> > wait_event*() route. I am looking into a better API to mask away all of the
-> > DEFINE_WAIT(), prepare_to_wait(), schedule()/schedule_timeout(), finish_wait()
-> > additions (the KJ list can attest to how many of these replacements I'm doing),
-> > but there simply does not exist such an API right now.
-> >
-> > Any input you could provide, though, would be greatly appreciated.
-> 
-> I gave your patch a shot and the oops below happens on a 2.6.11-rc3
-> after plugging in the card. Without the patch it is working.
+> >  
+> I have checked with -mh3, too, and it does also work. I have no 
+> experimental patch in my kernel, so I don't know, what the problem was. 
+> But I think, I have done something wrong in the config or so. Thanks for 
+> your help.
 
-Sorry for the long delay without a response!
+actually I asked you to test 2.6.11-rc3 and not the -mh3. I want to be
+sure that the latest testing kernel before the final 2.6.11 has no
+problems with it. So grab 2.6.11-rc3-bk3 and test it please.
 
-That looks like I may have missed some wake-up related issues. I'll
-check on it and get back to you soon.
+Regards
 
-Thanks,
-Nish
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+Tool for open source databases. Create drag-&-drop reports. Save time
+by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
