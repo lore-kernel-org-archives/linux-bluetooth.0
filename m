@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] how to obtain address for rfcomm connection
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1106164863.12437.44.camel@justakiss>
+From: Erwin Authried <eauth@softsys.co.at>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1106154308.8190.128.camel@pegasus>
 References: <1106148402.12428.21.camel@justakiss>
-	 <1106154308.8190.128.camel@pegasus>  <1106164863.12437.44.camel@justakiss>
+	 <1106154308.8190.128.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1106167013.8190.131.camel@pegasus>
+Message-Id: <1106164863.12437.44.camel@justakiss>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,25 +19,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 Jan 2005 21:36:53 +0100
+Date: Wed, 19 Jan 2005 21:01:03 +0100
 
-Hi Erwin,
+Am Mit, den 19.01.2005 schrieb Marcel Holtmann um 18:05:
+> Hi Erwin,
+> 
+> > I want to establish a rfcomm connection to a mobile phone. I don't know
+> > the phone's address or name a-priori. The pairing is initated from the
+> > phone before the rfcomm connection is initiated. Is there an easy way to
+> > get the phone's address from the preceding link key exchange (from
+> > /etc/bluetooth/link_key?). Browsing/scanning for devices might give more
+> > than one canditate for communication, but I want to use only the one
+> > that has already paired.
+> 
+> you will find any paired device in the link_key file. However if the
+> phone was connected then you can use normal technics to get the device
+> address at the that time. To what service did the phone connect?
+> 
+> Regards
+> 
+> Marcel
 
-> the phone (ericsson t630) didn't connect to a specific service, there's
-> a menu entry for discovering new devices. After a few seconds, the names
-> of the discovered devices show up. When one of them is selected, the
-> phone shows a prompt for entering the pincode, and the link key is saved
-> on the Linux system. The purpose of the system is a tcp/ip transmission
-> from the Linux system via GSM/GPRS. On the Linux system, no selection or
-> entry should be necessary, the ppp over rfcomm connection should come up
-> automatically or by pressing a button.
+Hi Marcel,
+the phone (ericsson t630) didn't connect to a specific service, there's
+a menu entry for discovering new devices. After a few seconds, the names
+of the discovered devices show up. When one of them is selected, the
+phone shows a prompt for entering the pincode, and the link key is saved
+on the Linux system. The purpose of the system is a tcp/ip transmission
+from the Linux system via GSM/GPRS. On the Linux system, no selection or
+entry should be necessary, the ppp over rfcomm connection should come up
+automatically or by pressing a button.
 
-establish a OBEX push service on your device and after you send a vCard
-from your phone you get the BD_ADDR.
-
-Regards
-
-Marcel
+Regards,
+Erwin
 
 
 
