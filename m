@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] CSR guys, which is difference??
+Subject: Re: [Bluez-users] rctest[3790]: Can't set L2CAP link mode
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200412291951.31412.cijoml@volny.cz>
-References: <200412291951.31412.cijoml@volny.cz>
+In-Reply-To: <cqunik$ule$1@sea.gmane.org>
+References: <cqunik$ule$1@sea.gmane.org>
 Content-Type: text/plain
-Message-Id: <1104348966.6325.4.camel@notepaq>
+Message-Id: <1104348843.6325.1.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Dec 2004 20:36:06 +0100
+Date: Wed, 29 Dec 2004 20:34:03 +0100
 
-Hi Michal,
+Hi,
 
-> which is difference between BlueCore02-External and BlueCore02??
+> This is part of my lsmod output:
+> 
+> [soraberri@castejon temp]$ lsmod
+> Module                  Size  Used by
+> hci_usb                15041  3
+> rfcomm                 36701  2
+> l2cap                  25285  7 rfcomm
+> bluetooth              46917  11 hci_usb,rfcomm,l2cap
+> 
+> sdpd and hcid are running
+> 
+> I think all the important stuff is there, and then why am I getting the 
+> following error?
+> 
+> [soraberri@castejon temp]$rctest -r
+> rctest[3790]: Can't set L2CAP link mode. Protocol not available(92)
 
-it is the same. I changed the decoding function in the latest version to
-be more specific about different CSR chips. In general you differ
-between ROM versions and versions with flash.
+this error is wrong and I actually fixed it in the CVS now.
+
+> Well it seems that the error is born within the call to
+> setsockopt(s, SOL_RFCOMM, RFCOMM_LM, &opt, sizeof(opt))
+> in rctest.c
+
+You need a kernel with RFCOMM service level security support. This is
+not mainline yet.
 
 Regards
 
