@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Gene Imes <ebi7@ozob.net>
-To: list-bluez <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Bluetooth security in bluez ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403290053.32295.cijoml@volny.cz>
+References: <20040328223546.2206.qmail@web60303.mail.yahoo.com>
+	 <200403290053.32295.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1080515964.11299.4.camel@go2>
+Message-Id: <1080514902.2281.183.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] rfcomm problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,21 +19,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 28 Mar 2004 17:19:24 -0600
+Date: Mon, 29 Mar 2004 01:01:42 +0200
 
-I have a D-Link dbt-120 dongle. This has been working fine with a
-bluetooth GPS. However today I tried to use it and I could not connect
-to the GPS.
+Hi Thomas,
 
-When I plug the dbt-120 in the /dev/rfcomm0-255 are created. If I try a
-'cat /dev/rfcomm0' I get cat: rfcomm0 No such device. Previously a 'cat
-/dev/rfcomm0' would return everything the GPS was sending.
+first if you start asking on a mailing list you should keep posting also
+your answers to it.
 
-Anyone know what is going on here?
+> > ok but i'm intersted in how the security is
+> > implemented (E0, E1, E21, E22, E3 algorithms) ... i'm
+> > looking for the source code that does the
+> > authentification and encryption. You mean that it's
+> > done inside the dongle ?
 
-Thanks,
+The Bluetooth host stack only handles everything at the HCI level and
+its upper layers. Everything down like link manager, baseband and radio
+is part of the Bluetooth chip. And this also means that every security
+mechanism is implemented in the chip. From the host side you can only
+trigger them.
 
-Gene 
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
