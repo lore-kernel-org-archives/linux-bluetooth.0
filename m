@@ -1,31 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] D-Bus interfaces
+Subject: Re: [Bluez-devel] hcid hotplug initialisation?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Fredrik Noring <noring@nocrew.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076333024.5263.116.camel@kalkyl.roxen.com>
-References: <1076265358.2670.36.camel@pegasus>
-	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
-	 <1076267396.2670.58.camel@pegasus>
-	 <1076275689.14742.93.camel@akka.yeti.nocrew.org>
-	 <1076277250.6869.24.camel@pegasus>
-	 <1076278554.14742.112.camel@akka.yeti.nocrew.org>
-	 <1076279508.6869.54.camel@pegasus>
-	 <1076280612.14742.147.camel@akka.yeti.nocrew.org>
-	 <1076282343.6869.65.camel@pegasus>
-	 <1076284317.14742.179.camel@akka.yeti.nocrew.org>
-	 <1076287085.6869.70.camel@pegasus>
-	 <1076311376.14742.202.camel@akka.yeti.nocrew.org>
-	 <1076321200.6869.75.camel@pegasus>
-	 <1076322129.5263.28.camel@kalkyl.roxen.com>
-	 <1076323138.6869.93.camel@pegasus>
-	 <1076323602.5263.41.camel@kalkyl.roxen.com>
-	 <1076324584.6869.109.camel@pegasus>
-	 <1076327592.5263.64.camel@kalkyl.roxen.com>
-	 <1076331669.6869.164.camel@pegasus>
-	 <1076333024.5263.116.camel@kalkyl.roxen.com>
+In-Reply-To: <1076330114.5263.85.camel@kalkyl.roxen.com>
+References: <1076323204.5263.34.camel@kalkyl.roxen.com>
+	 <1076323641.6869.98.camel@pegasus>
+	 <1076324203.5263.47.camel@kalkyl.roxen.com>
+	 <1076325635.6869.128.camel@pegasus>
+	 <1076330114.5263.85.camel@kalkyl.roxen.com>
 Content-Type: text/plain
-Message-Id: <1076341569.6869.200.camel@pegasus>
+Message-Id: <1076331044.6869.152.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -37,43 +22,63 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 09 Feb 2004 16:46:09 +0100
+Date: Mon, 09 Feb 2004 13:50:44 +0100
 
 Hi Fredrik,
 
-> > this is only true if the plain file itself is designed in somekind of
-> > database format like /etc/passwd, but for hcid.conf that is not
-> > acceptable. The format of hcid.conf is more flexible and if a user has
-> > to edit this file, I don't wanna allow a program do edit it as well and
-> > introduce its own format style.
+> > but you expect that the user has installed the Bluetooth specific
+> > software? 
 > 
-> Why is the formating style a problem?
+> Yes, it could be installed by default. A few megs of harddisk space 
+> is hardly an issue compared with having a handful of strange daemons
+> (hcid, stpd etc.) always running no matter if any Bluetooth devices
+> are actually available or not, is it?
 
-ask yourself what's the indentation of hcid.conf and how should a
-computer program know about it. Of course this is possible to handle,
-but it is always a mess.
+the daemons are idle if no device is attached. So who cares? If they are
+installed and should not be started, we can use /etc/default/bluetooth
+for these kind of settings.
 
-> > So we have to separate some settings.
+> > If the software is installed we start all needed parts of the
+> > Bluetooth subsystem. If they don't want them they shouldn't install
+> > their software.
 > 
-> Is the formating style issue the main reason for introducing a binary
-> database instead of plain text?
+> Starting these services on demand is more efficient and simpler for
+> the user. Perhaps 1 % of all users will try to use the Bluetooth stuff.
 
-No. This is the reason against letting hcid modify the hcid.conf. If the
-settings are stored like in /etc/passwd or in a per-line basis I have no
-problems with plain text files for this case.
+If they don't use Bluetooth, they don't even install it and so no
+problem. However it is _not_ efficient to start a whole subsystem with
+all its daemons from a hotplug script. Everyone who likes this approch
+can do it of course, but I will never accept this as default.
 
-> > If we want a clean interface for the configuration stuff that is not
-> > covered by the HCI specification (like name cache etc.) we must go
-> > through these interface in all cases, because the hcid implementation is
-> > replaceable and the storage format also.
+> > To make everything work perfect on the first use of a Bluetooth dongle
+> > is not the job of the Bluetooth subsystem. If the USB or PCMCIA subsytem
+> > detects a Bluetooth device it has to install, start or run whatever
+> > other action is needed to make it work.
 > 
-> It would be great to have file storage documented and part of the interface 
-> as well. Forcing specialized tools isn't flexible and user/admin friendly.
+> This would require that hcid is compatible with that approach. That's
+> the issue here. :)
 
-No. If we use a uniform storage, there is no need for a D-Bus interface,
-because the application can modify the storage directly. One of the main
-ideas is to abstract from the storage of the information. We provide an
-interface to access and modify them and that must be enough.
+No. This requires that the USB and PCMCIA subsystem knows what devices
+are Bluetooth devices. If not installed they have to install the BlueZ
+packages that are needed and then they have to run the init script.
+
+> > If hcid is not running, because no device is attached. How would you
+> > manage you pairings through D-Bus for example? For some stuff an
+> > attached device is not needed.
+> 
+> The hotplug may not be the only way to start hcid. Other services
+> may require it to start too, of course.
+
+Two places where we have to start a daemon? Too complex. Start it at
+init.
+
+> > If you think the long way then after hcid comes sdpd. This daemon must
+> > be started first, before any PAN service can be started.
+> 
+> This kind of dependency needs to be tracked too.
+
+I don't wanna track this down. Start hcid and sdpd and then everything
+else you want. Starting them from init is the best way.
 
 Regards
 
