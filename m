@@ -1,15 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <41AB14DD.3010807@csr.com>
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] DBT-120 firmware upgrade
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41AB14DD.3010807@csr.com>
 References: <200411261152.29925.pavouk@pavouk.org>
-	 <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus>
-	 <200411272130.44783.pavouk@pavouk.org> <1101588637.27074.22.camel@pegasus>
-	  <41AB14DD.3010807@csr.com>
-Content-Type: text/plain
-Message-Id: <1101731638.10115.0.camel@pegasus>
-Mime-Version: 1.0
+    <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus>
+    <200411272130.44783.pavouk@pavouk.org>
+    <1101588637.27074.22.camel@pegasus>
+In-Reply-To: <1101588637.27074.22.camel@pegasus>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,24 +21,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Nov 2004 13:33:58 +0100
+Date: Mon, 29 Nov 2004 12:23:57 +0000
 
-Hi Steven,
-
-> >>         Build 1586
-> >>         Chip version: BlueCore02
-> > 
-> > I assume this is HCI 18.2 firmware, but I am not quite sure. It is not
-> > in my list.
+Marcel Holtmann wrote:
+>>         Build 1586
+>>         Chip version: BlueCore02
 > 
-> Yep. It's 18.2.
+> I assume this is HCI 18.2 firmware, but I am not quite sure. It is not
+> in my list.
 
-do you have the full build information for my web page?
+Yep. It's 18.2.
 
-Regards
+	- Steven
 
-Marcel
 
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
