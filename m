@@ -2,12 +2,14 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Using windows breaks bluetooth in linux? huh
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200411190218.22275.wim.delvaux@adaptiveplanet.com>
+In-Reply-To: <419D45AE.5060306@patbert.com>
 References: <419AE72F.3030307@patbert.com>
-	 <1100762008.7164.15.camel@pegasus> <419D45AE.5060306@patbert.com>
-	 <200411190218.22275.wim.delvaux@adaptiveplanet.com>
+	 <1100673867.7208.128.camel@pegasus>  <419B6990.7020009@patbert.com>
+	 <1100704877.7607.8.camel@pegasus>  <419BB514.3030807@patbert.com>
+	 <1100723967.7164.11.camel@pegasus>  <419C118D.8050309@patbert.com>
+	 <1100762008.7164.15.camel@pegasus>  <419D45AE.5060306@patbert.com>
 Content-Type: text/plain
-Message-Id: <1100828535.7164.104.camel@pegasus>
+Message-Id: <1100828433.7164.101.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,19 +22,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 19 Nov 2004 02:42:15 +0100
+Date: Fri, 19 Nov 2004 02:40:33 +0100
 
-Hi Wim,
+Hi Patrick,
 
-> What is that problem with the link_key file.  I have to remove that file from 
-> time to time too.  I use a usb dongle and have to connect my device sometimes 
-> to this system sometimes to another. 
+> Ah wonderful! It took a few tries but it is happy again!
 > 
-> Could you explain why a link_key file could get 'out of sync' ?
+> Now in the future if I find myself back in windows will I be able to use 
+> it there without fear of disabling it in linux or should I just not use 
+> it in windows any more?
 
-the link key is invalid when you pair the two devices on a different
-operating system. It is that simple, because a new link key deprecates
-the old one.
+actually it is not very easy to share the link key between two operating
+system. The only way this may work is when you store the link key on the
+Bluetooth chip directly. However nobody has written support for that so
+far.
 
 Regards
 
