@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Sammy" <sammy@autumn.ccl.itri.org.tw>
-To: <bluez-users@lists.sourceforge.net>
-Subject: FW: [Bluez-users] PAN,just one connected line???
-Message-ID: <00ef01c48056$a696f3f0$7053608c@ccl.itri.org.tw>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
+Message-Id: <200408121011.i7CABsAo028549@news01.csr.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] it is possible to change the N inquiry <256 
+In-reply-to: "0|20c|=|ima|2U"'s message of "Thu, 12 Aug 2004 02:20:25 PDT."
+             <20040812092026.8225.qmail@web51805.mail.yahoo.com>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,38 +15,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 12 Aug 2004 18:25:11 +0800
+Date: Thu, 12 Aug 2004 11:11:53 +0100
 
-SGVsbG8hIQ0KDQpJIGhhZCB0cmllZCB0aGUgYnJjdGwgdGhhdCBlbmFibGUgYnJpZGdlIHN1cHBv
-cnQgb24gR04NClNvIG15IGFsbCBlbWJlZGRlZCBzeXN0ZW0oYXJtKSBjb3VsZCBiZSBjb25uZWN0
-ZWQgYnkgUEFOIFNjZW5hcmlvLg0Kd2hlbiBpIHVzZSBicmN0bCBhZnRlciBjcm9zcy1jb21waWxl
-IHRoZSBicmlkZ2UubyBhbmQgdHVuLm8gYXMgbW9kdWxlcy4NCml0IGhhcyBzb21lIHByb2JsZW0u
-YnV0IGlmIGkgIGNyb3NzLWNvbXBpbGUgaXQgaW50byBrZXJuZWwuDQphbmQgZGQgaWY9Li96SW1h
-Z2Ugb2Y9L2Rldi9tdGQxO3N5bmM7DQppdCBjYW4gd29yayBzbW9vdGhseTopDQphbmQgUEFOIFNj
-ZW5hcmlvIHNlZW1zIHRvIHN1cHBvcnQgU2NhdHRlcm5ldCENCg0KdGhhbmsgeW91IHZlcnkgbXVj
-aCBmb3IgUGF2ZWwncyBzdWdnZXN0aW9uIQ0KDQpDaGVlcnMsDQpTYW1teQ0KDQoNCg0KLS0tLS1P
-cmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IFBhdmVsIFJ1emlja2EgW21haWx0bzpwYXZvdWtA
-cGF2b3VrLm9yZ10NClNlbnQ6IEZyaWRheSwgQXVndXN0IDA2LCAyMDA0IDM6MzAgUE0NClRvOiBi
-bHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQNCkNjOiBTYW1teQ0KU3ViamVjdDogUmU6
-IFtCbHVlei11c2Vyc10gUEFOLGp1c3Qgb25lIGNvbm5lY3RlZCBsaW5lPz8/DQoNCg0KSGVsbG8s
-DQoNCj4gVGhlcmUgYXJlIGZvdXIgbm9kZXMgaGFkIGJlZW4gY29ubmVjdGVkIGJ5IHBhbmQuDQo+
-IGJ1dCBhZnRlciBpIGFzc2lnbiB0aGUgc3RhdGljIElQIHRvIGV2ZXJ5IGludGVyZmFjZSwNCj4g
-dGhlICdwaW5nJyBjb21tYW5kIGNhbid0IHdvcmsgbm9ybWFsbHkgYmVzaWRlcyB0aGUgbGluZSBi
-ZXR3ZWVuIFBBTlUxIGFuZA0KPiBHTih0aGUgZmlyc3QgY29ubmVjdGlvbikuIEkgZG9uJ3Qga25v
-dyBpdCBpcyBub3JtYWwgb3IgaSBsb3NzIHNvbWUNCj4gY29uZmlndXJhdGlvbiAuLi4NCg0KdGhp
-cyB3aWxsIG5vdCB3b3JrLCBiZWNhdXNlIHlvdXIgQk5FUCBpbnRlcmZhY2VzIGFyZSBpbiBpbmRl
-cGVuZGVudCBuZXR3b3Jrcw0Kd2l0aCBzYW1lIElQIHNwYWNlLiBZb3UgaGEgdHdvIGNob2ljZXM6
-DQoxLiBSb3V0aW5nDQotLS0tLS0tLS0tLS0tLS0tDQpZb3UgY2FuIGdpdmUgaW5kZXBlbmRlbnQg
-SVAgc3BhY2VzIGZvciBCTkVQIGludGVyZmFjZXMuDQoxMC4wLjAuMC8zMA0KMTAuMC4wLjQvMzAN
-CjEwLjAuMC44LzMwDQouLi4NCkl0IG1lYW5zIDEwLjAuMC4xIG9uIEJORVAwIG9uIEdOLCAxMC4w
-LjAuMiBvbiBCTkVQMCBvbiBQQU5VMQ0Kd2l0aCBtYXNrIDI1NS4yNTUuMjU1LjI1Mg0KDQpZb3Ug
-bXVzdCBoYXZlIGVuYWJsZWQgSVAgZm9yd2FyZGluZyBvbiBHTiBmb3IgY29ubmVjdGluZyBiZXR3
-ZWVuIFBBTlVzLg0KT24gUEFOVXMgaXQncyBncmVhdCB0byBzZXQgZGVmYXVsdCBnYXRld2F5IHRv
-IEdOcyBJUCBhZGRyZXNzLg0KDQoyLiBCcmlkZ2luZw0KLS0tLS0tLS0tLS0tLS0tLS0tLQ0KWW91
-IG11c3QgZW5hYmxlIGJyaWRnZSBzdXBwb3J0IG9uIEdOLg0KQ29tcGxldGUgbWFudWFsIGlzIGhl
-cmU6DQpodHRwOi8vYmx1ZXouc291cmNlZm9yZ2UubmV0L2NvbnRyaWIvSE9XVE8tUEFODQoNCkJl
-c3QgcmVnYXJkcywNCg0KUGF2ZWwgUnV6aWNrYQ0K
+> what I'm trying to do is that I want to speed up the discovery process.
+> As stated by Somil before, the device inquires 256 times or for 2.56 s
+> using one Train and then switches to a different Train. There are two
+> Inquiry Train (called as Train A or Train B).
 
+If you have a Bluetooth 1.2 scanning device, you will be able to use
+interlaced inquiry scan on it (HCI_write_inquiry_scan_type interlaced).
+This has the same effect.  In fact, it works better than switching
+trains on the inquirer because inquiry is quite inefficient and losing
+frames on a particular train can have a big impact on the likelihood of
+finding a device.
+
+Of course, this requires the other end to co-operate, so there's not a
+lot you can do on the inquiring side.
+
+pws
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
