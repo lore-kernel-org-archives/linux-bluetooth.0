@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v619)
-Message-Id: <302E52C4-FCAB-11D8-B286-000D93C1FAF6@hairstock.fi>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-ID: <20040901183311.1763.qmail@web11601.mail.yahoo.com>
+From: David Zhu <saki96@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-From: Tuomas Peronvuo <tuomas.peronvuo@hairstock.fi>
-Subject: [Bluez-users] Apple Wireless Keyboard, MX900-Hub & Mouse with FC2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] newbie fedora2 & bluez questions
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,53 +15,145 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 2 Sep 2004 09:41:58 +0300
+Date: Wed, 1 Sep 2004 11:33:11 -0700 (PDT)
 
-Hi!
+Hi All,
 
-First of all, I apologize if this sounds  vague, but I'll give my best 
-shot.
+I tried following the many howto guides on the web but
+I always seem to have problems after a certain step. 
+So I hope I'm not offending anyone with what may be a
+really simple issue.  Here we go...
 
-The problem:
+I have a DLink DBT-120 Rev 4 USB Bluetooth adapter,
+which I have confirmed is supported on the hardware
+page.
 
-Trying to get the apple wireless keyboard and mx900-bluetooth -mouse 
-working
-in fedora core 2 (kernel 2.6.8-1.521) via the usb mx900 bluetooth-hub.
+I've installed the necessary packages from the fedora
+core 2:
 
-Installed: Bluez libs & utils & devs.
+bluez-libs-2.5-2.1
+bluez-utils-2.4-3
+gnome-bluetooth-0.4.1-7
+bluez-sdp-1.5-2.1
 
-I've read Marcel Holtmanns 
-http://www.holtmann.org/linux/bluetooth/hid.html -"guide"
-and modprobed that I certainly have the hidp-module, but I'm not sure 
-if the selection
-"CONFIG_BT_HIDP" is enabled/selected.
+I'm running kernel 2.6.8
 
-My first question is: how do I check if the HIDP is enabled? And if 
-it's not, how do I enable it?
+so when I do a "hcitool scan" I am able to find:
+00:02:EE:E0:2A:E6       Nokia 6820
 
-Secondly and oddly enough, the mx900-mouse does work perfectly okay in 
-my current setup via
-the mx900 usb-bluetooth-hub. But when I run hcitool and try to find any 
-devices, i get squat.
+but when I do a "sdptool browse" I always get 
+Inquiring ...
+Failed to connect to SDP server on 00:02:EE:E0:2A:E6:
+Function not implemented
 
-And the same thing with runing hidd, it also finds nothing.  My best 
-guess is, that they both can't find
-nothing because the CONFIG_BT_HIDP is not enabled?
+Now I have a ThinkPad T30 which also has bluetooth,
+and again the same thing happens.  But if I try to
+browse for bluetooth services from the thinkpad, I get
+the PIN request, which I enter what I found in
+/et/bluetooth/pin.  So after the two devices are
+paired, now when I run sdptool browse I can see the
+services offered by the thinkpad but still not the
+nokia.  
 
-Any good guide (step by step)  or advices considering the 
-apple/hidp/mx900-hub -issue would be greatly appreciated.
+Does it seem weird that I have to pair before I can
+browse for services?  Or is something else
+fundamentally wrong?  The other thing is I can't use
+the nokia to browse so I can't get it paired with the
+Dlink bluetooth adapter.  Please help!
 
-Thanks!
+Below is my hcid.conf file:
+
+#
+# HCI daemon configuration file.
+#
+# $Id: hcid.conf,v 1.3 2002/07/18 18:12:46 maxk Exp $
+#
+
+# HCId options
+options {
+        # Automatically initialize new devices
+        autoinit yes;
+
+        # Security Manager mode
+        #   none - Security manager disabled
+        #   auto - Use local PIN for incoming
+connections
+        #   user - Always ask user for a PIN
+        #
+        security auto;
+
+        # Pairing mode
+        #   none  - Pairing disabled
+        #   multi - Allow pairing with already paired
+devices
+        #   once  - Pair once and deny successive
+attempts
+        pairing multi;
+
+        # PIN helper
+        pin_helper /usr/bin/bluepin;
+        #dbus_pin_helper;
+
+        # A dbus PIN daemon can be found at
+        #
+ftp://ftp.handhelds.org/pub/projects/gpe/source/bluez-pin-0.20.tar.gz
+}
+
+# Default settings for HCI devices
+device {
+        # Local device name
+        #   %d - device id
+        #   %h - host name
+        name "%h-%d";
+
+        # Local device class
+        class 0x120104;
+
+        # Default packet type
+        #pkt_type DH1,DM1,HV1;
+
+        # Inquiry and Page scan
+        iscan enable; pscan enable;
+
+        # Default link mode
+        #   none   - no specific policy 
+        #   accept - always accept incoming
+connections
+        #   master - become master on incoming
+connections,
+        #            deny role switch on outgoing
+connections
+        #
+        #lm accept,master;
+        #
+        lm accept;
+
+        # Default link policy
+        #   none    - no specific policy
+        #   rswitch - allow role switch
+        #   hold    - allow hold mode
+        #   sniff   - allow sniff mode
+        #   park    - allow park mode
+        #
+        #lp hold,sniff;
+        #
+        lp hold,sniff,park;
+
+        # Authentication and Encryption
+        auth enable;
+        encrypt enable;
+}
 
 
+Thanks in advance!
+David
 
 
-
-
-
-
-
-
+		
+_______________________________
+Do you Yahoo!?
+Win 1 of 4,000 free domain names from Yahoo! Enter now.
+http://promotions.yahoo.com/goldrush
 
 
 -------------------------------------------------------
