@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Great new site!
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200401222007.04710.cijoml@volny.cz>
+To: Max Krasnyansky <maxk@qualcomm.com>
+Cc: cijoml@volny.cz, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1074795430.1707.219.camel@localhost>
 References: <200401221516.50925.cijoml@volny.cz>
-	 <1074796243.1707.227.camel@localhost>  <200401222007.04710.cijoml@volny.cz>
+	 <1074795430.1707.219.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1074809850.3071.25.camel@pegasus>
+Message-Id: <1074809602.3071.23.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,19 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Jan 2004 23:17:30 +0100
+Date: Thu, 22 Jan 2004 23:13:22 +0100
 
-Hi Michal,
+Hi Folks,
 
-> Yes,great job :)
+> Holly shmolly. It's indeed awesome. The funny part is that I had no idea
+> that this was coming. I guess Marcel had a little surprise for us :).
 
-thanks.
+surprise, surprise :)
 
-> But Marcel could validate URL too :)
-> 
-> http://validator.w3.org/check?uri=http%3A%2F%2Fwww.bluez.org%2F
-
-Two very stupid things. Fixed now ;)
+Actually the new site is online since June 2003 and I acquired the
+domain name bluez.org already in March 2003. Between Christmas and New
+Year I did the last content and layout engine updates to the site, but
+forgot to set the redirection from bluez.sf.net. And what should I say?
+I did this yesterday and here it is. Hope everybody likes it.
 
 Regards
 
