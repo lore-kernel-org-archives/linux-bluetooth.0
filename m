@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] BlueZ and the ALSA support
+Subject: Re: [Bluez-devel] Error in rfcomm command
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41A027BD.5020401@xmission.com>
-References: <1100995285.7250.17.camel@pegasus>
-	 <41A027BD.5020401@xmission.com>
+In-Reply-To: <41A081D2.4060503@gmx.net>
+References: <41A081D2.4060503@gmx.net>
 Content-Type: text/plain
-Message-Id: <1101057242.7250.34.camel@pegasus>
+Message-Id: <1101056392.7250.23.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,29 +18,58 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 Nov 2004 18:14:02 +0100
+Date: Sun, 21 Nov 2004 17:59:52 +0100
 
-Hi Brad,
+Hi Dieter,
 
-> Wow. All that stuff was on my to-do list.
+> 1. rfcomm connect
+> 
+> If I want to connect to a device wich has an entry in rfcomm.conf with 
+> "rfcomm connect rfcomm0" I get the message "Can't find a config entry 
+> for rfcomm0"! I think it's an error in function "cmd_connect" 
+> (./bluez-utils-2.11/rfcomm/main.c):
+> 
+> static void cmd_connect(int ctl, int dev, bdaddr_t *bdaddr, int argc, 
+> char **argv)
+> {
+> 	struct sockaddr_rc laddr, raddr;
+> ...
+> 	
+> 	if (argc < 2) {
+> 		if (rfcomm_read_config(rfcomm_config_file) < 0) {
+> 			perror("Can't open RFCOMM config file");
+> 			return;
+> 		}
+> 
+> 		raddr.rc_family = AF_BLUETOOTH;
+> 		bacpy(&raddr.rc_bdaddr, &rfcomm_opts[dev].bdaddr);
+> 		raddr.rc_channel = rfcomm_opts[dev].channel;
+> 		
+> // wrong:	if (bacmp(&req.dst, BDADDR_ANY) == 0) {
+> // must be:
+> 		if (bacmp(&raddr.rc_bdaddr, BDADDR_ANY) == 0) {
+> 			fprintf(stderr, "Can't find a config entry for rfcomm%d\n", dev);
+> 
+> 			return;
+> 		}
+> 	} else {
+> 		raddr.rc_family = AF_BLUETOOTH;
+> ...
 
-I am sorry for shrinking your todo list, but this can happen if you give
-me access to your CVS ;)
+it thought I tested this and it always worked for me. However you are
+right and it is fixed in CVS now. Next time send a unified diff, because
+it is easier to read.
 
-> Do we owe you one beer, a six-pack or a whole case? :)
+> 2. rfcomm bind
+> 
+> If I execute "rfcomm bind rfcomm0" prior to "rfcomm connect rfcomm0" I 
+> get the message "Can't connect RFCOMM socket: Host is down"!
+> After a "rfcomm release rfcomm0" and a repeated "rfcomm connect rfcomm0" 
+> the connection will establish.
 
-Actually I really knew what to do, because I spent so many days in
-getting the BlueZ CVS in a good shape that this was a really easy job
-for me. Once you got the understanding for autoconf/automake, things
-will get really simple. However I will maybe ping you about the beer
-idea at some time ;)
-
-Seriously, I saw that you also updated the web page. This is great and
-it would be also great if you can fill in the README with some infos
-about it.
-
-Do anyone mind if we start using the kernel coding style? It will make
-later integration into the kernel or BlueZ so much easier.
+I don't know why it shows "Host is down", but you can't connect and bind
+the same RFCOMM TTY at the same time. If you binded it, then you should
+open the TTY to get the connection.
 
 Regards
 
