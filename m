@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-From: "Christoph Torens" <christoph@torens.de>
-Content-Type: text/plain; format=flowed; delsp=yes; charset=iso-8859-15
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Desperate newbie
+References: <20040328004606.90929.qmail@web21003.mail.yahoo.com>
+In-Reply-To: <20040328004606.90929.qmail@web21003.mail.yahoo.com>
 MIME-Version: 1.0
-Message-ID: <opr5jsgqtl7p7ahu@debian>
-Subject: [Bluez-users] Various questions
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200403280158.30064.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,373 +19,381 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 28 Mar 2004 03:15:52 +0200
+Date: Sun, 28 Mar 2004 01:58:30 +0100
 
-Hi,
+Hi,=20
 
-This mail has become quite long. Therefore I have to thank everybody who  
-reads it, though  :-)
+try change your service class to:
 
-I'd like to buy an additional Bluetooth Dongle,
-because my Zeevo Chip Dongles don't work properly and I stressed my friend  
-to long now by borrowing his CSR Dongle.
-So which chipsets exist at all, and is CSR the "all-time-best-solution"  
-for linux?
-And last but not least, how can I buy a Dongle with the desired chipset?  
-You normaly just see the manufacturers as Acer for example, not the  
-chipset, don't you? Is it absolutely unimportant at all, if its Acer,  
-Belkin, D-Link or what ever?
+class 0x10c;
 
+Michal
 
-Now, I just read Marcel's last mail Re: [Bluez-users] PANU and "ACL tx  
-timeout"
-He says one should try to update the firmware. Thats a faszinating idea,  
-because I didn't manage to solve my Bluetooth problems yet. I wonder if a  
-firmware update would help me, too. I didn't know this is possible at all.  
-But after a short time on google I think its not possible with my Dongles.  
-Or are there updates vor the Acer 510 Dongles?
-
-The funny thing is, with time I get more and more different error messages  
-regarding bluetooth.
-My last error was when trying to connect via pand: "Connection failed.  
-Permission Denied 13"
-So I guess I make some failure, but I can't find it.
-By the way: can I pair two PC's with Linux? Could this be an idea of my  
-failure?
-
-Another interessting thing is, that i can connect my viper (PC104) using  
-dund to Win2000. But the ppp0 device on the viper doesn't get configuered  
-automatically (I thougt this should happen? routing seems to get set  
-automatically, though) And I can't ping in any direction. The ppp  
-conection produces output every 3 seconds and while doing a ping, hcidump  
-produces output parallel to the ppp messages every 3 seconds.
-
-
-Here comes a lot of output:
-++
-
-root@viper root# dund --connect 00:04:3e:c0:9d:79 -n -D debug
-dund[311]: DUN daemon ver 1.1
-dund[311]: Searching for LAP on 00:04:3e:c0:9d:79
-dund[311]: Connecting to 00:04:3e:c0:9d:79 channel 2
-dund[311]: Connection established
-root@viper root# using channel 1
-Using interface ppp0
-Connect: ppp0 <--> /dev/rfcomm0
-sent [LCP ConfReq id=0x1 <magic 0xff9b94d3> <pcomp> <accomp>]
-rcvd [LCP ConfRej id=0x1 <magic 0xff9b94d3> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x2]
-rcvd [LCP ConfAck id=0x2]
-rcvd [LCP ConfReq id=0x1 <asyncmap 0x0> <mru 1600>]
-sent [LCP ConfRej id=0x1 <asyncmap 0x0>]
-sent [LCP ConfReq id=0x2]
-rcvd [LCP ConfAck id=0x2]
-...and so on...
-sent [LCP ConfReq id=0x2]
-rcvd [LCP ConfAck id=0x2]
-
-++
-
-my lan settings in win
-++
-C:\>ipconfig
-
-Windows 2000-IP-Konfiguration
-
-Ethernetadapter "LAN-Verbindung 2":
-
-         Verbindungsspezifisches DNS-Suffix:
-         IP-Adresse. . . . . . . . . . . . : 10.0.0.1
-         Subnetzmaske. . . . . . . . . . . : 255.255.255.0
-         Standardgateway . . . . . . . . . :
-
-Ethernetadapter "LAN-Verbindung":
-
-         Verbindungsspezifisches DNS-Suffix: dyn.ee
-         IP-Adresse. . . . . . . . . . . . : 192.168.0.7
-         Subnetzmaske. . . . . . . . . . . : 255.255.255.0
-         Standardgateway . . . . . . . . . : 192.168.0.9
-
-++
-
-
-root@viper root# ifconfig ppp0 10.0.0.2 netmask 255.255.255.0
-root@viper root# ifconfig -a
-eth0      Link encap:Ethernet  HWaddr 00:80:66:10:04:40
-           inet addr:192.168.0.50  Bcast:192.168.0.255  Mask:255.255.255.0
-           UP BROADCAST NOTRAILERS RUNNING MULTICAST  MTU:1500  Metric:1
-           RX packets:831 errors:8 dropped:0 overruns:8 frame:0
-           TX packets:71 errors:0 dropped:0 overruns:0 carrier:0
-           collisions:0 txqueuelen:100
-           RX bytes:60695 (59.2 KiB)  TX bytes:8767 (8.5 KiB)
-           Interrupt:1 Base address:0x5300
-
-lo        Link encap:Local Loopback
-           inet addr:127.0.0.1  Mask:255.0.0.0
-           UP LOOPBACK RUNNING  MTU:16436  Metric:1
-           RX packets:8 errors:0 dropped:0 overruns:0 frame:0
-           TX packets:8 errors:0 dropped:0 overruns:0 carrier:0
-           collisions:0 txqueuelen:0
-           RX bytes:560 (560.0 B)  TX bytes:560 (560.0 B)
-
-ppp0      Link encap:Point-Point Protocol
-           inet addr:10.0.0.2  P-t-P:10.0.0.2  Mask:255.255.255.0
-           UP POINTOPOINT RUNNING NOARP MULTICAST  MTU:1500  Metric:1
-           RX packets:0 errors:0 dropped:0 overruns:0 frame:0
-           TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
-           collisions:0 txqueuelen:3
-           RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
-++
-
-
-and here is the dump while the ppp was running already,
-then i pinged the win pc,
-stopped ping,
-and then i did "dund -K"
-
-++
-root@viper root# hcidump -x
-HCIDump - HCI packet analyzer ver 1.5
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< ACL data: handle 0x0035 flags 0x02 dlen 25
-     L2CAP(d): cid 0x45 len 21 [psm 0]
-       13 EF 23 7E FF 7D 23 C0 21 7D 21 7D 22 7D 20 7D 24 B5 5A 7E
-       65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-> ACL data: handle 0x0035 flags 0x02 dlen 22
-     L2CAP(d): cid 0x41 len 18 [psm 0]
-       11 EF 1D 7E C0 21 7D 22 7D 22 7D 20 7D 24 C3 51 7E BF
-< ACL data: handle 0x0035 flags 0x02 dlen 171
-     L2CAP(d): cid 0x45 len 167 [psm 0]
-       13 EF 44 01 FF 7D 23 7D 20 21 45 7D 20 7D 20 54 7D 20 7D 20
-       40 7D 20 40 7D 21 26 A7 7D 2A 7D 20 7D 20 7D 22 7D 2A 7D 20
-       7D 20 7D 21 7D 28 7D 20 33 C1 4B 7D 21 7D 20 7D 20 5A A3 BB
-       38 63 61 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D
-       20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D
-       20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D
-       20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D
-       20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D
-       20 7D 20 C9 DD 7E 65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-< ACL data: handle 0x0035 flags 0x02 dlen 153
-     L2CAP(d): cid 0x45 len 149 [psm 0]
-       13 EF 20 01 7E FF 7D 23 7D 20 21 45 7D 20 7D 20 54 7D 20 7D
-       20 40 7D 20 40 7D 21 26 A7 7D 2A 7D 20 7D 20 7D 22 7D 2A 7D
-       20 7D 20 7D 21 7D 28 7D 20 FF E4 4B 7D 21 7D 21 7D 20 5B A3
-       BB 38 DE 8C 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20
-       7D 20 7D 20 7D 38 69 7D 25 40 50 52 7D 21 40 7D 34 FC FF BF
-       7D 20 7D 20 7D 20 7D 20 40 7D 20 7D 20 7D 20 4C 38 7D 26 7D
-       20 7D 21 7D 20 7D 20 7D 20 E0 C6 7D 28 7D 20 38 BD 7D 21 40
-       7C FC FF BF 2F 7D 3E 7E 65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-< ACL data: handle 0x0035 flags 0x02 dlen 154
-     L2CAP(d): cid 0x45 len 150 [psm 0]
-       13 EF 22 01 7E FF 7D 23 7D 20 21 45 7D 20 7D 20 54 7D 20 7D
-       20 40 7D 20 40 7D 21 26 A7 7D 2A 7D 20 7D 20 7D 22 7D 2A 7D
-       20 7D 20 7D 21 7D 28 7D 20 7D 21 E5 4B 7D 21 7D 22 7D 20 5C
-       A3 BB 38 DA 8C 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D
-       20 7D 20 7D 20 7D 38 69 7D 25 40 50 52 7D 21 40 7D 34 FC FF
-       BF 7D 20 7D 20 7D 20 7D 20 40 7D 20 7D 20 7D 20 4C 38 7D 26
-       7D 20 7D 21 7D 20 7D 20 7D 20 E0 C6 7D 28 7D 20 38 BD 7D 21
-       40 7C FC FF BF 7D 26 D6 7E 65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-< ACL data: handle 0x0035 flags 0x02 dlen 25
-     L2CAP(d): cid 0x45 len 21 [psm 0]
-       13 EF 23 7E FF 7D 23 C0 21 7D 21 7D 22 7D 20 7D 24 B5 5A 7E
-       65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-> ACL data: handle 0x0035 flags 0x02 dlen 22
-     L2CAP(d): cid 0x41 len 18 [psm 0]
-       11 EF 1D 7E C0 21 7D 22 7D 22 7D 20 7D 24 C3 51 7E BF
-< ACL data: handle 0x0035 flags 0x02 dlen 151
-     L2CAP(d): cid 0x45 len 147 [psm 0]
-       13 EF 1C 01 FF 7D 23 7D 20 21 45 7D 20 7D 20 54 7D 20 7D 20
-       40 7D 20 40 7D 21 26 A7 7D 2A 7D 20 7D 20 7D 22 7D 2A 7D 20
-       7D 20 7D 21 7D 28 7D 20 77 E3 4B 7D 21 7D 23 7D 20 5D A3 BB
-       38 62 8E 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D
-       20 7D 20 7D 38 69 7D 25 40 50 52 7D 21 40 7D 34 FC FF BF 7D
-       20 7D 20 7D 20 7D 20 40 7D 20 7D 20 7D 20 4C 38 7D 26 7D 20
-       7D 21 7D 20 7D 20 7D 20 E0 C6 7D 28 7D 20 38 BD 7D 21 40 7C
-       FC FF BF 4D AE 7E 65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-< ACL data: handle 0x0035 flags 0x02 dlen 153
-     L2CAP(d): cid 0x45 len 149 [psm 0]
-       13 EF 20 01 7E FF 7D 23 7D 20 21 45 7D 20 7D 20 54 7D 20 7D
-       20 40 7D 20 40 7D 21 26 A7 7D 2A 7D 20 7D 20 7D 22 7D 2A 7D
-       20 7D 20 7D 21 7D 28 7D 20 22 E4 4B 7D 21 7D 24 7D 20 5E A3
-       BB 38 B5 8D 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20 7D 20
-       7D 20 7D 20 7D 38 69 7D 25 40 50 52 7D 21 40 7D 34 FC FF BF
-       7D 20 7D 20 7D 20 7D 20 40 7D 20 7D 20 7D 20 4C 38 7D 26 7D
-       20 7D 21 7D 20 7D 20 7D 20 E0 C6 7D 28 7D 20 38 BD 7D 21 40
-       7C FC FF BF 5D 7D 3B 7E 65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-< ACL data: handle 0x0035 flags 0x02 dlen 25
-     L2CAP(d): cid 0x45 len 21 [psm 0]
-       13 EF 23 7E FF 7D 23 C0 21 7D 21 7D 22 7D 20 7D 24 B5 5A 7E
-       65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-> ACL data: handle 0x0035 flags 0x02 dlen 22
-     L2CAP(d): cid 0x41 len 18 [psm 0]
-       11 EF 1D 7E C0 21 7D 22 7D 22 7D 20 7D 24 C3 51 7E BF
-< ACL data: handle 0x0035 flags 0x02 dlen 25
-     L2CAP(d): cid 0x45 len 21 [psm 0]
-       13 EF 23 7E FF 7D 23 C0 21 7D 21 7D 22 7D 20 7D 24 B5 5A 7E
-       65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-> ACL data: handle 0x0035 flags 0x02 dlen 22
-     L2CAP(d): cid 0x41 len 18 [psm 0]
-       11 EF 1D 7E C0 21 7D 22 7D 22 7D 20 7D 24 C3 51 7E BF
-< ACL data: handle 0x0035 flags 0x02 dlen 25
-     L2CAP(d): cid 0x45 len 21 [psm 0]
-       13 EF 23 7E FF 7D 23 C0 21 7D 21 7D 22 7D 20 7D 24 B5 5A 7E
-       65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-> ACL data: handle 0x0035 flags 0x02 dlen 22
-     L2CAP(d): cid 0x41 len 18 [psm 0]
-       11 EF 1D 7E C0 21 7D 22 7D 22 7D 20 7D 24 C3 51 7E BF
-< ACL data: handle 0x0035 flags 0x02 dlen 25
-     L2CAP(d): cid 0x45 len 21 [psm 0]
-       13 EF 23 7E FF 7D 23 C0 21 7D 21 7D 22 7D 20 7D 24 B5 5A 7E
-       65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-> ACL data: handle 0x0035 flags 0x02 dlen 22
-     L2CAP(d): cid 0x41 len 18 [psm 0]
-       11 EF 1D 7E C0 21 7D 22 7D 22 7D 20 7D 24 C3 51 7E BF
-< ACL data: handle 0x0035 flags 0x02 dlen 37
-     L2CAP(d): cid 0x45 len 33 [psm 0]
-       13 EF 3B 7E FF 7D 23 C0 21 7D 25 7D 23 7D 20 7D 30 55 73 65
-       72 20 72 65 71 75 65 73 74 79 7B 7E 65
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 9
-     L2CAP(d): cid 0x41 len 5 [psm 0]
-       11 FF 01 01 A3
-> ACL data: handle 0x0035 flags 0x02 dlen 22
-     L2CAP(d): cid 0x41 len 18 [psm 0]
-       11 EF 1D 7E C0 21 7D 26 7D 23 7D 20 7D 24 F3 79 7E BF
-< ACL data: handle 0x0035 flags 0x02 dlen 12
-     L2CAP(d): cid 0x45 len 8 [psm 0]
-       03 EF 09 E3 05 13 89 70
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 12
-     L2CAP(d): cid 0x41 len 8 [psm 0]
-       01 EF 09 E1 05 13 89 AA
-< ACL data: handle 0x0035 flags 0x02 dlen 8
-     L2CAP(d): cid 0x45 len 4 [psm 0]
-       13 53 01 77
-> HCI Event: Number of Completed Packets(0x13) plen 5
-   01 35 00 01 00
-> ACL data: handle 0x0035 flags 0x02 dlen 8
-     L2CAP(d): cid 0x41 len 4 [psm 0]
-       13 73 01 5D
-< ACL data: handle 0x0035 flags 0x02 dlen 8
-     L2CAP(d): cid 0x45 len 4 [psm 0]
-       03 53 01 FD
-< ACL data: handle 0x0035 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0045 scid 0x0041
-++
-
-But connecting to Linux doesn't work at all. The connection seems to be  
-established, but I get only send events on ppp and therefore I get a  
-timeout soon.
-++
-debian:/# dund --listen --nodetach
-dund[670]: DUN daemon ver 1.1
-dund[671]: New connection from 00:60:57:0C:88:1A
-Using interface ppp0
-Connect: ppp0 <--> /dev/rfcomm0
-LCP: timeout sending Config-Requests
-Connection terminated.
-++
-
-++
-root@viper root# dund --connect 00:04:3e:c0:9d:79 -n -D
-dund[310]: DUN daemon ver 1.1
-dund[310]: Searching for LAP on 00:04:3e:c0:9d:79
-dund[310]: Connecting to 00:04:3e:c0:9d:79 channel 1
-dund[310]: Connection established
-root@viper root# using channel 1
-Using interface ppp0
-Connect: ppp0 <--> /dev/rfcomm0
-sent [LCP ConfReq id=0x1 <magic 0x380889ad> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <magic 0x380889ad> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <magic 0x380889ad> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <magic 0x380889ad> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <magic 0x380889ad> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <magic 0x380889ad> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <magic 0x380889ad> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <magic 0x380889ad> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <magic 0x380889ad> <pcomp> <accomp>]
-sent [LCP ConfReq id=0x1 <magic 0x380889ad> <pcomp> <accomp>]
-LCP: timeout sending Config-Requests
-++
-
-Why is win working and linux not?? I think I still make a big failure!?
-
-My last question for now:
-Dund says it is a ppp over rfcomm connection. Connecting to Windows the  
-"Lan Access service" answers.
-Doing a rfcomm connection by hand, the "serial port" answers.
-But there also exists a "dial up service"
-So I'm a bit confused about what connects to what and why.
-
-sdptool knows LAN DUN PAN. Is it unimportant which service it is, that a  
-dund connects to?
-Can it connect to dund AND lan? is this the same?
-
-*confused*
-
-Thanks for reading tthis long email
-And thank you for any help.
-
--- 
-Regards,
-Christoph Torens
+Dne ne 28. b=F8ezna 2004 01:46 Gary Martin napsal(a):
+> Thanks Trevor for your assistance. I have been looking at the phone side =
+of
+> the problem. Now, after pairing, the phone says that there are no services
+> available (before I had "object push" and I could send  files to Linux).
+> Below is the output from: 1) pairing the phone and 2) refreshing the
+> supported services list on the phone.
+>
+> Does this make sense to anyone?
+>
+> The phone and connection works perfectly under Mac OS X??
+>
+> > HCI Event: Connect Request(0x04) plen 10
+>
+> < HCI Command: Accept Connection Request(0x01|0x0009) plen 7
+>
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: PIN Code Request(0x16) plen 6
+>
+> < HCI Command: PIN Code Request Reply(0x01|0x000d) plen 23
+>
+> > HCI Event: Command Complete(0x0e) plen 10
+> > HCI Event: Link Key Notification(0x18) plen 23
+> > HCI Event: Connect Complete(0x03) plen 11
+>
+> < HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+>
+> > HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
+> > HCI Event: Command Complete(0x0e) plen 6
+>
+> < HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
+>
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Connection Packet Type Changed(0x1d) plen 5
+> > HCI Event: Disconn Complete(0x05) plen 4
+> > HCI Event: Connect Request(0x04) plen 10
+>
+> < HCI Command: Accept Connection Request(0x01|0x0009) plen 7
+>
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Connect Complete(0x03) plen 11
+> > HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
+>
+> < HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+>
+> > HCI Event: Command Complete(0x0e) plen 6
+>
+> < HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
+>
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Connection Packet Type Changed(0x1d) plen 5
+> > ACL data: handle 0x002a flags 0x02 dlen 12
+>
+>     L2CAP(s): Connect req: psm 1 scid 0x0040
+> < ACL data: handle 0x002a flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+>
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x002a flags 0x02 dlen 16
+>
+>     L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
+>     MTU 251
+> < ACL data: handle 0x002a flags 0x02 dlen 14
+>     L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
+> < ACL data: handle 0x002a flags 0x02 dlen 12
+>     L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 0
+>
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x002a flags 0x02 dlen 14
+>
+>     L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
+>
+> > ACL data: handle 0x002a flags 0x02 dlen 12
+>
+>     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+> < ACL data: handle 0x002a flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+>
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > HCI Event: Disconn Complete(0x05) plen 4
+> > HCI Event: Connect Request(0x04) plen 10
+>
+> < HCI Command: Accept Connection Request(0x01|0x0009) plen 7
+>
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Connect Complete(0x03) plen 11
+> > HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
+>
+> < HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+>
+> > HCI Event: Command Complete(0x0e) plen 6
+>
+> < HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
+>
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Connection Packet Type Changed(0x1d) plen 5
+> > ACL data: handle 0x0029 flags 0x02 dlen 12
+>
+>     L2CAP(s): Connect req: psm 1 scid 0x0041
+> < ACL data: handle 0x0029 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 0 status 0
+>
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x0029 flags 0x02 dlen 16
+>
+>     L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
+>     MTU 251
+> < ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(s): Config rsp: scid 0x0041 flags 0x0000 result 0 clen 0
+> < ACL data: handle 0x0029 flags 0x02 dlen 12
+>     L2CAP(s): Config req: dcid 0x0041 flags 0x0000 clen 0
+>
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x0029 flags 0x02 dlen 14
+>
+>     L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
+>
+> > ACL data: handle 0x0029 flags 0x02 dlen 17
+> > ACL data: handle 0x0029 flags 0x01 dlen 17
+>
+>     L2CAP(d): cid 0x40 len 30 [psm 1]
+>         SDP SSA Req: tid 0x0 len 0x19
+>           pat uuid-16 0x1108 (Headset)
+>           max 0xffff
+>           aid(s) 0x0001 (SrvClassIDList) 0x0004 (ProtocolDescList) 0x0009
+> (BTProfileDescList) 0x0100 (SrvName) 0x0302 ((null))
+>           cont 00
+> < ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x41 len 10 [psm 1]
+>         SDP SSA Rsp: tid 0x0 len 0x5
+>           cnt 0x2
+>  len 0x2 frm->len 0x1 n 0x0
+>           cont 00
+>
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x0029 flags 0x02 dlen 17
+> > ACL data: handle 0x0029 flags 0x01 dlen 17
+>
+>     L2CAP(d): cid 0x40 len 30 [psm 1]
+>         SDP SSA Req: tid 0x0 len 0x19
+>           pat uuid-16 0x111e
+>           max 0xffff
+>           aid(s) 0x0001 (SrvClassIDList) 0x0004 (ProtocolDescList) 0x0009
+> (BTProfileDescList) 0x0100 (SrvName) 0x0311 ((null))
+>           cont 00
+> < ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x41 len 10 [psm 1]
+>         SDP SSA Rsp: tid 0x0 len 0x5
+>           cnt 0x2
+>  len 0x2 frm->len 0x1 n 0x0
+>           cont 00
+>
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x0029 flags 0x02 dlen 17
+> > ACL data: handle 0x0029 flags 0x01 dlen 14
+>
+>     L2CAP(d): cid 0x40 len 27 [psm 1]
+>         SDP SSA Req: tid 0x0 len 0x16
+>           pat uuid-16 0x1107 (IRMCSyncCmd)
+>           max 0xffff
+>           aid(s) 0x0001 (SrvClassIDList) 0x0004 (ProtocolDescList) 0x0009
+> (BTProfileDescList) 0x0100 (SrvName)
+>           cont 00
+> < ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x41 len 10 [psm 1]
+>         SDP SSA Rsp: tid 0x0 len 0x5
+>           cnt 0x2
+>  len 0x2 frm->len 0x1 n 0x0
+>           cont 00
+>
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x0029 flags 0x02 dlen 17
+> > ACL data: handle 0x0029 flags 0x01 dlen 17
+>
+>     L2CAP(d): cid 0x40 len 30 [psm 1]
+>         SDP SSA Req: tid 0x0 len 0x19
+>           pat uuid-16 0x1105 (OBEXObjPush)
+>           max 0xffff
+>           aid(s) 0x0001 (SrvClassIDList) 0x0004 (ProtocolDescList) 0x0009
+> (BTProfileDescList) 0x0100 (SrvName) 0x0303 ((null))
+>           cont 00
+> < ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x41 len 10 [psm 1]
+>         SDP SSA Rsp: tid 0x0 len 0x5
+>           cnt 0x2
+>  len 0x2 frm->len 0x1 n 0x0
+>           cont 00
+>
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x0029 flags 0x02 dlen 17
+> > ACL data: handle 0x0029 flags 0x01 dlen 14
+>
+>     L2CAP(d): cid 0x40 len 27 [psm 1]
+>         SDP SSA Req: tid 0x0 len 0x16
+>           pat uuid-16 0x1106 (OBEXObjTrnsf)
+>           max 0xffff
+>           aid(s) 0x0001 (SrvClassIDList) 0x0004 (ProtocolDescList) 0x0009
+> (BTProfileDescList) 0x0100 (SrvName)
+>           cont 00
+> < ACL data: handle 0x0029 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x41 len 10 [psm 1]
+>         SDP SSA Rsp: tid 0x0 len 0x5
+>           cnt 0x2
+>  len 0x2 frm->len 0x1 n 0x0
+>           cont 00
+>
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x0029 flags 0x02 dlen 12
+>
+>     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0041
+> < ACL data: handle 0x0029 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0041
+>
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > HCI Event: Disconn Complete(0x05) plen 4
+>
+> --- "Pering, Trevor" <trevor.pering@intel.com> wrote: > Given the output
+> you have, it's not a hciattach or hciusb problem. Those
+>
+> > pieces are the connection from linux to the Bluetooth hardware on your
+> > computer -- which seems to be working ok because you can do basic
+> > operations (like hcitool scan). There is something really strange going
+> > on because basic connectivity with the other device seems to work (as
+> > indicated by hcitool scan, which fetches the name from the remote
+> > device), but hcitool info and l2ping don't seem to be working properly,
+> > which is strange.
+> >
+> > Unfortunately, I don't know more than that to be able to help you. But,
+> > I think it indicates the problem might be on the remote (phone) side,
+> > not the laptop. Ideally, you could find a different BT device to try it
+> > with.
+> >
+> > 	Trevor
+> >
+> >
+> > -----Original Message-----
+> > From: bluez-users-admin@lists.sourceforge.net
+> > [mailto:bluez-users-admin@lists.sourceforge.net] On Behalf Of Gary
+> > Martin
+> > Sent: Saturday, March 27, 2004 3:25 AM
+> > To: bluez-users@lists.sourceforge.net
+> > Subject: [Bluez-users] Desperate newbie
+> >
+> > Hi all
+> >
+> > I'm a Linux user trying to sync my mobile phone with
+> > my computer in desperate need of help. I'm running
+> > Debian testing/unstable on a Apple PowerBook G3. I
+> > have researched as much as I can, but I can't get
+> > bluetooth to work with Linux.
+> >
+> > My phone (Sonyericsson T628) can pair with the
+> > PowerBook, but it says that the only service available
+> > is "object push" and I can send files to the
+> > PowerBook.
+> >
+> > Multisync cannot find the phone.
+> >
+> > Everything works perfectly in Mac OS X without any
+> > configuration
+> >
+> > I'm beginning to suspect it is a hci_usb -- hciattach
+> > problem. But I don't understand hciattach.
+> >
+> > Below are some diagnostics/output. Hopefully someone
+> > can help
+> >
+> >
+> > Debian:~# modinfo bfusb
+> > filename:
+> > /lib/modules/2.4.25-powerpc/kernel/drivers/bluetooth/bfusb.o
+> > description: "BlueFRITZ! USB driver ver 1.1"
+> > author:      "Marcel Holtmann <marcel@holtmann.org>"
+> > license:     "GPL"
+> >
+> > debian:~# lsmod
+> > Module                  Size  Used by    Not tainted
+> > rfcomm                 35640   1  (autoclean)
+> > l2cap                  18900   2  (autoclean) [rfcomm]
+> > af_packet              15112   1  (autoclean)
+> > hid                    23108   0  (unused)
+> > sco                    10308   0  (unused)
+> > hfs                    81196   0  (unused)
+> > dmasound_pmac          65424   1
+> > dmasound_core          12848   1  [dmasound_pmac]
+> > soundcore               4200   3  [dmasound_core]
+> > i2c-core               14532   0  [dmasound_pmac]
+> > hci_usb                 9152   1
+> > bluez                  36332   3  [rfcomm l2cap sco
+> > hci_usb]
+> >
+> > debian:~# hcitool scan
+> > Scanning ...
+> >         00:0E:07:54:32:0B       T628
+> >
+> > debian:~# hcitool info 00:0E:07:54:32:0B
+> > Requesting information ...
+> > Can't create connection: Input/output error
+> >
+> > debian:~# hcitool inq
+> > Inquiring ...
+> >         00:0E:07:54:32:0B       clock offset: 0x747b
+> >  class: 0x520204
+> >
+> > debian:~# hciconfig -a
+> > hci0:   Type: USB
+> >         BD Address: 00:0D:88:AC:D1:EE ACL MTU: 192:8
+> > SCO MTU: 64:8
+> >         UP RUNNING PSCAN ISCAN
+> >         RX bytes:388 acl:0 sco:0 events:18 errors:0
+> >         TX bytes:333 acl:0 sco:0 commands:15 errors:0
+> >         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00
+> > 0x00
+> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2
+> > HV3
+> >         Link policy: HOLD SNIFF PARK
+> >         Link mode: SLAVE ACCEPT
+> >         Name: 'debian-0'
+> >         Class: 0x000100
+> >         Service Classes: Unspecified
+> >         Device Class: Computer, Uncategorized
+> >         HCI Ver: 1.1 (0x1) HCI Rev: 0x1bb LMP Ver: 1.1
+> > (0x1) LMP Subver: 0x1bb
+> >         Manufacturer: Cambridge Silicon Radio (10)
+> >
+> > debian:~# l2ping 00:0E:07:54:32:0B
+> > Ping: 00:0E:07:54:32:0B from 00:0D:88:AC:D1:EE (data
+> > size 20) ...
+> > 0 bytes from 00:0E:07:54:32:0B id 200 time 56.94ms
+> > 0 bytes from 00:0E:07:54:32:0B id 201 time 32.72ms
+> > 0 bytes from 00:0E:07:54:32:0B id 202 time 44.73ms
+> > 0 bytes from 00:0E:07:54:32:0B id 203 time 38.74ms
+> > 0 bytes from 00:0E:07:54:32:0B id 204 time 38.74ms
+> > 0 bytes from 00:0E:07:54:32:0B id 205 time 48.77ms
+> > 0 bytes from 00:0E:07:54:32:0B id 206 time 41.79ms
+> > 0 bytes from 00:0E:07:54:32:0B id 207 time 42.79ms
+> > 0 bytes from 00:0E:07:54:32:0B id 208 time 39.81ms
+> > 0 bytes from 00:0E:07:54:32:0B id 209 time 44.83ms
+> > 0 bytes from 00:0E:07:54:32:0B id 210 time 42.83ms
+> > 0 bytes from 00:0E:07:54:32:0B id 211 time 41.84ms
+> > 0 bytes from 00:0E:07:54:32:0B id 212 time 39.85ms
+> > 13 sent, 13 received, 0% loss
+> >
+> > debian:~# lsusb
+> > Bus 002 Device 001: ID 0000:0000
+> > Bus 002 Device 002: ID 0a12:0001 Cambridge Silicon
+> > Radio, Ltd Bluetooth Dongle
+> > Bus 001 Device 001: ID 0000:0000
+>
+> Find local movie times and trailers on Yahoo! Movies.
+> http://au.movies.yahoo.com
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: IBM Linux Tutorials
+> Free Linux tutorial presented by Daniel Robbins, President and CEO of
+> GenToo technologies. Learn everything from fundamentals to system
+> administration.http://ads.osdn.com/?ad_id=3D1470&alloc_id=3D3638&op=3Dcli=
+ck
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
