@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f54d864050226004521c9a1a0@mail.gmail.com>
-From: Benjamin Vasanthakumar J <bennyvasanth@gmail.com>
+From: Mathias Adam <a2@adamis.de>
 To: bluez-users@lists.sourceforge.net
+Message-ID: <20050226031901.GL11723@adamis.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Bluetooth Device(Headset(Audio)+Data transfer) for a Linux PC
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Once again: Socket CF card and Kernel 2.6
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,40 +16,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 26 Feb 2005 14:15:08 +0530
+Date: Sat, 26 Feb 2005 04:19:03 +0100
 
-Dear all,
+Hello,
 
-We are planning for a single bluetooth device(microcontroller based)
-featuring a headset and our custom hardware device which sends status
-to the PC and gets control information over bluetooth. We plan to use
-a Bluetooth SoC with Headset Profile interfaced to the microcontroller
-over UART which fetches the status/control data from our custom
-hardware.
+I'm trying to install a Socket Bluetooth Compactflash Card (Revision H)
+in my Thinkpad X21. I tested it with the 2.4.29 kernel (from Debian
+unstable) and it works, but I would like to use 2.6 and there it doesn't
+work.
 
-On the PC side(linux) we are going to use a standard USB Bluetooth
-dongle. We are using the Bluez on the Linux PC side.
+With 2.6, the serial_cs module gets loaded as I insert the card and
+dmesg shows the following:
 
-i) We need to send audio information(playing song using some MP3
-player) from PC to the bluetooth device headset and also send data
-from Mic to the PC for voice recording.
+-----
+ttyS1: detected caps 00000700 should be 00000100
+ttyS1 at I/O 0x2f8 (irq = 11) is a 16C950/954
+-----
 
-What setup we need to make for audio configuration in Linux PC to
-route the audio information to the headset and a voice recording
-setup?
+Then I run modprobe hci_uart and this is what dmesg says:
 
-ii) Parallely we want to recieve the status info from the bluetooth
-device and need to send the appropriate control information from PC.
-We have tested data transfer between 2 PCs using BT USB dongles at
-L2CAP level. But our final target is we need to implement in firware
-on our Microcontroller.
+-----
+Bluetooth: HCI UART driver ver 2.1
+Bluetooth: HCI BCSP protocol initialized
+-----
+(I didn't include CONFIG_BT_HCIUART_H4 in my kernel this time)
 
-Is there a firmware level implementation of Bluez available?
+No problem so far, but then:  hciattach ttyS1 socket
+and it says "BCSP initialization timed out" and hcitool dev doesn't show
+any devices.
 
-Please advice.
+I already searched this list's archives and found that some cards (the
+Socket and some Xircom?) seem to have those problems with 2.6 while some
+others (Zoom?) don't. Does anybody know yet how to solve this problem?
+If there is no other solution: as my card works well with kernel 2.4, I
+wonder if it is possible to use the old hci_uart module from 2.4 in 2.6?
 
-Thanks & Regards,
-Benny
+Thanks for advice
+
+Mathias
+
+
+-- 
+Perfection is achieved not when you have nothing more to add,
+but when you have nothing left to take away.
+ - Antoine de Saint-Exupery
 
 
 -------------------------------------------------------
