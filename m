@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Fred Schaettgen <bluez-user@schaettgen.de>
+From: Vesa Halttunen <vesuri@jormas.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Use of /etc/bluetooth/link-key Bug or Feature ??
-References: <422DF27C.8080301@bjitodc.com> <200503090001.00828.jschindele@arcor.de>
-In-Reply-To: <200503090001.00828.jschindele@arcor.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200503110207.08959.bluez-user@schaettgen.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1110498275.3040.6.camel@pc.vesuri.net>
+Mime-Version: 1.0
+Subject: [Bluez-users] HID report mode protocol support in 2.6.11-mh1 broken/missing?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,22 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Mar 2005 02:07:06 +0100
+Date: Fri, 11 Mar 2005 01:44:35 +0200
 
-On Wednesday 09 March 2005 00:01, J=FCrgen Schindele wrote:
-=2E..
->  If this is a feature how can i delete a unique entry for one device
-> and not delete the whole file content because the content is not ascii ?
+Hi,
 
-In case you use KDE, you can use the "Paired devices" control center module=
- of=20
-kdebluetooth to list and remove paired devices.
+I upgraded my kernel from 2.6.10-mh2 to 2.6.11-mh1 and now my mouse and
+keyboard operate in boot protocol mode again so the special keys don't
+work. Does 2.6.11-mh1 lack full support for the report mode protocol, is
+it broken or has something else changed I'd have to know about? I'm
+using bluez-libs and -utils 2.15. The keyboard is a Logitech Elite
+keyboard and the mouse is Logitech MX900.
 
-=46red
+Regards,
 
-=2D-=20
-=46red Schaettgen
-bluez-devel@schaettgen.de
+-Vesa
+--=20
+            =B7 Vesa Halttunen - http://www.jormas.com/~vesuri/ =B7
+
 
 
 -------------------------------------------------------
