@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Russell Neches <russell@ccs.neu.edu>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] sonyericsson t630 info
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Russell Neches <russell@ccs.neu.edu>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040423073235.GB8270@heliopause.vort.org>
-References: <200404142157.41467.cijoml@volny.cz>
-	 <20040419104432.74490.qmail@web21006.mail.yahoo.com>
-	 <20040423073235.GB8270@heliopause.vort.org>
-Content-Type: text/plain
-Message-Id: <1082706043.23959.95.camel@pegasus>
+Message-ID: <20040423073235.GB8270@heliopause.vort.org>
+References: <200404142157.41467.cijoml@volny.cz> <20040419104432.74490.qmail@web21006.mail.yahoo.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20040419104432.74490.qmail@web21006.mail.yahoo.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +17,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Apr 2004 09:40:44 +0200
+Date: Fri, 23 Apr 2004 03:32:35 -0400
 
-Hi Russell,
+> If you only had an Apple PowerBook. Aahh ... !
 
-> I've got a Debian box, and I know several people who have
-> Bluetooth-equipped PowerBooks of various types. What sort of experiment
-> would be helpful?
+I've got a Debian box, and I know several people who have
+Bluetooth-equipped PowerBooks of various types. What sort of experiment
+would be helpful?
 
-everything that can trigger big endian bugs ;)
-
-Regards
-
-Marcel
-
-
+Russell
 
 
 -------------------------------------------------------
