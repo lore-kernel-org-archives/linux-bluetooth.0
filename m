@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Ladislav Lhotka <lada@lhotka.elsatnet.cz>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] HIDD not working .. for me
+From: Marcel Holtmann <marcel@holtmann.org>
+To: matiasbrutti@ciudad.com.ar
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200406192357.38037.matiasbrutti@ciudad.com.ar>
+References: <40D4D3B2.5000106@pobox.com>
+	 <200406192357.38037.matiasbrutti@ciudad.com.ar>
 Content-Type: text/plain
-Message-Id: <1087722591.6692.14.camel@missotis.lhotkovi.cz>
+Message-Id: <1087718775.25061.28.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] kernel panic
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,28 +19,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 20 Jun 2004 11:09:51 +0200
+Date: Sun, 20 Jun 2004 10:06:15 +0200
 
-Hi,
+Hi Matias,
 
-I have been quite succesful with setting up Bluetooth on IBM ThinkPad
-T41p with Gentoo Linux (kernel 2.6.5-gentoo-r1). The only serious
-problem is that after enabling BT with Fn-F5 and doing
+> hello ... change the bluez  to the new 2.7 version and I found there is no 
+> more bthid and now is called hidd .. but when I try to hidd --server I get 
+> the following error 
+> [root@ShuttleX matt]# hidd
+> Can't open HIDP control socket: Invalid argument
 
-/etc/init.d/bluetooth start
+you have to load the hidp kernel module.
 
-I can neither disable BT with Fn-F5 nor shutdown the system - in both
-cases the system hangs with
+Regards
 
-<0>Kernel panic: Fatal exception in interrupt
-In interrupt handler - not syncing
+Marcel
 
-Does anyone have a similar experience? What more info can I provide?
 
-Thanks, Lada
-
--- 
-Ladislav Lhotka <lada@lhotka.elsatnet.cz>
 
 
 -------------------------------------------------------
