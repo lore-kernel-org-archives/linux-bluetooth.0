@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Oops in hci_usb
+Subject: Re: [Bluez-users] configuring bluetooth device
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Riku Voipio <riku.voipio@iki.fi>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040503193747.GA21331@kos.to>
-References: <20040501173626.GA3866@kos.to> <1083587205.4666.0.camel@pegasus>
-	 <20040503193747.GA21331@kos.to>
+To: arundeep Singh <arundeep78@yahoo.com>
+Cc: bluez users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040503184147.83583.qmail@web61102.mail.yahoo.com>
+References: <20040503184147.83583.qmail@web61102.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1083686495.4666.39.camel@pegasus>
+Message-Id: <1083686375.4666.36.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,23 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 04 May 2004 18:01:35 +0200
+Date: Tue, 04 May 2004 17:59:35 +0200
 
-Hi Riku,
+Hi Arundeep,
 
-> > do you enabled CONFIG_BT_HCIUSB_SCO in your kernel? If yes, disable it
-> > and try again.
-> 
-> Thanks for everyone for help!
-> 
-> Getting rid SCO option and updating to 2.6.6-RC3 makes the bluetooth 
-> on x40 work like a charm, no more oops and pairing worked first try. 
-> I can try 2.6.6-RC3 with CONFIG_BT_HCIUSB_SCO if you want to track 
-> the problem deeper. 
+> I am working on 2.6.4 kernel. I am trying to configure my bluetooth usb
+> dongle by widcomm on my PC. but remain unable to. 
 
-please do so, because actually I don't know why it happens. Do anyone
-with an AVM BlueFRITZ! USB and the bfusb driver have seens this oops? I
-don't get the point what it has to do with the ISOC URB's.
+actually nobody here cares ;)
+
+> bluez is there on the system. but i didn't find few of the config
+> files. and also the there is no such device name hci0 or so in /dev
+> directory.
+
+Do you have an /dev/eth0 ;)
+
+However what do /proc/bus/usb/devices say? Do you loaded the correct USB
+host controller driver? Is this a Broadcom based dongle or what?
 
 Regards
 
