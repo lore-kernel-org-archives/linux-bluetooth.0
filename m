@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4118C229.3080606@dark-reality.de>
+Message-ID: <4118BEBE.2010505@dark-reality.de>
 From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
-References: <4117AB9A.9010909@dark-reality.de>	 <1092071356.4564.12.camel@pegasus>  <4117B098.5020805@dark-reality.de>	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>	 <1092090364.4564.46.camel@pegasus> <4118B5FF.5070008@dark-reality.de> <1092139719.4564.89.camel@pegasus>
-In-Reply-To: <1092139719.4564.89.camel@pegasus>
+Subject: Re: [Bluez-devel] "comlicated" setup - known issues for	hid	and	SCO?
+References: <4117A907.7010006@dark-reality.de>	 <1092071597.4564.17.camel@pegasus>  <4117B376.3030507@dark-reality.de>	 <1092073484.4564.32.camel@pegasus>  <4117BA71.5000800@dark-reality.de> <1092090585.4564.51.camel@pegasus>
+In-Reply-To: <1092090585.4564.51.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -17,39 +17,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 14:40:09 +0200
+Date: Tue, 10 Aug 2004 14:25:34 +0200
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
 Marcel Holtmann wrote:
 | Hi Lars,
-|>for those who are interested in further development of former snd-bt-sco
-|>and now bluetooth-alsa connection (project name not ready ;) we made a
-|>mailing list to exchange early thoughts.
-|
-|
-| I actually prefer that you discuss this on the bluez-devel mailing list,
-| because you may need to change BlueZ core parts and most of this will be
-| kernel related stuff and this should belong here.
 
-I know, and I voted for that too. But I also feel that we need to
-discuss some lineup questions first that might me just fuzz for the
-BlueZ list, so I think it's good to start seperatly.
+| so both devices are in the same piconet. There should be no problem, but
+| from my position I can't tell you anything more.
 
-We'll post and discuss BlueZ-specific stuff on the bluez-devel list, and
-propably the other one will die sooner or later. But for now I think
-it's a good way to make up our minds first.
+I think this message might have something to do with the problem:
 
-CU,
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 44
+
+My main problem does not even seem to be connected to the mouse, because
+it also happens when the mouse is far far away and not connected.
+
+In about 50% of SCO connections the sound coming from the headset is
+totally garbage (not the sound send TO the headset!); I think this might
+be connected to another report here on the list when someone mentioned
+he had to cut the first byte when recording audio from an SCO channel
+(because I'm using 16bit right now, too). This never happend with 8bit
+transmissions over SCO.
+
+Any ideas?
+
+Kernel is 2.6.7 with mh4 patch.
+
+cu,
 ~  Lars
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.3 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFBGMIpQWC6DTWkDAoRAsOIAJwL+eKvuybhnt3VvX8P9Rw7bLnwrwCgmDaS
-1jvapZrjdAMuEzg8TcbNfZo=
-=j9II
+iD8DBQFBGL6+QWC6DTWkDAoRAl2lAJ4ktMZ3xgDH5euwJmISKE/bM6l4XwCfci3X
+kXpVLb9uy8Nwu8qXP5rzBVg=
+=qY1P
 -----END PGP SIGNATURE-----
 
 
