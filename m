@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40183939.1000209@3WT.com.br>
-From: Rafael Vidal Aroca <rafael@3WT.com.br>
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: Bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] epox-presenter
+References: <4017F953.1090108@virgin.net> <1075314868.26729.34.camel@pegasus> <401830B2.5070407@virgin.net>
+In-Reply-To: <401830B2.5070407@virgin.net>
 MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hci0 problem after timeout
-References: <40170986.70105@3WT.com.br> <1075276651.12766.52.camel@pegasus>	 <4017D6E9.6030700@3WT.com.br> <1075306737.26729.3.camel@pegasus>	 <40182154.6030709@3WT.com.br> <1075323686.26729.41.camel@pegasus>	 <40182452.2040509@3WT.com.br> <1075324208.26729.44.camel@pegasus>
-In-Reply-To: <1075324208.26729.44.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200401282334.52360.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,39 +19,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jan 2004 20:35:37 -0200
+Date: Wed, 28 Jan 2004 23:34:51 +0100
 
+Dne st 28. ledna 2004 22:59 Rob Davis napsal(a):
+> Marcel Holtmann wrote:
+> >Hi Rob,
+> >
+> >>I've just picked up one of these devices, and was quite happy to see it
+> >>supported under linux, and even working with remote X windows..
+> >>
+> >>However, I was wondering if there was a way of slowing or speeding up
+> >>the speed of the mouse point, and getting the extra buttons working like
+> >>a wheel mouse, like in windoze?
+> >
+> >the code is quite self-explanatory and very simple. So go ahead and send
+> >me a patch for your features.
+>
+> Okay, my first ever C hack...
+>
+> Implemented three functions, back button triggers mouse button 4, next
+> button triggers mouse button 5, fn button triggers a keyboard alt + tab,
+> which changes window focus in kde, and probably gnome.
+>
+> I have also reduced the speed of the pointer from 12 to 4, which I am
+> much happier with as I have a hope of landing on the correct window.
+>
+> Sorry, I'm not sure how to do patch, but the file is small...
+>
+> All the best - Rob
 
-    Well, i managed to make the connection i wanted using ppp over a 
-rfcomm channel. I works great with no timeouts :-)
+diff -urN original_directory original_patched> /tmp/patch
 
-    I really don't know anyone here in my city that has a bluetooth 
-dongle, or even a csr based one.
-
-[]s Rafael.
-
-
-Marcel Holtmann wrote:
-
->Hi Rafael,
->
->  
->
->>    Unfortunatly, i don't have access to any other bluetooth dongle :-(
->>    
->>
->
->this is actually bad. Maybe a friend or a colleague has one that you can
->borrow for testing.
->
->Regards
->
->Marcel
->
->
->  
->
-
+Michal
 
 
 
