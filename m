@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050203142619.94035.qmail@web60902.mail.yahoo.com>
-From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
-Subject: Re: [Bluez-users] rfcomm question 3
+Message-ID: <20050203140325.25498.qmail@web52810.mail.yahoo.com>
+From: Peter van der Linden <pjotrdenstora@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1107436805.11944.58.camel@pegasus>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=big5
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Errorhandling in BCSP protocol?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,21 +16,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 3 Feb 2005 22:26:19 +0800 (CST)
+Date: Thu, 3 Feb 2005 06:03:25 -0800 (PST)
 
- Hi Marcel,
-    I'm sorry for doing such stupid thing.
-    Now I put all parts of rctest.c in my main program
-to test, and then I found the error message " Can't
-set RFCOMM link mode: Protocol not available (92)",
-and this happens in do_listen part. My T610 has
-included  my PC in the menu of "My device". So, what
-have I do so that the RFCOMM link can be set? Thanks.
-Michael
+Hi all,
 
-_______________________________________________________________________
-新年願望第一位 : 找到友緣人
-http://personals.yahoo.com.hk
+I am working with an implementation that has BlueZ
+running on a host processor and a CSR BlueCore02 as
+Bluetooth chip. The host processor and BlueCore
+communicate through BCSP protocol. The BCSP from BlueZ
+regularly reports errors like:
+bcsp_recv: Short BCSP packet
+bcsp_recv: Checksum failed
+bcsp_recv: Out-of-order packet arrived, got 1 expected
+2
+In these cases the BlueCore02 retransmits the BCSP
+packet after a timeout.
+
+My question: is there another mechanism than these
+timeouts in BCSP protocol? Are BCSP packets that cause
+these errormessages acknowledged over the BCSP link?
+According to a BCSP protocol document I saw there
+should e.g. be a means to send an acknowledgement with
+the expected pacletnumber even when the wrong
+pzcvketnumber is received. Is this implemented in
+BlueZ?
+I am running Linux version 2.4.18 with the latest
+BlueZ package for that kernel version. The intention
+is to switch to Linux 2.6, but not right now!
+Regards,
+Pjotr
+
+
+
+		
+__________________________________ 
+Do you Yahoo!? 
+Yahoo! Mail - Find what you need with new enhanced search.
+http://info.mail.yahoo.com/mail_250
 
 
 -------------------------------------------------------
