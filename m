@@ -1,73 +1,48 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: Daryl Van Vorst <daryl@wideray.com>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000801c3158d$497da950$5796fea9@baked>
-References: <000801c3158d$497da950$5796fea9@baked>
-Message-Id: <1052423632.2669.372.camel@pegasus.local>
-Mime-Version: 1.0
+Return-Path: <daryl@wideray.com>
+Date: Thu, 08 May 2003 15:06:13 -0700
+From: Daryl Van Vorst <daryl@wideray.com>
 Subject: RE: [Bluez-devel] Qualification Testing
-Content-Type: text/plain
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 08 May 2003 21:53:45 +0200
+In-reply-to: <000801c3158d$497da950$5796fea9@baked>
+To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Errors-to: daryl@wideray.com
+Message-id: <001301c315ae$0a6415d0$5796fea9@baked>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Daryl,
+Marcel,
 
-> It'll take me a bit of time to gather all of the logs. I'll send them to you
-> as I get them. The logs are a bit lengthy, so I'll send them directly to you
-> instead of the list.
+Here's Cetecom's response:
 
-no problem. My mailbox can accept large emails.
+"Yes, that's the way it should be.
 
-> The product hasn't been released yet, so I can't publicly discuss too much.
-> We could talk a bit off-list about it if you'd like.
+SABM (DLCI0)
+UA
+SABM (DLCIn)
+UA
+MSC exchange (IUT initiated)
+MSC exchange (Tester inititated)
+Send data"
 
-Maybe you can send me a short discription off-list.
+-Daryl.
 
-> Yeah, I figured.  It took a bit of work, but I now have a 2.4.18 kernel up
-> to mh4 (the latest on your site).
-
-The 2.4.18-mh4 should work fine and the Bluetooth subsystem is the same
-as the 2.4.20-mh7 and the not released 2.4.21-rc2.
-
-> Yup. From here on it will be done on an up-to-date kernel (Is 2.4.18 with
-> your most recent patch level considered up-to-date? Moving to 2.4.20 would
-> be a major hassle). I would have done that earlier, but I didn't realize how
-> outdated the bluez-kernel package was until it was too late.
-
-You don't get any problem with an updated Bluetooth subsystem of the
-2.4.18. If no other subsystem will break your setup, you are still on
-the safe way.
-
-> Heh heh. I care! ;)  Are you going to take a look at that?  I could have a
-> look, but it might take me a while to figure it out.
-
-I can't promise anything, but I will try to fix most of them :)
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-Enterprise Linux Forum Conference & Expo, June 4-6, 2003, Santa Clara
-The only event dedicated to issues related to Linux enterprise solutions
-www.enterpriselinuxforum.com
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> > >         5.) Once an RFCOMM channel is established, the IUT must
+> > > exchange MSC's (modem status commands) before sending data. 
+> > That is,
+> > > it must send an MSC, wait for a response, wait for the
+> > sender's MSC,
+> > > and respond to it before sending data. Our device sent an
+> > MSC and then
+> > > immediately started sending data when we used rctest. This
+> > applies to
+> > > many test cases.
+> > 
+> > We send the MSC after the UA. But we also go into
+> > BT_CONNECTED state and in this state you can also start 
+> > sending data. We should maybe go from BT_CONNECT -> BT_CONFIG 
+> > and only switch to BT_CONNECTED after the successful 
+> exchange of MSC.
+> 
+> That sounds good to me. Not sure about the UA though... I'll 
+> check on it.
