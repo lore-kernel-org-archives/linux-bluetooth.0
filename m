@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Cross-compile pand to Arm system problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: =?UTF-8?Q?=E9=BB=83=E5=AD=90?= =?UTF-8?Q?=E5=84=80?= <sammy@autumn.ccl.itri.org.tw>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <021d01c46ed2$1b00eed0$7053608c@ccl.itri.org.tw>
-References: <021d01c46ed2$1b00eed0$7053608c@ccl.itri.org.tw>
-Content-Type: text/plain
-Message-Id: <1090395444.21683.39.camel@pegasus>
-Mime-Version: 1.0
+From: =?big5?B?tsCkbLv2?= <sammy@autumn.ccl.itri.org.tw>
+To: <bluez-users@lists.sourceforge.net>
+Message-ID: <021d01c46ed2$1b00eed0$7053608c@ccl.itri.org.tw>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="big5"
+Subject: [Bluez-users] Cross-compile pand to Arm system problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +16,64 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Jul 2004 09:37:24 +0200
+Date: Wed, 21 Jul 2004 11:23:33 +0800
 
-Hi Sammy,
-
-> I download bluez-utils-2.7.tar.gz and bluez-lib-2.7.tar.gz
-> and cross-compile the pand daemon to arm-uclibc-gcc environment smoothly.
-> The process includes cross-compile bluez-lib firstly.
-> and copy the pand daemon to my all embedded system.(bnep module is ok too)
-> i hope they can be connected by pand.
-
-use the and bluez-libs-2.8 and bluez-utils-2.8, because I included some
-fixes for pand in that release.
-
-> But it always show the message like "bcsp_timed_event: Timeout, retransmitting 1 pkts"
-> of course the line is not connected.(But i try hcitool cc solution it can work.)
-
-You can ignore this error, because it only tells you that it lost one
-packet and it is now going to resend it. I will change that error into a
-debug message.
-
-Regards
-
-Marcel
+RGVhciBhbGw6DQoNCkkgZG93bmxvYWQgYmx1ZXotdXRpbHMtMi43LnRhci5neiBhbmQgYmx1ZXot
+bGliLTIuNy50YXIuZ3oNCmFuZCBjcm9zcy1jb21waWxlIHRoZSBwYW5kIGRhZW1vbiB0byBhcm0t
+dWNsaWJjLWdjYyBlbnZpcm9ubWVudCBzbW9vdGhseS4NClRoZSBwcm9jZXNzIGluY2x1ZGVzIGNy
+b3NzLWNvbXBpbGUgYmx1ZXotbGliIGZpcnN0bHkuDQphbmQgY29weSB0aGUgcGFuZCBkYWVtb24g
+dG8gbXkgYWxsIGVtYmVkZGVkIHN5c3RlbS4oYm5lcCBtb2R1bGUgaXMgb2sgdG9vKQ0KaSBob3Bl
+IHRoZXkgY2FuIGJlIGNvbm5lY3RlZCBieSBwYW5kLg0KQnV0IGl0IGFsd2F5cyBzaG93IHRoZSBt
+ZXNzYWdlIGxpa2UgImJjc3BfdGltZWRfZXZlbnQ6IFRpbWVvdXQsIHJldHJhbnNtaXR0aW5nIDEg
+cGt0cyINCm9mIGNvdXJzZSB0aGUgbGluZSBpcyBub3QgY29ubmVjdGVkLihCdXQgaSB0cnkgaGNp
+dG9vbCBjYyBzb2x1dGlvbiBpdCBjYW4gd29yay4pDQogDQpJZiB5b3UgaGF2ZSBzb21lIGNvbW1l
+bnQsaSBhbSBnbGFkIHRvIHJlY2VpdmUgaXQsdGhhbmtzISENCg0KU2FtbXkNCg0KDQoqKioqKioq
+KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKg0KZm9y
+IEE6IGJlIGEgR04NCioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKioqKioqKioqDQojIG1vZHByb2JlIGJuZXANClVzaW5nIC9saWIvbW9kdWxlcy8yLjQu
+MjEtcm1rMS9rZXJuZWwvbmV0L2JsdWV0b290aC9ibmVwLm8NCkJsdWVaIEJORVAgdmVyIDEuMA0K
+Q29weXJpZ2h0IChDKSAyMDAxLDIwMDIgSW52ZW50ZWwgU3lzdGVtZXMNCldyaXR0ZW4gMjAwMSwy
+MDAyIGJ5IENsZW1lbnQgTW9yZWF1IDxjbGVtZW50Lm1vcmVhdUBpbnZlbnRlbC5mcj4NCldyaXR0
+ZW4gMjAwMSwyMDAyIGJ5IERhdmlkIExpYmF1bHQgPGRhdmlkLmxpYmF1bHRAaW52ZW50ZWwuZnI+
+DQpDb3B5cmlnaHQgKEMpIDIwMDIgTWF4aW0gS3Jhc255YW5za2l5IDxtYXhrQHF1YWxjb21tLmNv
+bT4NCiNoY2lkDQpiY3NwX3RpbWVkX2V2ZW50OiBUaW1lb3V0LCByZXRyYW5zbWl0dGluZyAxIHBr
+dHMNCiNoY2ljb25maWcgLWENCmhjaTA6ICAgVHlwZTogVUFSVA0KICAgICAgICBCRCBBZGRyZXNz
+OiAwMDowMjo1QjowMDpBNTpDOCBBQ0wgTVRVOiAxOTI6OCAgU0NPIE1UVTogNjQ6OA0KICAgICAg
+ICBVUCBSVU5OSU5HIFBTQ0FOIElTQ0FODQogICAgICAgIFJYIGJ5dGVzOjkzOCBhY2w6MCBzY286
+MCBldmVudHM6MzUgZXJyb3JzOjANCiAgICAgICAgVFggYnl0ZXM6MTU4MSBhY2w6MCBzY286MCBj
+b21tYW5kczozOCBlcnJvcnM6MA0KICAgICAgICBGZWF0dXJlczogMHhmZiAweGZmIDB4MGYgMHgw
+MA0KICAgICAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgxIERIMyBESDUgSFYxIEhWMiBI
+VjMNCiAgICAgICAgTGluayBwb2xpY3k6IFJTV0lUQ0ggSE9MRCBTTklGRiBQQVJLDQogICAgICAg
+IExpbmsgbW9kZTogQUNDRVBUIE1BU1RFUg0KYmNzcF90aW1lZF9ldmVudDogVGltZW91dCwgcmV0
+cmFuc21pdHRpbmcgMSBwa3RzDQogICAgICAgIE5hbWU6ICdTY2FuX0FfQmx1ZVogKDApKG5vbmUp
+Jw0KICAgICAgICBDbGFzczogMHgwMDAxMDANCiAgICAgICAgU2VydmljZSBDbGFzc2VzOiBVbnNw
+ZWNpZmllZA0KICAgICAgICBEZXZpY2UgQ2xhc3M6IENvbXB1dGVyLCBVbmNhdGVnb3JpemVkDQog
+ICAgICAgIEhDSSBWZXI6IDEuMSAoMHgxKSBIQ0kgUmV2OiAweDIwZCBMTVAgVmVyOiAxLjEgKDB4
+MSkgTE1QIFN1YnZlcjogMHgyMGQNCiAgICAgICAgTWFudWZhY3R1cmVyOiBDYW1icmlkZ2UgU2ls
+aWNvbiBSYWRpbyAoMTApDQojcGFuZCAtLWxpc3RlbiAtLXJvbGUgR04NCiMNCioqKioqKioqKioq
+KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqDQpmb3IgQjog
+YmUgYSBQQU5VDQoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKioqKioqKg0KIyBtb2Rwcm9iZSBibmVwDQojaGNpZA0KI2hjaWNvbmZpZyAtYQ0KaGNp
+MDogICBUeXBlOiBVQVJUDQogICAgICAgIEJEIEFkZHJlc3M6IDAwOjAyOjVCOjAwOkE1OkZEIEFD
+TCBNVFU6IDE5Mjo4ICBTQ08gTVRVOiA2NDo4DQogICAgICAgIFVQIFJVTk5JTkcgUFNDQU4gSVND
+QU4NCiAgICAgICAgUlggYnl0ZXM6Mjg4IGFjbDowIHNjbzowIGV2ZW50czoxNCBlcnJvcnM6MA0K
+ICAgICAgICBUWCBieXRlczo0NjIgYWNsOjAgc2NvOjAgY29tbWFuZHM6MTMgZXJyb3JzOjANCiAg
+ICAgICAgRmVhdHVyZXM6IDB4ZmYgMHhmZiAweDBmIDB4MDANCiAgICAgICAgUGFja2V0IHR5cGU6
+IERNMSBETTMgRE01IERIMSBESDMgREg1IEhWMSBIVjIgSFYzDQogICAgICAgIExpbmsgcG9saWN5
+OiBSU1dJVENIIEhPTEQgU05JRkYgUEFSSw0KICAgICAgICBMaW5rIG1vZGU6IEFDQ0VQVCBNQVNU
+RVINCmJjc3BfdGltZWRfZXZlbnQ6IFRpbWVvdXQsIHJldHJhbnNtaXR0aW5nIDEgcGt0cw0KICAg
+ICAgICBOYW1lOiAnU2Nhbl9CX0JsdWVaICgwKShub25lKScNCiAgICAgICAgQ2xhc3M6IDB4MDAw
+MTAwDQogICAgICAgIFNlcnZpY2UgQ2xhc3NlczogVW5zcGVjaWZpZWQNCiAgICAgICAgRGV2aWNl
+IENsYXNzOiBDb21wdXRlciwgVW5jYXRlZ29yaXplZA0KICAgICAgICBIQ0kgVmVyOiAxLjEgKDB4
+MSkgSENJIFJldjogMHgyMGQgTE1QIFZlcjogMS4xICgweDEpIExNUCBTdWJ2ZXI6IDB4MjBkDQog
+ICAgICAgIE1hbnVmYWN0dXJlcjogQ2FtYnJpZGdlIFNpbGljb24gUmFkaW8gKDEwKQ0KI3BhbmQg
+LS1jb25uZWN0IDAwOjAyOjVCOjAwOkE1OkM4IA0KIyBwYW5kIC0tY29ubmVjdCAwMDowMjo1Qjow
+MDpBNTpDOA0KIyBiY3NwX3RpbWVkX2V2ZW50OiBUaW1lb3V0LCByZXRyYW5zbWl0dGluZyAxIHBr
+dHMNCiMgcGFuZCAtLWNvbm5lY3QgMDA6MDI6NUI6MDA6QTU6QzgNCiMgYmNzcF90aW1lZF9ldmVu
+dDogVGltZW91dCwgcmV0cmFuc21pdHRpbmcgMSBwa3RzDQojIHBhbmQgLS1jb25uZWN0IDAwOjAy
+OjVCOjAwOkE1OkM4DQojIGJjc3BfdGltZWRfZXZlbnQ6IFRpbWVvdXQsIHJldHJhbnNtaXR0aW5n
+IDEgcGt0cw0KcGFuZCAtLXNob3cNCiMgcGFuZCAtLXNob3cNCi4uLg0KLi4uDQoNCg0KQ2hlZXJz
+LA0KU2FtbXkNCg==
 
 
 
