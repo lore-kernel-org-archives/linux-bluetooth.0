@@ -1,86 +1,106 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <3F7BF2EC.2080000@freemail.hu>
-From: Lengyel Gabor <lgaga@freemail.hu>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] fujitsu-siemens pc card
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Oct 2003 11:42:04 +0200
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Logitech MX900 mouse with Dell Inspiron 8600
+From: Charles Bueche <charles@bueche.ch>
+To: bluez-devel@lists.sourceforge.net, peter@klausler.com
+In-Reply-To: <1070201531.8187.20.camel@bluez.bueche.ch>
+References: <1070201531.8187.20.camel@bluez.bueche.ch>
+Content-Type: text/plain
+Message-Id: <1070218289.8534.30.camel@bluez.bueche.ch>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Sun, 30 Nov 2003 19:51:29 +0100
 
-Hi!
+Hi again,
 
-I recently obtained a Fujitsu-Siemens Bluetooth PC Card and tried a lot 
-but could not make it work. I tried with debian sid, kernel 2.4.22 (from 
-kernel.org, not the debian one), on an Asus L3400Tp notebook.
+responding to my own email after studying fake.c : I got it to compile
+on 2.6, but this code isn't able to run as module on 2.6 kernels, which
+changed the module format.
 
-Pcmcia support is in the kernel (not in a module), the pcmcia socket 
-itself seems ok (though I can not test it with another card as I only 
-have this one):
+Peter : do you plan a 2.6 version anytime soon ?
 
-# cardctl ident
-Socket 0:
-   product info: "OXSEMI", "OXCB950", "Rev A"
-   manfid: 0x0279, 0x0001
-   function: 2 (serial)
-Socket 1:
-   no product info available
+TIA,
+Charles
 
-I applied this patch to my kernel: 
-http://www.ussg.iu.edu/hypermail/linux/kernel/0203.0/0040.html
-(Shouldn't 'cardctl ident' tell the real vendor and name for the 
-bluetooth card, instead of the uart?)
-
-I edited modules.conf according to the BlueZ Howto, now bluez modules 
-load automatically on boot, rfcomm l2cap and bluez is loaded all right.
-
-When I plug in the card, the following is written to /var/log/messages:
-
-Oct  2 11:17:30 lgnote kernel: cs: cb_alloc(bus 2): vendor 0x1415, 
-device 0x950b
-Oct  2 11:17:30 lgnote kernel: PCI: Enabling device 02:00.0 (0000 -> 0003)
-Oct  2 11:17:30 lgnote kernel: ttyS04 at port 0x4000 (irq = 9) is a 
-16C950/954
-Oct  2 11:17:30 lgnote pci.agent[577]: ... no modules for PCI slot 02:00.0
-
-There was no /dev/ttyS04 (and no ttyS4 either), so i created one (major 
-number 4, minor 68).
-
-Then I tried hciattach:
-# hciattach -n /dev/ttyS04 any
-It seems to work OK, hci0 device is created, but hciconfig hci0 up does 
-not work:
-Can't init device hci0. Connection timed out(110).
-
-I tried loading all the bluetooth modules (hci_uart, btuart_cs, ...) one 
-by one and all of them together ( :) ), but the result is the same. I 
-also tried hciattach with different device types (ericsson, digi, ...), 
-some of them seems OK (but the problem with hciconfig still remains), 
-with others it does not even start (for example with csr it says 
-"Initialization timed out").
-
-I have no further ideas, am I doing something wrong? Or is this card not 
-supported at all? :(
-
-Thank you all,
-Gabor Lengyel (Lgaga)
+On Sun, 2003-11-30 at 15:12, Charles Bueche wrote:
+> Hi,
+> 
+> I have this hardware combination : the new Logitech MX900, which is
+> talking bluetooth to its hub. This hub goes to my laptop using USB.
+> 
+> I'm using gentoo linux, with kernel 2.6.0test11. I have patched my
+> XFree86 (xfree-4.3.99.16.ebuild) with
+> http://www.yhbt.net/normalperson/files/linux/LogitechMX_kernel_and_X_patch/
+> to make it understand the PS2++ protocol, and the mouse somewhat works.
+> 
+> The setup is working fine, even if I didn't finish the setup completely
+> (all buttons aren't working yet).
+> 
+> Now, having a internal bluetooth module within my Dell Inspiron 8600, I
+> would like to connect the mouse directly, without going through the hub
+> and USB.
+> 
+> When I use the basic tools (hcitool scan, hcitool info), I get this info
+> block from the mx900 :
+> 
+> ==============
+> Requesting information ...
+> BD Address:  00:07:61:08:7E:2E
+> Device Name: Logitech MX900 Mouse
+> LMP Version: 1.1 (0x1) LMP Subversion: 0x350
+> Manufacturer: Cambridge Silicon Radio (10)
+> Features: 0xfc 0xff 0x0f 0x00
+> <encryption> <slot offset> <timing accuracy> <role switch> <hold mode>
+> <sniff mode> <park mode> <RSSI> <channel quality> <SCO link> <HV2
+> packets> <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+> <power control> <transparent SCO> 
+> ==============
+> 
+> I now understand that I need some piece of software to get the mouse
+> events from the bluez stack and pass them to a device that X would
+> understand.
+> 
+>  I tried to compile bthid from Peter Klauser. bthid itself compile, but
+> fake.o choke on line 87 of fake.c :
+> 
+> ====================
+> make -f make.fake fake.o
+> make[1]: Entering directory `/data/util/bthid-0.8'
+> gcc -pipe   -Iinclude/asm-i386/mach-default  -DMODULE -DMODVERSIONS
+> -include /usr/src/linux-2.6.0-test11-gentoo/include/config/modversions.h
+> -D__KERNEL__ -DMAJORNUM=250 -I/usr/src/linux-2.6.0-test11-gentoo/include
+> -fno-strict-aliasing -fno-common   -c -o fake.o fake.c
+> fake.c:86: parse error before "devfs_handle"
+> fake.c:86: warning: data definition has no type or storage class
+> make[1]: *** [fake.o] Error 1
+> make[1]: Leaving directory `/data/util/bthid-0.8'
+> make: *** [fake.o] Error 2
+> ====================
+> 
+> hints welcome. I can test whatewer piece of code you throw at me. I'm
+> however not knowledeable enough to code it myself.
+> 
+> Charles
+-- 
+Charles Bueche <charles@bueche.ch>
+sand, snow, wave, wind and net -surfer
 
 
 
 -------------------------------------------------------
-This sf.net email is sponsored by:ThinkGeek
-Welcome to geek heaven.
-http://thinkgeek.com/sf
+This SF.net email is sponsored by: SF.net Giveback Program.
+Does SourceForge.net help you be more productive?  Does it
+help you create better code?  SHARE THE LOVE, and help us help
+YOU!  Click Here: http://sourceforge.net/donate/
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
