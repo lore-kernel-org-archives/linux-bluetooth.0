@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Max <spamhole@gmx.at>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluez and D-Link DBT-120
-Message-ID: <20040404181317.GA962@venus>
-References: <20040403190647.GA16596@venus> <1081073362.2839.29.camel@pegasus>
+Subject: Re: [Bluez-users] pin code problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: guang <m9187@cn.ee.ccu.edu.tw>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <001301c41a44$77a46fa0$7b6b7b8c@yaya>
+References: <000c01c41a0c$b0441c80$7b6b7b8c@yaya>
+	 <1081073411.2839.31.camel@pegasus>  <001301c41a44$77a46fa0$7b6b7b8c@yaya>
+Content-Type: text/plain
+Message-Id: <1081100087.3032.4.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1081073362.2839.29.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,24 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 4 Apr 2004 20:13:17 +0200
+Date: Sun, 04 Apr 2004 19:34:47 +0200
 
-On Sun, Apr 04, 2004 at 12:09:23PM +0200, Marcel Holtmann wrote:
+Hi,
 
-Hello Marcel,
+> I am sure only one hcid running .
+> I typed " hcid -f /etc/bluetooth/hcid.conf
 
-> disable CONFIG_BT_HCIUSB_SCO in your kernel config.
+check it with "ps x | grep hcid". I am pretty sure that there are more
+than one running. Otherwise you can't get your hcidump output.
 
-I have checked in my current .config, and it is disabled:
+Regards
 
-max@venus:~$ zcat /proc/config.gz | grep BT_HCIUSB  
-CONFIG_BT_HCIUSB=m
-# CONFIG_BT_HCIUSB_SCO is not set
+Marcel
 
-Any ideas?
-
-thanks for your reply,
-Max
 
 
 
