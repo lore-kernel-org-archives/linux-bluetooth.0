@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040301153858.88049.qmail@web40708.mail.yahoo.com>
-From: Lalith Chakravarthi <lalithvc@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] OBEX retrieval
+Subject: Re: [Bluez-users] AUX1 packets
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Thor Egil Skaug <paxtonrd@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <000301c3fe31$fdf2b460$46a57e40@thores>
+References: <000301c3fe31$fdf2b460$46a57e40@thores>
+Content-Type: text/plain
+Message-Id: <1078152924.1942.126.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,24 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 1 Mar 2004 07:38:58 -0800 (PST)
+Date: Mon, 01 Mar 2004 15:55:24 +0100
 
-Hi
+Hi Thor,
 
-I have been able to push a few files from my computer to the phone
-using the obextool push command. I would like to know how to get the
-files from the phone to the computer. The phone that I have is a
-Motorola V-600 and it has a very limited option settings from its side.
-So, do advise me how to go about it. I have a Linux 2.4.19 kernel, if
-that helps.
+> Is there any way of having an ACL connection use AUX1 packets?
+> 
+> The packet type is not defined in the Bluetooth specification for
+> the HCI_create_connection command.
 
-regards
-Lalith
+you can't control this from the host stack side, because as you already
+have seen it is not defined for the HCI_create_connection command. It is
+the job of the link manager to choose the right packet types.
 
-__________________________________
-Do you Yahoo!?
-Get better spam protection with Yahoo! Mail.
-http://antispam.yahoo.com/tools
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
