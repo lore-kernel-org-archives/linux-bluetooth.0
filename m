@@ -1,8 +1,8 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] bt3c_cs time out - no firmware loaded?
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
 To: Krisztian Mark Szentes <office@produktivIT.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>, Edd Dumbill <ejad@debian.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>, benh@kernel.crashing.org, Edd Dumbill <ejad@debian.org>
 In-Reply-To: <200305161438.08919.office@produktivIT.com>
 References: 
 	<53B03DA73719D5119E6A0008C71E1D78030EA9A3@svr-mail1.corp.home.nl>
@@ -10,7 +10,7 @@ References:
 	<1053083095.26552.49.camel@pegasus>
 	<200305161438.08919.office@produktivIT.com>
 Content-Type: text/plain
-Message-Id: <1053091452.2561.86.camel@gaston>
+Message-Id: <1053090987.26550.120.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -24,35 +24,36 @@ List-Unsubscribe:
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 16 May 2003 15:24:13 +0200
+Date: 16 May 2003 15:16:19 +0200
 
-On Fri, 2003-05-16 at 14:38, Krisztian Mark Szentes wrote:
-> {hello Ben}
-> 
-> On Friday 16 May 2003 13:04, Marcel Holtmann wrote:
-> > > > > I have trouble with the 3COM Cardbus bluetooth card on a Powerbook
-> > > > > Titanium (a powerpc notebook). I patched the 2.4.20 kernel with
-> > > > > the mh-6 patch (and the benh patch which does not collide). I
-> > > > > haven't found any hint on the list yet.
-> ...
-> > You're using a Powerbook and the 3Com is currently not supported on the
-> > PowerPC architecture. The Kernel side of the driver should work fine
-> > (not tested), but the bluefw have no code to load the firmware. Take a
-> > look at the mailing list archive for this problem.
->
-> .../...
+Hi Krisztian,
 
-Hrm... The problem isn't simple. You are just not supposed to tap IOs
-that way from userland, especially since PPC arch doesn't have anything
-like "PIO" instructions. The IO space of your card is actually mapped
-somewhere in physical memory, that "somewhere" not beeing generally
-available to userland.
+> kind of astonished, I chose the 3COM card explicitly according to the BlueZ 
+> hardware compatibility list, I could also have chosen the Xircom or Anycom 
+> cards; they would probably have saved a lot of messing around.
+> Perhaps you could correct 
+> http://www.holtmann.org/linux/bluetooth/bt3c.html
+> in order to reflect the missing powerpc support.
 
-Can you tell me more about the card ? Is it a 16 bits PCMCIA device or
-is it a cardbus (PCI) one ? Why can't you tap the IOs solely from within
-a kernel driver ?
+I have added a small comment to this page.
 
-Ben.
+> Furthermore, you could also enhance the hardware support page by adding 
+> vendor co-operation information like linuxprinting.org does. I saw Anycom 
+> directly links to Marcel's homepage. A simple sorting of the list 
+> according to driver openness etc. would just suffice
+
+If you search through the mailing list archive, you will find a posting
+from Max that suggested the same thing. I included it into the list and
+removed it the at same day, because I am not the person who should
+decide which company is Linux friendly and which is not. Let the list
+and the driver source code talk for themself. And you mention the Anycom
+driver. I have this driver already finished over half a year ago, before
+I got the rights to publish it under GPL.
+
+Regards
+
+Marcel
+
 
 
 
