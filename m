@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42242BAB.7080406@futurlink.com>
-From: Pedro Monjo Florit <pedro.monjo@futurlink.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] OBEX Push without pairing
+Subject: Re: [Bluez-users] Report of working dongle: IOGear GBU311 and
+	question
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4223E423.4030603@cloutier-vilhuber.net>
+References: <20050228143635.6E7668844B@sc8-sf-spam1.sourceforge.net>
+	 <4223E423.4030603@cloutier-vilhuber.net>
+Content-Type: text/plain
+Message-Id: <1109666679.17256.129.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,28 +20,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Mar 2005 09:45:31 +0100
+Date: Tue, 01 Mar 2005 09:44:39 +0100
 
-Hi Marcel and everybody else in the list,
+Hi Lars,
 
-I am writing an applications that, among other things, sends an OBEX 
-Push to a device (e.g. a mobile phone). This is working fine, except for 
-one thing: whenever I send something to the device, the first time it 
-always asks for the PIN. I have seen that, for example, kbluetooth (the 
-KDE Bluetooth framework) and Impronto can send a file without pairing 
-first. How can I do that?
+> I can happily report that my new IOGear GBU311 works under stock SuSE 
+> 9.2 (connections tested with Palm T3 and Sony-Ericsson T610, using 
+> OBEX-FTP, OBEX-transfer, DUN).
+> 
+> However, I am curious: when plugging it in, the logs show a USB *HUB*, 
+> and registers keyboard and mouse drivers. Is this something SuSE 
+> specific, something driver-specific? Is SuSE misconfigured? or what does 
+> it mean when the USB dongle registers as a keyboard/mouse?
 
-I am sure that I am missing something, but still have not found what. In 
-my application, I call to socket(), bind() to a local address 
-(BDADDR_ANY) and then connect(). It is at the connect stage that the 
-pairing takes place. I have been following the code of kbluetooth and 
-all I can see is that I am doing essentially the same.
+the registration as mouse and keyboard is fine, but actually this device
+should only start working with a recent 2.6.11-rc5 kernel. What does the
+content of /proc/bus/usb/devices shows you? Also show us "hciconfig -a".
 
-Any help would be appreciated.
+Regards
 
-Cheers,
+Marcel
 
-Pedro Monjo
+
 
 
 -------------------------------------------------------
