@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-rbqanG/rnraesUL5oiK6"
-Message-Id: <1106218017.6052.22.camel@baroque.rococosoft.com>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Bluetrek G2
+Message-Id: <IAM1IW$205B23707D0A369DE13B2731D4A79F3F@libero.it>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+From: "andi.c@libero.it" <andi.c@libero.it>
+To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] PAND error: Function not implemented(38)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,38 +16,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 10:46:57 +0000
+Date: Thu, 20 Jan 2005 11:08:56 +0100
 
+Hi to all,
+making a pan connection on my linux box gives me the error:=0D
+=
 
---=-rbqanG/rnraesUL5oiK6
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+pand[3093]: Bluetooth PAN daemon version 2.13
+pand[3093]: Connecting t=
+o 00:10:60:A7:48:84
+pand[3093]: Connect to 00:10:60:A7:48:84 failed. Fun=
+ction not implemented(38)
 
-Hello world,
-Just to let you know that the above headset works fine with btsco and
-2.6.10-mh1 on Mandrake 10.1.  (I tried it with 2.6.10 and while it was
-detected and connected, I couldn't get any sound out of it --- could
-have been my fault though.)
+All the modules are loaded (bnep included) ,=
+ and all other hci operations work.
+Even bnep connection can be created =
+using the same host as slave with
+pand -listen.
 
-About the web-page: it would be useful to have a TO-DO list so people
-could dive in and fix/implement things.
-
-Nice work!
-Steve
-
---=-rbqanG/rnraesUL5oiK6
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQBB74whlgMqgVzLyWcRAm+qAJ49EDNkXchl3XPoEbTBnCvnIHYIXACfdm0f
-HuSJEAoekUzLOuvTMaveunM=
-=J+Ma
------END PGP SIGNATURE-----
-
---=-rbqanG/rnraesUL5oiK6--
+any suggestion ?=0A=0A=
+=0A=0A____________________________________________________________=0A6X v=
+elocizzare la tua navigazione a 56k? 6X Web Accelerator di Libero!=0AScar=
+icalo su INTERNET GRATIS 6X http://www.libero.it=0A
 
 
 
