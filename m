@@ -1,19 +1,23 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Fehr <andreas@mrs.ch>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] bluetooth serial vs. audio connection
-In-Reply-To: <1112006630.9016.3.camel@pegasus>
-Message-ID: <Pine.LNX.4.62.0503281310300.3475@ybpnyubfg.ybpnyqbznva>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.62.0503281112030.3082@ybpnyubfg.ybpnyqbznva>
 References: <Pine.LNX.4.62.0503271303450.3134@ybpnyubfg.ybpnyqbznva>
- <1111923433.9195.216.camel@pegasus>  <Pine.LNX.4.62.0503271357080.3134@ybpnyubfg.ybpnyqbznva>
-  <1111926923.9195.218.camel@pegasus>  <Pine.LNX.4.62.0503271736360.3135@ybpnyubfg.ybpnyqbznva>
-  <1111938339.9195.229.camel@pegasus>  <Pine.LNX.4.62.0503271751420.3135@ybpnyubfg.ybpnyqbznva>
-  <1111939568.9195.236.camel@pegasus>  <Pine.LNX.4.62.0503271813180.3135@ybpnyubfg.ybpnyqbznva>
-  <1111942691.9195.241.camel@pegasus>  <Pine.LNX.4.62.0503280908130.3082@ybpnyubfg.ybpnyqbznva>
-  <Pine.LNX.4.62.0503281112030.3082@ybpnyubfg.ybpnyqbznva>
- <1112006630.9016.3.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+	 <1111923433.9195.216.camel@pegasus>
+	 <Pine.LNX.4.62.0503271357080.3134@ybpnyubfg.ybpnyqbznva>
+	 <1111926923.9195.218.camel@pegasus>
+	 <Pine.LNX.4.62.0503271736360.3135@ybpnyubfg.ybpnyqbznva>
+	 <1111938339.9195.229.camel@pegasus>
+	 <Pine.LNX.4.62.0503271751420.3135@ybpnyubfg.ybpnyqbznva>
+	 <1111939568.9195.236.camel@pegasus>
+	 <Pine.LNX.4.62.0503271813180.3135@ybpnyubfg.ybpnyqbznva>
+	 <1111942691.9195.241.camel@pegasus>
+	 <Pine.LNX.4.62.0503280908130.3082@ybpnyubfg.ybpnyqbznva>
+	 <Pine.LNX.4.62.0503281112030.3082@ybpnyubfg.ybpnyqbznva>
+Content-Type: text/plain
+Message-Id: <1112006630.9016.3.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -25,31 +29,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Mar 2005 13:13:28 +0200 (CEST)
+Date: Mon, 28 Mar 2005 12:43:50 +0200
 
-On Mon, 28 Mar 2005, 12:43, Marcel Holtmann (as MH) wrote:
+Hi Andreas,
 
-Hi Marcel,
+> >AF: >MH: > Yes, I misread the question. This is a Samsung SGH-D500 (a 
+> >AF: >MH: > nice phone but crappy windows software...)
+> >AF: >MH: > 
+> >AF: >MH: > No difference. With or without --tree, there is only one 
+> >AF: >MH: > line of output "Browsing 00:xx ...", nothing else
+> >AF: >MH: 
+> >AF: >MH: I actually meant the "spdtool search" part to see if the 
+> >AF: >MH: segmentation fault is still present then. However, again the 
+> >AF: >MH: bad Samsung phone. I think I need one of these at home for 
+> >AF: >MH: fixing this thing.
+> 
+> Well, I tried to debug this segmentation fault, but the changes I made 
+> in the code haven't been reflected in the binary. I'm not that 
+> experienced as a programmer, so I don't know what happened (probably 
+> due to the static declaration of the functions?)
 
->MH: > Well, I tried to debug this segmentation fault, but the changes I 
->MH: > made in the code haven't been reflected in the binary. I'm not 
->MH: > that experienced as a programmer, so I don't know what happened 
->MH: > (probably due to the static declaration of the functions?)
->MH: 
->MH: what happens is quite clear. It is a Sequence against a Sequence of 
->MH: Sequence clash. There is another thread in the mailing list with 
->MH: this exact problem and a lot of explanation. However nobody fixed 
->MH: this so far.
+what happens is quite clear. It is a Sequence against a Sequence of
+Sequence clash. There is another thread in the mailing list with this
+exact problem and a lot of explanation. However nobody fixed this so
+far.
 
-Well, I'm happy this sounds clear for you... :-)))
+Regards
 
-But I'll leave it for that. The hint with the channel did the trick 
-(perhaps, something like that should be documented somewhere? or is it 
-already?)
+Marcel
 
-Thanks for all your time to help me solving this problem.
 
-Andreas
 
 
 -------------------------------------------------------
