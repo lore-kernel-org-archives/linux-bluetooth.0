@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BlueZ and headset
+Subject: Re: [Bluez-users] I'm looking for AmbiCom BT2000D drivers
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
+To: V <scorpio1970@inbox.ru>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200402022018.05536.cijoml@volny.cz>
-References: <200402022018.05536.cijoml@volny.cz>
+In-Reply-To: <000601c3e9a8$f6b9b8d0$6764a8c0@Scorpio>
+References: <000601c3e9a8$f6b9b8d0$6764a8c0@Scorpio>
 Content-Type: text/plain
-Message-Id: <1075756519.29899.193.camel@pegasus>
+Message-Id: <1075756388.29899.189.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,16 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 02 Feb 2004 22:15:19 +0100
+Date: Mon, 02 Feb 2004 22:13:09 +0100
 
-Hi Michal,
+Hi Vadim,
 
-> there is a some driver for SCO using ALSA. Does anything exists for good old 
-> OSS too?
+> I have new AmbiCom BT2000D Bluetooth compact flash card. I tried to 
+> 
+> use it with my Sharp Zaurus, but it seems the current bt950_cs driver
+> 
+> does not support it. Also I was not able to find any information in 
+> 
+> the internet about Linux drivers for this card.
 
-the complete SCO/eSCO stuff needs to be reworked, but I don't see any
-future for an OSS driver. ALSA is the choosen architecture for 2.6 and
-onwords.
+show us the output of dump_cis.
 
 Regards
 
