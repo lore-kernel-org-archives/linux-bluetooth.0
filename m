@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <3F65E012.6060009@csr.com>
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
-From: "Jiri Prazak" <bohemius@volny.cz>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <73d8c3bd2463806fbd0544eec8b00c2b@www1.mail.volny.cz>
-Content-Type: text/plain; charset="iso-8859-2"
-Subject: [Bluez-users] problems pairing with Nokia 3650
+To: Chris Sterling <chris.sterling@blackbearconsulting.com>
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] btuart_cs module freezes Zaurus SL5000D after 30
+    seconds
+References: <1063600741.9649.7.camel@dev.blackbear.com>
+In-Reply-To: <1063600741.9649.7.camel@dev.blackbear.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -15,67 +19,38 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 15 Sep 2003 18:58:10 +0200 (CEST)
+Date: Mon, 15 Sep 2003 16:51:46 +0100
 
-Hello all,
+Chris Sterling wrote:
+> btuart_cs: Unknown HCI packet with type 0xc0 received.
+> btuart_cs: Unknown HCI packet with type 0x00 received.
+> btuart_cs: Unknown HCI packet with type 0x41 received.
+> btuart_cs: Unknown HCI packet with type 0x00 received.
+[...]
 
-I have RedHat 8, I have upgraded the kernel to version
-2.4.20-19.8 and it is running on a Dell Latitude Notebook with
-BlueTake BT007 bluetooth adapter.
+Looks like your Bluetooth module uses the CSR chip set and is in BCSP
+mode. BlueZ hasn't been told this so it's trying to talk to it in H4
+mode.
 
-It seems that I have somewhat succesfully installed and
-configured BlueZ stack on it, hcitool can see my Nokia3650, I can
-ping it, rfcomm binds it but I cannot pair the two for my life.
+Tell BlueZ to use BCSP and everything should spring in to life (I think
+you just pass the bcsp option into hciattach).
 
-1.  Pairing initiated from the phone.  My phone finds
-"mynotebook"  when I select New paired device, it reports
-"waiting for mynotebook" and then it says "unable to pair with
-mynotebook" without ever asking for pin or anything.  The hcidump
-is as follows
+	- Steven
+-- 
 
-> HCI Event: Connect Request(0x04) plen 10
-< HCI Command: Accept Connection Request(0x01|0x0009) plen 7
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Connect Complete(0x03) plen 11
-> HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
-< HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Connection Packet Type Changed(0x1d) plen 5
-> ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0045
-< ACL data: handle 0x0029 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0045 result 2
-status 0 > HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Max Slots Change(0x1b) plen 3
-> HCI Event: Disconn Complete(0x05) plen 4
 
-I cannot make any sense out of this but I see no errors.
 
-2. Pairing initiated from "mynotebook".  I use rfcomm connect
-btaddress and the phone asks for a pin, I type in the pin
-(correct one) and I get either
-
-* connection refused
-
-or
-
-* Can't connect RFCOMM socket: Resource temporarily unavailable
-
-on the terminal.  Obviously if this does not work I cannot use
-gprs and pppd either.  Interesting thing is that before I try
-connecting using pppd rfcomm says the channel is clean and after
-the thing bombs it reports channel closed.  I really have no idea
-where the problem is, I tinkered with hci.conf and such but
-nothing seems to help, even disabling authentication has no
-effect.  First I thought it was going to be a minor config issue
-since the phone is visible but I'm not sure anymore.  Any help
-and advice is appreciated.
-
-Thanks Jirka
-
---=20
-Vyhraj Ford Fiesta s klimatizac=ED a dal=B9=ED ceny!
-V=EDce na http://soutez.volny.cz=20
+**********************************************************************
+The information transmitted is intended only for the person or
+entity to which it is addressed and may contain confidential 
+and/or privileged material. 
+Any review, retransmission, dissemination or other use of, or
+taking of any action in reliance upon, this information by 
+persons or entities other than the intended recipient is 
+prohibited.  
+If you received this in error, please contact the sender and 
+delete the material from any computer.
+**********************************************************************
 
 
 
