@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Han Hoekstra" <Han.Hoekstra@WirelessValue.nl>
-To: <bluez-users@lists.sourceforge.net>
-Subject: RE: [Bluez-users] Has anyone seen these problems with the CSRBlueCore and BlueZ before ?
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
-In-Reply-To: <1111068128.11792.73.camel@pegasus>
-Message-ID: <E1DBvrG-0002tO-0b@sc8-sf-mx1.sourceforge.net>
+Message-ID: <a0580c510503170611123a2c47@mail.gmail.com>
+From: Eduardo Bezerra <edubezval@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] A PAN newbie
+In-Reply-To: <1111068329.11792.78.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <a0580c510503160953311ea8e2@mail.gmail.com>
+	 <1111012139.11792.46.camel@pegasus>
+	 <a0580c51050317055564fe7f55@mail.gmail.com>
+	 <1111068329.11792.78.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,102 +21,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Mar 2005 15:19:44 +0100
+Date: Thu, 17 Mar 2005 10:11:28 -0400
 
-Hey Marcel,
+Hi Marcel,
 
-The info I get from hciconfig -a is :
-
-hci0:   Type: UART
-        BD Address: 00:A0:96:0A:BF:D4 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:303 acl:0 sco:0 events:13 errors:0
-        TX bytes:434 acl:0 sco:0 commands:12 errors:0
-        Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ (0)'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x5df LMP Ver: 1.2 (0x2) LMP Subver:
-0x5df
-        Manufacturer: Cambridge Silicon Radio (10)
-
-This info is what I get just after booting the board.
-
-Greetings,
-   Han
-
----
-Han Hoekstra
-Wireless Value B.V.
-Waanderweg 30a
-7812 HZ  Emmen
-Tel: +31-591-633200
-
------Original Message-----
-From: bluez-users-admin@lists.sourceforge.net
-[mailto:bluez-users-admin@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: donderdag 17 maart 2005 15:02
-To: BlueZ Mailing List
-Subject: Re: [Bluez-users] Has anyone seen these problems with the
-CSRBlueCore and BlueZ before ?
-
-Hi Han,
-
-> I'm developping an application on an ARM-7 based platform which is 
-> running Linux 2.4.18 with the latest BlueZ version for that platform.
-> In this application there is a master device that can connect to up to
-> 7 slaves (master and slave devices are all the same, the external 
-> controller determines which is master).
->  
-> The application does the following, the external controller on the 
-> master can send a single command to the Linux application, in the 
-> command is an address field identifying to which slaves the command 
-> must be passed on. A slave will pass the command on to its external 
-> controller, which will respond to the command by sending a reply back 
-> to the Linux slave, which in turn passes it on to the Linux master and 
-> is then handed over to the external controller again. As soon as all 
-> addressed slaves have responded, the sequence is repeated.
->  
-> Now to what I see happening, when I run this with 5 slaves, I don't 
-> see any problems for more than an hour, but when I run it with 6 or 7 
-> slaves, I see that the BlueCore resets itself, with 6 slaves after 
-> about 40 minutes and with 7 slaves already after 5 to 10 minutes. When 
-> I eliminate the CRC check I can run the 7 slaves configuration for up 
-> to about 40 minutes after it crashes.
->  
-> What I think happens is that the BlueCore receives data to fast over 
-> the air and can not pass it on to the Linux CPU quick enough, so there 
-> is an internal overflow in the BlueCore.
-> Communication between the BlueCore and the Linux CPU is done via BCSP 
-> at a speed of 921600 baud.
->  
-> Has anybody seen behaviour like this before and is there something I 
-> can do about it ???
-
-what does "hciconfig -a" tells you about the chip?
-
-Regards
-
-Marcel
+ Thanks. I will get.
 
 
-
-
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide Read honest & candid reviews
-on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
+On Thu, 17 Mar 2005 15:05:29 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Eduardo,
+> 
+> >   Thanks for the quick response. It's truth that I get a second bnep
+> > in the GN, the bnep1. But
+> > I tried to continue the configuration with a "ifconfig bnep1 10.0.0.4"
+> > and the problem kept.
+> > I thinked that at this point (with the two PANU connected and
+> > configured), I could ping
+> > the bnep0 with the old PANU and ping the bnep1 with the new PANU, even
+> > without the
+> > bridge configuration in the GN.
+> 
+> get yourself a network howto to understand why this is not working.
+> 
+> >   Ok, and how can I do a bridge configuration in the master ??
+> >   Is it just creating statics routes between the two bnep's?
+> 
+> The bridge is another virtual network card the combines your two BNEP
+> interface into a new one. This is of course not all a bridge can do, but
+> this is what you need. However this is not BlueZ specific. This is about
+> network administration and thus read a howto about that or take a look
+> at the PAN howto.
+> 
+> Regards
+> 
+> Marcel
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
