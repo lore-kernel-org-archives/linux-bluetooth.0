@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] patch for d-bus support in hcid
-From: David Woodhouse <dwmw2@infradead.org>
-To: Philip Blundell <pb@nexus.co.uk>
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1056040950.3518.18.camel@mill.nexus.co.uk>
-References: <1056040950.3518.18.camel@mill.nexus.co.uk>
-Message-Id: <1062710287.32473.12.camel@hades.cambridge.redhat.com>
-Mime-Version: 1.0
+From: Daniel Haensse <haensse@swissembedded.com>
+Reply-To: Daniel Haensse <haensse@swissembedded.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Message-Id: <200309042240.32662.haensse@swissembedded.com>
+Subject: [Bluez-devel] Can't init device hci0. No such device(19)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -19,33 +17,78 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 04 Sep 2003 22:18:08 +0100
-Content-Type: text/plain
+Date: Thu, 4 Sep 2003 22:40:32 +0200
+Content-Type: text/plain; CHARSET=us-ascii
 
-On Thu, 2003-06-19 at 17:42 +0100, Philip Blundell wrote:
-> This patch adds support to hcid for PIN requests using D-BUS.  (See
-> http://www.freedesktop.org/software/dbus/ if you don't know what D-BUS
-> is about.)
+Hi list,
 
- -  | K_PINHELP  PATH    {
- +  | K_PINHELP  WORD    {
+I  have cross compiled bluez stack for uclinux on 68knommu platforms. So fa=
+r,=20
+the utils are "executable".=20
+I had to make a couple of changes (background):
+- I did subsitute fork with vfok which is not implemented on uclinux.
+- Totally ripped off all the make files to fit it into the distro tree
+- We have /dev read only on our romfs.
+- Made some entries for the conf files on the romfs
+- Enabled all kernel bluez stuff (without module support)
+- I use some Mitsumi modules, which use a csr chip. (The modules work fine =
+on=20
+my SuSE 8.0 notebook.)
 
-It also removes support for actually configuring a pin helper as before.
-Reverting the above removes support for the magic '*dbus' value. 
+The problem is now:
+I can start hcid, but when I try to start hciattach, I can see=20
+Can't init device hci0. No such device(19) in /var/log/messages (see below =
+the=20
+log)
 
-+       if (hcid_dbus_init () == FALSE) {
-+               syslog (LOG_ERR, "Unable to get on D-BUS");
-+               exit (1);
 
-... and then it disables support for running hcid on any system on which
-dbus isn't actually active, even if not configured to _use_ dbus. :)
+any idea?
 
-I suspect we should just be using a script wrapper around 
-dbus-send, or a simple external program, rather than putting support for
-dbus directly into hcid.
+regards
 
--- 
-dwmw2
+Dani
+
+
+---------------------------------------------------------------------------=
+-------
+BlueZ HCI UART driver ver 2.1 Copyright (C) 2000,2001 Qualcomm Inc
+Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
+NET4: Linux TCP/IP 1.0 for NET4.0
+IP Protocols: ICMP, UDP, TCP
+kmem_create: Forcing size word alignment - ip_dst_cache
+IP: routing cache hash table of 512 buckets, 4Kbytes
+TCP: Hash tables configured (established 2048 bind 2048)
+NET4: Unix domain sockets 1.0/SMP for Linux NET4.0.
+BlueZ L2CAP ver 2.1 Copyright (C) 2000,2001 Qualcomm Inc
+Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
+BlueZ SCO ver 0.3 Copyright (C) 2000,2001 Qualcomm Inc
+Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
+BlueZ RFCOMM ver 1.0
+Copyright (C) 2002 Maxim Krasnyansky <maxk@qualcomm.com>
+Copyright (C) 2002 Marcel Holtmann <marcel@holtmann.org>
+BlueZ BNEP ver 1.1
+Copyright (C) 2001,2002 Inventel Systemes
+Written 2001,2002 by Clement Moreau <clement.moreau@inventel.fr>
+Written 2001,2002 by David Libault <david.libault@inventel.fr>
+Copyright (C) 2002 Maxim Krasnyanskiy <maxk@qualcomm.com>
+VFS: Mounted root (romfs filesystem) readonly.
+eth0: using half-duplex 10Base-T (RJ-45)
+
+dragonix login: root
+Password:
+# hcid -n &
+30
+# hcid[30]: HCI daemon ver 2.3 started
+
+# hciattach /dev/ttyS1 csr 115200 flow
+CSR build ID 0x01-0x75
+ttyS1 console mode off
+hcid[30]: HCI dev 0 registered
+hcid[32]: Can't init device hci0. No such device(19)
+
+hcid[30]: HCI dev 0 unregistered
+#
+
 
 
 
