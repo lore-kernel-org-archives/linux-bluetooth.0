@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] a2dp timing
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <d1f423d305040507533bae1618@mail.gmail.com>
+From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <425175E9.8040509@xmission.com>
-References: <42439ADA.5000006@xmission.com>
-	 <1111756476.9195.105.camel@pegasus>  <42443FDB.3070205@xmission.com>
-	 <1111771895.9195.133.camel@pegasus>  <425175E9.8040509@xmission.com>
-Content-Type: text/plain
-Message-Id: <1112713962.12406.42.camel@notepaq>
+Subject: Re: [Bluez-devel] arm boards for embedding bluez
+In-Reply-To: <42523631.6020905@thomae-privat.de>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <4251F6CB.8080209@xmission.com> <42523631.6020905@thomae-privat.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,30 +18,67 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 05 Apr 2005 17:12:42 +0200
+Date: Tue, 5 Apr 2005 10:53:44 -0400
 
 Hi Brad,
 
-> FYI, I found alsa-lib post-1.0.8 has fixed up the plugin api so plugins 
-> really can be built standalone. The plugins were moved to a different 
-> cvs project "alsa-plugins" and the api changed in the process.
+I posted in this list a little tutorial of how compiling and testing
+Bluez over ARM 1510 platform.  if you need more details feel free to
+contact me directelly.
 
-I know and actually the utils CVS already contains a plugin for SBC over
-RFCOMM. Was a simple proof-of-concept thing.
+Regards,
 
-> On a more pragmatic note, I sold my bluetake to a friend so it won't be 
-> as easy to try things on it. I bought one of the iTech sets so hopefully 
-> development can go well with the new headset.
+On Apr 5, 2005 2:54 AM, Matthias Thomae <bluez@thomae-privat.de> wrote:
+> Hi Brad,
+> 
+> how about this:
+> 
+> http://www.nslu2-linux.org/wiki/HowTo/BuildABlueSlug
+> 
+> Haven't tried it myself (yet), but looking forward to the nearing Beta
+> release of OpenSlug to build a cheap and low-power bluetooth access
+> point/NAS.
+> 
+> Regards.
+> Matthias
+> 
+> Brad Midgley wrote:
+> > Hey
+> >
+> > Does anyone have a feel for what is available now for doing embedded
+> > bluez stuff with arm? I would like to put together something with a
+> > class 1 adapter... it seems like there was talk of a board for embedding
+> > that had class 1 built in but I can't find it in the archives and
+> > googling reveals a bunch of designs that have probably been abandoned.
+> >
+> > I am hoping that by doing linux on arm, it would be
+> > cheaper/smaller/cooler than the $200+ each that a small x86 barebones
+> > board costs, eg:
+> > http://www.kontron.com/products/pdproductdetail.cfm?keyProduct=32658&kps=1689&kpc=237&keySiteRegion=1
+> >
+> >
+> > but 300Mhz/IDE/VGA is overkill for this... I just want something that
+> > could stream a2dp & do voip to a headset and act as an access point for
+> > a bluetooth pda.
+> >
+> > Brad
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
 
-I think we really need the Logitech/HP headphone for further development
-and so if anyone wants to support this, do a PayPal donation and then I
-will buy one for Brad and me.
 
-Regards
-
-Marcel
-
-
+-- 
+Anderson Clayton B. Rodrigues
+Eng. de Software
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
