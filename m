@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] pand + socket filtering on zaurus
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Stephen Crane <steve.crane@rococosoft.com>
-Cc: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>,
-   "'Bluez-devel@lists.sourceforge.net'" <Bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1086101397.2777.597.camel@baroque.rococosoft.com>
+To: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
+Cc: "'Bluez-devel@lists.sourceforge.net'" <Bluez-devel@lists.sourceforge.net>
+In-Reply-To: <AFE91B59A185A5439840B43AB7919047093983@mchp997a.mch.sbs.de>
 References: <AFE91B59A185A5439840B43AB7919047093983@mchp997a.mch.sbs.de>
-	 <1086101397.2777.597.camel@baroque.rococosoft.com>
 Content-Type: text/plain
-Message-Id: <1086101769.4702.54.camel@pegasus>
+Message-Id: <1086101619.4702.51.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,25 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Jun 2004 16:56:10 +0200
+Date: Tue, 01 Jun 2004 16:53:39 +0200
 
-Hi Stephen,
+Hi Matthias,
 
-> Unless Edd has built a package of modules for this kernel, the most
-> recent .ipk I know of is at Xavier Garreau's site:
-> 
-> http://fichiers.xgarreau.org/zaurus/bluez_2.4.18-mh8_arm.ipk
-> 
-> Note that this is from last August and a lot of bugs have been fixed
-> since then but this should get you started.
+> I found out, that the latest supported zaurus kernel for collie is 2.4.18 .
+> So I want to try this one. 
+> When I want to load l2cap.o after installing "bluez-zaurus_2.3b_arm.ipk",
+> it says: kernel-module version mismatch l2cap.o was compiled for kernel
+> 2.4.6...
+> while this kernel is 2.4.18...
 
-oops. The last is -mh17 ;)
+but even 2.3b was bluez-kernel-2.3 and this is outdated and deprecated.
 
-> Marcel, can we remove the bluez-zaurus_2.3b from the Sourceforge site?
-> It causes too much confusion.
+> So, is there any   "bluez-zaurus....ipk" compiled for 2.4.18 
+> and where can I download it ?
 
-Actually I don't own a Zaurus. How should we proceed we our Zaurus
-support? Looks like the job for a package maintainer is open.
+I don't know and I also don't know why they not include 2.4.18-mh17 to
+get an up-to-date Bluetooth subsystem.
 
 Regards
 
