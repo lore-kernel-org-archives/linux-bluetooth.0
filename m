@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Socket G card newbie Q
+Subject: Re: [Bluez-users] problem using kernel 2.4.18
 From: Marcel Holtmann <marcel@holtmann.org>
-To: John McCorquodale <mcq@cacr.caltech.edu>
+To: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040308002100.GA19049@viz.cacr.caltech.edu>
-References: <20040307214224.GB18481@viz.cacr.caltech.edu>
-	 <1078704901.15279.6.camel@pegasus>
-	 <20040308002100.GA19049@viz.cacr.caltech.edu>
+In-Reply-To: <168c01518d.1518d168c0@estudiants.urv.es>
+References: <168c01518d.1518d168c0@estudiants.urv.es>
 Content-Type: text/plain
-Message-Id: <1078705579.15279.18.camel@pegasus>
+Message-Id: <1078705218.15279.13.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,34 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 08 Mar 2004 01:26:19 +0100
+Date: Mon, 08 Mar 2004 01:20:18 +0100
 
-Hi John,
+Hi Albert,
 
-> The other day you said:
-> 
-> Marcel> The Socket 2.5 generation (also know as revision G) is a CSR based
-> Marcel> serial Bluetooth card. Look at the archives for more details.
+> I know that bluez-kernel-2.3 is no longer supported, and my kernel is out of date (red hat valhalla 2.4.18) , but I can't change my kernel, because I'm working on a robot and my manager doesn't want to change anything from it, so is there any way I can make BlueZ working on that machine? I get this error on doing make install:
+> make: *** [install] Error 1
 
-a CSR chip can also use BCSP ;)
-
-> And the list seems to indicate that the F card is BCSP and the G card is CSR.
-> That said, using bcsp yields:
-> 
->   $ hciattach ttyS0 bcsp 230400
->   BCSP initialization timed out
-
-May this is the problem with some serial cards and 2.6. Try 2.4 instead.
-
-> Am I mistaken about the F/G distinction?  Am I correct in using the normal
-> serial_cs driver in the PCMCIA cardmgr?  Is there something I can run directly
-> at the serial port that will give me a more verbose dialog than "initialization
-> timed out", which might indicate some level of partial success?  Could it
-> be that there's a new G card series out there -- these are brand spankin' new
-> cards?
-
-The revision E and F are Nokia based cards and they need the dtl1_cs
-driver. The revision G contains a CSR chip with BCSP.
+the bluez-kernel-2.3 is out of date and contains many unfixed bugs. My
+-mh patches are not meant for a RedHat kernel, so you are on your own if
+you don't wanna update your kernel to a newer vanilla one.
 
 Regards
 
