@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-From: "Christoph Torens" <c.torens@web.de>
-Content-Type: text/plain; format=flowed; delsp=yes; charset=iso-8859-15
-MIME-Version: 1.0
-Message-ID: <opsfbotflbeocfdv@debian>
-Subject: [Bluez-users] bluetooth pand and isp116x problems partly solved
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041002135954.91937.qmail@web53209.mail.yahoo.com>
+References: <20041002135954.91937.qmail@web53209.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1096833638.20349.3.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-users] Re: linux kernel to compile bluez
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,31 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 04 Oct 2004 03:52:17 +0200
+Date: Sun, 03 Oct 2004 22:00:38 +0200
 
-hello List,
+Hi Massimiliano,
 
-i wrote to the list a long time ago, because I had the problem, that a
-pand connection didn't work. And after trying this the usb dongle
-produced only timeouts.
+> I installed linux suse 9.1 professional
+> it ships the kernel 2.6.4-52
+> 
+> I can't compile bluez (other message posted to the
+> users and developer's list), so I'm thinking that the
+> problem could be the kernel version 
+> 
+> Have I to update the kernel to version 2.6.5-7.108
+> (from suse archive)?
+> 
+> Or other patch/versions are available?
 
-You pointed me to the usb host controller that could be the
-problem and of course you ware right.
+go for the upcoming SuSE Linux 9.2 release, because this will have the
+latest Bluetooth kernel and userspace code.
 
-I found out that the host controller driver needed a 4 msec deelay in a
-function hc_submit_urb to work properly.
-But sadly I don't understand WHY this helps. I believe my solution is
-only a cure for the symptom not for the cause.
-And it's not the right playe for a delay in this function, I think.
+Regards
 
-What I would like to know now:
-Why is pand (or dund or ppp over rfcomm) so critical?
-l2ping gave no errors, and also other usb tasks were ok.
+Marcel
 
 
--- 
-regards,
-Christoph
 
 
 -------------------------------------------------------
