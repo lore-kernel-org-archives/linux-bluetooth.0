@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <IAI9FS$D235C835C683FF0E0366C99E6C3B6BB1@libero.it>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-From: "andi.c@libero.it" <andi.c@libero.it>
-To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] ipaq h5550 pand question (2)
+Subject: Re: [Bluez-devel] Question about l2ping: 0 bytes always
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <B72A22937C14184DB0AF3324476E9C791A53FC@MBOX22.stu.nus.edu.sg>
+References: <B72A22937C14184DB0AF3324476E9C791A53FC@MBOX22.stu.nus.edu.sg>
+Content-Type: text/plain
+Message-Id: <1105963645.8080.42.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,13 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 Jan 2005 10:09:28 +0100
+Date: Mon, 17 Jan 2005 13:07:25 +0100
 
-a precisation: my ipaq is the 5450 not 5550=0A=0A=0A=0A__________________=
-__________________________________________=0ALibero ADSL: 3 mesi gratis e=
- navighi a 1.2 Mega. E poi hai l'Adsl senza limiti a meno di 1 euro al gi=
-orno. =0AAbbonati subito senza costi di attivazione su http://www.libero.=
-it=0A=0A
+Hi Teck,
+
+> I am able to run l2ping, attempting to send and receive packets from my linux box to my sony ericsson T630. However the output is always 
+>  
+> 0 bytes from xx:xx:xx:xx:xx id x time x ms. 
+>  
+> It always ends with x bytes sent, x bytes received, 0% loss. 
+>  
+> Is this the correct output?
+
+according to the L2CAP part of the specification the device can send you
+whatever echo responds it wants. This includes a zero byte response and
+for security reasons this is good, because we have seen DoS attacks when
+they are unable to handle big echo packets.
+
+Regards
+
+Marcel
+
 
 
 
