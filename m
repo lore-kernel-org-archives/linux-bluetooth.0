@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Version 3 libs/utils (was: Re: [Bluez-devel] patch for d-bus
-	support in hcid)
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: Max Krasnyansky <maxk@qualcomm.com>
-Cc: Philip Blundell <pb@nexus.co.uk>, bluez-devel@lists.sourceforge.net
-In-Reply-To: <5.1.0.14.2.20030620171218.0db953a8@unixmail.qualcomm.com>
-References: <5.1.0.14.2.20030620171218.0db953a8@unixmail.qualcomm.com>
+Subject: Re: [Bluez-devel] patch for d-bus support in hcid
+From: Philip Blundell <pb@nexus.co.uk>
+To: David Woodhouse <dwmw2@redhat.com>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1056446930.29264.403.camel@passion.cambridge.redhat.com>
+References: <1056040950.3518.18.camel@mill.nexus.co.uk>
+	<1056446930.29264.403.camel@passion.cambridge.redhat.com>
 Content-Type: text/plain
-Message-Id: <1056463255.2009.151.camel@baroque.rococosoft.com>
+Message-Id: <1056447092.10483.21.camel@mill.nexus.co.uk>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,29 +21,19 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 24 Jun 2003 15:00:55 +0100
+Date: 24 Jun 2003 10:31:33 +0100
 
-On Sat, 2003-06-21 at 01:13, Max Krasnyansky wrote:
-> We should really start working on 3.x libs and utils. There are so 
-> many things and ideas that we want to put in.
+On Tue, 2003-06-24 at 10:28, David Woodhouse wrote:
+> Thanks for doing this. There are now packages in Red Hat Rawhide with
+> this enabled.... volunteers to provide the GNOME and KDE GUI side for
+> this welcomed...
 
-I've backed out the unwanted changes to SDP in CVS. 
+Great.  I made a GTK-based GUI for use in GPE; it should work fine in a
+desktop environment too.
 
-How do you want to start version 3?  We'll need to keep the old utils
-and libs around for a while. However I'd like to merge SDP in early:
-there's a lot of duplicated effort (lists, etc.) which can be stripped
-out.
+ftp://ftp.handhelds.org/pub/projects/gpe/source/bluez-pin-0.20.tar.gz
 
-I have the first-cut at this merge in my local tree. However I don't
-want to check it in on top of the old utils and libs --- unless you
-think that's OK.
-
-So maybe the best way to proceed is to start a new branch in CVS?
-
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+p.
 
 
 
