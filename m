@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Jouni.Lohikoski@iki.fi" <jlohikos@cc.hut.fi>
-To: bluez-users@lists.sourceforge.net
+From: Paul Hedderly <bulkpaul@mjr.org>
+To: Jouni.Lohikoski@iki.fi
+Cc: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Epox BT-MS02B Bluetooth HID mouse, authorization and encryption?
-Message-ID: <20040919124431.GA485206@kosh.hut.fi>
-Reply-To: Jouni.Lohikoski@iki.fi
-References: <20040917202651.GA485579@kosh.hut.fi> <20040919075226.GS26469@wacka.mjr.org>
+Message-ID: <20040919075226.GS26469@wacka.mjr.org>
+References: <20040917202651.GA485579@kosh.hut.fi>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20040919075226.GS26469@wacka.mjr.org>
+In-Reply-To: <20040917202651.GA485579@kosh.hut.fi>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,38 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 19 Sep 2004 15:44:31 +0300
+Date: Sun, 19 Sep 2004 08:52:26 +0100
 
-On Sun, Sep 19, 2004 at 08:52:26AM +0100, Paul Hedderly wrote:
-> I think you'll find your mouse is the same as mine - try "1234".
+On Fri, Sep 17, 2004 at 11:26:51PM +0300, Jouni.Lohikoski@iki.fi wrote:
+>                                                                                 
+> I used to have authorization and encryption on in
+> /etc/bluetooth/hcid.conf before, but I noticed "hidd --search"
+> wanted a PIN then for outgoing connection. I have no idea what would be the
+> Bluetooth PIN-code for my mouse, neither was it mentioned anywhere in the
+> package or in the Windows-documentation which came with the mouse.
 
-Thanks!
+I think you'll find your mouse is the same as mine - try "1234".
 
-I did try 0000, 1234, 1111 and 9999 then but none of them seem to work.
-
-The trick is (or this time I was just lucky) the little grey button
-on the bottom of the mouse has to be pressed down whole time when 
-"hidd --search" is run on the Linux side. Only after the PIN code had 
-been entered and the hidd --search has succesfully connected to the mouse, 
-so BT pairing has been finished, the button can be released.
-
-Maybe EPoX technical support can correct me or confirm me, when/if they
-reply after the weekend or some day to my request mail. I found it
-little odd the EPoX Bluetooth Mouse User's Guide, which came with the
-mouse, does not mention anything how the BT pairing should be done.
-
-It would make sense though. When authorization is negotiated, the
-software on the mouse end of the peer checks if it accepts the PIN code 
-which is send by the host computer. The host computer must be the
-initiating party. If the grey button is then in that moment pressed down, 
-authorization is accepted (would think any code would do), if not, 
-the PIN confirmation request is rejected.
-
-It works now authorized and encrypted. Also recovers after the sleep
-mode.
-
-// jouni
-
+--
+Paul
 
 
 -------------------------------------------------------
