@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-Id: <5.1.0.14.2.20030512132833.0d19d8a0@unixmail.qualcomm.com>
+To: Krisztian Mark Szentes <office@produktivit.com>, bluez-users@lists.sourceforge.net
+From: Max Krasnyansky <maxk@qualcomm.com>
 Subject: Re: [Bluez-users] bt3c_cs time out - no firmware loaded?
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: Krisztian Mark Szentes <office@produktivit.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <200305081542.17759.office@produktivit.com>
 References: 
 	<53B03DA73719D5119E6A0008C71E1D78030EA9A3@svr-mail1.corp.home.nl>
-	<200305081542.17759.office@produktivit.com>
-Content-Type: text/plain
-Message-Id: <1052785027.1133.174.camel@pegasus.local>
+	<53B03DA73719D5119E6A0008C71E1D78030EA9A3@svr-mail1.corp.home.nl>
 Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -22,25 +21,17 @@ List-Unsubscribe:
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 13 May 2003 02:17:01 +0200
+Date: Mon, 12 May 2003 13:29:41 -0700
 
-Hi Krisztian,
+At 06:43 AM 5/8/2003, Krisztian Mark Szentes wrote:
+>May  8 15:02:20 tomcat cardmgr[1071]: socket 0: 3Com Bluetooth PC Card
+>May  8 15:02:20 tomcat cardmgr[1071]: executing: 'modprobe bt3c_cs'
+>May  8 15:02:21 tomcat hcid[1428]: HCI dev 0 registered
+>May  8 15:02:31 tomcat hcid[1616]: Can't init device hci0. Connection timed out(110)
+Hmm, you should see bluefw messages before HCI dev 0 registered.
+I guess you'd need to ping Marcel on that one.
 
-> I have trouble with the 3COM Cardbus bluetooth card on a Powerbook Titanium (a 
-> powerpc notebook). I patched the 2.4.20 kernel with the mh-6 patch (and the 
-> benh patch which does not collide). I haven't found any hint on the list yet.
-> 
-> With a USB bluetooth adapter (hci_usb) everything works fine. I have a 
-> wonderful RFCOMM communication to a Nokia 6310 and I can get on the internet 
-> via GPRS.
-
-is this a SMP enabled kernel? The driver have some problems if you run a
-SMP kernel. Try to disable it.
-
-Regards
-
-Marcel
-
+Max
 
 
 
