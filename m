@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth 1.2 and 1.1 compatibility
+Subject: Re: [Bluez-users] ms explorer for bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Sean Loh <blaze_wk@yahoo.com>
+To: neoclust <n1c0l4s.l3@wanadoo.fr>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <20041013022808.63256.qmail@web41113.mail.yahoo.com>
-References: <20041013022808.63256.qmail@web41113.mail.yahoo.com>
+In-Reply-To: <200410122022.30501.n1c0l4s.l3@wanadoo.fr>
+References: <200410122022.30501.n1c0l4s.l3@wanadoo.fr>
 Content-Type: text/plain
-Message-Id: <1097652607.4643.10.camel@notepaq>
+Message-Id: <1097652076.4643.5.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,45 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Oct 2004 09:30:07 +0200
+Date: Wed, 13 Oct 2004 09:21:16 +0200
 
-Hi Sean,
+Hi Nicolas,
 
-> I have curretnly written a program to transmit data
-> over IP over Bluetooth using the PAN profile. I was
-> wondering if I actually ported the program to use it
-> over another notebook using the Bluetooth usb 1.2
-> adapter, will bluez then still be the same. Or will
-> some bluez specifications change? My program just uses
-> the basic sockets to trasmit data. 
+> i have ms explorer for bluetooth my mouse work so well but my keyboard doesn't 
+> appear after a hcitool inq all my other bluetooth appear but not  the ms 
+> explorer for bluetooth 
 
-there will be no difference when using Bluetooth 1.1 or 1.2 devices. If
-you like you can even connect to a Bluetoth 1.0b device and will see no
-difference.
-
-> Other questions, 
-> - does bluez support the higher data
-> throughputs(around 2.1 Mbps) of Bluetooth 1.2?
-
-We already support the EDR extension for Bluetooth 1.2.
-
-> - are there any bluez compliant bluetooth usb
-> adapters?
-
-What I know is that BlueZ supports every USB dongle that is out on the
-market at the moment. But I haven't seen so far any dongle with EDR
-support.
-
-> - if my program is indeed able to be ported to be used
-> over the bluetooth 1.2 usb adapter, will my program
-> immediately benefit from the increased data rate of
-> the bluetooth 1.2 specification?
-
-Yes.
-
-> thanks for any help, bluez rocks!!
-
-You are welcome.
+once you are connected with your mouse it will become invisible and you
+have to press the connect button to see it again. Actually there is no
+need for seeing it again, because it will reconnect after you move it or
+press a mouse button and then this should be handled by the hidd.
 
 Regards
 
