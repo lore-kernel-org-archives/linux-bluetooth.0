@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050222092538.81728.qmail@web53205.mail.yahoo.com>
-From: Filipa Duarte <filipa_duarte@yahoo.com>
-To: BlueZ Users <bluez-users@lists.sourceforge.net>
+Message-ID: <421AED37.7050703@hobbits.no>
+From: "Vegard B. Havdal" <vegardh@hobbits.no>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Running L2CAP & HCI layers without OS
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Am stuck; HP laptop, Fedora
+References: <4215A788.9070205@yahoo-inc.com> <1109027434.7626.28.camel@pegasus>
+In-Reply-To: <1109027434.7626.28.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,50 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Feb 2005 01:25:38 -0800 (PST)
-
-Hello,
-
-It seams that my question about the l2cap and hci
-layers implemented in User Space is not so stupid
-after all! ;)
-
-Could anyone give me directions on how to run these
-layers without OS? One solution, I think, would be to
-change the l2cap and the hci files in order on not to
-have any OS call (that was actually what I as doing,
-which is quite a heavy work!). But it seams that there
-is an easy way (thanks Marcel, for pointing that
-out!).
-
-Regards,
-
-Filipa
+Date: Tue, 22 Feb 2005 09:28:39 +0100
 
 
+Marcel Holtmann wrote:
+> from this report I can't tell you anything, but the Bluetooth device
+> inside my NC4000 is working prefect and actually it is the same as in
+> your laptop. What does "hciconfig -a" tells you?
 
->Hi Filipa,
->
-> > By the way, does anybody has the l2cap and hci > >
-layers
-> > implemented im User Space? I need to have those >
->layers
-> > running without OS... 
->
-> Actually it is possible to do this, but you are on >
-the wrong mailing
-> list for this question ;)
->
-> Regards
-> 
-> Marcel
+It told me the device was down, whereafter I figured to try
+hciconfig hci0 up whereafter everything worked, so that was the little 
+drop of info I needed. Thanks!
 
-
-		
-__________________________________ 
-Do you Yahoo!? 
-Read only the mail you want - Yahoo! Mail SpamGuard. 
-http://promotions.yahoo.com/new_mail 
+Vegard :-)
 
 
 -------------------------------------------------------
