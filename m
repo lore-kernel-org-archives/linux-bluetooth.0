@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problems with multiple PANUs connecting via the
-	same Bluetooth USB dongle
+Subject: Re: [Bluez-users] patch for race condition
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Sami Nikkarinen <samitius@luukku.com>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1079743635953.samitius.70713.-NzbxEEFNkxHlpJ_X9rCCw@luukku.com>
-References: <1079743635953.samitius.70713.-NzbxEEFNkxHlpJ_X9rCCw@luukku.com>
+In-Reply-To: <200403201331.59289.cijoml@volny.cz>
+References: <200403201331.59289.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1079790903.31859.31.camel@pegasus>
+Message-Id: <1079790781.31859.28.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,14 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 20 Mar 2004 14:55:03 +0100
+Date: Sat, 20 Mar 2004 14:53:01 +0100
 
-Hi Sami,
+Hi Michal,
 
-> The only difference I can spot here is the HCI Revision and LMP Subversion fields, but can these explain the different performance of the dongles? Or is the reason somewhere else? At least it shouldn't be in any way related to the PAN profile, since the problems seem to exist in much lower level of Bluetooth.
+> pls don't remember send your patch for -mh2 to Marcello for including into 
+> 2.4.26 final
 
-the problem can be CSR firmwares prior HCI 16.4 and take a look at my
-web pages to see how HCI revision fits in to the CSR firmware version.
+it is all on its way and I also put out a new bunch of patches. Please
+try 2.4.25-mh3 if it works for you. Actually these new collection of
+patches has also now support for the brand new AVM BlueFRITZ! USB v2.0
+class 1 dongle.
 
 Regards
 
