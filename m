@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Jouni.Lohikoski@iki.fi" <jlohikos@cc.hut.fi>
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Epox BT-MS02B Bluetooth HID mouse, authorization	and encryption?
-Message-ID: <20040918172056.GA367853@kosh.hut.fi>
-Reply-To: Jouni.Lohikoski@iki.fi
-References: <20040917202651.GA485579@kosh.hut.fi> <1095456519.5973.15.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1095456519.5973.15.camel@pegasus>
+Subject: Re: [Bluez-users] Help
+Cc: <coser@cos.ufrj.br>
+References: <1320.146.164.98.1.1094044156.squirrel@webmail.cos.ufrj.br>
+In-Reply-To: <1320.146.164.98.1.1094044156.squirrel@webmail.cos.ufrj.br>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200409181030.38042.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,56 +20,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 18 Sep 2004 20:20:56 +0300
+Date: Sat, 18 Sep 2004 10:30:37 +0200
 
-On Fri, Sep 17, 2004 at 11:28:39PM +0200, Marcel Holtmann wrote:
-> > I got it working, but few things (3) I'd need to find out still. hidd
-> > program seems to be so new, there is no yet any documentation with it.
-> > Maybe later there will FAQ for Linux HID.
-> 
-> the hidd manpage is still missing. May you wanna write it for me?
+Send us hciconfig -a from both dongles
 
-Maybe when/if I'll understand this BT stuff fully. I've sometimes tried
-to draw a ISO/OSI preference model presentation of Bluetooth stack, but
-it is messy, I think, this far at least. 
+M.
 
-> Don't set auth and encrypt in hcid.conf. This puts your device in
-> security mode 3 and you don't wanna do this. So mailing list archive for
-> more details.
-
-Actually I was pretty happy to keep my device (BT dongle) in security
-mode 3 this far, before starting to use this HID mouse. Now when I had to turn
-authorization and encryption off, anyone could download one of ogg/mp3
-files from my computer with Bemused, not that I wouldn't share, and also
-write to my home directory through gnome-obex-server (Cool .bashrc anyone?)
-
-> This is a problem of the OBEX-server. Ask the author to implement proper
-> support for it.
-
-And Bemused, and ... quite many BT applications rely just on the lower lever
-security, althoug it is known to be vulnerable.
-
-> See above and read the Bluetooth specification to understand the
-> differences between device and service security.
-
-Ok, have to do that. Any good URI which would explain it like "for
-Dummies"?
-I just wonder, if service security will work with
-mobile phones then. I mean, is it possible to make obex-server such that
-mobile phone's OBEX software when sending some object understands the
-server needs additional password. Or maybe it works like obex-server
-would ask the lower HCI level to authenticate and encrypt after the
-initial connection. Well, have to study that.
-
-> You only have to press a mouse button and what for the reconnect of the
-> mouse. To make this working you need to start hidd --server as root at
-> boot time.
-
-Yep, that worked and works now. (Just have to keep that security level
-down)
-
-// jouni
-
+Dne st 1. z=E1=F8=ED 2004 15:09 coser@cos.ufrj.br napsal(a):
+>  Hi,
+>    my name is Alexandre I`am engeneering student and I bought two
+> Bluetooth usb dongle, model BT3030, FCC ID D6XBT3030. I`ve tried to make
+> two slackware 10.0 in two desktop Pentium III 650Mhz machines talk through
+> this two bluetooth usb dongle and I`ve exchanged messages with sucess and
+> also mesure RSSI too, but I always get the same number from TPL read. I
+> would like to know if this TPL function is already implemented at this
+> bluetooth dongle model, so I doing something wrong at read TPL or to use
+> this function I have to change my operating system or by another bluetooth
+> usb dongle.
+>   I've also used HCI from slackware package, bluez-libs-2.5-i386-1roc.tgz,
+> bluez-utils-2.4-i386-1roc.tgz bluez-bluefw-1.0-i686-1rmx.tgz.
+>
+>  Can anyone help me to solve this doubt?
+>
+> Thank you,
+>    Alexandre
+>
+>
+>
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
+> Project Admins to receive an Apple iPod Mini FREE for your judgement on
+> who ports your project to Linux PPC the best. Sponsored by IBM.
+> Deadline: Sept. 24. Go here: http://sf.net/ppc_contest.php
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
