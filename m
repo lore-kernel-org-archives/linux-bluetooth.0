@@ -1,42 +1,34 @@
-Return-Path: <zs@comp.rgu.ac.uk>
-Subject: Re: [Bluez-users] Bluetooth Service
-From: Zia Syed <zs@comp.rgu.ac.uk>
-Reply-To: zs@comp.rgu.ac.uk
-To: Marcel Holtmann <marcel@holtmann.org>,
-   Bluez <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1077217187.2767.17.camel@pegasus>
-References: <1077215650.9218.31.camel@zs> <1077217187.2767.17.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1077220929.9892.13.camel@zs>
+Return-Path: <alexandre.ghisoli@ycom.ch>
+Subject: Re: [Bluez-users] hid2usb error
+From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1077217133.2767.15.camel@pegasus>
+References: <1077206432.17056.7.camel@pc-04.ycom.ch>
+	 <1077215608.2767.2.camel@pegasus> <1077216551.17051.14.camel@pc-04.ycom.ch>
+	 <1077217133.2767.15.camel@pegasus>
+Content-Type: text/plain; charset=iso-8859-1
+Message-Id: <1077220737.17051.16.camel@pc-04.ycom.ch>
 Mime-Version: 1.0
-Date: Thu, 19 Feb 2004 20:02:10 +0000
+Date: Thu, 19 Feb 2004 20:58:57 +0100
 List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Marcel,
+Hum, 
 
-At first, I would want to make a simple chat application lookalike. The
-aim would be for client to discover services and establish connection to
-the server socket. Once having that, I was thinking about streaming
-other web-contents/xml using the connection. While reading the Bluetooth
-specification, I read about HTTP service, but again I don't know whether
-if its implemented in Bluez, or how can it can be implemented. 
+Many thanks, it's working now !!
 
-Also, for me the mystery is what happens when the service is being
-discovered? How does the client makes the connection to the service
-itself? Is there any relevant documentation around over it?
+Regards
+	--Alexandre
 
-Thanks.
-Zia
-On Thu, 2004-02-19 at 18:59, Marcel Holtmann wrote:
-> Hi Zia,
+Le jeu 19/02/2004 à 19:58, Marcel Holtmann a écrit :
+> Hi Alexandre,
 > 
-> > I was wondering how can I create my own Bluetooth service using Bluez? I
-> > was looking for any Bluez programming guide or sumthing but no luck :(.
-> > Can anyone guide/advise me about how to implement custom bluetooth
-> > service?
+> > Can I find this patch somewhere ?
 > 
-> what kind of service do you wanna implement?
+> in the Linux USB development mailing list archive. I searched for you
+> and attached it.
 > 
 > Regards
 > 
 > Marcel
+> 
