@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] HOWTO: Logitech MX900 Bluetooth Optical Mouse on
-	Linux
+Subject: Re: [Bluez-users] NEC usb bluetooth support
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Charles Bueche <charles@bueche.ch>
+To: Mitch <Mitch@0Bits.COM>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1071698686.6361.31.camel@bluez.bueche.ch>
-References: <1071698686.6361.31.camel@bluez.bueche.ch>
-Content-Type: text/plain; charset=iso-8859-15
-Message-Id: <1071699651.21803.83.camel@pegasus>
+In-Reply-To: <3FE029FA.6010204@0Bits.COM>
+References: <3FE029FA.6010204@0Bits.COM>
+Content-Type: text/plain
+Message-Id: <1071698841.21803.70.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,35 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Dec 2003 23:20:51 +0100
+Date: Wed, 17 Dec 2003 23:07:21 +0100
 
-Hi Charles,
+Hi Mitch,
 
-> With the help of Marcel, Olivier and a few other =FCbergeeks of the
-> Bluez-devel mailing list, I have been able to get my Logitech MX900
-> mouse working with my Dell Inspiron 8600 equiped with internal
-> Bluetooth.
->=20
-> I have made a small document to help other MX900 owners. It works for
-> me, but be prepared to suffer a bit :
->=20
-> - it's probably buggy
-> - it run CVS code
-> - it run on Gentoo with 2.6test kernel
-> - my english is ashaming
->=20
-> http://www.bueche.ch/comp/mx900/mx900.html
->=20
-> Comments welcome. Regards,
+> Ok, thanx to Marcel, i looked again, and no patches/source code changes
+> are needed. The error
+> 
+> 	hci_usb: probe of 7-2:1.1 failed with error -5
+> 
+> is spurious, and the device still works just fine.
 
-very nice. I linked it.
+these kind of errors sometimes happen. The USB folks should know more
+about them.
 
-I am also near at the stage where I know how to switch the Logitech
-wirless hub from HID into HCI mode. They use a special HID report for
-the mouse (report ID 16) to switch the mode. My Linux USB HID driver
-presents me an extra hiddev node, but I haven't got success in using it
-to send these special report. Do anyone here know how to send HID
-reports through a hiddev device node?
+> Another one to add to the list of working with linux bluetooth devices ;-)
+
+Please send me "hciconfig -a" and do you have a full product name or
+weblink?
 
 Regards
 
