@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hidp and hidd and MS keyboard hotkeys
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200408012330.32328.cijoml@volny.cz>
-References: <200408012330.32328.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1091396840.4279.4.camel@pegasus>
-Mime-Version: 1.0
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200408012330.32328.cijoml@volny.cz>
+Subject: [Bluez-users] hidp and hidd and MS keyboard hotkeys
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,26 +17,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 01 Aug 2004 23:47:20 +0200
+Date: Sun, 1 Aug 2004 23:30:32 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> I tested this combination and under 2.6. and 2.4 still doesn't works hotkeys. 
-> Do you expect to fix it soon?
+I tested this combination and under 2.6. and 2.4 still doesn't works hotkeys. 
+Do you expect to fix it soon?
 
-my main focus is now to get the generic HID parser for 2.6 in a good
-shape so I can submit it for inclusion into the mainline kernel. The 2.4
-HIDP backport is boot protocol mode only and this will stay a little bit
-until the 2.6 part is mature.
-
-Do you get the hotkeys working with 2.6.7-mh4? This patch contains a HID
-parser and support for the HID report protocol mode.
-
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
