@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Re: bluez & qos
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <AFE91B59A185A5439840B43AB7919047A83CA5@mchp997a.mch.sbs.de>
-References: <AFE91B59A185A5439840B43AB7919047A83CA5@mchp997a.mch.sbs.de>
+Message-ID: <AFE91B59A185A5439840B43AB7919047A83CA5@mchp997a.mch.sbs.de>
+From: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
+To: "'Bluez-devel@lists.sourceforge.net'"
+	 <Bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <1102523782.9988.80.camel@pegasus>
-Mime-Version: 1.0
+Subject: [Bluez-devel] Re: Re: bluez & qos
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +17,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 08 Dec 2004 17:36:22 +0100
+Date: Wed, 8 Dec 2004 17:29:39 +0100
 
-Hi Matthias,
+Hi all!
 
-> Basically I want to do the same like Jean Tourrilhes two years ago,
-> hoping that chips / firmware have better QoS support meanwhile: 
-> "... I"m trying to get the latency under control. I"m using BNEP with a mix
-> of TCP/IP traffic, ..."
-> 
-> I searched the mailing archiv for QoS and found a lot of firmware specific
-> discussion. 
-> 
-> What I couldnt find, but what I would need first is a kind of QoS-Howto,
-> explaining generally how to realize QoS with Bluez, i.e. how to control the
-> maximum poll interval.
-> It would be great to have some examplary code, that adjusts
-> the poll interval with the HCI_QoS_Setup command or sth. like that.
+Basically I want to do the same like Jean Tourrilhes two years ago,
+hoping that chips / firmware have better QoS support meanwhile: 
+"... I"m trying to get the latency under control. I"m using BNEP with a mix
+of TCP/IP traffic, ..."
 
-I don't know of any public example for QoS.
+I searched the mailing archiv for QoS and found a lot of firmware specific
+discussion. 
 
-Regards
+What I couldnt find, but what I would need first is a kind of QoS-Howto,
+explaining generally how to realize QoS with Bluez, i.e. how to control the
+maximum poll interval.
+It would be great to have some examplary code, that adjusts
+the poll interval with the HCI_QoS_Setup command or sth. like that.
 
-Marcel
-
+thanks a lot, Matthias
 
 
 
