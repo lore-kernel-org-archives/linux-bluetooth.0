@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41F8E3C3.70204@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] partly OT: pipe sound from Headset to soundcard
-References: <41F7CEF6.1050508@webstuhl.net> <41F7D274.4030208@xmission.com> <41F82DA9.8090806@webstuhl.net>
-In-Reply-To: <41F82DA9.8090806@webstuhl.net>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] Question about issuing AT commands via cu when
+	rfcomm connected to bluetooth phone
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <001f01c5041d$7ac09010$8a8115ac@stu.nus.edu.sg>
+References: <001f01c5041d$7ac09010$8a8115ac@stu.nus.edu.sg>
+Content-Type: text/plain
+Message-Id: <1106846707.3998.12.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,91 +19,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 27 Jan 2005 13:51:15 +0100
+Date: Thu, 27 Jan 2005 18:25:07 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Teck,
 
-Ben Pezzei wrote:
-| Hi Brad,
-|
-| Brad Midgley schrieb:
-|
-|> I had the same thought.
-|>
-|> We have a way to send line in to a stereo headset but there is a
-|> delay. (see bluetooth-alsa.sf.net)
-|
-|
-| Yeah, but this covers A2DP only, right?
-|
-| Right now, I was trying to accomplish this via asound.conf:
-| something like:
-| pcm.foo {
-|   type multi
-|   <map soundcard>
-|   <map headset>
-| }
-| pcm.bar {
-|   type route
-|   slave.pcm "bar"
-|   <map channels card out -> hs in>
-|   <map channels card in -> hs out>
-| }
-|
-| hope the idea is understandable
-|
-|
-http://www.alsa-project.org/alsa-doc/alsa-lib/pcm_plugins.html#pcm_plugins_route
+> I desire to issue some AT commands to my bluetooth phone as follows
+>  
+> # rfcomm bind rfcomm0 00:0a:d9:xx:xx:xx 15
+> After this I set the permission of the device rfcomm0 to being able to
+> read, write and execute by all users. 
+>  
+> I have the uucp package installed. Next I issued
+>  
+> #cu -l rfcomm0 -s 9600
+> The terminal reflected "Connected" soon after. 
+>  
+> However, beyond this point I have tried to issue AT commands to my
+> phone without success.
+> 
+> I understand that to use cu, I have to use % before issuing the
+> commands.
+> 
+> Please do enlighten me on how I may use AT commands via cu.
 
-|
-|
-| but I guess this won't work
-|
+this is not the cu mailing list ;) Check its manual page.
 
-why not, it looks as it should. But I don't know much about alsa routing...
+Regards
 
-|> You could write something similar that runs in userspace and copies
-|> audio streams around using sco.
-|
-| C hacking? ;) well, if there is really no other way, i could
-| try it. Are there some docs around to dig in or just the btsco
-| sources?
+Marcel
 
-I think the btsco kernel module does nearly what you are looking for
-(only in kernelspace). It takes an sco socket, reads the data and writes
-it to the alsa buffer and vice versa. Of course you would write it to an
-alsa device, not the internal buffer :)
 
-Should be possible to rip it apart and run it as a userspace program,
-dropping all kernel stuff and keeping mostly the thread that does the
-copy stuff.
-
-You can also have a look at the btsco command line daemon that does the
-connection handling. A combination of both should do what you want.
-Maybe *g*
-
-good luck, and make sure to re-destribute your sources, as it will be
-quite interesting for us I think :)
-
-best regards,
-~   Lars
-
-- --
-Lars Grunewaldt
-* software development
-* multimedia design
-skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
-web: http://www.dark-reality.de
-mail: lgw@dark-reality.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFB+OPCQWC6DTWkDAoRAp2zAJ9HE8vvVjbySeMS8UogZWmzMrnOeACfTugy
-P/hZxd03QggSTK5mOBDUPHo=
-=73yZ
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
