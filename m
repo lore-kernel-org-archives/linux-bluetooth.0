@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth gateway
+Subject: Re: [Bluez-users] error attaching device
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1105814392.14979.8.camel@portable.canb.net>
-References: <1105814392.14979.8.camel@portable.canb.net>
+Cc: mail@apexo.de
+In-Reply-To: <200501151854.40656.mail@apexo.de>
+References: <200501151854.40656.mail@apexo.de>
 Content-Type: text/plain
-Message-Id: <1105865546.8080.13.camel@pegasus>
+Message-Id: <1105865464.8080.10.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 Jan 2005 09:52:26 +0100
+Date: Sun, 16 Jan 2005 09:51:03 +0100
 
-Hi Can,
+Hi Christian,
 
->         I am trying to build a bluetooth gateway in my home.
->         
->         GSM Phone --bluetooth--> laptop --cable modem--> internet
->         
->         I can do this on windows but not on linux. I tried with bluez +
->         pand in NAP mode but it didn't worked.
->         ( http://bluez.sourceforge.net/contrib/HOWTO-PAN )
->         
->         anyone did this here?
+> I'm using linux kernel 2.6.10 with the following debian bluez packages:
+> bluez-bluefw            1.0-1
+> bluez-hcidump           1.12-1
+> bluez-pin               0.24-1
+> bluez-utils             2.10-5
+> 
+> my problem now is:
+> I have a Acer Bluetooth USB Dongle which works correctly when plugged into 
+> either one of the primary USB ports as well as within the Microsoft Natural 
+> Keyboad USB Hub but NOT in my newly acquired Acer USB 2.0 Hub which leaves 
+> the following error messages in the syslog:
+> 
+> kernel: hci_usb_intr_rx_submit: hci0 intr rx submit failed urb c6586b74 err 
+> -28
 
-what kind of phone is it? I haven't seen any phone with PAN support so
-far. If it is Symbian based phone then you need to deal with the mRouter
-stuff to get an IP connection.
+this is a problem in the USB subsystem or maybe it is buggy hardware.
+However you should post this problem to the USB development mailing
+list, because I have no idea what is wrong.
 
 Regards
 
