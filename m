@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <6ae1569005030604105d08a56e@mail.gmail.com>
-From: Adis Beglerovic <emerge.gentoo@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] adding a sdp service with a 128bit uuid
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1110096690.11503.2.camel@newer.loc>
+References: <42291076.5040109@gmx.ch> <1110021688.8058.108.camel@pegasus>
+	 <4229B30E.8080803@gmx.ch>  <1110029911.8168.5.camel@pegasus>
+	 <1110096690.11503.2.camel@newer.loc>
+Content-Type: text/plain
+Message-Id: <1110107963.8302.4.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] DBT-120 and Siemens S65
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +20,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 6 Mar 2005 13:10:21 +0100
+Date: Sun, 06 Mar 2005 12:19:23 +0100
 
-Hi
-Trying to connect my mobile phone and PC using blue tooth.
+Hi Taneli,
 
-1.Added needed stuff in my kernel 2.6.11 on gentoo box.
-When I plug inn my Dlink DBT-120 lights are ON and hcitools scan reports
-this:
-Scanning ...
-       00:01:E3:3C:79:45       Bash
-where bash is my mobile phone.
-and link quality is -->hcitool lq 00:01:E3:3C:79:45
-Link quality: 255
+> > > >>how to browse the local sdp services?
+> > > >>[sdptool browse dev] seems to be only for remote devices. I now always did 
+> > > >>it from another device to see the local seervices. how to [sdptool browse 
+> > > >>localhost]?
+> > > > 
+> > > > 
+> > > > sdptool browse local
+> > > 
+> > > nice :-)
+> > > maybe something that should/could be mentioned in the manpage or in --help
+> > 
+> > feel free to send in a patch.
+> 
+> What do you think about this? It adds the "sdptool browse local" to the
+> examples.
 
-Does this means that blue tooth works?
-2.How do I connect to devices?
-3. What tools can use for file transfer ?
+applied. Thanks.
 
-Thanks
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
