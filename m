@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] DBT-120 firmware upgrade
+Subject: Re: [Bluez-users] HCI connection_handle
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Pavel Ruzicka <pavouk@pavouk.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200411272130.44783.pavouk@pavouk.org>
-References: <200411261152.29925.pavouk@pavouk.org>
-	 <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus>
-	 <200411272130.44783.pavouk@pavouk.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <2de46576041127045238dc2264@mail.gmail.com>
+References: <2de46576041127045238dc2264@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1101588637.27074.22.camel@pegasus>
+Message-Id: <1101585529.27074.18.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,39 +18,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 27 Nov 2004 21:50:37 +0100
+Date: Sat, 27 Nov 2004 20:58:49 +0100
 
-Hi Pavel,
+Hi Manjunath,
 
-> thanks for perfect explaining.
-
-you are welcome.
-
-> I have good news. I flashed my dongle, and she is not dead ;-)
+> I am trying to use the "hcitool cmd" options and i have to pass the
+> connection_handle as a command parameter.
+> root:]#hcitool  con
+> < ACL 00:0B:0D:31:D1:BA handle 7 state 1 lm MASTER
 > 
-> Dongle now starts in HID mode. I must switch her to HCI with hid2hci.
-> hid2hci says something, that it fails, but it works. I have probably old 
-> version of this utility.
+> Assuming the connection_handle to be 7, i tried to read the rssi value
+> 
+> root:]#hcitool cmd 0x05 0x0005 0x0007
+> I get the following
+> 
+> < HCI Command: ogf 0x05, ocf 0x0005, plen 1
+>   07
+> > HCI Event: 0x0e plen 4
+>   01 05 14 12
+> 
+> This means there is some error as i have got 12 instead of 00......
+> 
+> Can you tell me what the problem is??
 
-This is a general problem with using libusb. The URB isn't finished, but
-the device already resets. So an error occurs, but this error can be
-ignored.
+the problem is that you should read the HCI specification if you wanna
+play with the "hcitool cmd ..." call. The handle is a 16 bit value. And
+btw error code 0x12 means invalid parameters.
 
-> Dongle in HID mode lights with power LED, but in HCI is power LED off.
-> Second LED blinks in both modes.
+However the RSSI can be read with "hcitool rssi ..." and this code also
+does the handle lookup for you.
 
-I know the LED stuff is weird.
+> 2) I tried using the test mode commands and I am simulatameously
+> running the hcidump, which prints a unknown command type. I am just
+> presuming that the commands might be working alright , only that
+> hcidump doesn't decipher the test commands. Am i right??
 
-> # hciconfig hci0 revision
-> hci0:   Type: USB
->         BD Address: 00:0D:88:XX:XX:XX ACL MTU: 192:8  SCO MTU: 64:8
->         Build 1586
->         Chip version: BlueCore02
->         Max key size: 128 bit
->         SCO mapping:  HCI
+What version of hcidump do you use? Show the undecoded output to us.
 
-I assume this is HCI 18.2 firmware, but I am not quite sure. It is not
-in my list.
+> 3) I was also trying to understand the hcitool.c code , can you tell
+> me where the functions  "hci_for_each_device" and the like defined?
+
+Actually you can do this by yourself. Look at the bluez-libs and
+bluez-utils source code. Maybe using grep is a good idea ;)
 
 Regards
 
