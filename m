@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <517CF7F08A05D4118C380000E869BFA4BDED8B@emg_ntserv2>
-From: R.Schade@tu-braunschweig.de
+From: "theresa g." <tereza99@hotmail.com>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-devel] Tutorial programming with bluez?
+Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Message-ID: <BAY2-F7xJagXTi8M19V0000e6e7@hotmail.com>
+Subject: [Bluez-devel] Help needed with getting Bluez on Axis Dev Board 82
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,26 +15,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Sep 2004 10:02:46 +0200
+Date: Wed, 08 Sep 2004 21:44:06 -0700
 
-Hello,
+Hello all,
 
-I'm looking for a tutorial or an introduction about bluez-programming. The
-internet search resulted in only hits over the installation of bluez :-/
-My bluez-installation works fine and now I want to control the bluez-stack
-with my own program and perhaps with my own profile. (I must implement a
-bluetooth-server).
+I am a desperate newbie in need of help getting Bluez working on my Axis Dev 
+board 82.  I have seen some posts by others implying they somehow got things 
+working on their boards.
 
-Thank you for your advices.
+For those who dont know much about kernels and writing patches, is there a 
+"how to" or list of instructions to help us get going.  For instance, what 
+do I do first?  The latest version for the board is 2.4.26 - so am I 
+supposed to apply Marcel's patch for that kernel from the Bluez site?  If 
+so, are there any special things that I am to do in addition?
 
-Ciao, Ralf
+I also saw a post that said someone had cross compiled bluez...does that 
+mean i have to put that into my makefile for the board?
+
+Please forgive me for not knowing much, as I am still learning about things.
+
+Thanks in advance,
+
+Theresa G.
+
+_________________________________________________________________
+Express yourself instantly with MSN Messenger! Download today - it's FREE! 
+http://messenger.msn.click-url.com/go/onm00200471ave/direct/01/
+
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
-Project Admins to receive an Apple iPod Mini FREE for your judgement on
-who ports your project to Linux PPC the best. Sponsored by IBM. 
-Deadline: Sept. 13. Go here: http://sf.net/ppc_contest.php
+This SF.Net email is sponsored by BEA Weblogic Workshop
+FREE Java Enterprise J2EE developer tools!
+Get your free copy of BEA WebLogic Workshop 8.1 today.
+http://ads.osdn.com/?ad_id=5047&alloc_id=10808&op=click
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
