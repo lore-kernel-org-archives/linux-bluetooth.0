@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041019163818.20530.qmail@web60408.mail.yahoo.com>
-From: Murat Bog <murat_bog@yahoo.com>
-Reply-To: murat_bog@yahoo.com
-Subject: Re: [Bluez-users] Packages to Use For Zaurus SL-6000L
-To: Stephen Crane <steve.crane@rococosoft.com>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <1098176914.16324.107.camel@baroque.rococosoft.com>
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] News: Stereo BT Headset from BlueTake
+References: <416D8520.5060102@thomae-privat.de> <200410191602.22586.wim.delvaux@adaptiveplanet.com> <1098197580.3068.1.camel@pegasus>
+In-Reply-To: <1098197580.3068.1.camel@pegasus>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200410191700.26363.wim.delvaux@adaptiveplanet.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,116 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Oct 2004 09:38:18 -0700 (PDT)
+Date: Tue, 19 Oct 2004 17:00:26 +0200
 
-Well, good news :).
+On Tuesday 19 October 2004 16:53, Marcel Holtmann wrote:
+> Hi Wim,
+>
+> > If it works for 'any' usb dongle (which I interpret as also older dongles
+> > - i.e 1.0) is there any reason why wouldn't work for PDA devices ?
+>
+> I don't own a Bluetooth 1.0b USB dongle, but I still have access to some
+> old PCMCIA cards and everyone of them should work, it the host stack (in
+> the Linux case BlueZ) support the A2DP profile. If you find an OS which
+> claims A2DP support it should work for PDAs, too.
 
-I tried using dmesg to see if I can get any more clues
-to my problem.  I saw some errors about unknown H4 (?)
-protocol, which reminded me of a message I had seen in
-the archive about using the flow control option.  So I
-tried hciattach with the flow control option specified
-and the interface came up!
+Familiar can ;-) 
 
-Thanks for the patient help,
-
-Murat
-
---- Stephen Crane <steve.crane@rococosoft.com> wrote:
-
-> Hi,
-> 
-> On Mon, 2004-10-18 at 20:29, Murat Bog wrote:
-> > Before I sent my query, I had tried using the 
-> > following combination of packages specified in
-> your
-> > readme file:
-> > 
-> > bluez-kernel-2.4.18-mh14_arm.ipk
-> > bluez-libs-2.8_arm.ipk
-> > bluez-utils-2.8_arm.ipk
-> > 
-> > They had installed without errors.  I initially
-> got
-> > the following message when I started the bluetooth
-> > services
-> > 
-> > Starting Bluetooth subsystem: hcid sdpdCan't open
-> > RFCOMM control socket: No such file or directory
-> >  rfcomm.
-> 
-> You need to edit modules.conf:
-> 
-> alias net-pf-31 bluez
-> alias bt-proto-0 l2cap
-> alias bt-proto-1 hci
-> alias bt-proto-2 sco
-> alias bt-proto-3 rfcomm
-> alias bt-proto-4 bnep
-> 
-> > It looked like the rfcomm bluez modules were not
-> > installed by the kernel, so I did
-> > 
-> > insmod l2cap
-> > insmod rfcomm
-> > depmod -a
-> > 
-> > and restarted bluetooth successfully.
-> > 
-> > Next, I ran
-> > 
-> > hciattach /dev/ttyS3 bt2000c
-> > 
-> > which also  executed successfully and returned the
-> > following response
-> > 
-> > CSR build ID 0x02-0x0D
-> > 
-> > The problem is when I tried running hciconfig
-> after
-> > this, I got
-> > 
-> > hci0:   Type: UART
-> >         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0
-> 
-> > SCO MTU: 0:0
-> >         DOWN INIT RUNNING
-> >         RX bytes:0 acl:0 sco:0 events:0 errors:0
-> >         TX bytes:4 acl:0 sco:0 commands:1 errors:0
-> > 
-> > but after a short while the status changed to just
-> > "DOWN".
-> > 
-> > If I tried to reset or bring up hci0 at this
-> point, I
-> > got the following error.
-> > 
-> > Can't init device hci0. Connection timed out(110)
-> > 
-> > I don't know if I'm missing something basic but I
-> had
-> > thought that perhaps there was a driver issue
-> which
-> > may have been fixed in the later versions of the
-> bluez
-> > packages under the zaurus download directory.
-> 
-> This does indeed look like a driver issue. Try
-> installing the -mh15
-> package; however I don't know if it will help or
-> not.
->  
-> > Regards,
-> > Murat
-> 
-> Steve
-> -- 
-> Stephen Crane, Rococo Software Ltd.
-> http://www.rococosoft.com
-> steve.crane@rococosoft.com +353-1-6601315 (ext 209)
-> 
-> 
-
+W
 
 
 -------------------------------------------------------
