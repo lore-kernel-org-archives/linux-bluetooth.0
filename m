@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth ipaq familiar
+Subject: Re: [Bluez-users] hidp in 2.4.28??
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Matthias Albert <matthias@ma-c.de>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1095082582.2191.35.camel@ringo.aicas.burg>
-References: <1095082582.2191.35.camel@ringo.aicas.burg>
+In-Reply-To: <200409130234.18019.cijoml@volny.cz>
+References: <200409130234.18019.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1095154677.5695.134.camel@pegasus>
+Message-Id: <1095153542.5695.131.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,27 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Sep 2004 11:37:57 +0200
+Date: Tue, 14 Sep 2004 11:19:02 +0200
 
-Hi Matthias,
+Hi Michal,
 
-> I have a iPAQ 5550 running with Familiar unstable 0.7.2 and Opie 1.1.4.
-> I can establish a connection over pand between a pc and the ipaq.
-> 
-> After that I have a device called bnep0 which I can configure with
-> ifconfig bnep0 and so on.
-> 
-> Now I would like to have a serial bluetooth connection between the pc
-> and the ipaq.
-> How can I do this?
+> when will you put into 2.4.28 hidp support? You announced it few weeks ago, 
+> but in pre3 it is still not present
 
-use dund, play with the rfcomm utility or write your own client/server
-application.
-
-> Is it possible with a serial bluetooth connection, that I can go outside
-> the frequency with my ipaq and go back and the connection is there?
-
-You have to write this stuff by yourself.
+I need to prepare my 2.6 update first, before I will send out the
+pending 2.4 stuff.
 
 Regards
 
