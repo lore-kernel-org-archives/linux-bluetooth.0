@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Mikko Rapeli <mikko.rapeli@iki.fi>
-Subject: Re: [Bluez-users] Socket CF adaptor,
- limited to 2-3KB/sec RFCOMM PPP connection?
-In-reply-to: <Pine.GSO.4.58.0410121425040.24690@gaia3.cc.gatech.edu>
+Date: Tue, 12 Oct 2004 14:37:16 -0400 (EDT)
+From: "Jay W. Summet" <summetj@cc.gatech.edu>
 To: bluez-users@lists.sourceforge.net
-Message-id: <20041012210802.GA4827@nalle>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-References: <Pine.GSO.4.58.0410121425040.24690@gaia3.cc.gatech.edu>
+Message-ID: <Pine.GSO.4.58.0410121425040.24690@gaia3.cc.gatech.edu>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] Socket CF adaptor, limited to 2-3KB/sec RFCOMM PPP connection?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +16,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Oct 2004 00:08:02 +0300
 
-On Tue, Oct 12, 2004 at 02:37:16PM -0400, Jay W. Summet wrote:
-> However, when I connect to my GPRS data provider, I only get 2.1 to 2.5
-> KBytes/second of transfer. If I use IrDA instead of bluetooth, I can
-> obtain the typical 5.1 to 5.6 KBytes/second transfer that I am expecting
-> from GPRS.
+Hello,
 
-I propose you first try to repeat this slow connection problem with plain 
-Bluetooth data transfer between Linux and the phone (OBEX or something), 
-since GPRS networks and cells may give you anything between 0 and ~50 kbps 
-of bandwidth depending on all kinds of things like network/cell load/number 
-of users etc etc. 
+I am using a Socket Compact Flash Bluetooth adaptor, (dtl1_cs module),
+Revision F (8510-00159 F) and am able to successfully connect to my
+Sony Ericsson T610 GSM phone over a RFCOMM interface with PPPD.
 
-And if the issue still exists, I'd say Marcel and other wizards would like 
-to see the hcidump, perhaps with -t ;)
+I'm running a generic Kernel.org 2.6.7 kernel on a Mandrake 10.0
+distribution. All of my user space tools came with the Mandrake 10.0
+distro, hcitool reports version 2.11, hcidump reports version 1.11.
 
--Mikko
+However, when I connect to my GPRS data provider, I only get 2.1 to 2.5
+KBytes/second of transfer. If I use IrDA instead of bluetooth, I can
+obtain the typical 5.1 to 5.6 KBytes/second transfer that I am expecting
+from GPRS.
+
+My ppp "peers" configuration script is setting the /dev/rfcomm0 tty to
+115200, and a friend is using the same scripts, configuration, and phone
+with a USB bluetooth adaptor and getting the 5.1 to 5.6 KBytes/second
+transfer.
+
+I believe the problem is either with the phone (unlikely) or the Socket CF
+card and/or software link to it.
+
+Has anybody else had experience with this issue? Any configuration
+settings for debugging I should turn on? (/var/log/messages doesn't show
+anything out of the ordinary happening) As I said, everything operates
+correctly, it just never gets above 2-2.5KB/second of bandwidth with the
+bluetooth link, while it peeks out at 5.6KB/sec on an IrDA link.
+
+Thanks,
+Jay
+
 
 
 -------------------------------------------------------
