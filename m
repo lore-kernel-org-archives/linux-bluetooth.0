@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41E404E9.60405@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Multiple Headsets
-References: <41E25ECD.2000505@fcse.co.uk> <41E267C4.5030906@dark-reality.de>	 <1105362147.8652.10.camel@pegasus> <41E2A9FC.2010405@dark-reality.de>	 <41E39BC8.2020105@xmission.com> <1105438532.8056.12.camel@pegasus> <41E3AAD8.9090303@dark-reality.de> <41E3FE69.5030903@xmission.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <41E3FE69.5030903@xmission.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+References: <41E25ECD.2000505@fcse.co.uk> <41E267C4.5030906@dark-reality.de>
+	 <1105362147.8652.10.camel@pegasus> <41E2A9FC.2010405@dark-reality.de>
+	 <41E39BC8.2020105@xmission.com> <1105438532.8056.12.camel@pegasus>
+	 <41E3AAD8.9090303@dark-reality.de>  <41E3FE69.5030903@xmission.com>
+Content-Type: text/plain
+Message-Id: <1105461428.8056.46.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,47 +21,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Jan 2005 17:55:05 +0100
+Date: Tue, 11 Jan 2005 17:37:08 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Brad,
 
-Brad Midgley wrote:
+> > What has to be documented is:
+> > 
+> > how to calculate the bitrate for the proper "alternate setting" of usb_hci?
+> > 
+> > We could put the table from the BT docs online
+> 
+> Where do I look to find this table? (The phrase "alternate setting" does 
+> not seem to be the way to find it)
 
-| Where do I look to find this table? (The phrase "alternate setting" does
-| not seem to be the way to find it)
+it is part of the HCI USB transport specification or look at the old
+Bluetooth 1.1 specification under H:2.
 
-I'll copy it from the docs, I should be able to recover it fastly.
+> What if it's set too high? Will it fail to work or will it waste space 
+> in the transmission?
 
-| What if it's set too high? Will it fail to work or will it waste space
-| in the transmission?
+Setting it to 0 makes the driver not to select the ISOC endpoint. When
+you choose a too high value this should fail. However I haven't tested
+this so far.
 
-It should simply fail, as Marcel already stated. This is not like
-choosing an upper limit, because the transfers should be synchronous and
-this have to fit in exact transmission windows. Of course it should do
-no harm if the windows are to big, but the specs are quite clear that
-cumulated data size and window size must fit exactly (well, plus one
-byte if I remember correctly).
+Regards
 
-Expect the table in an upcoming mail :)
+Marcel
 
-- - Lars
 
-- --
-Lars Grunewaldt
-* software development
-* multimedia design
-skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
-web: http://www.dark-reality.de
-mail: lgw@dark-reality.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD4DBQFB5ATpQWC6DTWkDAoRAl7QAJ9Xig8w+YC7j9CMhc5BNp6jp17E3ACYrN7s
-xNGMnAUMV4UC/UdrBSVrig==
-=9XR2
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
