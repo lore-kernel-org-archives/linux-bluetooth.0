@@ -1,12 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4118B5FF.5070008@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
-References: <4117AB9A.9010909@dark-reality.de>	 <1092071356.4564.12.camel@pegasus>  <4117B098.5020805@dark-reality.de>	 <1092073167.4564.26.camel@pegasus>  <4117C0AB.2010609@superbug.demon.co.uk> <1092090364.4564.46.camel@pegasus>
-In-Reply-To: <1092090364.4564.46.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jean Tourrilhes <jt@hpl.hp.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040809195448.GA24140@bougret.hpl.hp.com>
+References: <20040805013335.GA13608@bougret.hpl.hp.com>
+	 <1091976547.2773.29.camel@pegasus>
+	 <20040809185159.GA21899@bougret.hpl.hp.com>
+	 <1092078516.4564.40.camel@pegasus>
+	 <20040809195448.GA24140@bougret.hpl.hp.com>
+Content-Type: text/plain
+Message-Id: <1092125599.4564.76.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: [PATCH 2.6] link trigger for AODV and +
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,30 +22,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 13:48:15 +0200
+Date: Tue, 10 Aug 2004 10:13:19 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Jean,
 
-for those who are interested in further development of former snd-bt-sco
-and now bluetooth-alsa connection (project name not ready ;) we made a
-mailing list to exchange early thoughts.
+> > this is a good point and I do think that this patch is a nice additional
+> > feature for BlueZ, but I am not fully comfortable with it in its current
+> > shape. Actually some time ago I thought about removing the support for
+> > stack internal events.
+> 
+> 	In my stuff, I use internal events to know when hci interfaces
+> go up and down and when they appear and disappear. As far as I know,
+> those events are not available by any other means. They are not
+> available through RtNetlink because hci interfaces are not real netdev
+> interfaces.
 
-If anyone wants to participate, here's the address (I think joining is
-only possible by manual entry, just drop a mail to the list)
+these events should be available via hotplug and the bluetooth.agent and
+because of this I was thinking about removing the stack internal stuff.
 
-snd-bt-sco@corinis.net
+If the HCI connections themself are fully integrated into the driver and
+device model an event through hotplug would be the best. Comments?
 
-regards,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+> > I sent the full patch for inclusion, but it came out that one part
+> > causes troubles and so I removed this part. I didn't found the time for
+> > a further investigation.
+> 
+> 	That's what I said : I'm going to test it properly. If you
+> could remember the issue, that would help.
 
-iD8DBQFBGLX+QWC6DTWkDAoRAt3EAKCZ8owLo2JYZStQjkaKnIlCU57oOgCfbRQq
-DFQcaX9BI75yde7OXBYE42o=
-=xvN0
------END PGP SIGNATURE-----
+I searched the email exchange between Michal and me from the mailing
+list archives for you. Check out this thread:
+
+	http://thread.gmane.org/gmane.linux.bluez.user/2672
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
