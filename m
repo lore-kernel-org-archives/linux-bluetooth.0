@@ -1,75 +1,64 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: John McCorquodale <mcq@cacr.caltech.edu>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20040309212125.GA27173@viz.cacr.caltech.edu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Bluez HID story?
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 9 Mar 2004 13:21:25 -0800
+Return-Path: <jamesp@hisser.org>
+Date: Tue, 9 Mar 2004 21:02:52 +0000 (GMT)
+From: James Pattinson <jamesp@hisser.org>
+To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Obex / Palm TT
+In-Reply-To: <1047488348.28415.117.camel@pegasus.local>
+Message-ID: <Pine.LNX.4.58.0403092101240.24697@greebo>
+References: <Pine.LNX.4.44.0303121553230.9558-100000@greebo.hisser.org>
+ <1047488348.28415.117.camel@pegasus.local>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-users.lists.sourceforge.net>
 
-So I'm trying to get my spiffy new Logitech BT keyboard working with my CF
-BT card.
+Hi Marcel
 
-I found Peter Klausler's 'bthid' which seems to sortof work with the uinput
-driver in 2.4.25.  However, when typing very fast, it repeats substrings of
-my input more than once (e.g. 'ls -lsa' -> 'ls -ls-lsa') which is a problem
-that typing more slowly eliminates.  I've also had my kernel panic once or
-twice when trying this stuff out.
+Do you have any more info about this application? I have just revisted bluetooth 
+now I have a bt enabled handheld again. (This time it's Tungsten T3).
 
-I also found Marcel's page:
+Everything works great - would just like a way of using obex push.
 
-  http://www.holtmann.org/linux/bluetooth/hid.html
+I tried opexftp over rfcomm, the connection got established however the file 
+didn't transfer:
 
-Which starts off great talking about how "this reimplementation" reuses the HID
-parser from USB and is morally superior to Peter's work.  However, the page
-then goes on to talk about all sorts of USB dongles, which is irrelevant (the
-whole point of a BT keyboard is to throw the dongle in the trash and use my
-laptop's builtin BT), and further doesn't seem to talk about any exiting code
-at all past the mention of "this reiplementation" in the first paragraph.
+greebo root # obexftp -d /dev/bluetooth/rfcomm/0 -p /tmp/trace.out 
+Custom transport set to 'Siemens'
+Connecting...failed: connect
+Still trying to connect
 
-My question is:
+Thanks!
 
-  What is the best currently working way to handle bluetooth HI devices?  The
-  device itself, not the dongle.  How does one configure host-initiated
-  disconnection on idle detection (since I'm a Logitech KB, I guess I need to
-  do that)?  Am I just totally missing the important message on Marcel's
-  HID page?  By the way: what's doing the layout on hortmann.org? -- I really
-  respect and admire the minimalism and good design sense of those pages.
+James
 
-If there is such a thing, can you give me a quick breakdown of the steps one
-would take to get it working?  For example, for bthid, the steps I use go:
+On Wed, 12 Mar 2003, Marcel Holtmann wrote:
 
-  1. Get HCI working (cardmgr loads serial_cs, hciattach ttyS0 bcsp 2300400)
-  2. Compile bthid from http://www.visi.com/~pmk/bthid-0.10.tar.gz
-  3. hcitool scan, hit connect button, to deduce BT address of keyboard
-  4. bthid -n -v -v <address>
-  5. hit connect on KB
-
-If there is no existing HID implementation other than Peter's, please let me
-know this so I know it's worth the time to debug the substring repeat problem
-and figure out why it panics me.
-
-Thanks,
-
--mcq
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+> Hi James,
+> 
+> > 2. OBEX - I'm going to try this tonight, but don't believe it's going to 
+> > work, as the only suitable application seems to be obexftp which doesn't 
+> > yet support Bluetooth. Anyone got obex working over BT to a palm?
+> 
+> I have a program called btftp which implements the File Transfer
+> Profile, but it is not complete ready at the moment. The other one
+> called btobex is an implementation of the OBEX Push Profile and will
+> allow you to push/pull vcards etc. and download your phonebook and
+> calendar from an IrMC compatible phone. I asked Max to put it into CVS.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.net email is sponsored by:Crypto Challenge is now open! 
+> Get cracking and register here for some mind boggling fun and 
+> the chance of winning an Apple iPod:
+> http://ads.sourceforge.net/cgi-bin/redirect.pl?thaw0031en
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
