@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Content-Type: text/plain; charset="ISO-8859-1"
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-From: russellturner@fastmail.com.au
-Message-Id: <1106956484.11673.213836256@webmail.messagingengine.com>
-Subject: [Bluez-users] General Debian bluez question
+Subject: Re: [Bluez-users] Installing Bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41FA486F.9040000@gmx.ch>
+References: <41F81653.4030601@gmx.ch> <1106778292.28444.60.camel@pegasus>
+	 <41F81FAF.8040002@gmx.ch> <1106847147.3998.17.camel@pegasus>
+	 <41FA486F.9040000@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1106933995.9644.5.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,27 +20,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 Jan 2005 10:54:44 +1100
+Date: Fri, 28 Jan 2005 18:39:55 +0100
 
-Hi Everyone,
-I am hoping someone can answer a general Debian-bluez question.
+Hi Marco,
 
-I have installed Debian sarge and upgraded to the sid kernel so I can
-apply the patch patch-2.6.10-mh2.gz.
+> I expect it to pe for the 2.6.10 Kernel and hope that it's usuable with the 
+> 2.6.7 one...
+> How bad is the 2.6.7 patch? Wher can I download it?
 
-When installing sarge I also choose the bluez-utils package, but there
-is another package called kernel-patch-2.6-bluez. Should I also be
-patching the 2.6.10 kernel with this patch, as well as the "mh2" one?
+the latest 2.6.7 patch includes almost the same of the Bluetooth
+subsystem that is in 2.6.8. So you miss the patches for two kernel
+releases and actually I counted them. There are 33 patches between the
+2.6.7 and 2.6.10 kernel. The ones from the patch-2.6.10-mh2 are not
+included in this count.
 
-My Microsoft bluetooth mouse works fine without the debian patch - or at
-least it seems to! I'm just curious about whether I need both patches. I
-will continue to use the "mh2" patch do I can enjoy scroll-wheel
-support.
+Regards
 
-Thanks. 
--- 
-  
-  russellturner@fastmail.com.au
+Marcel
+
 
 
 
