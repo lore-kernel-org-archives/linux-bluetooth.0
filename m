@@ -1,61 +1,61 @@
-Return-Path: <office@produktivIT.com>
-From: Krisztian Mark Szentes <office@produktivIT.com>
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+Return-Path: <benh@kernel.crashing.org>
 Subject: Re: [Bluez-users] bt3c_cs time out - no firmware loaded?
-Date: Fri, 16 May 2003 16:22:47 +0200
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>, Edd Dumbill <ejad@debian.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+Cc: Krisztian Mark Szentes <office@produktivIT.com>, BlueZ Mailing List <bluez-users@lists.sourceforge.net>, Edd Dumbill <ejad@debian.org>
+In-Reply-To: <1053093446.26552.137.camel@pegasus>
 References: 
 	<53B03DA73719D5119E6A0008C71E1D78030EA9A3@svr-mail1.corp.home.nl>
-	<1053091452.2561.86.camel@gaston> <1053091839.26550.125.camel@pegasus>
-In-Reply-To: <1053091839.26550.125.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-15"
-Message-Id: <200305161622.47728.office@produktivIT.com>
+	<200305131047.39294.office@produktivIT.com>
+	<1053083095.26552.49.camel@pegasus>
+	<200305161438.08919.office@produktivIT.com>
+	<1053091452.2561.86.camel@gaston>  <1053091839.26550.125.camel@pegasus>
+	<1053091938.2978.88.camel@gaston>  <1053092394.26552.132.camel@pegasus>
+	<1053092826.2561.90.camel@gaston>  <1053093446.26552.137.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1053094302.2561.99.camel@gaston>
+Mime-Version: 1.0
+Date: 16 May 2003 16:11:43 +0200
+Sender: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 List-ID: <bluez-users.lists.sourceforge.net>
 
+On Fri, 2003-05-16 at 15:57, Marcel Holtmann wrote:
+> Hi Ben,
+> 
+> > > an ioctl is not possible at that time, because we need the firmware
+> > > loaded before we can initialise the Bluetooth HCI device. And I don't
+> > > want to use the /proc for this kind of stuff. We hopefully will have a
+> > > unified interface for this in 2.5 with request_firmware() call and the
+> > > sysfs. See current discussion on LKML.
+> > 
+> > Then a /proc entry or a temporary /dev entry will be the only sane
+> > solution for 2.4 I'm afraid...
+> 
+> if you don't see any other solution to work around, this device will be
+> not supported on the PowerPC platform.
 
+And probably many others...
 
-On Friday 16 May 2003 15:30, Marcel Holtmann wrote:
+direct IO port access is really an x86 thing... 
 
-> > Hrm... The problem isn't simple. You are just not supposed to tap IOs
-> > that way from userland, especially since PPC arch doesn't have
-> > anything like "PIO" instructions. The IO space of your card is
-> > actually mapped somewhere in physical memory, that "somewhere" not
-> > beeing generally available to userland.
-> >
-> > Can you tell me more about the card ? Is it a 16 bits PCMCIA device or
-> > is it a cardbus (PCI) one ? Why can't you tap the IOs solely from
-> > within a kernel driver ?
->
-> this is a 16 Bit PCMCIA card. We need to load the firmware from
-> userspace, because we can't distribute it within the kernel driver due
-> the legal issues. At the moment we don't even distribute the firmware
-> file with our userspace firmware loader program.
+Note that if the cardbus bridge actually sits on the main PCI bus and uses
+"legacy" PIO addresses, it is possible to do something, though I hate it ;)
 
-OK.
+You can call the sys_pciconfig_iobase syscall to retreive the physical base
+address where the IO ports of a given PCI bus are mapped.
 
-I am fed up with the card, I bought it almost year ago and hoped it would 
-some time become easier to use. I chose it over the Xircom and Anycom 
-parts because its antenna looked neat. In the meantime, I also bought a 
-USB device which explicitely stated Linux compatibility on the 
-manufacturer's web site (Epox).
-I'm thinking about 
+By passing that the bus number where the cardbus bridge lives on, you can
+then use the resulting value to mmap /dev/mem and actually access those
+IO ports.
 
-(1) asking 3COM for permission, or 
-(2) returning it to 3COM's headquarters or 
-(3) publicly destroying it and putting up a video or
-(4) sell it to a modern slave (Windoze user) and donating the money to 
-Debian
+When actually implementing inx/outx in userland, I strongly suggest you do
+what the kernel does in asm/io.h for ld/st_le16, so you get byteswapped
+access for 16 bits, and have proper eieio barriers.
 
-Marcel, can you give me a hint whom I should contact for (1)? 
+That syscall should have the following syntax:
 
-Salut
+#define IOBASE_IO		2
 
-Mark
+syscall(200, IOBASE_IO, bus_number, 0);
 
-P.S. Maybe I should do (1), (2), (3) AND (4)   :-))
-
--- 
-produktivIT   -  Open-Source Solution Provider
-Siebenbrunnengasse 55/7
-A-1050 Wien
+Ben.
