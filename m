@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41668ADE.7010004@uni-paderborn.de>
-From: Stefan Mischke <survivor@uni-paderborn.de>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] read_RSSI and others not thread-safe?
+Subject: Re: [Bluez-devel] tcsendbreak and flow control on hciattach (csr
+	chip)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rognlien Dag Kristian <Dag.K.Rognlien@sintef.no>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <39417DF3286A66428FA558987839F44F152D99@SINTEFXCH01.sintef.no>
+References: <39417DF3286A66428FA558987839F44F152D99@SINTEFXCH01.sintef.no>
+Content-Type: text/plain
+Message-Id: <1097229854.4893.4.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,27 +19,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 08 Oct 2004 14:41:02 +0200
+Date: Fri, 08 Oct 2004 12:04:17 +0200
 
-Hello!
+Hi Dag,
 
-I've written a small JBlueZ-like JNI-Library which gives Java access to 
-BlueZ. My demo application has one threads for each connection (two at 
-the moment) which concurrently do read_RSSI, read_Transmit_Power_Level 
-and read_Link_Quality. If by random two threads do one, two or all three 
-of these calls at the same time, the result values are equal (although 
-they can't be since one connection is really bad). This doesn't happen 
-if I declace the three functions "synchronized" in the Java part of the 
-JNI. But this should not be necessary, should it? Since my functions 
-only use by-value parameters and local variables, they should be 
-thread-safe. I also figured out that the BlueZ sockets in these calls 
-are unequal, but the result (RSSI value) is equal. Why can this happen?
+> If I enable both flow control and send break with hciattach:
+> hciattach -b ttyS1 csr 921600 flow
+> 
+> The unit fails to initialize. This does not happen if I disable flow
+> control, or send break.
+> The problem is also solved by setting a sleep of 0.5 seconds after the
+> tcsendbreak command in the hciattach.c code.
+> 
+> This is on an Intel XScale platform.
+> 
+> I use bluez libs and bluez utils 2.9 on a 2.4.21 kernel with the mh9
+> patch.
+> 
+> Any ideas for another solution than the usleep, or is this the best
+> solution?
 
-I wonder if this could also occour on one of the other, more important 
-functions like l2cap_read/write. Any idea? Thanks!
+maybe this is CSR specific, I don't know. Actually I wasn't aware of
+that the -b option is really used. However if the 0.5 seconds sleep is
+needed then send me a patch for it and I will apply it.
 
 Regards
-Stefan
+
+Marcel
+
 
 
 
