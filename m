@@ -1,91 +1,66 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Thomas Chiverton <thomas.chiverton@bluefinger.com>
-To: Chakravarthi Lalith-A5259C <A5259C@motorola.com>
-Subject: Re: [Bluez-users] Time out!!
-References: <2F8E7538CA01D711BC5900B0D079E7100394F3D0@zin03exm01.corp.mot.com>
-In-Reply-To: <2F8E7538CA01D711BC5900B0D079E7100394F3D0@zin03exm01.corp.mot.com>
-Cc: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200402251144.54833.thomas.chiverton@bluefinger.com>
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Feb 2004 11:44:54 +0000
-
-On Wednesday 25 Feb 2004 11:10 am, you said:
-> beginner and would appreciate any step-by-step approach towards
-> establishing a two-way connection with a motorola V-600 phone
-
-Install blueZ.
-Load the bluez modules 
-*edit modules.conf
-	alias net-pf-31 bluez
-	alias bt-proto-0 l2cap
-	alias bt-proto-2 sco
-	alias tty-ldisc-15 hci_uart
-*insmod rfcomm
-hciconfig should show your adapter.
-hciconfig hci0 up should bring it online.
-
-Install kde-bluetooth.
-*edit /etc/bluetooth/hcid.conf
-	security user;
-        pairing multi;
-	pin_helper /usr/bin/kbluepin;
-*reboot
-*check hciconfig again
-*start KDE - you should see a notification.
-*init a normal pairing from you phone (see manual) - kde should prompt you for 
-the PIN.
-
-enter 'scp:/' as the URL in Konqueror - you should be able to browse onto your 
-phone, obexpush, and it'll open the push client.
-
-If you send files from the phone, a window should apper.
-
-This is all based on my recent experience getting everything working with 
-KDE3.2, on a RedHat9 box.
+Return-Path: <klaus@encephalon.dk>
+Date: Wed, 25 Feb 2004 12:38:47 +0100
+From: Klaus Holst <klaus@encephalon.dk>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] dund never activates pppd
+Message-ID: <20040225113847.GB1339@encephalon.dk>
+References: <20040223213658.GA1453@encephalon.dk> <1077573810.2791.161.camel@pegasus> <20040224085351.GA3782@encephalon.dk> <1077624875.2880.44.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1077624875.2880.44.camel@pegasus>
+List-ID: <bluez-users.lists.sourceforge.net>
 
 
--- 
-Tom Chiverton 
-Advanced ColdFusion Programmer
+> > > show us "hciconfig -a" after you plugged in the dongle.
+> > >
+> >
+> > hci0:   Type: USB
+> >         BD Address: 00:03:C9:2E:6C:F6 ACL MTU: 377:10  SCO MTU: 16:0
+> >         UP RUNNING PSCAN ISCAN AUTH ENCRYPT
+> >         RX bytes:647 acl:0 sco:0 events:18 errors:0
+> >         TX bytes:314 acl:0 sco:0 commands:18 errors:0
+> >         Features: 0xff 0xfd 0x05 0x00 0x00 0x00 0x00 0x00
+> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+> >         Link policy: HOLD SNIFF PARK
+> >         Link mode: ACCEPT MASTER
+> >         Name: 'MINI (linux)'
+> >         Class: 0x000100
+> >         Service Classes: Unspecified
+> >         Device Class: Computer, Uncategorized
+> >         HCI Ver: 1.1 (0x1) HCI Rev: 0x2 LMP Ver: 1.1 (0x1) LMP Subver: 0x1007
+> >         Manufacturer: Broadcom Corporation (15)
+>
+> and what Bluetooth chip is in your PDA? Use "hcitool info <bdaddr>".
+> 
+> Do you have any other Bluetooth dongle to test this with? Maybe the
+> Broadcom dongle is problematic.
 
-Tel: +44(0)1749 834997
-email: tom.chiverton@bluefinger.com
-BlueFinger Limited
-Underwood Business Park
-Wookey Hole Road, WELLS. BA5 1AF
-Tel: +44 (0)1749 834900
-Fax: +44 (0)1749 834901
-web: www.bluefinger.com
-Company Reg No: 4209395 Registered Office: 2 Temple Back East, Temple
-Quay, BRISTOL. BS1 6EG.
-*** This E-mail contains confidential information for the addressee
-only. If you are not the intended recipient, please notify us
-immediately. You should not use, disclose, distribute or copy this
-communication if received in error. No binding contract will result from
-this e-mail until such time as a written document is signed on behalf of
-the company. BlueFinger Limited cannot accept responsibility for the
-completeness or accuracy of this message as it has been transmitted over
-public networks.***
+> Regards
+
+> Marcel
+
+Here is the info from the PDA:
+
+# hcitool info 00:04:3E:A2:2D:C9
+Requesting information ...
+        BD Address:  00:04:3E:A2:2D:C9
+        Device Name: Pocket_PC
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x8d
+        Manufacturer: Telencomm Inc. (18)
+        Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset> 
+                <timing accuracy> <role switch> <hold mode> <sniff mode> 
+                <park state> <RSSI> <channel quality> <SCO link> 
+                <HV2 packets> <HV3 packets> <u-law log> <A-law log> 
+                <CVSD> <power control> 
 
 
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Actually the dongle (Belkin F8T001) is listed as supported in
+http://www.holtmann.org/linux/bluetooth/devices.html.
+
+However in case I should try to find another dongle, can anyone recommend one 
+which is properly supported by linux/bluez and has a reasonable range?
+
+Best regards
+Klaus
