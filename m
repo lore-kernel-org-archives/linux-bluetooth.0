@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] can't establish a connection
-From: ben4fun <ben_4_fun@freenet.de>
-Cc: bluez-users mailing list <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1092778940.31651.39.camel@pegasus>
-References: <1091742606.6143.17.camel@localhost>
-	 <1092727197.12606.1.camel@localhost> <1092728177.31651.6.camel@pegasus>
-	 <200408170949.50588.cijoml@volny.cz>  <1092776029.3475.27.camel@localhost>
-	 <1092778940.31651.39.camel@pegasus>
-Content-Type: multipart/alternative; boundary="=-55e61B2hOdbC4GzdstSJ"
-Message-Id: <1092779397.3475.31.camel@localhost>
+Subject: Re: [Bluez-users] BlueZ Newbie
+From: Marcel Holtmann <marcel@holtmann.org>
+To: mlists@tdbnetworks.org
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <45811.212.183.131.161.1092733345.squirrel@sockthing.tdbnetworks.org>
+References: <1092718810.3163.76.camel@hellontoast>
+	 <1092726160.31651.4.camel@pegasus>
+	 <45811.212.183.131.161.1092733345.squirrel@sockthing.tdbnetworks.org>
+Content-Type: text/plain
+Message-Id: <1092744170.10582.18.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,73 +20,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Aug 2004 23:49:58 +0200
+Date: Tue, 17 Aug 2004 14:02:50 +0200
 
+Hi Richard,
 
---=-55e61B2hOdbC4GzdstSJ
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-Hi Marcel,
-
-
-> so adding the broken ISOC quirk would be enough to make this dongle work
-> again. Maybe the last time I tested it, I had the SCO support disabled.
+> In a word, yes, It's a Sony Ericsson P900.
 > 
+> Is that a major problem?
 
-Is this something to add in the kernel settings?
-
-
-> What does "hciconfig hci0 revision" say? These versions look a little
-> bit wrong.
-> 
-
-hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:02:72:B3:43:18 ACL MTU: 377:10  SCO MTU: 16:0
-        Unsupported manufacturer
+the hcidump showed me a mRouter behaviour. Check with sdptool on what
+RFCOMM channel your phones has its DUN Profile and then try to use this
+one.
 
 Regards
 
-Ben
+Marcel
 
---=-55e61B2hOdbC4GzdstSJ
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: 7bit
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
-<HTML>
-<HEAD>
-  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=UTF-8">
-  <META NAME="GENERATOR" CONTENT="GtkHTML/3.0.10">
-</HEAD>
-<BODY>
-Hi Marcel,<BR>
-<BR>
-<BLOCKQUOTE TYPE=CITE>
-<PRE><FONT COLOR="#737373"><I>so adding the broken ISOC quirk would be enough to make this dongle work
-again. Maybe the last time I tested it, I had the SCO support disabled.
-</I></FONT></PRE>
-</BLOCKQUOTE>
-Is this something to add in the kernel settings?<BR>
-<BR>
-<BLOCKQUOTE TYPE=CITE>
-<PRE><FONT COLOR="#737373"><I>What does &quot;hciconfig hci0 revision&quot; say? These versions look a little
-bit wrong.
-</I></FONT></PRE>
-</BLOCKQUOTE>
-hciconfig hci0 revision<BR>
-hci0:&nbsp;&nbsp; Type: USB<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:02:72:B3:43:18 ACL MTU: 377:10&nbsp; SCO MTU: 16:0<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Unsupported manufacturer<BR>
-<BR>
-Regards<BR>
-<BR>
-Ben
-</BODY>
-</HTML>
-
---=-55e61B2hOdbC4GzdstSJ--
 
 
 
