@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] little pb with my bluetooth
+Subject: Re: [Bluez-users] Data across Bluetooth Connection - Not file
+	transfer
 From: Marcel Holtmann <marcel@holtmann.org>
-To: nicolas <n1c0l4s.l3@wanadoo.fr>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403180820.29734.n1c0l4s.l3@wanadoo.fr>
-References: <200403180820.29734.n1c0l4s.l3@wanadoo.fr>
+To: Pavel Ruzicka <pavouk@pavouk.org>
+Cc: Lalith Chakravarthi <lalithvc@yahoo.com>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403181100.21296.pavouk@pavouk.org>
+References: <20040318091849.58373.qmail@web40707.mail.yahoo.com>
+	 <200403181100.21296.pavouk@pavouk.org>
 Content-Type: text/plain
-Message-Id: <1079623105.3301.37.camel@pegasus>
+Message-Id: <1079623416.3301.40.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,14 +21,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 18 Mar 2004 16:18:26 +0100
+Date: Thu, 18 Mar 2004 16:23:36 +0100
 
-Hi Nicolas,
+Hi Pavel,
 
-> I wanna use Microsoft wirelless IntelliMouse Explorer fr Bluetooth and the 
-> keyboard associated
+> > I think there would be a way out for this. But I am not much of a
+> > programmer. If you can give me any ideas, I can have our programmer
+> > implement the same.
+> 
+> I'am not programmer too ;-) Only some perl scripts...
 
-take a look at this HOWTO http://www.bueche.ch/comp/mx900/mx900.html
+if you talk about direct Bluetooth programming, it is all about socket
+programming. Look at the examples under utils/test/
 
 Regards
 
