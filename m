@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040313093829.3814.qmail@web41713.mail.yahoo.com>
-From: =?iso-8859-1?q?c=E9cile=20Ayr?= <tetilou2003@yahoo.fr>
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] unable to retrieve services
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200403122013.07865.cijoml@volny.cz>
+Subject: [Bluez-users] hciconfig revision
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,35 +17,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 13 Mar 2004 10:38:29 +0100 (CET)
+Date: Fri, 12 Mar 2004 20:13:07 +0100
 
-Hi,
+Hi Marcel,
 
-I have a laptop with a bluez environment and a USB
-port. I tried to connect to my laptop with a PDA
-running bluetooth. The PDA can locate my laptop but is
-unabled to retrieve the services of my laptop. I set
-the service/device class on my laptop, such as:
+why man has to specify dongle, when he has only one? :(
 
-hciconfig hci0 class 0x92010C 
+hciconfig hci0 revision...
+why not only
 
-Any idea why it doesn't work? 
+hciconfig revision
+and
+hciconfig -a revision
 
-On the other hand, I can retrieve the services of my
-PDA from my laptop without problem.
+:)
 
-Thanks for your help. 
-Cecile
-
-
-	
-
-	
-		
-Yahoo! Mail : votre e-mail personnel et gratuit qui vous suit partout ! 
-Créez votre Yahoo! Mail sur http://fr.benefits.yahoo.com/
-
-Dialoguez en direct avec vos amis grâce à Yahoo! Messenger !Téléchargez Yahoo! Messenger sur http://fr.messenger.yahoo.com
+Michal 
 
 
 -------------------------------------------------------
