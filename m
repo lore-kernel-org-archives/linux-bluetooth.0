@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] RFCOMM Device
+Subject: Re: [Bluez-users] how to get bluetooth to emulate comport?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d1f423d3050226200521a6d7a@mail.gmail.com>
-References: <d1f423d3050226200521a6d7a@mail.gmail.com>
+In-Reply-To: <20050227082859.31822.qmail@web50706.mail.yahoo.com>
+References: <20050227082859.31822.qmail@web50706.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1109578219.17256.5.camel@pegasus>
+Message-Id: <1109578129.17256.2.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Feb 2005 09:10:19 +0100
+Date: Mon, 28 Feb 2005 09:08:49 +0100
 
-Hi Anderson,
+Hi John,
 
-> I am new with Bluez  and I trying to set up a rfcomm device but the
-> /dev/rfcomm0 is not being created or does not exist.
+> I have zonet usb dongle, pm-325 sprint phone.
 > 
-> # rfcomm bind 0 aa:aa:aa:aa:aa 1 (works)
-> #rfcomm
-> rfcomm0: aa:aa:aa:aa:aa clean (is it right?)
+> hciconfig hci0 up
+> 
+> Can't open HCI socket.: Address family not
+> supported by protocol
+> 
+> I thought i installed the necessary modules?
 
-it must be "rfcomm0: aa:aa:aa:aa:aa channel 1 clean", but yes that is
-right.
-
-> but when i try to use pppd it does not work, it does not recognize the
-> /dev/rfcomm0
-
-Check if /dev/rfcomm0 exists and if not install udev or create it by
-hand.
+check what "lsmod | grep bluetooth" says.
 
 Regards
 
