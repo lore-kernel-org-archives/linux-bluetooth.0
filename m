@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Wolfgang =?iso-8859-1?q?M=FCes?= <wolfgang@iksw-muees.de>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200405291047.20701.wolfgang@iksw-muees.de>
-Subject: [Bluez-users] Problem with slow Speed of Socket CF Card
+Subject: Re: [Bluez-users] bluetooth and gps
+From: Gene Imes <ebi7@ozob.net>
+To: list-bluez <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40B67EB9.7080102@connectingyou.com.au>
+References: <40B67EB9.7080102@connectingyou.com.au>
+Content-Type: text/plain
+Message-Id: <1085799548.31067.50.camel@go2>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,32 +17,71 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 May 2004 10:47:20 +0200
+Date: Fri, 28 May 2004 21:59:08 -0500
 
-Hello,
+On Thu, 2004-05-27 at 18:50, Joseph Sirucka wrote:
+> Hi All
+> 
+> I have a bluetooth gps unit and would like to know how do I get about 
+> connecting the unit to my linux machine.
+> 
+> I can get the usb bluetooth working with
+> 
+> bfusb and hci_usb drivers with others like l2cap, bluez etc
+> 
+> I can hcitool scan the bluetooth unit.
+> 
+> what do I need to make a connection to the unit.
+> 
+> regards
+> 
+> Joseph
 
-I am using the Socket Communications CF Card Rev. G with the CSR chipset=20
-and the bcsp protocol in my Zaurus C750 with Kernel 2.4.18.
-It is working fine (thank you, guys).
+rfcomm -h shows the following:
 
-hicattach opens the card with a speed of 230 KBit/s. This is the speed=20
-the CSR chipset is initialized after reset. I am using PAN, and I get a=20
-file transfer rate of about 150 KBit/s. With other bluetooth devices=20
-(USB dongle) I get about 550-600 KBit/s.
+rfcomm bind <dev> <bdaddr> <channel>
 
-I have asked Socket Communications if the card is limited to slow=20
-baudrates, and they have answered me that this card is able to perform=20
-about 730 KBit/s under ideal conditions.
+<dev> is rfcommX where X is 0,1,2... probably 0
 
-Obviously, this is not possible with a serial UART and 230 KBit/s.
-So there must be a speed change command, and I want to use it.
+<bdaddr> is the output of your device determined by hcitool scan. In my
+case is:
+root@tr1a:~# hcitool scan
+Scanning ...
+        00:02:C7:15:7A:2F       BTGPS 157A2F
 
-Can anybody give me some usefull advice how to proceed?=20
-I am able to write/change kernel drivers, but I have no hint where to=20
-start and how to get the speed change information in the bcsp protocol.
+<channel> is 0-13 depending on your location
 
-best regards
-Wolfgang M=FCes
+So the command for me would be
+
+rfcomm bind 0 00:02:C7:15:7A:2F 1
+
+My /etc/bluetooth rfcomm.conf looks thus:
+
+rfcomm0 {
+        # Automatically bind the device at startup
+        bind yes;
+ 
+        # Bluetooth address of the device
+        #device 11:22:33:44:55:66;
+        device 00:02:C7:15:7A:2F;
+ 
+        # RFCOMM channel for the connection
+        channel 1;
+ 
+        # Description of the connection
+        comment "Example Bluetooth device";
+}
+
+So if you type 'rfcomm bind 0' your device should be connected. Then say
+perhaps you have gpsdrive. Click the 'Start GPSD' button and you should
+be connected.
+
+Good luck.
+
+Ciao,
+
+Gene
+
 
 
 -------------------------------------------------------
