@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Marco Trudel" <soapy@gmx.ch>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <27620.1100470371@www17.gmx.net>
-Content-Type: text/plain; charset="us-ascii"
-Subject: [Bluez-devel] combination keys support? [4]
+Subject: Re: [Bluez-devel] combination keys support?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4197C4FB.60905@gmx.ch>
+References: <4197C4FB.60905@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1100466308.21403.88.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,51 +18,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 14 Nov 2004 23:12:51 +0100 (MET)
+Date: Sun, 14 Nov 2004 22:05:07 +0100
 
-> your analysis of the problem is wrong.
-> Use "hcidump -x" as root and see what really happens.
+Hi Marco,
 
-here the dump starting when i enter the pin in the mobile phone:
+> I programmed a little bluetooth server and startet it on my computer.
+> I programmed a little bluetooth client and startet it on my mobile phone.
+> 
+> when i start the client and try to connect to my programmed service, i 
+> come to the pairing steps. my mobile phone then tells me "pairing and 
+> connection rejected because of security reasons".
+> 
+> searching on google for that, i found that my nokia mobile phone only 
+> works with combination keys. if the remote devices works with unit keys, 
+> the connection is refused because of security reasons.
 
------ start -----
-> HCI Event: PIN Code Request (0x16) plen 6
-  8E 08 52 ED 0E 00
-< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
-  8E 08 52 ED 0E 00 01 31 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0D 04 00 8E 08 52 ED 0E 00
-> HCI Event: Link Key Notification (0x18) plen 23
-  8E 08 52 ED 0E 00 B9 2F DD 2F 51 0C 91 E3 79 3C 53 8A C1 54
-  22 50 01
-> ACL data: handle 0x0000 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-< ACL data: handle 0x0000 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> HCI Event: Disconn Complete (0x05) plen 4
-  00 00 00 29
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  01 00 00 01 00
------ stop -----
+your analysis of the problem is wrong. Use "hcidump -x" as root and see
+what really happens.
 
-the mobile phone tells me "pairing and connection rejected for security
-reason".
-Then "disconnected from ..."
-if i enter an wrong pin, another message appears.
+Regards
 
-there are a lot of posts in forums and so on that this is a problem of
-combination keys <-> unit keys.
-but i'd really like to hear something different!
+Marcel
 
-kind regards
-Marco Trudel
 
--- 
-NEU +++ DSL Komplett von GMX +++ http://www.gmx.net/de/go/dsl
-GMX DSL-Netzanschluss + Tarif zum supergünstigen Komplett-Preis!
 
 
 -------------------------------------------------------
