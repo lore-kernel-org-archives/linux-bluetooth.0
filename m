@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <6.1.2.0.2.20050124180402.041c1eb0@pop.gmx.net>
-To: bluez-users@lists.sourceforge.net
-From: George <george.news@gmx.net>
 Subject: Re: [Bluez-users] Bluez BNEP connection close
-In-Reply-To: <1106583831.8058.52.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <6.1.2.0.2.20050124172931.041a03a0@pop.gmx.net>
 References: <6.1.2.0.2.20050124165802.04168330@luna.tlmat.unican.es>
- <1106581771.8058.49.camel@pegasus>
- <6.1.2.0.2.20050124172931.041a03a0@pop.gmx.net>
- <1106583831.8058.52.camel@pegasus>
+	 <1106581771.8058.49.camel@pegasus>
+	 <6.1.2.0.2.20050124172931.041a03a0@pop.gmx.net>
+Content-Type: text/plain
+Message-Id: <1106583831.8058.52.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,21 +20,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 24 Jan 2005 18:04:37 +0100
+Date: Mon, 24 Jan 2005 17:23:51 +0100
 
-At 17:23 24/01/2005, Marcel Holtmann wrote:
- >I actually expected to see this kind of messages. Seems like you should
- >replace the hardware. What does "hciconfig hci0 version" say about your
- >Bluetooth adapters?
+Hi George,
 
-hci0:   Type: USB
-         BD Address: 00:02:72:00:D4:29 ACL MTU: 192:8  SCO MTU: 64:8
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
-         Manufacturer: Cambridge Silicon Radio (10)
+> The fact is that I have copy pand code to automate them into my 
+> application. My application makes a bridge in order to communicate WIFI and 
+> BlueTooth.
+> 
+> The traffic is not too much.. when I run a ping -s 50000 it crashes and 
+> hangs. The result is that some packets are transmitted correctly while 
+> others doesn't.
+> The bnep0 connection disappears and then both ends are no more connected.
+> 
+> After happening all that things I have to restart everything as the sdpd 
+> and also the bluetooth devices on both ends are hanged.
+> 
+> For giving more information, one of the ends is a Sharp Zaurus 5500 and the 
+> other is a Laptop using and AnyCom usb dongle
+> 
+> By having a look at /var/log/messages I have one messge that is:
+> 
+> Kernel: NETDED WATCHDOG: bnep0: transmit timed out
+> 
+> and also in other parts
+> 
+> Jan 24 17:14:35 kernel: hci_acl_tx_to: hci0 ACL tx timeout
+> Jan 24 17:14:35 kernel: hci_acl_tx_to: hci0 killing stalled ACL connection 
+> BA:D4:09:EE:02:00
+> Jan 24 17:14:35 kernel: hci_acl_tx_to: hci0 ACL tx timeout
+> Jan 24 17:14:35 kernel: hci_acl_tx_to: hci0 killing stalled ACL connection 
+> BA:D4:09:EE:02:00
 
+I actually expected to see this kind of messages. Seems like you should
+replace the hardware. What does "hciconfig hci0 version" say about your
+Bluetooth adapters?
 
+Regards
 
-Thanks.
+Marcel
+
 
 
 
