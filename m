@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] HCI Monitoring
+Subject: Re: [Bluez-devel] messaging using bluez tools
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <BAY12-DAV9D18C724C8B6018A26075AB9A0@phx.gbl>
-References: <BAY12-DAV9D18C724C8B6018A26075AB9A0@phx.gbl>
+In-Reply-To: <cqrr8a$su8$1@sea.gmane.org>
+References: <cqrr8a$su8$1@sea.gmane.org>
 Content-Type: text/plain
-Message-Id: <1104316464.6319.27.camel@notepaq>
+Message-Id: <1104316118.6319.18.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,19 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 29 Dec 2004 11:34:24 +0100
+Date: Wed, 29 Dec 2004 11:28:38 +0100
 
-Hi Keshav,
+Hi,
 
-> How can we monitor when a HCI connection is opened and closed? 
->  
-> Which events I should look for?
+> only to take the idea: is it possible to send "Hello world" string from 
+> one box  to another (wich must be listening) only using the built-in 
+> bluez tools (hcitool, sdptool, rfcomm...), or psome code snippet is needed?
 
-look HCI_Connection_Complete and the corresponding commands and events.
- 
-> Sorry about these trivial questions and thanks for your time :-)
-
-Look at the HCI part of the Bluetooth specification.
+you can do this with "rfcomm {listen|connect} ..." and tools like cat
+and echo. Or you look at the source code of rctest.c.
 
 Regards
 
