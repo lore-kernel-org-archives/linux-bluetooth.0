@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Rainer Dorsch <rdorsch@web.de>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Setting up an hotplug connection with USB dongles
-References: <200411282132.37941.rdorsch@web.de> <200501021451.09711.rdorsch@web.de> <1104674297.8894.3.camel@pegasus>
-In-Reply-To: <1104674297.8894.3.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-15"
-Message-Id: <200501021837.34836.rdorsch@web.de>
+From: Paul Ionescu <i_p_a_u_l@yahoo.com>
+Message-ID: <pan.2005.01.02.14.10.41.509677@yahoo.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] btsco questions
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,69 +16,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 2 Jan 2005 18:37:34 +0100
+Date: Sun, 02 Jan 2005 16:10:41 +0200
 
-Am Sonntag, 2. Januar 2005 14:58 schrieb Marcel Holtmann:
-> Hi Rainer,
->
-> > > add a line with "auto bnep0" and it will bring up your interface when
-> > > it is available.
-> >
-> > From man interfaces
-> >
-> > Stanzas beginning with the word "auto" are used to identify the physical
-> > interfaces to be brought up when ifup is run with the -a option.  (This
-> > option  is  used  by  the system boot scripts.)  Physical interface names
-> > should follow the word "auto" on the same line.  There can be multiple
-> > "auto" stanzas.  ifup brings the named interfaces up in the order listed.
-> >
-> > From the ifup manpage
-> >
-> >       -a, --all
-> >               If given to ifup, affect all interfaces marked auto. 
-> > Interfaces are brought up in the order in  which  they  are  defined  in 
-> > /etc/net- work/interfaces.  If given to ifdown, affect all interfaces.
-> > Interfaces are brought down in the order in which they are currently
-> > listed in the state file.
->
-> if you use "auto bnep0" and hotplug is configured to deal also with the
-> network interface then bnep0 will be brought up at the time the kernel
-> created it. No need to run ifup/ifdown manually.
+Hi all,
 
-Hmm....do I enable that with in /etc/default/hotplug
+I am trying to play with btsco from CVS.
+I have kernel 2.6.10 and bluez-libs-2.10, bluez-utils-2.10.
+I don't have a headset device, so I am trying to connect it the other way
+around, to a NOKIA 6310i phone with support for AudioGateway and Headset
+profile.
 
-# NET_AGENT_POLICY
-# - how to manage network interfaces with ifupdown? 'all', 'auto' or 'hotplug'
-NET_AGENT_POLICY=hotplug
+btsco is connecting fine to the phone, the phone shows the headset icon
+on the screen, so it senses a headset connection, then when the phone
+rings, I can see a lot of SCO packets in hcidump, but arecord does not
+record anything.
+I tried to aplay some wav file, but it does not seem to work as I don't
+see any SCO packets in hcidump when I try it.
+I even tried to activate the loopback option in alsa mixer, in order to
+send back the same echo, but still nothing.
 
-?
+Is btsco supposed to work in this scenario ?
+
+Any thoughts ?
 
 Thanks,
-Rainer
+Paul
 
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> The SF.Net email is sponsored by: Beat the post-holiday blues
-> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
-> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
--- 
-Rainer Dorsch
-Alzentalstr. 28
-D-71083 Herrenberg
-07032-919495
-Icq: 32550367
 
 
 -------------------------------------------------------
