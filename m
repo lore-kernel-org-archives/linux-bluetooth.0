@@ -1,14 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] SBC packer done, kind of
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20041123074829.7f978ce7.henryk@ploetzli.ch>
+Message-Id: <20041123074829.7f978ce7.henryk@ploetzli.ch>
+In-Reply-To: <1101191260.26578.43.camel@pegasus>
 References: <20041123014732.3a03b10e.henryk@ploetzli.ch>
-	 <1101191260.26578.43.camel@pegasus>
-	 <20041123074829.7f978ce7.henryk@ploetzli.ch>
-Content-Type: text/plain
-Message-Id: <1101201897.26578.54.camel@pegasus>
+	<1101191260.26578.43.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="pgp-sha1";
+ boundary="Signature=_Tue__23_Nov_2004_07_48_29_+0100_33QHFpzeo+l/yHXN"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,51 +21,86 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Nov 2004 10:24:57 +0100
+Date: Tue, 23 Nov 2004 07:48:29 +0100
 
-Hi Henryk,
+--Signature=_Tue__23_Nov_2004_07_48_29_+0100_33QHFpzeo+l/yHXN
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > these are good news. So I really must code the sbcenc tool now. In
-> > what fields do I have to put the PCM stream and what other things must
-> > I set?
-> 
-> You'll have to get yourself a shiny new struct sbc_frame, fill in the
-> metadata and then put the pcm samples in the pcm_sample member. Then do
-> the regular init (only once), analyze, pack (which do the reverse of
-> their decoding counterparts).
+Moin,
 
-the sbcenc program can now read Sun/NeXT audio S16_BE AU files and it
-runs the encoder and writes the SBC frames to standard output. The tools
-sbcinfo and rcplay are modified to accept the filename "-" as reading
-from standard input. The sbcdec can't use standard input at the moment.
+Am Tue, 23 Nov 2004 07:27:40 +0100 schrieb Marcel Holtmann:
 
-However it does not work as expected, but if you accept some noise you
-will get some results. I used these commands for testing:
+> these are good news. So I really must code the sbcenc tool now. In
+> what fields do I have to put the PCM stream and what other things must
+> I set?
 
-	sbcenc file.au > file.sbc
-	sbcdec file.sbc
+You'll have to get yourself a shiny new struct sbc_frame, fill in the
+metadata and then put the pcm samples in the pcm_sample member. Then do
+the regular init (only once), analyze, pack (which do the reverse of
+their decoding counterparts).
 
-> > Actually that is the main point behind using tabs with the size of 8
-> > spaces. Code that uses too much nested structures become unreadable
-> > and you start thinking of how you can make this easier and make it
-> > looking a little bit nicer. In most cases the answer is inline
-> > functions.
-> 
-> Well yes. For most programs that's entirely true but in this special
-> case of only a few ever recurring tight loops (some of them even copied
-> literally from the spec) I don't see how littering the otherwise linear
-> functionality all over the file would make it easier to read. I'd rather
-> say the opposite was true.
+My test code looked kind of like this:
 
-Don't worry too much about it, because once we have a working decoder
-and encoder we can look over your code and optimize it. Maybe some loops
-will simply disappear then.
+struct sbc_frame frame;
+struct sbc_encoder_state estate;
 
-Regards
+frame.sampling_frequency =3D 44.1;
+frame.blocks =3D 16;
+frame.channel_mode =3D DUAL_CHANNEL;
+frame.channels =3D 2;
+frame.allocation_method =3D SNR;
+frame.subbands =3D 8;
+frame.bitpool =3D 64;
+   =20
+for(int i =3D 0; i < frame.subbands*frame.blocks; i++) {
+  frame.pcm_sample[0][i] =3D ((double)i /
+                (double)(frame.subbands*frame.blocks))* (1<<15);   =20
+  frame.pcm_sample[1][i] =3D ((double)i /
+                (double)(frame.subbands*frame.blocks))* (1<<15) * (-1);=20
+}   =20
 
-Marcel
+sbc_encoder_init(&estate, &frame);
+sbc_analyze_audio(&estate, &frame);
+framelen =3D sbc_pack_frame(stream+pos, &frame, streamlength-pos-1);
 
 
+I'm not sure to which value the pcm samples should be normalized. For
+starters I'd recommend keeping them between -2^15 and 2^15.
+
+> Actually that is the main point behind using tabs with the size of 8
+> spaces. Code that uses too much nested structures become unreadable
+> and you start thinking of how you can make this easier and make it
+> looking a little bit nicer. In most cases the answer is inline
+> functions.
+
+Well yes. For most programs that's entirely true but in this special
+case of only a few ever recurring tight loops (some of them even copied
+literally from the spec) I don't see how littering the otherwise linear
+functionality all over the file would make it easier to read. I'd rather
+say the opposite was true.
+
+Oh why, I'll do my very best ...
+
+--=20
+Henryk Pl=F6tz
+Gr=FC=DFe aus Berlin
+~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
+~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+
+--Signature=_Tue__23_Nov_2004_07_48_29_+0100_33QHFpzeo+l/yHXN
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+
+iD8DBQFBot1BIjWgKE0OA2gRApCrAKDrsxYTCK3rmk1d8LXjuDiXLmxw9wCgveWY
+WGNlOqmTct4PtRniEnOiCcs=
+=DyA0
+-----END PGP SIGNATURE-----
+
+--Signature=_Tue__23_Nov_2004_07_48_29_+0100_33QHFpzeo+l/yHXN--
 
 
 -------------------------------------------------------
