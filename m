@@ -1,9 +1,9 @@
-Return-Path: <noring@nocrew.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] D-Bus interfaces
-From: Fredrik Noring <noring@nocrew.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Fredrik Noring <noring@nocrew.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076506369.2777.88.camel@pegasus>
+In-Reply-To: <1076493798.6281.19.camel@kalkyl.roxen.com>
 References: <1076265358.2670.36.camel@pegasus>
 	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
 	 <1076267396.2670.58.camel@pegasus>
@@ -20,36 +20,74 @@ References: <1076265358.2670.36.camel@pegasus>
 	 <1076322129.5263.28.camel@kalkyl.roxen.com>
 	 <1076323138.6869.93.camel@pegasus>
 	 <1076493798.6281.19.camel@kalkyl.roxen.com>
-	 <1076506369.2777.88.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1076508315.6281.131.camel@kalkyl.roxen.com>
+Message-Id: <1076506369.2777.88.camel@pegasus>
 Mime-Version: 1.0
-Date: Wed, 11 Feb 2004 15:05:15 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 11 Feb 2004 14:32:50 +0100
 
-Marcel,
+Hi Fredrik,
 
-ons 2004-02-11 klockan 14.32 skrev Marcel Holtmann:
-> These are not needed in the D-Bus interface. The first parameter of a
-> D-Bus method will be "string device" and can be "hci0" or a BD_ADDR and
-> this is enough to identify the device and open the needed socket.
+> This looks good but many HCI functions are perhaps a bit low level? These
+> are probably OK:
+> 
+>    org.bluetooth.hci.devup
+>    org.bluetooth.hci.devdown
+>    org.bluetooth.hci.devreset
+>    org.bluetooth.hci.devinfo
+>    org.bluetooth.hci.set_pkt_type
+>    org.bluetooth.hci.set_link_policy
+>    org.bluetooth.hci.set_link_mode
+>    org.bluetooth.hci.write_local_name
+>    org.bluetooth.hci.read_local_name
+>    etc.
 
-Agreed. For configuration management, the difference in reference is 
-very important:
+we don't have to use the HCI names for it. We can choose names that fit
+a little bit more better.
 
-When using "hci0", the setting will be permanently stored and used for
-all devices that become "hci0". When using "00:00:00:00:00:00", the
-device with that address will have that setting, regardless of the
-interface (hci0, hci1 or otherwise). Configurations based on addresses
-should have higher priority than those based on interfaces.
+> But these do not appear to be suited for a DBus interface because they deal
+> with low level things like sockets:
+> 
+>    hci_open
+>    hci_close
+>    hci_recv
+>    hci_send_command
+>    hci_send_request
+>    hci_errno
+>    etc.
 
-The applications will have to be careful on how to use the references,
-unless we decide that configurations only will be stored on addresses
-regardless of the type reference used by the application.
+These are not needed in the D-Bus interface. The first parameter of a
+D-Bus method will be "string device" and can be "hci0" or a BD_ADDR and
+this is enough to identify the device and open the needed socket.
 
-> The HCI don't defines anything on PIN or link key management, but a
-> D-Bus interface should provide functions for it.
+> Do you mean an extended subset of HCI? I'm not sure I understand, please
+> explain. What will be omitted and what will be extended?
 
-Agreed.
+The HCI don't defines anything on PIN or link key management, but a
+D-Bus interface should provide functions for it.
 
-Fredrik
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
