@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Edd Dumbill <edd@usefulinc.com>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Master, Slave and Maximal Peers Questions
+From: Marcel Holtmann <marcel@holtmann.org>
+To: ag@new-media-artists.de
+Cc: Bluez Devel <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <FJENILNPNAGPJMMDOKDCMEBHDMAA.ag@new-media-artists.de>
+References: <FJENILNPNAGPJMMDOKDCMEBHDMAA.ag@new-media-artists.de>
 Content-Type: text/plain
-Message-Id: <1074424282.16573.52.camel@saag>
+Message-Id: <1074353316.2629.148.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] libtool and autoconf versions
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,23 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 18 Jan 2004 11:11:22 +0000
+Date: Sat, 17 Jan 2004 16:28:37 +0100
 
-The BlueZ packages still use libtool1.4 and autoconf2.13, which are
-outdated.
+Hi Andreas,
 
-Debian wants to remove support for libtool1.4.  The reasons for the
-dropping of libtool1.4 are here:
-http://lists.debian.org/debian-devel/2004/debian-devel-200401/msg00968.html
+> >I don't see any reason why you can't connect a third device into this
+> >piconet. Run "hcidump -w <file>" for the third connection, so we can see
+> >what happens on the HCI layer.
+> 
+> you where right, there is no problem with connecting more than two with
+> rfcomm. I just saw "device or resource busy" from rfcomm often in my logs so
+> i assumed it would be that reason but it wasnt. Now i have to find out what
+> was the reason for this. Any what would be the most obvious reasons for
+> this, if any?
 
-What do you think to the idea of updating to libtool1.5 and autoconf2.5
-(and a newer automake too)?
+what is the correct errno that would be returned? Run hcidump as I told
+you.
 
-It's not actually critical right now, as I am not likely to need to
-re-run autoconf or libtool to package BlueZ, but it seems likely that
-it's a good idea to move to more updated versions of these tools.
+Regards
 
--- Edd
+Marcel
 
 
 
