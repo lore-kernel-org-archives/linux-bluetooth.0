@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hcitool scan gives timeout on an ipaq 5500
+Subject: Re: [Bluez-users] hcidump supports real raw packets ??
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Filipe Abrantes <fla@inescporto.pt>
+To: Emmanuel Mendoza Acevedo <emma_kev@hotmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <415AF591.2040706@inescporto.pt>
-References: <47EFEB1E.7010903@inescn.pt> <1096373451.4649.3.camel@notepaq>
-	 <415AF591.2040706@inescporto.pt>
+In-Reply-To: <BAY17-F34grqouLS7h2000174d7@hotmail.com>
+References: <BAY17-F34grqouLS7h2000174d7@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1096496864.6380.16.camel@pegasus>
+Message-Id: <1096496941.6380.18.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,31 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 30 Sep 2004 00:27:45 +0200
+Date: Thu, 30 Sep 2004 00:29:01 +0200
 
-Hi Filipe,
+Hi Emmanuel,
 
-> #hcidump -x
-> HCIDump - HCI packet analyzer ver 1.5
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> 
->   (#hcitool scan - (gives timeout) )
-> 
-> < HCI Command: Inquiry(0x01|0x0001) plen 5 
-> 
->    33 8B 9E 08 0A
-> 
->   (#hciconfig -a  - (also gives timeout)
-> 
-> < HCI Command: Read Local Name(0x03|0x0014) plen 0
-> 
-> 
-> this is too cryptic for me, hope it helps you solving the problem, let 
-> me know if you find something.
+> thanks for your help, but I'd like know what do I need for 
+> capture hci packets in real time from the air (no capture local packets) 
+> with hcidump?
 
-maybe the Bluetooth support for the iPAQ 5xxx is broken. They use some
-weird Bluetooth chip and maybe you need some other settings for
-hciattach, but I don't really not what are the best.
+read and understand the Bluetooth specification first, because there are
+no HCI packets on the air.
 
 Regards
 
