@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41F94E81.90207@debiancolombia.org>
-From: "Fredy P." <digitalfredy@debiancolombia.org>
+Message-ID: <41F81D6F.3000908@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] usb trendnet
-References: <41DC8010.7050600@debiancolombia.org>
-	<1105014610.4299.28.camel@pegasus>
-In-Reply-To: <1105014610.4299.28.camel@pegasus>
-Content-Type: text/plain;
-	charset=ISO-8859-1;
-	format=flowed
+Subject: Re: [Bluez-users] bluetooth-alsa and Jabra BT800
+References: <4d3382eb6csbellon@sbellon.de>
+In-Reply-To: <4d3382eb6csbellon@sbellon.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,142 +18,244 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 27 Jan 2005 15:26:41 -0500
+Date: Wed, 26 Jan 2005 15:45:03 -0700
 
-Marcel Holtmann escribi=F3:
-> Hi Fredy,
->=20
->=20
->>I read the HW compatible list, and no is in it usb trendnet adapters, i=
-s=20
->>becouse are no tested or becouse are no soported?
->>
->>I read the user and developer list archives whit the word trendnet and =
-i=20
->>no get information.
->>
->>I neds buy a usb adapter, the trendent TBW-102UB have 1000m, buy it?
->>are any other 100m tested in linux?
->=20
->=20
-> you only know if it works if you buy it, but in general every USB
-> adapter works. However the CSR ones seem to work better than the rest,
-> but this is not a BlueZ problem.
->=20
-> After you get it working send us "hciconfig -a" and the content
-> of /proc/bus/usb/devices.
+did you put it in pairing mode (usually by holding down the power button 
+until it beeps) just before running btsco?
 
-Hi Marcel, i buy the trendent TBW-102UB bluetooth usb adapter, i can see=20
-other devices and the other devices can see the pc but y can not send or=20
-recive information (the other device is a sonyericsson movil), i read=20
-but can understand very good, where can get information abut?
-i like see bluetooth in the OSI model for understand, you can help me=20
-whit a link?
-
-tanks and sorry my bad english
-
-# hciconfig -a
-hci0:   Type: USB
-         BD Address: 00:E0:98:D1:A8:B3 ACL MTU: 192:8  SCO MTU: 64:8
-         UP RUNNING PSCAN ISCAN
-         RX bytes:99 acl:0 sco:0 events:13 errors:0
-         TX bytes:296 acl:0 sco:0 commands:12 errors:0
-         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: ACCEPT MASTER
-         Name: 'PINGU-0'
-         Class: 0x000100
-         Service Classes: Unspecified
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP=20
-Subver: 0x20d
-         Manufacturer: Cambridge Silicon Radio (10)
-################# end ################
-
-# cat /proc/bus/usb/devices
-T:  Bus=3D01 Lev=3D00 Prnt=3D00 Port=3D00 Cnt=3D00 Dev#=3D  1 Spd=3D12  M=
-xCh=3D 2
-B:  Alloc=3D 27/900 us ( 3%), #Int=3D  1, #Iso=3D  2
-D:  Ver=3D 1.10 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 MxPS=3D 8 #Cfgs=3D  1
-P:  Vendor=3D0000 ProdID=3D0000 Rev=3D 0.00
-S:  Product=3DUSB OHCI Root Hub
-S:  SerialNumber=3Dcc2f1000
-C:* #Ifs=3D 1 Cfg#=3D 1 Atr=3D40 MxPwr=3D  0mA
-I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 Driver=
-=3Dhub
-E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D   2 Ivl=3D255ms
-T:  Bus=3D01 Lev=3D01 Prnt=3D01 Port=3D00 Cnt=3D01 Dev#=3D  2 Spd=3D12  M=
-xCh=3D 0
-D:  Ver=3D 1.10 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
-P:  Vendor=3D07b8 ProdID=3Db02a Rev=3D 5.25
-S:  Product=3DBluetooth USB Adapter
-C:* #Ifs=3D 3 Cfg#=3D 1 Atr=3D80 MxPwr=3D 86mA
-I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
-E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-I:  If#=3D 2 Alt=3D 0 #EPs=3D 0 Cls=3Dfe(app. ) Sub=3D01 Prot=3D00 Driver=
-=3D(none)
-  ######################### end #########################################
-
-PD: CSR =3D Cambridge Silicon Radio ?
-
-
->=20
-> Regards
->=20
-> Marcel
->=20
->=20
->=20
->=20
-> -------------------------------------------------------
-> The SF.Net email is sponsored by: Beat the post-holiday blues
-> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
-> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->=20
-
-
---=20
-Suerte and F.S.Fv.
-
-ATT: Fredy P.
-___________________________________________________
-F.S.Fv. es acr=F3nimo de Free Software Forever
-http://www.fsf.org/philosophy/free-sw.es.html
-
-Normas b=E1sicas de comportamiento en el ciberespacio
-http://www.netiqueta.org/
+Stefan Bellon wrote:
+> Hi!
+> 
+> Today I got my Jabra BT800 and wanted to try it with bluetooth-alsa.
+> The page lists the BT200 and BT250 as working, so I suspect it should
+> be able to get the BT800 going as well.
+> 
+> However, I'm having trouble, and frankly, this is my first Bluetooth
+> headset, so my experience is not that big.
+> 
+> I followed the instruction on the bluetooth-alsa page and include the
+> output here. Hopefully somebody of you can shed some light on what I'm
+> missing.
+> 
+> The Bluetooth adapter I'm using at the PC is a AVM BlueFritz USB 2.0
+> 
+> root@roma# hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:04:0E:87:88:E9 ACL MTU: 120:20  SCO MTU: 64:0
+>         UP RUNNING PSCAN ISCAN 
+>         RX bytes:2502 acl:1 sco:0 events:120 errors:0
+>         TX bytes:1029 acl:12 sco:0 commands:66 errors:0
+>         Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+>         Link policy: RSWITCH HOLD SNIFF PARK 
+>         Link mode: ACCEPT MASTER 
+>         Name: 'roma-0'
+>         Class: 0x000100
+>         Service Classes: Unspecified
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x2005 LMP Ver: 1.1 (0x1) LMP Subver: 0x1805
+>         Manufacturer: AVM Berlin (31)
+> 
+> root@roma# hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:04:0E:87:88:E9 ACL MTU: 120:20  SCO MTU: 64:0
+>         Unknown type
+> 
+> root@roma# hcitool info 00:07:A4:21:1D:86
+> Requesting information ...
+>         BD Address:  00:07:A4:21:1D:86
+>         Device Name: Jabra BT800
+>         LMP Version: 1.2 (0x2) LMP Subversion: 0x68d
+>         Manufacturer: Cambridge Silicon Radio (10)
+>         Features: 0xfc 0xff 0x8b 0x78 0x08 0x08 0x00 0x80
+>                 <encryption> <slot offset> <timing accuracy> <role switch> 
+>                 <hold mode> <sniff mode> <park state> <RSSI> <channel quality> 
+>                 <SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log> 
+>                 <CVSD> <paging scheme> <transparent SCO> <broadcast encrypt> 
+>                 <enhanced iscan> <interlaced iscan> <interlaced pscan> 
+>                 <inquiry with RSSI> <AFH cap. slave> <AFH cap. master> 
+>                 <extended features> 
+> 
+> 
+> sbellon@roma$ btsco 00:07:A4:21:1D:86
+> Device is 1:0
+> Failed to connect to SDP server: Connection timed out
+> Assuming channel 2
+> Voice setting: 0x0060
+> Can't connect RFCOMM channel: Resource temporarily unavailable
+> 
+> The following is the hcidump for the btsco execution above:
+> 
+> root@roma# hcidump -X
+> HCIDump - HCI packet analyzer ver 1.12
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>   0000: 86 1d 21 a4 07 00 18 cc  02 00 00 00 00           ..!..........
+> 
+>>HCI Event: Command Status (0x0f) plen 4
+> 
+>   0000: 00 01 05 04                                       ....
+> 
+>>HCI Event: Link Key Request (0x17) plen 6
+> 
+>   0000: 86 1d 21 a4 07 00                                 ..!...
+> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+>   0000: 86 1d 21 a4 07 00 91 19  02 dc fc bc 09 ee 46 a3  ..!...........F.
+>   0010: 33 f2 01 d5 fc 1a                                 3.....
+> 
+>>HCI Event: Command Complete (0x0e) plen 10
+> 
+>   0000: 01 0b 04 00 86 1d 21 a4  07 00                    ......!...
+> 
+>>HCI Event: Connect Complete (0x03) plen 11
+> 
+>   0000: 00 05 00 86 1d 21 a4 07  00 01 01                 .....!.....
+> < ACL data: handle 0x0005 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0040
+> < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+>   0000: 05 00 0f 00                                       ....
+> 
+>>HCI Event: Connection Packet Type Changed (0x1d) plen 5
+> 
+>   0000: 00 05 00 18 cc                                    .....
+> 
+>>HCI Event: Command Complete (0x0e) plen 6
+> 
+>   0000: 01 0d 08 00 05 00                                 ......
+> 
+>>HCI Event: Number of Completed Packets (0x13) plen 5
+> 
+>   0000: 01 05 00 01 00                                    .....
+> < HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+> 
+>>HCI Event: Command Complete (0x0e) plen 6
+> 
+>   0000: 01 25 0c 00 60 00                                 .%..`.
+> < ACL data: handle 0x0005 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 3 scid 0x0040
+> 
+>>HCI Event: Number of Completed Packets (0x13) plen 5
+> 
+>   0000: 01 05 00 01 00                                    .....
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>   0000: 05 00 13                                          ...
+> 
+>>HCI Event: Command Status (0x0f) plen 4
+> 
+>   0000: 00 01 06 04                                       ....
+> 
+>>HCI Event: Disconn Complete (0x05) plen 4
+> 
+>   0000: 00 05 00 16                                       ....
+> 
+> 
+> sbellon@roma$ aplay -D plughw:Headset some.wav
+> Playing WAVE 'some.wav' : Unsigned 8 bit, Rate 11025 Hz, Mono
+> Aborted by signal Interrupt...
+> 
+> The following is the hcidump for the aplay execution above:
+> 
+> root@roma# hcidump -X
+> HCIDump - HCI packet analyzer ver 1.12
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> 
+>>HCI Event: Connect Request (0x04) plen 10
+> 
+>   0000: 86 1d 21 a4 07 00 0c 04  20 01                    ..!..... .
+> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+>   0000: 86 1d 21 a4 07 00 00                              ..!....
+> 
+>>HCI Event: Command Status (0x0f) plen 4
+> 
+>   0000: 00 01 09 04                                       ....
+> 
+>>HCI Event: Role Change (0x12) plen 8
+> 
+>   0000: 00 86 1d 21 a4 07 00 00                           ...!....
+> 
+>>HCI Event: Link Key Request (0x17) plen 6
+> 
+>   0000: 86 1d 21 a4 07 00                                 ..!...
+> < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+>   0000: 86 1d 21 a4 07 00 91 19  02 dc fc bc 09 ee 46 a3  ..!...........F.
+>   0010: 33 f2 01 d5 fc 1a                                 3.....
+> 
+>>HCI Event: Command Complete (0x0e) plen 10
+> 
+>   0000: 01 0b 04 00 86 1d 21 a4  07 00                    ......!...
+> 
+>>HCI Event: Connect Complete (0x03) plen 11
+> 
+>   0000: 00 06 00 86 1d 21 a4 07  00 01 01                 .....!.....
+> < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+>   0000: 06 00 0f 00                                       ....
+> 
+>>HCI Event: Connection Packet Type Changed (0x1d) plen 5
+> 
+>   0000: 00 06 00 18 cc                                    .....
+> 
+>>HCI Event: Command Complete (0x0e) plen 6
+> 
+>   0000: 01 0d 08 00 06 00                                 ......
+> < HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+>   0000: 06 00 18 cc                                       ....
+> 
+>>HCI Event: Command Status (0x0f) plen 4
+> 
+>   0000: 00 01 0f 04                                       ....
+> 
+>>HCI Event: Connection Packet Type Changed (0x1d) plen 5
+> 
+>   0000: 00 06 00 18 cc                                    .....
+> 
+> As you can see from the dmesg output, the snd-bt-sco module itself is
+> loaded:
+> 
+> snd-bt-sco revision 1.4 $
+> snd-bt-sco: snd-bt-scod thread starting
+> snd-bt-sco: playback_open
+> snd-bt-sco: prepare ok bps: 16000 size: 32768 count: 8192
+> snd-bt-sco: playback_open
+> snd-bt-sco: capture_open
+> snd-bt-sco: prepare ok bps: 16000 size: 32768 count: 512
+> snd-bt-sco: capture_prepare
+> snd-bt-sco: prepare ok bps: 16000 size: 32768 count: 512
+> snd-bt-sco: playback_open
+> snd-bt-sco: capture_open
+> snd-bt-sco: prepare ok bps: 16000 size: 32768 count: 512
+> snd-bt-sco: capture_prepare
+> snd-bt-sco: prepare ok bps: 16000 size: 32768 count: 512
+> snd-bt-sco: playback_open
+> snd-bt-sco: capture_open
+> snd-bt-sco: prepare ok bps: 16000 size: 23808 count: 11904
+> snd-bt-sco: playback_trigger 1
+> snd-bt-sco: setting playback to bspcm
+> snd-bt-sco: playback_trigger 0
+> snd-bt-sco: setting playback to NULL
+> snd-bt-sco: playback_open
+> snd-bt-sco: prepare ok bps: 16000 size: 8002 count: 2000
+> snd-bt-sco: playback_trigger 1
+> snd-bt-sco: setting playback to bspcm
+> snd-bt-sco: playback_trigger 0
+> snd-bt-sco: setting playback to NULL
+> snd-bt-sco: playback_open
+> snd-bt-sco: prepare ok bps: 16000 size: 8002 count: 2000
+> snd-bt-sco: playback_trigger 1
+> snd-bt-sco: setting playback to bspcm
+> snd-bt-sco: playback_trigger 0
+> snd-bt-sco: setting playback to NULL
+> snd-bt-sco: playback_open
+> snd-bt-sco: prepare ok bps: 16000 size: 8002 count: 2000
+> snd-bt-sco: playback_trigger 1
+> snd-bt-sco: setting playback to bspcm
+> snd-bt-sco: playback_trigger 0
+> snd-bt-sco: setting playback to NULL
+> 
+> Thanks in advance for any help.
+> 
+> Greetings,
+> Stefan.
+> 
 
 
 -------------------------------------------------------
