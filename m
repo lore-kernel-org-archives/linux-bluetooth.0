@@ -1,15 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] 2.6.8-mh2 hotkeys not working and hcidump
-	freezes laptop
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <200409281433.01986.cijoml@volny.cz>
-References: <200409281043.57935.cijoml@volny.cz>
-	 <1096373367.4649.1.camel@notepaq>  <200409281433.01986.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1096378046.4621.2.camel@notepaq>
-Mime-Version: 1.0
+Message-Id: <200409281319.i8SDJkQt011868@news01.csr.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] ipaq 1945 
+In-reply-to: <320075ff04092805251ce925e6@mail.gmail.com> 
+References: <320075ff040925153753850d92@mail.gmail.com> <1096153758.7719.12.camel@pegasus> <320075ff040926011212538dac@mail.gmail.com> <003001c4a3ba$d064fba0$8696a8c0@marcy> <320075ff0409270050bbaf228@mail.gmail.com> <1096371841.4950.5.camel@notepaq> <320075ff04092805251ce925e6@mail.gmail.com>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,35 +15,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Sep 2004 15:27:26 +0200
+Date: Tue, 28 Sep 2004 14:19:45 +0100
 
-Hi Michal,
-
-> > > I tried your latest mh patch in 2.6.9-rc2 and hotkeys stopped working. I
-> > > tried to run hcidump 1.12 to get whats happens when key is pressed and
-> > > then laptop totally freezes.
-> >
-> > that is bad. Please produce an oops for me. Is vanilla 2.6.9-rc2-bk14
-> > working as expected?
+Nigel Magnay wrote:
+> I had thought I could bridge the interfaces, but I have tried lots of
+> things like
+> brctl addbr br0
+>  brctl addif br0 eth0
+>  brctl addif br0 bnep0
 > 
-> Marcel how? When I start hcidump and press any key, kernel freezes - only 
-> press reset button helps. When not started, keyboard works, but hotkeys 
-> returns nothink.
-> When I disconnect keyboard and move mouse or dumps rfcomm data, everything 
-> works.
+> but that just leads to aggravating things like the linux box dropping
+> off the network altogether ..
 
-do you have a second machine? If yes, then use netconsole. Otherwise do
-it the old ways with a serial console cable a switching back into the
-main console before calling hcidump and make a picture of the oops. If
-there is one.
+The particular problem I had when I tried this a while ago now was that
+you need to be careful to use br0 as the interface anywhere you would
+normally use eth0 or bnep0.  So for example if you're using DHCP you
+need to run it on br0 to give the IP address to that, or packets won't
+get routed properly (the Ethernet and IP routes aren't consistent).  And
+so on.
 
-Please try 2.6.9-rc2-bk14 without my patch. If it works we may can find
-out what is wrong in -mh2.
+This may be completely irrelevant and my memory is a bit faded.
 
-Regards
+pws
 
-Marcel
 
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
