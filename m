@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Fix some bugs in hcidump.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: James Courtier-Dutton <James@superbug.demon.co.uk>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <403A1693.1060909@superbug.demon.co.uk>
-References: <40397111.7000903@superbug.demon.co.uk>
-	 <1077522140.2832.70.camel@pegasus>  <403A02FA.60008@superbug.demon.co.uk>
-	 <1077545085.13454.1.camel@pegasus>  <403A1693.1060909@superbug.demon.co.uk>
-Content-Type: text/plain
-Message-Id: <1077557957.2791.58.camel@pegasus>
-Mime-Version: 1.0
+From: Fred =?iso-8859-1?q?Sch=E4ttgen?= <Sch@ttgen.net>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Inquiry scans.
+References: <403A1ECE.6030005@superbug.demon.co.uk>
+In-Reply-To: <403A1ECE.6030005@superbug.demon.co.uk>
+Cc: James Courtier-Dutton <James@superbug.demon.co.uk>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200402231838.53701.Sch@ttgen.net>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +19,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 23 Feb 2004 18:39:17 +0100
+Date: Mon, 23 Feb 2004 18:38:53 +0100
 
-Hi James,
+On Monday 23 February 2004 16:39, James Courtier-Dutton wrote:
+> I have a Nokia 6310i mobile phone.
+> It has a bluetooth menu item that says: -
+> "Search for audio accessories"
+>
+> If I activate this on the Nokia, it finds the Bluetooth headset.
+>
+> In Bluez, in hcidump, I would expect to see these requests/responds
+> between those two devices, but I see nothing.
+>
+> If bluez never sees the Inquiry scan from the Nokia, how will bluez ever
+> be able to respond?
 
-> I have also added some extra checks so that the while loops will not go 
-> mad if there is a badly formed packet. I.E. n,n1,n2 get given bad values.
+You can't see inquiry scans with hcidump. Afaik there is no way to find out if 
+your bluetooth adapter responded to an inquiry from another device.
+The nokia probably looks a the device class - which is returned as part of an 
+inquiry result - of the bluetooth device to find out if it is a 
+headset/handsfree or not, so it can single out the headsets
+without having to use SDP (which is visible in hcidump).
+If you set the device class of your computer to 0x700408 for instance, the 
+phone should recognize your computer as a handsfree. Problem is that most 
+devices will place a headset icon next to your computers name in the device 
+list now ;)
 
-patch is applied with some cosmetical changes.
+greetings
+Fred
 
-Regards
-
-Marcel
-
-
+-- 
+Fred Schaettgen
+Sch@ttgen.net
 
 
 -------------------------------------------------------
