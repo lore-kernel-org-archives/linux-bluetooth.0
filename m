@@ -1,71 +1,43 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Bc. Michal Semler" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
+Return-Path: <mlists@tdbnetworks.org>
+Message-ID: <45811.212.183.131.161.1092733345.squirrel@sockthing.tdbnetworks.org>
+In-Reply-To: <1092726160.31651.4.camel@pegasus>
+References: <1092718810.3163.76.camel@hellontoast>
+    <1092726160.31651.4.camel@pegasus>
+Date: Tue, 17 Aug 2004 10:02:25 +0100 (BST)
 Subject: Re: [Bluez-users] BlueZ Newbie
-References: <1092718810.3163.76.camel@hellontoast> <1092726160.31651.4.camel@pegasus> <45811.212.183.131.161.1092733345.squirrel@sockthing.tdbnetworks.org>
-In-Reply-To: <45811.212.183.131.161.1092733345.squirrel@sockthing.tdbnetworks.org>
+From: mlists@tdbnetworks.org
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: "Richard Worwood" <mlists@tdbnetworks.org>,
+   "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200408171207.19760.cijoml@volny.cz>
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Aug 2004 12:07:19 +0200
+Content-Type: text/plain;charset=iso-8859-1
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi,
+Marcel,
+In a word, yes, It's a Sony Ericsson P900.
 
-I don't know this phone, but there is a little howto here:
-http://www.alfonsomartone.itb.it/pdzrho.html
+Is that a major problem?
 
-Michal
+Thanks in advance
 
-Dne =FAt 17. srpna 2004 11:02 mlists@tdbnetworks.org napsal(a):
-> Marcel,
-> In a word, yes, It's a Sony Ericsson P900.
+Richard
+
+> Hi Richard,
 >
-> Is that a major problem?
+>> Firstly apologies in advance if I ask any stupid questions but I'm a
+>> complete newbie to BlueZ and am trying to use it to enable me to dial-up
+>> to the net using gprs.
+>>
+>> Any way to the problem I've got all the way to the point that rfcomm
+>> associations happen automatically and then I try to access the device
+>> using minicom and it starts fine but doesn't appear to be completing the
+>> connection process and then drops.
 >
-> Thanks in advance
+> let me guess, this is a Symbian based mobile phone.
 >
-> Richard
+> Regards
 >
-> > Hi Richard,
-> >
-> >> Firstly apologies in advance if I ask any stupid questions but I'm a
-> >> complete newbie to BlueZ and am trying to use it to enable me to dial-=
-up
-> >> to the net using gprs.
-> >>
-> >> Any way to the problem I've got all the way to the point that rfcomm
-> >> associations happen automatically and then I try to access the device
-> >> using minicom and it starts fine but doesn't appear to be completing t=
-he
-> >> connection process and then drops.
-> >
-> > let me guess, this is a Symbian based mobile phone.
-> >
-> > Regards
-> >
-> > Marcel
-> >
-> > -------------------------------------------------------
-> > SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
-> > 100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
-> > Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
-> > http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+> Marcel
 >
 > -------------------------------------------------------
 > SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
@@ -76,14 +48,4 @@ he
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-
--------------------------------------------------------
-SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
-100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
-Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
-http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
