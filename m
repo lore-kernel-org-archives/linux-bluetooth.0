@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluetooth on iPAQ
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050328111949.9192.qmail@web52408.mail.yahoo.com>
-References: <20050328111949.9192.qmail@web52408.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1112009373.9016.16.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20050328111949.9192.qmail@web52408.mail.yahoo.com>
+From: jose <twblr@yahoo.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] bluetooth on iPAQ
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +16,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Mar 2005 13:29:33 +0200
+Date: Mon, 28 Mar 2005 03:19:49 -0800 (PST)
 
-Hi Jose,
+hi,
 
-> i use an iPAQ PocketPC, H3800 series. This does not
-> have built-in bluetooth support.
-> 
-> how do i enable bluetooth on this device.
+i use an iPAQ PocketPC, H3800 series. This does not
+have built-in bluetooth support.
 
-buy one of the sleeves (PCMCIA or CF) and get the right Bluetooth card
-for it.
+how do i enable bluetooth on this device.
 
-Regards
+rgds,
+Jose
 
-Marcel
-
-
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
