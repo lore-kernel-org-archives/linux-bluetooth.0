@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Thor Egil Skaug" <paxtonrd@hotmail.com>
+To: "'Peter Stephenson'" <pws@csr.com>, <bluez-users@lists.sourceforge.net>
 Subject: RE: [Bluez-users] HCI_switch_role
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Thor Egil Skaug <paxtonrd@hotmail.com>
-Cc: "'Peter Stephenson'" <pws@csr.com>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <000b01c4023c$a57de0c0$9349edc7@thores>
-References: <000b01c4023c$a57de0c0$9349edc7@thores>
-Content-Type: text/plain
-Message-Id: <1078447750.2762.45.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <000b01c4023c$a57de0c0$9349edc7@thores>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <7130.1078397385@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,19 +17,11 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Mar 2004 01:49:10 +0100
+Date: Thu, 4 Mar 2004 15:01:37 -0800
 
-Hi Thor,
+Is a slave allowed to switch role to master?
 
-> Is a slave allowed to switch role to master?
-
-every side can switch the role.
-
-Regards
-
-Marcel
-
-
+Thor
 
 
 -------------------------------------------------------
