@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <AFE91B59A185A5439840B43AB7919047093972@mchp997a.mch.sbs.de>
-From: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
-To: "'Bluez-devel@lists.sourceforge.net'"
-	 <Bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C4426D.5B442E80"
-Subject: [Bluez-devel] pand + socket filtering on zaurus
+Subject: Re: [Bluez-devel] Announce : BlueZ-based implemantation of JSR82
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Julien Campana <juliencampana@yahoo.fr>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1085496174.900.127.camel@fischer>
+References: <1085393268.892.40.camel@fischer>
+	 <1085487245.9779.89.camel@pegasus>  <1085489942.900.89.camel@fischer>
+	 <1085492205.9779.119.camel@pegasus>  <1085496174.900.127.camel@fischer>
+Content-Type: text/plain
+Message-Id: <1085497660.9779.139.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,126 +20,50 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 25 May 2004 17:31:32 +0200
+Date: Tue, 25 May 2004 17:07:40 +0200
 
-This message is in MIME format. Since your mail reader does not understand
-this format, some or all of this message may not be legible.
+Hi Julien,
 
-------_=_NextPart_001_01C4426D.5B442E80
-Content-Type: text/plain
+> There are main reason why I rewrote some BlueZ functions is that:
+> - Functions like "sdp_service_search_attr_req" return a list of
+> sdp_record_t. If I had to parse these sdp_record_t  in order to
+> construct the requested Java Objects, this would have been an amazing
+> amount of switch or if statement. The best solution was therefore to
+> directly send the bytes to the java implementation.
 
-Hi,
- 
-I am running bluez / bnep / pan on a zaurus; it works fine.
- 
-But thenI needed to change my kernel (zImage) to get some other software
-running: 
-I had to build in the Socket Filtering    (make menuconfig: Networking
-Options -> Socket Filtering).
-This was the only change I did to the kernel.
- 
-With the new kernel, pand has some problems: I can "pand -s" ( remote
-station does "pand -c <MAC>").
-They can ping. but when the connection is terminated ("pand -K"), no matter
-from which station,
-the zaurus gets frozen. I have to reboot the zaurus.
-Also, I cannot "pand -c <MAC>" from the zaurus side, which works fine
-without the "Socket Filtering" .
- 
-This problem occurs only on zaurus. On my desktop the Socket Filtering
-doesnt interfere with pand.
-But there, I have a completely different kernel (2.4.19) than on zaurus
-(2.4.6), with a different set of 
-kernel build-ins
-Does anybody know, whether "Socket Filtering" requires or forbids some other
-kernel build-ins, 
-in order to work with pand ?
- 
-Any comments on this are welcome. Thanks, Matthias
- 
- 
- 
- 
- 
- 
+put this problem up in a seperate thread on the mailing list and tell
+how the Java Objects have to look like. We should find a better solution
+for that.
 
-------_=_NextPart_001_01C4426D.5B442E80
-Content-Type: text/html
+> > What I also don't wanna use is somekind of "de.avetana.bluetooth" vendor
+> > extensions. If something is not possible in pure Java JSR-82, sorry not
+> > my bad ;)
+> 
+> JSR-82 provides just the minimal amount of classes. It lets the
+> programmer use "background classes" but this is transparent for the
+> end-user (I will give some example of this transparency in the future
+> how-to). These de.avetana.bluetooth.* classes are really needed to fully
+> implement all javax.bluetooth.* classes.
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=us-ascii">
-<TITLE>Nachricht</TITLE>
+You must explain this to me in detail, because I don't understand why.
+Actually I think we should avoid this.
 
-<META content="MSHTML 6.00.2800.1400" name=GENERATOR></HEAD>
-<BODY>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004>Hi,</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>I am running bluez / 
-bnep / pan on a zaurus; it works fine.</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>But thenI needed to 
-change my kernel (zImage) to get some other software running: 
-</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>I had to build in 
-the Socket Filtering&nbsp;&nbsp;&nbsp; </SPAN></FONT><FONT face=Arial 
-size=2><SPAN class=683561915-25052004>(make menuconfig: Networking Options -&gt; 
-Socket Filtering).</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>This was the only 
-change I did to the kernel.</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>With the new kernel, 
-pand has some problems: I can "pand -s" ( remote station does "pand -c 
-&lt;MAC&gt;").</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>They can ping. but 
-when the connection is terminated ("pand -K"), no matter from which 
-station,</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>the zaurus gets 
-frozen. I have to reboot the zaurus.</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>Also, I cannot "pand 
--c &lt;MAC&gt;" from the zaurus side, which works fine without the "Socket 
-Filtering" .</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>This problem occurs 
-only on zaurus. On my desktop the Socket Filtering doesnt interfere with 
-pand.</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>But there, I have a 
-completely different kernel (2.4.19) than on zaurus (2.4.6), with 
-a&nbsp;different set of </SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>kernel 
-build-ins</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004></SPAN></FONT><FONT 
-face=Arial size=2><SPAN class=683561915-25052004>Does anybody know, whether 
-"Socket Filtering" requires or <FONT face=Arial size=2><SPAN 
-class=683561915-25052004>forbids some other kernel build-ins, 
-</SPAN></FONT></SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004><FONT face=Arial 
-size=2><SPAN class=683561915-25052004>in order to work with pand 
-?</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004></SPAN></FONT>&nbsp;</DIV></SPAN></FONT>
-<DIV><FONT face=Arial size=2><SPAN class=683561915-25052004>Any comments on this 
-are welcome. </SPAN></FONT><FONT face=Arial size=2><SPAN 
-class=683561915-25052004>Thanks, Matthias</SPAN></FONT></DIV>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=Arial size=2><SPAN 
-class=683561915-25052004></SPAN></FONT>&nbsp;</DIV></BODY></HTML>
+> > The native interface should only be a wrapper. Let's talk about the
+> > stuff and put some of it back to the Bluetooth library where it should
+> > belong.
+> 
+> I would say that 90% of the native interface is today a wrapper. Only
+> the service search uses home-made-functions derived from the BlueZ code.
 
-------_=_NextPart_001_01C4426D.5B442E80--
+As said already, lets fix this in the Bluetooth library itself. I know
+that SDP itself is a horrible mess of object oriented stuff, but I think
+we will find a solution for it.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
