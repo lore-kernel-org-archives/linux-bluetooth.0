@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <418BA616.8080707@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: Matthias Thomae <bluez@thomae-privat.de>
-CC: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] News: Stereo BT Headset from BlueTake
-References: <416D8520.5060102@thomae-privat.de> <418B2B9F.7000703@xmission.com> <418B4124.8050505@thomae-privat.de>
-In-Reply-To: <418B4124.8050505@thomae-privat.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] AW: Re: Again dund
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAABJG805ofp06ZnA72MyIcZwEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAABJG805ofp06ZnA72MyIcZwEAAAAA@t-online.de>
+Content-Type: text/plain
+Message-Id: <1099664868.6919.20.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,39 +19,85 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Nov 2004 09:11:02 -0700
+Date: Fri, 05 Nov 2004 15:27:47 +0100
 
-Matthias
+Hi Peter,
 
-> I hope so too :)
-> What about your report to the snd-bt-sco mailing list:
+> during my efforts to bring up a bluetooth connection, I'm always logged in
+> as root.
 > 
->  > It comes with a dongle to get stereo audio from a non-bluetooth
->  > device. It works ok, but only consistently at short ranges (<1 meter).
->  > It drops audio randomly or if I turn my head an unfortunate way  :(
+> I checked with ps, here the result:
+> 
+> Linux-Notebook:~ # ps
+>   PID TTY          TIME CMD
+>  6340 pts/1    00:00:00 bash
+>  6348 pts/1    00:00:00 ps
+> Linux-Notebook:~ # hcid
+> Linux-Notebook:~ # ps
+>   PID TTY          TIME CMD
+>  6340 pts/1    00:00:00 bash
+>  6363 pts/1    00:00:00 ps
 
-Oh yeah. I changed two things and I think both helped it:
+reading the manual page of ps may help. Or try "ps x" ;)
 
-- turned off "auto range extender" on my 2.4Ghz cordless vtech phones
-- charged the headset and dongle through another charge cycle (The 
-headset does not have a low-power indicator... the audio just starts to 
-break up.)
+> Then I initializedb the BT-function of my Toshiba-laptop:
+> 
+> Linux-Notebook:~ # dmabt
+> Linux-Notebook:~ # ps
+>   PID TTY          TIME CMD
+>  6340 pts/1    00:00:00 bash
+>  6462 pts/1    00:00:00 ps
+> Linux-Notebook:~ # hcid
+> Linux-Notebook:~ # ps
+>   PID TTY          TIME CMD
+>  6340 pts/1    00:00:00 bash
+>  6552 pts/1    00:00:00 ps
+> 
+> The next step was to use the hcitool:
+> 
+> Linux-Notebook:~ # hcitool scan
+> Scanning ...
+>         00:0B:CE:00:01:8F       Bluetooth-Modul
+>         00:02:EE:D0:49:44       PkM 6820
+> 
+> the BT-Modul and my handy (Nokia 6820) were detected. With sdptool I tried
+> to get the available services, at first of the BT-Modul:
+> 
+> Linux-Notebook:~ # sdptool browse 00:0B:CE:00:01:8F
+> Failed to connect to SDP server on 00:0B:CE:00:01:8F: Connection refused
+> 
+> and second my handy:
+> 
+> Linux-Notebook:~ # sdptool browse 00:02:EE:D0:49:44
+> Browsing 00:02:EE:D0:49:44 ...
+> Service Name: OBEX Object Push
+> Service RecHandle: 0x10000
+> Service Class ID List:
+>   "OBEX Object Push" (0x1105)
+> Protocol Descriptor List:
+>   "L2CAP" (0x0100)
+>   "RFCOMM" (0x0003)
+>     Channel: 9
+>   "OBEX" (0x0008)
+> Language Base Attr List:
+>   code_ISO639: 0x656e
+>   encoding:    0x6a
+>   base_offset: 0x100
+> Profile Descriptor List:
+>   "OBEX Object Push" (0x1105)
+>     Version: 0x0100
+> etc........
+> 
+> At the moment I don't know how to get the daemon hcid running. I think if
+> this daemon runs, many of the problems are solved, aren't they?
 
-Now I can get about 5 meters away with good audio. I can get a little 
-over 10 meters away if I'm using my cellphone or the computer with 
-voice-quality audio. I'm not sure if the difference is that's because 
-A2DP needs so much more reliable bandwidth or because the dongle could 
-use a better antenna.
+You must run "hcidump -x" to see what is going on.
 
-BT Musicool 300 claims to get up to 20 meters in good conditions. Are 
-they using Class 1 adapters?
+Regards
 
-> Marcel seems to have something :)
-> http://www.holtmann.org/linux/bluetooth/audio.html
+Marcel
 
-nice
 
-Brad
 
 
 -------------------------------------------------------
