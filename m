@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <20050225082547.84269.qmail@web26603.mail.ukl.yahoo.com>
+From: BZ Benny <bennybbz@yahoo.fr>
 Subject: Re: [Bluez-users] trying to send data at HCI level
-From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050225082547.84269.qmail@web26603.mail.ukl.yahoo.com>
-References: <20050225082547.84269.qmail@web26603.mail.ukl.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1109322208.7872.10.camel@notepaq>
-Mime-Version: 1.0
+In-Reply-To: <1109068760.8506.13.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,32 +17,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 25 Feb 2005 10:03:27 +0100
+Date: Fri, 25 Feb 2005 09:25:47 +0100 (CET)
 
-Hi Benny,
+Hi,
 
-> I was trying to send HCI command i define all the
-> debug tools of buetooth.ko.
-> Therfore I create AF_Bluetooth socket family.
-> My data isn't received by my dongle.
-> 
-> for debuging I was searching for the command read()
-> from socket in the hci_sock.c side.
-> But I didn't find it. 
-> I think that it's hci_sock_sendmsg() wich forward my
-> HCI command to hci_usb.ko.
-> 
-> but how bluetooth.ko layer catch my HCI command?
+I was trying to send HCI command i define all the
+debug tools of buetooth.ko.
+Therfore I create AF_Bluetooth socket family.
+My data isn't received by my dongle.
 
-I have no idea what you are doing, but the HCI raw socket allows you to
-send any command you like. Look at the library source code for more
-information.
+for debuging I was searching for the command read()
+from socket in the hci_sock.c side.
+But I didn't find it. 
+I think that it's hci_sock_sendmsg() wich forward my
+HCI command to hci_usb.ko.
 
-Regards
+but how bluetooth.ko layer catch my HCI command?
 
-Marcel
+regards 
+benny
 
 
+
+
+
+
+	
+
+	
+		
+Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
+Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
