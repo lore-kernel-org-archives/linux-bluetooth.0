@@ -1,29 +1,66 @@
-Return-Path: <justin-qt-dated-1065700099.006603@affinix.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] dtl1_cs suspend bug
-Date: Wed, 24 Sep 2003 20:35:48 -0700
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Justin Karneges <justin-qt@affinix.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200309232306.30064.justin-qt@affinix.com>
 References: <200309220408.04569.justin-qt@affinix.com>
-	<200309232306.30064.justin-qt@affinix.com> <1064396202.1619.116.camel@pegasus>
-In-Reply-To: <1064396202.1619.116.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200309242035.48663.justin-qt@affinix.com>
-From: Justin Karneges <justin-qt@affinix.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+	<200309231648.12696.justin-qt@affinix.com>
+	<1064367347.1620.67.camel@pegasus>
+	<200309232306.30064.justin-qt@affinix.com>
+Content-Type: text/plain
+Message-Id: <1064396202.1619.116.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 24 Sep 2003 11:36:36 +0200
 
-On Wednesday 24 September 2003 02:36 am, Marcel Holtmann wrote:
-> Maybe you should ask Socket for the specs of the Nokia card. Last time
-> they send me a NDA which I can't accept. Now they have the Rev. G card
-> on the market and these old cards are not built anymore. Maybe they make
-> the specs public if someone asks. Put me on CC if you write to them.
+Hi Justin,
 
-I have written you privately about this.
+> So Affix goes through some sort of serial library, while Bluez writes to the 
+> UART directly?  I noticed calls like outb() in bluez, but no such calls in 
+> Affix, which probably explains some things..
 
-By the way, I have found a simpler way to break the driver.  It seems that if 
-I do 'hciconfig hci0 down', then 'hciconfig hci0 up' will hang.  This is 
-without issuing any cardctl commands.  I'm not sure if this should be 
-considered surprising.
+at the time I have looked at the code it was even worse. But in general
+they like to represent the UART as a serial interface ttyS16 or so and
+use a ldisc for the Nokia transport protocol.
 
--Justin
+> > The register/unregister should also work with BlueZ, but you must make
+> > sure that the UART is in the correct state, as I said previous.
+> 
+> Right.  I tried Affix tonight, and it does not properly function after a 
+> 'cardctl reset' either.  However, it can be solved by typing 'btctl down ; 
+> btctl up'.  This looks more like a bug in their hci side of things.  In any 
+> case, the UART gets reset to the correct state somehow and the driver works.
+> 
+> Now how to figure out what they are doing so we can have this in Bluez (minus 
+> the hci bug of course :)).
+
+Maybe you should ask Socket for the specs of the Nokia card. Last time
+they send me a NDA which I can't accept. Now they have the Rev. G card
+on the market and these old cards are not built anymore. Maybe they make
+the specs public if someone asks. Put me on CC if you write to them.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This sf.net email is sponsored by:ThinkGeek
+Welcome to geek heaven.
+http://thinkgeek.com/sf
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
