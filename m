@@ -1,11 +1,18 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Re: How to emulate slave serial ports ?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-From: Davide Rizzo <rizzo@eidosspa.it>
-Message-ID: <loom.20041110T153147-263@post.gmane.org>
-References: <4190FB84.1040000@eidosspa.it>  <1100023997.6866.16.camel@pegasus>  <loom.20041110T091344-899@post.gmane.org>  <1100078284.25879.61.camel@pegasus>  <loom.20041110T103214-10@post.gmane.org>  <1100080758.25879.66.camel@pegasus>  <loom.20041110T131444-132@post.gmane.org> <1100094365.10067.2.camel@notepaq>
+In-Reply-To: <loom.20041110T131444-132@post.gmane.org>
+References: <4190FB84.1040000@eidosspa.it>
+	 <1100023997.6866.16.camel@pegasus>
+	 <loom.20041110T091344-899@post.gmane.org>
+	 <1100078284.25879.61.camel@pegasus>
+	 <loom.20041110T103214-10@post.gmane.org>
+	 <1100080758.25879.66.camel@pegasus>
+	 <loom.20041110T131444-132@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1100094365.10067.2.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: How to emulate slave serial ports ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,44 +24,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 10 Nov 2004 14:34:46 +0000 (UTC)
+Date: Wed, 10 Nov 2004 14:46:05 +0100
 
-Marcel Holtmann <marcel <at> holtmann.org> writes:
+Hi Davide,
 
+> I solved (almost) all problems !
 > 
-> Hi Davide,
+> The correct solution is:
 > 
-> > I solved (almost) all problems !
+> hciconfig hci0 up
+> hcid
+> sdpd &
+> sdptool add SP
+> rfcomm listen /dev/rfcomm0 &
 > 
-> no it is not. This is only a workaround. Change your program to use a
-> socket descriptor instead of a TTY descriptor and handle the incoming
-> connection request and the SDP service registration by yourself.
-> 
-> > The only problem is that rfcomm exits when windows closes the connection,
-> > so I need to run it again to be ready to listen for the next connection.
-> > But this is a minor problem, I'll investigate in the rfcomm code to get the
-> > parts I need, so I'll be able also to understand if the connection is on or
-> > not.
-> 
-> As I said, it is only a workaround.
-> 
-> Regards
-> 
-> Marcel
+> ... and now the program on the target can use /dev/rfcomm0 exactly like
+> before it worked with /dev/TTYSACx !
 
-Hi Marcel,
+no it is not. This is only a workaround. Change your program to use a
+socket descriptor instead of a TTY descriptor and handle the incoming
+connection request and the SDP service registration by yourself.
 
-You're absolutely right.
-I'll use the socket interface instead of /dev/rfcomm0, it's much more flexible
-and powerful.
+> The only problem is that rfcomm exits when windows closes the connection,
+> so I need to run it again to be ready to listen for the next connection.
+> But this is a minor problem, I'll investigate in the rfcomm code to get the
+> parts I need, so I'll be able also to understand if the connection is on or
+> not.
 
-Thank you again,
+As I said, it is only a workaround.
 
-Davide
+Regards
 
-All difficult problems have a simple solution.
-That is wrong.
-(A. Einstein)
+Marcel
 
 
 
