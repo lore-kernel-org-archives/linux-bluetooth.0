@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] PAN profile of bluetooth
+Subject: Re: [Bluez-devel] Small bugfix for hstest
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Till Harbaum <harbaum@beecon.de>
-Cc: "Williams, Richard" <Richard.Williams@VITRONICS.com>,
-   blookk - <blookk@hotmail.com>, bluez-devel@lists.sf.net
-In-Reply-To: <200408301756.14723.harbaum@beecon.de>
-References: <A1F0D47583A2D711919F00600819B3A45BDCF7@goofy.vitronics.com>
-	 <200408301756.14723.harbaum@beecon.de>
+Cc: bluez-devel@lists.sf.net
+In-Reply-To: <200408301753.25934.harbaum@beecon.de>
+References: <200408301753.25934.harbaum@beecon.de>
 Content-Type: text/plain
-Message-Id: <1093882109.5620.89.camel@pegasus>
+Message-Id: <1093882030.5620.86.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,19 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 30 Aug 2004 18:08:30 +0200
+Date: Mon, 30 Aug 2004 18:07:10 +0200
 
 Hi Till,
 
-> > Did you make sure the /etc/bluetooth/pan/dev-up file is correct and present
-> > on both your devices, master and slave ? If this file isn't there, you
-> > won't get the bnep process started.
-> Are you sure? I never heard of that file, but have successfully been using 
-> bnep without even having a /etc/bluetooth/pan directory on my pc.
+> i have played around with hstest and some uart based hardware and found a 
+> problem, that only seems to happen with uart based devices:
+> 
+> A client may receive sco data packets that are bigger than the sco mtu. hstest 
+> returns packets of exactly the same size of the packets it received. If the 
+> packet received is bigger then the sco mtu, then packets bigger than sco mtu 
+> are being sent and being dropped in the kernel. As a result, no data is being 
+> sent at all. Instead multiple smaller sco packets should be sent.
+> 
+> The attached patch has to be applied to bluez-utils/test/hstest.c and fixes 
+> the problem inside hstest. It would as well be possible to make the kernel 
+> sco code detect this and fragment the payload accordingly. But imho this 
+> should be done in the application.
 
-this depends on your system. Actually on every new system that uses
-hotplug, there is no need for using dev-up. The bnep0 is like every
-other network card in your machine and hotplug takes care of it.
+I applied the patch, but there must be space between "while" and "(" to
+keep me and the coding style happy ;)
 
 Regards
 
