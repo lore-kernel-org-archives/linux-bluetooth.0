@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <40F70E09.7010300@uni-paderborn.de>
-From: Stefan Mischke <survivor@uni-paderborn.de>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] SDP service example
+Subject: RE: [Bluez-devel] RFCOMM communication gets stalled
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Williams, Richard" <Richard.Williams@VITRONICS.com>
+Cc: "Bluez-Devel (E-mail)" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <A1F0D47583A2D711919F00600819B3A45BDC76@goofy.vitronics.com>
+References: <A1F0D47583A2D711919F00600819B3A45BDC76@goofy.vitronics.com>
+Content-Type: text/plain
+Message-Id: <1089915789.4517.43.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,24 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 16 Jul 2004 01:06:49 +0200
+Date: Thu, 15 Jul 2004 20:23:09 +0200
 
-Hi!
+Hi Richard,
 
-I'm looking for a small example to show me how to write my own SDP 
-service? Particularly, I'd like to know where exactly the service 
-functions of my new service are bound to SDP. I looked into the souce 
-code, but I couldn't find it. I almost suppose SDP just provides the 
-L2CAP channel id where the new service is listening or how does it work? 
-Sorry, I'm not so much into this Linux developer thing and I have not 
-yet found any good documentation. I'm also looking for docs how this 
-Linux/Unix socket interface stuff works (preferably in German ;-). Yes, 
-I checked the manpages, but they are not quite explanatory.
+> I use the rfcomm tty interface quite successfully for sending GPS data
+> strings from a GPS receiver to an Ipaq and then to another small wrist display.
+> Why use the rfcomm socket interface instead of the TTY ? 
+> 
+> Should I consider changing my code from TTY to socket ? Its not so difficult, I just
+> wonder why you recommend one vs the other.
 
-Thanks for any help!
+the question is what is the advantage of keeping a legacy TTY if you
+already have the source code? There is no difference between a socket
+descriptor and a file descriptor, so why involve another subsystem?
 
-Kind regards
-Stefan
+Regards
+
+Marcel
+
 
 
 
