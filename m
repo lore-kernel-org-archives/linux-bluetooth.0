@@ -1,19 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] HIDP backport for 2.4
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Michael Frey <mfrey@pepper.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <76F28965-DF34-11D8-B83A-00039390D626@pepper.com>
-References: <1090054739.4558.2.camel@pegasus>
-	 <1090759952.4791.91.camel@pegasus>
-	 <9A44A69C-DF28-11D8-B83A-00039390D626@pepper.com>
-	 <1090864026.29589.1.camel@pegasus>
-	 <5F07F140-DF2E-11D8-B83A-00039390D626@pepper.com>
-	 <1090865790.29589.5.camel@pegasus>
-	 <76F28965-DF34-11D8-B83A-00039390D626@pepper.com>
-Content-Type: text/plain
-Message-Id: <1090875679.10807.1.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Message-ID: <A1F0D47583A2D711919F00600819B3A45BDCA6@goofy.vitronics.com>
+From: "Williams, Richard" <Richard.Williams@VITRONICS.com>
+To: "Bluez-Devel (E-mail)" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Bluetooth Power Modes
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,24 +16,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 26 Jul 2004 23:01:19 +0200
+Date: Mon, 26 Jul 2004 15:50:18 -0400
 
-Hi Michael,
 
-> Thanks for the help.  However I do not have sockfd_lookup()  in 
-> net/bluetooth/bnep/core.c
+Hi,
 
-it should be present in any 2.4.20 kernel.
+I'm working on an embedded system, with a USB Bluetooth dongle. This is =
+a battery operated
+system, so power consumption is very important to me.
 
-> Am I that out of date?  Is there a more recent patch I should apply?
+Does BlueZ support the Bluetooth low-power modes, such as Park and Sniff =
+?
 
-Your kernel is out of date, because I made the patch against the latest
-2.4.27-rc3. Take another kernel source and simply copy that function.
+If I have a Bluetooth dongle in my USB port, and I turn off the BlueZ =
+stack by using
+"/etc/rc.d/init.d/bluetooth stop"  which then does an "hciconfig hci0 =
+down" the Bluetooth dongle
+is not powered down. (The Blue LED inside the dongle is still blinking.) =
+Is this a function of
+the Bluetooth stack or is this a USB responsibility ?
 
-Regards
+thanks,
 
-Marcel
+Rich
 
+
+Richard B. Williams
+Vitronics, Inc.
+An MTC Technologies Company
+3 Corbett Way
+Eatontown, NJ 07724-2262
+732-389-0244 x29
+Richard.Williams@vitronics.com
 
 
 
