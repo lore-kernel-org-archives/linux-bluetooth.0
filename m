@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42145EFC.5040107@avantwave.com>
-From: mike <mikelee@avantwave.com>
-MIME-Version: 1.0
+From: Alain Volmat <avolmat@src.ricoh.co.jp>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] rfcomm question 3
-References: <20050217053715.12789.qmail@web60907.mail.yahoo.com>
+Message-ID: <20050217062800.GJ20495@snoopy.src.ricoh.co.jp>
+References: <1107626911.6921.179.camel@pegasus> <20050217053715.12789.qmail@web60907.mail.yahoo.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20050217053715.12789.qmail@web60907.mail.yahoo.com>
-Content-Type: text/plain; charset=Big5
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,14 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Feb 2005 17:08:12 +0800
+Date: Thu, 17 Feb 2005 15:28:00 +0900
 
-Dear Cheung
+Hi Michael,
 
-Please take a look on bluez-util/tools/sdptool.c. It should help a lot.
+> I wish to know that is there any guideline or even the 
+> source code for sdp programming? 
 
-best regard
-Mike,Lee
+looking at the source of sdptool might help.
+
+Sincerely,
+
+Alain
 
 
 -------------------------------------------------------
