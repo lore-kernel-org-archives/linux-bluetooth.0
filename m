@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] l2cap retransmission
+Subject: Re: [Bluez-users] passive inquiry
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de4657604121705486b925ee0@mail.gmail.com>
-References: <2de4657604121705486b925ee0@mail.gmail.com>
+In-Reply-To: <20041217141809.62713.qmail@web40605.mail.yahoo.com>
+References: <20041217141809.62713.qmail@web40605.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1103293614.28046.99.camel@pegasus>
+Message-Id: <1103293492.28046.97.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,24 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Dec 2004 15:26:54 +0100
+Date: Fri, 17 Dec 2004 15:24:52 +0100
 
-Hi Manjunath,
+Hi Andrea,
 
-> in l2test suppose a data mismatch or error occurs, are the packets
-> retransmitted???? if yes, can we watch the packet retransmission in
-> hcidump......
+> i want to know if it is possible to make a "passive
+> inquiry", i explain better, a device A do an inquiry
+> no find their neighbours, it is possible for a device
+> B (in the reachability field) to know that was
+> inquiried by device A? The applican can receive an
+> event each time the device is inquiried?
 
-use the source, Luke ;)
-
-The L2CAP layer is reliable and so there can't be an error. But if there
-is a retransmission you will see it with hcidump.
-
-> i have been able to see some data and sequence mismatch packets  and
-> the connection was not brought down....so i assume that retransmission
-> must have taken place.....
-
-You know that l2test is a test program, do you?
+I am going to feel stupid. The answer is no (as before).
 
 Regards
 
