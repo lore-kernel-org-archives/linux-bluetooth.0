@@ -1,57 +1,42 @@
-Return-Path: <tdwan@MIT.EDU>
-Message-ID: <1082563268.40869ac41cfc3@webmail.mit.edu>
-Date: Wed, 21 Apr 2004 12:01:08 -0400
-From: Tehyih D Wan <tdwan@MIT.EDU>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] installing bluez-hciemu-1.0 on Debian--GLib not	found
-References: <1081889721.407c53b90c5d4@webmail.mit.edu> <1082161011.4489.30.camel@pegasus>
-In-Reply-To: <1082161011.4489.30.camel@pegasus>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <40869C77.4030103@deis.unibo.it>
+From: Brunelli Davide <dbrunelli@deis.unibo.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-List-ID: <bluez-users.lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] Power control
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Wed, 21 Apr 2004 18:08:23 +0200
 
-Hi Marcel,
 
-I looked in hciemu.c and the only reference I found to Glib was the #include
-<glib.h> line.  Should I change this to say glib-2.0?  Or is there another
-source file I should look at?
+Hi,
 
-I did get the emulator installed (at least, I no longer get configuration
-errors) by installing the glib1.2-dev library.  However, I'm not able to
-emulate any devices.  Typing "hciemu localhost:11" gives no errors, but when I
-try "hciconfig hci11 up" I get a message that there is no such device.  I run
-/etc/init.d/bluetooth start before everything but that does not seem to make a
-difference.  Suggestions on what log files or messages I can look for to see
-what is wrong?
+how can I set power transmission in bluez?
 
-Thanks,
-Debbie
+Thanks
 
-Quoting Marcel Holtmann <marcel@holtmann.org>:
 
-> Hi Debbie,
-> 
-> > I'm trying to install bluez-hciemu on Debian, and getting the error
-> "checking
-> > for glib-config...not found" when I run the ./configure script.
-> > 
-> > I've installed libglib2.0, libglib2.0-dev, libglib2.0-data, and
-> libglib2.0-dbg,
-> > but I still get the same error when running the ./configure script.
-> > 
-> > There was a thread about this same problem back in 2003 but the only
-> suggestion
-> > seemed to be to try installing the -dev packages for Glib.  Any ideas on
-> what
-> > else I might try?
-> 
-> change the source of hciemu to use Glib 2.x (and send us a patch) or
-> install the development packages of Glib 1.4.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
+
+
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
