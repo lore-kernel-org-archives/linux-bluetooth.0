@@ -4,8 +4,8 @@ From: "Daryl Van Vorst" <daryl@wideray.com>
 To: "'Max Krasnyansky'" <maxk@qualcomm.com>
 Cc: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Qualification Testing
-Date: Fri, 9 May 2003 16:40:33 -0700
-Message-ID: <000801c31684$627d9f80$1a01010a@baked>
+Date: Fri, 9 May 2003 16:16:13 -0700
+Message-ID: <000101c31680$fc777ce0$1a01010a@baked>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 In-Reply-To: <1052520660.10456.220.camel@localhost.localdomain>
@@ -20,14 +20,10 @@ Max,
 > that we don't really know which channel should be closed=20
 > (i.e. which app should be notified).
 
-Here's Cetecom's response to your comment:
+Interesting point.
 
-"Good point ! I agree, in a messed up remote L2CAP stack, CID could be wron=
-g
-as well if length is wrong. But I think it is a good approach to check
-first, if that CID exists and if yes, notify the app about that channel."
-
-So how about we do this:  As above, if it exists then we close it. If not,
-we log an error.
+To pass qualification it's easy enough for us to just close the channel. Bu=
+t
+I agree, it's risky. I'll pass your comment along.
 
 -Daryl.
