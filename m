@@ -1,56 +1,48 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <SRS0+19518ea8d5ecdcecdd27+262+infradead.org+dwmw2@pentafluge-143843.srs.infradead.org>
 Subject: Re: [Bluez-devel] autoconf breaks portability. Film at 11.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Woodhouse <dwmw2@infradead.org>
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1084369122.4426.106.camel@hades.cambridge.redhat.com>
+In-Reply-To: <1084368666.25099.38.camel@pegasus>
 References: <1084268833.11301.0.camel@hades.cambridge.redhat.com>
 	 <1084368666.25099.38.camel@pegasus>
-	 <1084369122.4426.106.camel@hades.cambridge.redhat.com>
 Content-Type: text/plain
-Message-Id: <1084369703.25099.56.camel@pegasus>
+Message-Id: <1084369122.4426.106.camel@hades.cambridge.redhat.com>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 May 2004 15:48:23 +0200
+Date: Wed, 12 May 2004 14:38:42 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi David,
-
-> > I heard of that problem, but I can't reproduce it. If you call
-> > "./bootstrap" every that is necessary should be created.
+On Wed, 2004-05-12 at 15:31 +0200, Marcel Holtmann wrote:
+> Hi David,
 > 
-> Still no substitute for proper makefiles. Do we _really_ need the system
-> to check for itself how to build Fortran shared libraries? Yes, that's
-> one of the things it does.
+> > I cannot build libs2. The autoconf stuff is broken. The last thing it
+> > says is this:
+> > 
+> > configure.in:19: required file `./ltmain.sh' not found
+> > 
+> > Please can we ditch this crap and use sane makefiles instead?
+> 
+> I heard of that problem, but I can't reproduce it. If you call
+> "./bootstrap" every that is necessary should be created.
 
-if you can tell me how to disable C++ and Fortran checking I am glad to
-include it ;)
+Still no substitute for proper makefiles. Do we _really_ need the system
+to check for itself how to build Fortran shared libraries? Yes, that's
+one of the things it does.
 
-> Btw, swave() in hciattach still uses 10 characters of a 9-char array. 
+Btw, swave() in hciattach still uses 10 characters of a 9-char array. 
 
-Fixed in CVS now.
+--- bluez-utils-2.7/tools/hciattach.c.orig	2004-05-11 23:08:57.668856200 +0100
++++ bluez-utils-2.7/tools/hciattach.c	2004-05-11 23:11:43.626626784 +0100
+@@ -640,7 +640,7 @@
+ static int swave(int fd, struct uart_t *u, struct termios *ti)
+ {
+ 	struct timespec tm = {0, 500000};
+-	char cmd[9], rsp[100];
++	char cmd[10], rsp[100];
+ 	int r;
+ 
+ 	// Silicon Wave set baud rate command
 
-Regards
 
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by Sleepycat Software
-Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to deliver
-higher performing products faster, at low TCO.
-http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+dwmw2
