@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Edd Dumbill <edd@usefulinc.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1100267525.8785.39.camel@saag>
+In-Reply-To: <1100261630.12168.71.camel@pegasus>
 References: <1100260673.8785.20.camel@saag>
-	 <1100261630.12168.71.camel@pegasus>  <1100267525.8785.39.camel@saag>
-Message-Id: <1100268649.8785.43.camel@saag>
+	 <1100261630.12168.71.camel@pegasus>
+Message-Id: <1100267525.8785.39.camel@saag>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] Debian testing required: bcm203x firmware
 Content-Type: text/plain
@@ -19,21 +19,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 12 Nov 2004 14:10:49 +0000
+Date: Fri, 12 Nov 2004 13:52:05 +0000
 
-On Fri, 2004-11-12 at 13:52 +0000, Edd Dumbill wrote:
-> On Fri, 2004-11-12 at 13:13 +0100, Marcel Holtmann wrote:
-> > the firmware files are in the wrong place. You are using the old
-> > directory. They must be under /lib/firmware/.
+On Fri, 2004-11-12 at 13:13 +0100, Marcel Holtmann wrote:
+> the firmware files are in the wrong place. You are using the old
+> directory. They must be under /lib/firmware/.
 
-OK, I renamed it to bluez-firmware and changed the location back
-to /lib/firmware.  bluez-utils-2.10-4 also updated to reference the
-right firmware package name.
+Ah yes, I see that now.
 
-Debian users: please re-test!
+I still tend to think it'd be better to have everything
+under /usr/lib/hotplug/firmware, but I understand your reasons, so I'll
+change this back.
+
+> Actually I would prefer to have bluez-bcm203x and bluez-firmware,
+> because I try to get the AVM and 3Com firmware also into this package.
+> This also avoids that people install bluez-bcm203x for their 2.6 kernel
+> even if they don't need it. The naming leads to that.
+
+OK, I didn't know you planned other firmwares.  I have no problem with
+doing that rename.
+
+> And btw what does it take to get a virtual packages called bluez that
+> installs all the needed BlueZ packages?
+
+I can do that too.  Should it include the bcm203x firmware loader or
+not?
 
 -- Edd
-
 
 
 
