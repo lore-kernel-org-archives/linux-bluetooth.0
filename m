@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] can't establish a connection
-From: ben4fun <ben_4_fun@freenet.de>
-To: bluez-users mailing list <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1091810383.4570.14.camel@localhost>
-References: <1091742606.6143.17.camel@localhost>
-	 <1091747064.6143.25.camel@localhost> <1091748133.20839.63.camel@pegasus>
-	 <200408060216.05030.cijoml@volny.cz>  <1091810383.4570.14.camel@localhost>
+Subject: Re: [Bluez-users] BlueZ Newbie
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Richard Worwood <mlists@tdbnetworks.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1092718810.3163.76.camel@hellontoast>
+References: <1092718810.3163.76.camel@hellontoast>
 Content-Type: text/plain
-Message-Id: <1092727197.12606.1.camel@localhost>
+Message-Id: <1092726160.31651.4.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,50 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Aug 2004 09:20:00 +0200
+Date: Tue, 17 Aug 2004 09:02:40 +0200
 
-Hi,
+Hi Richard,
 
-I still cannot use my broadcom bluetooth dongle. It doesn't seem to be a
-usb relevant problem. (as far as I know, cause I'm a newbie).
+> Firstly apologies in advance if I ask any stupid questions but I'm a
+> complete newbie to BlueZ and am trying to use it to enable me to dial-up
+> to the net using gprs.
+> 
+> Any way to the problem I've got all the way to the point that rfcomm
+> associations happen automatically and then I try to access the device
+> using minicom and it starts fine but doesn't appear to be completing the
+> connection process and then drops.
 
-This is what I get when I plug my dongle.
+let me guess, this is a Symbian based mobile phone.
 
-tail -f /var/log/messages | grep usb
+Regards
 
-Aug 16 11:17:25 localhost kernel: usb 1-1: new full speed USB device
-using address 10
-Aug 16 11:17:27 localhost kernel: usb 1-1.1: new full speed USB device
-using address 11
-Aug 16 11:17:28 localhost kernel: hci_usb_isoc_rx_submit: hci0 isoc rx
-submit failed urb c1cb1014 err -90
-Aug 16 11:17:28 localhost kernel: hci_usb_isoc_rx_submit: hci0 isoc rx
-submit failed urb c1cb1014 err -90
-Aug 16 11:17:30 localhost kernel: usb 1-1.2: new full speed USB device
-using address 12
-Aug 16 11:17:31 localhost kernel: input: USB HID v1.11 Keyboard
-[0a5c:3502] on usb-0000:00:07.2-1.2
-Aug 16 11:17:32 localhost kernel: usb 1-1.3: new full speed USB device
-using address 13
-Aug 16 11:17:33 localhost kernel: input: USB HID v1.11 Mouse [0a5c:3503]
-on usb-0000:00:07.2-1.3
-
-
-lsusb
-Bus 002 Device 001: ID 0000:0000
-Bus 001 Device 013: ID 0a5c:3503 Broadcom Corp.
-Bus 001 Device 012: ID 0a5c:3502 Broadcom Corp.
-Bus 001 Device 011: ID 0a5c:200a Broadcom Corp.
-Bus 001 Device 010: ID 0a5c:3535 Broadcom Corp.
-Bus 001 Device 001: ID 0000:0000
-
-I read your article Marcel Broadcom devices with bluetooth support but
-the command HCI_Reset, returned an error. Do you have a clue?
-
-Regards,
-
-Ben
-
+Marcel
 
 
 
