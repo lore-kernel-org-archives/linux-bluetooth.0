@@ -1,52 +1,57 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41470C59.2050909@uni-paderborn.de>
+Return-Path: <survivor@uni-paderborn.de>
+Message-ID: <4146FD1E.9090100@uni-paderborn.de>
+Date: Tue, 14 Sep 2004 16:15:58 +0200
 From: Stefan Mischke <survivor@uni-paderborn.de>
 MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] L2CAP: One failing connection hurts others?
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 14 Sep 2004 17:20:57 +0200
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] sdp_search and l2cap concurrently
+References: <41430846.4010006@uni-paderborn.de> <1094997749.5695.13.camel@pegasus>
+In-Reply-To: <1094997749.5695.13.camel@pegasus>
+Content-Type: text/html; charset=us-ascii
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hello!
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Please forget this one. My fault. Sorry!<br>
+<br>
+Marcel Holtmann schrieb:<br>
+<blockquote cite="mid1094997749.5695.13.camel@pegasus" type="cite">
+  <pre wrap="">Hi Stefan,
 
-I'm observing the following issue: I have 3 BT devices. 2 in listening 
-state, the 3rd is connecting to both of them repeatingly via L2CAP 
-(polling some data). If one of the listening devices is almost of the 
-range and makes connection attempts fail, this also causes the 
-connection attempts to the other device (which is good in range) to fail 
-with errno 16 "Device or ressource busy". The (almost) out of range 
-device fails as expected with errno 110 "Connection timed out" (since I 
-set a timeout) or 112 "Host is down".
-
-Now my question: Is there a way to circumvent this errno 16, so that I 
-can further connect to in range devices even if one device is getting 
-out of range and thus producing errors? What makes L2CAP failing with 
-errno 16? How can I prevent it?
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">I've written a small library which uses the JNI to bring BlueZ to
+Java. Upon that, I'm writing a small "Location Aware
+Web-Service"-Demo. So my ClientApp has a DiscoveryThread which does
+non-cached inquiry and sdp_search() all the time, and an UpdateThread
+which uses the DiscoveryInfo to connect to the servers, measure RSSI
+and LQ and transmit the websites via L2CAP. Everything works fine
+while all devices are good in range, but if one device is at the edge
+of the range, sdp_search() blocks the DiscoveryThread and also seems
+to cripple/block the UpdateThread. I don't know why. I have seen that
+there is a hard coded 20s timeout in sdp_read_resp(). Is there a way
+to decrease this timeout or to make it a settable parameter in future
+versions? Anyway, sdp should not cripple l2cap, shold it? Any
+suggestions? Thanks in advance!
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+what do you mean by cripple L2CAP and use it concurrently. Explain in
+more detail what your program is really doing and check how many low
+level HCI connections are opened at the same time.
 
 Regards
-Stefan
 
-P.S.: Funnily enough, 110 and 112 are the telephone numbers for police 
-and fire department in Germany. I wonder if there's any connection. :)
+Marcel
 
 
-
--------------------------------------------------------
-This SF.Net email is sponsored by: thawte's Crypto Challenge Vl
-Crack the code and win a Sony DCRHC40 MiniDV Digital Handycam
-Camcorder. More prizes in the weekly Lunch Hour Challenge.
-Sign up NOW http://ad.doubleclick.net/clk;10740251;10262165;m
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+  </pre>
+</blockquote>
+</body>
+</html>
