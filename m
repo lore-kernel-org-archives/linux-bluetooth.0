@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de4657604122303546f813ecf@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Anybody using Socket CF Bluetooth version F on
+	Zaurus
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041222161314.65249.qmail@web11610.mail.yahoo.com>
+References: <20041222161314.65249.qmail@web11610.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1103802134.20258.69.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] get remote bt address
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +19,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Dec 2004 17:24:03 +0530
+Date: Thu, 23 Dec 2004 12:42:14 +0100
 
-Hi marcel,
-I am using l2cap sockets. On the receiving side, i want to find out
-the remote (sender's) bluetooth address. i do not have the dev_id or
-handle of the sender which has already established a connection. I
-want to get it in my c code, not using hcitool con or other means.
-I am trying getpeername, but it doesn't seem to work. Hope you can
-suggest something.
+Hi Bashkar,
 
-Thanx,
-Regards,
-Manjunath
+> Has anyone gotten this card (Socket CF Bluetooth, version F) to work on
+> a Zaurus. If so, please post what ROM, kernel version, and Bluez or
+> Affix  packages you are using. My card is detected by PCMCIA, but the
+> dtl1_cs modules doesn't see it. So I can see it in "cardctl ident", but
+> no driver is loaded, and hciconfig doesn't see it.
+
+check /etc/pcmcia/bluetooth.conf for the correct entry. Post the output
+of dump_cis of your card.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
