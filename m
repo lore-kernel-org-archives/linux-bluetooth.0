@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4100F85D.5080200@india.hp.com>
-From: Swarup Mohalik <mohalik@india.hp.com>
-Reply-To: mohalik@india.hp.com
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-References: <200401302209.52396.raydar@nwlink.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] rfcomm
+Subject: Re: [Bluez-users] ISSC USB Dongle does not work with current bluez?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andreas Krause <Andreas.Krause@web.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200407231251.27478.Andreas.Krause@web.de>
+References: <200407222124.44032.Andreas.Krause@web.de>
+	 <200407231230.50970.Andreas.Krause@web.de>
+	 <1090579307.4791.12.camel@pegasus>
+	 <200407231251.27478.Andreas.Krause@web.de>
+Content-Type: text/plain
+Message-Id: <1090579838.4791.20.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,25 +21,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jul 2004 17:07:01 +0530
+Date: Fri, 23 Jul 2004 12:50:38 +0200
 
-I have bluez with bluez-utils-2.7 on two RH 8.0 systems (lx1 and lx2).
+Hi Andreas,
 
-When I start rctest -r on lx1 without starting rctest -s on lx2, lx2 hangs
-and I have to switch it off and on to restart. This happens EVERY TIME
-I try this.
+> > > And here's the dump for "hcitool inq":
+> > > < HCI Command: Inquiry (0x01|0x0001) plen 5
+> > >   33 8B 9E 08 64
+> > > > HCI Event: Command Status (0x0f) plen 4
+> > >   00 01 01 04
+> > 
+> > I miss the inquiry complete event.
+> 
+> There's no other output. 'hcitool scan' terminates with "Inquiry failed: 
+> Connection timed out". No other events shown by hcidump. Sorry.
 
-This does not happen when I run l2test in any way. Does it prove that
-there is a problem with RFCOMM? I have not seen this problem in
-the mailing list. If I have missed it, please inform.
+very nice :(
 
-I have not tried the rfcomm transfer the other way because I share lx1
-with others.
+Another buggy Bluetooth chip with a stupid link manager. Is it really so
+hard to get a correct HCI implementation before manufacturing end-user
+products?
 
-Thanks in anticipation,
-Swarup
+Regards
 
-
+Marcel
 
 
 
