@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problem with compiling Bluez-Package version  1.2
+Subject: Re: [Bluez-users] BlueZ error in cc,cc,dc sequence
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ashok <ashokg@iap-online.net>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1081418089.5046.7.camel@ashokg>
-References: <1081418089.5046.7.camel@ashokg>
+In-Reply-To: <200404162339.01392.cijoml@volny.cz>
+References: <200404162339.01392.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1082159784.4489.10.camel@pegasus>
+Message-Id: <1082159344.4489.1.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,26 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Apr 2004 01:56:24 +0200
+Date: Sat, 17 Apr 2004 01:49:04 +0200
 
-Hi Ashok,
+Hi Michal,
 
->         I have a problem in compiling the bluez source code and
-> installing it. Can any body please tell me how to do the compilation and
-> installation of the bluez module.
+> notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
+> notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
+> Can't create connection: Input/output error
 
-use a fairly new Linux kernel with Bluetooth support enabled and run
+you can't have to ACL links to the same remote device.
 
-	./configure && make && make install
+> notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
+> Can't create connection: Input/output error
+> notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
+> Can't create connection: Input/output error
+> notas:/etc/hotplug# hcitool dc 00:0A:D9:FC:EC:51
+> Not connected.
+> notas:/etc/hotplug# hcitool dc 00:0A:D9:FC:EC:51
+> Not connected.
+> notas:/etc/hotplug# hcitool cc 00:0A:D9:FC:EC:51
+> Can't create connection: Input/output error
+> notas:/etc/hotplug# hcitool dc 00:0A:D9:FC:EC:51
+> Not connected.
+> 
+> But device is connected
 
-to compile, build and install the userspace packages from the BlueZ
-download page.
-
-> 	It will be helpful if some one would help me to give their valuable
-> suggestions to port bluez to a different operating system
-
-A different operation system than Linux? Actually it would be better to
-start the Bluetooth stack from scratch ;)
+Check with "hcitool con" every time, because this is what the kernel
+sees and "hcitool dc" only sends the raw HCI_Disconnect command.
 
 Regards
 
