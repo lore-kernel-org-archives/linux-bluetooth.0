@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] USING PAN: PANU(desktop1)
-	->NAP(desktop2)->internet
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050203182345.4839.qmail@web26409.mail.ukl.yahoo.com>
-References: <20050203182345.4839.qmail@web26409.mail.ukl.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1107456281.6823.1.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20050203182345.4839.qmail@web26409.mail.ukl.yahoo.com>
+From: benbouzid imad <imad_benb@yahoo.fr>
+Subject: Re: [Bluez-users] USING PAN: PANU(desktop1) ->NAP(desktop2)->internet
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1107451291.11944.96.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,44 +17,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 03 Feb 2005 19:44:41 +0100
+Date: Thu, 3 Feb 2005 19:23:45 +0100 (CET)
 
-Hi,
+Hi, 
+>>then check with sdptool what is running on your NAP
+machine.
+all is funny. 
+I did 
+#sdptool add NAP
+and I was able to find it and to connect to it.
+but if it's the sdptool which sets the services, what
+does it mean --role NAP in thes line :
+# pand --listen --role NAP
 
-> machine.
-> all is funny. 
-> I did 
-> #sdptool add NAP
-> and I was able to find it and to connect to it.
-> but if it's the sdptool which sets the services, what
-> does it mean --role NAP in thes line :
-> # pand --listen --role NAP
+and, other thing, annother computer which is in
+windows XP needs a PIN identifier to connect itself to
+my NAP.
+where I can find this PIN whereas the PANU in linux
+connected successfuly to my NAP without asking for any
+PIN.
+In windows I tried 0000 and and without any number but
+it did't connect.
 
-a decent version of pand can set the service entry by itself. I meant
-what you see with sdptool if you execute it on your client and request
-the services on the master.
+regards, 
 
-> and, other thing, annother computer which is in
-> windows XP needs a PIN identifier to connect itself to
-> my NAP.
-> where I can find this PIN whereas the PANU in linux
-> connected successfuly to my NAP without asking for any
-> PIN.
-> In windows I tried 0000 and and without any number but
-> it did't connect.
-
-Look at /etc/bluetooth/pin for incoming connection.
-
-> ps:Marcel you are the best i read a lot of mail by
-> you. and sincerly, I admire you.
-
-Thanks.
-
-Regards
-
-Marcel
+ps:Marcel you are the best i read a lot of mail by
+you. and sincerly, I admire you.
 
 
+	
+
+	
+		
+Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
+Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
