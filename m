@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <41A11275.1090108@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] BlueZ and the ALSA support
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41A11275.1090108@dark-reality.de>
-References: <1100995285.7250.17.camel@pegasus>
-	 <41A027BD.5020401@xmission.com> <1101057242.7250.34.camel@pegasus>
-	 <41A0D34C.8070400@dark-reality.de> <1101061573.7250.68.camel@pegasus>
-	 <41A0F6F4.6070707@dark-reality.de> <1101069548.7250.77.camel@pegasus>
-	 <41A11275.1090108@dark-reality.de>
-Content-Type: text/plain
-Message-Id: <1101077143.7250.83.camel@pegasus>
-Mime-Version: 1.0
+References: <1100995285.7250.17.camel@pegasus>	 <41A027BD.5020401@xmission.com> <1101057242.7250.34.camel@pegasus>	 <41A0D34C.8070400@dark-reality.de> <1101061573.7250.68.camel@pegasus>	 <41A0F6F4.6070707@dark-reality.de> <1101069548.7250.77.camel@pegasus>
+In-Reply-To: <1101069548.7250.77.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,27 +18,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 Nov 2004 23:45:43 +0100
+Date: Sun, 21 Nov 2004 23:11:01 +0100
 
-Hi Lars,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> | To be honest, I don't know. This ISOC stuff is still a mystery to me and
-> | so far I don't know of any Linux driver that is using the ISOC transfers
-> | and have to change the alternate setting at the same time. Selecting it
-> | at probe() time is very easy.
-
-> Maybe we simply have to try what happens *shudder*... any ideas whom we
-> could ask for more information? linux usb devlist?
-
-when you try, expect kernel freezes or crashes. The only place to ask is
-the Linux USB developer mailing list, but I think we should first clean
-up our URB management mess.
-
-Regards
-
-Marcel
+Marcel Holtmann wrote:
+|>don't you think it should be possible to
+|>a) block the submit of new urbs when a change notify has arrived
+|>b) queue until the queue is empty
+|>c) change the endpoint setting and release the block
+|>
+|>I don't know to which bad runs or locks this could lead...
+|
+|
+| To be honest, I don't know. This ISOC stuff is still a mystery to me and
+| so far I don't know of any Linux driver that is using the ISOC transfers
+| and have to change the alternate setting at the same time. Selecting it
+| at probe() time is very easy.
 
 
+Maybe we simply have to try what happens *shudder*... any ideas whom we
+could ask for more information? linux usb devlist?
+
+cu,
+~  Lars
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFBoRJ1QWC6DTWkDAoRAnonAKCur76BoMJjdiW1C1Hr4+1UNXStgQCeNQR9
++PjiFwiOMa8LrOTjDE0/xMw=
+=f1x7
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
