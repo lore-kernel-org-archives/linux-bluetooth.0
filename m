@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Elimar Riesebieter <riesebie@lxtec.de>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-Message-ID: <20040409153508.GA2123@aragorn.home.lxtec.de>
+From: Gregoire Favre <Gregoire.Favre@freesurf.ch>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] No more bluez.o in 2.6?
+Message-ID: <20040409124008.GA29582@magma.epfl.ch>
+References: <20040407172325.GC9593@magma.epfl.ch> <20040407214322.GA14396@magma.epfl.ch> <1081417632.2970.0.camel@pegasus> <20040408150029.GA5539@magma.epfl.ch>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="HcAYCG3uE/tztfnV"
-Subject: [Bluez-users] hid2hci
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20040408150029.GA5539@magma.epfl.ch>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,98 +17,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 9 Apr 2004 17:35:08 +0200
+Date: Fri, 9 Apr 2004 14:40:08 +0200
 
+On Thu, Apr 08, 2004 at 05:00:29PM +0200, Gregoire Favre wrote:
+> Now, some kernels recompilation later, I still have a problem which I
+> don't know how to solve:
+>=20
+> dund[3539]: DUN daemon ver 1.1
+> dund[3554]: New connection from 00:...
+> pppd[3561]: pppd 2.4.1 started by root, uid 0
+> pppd[3561]: Using interface ppp0
+> pppd[3561]: Connect: ppp0 <--> /dev/rfcomm0
+> pppd[3561]: Cannot determine ethernet address for proxy ARP
+> pppd[3561]: local  IP address 192.168.1.2
+> pppd[3561]: remote IP address 172.31.130.67
+> pppd[3561]: IPCP terminated by peer
+> pppd[3561]: Hangup (SIGHUP)
+> pppd[3561]: Modem hangup
+> pppd[3561]: Connection terminated.
+> pppd[3561]: Connect time 0.8 minutes.
+> pppd[3561]: Sent 571 bytes, received 322 bytes.
+> pppd[3561]: Exit.
 
---HcAYCG3uE/tztfnV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> ...
 
-Hi all,
+> http://www-jcsu.jesus.cam.ac.uk/~ned21/tech/tungsten_linux.html
 
-I am trying to connect my Nokia6310i to my LinuxPPC Box.
-Installed:
+Just beacuse someone could have the same problem I did have: I just
+commented out the proxyarp option in peers/dun and my palm was able to
+try to connect to my linux box over ssh (without success due to my ssh2
+or??? but I can see the try to connect on my logs in the linux box) :-)
 
-ii  bluez-pin      0.22-1         Bluetooth PIN helper with D-BUS support
-ii  bluez-utils    2.6-0lxtecppc1 Utilities for controlling Bluetooth devic=
-es
-ii  bluez-utils2   0.1-0lxtecppc1 BlueZ utilities
-ii  libbluetooth1  2.6-0lxtecppc1 Library to use the BlueZ Linux Bluetooth =
-sta
-ii  libbluez1      0.1-0lxtecppc1 BlueZ library
+Sorry for all my emails and thank for all who contributed in BlueZ !!!
 
-
-Linux version 2.6.5--mh2-aragorn (root@aragorn) \
-(gcc-Version 3.3.3 (Debian 20040401)) #1 Fri Apr 9 14:53:38 CEST 2004
-
-Running hid2hci out of bluez-utils2 produces following oops:
-
-aragorn:/source/bluez/cvs/utils2/hid# ./hid2hci
-Switching device 05ac:1000 to HCI mode was successful
-usb 1-1: USB disconnect, address 2
-drivers/usb/input/hid-core.c: can't resubmit intr, 0001:01:1a.0-1/input0, s=
-tatus -19
-drivers/usb/input/hid-core.c: can't resubmit intr, 0001:01:1a.0-1/input1, s=
-tatus -19
-usb 1-1: new full speed USB device using address 3
-Oops: kernel access of bad area, sig: 11 [#1]
-NIP: F24786B8 LR: F24786C0 SP: EF3E7D00 REGS: ef3e7c50 TRAP: 0301    Not ta=
-inted
-MSR: 00009032 EE: 1 PR: 0 FP: 0 ME: 1 IR/DR: 11
-DAR: 01DAD002, DSISR: 40000000
-TASK =3D ef4c9980[133] 'khubd' Last syscall: -1
-GPR00: 00000022 EF3E7D00 EF4C9980 EEE8E800 EF4E42E0 00000000 00000001 00000=
-000
-GPR08: F2476F40 01DAD000 EEE8E800 28028224 88028222
-Call trace:
- [f2478938] usb_set_interface+0x94/0x164 [usbcore]
- [f243dadc] hci_usb_probe+0x21c/0x48c [hci_usb]
- [f2472090] usb_probe_interface+0x80/0x98 [usbcore]
- [c0161dcc] bus_match+0x50/0x8c
- [c0161e60] device_attach+0x58/0xbc
- [c01620e0] bus_add_device+0x7c/0xd8
- [c0160980] device_add+0xb0/0x184
- [f2478d24] usb_set_configuration+0x20c/0x25c [usbcore]
- [f24733cc] usb_new_device+0x2bc/0x3d4 [usbcore]
- [f2474e2c] hub_port_connect_change+0x1a0/0x298 [usbcore]
- [f24751f8] hub_events+0x2d4/0x354 [usbcore]
- [f24752b4] hub_thread+0x3c/0xf4 [usbcore]
- [c000ad4c] kernel_thread+0x44/0x60
-
-Running lsusb after that oops:
-
-Bus 004 Device 001: ID 0000:0000 =20
-Bus 003 Device 001: ID 0000:0000 =20
-Bus 002 Device 001: ID 0000:0000 =20
-Bus 001 Device 001: ID 0000:0000 =20
-
-Any hint?
-
-Ciao
-
-Elimar
-
-
---=20
-  "Talking much about oneself can also=20
-   be a means to conceal oneself."
-         -Friedrich Nietzsche
-
---HcAYCG3uE/tztfnV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQFAdsKs3Ig8bsVPf7ARAi1FAJsHUztauyzV0zmkx4vzj6/1pEirjACdEJxG
-EWnrWIprM2TZn+s4iITv3IA=
-=WSsf
------END PGP SIGNATURE-----
-
---HcAYCG3uE/tztfnV--
+	Gr=E9goire
+_________________________________________________________________________=
+_
+http://algebra.epfl.ch/greg ICQ:16624071 mailto:Gregoire.Favre@freesurf.c=
+h
 
 
 -------------------------------------------------------
