@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Catalin Drula <catalin.drula@imag.fr>
-Message-ID: <loom.20050324T175954-608@post.gmane.org>
+Subject: Re: [Bluez-devel] Hp bluetooth headset a2dp
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20050324165647.GA12921@externe.net>
+References: <20050324165647.GA12921@externe.net>
+Content-Type: text/plain
+Message-Id: <1111683862.1916.77.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Host to Host Controller flow control
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,23 +18,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Mar 2005 17:04:25 +0000 (UTC)
+Date: Thu, 24 Mar 2005 18:04:22 +0100
 
-Hi Marcel,
+Hi Guylhem,
 
-I was succesful in writing a patch for handling the Hardware Error event. I have
-an iPAQ h5550 with a buggy Bluetooth module from RTX Telecom. I have done some
-tests after applying the patch and everything seems to be going smooth (whenever
-the HW error event occurs, the application sees a "connection abort" and
-synchronization is automatically regained). I will post it tomorrow along with
-more detailed explanation.
+> I didn't have time to play with them for sometime. Guess what happens
+> when I try them again today? Acceptable audio !
+> Same hardware, same binaries - nothing changed !
+> 
+> I then realised it was making sudden accelerations (little by little),
+> then suddently going back to normal, and so on during audio playback.
+> 
+> subbands = 1
+> allocation method = 1
+> channel_mode = 2
+> blocks = 3
+> sampling frequency = 2
+> bitpool = 32
+> frame len = 72
+> Using address: 00:0D:44:2A:09:00
+> 
+> I started to do something else, and now even after power cycling,
+> relinking, it's not playing anymore.
+> 
+> Wow. Any idea on that strange beast?
+> 
+> PS: I was suggested to try to record a session of normal audio
+> interaction. How can it be done? I'll try to borrow a frieds ipaq and
+> see how it is supposed to work.
 
-I wanted to take a shot at implementing host-to-controller flow control for 
-Bluez. Before I start, it'd be great to have your thoughts on this.
+does somebody wants to donate one of these to me? Then I can start
+looking what's the problem with them. I think our AVDTP implementation
+is not quite right and needs some more work at the timing part of the
+stream sending.
 
-Thanks,
+Regards
 
-Catalin
+Marcel
+
 
 
 
