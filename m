@@ -1,18 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] autoconf breaks portability. Film at 11.
+Subject: Re: [Bluez-devel] PAN and bridge problem when bnep0 disconnects
+	before bnep1
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Woodhouse <dwmw2@infradead.org>
+To: Matthias Thomae <bluez@thomae-privat.de>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1084384989.4426.450.camel@hades.cambridge.redhat.com>
-References: <1084268833.11301.0.camel@hades.cambridge.redhat.com>
-	 <1084368666.25099.38.camel@pegasus>
-	 <1084369122.4426.106.camel@hades.cambridge.redhat.com>
-	 <1084369703.25099.56.camel@pegasus>
-	 <1084371089.4426.148.camel@hades.cambridge.redhat.com>
-	 <1084382619.25099.81.camel@pegasus>
-	 <1084384989.4426.450.camel@hades.cambridge.redhat.com>
+In-Reply-To: <40A27A5C.4080603@thomae-privat.de>
+References: <40A27A5C.4080603@thomae-privat.de>
 Content-Type: text/plain
-Message-Id: <1084398405.25099.118.camel@pegasus>
+Message-Id: <1084398131.25099.115.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -24,36 +19,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 May 2004 23:46:45 +0200
+Date: Wed, 12 May 2004 23:42:11 +0200
 
-Hi David,
+Hi Matthias,
 
-> It was October 2002. I don't seem to be able to find my list archives
-> from then -- it's possible I wasn't subscribed at the time, although
-> that surprises me.
+> I have a BlueZ NAP setup with bridging (essentially following the PAN
+> HOWTO), which works quite nicely (thanks to all developers :) except
+> when the first connected bnep0 client is killed before the 2nd client
+> (bnep1).
 > 
-> http://sourceforge.net/mailarchive/message.php?msg_id=2348496
-> http://sourceforge.net/mailarchive/message.php?msg_id=2360924
+> I am running a DHCP server on the server's bridge (pan0), and eth0 is
+> NOT part of the bridge, I use IP forwarding instead.
 > 
-> ftp://ftp.uk.linux.org/pub/people/dwmw2/random/bluez-makefiles-3.tar.gz
+> The problem is, that after bnep0 is removed (by killing it on the
+> respective client with 'pand -K'), bnep1 doesn't 'work' any longer,
+> meaning ping etc. don't work any more. And I couldn't find anything in
+> the syslogs, except that after a while the client's DHCP client starts
+> to issue DHCPDISCOVERs.
 > 
-> I'd have to update them and there were a couple of missing features
-> ('make DESTDIR=xx install' comes to mind) but I'm more than happy to do
-> so if you're interested. 
-
-I am not interested in this way. I am interested in fixing this the
-autoconf/automake way.
-
-> > > configure.in:19: required file `./ltmain.sh' not found
-> > > compat/Makefile.am: installing `./depcomp'
-> > 
-> > but this isn't a problem. It says something like that, but also creates
-> > every file that it complains about.
+> ifdown/ifup on bnep1 don't seem to help either, the only way I could
+> find to make it work again was to issue 'pand -K' on the server and
+> reconnect the clients.
 > 
-> hades /hades/bluez/libs2 $ ./configure
-> -bash2: ./configure: No such file or directory
+> If bnep1 disconnects before bnep0, no problem.
+> 
+> I'm using quite late BlueZ versions on all machines (at least kernel
+> 2.6.5-mh3 and the latest Debian bluez-utils 2.6-1 and bluez-pan
+> 1.1rel-4), and I can reproduce the behaviour also with a Windows client
+> on bnep0.
 
-There must be another problem. Please do a clean CVS checkout.
+sounds like a bridge problem to me. Are you sure that your bridge is
+setup correctly. Take a look at the bridge howto's.
 
 Regards
 
