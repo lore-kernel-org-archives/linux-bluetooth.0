@@ -1,18 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SBC packer done, kind of
+Subject: Re: [Bluez-devel] "playback drain error" with snd-bt-sco
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1101272477.27351.67.camel@pegasus>
-References: <20041123014732.3a03b10e.henryk@ploetzli.ch>
-	 <1101191260.26578.43.camel@pegasus>
-	 <20041123074829.7f978ce7.henryk@ploetzli.ch>
-	 <1101201897.26578.54.camel@pegasus>
-	 <20041123204901.776fe240.henryk@ploetzli.ch>
-	 <1101243809.27351.18.camel@pegasus>
-	 <20041124042114.5e1fee94.henryk@ploetzli.ch>
-	 <1101272477.27351.67.camel@pegasus>
+In-Reply-To: <200411250023.28429.mailsp@sebastian-eichner.de>
+References: <200411250023.28429.mailsp@sebastian-eichner.de>
 Content-Type: text/plain
-Message-Id: <1101278049.27351.98.camel@pegasus>
+Message-Id: <1101351075.7538.25.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -25,24 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Nov 2004 07:34:09 +0100
+Date: Thu, 25 Nov 2004 03:51:15 +0100
 
-Hi Henryk,
+Hi Sebastian,
 
-> > > this actually reminds me again that I am not an audio expert. Can you
-> > > fix it easily?
-> > 
-> > Yupp, I think I did.
+> i would love to get my new Bluetooth headset (Bluetake BT420) running 
+> with linux. So i compiled and installed the alsa-bluetooth cvs code 
+> (btw: i had to add "-lsdp" to the libs in the Makefile to make it 
+> compile). 
+
+maybe you should update to the latest bluez-libs.
+
+> I can load the kernel module and start btsco:
+> /usr/local/bin/btsco 00:08:F4:30:03:71
+> Device is 1:0
+> Voice setting: 0x0060
+> RFCOMM channel 5 connected
 > 
-> wow, good work. I can now do things like this:
+> But when i play a wav-file via aplay or play/dsp1, i do not hear 
+> anything but get an error message in the system log:
 > 
-> 	sbcenc <au-file> | sbcinfo -
-> 	sbcenc <au-file> | rcplay <bdaddr> -
+> Nov 25 00:12:34 linux kernel: snd-bt-sco: playback_open
+> Nov 25 00:12:34 linux kernel: snd-bt-sco: prepare ok bps: 16000 size: 
+> 16002 count: 4000
+> Nov 25 00:12:34 linux kernel: snd-bt-sco: playback_trigger 1
+> Nov 25 00:12:34 linux kernel: snd-bt-sco: setting playback to bspcm
+> Nov 25 00:12:44 linux kernel: ALSA sound/core/pcm_native.c:1316: 
+> playback drain error (DMA or IRQ trouble?)
+> Nov 25 00:12:44 linux kernel: snd-bt-sco: playback_trigger 0
+> Nov 25 00:12:44 linux kernel: snd-bt-sco: setting playback to NULL
+> 
+> 
+> I am using kernel 2.6.5 from SuSE-linux, so i replaced the kalloc() 
+> statements with the old ones (found in cvs and did some merging). 
+> Compiled and loaded fine without any errors.
+> 
+> Do you have an idea whats going wrong? Or doesnt it work with 2.6.5 
+> anymore at all?
 
-when using sbcenc in a pipe with rcplay I get a delay for the first bits
-of music that should be played. This is only on the first call of the
-program or after the kernel removed it from its cache. Do you have any
-idea what might causes this?
+Why don't you try a 2.6.10-rc2-bk9 or 2.6.9-mh4 and see if this one
+works.
 
 Regards
 
