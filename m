@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Connect Error - Function not implemented
+Subject: Re: [Bluez-users] Key step in bluetonium setup, bcm203x does not
+	load firmware
 From: Marcel Holtmann <marcel@holtmann.org>
-To: George <george.news@gmx.net>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <6.1.2.0.2.20040902194629.053ab320@luna.tlmat.unican.es>
-References: <6.1.2.0.2.20040902194629.053ab320@luna.tlmat.unican.es>
+To: gonzalo briceno <gonzalohbriceno@yahoo.com>
+Cc: Luiz Fernando Capitulino <lcapitulino@conectiva.com.br>,
+   bluez-users@lists.sourceforge.net
+In-Reply-To: <20040905073705.47183.qmail@web52803.mail.yahoo.com>
+References: <20040905073705.47183.qmail@web52803.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1094459161.5145.12.camel@notepaq>
+Message-Id: <1094459053.5145.9.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,30 +20,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Sep 2004 10:26:01 +0200
+Date: Mon, 06 Sep 2004 10:24:13 +0200
 
-Hi George,
+Hi Gonzalo,
 
-> I'm developing under kernel 2.4.21 an application that involves dealing 
-> with bluetooth devices.
-> In order to make the application I have taken part of the code of the pand 
-> (it's opensource great!!!). My application is very similar to that. It's a 
-> daemon that firstly look for Bluetooth devices, if any found it tries to 
-> establish a bnep connection and then it runs as a server in order to be 
-> able to attend connection request. As you can see it's more or less all the 
-> stuff in pand. I have also automate the bridge creation, ...
-> 
-> Well I have been checking the correct behaviour by running my application 
-> and then connecting using pand. This way everything works ok.
-> 
-> However when running my application on two PC I get the following error 
-> from the connect statement: Function not implemented (38)
-> Then if I try again with pand I still get the error.
-> 
-> What is the reason for this error?
+> You are completely right.  I followed your instructions and my
+> Broadcom Bluetonium (bcm203x module) based chip is working.  I hope I
+> did not gloss over any section of information although I am almost
+> positive that I did not.  Anyways, any one having this problem has to
+> simply download bluez-firmware and copy the broadcom files onto
+> /usr/lib/hotplug/firmware.  
 
-check your role switch and master/slave settings and make sure that you
-are not using security mode 3.
+the /usr/lib/hotplug/firmware was the old place for firmware files and
+we came to the conclusion that putting them into /lib/firmware is much
+better. The Debian Sarge/Sid and the upcoming SuSE 9.2 support both
+directories, so it is a problem of the hotplug package of your
+distribution.
 
 Regards
 
