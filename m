@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4114E75E.6030901@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Logiteh MX900 / USB Bluetooth "dongle" support?
-References: <4114CE58.5070302@dark-reality.de>	 <1091883214.2773.0.camel@pegasus> <200408071412.54806.puggy@gentoo.org>	 <4114D840.2090609@dark-reality.de> <1091885932.2773.3.camel@pegasus>
-In-Reply-To: <1091885932.2773.3.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lars Grunewaldt <lgw@dark-reality.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4114D840.2090609@dark-reality.de>
+References: <4114CE58.5070302@dark-reality.de>
+	 <1091883214.2773.0.camel@pegasus> <200408071412.54806.puggy@gentoo.org>
+	 <4114D840.2090609@dark-reality.de>
+Content-Type: text/plain
+Message-Id: <1091885932.2773.3.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,35 +20,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 07 Aug 2004 16:29:50 +0200
+Date: Sat, 07 Aug 2004 15:38:52 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Lars,
 
-Marcel Holtmann wrote:
-| Hi Lars,
-|
-|
-|>Hm I just tried
-|>| hid2hci -0
-|>Switching device 046d:c705 to HCI mode failed (no such file or directory)
-|
-|
-| check that you've compiled a kernel with CONFIG_USB_HIDDEV and check
-| that the hiddev device nodes are present.
+> Hm I just tried
+> | hid2hci -0
+> Switching device 046d:c705 to HCI mode failed (no such file or directory)
 
-thanks, I missed hiddev raw devices. works fine now :)
+check that you've compiled a kernel with CONFIG_USB_HIDDEV and check
+that the hiddev device nodes are present.
 
-cu,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+Regards
 
-iD8DBQFBFOdeQWC6DTWkDAoRAhMtAJ9k79ZOM0+YJ/2ySA7UFhocZqt3nQCeLyOH
-PgxeA4k3H+18q+0Op9uiw0M=
-=ipFK
------END PGP SIGNATURE-----
+Marcel
+
+
 
 
 -------------------------------------------------------
