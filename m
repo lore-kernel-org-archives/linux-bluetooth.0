@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <422BC615.2060600@avantwave.com>
-From: mike <mikelee@avantwave.com>
-MIME-Version: 1.0
+From: Vardhman Jain <vardhman@students.iiit.net>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] about connection timeout
+Message-ID: <Pine.LNX.4.44.0503062141150.12145-100000@students.iiit.net>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-devel] (no subject)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,14 +16,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 07 Mar 2005 11:10:13 +0800
+Date: Sun, 6 Mar 2005 21:42:27 +0530 (IST)
 
-Hi all
-   How can i know there is connection error? And when i want to 
-reconnect the other side, do i need to reset the bluetooth stack ?
 
-best regard
-Mike,Lee
+ I am in need of a solution to help me use the obex-server programmatically.
+
+        What I need to do is whenever a file is recieved at the server I 
+get some kind of callback or signal, so I can call some other 
+program/function which was waiting for files from bluetooth. I need this 
+to be done in a for loop until the remote device disconnects. It would be 
+great If I can call the file recieving code as a waiting function call in 
+my code. 
+
+	Any help or pointers are appreciated.
+
+
+Vardhman
+
+
+
+
+
+
+-- 
+Vardhman Jain
+IV Year B.Tech. CSE
+IIIT-Hyderabad
+
+presence on net:
+    http://students.iiit.net/~vardhman
+    http://vardhman.blogspot.com
+1) My Box said: "Install Win2k or better ..." So I installed GNU/Linux.
+2) What you are is God's gift to you and what you become is your gift to God.
+
+
 
 
 -------------------------------------------------------
