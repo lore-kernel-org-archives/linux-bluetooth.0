@@ -1,39 +1,28 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Message-id: <168c01518d.1518d168c0@estudiants.urv.es>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Subject: [Bluez-users] problem using kernel 2.4.18
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 07 Mar 2004 19:30:08 +0100
+Return-Path: <wim.delvaux@adaptiveplanet.com>
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: bnep and refcnt
+Date: Sun, 7 Mar 2004 16:25:01 +0100
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200403071625.01627.wim.delvaux@adaptiveplanet.com>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hello again!
+Hi,
 
-I know that bluez-kernel-2.3 is no longer supported, and my kernel is out of date (red hat valhalla 2.4.18) , but I can't change my kernel, because I'm working on a robot and my manager doesn't want to change anything from it, so is there any way I can make BlueZ working on that machine? I get this error on doing make install:
-make: *** [install] Error 1
+after browsing the Linux 2.6 code there is a remark in net/core/dev.c that 
+state what the problem with the following message that I get is 
 
-thank you again!!!
+unregister_netdevice: waiting for bnep0 to become free. Usage count = 6
 
-Albert
+The comment with the function in dev.c states that this error is caused by 
+buggy protocols that should unregister after receiving notification that the 
+devices they are using has been unregistered.  They should call 
+unregister_netdev which decreases the refcnt.
 
+Can anybody help me tracking down this problem I have with explaning which 
+protocols could be using bnep0 ?
 
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+W
