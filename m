@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: John McCorquodale <mcq@cacr.caltech.edu>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20040307214224.GB18481@viz.cacr.caltech.edu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Socket G card newbie Q
+From: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Message-id: <168c01518d.1518d168c0@estudiants.urv.es>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Subject: [Bluez-users] problem using kernel 2.4.18
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,31 +15,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 7 Mar 2004 13:42:24 -0800
+Date: Sun, 07 Mar 2004 19:30:08 +0100
 
-Hi, y'all,
+Hello again!
 
-I'm trying to get my socket CF G card to work in my pcmcia slot.  Just trying
-to get to the point where I can do an hci scan.  From what I've been able to
-glean from the list and howtos, this is my approach:
+I know that bluez-kernel-2.3 is no longer supported, and my kernel is out of date (red hat valhalla 2.4.18) , but I can't change my kernel, because I'm working on a robot and my manager doesn't want to change anything from it, so is there any way I can make BlueZ working on that machine? I get this error on doing make install:
+make: *** [install] Error 1
 
-  1. pcmcia-cs loads G card as serial_cs (minicom on ttyS0 shows a packet
-     coming in every half-second or so, but I don't know what baud rate
-     I should be using, nor what HCI packets look like, so I can only assume
-     that it's correct)
+thank you again!!!
 
-  2. All bluez support built in to kernel (2.6.3-mm2, 2.4.25, 2.4.20 all
-     tried with same results)
+Albert
 
-  3. hciattach ttyS0 csr 230400
-     Responds: "Initialization timed out."
-
-Anybody care to kick me a step further in the right direction on this sunny
-southern California afternoon?
-
-Thanks,
-
--mcq
 
 
 -------------------------------------------------------
