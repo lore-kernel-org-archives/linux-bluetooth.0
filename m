@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Johan Svedberg <johan@svedberg.pp.se>
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20040406101704.GA42503.johan@svedberg.pp.se>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Problems with 2.5.6 and D-Link DBT-120
+Subject: Re: [Bluez-users] BT950_CS
+References: <407195F7.4020907@pobox.com> <200404052141.38457.cijoml@volny.cz> <40720DAF.5040606@pobox.com>
+In-Reply-To: <40720DAF.5040606@pobox.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200404060905.39457.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,20 +19,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 6 Apr 2004 10:22:45 +0200
+Date: Tue, 6 Apr 2004 09:05:38 +0200
 
-Hi
+Ask Marcel,
 
-Since 2.6.5 I'm having problems with my D-Link DBT-120. It is recognized
-fine when I use the TTY-driver under the USB meny. But when I have
-selected that I can't select the Bluetooth subsystem which my
-userspace-tools needs. So there seem to be a dependency problem here.
+He is the ONLY one :)
 
-I've tried using the USB drivers found in theBluetooth subsystem
-instead, but those don't seem to recognize the device.
+Michal
 
--- 
-Johan Svedberg, johan@svedberg.pp.se, http://johan.svedberg.pp.se/
+Dne =FAt 6. dubna 2004 03:53 Daniel Jimenez napsal(a):
+> Michal Semler (volny.cz) wrote:
+> > I think that this driver is not ported to 2.6 nor finished. It has many
+> > errors in 2.4 too, but is compilable.
+> >
+> > Michal
+>
+> Can anyone confirm this? I picked up this card off ebay thinking it
+> would work.
+>
+> Perhaps we should contact the bluez hardware list maintainer and have
+> him/her denote which Kernels the modules are compatible with.
 
 
 -------------------------------------------------------
