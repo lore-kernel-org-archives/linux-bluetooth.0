@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jan Schermer <zviratko@n.cz>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] init script 0.1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200404171431.32008.cijoml@volny.cz>
+References: <200404171431.32008.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1082288518.30797.13.camel@localhost>
+Message-Id: <1082280582.4403.17.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Connection times out after a while
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,33 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 18 Apr 2004 13:41:58 +0200
+Date: Sun, 18 Apr 2004 11:29:42 +0200
 
-Hi,
+Hi Michal,
 
-I can pair the devices fine, RFCOMM opens connection and I can issue AT
-commands to my mobile phone via minicom. However at some point (few
-seconds from the opening of connection) the communication just hangs and
-I have to reconnect the device and reload hci_usb driver for another
-connection to be initiated (otherwise, all connections time out (I see
-the bt communication icon on my phone though).
+> sending you first version of bluetooth init script and bluetooth default 
+> script.
+> 
+> PLS check it out and tell me your comments.
+> 
+> PAND like master is now started using following switches:
+> pand -s -M -r NAP
+> which I think are most common used.
+> 
+> This version needs implement DUNDmaster,DUNDclient, PANDclient
+> 
+> tell me how would you like these to implement
 
-I am using Billionton USB dongle and SonyEricsson T610, I also tried
-with XDA2 but the same problem occurs.
+install the Debian bluez-pan package and look at /etc/default/bluez-pan.
+I think that variables like PAND_ENABLED and PAND_OPTION are a good way
+of doing this, but you should also check the Debian guides.
 
-If I use the dongle and phone under VMWARE, everything works fine - so
-it must be something in the driver or my setup, but I have used it in
-the past and I'm almost sure that my setup is fine.
+Regards
 
-I have tried kernels 2.6.5, 2.6.5-love[1-3], 2.6.5-gentoo-r1 without
-success. I even patched the third bluetooth patch in the kernel with no
-effect.
+Marcel
 
-Any way I can debug this? Has anyone had the same problems like me?
-
-Thx a lot
-
-Jan
 
 
 
