@@ -3,12 +3,11 @@ Subject: Re: [Bluez-users] RFCOMM Question
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Kasimir =?ISO-8859-1?Q?M=FCller?= <Kasimir.Mueller@t-online.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <403B901E.4090706@t-online.de>
+In-Reply-To: <403B8A20.3030806@t-online.de>
 References: <403B7FA5.4050607@gmx.de> <1077642423.2919.18.camel@pegasus>
-	 <403B8A20.3030806@t-online.de> <1077644228.2919.22.camel@pegasus>
-	 <403B901E.4090706@t-online.de>
+	 <403B8A20.3030806@t-online.de>
 Content-Type: text/plain
-Message-Id: <1077649188.2919.28.camel@pegasus>
+Message-Id: <1077644228.2919.22.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,20 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 24 Feb 2004 19:59:48 +0100
+Date: Tue, 24 Feb 2004 18:37:08 +0100
 
 Hi Kasimir,
 
-> >if you need 10 connections at the same time, then yes, you should better
-> >use two adapters. Remember that you can have 10 connections at the same
-> >time, but 3 of them must be parked.
-> >  
-> Sorry , I was precise.
-> I going to read the status of the 10 devices sequentially  .
-> So I can switch the connection ?
+> The problem is, I must have at least 10 distinct connections from 10 
+> devices, which must be
+> identified by e.g. Hardware-Adress .
+> So I must use 2 sticks on the server side ?
 
-you can park 9 of your connections and only unpark the one that you
-need. I must admit that I never tested such a setup.
+if you need 10 connections at the same time, then yes, you should better
+use two adapters. Remember that you can have 10 connections at the same
+time, but 3 of them must be parked.
+
+> Thanks again very much for your quick and competent answer.
+
+You are welcome.
 
 Regards
 
