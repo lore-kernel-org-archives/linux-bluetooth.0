@@ -1,12 +1,22 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41F4A55D.9070701@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Alignment issue
+From: David Woodhouse <dwmw2@infradead.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] scooped by pocketpc (a2dp)
-References: <41E93682.9040907@xmission.com> <41E93B4F.1010600@dark-reality.de> <41EA1B6E.3070303@xmission.com>
-In-Reply-To: <41EA1B6E.3070303@xmission.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Cc: Daryl Van Vorst <daryl@wideray.com>
+In-Reply-To: <1106493755.9269.17.camel@pegasus>
+References: <001301c47f09$3900e650$1301010a@baked>
+	 <1092208405.4564.227.camel@pegasus>
+	 <1106231454.26551.582.camel@hades.cambridge.redhat.com>
+	 <1106232343.8190.187.camel@pegasus>
+	 <1106233175.26551.597.camel@hades.cambridge.redhat.com>
+	 <1106480346.9269.2.camel@pegasus>
+	 <1106483393.6480.11.camel@localhost.localdomain>
+	 <1106491241.9269.10.camel@pegasus>
+	 <1106493068.6480.12.camel@localhost.localdomain>
+	 <1106493755.9269.17.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1106522212.6480.17.camel@localhost.localdomain>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,37 +28,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Jan 2005 00:35:57 -0700
+Date: Sun, 23 Jan 2005 23:16:52 +0000
 
-Lars
+On Sun, 2005-01-23 at 16:22 +0100, Marcel Holtmann wrote:
+> and what is the prefered one? I would use __typeof__, because the
+> previous version did so. However I am not a compiler expert.
 
-> hmm. i see a menu for alsa devices but our userspace a2dp device 
-> (currently stubbed out, but not implemented) doesn't show up. i set it 
-> up as documented in btsco/bt/BUILD
-> 
->> That leads to - at least - gnomemeeting and openphone supporting alsa
->> directly :)
+It doesn't matter. I prefer the one without underscores.
 
-I noticed that linphone from debian-testing has oss and alsa devices in 
-its audio device selection menu.
+-- 
+dwmw2
 
-I still haven't been able to get the stubbed out alsa-lib driver to show 
-up! I also tried a .asoundrc with
-
-pcm.a2dpplug {
-         type plug
-         slave { pcm "a2dp" }
-}
-
-pcm.a2dp {
-         type a2dp
-         bdaddr "00:08:F4:30:05:BB"
-}
-
-since that was more like what the jack plugin is supposed to have... no 
-luck...
-
-Brad
 
 
 -------------------------------------------------------
