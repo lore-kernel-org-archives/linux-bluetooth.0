@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] browsing non-public services?
+Subject: Re: [Bluez-devel] sdp patch
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Collin R. Mulliner" <collin@betaversion.net>
+To: Simon Vogl <vogl@soft.uni-linz.ac.at>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040224142400.212a912f@coredump>
-References: <403B1072.1020102@soft.uni-linz.ac.at>
-	 <1077624474.2880.37.camel@pegasus> <20040224132517.0434ab6d@coredump>
-	 <1077626176.2880.54.camel@pegasus> <20040224134200.45dab5be@coredump>
-	 <1077627172.2880.70.camel@pegasus>  <20040224142400.212a912f@coredump>
+In-Reply-To: <403B471D.7080908@soft.uni-linz.ac.at>
+References: <403B08B4.1000602@soft.uni-linz.ac.at>
+	 <1077624690.2880.40.camel@pegasus>  <403B471D.7080908@soft.uni-linz.ac.at>
 Content-Type: text/plain
-Message-Id: <1077629602.2880.90.camel@pegasus>
+Message-Id: <1077628380.2880.84.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,23 +19,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 Feb 2004 14:33:22 +0100
+Date: Tue, 24 Feb 2004 14:13:01 +0100
 
-Hi Collin,
+Hi Simon,
 
-> yes I'm sure - a friend of me test this very well (he wrote btxml.c).
-> There for I thought 0x5555 would be the "key" to these two channels.
+> sorry for this - here it is again (tested against a freshly updated cvs tree):
 
-then there is a difference between 6310 and 6310i, because the Nokia
-6310 have no service on RFCOMM channel 17 and 18. Phonebook reading
-without pairing goes through OBEX.
+I don't know what CVS checkout you use, but it still fails.
 
-The btxml.c is much too complex for this and there is no need to go
-through a TTY device for it. I can be done directly through a socket.
-Maybe he should look at attest.c for an example.
-
-I need the output of "sdptest records <bdaddr-6310i>" to see if this
-model has more hidden SDP records.
+	patching file include/sdp.h
+	Hunk #1 FAILED at 94.
+	Hunk #2 FAILED at 125.
+	Hunk #3 FAILED at 163.
+	3 out of 3 hunks FAILED -- saving rejects to file include/sdp.h.rej
+	patching file tools/listattr.c
+	Hunk #1 FAILED at 209.
+	1 out of 1 hunk FAILED -- saving rejects to file tools/listattr.c.rej
+	patching file tools/sdptool.c
+	Hunk #1 FAILED at 438.
+	Hunk #2 FAILED at 911.
+	2 out of 2 hunks FAILED -- saving rejects to file tools/sdptool.c.rej
 
 Regards
 
