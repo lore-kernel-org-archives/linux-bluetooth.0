@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v612)
-To: bluez-users@lists.sourceforge.net
-Message-Id: <D303E807-5443-11D8-9C26-000A959C67D2@mac.com>
-Content-Type: multipart/signed; micalg=sha1; boundary=Apple-Mail-6-647164607; protocol="application/pkcs7-signature"
-From: Alex Eiser <alexe@mac.com>
-Subject: [Bluez-users] Creating a new SDP service
+Subject: Re: [Bluez-users] PAN and security mode 3
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mark RISON <mrison@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY8-F97aHyJBu3pQBo0002a6ce@hotmail.com>
+References: <BAY8-F97aHyJBu3pQBo0002a6ce@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1075584286.2720.88.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,79 +18,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 31 Jan 2004 18:18:48 -0500
+Date: Sat, 31 Jan 2004 22:24:46 +0100
 
+Hi Mark,
 
---Apple-Mail-6-647164607
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain;
-	charset=US-ASCII;
-	format=flowed
+> - If in the "device" part of hcid.conf I put "auth enable" and
+> "encrypt enable", does this enforce security mode 3 for all (incoming
+> and outgoing) connections, or do I need to make sure appropriate
+> settings are specified in other files/utilities (and if so, which?)?
 
-Hi,
+yes.
 
-I need to create a custom SDP service to perform some communications 
-between a Mac OS X machine and a linux machine. While I could 
-accomplish this by using serial ports, this makes the macos programing 
-a lot uglier.
+> - If I only start the PAN daemon, does this guarantee that no other
+> profiles will be running (i.e. only PAN will allow access to the
+> laptop)?
 
-Is there a way to create a new service with the SDP tool, with out 
-adding new code to sdptool.c?
+Of course you will need hcid and sdpd, too. But if you only have pand
+running you have only support for the PAN profile. To be sure check what
+listen sockets /proc/bluetooth/l2cap and /proc/bluetooth/rfcomm say.
 
-Alex
+> - Can "auth enable" and "encrypt enable" in hcid.conf be overwritten
+> by command-line utility/daemon arguments, or is this a bullet-proof
+> way to enfore security mode 3 irrespective of "user error"?
 
+Yes. The difference between security mode 3 and not is device dependent
+and has nothing to with any local daemon. See
 
---Apple-Mail-6-647164607
-Content-Transfer-Encoding: base64
-Content-Type: application/pkcs7-signature;
-	name=smime.p7s
-Content-Disposition: attachment;
-	filename=smime.p7s
+	hciconfig hci0 noencrypt
+	hciconfig hci0 noauth
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIGDjCCAscw
-ggIwoAMCAQICAws8qjANBgkqhkiG9w0BAQQFADBiMQswCQYDVQQGEwJaQTElMCMGA1UEChMcVGhh
-d3RlIENvbnN1bHRpbmcgKFB0eSkgTHRkLjEsMCoGA1UEAxMjVGhhd3RlIFBlcnNvbmFsIEZyZWVt
-YWlsIElzc3VpbmcgQ0EwHhcNMDMxMTI5MDYzODQ4WhcNMDQxMTI4MDYzODQ4WjA/MR8wHQYDVQQD
-ExZUaGF3dGUgRnJlZW1haWwgTWVtYmVyMRwwGgYJKoZIhvcNAQkBFg1hbGV4ZUBtYWMuY29tMIIB
-IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA26D0SquOKhbzwu+3wyMOR09HA0TBwWsI7MM4
-Y+nbF99cLapwXpuvF+aO5NLJuHd7DlNTWpTqS00mIg8HbqqdyIwhgr88YrW46txE0B8ZEt4E3inx
-9f16+/cTbF9OalzCps/6m7VoreQSH8EZnE+27uAPPm69+ArJ6YqKQSLJJ8+7naCKWwiWW4GhOF/j
-QiGOnxL4T6uqDSFX72DtaVPhNckhMzIAx7MjSaK+ec398M3vkkWLw9X2WUrgq2yp1fRTcf5NM4ix
-wYQucxPAnyILyfRczrluFiblYLIn2/lUhimASo+4d6FdTDujJs9/VfWzSciXufPgdoEGqz9Clb6B
-owIDAQABoyowKDAYBgNVHREEETAPgQ1hbGV4ZUBtYWMuY29tMAwGA1UdEwEB/wQCMAAwDQYJKoZI
-hvcNAQEEBQADgYEAWxgmAHBiAkEmZZtXfrlDOCRk2eboiXry6LVYRSdh5T4R/GPKi+ZVRawFpIKU
-sII+HJyLtR6gkj8FSObAQShK3WM0c8NfkKyZ4CMGoq/8pm2hv9Ti2PGRKeFsFChQIKr+u8FBAs+a
-12kfwasK4+XMSmQ/xYgnrLYkHsxvZi/RCIkwggM/MIICqKADAgECAgENMA0GCSqGSIb3DQEBBQUA
-MIHRMQswCQYDVQQGEwJaQTEVMBMGA1UECBMMV2VzdGVybiBDYXBlMRIwEAYDVQQHEwlDYXBlIFRv
-d24xGjAYBgNVBAoTEVRoYXd0ZSBDb25zdWx0aW5nMSgwJgYDVQQLEx9DZXJ0aWZpY2F0aW9uIFNl
-cnZpY2VzIERpdmlzaW9uMSQwIgYDVQQDExtUaGF3dGUgUGVyc29uYWwgRnJlZW1haWwgQ0ExKzAp
-BgkqhkiG9w0BCQEWHHBlcnNvbmFsLWZyZWVtYWlsQHRoYXd0ZS5jb20wHhcNMDMwNzE3MDAwMDAw
-WhcNMTMwNzE2MjM1OTU5WjBiMQswCQYDVQQGEwJaQTElMCMGA1UEChMcVGhhd3RlIENvbnN1bHRp
-bmcgKFB0eSkgTHRkLjEsMCoGA1UEAxMjVGhhd3RlIFBlcnNvbmFsIEZyZWVtYWlsIElzc3Vpbmcg
-Q0EwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMSmPFVzVftOucqZWh5owHUEcJ3f6f+jHuy9
-zfVb8hp2vX8MOmHyv1HOAdTlUAow1wJjWiyJFXCO3cnwK4Vaqj9xVsuvPAsH5/EfkTYkKhPPK9Xz
-gnc9A74r/rsYPge/QIACZNenprufZdHFKlSFD0gEf6e20TxhBEAeZBlyYLf7AgMBAAGjgZQwgZEw
-EgYDVR0TAQH/BAgwBgEB/wIBADBDBgNVHR8EPDA6MDigNqA0hjJodHRwOi8vY3JsLnRoYXd0ZS5j
-b20vVGhhd3RlUGVyc29uYWxGcmVlbWFpbENBLmNybDALBgNVHQ8EBAMCAQYwKQYDVR0RBCIwIKQe
-MBwxGjAYBgNVBAMTEVByaXZhdGVMYWJlbDItMTM4MA0GCSqGSIb3DQEBBQUAA4GBAEiM0VCD6gsu
-zA2jZqxnD3+vrL7CF6FDlpSdf0whuPg2H6otnzYvwPQcUCCTcDz9reFhYsPZOhl+hLGZGwDFGguC
-dJ4lUJRix9sncVcljd2pnDmOjCBPZV+V2vf3h9bGCE6u9uo05RAaWzVNd+NWIXiC3CEZNd4ksdMd
-Rv9dX2VPMYIC5zCCAuMCAQEwaTBiMQswCQYDVQQGEwJaQTElMCMGA1UEChMcVGhhd3RlIENvbnN1
-bHRpbmcgKFB0eSkgTHRkLjEsMCoGA1UEAxMjVGhhd3RlIFBlcnNvbmFsIEZyZWVtYWlsIElzc3Vp
-bmcgQ0ECAws8qjAJBgUrDgMCGgUAoIIBUzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqG
-SIb3DQEJBTEPFw0wNDAxMzEyMzE4NDlaMCMGCSqGSIb3DQEJBDEWBBRl6nHmBSWh8XgJj8sLGJi5
-YoUDszB4BgkrBgEEAYI3EAQxazBpMGIxCzAJBgNVBAYTAlpBMSUwIwYDVQQKExxUaGF3dGUgQ29u
-c3VsdGluZyAoUHR5KSBMdGQuMSwwKgYDVQQDEyNUaGF3dGUgUGVyc29uYWwgRnJlZW1haWwgSXNz
-dWluZyBDQQIDCzyqMHoGCyqGSIb3DQEJEAILMWugaTBiMQswCQYDVQQGEwJaQTElMCMGA1UEChMc
-VGhhd3RlIENvbnN1bHRpbmcgKFB0eSkgTHRkLjEsMCoGA1UEAxMjVGhhd3RlIFBlcnNvbmFsIEZy
-ZWVtYWlsIElzc3VpbmcgQ0ECAws8qjANBgkqhkiG9w0BAQEFAASCAQB1EjlvwHlQi9xHz/9ecLGm
-8/JQFw1CHupctsYDgYzgJNBliM+9k21nLrJh/ddoMwJXVzvyRx8VaKM2Ggax0z/rU2Ofy4HwGMu3
-9cPmGik1niNzcMtS0sCnVWXRflwKL9t5whdiQkdpGtIhd1OfEBD60bdO5CTWnkAUdLjQ6n/4vlmE
-z4uF34GHmLzYIpn0AMY2+JZpYWCZJUArwfZ4GtP49qnh7Ce6ND2Fb/SlF4nCNk2IL+rqgUttLwtS
-VQgm4g6WLn7yMQN4CTvmC3hvXzMuAbOdk6ftnTf63XhX+ywWgc3yBDY6n1pUtal50Lc4n0HbIfH1
-DwiUDuUEjOYjSH7hAAAAAAAA
+> - How does authorisation work in BlueZ?  Ideally I'd like to be able
+> to specify a list of BD_ADDRs to (exclusively) authorise for PAN, but
+> if it's necessary for all connection requests to be manually
+> authorised, that's better than nothing.
 
---Apple-Mail-6-647164607--
+This is currently not implemented and the best way to do this is in pand
+directly. Otherwise the kernel have to control a black- or whitelist of
+device addresses and I don't think that is a good idea.
+
+> - /etc/bluetooth/link_keys appears to be where link keys resulting
+> from pairing are stored.  Is this correct, and if so, what is the
+> format, and will deleting this file remove all pairing information (or
+> do I need to delete something else somewhere else?)?
+
+Yes, it will remove all pairings. For the format look at the source.
+
+Regards
+
+Marcel
+
 
 
 
