@@ -1,15 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hcidump, was: rfcomm: permission denied
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Zbigniew Diaczyszyn (gmx)" <z.dia@gmx.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <003b01c3f65e$371ef400$dc4db850@ULLA>
-References: <000d01c3f343$d89f1ad0$e04db850@ULLA>
-	 <1076855680.14758.55.camel@pegasus>  <000b01c3f599$04aaf520$de4bb850@ULLA>
-	 <1077058491.2665.131.camel@pegasus>  <003b01c3f65e$371ef400$dc4db850@ULLA>
-Content-Type: text/plain
-Message-Id: <1077147114.2685.11.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <003501c3f672$d6e45a20$c4648dd4@tullio>
+From: "Tullio" <julianino@inwind.it>
+To: "Bluez List" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0032_01C3F67B.362C7780"
+Subject: [Bluez-users] pppd problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +16,97 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Feb 2004 00:31:54 +0100
+Date: Wed, 18 Feb 2004 23:59:14 +0100
 
-Hi Zbigniew,
+Messaggio in formato MIME composto da più parti.
 
-> Right. After I had started the hcid daemon. The USB dongle is placed in the notebook.
-> 
-> Just for understanding: 
-> the adress I get from hciconfig is the adress from my USB dongle, and I have to bind it to rfcomm?
+------=_NextPart_000_0032_01C3F67B.362C7780
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: Quoted-Printable
 
-yes, hciconfig shows you the local address of your device. For rfcomm
-you have to use the remote address.
+Hi to all,
 
-Regards
+I want to use a Nokia 3650 as a modem. I have written the pppd peers =
+file and the chat script, but when I try the connection using pppd call =
+gprs there isn't any result.
 
-Marcel
+These are my pppd peers file (/etc/ppp/gprs):=20
+/dev/rfcomm0 57600=20
+connect '/usr/sbin/chat -v -f /etc/ppp/chat-gprs'
+noauth
+defaultroute
+debug
+
+and here's my chat script (/etc/ppp/chat-gprs): TIMEOUT         5
+ECHO            ON
+ABORT           '\nBUSY\r'
+ABORT           '\nERROR\r'
+ABORT           '\nNO ANSWER\r'
+ABORT           '\nNO CARRIER\r'
+ABORT           '\nNO DIALTONE\r'
+ABORT           '\nRINGING\r\n\r\nRINGING\r'
+''              \rAT
+TIMEOUT         12
+OK              ATE1
+OK              'AT+cgdcont=3D1,"IP","internet.wind"'
+OK              ATD*99***1#
+How can I solve this problem? Thanks Julianino
+
+
+------=_NextPart_000_0032_01C3F67B.362C7780
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: Quoted-Printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 5.50.4134.100" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>
+<DIV><FONT face=3DArial size=3D2>Hi to all,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I want to use a Nokia 3650 as a modem. =
+I have=20
+written the pppd peers file and the chat script, but when&nbsp;I try the =
+
+connection using pppd call gprs there isn't any result.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>These are my pppd peers file =
+(/etc/ppp/gprs):=20
+</FONT></DIV>
+<DIV><PRE><FONT face=3DArial size=3D2>/dev/rfcomm0 57600=20
+connect '/usr/sbin/chat -v -f /etc/ppp/chat-gprs'
+noauth
+defaultroute
+debug
+</FONT></PRE><PRE><FONT face=3DArial size=3D2>and here's my chat script =
+(/etc/ppp/chat-gprs): </FONT><PRE><FONT face=3DArial size=3D2>TIMEOUT    =
+     5
+ECHO            ON
+ABORT           '\nBUSY\r'
+ABORT           '\nERROR\r'
+ABORT           '\nNO ANSWER\r'
+ABORT           '\nNO CARRIER\r'
+ABORT           '\nNO DIALTONE\r'
+ABORT           '\nRINGING\r\n\r\nRINGING\r'
+''              \rAT
+TIMEOUT         12
+OK              ATE1
+OK              'AT+cgdcont=3D1,"IP","internet.wind"'
+OK              ATD*99***1#
+</FONT></PRE><PRE><FONT face=3DArial size=3D2>How can I solve this =
+problem?</FONT></PRE><PRE><FONT face=3DArial =
+size=3D2></FONT>&nbsp;</PRE><PRE><FONT face=3DArial =
+size=3D2>Thanks</FONT></PRE><PRE><FONT face=3DArial =
+size=3D2></FONT>&nbsp;</PRE><PRE><FONT face=3DArial =
+size=3D2>Julianino</FONT></PRE></PRE></DIV></FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0032_01C3F67B.362C7780--
 
 
 
