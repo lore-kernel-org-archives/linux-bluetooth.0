@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT test mode operation
+Subject: Re: [Bluez-users] Keyboarch encryption howto?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de46576041124081140dc74b7@mail.gmail.com>
-References: <2de46576041124081140dc74b7@mail.gmail.com>
+In-Reply-To: <200411241701.07891.cijoml@volny.cz>
+References: <200411241701.07891.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1101314675.27351.126.camel@pegasus>
+Message-Id: <1101313747.27351.122.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,26 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 Nov 2004 17:44:35 +0100
+Date: Wed, 24 Nov 2004 17:29:07 +0100
 
-Hi Manjunath,
+Hi Michal,
 
-> can i configure my bt dongles to operate in test mode....and then
-> conduct the loopback or transmitter tests. This is indicated in the
-> HCI part of the specification....so is it possible to run these tests
-> just with BT devices connected to host PC's,  and not using a BT
-> protocol analyser.
+> is there any howto where described how to start encryption on BT keyboard?
 
-you can set your devices into test mode with the correct HCI command. I
-think you need to use "hcitool cmd ..." for that, because I never tried
-or implemented support for it.
+there exists a hidd version that can enable the keyboard encryption
+after the connection (-E switch). I haven't really tried it and it maybe
+not work as expected with some devices. This should be fixed some time
+with the new policy manager inside the kernel.
 
-What has this to do with a protocol analyzer?
+> Is my MS keyboard (CSR based) supported?
 
-> If i buy a BT tester, then wouldn't my BT dongle be the DUT....
-> Also, if i buy a CATC-tracer/trainer, should I again buy a BT tester????
-
-Actually what do you mean by BT Tester?
+Yes, it supports encryption.
 
 Regards
 
