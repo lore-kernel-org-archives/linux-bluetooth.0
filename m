@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] SuSE 9.1 Pro and Epox Barton wireless desktop
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ulrich Wisser <u.wisser@publisher.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1091568946.3759.18.camel@dorette.Entenhausen>
-References: <1091568946.3759.18.camel@dorette.Entenhausen>
+From: Ulrich Wisser <u.wisser@publisher.de>
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1091569567.16182.36.camel@pegasus>
+Message-Id: <1091568946.3759.18.camel@dorette.Entenhausen>
 Mime-Version: 1.0
+Subject: [Bluez-users] SuSE 9.1 Pro and Epox Barton wireless desktop
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,22 +15,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 03 Aug 2004 23:46:07 +0200
+Date: Tue, 03 Aug 2004 23:35:47 +0200
 
-Hi Ulrich,
+Hello,
 
-> has anybody got that combination running?
-> When I plug in my BT-DG03BF USB bluetooth dongle "hcitool dev" does not
-> show any device. Please find the /var/log/messages below.
-> 
-> Any idea how to get the dongle working? The keyboard and mouse?
+has anybody got that combination running?
+When I plug in my BT-DG03BF USB bluetooth dongle "hcitool dev" does not
+show any device. Please find the /var/log/messages below.
 
-the dongle of the Barton desktop is a HID proxy dongle. You must run
-hid2hci first before you will see it with hciconfig.
+Any idea how to get the dongle working? The keyboard and mouse?
 
-Regards
+TIA
 
-Marcel
+Ulrich
+
+
+Jul 31 10:34:38 dorette kernel: usb 1-1: new full speed USB device using
+address                 3
+Jul 31 10:34:38 dorette /etc/hotplug/usb.agent[3868]: need a device for
+this com                mand
+Jul 31 10:34:38 dorette kernel: input: USB HID v1.11 Keyboard
+[0a12:1000] on usb                -0000:00:07.2-1
+Jul 31 10:34:39 dorette kernel: drivers/usb/input/hid-core.c: ctrl urb
+status -3                2 received
+Jul 31 10:34:39 dorette /etc/hotplug/usb.agent[3889]: need a device for
+this com                mand
+Jul 31 10:34:39 dorette kernel: input: USB HID v1.11 Mouse [0a12:1000]
+on usb-00                00:00:07.2-1
 
 
 
