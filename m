@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Can't create socket.: No such file or directory
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Carl Norum <carl.norum@usask.ca>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <51279096-6253-11D8-9EE6-000393C5CB34@usask.ca>
+References: <51279096-6253-11D8-9EE6-000393C5CB34@usask.ca>
 Content-Type: text/plain
-Message-Id: <1077206432.17056.7.camel@pc-04.ycom.ch>
+Message-Id: <1077186017.2685.18.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] hid2usb error
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,31 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Feb 2004 17:00:32 +0100
+Date: Thu, 19 Feb 2004 11:20:17 +0100
 
-Hi there, 
+Hi Carl,
 
-I've the Logitech diNovo Bluetooth kit, and try to use it as BT device.
-So, i've bluez-libs2 & bluez-utils2 to use the hid2hci tool to pass my
-Logitech USB HUB to an Bluetooth HUB.
+> I've just finished installing BlueZ on a Mandrake machine of mine, but 
+> I can't make l2ping work.  "hcitool scan" and "hcitool inq" both show 
+> me the other bluetooth machine (iBook with 3Com dongle), and "hcitool 
+> cc --role=m ...." appears to work too, as "hcitool con" shows the 
+> connection.  l2ping however, just always says "Can't create socket.: No 
+> such file or directory", and that's it.
 
-Kernel 2.6.2-mh
-hid module loaded.
-
-Running the hid2usb give :
-Invalid argument ...
-
-After some investigations, it appear that the following line return the
-error (around line 240) :
-
-err = send_report(fd, rep1, sizeof(rep1))
-
-at the 2nd byte send (0xff 0x80)
-Anyone can help me, plz ?
+load the l2cap.o kernel module.
 
 Regards
 
-	--Alexandre
+Marcel
 
 
 
