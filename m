@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Help Me ! Pstool of csr bt chip
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041112211827.71472.qmail@web54509.mail.yahoo.com>
-References: <20041112211827.71472.qmail@web54509.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1100294565.7349.7.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20041112211827.71472.qmail@web54509.mail.yahoo.com>
+From: Luis p <luisito555es@yahoo.es>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Help Me ! Pstool of csr bt chip
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,20 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 12 Nov 2004 22:22:45 +0100
+Date: Fri, 12 Nov 2004 22:18:27 +0100 (CET)
 
-Hi Luis,
+Please help me! I need Pstool win32 for configure csr
+bluetooth chip.
 
-> Please help me! I need Pstool win32 for configure csr
-> bluetooth chip.
-
-the pstool is not free software. Ask your sales contact at CSR.
-
-Regards
-
-Marcel
+Many Thanks
 
 
+
+
+		
+______________________________________________
+Renovamos el Correo Yahoo!: ¡100 MB GRATIS!
+Nuevos servicios, más seguridad
+http://correo.yahoo.es
 
 
 -------------------------------------------------------
