@@ -1,12 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Qualification Testing
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: Daryl Van Vorst <daryl@wideray.com>
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <000201c31508$200eac20$6400a8c0@baked>
-References: <000201c31508$200eac20$6400a8c0@baked>
+Subject: Re: [Bluez-devel] Qualification Testing
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Max Krasnyansky <maxk@qualcomm.com>
+Cc: Daryl Van Vorst <daryl@wideray.com>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1052637555.24170.7.camel@localhost.localdomain>
+References: <000c01c313f5$b57ae030$1a01010a@baked>
+	<000c01c313f5$b57ae030$1a01010a@baked>
+	<5.1.0.14.2.20030508171149.01c082c0@unixmail.qualcomm.com>
+	<1052442873.1069.35.camel@pegasus.local>
+	<1052545687.10456.235.camel@localhost.localdomain>
+	<1052584255.1133.13.camel@pegasus.local>
+	<1052637555.24170.7.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1052757449.1664.85.camel@baroque.rococosoft.com>
+Message-Id: <1052639076.1133.22.camel@pegasus.local>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,39 +26,35 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 12 May 2003 17:37:29 +0100
+Date: 11 May 2003 09:44:29 +0200
 
-Hi Daryl,
+Hi Max,
 
-On Thu, 2003-05-08 at 03:18, Daryl Van Vorst wrote:
-> Steve,
-> 
-> > >         2.) There appears to be a problem handling continuation 
-> > > states. Handling continuation state is optional. We found 
-> > that if the 
-> > > querying device sends a maximum byte count of 100, the 
-> > continutation 
-> > > state worked fine. But if the querying device sent a maximum byte 
-> > > count of 8, the continuation state doesn't work (the 
-> > continuation flag 
-> > > wasn't recognized in the next packet). I can dig up an 
-> > example log if 
-> > > it would help.
+> > > Ok. I've fixed that (and pushed changes to BK). My idea about 
+> > > with TX_THROTTLED flag didn't work. Well, it worked but only in 
+> > > one direction :). Changing state machine would've been fairly big
+> > > change and could've affected compatibility.
+> > > So I added a simple logic to track MSC exchange state. Works beautifully
 > > 
-> > Yeah it would be good to get a log. I imagine 8-bytes is 
-> > pretty close to the minimum size.
+> > I like to see this logic in the state machine, but I agree with with you
+> > that it is not the right time for changing it. Your patch works also
+> > fine for me and I have a new 2.4.20 with all patches up and running.
+> > 
+> Actually MSC exchange is not part of the connect procedure. After UA is
+> received DLC is considered connected. Which means some implementations
+> might not send first MSC before they have data to send, that's what
+> meant that changing state machine could affect compatibility.
+> Besides MSC exchange, just like L2CAP config, doesn't have strict  
+> sequence which makes it hard to track with a single state. i.e they 
+> sent MSC first, we sent MSC first, etc. So I think we're ok.
 
-Would it be possible to get an hcidump from the machine on which the SDP
-server is running? (I am interested to see what data the SDP server is
-actually returning.)
+good point. And with your argument, I feel that you have choosen the
+absolute correct way to implement this.
 
-(hcidump -x -w file.dump -i hci0)
+Regards
 
-Thanks,
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+Marcel
+
 
 
 
