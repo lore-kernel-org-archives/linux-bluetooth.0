@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth Access Point elmeg D@VOS-44.dsl
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Florian <Kimpenhaus@gmx.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <opr3xmdugiqdj9uv@mail.gmx.de>
-References: <opr3xmdugiqdj9uv@mail.gmx.de>
-Content-Type: text/plain
-Message-Id: <1077725935.2919.116.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+From: Florian <Kimpenhaus@gmx.de>
+Content-Type: text/plain; format=flowed; charset=us-ascii
+MIME-Version: 1.0
+Message-ID: <opr3xmdugiqdj9uv@mail.gmx.de>
+Subject: [Bluez-users] Bluetooth Access Point elmeg D@VOS-44.dsl
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,27 +15,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Feb 2004 17:18:55 +0100
-
-Hi Florian,
-
-> im using an elmeg D@VOS-44.dsl AP has anyone figured out how to pair and 
-> connect the device
-> or is it impossible too do that using bluez(at the moment)?
-
-it looks like the AP is using LAN access using PPP and DUN. So it should
-be easy to connect to the AP using
-
-	dund --connect <bdaddr-ap>
-
-Please also run "hcitool info <bdaddr-ap>" (as root) and show us the
-output.
-
-Regards
-
-Marcel
+Date: Wed, 25 Feb 2004 16:23:44 +0100
 
 
+hi,
+
+im using an elmeg D@VOS-44.dsl AP has anyone figured out how to pair and 
+connect the device
+or is it impossible too do that using bluez(at the moment)?
+
+
+using
+gentoo linux 2.6.3
+USB BT-Device (BT3030 Tecom)
+
+-- 
+Using M2, Opera's revolutionary e-mail client: http://www.opera.com/m2/
 
 
 -------------------------------------------------------
