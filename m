@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] MSI MS-6970 (BToes) firmware upgrade
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
+To: Pavel Ruzicka <pavouk@pavouk.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200407152241.30155.cijoml@volny.cz>
+In-Reply-To: <200407152159.47024.pavouk@pavouk.org>
 References: <200407131225.15448.pavouk@pavouk.org>
-	 <1089826413.4517.4.camel@pegasus> <200407152159.47024.pavouk@pavouk.org>
-	 <200407152241.30155.cijoml@volny.cz>
+	 <1089826413.4517.4.camel@pegasus>  <200407152159.47024.pavouk@pavouk.org>
 Content-Type: text/plain
-Message-Id: <1089959822.4517.52.camel@pegasus>
+Message-Id: <1089959513.4517.46.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,28 +19,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 16 Jul 2004 08:37:02 +0200
+Date: Fri, 16 Jul 2004 08:31:53 +0200
 
-Hi Michal,
+Hi Pavel,
 
-> Does anybody has a newer .dfu file for Microsoft Wireless Transceiver 
-> dongle? :(
-> It would be nice to has it 1.2 ready :((
+> > do you got a *.dfu file for your dongle from MSI?
+> 
+> Yes, I have file fw525.dfu from original installation CD.
+> File is available for example here:
+> http://home.online.no/~edg-edva/fw525.dfu
 
-I don't know of any and flashing another one breaks your Microsoft
-dongle completly.
-
-> Marcel could you pls enhance your site with supported dongles about info that 
-> this dongle was successfully upgraded using newer firmware and contact to 
-> person who reported it? It will help many people and will save our time to 
-> this feature questions.
-
-The only dongle that can be easily updated using the Apple firmware is
-from D-Link. And I only had success with the B3 revision. The B4 is not
-working and I broke another dongle of mine.
-
-So I won't go any further with firmware upgrades until the manufactures
-come to me and say that they wanna have a Linux firmware upgrade tool.
+the 525 firmware is HCI 16.4 and you already had this on your dongle.
 
 Regards
 
