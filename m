@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] siemens s55
+Subject: Re: [Bluez-devel] Re: multi rfcomm/sco connection
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20041109150154.25020.qmail@webmail2.aruba.it>
-References: <20041109150154.25020.qmail@webmail2.aruba.it>
+In-Reply-To: <20041109144107.19373.qmail@webmail.aruba.it>
+References: <20040727145602.30665.qmail@webmail.aruba.it>
+	 <1090940808.4845.21.camel@pegasus>
+	 <20041109144107.19373.qmail@webmail.aruba.it>
 Content-Type: text/plain
-Message-Id: <1100048237.25879.8.camel@pegasus>
+Message-Id: <1100047927.25879.1.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +20,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 10 Nov 2004 01:57:17 +0100
+Date: Wed, 10 Nov 2004 01:52:07 +0100
 
 Hi,
 
-> Does anyone tried to use the audio bluetooth features of the S55? 
+> I was looking, few months ago, for a way to solve a problem more or less 
+> like your. 
 > 
-> I mean I can listen/play audio on several nokia, motorola, etc. but I find 
-> no way to play with the siemens. I saw that the bluetooth-alsa people 
-> support the Jabra BT200 and Siemens HHB-600 (who should work with the S55) 
-> but I didn't find their mailing-list, is there one? 
+> All what I could do was to set the headphones to HV3 and the bt-dongle too, 
+> in this mode it was possible to "listen"  audio on 3 different channels, the 
+> problem, for me, was that this channels were "mixed" so if with a channel I 
+> was receiving 24bit with 3 channels they were 72, but I could not find a way 
+> to "demux" this caos who was coming out, but I remember I found a way to 
+> "create" 3 different sco connections with just one bt-(usb)-dongle.
 
-explain this a little bit more. What do you play on the mobile phones?
+this sounds like a problem with the wrong alternate setting on the ISOC
+interface of the USB device. Your workaround is not reliable and maybe
+it is CSR specific. To get more than one SCO channel working the hci_usb
+driver must be fixed to dynamicaly change the alternate settting.
 
 Regards
 
