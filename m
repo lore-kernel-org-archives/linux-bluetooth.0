@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <406C1E19.7090003@ntlworld.com>
-From: Oli Ellis <oliver.ellis@ntlworld.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] RE: Logitech multimedia keys off by one
+Subject: Re: [Bluez-users] can't compile bluez-utils-2.6
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200404020850.11459.cijoml@volny.cz>
+References: <200404020850.11459.cijoml@volny.cz>
+Content-Type: text/plain; charset=iso-8859-2
+Message-Id: <1080894207.2774.47.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,22 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 01 Apr 2004 14:50:17 +0100
+Date: Fri, 02 Apr 2004 10:23:28 +0200
 
-Yes, I tried the same -1 trick, but it seems more complicated than that. 
-The event should tally with what is written on the keyboard, and I don't 
-think that bluetooth devices can be released unless they are fully 
-compliant (I have been reading up!). Plus, if Logitech can't get it 
-right, who can? Marcel suggested it could be an error with the parser, 
-but this looks to be beyond my programming expertise.
+Hi Michal,
 
-Also, a question to Mr Holtmann: The latest release of the Bluez package 
-with bluez-libs-2.6 and bluez-utils-2.6 - does this negate the need for 
-the CVS version for tools like hid2hci and bthid?
+> make uninstall in bluez-sdp-1.5 and then make in bluez utils-2.6 causes=
+=20
+> errors:
+>=20
+> gcc -DPACKAGE_NAME=3D\"\" -DPACKAGE_TARNAME=3D\"\" -DPACKAGE_VERSION=3D=
+\"\"=20
+> -DPACKAGE_STRING=3D\"\" -DPACKAGE_BUGREPORT=3D\"\" -DPACKAGE=3D\"bluez-=
+utils\"=20
+> -DVERSION=3D\"2.6\" -DYYTEXT_POINTER=3D1  -I. -I.    -I/usr/include  -W=
+all -g -O2=20
+> -c sdptool.c
+> sdptool.c:36:27: bluetooth/sdp.h: nen=ED souborem ani adres=E1=F8em
+> sdptool.c:37:31: bluetooth/sdp_lib.h: nen=ED souborem ani adres=E1=F8em
+> sdptool.c:38:36: bluetooth/sdp_internal.h: nen=ED souborem ani adres=E1=
+=F8em
+> sdptool.c:45: error: parse error before "bdaddr_t"
 
-Thanks
+you must install bluez-libs-2.6 first.
 
-- Oli
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
