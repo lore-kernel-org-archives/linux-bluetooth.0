@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] btohs,btohl, ...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050209143858.1e0350c3@CleverSophie>
-References: <20050209140701.2cf50710@CleverSophie>
-	 <1107955171.13863.26.camel@pegasus>  <20050209143858.1e0350c3@CleverSophie>
+Subject: Re: [Bluez-devel] L2CAP retransmission, flow control
+From: Imre Deak <imre.deak@Nokia.com>
+To: Bluez-Devel <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1107944306.13863.15.camel@pegasus>
+References: <1107934854.9489.4.camel@mammoth.research.nokia.com>
+	 <1107938887.13863.4.camel@pegasus>
+	 <1107940961.9489.32.camel@mammoth.research.nokia.com>
+	 <1107944306.13863.15.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1107957430.13863.34.camel@pegasus>
+Message-Id: <1107955473.9489.37.camel@mammoth.research.nokia.com>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,33 +21,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 09 Feb 2005 14:57:10 +0100
+Date: Wed, 09 Feb 2005 15:24:33 +0200
 
-Hi Bjoern,
+On Wed, 2005-02-09 at 11:18 +0100, ext Marcel Holtmann wrote:
+> If SOCK_STREAM is requested and RFC negotiation fails, then also the
+> connection must fail. For SOCK_STREAM you need flow control.
+>
+> For SOCK_DGRAM and SOCK_RAW we don't do anything. The SOCK_DGRAM is for
+> connection-less channels and SOCK_RAW gives access to the signal channel
+> itself.
+> 
+> If you use SOCK_SEQPACKET (current type) and mode > 0 then negotiate RFC
+> and if success then use it, otherwise fail.
+> 
 
-> sorry for my signing. I read that sometimes a different order is used within a byte as well and not only between bytes. 
+Thanks, it got clearer now.
+Shouldn't we support the flow control only mode, so without
+retransmission? For SOCK_SEQPACKET and a specific mode value for
+example.
 
-I don't know of any architecture that stores the bits of its bytes in a
-different order and where this is visible to for the user. However such
-a platform might exists.
-
-> Okay that makes it easier.
-
-You mean big endian communicates with little endian or vice versa?
-
-> But if this is not the case:
-> When I send a 32bit integer for example, do I have to worry about the order of the bytes when I send or receive them? 
-
-If you have a byte stream (a character array) then you don't need to
-worry, because they are stored in a endianless format (bytewise). If you
-use datatypes like uint16_t and uint32_t and send them to the stream or
-copy them into an array then you should convert them to the same endian
-encoding.
-
-Regards
-
-Marcel
-
+--Imre
 
 
 
