@@ -1,257 +1,42 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andi Kleen <ak@suse.de>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>, netdev@oss.sgi.com,
-   viro@zenII.linux.org.uk
-In-Reply-To: <20040215002513.7c6fc532.ak@suse.de>
-References: <20040206050042.20a2b3b0.ak@suse.de>
-	 <1076079512.2806.40.camel@pegasus> <20040207032428.56ffbebc.ak@suse.de>
-	 <1076152411.14418.73.camel@pegasus> <20040207125723.391a1fcd.ak@suse.de>
-	 <1076173068.2670.4.camel@pegasus> <20040207172436.GB449@wotan.suse.de>
-	 <1076525743.2792.1.camel@pegasus>  <20040215002513.7c6fc532.ak@suse.de>
-Content-Type: multipart/mixed; boundary="=-NfNX0DxuTNen//JZIYqY"
-Message-Id: <1076532421.3041.2.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: some bluetooth fixes
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 Feb 2004 21:47:01 +0100
-
-
---=-NfNX0DxuTNen//JZIYqY
+Return-Path: <noring@nocrew.org>
+Subject: Re: [Bluez-devel] D-Bus interfaces
+From: Fredrik Noring <noring@nocrew.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1076517913.2696.39.camel@pegasus>
+References: <1076265358.2670.36.camel@pegasus>
+	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
+	 <1076267396.2670.58.camel@pegasus>
+	 <1076275689.14742.93.camel@akka.yeti.nocrew.org>
+	 <1076277250.6869.24.camel@pegasus>
+	 <1076278554.14742.112.camel@akka.yeti.nocrew.org>
+	 <1076279508.6869.54.camel@pegasus>
+	 <1076280612.14742.147.camel@akka.yeti.nocrew.org>
+	 <1076282343.6869.65.camel@pegasus>
+	 <1076284317.14742.179.camel@akka.yeti.nocrew.org>
+	 <1076287085.6869.70.camel@pegasus>
+	 <1076311376.14742.202.camel@akka.yeti.nocrew.org>
+	 <1076321200.6869.75.camel@pegasus>
+	 <1076322129.5263.28.camel@kalkyl.roxen.com>
+	 <1076323138.6869.93.camel@pegasus>
+	 <1076493798.6281.19.camel@kalkyl.roxen.com>
+	 <1076506369.2777.88.camel@pegasus>
+	 <1076508315.6281.131.camel@kalkyl.roxen.com>
+	 <1076517913.2696.39.camel@pegasus>
 Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Message-Id: <1076536853.31726.3.camel@akka.yeti.nocrew.org>
+Mime-Version: 1.0
+Date: Wed, 11 Feb 2004 23:00:53 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Andi,
+Marcel,
 
-> +	if (req.conn_num * sizeof(*ci) > PAGE_SIZE * 2)
-> +		return -EINVAL;
-> 
-> This can still overflow. It should be 
-> 
-> 	if (req.conn_num > (PAGE_SIZE * 2)/sizeof(*ci))
-> 		return -EINVAL
+On Wed, 2004-02-11 at 17:45, Marcel Holtmann wrote:
+> do we really need to store configurations based on the device id? I
+> think we should store them all based on the device address only.
 
-thanks for reviewing the patch again. The fixed version is only attached
-for control. It goes out to Dave in the next minutes.
-
-Regards
-
-Marcel
-
-
---=-NfNX0DxuTNen//JZIYqY
-Content-Disposition: attachment; filename=patch
-Content-Type: text/plain; name=patch; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
-
-===== net/bluetooth/hci_conn.c 1.9 vs edited =====
---- 1.9/net/bluetooth/hci_conn.c	Tue Jan 13 03:50:09 2004
-+++ edited/net/bluetooth/hci_conn.c	Wed Feb 11 21:00:52 2004
-@@ -353,21 +353,24 @@
- 	struct hci_conn_info *ci;
- 	struct hci_dev *hdev;
- 	struct list_head *p;
--	int n = 0, size;
-+	int n = 0, size, err;
- 
- 	if (copy_from_user(&req, (void *) arg, sizeof(req)))
- 		return -EFAULT;
- 
--	if (!(hdev = hci_dev_get(req.dev_id)))
--		return -ENODEV;
--
--	size = req.conn_num * sizeof(struct hci_conn_info) + sizeof(req);
-+	if (!req.conn_num || req.conn_num > (PAGE_SIZE * 2) / sizeof(*ci))
-+		return -EINVAL;
- 
--	if (verify_area(VERIFY_WRITE, (void *)arg, size))
--		return -EFAULT;
-+	size = sizeof(req) + req.conn_num * sizeof(*ci);
- 
- 	if (!(cl = (void *) kmalloc(size, GFP_KERNEL)))
- 		return -ENOMEM;
-+
-+	if (!(hdev = hci_dev_get(req.dev_id))) {
-+		kfree(cl);
-+		return -ENODEV;
-+	}
-+
- 	ci = cl->conn_info;
- 
- 	hci_dev_lock_bh(hdev);
-@@ -381,20 +384,21 @@
- 		(ci + n)->out   = c->out;
- 		(ci + n)->state = c->state;
- 		(ci + n)->link_mode = c->link_mode;
--		n++;
-+		if (++n >= req.conn_num)
-+			break;
- 	}
- 	hci_dev_unlock_bh(hdev);
- 
- 	cl->dev_id = hdev->id;
- 	cl->conn_num = n;
--	size = n * sizeof(struct hci_conn_info) + sizeof(req);
-+	size = sizeof(req) + n * sizeof(*ci);
- 
- 	hci_dev_put(hdev);
- 
--	copy_to_user((void *) arg, cl, size);
-+	err = copy_to_user((void *) arg, cl, size);
- 	kfree(cl);
- 
--	return 0;
-+	return err ? -EFAULT : 0;
- }
- 
- int hci_get_conn_info(struct hci_dev *hdev, unsigned long arg)
-@@ -407,9 +411,6 @@
- 	if (copy_from_user(&req, (void *) arg, sizeof(req)))
- 		return -EFAULT;
- 
--	if (verify_area(VERIFY_WRITE, ptr, sizeof(ci)))
--		return -EFAULT;
--
- 	hci_dev_lock_bh(hdev);
- 	conn = hci_conn_hash_lookup_ba(hdev, req.type, &req.bdaddr);
- 	if (conn) {
-@@ -425,6 +426,5 @@
- 	if (!conn)
- 		return -ENOENT;
- 
--	copy_to_user(ptr, &ci, sizeof(ci));
--	return 0;
-+	return copy_to_user(ptr, &ci, sizeof(ci)) ? -EFAULT : 0;
- }
-===== net/bluetooth/hci_core.c 1.22 vs edited =====
---- 1.22/net/bluetooth/hci_core.c	Thu Feb  5 13:07:36 2004
-+++ edited/net/bluetooth/hci_core.c	Wed Feb 11 20:59:03 2004
-@@ -716,22 +716,20 @@
- 	struct hci_dev_list_req *dl;
- 	struct hci_dev_req *dr;
- 	struct list_head *p;
--	int n = 0, size;
-+	int n = 0, size, err;
- 	__u16 dev_num;
- 
- 	if (get_user(dev_num, (__u16 *) arg))
- 		return -EFAULT;
- 
--	if (!dev_num)
-+	if (!dev_num || dev_num > (PAGE_SIZE * 2) / sizeof(*dr))
- 		return -EINVAL;
--	
--	size = dev_num * sizeof(*dr) + sizeof(*dl);
- 
--	if (verify_area(VERIFY_WRITE, (void *) arg, size))
--		return -EFAULT;
-+	size = sizeof(*dl) + dev_num * sizeof(*dr);
- 
- 	if (!(dl = kmalloc(size, GFP_KERNEL)))
- 		return -ENOMEM;
-+
- 	dr = dl->dev_req;
- 
- 	read_lock_bh(&hci_dev_list_lock);
-@@ -746,12 +744,12 @@
- 	read_unlock_bh(&hci_dev_list_lock);
- 
- 	dl->dev_num = n;
--	size = n * sizeof(*dr) + sizeof(*dl);
-+	size = sizeof(*dl) + n * sizeof(*dr);
- 
--	copy_to_user((void *) arg, dl, size);
-+	err = copy_to_user((void *) arg, dl, size);
- 	kfree(dl);
- 
--	return 0;
-+	return err ? -EFAULT : 0;
- }
- 
- int hci_get_dev_info(unsigned long arg)
-===== net/bluetooth/rfcomm/tty.c 1.28 vs edited =====
---- 1.28/net/bluetooth/rfcomm/tty.c	Thu Aug  7 02:24:51 2003
-+++ edited/net/bluetooth/rfcomm/tty.c	Wed Feb 11 21:01:25 2004
-@@ -349,7 +349,7 @@
- 	struct rfcomm_dev_list_req *dl;
- 	struct rfcomm_dev_info *di;
- 	struct list_head *p;
--	int n = 0, size;
-+	int n = 0, size, err;
- 	u16 dev_num;
- 
- 	BT_DBG("");
-@@ -357,14 +357,11 @@
- 	if (get_user(dev_num, (u16 *) arg))
- 		return -EFAULT;
- 
--	if (!dev_num)
-+	if (!dev_num || dev_num > (PAGE_SIZE * 4) / sizeof(*di))
- 		return -EINVAL;
- 
- 	size = sizeof(*dl) + dev_num * sizeof(*di);
- 
--	if (verify_area(VERIFY_WRITE, (void *)arg, size))
--		return -EFAULT;
--
- 	if (!(dl = kmalloc(size, GFP_KERNEL)))
- 		return -ENOMEM;
- 
-@@ -389,9 +386,10 @@
- 	dl->dev_num = n;
- 	size = sizeof(*dl) + n * sizeof(*di);
- 
--	copy_to_user((void *) arg, dl, size);
-+	err = copy_to_user((void *) arg, dl, size);
- 	kfree(dl);
--	return 0;
-+
-+	return err ? -EFAULT : 0;
- }
- 
- static int rfcomm_get_dev_info(unsigned long arg)
-@@ -563,8 +561,10 @@
- 	set_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
- 
- 	err = rfcomm_dlc_open(dlc, &dev->src, &dev->dst, dev->channel);
--	if (err < 0)
-+	if (err < 0) {
-+		rfcomm_dev_put(dev);
- 		return err;
-+	}
- 
- 	/* Wait for DLC to connect */
- 	add_wait_queue(&dev->wait, &wait);
-@@ -588,6 +588,9 @@
- 	}
- 	set_current_state(TASK_RUNNING);
- 	remove_wait_queue(&dev->wait, &wait);
-+
-+	if (err < 0)
-+		rfcomm_dev_put(dev);
- 
- 	return err;
- }
-
---=-NfNX0DxuTNen//JZIYqY--
-
-
-
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+My opinion is that we can drop support for the "device hci0 { ... }"
+syntax since it's a bit confusing - Bluetooth devices are very address
+oriented so "device { ... }" and "device 00:00:00:00:00:00 { ... }"
+are enough. This would also simplify the configuration code in hcid,
+i.e. less risk for bugs.
