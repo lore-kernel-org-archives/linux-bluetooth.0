@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth device missing after kernel recompile
+Subject: Re: [Bluez-users] rfcomm problems
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Mick Wever <hair@netbeans.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <pan.2004.03.29.08.17.54.697624@netbeans.org>
-References: <pan.2004.03.29.08.17.54.697624@netbeans.org>
+To: Gene Imes <ebi7@ozob.net>
+Cc: list-bluez <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1080515964.11299.4.camel@go2>
+References: <1080515964.11299.4.camel@go2>
 Content-Type: text/plain
-Message-Id: <1080556737.2281.217.camel@pegasus>
+Message-Id: <1080556492.2281.211.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,27 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Mar 2004 12:38:57 +0200
+Date: Mon, 29 Mar 2004 12:34:53 +0200
 
-Hi Mick,
+Hi Gene,
 
-> After recompiling my kernel (2.6) bluetooth has stopped working for me.
-> lsmod gives me the required modules.
-> When I type 'hcitool scan' I get:
-> "Device is not available.: Success".
-> And 'hcitool inq' gives me:
-> "Inquiring ...
-> Inquiry failed.: No such device".
-> 'hcitool dev' does not output any devices.
+> I have a D-Link dbt-120 dongle. This has been working fine with a
+> bluetooth GPS. However today I tried to use it and I could not connect
+> to the GPS.
+> 
+> When I plug the dbt-120 in the /dev/rfcomm0-255 are created. If I try a
+> 'cat /dev/rfcomm0' I get cat: rfcomm0 No such device. Previously a 'cat
+> /dev/rfcomm0' would return everything the GPS was sending.
+> 
+> Anyone know what is going on here?
 
-this means that your device is not detected. Does it show up in lsmod?
-What kernel do you have changed? What do lspci say?
-
-> What am I missing? What is the /dev device file that is used? How do I
-> create the local device again if that is what's needed?
-
-Come on, do you ever created the eth0 device under /dev? This is
-networking, so no device nodes are needed.
+you should check that "rfcomm -a" reports your bindung with the GPS
+device. Check if hcid is runninng and run "hcidump -x" to see what is
+going on. And of course find out what you have changed.
 
 Regards
 
