@@ -1,27 +1,50 @@
-Return-Path: <maxk@qualcomm.com>
-Message-Id: <5.1.0.14.2.20030612182217.0ac56668@unixmail.qualcomm.com>
-Date: Thu, 12 Jun 2003 18:22:53 -0700
-To: "Daryl Van Vorst" <daryl@wideray.com>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
-From: Max Krasnyansky <maxk@qualcomm.com>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Qualification Testing
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Daryl Van Vorst <daryl@wideray.com>
+Cc: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <001501c33124$cc792160$1a01010a@baked>
-References: <5.1.0.14.2.20030612120846.0ba3b5c8@unixmail.qualcomm.com>
+References: <001501c33124$cc792160$1a01010a@baked>
+Content-Type: text/plain
+Message-Id: <1055453309.3443.74.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 12 Jun 2003 23:28:22 +0200
 
-At 01:54 PM 6/12/2003, Daryl Van Vorst wrote:
->Fantastic! Thanks. :)
->
->Yeah, it should help others. Hopefully there aren't other subtleties that
->we've missed regarding this.
->
->Looks like all of the current failures now have fixes from you and Marcel.
->So far the only way that I've been updating my stack is by using Marcel's
->patches. Marcel, any chance you could make another patch once Max has put in
->this L2CAP thing?
+Hi Daryl,
 
-Done. Pushed to BK 2.4.
+> Looks like all of the current failures now have fixes from you and Marcel.
+> So far the only way that I've been updating my stack is by using Marcel's
+> patches. Marcel, any chance you could make another patch once Max has put in
+> this L2CAP thing?
 
-Max
+the next patches are planned for the end of next week, because they will
+include the CMTP implementation for the Commmon ISDN Profile. But you
+can use patch-2.4.18-mh6 and I sent you the incremental fixes by email.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.NET email is sponsored by: eBay
+Great deals on office technology -- on eBay now! Click here:
+http://adfarm.mediaplex.com/ad/ck/711-11697-6916-5
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
