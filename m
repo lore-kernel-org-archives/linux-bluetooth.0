@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040401105910.81075.qmail@web40713.mail.yahoo.com>
-From: Lalith Chakravarthi <lalithvc@yahoo.com>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Simple file push, without OBEX?
+Subject: Re: [Bluez-users] Re: Bluetooth security in bluez ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Anssi Saari <as@sci.fi>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040401102919.GA6987@sci.fi>
+References: <20040328220800.36896.qmail@web60302.mail.yahoo.com>
+	 <200403290028.48289.cijoml@volny.cz> <1080514616.2281.178.camel@pegasus>
+	 <20040401102919.GA6987@sci.fi>
+Content-Type: text/plain
+Message-Id: <1080816007.3059.18.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,32 +20,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 1 Apr 2004 02:59:10 -0800 (PST)
+Date: Thu, 01 Apr 2004 12:40:08 +0200
+
+Hi Anssi,
+
+> > setting auth and encrypt in hcid.conf enables security mode 3, which is
+> > not what most people want. Leave it off and use security mode 1/2 and
+> > let the remote device trigger the security mechanism.
+> 
+> How can you tell whether a connection is encrypted or not in Bluez if
+> security mode is 2?
+
+check with "hcitool con"
+
+Connections:
+        < ACL 00:0A:xx:xx:xx:xx handle 43 state 1 lm MASTER ENCRYPT 
+
+Regards
+
+Marcel
 
 
-> 
-> Is it possible to send a simple file, such as a vCard, or an image, 
-> from a MIDlet running on one device to another device, via bluetooth?
-> 
-> It seems to be an operation that requires an OBEX push to me, but as 
-> no handsets implement OBEX in their JSR-82 implementations, that 
-> leaves RFCOMM or L2CAP. As far as I can see, RFCOMM/L2CAP 
-> connections are always client/server. Is it possible to simply 
-> connect to another device and send a file using these methods, 
-> without specifying a service or custom MIDlet to connect to, and 
-> have the receiver deal with the file appropriately? Or is there a 
-> generic service that accepts incoming files, that can be specified 
-> in the connection string? 
-> 
-> thanks for any help. And no, this isn't an April Fools joke!
-> 
-> 
-
-
-__________________________________
-Do you Yahoo!?
-Yahoo! Small Business $15K Web Design Giveaway 
-http://promotions.yahoo.com/design_giveaway/
 
 
 -------------------------------------------------------
