@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BlueZ & Cygwin
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Dave Dev <alwaysgone@seznam.cz>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <24890.1027935-9861-691202765-1086947404@email.seznam.cz>
-References: <24890.1027935-9861-691202765-1086947404@email.seznam.cz>
-Content-Type: text/plain
-Message-Id: <1086975213.7930.113.camel@pegasus>
-Mime-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200406141329.45458.cijoml@volny.cz>
+Subject: [Bluez-users] nokia wireless keyboard
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,21 +17,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Jun 2004 19:33:33 +0200
+Date: Mon, 14 Jun 2004 13:29:45 +0200
 
-Hi Dave,
+Hi,
 
-> Have any of you tried using BlueZ & Cygwin together?  Does it work?  If yes, how does one port and compile BlueZ in it?
-> 
-> I'm curious...
+new BT keyboard from nokia looks very interessant :)
 
-how would you compile the BlueZ kernel code ;)
+http://mobil.idnes.cz/obrazek.html?obrazek=nokia_wireless_keyboard_00.jpg
 
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
