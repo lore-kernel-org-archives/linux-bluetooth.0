@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluez-utils Makefile fault
+Subject: Re: [Bluez-users] Bug when MS Transceiver in USB1.1 slot:
 From: Marcel Holtmann <marcel@holtmann.org>
 To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200408151009.38583.cijoml@volny.cz>
-References: <200408142331.27222.cijoml@volny.cz>
-	 <1092530108.4375.13.camel@pegasus>  <200408151009.38583.cijoml@volny.cz>
+In-Reply-To: <200408151032.10012.cijoml@volny.cz>
+References: <200408151032.10012.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1092564842.4375.24.camel@pegasus>
+Message-Id: <1092564721.4375.21.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,20 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 Aug 2004 12:14:02 +0200
+Date: Sun, 15 Aug 2004 12:12:01 +0200
 
 Hi Michal,
 
-> > > when make uninstall and then make a new ones in bluez-utils, all my
-> > > configurated files were replaced with default conf files :(
-> > > PLS add some kind of check (md5sum??)
-> >
-> > if you tell me how to do this with default autoconf/automake methods I
+> I have this problem and because I don't know if it is job for you or USB guys, 
+> I posted it into kernel-bugs.osdl.org.
 > 
-> This can be done via standart commands in section in Makefile (if and test), 
-> but I don't know if this is possible with autotools
+> PLS check it:
+> 
+> http://kernel-bugs.osdl.org/show_bug.cgi?id=3210
+> 
+> when Transceiver is in 2.0 slot, everything works like a charm
 
-I know, but I won't add extra Makefile rules if it is not necessary.
+sounds like a USB host driver bug.
 
 Regards
 
