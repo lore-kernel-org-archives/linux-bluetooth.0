@@ -1,43 +1,63 @@
-Return-Path: <steve.crane@rococosoft.com>
+Return-Path: <Olivier.Bornet@puck.ch>
+Date: Tue, 10 Aug 2004 11:30:40 +0200
+To: andy@beuth.info
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Multisync Bluetooth No devices
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: andy@beuth.info, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1092127904.4564.79.camel@pegasus>
-References: <1092127580.9886.56.camel@goya>
-	 <1092127904.4564.79.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1092131858.24961.1052.camel@baroque.rococosoft.com>
+Message-ID: <20040810093040.GS10085@puck.ch>
+References: <1092127580.9886.56.camel@goya> <1092127904.4564.79.camel@pegasus>
 Mime-Version: 1.0
-Date: Tue, 10 Aug 2004 10:57:39 +0100
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="eheScQNz3K90DVRs"
+In-Reply-To: <1092127904.4564.79.camel@pegasus>
+From: Olivier Bornet <Olivier.Bornet@puck.ch>
 List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Andy, Marcel,
 
-On Tue, 2004-08-10 at 09:51, Marcel Holtmann wrote:
-> Hi Andy,
-> 
-> > I run debian unstable with kernel 2.6.7 and mh4 from Marcel Holtmann
-> > (thanx). My problem is the following. By booting my pc i got the message
-> > No devices in HCI mode found.
-> > My Bluetooth is working under gnome with all applications exclude
-> > MULTISYNC. My Card is PCCARD 3COM 3CRWB6096 mit Kernel Driver und
-> > firmware loader. I can send SMS via Bluetooth and scmxx to my Siemens
-> > S55 but there is no way to get it work with Multisync.
+--eheScQNz3K90DVRs
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
 > > The Bluetooth Button in the "Connect with" selection is only grey.
-> > Any Idea??
-> > hid2hci say "No devices in HCI mode found" too.
-> 
+>=20
 > the Multisync package maintainer linked the Bluetooth plugin against the
 > libsdp which is no longer present. File a Debian bug report, because
+> this is not a BlueZ problem.
 
-You can bodge around this by making a softlink:
-# ln -s /usr/lib/libsdp.so /usr/lib/libbluetooth.so.1.0.8
+This is already done:
 
-Pretty awful but it should work.
+http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D262901
 
-Later,
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+See also the multisync mailing lists. A thread with this topic is
+already posted:
+
+http://sourceforge.net/mailarchive/forum.php?thread_id=3D5266361&forum_id=
+=3D12899
+
+Good day.
+
+		Olivier
+--=20
+Olivier Bornet                |    fran=E7ais : http://puck.ch/f
+Swiss Ice Hockey Results      |    english  : http://puck.ch/e
+http://puck.ch/               |    deutsch  : http://puck.ch/g
+Olivier.Bornet@puck.ch        |    italiano : http://puck.ch/i
+Get my PGP-key at http://puck.ch/pgp or at http://pgp.mit.edu/
+
+--eheScQNz3K90DVRs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFBGJXAdj3R/MU9khgRAupvAKCXKiperdeeg4jrtsC/x8nqRtPGSgCeO4ur
+JxghhF3JBNWha8qWTFHu4Xs=
+=kiXQ
+-----END PGP SIGNATURE-----
+
+--eheScQNz3K90DVRs--
