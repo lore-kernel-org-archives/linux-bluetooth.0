@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] MTU and MRU for Bluetooth
+Subject: Re: [Bluez-users] Oops in hci_usb
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Florian <Kimpenhaus@gmx.de>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <opr7hpnaqeqdj9uv@mail.gmx.de>
-References: <opr7hpnaqeqdj9uv@mail.gmx.de>
+In-Reply-To: <200405041930.50943.cijoml@volny.cz>
+References: <20040501173626.GA3866@kos.to>
+	 <1083686495.4666.39.camel@pegasus> <20040504172251.GA27072@kos.to>
+	 <200405041930.50943.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1083692600.4666.57.camel@pegasus>
+Message-Id: <1083692472.4666.54.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,14 +20,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 04 May 2004 19:43:20 +0200
+Date: Tue, 04 May 2004 19:41:12 +0200
 
-Hi Florian,
+Hi Michal,
 
-> some suggestions for suitable values for MTU / MRU when using pppd and PAP?
+> switch off Preempt kernel, switch off sco support. This helped me.
 
-are these values not related to the upper protocols like TCP/IP? The
-underlaying RFCOMM protocol is a stream, so you don't have a MTU.
+I already know that SCO support triggers it, but the preempt is worth to
+try. So leave SCO on and disable preempt. Do the bug still occurs?
 
 Regards
 
