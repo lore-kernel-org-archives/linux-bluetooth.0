@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <BAY104-F545C3886C1F9ECE32CF4DC1A60@phx.gbl>
-From: "blookk -" <blookk@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] compiling hciconfig for ARM
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY104-F3387CCB50D8B5E0CA2C7DAC1A50@phx.gbl>
+References: <BAY104-F3387CCB50D8B5E0CA2C7DAC1A50@phx.gbl>
+Content-Type: text/plain
+Message-Id: <1103892070.20258.87.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/html; charset=iso-8859-1; format=flowed
-Subject: [Bluez-devel] Re: compiling hciconfig for ARM
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,22 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 24 Dec 2004 19:42:33 +0000
+Date: Fri, 24 Dec 2004 13:41:10 +0100
 
-<html><div style='background-color:'><DIV class=RTE>Hi Marcel.</DIV>
-<DIV class=RTE>&nbsp;</DIV>
-<DIV class=RTE>I use a kernel 2.4.20 and a Compactflash Bluetooth BT0100M.</DIV>
-<DIV class=RTE>&nbsp;</DIV>
-<DIV class=RTE>Thanks.</DIV>
-<DIV class=RTE>&nbsp;</DIV>
-<DIV class=RTE>Regards.</DIV>
-<DIV class=RTE>&nbsp;</DIV>
-<DIV class=RTE>PD: Why I do not receive the messages of mailing list in my email?. I read the messages in the web.</DIV>
-<DIV class=RTE>&nbsp;</DIV>
-<DIV class=RTE>-------------------------</DIV>
-<DIV class=RTE>&nbsp;</DIV>
-<DIV class=RTE>&nbsp;</DIV>
-<DIV class=RTE>Hi,<BR> <BR> &gt; I have compiled the Bluez Utils and Libs 2.11 for a ARM platform,<BR> &gt; concretly for the CPU ARM7TDMI.<BR> &gt; I have done the compilation with uClibc-0.9.19 and in "hciconfig" tool<BR> &gt; I have a problem when I make"hciconfig -a" or "hciconfig hci0 name" or<BR> &gt; "hciconfig hci0 class" and other.<BR> &gt; All this problems occurs in file "hci.c", in function "int<BR> &gt; hci_send_req(int dd, struct hci_request *r, int to)".<BR> &gt; In this function when the program execute "n = poll(&amp;p, 1, to)" I<BR> &gt; obtain a kernel panic like this (executing hciconfig -a):<BR> <BR> what kernel and what Bluetooth hardware do you use?<BR> <BR> Regards<BR> <BR> Marcel<BR>&nbsp;<BR></DIV></div></html>
+Hi,
+
+> I have compiled the Bluez Utils and Libs 2.11 for a ARM platform,
+> concretly for the CPU ARM7TDMI.
+> I have done the compilation with uClibc-0.9.19 and in "hciconfig" tool
+> I have a problem when I make"hciconfig -a" or "hciconfig hci0 name" or
+> "hciconfig hci0 class" and other.
+> All this problems occurs in file "hci.c", in function "int
+> hci_send_req(int dd, struct hci_request *r, int to)".
+> In this function when the program execute "n = poll(&p, 1, to)" I
+> obtain a kernel panic like this (executing hciconfig -a):
+
+what kernel and what Bluetooth hardware do you use?
+
+Regards
+
+Marcel
+
 
 
 
