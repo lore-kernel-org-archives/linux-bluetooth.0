@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Geert Geurts <geert@ebm.nl>
+Message-ID: <20040328020755.5494.qmail@web21003.mail.yahoo.com>
+From: =?iso-8859-1?q?Gary=20Martin?= <gary_martin_au@yahoo.com.au>
+Subject: Re: [Bluez-users] Desperate newbie
 To: bluez-users@lists.sourceforge.net
-Message-Id: <1080503792.10768.4.camel@geert.ebm.nl>
-Mime-Version: 1.0
+In-Reply-To: <200403280158.30064.cijoml@volny.cz>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] (no subject)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,17 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 28 Mar 2004 21:56:32 +0200
+Date: Sun, 28 Mar 2004 12:07:55 +1000 (EST)
 
-Hello!
-I've been working to get my palm to connect using bluetooth....
-Guess wat my problem was... I had the affix drivers also
-installed/loaded ....ughh... yea stupid wanker I know. I've got it
-working using affix (sorry, It started to work faster...)now, anyways
-why should I swich to bluez?? I know if I don't want to I don't have to
-but putting it in a other way why is bluez part of the kernel and not
-affix?
+Thanks for the suggestion Michal. I changed the class from 0x100; to 0x10c; in the file
+hcid.conf, but nothing has changed. I'm glad it is not only me that is mystified.
 
+Gary
+
+
+--- "Michal Semler (volny.cz)" <cijoml@volny.cz> wrote: > Hi, 
+> 
+> try change your service class to:
+> 
+> class 0x10c;
+> 
+> Michal
+> 
+
+Find local movie times and trailers on Yahoo! Movies.
+http://au.movies.yahoo.com
 
 
 -------------------------------------------------------
