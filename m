@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040422073712.86329.qmail@web20419.mail.yahoo.com>
-From: Marian Gasparovic <marosg@yahoo.com>
+Message-ID: <20040422055958.17526.qmail@web20416.mail.yahoo.com>
+From: am "quiñones" <am_quinones@yahoo.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] bluetooth/gprs problem
+Content-Type: multipart/alternative; boundary="0-1547405518-1082613598=:14708"
+Subject: [Bluez-users] sample applications
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,41 +15,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Apr 2004 00:37:12 -0700 (PDT)
+Date: Wed, 21 Apr 2004 22:59:58 -0700 (PDT)
 
-Hi all,
-I have i-Tec USB Dongle with Broadcom chip connected
-to my notebook with Debian Woody. I am able to
-establish bluetooth connection to my Siemens S55
-mobile. After I start pppd for GPRS access to Internet
-I get connected. I can ping any server for as long as
-I want. But when I open any web page under Konqueror
-or try ping -f, after couple of seconds (10-20) I
-loose connection. First I see bluetooth going away on
-mobil display, then gprs disconnect and after a minute
-pppd finds it out too. Any suggestions where to look ?
-I tried it with several notebooks, usb bluetooth
-devices and mobiles and only this i-Tec USB Dongle
-makes troubles. Under Windows XP it works without a
-problem.
-Thank you a lot
+--0-1547405518-1082613598=:14708
+Content-Type: text/plain; charset=us-ascii
 
+Hi! I'm a college student doing on-the-job training, and my project right now is to make an application which sends data (specifically, personal profiles) from the pc to a mobile phone or PDA upon request of the cell phone or PDA, via bluetooth. Do you guys know where i can find some related sample programs? Just so i can study them. Thanks in advance! :)
+ 
+- Amabelle Quiñones
+Student, Ateneo de Manila University
+Student Assistant, Advanced Science and Technology Institute
+Quezon City, Philippines
 
-=====
-===================
- Marian Gasparovic
-===================
-"The mere thought hadn't  even  begun  to speculate about the merest possibility of crossing my mind."
-
-
-
-
-	
 		
-__________________________________
+---------------------------------
 Do you Yahoo!?
 Yahoo! Photos: High-quality 4x6 digital prints for 25¢
-http://photos.yahoo.com/ph/print_splash
+--0-1547405518-1082613598=:14708
+Content-Type: text/html; charset=us-ascii
+
+<DIV>Hi! I'm a college student doing on-the-job training, and my project right now is to make an application which sends data (specifically, personal&nbsp;profiles) from the pc to a mobile phone or PDA upon request of the cell phone or PDA, via bluetooth. Do you guys know where i can find some related sample programs? Just so i can study them. Thanks in advance! :)</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>- Amabelle Quiñones</DIV>
+<DIV>Student, Ateneo de Manila University</DIV>
+<DIV>Student Assistant, Advanced Science and Technology&nbsp;Institute</DIV>
+<DIV>Quezon City, Philippines</DIV><p>
+		<hr size=1><font face=arial size=-1>Do you Yahoo!?<br>
+Yahoo! Photos: <a href="http://pa.yahoo.com/*http://us.rd.yahoo.com/evt=23765/*http://photos.yahoo.c
+om/ph/print_splash">High-quality 4x6 digital prints for 25¢</a>
+--0-1547405518-1082613598=:14708--
 
 
 -------------------------------------------------------
