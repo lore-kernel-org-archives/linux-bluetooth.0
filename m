@@ -1,36 +1,59 @@
-Return-Path: <krose@jihl.valley-of-wind.krose.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] AMD64 HID pairing
-References: <khnacuya23u.fsf@hunter-killer.kendall.corp.akamai.com>
-	<1097185188.7325.75.camel@pegasus>
-	<khnr7oa8ah1.fsf@hunter-killer.kendall.corp.akamai.com>
-	<1097186322.7325.79.camel@pegasus>
-	<khnk6u289o5.fsf@hunter-killer.kendall.corp.akamai.com>
-	<87ekk82ar4.fsf@nausicaa.krose.org> <1097342518.12972.3.camel@pegasus>
-	<87zn2v1xry.fsf@nausicaa.krose.org> <1097359976.12972.5.camel@pegasus>
-	<877jpz1ath.fsf@nausicaa.krose.org>
-	<1097395131.12972.20.camel@pegasus>
-From: Kyle Rose <krose@krose.org>
-Date: Sun, 10 Oct 2004 18:05:09 -0400
-In-Reply-To: <1097395131.12972.20.camel@pegasus> (Marcel Holtmann's message of
-	"Sun, 10 Oct 2004 09:58:51 +0200")
-Message-ID: <87acuu6xgq.fsf@jihl.valley-of-wind.krose.org>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+Reply-To: axs203dd@excite.com
+From: "mr" <axs203dd@excite.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: Kyle Rose <krose@jihl.valley-of-wind.krose.org>
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain; charset="us-ascii"
+Message-Id: <20041010175639.E7B58B6D5@xprdmailfe17.nwk.excite.com>
+Subject: [Bluez-users] HCI Stops responding
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sun, 10 Oct 2004 13:56:39 -0400 (EDT)
 
-Marcel Holtmann <marcel@holtmann.org> writes:
 
-> Do you tried the bluez-utils from CVS?
+Hi,
 
-Well, I'll be a sonofabitch.  With the CVS bluez-utils, it works
-fine.  I'd be interested in figuring out what made the difference.  I
-may just try recompiling Debian's source package with gcc-3.4 to see
-if the compiler makes the difference.
 
-Thanks, Marcel.
 
-Cheers,
-Kyle
+I am using Slackware 10 with bluetooth support compiled as modules and bluez-libs-2.10 & bluez-utils-2.10. My box is an Athlon AMD K7 600MHz and the motherboard is Gigabyte 7IXE.
+
+
+
+I can;t get bluez to work properly. After some packets transmission the link breaks down and I have to unplug the dongle and plug it back again. It happened once to load the uhci (or usb-uhci) module and the PAN worked fine. However it is impossible to load these modules in the new distribution of Slackware, so I have to use usb-ohci instead.
+
+
+
+I can't find out the source of the problem..
+
+Please help
+
+
+
+
+
+regards
+
+Elias
+
+_______________________________________________
+Join Excite! - http://www.excite.com
+The most personalized portal on the Web!
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
