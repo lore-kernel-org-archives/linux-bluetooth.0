@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth for network
+Subject: Re: [Bluez-users] Scan Time for hcitool
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Peter K. Martin" <Peter.K.Martin@t-online.de>
+To: alexj@nada.kth.se
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAFSqC4ChMLEGKSvEU2nZPawEAAAAA@t-online.de>
-References: 
-	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAFSqC4ChMLEGKSvEU2nZPawEAAAAA@t-online.de>
+In-Reply-To: <1302.213.112.80.112.1097230559.squirrel@webmail.nada.kth.se>
+References: <1302.213.112.80.112.1097230559.squirrel@webmail.nada.kth.se>
 Content-Type: text/plain
-Message-Id: <1097235419.4407.6.camel@pegasus>
+Message-Id: <1097234685.4407.3.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,25 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 08 Oct 2004 13:36:59 +0200
+Date: Fri, 08 Oct 2004 13:24:45 +0200
 
-Hi Peter,
+Hi Alex,
 
-> > I'm using SuSE 9.1 and have installed and activated the 
-> > bluetooth-function of my notebook (Toshiba Satellite Pro M10). Now I 
-> > want to use the bluetooth-connection to an accesspoint - it is 
-> > possible to establish this connection - as a dummy-networkcard.
+> I'm using hcitool to search for a number of known HW-addresses, to see of
+> someones in the (coffee)room. Corny, but fun.
+> Example:
+> hcitool name DE:39:EF:98:01:34
 > 
-> > if you access point uses the PAN profile then you can use pand and then
-> configure the new >  > bnep0 network interface like you did with eth0
-> before.
+> However, If all phones/devices are present, the script runs quickliy,
+> traversin through the list. But, if one is missing it takes a very long
+> time before it terminates. Setting a timeoutflag, doesn't seem to do the
+> trick. And I can't spawn more cild processes, because the first one locks
+> up the HCi device, of course.
 > 
-> Unfortunately I cannot use pand, I already tried it - no reaction, also the
-> second one which comes with bluez. Only hcitool works and with hcitool cc
-> <addr> I'm able to connect to the accesspoint. Is there a way with rfcommX
-> and how to do this?
+> What can be done to shorten the seek->timeout time for non-present devices
+> that have known HW-addresses?
 
-then you must use dund for PPP over RFCOMM.
+I don't know if it also works for the name resolve, but it should be and
+the timeout parameter you are looking for is called page timeout and can
+be set via hciconfig.
 
 Regards
 
