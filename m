@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] HCI data packets
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de46576041206085827162a8f@mail.gmail.com>
-References: <2de46576041206085827162a8f@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1102358712.9644.41.camel@pegasus>
+Message-ID: <BAY12-F189C6AE7165F49B14F54BF8AB40@phx.gbl>
+From: "salvatore olgato" <sal_olg@hotmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Subject: [Bluez-users] registry
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,28 +16,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 19:45:12 +0100
+Date: Mon, 06 Dec 2004 17:09:20 +0000
 
-Hi Manjunath,
+Hi, Marcel.
 
-> Does, opening a socket and then connect() at the
-> L2CAP......automatically establish an HCI connection first and then an
-> L2CAP connection on top of it??  This is what HCI dump shows..
+Does BlueZ support Security manager, service database and device database?
 
-this is correct and it must work like this.
+Where is the information on the security (any)?
 
-> Can I in someway just create an HCI connection first and then pump HCI data
-> packet with some known payload???How can i generate the test data
-> packets........... In a way, i just want  pump raw bits.....
+Regards.
 
-You can use the HCI raw socket. This is what the library and the tools
-are doing. However be careful with the ACL packets, because some chips
-expect L2CAP frames and not random payload.
-
-Regards
-
-Marcel
-
+_________________________________________________________________
+Personalizza MSN Messenger con sfondi e fotografie! 
+http://www.ilovemessenger.msn.it/
 
 
 
