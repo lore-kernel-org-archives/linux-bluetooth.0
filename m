@@ -1,66 +1,71 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Radoslav Reznicek" <radecek@email.cz>
-To: <bluez-users@lists.sourceforge.net>
-Message-ID: <000e01c3f4d0$8128de60$4461daa0@radecek>
+Return-Path: <m_laverd@alcor.concordia.ca>
+Date: Mon, 16 Feb 2004 15:17:40 -0500 (EST)
+From: Marc-Andre Laverdiere-Papineau <m_laverd@alcor.concordia.ca>
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Major slowdown when service discovery+opening a
+ service happens on two systems trying to talk to each other
+In-Reply-To: <1076921935.2840.43.camel@pegasus>
+Message-ID: <Pine.OSF.4.44.0402161503210.336210-100000@alcor.concordia.ca>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-2"
-Subject: [Bluez-users] pairing i-Tech BT USB dongle and Nokia 6310i
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 16 Feb 2004 21:55:47 +0100
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-users.lists.sourceforge.net>
 
-I can't paired i-Tech BT USB dongle and phone Nokia 6310i. When I want
-connect to phone,  phone ask me for PIN. After enter PIN phone says "bad
-PIN". PC do not ask me for PIN. When I  try run bluepin script from shell,
-it return error. What do I bad?
-OS Mandrake9.2 kernel 2.4.22
-When I using Windows, i-Tech BT USB dongle and phone work correctly.
+Thanks Marcel for the help!
 
-[root@localhost bluetooth]# hcitool scan
-Scanning ...
-        00:60:57:10:CE:17       Nokia 6310i
-[root@localhost bluetooth]# rfcomm connect rfcomm0 00:60:57:10:CE:17
-Can't connect RFCOMM socket: Connection refused
-[root@localhost bluetooth]# bluepin
-Traceback (most recent call last):
-  File "/bin/bluepin", line 39, in ?
-    class Dialog(GtkDialog):
-NameError: name 'GtkDialog' is not defined
-[root@localhost bluetooth]#
+I'm not following all the terminology, since
+I'm working with Java. I was wondering what you would suggest that would
+be better for performance.
 
+This project is about ad-hoc networking and so the devices need to be
+constantly looking out for others that can be part of the network. The
+design wasn't built thinking that performance would be so hit. Do you have
+any idea why those two scenarios are different?
 
-[root@localhost bluetooth]#cat /var/log/syslog
-Feb 15 18:26:10 localhost kernel: BlueZ RFCOMM ver 1.0
-Feb 15 18:26:10 localhost kernel: Copyright (C) 2002 Maxim Krasnyansky
-<maxk@qualcomm.com>
-Feb 15 18:26:10 localhost kernel: Copyright (C) 2002 Marcel
-Holtmann<marcel@holtmann.org>
-Feb 15 18:26:35 localhost hcid[1587]: link_key_request
-(sba=C3:D1:00:1B:08:00,  dba=17:CE:10:57:60:00)
-Feb 15 18:26:37 localhost hcid[1587]: pin_code_request
-(sba=C3:D1:00:1B:08:00,  dba=17:CE:10:57:60:00)
-Feb 15 18:28:06 localhost hcid[1587]: pin_code_request
-(sba=C3:D1:00:1B:08:00,  dba=17:CE:10:57:60:00)
-Feb 15 18:29:51 localhost hcid[1587]: pin_code_request
-(sba=C3:D1:00:1B:08:00,  dba=17:CE:10:57:60:00)
+Scenario 1:
+Device A: Device Discovery, Service Discovery, connects to Device B and
+sends data
+Device B: Device Discovery, Service Discovery, L2CAP service
+This works super well. In this context the Service Discovery for Device B
+never finds anything. I don't know if that makes a difference or not.
 
+Scenario 2:
+Device A: Device Discovery, Service Discovery, L2CAP service, connects to
+Device B and sends data
+Device B: Device Discovery, Service Discovery, L2CAP service
+This makes me wish I never got in this project :(
 
+On Mon, 16 Feb 2004, Marcel Holtmann wrote:
+<snip>
+> so it is possible that you run an inquiry while you page another device.
+Actually, in the current situation, we have only 2 'devices', so they
+boringly scan each other and that's it.
 
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Hciconfig shows a few options for page scan (device discovery?) and
+inquiry scan (service discovery?). Should I consider tweaking those?
+> Actually I don't know if this is supported by any Bluetooth chips on the
+> market. And you run an inquiry while you have an ACL link opened. This
+> works with most devices that supports scatternet, but is not one of the
+> best ideas and can decrease your performance. What does "hciconfig -a"
+> say about your devices?
+<snip>
+It says:
+# hciconfig hci0 up
+# sdpd
+# hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:0A:3A:50:9C:DA ACL MTU: 192:8  SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:69 acl:0 sco:0 events:8 errors:0
+        TX bytes:27 acl:0 sco:0 commands:7 errors:0
+        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy:
+        Link mode: SLAVE ACCEPT
+        Name: 'BlueZ (0)'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
+0x20d
+        Manufacturer: Cambridge Silicon Radio (10)
