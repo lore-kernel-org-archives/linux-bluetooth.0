@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <419B6990.7020009@patbert.com>
-From: Patrick <patbert@patbert.com>
-MIME-Version: 1.0
+Message-ID: <2de4657604111705203c910b8b@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Using windows breaks bluetooth in linux? huh
-References: <419AE72F.3030307@patbert.com> <1100673867.7208.128.camel@pegasus>
-In-Reply-To: <1100673867.7208.128.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] bluetooth connection goes down
+In-Reply-To: <1100673743.7208.125.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <2de46576041116061851f9e35f@mail.gmail.com>
+	 <1100616835.7235.13.camel@notepaq>
+	 <2de4657604111621221753c870@mail.gmail.com>
+	 <1100673743.7208.125.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,47 +21,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Nov 2004 10:09:04 -0500
+Date: Wed, 17 Nov 2004 18:50:20 +0530
 
-Ah ha! So I am not crazy!
-
-
-Kawaii64 patrick # hciconfig -a
-hci0:   Type: USB
-         BD Address: 00:80:C8:35:6B:CF ACL MTU: 192:8  SCO MTU: 64:8
-         UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-         RX bytes:1799 acl:0 sco:0 events:160 errors:0
-         TX bytes:1141 acl:0 sco:0 commands:63 errors:0
-         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-         Name: 'BlueZ (0)'
-         Class: 0x000100
-         Service Classes: Unspecified
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x1bb LMP Ver: 1.1 (0x1) LMP 
-Subver: 0x1bb
-         Manufacturer: Cambridge Silicon Radio (10)
+hi marcel,
+thanx ...this works fine....previously, i was doing it wrong...........
 
 
-Thank you again for your help,
-
-Patrick
-
-Marcel Holtmann wrote:
-> Hi Patrick,
+On Wed, 17 Nov 2004 07:42:23 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Manjunath,
+> 
+> > 1> i am using the hcitool to get the rssi, lq and tpl
+> > values........hcitool gives me these values only after a "cc" to my
+> > neighbor BT device. Is there some other method to get these values????
+> > Also, are there any other performance parameters specific to BT i can
+> > measure, like delay??
+> 
+> the RSSI, link quality and transmit power level commands of hcitool also
+> work when you created the connection through L2CAP etc. If you confuse
+> your Bluetooth chips with creation and termination of the low level HCI
+> connection then it is your fault.
+> 
+> > 2> I am using linux kernel 2.6.6 and currently available bluetooth
+> > debian packages.
+> 
+> Update to at least 2.6.9-mh3 or use 2.6.10-rc2.
 > 
 > 
-> you re-paired your keyboard with Windows and thus the Linux side
-> provides a wrong link key now. What does "hciconfig -a" say?
 > 
 > Regards
 > 
 > Marcel
-> 
-> 
-> 
 > 
 > -------------------------------------------------------
 > This SF.Net email is sponsored by: InterSystems CACHE
@@ -69,6 +61,7 @@ Marcel Holtmann wrote:
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
