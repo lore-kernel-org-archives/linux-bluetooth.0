@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Roderick Taylor <rtaylor@hcvwireless.com>
-Reply-To: rtaylor@hcvwireless.com
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1090833153.3497.4005.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-users] Motorola HS810 problems
+Subject: Re: [Bluez-users] obexserver and t68i problem?
+References: <200407251403.50608.cijoml@volny.cz> <200407251833.14161.cijoml@volny.cz> <1090773882.31693.14.camel@pegasus>
+In-Reply-To: <1090773882.31693.14.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200407252048.03230.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,39 +19,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 26 Jul 2004 10:12:34 +0100
+Date: Sun, 25 Jul 2004 20:48:03 +0200
 
-I have a Motorola HS810 headset.
+Hmm I can hope :D
 
-To pair with BlueZ, I put the headset in paring mode and use the command
+But I think that if apple provides firmware update, Microsoft will do so to=
+o.
 
-hcitool cc <bd_addr>
+Michal=20
 
-I've set the pin helper to output PIN#:0000 and The blue light on the
-headset flashes 10 times to indicate that paring was successful.  But
-hcitool has given an error message.
-
-sh-2.03# hcitool cc 00:07:A4:2A:47:50
-Can't create connection: Connection timed out
-sh-2.03# hcitool con
-Connections:
-        < ACL 00:07:A4:2A:47:50 handle 42 state 1 lm MASTER AUTH ENCRYPT
-sh-2.03#
-
-When I try and use hstest.  I get 
-
-.sh-2.03# ./hstest play 12345.wav  00:07:A4:2A:47:50
-Voice setting: 0x0060
-Can't connect RFCOMM channel: Connection refused
-sh-2.03#
-
-I am trying to get sound to play out of the headset.
-
-Is anybody working on an implementation of the headset and handsfree
-profiles?  I'd be keen to help out if they are.
-
-Rod.
-
+Dne ne 25. =E8ervence 2004 18:44 Marcel Holtmann napsal(a):
+> Hi Michal,
+>
+> > Still looking for a newer firmware for my dongle. And still hope, that =
+XP
+> > SP2 will include except builtin BT support upgrade of dongle firmware
+> > too...
+>
+> don't expect too much. I think that Microsoft still don't likes
+> Bluetooth.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by BEA Weblogic Workshop
+> FREE Java Enterprise J2EE developer tools!
+> Get your free copy of BEA WebLogic Workshop 8.1 today.
+> http://ads.osdn.com/?ad_id=3D4721&alloc_id=3D10040&op=3Dclick
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
