@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050309162812.75343.qmail@web26603.mail.ukl.yahoo.com>
-From: BZ Benny <bennybbz@yahoo.fr>
-To: bluez maillinglist <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Adresse resolution in BlueZ
+Message-ID: <f54d86405030903455bf71640@mail.gmail.com>
+From: Benny <bennyvasanth@gmail.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <d1f423d30503071045794c487e@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <d1f423d30503071045794c487e@mail.gmail.com>
+Subject: [Bluez-users] Can 2 services work parallely between a PC and a BT device
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,29 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 9 Mar 2005 17:28:12 +0100 (CET)
+Date: Wed, 9 Mar 2005 17:15:52 +0530
 
-Hi,
+Dear all,
 
-The Adresse resolution in bluez is done in the BNEP
-isn"t it?
+Whether 2 profile services work parallely between a PC and a single BT device.
 
-But I see in the specification of BNEP that the
-adresse resolution may be handled by PAN layer. Is
-BlueZ like that because it was the best solution for
-implementing PAN on linux.
+- On the PC we use a Standard USB BT Dongle with the required profile settings.
+- BT device has to have the Headset profile and the Serial port
+profile implementaion.
 
-regards,
-benny
+Is there any Bluetooth SoC which supports 2 profiles simultaneously
+with the same Host?
 
-
-
-	
-
-	
-		
-Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
-Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
+Thanks & Regards,
+Benny
 
 
 -------------------------------------------------------
