@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Soenke von Stamm <bluez0406@elmo.dyn.lindenarea.net>
+Message-ID: <011e01c45d24$fbbf2370$640aa8c0@frodo>
+From: "Torsten E." <linux-user@gmx.com>
 To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-15"
-Message-Id: <200406281843.14536.bluez0406@elmo.dyn.lindenarea.net>
-Subject: [Bluez-users] yet another Barton Keyboard problem
+	charset="iso-8859-1"
+Subject: [Bluez-users] Hi there! ... and my first question
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,70 +16,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Jun 2004 18:43:14 +0200
+Date: Mon, 28 Jun 2004 17:30:42 +0200
 
-Hi!
+Hi there,
 
-I'm new to the list but I've read about another guy's problem with this k=
-b in=20
-the archive. My problem might be a little different as I assume my shiny=20
-lilly Barton is jast broken.
+well, after reading some docs regarding PAN I wasn't able to manage the
+problem.
+I'd like to attach my iPaq 3970 via BlueTooth to my Linuxbox (SuSE 9.1,
+with SuSE kernel 2.6.5-7.75-default).
 
-I have purchased it just a few days back, plugged it into the next comput=
-er=20
-(the originally supplied dongle that is) and wondered a bit why I couldn'=
-t=20
-access the BIOS. I had jus read in c't that this should work... (and it w=
-orks=20
-with my Logitech Cordless Desktop via USB)
+I configured the Linuxbox so I'm able to l2ping the iPaq, but right when
+using DUND I get errors in /var/log/messages like:
+Jun 28 17:01:09 gandalf /etc/hotplug/tty.agent[6372]: TTY try 1 while
+waiting for /class/tty/rfcomm0's bus_id
+Jun 28 17:01:10 gandalf /etc/hotplug/tty.agent[6372]: TTY try 2 while
+waiting for /class/tty/rfcomm0's bus_id
+Jun 28 17:01:11 gandalf /etc/hotplug/tty.agent[6372]: TTY try 3 while
+waiting for /class/tty/rfcomm0's bus_id
+Jun 28 17:01:11 gandalf dund[6371]: RFCOMM TTY creation failed. No such
+file or directory(2)
+Jun 28 17:01:12 gandalf /etc/hotplug/tty.agent[6389]: remove tty device
+/class/tty/rfcomm0
+Jun 28 17:01:12 gandalf /etc/hotplug/tty.agent[6372]: TTY try 4 while
+waiting for /class/tty/rfcomm0's bus_id
+Jun 28 17:01:13 gandalf /etc/hotplug/tty.agent[6372]: TTY try 5 while
+waiting for /class/tty/rfcomm0's bus_id
+Jun 28 17:01:24 gandalf /etc/hotplug/tty.agent[6372]: add tty device
+/class/tty/rfcomm0
 
-Further on under Linux (debian sid, 2.6.[67]-mh1/custom) after some troub=
-le I=20
-was able to attach the mouse which then also ran in hidproxy mode, but th=
-e kb=20
-still refuses every connection attempt. On one machine I was able to see =
-it=20
-via=20
+As there's no directory /class onmy box, but /sys/classm I guess that's
+the correct one.
+But I'm not able to create any file or directory there ... what does I
+have to do?
 
-~$ hcitool inq
-Inquiring ...
-        00:04:61:81:75:B2       clock offset: 0x0597    class: 0x002580
-        00:04:61:81:74:2B       clock offset: 0x5658    class: 0x002540
-(kb is the second one)
+If you need more information please let me know.
+(English isn't my native language, so hopefully you get what I mean ...
+german would be better ... ;))
 
-but my home machine doesn't even give me that:
-
-~$ hcitool inq
-Inquiring ...
-~$
-
-Funny anough, the kde environment (kbluetoothd and bluetooth:/) returns=20
-adresses and names. The mouse works fine now.
-
-Connection attempts mostly look like this:
-
-bibo:~# hcitool cc --role=3Dm 00:04:61:81:74:2B
-Can't create connection: Connection timed out
-bibo:~# hcitool cc --role=3Ds 00:04:61:81:74:2B
-Can't create connection: Connection timed out
-
-but sometimes I also get that error 53...
-
-As I've read the other thread I've tried each and every option described =
-there=20
-but nothing helps.
-
-Now I'm wondering if I should just return the whole package because of th=
-e=20
-non-operational hidproxy mode. Or I could bite the bullet and try with a=20
-win98se install only for testing my hardware :-(
-
-
-any advice?
-
-tia,
-
-	S=F6nke
+Best regards
+Torsten
 
 
 
