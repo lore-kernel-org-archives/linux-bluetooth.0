@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] hotplug USB dongle problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Pavel Ruzicka <pavouk@pavouk.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200402281549.59370.pavouk@pavouk.org>
-References: <200402281424.55149.pavouk@pavouk.org>
-	 <1077976353.2843.82.camel@pegasus>  <200402281549.59370.pavouk@pavouk.org>
-Content-Type: text/plain
-Message-Id: <1077981557.2843.89.camel@pegasus>
-Mime-Version: 1.0
+References: <200402281424.55149.pavouk@pavouk.org> <1077976353.2843.82.camel@pegasus>
+In-Reply-To: <1077976353.2843.82.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200402281549.59370.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,24 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 28 Feb 2004 16:19:17 +0100
+Date: Sat, 28 Feb 2004 15:49:59 +0100
 
-Hi Pavel,
+Hello,
 
-> I start hcid, sdpd, pand from init script.
-> 
-> What is the right sequence for killing these daemons?
-> Original script kills hcid and sdpd.
-> I'am killing in reverse sequence:
-> pand, sdpd, hcid.
+> > I have configured Mandrake9.2 desktop with USB dongle.
+> > I have kernel 2.6.2
+>
+> don't start pand from bluetooth.agent script. Start it from the init
+> script.
 
-it don't really matters, but in general using a reverse sequence is the
-best way.
+Thanks for help, it works now.
+I start hcid, sdpd, pand from init script.
 
-Regards
+What is the right sequence for killing these daemons?
+Original script kills hcid and sdpd.
+I'am killing in reverse sequence:
+pand, sdpd, hcid.
 
-Marcel
+Best regards,
 
+Pavel Ruzicka
 
 
 
