@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Date: Fri, 11 Feb 2005 10:42:53 -0500 (EST)
-From: "Jay W. Summet" <summetj@cc.gatech.edu>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.GSO.4.58.0502111016380.16262@gaia3.cc.gatech.edu>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] Re: Trouble pairing with new phone...
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C5104A.8CE83BC9"
+Message-ID: <7DBAFEC6A76F3E42817DF1EBE64CB02601DEF72A@FTRDMEL2.rd.francetelecom.fr>
+From: "MURZEAU Bastien RD-ILAB-LON" <bastien.murzeau@francetelecom.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] UMTS - Bluetooth - Bandwidth issue
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,79 +17,177 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 11 Feb 2005 16:01:21 +0100
 
->you set yourself into security mode 3 by using auth and encrypt. Are you
->sure that you know what you are doing?
+This is a multi-part message in MIME format.
 
-I'm not sure of anything, but it has worked for me in the past, and I get
-the exact same results if I comment out the auth and encrypt commands in
-the hcid.conf file. I've left them commented out for the rest of my
-debugging.
+------_=_NextPart_001_01C5104A.8CE83BC9
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
+Hi all,
 
->The PIN helper can't provide a PIN as it seems. Fix this.
->
+I currently encounter bandwidth problem with a UMTS (3G) mobile phone
+(Sony Ericsson z1010). Basically, I am using the Bluetooth link to
+establish a ppp connection from a laptop through the phone's modem. On
+Fedora core 3 the bandwidth is perfect, I mean I can reach the maximum
+bandwidth achievable on UMTS (around 380 Kbit/s).=20
 
-I don't think the answer is quite this simple for the following reasons:
+My problem is on Redhat 9 (2.4.26). I do the same thing but I am limited
+to < 104 Kbit/s. It sounds like I have a serial speed bandwidth (115 200
+bit/s) over Bluetooth. I also tried on Ipaq (familiar v0.7.2) and it's
+the same problem.
 
-1) my hcid.conf file has
- security auto;
-which if I understand it correctly is supposed to use the
-/etc/bluetooth/pin file as opposed to the pin_helper application.
+Does someone have any idea? Do I have to upgrade the Bluetooth stack?
+Which patch?
 
-1a) If I change this to "security user" the bluez-pin helper launches (but
-my Palm T times out before I can enter the PIN on the laptop!) If I try to
-pair the T610 phone with the laptop when "security user" is set, the
-bluez-pin helper program DOES NOT LAUNCH, and hcidump -X says the
-following:
+Thank you very much for all your help,
 
-HCIDump - HCI packet analyzer ver 1.12
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request (0x04) plen 10
-  B2 E6 1D D9 0A 00 04 02 52 01
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  B2 E6 1D D9 0A 00 00
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04
-> HCI Event: Connect Complete (0x03) plen 11
-  1A 29 00 B2 E6 1D D9 0A 00 01 00
+Bastien
 
+PS: Hardware details
+-	Fedora core 3 is a HP nc6000 with a Bluetooth USB dongle
+-	Redhat 9 is a HP N610C with Bluetooth integrated in the screen
+(Compaq's proprietary MultiPort)
+-	Ipaq is a HP h3970=20
 
-2) My Palm T pairs correctly with the Pin in the /etc/bluetooth/pin file
-when I use "security auto" (but the T610 phone does not).
+------_=_NextPart_001_01C5104A.8CE83BC9
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-3) I have pin_helper set to /usr/bin/bluez-pin (which when I run it
-manually appears to work just fine...) and when I (successfully) pair my
-Palm T, it does not ask me for a pin, but uses the one in the pin file (if
-"security auto" is set).
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+6.5.7226.0">
+<TITLE>UMTS - Bluetooth - Bandwidth issue</TITLE>
+</HEAD>
+<BODY>
+<!-- Converted from text/rtf format -->
 
+<P ALIGN=3DLEFT><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial">Hi =
+all,</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN></P>
 
-I find it interesting to note that when "security user" is set, although
-the bluez-pin program runs, my Palm T fails in the pairing attempt before
-I have time to enter a Pin.  BUT, under the same conditions, the bluez-pin
-tool never launches when my T610 attempts to pair.  {This seems to be a
-problem with the hcid <-->bluez-pin tool connection?}
+<P ALIGN=3DLEFT><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial">I =
+currently encounter</FONT><FONT SIZE=3D2 =
+FACE=3D"Arial"></FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"> <FONT SIZE=3D2 =
+FACE=3D"Arial">bandwidth</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial"></FONT> <FONT SIZE=3D2 =
+FACE=3D"Arial">problem with a UMTS (3G) mobile phone (Sony Ericsson =
+z1010).</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> =
+<FONT SIZE=3D2 FACE=3D"Arial">Basically, I am using =
+the</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> <FONT =
+SIZE=3D2 FACE=3D"Arial">Bluetooth</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial"></FONT> <FONT SIZE=3D2 FACE=3D"Arial">link to establish a =
+ppp connection</FONT> <FONT SIZE=3D2 FACE=3D"Arial">from</FONT><FONT =
+SIZE=3D2 FACE=3D"Arial"> a laptop</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> <FONT SIZE=3D2 =
+FACE=3D"Arial">through the</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> <FONT SIZE=3D2 =
+FACE=3D"Arial">phone's</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"> <FONT SIZE=3D2 FACE=3D"Arial">modem</FONT><FONT SIZE=3D2 =
+FACE=3D"Arial">.</FONT> <FONT SIZE=3D2 FACE=3D"Arial">On Fedora core 3 =
+the</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> <FONT =
+SIZE=3D2 FACE=3D"Arial">bandwidth</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial"></FONT> <FONT SIZE=3D2 FACE=3D"Arial">is perfect, I =
+mean</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> =
+<FONT SIZE=3D2 FACE=3D"Arial">I</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial"></FONT> <FONT SIZE=3D2 FACE=3D"Arial">can reach the =
+maximum bandwidth</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"> <FONT SIZE=3D2 =
+FACE=3D"Arial">achievable</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial"></FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> <FONT SIZE=3D2 =
+FACE=3D"Arial">on UMTS (around 380 K</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial">bit</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial">/s). </FONT></SPAN></P>
 
-When I'm using "security auto" the PalmT pairs just fine with the pin in
-the /etc/bluetooth/pin, but the T610 does not.
+<P ALIGN=3DLEFT><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial">My =
+problem is on Redhat</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial"></FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> <FONT SIZE=3D2 =
+FACE=3D"Arial">9 (</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial">2.4.26).</FONT> <FONT =
+SIZE=3D2 FACE=3D"Arial">I do the same thing but I am limited to =
+&lt;</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> =
+<FONT SIZE=3D2 FACE=3D"Arial">104 Kbit/s.</FONT> <FONT SIZE=3D2 =
+FACE=3D"Arial">It sounds like I have</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> <FONT SIZE=3D2 =
+FACE=3D"Arial">a serial speed bandwidth (115 200 bit/s)</FONT><FONT =
+SIZE=3D2 FACE=3D"Arial"> over</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> <FONT SIZE=3D2 =
+FACE=3D"Arial">Bluetooth</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial">.</FONT><FONT SIZE=3D2 =
+FACE=3D"Arial"></FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"> <FONT SIZE=3D2 FACE=3D"Arial">I</FONT><FONT SIZE=3D2 =
+FACE=3D"Arial"> also tried on Ipaq (familiar v0.7.2) and it's the same =
+problem.</FONT></SPAN></P>
 
-All of the above tests were done with auth and encrypt turned off.
+<P ALIGN=3DLEFT><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial">Do</FONT><FONT SIZE=3D2 FACE=3D"Arial">es someone have =
+any idea</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial">?</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> <FONT SIZE=3D2 =
+FACE=3D"Arial">D</FONT><FONT SIZE=3D2 =
+FACE=3D"Arial">o</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"> <FONT SIZE=3D2 FACE=3D"Arial">I</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial"></FONT> <FONT SIZE=3D2 FACE=3D"Arial">have to upgrade =
+the</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> <FONT =
+SIZE=3D2 FACE=3D"Arial">Bluetooth</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial"></FONT> <FONT SIZE=3D2 FACE=3D"Arial">stack?</FONT> <FONT =
+SIZE=3D2 FACE=3D"Arial">Which patch?</FONT></SPAN></P>
 
+<P ALIGN=3DLEFT><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial">Thank =
+you very much for all your help,</FONT></SPAN></P>
 
+<P ALIGN=3DLEFT><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial">Bastien</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN></P>
 
->Even an application with L2CAP_LM_MASTER set can force the role switch
->at connection creation.
+<P ALIGN=3DLEFT><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial">PS: =
+Hardware details</FONT></SPAN></P>
 
-The only applications I'm running are hcid, sdpd and rfcomm which are
-started in my bluetooth services (rc.d) file. I even commented out the
-"rfcomm bind all" command from my /etc/rc.d/init.d/bluetooth file, but it
-didn't change anything.
+<P><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"> =
+<FONT SIZE=3D2 FACE=3D"Arial">Fedora core 3 is a HP nc6000 with a</FONT> =
+<FONT SIZE=3D2 FACE=3D"Arial">Bluetooth</FONT> <FONT SIZE=3D2 =
+FACE=3D"Arial">USB</FONT> <FONT SIZE=3D2 =
+FACE=3D"Arial">dongle</FONT></SPAN>
 
-Jay
+<BR><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT> <FONT =
+SIZE=3D2 FACE=3D"Arial">Redhat 9 is a HP N610C with Bluetooth integrated =
+in the screen</FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"><FONT SIZE=3D2 FACE=3D"Arial"> (</FONT></SPAN><SPAN =
+LANG=3D"en-gb"></SPAN><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial">Compaq's</FONT> <FONT SIZE=3D2 FACE=3D"Arial">proprietary =
+MultiPort</FONT><FONT SIZE=3D2 FACE=3D"Arial">)</FONT></SPAN>
 
+<BR><SPAN LANG=3D"en-gb"><FONT SIZE=3D2 =
+FACE=3D"Arial">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT> <FONT =
+SIZE=3D2 FACE=3D"Arial">I</FONT><FONT SIZE=3D2 FACE=3D"Arial">paq</FONT> =
+<FONT SIZE=3D2 FACE=3D"Arial">is a</FONT> <FONT SIZE=3D2 =
+FACE=3D"Arial">HP</FONT> <FONT SIZE=3D2 FACE=3D"Arial">h3970</FONT><FONT =
+SIZE=3D2 FACE=3D"Arial"></FONT></SPAN><SPAN LANG=3D"en-gb"></SPAN><SPAN =
+LANG=3D"en-gb"> </SPAN>
+</P>
 
-
-
+</BODY>
+</HTML>
+------_=_NextPart_001_01C5104A.8CE83BC9--
 
 
 -------------------------------------------------------
