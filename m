@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Markus Uhr <uhrm@student.ethz.ch>
+Message-ID: <20050101081248.22932.qmail@web60803.mail.yahoo.com>
+From: Tom Watson <sdc695@yahoo.com>
+Subject: Re: [Bluez-users] Source sample custom Bluetooth
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1104589274.10387.9.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-users] IBM Bluetooth PC Card II
+In-Reply-To: <20050101041221.D959F32E17@sc8-sf-spam1.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,36 +17,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 01 Jan 2005 15:21:14 +0100
+Date: Sat, 1 Jan 2005 00:12:48 -0800 (PST)
 
-Hello
+> From: Jonathan Sass <jsass@magnifeye.com>
+> To: bluez-users@lists.sourceforge.net
+> Subject: [Bluez-users] Source sample custom Bluetooth
+> Reply-To: bluez-users@lists.sourceforge.net
+> 
+> I am writing code to talk to a custom bluetooth device that I need two 
+> way communication with.  (I sent it commands and it sends characters). 
+> Can you please point me to some sample linux (fc2 ideally) source code.
+> 
+> Jonathan
+> 
 
-In http://www.holtmann.org/linux/bluetooth/devices.html the
-IBM Bluetooth PC Card II is reported to work with the hci_uart
-driver. However, when I insert to card into my computer I get these
-Log-Messages:
+Look at minicom.  It can do 2-way "serial" communication.  I had a bluetooth
+GPS goodie.  I could use minicom to send it commands and get results.
 
-Jan  1 14:06:08 [cardmgr] socket 0: IBM Bluetooth PC Card II
-Jan  1 14:06:08 [cardmgr] executing: 'modprobe serial_cs'
-Jan  1 14:06:08 [cardmgr] get dev info on socket 0 failed: No such
-device
-Jan  1 14:06:08 [kernel] serial_cs: no usable port range found, giving
-up
-Jan  1 14:06:08 [kernel] serial_cs: RequestIO: No more items
+=====
+-- 
+Tom Watson
+tsw@johana.com
 
-So, has anybody an idea what could be wrong that the PCMCIA subsystem
-doesn't initialize the card properly? Do I need to pass some special
-parameters?
 
-My config entry in /etc/pcmcia/bluetooth.conf for the card:
-
-card "IBM Bluetooth PC Card II"
-  version "IBM", "Bluetooth PC Card II", "", ""
-  bind "serial_cs" class "bluetooth"
-
-Is anything wrong with that?
-
-Markus Uhr
+		
+__________________________________ 
+Do you Yahoo!? 
+The all-new My Yahoo! - Get yours free! 
+http://my.yahoo.com 
+ 
 
 
 
