@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <421AED37.7050703@hobbits.no>
-From: "Vegard B. Havdal" <vegardh@hobbits.no>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Am stuck; HP laptop, Fedora
-References: <4215A788.9070205@yahoo-inc.com> <1109027434.7626.28.camel@pegasus>
-In-Reply-To: <1109027434.7626.28.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] trying to send data at HCI level
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mohan K <kmohangda@gmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <7aa80ced0502212319181c8835@mail.gmail.com>
+References: <7aa80ced0502212224cce2126@mail.gmail.com>
+	 <1109055931.8506.0.camel@pegasus>
+	 <7aa80ced0502212319181c8835@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1109059399.8506.3.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,19 +21,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Feb 2005 09:28:39 +0100
+Date: Tue, 22 Feb 2005 09:03:19 +0100
+
+Hi Mohan,
+
+>               Thank you for your response. I need some clarifications. 
+> How to set the device device in RAW mode? In my program I opened the
+> socket in RAW mode. Is it sufficient?
+
+no, that is not enough. You must use "ioctl(dd, HCISETRAW, 1)".
+
+Regards
+
+Marcel
 
 
-Marcel Holtmann wrote:
-> from this report I can't tell you anything, but the Bluetooth device
-> inside my NC4000 is working prefect and actually it is the same as in
-> your laptop. What does "hciconfig -a" tells you?
-
-It told me the device was down, whereafter I figured to try
-hciconfig hci0 up whereafter everything worked, so that was the little 
-drop of info I needed. Thanks!
-
-Vegard :-)
 
 
 -------------------------------------------------------
