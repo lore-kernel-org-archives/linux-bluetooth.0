@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] can't compile bluez-utils-2.6
+Subject: Re: [Bluez-users] Re: Bluetooth security in bluez ?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
+To: Anssi Saari <as@sci.fi>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404020850.11459.cijoml@volny.cz>
-References: <200404020850.11459.cijoml@volny.cz>
-Content-Type: text/plain; charset=iso-8859-2
-Message-Id: <1080894207.2774.47.camel@pegasus>
+In-Reply-To: <20040402111506.GA15425@sci.fi>
+References: <20040328220800.36896.qmail@web60302.mail.yahoo.com>
+	 <200403290028.48289.cijoml@volny.cz> <1080514616.2281.178.camel@pegasus>
+	 <20040401102919.GA6987@sci.fi> <1080816007.3059.18.camel@pegasus>
+	 <20040402111506.GA15425@sci.fi>
+Content-Type: text/plain
+Message-Id: <1080905701.2836.5.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,28 +21,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 02 Apr 2004 10:23:28 +0200
+Date: Fri, 02 Apr 2004 13:35:02 +0200
 
-Hi Michal,
+Hi Anssi,
 
-> make uninstall in bluez-sdp-1.5 and then make in bluez utils-2.6 causes=
-=20
-> errors:
->=20
-> gcc -DPACKAGE_NAME=3D\"\" -DPACKAGE_TARNAME=3D\"\" -DPACKAGE_VERSION=3D=
-\"\"=20
-> -DPACKAGE_STRING=3D\"\" -DPACKAGE_BUGREPORT=3D\"\" -DPACKAGE=3D\"bluez-=
-utils\"=20
-> -DVERSION=3D\"2.6\" -DYYTEXT_POINTER=3D1  -I. -I.    -I/usr/include  -W=
-all -g -O2=20
-> -c sdptool.c
-> sdptool.c:36:27: bluetooth/sdp.h: nen=ED souborem ani adres=E1=F8em
-> sdptool.c:37:31: bluetooth/sdp_lib.h: nen=ED souborem ani adres=E1=F8em
-> sdptool.c:38:36: bluetooth/sdp_internal.h: nen=ED souborem ani adres=E1=
-=F8em
-> sdptool.c:45: error: parse error before "bdaddr_t"
+> > > How can you tell whether a connection is encrypted or not in Bluez if
+> > > security mode is 2?
+> > 
+> > check with "hcitool con"
+> > 
+> > Connections:
+> >         < ACL 00:0A:xx:xx:xx:xx handle 43 state 1 lm MASTER ENCRYPT 
+> 
+> Great, thanks. Are RFCOMM connections for dialup usually encrypted? I
+> have Bray & Sturman's BT book, but it only mentions in passing that
+> "RFCOMM will enforce security for dialup networking" where it talks
+> about the security manager.
 
-you must install bluez-libs-2.6 first.
+the RFCOMM connection itself can't be encrypted, but the underlaying ACL
+link can. The link is shared across every connection between two devices
+and this means if you enforce once the encryption it is there for every
+other RFCOMM, L2CAP etc. connection at that time. Some books don't make
+this point very clear and talking about a security manager is another
+topic, because the Bluetooth security mechanism are part of the lower
+(hardware and firmware) layers.
 
 Regards
 
