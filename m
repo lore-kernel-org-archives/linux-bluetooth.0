@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Broadcast and reassembly
+Subject: Re: [Bluez-users] D-Link DBT-120
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Thor Egil Skaug <paxtonrd@hotmail.com>
+To: Gene Imes <ebi7@ozob.net>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <000101c402dd$9f3316d0$9349edc7@thores>
-References: <000101c402dd$9f3316d0$9349edc7@thores>
+In-Reply-To: <1078518584.11763.2.camel@tr1a.ozob.net>
+References: <1078322158.11523.83.camel@go2>
+	 <1078322721.2787.86.camel@pegasus>  <1078339075.8547.2.camel@go2>
+	 <1078487569.2762.56.camel@pegasus>
+	 <1078493466.27893.11.camel@tr1a.ozob.net> <1078503094.3700.5.camel@pegasus>
+	 <1078518584.11763.2.camel@tr1a.ozob.net>
 Content-Type: text/plain
-Message-Id: <1078526281.19852.48.camel@pegasus>
+Message-Id: <1078525247.19852.29.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,29 +22,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Mar 2004 23:38:02 +0100
+Date: Fri, 05 Mar 2004 23:20:48 +0100
 
-Hi Thor,
+Hi Gene,
 
-> I am experiencing some problems when reassembling active broadcast
-> messages when the
-> (hci) num_broadcast_retransmissions is set > 0 (at the sender), and with
-> a decent L2CAP message size,
-> > 100 bytes.
+> > what kind of USB host controller driver do you use? What do lspci say?
 > 
-> I constantly get start_fragments and continuing_fragments that are out
-> of order, and since
-> the l2cap header is the only way I can know when I am done reading one
-> message and can expect
-> another, this is troublesome. I thought the device was supposed to
-> deliver messages in order?
+> Hope this helps.
 > 
-> Has anyone ever implemented this, and hopefully had the same
-> experiences?
+> #
+> # USB Host Controller Drivers
+> #
+> CONFIG_USB_EHCI_HCD=y
+> # CONFIG_USB_EHCI_SPLIT_ISO is not set
+> # CONFIG_USB_OHCI_HCD is not set
+> CONFIG_USB_UHCI_HCD=y
 
-I never worked with any kind of broadcast and Bluetooth. Some people
-tried this before, but nobody came up with a patch or something else.
-This can be your job ;)
+Alan Stern is working on a better UHCI support that could explain it and
+there was a unlink-while-submit patch for the OHCI driver I use. Please
+check the latest 2.6.4-bk kernel and if it you still have a problem on
+unplug post it to the USB mailing list, so some of the patches from the
+-mm branch are forwarded for inclusion.
 
 Regards
 
