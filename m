@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <33496.200.209.60.3.1110394991.squirrel@webmail.indt.org>
-From: takahasi@indt.org
+Subject: Re: [Bluez-users] Is there authenticate only incoming mode
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Subject: [Bluez-users] PAN Setup question
+In-Reply-To: <422F4208.8070706@ul.ie>
+References: <422F4208.8070706@ul.ie>
+Content-Type: text/plain
+Message-Id: <1110393974.5462.45.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,48 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 9 Mar 2005 16:03:11 -0300 (BRT)
+Date: Wed, 09 Mar 2005 19:46:13 +0100
+
+Hi Joe,
+
+> Is it possible to configure hcid so that authentication (i.e. PIN 
+> challenge) is only invoked on incoming connections. I'd like to make a 
+> PIN request only if some other device tries to use my PC (e.g. object 
+> push) but it is not required if I want to send to them (and my PC 
+> initiates the connection). I'm not too bothered about encryption at this 
+> stage..
+> 
+> I've searched the newslist and tried configuring hcid.conf but haven't 
+> been able to get it working. Guess it is not intended to  work that way.
+
+this is only possible with security mode 2.
+
+Regards
+
+Marcel
 
 
-I am a beginner on BlueZ stack. I am trying to create an ad hoc group
-network composed by ONE GN and TWO PANU.
-
-     GN_PC (master) -  hci.conf (lm accept,master;)
-     PANU01_PC(slave) -  hci.conf (lm accept;)
-     PANU02_PC(slave) -  hci.conf(lm accept;)
-     commands sequence:
-        1. gn_pc$ pand --listen --role GN
-        2. panu01_pc$ pand --connect 00:20:E0:**:**:74
-        3. panu02_pc$ pand --connect 00:20:E0:**:**:74
-        4. gc_pc$ ifconfig bnep0 10.0.0.1 netmask 255.255.255.0
-        5. panu01_pc$ ifconfig bnep0 10.0.0.2 netmask 255.255.255.0
-        6. panu02_pc$ ifconfig bnep0 10.0.0.3 netmask 255.255.255.0
-
-      gn_pc connections:
-        > ACL 00:20:E0:**:**:92 handle 45 state 1 lm SLAVE
-        > ACL 00:20:E0:**:**:89 handle 41 state 1 lm SLAVE
-
-     gc_pc dump:
-       osmtc11:/usr/src/bluez/bluez-utils-2.15/pand# pand --listen --role
-GN --nodetach
-       pand[7301]: Bluetooth PAN daemon
-       pand[7303]: New connection from 00:20:E0:**:**:89 bnep0
-       pand[7329]: New connection from 00:20:E0:**:**:92 bnep1
-
-
-
-   I CAN'T REACH PANU02_PC!!!
-   l2ping is working among the devices! However at network layer, the GN
-is not foward IP packages and i am not able to ping.
-   Ping 10.0.0.1 from panu01_pc is working.
-   Ping 10.0.0.1 from panu02_pc is NOT WORKING
-
-   How can I add the both panus in the same network?
-   According with gc_pc dump, bnep0 and bnep1 are created.
-   How can I add panu02_pc to bnep0?
-
-   Thanks,
-    Claudio.
 
 
 -------------------------------------------------------
