@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Sean Godsell" <sgodsell@hotmail.com>
-To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY12-F11Y5z4IssCQq0001e47a@hotmail.com>
-Subject: [Bluez-users] Anonying PIN
+From: Thomas Chiverton <thomas.chiverton@bluefinger.com>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] rfcomm connection refused / Host is down
+References: <8934986c29.86c2989349@estudiants.urv.es>
+In-Reply-To: <8934986c29.86c2989349@estudiants.urv.es>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200403301650.34805.thomas.chiverton@bluefinger.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,21 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 30 Mar 2004 13:11:26 -0500
+Date: Tue, 30 Mar 2004 16:50:34 +0100
 
-Hello Bluez users,
+On Tuesday 30 Mar 2004 16:02 pm, you said:
+> I get a message with:
+>  Can't connect RFCOMM socket: Connection refused
+> or either:
+> Can't connect RFCOMM socket: Host is down
 
-Is there any way that you can avoid using the pin?  In other words have 
-users connect to your PC without being prompted on the connecting device for 
-a pin.   This would be a real blessing.  Any help on this would really be 
-appreciated.
+Are the devices already paired ?
 
-Thank you
-Sean
+-- 
+Tom Chiverton 
+Advanced ColdFusion Programmer
 
-_________________________________________________________________
-http://join.msn.com/?pgmarket=en-ca&page=byoa/prem&xAPID=1994&DI=1034&SU=http://hotmail.com/enca&HL=Market_MSNIS_Taglines
-
+Tel: +44(0)1749 834997
+email: tom.chiverton@bluefinger.com
+BlueFinger Limited
+Underwood Business Park
+Wookey Hole Road, WELLS. BA5 1AF
+Tel: +44 (0)1749 834900
+Fax: +44 (0)1749 834901
+web: www.bluefinger.com
+Company Reg No: 4209395 Registered Office: 2 Temple Back East, Temple
+Quay, BRISTOL. BS1 6EG.
+*** This E-mail contains confidential information for the addressee
+only. If you are not the intended recipient, please notify us
+immediately. You should not use, disclose, distribute or copy this
+communication if received in error. No binding contract will result from
+this e-mail until such time as a written document is signed on behalf of
+the company. BlueFinger Limited cannot accept responsibility for the
+completeness or accuracy of this message as it has been transmitted over
+public networks.***
 
 
 -------------------------------------------------------
