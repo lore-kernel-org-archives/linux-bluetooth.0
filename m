@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <413F701F.5020905@3wt.com.br>
-From: Rafael Vidal Aroca <rafael@3wt.com.br>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Power level & Scan Timing
+Subject: Re: [Bluez-users] BT3030
+From: Marcel Holtmann <marcel@holtmann.org>
+To: coser@cos.ufrj.br
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <1462.146.164.98.1.1094654092.squirrel@webmail.cos.ufrj.br>
+References: <1375.146.164.98.1.1094649817.squirrel@webmail.cos.ufrj.br>
+	 <1094652906.5289.4.camel@notepaq>
+	 <1462.146.164.98.1.1094654092.squirrel@webmail.cos.ufrj.br>
+Content-Type: text/plain
+Message-Id: <1094656147.5289.6.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,31 +20,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 08 Sep 2004 17:48:31 -0300
+Date: Wed, 08 Sep 2004 17:09:07 +0200
+
+Hi Alexandre,
+
+>     If this function is not implemented, do you know where I can find a
+> usb dongle model that implemented this TPL function ?
+
+try a CSR based dongle. It should work with them.
+
+Regards
+
+Marcel
 
 
-    Hello,
-
-    i'm playing with my dbt-120 d-link usb dongle, and i'm not managing 
-to do some things i wanted...
-
-    1) I want to decrease the power or my dongle, cause de devices work 
-over 20m....i want they to be detected just near the computer. I know 
-it's possible, but could not find documentaion...so the question is: how 
-can i decreate the power of my bluetooth adapter?
-
-    2) I'm using hcitool scan to constantly detect if my ipaq is near my 
-desktop. It seems to be really slow (from 10 to 15 seconds to 
-scan)...can this time be reduced? Does bluez do some kind of cache? (i 
-ask that because i can turn my ipaq of, and hcitool scan will not only 
-detect my ipaq anymore in about 12 seconds...)
-
-thanks
-Rafael.
-   
-
-   
-     
 
 
 -------------------------------------------------------
