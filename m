@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Charles Bueche <charles@bueche.ch>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] phone+heaset
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?ISO-8859-1?Q?Jo=E3o?= Santos <jsantos_pt@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Sea2-F4J2ivuV8vTWoq0001672a@hotmail.com>
+References: <Sea2-F4J2ivuV8vTWoq0001672a@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1073555620.5632.8.camel@bluez.bueche.ch>
+Message-Id: <1073519086.9584.0.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] disappointed with my MX900 battery life
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,28 +18,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Jan 2004 10:53:40 +0100
+Date: Thu, 08 Jan 2004 00:44:46 +0100
 
-Hi,
+Hi Joao,
 
-I'm using the CVS version of libs2 and utils2, with my MX900. I have the
-impression that the MX900 batteries don't last very long between two
-charging cycles (2-3 days). Can other here confirm this ?
+> I want to use the casira as a headset of a 6310i, using a headphone/speaker 
+> in the pc.
+> 
+> i have made a rfcomm connection to the phone using:
+> 
+> [root@olivia test]# rfcomm connect /dev/rfcomm0 00:60:57:15:8A:A9 12
+> Connected /dev/rfcomm0 to 00:60:57:15:8A:A9 on channel 12
+> Press CTRL-C for hangup
+> 
+> and using the test application scotest in the bluez-utils-2.3 i have:
+> 
+> [root@olivia test]# ./scotest -r  00:60:57:15:8A:A9
+> scotest[30657]: Waiting for connection ...
+> scotest[30657]: Connect from 00:60:57:15:8A:A9
+> 
+> then i click in any button an the app pass to the recv mode
+> 
+> scotest[30657]: Receiving ...recv_mode()
+> 
+> 
+> scotest[30657]: Read failed. Connection reset by peer(104)
+> scotest[30657]: Disconnect
+> 
+> but i don't receve any data in my buffer.
+> When i stop pushing the buttons for a while, i recebe -1 in my read() 
+> function and the appl disconnect.
+> 
+> what is the problem!!
 
-I must explain that I use my MX900 without the docking (with a laptop
-underway), so I only dock the mouse to load it when it blink red.
+check SCO mapping of your Casira.
 
-And being with empty batteries underway leaves me with the poor
-touchpad.
+Regards
 
-Any better experience under Window$ ? Is some optimization possible in
-the code to better use the "standby" modes of the MX900 ?
+Marcel
 
-Charles
-
--- 
-Charles Bueche <charles@bueche.ch>
-sand, snow, wave, wind and net -surfer
 
 
 
