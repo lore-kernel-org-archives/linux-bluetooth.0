@@ -1,65 +1,52 @@
-Return-Path: <mplanque@laas.fr>
-From: Michel Planques <mplanque@laas.fr>
-Message-ID: <2338.82.255.26.193.1076970003.squirrel@www.laas.fr>
-Date: Mon, 16 Feb 2004 23:20:03 +0100 (CET)
-Subject: Re: [Bluez-users] How to configure a 723kbps connection?
-To: <marcel@holtmann.org>
-In-Reply-To: <1076855596.14758.52.camel@pegasus>
-References: <20040215000300.0C48932D37@mail.rvs.uni-bielefeld.de>
-        <1076855596.14758.52.camel@pegasus>
-Cc: <grpmind+bluez.users@boromir.vpop.net>,
-   <bluez-users@lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: "Radoslav Reznicek" <radecek@email.cz>
+Subject: Re: [Bluez-users] pairing i-Tech BT USB dongle and Nokia 6310i
+References: <000e01c3f4d0$8128de60$4461daa0@radecek>
+In-Reply-To: <000e01c3f4d0$8128de60$4461daa0@radecek>
+Cc: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200402162247.13628.pavouk@pavouk.org>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 16 Feb 2004 22:47:13 +0100
 
-Hi Marcel,
+Hello,
 
-l2test is a good tool to generate Bluetooth traffic between 2 linux
-stations. You can also use the PAN profile with bnep protocol and a
-TCP/UDP traffic generator : I suggest iperf (it works on Linux and
-Windows). I followed these two methods and the results were similar.
+> I can't paired i-Tech BT USB dongle and phone Nokia 6310i. When I want
+> connect to phone,  phone ask me for PIN. After enter PIN phone says "bad
+> PIN". PC do not ask me for PIN. When I  try run bluepin script from shell,
+> it return error. What do I bad?
+> OS Mandrake9.2 kernel 2.4.22
+> When I using Windows, i-Tech BT USB dongle and phone work correctly.
 
-I had some bad experiences with the packet type choosen by my dongle's
-link manager. I had to force the packet type to DH5 reach the maximum bit
-rate.
+I was similar problem with Mandrake. You can try edit file /etc/bluetooth/p=
+in
+and change "BlueZ" to some numbers "1234". But I don't know, if I make some
+other actions. Maybe restart of init script...
+
+Best regards,
+
+Pavel R=F9=BEi=E8ka
 
 
 
-Michel.
-
-> Hi,
->
->> I'd like to configure a linux box using a USB bt dongle to talk to an
->> ipaq     at 723kbps for streaming video. So two questions:
->
-> what iPAQ is this?
->
->> 1. How can I tell at what rate the two bluetooth devices are talking?
->> I could    use l2test if I could run linux on the ipaq, but I can't
->> (yet).
->
-> Buy a protocol analyser ;)
->
->> 2. How can I configure the two to talk at the assymetric 723kbps rate?
->>
->
-> In general this is not needed, because the link manager should choose
-> the best package types for you.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-> Build and deploy apps & Web services for Linux with
-> a free DVD software kit from IBM. Click Now!
-> http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
