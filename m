@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: soraberri <421246@posta.unizar.es>
-Message-ID: <cuvg8v$6qs$1@sea.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Profiles and Service publicing
+From: "Florian Kimpenhaus" <Kimpenhaus@gmx.de>
+To: <bluez-users@lists.sourceforge.net>
+Subject: AW: [Bluez-users] Quality Bluetooth access point
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+In-Reply-To: <421221A2.9060009@optibrand.com>
+Message-ID: <E1D1C8M-0001Ik-6P@sc8-sf-mx1.sourceforge.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,70 +18,83 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Feb 2005 14:04:49 +0100
+Date: Wed, 16 Feb 2005 00:29:23 +0100
 
-Hi,
+Hi Dave,
 
-This post is about a specific headset, about btsco and about SDP support 
-in BlueZ. I'm not sure if btsco is being talked here, but anyway I think 
-  this post also concerns BlueZ
+I use an elmeg D@vos44dsl it integrates an BT-AP into an ISDN-DSL Router
+with a bunch of telecommunication features. It works stable enough for =
+home
+use but sometimes the AP hangs and requires a hard reboot. It uses the
+LAN-AP profile with ppp.(PAN would be nice :( ) Logging? Yes but only =
+under
+Windows and not very detailed. Speed is about 40KB-50KB with an old =
+BT3030
+USB-Dongel (not really fast). Btw it costs 329=80 plus 70=80 for the =
+Bluetooth
+module not really a bargain (in fact you do not need ISDN or DSL
+functionality).=20
+The anycom BT-AP is expensive too (730=80 for ANYCOM Blue AP-2001 Anycom =
+LAN
+Access Point AlpsChip GR D, (CC3051)).
 
-This is the context:
-· BlueZ and btsco installed and working.
-· btsco works fine with the headset (Bluetrek G2).
-· once SCO connected, pushing the TALK button on the headset leads to a 
-SCO disconnect state, but pushing TALK again will reconnect without 
-problems.
+What about using an apple mac mini as base system? Low power consumption =
+(13
+Watts idle), small, quiet, CD/DVD?! Internal BT-module (is it class 1?)
+(maybe apple build an EDR module one day so you can upgrade or simply =
+use an
+USB device)
+For about 590=80 and if you have some use for the other hardware it =
+looks
+interesting.
 
-But:
-· When the headset is switched OFF, the SCO channel is abrubtly 
-disconnected and the btsco daemon goes on running.
-· When I switch ON the headset again (not in the pairing mode, only 
-switch on) it won't connect to the Audio GAteway again.
-· Pushing now the TALK button breafly it enters in which I have named 
-"dumb mode" (because it is unfructuous). I have dumped what is going on 
-in the dumb mode, which I will interpret for you:
+If you build one single board computer it would be nice if you post the
+components you use and how expensive it goes in the end.
 
-The following SDP transaction is repeating again and again until the 
-headset gets tired:
+Regards Florian
 
- > ACL data: handle 0x0029 flags 0x02 dlen 19
-     L2CAP(d): cid 0x0040 len 15 [psm 1]
-         SDP SS Req: tid 0x49 len 0xa
-           pat uuid-32 0x1112 (AG)
-           max 0x28
-           cont 00
-< ACL data: handle 0x0029 flags 0x02 dlen 14
-     L2CAP(d): cid 0x0040 len 10 [psm 1]
-         SDP SS Rsp: tid 0x49 len 0x5
-           tot 0x0 cur 0x0
-           cont 00
 
-The first is a SDP_ServiceSearch Request from the headset looking for a 
-service with UUID  of value 0x1112 (corresponds to AudioGateway).
-The second is a SDP_ServiceSearch Response from BlueZ saying that the 
-requested service is not found in the SDP database nor nothing even 
-similar, which is really true because I have not add this service 
-("sdptool add AG" is not supported)
+-----Urspr=FCngliche Nachricht-----
+Von: bluez-users-admin@lists.sourceforge.net
+[mailto:bluez-users-admin@lists.sourceforge.net] Im Auftrag von Dave
+Henriksen
+Gesendet: Dienstag, 15. Februar 2005 17:22
+An: bluez-users@lists.sourceforge.net
+Betreff: [Bluez-users] Quality Bluetooth access point
 
-Now:
-Now is when some leak of knowledge hammers mi soul:
-· In the assumption that, some way, I could create a service record in 
-the service database specifying AudioGateway UUID, would it be enough 
-for the heaset to reconnect again?
-· I think of btsco as if it was an AudioGateway implementation (or 
-headset profile implementation) using the BLuez stack, but if it doesn't 
-register by its own the AG service in the local database, maybe it is 
-not a profile imlpementation?
+Does anyone know of a really good class 1 Bluetooth network access point =
+?
 
-So:
-Please, could you give me some points to understand this? Also, if it's 
-not being possible to fix the reconnection problem because of some lack 
-of development, I would like to know where is the failure.
+We have had fairly good luck with the AXIS access point, but it is no=20
+longer being supported by AXIS.    Also, it tends to go brain dead once=20
+in a while, and sometimes even requires a hard reboot.
 
-Thank you very much
+The Anycom access point looks decent, but doesn't provide much in terms=20
+of  logging and debugging of connection problems.   Also, there is no=20
+way to tell it not to save the link keys.   The firmware also has a bug=20
+in it where if you tell it to automatically check for new firmware on=20
+startup, it becomes a boat anchor and has to be sent back to the=20
+manufacturer (This is documented on their website).
 
-Luis
+I have seen a few others out there, but I don't believe that any of them =
+
+are Class 1 devices.
+
+I would prefer to buy a really good access point, but I am now=20
+considering just building my own using BlueZ, and a very small single=20
+board computer running a 300MHZ Geode processor.
+
+
+
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now.
+http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 
