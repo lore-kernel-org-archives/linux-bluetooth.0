@@ -1,49 +1,69 @@
-Return-Path: <James@superbug.demon.co.uk>
-Message-ID: <403CB172.8070103@superbug.demon.co.uk>
-Date: Wed, 25 Feb 2004 14:30:10 +0000
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <403CAFC0.50807@superbug.demon.co.uk>
 From: James Courtier-Dutton <James@superbug.demon.co.uk>
 MIME-Version: 1.0
 To: Mauro Tortonesi <mtortonesi@ing.unife.it>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-   =?ISO-8859-1?Q?Fred_Sch=E4tt?=
- =?ISO-8859-1?Q?gen?= <bluez-devel@schaettgen.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Simon Vogl <vogl@soft.uni-linz.ac.at>
+CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] sco link help needed
-References: <4034CA08.50500@soft.uni-linz.ac.at> <200402251359.00791.mtortonesi@ing.unife.it> <1077715546.2919.77.camel@pegasus> <200402251504.47809.mtortonesi@ing.unife.it>
-In-Reply-To: <200402251504.47809.mtortonesi@ing.unife.it>
+References: <4034CA08.50500@soft.uni-linz.ac.at> <40393D4D.5070908@superbug.demon.co.uk> <1077522938.2832.84.camel@pegasus> <200402251359.00791.mtortonesi@ing.unife.it>
+In-Reply-To: <200402251359.00791.mtortonesi@ing.unife.it>
 Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 25 Feb 2004 14:22:56 +0000
 
 Mauro Tortonesi wrote:
->>
->>You can send PCM audio over a SCO socket, but you can't expect that the
->>PCM stream on the other side is byte by byte the same. It only sounds
->>the same.
 > 
+> i have been trying to transfer pcm data over a sco socket both using scotest 
+> and other similar apps of mine, but the actual data tranferred were only a 
+> bunch of random bytes, completely unrelated to the data sent. moreover, the 
+> behaviour of sco links is very unreliable. in my tests i have used several 
+> usb dongles with CSR chips (firmware versions ranging from HCI 15.3 to HCI 
+> 16.4) and kernel versions from 2.4.22 to 2.4.25-pre7.
 > 
-> i haven't tried, but i don't suppose that infinite series of zeros i get on 
-> the receiver sounds just like art blakey's alamode. there is surely something 
-> wrong in the transfer process. could it be the fact that my hosts have an 
-> usb-uhci controller?
-> 
+> you have told us many times that there are strong limitations in what you can 
+> do with sco sockets, but i still can't understand what are these limitations. 
+> i have tried searching trough the archives but i couldn't find anything 
+> interesting about this.
 
-If you are receiving only zeros at the far end, the problem is with the 
-sco driver or the hci-usb driver or the uhci_hcd driver.
+The standard SCO link takes data from the user app. The CSR chip (any 
+bluetooth device in fact) will take that data and treat it as Audio PCM 
+samples. the CSR chip will then use a LOSSY codec called CVSD and 
+transmit those samples over the air. Due to interference, some of the 
+samples in the air get lost. At the receiving end, CVSD is converted 
+back into PCM audio. If any samples have been lost in the air, they are 
+replaced with duplicate of the previous sample.
+Due to the lossy nature of the CVSD codec, the actual PCM values will be 
+different at the destination end as they were at the source end. But the 
+differences will be such that they are mostly unnoticeable to the human 
+ear. So, if you are wishing to transfer anything other than Sound across 
+a SCO link, change your mind. If you look at the video streaming 
+bluetooth profiles, you will see that they all use Bulk transfers.
+Some CSR chips try to include a "Transparent" feature, which disables 
+the CVSD codec, and passes samples directly onto the air, but that also 
+has problems associated with it.
 
-I currently think the hci-usb driver is at fault, but I am doing 
-research with the linux usb developers to discover how they think it 
-should be done, and then I will look at the hci-usb driver and see if it 
-is doing things correctly.
-
-With my system, the urbs are failing the submit_urb in the hci-usb 
-driver on kernel 2.6.3, so the hci-usb driver must be doing something 
-wrong as the new kernel usb code does more checks in order to catch 
-badly behaved applications. I think they are taking the approach that if 
-an application is behaving badly, make it fail completely, thus forcing 
-the program writter to correct it. Seems like a good policy to me. It is 
-better to have an application working 100% of the time or 0% of the 
-time, rather than randomly working/not working.
+If your usb device can do Interrupt OUT, use that instead if you need 
+low latency output. Some USB dongles can do it, some cannot.
 
 Cheers
 James
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
