@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000c01c52f10$1b76cd40$4cca12ac@stu.nus.edu.sg>
+Message-ID: <000901c52fa7$1a47bc80$52cc13ac@stu.nus.edu.sg>
 From: "Khoo Teck Ping" <eng10166@nus.edu.sg>
 To: <bluez-devel@lists.sourceforge.net>
+References: <20050323115636.85967.qmail@web52406.mail.yahoo.com>
+Subject: Re: [Bluez-devel] file transfer using ObexFTP
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0009_01C52F53.263621C0"
-Subject: [Bluez-devel] Problem installing BlueZ on the Sharp Zaurus
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,105 +20,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 23 Mar 2005 02:51:01 +0800
+Date: Wed, 23 Mar 2005 20:51:54 +0800
 
-This is a multi-part message in MIME format.
+hullo Jose
 
-------=_NextPart_000_0009_01C52F53.263621C0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+You may run the following
 
-Dear All
+#obexftp -b 00:0a:d9:xx:xx:xx -B 10 -g telecom/pb.vcf
 
-Please help.=20
+to download the entire address book from a Sony Ericsson T610/T630.
 
-I saved the following packages from the BlueZ downloads page under Sharp =
-Zaurus:
+where -b <bluetooth address>
+and -B <rfcomm ports 1~30>
+and -g <file location on phone>
 
-bluez-hcidump-1.12_arm.ipk
-bluez-kernel-2.4.18-mh15_arm.ipk
-bluez-libs_2.10_arm.ipk
-bluez-utils_2.10_arm.ipk
+On the T630 ports 10 and 15 are open, as in you may connect to them without 
+pairing.
 
-I saved all these onto my Zaurus. I then ran
-
-# ipkg install bluez-hcidump-1.12_arm.ipk, and=20
-# ipkg install bluez-kernel-2.4.18-mh15_arm.ipk, and
-# ipkg install bluez-libs_2.10_arm.ipk
-
-All appeared fine and I checked that the modules were indeed present.=20
-
-However, when I ran=20
-# ipkg install bluez-utils_2.10_arm.ipk
-
-I got the following error
-Cannot satisfy the following dependencies for bluez-utils: libbluetooth =
-libsdp
-
-Please help if possible. Thank You very much.
+You may try downloading other types of files.
 
 Teck Ping
 
-------=_NextPart_000_0009_01C52F53.263621C0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2900.2604" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Dear All</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Please help. </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I saved the following packages from the =
-BlueZ=20
-downloads page under Sharp Zaurus:</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>bluez-hcidump-1.12_arm.ipk</FONT></DIV>
-<DIV><FONT face=3DArial =
-size=3D2>bluez-kernel-2.4.18-mh15_arm.ipk</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>bluez-libs_2.10_arm.ipk</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>bluez-utils_2.10_arm.ipk</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I saved all these onto my Zaurus. I =
-then=20
-ran</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2># ipkg install <FONT face=3DArial=20
-size=3D2>bluez-hcidump-1.12_arm.ipk, and </FONT></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2># ipkg install <FONT face=3DArial=20
-size=3D2>bluez-kernel-2.4.18-mh15_arm.ipk, and</FONT></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2># ipkg install <FONT face=3DArial=20
-size=3D2>bluez-libs_2.10_arm.ipk</FONT></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>All appeared fine and I checked that =
-the modules=20
-were indeed present. </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>However, when I ran </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2># ipkg install=20
-bluez-utils_2.10_arm.ipk</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I got the following error</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Cannot satisfy the following =
-dependencies for=20
-bluez-utils: libbluetooth libsdp</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Please help if possible. Thank You very =
+----- Original Message ----- 
+From: "jose" <twblr@yahoo.com>
+To: <bluez-devel@lists.sourceforge.net>
+Sent: Wednesday, March 23, 2005 7:56 PM
+Subject: [Bluez-devel] file transfer using ObexFTP
 
-much.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Teck Ping</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV></BODY></HTML>
 
-------=_NextPart_000_0009_01C52F53.263621C0--
+> hi,
+>
+> how do i transfer files using obexFTP, from pc to pc
+> (both running linux), or from pc (running linux) to a
+> bluetooth enabled mobile.
+>
+> Rgds,
+> Jose.
+>
+>
+>
+> __________________________________
+> Do you Yahoo!?
+> Make Yahoo! your home page
+> http://www.yahoo.com/r/hs
+>
+>
+> -------------------------------------------------------
+> This SF.net email is sponsored by: 2005 Windows Mobile Application Contest
+> Submit applications for Windows Mobile(tm)-based Pocket PCs or Smartphones
+> for the chance to win $25,000 and application distribution. Enter today at
+> http://ads.osdn.com/?ad_id=6882&alloc_id=15148&op=click
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel 
 
 
 
