@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] confusion about libs/sdp.c -
-	sdp_service_search_req()
+Subject: Re: [Bluez-devel] Cleaning up after sdp_get_access_protos()
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Cc: Stephen Crane <steve.crane@rococosoft.com>
-In-Reply-To: <ef9938ec05022511243993f46d@mail.gmail.com>
-References: <ef9938ec05022511243993f46d@mail.gmail.com>
+In-Reply-To: <001401c51b9d$4c81af30$1a01010a@baked>
+References: <001401c51b9d$4c81af30$1a01010a@baked>
 Content-Type: text/plain
-Message-Id: <1109579650.17256.29.camel@pegasus>
+Message-Id: <1109579551.17256.27.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,48 +19,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Feb 2005 09:34:10 +0100
+Date: Mon, 28 Feb 2005 09:32:31 +0100
 
-Hi Albert,
+Hi Daryl,
 
-> the documentation for sdp_service_search_req() states that it outputs
-> an sdp_list_t * of sdp_record_t * (list of sdp service records)
+> This stuff hurts my brain, so I was hoping someone (Marcel? ;) could verify
+> my logic.
 > 
-> reading through the code, it appears that it actually returns a list
-> of uint32_t * data structures.
+> I'm mentioning this mostly because the utils code gets used as example code.
 > 
-> line 2721:
->         extract_record_handle_seq(pdata, rsp, rec_count, &scanned);
+> In this snippet from sdptool.c, proto is cleaned up with
+> sdp_list_free(proto, (sdp_free_func_t)sdp_data_free);
 > 
+>         if (sdp_get_access_protos(rec, &proto) == 0) {
+>                 printf("Protocol Descriptor List:\n");
+>                 sdp_list_foreach(proto, print_access_protos, 0);
+>                 sdp_list_free(proto, (sdp_free_func_t)sdp_data_free);
+>         }
 > 
-> line 2523:
-> static void extract_record_handle_seq(char *pdu, sdp_list_t **seq, int
-> count, int *scanned)
-> {
->     sdp_list_t *pSeq = *seq;
->     char *pdata = pdu;
->     int n;
->  
->     for (n = 0; n < count; n++) {
->         uint32_t *pSvcRec = (uint32_t *) malloc(sizeof(uint32_t));
->         *pSvcRec = ntohl(bt_get_unaligned((uint32_t *) pdata));
->         pSeq = sdp_list_append(pSeq, pSvcRec);
->         pdata += sizeof(uint32_t);
->         *scanned += sizeof(uint32_t);
->     }
->     *seq = pSeq;
-> }
+> I think the cleanup should be:
 > 
-> I think this will cause segfaults when you try to sdp_record_free the
-> records in the list (it does for me).
+>     sdp_list_foreach(proto,(sdp_list_func_t)sdp_list_free,0);
+>     sdp_list_free(proto,0);
 > 
-> perhaps it shold read something more like:
->         sdp_record_t *pSvcRec = (sdp_record_t*) malloc(sizeof(sdp_record_t));
->         pSvcRec->attrlist = pSvcRec->pattern = 0;
->         pSvcRec->handle = ntohl(bt_get_unaligned((uint32_t *) pdata));
->         pSeq = sdp_list_append(pSeq, pSvcRec);
+> Looking at sdp.c source (in libs), sdp_get_access_protos() returns a list of
+> lists of data sequences. The data sequences themselves shouldn't be freed at
+> this point because they weren't allocated by sdp_get_access_protos() (thus
+> the ,0 in the sdp_list_foreach call). But the list of lists is allocated
+> inside sdp_get_access_protos().
 
-Steve, any thoughts on this one?
+actually I have no idea, because I didn't wrote this code.
+
+Steve, any thoughts?
 
 Regards
 
