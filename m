@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] l2ping acts like ping
+Subject: Re: [Bluez-users] BlueZ error in cc,cc,dc sequence
 From: Marcel Holtmann <marcel@holtmann.org>
 To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404171019.52523.cijoml@volny.cz>
-References: <200404171019.52523.cijoml@volny.cz>
+In-Reply-To: <200404171022.09689.cijoml@volny.cz>
+References: <200404162339.01392.cijoml@volny.cz>
+	 <200404170957.35029.cijoml@volny.cz> <1082189235.4489.46.camel@pegasus>
+	 <200404171022.09689.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1082192860.4489.55.camel@pegasus>
+Message-Id: <1082192587.4489.53.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,17 +20,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Apr 2004 11:07:40 +0200
+Date: Sat, 17 Apr 2004 11:03:07 +0200
 
 Hi Michal,
 
-> we should possibly ping from 0 not 200 like normal ping :)
+> So it is good that I found it :)
 
-I don't know why it is from 200, so I applied your patch. Thanks.
+right now I am not sure what the problem is and I have no time for
+further investigations, because in general hcitool cc/dc should not be
+used for ACL link creation. But feel free to do it by yourself.
 
 Regards
 
-marcel
+Marcel
 
 
 
