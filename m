@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Pavel Ruzicka <pavouk@pavouk.org>
 Subject: Re: [Bluez-users] Re: MSI 6970 removing - kernel freeze
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Pavel Ruzicka <pavouk@pavouk.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200402222357.46031.pavouk@pavouk.org>
-References: <200402222357.46031.pavouk@pavouk.org>
-Content-Type: text/plain
-Message-Id: <1077491054.2832.39.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200402222357.46031.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +16,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 Feb 2004 00:04:14 +0100
+Date: Sun, 22 Feb 2004 23:57:46 +0100
 
-Hi Pavel,
+Hello,
 
-> But i found other problem.
-> 
-> When I make "hciconfig hci0 up"
-> Interface goes up.
-> next "hciconfig hci0 down".
-> Interface goes down.
-> next hciconfig hci0 up"
-> I get this error:
-> Can't init device hci0. Connection timed out(110)
-> 
-> I must reinsert dongle or rmmod/modprobe kernel module hci_usb.
+> > > > When I have hci0 up and I remove my USB MSI 6970 dongle, then kernel
+> > > > freezes.
+> >
+> > Workaround is to make "hciconfig hci0 down" before removing USB dongle
+> > from computer.
+>
+> or you don't select CONFIG_BT_HCIUSB_SCO in your kernel config.
 
-this problem only occurs on UHCI USB host contollers. The USB guys have
-a bunch of fixes and I hope this gets fixed some time.
+thanks, It works now.
 
-Regards
+But i found other problem.
 
-Marcel
+When I make "hciconfig hci0 up"
+Interface goes up.
+next "hciconfig hci0 down".
+Interface goes down.
+next hciconfig hci0 up"
+I get this error:
+Can't init device hci0. Connection timed out(110)
 
+I must reinsert dongle or rmmod/modprobe kernel module hci_usb.
+
+Best regards,
+
+Pavel Ruzicka
 
 
 
