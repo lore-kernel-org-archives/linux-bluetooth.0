@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT-1.2 spec device
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200501032250.27339.cijoml@volny.cz>
-References: <2de46576050103071248159461@mail.gmail.com>
-	 <200501032137.22606.cijoml@volny.cz> <1104785612.8894.68.camel@pegasus>
-	 <200501032250.27339.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1104789976.8894.76.camel@pegasus>
-Mime-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] 2.6.10 multimedia keys
+References: <41D85BB7.5020506@comcast.net> <200501032144.53762.cijoml@volny.cz> <1104785779.8894.72.camel@pegasus>
+In-Reply-To: <1104785779.8894.72.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200501032252.57493.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,32 +19,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 03 Jan 2005 23:06:16 +0100
+Date: Mon, 3 Jan 2005 22:52:57 +0100
 
-Hi Michal,
+Dne po 3. ledna 2005 21:56 Marcel Holtmann napsal(a):
+> Hi Michal,
+>
+> > Marcel pls write support for user space configuring hotkey keycodes too,
+> > coz I have multimedia keys on my laptop and those keys returns other key
+> > press keycodes than keys on MS desktop........than I can't configure it
+> > well, coz 254 returns IE key on notebook and email key on MS desktop and
+> > so on...
+>
+> some parts of this are not my job. The input guys must work on it. The
+> Bluetooth HIDP is only a transport layer between L2CAP and the generic
+> HID parser and/or the input subsystem.
 
-> > > > you can update the D-Link DBT-120 Rev. B3.
-> > >
-> > > is B2 firmware supported too? Apple garantee it, but tried it anybody? My
-> > > friend want me to flash it for him, but I worry about destroying dongle.
-> >
-> > in general yes, but I don't tested these ones. After I flashed a B4 it
-> > seems that I destroyed some of the radio/baseband settings. The Linux
-> > may still have some bugs and will not work with the timings of all flash
-> > chips.
-> 
-> And you flashed 1.1 or 1.2 firmware? If you want, I can send you original B4 
-> firmware, if dongle is abble to go to DFU mode
+This is work for our driver I thought...We pass 254 to subsystem which than 
+work with it...so we should send for example 117 instead of 254 originally 
+reported.
+Am I right?
 
-I had a backup of B4 and tried to re-flash it, but it didn't helped.
-However this must not mean anything. You can try the CSR flash tool or
-the tool that comes with the Widcomm stack.
+Michal
 
-Regards
-
-Marcel
-
-
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> The SF.Net email is sponsored by: Beat the post-holiday blues
+> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
