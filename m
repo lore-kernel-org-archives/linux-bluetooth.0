@@ -1,40 +1,44 @@
-Return-Path: <mlists@tdbnetworks.org>
-Subject: Re: [Bluez-users] BlueZ Newbie
-From: Richard Worwood <mlists@tdbnetworks.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1092744170.10582.18.camel@notepaq>
-References: <1092718810.3163.76.camel@hellontoast>
-	 <1092726160.31651.4.camel@pegasus>
-	 <45811.212.183.131.161.1092733345.squirrel@sockthing.tdbnetworks.org>
-	 <1092744170.10582.18.camel@notepaq>
-Content-Type: text/plain
-Message-Id: <1092816568.3270.0.camel@hellontoast>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <db972f43040818004773fa590a@mail.gmail.com>
+From: Ricky Soh <rickysoh@gmail.com>
+Reply-To: Ricky Soh <rickysoh@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
-Date: Wed, 18 Aug 2004 09:09:28 +0100
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] Newbie
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Wed, 18 Aug 2004 15:47:10 +0800
 
-Marcel, you're a star :)
+Sorry, I am a newbie in this area and is doing a sch project in Linux
+using Bluez. Thus i would like to find out where can i find the
+complete listing of the bluez api.
 
-On Tue, 2004-08-17 at 13:02, Marcel Holtmann wrote:
-> Hi Richard,
-> 
-> > In a word, yes, It's a Sony Ericsson P900.
-> > 
-> > Is that a major problem?
-> 
-> the hcidump showed me a mRouter behaviour. Check with sdptool on what
-> RFCOMM channel your phones has its DUN Profile and then try to use this
-> one.
-> 
-> Regards
-> 
-> Marcel
--- 
-Richard Worwood, TDB Networks
-4 High Street, Twyford, Berkshire RG10 9AE
+Secondly, I compile the following code btxml.c from a web and tried
+running. However, it produces this line:
 
-Office: +44 (0) 118 934 0056
-Mobile: +44 (0) 7771 662880
-Email: richardw@tdbnetworks.com
-Web: www.tdbnetworks.com
+/dev/bluetooth/rfcomm/0: No such file or directory
+
+Anyone of you can assist in this?
+
+Sincerely
+Ric
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
