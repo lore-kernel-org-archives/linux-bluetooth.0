@@ -1,53 +1,43 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Device class resetting itself after device is
-	removed
-From: Marcel Holtmann <marcel@holtmann.org>
-To: trejkaz@trypticon.org
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200411020056.00919.trejkaz@trypticon.org>
-References: <200411012222.49520.trejkaz@trypticon.org>
-	 <1099313117.16247.84.camel@pegasus>
-	 <200411020056.00919.trejkaz@trypticon.org>
-Content-Type: text/plain
-Message-Id: <1099319623.16247.102.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 01 Nov 2004 15:33:43 +0100
+Return-Path: <cijoml@volny.cz>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-users] info about encryption in proc?
+Date: Mon, 1 Nov 2004 15:45:30 +0100
+References: <200411011341.30769.cijoml@volny.cz> <200411011442.37852.cijoml@volny.cz> <1099317714.16247.100.camel@pegasus>
+In-Reply-To: <1099317714.16247.100.camel@pegasus>
+Cc: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200411011545.30255.cijoml@volny.cz>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Trejkaz,
+OK,
 
-> > are you sure that your hcid is running?
-> 
-> Yup, looks healthy so far:
-> 
-> [100] trejkaz@raven:~> ps -ef|grep hcid
-> root      6821     1  0 Nov01 ?        00:00:00 hcid: processing events                   
+I thought, that is possible to see how many bits device use
 
-if it still doesn't work, you may have to restart it to use your new
-settings.
+M.
 
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by:
-Sybase ASE Linux Express Edition - download now for FREE
-LinuxWorld Reader's Choice Award Winner for best database on Linux.
-http://ads.osdn.com/?ad_id=5588&alloc_id=12065&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Dne po 1. listopadu 2004 15:01 jste napsal(a):
+> Hi Michal,
+>
+> > > > is it possible to show in proc info about encryption which is used to
+> > > > intercommunicate between linux box and other devices?
+> > >
+> > > what do you expect to see? This is a boolean value and "hcitool con"
+> > > shows you the current state.
+> >
+> > for example in /proc/bluetooth/encryption
+> >
+> > MS Keyboard 128bit
+> > MS Mouse none
+> > ...
+>
+> as I said, this is only a boolean value and "hcitool con" already shows
+> the current state of the encryption. How many bits are used for it, is
+> not retrievable with standard HCI commands.
+>
+> Regards
+>
+> Marcel
