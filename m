@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-From: DVornheder@t-online.de
-Content-Type: text/plain; charset="ISO-8859-1"
-Message-ID: <1BYJR5-1Xq5q40@cmpmail07.bbul.t-online.de>
-Subject: [Bluez-users] Some questions
+From: Ben Wilson <bwilson@yooser.org>
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] New Zaurus packages available
+Message-ID: <20040610041900.GB21115@stag.mark-and-erika.com>
+References: <1086340599.10892.807.camel@baroque.rococosoft.com> <20040607050241.GA27386@stag.mark-and-erika.com> <1086774349.7888.867.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1086774349.7888.867.camel@baroque.rococosoft.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,67 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Jun 2004 08:53:15 +0200
+Date: Thu, 10 Jun 2004 00:19:01 -0400
 
-Hi !
+* On Wed, Jun 09, 2004 at 10:45:49AM +0100, I received from Stephen Crane:
+> On Mon, 2004-06-07 at 06:02, Ben Wilson wrote:
+> > Should this work on a 6000L?
+> 
+> I can't promise anything. I haven't got a 6000L.
 
-Yesterday i bought a Belkin Bluetooth USB Adapter.
+The package works fine, but it doesn't look like my card is supported.
 
-After plugin the adapter i get this messages:
+It's the AmbiCom BT2000-CF.
 
-Jun  9 21:36:05 pclap kernel: usb 1-1: new full speed USB device using
-address 
-2
-Jun  9 21:36:05 pclap /etc/hotplug/usb.agent[11903]: need a device for
-this 
-command
-Jun  9 21:36:05 pclap hcid[4002]: HCI dev 0 registered
-Jun  9 21:36:05 pclap hcid[4002]: HCI dev 0 up
-Jun  9 21:36:05 pclap hcid[4002]: Starting security manager 0
-Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM ver 1.3
-Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM socket layer initialized
-Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM TTY layer initialized
+# cardctl ident
+Socket 0:
+  product info: "AmbiCom BT2000C", "Bluetooth PC/CF Card", "",
+""
+  manfid: 0x022d, 0x2000
+  function: 2 (serial)
 
-lsusb shows:
+dmesg shows:
 
-Bus 002 Device 002: ID 050d:0081 Belkin Components
+ttyS03 at port 0xf60002f8 (irq = 43) is a 16C950/954
+pxa_pcmcia_suspend(0)
 
-With ciptool search the adapter is connecting to my AVM Fritz ISDN AP-X:
+I guess this makes it a 0x16C950 UART card, but its a BT2000C,
+which is unsupported.
 
-Jun  9 21:40:00 pclap hcid[4002]: pin_code_request
-(sba=00:0A:3A:51:81:4E, 
-dba=00:04:0E:85:35:15)
-Jun  9 21:40:00 pclap hcid[4002]: link_key_notify
-(sba=00:0A:3A:51:81:4E)
-Jun  9 21:40:00 pclap hcid[4002]: Saving link key 00:0A:3A:51:81:4E 
-00:04:0E:85:35:15
+> 
+> Steve
+> -- 
+> Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+> steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
-hcitool scan shows:
+Thanks!
 
-Scanning ...
-	00:04:0E:85:35:15	Bluetooth ISDN Access Point
-	00:04:0E:83:3C:40	BlueZ (0)
-                           00:02:72:44:CF:9F                  
-BELKIN_PRT_44CF9F
-
-My questions:
-
-- No driver is loaded after plugin the adapter.
-
-   Is this ok ?
-
-- How can i open a internet connection ?
-
-- How can i print on my usb printer which is connected to the
-BELKIN_PRT_44CF9F
-
-   bluetooth adapter ?
-
-
-Dirk
-
-
-
+-- 
+Ben
 
 
 -------------------------------------------------------
