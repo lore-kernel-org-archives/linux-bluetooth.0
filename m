@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
+From: Geert Geurts <geert@ebm.nl>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200403222018.55288.cijoml@volny.cz>
-Subject: [Bluez-users] Control ACL link from user-space?
+Message-Id: <1079973771.5419.24.camel@geert.ebm.nl>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] sendmsg: No buffer space available
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,17 +15,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Mar 2004 20:18:55 +0100
+Date: Mon, 22 Mar 2004 17:42:51 +0100
 
-Hi Marcel,
+Hello, I've got a problem with my usb-dongle...
+as soon as I put request too much traffic over ppp (a webpage is too
+much, ping is no problem) the connection is broken...
+when I try to ping over the ppp after I got the timeout on my palm, I
+get sendmsg: No buffer space available 
+when I do the same when I didn't get the timeout message yet I get a
+normal reply...
 
-is it possible to control ACL link of HID devices from userspace?
-When my screen-saver starts, it should call ACL disconnect to save power of 
-mouse and keyboard.
+I found out that I have the same problem when I try connecting via
+normal cradle/cable...
+no matter witch speed I set! well tried 19200 without success...
 
-Your opinion?
+I'm using gentoo linux
+devfs and usbfs
+2.4.23-ck3-mh2 kernel
+bluez-kernel-2.3
+bluez-libs-2.4
+bluez-pan-1.1
+bluez-sdp-1.5
+bluez-utils-2.3-r1
 
-Michal
 
 
 -------------------------------------------------------
