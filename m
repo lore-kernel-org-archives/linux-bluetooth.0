@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hid2hci
+Subject: Re: [Bluez-users] Pretec and Ambicom BT2000E driver
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Elimar Riesebieter <riesebie@lxtec.de>
+To: Pavel Ruzicka <pavouk@pavouk.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040409193454.GA2187@aragorn.home.lxtec.de>
-References: <20040409153508.GA2123@aragorn.home.lxtec.de>
-	 <1081531882.21596.23.camel@pegasus>
-	 <20040409193454.GA2187@aragorn.home.lxtec.de>
+In-Reply-To: <200404100030.49916.pavouk@pavouk.org>
+References: <200404100030.49916.pavouk@pavouk.org>
 Content-Type: text/plain
-Message-Id: <1081593331.3028.10.camel@pegasus>
+Message-Id: <1081593241.3028.7.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,19 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 10 Apr 2004 12:35:31 +0200
+Date: Sat, 10 Apr 2004 12:34:01 +0200
 
-Hi Elimar,
+Hi Pavel,
 
-> [...]
-> > looks like another USB problem. Maybe the USB guys already have a fix
-> > for it. Ask them.
-> 
-> hci_usb was loaded while running hid2hci. Unloading that module
-> solves the prob. hci_usb is loaded from hotplug after changing to
-> hci by hid2hci.
+> yesterday somebody talks about BT2000E CF card.
+> I have Pretec BT2000E CF card.
+> I found new version of alternative driver which probably fix resume problems 
+> and 2.6 kernel compiling.
 
-so this is really an USB race.
+I know that driver and I really thought of including it, but the best
+way is to make it working through serial_cs and hci_uart/hciattach. Once
+this is solved every card with a 16C950 UART will work and not only the
+two with an Ericsson chip on it.
 
 Regards
 
