@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200405191405.41365.cijoml@volny.cz>
-Subject: [Bluez-users] Final sound support in BlueZ
+Subject: Re: [Bluez-users] sdpd crashing (in uclinux)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: egroJorge <egroJorge@terra.es>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <692442859.20040519115732@terra.es>
+References: <692442859.20040519115732@terra.es>
+Content-Type: text/plain
+Message-Id: <1084961712.4327.34.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,14 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 May 2004 14:05:41 +0200
+Date: Wed, 19 May 2004 12:15:13 +0200
 
-Hi Marcel,
+Hi Jorge,
 
-do you work on sco support for BlueZ which will allow us finally talk to BT 
-headsets? In our market are selled BT enabled repros too.
+> I have already "ported" the bluez-utils to uclinux (over an ARM7DMI)
+> and I realized than sdpd crash whenever other device tries to browse
+> its services). I have printfed the code and followed it until I found
+> out that it is the command sdp_put_unligned which is having a
+> segmentation fault.
+> I have seen that sdp_put_unligned is defined as a macro depending of
+> the definition or not of 386 architecture. I will trie to play with
+> the defines and to port hcidump in order to have more information but
+> I would like to ask the list about this problem in the case I am not the
+> first one.
 
-Michal
+please start using bluez-libs-2.7 and bluez-utils-2.7, because the SDP
+stuff is now part of the core packages and I stopped maintaining the
+bluez-sdp package.
+
+The new Bluetooth library contains a bt_put_unaligned macro for general
+use and I used a slight different method for non i386 platforms.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
