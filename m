@@ -1,7 +1,7 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Peter Johanson <latexer@gentoo.org>
+From: Peter Johanson <peter@peterjohanson.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20050114063841.GB23441@butchy.cubesearch.com>
+Message-ID: <20050114051845.GA23441@butchy.cubesearch.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Subject: [Bluez-users] Philips PC Card + 2.6.10 kernel.
@@ -16,9 +16,8 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Jan 2005 22:38:41 -0800
+Date: Thu, 13 Jan 2005 21:18:45 -0800
 
-(Resent, as it was sent from the wrong address the first time)
 Hey all,
 
 I'm working on getting a newly aquired Philips PC Card working, using a
