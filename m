@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] DBT-120 firmware upgrade
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41AB1AF5.3030901@csr.com>
-References: <200411261152.29925.pavouk@pavouk.org>
-	 <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus>
-	 <200411272130.44783.pavouk@pavouk.org> <1101588637.27074.22.camel@pegasus>
-	 <41AB14DD.3010807@csr.com> <1101731638.10115.0.camel@pegasus>
-	  <41AB1AF5.3030901@csr.com>
-Content-Type: text/plain
-Message-Id: <1101749410.7562.21.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41AB4CFE.2000602@vdsoft.org>
+From: Vladimir Dvorak <dvorakv@vdsoft.org>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] BCM203x - firmware load failed
+References: <41AA747D.5020800@vdsoft.org> <1101692136.9527.7.camel@pegasus>
+In-Reply-To: <1101692136.9527.7.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,32 +18,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Nov 2004 18:30:10 +0100
+Date: Mon, 29 Nov 2004 17:23:26 +0100
 
-Hi Steven,
+Marcel Holtmann wrote:
 
-> > do you have the full build information for my web page?
-> 
-> Oops, I should have enclosed that:
-> 
->   0x632 1586 bc02x_8unified_fl_bt1.2_18_0408131143_encr128 2004-08-13
+>Hi Vladimir,
+>
+>  
+>
+>>I have a problem with Belkin Bluetooth USB adapter based on BCM203x 
+>>chip. When I plug this dongle into USB port, kernel returns:
+>>
+>>Bluetooth: Broadcom Blutonium firmware driver ver 1.0
+>>bcm203x_probe: Mini driver request failed
+>>bcm203x: probe of 2-1:1.0 failed with error -5
+>>usbcore: registered new driver bcm203x
+>>    
+>>
+>
+>you must make sure that the firmware files are installed. On a Debian
+>System is should be enough to install the bluez-firmware package.
+>
+>Regards
+>
+>Marcel
+>
+>
+>  
+>
+Hi Marcel,
 
-thanks for this one, but actually I have another one:
+thank you very much! Now it is working.
 
-# hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:C0:DF:xx:xx:xx ACL MTU: 192:8  SCO MTU: 64:8
-        Build 1354
-        Chip version: BlueCore02
-        Max key size: 56 bit
-        SCO mapping:  HCI
-
-I assume that this is also a HCI 18.2, right?
-
-Regards
-
-Marcel
-
+Vladimir
 
 
 
