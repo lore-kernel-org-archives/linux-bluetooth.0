@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4117B376.3030507@dark-reality.de>
+Message-ID: <4117B098.5020805@dark-reality.de>
 From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] "comlicated" setup - known issues for hid and	SCO?
-References: <4117A907.7010006@dark-reality.de> <1092071597.4564.17.camel@pegasus>
-In-Reply-To: <1092071597.4564.17.camel@pegasus>
+Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
+References: <4117AB9A.9010909@dark-reality.de> <1092071356.4564.12.camel@pegasus>
+In-Reply-To: <1092071356.4564.12.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -17,7 +17,7 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 09 Aug 2004 19:25:10 +0200
+Date: Mon, 09 Aug 2004 19:12:56 +0200
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
@@ -26,53 +26,29 @@ Marcel Holtmann wrote:
 | Hi Lars,
 |
 |
-|>right now I'm using two BT devices with my Epox dongle, an MX900 mice
-|>and a Sony Ericcson HBH-35 Headset with snd-bt-sco (voice mode 0x0060,
-|>before you ask ;)
+|>A while ago I decided that I might want to take over the snd-bt-sco
+|>project.
 |
+| you can use this mailing list and you can also post patches here.
 |
-| what does "hcitool info ..." say about your headset? What is the
-| firmware version of your EPoX dongle?
-|
-|
-Headset:
-~        BD Address:  00:0E:07:33:DE:2B
-~        Device Name: HBH-35
-~        LMP Version: 1.1 (0x1) LMP Subversion: 0x8d40
-~        Manufacturer: Ericsson Technology Licensing (0)
-~        Features: 0xbc 0x28 0x01 0x00 0x00 0x00 0x00 0x00
-~                <encryption> <slot offset> <timing accuracy> <role switch>
-~                <sniff mode> <SCO link> <HV3 packets> <CVSD>
+| And as I said before, the best way is to extend the current SCO kernel
+| module with an ALSA interface, because the basic idea of snd-bt-sco is
+| wrong.
 
+I think you are absolutly right, but can you explain a bit more what you
+have in mind? No code fragments or stuff, just how you think this might
+be structured and integrated best. I think you are the person who knows
+most about this topic.
 
-Mouse:
-~        BD Address:  00:07:61:04:D6:7D
-~        Device Name: Logitech MX900 Mouse
-~        LMP Version: 1.1 (0x1) LMP Subversion: 0x350
-~        Manufacturer: Cambridge Silicon Radio (10)
-~        Features: 0xfc 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-~                <encryption> <slot offset> <timing accuracy> <role switch>
-~                <hold mode> <sniff mode> <park state> <RSSI> <channel
-quality>
-~                <SCO link> <HV2 packets> <HV3 packets> <u-law log>
-<A-law log>
-~                <CVSD> <paging scheme> <power control> <transparent SCO>
-
-
-How can I find out what firmware my dongle has? It's a BT-DG03...
-
-cu,
+thanks,
 ~  Lars
-
-PS: great mouse, by the way. Works perfectly with Bluetooth and connects
-easily to different systems.
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.3 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFBF7N2QWC6DTWkDAoRArpEAJ4mMDV59gdZUyPBzsZ3a+iqrZsBtwCfZPPZ
-TJWAeT+qMUXQ3nGs7DxbrYA=
-=gvqb
+iD8DBQFBF7CYQWC6DTWkDAoRAqvUAKCjj1RzXu+OHjGa8rpw39r09ldRhwCguZd8
+ys/yzAvmczrpsrUd5LzqDMg=
+=ui6U
 -----END PGP SIGNATURE-----
 
 
