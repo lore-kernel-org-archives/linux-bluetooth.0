@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200501282151.ALQ50969@ms12.netsolmail.com>
-References: <200501282151.ALQ50969@ms12.netsolmail.com>
+MIME-Version: 1.0
+From: Stefan Bellon <sbellon@sbellon.de>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <4d348a05e8sbellon@sbellon.de>
+In-Reply-To: <4d33b69105sbellon@sbellon.de>
+References: <4d3382eb6csbellon@sbellon.de> <41F81D6F.3000908@xmission.com> <4d33b69105sbellon@sbellon.de>
 Content-Type: text/plain
-Message-Id: <1106961215.10580.5.camel@pegasus>
-Mime-Version: 1.0
+Subject: [Bluez-users] Re: bluetooth-alsa and Jabra BT800
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,49 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 Jan 2005 02:13:35 +0100
+Date: Fri, 28 Jan 2005 23:17:05 +0100
 
-Hi Chris,
+Stefan Bellon wrote:
+> Brad Midgley wrote:
+> > did you put it in pairing mode (usually by holding down the power
+> > button until it beeps) just before running btsco?
 
-> I installed bluez-libs-2.14 and bluez-utils-2.14 on a linux 2.4.26 system. I 
-> also installed the BCM2033-FW.bin  and BCM2033-MD.hex files in both /
-> lib/firmware and /usr/lib/hotplug/firmware. The bluez kernel module 
-> loads, and I can see stuff like this in the messages log when I unplug and 
-> plug in the device and start the hcid daemon:
-> 
-> Jan 28 12:23:59 krank kernel: usb.c: deregistering driver hci_usb
-> Jan 28 12:24:14 krank kernel: BlueZ Core ver 2.3 Copyright (C) 2000,2001 
-> Qualcomm Inc
-> Jan 28 12:24:14 krank kernel: Written 2000,2001 by Maxim Krasnyansky 
-> <maxk@qualcomm.com>
-> Jan 28 12:24:31 krank kernel: BlueZ HCI USB driver ver 2.5 Copyright 
-> (C) 2000,2001 Qualcomm Inc
-> Jan 28 12:24:31 krank kernel: Written 2000,2001 by Maxim Krasnyansky 
-> <maxk@qualcomm.com>
-> Jan 28 12:24:31 krank kernel: usb.c: registered new driver hci_usb
-> Jan 28 12:25:13 krank kernel: usb.c: USB disconnect on device 00:04.2-2 
-> address 2
-> Jan 28 12:25:17 krank kernel: hub.c: new USB device 00:04.2-2, assigned 
-> address 3
-> Jan 28 12:36:49 krank -- MARK --
-> Jan 28 12:39:06 krank hcid[1025]: Bluetooth HCI daemon
-> 
-> However, when I do a 'hcitool dev' it doesn't see anything- it just says 
-> "Devices:" and then nothing. If I run lsusb it says:
-> 
-> Bus 001 Device 001: ID 0000:0000  
-> Bus 001 Device 003: ID 0a5c:2033 Broadcom Corp. BCM2033 Bluetooth
-> 
-> What'd I do wrong?
+> I tried that as well. Doesn't make any difference. But the headset and
+> the PC are already paired. Do you have to put the headset into pairing
+> mode every time you start btsco?
 
-on a system with a 2.4 kernel you need the bcm203x utility. You must
-enable when compiling bluez-utils.
+> Anyway, even that would be acceptable if it worked. ;-}
 
-Regards
+> On http://www.dcs.gla.ac.uk/~jp/snd-bt-sco/README there's the hint to
+> find out about the channel to use with btsco. But I get:
 
-Marcel
+> root@roma# sdptool search --bdaddr 00:07:A4:21:1D:86 0x1108
+> Class 0x1108
+> Failed to connect to SDP server on 00:07:A4:21:1D:86: Connection
+> timed out
 
+> Is this a problem? What else can I do to track down the problem? TIA.
 
+Tomorrow I have some time I could spend on tracking that problem down.
+But I could need a bit of help here. What else could I try to debug? I
+really want to get my Jabra BT800 going with bluetooth-alsa.
+
+-- 
+Stefan Bellon
 
 
 -------------------------------------------------------
