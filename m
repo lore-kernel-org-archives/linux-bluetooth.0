@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] CF cards capable of 1Mbps?
-From: David Woodhouse <dwmw2@infradead.org>
-To: Nils Faerber <nils@kernelconcepts.de>
+From: Nils Faerber <nils@kernelconcepts.de>
+To: David Woodhouse <dwmw2@infradead.org>
 Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1063110035.21136.1291.camel@idoru.kc.de>
+In-Reply-To: <1063101266.32473.368.camel@hades.cambridge.redhat.com>
 References: <1063101266.32473.368.camel@hades.cambridge.redhat.com>
-	<1063110035.21136.1291.camel@idoru.kc.de>
-Message-Id: <1063111685.32473.425.camel@hades.cambridge.redhat.com>
+Message-Id: <1063110035.21136.1291.camel@idoru.kc.de>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,52 +19,33 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 09 Sep 2003 13:48:05 +0100
+Date: Tue, 09 Sep 2003 14:20:35 +0200
 Content-Type: text/plain
 
-On Tue, 2003-09-09 at 14:20 +0200, Nils Faerber wrote:
-> The fact that the UART of the CF card sais it would run at 115kbps does
-> not at all mean that the actual data throughput is only 115kbps.
-> For example we have a Brainboxes CF card which you set to 115kbps but
-> actually uses 1Mbps between the UART and the CSR chipset then. The UART
-> clock is simply higher so that a devider for 115kbps results in 1Mbps.
-> Only if your OS tries to setup something based on the baudrate you would
-> be in trouble here. Linux has no problems with the extra bitrate.
+Am Di, 2003-09-09 um 11.54 schrieb David Woodhouse:
+> Slightly off-topic question... can anyone recommend a CF Bluetooth card
+> which can actually do 1Mbps? Preferably available in the UK.
+> 
+> Many of them are advertised that way, but turn out to have a UART which
+> is only capable of 115200 baud. The hardware compatibility list probably
+> ought to give the maximum speeds.
 
-This is true. Which is why I confirmed with BNEP bandwidth tests that I
-only get about 9-10Kbps transfer rate, and checked what speed the CSR
-chip thinks it's talking at too...
+The fact that the UART of the CF card sais it would run at 115kbps does
+not at all mean that the actual data throughput is only 115kbps.
+For example we have a Brainboxes CF card which you set to 115kbps but
+actually uses 1Mbps between the UART and the CSR chipset then. The UART
+clock is simply higher so that a devider for 115kbps results in 1Mbps.
+Only if your OS tries to setup something based on the baudrate you would
+be in trouble here. Linux has no problems with the extra bitrate.
 
- # pskey -d /dev/tts/0 -b
-Physical device :/dev/tts/0
-Speed           :115200
-Use BCSP        :YES
-Initiating read thread
-BT SYS: Initializing BCSP
-BT SYS: BCSP initialized and syncronized
-Synchronized
-Successfully read firmware info.
- Firmware version: 272
-pskey>191
-Key 0191 length 10
-01d8 0006 00fa 0014 0004 0000 0004 001e 0064 000a
-
-The information about the Brainboxes card is appreciated -- thanks.
-http://www.brainboxes.com/products/bluetooth/product.asp?id=BL-565
-says only 721Kbps, but that'll do me fine; I'll see if I can find one of
-those for slightly less than the insane amount of money they seem to
-claim is the recommended price.
-
-I had a Cyberblue BLUE-CF01 which had a baud_base of 1152000, but the
-first one went back due to radio-side reliability problems -- only about
-1 in 5 times would it detect and correctly get name from my phone which
-was sitting right next to it. The second one was better for a while, but
-then started to lose RX characters, until last week it finally gave up
-completely and I don't receive _anything_ from the CSR chip. I don't
-think I want another of those :)
+CU
+  nils faerber
 
 -- 
-dwmw2
+kernel concepts          Tel: +49-271-771091-12
+Dreisbachstr. 24         Fax: +49-271-771091-19
+D-57250 Netphen          D1 : +49-170-2729106
+--
 
 
 
