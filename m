@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <3FFC03A3.5090807@york.ac.uk>
-From: Alex Holland <ah160@york.ac.uk>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] blue-fw not working for USB Belkin F8T001 in	Gentoo
- Linux
-References: <3FFBFC34.3050509@york.ac.uk> <1073479827.2508.143.camel@pegasus>
-In-Reply-To: <1073479827.2508.143.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] blue-fw not working for USB Belkin F8T001 in
+	Gentoo Linux
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alex Holland <ah160@york.ac.uk>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3FFBFC34.3050509@york.ac.uk>
+References: <3FFBFC34.3050509@york.ac.uk>
+Content-Type: text/plain
+Message-Id: <1073479827.2508.143.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,27 +19,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Jan 2004 13:03:31 +0000
+Date: Wed, 07 Jan 2004 13:50:27 +0100
 
-Marcel Holtmann wrote:
+Hi Alex,
 
-> I never got the bluefw working fine with my Broadcom based dongles. So I
-> wrote a kernel driver for loading the firmware. My -mh2 patch for 2.6.0
-> contains this bcm203x driver, but I haven't one for the 2.4 series.
+> I'm a Gentoo user, and my kernel and bluetooth modules are all compiled 
+> using the latest Gentoo Sources, 2.4.22-r2.
+> 
+> When I was using 2.4.20-r9, hci_usb wouldn't see my USB bluetooth dongle 
+> until after bluefw had run. Since I upgraded to 2.4.22-r2, my dongle is 
+> detected as part of the standard USB bus scan during boot, although it 
+> brings up a lot of insmod errors. Further on during the boot, bluefw 
+> always fails, saying that my device has timed out. This leaves my 
+> bluetooth device invisible to hciconfig.
+> 
+> Everything works fine if I boot into Windows XP and let the Belkin 
+> software load the firmware, then reboot into Linux without powering 
+> down. I still get the insmod errors, but bluefw brings up no error 
+> messages and all bluetooth things work wonderfully.
+> 
+> I realise this may look more like a Gentoo query than a bluez query, but 
+> there don't seem to be many bluetooth users on the Gentoo forums, so I 
+> thought this might be the best place to ask.
 
-Interesting - bluefw appeared to work when I was using the 2.4.20-r9 
-kernel sources. It would report success, but my bluetooth connection was 
-very dodgy (see previous mails about instability). However, I don't know 
-if this was due to the usb extension cable I was using, or the firmware 
-being loaded incorrectly (possibly the latter, as it worked fine in 
-Windows even with the cable).
+I never got the bluefw working fine with my Broadcom based dongles. So I
+wrote a kernel driver for loading the firmware. My -mh2 patch for 2.6.0
+contains this bcm203x driver, but I haven't one for the 2.4 series.
 
-Any plans to backport the -mh2 patch to 2.4? The Gentoo devs would 
-probably be interested, they're patch crazy :)
+Regards
 
-In the meantime, I'll just do the XP/Linux reboot trick, I guess.
+Marcel
 
-Alex
 
 
 
