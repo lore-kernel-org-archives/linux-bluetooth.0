@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040320211932.69476.qmail@web60105.mail.yahoo.com>
-From: blue ranger <theblueresearcher@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <004a01c40eb7$82153b10$14212a3e@k62300>
+From: "Juan Manuel" <kwyjibo@ono.com>
+To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-928857665-1079817572=:69453"
-Subject: [Bluez-users] Bluetooth in promiscuous mode and passively collecting traffic?
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Subject: [Bluez-users] How to install Bluez after cross-compile the sources
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,25 +16,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 20 Mar 2004 13:19:32 -0800 (PST)
+Date: Sat, 20 Mar 2004 21:11:18 +0100
 
---0-928857665-1079817572=:69453
-Content-Type: text/plain; charset=us-ascii
+I have cross-compiled succesfully the sources for an ARM plataform. I set
+the option --prefix to obtain the result on a directory of my election, and
+now, I don't know what to do for intall the compilation results in the
+target computer, an armbase from Compulab. What should I do?
 
-I am wondering if there has been any development in using current Bluetooth chips in a promiscuous mode, being able to passively listen to any traffic around?  From the research I've done, I know that a year ago this was not really possible unless you bought a protocol analyzer that is very expensive.  I am working on a Bluetooth project at school and am trying to find a way to collect Bluetooth traffic that is not necessarily directed at my Bluetooth chip.  Thanks for any help you can give.  
- 
-- Ken
 
-Do you Yahoo!?
-Yahoo! Finance Tax Center - File online. File on time.
---0-928857665-1079817572=:69453
-Content-Type: text/html; charset=us-ascii
-
-<DIV>I am wondering if there has been any development in using current Bluetooth chips in a promiscuous mode, being able to passively listen to any traffic around?&nbsp; From the research I've done, I know that a year ago this was not really possible unless you bought a protocol analyzer that is very expensive.&nbsp; I am working on a Bluetooth project at school and am trying to find a way to collect Bluetooth traffic that is not necessarily directed at my Bluetooth chip.&nbsp; Thanks for any help you can give.&nbsp; </DIV>
-<DIV>&nbsp;</DIV>
-<DIV>- Ken</DIV><p><font face=arial size=-1>Do you Yahoo!?<br>
-<a href="http://taxes.yahoo.com/filing.html"><b>Yahoo! Finance Tax Center</a></b> - File online. File on time.
---0-928857665-1079817572=:69453--
 
 
 -------------------------------------------------------
