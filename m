@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Packages to Use For Zaurus SL-6000L
+Subject: Re: [Bluez-users] rfcomm pppd
 From: Marcel Holtmann <marcel@holtmann.org>
-To: murat_bog@yahoo.com
+To: Matthias Albert <matthias@ma-c.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041016065031.39199.qmail@web60406.mail.yahoo.com>
-References: <20041016065031.39199.qmail@web60406.mail.yahoo.com>
+In-Reply-To: <1097845922.12708.16.camel@ringo.aicas.burg>
+References: <1097845922.12708.16.camel@ringo.aicas.burg>
 Content-Type: text/plain
-Message-Id: <1097927722.4911.10.camel@pegasus>
+Message-Id: <1097927566.4911.7.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,31 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 16 Oct 2004 13:55:22 +0200
+Date: Sat, 16 Oct 2004 13:52:46 +0200
 
-Hi Murat,
+Hi Matthias,
 
-> I am wondering which combination of Bluez packages I
-> should be installing on a Zaurus 6000L with factory
-> configuration(2.4.18-rml7-pxa3-embedix with ROM
-> version 1.12) to work with an AmbiCom BT2000CF card.
+> now I'm able to establish a connection from my ipaq (running familiar)
+> to my notebook (linux, debian host).
 > 
-> The latest set of packages do not seem to be working
-> together.  When I install bluez-utils-2.10_arm.ipk, it
-> reports a dependency error when used with
-> bluez-kernel-2.4.18-mh15_arm.ipk and
-> bluez-libs-2.10_arm.ipk.
+> hcitool scan -> list of all available bluetooth devices
+>  -> select the one I need
+> sdptool browse <bluetoothadress> -> gives me list of all availble
+> profiles
 > 
-> I also see that when I run "/etc/rc.d/init.d/bluetooth
-> start" command, I get the following message:
+> rfcomm connect 0 <bluetoothadress> 1 -> do a serial connection to my bt
+> device
 > 
-> "Starting Bluetooth subsystem:/usr/sbin/hcid: error
-> while loading shared libraries: libsdp.so.2: cannot
-> load shared object file: No such file or directory"
+> rfcomm show -> give me a list of established connections
+> 
+> So everytime I do this, the pppd is starting. If nothing happens the
+> connection will be closed. Where can I define which program should be
+> started? I don't want that pppd is starting. I want to see with minicom
+> what happen on the device. Do you know what I mean?. So where can I
+> define this?
 
-you need an updated kernel, because the Bluetooth support of the 2.4.18
-kernel is outdated. However I don't own a Zaurus and I have no idea how
-to fix this the right way.
+I don't understand what you mean. Do you establish the connection from
+your iPAQ or from your notebook?
 
 Regards
 
