@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT mouse disconnect
-From: Marcel Holtmann <marcel@holtmann.org>
-To: sandro.weiser@gmx.de
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200406201934.30037.sandro.weiser@gmx.de>
-References: <200406201934.30037.sandro.weiser@gmx.de>
-Content-Type: text/plain
-Message-Id: <1087756769.4781.44.camel@pegasus>
-Mime-Version: 1.0
+From: Sandro Weiser <sandro.weiser@gmx.de>
+Reply-To: sandro.weiser@gmx.de
+To: Bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Message-Id: <200406201934.30037.sandro.weiser@gmx.de>
+Cc: 
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Subject: [Bluez-users] BT mouse disconnect
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,58 +18,129 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 20 Jun 2004 20:39:29 +0200
+Date: Sun, 20 Jun 2004 19:34:28 +0200
 
-Hi Sandro,
+When I don't use my BT Mouse, the mouse disconnects after a certain period
+when I use the hidp Module. After that the mouse isn't detectable anymore!
+No reboot, no Linux or Windoof can detect the mouse anymore. Only removing
+the batterys helps and after that the mouse works like before.
+Note: the mouse is an Epox and switches completely of when it's not used.
+I've to press one or more buttons to reenable the mouse. But when using the
+hid-proxy of the adapter, that's no problem.
 
-> When I don't use my BT Mouse, the mouse disconnects after a certain period
-> when I use the hidp Module. After that the mouse isn't detectable anymore!
-> No reboot, no Linux or Windoof can detect the mouse anymore. Only removing
-> the batterys helps and after that the mouse works like before.
-> Note: the mouse is an Epox and switches completely of when it's not used.
-> I've to press one or more buttons to reenable the mouse. But when using the
-> hid-proxy of the adapter, that's no problem.
+Can somebody please explain what I'm doing wrong or simply help?
 
-this is the stupid CSR bug when terminating the L2CAP connections. I
-really thought that I found a workaround, but it seems not :(
+hidd --show
+00:04:61:81:76:D9 CSR HIDEngine Three Button Mouse [0000:0000] connected
 
-My EPoX mouse has an earlier build id (0x020a), but I can't remember
-that I tested it with the hidp module before. Will do this as soon as
-possible.
+hcitool info `cat /etc/bluetooth/Bluetooth-Mouse\ 8176D9`
+Requesting information ...
+        BD Address:  00:04:61:81:76:d9
+        Device Name: Bluetooth-Mouse 8176D9
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x356
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <RSSI> <channel quality> <SCO link> <HV2
+packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+                <transparent SCO>
 
-In HID proxy mode the boot mode is used and I don't know if the device
-still uses an idle timeout. Will check this, too.
+hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:04:61:81:28:16 ACL MTU: 192:8  SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:808820 acl:51762 sco:0 events:3379 errors:0
+        TX bytes:5097 acl:228 sco:0 commands:51 errors:0
+        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: ACCEPT MASTER
+        Name: 'A31'
+        Class: 0x100100
+        Service Classes: Object Transfer
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x360 LMP Ver: 1.1 (0x1) LMP Subver:
+0x360
+        Manufacturer: Cambridge Silicon Radio (10)
 
-> > HCI Event: Mode Change(0x14) plen 6
->   00 2D 00 02 78 00
-> > ACL data: handle 0x002d flags 0x02 dlen 12
->     L2CAP(s): Disconn req: dcid 0x0041 scid 0x0044
-> < ACL data: handle 0x002d flags 0x02 dlen 12
->     L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0044
-> < ACL data: handle 0x002d flags 0x02 dlen 12
->     L2CAP(s): Disconn req: dcid 0x0043 scid 0x0040
+hcidump -x
+> ACL data: handle 0x002d flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 0]
+      A1 02 00 00 FF 00
+> ACL data: handle 0x002d flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 0]
+      A1 02 00 00 FF 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 00 00 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 02 14 00
+> ACL data: handle 0x002d flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 0]
+      A1 02 00 00 01 00
+> ACL data: handle 0x002d flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 0]
+      A1 02 00 00 01 00
+> ACL data: handle 0x002d flags 0x02 dlen 10
+    L2CAP(d): cid 0x41 len 6 [psm 0]
+      A1 02 00 00 01 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 00 00 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 02 28 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 00 00 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 02 3C 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 00 00 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 02 50 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 00 00 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 02 64 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 00 00 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 02 78 00
+> ACL data: handle 0x002d flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0044
+< ACL data: handle 0x002d flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0044
+< ACL data: handle 0x002d flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0043 scid 0x0040
+> HCI Event: Number of Completed Packets(0x13) plen 5
+  01 2D 00 01 00
+> HCI Event: Number of Completed Packets(0x13) plen 5
+  01 2D 00 01 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 00 00 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 02 14 00
+> ACL data: handle 0x002d flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0043
+< ACL data: handle 0x002d flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0043
+> HCI Event: Number of Completed Packets(0x13) plen 5
+  01 2D 00 01 00
+> ACL data: handle 0x002d flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0043 scid 0x0040
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 00 00 00
+> HCI Event: Mode Change(0x14) plen 6
+  00 2D 00 02 78 00
+< HCI Command: Disconnect(0x01|0x0006) plen 3
+  2D 00 13
+> HCI Event: Command Status(0x0f) plen 4
+  00 01 06 04
+> HCI Event: Disconn Complete(0x05) plen 4
+  00 2D 00 16
 
-This is the problematic command that the CSR firmware don't like. The
-mouse disconnects the control channel. We ack that and then we terminate
-the interrupt channel and this is what these devices make going mad.
-
-After a little bit more thinking it maybe that the firmware terminates
-the interrupt channel first. I can't tell you that from your hcidump,
-because it misses the L2CAP connection setup calls. From looking at the
-dcid and scid values this can be the problem here. My workaround assumes
-that the control channel is always closed first. I must check that.
-
-May you wanna try to start hidd with the --timeout option and set your
-own value that is shorter than the timeout value of the mouse. My list
-says that it uses a timeout of 11 minutes. Maybe you wanna try eight
-minutes. In the case we terminate the connection everything should work
-fine.
-
-Regards
-
-Marcel
-
-
+--
+Sandro Weiser <Sandro.Weiser@gmx.de>
+Fingerprint: 77E0 7C87 4DB2 6BBB 5419  343C 7995 1C67 25B9 CBF1
 
 
 -------------------------------------------------------
