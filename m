@@ -1,12 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Connects... Then disconnects
+Subject: Re: [Bluez-users] Linux-2.6, Zaapa USB Dongle - can't find near
+	devices
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ned Lowe <ned@nedlowe.co.uk>
+To: Filipe Veloza <fmvel@rnl.ist.utl.pt>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <000101c44b92$64dcb1f0$0202a8c0@chumpi>
-References: <000101c44b92$64dcb1f0$0202a8c0@chumpi>
+In-Reply-To: <1086534124.9206.2.camel@castle.budism.pt>
+References: <1086372047.8985.14.camel@castle.budism.pt>
+	 <200406042022.58589.cijoml@volny.cz>  <1086374092.4424.24.camel@pegasus>
+	 <1086434351.6274.2.camel@castle.budism.pt>
+	 <1086434730.16316.82.camel@pegasus>
+	 <1086534124.9206.2.camel@castle.budism.pt>
 Content-Type: text/plain
-Message-Id: <1086534440.4765.2.camel@pegasus>
+Message-Id: <1086534380.4765.0.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,36 +23,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 06 Jun 2004 17:07:20 +0200
+Date: Sun, 06 Jun 2004 17:06:20 +0200
 
-Hi Ned,
+Hi Filipe,
 
-> I was hoping you could help me with a rather annoying problem I am
-> experiencing.
+> Apperently now I can bring the device up ( maybe the command was worng
+> :P SORRY ). but there's still something that's doesn't feel right but
+> that would be another issue.
 > 
-> I have just set up the Belkin F8T003 Bluetooth USB Adapter under
-> Mandrake 10.0.  I am trying to connect (not simultaneously) to two
-> machines, one XP and the other an Apple PowerBook.
+> This is solved thanks for the help ppl.
 > 
-> I can connect from Linux to my XP box no problem:
+> I take the chance to annouce ( if anyone is interested ) I got a linux
+> box l2ping with a Nokia Ngage mogile using a Zaapa USB dongle.
 > 
-> rfcomm connect rfcomm0 xx:xx:xx...
-> 
-> I can *see* my Apple PowerBook Bluetooth adapter from Linux and
-> vice-versa, and can pair from the PowerBook.  However if I run the above
-> command:
-> 
-> rfcomm connect rfcomm0 yy:yy:yy...
-> 
-> for the PowerBook connection, then I get:
-> 
-> Can't connect RFCOMM socket: Connection refused
-> 
-> The funny thing is that the PowerBook connection listing shows a
-> connection being established for about one second, then loses it.
+> Maybe you can add to the support page in order to help others finding
+> this info.
 
-you need a service that is listening on that RFCOMM channel on the
-PowerBook side.
+send us the output of "hciconfig -a" and "hcitool info <ngage>" as root.
 
 Regards
 
