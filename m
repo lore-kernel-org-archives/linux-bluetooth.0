@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] sdpd crashing (in uclinux)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: egroJorge <egroJorge@terra.es>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <692442859.20040519115732@terra.es>
-References: <692442859.20040519115732@terra.es>
-Content-Type: text/plain
-Message-Id: <1084961712.4327.34.camel@pegasus>
-Mime-Version: 1.0
+From: =?ISO-8859-1?B?Sm9yZ2UgQS4gR29ueuFsZXo=?= <egrojorge@terra.es>
+Reply-To: egroJorge <egroJorge@terra.es>
+Message-ID: <692442859.20040519115732@terra.es>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] sdpd crashing (in uclinux)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,32 +16,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 May 2004 12:15:13 +0200
+Date: Wed, 19 May 2004 11:57:32 +0200
 
-Hi Jorge,
+Hello
 
-> I have already "ported" the bluez-utils to uclinux (over an ARM7DMI)
-> and I realized than sdpd crash whenever other device tries to browse
-> its services). I have printfed the code and followed it until I found
-> out that it is the command sdp_put_unligned which is having a
-> segmentation fault.
-> I have seen that sdp_put_unligned is defined as a macro depending of
-> the definition or not of 386 architecture. I will trie to play with
-> the defines and to port hcidump in order to have more information but
-> I would like to ask the list about this problem in the case I am not the
-> first one.
+I have already "ported" the bluez-utils to uclinux (over an ARM7DMI)
+and I realized than sdpd crash whenever other device tries to browse
+its services). I have printfed the code and followed it until I found
+out that it is the command sdp_put_unligned which is having a
+segmentation fault.
+I have seen that sdp_put_unligned is defined as a macro depending of
+the definition or not of 386 architecture. I will trie to play with
+the defines and to port hcidump in order to have more information but
+I would like to ask the list about this problem in the case I am not the
+first one.
 
-please start using bluez-libs-2.7 and bluez-utils-2.7, because the SDP
-stuff is now part of the core packages and I stopped maintaining the
-bluez-sdp package.
+(I think my system is little endian, but I will also trie to be sure of
+it today)
 
-The new Bluetooth library contains a bt_put_unaligned macro for general
-use and I used a slight different method for non i386 platforms.
+Thanks for your help!
 
-Regards
-
-Marcel
-
+Jorge
 
 
 
