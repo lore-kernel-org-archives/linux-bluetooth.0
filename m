@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Edd Dumbill <edd@usefulinc.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1091123717.12651.107.camel@pegasus>
-References: <1091123717.12651.107.camel@pegasus>
-Message-Id: <1091981521.6281.39.camel@saag>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Apple bluetooth keyboard fun...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: patbert@patbert.com
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <411649EB.9020407@patbert.com>
+References: <4115A5E3.8000107@patbert.com> <1091959881.2773.6.camel@pegasus>
+	 <411649EB.9020407@patbert.com>
 Content-Type: text/plain
-Subject: [Bluez-users] Re: [BlueZ-Announce] Release of bluez-libs-2.9 and bluez-utils-2.9
+Message-Id: <1091980492.2773.33.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,31 +19,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 08 Aug 2004 17:12:01 +0100
+Date: Sun, 08 Aug 2004 17:54:52 +0200
 
-On Thu, 2004-07-29 at 19:55 +0200, Marcel Holtmann wrote:
-> Hi Folks,
+Hi Patrick,
+
+> Alright I got libz, utils, and pin 2.9. I had to install dbus to get 
+> bluez-pin to compile.
 > 
-> I released a new stable version of the Bluetooth library and also the
-> utilities. The library contains only small updates, but the utilities
-> got some major enhancements in the HID area. The EPoX keyboards and
-> their new HID presenters should now work correct in report protocol
-> mode.
+> Now I have to do hciconfig hci0 up to get the adaptor to wake up...
 
-I just ploaded these to Debian unstable; they should be available in the
-archive later today.  I also updated the vastly out of date bluez-
-hcidump.
+start the hcid and sdpd from a boot script. Make sure that only one hcid
+is running.
 
-> With this version the bluez-bluefw is deprecated by the bluez-firmware
-> package. The Broadcom firmware loading utility for 2.4 kernels is now
-> also part of the bluez-utils package and was renamed to bcm203x.
+> Now whenever I try to connect with hidd it always times out.
+> 
+> Ah yes and I am using a 2.6.8-rc3 colonel now.
 
-I have not yet enabled this in the Debian package as it will mean a new
-package, which would have delayed the upload of 2.9.  When I do enable
-it, it will be in a package called bluez-bcm203x.  Sometime in the next
-two weeks I hope.
+On first connect to your keyboard you must input the PIN on it and press
+enter. Run "hcidump -x" as root to check what is going on.
 
--- Edd
+> 2.7 was a package from my distro, I had to do 2.9 by hand. I guess there 
+> is a chance I missed something but it all seemed to go over without a 
+> hitch installation wise.
+
+I hope you removed the distro packages first, before installing the new
+ones. Ask the package maintainer to adapt the upstream version.
+
+Regards
+
+Marcel
 
 
 
