@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] paging/inquiry during inquiry
+Subject: Re: [Bluez-users] HCI Config returns Can't Init device
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4247EC03.9040709@gmx.ch>
-References: <30791.1111942436@www59.gmx.net>
-	 <1111943377.9195.253.camel@pegasus>  <4247EC03.9040709@gmx.ch>
+In-Reply-To: <f16b04cf05032803331d32b690@mail.gmail.com>
+References: <f16b04cf050327221766330331@mail.gmail.com>
+	 <1112008411.9016.11.camel@pegasus>
+	 <f16b04cf05032803331d32b690@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1112010070.9016.23.camel@pegasus>
+Message-Id: <1112009900.9016.19.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,29 +20,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Mar 2005 13:41:10 +0200
+Date: Mon, 28 Mar 2005 13:38:20 +0200
 
-Hi Marco,
+Hi Hariharan,
 
-> > as far as I know, you can't page when you run an inquiry. But when a
-> > connection is established you can hold this and then page and inquire
-> > again.
+> i have patched kernel 2,4,18 with the yours respective patch. Since i
+> am using Samsung S3C2440 processor, smasung officially supports only
+> the kernel 2.4.18. hence i need to get
+> the best result of bluetooth using this kernel version 2.4.18 only.
 > 
-> my question goes in the other direction:
-> My dongle is doing an inquiry, can others during this inquiry do a page 
-> scan on my dongle or can they inquire me?
+> Facing the problem is ,
 
-you mean "page me" and not "page scan me". Reverse your thinking of what
-this means.
-
-However if you run an inquiry you can't be paged or inquired as far as I
-know.
-
-> What are the requirements for this?
-
-I think you need massive changes inside the Bluetooth radio/baseband
-specification to allow this. However let someone with deep knowledge in
-this area explain it to you.
+there is no need to repeat your problem. I don't have a Samsung S3 or a
+Silicon Wave module (with UART interface) laying around. So I can't help
+here, but the 2.6 kernel will also work with the Samsung processor and
+so you should really go this direction.
 
 Regards
 
