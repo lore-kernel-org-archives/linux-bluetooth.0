@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Elimination of pow() in SBC code
-Message-Id: <20041128025750.00e11da4.henryk@ploetzli.ch>
-In-Reply-To: <1101599506.18467.6.camel@pegasus>
-References: <1101599506.18467.6.camel@pegasus>
+Subject: Re: [Bluez-devel] encoding delay, librarifying a2play
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41A936C6.70209@xmission.com>
+References: <41A936C6.70209@xmission.com>
+Content-Type: text/plain
+Message-Id: <1101624988.18467.32.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Sun__28_Nov_2004_02_57_50_+0100_9iyCupMCKcAVnvUu"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,51 +18,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 28 Nov 2004 02:57:50 +0100
+Date: Sun, 28 Nov 2004 07:56:28 +0100
 
---Signature=_Sun__28_Nov_2004_02_57_50_+0100_9iyCupMCKcAVnvUu
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Brad,
 
-Moin,
+> I was able to encode audio in real time with:
+> 
+> arecord -c 2 -r 44100 -f S16_BE -t au /dev/stdout | ./sbc/sbcenc - | 
+> ./a2play 00:08:F4:30:05:BB
+> 
+> But I estimate the delay is about 300ms. The bluetake encoder dongle was 
+> bothering me with its delay which is probably under 200ms... I really 
+> want to get our encoder under 100ms. I read somewhere that 60ms is 
+> achievable.
+> 
+> I think the place to start to get shorter latency is to write something 
+> that reads audio itself, uses the encoder library and writes out to the 
+> headset. Context switches between the 3 userland apps could be wiped 
+> out. I imagine the app will have command-line args for rate and mode, 
+> will open/ioctl the audio device appropriately, and then write to the 
+> headset.
 
-Am Sun, 28 Nov 2004 00:51:46 +0100 schrieb Marcel Holtmann:
+the pipes and too small buffers can be really a problem here.
 
-> the pow() function is the only reason for linking with -lm and it is
-> only used in one place with a limit range of parameters.
+> What's the ultimate destination for a2play? A library somewhere? I need 
+> to break a2play into at least 3 files: headers, library, and a fairly 
+> simple main(). Is this a good time?
 
-Oh yes, that occurence of pow(2.0, x) is in older code I forgot about.
-(And before -lm was necessary for cos(), too)
+I propose a generic AVDTP library that will handle all AVDTP related
+things. I checked in some basic code into the avdtp directory. My idea
+is to make the library look like a socket interface so we can later move
+things very easy to a kernel AVDTP implementation.
 
-> So what is the range of scale_factor[ch][sb]. From a quick testing a
-> saw that it ranges from 0 - 15. Is this always true?=20
+The a2play is then only a frontend for the AVDTP library, SBC library
+and some audio input library (libmad for exmaple). And I think we should
+also include the rcplay stuff into it and provide an alternate RFCOMM
+streaming with an extra parameter.
 
-Yes, scale_factor is a 4 bit integer (Table 12.13 of A2DP) and there
-should be no way of getting it bigger. If there was this would be a bug.
+However the final goal should be an ALSA library extension like their
+JACK plugin. But from my first tests I realized that it is impossible to
+create such an extension outside the ALSA PCM directory. I must talk
+with the ALSA developers about that issue.
 
-> If yes, then I would use a pre-calculated array for 2^x.
+Regards
 
-Isn't 1<<x good enough for that?
+Marcel
 
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
 
---Signature=_Sun__28_Nov_2004_02_57_50_+0100_9iyCupMCKcAVnvUu
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQFBqTCiIjWgKE0OA2gRApq9AJ447miqy2GNRC4+a3jUX9vqqpf0LwCfa6fM
-YerNSHG+aQwCicilLN4/A6E=
-=OW1X
------END PGP SIGNATURE-----
-
---Signature=_Sun__28_Nov_2004_02_57_50_+0100_9iyCupMCKcAVnvUu--
 
 
 -------------------------------------------------------
