@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth and wireless lan horror
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Peter Bergmann <bergmann.peter@gmx.net>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <30847.1065160235@www33.gmx.net>
-References: <30847.1065160235@www33.gmx.net>
-Content-Type: text/plain
-Message-Id: <1065171540.1734.97.camel@pegasus>
-Mime-Version: 1.0
+From: "Peter Bergmann" <bergmann.peter@gmx.net>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Message-ID: <25242.1065171480@www39.gmx.net>
+Content-Type: text/plain; charset="iso-8859-1"
+Subject: [Bluez-users] Re: bluetooth and wireless lan horror
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -18,10 +15,29 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 03 Oct 2003 10:58:54 +0200
+Date: Fri, 3 Oct 2003 10:58:00 +0200 (MEST)
 
-Hi Peter,
+i have searched in  the archives.
+there are lots of similar problem reports altough others say that there is
+no
+problem at all.
+obviously  the reason for problems is the distance between the bluetooth and
+the wifi device which should be at least 3 inches. the distance on my device
+is 
+far les. i'm using the only 2 usb ports with a bt and wifi usb token and
+there is no space
+between the usb ports :(
 
+another solution is using a 5ghz wifi adapter ...
+
+---Original Message ---
+Date: Fri, 3 Oct 2003 07:50:35 +0200 (MEST)
+From: "Peter Bergmann" <bergmann.peter@gmx.net>
+To: bluez-users@lists.sourceforge.net
+Subject: bluetooth and wireless lan horror
+
+> hi,
+> 
 > this question/problem is (maybe) not directly related with bluez .
 > i use bluez with a class 2 usb dongle together with a wireless lan
 > pcmcia card.  bluez is used for a rfcomm connection to a bluetooth
@@ -38,22 +54,19 @@ Hi Peter,
 > 
 > i dont' understand why wlan transmission is affected even if no data 
 > goes over the bluez rfcomm connection!?
+> 
+> is there anything i can do about this?
+> thanks a lot for any hints.
+> 
+> cheers, pet 
 
-even if is there is no traffic on the RFCOMM connection doesn't mean
-that there is no traffic at all. Due the fast hopping frequency of
-Bluetooth it is more robust than WLAN and in general there is nothing
-you can do ;) You can use LAN access or PAN over Bluetooth.
+-- 
+NEU FÜR ALLE - GMX MediaCenter - für Fotos, Musik, Dateien...
+Fotoalbum, File Sharing, MMS, Multimedia-Gruß, GMX FotoService
 
-One thing you can try is that you switch your language code of your
-Bluetooth device to france and in this case it won't use all 79 channels
-anymore. Then you can put your WLAN card on a frequency which is no
-longer used by Bluetooth. Maybe this helps, but don't ask me how to do
-this in detail.
+Jetzt kostenlos anmelden unter http://www.gmx.net
 
-Regards
-
-Marcel
-
++++ GMX - die erste Adresse für Mail, Message, More! +++
 
 
 
