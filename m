@@ -3,11 +3,10 @@ Subject: Re: [Bluez-users] pin code problem
 From: Marcel Holtmann <marcel@holtmann.org>
 To: guang <m9187@cn.ee.ccu.edu.tw>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <001301c41a44$77a46fa0$7b6b7b8c@yaya>
+In-Reply-To: <000c01c41a0c$b0441c80$7b6b7b8c@yaya>
 References: <000c01c41a0c$b0441c80$7b6b7b8c@yaya>
-	 <1081073411.2839.31.camel@pegasus>  <001301c41a44$77a46fa0$7b6b7b8c@yaya>
 Content-Type: text/plain
-Message-Id: <1081100087.3032.4.camel@pegasus>
+Message-Id: <1081073411.2839.31.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,15 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 04 Apr 2004 19:34:47 +0200
+Date: Sun, 04 Apr 2004 12:10:11 +0200
 
 Hi,
 
-> I am sure only one hcid running .
-> I typed " hcid -f /etc/bluetooth/hcid.conf
+> I implement an Audio Gateway (PC) to communication a Headset (sony
+> ericsson HBH-65), but  AG can't commucation HS. As fllow:
+>  
+> I type " l2ping 00:0D:E3:00:00:33" 
+> and it appear :
+>   [root@bluez root]# l2ping 00:0A:D9:A1:F4:49
+>   Can't connect.: Permission denied
+>  
+> and i used hcidump to dump file:
+>  
+> HCIDump - HCI packet analyzer ver 1.6
+> < HCI Command: Create Connection(0x01|0x0005) plen 13
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Link Key Request(0x17) plen 6
+> < HCI Command: Link Key Request Negative Reply(0x01|0x000c) plen 6
+> > HCI Event: Command Complete(0x0e) plen 10
+> < HCI Command: Link Key Request Negative Reply(0x01|0x000c) plen 6
+> > HCI Event: Command Complete(0x0e) plen 10
+> < HCI Command: Link Key Request Negative Reply(0x01|0x000c) plen 6
+> > HCI Event: Command Complete(0x0e) plen 10
+> > HCI Event: Connect Complete(0x03) plen 11
+> 
+> I guess the problem be caused by PIN Code.
+> How can I enter PIN Code to response HS.
+> How to paring between AG and HS ?
 
-check it with "ps x | grep hcid". I am pretty sure that there are more
-than one running. Otherwise you can't get your hcidump output.
+make sure that only one hcid is running.
 
 Regards
 
