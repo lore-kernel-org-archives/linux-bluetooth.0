@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041217141809.62713.qmail@web40605.mail.yahoo.com>
-From: Paolino paperino <vonzoltan@yahoo.it>
-Subject: Re: [Bluez-users] passive inquiry
+Message-ID: <2de4657604121705486b925ee0@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <2de4657604121705486b925ee0@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] l2cap retransmission
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,24 +16,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Dec 2004 15:18:09 +0100 (CET)
+Date: Fri, 17 Dec 2004 19:18:32 +0530
 
-Hi,
-i want to know if it is possible to make a "passive
-inquiry", i explain better, a device A do an inquiry
-no find their neighbours, it is possible for a device
-B (in the reachability field) to know that was
-inquiried by device A? The applican can receive an
-event each time the device is inquiried?
+Hi marcel,
+in l2test suppose a data mismatch or error occurs, are the packets
+retransmitted???? if yes, can we watch the packet retransmission in
+hcidump......
 
-Thank's a lot
-Andrea S.
+i have been able to see some data and sequence mismatch packets  and
+the connection was not brought down....so i assume that retransmission
+must have taken place.....
 
-
-		
-___________________________________ 
-Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
-http://it.messenger.yahoo.it
+regards,
+manjunath
 
 
 -------------------------------------------------------
