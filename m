@@ -1,81 +1,149 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm stty -echo
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: "Pering, Trevor" <trevor.pering@intel.com>
+Return-Path: <andrew@radke.iig.com.au>
+Message-ID: <3F26FB4B.6060007@radke.iig.com.au>
+Date: Wed, 30 Jul 2003 08:55:07 +1000
+From: Andrew Radke <andrew@radke.iig.com.au>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: 
-	<DD755978BA8283409FB0087C39132BD1023FBACD@fmsmsx404.fm.intel.com>
-References: 
-	<DD755978BA8283409FB0087C39132BD1023FBACD@fmsmsx404.fm.intel.com>
-Message-Id: <1059559745.26914.145.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 30 Jul 2003 12:08:59 +0200
-Content-Type: multipart/mixed; boundary="=-dwhqNJF51xmrWsgFbEqe"
+Subject: Re: [Bluez-users] bluez and OBEX File Transfer
+References: <3F229216.3060000@radke.iig.com.au>
+	<1059380203.1015.80.camel@pegasus>
+In-Reply-To: <1059380203.1015.80.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-users.lists.sourceforge.net>
 
+Marcel Holtmann wrote:
+[snip]
+> I have started a btftp client, which you can found in the BlueZ CVS in
+> the repository obex. But at the moment no btftpd exists.
 
---=-dwhqNJF51xmrWsgFbEqe
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
+The client will be a nice addition. Any plans on the btftpd? Anything a 
+non-programmer can do to help? Write it in Perl maybe? :-)
 
-Hi Trevor,
-
-> Basically, if I connect to my BlueZ device (acting as an "rfcomm listen"
-> server), it connects ok but the /dev/rfcomm0 serial port is in "stty
-> echo" mode -- which means that any data sent from the remote client get
-> echoed back -- which is not what I want in this case. 
+> BTW please send me "hcitool info <t610-bdaddr>" and the complete sdptool
+> browse for your phone.
 > 
-> To fix this, one would normally type "stty -F /dev/rfcomm0 -echo" --
-> which works nicely *after* the connection has been formed. However,
-> before the connection has been made, I get a "no such device" error on
-> /dev/rfcomm0.  
+> Regards
 > 
-> Any thoughts on how to get around this problem?  Is there some way to
-> fix this cleanly? Is this the behavior rfcomm should have? 
+> Marcel
 
-the problem is that we use the default termios settings for RFCOMM.
-Maybe it is bad to enable echo by default. Every application which sets
-their own termios is working fine, but others will get problems.
+# hcitool info 00:0a:**:**:**:**
+Requesting information ...
+         BD Address:  00:0a:**:**:**:**
+         Device Name: T610
+         LMP Version: 1.1 (0x1) LMP Subversion: 0x400
+         Manufacturer: Ericsson Mobile Comunications (0)
+         Features: 0x04 0xea 0x31 0x00
+                 <encryption> <RSSI> <SCO link> <HV3 packets>
+                 <u-law log> <A-law log> <CVSD>
 
-The attached patch disables echo for every terminal.
+# sdptool browse 00:0a:**:**:**:**
+Browsing 00:0A:**:**:**:** ...
+Service Name: Dial-up Networking
+Service RecHandle: 0x10000
+Service Class ID List:
+   "Dialup Networking" (0x1103)
+   "Generic Networking" (0x1201)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 1
+Profile Descriptor List:
+   "Dialup Networking" (0x1103)
+     Version: 0x0100
 
-Regards
+Service Name: Voice gateway
+Service RecHandle: 0x10002
+Service Class ID List:
+   "Headset Audio Gateway" (0x1112)
+   "Generic Audio" (0x1203)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 3
+Profile Descriptor List:
+   "Headset" (0x1108)
+     Version: 0x0100
 
-Marcel
+Service Name: Serial Port 1
+Service RecHandle: 0x10003
+Service Class ID List:
+   "Serial Port" (0x1101)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 4
 
+Service Name: Serial Port 2
+Service RecHandle: 0x10004
+Service Class ID List:
+   "Serial Port" (0x1101)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 5
 
---=-dwhqNJF51xmrWsgFbEqe
-Content-Disposition: attachment; filename=patch-rfcomm-tty-no-echo
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/x-patch; NAME=patch-rfcomm-tty-no-echo; CHARSET=ISO-8859-15
+Service Name: OBEX Object Push
+Service RecHandle: 0x10005
+Service Class ID List:
+   "OBEX Object Push" (0x1105)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 10
+   "OBEX" (0x0008)
+Profile Descriptor List:
+   "OBEX Object Push" (0x1105)
+     Version: 0x0100
 
-diff -urN linux-2.4.21/net/bluetooth/rfcomm/tty.c linux-2.4.21-mh/net/bluet=
-ooth/rfcomm/tty.c
---- linux-2.4.21/net/bluetooth/rfcomm/tty.c	Fri Jun 13 16:51:39 2003
-+++ linux-2.4.21-mh/net/bluetooth/rfcomm/tty.c	Wed Jul 30 12:01:29 2003
-@@ -905,8 +905,8 @@
-=20
- 	/* Register the TTY driver */
- 	rfcomm_tty_driver.init_termios =3D tty_std_termios;
--	rfcomm_tty_driver.init_termios.c_cflag =3D B9600 | CS8 | CREAD | HUPCL | =
-CLOCAL;
--	rfcomm_tty_driver.flags =3D TTY_DRIVER_REAL_RAW;
-+	rfcomm_tty_driver.init_termios.c_cflag =3D B115200 | CS8 | CREAD | HUPCL =
-| CLOCAL;
-+	rfcomm_tty_driver.init_termios.c_lflag =3D 0;
-=20
- 	if (tty_register_driver(&rfcomm_tty_driver)) {
- 		BT_ERR("Can't register RFCOMM TTY driver");
+Service Name: IrMC Synchronization
+Service RecHandle: 0x10006
+Service Class ID List:
+   "IrMCSync" (0x1104)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 11
+   "OBEX" (0x0008)
+Profile Descriptor List:
+   "IrMCSync" (0x1104)
+     Version: 0x0100
 
---=-dwhqNJF51xmrWsgFbEqe--
+Service Name: HF Voice gateway
+Service RecHandle: 0x10007
+Service Class ID List:
+   "" (0x111f)
+   "Generic Audio" (0x1203)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 6
+Profile Descriptor List:
+   "" (0x111e)
+     Version: 0x0100
+
+Service Name: OBEX Basic Imaging
+Service RecHandle: 0x1000b
+Service Class ID List:
+   "" (0x111b)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 15
+   "OBEX" (0x0008)
+Profile Descriptor List:
+   "" (0x111a)
+     Version: 0x0100
+
+Service Name: OBEX File Transfer
+Service RecHandle: 0x1000f
+Service Class ID List:
+   "OBEX File Transfer" (0x1106)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 7
+   "OBEX" (0x0008)
+Profile Descriptor List:
+   "OBEX File Transfer" (0x1106)
+     Version: 0x0100
