@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Benoit Panizzon <panizzon@woody.ch>
+From: Ashok <ashokg@iap-online.net>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] How to initiate a Pin-Exchange?
-References: <200404142203.21126.panizzon@woody.ch> <200404142211.55534.cijoml@volny.cz>
-In-Reply-To: <200404142211.55534.cijoml@volny.cz>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <200404151149.35989.panizzon@woody.ch>
+Content-Type: text/plain
+Message-Id: <1081418089.5046.7.camel@ashokg>
+Mime-Version: 1.0
+Subject: [Bluez-users] Problem with compiling Bluez-Package version  1.2
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,38 +15,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 15 Apr 2004 11:49:32 +0200
+Date: Thu, 15 Apr 2004 11:34:49 +0530
 
-=2D----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hello everybody,
 
-Hi Michal
+        This is my first mail to this group..
 
-> > How can I start the pin exchange with bluez?
-> > bluez-pin does nothing at all as I see with hcidump.
->
-> It's used when second site request pin when connecting
+        I have a problem in compiling the bluez source code and
+installing it. Can any body please tell me how to do the compilation and
+installation of the bluez module.
 
-Ok, but how do I request a pin from another device with bluez? Like when I =
-got=20
-a bluez-bluez setup?
+	It will be helpful if some one would help me to give their valuable
+suggestions to port bluez to a different operating system
 
-> > PS: Are Sitecom CN-500 USB Dongels know to OOPS Kernel 2.6.5 when plugg=
-ed
-> > or unplugged? Any workaround?
->
-> install 2.6.5-mh3 patch from Marcel's site
+	Mail Id : ashokg@iap-online.net
+	Hopping to receive an answer soon 
 
-Thx for the Hint..
+Regards
 
-=2D -Benoit-
-=2D----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQFAflqtCVq2G/yL7/ARAkNuAKDEN/iGps5iD4CLbxqsYIvvLSBjXQCg04yG
-NJbJc/vXIGv2uOOZCIutHd4=3D
-=3DOIcg
-=2D----END PGP SIGNATURE-----
+Ashok.G
 
 
 
