@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40869C77.4030103@deis.unibo.it>
-From: Brunelli Davide <dbrunelli@deis.unibo.it>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Power control
+From: jerry angelo <bmangra@yahoo.com>
+Message-ID: <loom.20040421T065041-933@post.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Can a Linux/Impronto developed application be run on Windows environment?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,15 +15,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Apr 2004 18:08:23 +0200
+Date: Wed, 21 Apr 2004 04:59:20 +0000 (UTC)
 
+In other words can i develop my BT application using Impronto DK and transport 
+it over to two Windows machines and make them run as they did with two linux 
+machines over Bluez?  
 
-Hi,
+My current USB dongles are D-Link's DBT 120 and Windows XP installed drivers 
+are from WIDCOMM, its a btport.sys driver version 1.4.2.8.
 
-how can I set power transmission in bluez?
+I am using Bluez w/ the hci_usb driver for my linux machine.  i have a fedora 
+box w/ 2.4.22 w/bluez installed.
 
-Thanks
+Any help in this matter would be very helpful.
 
+thanks
+jerry
 
 
 
