@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050330174856.17375.qmail@web8505.mail.in.yahoo.com>
-From: mahabaleshwara k <mahabaleshwara_k@yahoo.co.in>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <424A7937.9090907@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] file transfer from phone to PC
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] inquiry with rssi
+References: <42492056.9040601@gmx.ch> <1112091034.9016.64.camel@pegasus>	 <42492B72.6010701@gmx.ch> <1112109506.9016.73.camel@pegasus>
+In-Reply-To: <1112109506.9016.73.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 30 Mar 2005 18:48:56 +0100 (BST)
+Date: Wed, 30 Mar 2005 12:02:31 +0200
 
-Hi all,
-I am trying for file transfer between PC and MOTOROLA
-mobile-E398 over bluetooth.I am having linux-2.4.20
-kernel with blueZ libs, utilis,openobex and obexftp
-compiled. I am able to transfer(put) images from PC to
-mobile using obexftp but NOT FROM MOBILE TO PC. Can
-any one suggest me solution or where I went wrong?
-Regards,
-Maha.
+Marcel Holtmann wrote:
+> Hi Marco,
+> 
+> 
+>>Can you please provide an example?
+>>I'm not that experienced in bluetooth programming as you are...
+>>
+>>It would be sensefull to have a codesnippet like that in the 
+>>mailinglistarchive as well...
+> 
+> 
+> actually there is such a code snippet in the mailing list archive.
 
+found it. thanks for the hint!
 
-________________________________________________________________________
-Yahoo! India Matrimony: Find your life partner online
-Go to: http://yahoo.shaadi.com/india-matrimony
+regards
+Marco
 
 
 -------------------------------------------------------
