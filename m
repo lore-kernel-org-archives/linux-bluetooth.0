@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Max M." <bluez-ml@maxim.comm2000.it>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.21.0502241626280.12963-100000@blomma.comm2000.it>
+Message-ID: <E73D9A5BC4A2D711BBC600065BF3595F1C66CFB9@il06exm10>
+From: Mandalia Hiren-AHM047 <hirenm@motorola.com>
+To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] tx submit failed urb c4c6b014 type 3 err -19
+Content-Type: text/plain
+Subject: [Bluez-users] using sdptool
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,35 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Feb 2005 17:09:07 +0100 (MET)
+Date: Thu, 24 Feb 2005 17:14:34 -0600
 
-Hi.
+Hello all
 
-I'm prototyping an application that should eventually become a
-Voip/Bluethooth gateway.
+I don't know how to frame my question but I will tell you what problem I'm facing. I have 2 linux machines and a Bluetooth USB dongle on each. 
 
-Among the various problems I'm facing (i.e. occasional bizzare errors on
-SCO connections, or inability to open more than one SCO link through the
-same BT dongle), the currently most serious one is the following.
+When I do "sdptool get"(on 1 machine) I get
+% sdptool get record_handle
+Service Name: SDP server
+Service Description: Bluetooth service discovery server
+So on....
 
-After a while my program is running (repeatedly dialing a phone number,
-opening and closing the audio link), the following error shows up
 
- kernel: __tx_submit: hci0 tx submit failed urb c4c6b014 type 3 err -19
+When I do (on another machine) I get 
+% sdptool get record_handle
+Failed to connect to SDP server on FF:FF:FF:00:00:00: no such file or directory.
 
-followed, a few seconds later, by an "Unable to handle kernel NULL
-pointer..." message, which does not get logged.
 
-Of course, I'm not asking what the cause is. I just need some suggestions
-as to how to further investigate the problem and provide a more useful
-report.
-
-My system is Debian with kernel package 2.6.10-1-686.
+I guess my question should be "how to start a SDP server on a machine?" 
 
 Thanks,
-
-Maxim
-
+Hiren Mandalia
 
 
 
