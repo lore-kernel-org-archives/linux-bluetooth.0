@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Difference between rctest.c and main.c in
-	/rfcomm directory
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Anthony Yulo <strikewing16th@hotmail.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY16-F358WlSOBCCLj0001e0fe@hotmail.com>
-References: <BAY16-F358WlSOBCCLj0001e0fe@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1082391200.4403.59.camel@pegasus>
+From: "Anthony Yulo" <strikewing16th@hotmail.com>
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Message-ID: <BAY16-F358WlSOBCCLj0001e0fe@hotmail.com>
+Subject: [Bluez-devel] Difference between rctest.c and main.c in /rfcomm directory
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,26 +15,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 19 Apr 2004 18:13:20 +0200
+Date: Mon, 19 Apr 2004 15:37:30 +0000
 
-Hi Anthony,
+I am only familiar with rfcomm that uses plain sockets...
 
-> I am only familiar with rfcomm that uses plain sockets...
-> 
-> I am only familiart with the rctest.c code that just setup the socket for 
-> RFCOMM..
-> 
-> but i noticed some additional constants i.e. RFCOMM_REUSE_DLC, 
-> RFCOMM_RELEASE_ONHUP..  in main.c of the /rfcomm directory (src)
-> 
-> Can someone explain to me briefly whats this for?
+I am only familiart with the rctest.c code that just setup the socket for 
+RFCOMM..
 
-they are for transforming a Bluetooth RFCOMM socket into a TTY device.
+but i noticed some additional constants i.e. RFCOMM_REUSE_DLC, 
+RFCOMM_RELEASE_ONHUP..  in main.c of the /rfcomm directory (src)
 
-Regards
+Can someone explain to me briefly whats this for?
 
-Marcel
+tnx..
 
+_________________________________________________________________
+Add photos to your e-mail with MSN 8. Get 2 months FREE*. 
+http://join.msn.com/?page=features/featuredemail
 
 
 
