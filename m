@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <5.1.0.14.2.20030721154456.0936f098@unixmail.qualcomm.com>
-To: James Courtier-Dutton <James@superbug.demon.co.uk>, bluez Dev <bluez-devel@lists.sourceforge.net>
+Message-Id: <5.1.0.14.2.20030721152542.096f0a48@unixmail.qualcomm.com>
+To: James Courtier-Dutton <James@superbug.demon.co.uk>, James Courtier-Dutton <James@superbug.demon.co.uk>
 From: Max Krasnyansky <maxk@qualcomm.com>
-Subject: Re: [Bluez-devel] Headset via usb dongle devel problems.
-In-Reply-To: <3F0EF99B.6000400@superbug.demon.co.uk>
+Subject: Re: [Bluez-devel] Bluetooth headset problems.
+Cc: Cozza <ac2crp@blueyonder.co.uk>, bluez Dev <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <3F08719F.70708@superbug.demon.co.uk>
+References: <3F062FF5.7020703@superbug.demon.co.uk>
+	<3F02DBA9.1060305@superbug.demon.co.uk>
+	<004701c34153$0e650ba0$fd02a8c0@troll>
+	<3F062FF5.7020703@superbug.demon.co.uk>
 Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -17,57 +23,22 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 21 Jul 2003 16:13:24 -0700
-Content-Type: text/plain; CHARSET=us-ascii
+Date: Mon, 21 Jul 2003 15:30:32 -0700
 
-At 10:53 AM 7/11/2003, James Courtier-Dutton wrote:
->Hi,
->
->I have discovered that the performance of the bluez stack is a problem when using the hci_usb.c driver.
->I cannot get it to send SCO packets quicker than one urb per 40ms.
->As the headset needs one urb per 3ms, this is quite a problem.
-Interesting. We shouldn't have any limitations in this area.
+At 11:59 AM 7/6/2003, James Courtier-Dutton wrote:
 
->I would also assume that other applications like file transfer over bluetooth would be bad.
-They aren't :). L2CAP, RFCOMM, BNEP transfers using USB devices easily achieve max Bluetooth
-throughput. And if you do it over HCIEmu you get numbers like 5Mbytes/sec. So HCI core and
-ACL scheduler is pretty darn fast :)
 
->Would it be ok for the hci_usb.c driver to implement say 100 urbs per type. I.E. 100 output urbs for BULK, 100 output urbs for SCO etc.
-This is not needed. I did quite a bit of testing with URB queuing, submitting more than 4 tx/rx 
-URBs does not seem to improve performance. In fact you can easily saturate Bluetooth link even if 
-use submit one URB at a time and wait for completion. I'm talking about bulk URBs here, like you 
-showed in prev emails emails isoc is different.
-
->Also, I need to know what the intended buffer management in the bluez driver is.
->1) Application allocs some memory.
->2) Application fills memory with data
->3) Application calls bluez with pointer and length of memory.
->4) What does bluez do now?
->Does it: -
->5) memcpy the data from user memory (maybe copyfromuser), add headers to it creating a packet, cutting it up into multiple packets if needed. (E.g. adding connection numbers etc.)
->6) calls the low level device driver with pointer and length of packet.
->7) low level device driver queues it for output. blocks here is the queue is full.
->8) Returns control back to application.
->9) low level device driver outputs the packet, and calls tx_complete callback.
->10) tx_complete callback signals to higher layers in bluez that the tx is complete, and the higher layers release the memory.
-Very very close :).
-
-Here is what happens in case when for example L2CAP application calls send() on L2CAP socket:
-
-1) L2CAP allocates new SKB, does copy_from_user() and passes SKB to the HCI core.
-2) HCI core adds HCI headers (SKB has room reserved for that), puts SKB into TX queue
-of the appropriate ACL connection and schedules TX task.
-3) TX task wakes up, decides which packets to send now (based on various counters) 
-and hands those packets over to the HCI driver (let's say HCI USB driver).
-4) HCI USB driver allocates URB (URB is initialized to use data buffer of the SKB) and
-submits URB.
-5) Once transfer is complete USB core calls hci_usb_tx_complete() call back which destroys 
-SKB.
-
-So, the answer is - yes we do only one copy.
+>>I have made some progress. I can now record audio from the headset without it loosing any samples. I.e. I can record 8 bit PCM at 8000hz and it sounds fine. Before it was loosing samples and recording at more like 4000hz.
+>>Once I get playback to work, I will post a patch to this list.
+>>Cheers
+>>James
+>If anyone is interested, the fix for recording required 2 urbs for each isoc connection. The current cvs only uses 1 urb for isoc connections, so the usbcore fills one urb in real time, and then when it is full, sends it to hci_usb.c via a callback. Once hci_usb.c has finished with the urb it sends it back to the usbcore to get refilled. The problem is that while hci_usb.c is processing the urb, usbcore has no urb to put real time audio samples in, so it just drops them. If 2 urbs are used, if hci_usb.c is processing one, usbcore always has another to place samples in. As long as hci_usb.c does not hold on to it's urb for too long, all is ok. This fix was discovered by comparing the alsa snd-usb-audio driver with the hci_usb.c driver.
+Make sense. 
+So basically you're saying that you're just calling hci_usb_isoc_rx_submit() twice 
+during open, right ? ie just like hci_usb_bulk_rx_submit() is called multiple times.
 
 Max
+        
 
 
 
