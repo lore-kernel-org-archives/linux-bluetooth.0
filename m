@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <1039977544@web.de>
-MIME-Version: 1.0
-From: "Polina Tataeva" <polina.t@web.de>
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/html; charset="iso-8859-1"
-Subject: [Bluez-users] TAP/TUN with blueZ
+Subject: Re: [Bluez-users] Limit communication to serveral devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Philip Lawatsch <philip@lawatsch.at>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <412C9803.6080306@lawatsch.at>
+References: <412C9803.6080306@lawatsch.at>
+Content-Type: text/plain
+Message-Id: <1093443880.537.0.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,10 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Aug 2004 16:56:00 +0200
+Date: Wed, 25 Aug 2004 16:24:40 +0200
 
-<html><style>p {margin: 0px}</style><body bgcolor='#ffffff' style='font-size:9pt; font-family:Verdana; font-family: Verdana' ><STYLE>p {margin: 0px}</STYLE><P>Hi,</P><P>do anybody know how can i run a tap device over bnep or ppp? </P><P>I&nbsp;can establish&nbsp;bnep connection or ppp/rfcomm connection and want to send the&nbsp;pakets to my own TCP/IP Stack.&nbsp; The TCP/IP Stack run in User space and blueZ in&nbsp;Kernel. I thout&nbsp;I could run a tap device over it and&nbsp;read the messages from tap divice, but i don't know how to do it?&nbsp;</P><P>Maybe somebody knows the other way to recieve and send messages from kernel space into the User space?</P><P>&nbsp;</P><P>Regards</P><P>&nbsp;</P><P>Polina</P><P>&nbsp;&nbsp;</P><br><br><table cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#000000"><img src="http://img.web.de/p.gif" width="1" height="1" border="0" alt="" /></td></tr><tr><td style="font-family:verdana; font-size:12px; line-height:17px;">Aufnehmen!
- , abschicken, nah sein - So einfach ist &nbsp;&nbsp;<br>WEB.DE Video-Mail: <A HREF="http://freemail.web.de/?mc=021200"><B>http://freemail.web.de/?mc=021200</B></A>&nbsp;&nbsp;</td></tr></table></body></html>
+Hi Philip,
+
+> Call me paranoid but I would like to know if there is any way to limit 
+> all types of communication to just several devices by checking with the 
+> hardware addresses.
+> 
+> I understand that in principle not being discoverable and the pin 
+> challenge should help you with being secure but to me this is not enough.
+> 
+> I'm currently running 2 class 1 devices to serve my flat with rfcomm for 
+> dial in and I for sure do not want anyone besides me to get access to 
+> these com ports.
+> 
+> Is there anything I can do to tighten security and limit all 
+> communication to just some devices?
+
+you must change the code of the accept routine in the RFCOMM server
+program that you are using.
+
+Regards
+
+Marcel
+
 
 
 
