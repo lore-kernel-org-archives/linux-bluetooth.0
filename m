@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-To: <bluez-users@lists.sourceforge.net>
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAOENVeipKPUqttCCB9ZhD1QEAAAAA@t-online.de>
+Message-ID: <41661E65.2080201@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0016_01C4AD14.B44EA2A0"
-Subject: [Bluez-users] bluetooth for network
+To: sergei@stams.strath.ac.uk, bluez-users@lists.sourceforge.net
+References: <200410080116.49621.serguei@ntlworld.com>
+In-Reply-To: <200410080116.49621.serguei@ntlworld.com>
+Subject: Re: [Bluez-users] Bluetooth headphone profile?
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,70 +17,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 8 Oct 2004 08:56:23 +0200
+Date: Thu, 07 Oct 2004 22:58:13 -0600
 
-This is a multi-part message in MIME format.
+Sergei,
 
-------=_NextPart_000_0016_01C4AD14.B44EA2A0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Several people have worked on this over time. Right now the most updated 
+patches are at http://sourceforge.net/projects/bluetooth-alsa/ (see cvs 
+projects "kernel" and "btsco")
 
-hello,
-I'm using SuSE 9.1 and have installed and activated the =
-bluetooth-function
-of my notebook (Toshiba Satellite Pro M10). Now I want to use the
-bluetooth-connection to an accesspoint - it is possible to establish =
-this
-connection - as a dummy-networkcard.
-=20
-What is to do, so that the Linux-System accept the bluetooth-connection =
-as a
-network-connection?
-=20
-Thanks in advance for the urgently needed help
-Peter
+There's a lot of work to be done on it to make it more solid.
 
-------=_NextPart_000_0016_01C4AD14.B44EA2A0
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+I have used it with kphone to do voip. The user experience isn't as 
+straightforward as it should be, but it is a good proof of concept.
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<TITLE>Nachricht</TITLE>
+Brad
 
-<META content=3D"MSHTML 6.00.2800.1458" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D295275106-08102004>hello,</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D295275106-08102004>I'm =
-using SuSE 9.1=20
-and have installed and activated the bluetooth-function of my notebook =
-(Toshiba=20
-Satellite Pro M10). Now I want to use the bluetooth-connection to an =
-accesspoint=20
-- it is possible to establish this connection - as a=20
-dummy-networkcard.</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D295275106-08102004></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D295275106-08102004>What =
-is to do, so=20
-that the Linux-System accept the bluetooth-connection as a=20
-network-connection?</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D295275106-08102004></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D295275106-08102004>Thanks =
-in advance=20
-for the urgently needed help</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D295275106-08102004>Peter</SPAN></FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0016_01C4AD14.B44EA2A0--
-
-
+serguei@ntlworld.com wrote:
+> Hi, everybody!
+> Does anyone has an experience in setting bluetooth headphones in linux? I 
+> browsed a lot of sites but, alas, found no info on headphones... ;-(
+> I own EPoX BT-HS01 and was able to make it recognised by my vaio Z1XSP
+> 
+> [root@istra dev]# l2ping 00:0D:FD:00:FB:70
+> Ping: 00:0D:FD:00:FB:70 from 08:00:46:CA:78:7B (data size 20) ...
+> 44 bytes from 00:0D:FD:00:FB:70 id 200 time 48.87ms
+> 44 bytes from 00:0D:FD:00:FB:70 id 201 time 27.28ms
+> 44 bytes from 00:0D:FD:00:FB:70 id 202 time 33.28ms
+> 
+> But what to do next? How to switch to headphone profile so to make audio 
+> transfered to the headphone and to get its mic input in?
+> The idea is to use the headphone with IP telephony such as www.skype.com - 
+> highly recommended!
+> 
+> Thanks in advance!
+> 
+> 
+> -------------------------------------------------------
+> This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+> Use IT products in your business? Tell us what you think of them. Give us
+> Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+> http://productguide.itmanagersjournal.com/guidepromo.tmpl
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
