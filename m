@@ -1,15 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Bc. Michal Semler" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] can't establish a connection
-References: <1091742606.6143.17.camel@localhost> <200408060216.05030.cijoml@volny.cz> <1091809290.4570.9.camel@localhost>
-In-Reply-To: <1091809290.4570.9.camel@localhost>
-Cc: ben4fun <ben_4_fun@freenet.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200408061827.43940.cijoml@volny.cz>
+Subject: RE: [Bluez-users] it is possible to change the N inquiry <256
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Somil.Asthana@nokia.com
+Cc: matrix230@yahoo.com,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E320A8529CF07E4C967ECC2F380B0CF901403856@bsebe001.americas.nokia.com>
+References: 
+	 <E320A8529CF07E4C967ECC2F380B0CF901403856@bsebe001.americas.nokia.com>
+Content-Type: text/plain
+Message-Id: <1091802237.20839.116.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,50 +20,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 6 Aug 2004 18:27:43 +0200
+Date: Fri, 06 Aug 2004 16:23:58 +0200
 
-Then add into your kernel config
-CONFIG_USB_DEVICEFS=3Dy
-and recompile
+Hi Somil,
 
-And pls, write into mailing list!
+> I think ,but I am not sure, he is asking if its possible to change the Inquiry Train time. The device inquires 256 times or for 2.56 s using one Train and then switches to a different Train. There are two Inquiry Train (called as Train A or Train B).
+> 
+>  I don't know any HCI cmd which can reduce this time perhaps there can be a vendor specific 
+> cmd.
 
-M.
+if this is what he was asking for then the answer is no. I actually
+don't know any vendor that allows a modification of that value.
 
-Dne p=E1 6. srpna 2004 18:21 jste napsal(a):
-> Hi,
->
-> > add
-> >
-> > none            /proc/bus/usb   usbdevfs faults                 0      =
- 0
-> >
-> > into /etc/fstab
-> >
-> > then write
-> > mount -a
->
-> It's done.
-> After a reboot, I did  "mount -t usbdevfs none /proc/bus/usb" from the
-> USB-howto . It confirmed me it was already mounted. But it is strange
-> that /proc/bus/usb/device file is still empty.
->
-> Then I did "hciconfig hci0 up"
-> and I still have "Can't init device hci0. Connection timed out(110)"
->
-> But the hciconfig message changed. It is now:
->
-> "hci0:   Type: USB
->         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
->         DOWN
->         RX bytes:0 acl:0 sco:0 events:0 errors:0
->         TX bytes:6 acl:0 sco:0 commands:2 errors:0"
->
-> No idea why I have so much difficulties with this dongle.
->
-> Regards,
->
-> Ben
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
