@@ -1,16 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Charles Bueche <charles@bueche.ch>
-To: niklas adolfsson <niklas.adolfsson@home.se>
-Cc: Niklas Adolfsson <nikad767@student.liu.se>,
+Message-ID: <4123C6D8.5090205@home.se>
+From: niklas adolfsson <niklas.adolfsson@home.se>
+MIME-Version: 1.0
+To: Charles Bueche <charles@bueche.ch>
+CC: Niklas Adolfsson <nikad767@student.liu.se>,
    BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Update on sending from K700i
-Message-Id: <20040819064900.1836fbb2@bluez.bueche.ch>
-In-Reply-To: <4123C6D8.5090205@home.se>
-References: <1279491264f2.1264f2127949@liu.se>
-	<20040818215823.57d781c1@bluez.bueche.ch>
-	<4123C6D8.5090205@home.se>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <1279491264f2.1264f2127949@liu.se> <20040818215823.57d781c1@bluez.bueche.ch>
+In-Reply-To: <20040818215823.57d781c1@bluez.bueche.ch>
+Content-Type: multipart/alternative;
+ boundary="------------080202030808050101020503"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,68 +20,108 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Aug 2004 06:49:00 +0200
+Date: Wed, 18 Aug 2004 23:15:04 +0200
 
-Hi,
+This is a multi-part message in MIME format.
+--------------080202030808050101020503
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I will talk to my local (Switzerland) service center and see what they
-can do. My firmware release is currently R2A041.
+Charles Bueche wrote:
 
-I use kbluetoothd to receive files but haven't seen your bad behavior so
-far when sending files to my PC. What user-space software are you using
-on your PC ?
+>Hi Niklas,
+>
+>Have you been able to get some more infos ? I'm fighting with similar
+>problems with my K700i.
+>
+>Regards,
+>Charles
+>
+>On Thu, 22 Jul 2004 09:41:31 +0200
+>Niklas Adolfsson <nikad767@student.liu.se> wrote:
+>  
+>
+>>I will talk to the SonyEricsson service center to see if they have any
+>>updates. If i get it to work or anything else changes i will get back
+>>to you.
+>>
+>>//niklas
+>>    
+>>
+>
+>
+>  
+>
+No, i called my service center and they said that they had to send it to 
+SonyEricsson as for now. Maybe they will have the equipment to do this 
+when i wait i i come back in a couple of weeks. I have to use the phone 
+so i cannot let them take it even for a day. It is strange that 
+everything works fine with my wifes Z600 but with my K700i i can only 
+send one file to the computer and then the connection holds my phone so 
+that i cannot use bluetooth again until i turn off and on the phone. The 
+connection works perfectly with the Z600 it releases the phone as soon 
+as it has sent a file so it can send a new one. Other things work though 
+on my phone, i sync it with evolution and recieve files for example 
+without problems. Good luck, i will be back when i have gotten the phone 
+updated, if you get a solution please get back to me.
 
+//niklas
+
+--------------080202030808050101020503
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Charles Bueche wrote:
+<blockquote cite="mid20040818215823.57d781c1@bluez.bueche.ch"
+ type="cite">
+  <pre wrap="">Hi Niklas,
+
+Have you been able to get some more infos ? I'm fighting with similar
+problems with my K700i.
+
+Regards,
 Charles
 
-On Wed, 18 Aug 2004 23:15:04 +0200
-niklas adolfsson <niklas.adolfsson@home.se> wrote:
+On Thu, 22 Jul 2004 09:41:31 +0200
+Niklas Adolfsson <a class="moz-txt-link-rfc2396E" href="mailto:nikad767@student.liu.se">&lt;nikad767@student.liu.se&gt;</a> wrote:
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">I will talk to the SonyEricsson service center to see if they have any
+updates. If i get it to work or anything else changes i will get back
+to you.
 
-> Charles Bueche wrote:
-> 
-> >Hi Niklas,
-> >
-> >Have you been able to get some more infos ? I'm fighting with similar
-> >problems with my K700i.
-> >
-> >Regards,
-> >Charles
-> >
-> >On Thu, 22 Jul 2004 09:41:31 +0200
-> >Niklas Adolfsson <nikad767@student.liu.se> wrote:
-> >  
-> >
-> >>I will talk to the SonyEricsson service center to see if they have
-> >any>updates. If i get it to work or anything else changes i will get
-> >back>to you.
-> >>
-> >>//niklas
-> >>    
-> >>
-> >
-> >
-> >  
-> >
-> No, i called my service center and they said that they had to send it
-> to SonyEricsson as for now. Maybe they will have the equipment to do
-> this when i wait i i come back in a couple of weeks. I have to use the
-> phone so i cannot let them take it even for a day. It is strange that 
-> everything works fine with my wifes Z600 but with my K700i i can only 
-> send one file to the computer and then the connection holds my phone
-> so that i cannot use bluetooth again until i turn off and on the
-> phone. The connection works perfectly with the Z600 it releases the
-> phone as soon as it has sent a file so it can send a new one. Other
-> things work though on my phone, i sync it with evolution and recieve
-> files for example without problems. Good luck, i will be back when i
-> have gotten the phone updated, if you get a solution please get back
-> to me.
-> 
-> //niklas
-> 
+//niklas
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
 
+  </pre>
+</blockquote>
+No, i called my service center and they said that they had to send it
+to SonyEricsson as for now. Maybe they will have the equipment to do
+this when i wait i i come back in a couple of weeks. I have to use the
+phone so i cannot let them take it even for a day. It is strange that
+everything works fine with my wifes Z600 but with my K700i i can only
+send one file to the computer and then the connection holds my phone so
+that i cannot use bluetooth again until i turn off and on the phone.
+The connection works perfectly with the Z600 it releases the phone as
+soon as it has sent a file so it can send a new one. Other things work
+though on my phone, i sync it with evolution and recieve files for
+example without problems. Good luck, i will be back when i have gotten
+the phone updated, if you get a solution please get back to me.<br>
+<br>
+//niklas<br>
+</body>
+</html>
 
--- 
-Charles Bueche <charles@bueche.ch>
-sand, snow, wave, wind and net -surfer
+--------------080202030808050101020503--
 
 
 -------------------------------------------------------
