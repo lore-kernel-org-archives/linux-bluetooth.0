@@ -1,48 +1,47 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Didier Alves" <dsas@mega.ist.utl.pt>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <000c01c3fc6b$95a62620$318388c1@zedidas>
+Return-Path: <strikewing16th@hotmail.com>
+From: "Anthony Yulo" <strikewing16th@hotmail.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+References: <LAW11-F70hbG9UwhcYb0001b888@hotmail.com> <1077730129.2919.123.camel@pegasus> <Law11-OE444hG9vJaSx000173ba@hotmail.com> <1077790469.2754.23.camel@pegasus>
+Subject: Re: [Bluez-devel] multiple devices clarification?
+Date: Thu, 26 Feb 2004 19:35:06 +0800
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="us-ascii"
-Subject: [Bluez-devel] Widcomm BlueConnect and Bluez
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Feb 2004 13:22:24 -0000
+	charset="iso-8859-1"
+Message-ID: <Law11-OE67gTCxceqdr00018303@hotmail.com>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
+Hi Marcel!!
 
-Does anybody tried to connect a TDK CSR usb dongle using bluez and a PDA
-with Widcomm Blueconnect 3.0 springboard? I can create rfcomm links
-without any problem but after some time (2-10 seconds) the springboard
-stop receiving data. The problem occurs when I try to send a stream of
-data from the PC with bluez. It looks like there is a buffer overrun on
-the receiver. I know that the problem is from the PDA but since that
-Widcomm stopped working on BlueConnect, I can't get any help from them.
-So if anybody has any ideia about what the problem is and how to resolve
-it, please help.
+OK!! i understand now!!:) hehe.. that was a relief.. What  I thought with
+the text was that its only possible to have 2 dongles which are master...
+well anyway, now i understand...
 
-Thanks.
+tnx very much!!! :)
 
-Didier
+----- Original Message -----
+From: "Marcel Holtmann" <marcel@holtmann.org>
+To: "Anthony Yulo" <strikewing16th@hotmail.com>
+Cc: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+Sent: Thursday, February 26, 2004 6:14 PM
+Subject: Re: [Bluez-devel] multiple devices clarification?
 
 
-
-
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> Hi Anthony,
+>
+> > So i can't use 5 CSR- based dongles on one pc?
+> > What do you mean per device limitations? :)
+>
+> what you don't understand is that there is a difference between number
+> of devices and number of connections per device.
+>
+> BlueZ supports up to 16 device per host. If all of them are CSR based
+> with the HCI 16.x firmware or greater, each of them can be master of
+> seven slaves or slave of two masters.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
