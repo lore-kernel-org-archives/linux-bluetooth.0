@@ -1,11 +1,20 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <D971A27FCD3DE04689089E8A98D8AF710361C30C@G9JJ1.mgb01.telekom.de>
-From: "Mateo, Jose-Luis" <Jose-Luis.Mateo@t-systems.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] Zaurus and PAN profile
+Subject: Re: [Bluez-users] Slaves in Sniff mode
+From: Marcel Holtmann <marcel@holtmann.org>
+To: tOpSy TuRvY <topsyturvy@nemo.student.utwente.nl>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.BSO.4.58.0406231451130.835@nemo.student.utwente.nl>
+References: <E1BcqIi-0002cT-53@sc8-sf-list2.sourceforge.net>
+	 <Pine.BSO.4.58.0406222046050.9882@nemo.student.utwente.nl>
+	 <1087939830.4209.12.camel@pegasus>
+	 <Pine.BSO.4.58.0406222346200.5451@nemo.student.utwente.nl>
+	 <1087942444.4209.45.camel@pegasus>
+	 <Pine.BSO.4.58.0406231319140.20827@nemo.student.utwente.nl>
+	 <1087992990.4209.79.camel@pegasus>
+	 <Pine.BSO.4.58.0406231451130.835@nemo.student.utwente.nl>
+Content-Type: text/plain
+Message-Id: <1087997435.4209.104.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,18 +25,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Jun 2004 17:23:05 +0200
+Date: Wed, 23 Jun 2004 15:30:35 +0200
 
+Hi Assed,
 
-Hallo,
-I'm trying to connect a Zaurus PDA with a Laptop using the PAN Profile. =
-I can ping with l2ping and connect using hcitool, but not using pand. =
-The message error is: Connection refused (111).
+> I'm wondering how the master can request an unsniff if the slave is not 
+> listening to the channel.
+> 
+> I suppose the master should delay transmission till the next sniff window 
+> starts (i.e. as Peter suggested). Of course I'm guessing that at this 
+> point it could request an unsniff if the packet to be transmitted will 
+> not fit the sniff window.
 
-Any experiences?
+everything depends on the sniff window, but the HCI also defines an exit
+sniff mode command. I don't know how this is implemented on link manager
+level.
 
-Thanks,
-Jos=E9
+> p.s. I'm also wondering how you get the time to reply to everybodys 
+> questions!
+
+I do my best ;)
+
+Regards
+
+Marcel
+
 
 
 
