@@ -1,18 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Config for Socket CF card
+Subject: Re: [Bluez-users] Belkin CF card (F8T020)
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Max Krasnyansky <maxk@qualcomm.com>, digger vermont <dv_mlist@verizon.net>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1074820370.976.166.camel@gaston>
-References: <1074566227.3670.24.camel@myrna>
-	 <1074597777.7088.2.camel@pegasus>  <1074697933.3020.19.camel@myrna>
-	 <1074698544.7088.102.camel@pegasus>  <1074749699.2573.17.camel@myrna>
-	 <1074775827.3071.1.camel@pegasus>  <1074814697.3159.3.camel@myrna>
-	 <1074816664.3071.60.camel@pegasus>  <1074818667.1733.27.camel@localhost>
-	 <1074819483.3071.79.camel@pegasus>  <1074820370.976.166.camel@gaston>
+To: Jason Bell <jaseb@enigmastation.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040122200857.A20723@enigmastation.com>
+References: <20040122200857.A20723@enigmastation.com>
 Content-Type: text/plain
-Message-Id: <1074821198.3071.84.camel@pegasus>
+Message-Id: <1074821288.3071.86.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -24,16 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jan 2004 02:26:38 +0100
+Date: Fri, 23 Jan 2004 02:28:09 +0100
 
-Hi Ben,
+Hi Jason,
 
-> Well, adding the second "l" to Russell might make him happier, though 
-> in the end, you really want the "other" Russell, that is Mr King
-> which is the serial driver author, not poor Rusty :)
+> I've read through a lot of the BlueZ docs and got a basic build installed.  On closer inspection it seems that the Belkin PDA CF card is not supported.
+> 
+> I ran a plain BlueZ install to see if anything would happen, it appears not.
+> 
+> When I run 'hciconfig' I get the error message:
+> 
+> Can't open HCI socket.: Address family not supported by protocol.
+> 
+> Is there anything I, (or anyone else) can do?
 
-of course I meant Russell King. Sorry for that confusion. Seems like I
-mixed the two entries from my addressbook ;)
+what kernel modules do you have loaded?
 
 Regards
 
