@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42407B38.7050900@debiancolombia.org>
-From: "Fredy P." <digitalfredy@debiancolombia.org>
+Message-ID: <424067AB.9030602@kawaiyume.net>
+From: sir <sir@kawaiyume.net>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] connect T610 to PC problem
-References: <20050322150335.73224.qmail@web60910.mail.yahoo.com>
-In-Reply-To: <20050322150335.73224.qmail@web60910.mail.yahoo.com>
-Content-Type: text/plain;
-	charset=Big5
+Subject: Re: [Bluez-users] Re: Yakumo
+References: <d1n8on$1e8$1@sea.gmane.org> <423F36FF.1020903@kawaiyume.net> <d1po3h$4p2$1@sea.gmane.org>
+In-Reply-To: <d1po3h$4p2$1@sea.gmane.org>
+Content-Type: text/html; charset=ISO-8859-15
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,43 +18,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Mar 2005 15:08:24 -0500
+Date: Tue, 22 Mar 2005 19:44:59 +0100
 
-Ka Kin Cheung escribio':
-> Hi all!
->     I can connect T610 from PC successfully! The key
-> point is: you have to set the same channel of SDP and
-> rfcomm, and set the class in hciconfig as 0x200404
-> i.e. headset. Then after typing "rfcomm listen 0
-> <channel>", the phone can connect to Pc successfully.
-> But then, I face a new problem. When I put the socket
-> programming part in my main program, after I
-> successfully connect T610 to the PC, it showed
-> "dev/rfcomm0: no such device". Why is that?
->     Then I looked at rfcomm/main.c, and put the
-> cmd_listen part in my main program, but after that,
-> when I tried to connect T610 to PC, the T610 always
-> showed "Bluetooth connection failed". Why is that?
-It is becouse you have a lm master, i only have :
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content=3D"text/html;charset=3DISO-8859-15"
+ http-equiv=3D"Content-Type">
+  <title></title>
+</head>
+<body bgcolor=3D"#ffffff" text=3D"#000000">
+Bernhard Walle a =E9crit=A0:
+<blockquote cite=3D"midd1po3h$4p2$1@sea.gmane.org" type=3D"cite">
+  <pre wrap=3D"">Hello,
 
-        lm accept;
+* sir [21.03.2005 22:05]:
+  </pre>
+  <blockquote type=3D"cite">
+    <pre wrap=3D"">Bernhard Walle a =E9crit :
 
-and y can add the pc to movil from movil
-> Please give any suggestion about it. If neccessary,
-> any user can ask me to send my programs to you to have
-> a look. Thank you very much for your kindness.
-> Michael=20
+    </pre>
+    <blockquote type=3D"cite">
+      <pre wrap=3D"">is anyone using a Yakumo USB module class 1? Can you=
+ recommend this for
+using on Linux?
 
---=20
-Suerte and F.S.Fv.
+If not, any other recommendations for cheap class 1 modules?
+      </pre>
+    </blockquote>
+    <pre wrap=3D"">I have a Yakumo USB key, and everything works great.
 
-ATT: Fredy P.
-___________________________________________________
-F.S.Fv. es acro'nimo de Free Software Forever
-http://www.fsf.org/philosophy/free-sw.es.html
+Can somebody tell me if multiconnection if possible ?
+    </pre>
+  </blockquote>
+  <pre wrap=3D""><!---->
+What is multiconnection? Is this a Yakumo specific problem?
 
-Normas ba'sicas de comportamiento en el ciberespacio
-http://www.netiqueta.org/
+
+Regards,
+Bernhard
+
+  </pre>
+</blockquote>
+No not at all, but I want to develop a Java Piconet Server, but I don't
+know how to do that.<br>
+<br>
+Yakuma USB dongle works perfectly for 1 mobile device, and I think more
+is possible.<br>
+</body>
+</html>
+
 
 
 -------------------------------------------------------
