@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050322070534.8383.qmail@web8502.mail.in.yahoo.com>
+Message-ID: <20050322042925.87922.qmail@web8508.mail.in.yahoo.com>
 From: mahabaleshwara k <mahabaleshwara_k@yahoo.co.in>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] same problem in bluez-utilis cross compilation
+Subject: [Bluez-users] Re:cross compilation of BlueZ for MIPS
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +16,10 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Mar 2005 07:05:34 +0000 (GMT)
+Date: Tue, 22 Mar 2005 04:29:25 +0000 (GMT)
 
-Hi all,
-I have also tried cross compilation of blueZ-utilis
-for MIPS. I am getting same problem and even error as
-Stephan is mentioned on 16th. No error in Bluez-lib
-compilation but during utilis, library is not found
-error.
-Can any one help me out in this problem?
-Thanking you all.
-Regards,
-Maha.
-
+when i compile i get error like non structure member
+"nice" in core.c file.
 
 ________________________________________________________________________
 Yahoo! India Matrimony: Find your life partner online
