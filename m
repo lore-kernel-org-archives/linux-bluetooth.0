@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] detecting BT devices
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <b895079705010722156869ddd7@mail.gmail.com>
-References: <b895079705010722156869ddd7@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1105193038.8137.3.camel@pegasus>
+Message-ID: <2de4657605010801137c118137@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] l2test-number of frames
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,28 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 08 Jan 2005 15:03:58 +0100
+Date: Sat, 8 Jan 2005 14:43:49 +0530
 
-Hi Weston,
+Hi marcel,
+in the l2test, i am not able to send more than 512 frames. The utility
+stops at this point every time. I want to run the utility for about
+5000 packets, but after 512 packets, i get the following error
 
-> I am aware of scanning for bluetooth devices, but is there anyway I
-> can have my linux box notify me when bt devices come in range? Or
-> something along those lines?
+ "Send failed. Connection reset by peer(104)"....
 
-you can use the HCI raw socket in together with the periodic inquiry
-feature. However you must write a program for this by your own.
+i think some constant in l2cap.cc or h is causing this problem. Hope
+you can help me this one.
 
-> Also, anyone got reading material for using RFCONN to interact with bt
-> devices using rs232 stuff.
-
-Check the mailing list archive and the web. There are a lot of examples
-around there.
-
-Regards
-
-Marcel
-
-
+Thanx ,
+Regards,
+Manjunath
 
 
 -------------------------------------------------------
