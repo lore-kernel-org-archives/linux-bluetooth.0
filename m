@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Project about Bluetooth Security: Request for
-	assistance
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <002f01c4fd75$e647c280$19cb13ac@stu.nus.edu.sg>
-References: <002f01c4fd75$e647c280$19cb13ac@stu.nus.edu.sg>
-Content-Type: text/plain
-Message-Id: <1106077737.8190.74.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41ED434B.9060207@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [btsco] automake error
+References: <41ED224E.9030702@pca.it>
+In-Reply-To: <41ED224E.9030702@pca.it>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,66 +18,87 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 Jan 2005 20:48:57 +0100
+Date: Tue, 18 Jan 2005 10:11:39 -0700
 
-Hi Khoo,
+thanks Luca. keep those patches coming :)
 
-> I have some questions about bluetooth security. 
-
-I normally take money for these kind of answers ;)
- 
-> I am currently doing a project on bluetooth security and am required
-> to develop some software (with bluetooth hardware) which can
-> demonstrate bluetooth security weaknesses. 
->  
-> Following are my ideas, please comment
->  
-> 1. I have a silicon wave Bluetooth USB dongle and a V3 headset, and a
-> Nokia 6600 smartphone. I desire to capture packets sent between the
-> phone and the headset, without a bluetooth protocol analyser (eg from
-> mobiwave), so that I can demostrate that a hacker can listen in to
-> unencrypted voice traffic. Is this possible at all?
-
-This is not possible. You need a protocol analyzer.
- 
-> hcidump is similar to a protocol analyser, but it can capture only
-> high level traffic. My guess is that I can use hcitool scan to get the
-> bluetooth address of the phone and the headset first, and then based
-> on the addresses attempt to calculate the pseudo random frequency
-> hopping sequence, so that I can stay in the same frequency as the
-> phone and the headset. Problem is i don't understand the output of
-> hcidump. Can hcidump capture traffic which does not belong to the host
-> device? 
-
-Even if hcidump would be able to do this, there is no normal Bluetooth
-dongle available that can be a passive member of a piconet.
- 
-> 2. May I know the steps required to reproduce the work done by Adam
-> Laurie (bluesnarfing) or the Flexilis team(bluesniper)? Will the test
-> programs provided by the install of BlueZ be good as starting points?
-> If so, which test program should I focus on? Please provide details if
-> possible. This is purely for academic purposes. 
-
-The bluesniper is hardware stuff. You simply change the antenna of your
-Bluetooth dongle. For bluesnarfing and bluebugging, this can be done
-with normal utils from the BlueZ distribution or CVS. Take a look at the
-21C3 slides or my Portoroz presentation. There will be another one at
-the FFG 2005 in Munich at the end of February.
- 
-> 3. For the program l2ping.c, what is the end result of the victim
-> phone of running the program? Does it cause the phone to malfunction? 
->  
-> I ran it and pinged my Sony Ericsson T630. Later my phone could not
-> initiate a bluetooth connection with my headset. Otherwise everything
-> else is fine. 
-
-I haven't seen any phone vulnerable to the l2ping attack so far.
-
-Regards
-
-Marcel
-
-
+Luca Capello wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+> 
+> Hello,
+> 
+> I'm new to the list, so hello to everyone :-)
+> 
+> I just bought a Bluetake i-Phono and I was trying to test it (Debian
+> unstable, kernel 2.6.10, ALSA 1.0.8), but I got an automake error:
+> =====
+> luca@gismo:~/src/kernel/bluetooth$ cvs
+> - -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa login
+> Logging in to :pserver:anonymous@cvs.sf.net:2401/cvsroot/bluetooth-alsa
+> CVS password:
+> luca@gismo:~/src/kernel/bluetooth$ cvs
+> - -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa co btsco
+> cvs checkout: Updating btsco
+> <cut>
+> U btsco/sbc/sbcinfo.c
+> 
+> luca@gismo:~/src/kernel/bluetooth$ cd btsco/
+> luca@gismo:~/src/kernel/bluetooth/btsco$ ./bootstrap
+> automake: unrecognized option -- `--ignore-deps'
+> Try `automake --help' for more information.
+> 
+> luca@gismo:~/src/kernel/bluetooth/btsco$ automake --help | grep ignore
+> luca@gismo:~/src/kernel/bluetooth/btsco$ automake --version | grep automake
+> automake (GNU automake) 1.4-p6
+> =====
+> 
+> So, the attached patch check for automake-1.7 during the bootstrap
+> process and add an info in the README.
+> 
+> But I still have some compilation problems... (new post, IMHO it's better).
+> 
+> Thx, bye,
+> Gismo / Luca
+> -----BEGIN PGP SIGNATURE-----
+> Version: GnuPG v1.2.5 (GNU/Linux)
+> Comment: Using GnuPG with Debian - http://enigmail.mozdev.org
+> 
+> iD8DBQFB7R1mVAp7Xm10JmkRAsS6AJ0cJCqjyaxxDdVW2HafWJFWwJbatQCdF002
+> OXtjJYOo4mfeYcpDZyGT9Y0=
+> =eIey
+> -----END PGP SIGNATURE-----
+> 
+> 
+> ------------------------------------------------------------------------
+> 
+> diff -Naur btsco_cvs-20050118-1520/bootstrap btsco/bootstrap
+> --- btsco_cvs-20050118-1520/bootstrap	2005-01-18 15:22:44.000000000 +0100
+> +++ btsco/bootstrap	2005-01-18 15:19:38.000000000 +0100
+> @@ -1,2 +1,10 @@
+>  #! /bin/sh
+> -aclocal && autoheader && automake --add-missing --copy --ignore-deps && autoconf
+> +
+> +if [ ! `which automake-1.7` ]; then
+> +    echo -e "\n*** You need automake-1.7 to compile this software ***\n"
+> +    exit 1
+> +elif [ ! `automake --version | grep -q 1.7` ]; then
+> +    AUTOMAKE_VERSION="-1.7"
+> +fi
+> + 
+> +aclocal$AUTOMAKE_VERSION && autoheader && automake$AUTOMAKE_VERSION --add-missing --copy --ignore-deps && autoconf
+> diff -Naur btsco_cvs-20050118-1520/README btsco/README
+> --- btsco_cvs-20050118-1520/README	2005-01-18 15:23:32.000000000 +0100
+> +++ btsco/README	2004-11-25 01:51:40.000000000 +0100
+> @@ -37,7 +37,7 @@
+>      1. The CVS repository must be checked out:
+>          cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa login
+>          cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa co btsco
+> -    2. After that it must be compiled, you need automake1.7 to do it:
+> +    2. After that it must be compiled:
+>          ./bootstrap
+>          ./configure
+>          make
 
 
 -------------------------------------------------------
