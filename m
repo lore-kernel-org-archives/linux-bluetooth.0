@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] MX900 sometimes catalepsic
+Subject: Re: [Bluez-users] setup pairing?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1106681895.20288.0.camel@bluez.bueche.ch>
-References: <1106681895.20288.0.camel@bluez.bueche.ch>
+In-Reply-To: <41F71444.4080404@coriand.com>
+References: <41F5C90D.90401@coriand.com> <1106660253.8242.7.camel@pegasus>
+	 <41F71444.4080404@coriand.com>
 Content-Type: text/plain
-Message-Id: <1106761340.28444.46.camel@pegasus>
+Message-Id: <1106719674.28444.1.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,57 +19,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 26 Jan 2005 18:42:20 +0100
+Date: Wed, 26 Jan 2005 07:07:54 +0100
 
-Hi Charles,
+Hi Franz,
 
-> I'm running 2.6.10-gentoo-r4 with patch-2.6.10-mh1.gz. My hardware is a
-> Logitech MX900 mouse and a Dell Inspiron 8600 with a CSR chip :
+> thanks for your response!
 > 
-> hci0:   Type: USB
->         BD Address: 00:10:C6:22:54:AF ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN 
->         RX bytes:113629 acl:7992 sco:0 events:88 errors:0
->         TX bytes:1043 acl:24 sco:0 commands:42 errors:0
->         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
->         Link policy: RSWITCH HOLD SNIFF PARK 
->         Link mode: SLAVE ACCEPT 
->         Name: 'laptopcb (0)'
->         Class: 0x100100
->         Service Classes: Object Transfer
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x235 LMP Ver: 1.1 (0x1) LMP Subver: 0x235
+> #./hciconfig -a
+> hci0:   Type: UART
+>         BD Address: 00:60:57:01:10:AE ACL MTU: 384:80  SCO MTU: 128:80
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:172 acl:0 sco:0 events:17 errors:0
+>         TX bytes:80 acl:0 sco:0 commands:17 errors:0
+>         Features: 0xff 0xff 0x09 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy:
+>         Link mode: SLAVE ACCEPT
+>         Name: 'WatchPad_15'
+>         Class: 0x000000
+>         Service Classes: Unspecified
+>         Device Class: Miscellaneous,
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0xbc LMP Ver: 1.1 (0x1) LMP Subver: 0xbc
 >         Manufacturer: Cambridge Silicon Radio (10)
+> #
 > 
-> I'm not using the mouse bluetooth dock for any connection (only battery
-> loading).
-> 
-> Often, after unpacking my laptop and MX900 mouse from its bag, the mouse
-> appear to "hang". The laptop doesn't see it, and I have to open the
-> mouse battery location and quickly unplug one battery to reset the
-> mouse. After this treatment, the mouse announce itself and the laptop
-> sees it and create the devices with udev.
-> 
-> The problem happen about 1/4 of the time when unpacking the laptop, but
-> in a systematic way after a reboot (eg after upgrading my kernel). I
-> never boot my laptop under Windows, and I never use the mouse with other
-> machines. The "connect" button has no effect.
-> 
-> The problem has be present since a long time and several kernels and
-> bluez patches, maybe since always.
-> 
-> It would only be annoying, but the battery door of my mouse is starting
-> to present a bad shape after openning it with just about all the tools
-> that fits it, including cisors.
+> Problem is now, that I don't have ./hcidump cause of memory problems on
+> this watch.
 
-I have no idea what the problem is, but I assume that it is because of
-the reconnect feature of the mouse. I will always try to reconnect when
-you move your bag and after some failed retries it may deadlock itself.
-
-On the other hand there is maybe a small race when you shutdown the
-machine and disconnect every device. May a "hciconfig hci0 noscan"
-before calling "hidd -K" will help.
+I assume that this is a problem with the PIN-helper. Check your logfiles
+and install hcidump. You really need it to debug this stuff.
 
 Regards
 
