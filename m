@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Alexander Holler <holler@ahsoftware.de>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <8430000.1072356496@[192.168.207.2]>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] hid2hci and Logitech Hub
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1072139164.2876.39.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Bluetooth kernel patch for 2.6.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,28 +15,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Dec 2003 13:48:16 +0100
+Date: Tue, 23 Dec 2003 01:26:05 +0100
 
-Hello,
+Hi Folks,
 
-I've just tried hid2hic with my Logitech Hub.
+the first Bluetooth kernel patch for 2.6.0 is now available [1] and it
+contains a bunch of updates to sync up with the Bluetooth subsystem of
+the Linux 2.6 series. Here is the changelog:
 
-It doesn't work. After changing the vendor and product numbers, I receive 
--1 (errno: broken pipe) from the ioctl.
+  o Add missing maintainer entries for the Bluetooth subsystem
+  o Add CAPI message transport protocol support
+  o Update the Kconfig entry for the BlueFRITZ! USB driver
+  o Add module aliases for the Bluetooth protocols
+  o Correct the module alias for the network family
+  o Support for AVM BlueFRITZ! USB
+  o Remove USB zero packet option
+  o Support inquiry results with RSSI
+  o Update HCI security filter
+  o Add support for an old ALPS module
+  o Add support for the Digianswer USB devices
+  o Always use two ISOC URB's
+  o Disable credit based flow control by default
 
-Then I've tried some of the control transfers I've logged using SnoopyPro 
-and Windows XP. None of them are working. I allways receive -1 (Device or 
-resource busy).
+Regards
 
-What makes me wonder is that in the windows logs, the transfers are allways 
-of type 21 (out, class, interface), but hid2hci normally uses type 40 (out, 
-vendor, device).
+Marcel
 
-Any pointers?
-
-Regards,
-
-Alexander
+[1] http://www.holtmann.org/linux/kernel/patch-2.6.0-mh1.gz
 
 
 
