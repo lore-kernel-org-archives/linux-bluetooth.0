@@ -1,31 +1,68 @@
-Return-Path: <jt@bougret.hpl.hp.com>
-Date: Fri, 13 Aug 2004 16:53:33 -0700
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jean Tourrilhes <jt@hpl.hp.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
    Steven Singer <steven.singer@csr.com>
-Subject: Re: CSR firmware question...
-Message-ID: <20040813235333.GA5860@bougret.hpl.hp.com>
-Reply-To: jt@hpl.hp.com
-References: <20040813002514.GA21388@bougret.hpl.hp.com> <1092385877.28711.185.camel@pegasus> <20040813163736.GC22763@bougret.hpl.hp.com> <1092416234.28711.256.camel@pegasus> <20040813223412.GA3158@bougret.hpl.hp.com> <1092440127.4501.73.camel@pegasus>
+In-Reply-To: <20040813223412.GA3158@bougret.hpl.hp.com>
+References: <20040813002514.GA21388@bougret.hpl.hp.com>
+	 <1092385877.28711.185.camel@pegasus>
+	 <20040813163736.GC22763@bougret.hpl.hp.com>
+	 <1092416234.28711.256.camel@pegasus>
+	 <20040813223412.GA3158@bougret.hpl.hp.com>
+Content-Type: text/plain
+Message-Id: <1092440127.4501.73.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1092440127.4501.73.camel@pegasus>
-From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Subject: [Bluez-devel] Re: CSR firmware question...
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Sat, 14 Aug 2004 01:35:27 +0200
 
-On Sat, Aug 14, 2004 at 01:35:27AM +0200, Marcel Holtmann wrote:
-> Hi Jean,
+Hi Jean,
+
+> > try running hid2hci :)
 > 
-> your firmware update must be successful, because this looks like a
-> dongle with HCI 18.1 firmware in HID mode. Use hid2hci. It must work.
+> 	Try, and it won't work, the device doesn't even have a control
+> pipe anymore. Dead.
 
-	Found the reason. Under 2.6.X, hid2hci doesn't work. On the
-other hand, works fine in 2.4.X. And of course need to be done every
-time I plug the dongle.
-	Hmm...
+as far as I know, every USB device has a control endpoint.
 
-> Regards
+> > If this does not work, show us /proc/bus/usb/devices.
 > 
-> Marcel
+> T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  5 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+> P:  Vendor=0a12 ProdID=1000 Rev=12.41
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=  0mA
+> I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> I:  If#= 1 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=(none)
+> E:  Ad=82(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> 
+> 	(That's with 2.4.X. Under 2.6.X, I can't make sense of the usb stuff).
 
-	Jean
+your firmware update must be successful, because this looks like a
+dongle with HCI 18.1 firmware in HID mode. Use hid2hci. It must work.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
