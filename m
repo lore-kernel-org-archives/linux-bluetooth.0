@@ -1,14 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth dongle
+Subject: Re: [Bluez-users] Help needed (Fedora Core 2)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Ricky Soh <rickysoh@gmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <db972f4304091218256f88456a@mail.gmail.com>
-References: <db972f43040910000351e5b931@mail.gmail.com>
-	 <1094997330.5695.4.camel@pegasus>
-	 <db972f4304091218256f88456a@mail.gmail.com>
+In-Reply-To: <db972f43040912183766fef4f9@mail.gmail.com>
+References: <db972f43040909203314e6825d@mail.gmail.com>
+	 <20040910034429.37672.qmail@web11605.mail.yahoo.com>
+	 <db972f43040909223675a4a082@mail.gmail.com>
+	 <1094997279.5695.2.camel@pegasus>
+	 <db972f43040912183766fef4f9@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1095079363.5695.48.camel@pegasus>
+Message-Id: <1095072018.5695.35.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,17 +22,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Sep 2004 14:42:44 +0200
+Date: Mon, 13 Sep 2004 12:40:18 +0200
 
 Hi Ricky,
 
-> I have tried service bluetooth restart and yet, hciconfig will not get
-> a respond. I have read that i may have to edit some config file to get
-> it working but i have no idea which file and how to edit them. Any
-> advise? Thanks
+> If bluez is installed properly, i should be able to see bluez under
+> lsmod right? And l2test and scotest command are bluez command too, why
+> are they missing? Please help.
 
-you should do what I asked you to do. Look for any USB or Bluetooth
-related error messages in your logs or at the dmesg output.
+with a 2.6 kernel the core module is named bluetooth.ko and not bluez.o
+and the l2test and scotest commands are never installed by default.
 
 Regards
 
