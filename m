@@ -1,76 +1,40 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BT3030
-References: <200405150903.23338.hedin@hiervard.ru> <1084611681.24119.24.camel@pegasus> <200405162253.38581.hedin@hiervard.ru>
-In-Reply-To: <200405162253.38581.hedin@hiervard.ru>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="koi8-r"
-Message-Id: <200405161807.38658.cijoml@volny.cz>
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 May 2004 18:07:38 +0200
+Return-Path: <charles@bueche.ch>
+Date: Sun, 16 May 2004 17:49:23 +0200
+From: Charles Bueche <charles@bueche.ch>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Bluez+2.6+Logitech bluetooth
+Message-Id: <20040516174923.5a5f58af@bluez.bueche.ch>
+In-Reply-To: <1084708456.4184.0.camel@pegasus>
+References: <20040515163903.CB06543F94@rekin8.go2.pl>
+	<20040516081059.46f1904b@bluez.bueche.ch>
+	<1084708456.4184.0.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+List-ID: <bluez-users.lists.sourceforge.net>
 
-On Sunday 16 of May 2004 17:53, =E8=C5=C4=C9=CE wrote:
-> Saturday 15 May 2004 16:01, Marcel Holtmann =D0=C9=DB=C5=D4:
-> > Hi Hedin,
-> >
-> > > Here is my `dmesg` log after I load my modules after connecting the
-> > > dongle:
-> > >
-> > > usb 1-1: new full speed USB device using address 3
-> > > Bluetooth: Core ver 2.4
-> > > NET: Registered protocol family 31
-> > > Bluetooth: HCI device and connection manager initialized
-> > > Bluetooth: HCI socket layer initialized
-> > > Bluetooth: L2CAP ver 2.1
-> > > Bluetooth: L2CAP socket layer initialized
-> > > Bluetooth: HCI USB driver ver 2.5
-> > > usbcore: registered new driver hci_usb
-> > > Bluetooth: Broadcom Blutonium firmware driver ver 1.0
-> > > bcm203x_probe: Mini driver request failed
-> > > bcm203x: probe of 1-1:1.0 failed with error -5
-> > > usbcore: registered new driver bcm203x
-> >
-> > this means that the request for the mini driver file BCM2033-MD.hex
-> > failed. You need /sys mounted, you need /etc/hotplug/firmware.agent and
-> > you must put the two firmware files from Broadcom in the firmware
-> > directory under /usr/lib/hotplug/firmware.
->
-> Sorry for dumb questions. I got these two filfes into
-> /usr/lib/hotplug/firware (I took them from bluez-blufw package).
-> The error still remains.
->
-> But how about another one? I can't find it and what is "/sys" ? (I'm not
-> really experienced with Linux, sorry).
+Hi Marcel,
 
-write:
-mkdir /sys
+yes, I know I'm a bit off the bleeding edge since some weeks, but I'm
+not alone at fault : gentoo-dev-sources is still at 2.6.5, and I don't
+want to switch to another kernel for now.
 
-edit /etc/fstab and add this line:
-sysfs           /sys            sysfs   defaults                0       0
-save it and write:
-mount -a as root
+When 2.6.6 is out, I will try your patch and the new user-space daemons.
+Meanwhile, thank for your support to us all bluez users.
 
-Michal
+Charles
 
+On Sun, 16 May 2004 13:54:17 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
--------------------------------------------------------
-This SF.Net email is sponsored by: SourceForge.net Broadband
-Sign-up now for SourceForge Broadband and get the fastest
-6.0/768 connection for only $19.95/mo for the first 3 months!
-http://ads.osdn.com/?ad_id=2562&alloc_id=6184&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+> Hi Charles,
+> 
+> > you may want to try my cookbook at
+> > http://www.bueche.ch/comp/mx900/mx900.html
+> 
+> maybe you wanna play with the new hidd from bluez-utils-2.7 and the
+> hidp kernel module from patch-2.6.6-mh1 ;)
+> 
+> Regards
+> 
+> Marcel
