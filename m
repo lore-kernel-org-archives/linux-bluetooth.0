@@ -1,13 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41A53075.4090003@phaldor.co.uk>
-From: Dave Givens <dave.givens@phaldor.co.uk>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Bluetooth Printing (Belkin Print Server)
-References: <41A2089D.5030100@phaldor.co.uk> <1101139759.15086.14.camel@pegasus> <41A21EE3.5060408@phaldor.co.uk> <20041123091654.GB16952@suse.de> <1101202810.26578.61.camel@pegasus> <41A35BFE.9000507@phaldor.co.uk> <20041123161157.GK16952@suse.de> <41A387FD.2050909@phaldor.co.uk> <20041124101828.GN16952@suse.de>
-In-Reply-To: <20041124101828.GN16952@suse.de>
-Content-Type: multipart/alternative;
- boundary="------------050007060607010607020100"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41A3B992.7080202@phaldor.co.uk>
+References: <41A2089D.5030100@phaldor.co.uk>
+	 <1101139759.15086.14.camel@pegasus> <41A21EE3.5060408@phaldor.co.uk>
+	 <20041123091654.GB16952@suse.de> <1101202810.26578.61.camel@pegasus>
+	 <41A35BFE.9000507@phaldor.co.uk> <1101226220.27351.4.camel@pegasus>
+	 <41A36388.4010301@phaldor.co.uk> <1101227784.27351.7.camel@pegasus>
+	 <41A3715B.6050101@phaldor.co.uk>  <41A3B992.7080202@phaldor.co.uk>
+Content-Type: text/plain
+Message-Id: <1101276396.27351.92.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,102 +23,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Nov 2004 01:08:05 +0000
+Date: Wed, 24 Nov 2004 07:06:36 +0100
 
-This is a multi-part message in MIME format.
---------------050007060607010607020100
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Dave,
 
-Stefan,
-    The TSP700 is an 80mm wide thermal receipt or voucher printer, no it 
-cannot handle postscript. But I have tried with other printers that can 
-and it makes no difference. It works  fine with the belkin print server 
-under windows but not under Linux. The problem seems to lie with the 
-print server.
+>     Sorry for the stupid question, here are the results you asked for.
 
-Dave Givens
+please attach them as *.txt files.
 
-Stefan Behlert wrote:
+And the information so far are looking a little bit weird. For the
+serial port they use UUID32 and for HCRP they use UUID16. I've never
+seen this before.
 
->Moin,
->
->On Nov 23, 04 18:57:01 +0000, Dave Givens wrote:
->  
->
->>Stefan,
->>   Yes I did configure it the way you have suggested, but when it comes 
->>to the uri, I entered bluetooth://0002724080A3 as per instructions. This 
->>does not allow me to specify that the printer is a Star TSP700 or 
->>install the specific drivers for the model.
->>    
->>
->
->Hm. I still think that that's  the problem so I'm going to stress that
->issue a little bit more...sorry :)
->I'm not sure what of the printer model mentioned in the Yast-modul is
->compatible to the TSP700. Can the TSP handle postscript?
->
->        Stefan
-> 
->  
->
->>Dave Givens
->>    
->>
+However may you wanna force it to use the serial port profile. I haven't
+tried this for a long time, but actually this URI should do it:
 
---------------050007060607010607020100
-Content-Type: text/html; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+	bluetooth://0002724080A3/spp
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
-  <title></title>
-</head>
-<body>
-Stefan,<br>
-&nbsp;&nbsp;&nbsp; The TSP700 is an 80mm wide thermal receipt or voucher printer, no
-it cannot handle postscript. But I have tried with other printers that
-can and it makes no difference. It works&nbsp; fine with the belkin print
-server under windows but not under Linux. The problem seems to lie with
-the print server.<br>
-<br>
-Dave Givens<br>
-<br>
-Stefan Behlert wrote:<br>
-<blockquote type="cite" cite="mid20041124101828.GN16952@suse.de">
-  <pre wrap="">Moin,
+In hcidump you should now see a connection to RFCOMM channel 3 (DLCI 6).
 
-On Nov 23, 04 18:57:01 +0000, Dave Givens wrote:
-  </pre>
-  <blockquote type="cite">
-    <pre wrap="">Stefan,
-   Yes I did configure it the way you have suggested, but when it comes 
-to the uri, I entered bluetooth://0002724080A3 as per instructions. This 
-does not allow me to specify that the printer is a Star TSP700 or 
-install the specific drivers for the model.
-    </pre>
-  </blockquote>
-  <pre wrap=""><!---->
-Hm. I still think that that's  the problem so I'm going to stress that
-issue a little bit more...sorry :)
-I'm not sure what of the printer model mentioned in the Yast-modul is
-compatible to the TSP700. Can the TSP handle postscript?
+Regards
 
-        Stefan
- 
-  </pre>
-  <blockquote type="cite">
-    <pre wrap="">Dave Givens
-    </pre>
-  </blockquote>
-</blockquote>
-</body>
-</html>
+Marcel
 
---------------050007060607010607020100--
 
 
 
