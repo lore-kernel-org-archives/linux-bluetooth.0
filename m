@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problem with Suse 9.0 and BlueZ
-From: Marcel Holtmann <marcel@holtmann.org>
-To: paulo@mail.wollny.com.br
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405101448.i4AEmIK26418@home.iis.com.br>
-References: <200405101448.i4AEmIK26418@home.iis.com.br>
-Content-Type: text/plain
-Message-Id: <1084201089.9639.1.camel@pegasus>
-Mime-Version: 1.0
+Message-Id: <200405101448.i4AEmIK26418@home.iis.com.br>
+From: <paulo@mail.wollny.com.br>
+To: "=?ISO-8859-1?Q?=42=6c=75=65=5a=20=4d=61=69=6c=69=6e=67=20=4c=69=73=74?="<bluez-users@lists.sourceforge.net>
+Reply-To: <paulo@mail.wollny.com.br>
+Content-Type: text/plain;
+Subject: [Bluez-users] Problem with Suse 9.0 and BlueZ
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,35 +15,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 May 2004 16:58:10 +0200
+Date: Mon, 10 May 2004 11:48:19 -0300
 
-Hi Paulo,
+Hi all,
 
-> i'm trying to use BlueZ with Suse 9.0 and am finding following problems:
-> 
-> 1 - /dev/rfcomm0 could not be found.  I have tryed mknod /dev/rfcomm0 c 216 0. Is this right?
+i'm trying to use BlueZ with Suse 9.0 and am finding following problems:
 
-this is correct, but the SuSE 9.0 should create these device nodes.
+1 - /dev/rfcomm0 could not be found.  I have tryed mknod /dev/rfcomm0 c 216 0. Is this right?
 
-> 2 - Starting the daemons, it get the following message on /var/log/messages
-> 
->  May 10 11:35:07 hirscheberg hcid[15820]: HCI daemon ver 2.3 started
-> May 10 11:35:07 hirscheberg hcid[15820]: Starting security manager 0
-> May 10 11:35:07 hirscheberg sdpd[15825]: SDPd ver 1.2 started
-> May 10 11:35:18 hirscheberg hcid[15820]: pin_code_request (sba=72:8C:01:72:02:00, dba=E2:59:22:E3:01:00)
-> May 10 11:35:18 hirscheberg kernel: Warning: null TTY for (d8:00) in tty_fasync
-> May 10 11:37:32 hirscheberg hcid[15820]: pin_code_request (sba=72:8C:01:72:02:00, dba=E2:59:22:E3:01:00)
-> May 10 11:37:32 hirscheberg kernel: Warning: null TTY for (d8:00) in tty_fasync
+2 - Starting the daemons, it get the following message on /var/log/messages
 
-I don't know where the "null TTY" came from.
+ May 10 11:35:07 hirscheberg hcid[15820]: HCI daemon ver 2.3 started
+May 10 11:35:07 hirscheberg hcid[15820]: Starting security manager 0
+May 10 11:35:07 hirscheberg sdpd[15825]: SDPd ver 1.2 started
+May 10 11:35:18 hirscheberg hcid[15820]: pin_code_request (sba=72:8C:01:72:02:00, dba=E2:59:22:E3:01:00)
+May 10 11:35:18 hirscheberg kernel: Warning: null TTY for (d8:00) in tty_fasync
+May 10 11:37:32 hirscheberg hcid[15820]: pin_code_request (sba=72:8C:01:72:02:00, dba=E2:59:22:E3:01:00)
+May 10 11:37:32 hirscheberg kernel: Warning: null TTY for (d8:00) in tty_fasync
 
-> 3 - When trying to contact the phone (a Siemens S55), after havin /etc/bluetooth/pin PIN:1234 with echo "ATZ" > /dev/rfcomm0 i can not connect to th phone.
+3 - When trying to contact the phone (a Siemens S55), after havin /etc/bluetooth/pin PIN:1234 with echo "ATZ" > /dev/rfcomm0 i can not connect to th phone.
 
-Show us "hcidump -x" as root to see what happens.
+Any help is welcome. 
 
-Regards
+Best regards,
 
-Marcel
+Paulo Wollny
+
+
 
 
 
