@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problems with RS232 and BT - Can't init device
-	hci0
+Subject: Re: [Bluez-users] CAD library for BT carrier socket
 From: Marcel Holtmann <marcel@holtmann.org>
-To: zubiwat@poczta.onet.pl
+To: Przemek Hausman <aquamala@o2.pl>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403021801.11637.zubiwat@poczta.onet.pl>
-References: <200403021801.11637.zubiwat@poczta.onet.pl>
+In-Reply-To: <20040302190149.GA12430@mech.pw.edu.pl>
+References: <20040302190149.GA12430@mech.pw.edu.pl>
 Content-Type: text/plain
-Message-Id: <1078257013.1942.200.camel@pegasus>
+Message-Id: <1078256656.1942.197.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,27 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 02 Mar 2004 20:50:13 +0100
+Date: Tue, 02 Mar 2004 20:44:16 +0100
 
-Hi Maciej,
+Hi Przemek,
 
-> I have CSR chip connected to my PC by RS232
-> When try to use hciattach /dev/ttyS0 any 921600 flow I always get:
-> hcid[2594]: HCI daemon ver 2.4 started
-> hcid[2594]: HCI dev 0 registered
-> hcid[2612]: Can't init device hci0. Connection timed out(110)
+> I'm afraid it's not a good place to ask but I have no idea where else can I try.
 > 
-> When I use hciattach /dev/ttyS0 csr 921600 flow I get:
-> Initialization timed out.
+> I am looking for a library for CAD software (e.g. Eagle od Protel) which contains a package 
+> and PCB layout for Suyin's Bluetooth Carrier Socket for Ericsson Module ROK101007.
 > 
-> I also tried to setserial /dev/ttyS0 baud_base 921600
-> 
-> What is the problem because i red almost every howto and mail on mailing list. 
-> I only get some signals from the device but he can't analize what is it.
-> Im using bluez-libs 2.5, bluez-utils 2.4  with kernel 2.4.22
-> Please help me!
+> If you have such library I would like to kindly ask you for it. Please, make it available on
+> some www site or send it here. Of corse you can push in to my priv `aquamala [in domain] o2
+> [dot] pl'.
 
-are you sure that your ttyS0 is capable of more than 115200 baud?
+I don't know of any, but I am only a software engineer ;)
 
 Regards
 
