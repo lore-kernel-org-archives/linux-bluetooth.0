@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] does flush_to in l2cap setsockopt currently do
-	anything?
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <ef9938ec05032915072ee95a9@mail.gmail.com>
+From: Albert Huang <ashuang@gmail.com>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <ef9938ec05032915072ee95a9@mail.gmail.com>
-References: <ef9938ec05032915072ee95a9@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1112137866.9016.164.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] does flush_to in l2cap setsockopt currently do anything?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,30 +16,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 30 Mar 2005 01:11:06 +0200
+Date: Tue, 29 Mar 2005 18:07:11 -0500
 
-Hi Albert,
+Hi all,
 
-> I was poking through the sources while trying to find an easy way to
-> set the ACL automatic flush timeout with an l2cap socket.
-> 
-> Does setsockopt(s, SOL_L2CAP, L2CAP_OPTIONS, ...) cause the underlying
-> ACL automatic flush timeout to change?  It doesn't look like flush_to
-> is being used in net/bluetooth/l2cap.c:setsockopt
+I was poking through the sources while trying to find an easy way to
+set the ACL automatic flush timeout with an l2cap socket.
 
-it is doing nothing at the moment.
+Does setsockopt(s, SOL_L2CAP, L2CAP_OPTIONS, ...) cause the underlying
+ACL automatic flush timeout to change?  It doesn't look like flush_to
+is being used in net/bluetooth/l2cap.c:setsockopt
 
-> Is there an easier way of doing it short of extracting the underlying
-> ACL connection handle and then sending an HCI
-> Write_Automatic_Flush_Timeout command packet to a separate HCI socket?
+Is there an easier way of doing it short of extracting the underlying
+ACL connection handle and then sending an HCI
+Write_Automatic_Flush_Timeout command packet to a separate HCI socket?
 
-May you wanna look at the cmd_info() part of hcitool.c.
-
-Regards
-
-Marcel
-
-
+Regards,
+Albert
 
 
 -------------------------------------------------------
