@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth capture and client manager
+Subject: Re: [Bluez-users] NAT connection established but no data transport
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: skrzypek-piotr@o2.pl
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de46576041101220615adedb4@mail.gmail.com>
-References: <2de46576041101220615adedb4@mail.gmail.com>
+In-Reply-To: <20041102074127.9B9CAD0B0F@rekin6.o2.pl>
+References: <20041101214200.C1E5BD0B0C@rekin6.o2.pl>
+	 <1099347952.10948.19.camel@pegasus>
+	 <20041101235513.2017B3816E@rekin11.go2.pl>
+	 <1099362451.10948.22.camel@pegasus>
+	 <20041102074127.9B9CAD0B0F@rekin6.o2.pl>
 Content-Type: text/plain
-Message-Id: <1099392428.10948.28.camel@pegasus>
+Message-Id: <1099392282.10948.25.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,30 +22,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 02 Nov 2004 11:47:08 +0100
+Date: Tue, 02 Nov 2004 11:44:42 +0100
 
-Hi Manjunath,
+Hi Pete,
 
-> I am working on a BT project and am trying to capture bluetooth packets. 
+> >> >try to activate bnep0 and set an IP address.
+> >> i set: ifconfig bnep0 192.168.0.1
+> >> and when i type ifconfig there is nothing about bnep0, but when i
+> type
+> >> ifconfig bnep0
+> >> i can see everything just like it should be: the same mac adress
+> >> (read from cover of usb device), ip 192.168.0.1, appropriate mask
+> >> etc. but still it doesn`t send/recieve data. 
+> >> 
+> >> Maybe it can help somehow:
+> >> I checked the transmission status on the notebook and it says that
+> >> the device is transmitting (especially while pinging) but not
+> reciving.
+> >
+> >are you sure that you are using the latest -mh patch for your kernel?
 > 
-> I have done a simple test, where in using hcidump i have captured the
-> packets and saved it to a file. I have then fed the file to
-> ethereal.........which gives limited and insufficient information like
-> data bytes, frame number etc. I am not able to retrieve any header
-> contents
+> There is only one patch for kernel 2.4.27 and i`m using it.
 
-I never finished the Bluetooth decoder for Ethereal and so it is only
-capable of reading the hcidump format.
-
-> Is it possible to capture and analyse BT packets from the air
-> interface, calculate the data transfer rate, etc...something similar
-> to a 802.11 client manager???? Please do send the links ..if some work
-> has already taken place on this front.
-
-For getting air packets you need a protocol analyzer. For a client
-manager you can use the link quality, RSSI etc. and you should look the
-HCI part of the specification, because everything you can do is in
-there.
+do you have some firewall rules activated? Check the syslog for more
+information and check with "hcidump -X" as root what goes over the
+Bluetooth interface.
 
 Regards
 
