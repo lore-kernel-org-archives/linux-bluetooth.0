@@ -1,53 +1,64 @@
-Return-Path: <James@superbug.demon.co.uk>
-Message-ID: <4118C562.1050300@superbug.demon.co.uk>
-Date: Tue, 10 Aug 2004 13:53:54 +0100
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <4118C229.3080606@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Lars Grunewaldt <lgw@dark-reality.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
-References: <4117AB9A.9010909@dark-reality.de>	 <1092071356.4564.12.camel@pegasus>  <4117B098.5020805@dark-reality.de>	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>	 <1092090364.4564.46.camel@pegasus> <41180E64.1010007@dark-reality.de> <1092140041.4564.96.camel@pegasus>
-In-Reply-To: <1092140041.4564.96.camel@pegasus>
+References: <4117AB9A.9010909@dark-reality.de>	 <1092071356.4564.12.camel@pegasus>  <4117B098.5020805@dark-reality.de>	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>	 <1092090364.4564.46.camel@pegasus> <4118B5FF.5070008@dark-reality.de> <1092139719.4564.89.camel@pegasus>
+In-Reply-To: <1092139719.4564.89.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 10 Aug 2004 14:40:09 +0200
 
-I don't know if this will help, but I will itemise the requirements that 
-and alsa driver will need:
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-1) A ring buffer, that is then broken up into 2 or more chunks called 
-periods. The userland application will set the buffer_size and period_size.
-2) An interrupt or callback routine is called as each period reaches the 
-headset speakers, same for capture from headset mic.
-3) A hardware pointer value, that can be read at any time, and returns 
-the current sample being played by the speakers, or as close as possible 
-to it.
-4) Latency between samples leaving the ring buffer and being played to 
-the speakers should be as small as possible. This should be less than 
-10ms. Optimum low latency is achieved using 2 periods per buffer.
-5) The rate at which samples leave the ring buffer should be constant, 
-and ideally under hardware control.
+Marcel Holtmann wrote:
+| Hi Lars,
+|>for those who are interested in further development of former snd-bt-sco
+|>and now bluetooth-alsa connection (project name not ready ;) we made a
+|>mailing list to exchange early thoughts.
+|
+|
+| I actually prefer that you discuss this on the bluez-devel mailing list,
+| because you may need to change BlueZ core parts and most of this will be
+| kernel related stuff and this should belong here.
 
-My suggestion for the SCO channel, is to use a fixed number, normally 2, 
-of SCO packets in a loop.
-1) User app fills buffer.
-2) SCO takes X samples from ring buffer, creates a SCO packet, and sends 
-it to the hardware.
-3) SCO takes X more samples from the ring buffer, creates another SCO 
-packet, and sends it to the hardware.
-4) SCO then waits until SCO has finished (2), and only then takes X 
-samples from the ring buffer, creates a SCO packet, and sends it to the 
-hardware...then repeats.
-5) Add a SCO api call, so that the higher level module can find out how 
-much of the SCO packet has been output, and thus return accurate 
-hardware pointer values.
+I know, and I voted for that too. But I also feel that we need to
+discuss some lineup questions first that might me just fuzz for the
+BlueZ list, so I think it's good to start seperatly.
 
-In this way there are only ever 2 SCO packets in the pipeline.
-It fixes the latency, and we always have an accurate idea of which 
-sample is currently being played.
+We'll post and discuss BlueZ-specific stuff on the bluez-devel list, and
+propably the other one will die sooner or later. But for now I think
+it's a good way to make up our minds first.
 
-Summary: Limit the size of the SCO packet buffer to 2 packets, or some 
-fixed even value.
+CU,
+~  Lars
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-Cheers
-James
+iD8DBQFBGMIpQWC6DTWkDAoRAsOIAJwL+eKvuybhnt3VvX8P9Rw7bLnwrwCgmDaS
+1jvapZrjdAMuEzg8TcbNfZo=
+=j9II
+-----END PGP SIGNATURE-----
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
