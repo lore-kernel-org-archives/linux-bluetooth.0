@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth after suspend? 
-In-reply-to: <42513AA3.1050309@arnes.si> 
-References: <42513AA3.1050309@arnes.si>
-Message-ID: <17461.1112620837@csr.com>
-From: Peter Stephenson <pws@csr.com>
+Message-ID: <42513AA3.1050309@arnes.si>
+From: Matija Grabnar <matija.grabnar@arnes.si>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Subject: [Bluez-users] Bluetooth after suspend?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,32 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 04 Apr 2005 14:20:37 +0100
+Date: Mon, 04 Apr 2005 15:01:23 +0200
 
-Matija Grabnar wrote:
-> I've noticed that bluetooth (I use it for DUN over a Nokia phone 
-> exclusively) seems not to
-> work after the system comes back from suspend (laptop, both APM suspend 
-> on a Dell laptop
-> with a USB bluetooth dongle, and ACPI suspend on a Prestigio/Clevo with 
-> internal bletooth).
-> 
-> Any ideas where I should look for the cause?
+I've noticed that bluetooth (I use it for DUN over a Nokia phone 
+exclusively) seems not to
+work after the system comes back from suspend (laptop, both APM suspend 
+on a Dell laptop
+with a USB bluetooth dongle, and ACPI suspend on a Prestigio/Clevo with 
+internal bletooth).
 
-Find out what sort of dongle it is, and if it's CSR, the firmware version
-(HCI subversion, which you should get at the same time).
-
-pws
-
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-**********************************************************************
-
+Any ideas where I should look for the cause?
 
 
 -------------------------------------------------------
