@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050403005501.24288.qmail@web50704.mail.yahoo.com>
-From: "John H." <mistamaila@yahoo.com>
-Subject: Re: [Bluez-users] cannot connect to pm-325 phone w/bluez
+In-Reply-To: <OFF9322AD8.00D92B2E-ON85256FD7.001D7911-85256FD7.001E1496@alps.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: 6667
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Message-ID: <OF5B3D8884.B77486D9-ON85256FD7.007C2BAB-85256FD7.007C5FC0@alps.com>
+From: scott.meesseman@alpsautomotive.com
+Content-Type: multipart/alternative; boundary="=_alternative 007C5FBA85256FD7_="
+Subject: [Bluez-users] Bluetooth Synchronization on Nokia (3650)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,95 +17,62 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 2 Apr 2005 16:55:01 -0800 (PST)
+Date: Sat, 2 Apr 2005 17:38:12 -0500
 
-not sure if you got this reply, since one of mine
-didn't make it out before, and i haven't heard back on
-this one.
-thx
+This is a multipart message in MIME format.
+--=_alternative 007C5FBA85256FD7_=
+Content-Type: text/plain; charset="US-ASCII"
 
+Hello all, 
 
---- "John H." <mistamaila@yahoo.com> wrote:
-> well, I need to use DUN(dial up networking) and dial
-> #777 to use the internet.
-> 
-> I'd LIKE to, if the phone is capable, use bticd,
-> showing caller ID on the screen.
-> 
-> And I'd like to be able to use a mic/speakers from
-> the
-> computer instead of the actual phone sometime.
-> 
-> 
-> 
-> --- Marcel Holtmann <marcel@holtmann.org> wrote:
-> > Hi John,
-> > 
-> > > That is bizarre, as I remember trying the next
-> > > recommendation and sending the output that I
-> got.
-> > > 
-> > > well, here it is again...
-> > > 
-> > > 
-> > > sdptool browse
-> > > Inquiring ...
-> > > Browsing 08:00:37:12:C4:B1 ...
-> > > Service Search failed: Connection timed out
-> > > 
-> > >  sdptool search --bdaddr 08:00:37:12:C4:B1 
-> OPUSH
-> > > Searching for OPUSH on 08:00:37:12:C4:B1 ...
-> > > 
-> > > got that for every service I specified.
-> > 
-> > first you need to know what service you wanna use.
-> > If you see failures
-> > like this, then run "hcidump -X -V" in another
-> > terminal and send in the
-> > output.
-> > 
-> > Regards
-> > 
-> > Marcel
-> > 
-> > 
-> > 
-> > 
-> >
->
--------------------------------------------------------
-> > SF email is sponsored by - The IT Product Guide
-> > Read honest & candid reviews on hundreds of IT
-> > Products from real users.
-> > Discover which products truly live up to the hype.
-> > Start reading now.
-> >
->
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> >
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> > 
-> 
-> 
-> 		
-> __________________________________ 
-> Do you Yahoo!? 
-> Yahoo! Small Business - Try our new resources site!
-> http://smallbusiness.yahoo.com/resources/ 
-> 
+I sent this out already but I messed up on the subject line, please don't 
+mind me :
 
 
-		
-__________________________________ 
-Do you Yahoo!? 
-Yahoo! Personals - Better first dates. More second dates. 
-http://personals.yahoo.com
+A while back I wrote an application that syncs my Sony Ericcson phone via 
+IrMC synchronization.  Recently I purchased a Nokia 3650 thinking that it 
+supported same IrMC Synchronization profile over Bluetooth (I guess I just 
+based that thinking on Apple iSync supporting the 3650, because I though 
+that iSync only used IrMC sync).  Well I was wrong :-) ... 
 
+Does anyone know how synchronization is done over bluetooth on this nokia 
+3650 (and other symbian nokias?).  It must be possible, iSync is doing 
+it...  some kind of OBEX command ? or something over tcp/ip/network ? 
+
+Thank you very much for your time .... 
+
+Regards,
+Scott Meesseman
+
+--=_alternative 007C5FBA85256FD7_=
+Content-Type: text/html; charset="US-ASCII"
+
+
+<br><font size=2 face="sans-serif"><br>
+Hello all,</font><font size=3> <br>
+</font>
+<br><font size=2 face="sans-serif">I sent this out already but I messed
+up on the subject line, please don't mind me :</font>
+<br>
+<br><font size=2 face="sans-serif"><br>
+A while back I wrote an application that syncs my Sony Ericcson phone via
+IrMC synchronization. &nbsp;Recently I purchased a Nokia 3650 thinking
+that it supported same IrMC Synchronization profile over Bluetooth (I guess
+I just based that thinking on Apple iSync supporting the 3650, because
+I though that iSync only used IrMC sync). &nbsp;Well I was wrong :-) ...</font><font size=3>
+<br>
+</font><font size=2 face="sans-serif"><br>
+Does anyone know how synchronization is done over bluetooth on this nokia
+3650 (and other symbian nokias?). &nbsp;It must be possible, iSync is doing
+it... &nbsp;some kind of OBEX command ? or something over tcp/ip/network
+?</font><font size=3> <br>
+</font><font size=2 face="sans-serif"><br>
+Thank you very much for your time ....</font><font size=3> <br>
+</font><font size=2 face="sans-serif"><br>
+Regards,<br>
+Scott Meesseman</font>
+<br>
+--=_alternative 007C5FBA85256FD7_=--
 
 
 -------------------------------------------------------
