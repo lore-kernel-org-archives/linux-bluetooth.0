@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Paul Hedderly <bulkpaul@mjr.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Unidentified Bluetooth CF card
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Paul Hedderly <bulkpaul@mjr.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040915123623.GQ26469@wacka.mjr.org>
+Message-ID: <20040915123623.GQ26469@wacka.mjr.org>
 References: <20040915090305.GL26469@wacka.mjr.org>
-	 <20040915123623.GQ26469@wacka.mjr.org>
-Content-Type: text/plain
-Message-Id: <1095255481.5263.111.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20040915090305.GL26469@wacka.mjr.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,33 +17,108 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 15 Sep 2004 15:38:01 +0200
+Date: Wed, 15 Sep 2004 13:36:23 +0100
 
-Hi Paul,
+Apparently this card does work with linux:
+	http://www.mavintec.com/product_bt_cf.eng.html
+Above link shows my card - though it does not say mavin/tec anywhere on
+it.
 
-> Apparently this card does work with linux:
-> 	http://www.mavintec.com/product_bt_cf.eng.html
-> Above link shows my card - though it does not say mavin/tec anywhere on
-> it.
+That page points to Marcel's webpage to show that their card works with
+btuart_cs...
+
+/me tries btuart_cs again!
+
+Of course just because the model number matches precisely and the card
+looks identical... doesn't mean that the board inside is the same. Sigh!
+
+--
+Paul
+
+On Wed, Sep 15, 2004 at 10:03:05AM +0100, Paul Hedderly wrote:
+> Ok I got a cheap CF Bluetooth card from ebay. I got it a while ago and
+> keep trying to make it work... but can't (all the others I have no
+> problem with...)
 > 
-> That page points to Marcel's webpage to show that their card works with
-> btuart_cs...
+> I think it's a 'Mavin' - there are pictures of the front and back at:
+> 	http://mjr.org/bt/front.jpg
+> 	http://mjr.org/bt/back.jpg
+> 	http://mjr.org/bt/inside.jpg
+> 	http://mjr.org/bt/closeup.jpg
 > 
-> /me tries btuart_cs again!
+> The main chips inside (to save you needing to to the pics :O) are:
+> 	OXCF950
+> 	BC212
+> 	29LV800BA-90
 > 
-> Of course just because the model number matches precisely and the card
-> looks identical... doesn't mean that the board inside is the same. Sigh!
-
-I think there was something like this. They changed from an Ericsson
-chip to a CSR chip, but they kept the initial baud rate of 57600. Try to
-play with it, because hciattach offers you an switch for the initial
-baud rate setting.
-
-Regards
-
-Marcel
-
-
+> And the markings are:
+> 	Model No.:MCF-M2.1
+> 	60m
+> 	S/N:MCF 0001773
+> 	Made in Taiwan
+> 
+> I've tried various conf definitions and drivers but get nothing.
+> 
+> weeblu:/etc/bluetooth# cardctl ident 1
+>   product info: "CF CARD", "GENERIC", "", ""
+>   manfid: 0x0279, 0x950b
+>   function: 2 (serial)
+> 
+> I've tried stuff like:
+> 	
+> card "Noname... Compact Flash Card"
+>   manfid 0x0279, 0x950b
+>   bind "btuart_cs"
+> and
+>   bind "bt950_cs"
+> 
+> Also tried the bt950 driver and tried to compile the bt2000e driver
+> (Since this card seems to have the Oxford Semi CS950 chip in it)
+> 
+> All I get are lines like:
+> 
+> Sep 15 09:36:11 weeblu kernel: bt950_cs: Unknown HCI packet with type 0x70 received.
+> Sep 15 09:36:11 weeblu kernel: bt950_cs: Unknown HCI packet with type 0xFD received.
+> Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0x60 received.
+> Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0xFD received.
+> Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0x70 received.
+> Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0xFD received.
+> Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0x60 received.
+> Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0xFD received.
+> Sep 15 09:36:12 weeblu kernel: bt950_cs: Unknown HCI packet with type 0x00 received.
+> 
+> and:
+> 
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: RLSI
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xc0 received.
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0x00 received.
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0x41 received.
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0x00 received.
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xbe received.
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xda received.
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xdc received.
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xed received.
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xed received.
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0x00 received.
+> Sep 15 09:42:30 weeblu kernel: btuart_cs: Unknown HCI packet with type 0xff received.
+> 
+> 
+> Any ideas?
+> 
+> --
+> Cheers
+> Paul
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: thawte's Crypto Challenge Vl
+> Crack the code and win a Sony DCRHC40 MiniDV Digital Handycam
+> Camcorder. More prizes in the weekly Lunch Hour Challenge.
+> Sign up NOW http://ad.doubleclick.net/clk;10740251;10262165;m
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
