@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] IBM Bluetooth PC Card II
+Subject: Re: [Bluez-users] bluecore02 and BT2.0 19.x fw
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1104589274.10387.9.camel@localhost>
-References: <1104589274.10387.9.camel@localhost>
+In-Reply-To: <200412292101.17166.cijoml@volny.cz>
+References: <200412292101.17166.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1104605355.4253.13.camel@pegasus>
+Message-Id: <1104605056.4253.6.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,36 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 01 Jan 2005 19:49:15 +0100
+Date: Sat, 01 Jan 2005 19:44:16 +0100
 
-Hi Markus,
+Hi Michal,
 
-> In http://www.holtmann.org/linux/bluetooth/devices.html the
-> IBM Bluetooth PC Card II is reported to work with the hci_uart
-> driver. However, when I insert to card into my computer I get these
-> Log-Messages:
-> 
-> Jan  1 14:06:08 [cardmgr] socket 0: IBM Bluetooth PC Card II
-> Jan  1 14:06:08 [cardmgr] executing: 'modprobe serial_cs'
-> Jan  1 14:06:08 [cardmgr] get dev info on socket 0 failed: No such
-> device
-> Jan  1 14:06:08 [kernel] serial_cs: no usable port range found, giving
-> up
-> Jan  1 14:06:08 [kernel] serial_cs: RequestIO: No more items
-> 
-> So, has anybody an idea what could be wrong that the PCMCIA subsystem
-> doesn't initialize the card properly? Do I need to pass some special
-> parameters?
-> 
-> My config entry in /etc/pcmcia/bluetooth.conf for the card:
-> 
-> card "IBM Bluetooth PC Card II"
->   version "IBM", "Bluetooth PC Card II", "", ""
->   bind "serial_cs" class "bluetooth"
-> 
-> Is anything wrong with that?
+> will be possible to use BT 2.0 19.x fw with BlueCore02? It would be nice if 
+> apple would release 2.0 fw for us :)
 
-what kernel version is this?
+the Bluetooth 2.0 is mostly EDR and this is not possible with the
+BlueCore02 chips. You will need at least BlueCore4.
 
 Regards
 
