@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: RE : [Bluez-devel] Audio to headset
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Message-ID: <A1F0D47583A2D711919F00600819B3A4ED37@goofy.vitronics.com>
-From: "Williams, Richard" <Richard.Williams@VITRONICS.com>
-To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-Cc: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] rfcomm error message?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Anthony Yulo <strikewing16th@hotmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <LAW11-OE47NCsn8BWz60002faea@hotmail.com>
+References: <Law11-F41C9IHzQL9P30004988b@hotmail.com>
+	 <1074689125.7088.71.camel@pegasus>
+	 <LAW11-OE47NCsn8BWz60002faea@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1074697306.7088.92.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,50 +20,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Jan 2004 12:07:58 -0500
+Date: Wed, 21 Jan 2004 16:01:46 +0100
 
-Hello,
+Hi Anthony,
 
-I am about to start a bluetooth headset project, but for an embedded =
-system running an x-scale processor and linux 2.4.19. Will I need to =
-upgrade to the 2.4.24 as Marcel suggests ?=20
+> > yes you can, but in that case you have to start with RFCOMM socket
+> > programming. Look at rctest for an example.
+> 
+> I forgot to ask about the rctest example.. i tried compiling the rctest
+> example manually in directory where rctest is..
+> "gcc rctest.c" ... and then there was an error saying "undefined reference
+> to aparticularfunction()"..
+> something like that.. what does that mean? how can i fix it?
 
-thanks,
-
-Rich
-
------Original Message-----
-From: Marcel Holtmann [mailto:marcel@holtmann.org]
-Sent: Wednesday, January 21, 2004 9:26 AM
-To: J=E9r=F4me Stadelmann
-Cc: BlueZ Mailing List
-Subject: Re: RE : [Bluez-devel] Audio to headset
-
-
-Hi Jerome,
-
-> I have used hsplay with the same result.
-> My kernel version is 2.4.21 from a SuSe distribution.
-
-this kernel don't work correct. Try at least 2.4.21-mh4 and I suggest
-you to upgrade to 2.4.24-mh2.
+unpack the utils source and run "./configure && make" and you will get
+your rctest binary.
 
 Regards
 
 Marcel
 
 
-
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
