@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Security
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Cc: marcel@holtman.org
-In-Reply-To: <BAY12-F513FD3FD46540B31815448AB40@phx.gbl>
-References: <BAY12-F513FD3FD46540B31815448AB40@phx.gbl>
-Content-Type: text/plain
-Message-Id: <1102346344.9644.29.camel@pegasus>
+Message-ID: <BAY12-F184548D865F7C7ED1F9A4F8AB40@phx.gbl>
+From: "salvatore olgato" <sal_olg@hotmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Subject: [Bluez-users] trusted
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,27 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 16:19:03 +0100
+Date: Mon, 06 Dec 2004 15:14:50 +0000
 
-Hi Salvatore,
+Does BlueZ impost trusted and Untrusted device?
 
-> Does BlueZ support Secure mode 2 and 3?
+Does BlueZ support Authorisation and authentication, authentication only, no 
+authentication no authorisation for access service?
 
-it supports security mode 1, 2 and 3.
+Hi.
 
-> In which way?
-
-You set *_LM_AUTH and *_LM_ENCRYPT with a setsockopt() call.
-
-> The security in BlueZ consist only in the arrange Authorisation, 
-> Authentication, Pin, ecc.?
-
-What do you mean by that?
-
-Regards
-
-Marcel
-
+_________________________________________________________________
+Blocca le pop-up pubblicitarie con MSN Toolbar! http://toolbar.msn.it/
 
 
 
