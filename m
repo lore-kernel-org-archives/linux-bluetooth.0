@@ -1,24 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+Message-ID: <41A027BD.5020401@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] AVDTP socket?
-Message-Id: <20041121064655.0b04dd8a.henryk@ploetzli.ch>
-In-Reply-To: <cbf0aec9041118052714481128@mail.gmail.com>
-References: <418DB442.2050801@uen.org>
-	<41925793.3050404@xmission.com>
-	<1100113055.25879.73.camel@pegasus>
-	<419543B3.8050601@xmission.com>
-	<1100306337.7349.29.camel@pegasus>
-	<41957BC1.507@xmission.com>
-	<1100351199.7349.50.camel@pegasus>
-	<41970F25.4020902@xmission.com>
-	<1100446172.21403.16.camel@pegasus>
-	<419B7292.9080706@xmission.com>
-	<cbf0aec9041118052714481128@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Sun__21_Nov_2004_06_46_56_+0100_sioIcoXb6AManvEn"
+Subject: Re: [Bluez-devel] BlueZ and the ALSA support
+References: <1100995285.7250.17.camel@pegasus>
+In-Reply-To: <1100995285.7250.17.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -30,51 +18,76 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 Nov 2004 06:46:55 +0100
+Date: Sat, 20 Nov 2004 22:29:33 -0700
 
---Signature=_Sun__21_Nov_2004_06_46_56_+0100_sioIcoXb6AManvEn
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Marcel,
 
-Moin,
+Wow. All that stuff was on my to-do list.
 
-Am Thu, 18 Nov 2004 14:27:26 +0100 schrieb Henryk Pl=F6tz:
+Do we owe you one beer, a six-pack or a whole case? :)
 
-> I have problems synthesizing the PCM audio samples but can parse all
-> of the example SBC streams just fine.
+Brad
 
-Ok, catched it. I reimplemented the SBC analyzer and synthesizer  in
-Octave which is easier to play around with and found that my C
-synthesizer was working fine - on wrong subband samples. The bitstream
-unpacker had a bug which made it shift the incoming bits once to often.=20
-
-So sbc-test from the CVS is now able to decode 4 and 8 subband mono SBC
-files (there's something wrong with stereo, I'll look into that
-shortly).=20
-
-I also moved all my static const tables to a separate header file and
-replaced my cos() calls with precomputed tables. The decoder is still
-about 5 times slower than the reference one, though.
-
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
-
---Signature=_Sun__21_Nov_2004_06_46_56_+0100_sioIcoXb6AManvEn
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQFBoCvXIjWgKE0OA2gRAp/VAKCOhr+LAucWEH10KBAOxFDxudTHwACfaq5X
-LWB3XycpI29/ic91eDI/Lqk=
-=mU0e
------END PGP SIGNATURE-----
-
---Signature=_Sun__21_Nov_2004_06_46_56_+0100_sioIcoXb6AManvEn--
+Marcel Holtmann wrote:
+> Hi Folks,
+> 
+> I spent some hours to clean up the btsco CVS repository from the ALSA
+> Bluetooth project and also changed the code a little bit for easier use
+> by non technical people. It should now compile and work without the need
+> of reinstalling or changing any ALSA stuff. Here is a quick walktrough.
+> 
+> First the CVS repository must be checked out:
+> 
+> 	cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa login
+> 	cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa co btsco
+> 
+> After that is must be compiled:
+> 
+> 	./bootstrap
+> 	./configure
+> 	make
+> 	make install
+> 	make maintainer-clean
+> 
+> And you need the kernel module:
+> 
+> 	cd kernel
+> 	make
+> 	make install
+> 	make clean
+> 
+> Now go ahead and use it like before.
+> 
+> As you may now realized the snd-bt-sco kernel driver is also inside this
+> repository and with a recent 2.6 kernel there are no problems with
+> compiling a kernel module outside the kernel source directory. However
+> if you haven't installed the running kernel by yourself you may need to
+> install the kernel source package from your distribution.
+> 
+> Every crappy header file is now removed and the needed IOCTL and the
+> HWDEP definition is added to the source directly in a compatible way.
+> 
+> The A2DP related programs are integrated into the Makefile and they are
+> also compiled, but for now they are not installed.
+> 
+> This should make the development a lot more easier :)
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: InterSystems CACHE
+> FREE OODBMS DOWNLOAD - A multidimensional database that combines
+> robust object and relational technologies, making it a perfect match
+> for Java, C++,COM, XML, ODBC and JDBC. www.intersystems.com/match8
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
