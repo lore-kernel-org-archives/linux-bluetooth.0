@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040202045646.51663.qmail@web40406.mail.yahoo.com>
-From: beichuang <beichuang@yahoo.com>
-Reply-To: beichuang@yahoo.com
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Problem with OBEX Object Push Service Description
+Subject: Re: [Bluez-users] Creating a new SDP service
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alex Eiser <alexe@mac.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <D303E807-5443-11D8-9C26-000A959C67D2@mac.com>
+References: <D303E807-5443-11D8-9C26-000A959C67D2@mac.com>
+Content-Type: text/plain
+Message-Id: <1075591715.2720.91.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,82 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 1 Feb 2004 20:56:46 -0800 (PST)
+Date: Sun, 01 Feb 2004 00:28:35 +0100
 
-Hello, 
+Hi Alex,
 
-I want to make an OBEX Object Push server and wish
-this server can be discovered by other BT devices.
+> I need to create a custom SDP service to perform some communications 
+> between a Mac OS X machine and a linux machine. While I could 
+> accomplish this by using serial ports, this makes the macos programing 
+> a lot uglier.
+> 
+> Is there a way to create a new service with the SDP tool, with out 
+> adding new code to sdptool.c?
 
-Before I do that, I used the command to add a OBEX
-service as the command line:
+No, you have to write your own code. But this code must not be in
+sdptool. Look at pand for an example.
 
-#sdptool -add --channel=5 OPUSH
+Regards
 
-However, I cannot discover this service from other
-devices (my iPAQ 5550) although the device can be
-found.
-
-I have then tested to send a vcard to my desktop from
-iPAQ. It sopped after the prompt "connected with
-BlueZ(0)" 
-
-I have also compared the SDP information with any
-other OPUSH server on Windows 2000, which works with
-my iPAQ.
-But it seems the information is the same.
-
-Here below is the SDP details for the OBEX push server
-
-Attribute Identifier : 0x0 - ServiceRecordHandle
-  Integer : 0x804d130
-Attribute Identifier : 0x1 - ServiceClassIDList
-  Data Sequence
-    UUID16 : 0x1105 - OBEXObjectPush
-Attribute Identifier : 0x4 - ProtocolDescriptorList
-  Data Sequence
-    Data Sequence
-      UUID16 : 0x0100 - L2CAP
-    Data Sequence
-      UUID16 : 0x0003 - RFCOMM
-      Channel/Port (Integer) : 0x3
-    Data Sequence
-      UUID16 : 0x0008 - OBEX
-Attribute Identifier : 0x5 - BrowseGroupList
-  Data Sequence
-    UUID16 : 0x1002 - PublicBrowseGroup (SDP)
-Attribute Identifier : 0x9 -
-BluetoothProfileDescriptorList
-  Data Sequence
-    Data Sequence
-      UUID16 : 0x1105 - OBEXObjectPush
-      Version (Integer) : 0x100
-Attribute Identifier : 0x100
-  Text : "OBEX Object Push"
-Attribute Identifier : 0x303
-  Data Sequence
-    Integer : 0x1
-    Integer : 0x2
-    Integer : 0x3
-    Integer : 0x4
-    Integer : 0x5
-    Integer : 0x6
+Marcel
 
 
-Anyone can find the reason why it is not interoperable
-with my iPAQ? I can just not find any error with the
-comparison with another working OBEX server.
-
-Thanks and regards
-
-/B.C.
-
-
-
-__________________________________
-Do you Yahoo!?
-Yahoo! SiteBuilder - Free web site building tool. Try it!
-http://webhosting.yahoo.com/ps/sb/
 
 
 -------------------------------------------------------
