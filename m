@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <d1f423d3050328085166da3261@mail.gmail.com>
-From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
+From: "Marco Trudel" <mtrudel@gmx.ch>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] creating the bnep0 device
-In-Reply-To: <1112006473.9016.0.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <424780AA.4020705@coloradocollege.edu>
-	 <1112006473.9016.0.camel@pegasus>
+MIME-Version: 1.0
+References: <1112015700.9016.30.camel@pegasus>
+Subject: Re: [Bluez-users] getting bluetooth v1.2
+Message-ID: <20242.1112026706@www42.gmx.net>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,76 +17,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Mar 2005 08:51:41 -0800
+Date: Mon, 28 Mar 2005 18:18:26 +0200 (MEST)
 
-Hi Jonathan,
+so it doesn't mather that i've a silicon dongle?
+(i need the bt v1.2 only because the rssi inquiry)
+or isn't it a silicon one?
+
+what is now the procedure?
+- getting the btdfu program
+- fix it (Adam Goode told how)
+- download the 18.x firmware. where can i get it?
+- install it...
+
+regards
+Marco
 
 
-As Marcel has menssioned you should connect the devices using PAND
-first. When the connection is ok the bnep0 is created automatically by
-PAND. Ex:
-
-GN side
-
-pand --listen --role GN
-
-PANU side:
-pand --connect <bdaddr> --role PANU
-
-If everything got OK you can apply an IP address at both sides
-
-GN side:
-#ifconfig bnep0 10.0.0.1
-
-PANU side:
-#ifconfig bnep0 10.0.0.2
-
-so you can try ping one of these addresses 
-
-hope it helps.
-
-all the best
-
-On Mon, 28 Mar 2005 12:41:13 +0200, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jonathan,
+> Hi Marco,
 > 
-> > I have a pretty remedial question involving setting up bluettoth in
-> > Linux, but I don't think that I've seen any answers in the documentation
-> > or mailing list.
-> >
-> > I'm using kernel 2.6.11 with a LinkSys USBBT100 adaptor.  The adaptor
-> > can scan and ping other bluetooth devices with l2ping, but I'm having
-> > problems getting bnep0 recognized as a network interface.
-> >
-> > ifconfig bnep0 returns
-> > bnep0: error fetching interface information: Device not found
-> >
-> > The fedora utility sees bnep0, but cannot activate it and returns
-> > SIOCGIFFLAGS: No such device
-> > when I try to deactivate it.
-> >
-> > I get the same results when I use bluez/benp compiled into the kernel or
-> > loading them as modules.  /var/log/messages has the bluetooth messages:
-> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: L2CAP ver 2.7
-> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: L2CAP socket layer initialized
-> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM ver 1.5
-> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM socket layer
-> > initialized
-> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM TTY layer initialized
-> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: BNEP (Ethernet Emulation)
-> > ver 1.2
-> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: BNEP filters: protocol
-> > multicast
-> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: HIDP (Human Interface
-> > Emulation) ver 1.1
-> >
-> > Does anyone have suggestions to get bnep0 off the ground?
+> > > check with "hciconfig hci0 revision" as root what BlueCore chip is on
+> it
+> > > and no, these are not the problematic dongles.
+> > 
+> > it's a BlueCore02
+> > 
+> > >>so, an update to bt v1.2 wouldn't make sense to me...
+> > > 
+> > > What does "lsusb" tells you?
+> > 
+> > it think you mean this line:
+> > Bus 002 Device 008: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
+> Dongle
 > 
-> what about using "pand --connect" before you try to use "ifconfig".
+> and if this chip now contains 8 Mbit flash you get a good chance to
+> upgrade it with HCI 18.x firmware and so get Bluetooth 1.2 support.
 > 
 > Regards
 > 
 > Marcel
+> 
+> 
 > 
 > 
 > -------------------------------------------------------
@@ -102,11 +70,9 @@ On Mon, 28 Mar 2005 12:41:13 +0200, Marcel Holtmann <marcel@holtmann.org> wrote:
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
 > 
 
-
 -- 
-Anderson Clayton B. Rodrigues
-Eng. de Software
-Instituto Nokia de Tecnologia - INdT
+Handyrechnung zu hoch? Tipp: SMS und MMS mit GMX
+Seien Sie so frei: Alle Infos unter http://www.gmx.net/de/go/freesms
 
 
 -------------------------------------------------------
