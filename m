@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40C85761.4060201@dim.uchile.cl>
-From: Eduardo Moreno <emoreno@dim.uchile.cl>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] hci_acldata_packet error in a Palm connection.
+Subject: Re: [Bluez-users] Some questions
+From: Marcel Holtmann <marcel@holtmann.org>
+To: DVornheder@t-online.de
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1BYJR5-1Xq5q40@cmpmail07.bbul.t-online.de>
+References: <1BYJR5-1Xq5q40@cmpmail07.bbul.t-online.de>
+Content-Type: text/plain
+Message-Id: <1086863592.1607.47.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,29 +18,80 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Jun 2004 14:43:13 +0200
+Date: Thu, 10 Jun 2004 12:33:13 +0200
 
-Hi list.
+Hi Dirk,
 
-I'm starting in the bluetooth world, and i'm trying to connect my Palm 
-Tungsten T2 with my Kernel 2.6.6 + usb dongle.
+> Yesterday i bought a Belkin Bluetooth USB Adapter.
+> 
+> After plugin the adapter i get this messages:
+> 
+> Jun  9 21:36:05 pclap kernel: usb 1-1: new full speed USB device using
+> address 
+> 2
+> Jun  9 21:36:05 pclap /etc/hotplug/usb.agent[11903]: need a device for
+> this 
+> command
+> Jun  9 21:36:05 pclap hcid[4002]: HCI dev 0 registered
+> Jun  9 21:36:05 pclap hcid[4002]: HCI dev 0 up
+> Jun  9 21:36:05 pclap hcid[4002]: Starting security manager 0
+> Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM ver 1.3
+> Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM socket layer initialized
+> Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM TTY layer initialized
+> 
+> lsusb shows:
+> 
+> Bus 002 Device 002: ID 050d:0081 Belkin Components
+> 
+> With ciptool search the adapter is connecting to my AVM Fritz ISDN AP-X:
+> 
+> Jun  9 21:40:00 pclap hcid[4002]: pin_code_request
+> (sba=00:0A:3A:51:81:4E, 
+> dba=00:04:0E:85:35:15)
+> Jun  9 21:40:00 pclap hcid[4002]: link_key_notify
+> (sba=00:0A:3A:51:81:4E)
+> Jun  9 21:40:00 pclap hcid[4002]: Saving link key 00:0A:3A:51:81:4E 
+> 00:04:0E:85:35:15
+> 
+> hcitool scan shows:
+> 
+> Scanning ...
+> 	00:04:0E:85:35:15	Bluetooth ISDN Access Point
+> 	00:04:0E:83:3C:40	BlueZ (0)
+>                            00:02:72:44:CF:9F                  
+> BELKIN_PRT_44CF9F
+> 
+> My questions:
+> 
+> - No driver is loaded after plugin the adapter.
+> 
+>    Is this ok ?
 
-I followed all the clasical howtos of Palm+BlueZ (of course, using the 
-2.6.6 modules).
+I think the hci_usb is loaded, otherwise your device won't work.
 
-I start hcid, sdpd, without problem, the communication with the palm 
-works great, I can also l2ping the palm device.
+> - How can i open a internet connection ?
 
-But when I try a ppp connection (using dund) I receive the following 
-message in /var/log/messages:
+Use pppd and the CAPI plugin for it. Check with capiinfo for your ISDN
+access point.
 
-kernel: hci_acldata_packet: hci0 ACL packet for unknown connection handle 1
+http://www.holtmann.org/linux/bluetooth/isdn.html
 
-Searching "ACL packet for unknown connection handle 1" in google, I 
-found 3 very old messages (2001) of this mailing list speaking about a 
-bug.....
+> - How can i print on my usb printer which is connected to the
+> BELKIN_PRT_44CF9F
+> 
+>    bluetooth adapter ?
 
-Anybody can help me? thanks.
+First send me some info about this printer adapter for my list. The
+output "hcitool info ..." will be nice.
+
+The CUPS printing backend for Bluetooth will help you out here.
+
+http://www.holtmann.org/linux/bluetooth/cups.html
+
+Regards
+
+Marcel
+
 
 
 
