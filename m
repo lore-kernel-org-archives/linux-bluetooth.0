@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <401267F8.9080308@Fampeeters.com>
-From: Francesco Peeters <Francesco@Fampeeters.com>
-MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Subject: [Bluez-users] hci_cmd_task: hci0 command tx timeout
+From: Jason Bell <jaseb@enigmastation.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Belkin CF card (F8T020)
+Message-ID: <20040123171347.A11107@enigmastation.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,32 +15,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 24 Jan 2004 13:41:28 +0100
+Date: Fri, 23 Jan 2004 17:13:47 -0500
 
-I am running Fedora Core 1 now, with all BlueZ RPMs installed.
+Marcel,
+Sorry it's taken a little while to get back to you.
 
-My Sitecom BT (CN-500) dongle is recognized and my laptop and T|T3 are 
-paired.
-When I do a hcitool scan and hcitool info, I see the T|T3.
+modprobe lists the following of use.
 
-I have hci and sdpd running, and dund --listen --msdun --channel 1 
-10.50.164.3:10.50.164.4
+alias net-pf-31 bluez
+alias bt-proto-0 l2cap
+alias bt-proto-2 scp
+alias bt-proto-3 rcomm
+alias bt-proto-4bnep
+alias tty-ldisc-15 hci_uart
+alias char-major-10-250 hci_vhc1
 
-I have sucessfully created the connection setup and network setup on the 
-T|T3, but whenever I press the connect button, the T|T3 times out and 
-the linux machine gives an error:
-hci_cmd_task: hci0 command tx timeout
+So as far as I can see it looks like it has loaded okay.
 
-Any idea what to look for, or is this old laptop just *too* slow?
+The Zaurus powers down on its own accord now, I think the card is sapping power as it's fine in the cradle.
 
-TIA!
+Any help would be great.
 
---FP
-PalmOS user since Pilot1000
- Tungsten|T3 owner, still learning new DateBK5 tricks every day!
-Linux user since RedHat 4.0
- Just started playing with Fedora Core 1
-
+Regards
+Jase Bell
 
 
 
