@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluez Ported on uClinux
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <34ec511439101.heejune@snut.ac.kr>
-References: <34ec511439101.heejune@snut.ac.kr>
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1106299817.28779.188.camel@justakiss>
-Mime-Version: 1.0
+From: =?euc-kr?B?vsjI8cHY?= <heejune@snut.ac.kr>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Cc: 
+MIME-Version: 1.0
+Message-ID: <34ec511439101.heejune@snut.ac.kr>
+Content-Type: multipart/alternative;
+	boundary="DC8711266.1106277111321.MailEdge"
+Subject: [Bluez-users] Bluez Ported on uClinux
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,86 +18,79 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 21 Jan 2005 10:30:17 +0100
+Date: Fri, 21 Jan 2005 12:11:51 +0900
 
-Am Fre, den 21.01.2005 schrieb =EC=95=88=ED=9D=AC=EC=A4=80 um 4:11:
->         Dear BlueZers,
->        =20
->         =20
->        =20
->         Recently I ported Bluez (kernel stack, and lib and utils) on
->         uClinux (Arm cored Conexant Network Processor Machine).=20
->        =20
->         Why? I couldn't find any port (usually the Makefiles) on the
->         web, and saw several unclearly answered questions on the
->         mailing list.=20
->        =20
->         =20
->        =20
->         Now, I works very well for PAN and SPP (which is my major
->         applications so far): however, it works excellent but It does
->         not work very well with Windows application provided my dongle
->         provider (CSR-based AirBird USB class 1).   Especially it take
->         too long time to make pan connection (around 30 secs), though
->         it it works ok after the long connection time.=20
->        =20
->         =20
->        =20
->         =20
->        =20
->         Here I ask some help request !
->        =20
->         =20
->        =20
->          -  Is there any way to make the ip assigning process
->         automatically?
->        =20
->         =20
->        =20
->              > pand --listen --master --role GN
->        =20
->         =20
->        =20
->             .....
->        =20
->         =20
->        =20
->              >ifconfig bnep0  192.168.7.1=20
->        =20
->         =20
->        =20
->              Is there any way to make the ifconfig automatically? =20
->        =20
->         =20
->        =20
->            =20
->        =20
->          -  I cannot handle shared library very well. So I am using it
->         with static library.=20
->        =20
->             Is there anyone who success with shared library in uClinux
->         and Bluez lib and utils?
->        =20
-Hi,
+--DC8711266.1106277111321.MailEdge
+Content-Type: text/plain;charset=euc-kr
+Content-Transfer-Encoding: base64
 
-for the uClinux port, no Makefile changes are required. You just need a
-few options for "configure". Look at http://cvs.home.at/midori/sources/,
-you can find the build scripts in bluez-libs-2.10 and bluez-utils-2.10.
-=20
-The ifconfig should be done in /etc/bluetooth/pan/dev-up. My script
-looks like this:
-------------------------
-#!/bin/sh
-# IP and BT_GATEWAY are exported from /etc/rc
-ifconfig $1 $IP
-test -z $BT_GATEWAY || route add default gw $BT_GATEWAY
-------------------------
-The script is called automatically by pand.=20
-I'm not aware of shared library support for ARM.=20
+RGVhciBCbHVlWmVycywNCg0KUmVjZW50bHkgSSBwb3J0ZWQgQmx1ZXogKGtlcm5lbCBzdGFjaywg
+YW5kIGxpYiBhbmQgdXRpbHMpIG9uIHVDbGludXggKEFybSBjb3JlZCBDb25leGFudCBOZXR3b3Jr
+IFByb2Nlc3NvciBNYWNoaW5lKS4gDQpXaHk/IEkgY291bGRuJ3QgZmluZCBhbnkgcG9ydCAodXN1
+YWxseSB0aGUgTWFrZWZpbGVzKSBvbiB0aGUgd2ViLCBhbmQgc2F3IHNldmVyYWwgdW5jbGVhcmx5
+IGFuc3dlcmVkIHF1ZXN0aW9ucyBvbiB0aGUgbWFpbGluZyBsaXN0LiANCg0KTm93LCBJIHdvcmtz
+IHZlcnkgd2VsbCBmb3IgUEFOIGFuZCBTUFAgKHdoaWNoIGlzIG15IG1ham9yIGFwcGxpY2F0aW9u
+cyBzbyBmYXIpOiBob3dldmVyLCBpdCB3b3JrcyBleGNlbGxlbnQgYnV0IEl0IGRvZXMgbm90IHdv
+cmsgdmVyeSB3ZWxsIHdpdGggV2luZG93cyBhcHBsaWNhdGlvbiBwcm92aWRlZCBteSBkb25nbGUg
+cHJvdmlkZXIgKENTUi1iYXNlZCBBaXJCaXJkIFVTQiBjbGFzcyAxKS4gICBFc3BlY2lhbGx5IGl0
+IHRha2UgdG9vIGxvbmcgdGltZSB0byBtYWtlIHBhbiBjb25uZWN0aW9uIChhcm91bmQgMzAgc2Vj
+cyksIHRob3VnaCBpdCBpdCB3b3JrcyBvayBhZnRlciB0aGUgbG9uZyBjb25uZWN0aW9uIHRpbWUu
+IA0KDQoNCkhlcmUgSSBhc2sgc29tZSBoZWxwIHJlcXVlc3QgIQ0KDQogLSAgSXMgdGhlcmUgYW55
+IHdheSB0byBtYWtlIHRoZSBpcCBhc3NpZ25pbmcgcHJvY2VzcyBhdXRvbWF0aWNhbGx5Pw0KDQog
+ICAgID4gcGFuZCAtLWxpc3RlbiAtLW1hc3RlciAtLXJvbGUgR04NCg0KICAgIC4uLi4uDQoNCiAg
+ICAgPmlmY29uZmlnIGJuZXAwICAxOTIuMTY4LjcuMSANCg0KICAgICBJcyB0aGVyZSBhbnkgd2F5
+IHRvIG1ha2UgdGhlIGlmY29uZmlnIGF1dG9tYXRpY2FsbHk/ICANCg0KICAgIA0KIC0gIEkgY2Fu
+bm90IGhhbmRsZSBzaGFyZWQgbGlicmFyeSB2ZXJ5IHdlbGwuIFNvIEkgYW0gdXNpbmcgaXQgd2l0
+aCBzdGF0aWMgbGlicmFyeS4gDQogICAgSXMgdGhlcmUgYW55b25lIHdobyBzdWNjZXNzIHdpdGgg
+c2hhcmVkIGxpYnJhcnkgaW4gdUNsaW51eCBhbmQgQmx1ZXogbGliIGFuZCB1dGlscz8NCg0KDQoN
+ClRoYW5rcy4NCg0KDQpIZWVqdW5lCg==
 
-Regards,
-Erwin
 
+--DC8711266.1106277111321.MailEdge
+Content-Type: text/html;charset=euc-kr
+Content-Transfer-Encoding: base64
+
+PGh0bWw+PGJvZHkgYmFja2dyb3VuZD0nJz4KPHN0eWxlPjwhLS0NClAge21hcmdpbi10b3A6IDA7
+IG1hcmdpbi1ib3R0b206IDA7IGZvbnQtRmFtaWx5OiBndWxpbTsgZm9udC1TaXplOiA5cHQ7fQ0K
+LS0+PC9zdHlsZT4NCjxCTE9DS1FVT1RFIHN0eWxlPSJQQURESU5HLVJJR0hUOiAwcHg7IFBBRERJ
+TkctTEVGVDogNXB4OyBNQVJHSU4tTEVGVDogNXB4OyBCT1JERVItTEVGVDogIzAwMDAwMCAycHgg
+c29saWQ7IE1BUkdJTi1SSUdIVDogMHB4Ij4NCjxQPkRlYXIgQmx1ZVplcnMsPC9QPg0KPFA+Jm5i
+c3A7PC9QPg0KPFA+UmVjZW50bHkgSSBwb3J0ZWQgQmx1ZXogKGtlcm5lbCBzdGFjaywgYW5kIGxp
+YiBhbmQgdXRpbHMpIG9uIHVDbGludXggKEFybSBjb3JlZCBDb25leGFudCBOZXR3b3JrIFByb2Nl
+c3NvciBNYWNoaW5lKS4gPC9QPg0KPFA+V2h5PyBJIGNvdWxkbid0IGZpbmQgYW55IHBvcnQgKHVz
+dWFsbHkgdGhlIE1ha2VmaWxlcykgb24gdGhlIHdlYiwgYW5kIHNhdyBzZXZlcmFsIHVuY2xlYXJs
+eSBhbnN3ZXJlZCBxdWVzdGlvbnMgb24gdGhlIG1haWxpbmcgbGlzdC4gPC9QPg0KPFA+Jm5ic3A7
+PC9QPg0KPFA+Tm93LCBJIHdvcmtzIHZlcnkgd2VsbCBmb3IgUEFOIGFuZCBTUFAgKHdoaWNoIGlz
+IG15IG1ham9yIGFwcGxpY2F0aW9ucyBzbyBmYXIpOiBob3dldmVyLCBpdCB3b3JrcyBleGNlbGxl
+bnQgYnV0IEl0IGRvZXMgbm90IHdvcmsgdmVyeSB3ZWxsIHdpdGggV2luZG93cyBhcHBsaWNhdGlv
+biBwcm92aWRlZCBteSBkb25nbGUgcHJvdmlkZXIgKENTUi1iYXNlZCBBaXJCaXJkIFVTQiBjbGFz
+cyAxKS4mbmJzcDsmbmJzcDsmbmJzcDtFc3BlY2lhbGx5IGl0IHRha2UgdG9vIGxvbmcgdGltZSB0
+byBtYWtlIHBhbiBjb25uZWN0aW9uIChhcm91bmQgMzAgc2VjcyksIHRob3VnaCBpdCBpdCB3b3Jr
+cyBvayBhZnRlciB0aGUgbG9uZyBjb25uZWN0aW9uIHRpbWUuIDwvUD4NCjxQPiZuYnNwOzwvUD4N
+CjxQPiZuYnNwOzwvUD4NCjxQPkhlcmUgSSBhc2sgc29tZSBoZWxwIHJlcXVlc3QgITwvUD4NCjxQ
+PiZuYnNwOzwvUD4NCjxQPiZuYnNwOy0mbmJzcDsgSXMgdGhlcmUgYW55IHdheSB0byBtYWtlIHRo
+ZSBpcCBhc3NpZ25pbmcgcHJvY2VzcyBhdXRvbWF0aWNhbGx5PzwvUD4NCjxQPiZuYnNwOzwvUD4N
+CjxQPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAmZ3Q7IHBhbmQgLS1saXN0ZW4gLS1tYXN0ZXIg
+LS1yb2xlIEdOPC9QPg0KPFA+Jm5ic3A7PC9QPg0KPFA+Jm5ic3A7Jm5ic3A7Jm5ic3A7IC4uLi4u
+PC9QPg0KPFA+Jm5ic3A7PC9QPg0KPFA+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZndDtpZmNv
+bmZpZyBibmVwMCZuYnNwOyAxOTIuMTY4LjcuMSA8L1A+DQo8UD4mbmJzcDs8L1A+DQo8UD4mbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDtJcyB0aGVyZSBhbnkgd2F5IHRvIG1ha2UgdGhlIGlm
+Y29uZmlnIGF1dG9tYXRpY2FsbHk/Jm5ic3A7IDwvUD4NCjxQPiZuYnNwOzwvUD4NCjxQPiZuYnNw
+OyZuYnNwOyZuYnNwOyA8L1A+DQo8UD4mbmJzcDstJm5ic3A7IEkgY2Fubm90IGhhbmRsZSBzaGFy
+ZWQgbGlicmFyeSB2ZXJ5IHdlbGwuIFNvIEkgYW0gdXNpbmcgaXQgd2l0aCBzdGF0aWMgbGlicmFy
+eS4gPC9QPg0KPFA+Jm5ic3A7Jm5ic3A7Jm5ic3A7IElzIHRoZXJlIGFueW9uZSB3aG8gc3VjY2Vz
+cyB3aXRoIHNoYXJlZCBsaWJyYXJ5IGluIHVDbGludXggYW5kIEJsdWV6IGxpYiBhbmQgdXRpbHM/
+PC9QPg0KPFA+Jm5ic3A7PC9QPg0KPFA+Jm5ic3A7PC9QPg0KPFA+Jm5ic3A7PC9QPg0KPFA+VGhh
+bmtzLjwvUD4NCjxQPiZuYnNwOzwvUD4NCjxQPiZuYnNwOzwvUD4NCjxQPkhlZWp1bmU8L1A+DQo8
+UD4mbmJzcDs8L1A+DQo8UD4mbmJzcDs8L1A+DQo8UD4mbmJzcDs8L1A+DQo8UD4mbmJzcDs8L1A+
+PC9CTE9DS1FVT1RFPjwvYm9keT48L2h0bWw+CjxpbWcgYm9yZGVyPTAgd2lkdGg9MSBoZWlnaHQ9
+MSBzcmM9J2h0dHA6Ly9tYWlsLnNudXQuYWMua3IvbWUvanNwL2luYm94L2Rpc3BSZWN2Q29uZmly
+bUZvclNlbnQuanNwP2FjdGlvbktpbmQ9aW5zZXJ0JnNVc2VySUQ9aGVlanVuZSZzTXNnSUQ9MzRl
+YzUxMTQzOTEwMSZzRU1haWw9Ymx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0JnNOYW1l
+PUJsdWVaIE1haWxpbmcgTGlzdCAnID4K
+
+
+--DC8711266.1106277111321.MailEdge--
 
 
 
