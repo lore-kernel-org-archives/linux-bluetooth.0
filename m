@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Keeping keyboards alive
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bernard Mentink <Bernard.Mentink@trimble.co.nz>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8285CB7241FCFC4BB721A6F953F9B35EFB30EB@nzc-ap-xch-01.ap.trimblecorp.net>
-References: 
-	 <8285CB7241FCFC4BB721A6F953F9B35EFB30EB@nzc-ap-xch-01.ap.trimblecorp.net>
-Content-Type: text/plain
-Message-Id: <1079350163.3405.6.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Message-ID: <8285CB7241FCFC4BB721A6F953F9B35EFB30EB@nzc-ap-xch-01.ap.trimblecorp.net>
+From: "Bernard Mentink" <Bernard.Mentink@trimble.co.nz>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Keeping keyboards alive
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,25 +16,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 15 Mar 2004 12:29:24 +0100
+Date: Mon, 15 Mar 2004 09:07:46 +1300
 
-Hi Bernard,
 
-> I have been using my Apple Bluetooth keyboard sucessfully for some weeks now with the stack and am very happy with it.
-> 
-> My only niggle is the lack of support for regular polling of the keyboard to keep it awake.
-> (The keyboard goes into deep sleep after about 10mins of inactivity, I then have to cycle the power to reconnect)
+Hi All,
 
-there is a similar problem with the Microsoft devices, but I thought I
-fixed it. Keeping the device connected is bad for battery. For example
-my Apple mouse never disconnects. My only missing Bluetooth HID device
-is the Apple keyboard and so I think that I can't tell you anything
-useful.
+I have been using my Apple Bluetooth keyboard sucessfully for some weeks =
+now with the stack and am very happy with it.
 
-Regards
+My only niggle is the lack of support for regular polling of the =
+keyboard to keep it awake.
+(The keyboard goes into deep sleep after about 10mins of inactivity, I =
+then have to cycle the power to reconnect)
 
-Marcel
+Is it possible to give an option to hcid, to give the user the ability =
+to keep their keyboard alive?
 
+Keep up the good work,
+
+Cheers,
+Bernard Mentink
 
 
 
