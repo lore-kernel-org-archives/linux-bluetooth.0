@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <20050207114318.70160.qmail@web26608.mail.ukl.yahoo.com>
+From: BZ Benny <bennybbz@yahoo.fr>
+Subject: Re: [Bluez-users] installing patch
 To: bluez-users@lists.sourceforge.net
-From: Jesse Guardiani <jesse@wingnet.net>
-Message-ID: <cu8ldk$3b8$1@sea.gmane.org>
-References: <ctriti$j66$1@sea.gmane.org> <200502022312.51283.cijoml@volny.cz> <cttelp$240$1@sea.gmane.org> <1107451039.11944.92.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Re: CSR USB dongle w/BT 1.2 and headset/handsfree profiles?
+In-Reply-To: <200502071235.57493.cijoml@volny.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,45 +17,69 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 07 Feb 2005 16:10:27 -0500
+Date: Mon, 7 Feb 2005 12:43:18 +0100 (CET)
 
-Marcel Holtmann wrote:
+Hi Michal,
 
-> Hi Jesse,
+tank you.
+
+regards
+imad
+
+ --- Michal Semler <cijoml@volny.cz> a écrit : 
+> Dne po 7. února 2005 12:12 BZ Benny napsal(a):
+> > Hi all,
+> >
+> > Someone can help me installing patch? can you give
+> me
+> > a url of an howto either?
+> > patch-2.6.10-mh4.gz is a text file I don't know
+> how
+> > installing it.
+> > tanks.
+> >
+> > regards
+> > benn
 > 
->> > D-Link DBT-120 rev B3 is your choice :)
->> 
->> Is the new B4 revision OK too?
+> gzip -cd patch-xxx.gz |patch -p0
 > 
-> I had timing problems when flashing it with btdfu. Try it at your own
-> risk.
+> in directory where your kernel sources are unzipped
+> for example /usr/src/
+> 
+> Michal
+> 
+> 
+>
+-------------------------------------------------------
+> This SF.Net email is sponsored by: IntelliVIEW --
+> Interactive Reporting
+> Tool for open source databases. Create drag-&-drop
+> reports. Save time
+> by over 75%! Publish reports on the web. Export to
+> DOC, XLS, RTF, etc.
+> Download a FREE copy at
+> http://www.intelliview.com/go/osdn_nl
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+>  
 
-What does that mean, exactly? Does the dongle become unusable? Does audio
-not work correctly after a firmware upgrade? Does the firmware just not
-upgrade properly?
 
-Sorry to keep bugging you about this, but you can imagine that it's not
-incredibly easy to find B3 revisions. I've found tons of B4 revisions,
-but the B3s are a bit more rare. I'm just wondering if I can get by with
-a B4.
+	
 
-Thanks!
-
--- 
-Jesse Guardiani, Systems Administrator
-WingNET Internet Services,
-P.O. Box 2605 // Cleveland, TN 37320-2605
-423-559-LINK (v)  423-559-5145 (f)
-http://www.wingnet.net
-
-
+	
+		
+Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
+Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+Tool for open source databases. Create drag-&-drop reports. Save time
+by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+Download a FREE copy at http://www.intelliview.com/go/osdn_nl
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
