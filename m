@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Service level security for RFCOMM
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bhatt Abhi-ABHATT <ABHISHEK.BHATT@motorola.com>
-Cc: Stephen Crane <steve.crane@rococosoft.com>,
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: Bhatt Abhi-ABHATT <ABHISHEK.BHATT@motorola.com>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5987A7CB1694D811A04D0002B32C289601BF3C01@il93exb05.corp.mot.com>
+In-Reply-To: <1099062653.28599.47.camel@baroque.rococosoft.com>
 References: 
-	 <5987A7CB1694D811A04D0002B32C289601BF3C01@il93exb05.corp.mot.com>
+	 <5987A7CB1694D811A04D0002B32C289601BF3BFE@il93exb05.corp.mot.com>
+	 <1099061231.10164.62.camel@pegasus>
+	 <1099062653.28599.47.camel@baroque.rococosoft.com>
 Content-Type: text/plain
-Message-Id: <1099069376.10164.75.camel@pegasus>
+Message-Id: <1099068050.10164.69.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,20 +22,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Oct 2004 19:02:56 +0200
+Date: Fri, 29 Oct 2004 18:40:50 +0200
 
-Hi Abhi,
+Hi Steve,
 
-> > Marcel is right here. You can try and kludge it by trying to enforce the
-> > security requirements _after_ the connection has been accepted but this
-> > is pretty horrible (and it's hard to prevent acceptAndOpen() returning a
-> > connection which is immediately closed).
+> > So the question still stands. Should we already force authentication
+> > when the peer sends PN CMD?
 > 
-> Sorry for the confusion but I wasn't referring to user space at all. I was thinking of having the rfcomm service level security implemented in almost the same way as the l2cap service level security(incoming connection). The service level security options could be set using setsockopt(..) in rfcomm. This in turn could be used to set the service level settings for the l2cap socket it uses. I can draw a sequence diagram(function calls) to show how i
-> picture the design. I'll do that.
+> Actually p412 in the SPEC (v1.1) says:
+> 
+> "On the responding side, if authentication procedures are triggered from
+> RFCOMM, this must only be done when receiving a SABM frame, not when
+> receiving configuration commands preparing an unopened DLC (Erratum
+> 1052)."
 
-not needed, because it won't work this way. The L2CAP layer has nothing
-to do with it, you must interface with the HCI layer.
+this is a clear statement. Thanks for pointing this out.
+
+However this also leads to a security problem, because I can scan the
+RFCOMM ports of a remote device without forcing the security mechanism.
+I only have to do the PN exchange and then disconnect. What should a
+remote device do when a PN CMD comes in for a channel without a service
+behind it?
+
+> > You must convince me that this is really needed and a good idea. For
+> > what kind of application do you wanna use it?
+> 
+> It's for the same reason as stated above: you don't want the connection
+> to succeed unless the security requirements can be met. If you have a
+> client in security mode 2 and a server in security mode 1, you want the
+> server to see an incoming connection _only_ if authentication/encryption
+> have been successfully performed. You _don't_ want the server to see an
+> incoming connection which is immediately closed.
+
+Sorry, I don't get the point. Why should a client care about security
+mode 2, when it want to connect to a server in security mode 1. Actually
+the server must know what services to protect and not the client. If you
+have such server running, then this is a wrong designed server from my
+point of view.
 
 Regards
 
