@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Dominik Blystak <Dominik.Blystak@pro-open.de>
+Message-ID: <4106C88A.6020009@ntlworld.com>
+From: Oli Ellis <oliver.ellis@ntlworld.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1091009362.2389.16.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-users] mRouter and sx1
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Will this work?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,55 +15,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jul 2004 12:09:22 +0200
+Date: Tue, 27 Jul 2004 22:26:34 +0100
 
-Hello all, 
+I am looking into feasability of building a bluetooth-based item that 
+could be controlled easily from any pc (mostly with linux) for the 
+purposes of home automation, and I have come upon several bluetooth 
+dongles with serial ports on them (for example this one: 
+http://www.socketcom.com/product/CS0400-479.asp), claiming to support 
+General Access Profile, Service Discovery Profile and Serial Port**** 
+profiles, as well as driverless operation with any serial device 
+(configuration can be done via AT commands).
 
+Obviously no-one will know the specifics of this particular device, but 
+in principle, with the tools that are available under linux at the 
+moment, would it be possible to establish a connection to the device and 
+then send data to it just like an attached serial device? I understand 
+that serial emulation is available under the bluez package, but how far 
+does it go? Can one control individual pins, or is it just as a stream 
+of bytes? My primary idea is to use it inside something like a lamp so 
+that, for example,  the brightness can be controlled, or a coffee 
+machine, or anything.
 
-I got a Siemens sx1 phone, which uses some kind of mRouter software
-(windows). After browsing through the mailing list archives I tried the
-setup described here:
-http://mobile.linux.pt/p800
+And if it is possible, is it also sensible to do it in this way? I 
+understand that bluetooth chips are down to ~$5 (US), but this item is 
+going for ~$170 (US). It there a more cost-effective way of talking to a 
+number of bluetooth devices?
 
-The bluetooth connection works (e.g. p3nfs) but I guess that the sx1
-needs another chat file. Thats the output / error I get:
+Sorry for the long post, and many thanks for any thoughts you might have
 
-#sdptool browse 
-Service Name: Bluetooth Serial Port
-Service Description: Bluetooth Serial Port
-Service Provider: Symbian Ltd.
-Service RecHandle: 0x10026
-Service Class ID List:
-  "Serial Port" (0x1101)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 2
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-
-
-
-#rfcomm
-rfcomm1: 00:01:E3:2E:91:81 channel 2 clean
-
-
-(changed /dev/ttyS1 in "/etc/ppp/peers/sx1-local" to /dev/rfcomm1)
-
-#pppd call sx1-local debug nodetach
-Connect script failed
-
-
-As mentioned before I guess that the chat script needs to be modified. I
-would like to know how the communication through the serial port in
-windows can be dumped, so I could check that chat script.
-
-
-Thank you
-Dominik Blystak
-
+-Oli **
 
 
 -------------------------------------------------------
