@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Jason Van Patten <jvp@lateapex.net>
+Message-Id: <200309122202.h8CM2X905779@localhost.lateapex.net>
 Subject: Re: [Bluez-users] IBM Thinkpad A31p and Bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: jvp@lateapex.net
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200309122202.h8CM2X905779@localhost.lateapex.net>
-References: <200309122202.h8CM2X905779@localhost.lateapex.net>
-Content-Type: text/plain
-Message-Id: <1063405430.28891.334.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Reply-To: jvp@lateapex.net
+In-Reply-To: <1063401632.28890.268.camel@pegasus> from "Marcel Holtmann" at Sep 12, 2003 11:20:26 PM
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -18,28 +17,30 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 13 Sep 2003 00:23:41 +0200
+Date: Fri, 12 Sep 2003 18:02:33 -0400 (EDT)
 
-Hi Jason,
+At Fri Sep 12 17:20:26 2003, Marcel Holtmann wrote:
+> the Bluetooth adapter in this notebook is a USB based from CSR and it
+> should work perfect with the hci_usb driver. Have you switched the
+> Bluetooth device on?
 
-> > the Bluetooth adapter in this notebook is a USB based from CSR and it
-> > should work perfect with the hci_usb driver. Have you switched the
-> > Bluetooth device on?
-> 
-> When you say "switched the Bluetooth device on" do you mean like my Palm? 
-> My goal is to get the laptop and the Palm chatting with one another via
-> Bluetooth.
+When you say "switched the Bluetooth device on" do you mean like my Palm? 
+My goal is to get the laptop and the Palm chatting with one another via
+Bluetooth.
 
-as I know the IBM notebook's have a switch near the keyboard to switch
-the Bluetooth device on and off. Or maybe there is a BIOS option. What
-do /proc/bus/usb/devices say? I know that the IBM Ultraport module don't
-set the Bluetooth class in the USB descriptor, so maybe we have another
-one.
+However, given the reading I've done (and it's quite possible I've misread,
+so forgive my ignorance) the hci device should show up regardless of whether
+there's another BT-enabled device around.
 
-Regards
+# hciconfig -a
+# 
 
-Marcel
+I'm not seeing anything.
 
+jas
+-- 
+Jason Van Patten
+AOL IM: Jason VP 
 
 
 
