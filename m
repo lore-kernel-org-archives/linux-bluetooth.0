@@ -1,47 +1,70 @@
-Return-Path: <jeffs@fairwayacademy.org>
-From: Jeff Sutherland <jeffs@fairwayacademy.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-users] Mysterious problem with l2test on Coldfire 5282
-Date: Tue, 17 Feb 2004 16:47:06 -0500
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-References: <200402170924.31121.jeffs@fairwayacademy.org> <200402171126.46462.jeffs@fairwayacademy.org> <1077042956.2665.85.camel@pegasus>
-In-Reply-To: <1077042956.2665.85.camel@pegasus>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <40327D70.8080003@vpop.net>
+From: Matthew Reimer <mreimer@vpop.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200402171647.11969.jeffs@fairwayacademy.org>
-List-ID: <bluez-users.lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net, pmarques@grupopie.com
+Subject: Re: [Bluez-users] How to configure a 723kbps connection?
+References: <lists.bluez.users.40327430.2090807@grupopie.com>
+In-Reply-To: <lists.bluez.users.40327430.2090807@grupopie.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 17 Feb 2004 14:45:36 -0600
 
-On Tuesday 17 February 2004 13:35, Marcel Holtmann wrote:
-> Hi Jeff,
->
-> > > maybe this code in send_mode() is the problem
-> > >
-> > > 	*(uint32_t *) buf = htobl(seq++);
-> > > 	*(uint16_t *)(buf+4) = htobs(data_size);
-> > >
-> > > Replace it with
-> > >
-> > > 	*(uint32_t *) buf = htobl(seq);
-> > > 	*(uint16_t *)(buf+4) = htobs(data_size);
-> > > 	seq++;
-> > >
-> > > I am not a uClinux or compiler expert, so this is only guess.
-> >
-> > Oh, Doh!  I'm sure this is it (haven't tried it yet, though) because of
-> > the way the byteswap_32() macro expands!  No fair doing
-> > increment/decrement ops on variables inside macros :-)
->
-> I applied the fix for l2test, rctest and scotest. Should be in CVS now.
+Paulo Marques wrote:
+> grpmind+bluez.users@boromir.vpop.net wrote:
+> 
+>>
+>> For a poor man's throughput test I'm downloading a 7M mpeg file, both
+>> through Pocket IE and by having Pocket TV stream it from my 100Mbps LAN.
+>> I'm running "nload -o 800 -t 250 xl0" and watching the outgoing avg in
+>> kbit/s.
+>>
+>> No matter what I do, the average caps out at about 265kbps. I've tried 
+>> all
+>> the following in various combinations:
+> 
+> 
+> 
+> What profile are you using? LAN or PAN?
 
-I confirmed that this fixed the problem.  I think that this was maybe the last 
-of my major issues, thanks for all the help.  rfcomm seems to work, now I 
-just need to make use of the connection.  Due to limited resources on my 
-Coldfire board I'll probably just use ppp to establish a tcp/ip connection.
+I think I'm using PAN (what PPC2003 and sdptool call "Network Access 
+Point"). Is that what you mean?
 
-Regards,
--Jeff
--- 
-Secure your email with Gnu Privacy Guard and Mozilla, the open source
-cross platform solution for Windows, Linux, and Mac OS X.
-See http://enigmail.mozdev.org/
+
+> If you're using LAN you should really try using PAN. I don't trust the 
+> micro$oft stack at all. The simpler the profile, the most likely it is 
+> to work ok.
+> 
+>> Does all this mean that my ipaq has a slow UART
+> 
+> 
+> It's strange... a slow UART should be 230400 or 460800 baud. If it were 
+> 230400 you shouldn't get a bandwidth as high as you're getting. If it 
+> were 460800 you'd probably be a little higher.
+> 
+> Of course, this is no proof that the UART is in fact the culprit.
+
+Yes, it is perplexing. I'm waiting to hear back from knowledgeable 
+people about how the bluetooth chip is connected.
+
+Matt
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
