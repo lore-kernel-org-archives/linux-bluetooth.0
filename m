@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de46576041203223817d0cc34@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] how to interpret 'link quality' value
-In-Reply-To: <1102084671.8479.18.camel@pegasus>
+Subject: Re: [Bluez-users] nonblocking connect : Wrong return code ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200412040251.25791.wim.delvaux@adaptiveplanet.com>
+References: <200412040251.25791.wim.delvaux@adaptiveplanet.com>
+Content-Type: text/plain
+Message-Id: <1102135551.8479.34.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <200412031515.02372.wim.delvaux@adaptiveplanet.com>
-	 <1102084671.8479.18.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,47 +18,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 4 Dec 2004 12:08:41 +0530
+Date: Sat, 04 Dec 2004 05:45:51 +0100
 
-Hi marcel,
-I am using anycom dongle (so SiW chipset)........can i consider the
-same approximation for the link quality as u have  mentioned for the
-CSR chipset.........
-Also, I am using usb-120 which is a class-2 device. I see the power
-control feature .....if i enable communication between 2 devices which
-are in Line of sight and short distance apart....shouldn't the
-transmit power level decrease??? It is not decreasing. Is this feature
-the same as  adpative power control feature????
-Thanks,
-Regards,
-Manjunath
+Hi Wim,
 
-On Fri, 03 Dec 2004 15:37:51 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Wim,
+> when using a nonblocking socket,
 > 
-> > can anybody tell me the range for a 'link' quality
-> > Is there a range ?
+> when the connect is requested the errno that is returned is 11. (resource 
+> temporarily unavailable)
 > 
-> this value is vendor specific. For a CSR chip I have this information on
-> my webpage.
+> Man page says that it should be EINPROGRESS (which is 115).
 > 
-> Regards
+> Man page for connect says :
 > 
-> Marcel
+> EINPROGRESS : 
+> 
+> The socket is non-blocking and the connection cannot be completed immediately.  
+> It is possible to select(2) or poll(2) for completion by selecting
+> 
+> but
+> 
+> EAGAIN :
+> 
+> No more free local ports or insufficient entries in the routing cache
 > 
 > 
-> 
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://productguide.itmanagersjournal.com/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+> EAGAIN is a proper return code for this situations for read or write but not 
+> for connect ...
+
+we had this questions a long time ago and I never got a final answer
+from anyone what is the right way to do. However the change must be done
+in bt_sock_wait_state() and you must check rfcomm/sock.c, l2cap.c and
+sco.c if it is still working as expected. Feel free to send in a patch
+for it.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
