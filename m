@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Report of working dongle: IOGear GBU311 and
-	question
+Subject: Re: [Bluez-users] BNEP connection destroing :(
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4223E423.4030603@cloutier-vilhuber.net>
-References: <20050228143635.6E7668844B@sc8-sf-spam1.sourceforge.net>
-	 <4223E423.4030603@cloutier-vilhuber.net>
+In-Reply-To: <1109664374.42242276c644b@mail.orbitel.bg>
+References: <1109664374.42242276c644b@mail.orbitel.bg>
 Content-Type: text/plain
-Message-Id: <1109666679.17256.129.camel@pegasus>
+Message-Id: <1109666579.17256.126.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,22 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Mar 2005 09:44:39 +0100
+Date: Tue, 01 Mar 2005 09:42:59 +0100
 
-Hi Lars,
+Hi Todor,
 
-> I can happily report that my new IOGear GBU311 works under stock SuSE 
-> 9.2 (connections tested with Palm T3 and Sony-Ericsson T610, using 
-> OBEX-FTP, OBEX-transfer, DUN).
+> I successful make a bnep connection between my laptop (with Slackware 10.0, kernel 2.4.26 with openmosix 
+> patch and latest version of bluez libs and bluez pand, but i tryed also with other versions) and desktop PC with 
+> Windows XP Pro, after few minutes  (not measured), on linux system the bnep0 interface was destroyed.
 > 
-> However, I am curious: when plugging it in, the logs show a USB *HUB*, 
-> and registers keyboard and mouse drivers. Is this something SuSE 
-> specific, something driver-specific? Is SuSE misconfigured? or what does 
-> it mean when the USB dongle registers as a keyboard/mouse?
+> Attempting to reconnect with pand worked silently, but the bnep0 interface was not created. Workaround was to 
+> remove and re-insert the dongle on my laptop, then i recreate the bnep connection again.
 
-the registration as mouse and keyboard is fine, but actually this device
-should only start working with a recent 2.6.11-rc5 kernel. What does the
-content of /proc/bus/usb/devices shows you? Also show us "hciconfig -a".
+run "hcidump -X -V" as root while connecting and see what really
+happens.
 
 Regards
 
