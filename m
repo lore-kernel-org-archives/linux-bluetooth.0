@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200403070058.50508.wim.delvaux@adaptiveplanet.com>
-Subject: [Bluez-users] killing a persisted pand session
+Subject: Re: [Bluez-users] Toshiba Portege M200 internal bluetooth adapter
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Brad Midgley <bmidgley@xmission.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <404A2A86.2090706@xmission.com>
+References: <404A2A86.2090706@xmission.com>
+Content-Type: text/plain
+Message-Id: <1078615185.6530.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,40 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 7 Mar 2004 00:58:50 +0100
+Date: Sun, 07 Mar 2004 00:19:45 +0100
 
-Hi all,
+Hi Brad,
 
-If i run
+> I'm not totally sure how to use the internal bluetooth on my toshiba
+> portege m200. I saw reports of "hci_usb + toshiba" for similar models
+> but I have no idea what that means. usbfs doesn't show anything that
+> looks like bluetooth but lspci -v reports one device I'm not sure about.
+> Maybe that's it...
+> 
+> 02:0d.0 System peripheral: Toshiba America Info Systems: Unknown device
+> 0805 (rev 05)
+> 	Subsystem: Toshiba America Info Systems: Unknown device 0001
+> 	Flags: medium devsel, IRQ 11
+> 	Memory at 20000c00 (32-bit, non-prefetchable) [disabled] [size=512]
+> 	Capabilities: [80] Power Management version 2
+> 
+> Does anyone know if there's a chance it's supported?
 
-pand --persist --connect XXXX
+I am sure that your device is supported and I am sure that it is an USB
+Bluetooth adapter, but you have to activate it first. Take a look at
+this page
 
-this means that pand will try to reestablish the connection to XXX whenever it 
-needs to.
+	http://www.holtmann.org/linux/bluetooth/toshiba.html
 
-Now I want to terminate that application.
+and search through the mailing list archives.
 
-Should I run 
+Regards
 
-pand -k XXX ?
+Marcel
 
-or
-
-pand -K ?
-
-or
-
-kill `pidof pand` ( or a bit more complicated)
-
-I have tried
-
-pand -k
-
-which seems the most logical but this only closes the connection which then 
-gets reestablished after the interval timeout (5 secs).  I would expect a -k 
-to really 'kill' the connection and terminate the corresponding pand
-
-W
 
 
 
