@@ -1,76 +1,58 @@
-Return-Path: <stern@rowland.harvard.edu>
-Date: Wed, 28 Apr 2004 15:13:44 -0400 (EDT)
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Greg KH <greg@kroah.com>
-cc: bluez-devel@lists.sourceforge.net, Marcel Holtmann <marcel@holtmann.org>,
+Return-Path: <greg@kroah.com>
+Date: Wed, 28 Apr 2004 11:18:09 -0700
+From: Greg KH <greg@kroah.com>
+To: Marcel Holtmann <marcel@holtmann.org>, g@kroah.com
+Cc: Alan Stern <stern@rowland.harvard.edu>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
    USB development list <linux-usb-devel@lists.sourceforge.net>
 Subject: Re: PATCH: (as265) Fix bluetooth driver's wait_for_urb()
-In-Reply-To: <20040428174325.GG32040@kroah.com>
-Message-ID: <Pine.LNX.4.44L0.0404281433040.678-100000@ida.rowland.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-ID: <20040428181808.GA15218@kroah.com>
+References: <Pine.LNX.4.44L0.0404281321520.1238-100000@ida.rowland.org> <20040428174325.GG32040@kroah.com> <1083175733.4000.67.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1083175733.4000.67.camel@pegasus>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Wed, 28 Apr 2004, Greg KH wrote:
-
-> On Wed, Apr 28, 2004 at 01:25:08PM -0400, Alan Stern wrote:
-> > Greg:
-> > 
-> > Your recent change to struct urb broke this function in the bluetooth 
-> > driver.
+On Wed, Apr 28, 2004 at 08:08:53PM +0200, Marcel Holtmann wrote:
+> Hi Greg,
 > 
-> I know.  I really hate what the Bluetooth driver does, and it's up to
-> them to keep up with the changes in urbs due to them statically
-> including a urb in their structures.  That is what they agreed to when
-> they did this a while ago.  They are on their own here...
-
-I have to agree that life would be easier all 'round if the bluetooth code 
-was changed to use dynamically-allocated URBs.
-
-> > You know, I think usb_wait_for_urb() would make an excellent 
-> > addition to usbcore.
+> > I know.  I really hate what the Bluetooth driver does, and it's up to
+> > them to keep up with the changes in urbs due to them statically
+> > including a urb in their structures.  That is what they agreed to when
+> > they did this a while ago.  They are on their own here...
 > 
-> No, no one should do that.  Just use the proper usb_alloc_urb() and
-> usb_free_urb() and you will be fine.
+> I know that Max accepted this. So I also have to accept this, but this
+> doesn't count for the bfusb driver and inserting this hack prevents it
+> from oopsing on a UHCI controller, too.
 
-There's more to it than that.  Yes, if all you're worried about is freeing 
-an URB then usb_alloc_urb() and usb_free_urb() will take care of 
-everything -- you don't even need to use synchronous unlinks.
+If you unlink the urb synchronously there should be no more problems, as
+Alan has fixed this in the UHCI driver, right?
 
-However...  Suppose you want to cancel an outstanding URB and then reuse 
-that URB for a new request.  Or suppose a driver's disconnect() routine 
-has been called and it needs to cancel all outstanding URBs before 
-allowing the driver to be unloaded from memory.  In both cases it's 
-necessary to wait until _after_ the completion handler has finished -- in 
-the first case because you don't want to reuse the URB's data fields while 
-the completion handler may still be looking at them, in the second case 
-because you don't want the completion handler to try to run when its code 
-segment has been unloaded.
-
-The second case is no longer an issue, even for the UHCI driver, because
-it now implements the appropriate endpoint_disable method.  This will
-prevent the majority of possible problems.
-
-But the first case still applies.  (As does the case of maverick drivers
-like Bluetooth that don't use usb_free_urb().)  So there has to be a way
-for a driver to wait until an URB's completion handler has finished.  
-That's the need addressed by usb_wait_for_urb().
-
-> > At some future time we could consider replacing 
-> > synchronous unlink_urb with asynchronous unlink plus wait_for_urb.
+> > So, Bluetooth developers, have you reconsidered your "need" to put a
+> > static urb in your structure?  Are you convinced yet of the wrongness of
+> > your ways?  Do you want a patch to change your subsystem to follow the
+> > rest of the kernel with regards to USB?
 > 
-> Why?  Does it cause undue hardship in the host controllers to have a
-> synchronous unlink_urb?
+> Right now I don't have enough time to rewrite the hci_usb driver, but it
+> is on my todo list. Actually the bulk and isoc URB's should only be
+> started when they are needed. This means when an ACL or SCO link is
+> really established. However I think we should go back to the discussion
+> how we can combine an URB with a SKB in a nice way. This would also be
+> helpful for the bfusb driver.
 
-There's two points of confusion here.  First, the host controller drivers
-don't implement synchronous unlinking -- it's all handled higher up in
-core/hcd.c.  As far as the HCDs are concerned everything is asynchronous.
+What's wrong with just a pointer to the urb in the skb?
 
-Second, synchronous unlink_urb doesn't do what is needed because it 
-doesn't guarantee that the completion handler will have finished when it 
-returns.  It only guarantees that the completion handler will have 
-finished if it returns _with no error_.  A race can cause such an error, 
-but the driver will still have to wait until the completion handler has 
-finished.  That's why usb_wait_for_urb() is needed.
+Some of the main reason I want to do this (becides all of the reference
+counting stuff) is to see if a separate pool of urbs could increase
+throughput any.  If we change the usb core to do this, and there is a
+speed increase, then the bluetooth drivers would also see this
+improvement.  But by trying to manage the memory yourself, you wouldn't
+:)
 
-Alan Stern
+Good enough bribe?
+
+Hey, I'll even write the patch for the hci_usb driver :)
+
+thanks,
+
+greg k-h
