@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Michael B Allen <mba2000@ioplex.com>
+Message-ID: <20050225194018.4684.qmail@web60401.mail.yahoo.com>
+From: Tanveer Chowdhury <tanveer_t2002@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Message-Id: <20050225163841.4e1a96ce.mba2000@ioplex.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] Waking up a machine with bluetooth signal?
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Connect to mysql server thorugh SDP
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,21 +16,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Feb 2005 16:38:41 -0500
+Date: Fri, 25 Feb 2005 11:40:18 -0800 (PST)
 
-I just bought a mac mini w/ a bluetooth keyboard. I'd like to be able to ssh
-into it from my laptop but when it's in sleep mode it doesn't respond over
-the network. I can't use wake on lan because it's a wireless connection not
-ethernet. I'm all the way across the other side of the room and I'm very
-very lazy so I would like to use the bluetooth capability builtin to my
-Thinkpad T30 to try to wake up the mac mini from across the room. Is this
-possible?
+Thanks for answering. 
+Me and my frined are doing a project here just to
+learn where we have a db server(mysql) in Linux PC and
+installed all necessary IDE & SDK in win2000 PC. Now
+We want to design a program that can access that
+database through LAN as we dont have a NOKIA 60 series
+phone or USB dongles. Now asked baout SDP because how
+to offer the mysqld service to my win2000 PC?
+I can connect my emulator to internet and also to
+another PC on LAN. But how to access the mysql server?
+So that when I manage a compatible phone then I can
+interact to database via BT on that phone.
+Hope I made myself clear.
 
-Thanks,
-Mike
+Regards
+-Tanveer 
 
--- 
-IRC - where men are men, women are men, and the boys are FBI agents.
+
+		
+__________________________________ 
+Do you Yahoo!? 
+Yahoo! Mail - 250MB free storage. Do more. Manage less. 
+http://info.mail.yahoo.com/mail_250
 
 
 -------------------------------------------------------
