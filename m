@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Di Pietro Nicolas <potens@swing.be>
-To: bluez <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1087773092.16254.29.camel@darthvader.linuxkot.kap>
-Mime-Version: 1.0
-Subject: [Bluez-users] DiNovo /MX900 : some help for the others (and questions for me)
+From: David Feldman <wb0gaz@hotmail.com>
+To: bluez-users@lists.sourceforge.net
+Cc: wb0gaz@hotmail.com
+Message-Id: <20040620170410.96A6F530.wb0gaz@hotmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Subject: [Bluez-users] rfcomm - "Connection refused"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,75 +16,130 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 21 Jun 2004 01:11:32 +0200
+Date: Sun, 20 Jun 2004 17:04:10 -0600
 
-Hi all,
-I'm writing this to say to you that I'm happy because my DiNovo set
-(with keyboards, mediapad and mouse) works in BT mode !!! yeah, it's
-great.
-Thanks a lot to all the hackers who do that possible ! And for all the
-people who respond to my (sometimes) stupid questions
+This continues my work to get a bluetooth connection going from
+my RH9 laptop to a Sony Ericsson T68 (not i) cell phone.
 
-<help>
-For to people having bad luck with this, here are the steps I followed :
-compile new kernel (2.6.6 or 2.6.7, no matter) with mh patches
-here are the options I used :
-<snip>
-CONFIG_BT_HCIUSB=m
-CONFIG_BT_HCIUSB_SCO=y
-CONFIG_BT_HCIUART=m
-CONFIG_BT_HCIUART_H4=y
-CONFIG_BT_HCIUART_BCSP=y
-CONFIG_BT_HCIUART_BCSP_TXCRC=y
-CONFIG_BT_HCIBCM203X=m
-CONFIG_BT_HCIBFUSB=m
-CONFIG_BT_HCIVHCI=m
-CONFIG_NETDEVICES=y
-CONFIG_DUMMY=m
-</snip>
+I've created /dev/rfcomm0 (and 1, 2, 3) per below.
 
-compile bluez-lib 2.7 and bluez-utils 2.7 (and install it !)
-#modprobe bluetooth
-#modprobe sbp2
+The situation I'm encountering is this - when I issue rfcomm command
+to link /dev/rfcomm0 to the DUN service in the phone (which I believe
+is on channel 1 per sdpscan), I encounter "connection refused".
 
-there should be a script named bluetooth in your init.d
-#/etc/init.d/bluetooth start
+I've edited /etc/bluetooth/rfcomm.conf to reflect my phone's MAC 
+address
+and RFCOMM use of channel 1.
 
-If all works, the BT hub should blink once and all should work !!!
+I've edited /etc/bluetooth/bluepin and /etc/bluetooth/pin to reflect 
+a simple
+4-digit PIN I often use. The phone never asks for a PIN (it normally 
+does when
+I am linking from the windows laptop or win ce device to the phone...)
 
-If not, say what append, maybe I've missed a step in this explaination.
-</help>
+The sequence of commands I am using is below - hciconfig up to enable
+the bluetooth card (that appears to be working, I've been able to use 
+a number
+of other commands to interact with the phone), then rfcomm which is my
+attempt to link /dev/rfcomm0 with the DUN service of the phone. I 
+then try
+to make a serial connection to /dev/rfcomm0 (I've tried minicom as 
+well as
+the cat command below.) Any serial connection to /dev/rfcomm0 results 
+in
+the "connection refused" message.
 
-<question>
-Has someone succeded getting all the buttons to work ?
-I mean only 7 on the 30 special keys of the keyboard works and
-only 5 of the 10 buttons of the mouse work for me.
+Further down in this posting is the output of hcidump that occurs at 
+the time
+I issue the cat </dev/rfcomm0 command below.
+ 
+Dave
+wb0gaz@hotmail.com
 
-If not, is there a way I could help developers with it ? I can't help
-with code (I'm a java developer) but I can send dumps (with hcidumps) or
-I can try some instructions. If someone think it could help, the only
-thing he has to do is to tell it to me, I'll be pleased to give some
-help by this way.
+==================================================
 
-Is there something to do to get the keyboad  working after a reboot ?
-Mine seems (in fact, the hub seems) the stay in BT mode but, it's a bit
-annoying when you've to do something before the /etc/init.d/bluetooth is
-lauched.
+crw-r--r--    1 root     root     216,   0 Jun 15 04:16 /dev/rfcomm0
 
-</question>
+----------------------------------------------------------------------
+----
 
-Good luck for the people having this keyboard and, once again,
-thanks a lot to the developers.
+hciconfig hci0 up
+rfcomm bind /dev/rfcomm0 MAC-ADDRESS 1
+rfcomm
+  --->  rfcomm0: MAC-ADDRESS channel 1 clean
+cat </dev/rfcomm0
+  --->  bash: /dev/rfcomm0: Connection refused
+rfcomm
+  --->  rfcomm0: MAC-ADDRESS channel 1 closed
 
-Nicolas
+----------------------------------------------------------------------
+----
 
-PS: I've writen a letter to Logitech, they respond me that they won't
-nor want to help the developers, they won't write some drivers and
-that's all! So, if you own some Logitech device and this device doesn't
-work under linux, write them to say that your're not happy to be
-ignored. (but do it smartly, please, do give a bad picture of all the
-people using Linux or some other free(as free speech, not as pirated) OS
-!
+HCIDump - HCI packet analyzer ver 1.8
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Create Connection(0x01|0x0005) plen 13
+> HCI Event: Command Status(0x0f) plen 4
+> HCI Event: Connect Complete(0x03) plen 11
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> HCI Event: Command Complete(0x0e) plen 6
+> ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0055 scid 0x0040 result 0 status 0
+< ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0055 flags 0x0000 clen 4
+    MTU 1024 
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 4
+    MTU 251 
+> ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
+    MTU 251 
+< ACL data: handle 0x0028 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0055 flags 0x0000 result 0 clen 0
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x55 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c 
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x40 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
+< ACL data: handle 0x0028 flags 0x02 dlen 18
+    L2CAP(d): cid 0x55 len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 2 frame_type 0 credit_flow 15 pri 0 ack_timer 0 frame_size 
+246 max_retrans 0 credits 7
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 19
+    L2CAP(d): cid 0x40 len 15 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 2 frame_type 0 credit_flow 0 pri 7 ack_timer 0 frame_size 
+246 max_retrans 0 credits 0
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x55 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59 
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x40 len 4 [psm 3]
+      RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73 
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x55 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd 
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0055 scid 0x0040
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x40 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
+> ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0055 scid 0x0040
+< HCI Command: Disconnect(0x01|0x0006) plen 3
+> HCI Event: Command Status(0x0f) plen 4
+> HCI Event: Disconn Complete(0x05) plen 4
 
 
 
