@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] L2Ping / Rfcomm connect : Function not implemented
-References: <200412122356.09617.wim.delvaux@adaptiveplanet.com> <200412131312.21010.wim.delvaux@adaptiveplanet.com> <1102940155.8750.153.camel@pegasus>
-In-Reply-To: <1102940155.8750.153.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200412131318.34035.wim.delvaux@adaptiveplanet.com>
+Subject: Re: [Bluez-users] L2Ping / Rfcomm connect : Function not
+	implemented
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200412131312.21010.wim.delvaux@adaptiveplanet.com>
+References: <200412122356.09617.wim.delvaux@adaptiveplanet.com>
+	 <1102939476.8750.148.camel@pegasus>
+	 <200412131309.12167.wim.delvaux@adaptiveplanet.com>
+	 <200412131312.21010.wim.delvaux@adaptiveplanet.com>
+Content-Type: text/plain
+Message-Id: <1102940155.8750.153.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,30 +22,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Dec 2004 13:18:33 +0100
+Date: Mon, 13 Dec 2004 13:15:55 +0100
 
-On Monday 13 December 2004 13:15, Marcel Holtmann wrote:
-> Hi Wim,
->
-> > I just disconnected my Ipaq-> Desktop BNEP connection.
-> >
-> > And even now hcitool scan on my desktop can only find the phone and NOT
-> > the Ipaq.
-> >
-> > hcitool scan on the Ipaq does not reveal ANY device (not even the
-> > desktop) ????!?
-> >
-> > Why has it all of a sudden broke down ? Could the BT hardware be in an
-> > 'odd' state ? Might Depleting the battery help ?
->
-> the battery should have nothing to do with it, but the hardware could be
-> somekind of broken. This happens.
+Hi Wim,
 
-I was hoping a battery depletion would 'reset' hardware
+> I just disconnected my Ipaq-> Desktop BNEP connection.
+> 
+> And even now hcitool scan on my desktop can only find the phone and NOT the 
+> Ipaq.
+> 
+> hcitool scan on the Ipaq does not reveal ANY device (not even the desktop)
+> ????!?
+> 
+> Why has it all of a sudden broke down ? Could the BT hardware be in an 'odd' 
+> state ? Might Depleting the battery help ?
 
-could that kernel 'freeze' have cause this ?
+the battery should have nothing to do with it, but the hardware could be
+somekind of broken. This happens.
 
-W
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
