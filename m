@@ -1,59 +1,62 @@
-Return-Path: <jt@bougret.hpl.hp.com>
-Date: Mon, 15 Sep 2003 09:20:22 -0700
-To: Johannes Erdfelt <johannes@erdfelt.com>
-Cc: Max Krasnyansky <maxk@qualcomm.com>, Marcel Holtmann <marcel@holtmann.org>,
-   BlueZ mailing list <bluez-devel@lists.sourceforge.net>,
-   linux-usb-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [BUG] hci_usb + uhci vs. usb-uhci
-Message-ID: <20030915162022.GA14793@bougret.hpl.hp.com>
-Reply-To: jt@hpl.hp.com
-References: <20030912215154.GB24895@bougret.hpl.hp.com> <20030912183251.G18890@sventech.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20030912183251.G18890@sventech.com>
-From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: jp-www@dcs.gla.ac.uk
+To: James Courtier-Dutton <James@superbug.demon.co.uk>
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [ANNOUNCE] ALSA Bluetooth Headset Driver
+In-Reply-To: <3F65CD1D.1020100@superbug.demon.co.uk>
+Message-ID: <Pine.LNX.4.54.999.0309151532340.27929@brava.dcs.gla.ac.uk>
+References: <Pine.LNX.4.54.999.0309150112530.29667@sibu.dcs.gla.ac.uk>
+ <3F65CD1D.1020100@superbug.demon.co.uk>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Mon, 15 Sep 2003 15:51:11 +0100 (BST)
 
-On Fri, Sep 12, 2003 at 06:32:51PM -0400, Johannes Erdfelt wrote:
-> On Fri, Sep 12, 2003, Jean Tourrilhes <jt@bougret.hpl.hp.com> wrote:
-> > 	I just spent some time tracking a problem with hci_usb (BlueZ
-> > USB driver) and uhci. This happens on 2 different PCs with different
-> > hardware and 2.4.X kernels, I describe one here.
-> > 
-> > UHCI Hardware :
-> > 	00:07.2 USB Controller: Intel Corp. 82371AB PIIX4 USB (rev 01)
-> > BlueTooth hardware :
-> > 	HCI Ver: 1.1 (0x1) HCI Rev: 0x1bb LMP Ver: 1.1 (0x1) LMP Subver: 0x1bb
-> > 	Manufacturer: Cambridge Silicon Radio (10)
-> > Kernel : 2.4.22 UP
-> > 
-> > 	What happens :
-> > 	Start BNEP session (i.e. TCP/IP over BT). Start intensive TCP
-> > app (web download, netperf, X-Window). After a few seconds, on the
-> > transmitter the hardware just stops :
-> > --------------------------------------------------------
-> > < ACL data: handle 0x0029 flags 0x01 dlen 192
-> > < ACL data: handle 0x0029 flags 0x01 dlen 192
-> > < ACL data: handle 0x0029 flags 0x01 dlen 192
-> > < ACL data: handle 0x0029 flags 0x01 dlen 192
-> > < ACL data: handle 0x0029 flags 0x01 dlen 192
-> > --------------------------------------------------------
-> > 	The "Number of Completed Packets" event never comes back. I
-> > have to physically unplug the USB dongle to recover. I could not see
-> > any error messages in the log, except after a few seconds some BNEP
-> > and ACL timeouts (which are expected).
-> > 
-> > 	I initially though that it was a BlueTooth problem. However,
-> > I've never seen it happening with my OHCI hardware on SMP (which is
-> > what I normally use). And, if I replace uhci.o with usb-uhci.o on the
-> > same hardware, the problem goes away completely.
-> > 	So, there is definitely something about uhci.o...
-> 
-> Did you enable zero packet when you compiled the BT driver?
-> 
-> JE
+On Mon, 15 Sep 2003 3:30pm +0100, James Courtier-Dutton wrote:
 
-	Nope. The compilation of hci_usb was exactly the same for uhci
-and for usb-uhci/ohci.
+> I was also working on this. Do you have full duplex sound working ?
+> I was under the impression that changes needed to be made to the
+> bluetooth stack before full duplex worked.
 
-	Jean
+Yes, full duplex seems to work. I've tested this out using the ALSA 0.9
+driver for the Robust Audio Tool.
+
+In fact, at the low level full duplex is a necessity since the outgoing
+SCO frames are currently clocked by the arrival and sizing of incoming
+frames. I haven't tried implementing any timers to replace this, but it's
+something that would be worth investigating.
+
+I'm glad to hear you're also working on a driver -- no doubt more ideas on
+good ways of implementation would be useful. How far have you got?
+
+Thanks.
+
+
+PS:
+
+I've just noticed a line missing from my patch, which will show up if you
+don't already have the snd-hwdep.o module installed:
+
+Add this line to alsa-driver-0.9.6/alsa-kernel/core/Makefile:
+
+obj-$(CONFIG_SND_BLUEZ_SCO) += snd-pcm.o snd-page-alloc.o snd.o snd-hwdep.o
+
+
+
+-------------------------------------------------------
+This sf.net email is sponsored by:ThinkGeek
+Welcome to geek heaven.
+http://thinkgeek.com/sf
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
