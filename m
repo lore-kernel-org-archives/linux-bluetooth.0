@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20040914105655.17926.qmail@webmail32.rediffmail.com>
-MIME-Version: 1.0
-From: "abhay b" <abhay7182@rediffmail.com>
-Reply-To: "abhay b" <abhay7182@rediffmail.com>
-To: bluez-devel@lists.sourceforge.net
-Content-type: multipart/alternative;
-	boundary="Next_1095159415---0-203.199.83.32-17766"
-Subject: [Bluez-devel] CardServices PCMCIA changed?
+Subject: RE: [Bluez-devel] Rfcomm use count
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daryl Van Vorst <daryl@wideray.com>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <002a01c499ed$143282d0$1a01010a@baked>
+References: <002a01c499ed$143282d0$1a01010a@baked>
+Content-Type: text/plain
+Message-Id: <1095153493.5695.129.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,35 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 14 Sep 2004 10:56:55 -0000
+Date: Tue, 14 Sep 2004 11:18:13 +0200
 
- This is a multipart mime message
+Hi Daryl,
 
+> I just noticed that bluez_accept_unlink() was called with a socked that was
+> in state BT_CLOSED, so it can't be the second if(). It would have been
+> called from the first if().
+> 
+> Clearly, I'm on glue.
+> 
+> Still, does the order of bluez_accept_unlink() and sock_release() matter?
 
---Next_1095159415---0-203.199.83.32-17766
-Content-type: text/html;
-	charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+I haven't done a full audit yet, but try to switch the order and see
+what happens. From a first look at it it makes sense to only release the
+socket when all the work is done, because otherwise lock_sock() makes no
+sense.
 
-<P>=0A&nbsp; <BR>=0Ahi<BR>=0Ai want to know whether the CardServices call r=
-elated to PCMCIA is changed in 2.6 kernel as i m not able to find it in 2.6=
-.5 instaed some pcmcia_xxx stuff is present ther<BR>=0Acan anyone guide me =
-on this?<BR>=0Athanks<BR>=0AAbhay=0A</P>=0A<br><br>=0A<A target=3D"_blank" =
-HREF=3D"http://clients.rediff.com/signature/track_sig.asp"><IMG SRC=3D"http=
-://ads.rediff.com/RealMedia/ads/adstream_nx.cgi/www.rediffmail.com/inbox.ht=
-m@Bottom" BORDER=3D0 VSPACE=3D0 HSPACE=3D0></a>=0A
---Next_1095159415---0-203.199.83.32-17766
-Content-type: text/plain;
-	charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Regards
 
- =A0=0Ahi=0Ai want to know whether the CardServices call related to PCMCIA =
-is changed in 2.6 kernel as i m not able to find it in 2.6.5 instaed some p=
-cmcia_xxx stuff is present ther=0Acan anyone guide me on this?=0Athanks=0AA=
-bhay
---Next_1095159415---0-203.199.83.32-17766--
+Marcel
+
 
 
 
