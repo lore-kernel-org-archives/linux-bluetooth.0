@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] ms explorer for bluetooth
+Subject: Re: [Bluez-users] bluez-hcidump package
 From: Marcel Holtmann <marcel@holtmann.org>
-To: neoclust <n1c0l4s.l3@wanadoo.fr>
+To: Monika Hubrich <monikahubrich@aol.com>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <200410122022.30501.n1c0l4s.l3@wanadoo.fr>
-References: <200410122022.30501.n1c0l4s.l3@wanadoo.fr>
+In-Reply-To: <001301c4b071$c7b509a0$c6b6b3ac@monika>
+References: <E1CHDBt-0002Ku-0s@sc8-sf-list2.sourceforge.net>
+	 <001301c4b071$c7b509a0$c6b6b3ac@monika>
 Content-Type: text/plain
-Message-Id: <1097652076.4643.5.camel@notepaq>
+Message-Id: <1097651859.4643.1.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,18 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Oct 2004 09:21:16 +0200
+Date: Wed, 13 Oct 2004 09:17:39 +0200
 
-Hi Nicolas,
+Hi Monika,
 
-> i have ms explorer for bluetooth my mouse work so well but my keyboard doesn't 
-> appear after a hcitool inq all my other bluetooth appear but not  the ms 
-> explorer for bluetooth 
+> > > -run "hcidump -x" as root and show us the output.
+> > > 
+> > > When I type in the command hcicump -x, 
+> > > the output is: Command not found.
+> > 
+> > you have to install the bluez-hcidump package.
+> > 
+> Okay.
+> 
+> Please show me the link.
 
-once you are connected with your mouse it will become invisible and you
-have to press the connect button to see it again. Actually there is no
-need for seeing it again, because it will reconnect after you move it or
-press a mouse button and then this should be handled by the hidd.
+look at www.bluez.org/download.html
 
 Regards
 
