@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <412C5482.3010909@t-online.de>
-From: detlef.grittner@t-online.de (Detlef Grittner)
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Pocket PC 2003 and Linux
+Subject: Re: [Bluez-users] Bluetooth Intellimouse Explorer not working
+	after reboot
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daniel Vollmer <maven@maven.de>
+Cc: Marcel Holtmann <bluez-users@lists.sourceforge.net>
+In-Reply-To: <475977561.20040824110859@maven.de>
+References: <167432047.20040823200031@maven.de>
+	 <1093285155.26717.25.camel@pegasus>  <489665030.20040823205505@maven.de>
+	 <1093293640.26717.48.camel@pegasus>  <475977561.20040824110859@maven.de>
+Content-Type: text/plain
+Message-Id: <1093339588.26717.59.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,29 +21,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Aug 2004 10:57:38 +0200
+Date: Tue, 24 Aug 2004 11:26:28 +0200
 
-I have a working connection between a Linux box with SuSE 9.1 (Sitecom 
-Bluetooth dongle) and a Pocket PC 2003 HP 5550.
-Ping and so on is no problem.
+Hi Daniel,
 
-But I found no way to transfer files from the Pocket PC to the Linux box.
-The other way round works: I can send any file from my Linux box to the 
-Pocket PC via OBEX push.
-I have tried to start the obex demon with:
-opd --mode OBEX --channel 10 --daemonize --path /tmp --sdp
-Although the Pocket PC finds the Linux box, it says there are no known 
-services on it.
-I have tried kbluetoothd as well and now the Pocket PC claims there is a 
-kbtserialchat service on my Linux box. But I have no idea what I can do 
-with it on my Pocket PC.
-I was able to establish a PAN network. But again, although the Pocket PC 
-claims it is working, I have no idea how to use it.
+> > the point in called "hciconfig hci0 noscan" before you call "hidd -K" is
+> > that in this case the mouse can't reconnect if you touch it again while
+> > your machine is shutting down.
+> 
+> But as I kill the hidd-daemon directly after issuing "hidd -K", this
+> shouldn't be a problem as it wouldn't try to reconnect. Or am I
+> missing something?
 
-What I want to do is a obex push from the Pocket PC to the Linux box.
-Any ideas what am I missing?
+the mouse will try to reconnect if you press a button or move it. So it
+is better to kill the hidd daemon before running "hidd -K". But even in
+this case a connection to L2CAP will be established by the mouse. This
+can cause troubles too.
 
-Detlef
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
