@@ -1,82 +1,44 @@
-Return-Path: <SRS0+53c6f9e0eda5ea539b39+515+infradead.org+dwmw2@canuck.srs.infradead.org>
-Subject: Re: [Bluez-devel] Alignment issue
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Daryl Van Vorst <daryl@wideray.com>,
-   "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092208405.4564.227.camel@pegasus>
-References: <001301c47f09$3900e650$1301010a@baked>
-	 <1092208405.4564.227.camel@pegasus>
-Content-Type: multipart/mixed; boundary="=-9sURTqgD2GzmsvX9bMVW"
-Date: Thu, 20 Jan 2005 14:30:53 +0000
-Message-Id: <1106231454.26551.582.camel@hades.cambridge.redhat.com>
-Mime-Version: 1.0
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-Id: <IAMCRI$22F218423567355D825477FD83475F70@libero.it>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+From: "andi.c@libero.it" <andi.c@libero.it>
+To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] how compile kernel modules
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 20 Jan 2005 15:11:42 +0100
+
+Hello,
+i simple question: how can i compile a custom set of bluez-module=
+s ?
+I ve the source code , from linux 2.4.19 kernel (i need them for tha=
+t version),
+but in
+the net\bluetooth\ there is no "configure" file. Can=
+ someone tell me the
+commands to use ? =0A=0A=0A=0A_____________________=
+_______________________________________=0A6X velocizzare la tua navigazio=
+ne a 56k? 6X Web Accelerator di Libero!=0AScaricalo su INTERNET GRATIS 6X=
+ http://www.libero.it=0A
 
 
---=-9sURTqgD2GzmsvX9bMVW
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
 
-On Wed, 2004-08-11 at 09:13 +0200, Marcel Holtmann wrote:
-> > The attached patch should fix the problem (it does as far as I can tell).
-> > The compiler probably thinks both arguments to memcpy() are aligned and so
-> > makes an optimization which breaks the copy (because the destination is not
-> > actually aligned). Perhaps this is a compiler bug... I'm using gcc 3.3.3.
-> > After googling and reading some discussion on the topic it seems that it's
-> > probably not a compiler bug. I'll leave that for someone else to decide. :)
-> 
-> after checking some more resources, you may be right and the compiler
-> optimizes here where it should not. I found a comment about gcc and
-> using its __builtin_memcpy. Try to replace the memcpy with memmove and
-> see if this works.
-
-That isn't guaranteed to work either. This is the patch I've been
-testing in the Fedora RPM since August. It lets the compiler know what's
-happening so it can generate optimal code.
-
--- 
-dwmw2
-
---=-9sURTqgD2GzmsvX9bMVW
-Content-Disposition: inline; filename=bluez-libs-2.10-align.patch
-Content-Type: text/x-patch; name=bluez-libs-2.10-align.patch; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
---- bluez-libs-2.10/include/bluetooth.h.align	2004-08-16 20:30:12.998705139 +0100
-+++ bluez-libs-2.10/include/bluetooth.h	2004-08-16 20:33:14.933543394 +0100
-@@ -88,17 +88,21 @@
- #endif
- 
- /* Bluetooth unaligned access */
--#if defined(__i386__) || defined(__x86_64__) || defined(__powerpc__) || defined(__s390__) || defined(__cris__)
--#define bt_get_unaligned(ptr) (*(ptr))
--#define bt_put_unaligned(val, ptr) ((void)( *(ptr) = (val) ))
--#else
--#define bt_get_unaligned(ptr) \
--	({ __typeof__(*(ptr)) __tmp; memmove(&__tmp, (ptr), sizeof(*(ptr))); __tmp; })
--#define bt_put_unaligned(val, ptr) \
--	({ __typeof__(*(ptr)) __tmp = (val); \
--	memmove((ptr), &__tmp, sizeof(*(ptr))); \
--	(void)0; })
--#endif
-+#define bt_get_unaligned(ptr)                   \
-+({                                              \
-+        struct __attribute__((packed)) {        \
-+                typeof(*(ptr)) __v;             \
-+        }  *__p = (ptr);                        \
-+        __p->__v;                               \
-+})
-+
-+#define bt_put_unaligned(val, ptr)		\
-+do {                                            \
-+        struct __attribute__((packed)) {        \
-+                typeof(*(ptr)) __v;             \
-+        }  *__p = (ptr);                        \
-+        __p->__v = (val);                       \
-+} while(0)
- 
- /* BD Address */
- typedef struct {
-
---=-9sURTqgD2GzmsvX9bMVW--
+-------------------------------------------------------
+This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+Tool for open source databases. Create drag-&-drop reports. Save time
+by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
