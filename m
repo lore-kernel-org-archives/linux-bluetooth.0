@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <406413FF.4070005@ei.tum.de>
-From: Matthias Thomae <thomae@ei.tum.de>
+Message-ID: <4063F68E.2050800@dfki.de>
+From: Yannick Djoumbou Feunang <feunang@dfki.de>
 MIME-Version: 1.0
-To: bluez-users <bluez-users@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] IBM T41 internal bluetooth, HCI Rev. 0x222
+Subject: [Bluez-users] Documentation
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,36 +15,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Mar 2004 12:29:03 +0100
+Date: Fri, 26 Mar 2004 10:23:26 +0100
 
-Dear Bluez users,
-
-I got this output of 'hciconfig -a' on an IBM Thinkpad T41 with built-in 
-bluetooth (from a kind person, I don't own one myself):
-
-hci0:   Type: USB
-         BD Address: 00:20:E0:XX:XX:XX ACL MTU: 192:8  SCO MTU: 64:8
-         UP RUNNING PSCAN ISCAN
-         RX bytes:1964236 acl:94984 sco:0 events:4993 errors:0
-         TX bytes:405157 acl:5003 sco:0 commands:15 errors:0
-         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-         Name: 'ondrabook-0'
-         Class: 0x120104
-         Service Classes: Networking, Object Transfer
-         Device Class: Computer, Desktop workstation
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x222 LMP Ver: 1.1 (0x1) LMP Subver:
-0x222
-         Manufacturer: Cambridge Silicon Radio (10)
-
-What kind of CSR chip (or Firmware) with what features is this? I 
-couldn't find anything about HCI Rev. 0x222 on 
-http://www.holtmann.org/linux/bluetooth/csr.html.
-
-Regards.
-Matthias
+Dear users,
+> 
+> I'm working on a Bluetooth project . I installed openobex /openobexapps 
+> on my Pc and it works.The PC makes connection with the handy and send 
+> files.But now i want to understand how it does.
+> I 've the sdp_lib.h/sdptool.c  and then hci_lib.h/hcitool.c but still 
+> don't really undertand it.
+> Do you have some documentation about  the functions(e.g hci_inquiry(), 
+> sdp_data_alloc(),..) used in those tool-files and what the really do 
+> ?Wich parameters they exactly take and give?
+> It would be a great help for me.
+> 
+> I also need a documentation about obexftp and obex synchronization.
+> I installed teh obexftp files.but i don't really know how to use it for  
+> file management from my pc  to my Bluetooth-handy and vice-versa.
+> 
+> Until today i can send vcards, sms and pictures to my bluetoot_handy but 
+> it does't walk vice versa-The handy can't make a connection with the PC 
+> although it automatically registered the Bluetooth-Adapter adress  of 
+> the PC.Can you tell me PLeaaaaaaassseeeee how i can master that.
+> 
+> I hope you can help me and will be very happy to become this help.
+> 
+> Yours sincerely
 
 
 
