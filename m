@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] colona key problem in 2.6 and bthid
+Subject: Re: [Bluez-users] hidp and hidd related bugs
 From: Marcel Holtmann <marcel@holtmann.org>
 To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405112215.21743.cijoml@volny.cz>
-References: <200405102355.12055.cijoml@volny.cz>
-	 <1084243988.25099.5.camel@pegasus>  <200405112215.21743.cijoml@volny.cz>
+In-Reply-To: <200405120030.54220.cijoml@volny.cz>
+References: <200405120030.54220.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1084369044.25099.44.camel@pegasus>
+Message-Id: <1084368090.25099.22.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,16 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 May 2004 15:37:24 +0200
+Date: Wed, 12 May 2004 15:21:30 +0200
 
 Hi Michal,
 
-> with hidd and hidp colona key works under 2.6.6 :)
-> Those were probably some shadows on moon
+> I did little research and here is output:
+> 
+> keys which are not reported in xev:
+> Eigene Dateien
+> Eigene Bilder
+> Eigene Musik
+> Messenger
+> Abmelden
+> 
+> Reported badly
+> Rechner is reported like Pause
+> Standby like Print
+> 
+> Do you want send keycodes which reports bthid in 2.4.26 to have the same 
+> hotkeys events?
 
-this is the important reasons, why I only want one generic HID parser
-implementation for Linux. Do it once right and everything is going to
-work like a charm.
+you own a german keyboard ;)
+
+However I can't help you in that case, because I have little interest to
+fix this. The HID parser that is used by the HIDP kernel module is the
+same parser as in the USB HID driver. In some near future they will be
+joined to use the same generic parser. The parser in bthid was written
+for the Microsoft keyboard and maybe did some assumptions that are wrong
+for other keyboards. Try to get the buttons work with current HIDP and
+some external programs like hotkeys.
+
+> hidd --killall wants atribute BDADDR 
+
+Silly typo. I only tested "-K" and that was working. It is fixed in CVS
+now.
 
 Regards
 
