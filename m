@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Encryption, authentication with Bluez
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Julien Campana <juliencampana@yahoo.fr>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1083758037.1541.36.camel@fischer>
-References: <1083758037.1541.36.camel@fischer>
+From: Julien Campana <juliencampana@yahoo.fr>
+To: BlueZ-devel List <bluez-devel@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1083761997.4420.4.camel@pegasus>
+Message-Id: <1083758037.1541.36.camel@fischer>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Encryption, authentication with Bluez
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,29 +15,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 05 May 2004 14:59:57 +0200
+Date: Wed, 05 May 2004 13:53:57 +0200
 
-Hi Julien,
+Hi Everybody,
 
-> With the hciconfig tool, authentication and encryption can be switch to
-> on/off. 
-> But if I well understood, this affects the local device and therefore
-> every future connection. 
+With the hciconfig tool, authentication and encryption can be switch to
+on/off. 
+But if I well understood, this affects the local device and therefore
+every future connection. 
+Is there any way to have two connections, one using authentication and
+not the other?
 
-if you switch auth and encrypt on with hciconfig or in hcid.conf then
-you are in security mode 3.
+Thank you for your answers,
 
-> Is there any way to have two connections, one using authentication and
-> not the other?
-
-This is security mode 2 (also called service level security) and of
-course this is possible. You can trigger auth or switch encryption with
-hcitool.
-
-Regards
-
-Marcel
-
+Julien Campana
+ 
 
 
 
