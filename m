@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Collin R. Mulliner" <collin@betaversion.net>
+From: David Mackie <d.mackie@ru.ac.za>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Can you spoof/forge Bluetooth Devices/Address?
-Message-Id: <20040606185024.7d7004d2@coredump>
-In-Reply-To: <20040606162154.GA94074@rucus.ru.ac.za>
-References: <20040606162154.GA94074@rucus.ru.ac.za>
+Message-ID: <20040606162154.GA94074@rucus.ru.ac.za>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Can you spoof/forge Bluetooth Devices/Address?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,25 +15,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 6 Jun 2004 18:50:24 +0200
+Date: Sun, 6 Jun 2004 18:21:54 +0200
 
 Hi,
 
-> Does anyone know if you are able to spoof or forge a Bluetooth Device
-> Address? I am wanting to pick up Bluetooth comms at one point and
+Does anyone know if you are able to spoof or forge a Bluetooth Device
+Address? I am wanting to pick up Bluetooth comms at one point and forward it
+on to another device but I am wanting the repeating devices to act like the
+original sending devices. Eg. If I have a phone that wants to communicate
+with my PC, I can have 2 repeaters, one spoofed as the PC and one as the
+phone.
 
-As far as I know you can't do this with standart (normal) bluetooth
-equipment. Maybe you can do this with special bluetooth devices, check
-out the CSR development information.
+phone <-BT-> Repeater(spoof PC) <-Not BT-> Repeater(spoof phone) <-BT-> PC
+
+More information on why I want to do this can be found at
+http://www.cs.ru.ac.za/research/students/g99m0302/masters/
+
+Any comment of suggestions will be greatly appreciated
+
+David
 
 
-... Collin
 
 -- 
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-According to my calculations the problem doesn't exist.
+ David Mackie
+ MSc Student, Department of Computer Science
+ Rhodes University, Grahamstown, South Africa
+ Email: d.mackie@ru.ac.za 
+ Web: http://www.cs.ru.ac.za/research/students/g99m0302/
 
 
 -------------------------------------------------------
