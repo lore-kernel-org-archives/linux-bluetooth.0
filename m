@@ -1,34 +1,28 @@
 Return-Path: <James@superbug.demon.co.uk>
-Message-ID: <3F184BED.8010409@superbug.demon.co.uk>
-Date: Fri, 18 Jul 2003 20:35:09 +0100
+Message-ID: <3F184AD5.5090709@superbug.demon.co.uk>
+Date: Fri, 18 Jul 2003 20:30:29 +0100
 From: James Courtier-Dutton <James@superbug.demon.co.uk>
 MIME-Version: 1.0
-To: Daryl Van Vorst <daryl@vanvorst.org>
-CC: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>, "'Siegfried Lehmann'" <Siegfried.Lehmann@CetecomUSA.com>, "'Benjamin Ko'" <Benjamin.Ko@CetecomUSA.com>
+To: Daryl Van Vorst <daryl@wideray.com>
+CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
 Subject: Re: [Bluez-devel] Qualification testing - rfcomm
-References: <000201c345a7$e6a3df20$d5b5160a@baked>
-In-Reply-To: <000201c345a7$e6a3df20$d5b5160a@baked>
+References: <001501c3457d$18b63a10$1a01010a@baked>
+In-Reply-To: <001501c3457d$18b63a10$1a01010a@baked>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 Daryl Van Vorst wrote:
-> James,
+> Marcel,
 > 
-> Unfortunately I'm not going to be of much help with SCO testing...  We've
-> been doing our testing with Cetecom (they're on the CC list).
+> Finally got some results on those latest rfcomm changes for qualification.
+> Looks like there are a few more problems. :(  But we're close. :)
 > 
-> It may be possible for you to arrange something with them if you (or someone
-> else) are making a product. Contact Ben Ko (benjamin.ko@CetecomUSA.com) if
-> you'd like to discuss it.
-> 
-> -Daryl.
->
-
-
-I am just an open source developer. I am not making any products or 
-otherwise profiting from what I am doing.
-So, unless CetecomUSA.com do testing for free, I don't think your 
-suggestion will help me much.
+Can you outline what hardware you are using to do the test.
+Is it:
+1) USB bluetooth adapters
+2) PCI bluetooth adapters
+3) PCMCIA bluetooth adapters
+4) Serial bluetooth adapters.
 
 Cheers
 James
