@@ -1,42 +1,56 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41596F71.9090003@c-s.fr>
-From: "GUILLON Gabriel" <gabriel.guillon@c-s.fr>
-MIME-Version: 1.0
-To: bluez devel <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-devel] Range
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 28 Sep 2004 16:04:33 +0200
+Return-Path: <pomac@vapor.com>
+Subject: Re: [Bluez-devel] [2.6.8 ->] Problems, hci_usb dosn't work.
+From: Ian Kumlien <pomac@vapor.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1095881187.6223.108.camel@pegasus>
+References: <1095807044.3211.9.camel@big> <1095842833.5762.27.camel@pegasus>
+	 <1095877600.3211.15.camel@big>  <1095877744.6223.88.camel@pegasus>
+	 <1095877955.3211.18.camel@big>  <1095878303.6223.93.camel@pegasus>
+	 <1095878969.3211.23.camel@big>  <1095879167.6223.104.camel@pegasus>
+	 <1095880805.3277.4.camel@big>  <1095881187.6223.108.camel@pegasus>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-7fGdaTQnTITMDNSsO6hV"
+Message-Id: <1095889873.3157.2.camel@big>
+Mime-Version: 1.0
+Date: Wed, 22 Sep 2004 23:51:13 +0200
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Is there a mean to know, by software, the range of a usb dongle?
-Subsequently, does any one know the range of the bluetooth chip of=20
-Powerbook 15" and Powerbook 17" (running linux) ??
 
+--=-7fGdaTQnTITMDNSsO6hV
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, 2004-09-22 at 21:26, Marcel Holtmann wrote:
+> This looks really like an ohci_hcd problem with interrupt URBs.
+
+The reply i received:
+Error -28 is -ENOSPC, which means the USB bandwidth was exhausted.  Too=20
+many devices were plugged into the same controller.  Unplugging some of=20
+the other devices ought to help.  Or even plugging the BT controller
+into one of the other ports rather than the external high-speed hub,
+since it is only a full-speed device.
+
+Alan Stern
+---
+
+Then i moved the usb dongle around in the newly discovered 2 usb
+ports...and suddenly it worked (only in one of the two usb ports though)
+and now i'm not touching it! =3D)
+
+Thanks for all the help =3D)
 --=20
-"Everything is funny, if you wait long enough"
+Ian Kumlien <pomac () vapor ! com> -- http://pomac.netswarm.net
 
-Gab
+--=-7fGdaTQnTITMDNSsO6hV
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
 
-"Il semble que le go=FBt des livres
-croisse avec l'intelligence."
-- Marcel Proust -
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
 
+iD8DBQBBUfPQ7F3Euyc51N8RAjXGAJ9512vmrTWdjNqdaQjfdVeYIfy1ugCePAPk
+5USETaj4AeRFPPoTuqKdtZY=
+=AZ4B
+-----END PGP SIGNATURE-----
 
--------------------------------------------------------
-This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
-Project Admins to receive an Apple iPod Mini FREE for your judgement on
-who ports your project to Linux PPC the best. Sponsored by IBM.
-Deadline: Sept. 24. Go here: http://sf.net/ppc_contest.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--=-7fGdaTQnTITMDNSsO6hV--
