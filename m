@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <3FE04C90.8050109@grupopie.com>
-From: Paulo Marques <pmarques@grupopie.com>
-MIME-Version: 1.0
-To: Marc Hansen <marc.hansen@gmx.net>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Networkperformance
-References: <23028.1071640737@www51.gmx.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+To: bluez-users@lists.sourceforge.net
+From: Will Partain <will.partain@verilab.com>
+Message-ID: <lu8ylbven9.fsf@pc22.verilab.com>
+References: <3F4F6BF2.6080303@gtmp.org> <1062170277.27784.138.camel@pegasus>
+ <3F4F70B1.20200@gtmp.org> <3F50803C.607@gtmp.org>
+ <1062425807.13729.162.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: Belkin F8T002 PC Card problem with Bluez
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,35 +18,72 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Dec 2003 12:31:12 +0000
+Date: Wed, 17 Dec 2003 11:59:22 +0000
 
-Marc Hansen wrote:
+(I am picking up a thread about this card from back in September.)
 
-> Hi, 
-> my Networkconnection is now stable for ours. Max was right not to use the 
-> alternate usbdriver! :-) 
->  
-> How fast could be network over bluetooth? 
-> I tried to see the performance with iptraf, but that does not work. 
+To recap, with Belkin F8T002 card plugged into a Presario
+908EA laptop running a modified current-RH9 kernel [added a
+few lines as Alexandre Jousset suggested earlier in this
+thread]. Then with...
 
-Best way to test it IMHO is to setup a BNEP (PAN) connection and measure the 
-speed of a FTP transfer over that link.
+   # /etc/rc.d/init.d/pcmcia restart 
+   Shutting down PCMCIA services: cardmgr modules. 
+   Starting PCMCIA services: cardmgr. 
+ 
+In the syslog for that, you see...
 
-This will give you the "net" bandwidth an application is supposed to get over IP 
-over bluetooth.
+    kernel: unloading Kernel Card Services 
+    kernel: Attached scsi CD-ROM sr0 at scsi0, channel 0, id 0, lun 0 
+    kernel: sr0: scsi3-mmc drive: 24x/24x writer cd/rw xa/form2 cdda tray 
+    kernel: Uniform CD-ROM driver Revision: 3.12 
+    kernel: Linux Kernel Card Services 3.1.22 
+    kernel:   options:  [pci] [cardbus] [pm] 
+    kernel: PCI: Assigned IRQ 10 for device 00:0a.0 
+    kernel: Yenta IRQ list 02b8, PCI irq10 
+    kernel: Socket status: 30000020 
+    kernel: cs: cb_alloc(bus 2): vendor 0x1415, device 0x950b 
+    kernel: PCI: Enabling device 02:00.0 (0000 -> 0003) 
+    kernel: ttyS4 at port 0x4000 (irq = 10) is a 16C950/954 
+    cardmgr[1508]: starting, version is 3.1.31 
+    cardmgr[1508]: watching 1 sockets 
+    cardmgr[1508]: Card Services release does not match 
+    kernel: cs: IO port probe 0x0c00-0x0cff: clean. 
+    kernel: cs: IO port probe 0x0100-0x04ff: excluding 0x200-0x207 0x378-0x3\
+    x4d0-0x4d7 
+    kernel: cs: IO port probe 0x0a00-0x0aff: clean. 
+    cardmgr[1508]: socket 0: CardBus hotplug device 
+    /sbin/hotplug: arguments (pci) env (PCI_SLOT_NAME=02:00.0 PCI_ID=1415:95\
+    /usr/sbin:/usr/bin ACTION=add PWD=/etc/hotplug PCI_SUBSYS_ID=1415:0001 S
+    CLASS=70006 _=/bin/env) 
+    /sbin/hotplug: invoke /etc/hotplug/pci.agent () 
+    /etc/hotplug/pci.agent: ... no modules for PCI slot 02:00.0 
 
-Note that even BNEP as some overhead as the IP / Ethernet headers have to go 
-through the connection, even if they are compressed/simplified.
+Anyway, it's there:
 
-I hope this helps,
+    # cardctl ident 
+    Socket 0: 
+      product info: "OXSEMI", "OXCB950", "Rev A" 
+      manfid: 0x0279, 0x0001 
+      function: 2 (serial) 
 
--- 
-Paulo Marques
-Software Development Department - Restinfor, Lda.
-Phone: +351 252 290600, Fax: +351 252 290601
-Web: www.grupopie.com
+An 'hciattach' then "works", where "works" is defined to
+mean "something happened".  The simplest form
+(hciattach /dev/ttyS4 any) spews nonsense, as was seen
+earlier in this thread.
 
-"In a world without walls and fences who needs windows and gates?"
+The glorious Marcel suggested 'hciattach /dev/ttyS4 bcsp'
+(which simply replies: "BCSP initialization timed out").  He
+further suggested fiddling with baud rates and the like;
+neither Alexandre not I have had any luck with that (it
+still just times out).
+
+So: Has anyone made further progress on this device and/or
+has any suggestions?  (I am serially incompetent and short
+of time, but I'll try to help if I can.)  Thanks and regards
+to all,
+
+Will
 
 
 
