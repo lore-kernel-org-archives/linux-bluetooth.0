@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] new bthid and switching off sensor in mouse???
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404021906.54779.cijoml@volny.cz>
-References: <200404021906.54779.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1080926895.2836.87.camel@pegasus>
-Mime-Version: 1.0
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200404021906.54779.cijoml@volny.cz>
+Subject: [Bluez-users] new bthid and switching off sensor in mouse???
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,25 +17,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 02 Apr 2004 19:28:15 +0200
+Date: Fri, 2 Apr 2004 19:06:54 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> I upgraded bthid from CVS and from that time optical sensor in my mouse is 
-> switching off??  It absolutelly not lights. Switch on makes it only pressing 
-> right mouse button???
-> 
-> Is it new feature or bug?
-> Can I switch this feature off? It makes me crazy
+I upgraded bthid from CVS and from that time optical sensor in my mouse is 
+switching off??  It absolutelly not lights. Switch on makes it only pressing 
+right mouse button???
 
-I don't know what you are talking about, but maybe the battery of your
-mouse is almost empty.
+Is it new feature or bug?
+Can I switch this feature off? It makes me crazy
 
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
