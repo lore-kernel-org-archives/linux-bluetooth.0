@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1103280955.4097.172.camel@justakiss>
-Mime-Version: 1.0
-Subject: [Bluez-users] how to identify power class
+From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
+To: <bluez-users@lists.sourceforge.net>
+Subject: AW: [Bluez-users] Toshiba and BT (SuSE 9.2)
+Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAIlEyQgujTUypH+pFEc3nRgEAAAAA@t-online.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="US-ASCII"
+In-Reply-To: <1103226781.6325.5.camel@notepaq>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,13 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Dec 2004 11:55:55 +0100
+Date: Fri, 17 Dec 2004 11:04:18 +0100
 
-Hi,
-is it possible to get the power class (1,2,3) of a bluetooth device by
-software (hciconfig, ...)? 
+Hi Marcel,
+thanks a lot for your professional help. I will try to get the information
+how to connect to the network from my local linux-user group.
 
--Erwin
+At the moment I'm not able to configure dund and ppp0 by YaST.
+
+Best regards and marry Christmas
+Peter
 
 
 
