@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <411810BF.8010001@dark-reality.de>
+Message-ID: <41180E64.1010007@dark-reality.de>
 From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] "comlicated" setup - known issues for	hid and SCO?
-References: <4117A907.7010006@dark-reality.de>	 <1092071597.4564.17.camel@pegasus>  <4117B376.3030507@dark-reality.de>	 <1092073484.4564.32.camel@pegasus>  <4117BA71.5000800@dark-reality.de> <1092090585.4564.51.camel@pegasus>
-In-Reply-To: <1092090585.4564.51.camel@pegasus>
+Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
+References: <4117AB9A.9010909@dark-reality.de>	 <1092071356.4564.12.camel@pegasus>  <4117B098.5020805@dark-reality.de>	 <1092073167.4564.26.camel@pegasus>  <4117C0AB.2010609@superbug.demon.co.uk> <1092090364.4564.46.camel@pegasus>
+In-Reply-To: <1092090364.4564.46.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -17,70 +17,60 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 02:03:11 +0200
+Date: Tue, 10 Aug 2004 01:53:08 +0200
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
 Marcel Holtmann wrote:
-| Hi Lars,
+
+|>To summarise, we need low latency, full duplex, and to provide that, we
+|>need to accurately be able to determine and control the buffer sizes.
+|>The current bluetooth stack has no api to help us in this regard, and
+|>therefore will not work very well.
 |
 |
-|>| I don't see the hold mode. This can cause problem if they form a
-|>| scatternet. When both are connect what does "hcitool con" say?
-|>
-|>without SCO connection active:
-|>Connections:
-|>~        < ACL 00:0E:07:33:DE:2B handle 45 state 1 lm MASTER
-|>~        > ACL 00:07:61:04:D6:7D handle 41 state 1 lm MASTER
-|>
-|>
-|>with active SCO connection:
-|>Connections:
-|>~        < SCO 00:0E:07:33:DE:2B handle 44 state 1 lm SLAVE
-|>~        < ACL 00:0E:07:33:DE:2B handle 45 state 1 lm MASTER
-|>~        > ACL 00:07:61:04:D6:7D handle 41 state 1 lm MASTER
-|
-|
-| so both devices are in the same piconet. There should be no problem, but
-| from my position I can't tell you anything more.
-|
+| Actually you think that we need it, but I am still not sure that this is
+| really needed in case of the concept of the SCO packet from the HCI and
+| the SCO handling that is done on link manager/chip level. However you
+| can still convince me with real code.
 
-Hm OK thanks anyway. I'll try to find out what's happening.
+I have to agree with Marcel here. I've been using snd-bt-sco for a while
+now with my HBH-35 Sony Ericsson Headset, and it works pretty well. Of
+course I don't know much about how audio is processed here, but the
+snd-bt-sco layer simply connects the sco socket to the alsa audio
+socket. There's not much stuff about full duplex or low latency done,
+I'm pretty sure I'd have noticed.
 
-|>BTW, do you know what is the difference between using channel "1" and
-|>"no" channel for the SCO connection? The btsco client has this option,
-|>and if it's used as "1" the language for the RFCOMM commands seems to be
-|>different (i.e. if I press the take/hold button on the headset, I get
-|>"AT+BVRA=?" when using without "channel", but "AT+CKPD=200" when used
-|>with channel 1).
-|
-| I've never used the btsco software.
+Of course this is useless if you want to do, say, proper audio handling
+in a way ProTools would do it, but for VoIP and Gateway phone I never
+had much of a problem.
 
-I'd not have asked if I thought it would have to do (much) with btsco.
+If audio latency could be reduced (I'd estimate it at about 250ms-400ms
+for input->output loopback) it would be a nice enhancement, but I won't
+state that "this can't be done with current Bluez".
 
-Here's what this channel does (default if not given is 2):
+I'm just not really sure where to start now ;)
 
-	addr.rc_family = AF_BLUETOOTH;
-	bacpy(&addr.rc_bdaddr, dst);
-	addr.rc_channel = channel;
-	if (connect(s, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-		close(s);
-		return -1;
-	}
+Marcel, what exactly do you mean by "implementing an alsa interface"?
+Should there be an interface [like SCO] that is than accessed by an
+additional alsa driver?
 
-I just thought you might remember something from the BT specs or so. But
-if you don't, I don't want to bother you, I can read up myself :)
+Maybe it would be possible to use some of the snd-bt-sco code here,
+because only the userspace daemon that "wraps" the sound sockets
+together must be "integrated" (well, it's functionality) into BlueZ,
+while the snd-bt-sco alsa driver could remain nearly the same, just
+accessing the BlueZ/alsa interface instead of BlueZ/SCO?
 
-thanks,
+cu,
 ~  Lars
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.3 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFBGBC+QWC6DTWkDAoRAsD3AKCiWO+t6jNpm35Sq3EzoXG/+oPUeQCfdmAm
-dlxxjGyWd45MV3RvVQvPJFI=
-=nZcH
+iD8DBQFBGA5kQWC6DTWkDAoRAv1rAKCiObAKyOieEGVYQXaXUL/miJoRhQCePGgG
+ccqZc1X2B3oRPW+WvLrSD6c=
+=pgzQ
 -----END PGP SIGNATURE-----
 
 
