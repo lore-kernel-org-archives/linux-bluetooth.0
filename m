@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Dominik Blystak <Dominik.Blystak@pro-open.de>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] ISSC USB Dongle does not work with current bluez?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andreas Krause <Andreas.Krause@web.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200407222124.44032.Andreas.Krause@web.de>
+References: <200407222124.44032.Andreas.Krause@web.de>
 Content-Type: text/plain
-Message-Id: <1090530634.2168.13.camel@localhost>
+Message-Id: <1090529272.21828.41.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] p3nfs drops connection
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,130 +18,90 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Jul 2004 23:10:34 +0200
+Date: Thu, 22 Jul 2004 22:47:52 +0200
 
-Hi,
+Hi Andreas,
 
-I hope nobody gets offended that I'm writing with an p3nfs issue to the
-bluez-users list, but I believe that somebody around here might have
-some experience with that tool and is willing to help a blueZ newbie ;)
+> I've got a Bluetooth USB Dongle, Vendor ID 0x1131 (ISSC, Integrated System 
+> Solution Corp.), Product ID 0x1001, Revision 3.115. All drivers load well and 
+> seamless, device is recognized correctly. hcid and sdpd also load well and 
+> don't complain. Kernel log is almost silent, no special lines there. However, 
+> no inqiry and no device scan is possible ("Connection timed out", see below). 
+> Same hardware _does_ find my bluetooth enabled mobile phone when used under 
+> Win2k. Any help or any clue?
 
-The problem is, that my Siemens SX1 drops every p3nfs connection attemp.
-As described in the manual I'm bringing up BT and the nfsclient on the
-phone. Then I type:
+where do you got these dongle?
 
-#rfcomm bind 0 00:01:E3:2E:91:81 11
-#p3nfsd -series60 -tty /dev/rfcomm0 -dir /mnt/sx1
+> Here's my config:
+> 
+> Distribution:	Gentoo Linux
+> Kernel		gentoo-dev-sources-2.6.7-r11
+> 		with patch-2.6.7-mh2
+> Packages:
+> sweethome root # epm -qa | grep blue
+> bluez-utils-2.5
+> bluez-libs-2.7
+> bluez-sdp-1.5
+> bluez-bluefw-1.0
+> kdebluetooth-20040416
+> bluez-pan-1.1
+> bluez-hcidump-1.9
+> bluez-hciemu-1.0
 
-The phone reacts with a message ("do you wish to allow this connec..")
-and after pushing the "ok" button the connection drops.
-The phone's lcd shows at first, "OK" and then "Connection closed
-(-2147483647)"
+you only need bluez-libs-2.8, bluez-utils-2.8 and bluez-hcidump-1.9. The
+rest of the BlueZ packages are deprecated and you will run into trouble
+installing them.
 
-At the terminal I get this output:
+> (bluez-utils-2.7 does not compile:
+> gcc -DHAVE_CONFIG_H -I. -I. -I..     -Wall -g -O2 -c ciptool.c
+> sdptool.c: In function `add_handsfree':
+> sdptool.c:1129: error: `HANDSFREE_SVCLASS_ID' undeclared (first use in this 
+> function)
+> sdptool.c:1129: error: (Each undeclared identifier is reported only once
+> sdptool.c:1129: error: for each function it appears in.)
+> sdptool.c:1135: error: `HANDSFREE_PROFILE_ID' undeclared (first use in this 
+> function)
+> sdptool.c:1151: error: `SDP_SUPPORTED_FEATURES' undeclared (first use in this 
+> function)
+> sdptool.c: At top level:
+> sdptool.c:1578: error: `HANDSFREE_SVCLASS_ID' undeclared here (not in a 
+> function)
+> )
 
-> p3nfsd: version 5.15, using /dev/rfcomm0 (115200), mounting on
-/mnt/sx1
-> p3nfsd: to stop the server do "ls /mnt/sx1/exit". (pid 2361)
-> nfs mount /mnt/sx1: (errno 19) No such device
+I will need at least bluez-libs-2.7 as written in the ChangeLog.
 
-I put an hcidump (see bottom) on that problem to get further information
-but im unexperienced in blueZ and I don't know what to do.
+> sweethome root # hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:11:67:00:0B:9E ACL MTU: 678:12  SCO MTU: 48:5
+>         UP RUNNING PSCAN ISCAN INQUIRY
+>         RX bytes:384 acl:0 sco:0 events:17 errors:0
+>         TX bytes:317 acl:0 sco:0 commands:17 errors:0
+>         Features: 0xff 0xff 0x0d 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'BlueZ (0)'
+>         Class: 0x000100
+>         Service Classes: Unspecified
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x172 LMP Ver: 1.1 (0x1) LMP Subver: 0x172
+>         Manufacturer: Integrated System Solution Corp. (57)
 
+Never seen a device from ISSC, but you already run an inquiry. Looks a
+little bit weird.
 
+> sweethome root # hcitool inq
+> Inquiring ...
+> Inquiry failed.: Connection timed out
+> sweethome root # hcitool scan
+> Scanning ...
+> Inquiry failed: Connection timed out
 
-Thanks a lot
+Run "hcidump -x" and show it to us while executing these commands.
 
-Dominik Blystak
+Regards
 
-
-
-#hcidump
-HCIDump - HCI packet analyzer ver 1.5
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Create Connection(0x01|0x0005) plen 13
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Connect Complete(0x03) plen 11
-< ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0040
-< HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Command Complete(0x0e) plen 6
-> HCI Event: Max Slots Change(0x1b) plen 3
-> ACL data: handle 0x0028 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x004f scid 0x0040 result 1 status 2
-> ACL data: handle 0x0028 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x004f scid 0x0040 result 0 status 0
-< ACL data: handle 0x0028 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x004f flags 0x0000 clen 4
-    MTU 1024
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 0
-< ACL data: handle 0x0028 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x004f flags 0x0000 result 0 clen 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0028 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 4
-    MTU 672
-< ACL data: handle 0x0028 flags 0x02 dlen 8
-    L2CAP(d): cid 0x4f len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0028 flags 0x02 dlen 8
-    L2CAP(d): cid 0x40 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-< ACL data: handle 0x0028 flags 0x02 dlen 18
-    L2CAP(d): cid 0x4f len 14 [psm 3]
-      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
-      dlci 22 frame_type 0 credit_flow 15 pri 7 ack_timer 0 frame_size
-667 max_retrans 0 credits 7
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0028 flags 0x02 dlen 18
-    L2CAP(d): cid 0x40 len 14 [psm 3]
-      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
-      dlci 22 frame_type 0 credit_flow 14 pri 7 ack_timer 0 frame_size
-667 max_retrans 0 credits 3
-< ACL data: handle 0x0028 flags 0x02 dlen 8
-    L2CAP(d): cid 0x4f len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 22 pf 1 ilen 0 fcs 0xb8
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0028 flags 0x02 dlen 8
-    L2CAP(d): cid 0x40 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 22 pf 1 ilen 0 fcs 0x73
-< ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(d): cid 0x4f len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 22 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
-< ACL data: handle 0x0028 flags 0x02 dlen 8
-    L2CAP(d): cid 0x4f len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 22 pf 1 ilen 0 fcs 0x59
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(d): cid 0x40 len 8 [psm 3]
-      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 22 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
-< ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(d): cid 0x4f len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 22 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0028 flags 0x02 dlen 8
-    L2CAP(d): cid 0x40 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 22 pf 1 ilen 0 fcs 0x73
-< ACL data: handle 0x0028 flags 0x02 dlen 8
-    L2CAP(d): cid 0x4f len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
-< ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x004f scid 0x0040
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> HCI Event: Number of Completed Packets(0x13) plen 5
-> ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x004f scid 0x0040
-< HCI Command: Disconnect(0x01|0x0006) plen 3
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Disconn Complete(0x05) plen 4
+Marcel
 
 
 
