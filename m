@@ -1,18 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Logitech MX900 mouse with Dell Inspiron 8600
+Subject: Re: [Bluez-devel] The future of Bluetooth HID
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Olivier Bornet <Olivier.Bornet@smartdata.ch>
-Cc: Charles Bueche <charles@bueche.ch>, Edd Dumbill <edd@usefulinc.com>,
-   Peter Klausler <peter@klausler.com>,
-   BlueZ Developers List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20031204085314.GA1780@smartdata.ch>
-References: <1070201531.8187.20.camel@bluez.bueche.ch>
-	 <1070218289.8534.30.camel@bluez.bueche.ch>
-	 <20031201093804.A1281@schnell.us.cray.com> <1070380522.19169.52.camel@saag>
-	 <1070380907.19169.55.camel@saag> <1070482683.18058.6.camel@bluez.bueche.ch>
-	 <1070483755.24159.114.camel@pegasus>  <20031204085314.GA1780@smartdata.ch>
-Content-Type: text/plain
-Message-Id: <1070545978.24162.179.camel@pegasus>
+To: Charles Bueche <charles@bueche.ch>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1070526591.8282.9.camel@bluez.bueche.ch>
+References: <1070482368.24159.110.camel@pegasus>
+	 <1070526591.8282.9.camel@bluez.bueche.ch>
+Content-Type: text/plain; charset=iso-8859-15
+Message-Id: <1070544281.24162.165.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -24,35 +19,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 04 Dec 2003 14:52:58 +0100
+Date: Thu, 04 Dec 2003 14:24:41 +0100
 
-Hi Olivier,
+Hi Charles,
 
-> October 13, I have send a patch to Peter for the mouse button problems.
-> See the two first email attached. No answer at all from Peter...
-> This is against version 0.6 of bthid, but this is a very simple patch,
-> so it must be easy to put in on the last release of bthid. The major
-> problem is that the MX900 send all the button status when there is a
-> change. And because if a button is not recognized by bthid, it was
-> assigning it by default to the button 1. Has the MX900 has more buttons
-> than bthid think. So, button 1 is always not pressed... (see attached
-> emails for more info).
-> 
-> October 18, I have send a patch for non-US keyboard. This was used by
-> another guy on bluez-users. Again, no answer from Peter... See 3rd email
-> attached to this one.
-> 
-> October 28, I have send the patches on the bluez-users list. No answer
-> from Peter... (see mailing list archive to find my message)
+> after being only a few days into Bluetooth, I'm very happy with Marcel'=
+s
+> work and the high quality of this list. I have now my Logitech MX900
+> almost working.
 
-I have now applied both patches to my implementation.
+my new code was not as bad as I expected and so it is already committed
+to CVS. I will look at the patches from Olivier and include them as soon
+as possible. This should make the MX900 working perfect and fix some
+keyboard layout problems.
 
-> Here is another try (on bluez-devel this time). Thanks to let me known
-> what is bad with my patches.  I'm sure if you will be put them in bthid,
-> people using Logitech deviceces will be happy. And also people using
-> non-us keyboard.
+For everyone who wants to play with the new HID code, you must be aware
+that you need the new Bluetooth library and this can actually break some
+of your setups. The second thing is the uinput driver that is already
+present in 2.6 and for 2.4 you have to pick my patch from LKML.
 
-You should always post them to the mailing list.
+We should now concentrate on getting a full featured HID parser. The
+most thing that I miss at the moment is that the LED events are not
+reported back to the HID device. I would appreciate if someone can look
+at it and send me a patch.
+
+> I will therefore donate 20=A4 or 20$ to Marcel for helping buying the
+> missing hardware he needs to complete his implementation. If some among
+> you do the same effort, Marcel will be able to purchase the hardware
+> needed. Please participate !
+>=20
+> Marcel, please let us say how you want the money delivered (which
+> currency, wheter paypal is OK, or note in an envelope, etc).
+
+I have a PayPal link on my German UpTimes article. Thanks for the offer.
+
+	http://www.holtmann.org/papers/bluetooth/uptimes2003.html
 
 Regards
 
