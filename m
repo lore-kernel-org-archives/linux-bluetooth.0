@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluetooth ethereal dissector
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <3F9F8062.90209@superbug.demon.co.uk>
+From: James Courtier-Dutton <James@superbug.demon.co.uk>
+MIME-Version: 1.0
 To: Paul Ionescu <paul@acorp.ro>
 Cc: ethereal-dev@ethereal.com,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1067379074.2419.24.camel@paul>
+Subject: Re: [Bluez-devel] bluetooth ethereal dissector
 References: <1067379074.2419.24.camel@paul>
-Content-Type: text/plain
-Message-Id: <1067425631.24043.224.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <1067379074.2419.24.camel@paul>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -19,10 +19,11 @@ List-Id: <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 29 Oct 2003 12:07:05 +0100
+Date: Wed, 29 Oct 2003 08:54:58 +0000
 
-Hi Paul,
-
+Paul Ionescu wrote:
+> Hi,
+> 
 > I am planning to make an ethereal dissector for bluetooth HCI
 > conversation for BlueZ Bluetooth stack.
 > In order to see this data, we have to load it first in ethereal.
@@ -30,19 +31,22 @@ Hi Paul,
 > 
 > 1. Make libpcap hci aware, and let it capture hci data in normal pcap
 > file like tcpdump, then ethereal will be able to sniff live from hci0.
-
-from my point of view this is not a good idea, because libpcap is for
-Ethernet traffic. But ask the libpcap guys what they think about it.
-
+> 
 > 2. Make ethereal read capture files made with hcidump -w.
+> 
+> The first one seems better, but the second is easier.
+> What do you think ?
+> 
+> P.S. This message is posted on both ethereal and bluez development
+> lists.
+> 
+The affix,"http://affix.sourceforge.net/", bluetooth stack for linux 
+already has an interface to ethereal, so it might be worth using the 
+same api as affix has with ethereal, thus sharing the amount of 
+development work needed to be done.
 
-This should be the way to go, because live capturing is not always what
-you want. However ethereal can read from stdin and we can modifiy
-hcidump to output the raw packages to stdout.
-
-Regards
-
-Marcel
+Cheers
+James
 
 
 
