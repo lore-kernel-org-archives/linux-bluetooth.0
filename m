@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <423589B1.6000403@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <42357B08.7020009@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
-To: Fredrik Tolf <fredrik@dolda2000.com>
-Cc: bluez-devel@lists.sourceforge.net
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re: [Patch] Some btsco modifications
 References: <1110683934.5056.43.camel@pc7.dolda2000.com>	 <4233C663.80109@xmission.com> <1110762698.5056.73.camel@pc7.dolda2000.com>
 In-Reply-To: <1110762698.5056.73.camel@pc7.dolda2000.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] Re: [Patch] Some btsco modifications
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,26 +18,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 14 Mar 2005 05:55:13 -0700
+Date: Mon, 14 Mar 2005 12:52:40 +0100
 
-Fredrik
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
->>> * Instead of (dis)connecting with the headset button, the driver
->>>notifies userspace when it is in use, and the userspace program connects
->>>accordingly.
->>> * Send SIGUSR1 to the userspace program to make the headset ring.
->>> * The userspace program now reads a config file, ~/.btscorc, which
->>>contains alternating lines of regexes and shell commands. Everything
->>>that the headset sends is matched against these regexes, and if a match
->>>if found, the shell command is run (with any back references replaced).
->>>This, of course, is primarily intended to "do stuff" with the headset
->>>button(s). Send SIGHUP to re-read the config file.
 
-Can you comment on what the implications are for supporting multiple 
-headsets simultaneously with a single btsco daemon? Would the kernel 
-interaction need to be changed again or could it be limited to the daemon?
+|>>On the bad side, the coding is pretty unelegant in its places, and I've
+|>>completely violated your coding style. Also, backward compatibility for
+|>>userspace communication is broken since I had to extend the structure
+|>>for incorporating usage status. I haven't updated the btsco2 program
+|>>either.
 
-Brad
+I really like the changes you made in this patch, but why don't you
+simply follow the coding style and send in a patch that's actually
+usefull to the community? It's not that hard to comply to coding
+style...? *scratchinghishead*
+
+maybe you could fix the coding style and send it in again :)
+
+Is it possible to have the headset buttons work as they did without the
+patch, like, switching between both behaviours? there are scenarios for
+both methods, and even the BT specs cover both of them.
+
+best regards & thanks for helping out,
+~  Lars
+
+- --
+Lars Grunewaldt
+* software development
+* multimedia design
+skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+web: http://www.dark-reality.de
+mail: lgw@dark-reality.de
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFCNXsHQWC6DTWkDAoRAty+AJ9aa55eTNBHLL9A5xgTzwVT6c7lmACfQ5mm
++Nw6fldrnKKJlRGwHV7qLkc=
+=nWCb
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
