@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Thinkpad X31 @ fedora core 2, trying to connect to Nokia 6380i
-Message-ID: <20040610101649.GA7496@gmx.net>
-References: <m365a0b8f9.fsf@bfnet.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <m365a0b8f9.fsf@bfnet.com>
+From: DVornheder@t-online.de
+Content-Type: text/plain; charset="ISO-8859-1"
+Message-ID: <1BYJR5-1Xq5q40@cmpmail07.bbul.t-online.de>
+Subject: [Bluez-users] Some questions
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,38 +15,67 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Jun 2004 12:16:49 +0200
+Date: Thu, 10 Jun 2004 08:53:15 +0200
 
-On  0, David Wuertele <dave-gnus@bfnet.com> wrote:
-> I boot my thinkpad, and the bluetooth chip is recognized.  My phone
-> has bluetooth turned on.  I see my phone when I scan, but I can't seem
-> to connect with it:
-> 
-> # uname -a
-> Linux 5nave 2.6.5-1.358 #1 Sat May 8 09:04:50 EDT 2004 i686 i686 i386 GNU/Linux
-> # rpm -q bluez-utils bluez-libs
-> bluez-utils-2.4-3
-> bluez-libs-2.5-2.1
-> # hcitool scan
-> Scanning ...
-> 	00:60:57:2A:37:E9	Dave's Nokia
-> [...]
-> # ps auxwf | grep hcid
-> root      1982  0.0  0.0  3100  700 ?        S    16:24   0:00 hcid: processing events
-> root      2785  0.0  0.0  3104  700 ?        S    16:43   0:00  \_ hcid: processing events
-> root      2790  0.0  0.0  4012  572 pts/1    S    16:44   0:00              \_ grep hcid
-> # rfcomm connect rfcomm0 00:60:57:2A:37:E9
-> Can't connect RFCOMM socket: Resource temporarily unavailable
-> # tail -2 /var/log/messages
-> Jun  9 16:43:37 5nave hcid[1982]: link_key_request (sba=00:20:E0:75:D6:F6, dba=00:60:57:2A:37:E9) 
-> Jun  9 16:43:37 5nave hcid[1982]: pin_code_request (sba=00:20:E0:75:D6:F6, dba=00:60:57:2A:37:E9) 
-> 
-> Is there something else I should be doing?
+Hi !
 
-Seems that your PIN exchange doesn't work. What is your "security"
-setting in hcid.conf? Does appear a pin windows on the mobile display?
+Yesterday i bought a Belkin Bluetooth USB Adapter.
 
-nicholas
+After plugin the adapter i get this messages:
+
+Jun  9 21:36:05 pclap kernel: usb 1-1: new full speed USB device using
+address 
+2
+Jun  9 21:36:05 pclap /etc/hotplug/usb.agent[11903]: need a device for
+this 
+command
+Jun  9 21:36:05 pclap hcid[4002]: HCI dev 0 registered
+Jun  9 21:36:05 pclap hcid[4002]: HCI dev 0 up
+Jun  9 21:36:05 pclap hcid[4002]: Starting security manager 0
+Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM ver 1.3
+Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM socket layer initialized
+Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM TTY layer initialized
+
+lsusb shows:
+
+Bus 002 Device 002: ID 050d:0081 Belkin Components
+
+With ciptool search the adapter is connecting to my AVM Fritz ISDN AP-X:
+
+Jun  9 21:40:00 pclap hcid[4002]: pin_code_request
+(sba=00:0A:3A:51:81:4E, 
+dba=00:04:0E:85:35:15)
+Jun  9 21:40:00 pclap hcid[4002]: link_key_notify
+(sba=00:0A:3A:51:81:4E)
+Jun  9 21:40:00 pclap hcid[4002]: Saving link key 00:0A:3A:51:81:4E 
+00:04:0E:85:35:15
+
+hcitool scan shows:
+
+Scanning ...
+	00:04:0E:85:35:15	Bluetooth ISDN Access Point
+	00:04:0E:83:3C:40	BlueZ (0)
+                           00:02:72:44:CF:9F                  
+BELKIN_PRT_44CF9F
+
+My questions:
+
+- No driver is loaded after plugin the adapter.
+
+   Is this ok ?
+
+- How can i open a internet connection ?
+
+- How can i print on my usb printer which is connected to the
+BELKIN_PRT_44CF9F
+
+   bluetooth adapter ?
+
+
+Dirk
+
+
+
 
 
 -------------------------------------------------------
