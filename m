@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41F4D1ED.6070502@webstuhl.net>
-From: Ben Pezzei <ben@webstuhl.net>
+Message-ID: <41F4A55D.9070701@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: Again: Problems with Dongle, Headset or btsco
-References: <41F0EB0A.1020302@webstuhl.net> <41F0FE84.8030401@dark-reality.de> <41F128F4.2020006@webstuhl.net> <41F13638.1080207@dark-reality.de> <41F25C4B.6040709@webstuhl.net> <csts46$p5n$1@sea.gmane.org> <41F29274.3020909@webstuhl.net> <41F3E469.3020306@dark-reality.de>
-In-Reply-To: <41F3E469.3020306@dark-reality.de>
+Subject: Re: [Bluez-devel] scooped by pocketpc (a2dp)
+References: <41E93682.9040907@xmission.com> <41E93B4F.1010600@dark-reality.de> <41EA1B6E.3070303@xmission.com>
+In-Reply-To: <41EA1B6E.3070303@xmission.com>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,31 +18,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Jan 2005 11:46:05 +0100
+Date: Mon, 24 Jan 2005 00:35:57 -0700
 
-Hi
+Lars
 
-Lars Grunewaldt schrieb:
-
+> hmm. i see a menu for alsa devices but our userspace a2dp device 
+> (currently stubbed out, but not implemented) doesn't show up. i set it 
+> up as documented in btsco/bt/BUILD
 > 
-> uhm, this is wrong. If you are using the "actual" btsco package from CVS
-> - - and you should be - it must record as signed 16 bit if I'm not
-> mistaken (possibly unsigned 16B, but in no case 8 bit)
+>> That leads to - at least - gnomemeeting and openphone supporting alsa
+>> directly :)
 
-This worked neither
+I noticed that linphone from debian-testing has oss and alsa devices in 
+its audio device selection menu.
 
-Anyways, I just want to let you know that I kicked the Anycom
-Dongle and bought an D-Link DBT 120 Rev 4, et voila: Everything
-is working fine.
+I still haven't been able to get the stubbed out alsa-lib driver to show 
+up! I also tried a .asoundrc with
 
-Headset: Plantronics 2500
+pcm.a2dpplug {
+         type plug
+         slave { pcm "a2dp" }
+}
 
-tnx again for your help and congrats @ Developers
+pcm.a2dp {
+         type a2dp
+         bdaddr "00:08:F4:30:05:BB"
+}
 
-greetings
-ben
+since that was more like what the jack plugin is supposed to have... no 
+luck...
 
-
+Brad
 
 
 -------------------------------------------------------
