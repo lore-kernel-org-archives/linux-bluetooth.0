@@ -1,9 +1,9 @@
-Return-Path: <jon@valvatne.com>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] hidd --server only finding one device
-From: Jon Valvatne <jon@valvatne.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jon Valvatne <jon@valvatne.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1087513312.4309.100.camel@pegasus>
+In-Reply-To: <1087512926.3103.51.camel@localhost.localdomain>
 References: <1087496559.3103.11.camel@localhost.localdomain>
 	 <1087504160.4309.78.camel@pegasus>
 	 <1087507199.3103.27.camel@localhost.localdomain>
@@ -11,33 +11,56 @@ References: <1087496559.3103.11.camel@localhost.localdomain>
 	 <1087511321.3103.32.camel@localhost.localdomain>
 	 <1087511911.4309.94.camel@pegasus>
 	 <1087512926.3103.51.camel@localhost.localdomain>
-	 <1087513312.4309.100.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1087520970.3103.87.camel@localhost.localdomain>
+Message-Id: <1087513312.4309.100.camel@pegasus>
 Mime-Version: 1.0
-Date: Fri, 18 Jun 2004 03:09:31 +0200
-List-ID: <bluez-users.lists.sourceforge.net>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 18 Jun 2004 01:01:52 +0200
 
-On Fri, 2004-06-18 at 01:01, Marcel Holtmann wrote:
-<snip>
-> 
-> I think the problem here is your Bluetooth card. The Nokia card is
-> working fine, but it seems that it has problems when you try to get
-> another device into that piconet in which it is already master. I only
-> own the DTL-1 and so I can't test this, but with a newer card or USB
-> dongle everything should work, because I tested already this case with
-> seven HID devices and it was working perfect.
-> 
+Hi Jon,
 
-Ok, thank you very much for your help. I was actually happy when I
-received a Socket card of revision F instead of G, because then I
-wouldn't have to worry about the G card not working with the 2.6 kernel.
-But I guess there's a reason they never supported HID in their windows
-drivers for the previous revisions.
+> Can anyone? This may be a silly question, but what exactly is the link
+> manager? Is there anything I can do to track the problem down, or should
+> I just give up?
 
-I've just ordered their special upgrade offer, so hopefully in a week or
-two I'll have both the F and the G revision to play with. Maybe I can
-even somehow make the newer card work with 2.6, so I can have both a new
-kernel and working HID. Wish me luck :)
+you must buy a protocol analyzer for this ;)
 
-Jon
+> Just to make sure I've understood this right: The problem is that once
+> the first connection is set up, the link manager won't accept (or
+> detect?) another incoming connection. The reason it works when I do it
+> manually is that the connect button on the keyboard makes the keyboard
+> listen for a connection, and the subsequent 'hidd --connect <addr>'
+> makes the CF card connect to the keyboard. Is that right?
+
+I think the problem here is your Bluetooth card. The Nokia card is
+working fine, but it seems that it has problems when you try to get
+another device into that piconet in which it is already master. I only
+own the DTL-1 and so I can't test this, but with a newer card or USB
+dongle everything should work, because I tested already this case with
+seven HID devices and it was working perfect.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by The 2004 JavaOne(SM) Conference
+Learn from the experts at JavaOne(SM), Sun's Worldwide Java Developer
+Conference, June 28 - July 1 at the Moscone Center in San Francisco, CA
+REGISTER AND SAVE! http://java.sun.com/javaone/sf Priority Code NWMGYKND
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
