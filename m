@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Device class resetting itself after device is
-	removed
+Subject: Re: [Bluez-users] MS BT Keyboard problem solved
 From: Marcel Holtmann <marcel@holtmann.org>
-To: trejkaz@xaoza.net
+To: Florian Echtler <echtler@fs.tum.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200411012222.49520.trejkaz@trypticon.org>
-References: <200411012222.49520.trejkaz@trypticon.org>
+In-Reply-To: <Pine.LNX.4.61.0411011023040.15228@block.bubble>
+References: <Pine.LNX.4.61.0411011023040.15228@block.bubble>
 Content-Type: text/plain
-Message-Id: <1099313117.16247.84.camel@pegasus>
+Message-Id: <1099313202.16247.87.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,49 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 01 Nov 2004 13:45:17 +0100
+Date: Mon, 01 Nov 2004 13:46:42 +0100
 
-Hi Trejkaz,
+Hi Florian,
 
-> I've been noticing some issues which seemed to start happening after I left my 
-> machine alone for a while.  Eventually I thought I would try to nail the 
-> problem down and exclude some parties like kdebluetooth from the picture.  
-> What's left is quite reproducible.  It turns out that these periods of 
-> leaving the machine alone coincided with the times I removed the dongle to 
-> use it at work. :-)
-> 
-> System in healthy state:
-> 
-> raven root # hciconfig hci0 class
-> hci0:   Type: USB
->         BD Address: 00:0B:0D:40:14:0D ACL MTU: 120:20  SCO MTU: 64:0
->         Class: 0xff0104
->         Service Classes: Positioning, Networking, Rendering, Capturing, Object 
-> Transfer, Audio, Telephony, Information
->         Device Class: Computer, Desktop workstation
-> 
-> System after removing dongle:
-> 
-> raven root # hciconfig hci0 class
-> Can't get device info: No such device
-> 
-> System after replacing dongle:
-> 
-> raven root # hciconfig hci0 class
-> hci0:   Type: USB
->         BD Address: 00:0B:0D:40:14:0D ACL MTU: 120:20  SCO MTU: 64:0
->         Class: 0x000000
->         Service Classes: Unspecified
->         Device Class: Miscellaneous,
-> 
-> Now, the class has reset to 0x000000, but that's not the value I have in 
-> hcid.conf.
-> 
-> It also destroys my hostname value and probably everything else important at 
-> the same time, which would certainly explain why I suddenly can't connect ot 
-> the computer from any devices when it happens.
+> remember my keyboard which refused to handle the multimedia
+> buttons, boot mode or not? Well, the solution was easier than
+> I thought - obviously, once the keyboard is in boot mode, it 
+> refuses to go back, even if hidd tells otherwise. I just had
+> to remove the batteries, wait a few seconds, pop them back in
+> and voila, the multimedia keys work as expected (with 2.6.8.1-mh1).
 
-are you sure that your hcid is running?
+this is interesting. May I must include a switch to report mode in the
+kernel, but I always thought that this is default. Do you own the old or
+the new Microsoft keyboard?
 
 Regards
 
