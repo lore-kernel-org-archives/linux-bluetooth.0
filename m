@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] SCO link
-Message-ID: <20040417074624.GA1663@gmx.net>
-References: <20040414090858.GL10652@kyberia.net> <1082160929.4489.27.camel@pegasus>
+Subject: Re: [Bluez-users] another oops with bthid and 2.6.5
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200404130755.36353.cijoml@volny.cz>
+References: <200404122330.11760.cijoml@volny.cz>
+	 <1081810426.8634.28.camel@pegasus>  <200404130755.36353.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1082161386.4489.39.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1082160929.4489.27.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,20 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Apr 2004 09:46:25 +0200
+Date: Sat, 17 Apr 2004 02:23:06 +0200
 
-On  0, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > is there a solution how to establish a SCO link (voice) between mobile phone and 
-> > PC in the way, that PC with soundcard will act as bluetooth handset ? 
-> > I've found an alsa driver, but this works in opposite direction (BT handset
-> > acts as soundcart to PC). 
-> 
-> not that I know of. Start writing it ;)
+Hi Michal,
 
-I think KDE Bluetooth Framework contains a Handsfree Implementation.
-Maybe this is what the OP searched, but I never tried it.
+> I forgot to say, that this oops happens when preempt is switched off
 
-nicholas
+you can see that in the oops ;)
+
+This is a normal NULL pointer dereference and we have to find the wrong
+code in uinput.c and fix it. Acutally I have not time for it :(
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
