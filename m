@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <411EF7C7.10900@hotmail.com>
-From: Walt <idunno2468@hotmail.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] MS multimedia keys
+Subject: Re: [Bluez-users] hidd not reports it's version
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200408142332.10700.cijoml@volny.cz>
+References: <200408142332.10700.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1092530313.4375.15.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,15 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 Aug 2004 01:42:31 -0400
+Date: Sun, 15 Aug 2004 02:38:33 +0200
 
-I have the ms bluetooth wireless desktop.  I was using kernel 2.6.7 
-patched, hidd  and hidp, and everything was fine.  I upgraded to 2.6.8, 
-first rc2 and now final, and the multimedia stopped working.  I checked 
-hcidump, and those keys, as well as the alt. function f* keys, dont 
-produce output. 
-Thanks
-Walt
+Hi Michal,
+
+> hidd doesn't report it's version when called hidd --help
+
+this is easy to fix and is in CVS now.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
