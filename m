@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <37D1FAB2FA7B7E4993785B956F853C73181467@ednex506.dsto.defence.gov.au>
-From: "Wodecki, Victor (Contractor)" <Victor.Wodecki@dsto.defence.gov.au>
-To: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] HCI Events and errors
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+To: bluez-devel@lists.sourceforge.net
+From: Jesse Guardiani <jesse@wingnet.net>
+Message-ID: <ctpmok$otj$2@sea.gmane.org>
+References: <41F0EB0A.1020302@webstuhl.net> <41F0FE84.8030401@dark-reality.de> <41F128F4.2020006@webstuhl.net> <41F13638.1080207@dark-reality.de> <41F25C4B.6040709@webstuhl.net> <csts46$p5n$1@sea.gmane.org> <41F29274.3020909@webstuhl.net> <41F3E469.3020306@dark-reality.de> <41F4D1ED.6070502@webstuhl.net> <41F4DA44.6070608@dark-reality.de> <1106569225.9269.64.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Re: Re: Again: Problems with Dongle, Headset or btsco
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,33 +17,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 2 Feb 2005 16:21:48 +1030
+Date: Wed, 02 Feb 2005 00:00:56 -0500
 
-Marcel,
+Marcel Holtmann wrote:
 
-> is there a reason why you use only DM1 packets and haven't 
-> activated any of the link policies? Try if this changes something.
+> Hi Lars,
+> 
+>> as it seems that those dongles seem not to work with the currect sco
+>> implementation, what would you propose to debug this misfunction?
+>> 
+>> Maybe the hci_usb driver can be fixed or a workaround added for this
+>> chipsets (I think they are buggy, not our implementation, but if there's
+>> a simple workaround...)
+> 
+> the Silicon Wave chips are not the best ones. They have problems and it
+> seems that they are not going to fix them. Mostly because they sell ROM
+> chips are these ones can't be updated by a newer firmware. However if
+> this is the problem with SCO packets and handle 0 then the hci_usb
+> driver should simply drop these frames, because they are not valid SCO
+> payload.
 
-I've tried changing them with no difference to the test results.
-
-> the "hci_num_comp_pkts_evt: hci0 num_hndl 1" is missing here and this
-> means that the flow is suspended and we can't send HCI commands or
-> data anymore. You may run into an memory problem if you keep 
-> sending and the hardware never wakes up again,
-
-The user-space app doesn't see any problem at the point where the
-hardware error is raised, so it keeps calling send() until eventually
-send() fails with a 'resource unavailable' error status, presumably
-because of the lack of sk_buf's.
-
-> but the question is why the hardware never wakes up?
-
-The NatSemi chip appears to be a LMX9814; I'll see how I go with the
-data sheets.
+I'm confused by this response. I have a USB-240 dongle too. Does this mean
+that a simple workaround is possible, or no?
 
 -- 
+Jesse Guardiani, Systems Administrator
+WingNET Internet Services,
+P.O. Box 2605 // Cleveland, TN 37320-2605
+423-559-LINK (v)  423-559-5145 (f)
+http://www.wingnet.net
 
-This email remains the property of the Australian Defence Organisation and is subject to the jurisdiction of section 70 of the Crimes Act 1914.  If you have received this email in error, you are requested to contact the sender and delete the email.
+
 
 
 -------------------------------------------------------
