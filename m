@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Suresh Srinivasan <sspriniv@engr.smu.edu>
-To: bluez-users@lists.sf.net
-Message-ID: <Pine.OSF.4.10.10406121321460.6753-100000@speed.seas.smu.edu>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] Broadcasting in Bluetooth
+To: bluez-users@lists.sourceforge.net
+From: David Wuertele <dave-gnus@bfnet.com>
+Message-ID: <m3oenr9t1k.fsf@bfnet.com>
+References: <m365a0b8f9.fsf@bfnet.com> <20040610101649.GA7496@gmx.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Re: Thinkpad X31 @ fedora core 2, trying to connect to Nokia 6380i
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,27 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 12 Jun 2004 13:28:36 -0500 (CDT)
+Date: Thu, 10 Jun 2004 11:17:27 -0700
 
+Nicholas> Seems that your PIN exchange doesn't work. What is your
+Nicholas> "security" setting in hcid.conf?
 
-Dear Maxim Krasnyansky,
-                        Iam suresh srinivasan, doing my masters in computer
-science at SMU. Iam currently looking at broadcasting in a bluetooth piconet.
->From my understanding from the bluetooth protocol stack is that broadcast
-is not supported as of now. Iam trying do the following to broadcast a packet in the bluetooth
-piconet:
+ security auto;
 
-1) Creating a connection(ACL) to all the slaves.
-2) In function "HCI_ACL_SEND" the parameter "flag" in the function
-hci_add_acl_hdr(skb,conn->handle,flags|ACL_START) is modified to flags|ACL_ACTIVE_BCAST".
-Can i broadcast with the above changes? or do i ned some more changes?
-Please, give me your valueable sugestions? please, guide me if iam in
-the wrong direction.Eagerly waiting for your response,
+Nicholas> Does appear a pin windows on the mobile display?
 
-Thanking you,
-Warm regards,
-suresh
+No, there was no change on my 6310i display.
+But on my laptop display I got a dialog asking for the PIN.
+Where do I get this mysterious PIN?
+I tried making one up.  Then it worked!
 
+Is this PIN stored somewhere?  I see a file
+
+  /etc/bluetooth/pin
+
+but it doesn't contain the PIN that I typed into the laptop dialog and
+the phone dialog.
+
+Dave
 
 
 
