@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] DiNovo Multimedia keys... again...
+Subject: Re: [Bluez-users] System Freeze....
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Rui Lopes <rlopes@ipb.pt>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <413C6DCD.3060606@ipb.pt>
-References: <413C6DCD.3060606@ipb.pt>
+To: Johannes <lintner@c-lab.de>
+Cc: David Stennett <praefectus@gmail.com>, bluez-users@lists.sourceforge.net
+In-Reply-To: <413EA0A2.7070507@c-lab.de>
+References: <1aef6225040907130365c31e4c@mail.gmail.com>
+	 <413EA0A2.7070507@c-lab.de>
 Content-Type: text/plain
-Message-Id: <1094627466.5384.2.camel@notepaq>
+Message-Id: <1094627398.5384.0.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,57 +19,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 08 Sep 2004 09:11:06 +0200
+Date: Wed, 08 Sep 2004 09:09:59 +0200
 
-Hi Rui,
+Hi Johannes,
 
-> I'm successfully using the Logitech DiNovo keyboard and mouse in both 
-> Desktop and Laptop in bluetooth. However, the multimedia keys are not 
-> recognized.
-> The procedure I followed to install the keyboard is the following:
-> 
-> $ modprobe hidp
-> $ hidd --server
-> $ hid2hci
-> 
-> done! it works.
-> 
-> I can see that the keyboard events with hcidump when pressing the 
-> multimedia hotkeys (in this case, volume up, volume down and mute):
-> HCIDump - HCI packet analyzer ver 1.10
-> device: hci0 snap_len: 1028 filter: 0xffffffff
->  > ACL data: handle 0x0029 flags 0x02 dlen 14
->      L2CAP(d): cid 0x0041 len 10 [psm 0]
->  > ACL data: handle 0x0029 flags 0x02 dlen 10
->      L2CAP(d): cid 0x0041 len 6 [psm 0]
->  > ACL data: handle 0x0029 flags 0x02 dlen 10
->      L2CAP(d): cid 0x0041 len 6 [psm 0]
->  > ACL data: handle 0x0029 flags 0x02 dlen 10
->      L2CAP(d): cid 0x0041 len 6 [psm 0]
->  > ACL data: handle 0x0029 flags 0x02 dlen 10
->      L2CAP(d): cid 0x0041 len 6 [psm 0]
->  > ACL data: handle 0x0029 flags 0x02 dlen 10
->      L2CAP(d): cid 0x0041 len 6 [psm 0]
->  > ACL data: handle 0x0029 flags 0x02 dlen 10
->      L2CAP(d): cid 0x0041 len 6 [psm 0]
->  > ACL data: handle 0x0029 flags 0x02 dlen 14
->      L2CAP(d): cid 0x0041 len 10 [psm 0]
-> 
-> But they don't show up in xev (this is the Return key press and release 
-> event. Multimedia keys doesn't cause any event to occurr):
-> KeyPress event, serial 26, synthetic NO, window 0x3c00001,
->      root 0x5e, subw 0x0, time 103253160, (391,131), root:(1299,323),
->      state 0x0, keycode 36 (keysym 0xff0d, Return), same_screen YES,
-> "   XLookupString gives 1 bytes:  "
-> 
-> KeyRelease event, serial 26, synthetic NO, window 0x3c00001,
->      root 0x5e, subw 0x0, time 103253248, (391,131), root:(1299,323),
->      state 0x0, keycode 36 (keysym 0xff0d, Return), same_screen YES,
-> "   XLookupString gives 1 bytes:  "
-> 
-> Any clue?
+> freezes it, when you are booting your system or even when it is still 
+> running?
+> My System stop while booting, when I put the dongle in. But this was 
+> before I patched my system for bluez.
 
-try the 2.6.8-mh1 kernel patch and see if they are mapped now.
+when you talk about such problems then always include your kernel
+version. Otherwise we can't tell you anything about it.
 
 Regards
 
