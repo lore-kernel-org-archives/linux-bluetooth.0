@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] HID mouse doesnt reconnect after sleep if
-	bemused-bemusedlinuxserver connection is open
+Subject: Re: [Bluez-users] hcidump and l2cap questions
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jouni.Lohikoski@iki.fi
+To: Sean Loh <blaze_wk@yahoo.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041017133034.GC274769@kosh.hut.fi>
-References: <20041017125132.GA274769@kosh.hut.fi>
-	 <1098018136.4911.87.camel@pegasus>  <20041017133034.GC274769@kosh.hut.fi>
+In-Reply-To: <20041017151430.12721.qmail@web41129.mail.yahoo.com>
+References: <20041017151430.12721.qmail@web41129.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1098026676.4911.96.camel@pegasus>
+Message-Id: <1098026437.4911.91.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,33 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 17 Oct 2004 17:24:37 +0200
+Date: Sun, 17 Oct 2004 17:20:37 +0200
 
-Hi Jouni,
+Hi Sean,
 
-> > > hcid is in security mode 3, auth+encryption turned on.
-> > 
-> > as I always said, do this only if you know what you are doing ;)
+> I'm streaming audio from one computer to another
+> computer  using the pan profile.
 > 
-> I have a hint of what I am doing? :-)
-> If I take the authentication off, with current bemused implementation
-> anyone could download ogg and mp3-files from my computer. I could not
-> claim I did not know this was possible or I didn't know that would be
-> illegal :P
+> 1. I would like to see bnep packets being filtered
+> through hcidump. But when i put the bnep filter on,
+> hcidump does not print out anything. It only seems to
+> print out acl and l2cap data. Why is that? How am I
+> able to see bnep packet info?
 
-fine for me as long as you are aware of the side effects of using
-security mode 3.
+simply call "hcidump -x" and be happy. However if you miss the initial
+l2cap_connect_req the dynamic channel assignment don't works.
 
-> > What does "hciconfig -a" and "hcitool info <phone>" say?
-> 
-> Now, in this moment when I have both HID-mouse and Bemused working, it
-> looks like this:
+> 2. I notice that even if i send udp packets that have
+> 55000 bytes. The maximum packet length that turns up
+> on hcidump is 1500 bytes. Shouldn't it be 55000 bytes
+> because the max mtu for an l2cap packet is 65535
+> bytes?
 
-Check with "hciconfig hci0 revision" (as root) your firmware version of
-your dongle, but it is not a HCI 16.x one and so it does not support any
-kind of scatternet stuff and this is maybe the reason why it fails. Use
-"hcidump -x" to check for the real HCI error codes and look them up in
-the Bluetooth specification.
+The L2CAP uses segmentation and we use a MTU of 1691. Start thinking a
+little bit about the Ethernet frame size and so on.
 
 Regards
 
