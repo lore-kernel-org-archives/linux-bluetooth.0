@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Przemek Hausman <aquamala@o2.pl>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] CAD library for BT carrier socket 
-Message-ID: <20040302190149.GA12430@mech.pw.edu.pl>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Problems with RS232 and BT - Can't init device hci0
+Message-ID: <20040302183742.GA12057@mech.pw.edu.pl>
+References: <200403021801.11637.zubiwat@poczta.onet.pl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-2
+In-Reply-To: <200403021801.11637.zubiwat@poczta.onet.pl>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,21 +17,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 2 Mar 2004 20:01:49 +0100
+Date: Tue, 2 Mar 2004 19:37:42 +0100
 
-Hi Folks!
+> When try to use hciattach /dev/ttyS0 any 921600 flow I always get:
+[...]
 
-I'm afraid it's not a good place to ask but I have no idea where else can I try.
+try this:
+$ strace -eopen hciattach /dev/ttyS0 any 921600
 
-I am looking for a library for CAD software (e.g. Eagle od Protel) which contains a package 
-and PCB layout for Suyin's Bluetooth Carrier Socket for Ericsson Module ROK101007.
-
-If you have such library I would like to kindly ask you for it. Please, make it available on
-some www site or send it here. Of corse you can push in to my priv `aquamala [in domain] o2
-[dot] pl'.
+and watch, what's wrong.
 
 Best regards, 
 Przemek Hausman
+
+-- 
+unsigned int gg = 2627828;
 
 
 -------------------------------------------------------
