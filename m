@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Question about hciconfig...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Michael Frey <mfrey@pepper.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <721F30FA-17CA-11D9-8894-00039390D626@pepper.com>
-References: <721F30FA-17CA-11D9-8894-00039390D626@pepper.com>
-Content-Type: text/plain
-Message-Id: <1097091489.7325.1.camel@pegasus>
-Mime-Version: 1.0
+Mime-Version: 1.0 (Apple Message framework v619)
+Message-Id: <721F30FA-17CA-11D9-8894-00039390D626@pepper.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+To: BlueZ List Mailing <bluez-devel@lists.sourceforge.net>
+From: Michael Frey <mfrey@pepper.com>
+Subject: [Bluez-devel] Question about hciconfig...
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,29 +15,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 06 Oct 2004 21:38:09 +0200
+Date: Wed, 6 Oct 2004 15:03:44 -0400
 
-Hi Michael,
+After looking at the hciconfig code I notices that the Max speed for an 
+ericsson uart module is maxed out at 115200.
 
-> After looking at the hciconfig code I notices that the Max speed for an 
-> ericsson uart module is maxed out at 115200.
-> 
-> 	{ "ericsson", 0x0000, 0x0000, HCI_UART_H4,   57600,  115200, FLOW_CTL, 
-> ericsson },
-> 
-> 
-> Am I interpreting this correct?  If so why the upper limit?
-> 
-> UARTS can go faster than 115200.
+	{ "ericsson", 0x0000, 0x0000, HCI_UART_H4,   57600,  115200, FLOW_CTL, 
+ericsson },
 
-this is the default value, because most serial ports on motherboards can
-only do 115200 max. If you own a high speed UART, you can overwrite this
-value from the command line.
 
-Regards
+Am I interpreting this correct?  If so why the upper limit?
 
-Marcel
+UARTS can go faster than 115200.
 
+Michael
 
 
 
