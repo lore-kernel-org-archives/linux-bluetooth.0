@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Till Harbaum <harbaum@beecon.de>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [SPAM?]:  [Bluez-devel] baswap neccesity
-Cc: soraberri <421246@posta.unizar.es>
-References: <cruhvs$fj5$1@sea.gmane.org>
-In-Reply-To: <cruhvs$fj5$1@sea.gmane.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200501101947.53084.harbaum@beecon.de>
+From: soraberri <421246@posta.unizar.es>
+Message-ID: <cruhvs$fj5$1@sea.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] baswap neccesity
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,24 +16,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Jan 2005 19:47:52 +0100
+Date: Mon, 10 Jan 2005 19:36:02 +0100
 
-Hi,
+Hi
 
-On Monday 10 January 2005 19:36, soraberri wrote:
-> Why is it neccesary? Why does the server listening at the other side
-> expect addresses in such byte ordering?
-It's not the server on the other side but the local bluetooth chip that wants 
-to receive the address in the reverse order. If you want to know why this is 
-you'll probably have to ask someone from the Bluetooth SIG.
+I'm reading rctest.c:
+In do_connect function, a call to bswap is used just before the connect 
+call:
+	baswap(&rem_addr.rc_bdaddr, strtoba(svr));
 
-Till
+In the server, baswap is again called just after the accept call
 
--- 
-Dr.-Ing. Till Harbaum                       Tel.:  +49 721 4998963
-BeeCon GmbH                                 Fax:   +49 721 4998962
-Haid-und-Neu Strasse 7, 76131 Karlsruhe     Mobil: +49 179 9087904
-harbaum@beecon.de                           http://www.beecon.de
+Why is it neccesary? Why does the server listening at the other side 
+expect addresses in such byte ordering?
+
+mmm, again thank you for your time (sometimes I feel like trying to slow 
+down a bit your work would enable me to get up to date, but it's 
+useless, the rate of events is dramatic and you always reemerge... ;-) )
+
 
 
 -------------------------------------------------------
