@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Elimar Riesebieter <riesebie@lxtec.de>
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bluez-utils 2.9
-Message-ID: <20040802184344.GA3303@aragorn.home.lxtec.de>
-References: <20040801225614.GB22083@aragorn.home.lxtec.de> <1091411747.4279.7.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="LQksG6bCIzRHxTLp"
-In-Reply-To: <1091411747.4279.7.camel@pegasus>
+Subject: Re: [Bluez-users] Palm connection problems.
+References: <17479.152.62.109.21.1091436641.squirrel@webmail.fusebox.be>
+In-Reply-To: <17479.152.62.109.21.1091436641.squirrel@webmail.fusebox.be>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200408021056.51246.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,52 +19,53 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 2 Aug 2004 20:43:44 +0200
+Date: Mon, 2 Aug 2004 10:56:51 +0200
 
+Hi,
 
---LQksG6bCIzRHxTLp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+at first upgrade to latest utils,libs and mh patch and try again
 
-On Mon, 02 Aug 2004 the mental interface of
-Marcel Holtmann told:
+Michal
 
-> Hi Elimar,
->=20
-> > why does hid2hci doesn't compile in bluez-utils 2.9?
-> >=20
-> > Both --enable-hid2hci nor --enable-all built the binary hid2hci.
-> >=20
-> > Tried the same on 2.8 where it works!
->=20
-> you need the USB library now to build hid2hci.
-
-Which USB library?
-
-Ciao
-
-Elimar
-
-
---=20
-  Never make anything simple and efficient when a way=20
-  can be found to make it complex and wonderful ;-)
-
---LQksG6bCIzRHxTLp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.5 (GNU/Linux)
-
-iD8DBQFBDotg3Ig8bsVPf7ARAtBCAJ9hf9AW3R7aBySWqqE/c6OYyhwiVgCfazA1
-LJTItdK9FY4CcSWgBQAlGFM=
-=0gxa
------END PGP SIGNATURE-----
-
---LQksG6bCIzRHxTLp--
+Dne po 2. srpna 2004 10:50 Johan Van den Brande napsal(a):
+> Marcal, Virat,
+>
+> Thanks for the replies!
+>
+> /dev/rfcomm0 exists:
+>
+> johan@questor:/tmp/bt> stat /dev/rfcomm0
+>   File: "/dev/rfcomm0"
+>   Size: 0               Blocks: 0          IO Block: 4096   Character
+> Device Device: 303h/771d       Inode: 146053      Links: 1     Device type:
+> d8,0 Access: (0666/crw-rw-rw-)  Uid: (    0/    root)   Gid: (    0/   
+> root) Access: Fri Jul  9 00:05:38 2004
+> Modify: Fri Jul  9 00:05:38 2004
+> Change: Fri Jul  9 00:05:58 2004
+>
+> (as does 1-255)
+>
+> The versions I'm using are:
+> bluez-fw       0.9
+> bluez-hcidump  1.5
+> bluez-hciemu   1.0
+> bluez-libs     2.4
+> bluez-pan      1.1
+> bluez-sdp      1.4
+> bluez-utils    2.3
+> patch-2.4.22-mh1
+>
+> I had it working in the past, though. But after a while it stopped
+> functioning. So I guess something must have changed in the meanwhile.
+> I'm not sure what, though.
+>
+> As for the 'bind' solution. The 'rfcomm bind <hw> <channel>' works, but
+> then the pppd daemon complains about /dev/rfcomm1 not existing ...
+>
+> Any advice on how I can gather more information (hcidump)?
+>
+> Regards,
+> Johan
 
 
 -------------------------------------------------------
