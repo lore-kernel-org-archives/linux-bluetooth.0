@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] tcp/ip with bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de46576041107213335071d47@mail.gmail.com>
-References: <2de46576041107213335071d47@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1099913078.6896.83.camel@pegasus>
-Mime-Version: 1.0
+From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
+To: <bluez-users@lists.sourceforge.net>
+Subject: AW: [Bluez-users]  Again dund
+Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAT2mvzXDViU6RxBXLMLKoFgEAAAAA@t-online.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <1099925675.6896.158.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 08 Nov 2004 12:24:38 +0100
+Date: Mon, 8 Nov 2004 19:09:50 +0100
 
-Hi Manjunath,
+Hi Marcel,
+I'm not yet able to tell linux, that my bluetooth-connection is a
+ethernet-connection. I have no idea how to manage this with PPP. With =
+YaST I
+tried to define the bt-connection as a networkcard - but it doesn't =
+realy
+work.
 
-> i have a tcp/ip client-server program (i.e) the server is listening
-> and the client sends information.....right now I am communicating over
-> the wired network. I want them to communicate over bluetooth.
-> Is this done by enabling ppp over rfcomm?? if yes, then what am i
-> suppossed to install???? some rfcomm package..
-> What about using the bluez-pan package???
+Linux-Notebook:~ # sdptool search --bdaddr 00:0B:CE:00:01:8F lan
+Searching for lan on 00:0B:CE:00:01:8F ...
+Service Name: Netzwerkzugang
+Service RecHandle: 0x10000
+Service Class ID List:
+  "LAN Access Using PPP" (0x1102)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 1
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
 
-you can establish a TCP/IP connection with the PAN profile or LAN access
-using PPP, but you can also change your program to use the RFCOMM socket
-instead of the TCP socket.
-
-Use the latest kernel and the latest bluez-libs and bluez-utils and
-everything will be there.
+What can I do - ? - perhaps I have to install SuSE 9.2 ??!
 
 Regards
-
-Marcel
+Peter
 
 
 
