@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Connect to mysql server using SDP
+Subject: Re: [Bluez-devel] SDP queries when authentication/encryption are
+	turned on
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050223074111.49990.qmail@web60405.mail.yahoo.com>
-References: <20050223074111.49990.qmail@web60405.mail.yahoo.com>
+In-Reply-To: <200502231044.48821.bluez-devel@schaettgen.de>
+References: <20050223020808.14745.qmail@web52803.mail.yahoo.com>
+	 <1109132939.8506.113.camel@pegasus>
+	 <200502231044.48821.bluez-devel@schaettgen.de>
 Content-Type: text/plain
-Message-Id: <1109242050.5645.11.camel@notepaq>
+Message-Id: <1109241819.5645.8.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,21 +21,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Feb 2005 11:47:30 +0100
+Date: Thu, 24 Feb 2005 11:43:39 +0100
 
-Hi Tanveer,
+Hi Fred,
 
->   I am doing a project here which is like I have a
-> linux machine and win2000 machine. Now there is a
-> databse server in the linuxbox and from win through
-> emulator I want to access the database just to send
-> and receive data. As I have no real hardware so have
-> to conneect to that linux thorugh LAN. I think I can
-> connect to linux thorugh LAN but how to get data from
-> there? which protocol to use?
+> > if you set your device into security mode 3, then this is what you get.
+> > As I have often said, do this only when you know what you are doing and
+> > what does this imply.
+> 
+> Marcel, why don't you simply put this often repeated sentence into a comment 
+> in default hcid.conf right above auth/encrypt? If people are not familiar 
+> with bluetooth, then it's reasonable to assume that you have to enable this 
+> if you want any security at all. You don't expect everbody to know what 
+> security mode 3 means and what the alternatives are, do you?
 
-I have no idea what you are talking about and what this has to do with
-Bluetooth or SDP. Explain it in more details.
+there is a comment that this is security mode 3, but actually this does
+not prevents for its misuse and the later complaints. Problem is that
+Bluetooth is still a complex technology and if you change defaults you
+should understand what you are doing. However I always accept patches
+that extends the manual pages with more details about it.
 
 Regards
 
