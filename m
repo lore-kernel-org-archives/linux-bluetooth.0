@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Patch for hcidump-1.15
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200412060001.32565.carlosarazevedo@netcabo.pt>
-References: <200412060001.32565.carlosarazevedo@netcabo.pt>
+From: Chen Bin <binch@mobilesoft.com.cn>
+To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1102314922.8510.48.camel@pegasus>
+Message-Id: <1102340081.653.6.camel@debian>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Prepare patch bluez for the CoD in hci_conn
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,24 +16,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 06 Dec 2004 07:35:22 +0100
+Date: Mon, 06 Dec 2004 21:34:41 +0800
 
-Hi Carlos,
+Hi Marcel,
 
-> This patch adds support for partial responses in the SDP code. The present
-> code tries to parse each of the partial responses to a REQ, which may not be
-> possible since the responses may be broken up in any way. This patch
-> introduces caching and late parsing were all the response is stored and
-> parsed only when complete. It does not support multiple concurrent pending
-> responses (from diferent connections or REQs).
+Do you remember that I have asked a CoD question in this list and you
+ask me to do a patch to let the CoD value in hci_conn? Now I have time
+to do this work and I have something to clarify for I am not a bluez
+member before and I am not very fimiliar with BlueZ.
 
-thanks for the patch, but you might wanna checkout version 1.16 where I
-already fixed this problem.
+This time I just want to keep the remote CoD value in hci_conn when a
+connection is done. But as you know, sometimes it is impossible for us
+to get the CoD of the remote class without a prestage inquiry. So, not
+every CoD value in hci_conn is valid. I will check the BT spec to find a
+right way to tell the user whether the CoD is valid.
 
-Regards
+Is it enough that I add a field to hci_conn and when the connection is
+done I update the field?
 
-Marcel
-
+Chen
 
 
 
