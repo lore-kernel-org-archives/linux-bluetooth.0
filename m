@@ -1,25 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Source sample custom Bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BEB39C04-5B6A-11D9-8017-000D9348D4BE@magnifeye.com>
-References: <4dfd570904122402134ec2fd32@mail.gmail.com>
-	 <4dfd570904122509237f2a2f48@mail.gmail.com>
-	 <1103995727.8758.31.camel@pegasus>
-	 <4dfd570904122509451e811d7a@mail.gmail.com>
-	 <1103996976.8758.34.camel@pegasus>
-	 <4dfd5709041225095410f71a46@mail.gmail.com>
-	 <1103997529.8758.36.camel@pegasus>
-	 <4dfd570904122510081a9bfa7@mail.gmail.com>
-	 <4dfd570904122510085371c17b@mail.gmail.com>
-	 <4dfd57090412251011705f52be@mail.gmail.com>
-	 <4dfd5709041225103246f6934c@mail.gmail.com>
-	 <1104000494.8758.46.camel@pegasus> <002601c4ebb8$4de24200$020ba8c0@heejune>
-	 <1104125195.9393.12.camel@pegasus>
-	 <BEB39C04-5B6A-11D9-8017-000D9348D4BE@magnifeye.com>
+From: Markus Uhr <uhrm@student.ethz.ch>
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1104604846.4253.1.camel@pegasus>
+Message-Id: <1104589274.10387.9.camel@localhost>
 Mime-Version: 1.0
+Subject: [Bluez-users] IBM Bluetooth PC Card II
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -31,21 +16,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 01 Jan 2005 19:40:46 +0100
+Date: Sat, 01 Jan 2005 15:21:14 +0100
 
-Hi Jonathan,
+Hello
 
-> I am writing code to talk to a custom bluetooth device that I need two 
-> way communication with.  (I sent it commands and it sends characters). 
-> Can you please point me to some sample linux (fc2 ideally) source code.
+In http://www.holtmann.org/linux/bluetooth/devices.html the
+IBM Bluetooth PC Card II is reported to work with the hci_uart
+driver. However, when I insert to card into my computer I get these
+Log-Messages:
 
-the best thing is using a serial profile based communication at RFCOMM
-protocol level. See rctest or attest for examples.
+Jan  1 14:06:08 [cardmgr] socket 0: IBM Bluetooth PC Card II
+Jan  1 14:06:08 [cardmgr] executing: 'modprobe serial_cs'
+Jan  1 14:06:08 [cardmgr] get dev info on socket 0 failed: No such
+device
+Jan  1 14:06:08 [kernel] serial_cs: no usable port range found, giving
+up
+Jan  1 14:06:08 [kernel] serial_cs: RequestIO: No more items
 
-Regards
+So, has anybody an idea what could be wrong that the PCMCIA subsystem
+doesn't initialize the card properly? Do I need to pass some special
+parameters?
 
-Marcel
+My config entry in /etc/pcmcia/bluetooth.conf for the card:
 
+card "IBM Bluetooth PC Card II"
+  version "IBM", "Bluetooth PC Card II", "", ""
+  bind "serial_cs" class "bluetooth"
+
+Is anything wrong with that?
+
+Markus Uhr
 
 
 
