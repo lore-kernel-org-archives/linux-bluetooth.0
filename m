@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Max Number of PANUs supported in PAN
+Subject: Re: [Bluez-users] Some questions
 From: Marcel Holtmann <marcel@holtmann.org>
-To: tOpSy TuRvY <topsyturvy@nemo.student.utwente.nl>
+To: Dirk Vornheder <DVornheder@t-online.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.BSO.4.58.0406222046050.9882@nemo.student.utwente.nl>
-References: <E1BcqIi-0002cT-53@sc8-sf-list2.sourceforge.net>
-	 <Pine.BSO.4.58.0406222046050.9882@nemo.student.utwente.nl>
+In-Reply-To: <200406221724.44949.dvornheder@t-online.de>
+References: <1BYJR5-1Xq5q40@cmpmail07.bbul.t-online.de>
+	 <200406152223.33329.dvornheder@t-online.de>
+	 <1087339136.13792.96.camel@pegasus>
+	 <200406221724.44949.dvornheder@t-online.de>
 Content-Type: text/plain
-Message-Id: <1087939830.4209.12.camel@pegasus>
+Message-Id: <1087939657.4209.8.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,26 +21,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Jun 2004 23:30:30 +0200
+Date: Tue, 22 Jun 2004 23:27:37 +0200
 
-Hi Assed,
+Hi Dirk,
 
-> Can someone tell me the maximum number of users supported in one PAN?
-> I guess this question boils down to:
+> > > The entires in  cups are:
+> > >
+> > > bluetooth://00027244CF9F/spp
+> >
+> > I prefer only using the URI and you don't need to add spp or hcrp,
+> > because the backend with use HCRP if found and only fall back to RFCOMM
+> > printing in the other case.
+> >
+> > Use "hcidump -x" to check what is happening.
+> >
 > 
-> a) Are PANUs in Parked mode supported (i.e. 200+ PANUs in one PAN 
-> possible).
-> b) Is the PAN able to juggle PANUs between active and parked mode so 
-> they all seem "connected" and are able to communicate with each 
-> other.
+> Here are the output from hcidump.
 > 
-> Also, can something tell me if something like above is possible in the BT 
-> SIG PAN specification, or does it also support a maximum of 8 users in a 
-> PAN.
+> Hope you find the problem.
 
-actually this might be possible. I never tried it, but the bigger
-problem will be to find a Bluetooth chip that is tested to work with
-seven actives slaves and a big number of parked devices in one piconet.
+I don't see any useful in it, but it looks very weird. Too much SDP
+traffic. Something must be screwed up. Make me a binary dump with -w and
+try to get the initial connection setup.
 
 Regards
 
