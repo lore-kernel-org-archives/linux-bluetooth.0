@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-In-Reply-To: <1102495339.9988.31.camel@pegasus>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] remove pairing with device?
-MIME-Version: 1.0
-Message-ID: <OF4C259331.38DF59B1-ONC1256F64.00304800-C1256F64.00308C40@isbac.com>
-From: Marius Schaefer/Camberg/ISBAC <Marius.Schaefer@ISBAC.COM>
-Content-Type: text/plain; charset="US-ASCII"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <OF0770A93A.BF533453-ONC1256F64.002DB738-C1256F64.002F0A9E@isbac.com>
+References: 
+	 <OF0770A93A.BF533453-ONC1256F64.002DB738-C1256F64.002F0A9E@isbac.com>
+Content-Type: text/plain
+Message-Id: <1102495339.9988.31.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,30 +19,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Dec 2004 09:50:16 +0100
+Date: Wed, 08 Dec 2004 09:42:19 +0100
 
-Hi Marcel,
+Hi Marius,
 
-> Hi Marius,
-> 
-> > I've gotten BlueZ and OpenObex to work, so I can send files from my 
-phone 
-> > to my linux box. I read the pin from /etc/bluetooth/pin. 
-> > That works very well. But once the phone is paired with Bluez, I can 
-> > change the pin of BlueZ, but the phone stays paired and won't ever ask 
-for 
-> > the new pin. When I delete the pairing on the phone, it will ask for 
-the 
-> > new pin, I need to delete the pairing on the BlueZ side. Is that 
-possible?
-> 
-> the link keys are stored in binary form in /etc/bluetooth/link_key. Look
-> at the mailing list archive for details about that. There has been a
-> thread lately.
-> 
-That was exactly what I was looking for, many thanks!
+> I've gotten BlueZ and OpenObex to work, so I can send files from my phone 
+> to my linux box. I read the pin from /etc/bluetooth/pin. 
+> That works very well. But once the phone is paired with Bluez, I can 
+> change the pin of BlueZ, but the phone stays paired and won't ever ask for 
+> the new pin. When I delete the pairing on the phone, it will ask for the 
+> new pin, I need to delete the pairing on the BlueZ side. Is that possible?
 
-Marius
+the link keys are stored in binary form in /etc/bluetooth/link_key. Look
+at the mailing list archive for details about that. There has been a
+thread lately.
+
+Regards
+
+Marcel
+
 
 
 
