@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Inquiry scans.
+Subject: Re: [Bluez-devel] [PATCH] Fix some bugs in hcidump.
 From: Marcel Holtmann <marcel@holtmann.org>
 To: James Courtier-Dutton <James@superbug.demon.co.uk>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <403A1ECE.6030005@superbug.demon.co.uk>
-References: <403A1ECE.6030005@superbug.demon.co.uk>
+In-Reply-To: <403A1693.1060909@superbug.demon.co.uk>
+References: <40397111.7000903@superbug.demon.co.uk>
+	 <1077522140.2832.70.camel@pegasus>  <403A02FA.60008@superbug.demon.co.uk>
+	 <1077545085.13454.1.camel@pegasus>  <403A1693.1060909@superbug.demon.co.uk>
 Content-Type: text/plain
-Message-Id: <1077556886.2791.51.camel@pegasus>
+Message-Id: <1077557957.2791.58.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,27 +20,14 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 23 Feb 2004 18:21:26 +0100
+Date: Mon, 23 Feb 2004 18:39:17 +0100
 
 Hi James,
 
-> I have a Nokia 6310i mobile phone.
-> It has a bluetooth menu item that says: -
-> "Search for audio accessories"
-> 
-> If I activate this on the Nokia, it finds the Bluetooth headset.
-> 
-> In Bluez, in hcidump, I would expect to see these requests/responds 
-> between those two devices, but I see nothing.
+> I have also added some extra checks so that the while loops will not go 
+> mad if there is a badly formed packet. I.E. n,n1,n2 get given bad values.
 
-you will never see them, because this is the job of the link manager and
-not the HCI layer.
-
-> If bluez never sees the Inquiry scan from the Nokia, how will bluez ever 
-> be able to respond?
-
-You don't need this information on the host stack side. The Bluetooth
-chip itself responds to it.
+patch is applied with some cosmetical changes.
 
 Regards
 
