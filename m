@@ -1,91 +1,76 @@
-Return-Path: <charles@bueche.ch>
-Subject: Re: [Bluez-devel] Getting in touch with libs2 and utils2
-From: Charles Bueche <charles@bueche.ch>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1071436139.4356.124.camel@pegasus>
-References: <1071436139.4356.124.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1071695000.6361.13.camel@bluez.bueche.ch>
-Mime-Version: 1.0
-Date: Wed, 17 Dec 2003 22:03:20 +0100
+Return-Path: <Steven.Singer@csr.com>
+Message-ID: <3FE0C1B9.5090504@csr.com>
+Date: Wed, 17 Dec 2003 20:51:05 +0000
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
+To: ag@new-media-artists.de
+CC: Marcel Holtmann <marcel@holtmann.org>,
+   BlueZ Mailing List
+    <bluez-devel@lists.sourceforge.net>
+Subject: Re: AW: [Bluez-devel] Device Busy during "hcitool info" or
+    "sdptoolsearch"
+References: <FJENILNPNAGPJMMDOKDCKEKBDJAA.ag@new-media-artists.de>
+In-Reply-To: <FJENILNPNAGPJMMDOKDCKEKBDJAA.ag@new-media-artists.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
+Andreas Gaufer wrote:
+> Not wokring inq:
+> < HCI Command: Inquiry(0x01|0x0001) plen 5
+>   33 8B 9E 08 0A
+> 
+> >HCI Event: Command Status(0x0f) plen 4
+>   0C 01 01 04
 
-success !!! Works much better than the hacked bthid under gentoo
-2.6test11.
+CSR firmware will issue this error code if you try to start an inquiry
+while an inquiry or a create_connection is already in progress.
 
-I followed your guide below (preceded by a cvs checkout of course). I
-then ran 
+The inquiry-inquiry restriction is there to protect against hosts who
+have lost control of what they're doing. If we accepted the second
+inquiry, how many inquiry_complete events should we issue?
 
-- hcid (from the gentoo bluez packages)
-- /opt/bluetooth/sbin/bthid --daemon
-- moving mouse --> discover message in syslog : WORKS. YOUPI !!!
+The create_connection-inquiry restriction is there because both
+procedures need to get as much radio bandwidth as possible to work. In
+particular, taking bandwidth away from paging can cause spurious failed
+connections. In this case, create_connection wins. If you issue a
+create_connection while an inquiry is in progress, we will terminate
+the inquiry with an inquiry_complete event and start paging
+immediately.
 
-With the hacked bthid, I had problems in startup (mouse not always
-discovered, etc).
+Once paging has finished and the baseband connection is complete then we
+will allow the host to inquire again.
 
-I don't have any other Bluetooth hardware (beside my Ericsson T68 which
-isn't a HID device AFAIK), so I can't make much more tests.
+Since a Bluetooth chip is connected to one host and since the chip is
+an embedded device with limited resources, we expect the host to handle
+the multiplexing of requests. We expect the host's state to be
+synchronised to ours - if it isn't, we're in trouble.
 
-Apparently, gentoo creates the uinput device in /dev/misc instead of the
-usual /dev/input. Thanks to Marcel for testing both in parser.c !
+It is unreasonable to expect that multiple applications can issue
+arbitrary HCI commands and expect the to complete as if they had sole
+access to the device (consider what would happen with ACL flow control
+tokens).
 
-I will now take the time to update my Web page. THX.
+SDP searching and similar activities will take over the radio to inquire
+and make connections. It is therefore expected that other simultaneous
+actions will fail.
 
-Charles
+In your case, the correct response to having your inquiry rejected is
+to back off for a few seconds and try again - either that, or find some
+way of sharing access to the device.
 
-On Sun, 2003-12-14 at 22:08, Marcel Holtmann wrote:
-> Hi Folks,
-> 
-> this is a mini HOWTO to give you directions how to test the new
-> generations of the Bluetooth library and utils. For most people the
-> important thing will be the HID support ;)
-> 
-> The first thing I have to tell you is that this code is only available
-> in CVS and until the new Bluetooth device manager and SDP daemon are not
-> ready this will definitely not change. So you have to check out the
-> libs2 and utils2 repositories by yourself. If you have done so, you can
-> use this commands to install them without effecting anything of your
-> current Bluetooth setups.
-> 
-> 	cd libs2
-> 	./bootstrap
-> 	./configure --prefix=/opt/bluetooth
-> 	make && make install
-> 
-> 	cd utils2
-> 	./bootstrap
-> 	./configure --prefix=/opt/bluetooth --with-bluetooth=/opt/bluetooth
-> 	make && make install
-> 
-> After that you have installed your software under /opt/bluetooth or any
-> other prefix you have choosen. At the moment we don't link the library
-> search path into the programs so you have to modify your /etc/ld.so.conf
-> to make your library found by the loader.
-> 
-> 	echo /opt/bluetooth/lib >> /etc/ld.so.conf
-> 	ldconfig
-> 
-> Feel free to play with it and send bug reports to the mailing list.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.net email is sponsored by: SF.net Giveback Program.
-> Does SourceForge.net help you be more productive?  Does it
-> help you create better code?  SHARE THE LOVE, and help us help
-> YOU!  Click Here: http://sourceforge.net/donate/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+	- Steven
 -- 
-Charles Bueche <charles@bueche.ch>
-sand, snow, wave, wind and net -surfer
+
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
