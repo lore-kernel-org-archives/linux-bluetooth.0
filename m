@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-To: <bluez-users@lists.sourceforge.net>
-Subject: AW: [Bluez-users] Conflict bluetooth and soundcard
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAejKkYMP2t0iWvwvgIRffgQEAAAAA@t-online.de>
+From: Michal Semler <cijoml@volny.cz>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Conflict bluetooth and soundcard
+References: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAklRz+OMPMEe49ORKn91EJAEAAAAA@t-online.de>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAklRz+OMPMEe49ORKn91EJAEAAAAA@t-online.de>
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <200412221041.57016.cijoml@volny.cz>
+  charset="iso-8859-2"
+Message-Id: <200412221041.57016.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,36 +19,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Dec 2004 11:49:07 +0100
+Date: Wed, 22 Dec 2004 10:41:57 +0100
 
-Hi Michal,
+Compile and use LATEST vanilla kernel 2.6.10-rc3 and let us know about 
+success.
 
-##>
-##>Compile and use LATEST vanilla kernel 2.6.10-rc3 and let us 
-##>know about 
-##>success.
-##>
+We NEVER give help to users using vendor kernels.
 
-I'm using SuSE 9.2 with kernel 2.6.8-24.5 and recompiled dmabt but no
-positiv result. Again the message Can't access Toshiba device /dev/toshiba
-occured. Then soundcard is also uncorrectly installed but this is to be
-solved by YaST at Sound --> options --> reset all.
-But the target is to have both available dmabt (bluetooth-function on of
-Toshiba-notebook) and a usable soundcard (in windows it is using PCI-bus 0
-and irq 11). So, do you have an idea to solve this problem?
+Michal
 
-##>We NEVER give help to users using vendor kernels.
-##>
-
-Why? Marcel Holtmann helped me very well to get the whole BT-function with
-AP started. I tried to get help from SuSE, but this is not really good.
-Sometimes they have heard something about bluetooth and BT on
-Toshiba-notebook is a story itself. So, I'm happy about help from
-bluez-users, especially as Bluez is part of the kernel of SuSE 9.2
-
-So, PLEASE be so kind to help me in this case.
-
-
+Dne st 22. prosince 2004 10:27 Peter K. Martin napsal(a):
+> Hi Marcel,
+> again thanks a lot for your help. The problem of the bt-connection to the
+> accesspoint seems to be solved. I have a littel additional question. There
+> seems to be a confict between dmabt and the soundcard. When the soundcard
+> is correctly installed, dmabt give the massage can't access bt-device. Then
+> I reboot linux with the bootoption ACPI=oldboot --> dmabt works without any
+> message and I'm able to reinstall the soundcard by YaST. But the next boot
+> without bootoption give the same result, so I can use either dmabt or
+> soundcard, They seem to use the same irq or dma-channel. How is this to be
+> changed for dmabt???
+>
+> Regards
+> Peter
 
 
 -------------------------------------------------------
