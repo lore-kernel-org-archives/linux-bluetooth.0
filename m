@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Collin R. Mulliner" <collin@betaversion.net>
-To: bluez-devel@lists.sourceforge.net
-Message-Id: <20040708165219.16a1d6db@coredump>
+Message-Id: <5.1.1.6.0.20040708160740.02419a70@172.16.0.2>
+To: "Williams, Richard" <Richard.Williams@VITRONICS.com>,
+   "Bluez-Devel (E-mail)" <bluez-devel@lists.sourceforge.net>
+From: Arnaud Mouiche <arnaud.mouiche@inventel.fr>
+Subject: Re: [Bluez-devel] SCO question
+In-Reply-To: <A1F0D47583A2D711919F00600819B3A4028BAE@goofy.vitronics.com
+ >
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="Multipart=_Thu__8_Jul_2004_16_52_19_+0200_BJ6/ID7fTNBYncwt"
-Subject: [Bluez-devel] patch for: RFComm dynamic channel allocation
+Content-Type: text/plain; charset="us-ascii"; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,44 +18,73 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 8 Jul 2004 16:52:19 +0200
+Date: Thu, 08 Jul 2004 16:08:59 +0200
 
+At 09:12 08/07/2004 -0400, Williams, Richard wrote:
 
---Multipart=_Thu__8_Jul_2004_16_52_19_+0200_BJ6/ID7fTNBYncwt
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+>Hi,
+>
+>I'm getting back to a BT headset <-> LINUX project that I had abandoned 
+>some months ago. I have an X-scale single board computer running Linux 
+>2.4.26 with the latest Bluez patches. I have a Sony Ericsson HBH-35 
+>headset that I'm trying to get to work with my computer. I have an Anycomm 
+>USB BT dongle.
+>
+>I have done the following:
+>modprobe hci_usb
+>modprobe rfcomm
+>modprobe sco
+>hcid
+>hciconfig hci0 up
+>hciconfig hci0 voice 0x0040
+>.... My Pin file is set up for a pin of "0000" - required by the headset.
+>
+>hcitool scan works OK and finds the headset
+>
+>l2ping works OK and pairs with the headset.
+>
+>hstest record t1.wav 00:0A:D9:74:97:19 1
 
-Hi,
+are you sure than "1" is the correct rfcomm channel ?
+you should perform a SDP request to get the correct one.
 
-just found and fixed the problem with dynamic rfcomm channel allocation.
-My code binds to a specific local bdaddr, the rfcomm tool binds to ANY.
-This case was not handled correctly. The fix is simple, see attachment.
+arnaud
 
+><<<This gives output:
+>Voice setting: 0x0040
+>RFCOMM channel connected
+>Can't connect SCO audio channel: Connection refused.
+>
+>I know that the socket connect statement in sco_connect() in hstest is 
+>failing.
+>Any ideas of the cause of this ?
+>
+>
+>thanks very much,
+>
+>Rich
+>
+>
+>
+>Richard B. Williams
+>Vitronics, Inc.
+>3 Corbett Way
+>Eatontown, NJ 07724-2262
+>732-389-0244 x29
+>Richard.Williams@vitronics.com
+>
+>
+>
+>-------------------------------------------------------
+>This SF.Net email sponsored by Black Hat Briefings & Training.
+>Attend Black Hat Briefings & Training, Las Vegas July 24-29 -
+>digital self defense, top technical experts, no vendor pitches,
+>unmatched networking opportunities. Visit www.blackhat.com
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-... Collin
-
--- 
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-Just don't create a file called -rf.  :-)  --Larry Wall
-
---Multipart=_Thu__8_Jul_2004_16_52_19_+0200_BJ6/ID7fTNBYncwt
-Content-Type: application/octet-stream;
- name="rfcomm_dynamic_channel_alloc_fix.patch"
-Content-Disposition: attachment;
- filename="rfcomm_dynamic_channel_alloc_fix.patch"
-Content-Transfer-Encoding: base64
-
-LS0tIHNvY2suY19vcmlnCTIwMDQtMDctMDggMTY6Mzk6MjkuMDAwMDAwMDAwICswMjAwCisrKyBz
-b2NrLmMJMjAwNC0wNy0wOCAxNjo0NzoyOC4wMDAwMDAwMDAgKzAyMDAKQEAgLTQwNyw3ICs0MDcs
-NyBAQAogCQl3cml0ZV9sb2NrX2JoKCZyZmNvbW1fc2tfbGlzdC5sb2NrKTsKIAogCQlmb3IgKGNo
-YW5uZWwgPSAxOyBjaGFubmVsIDwgMzE7IGNoYW5uZWwrKykKLQkJCWlmICghX19yZmNvbW1fZ2V0
-X3NvY2tfYnlfYWRkcihjaGFubmVsLCBzcmMpKSB7CisJCQlpZiAoIV9fcmZjb21tX2dldF9zb2Nr
-X2J5X2NoYW5uZWwoMCwgY2hhbm5lbCwgc3JjKSkgewogCQkJCXJmY29tbV9waShzayktPmNoYW5u
-ZWwgPSBjaGFubmVsOwogCQkJCWVyciA9IDA7CiAJCQkJYnJlYWs7Cg==
-
---Multipart=_Thu__8_Jul_2004_16_52_19_+0200_BJ6/ID7fTNBYncwt--
 
 
 -------------------------------------------------------
