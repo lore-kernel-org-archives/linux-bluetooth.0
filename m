@@ -1,76 +1,77 @@
-Return-Path: <tereza99@hotmail.com>
-From: "theresa g." <tereza99@hotmail.com>
-To: marcel@holtmann.org
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Help needed with getting Bluez on Axis Dev Board82
-Date: Sun, 12 Sep 2004 16:21:11 -0700
-Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY2-F29kDIc3DnGOKQ000420b4@hotmail.com>
+Return-Path: <survivor@uni-paderborn.de>
+Message-ID: <4144634E.4070404@uni-paderborn.de>
+Date: Sun, 12 Sep 2004 16:55:10 +0200
+From: Stefan Mischke <survivor@uni-paderborn.de>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] sdp_search and l2cap concurrently
+References: <41430846.4010006@uni-paderborn.de> <1094997749.5695.13.camel@pegasus>
+In-Reply-To: <1094997749.5695.13.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Thanks for your reply.  I actually did contact the Axis tech support and 
-they never got back to me, hence my post here.  I had some other questions 
-regarding the kernel version and applying patches to the kernel for axis.  
-Both questions I got responses from axis, but this last one when I mentioned 
-BlueZ in the email, I have not heard a word back.  I doubt they'd want to 
-help with BlueZ development.  Anyhow, if I ever figure things out I will 
-definitely post a how to online somewhere.
+Hi Marcel!
 
-Theresa
+Marcel Holtmann schrieb:
 
-----Original Message Follows----
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "theresa g." <tereza99@hotmail.com>
-CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Help needed with getting Bluez on Axis Dev 
-Board82
-Date: Sun, 12 Sep 2004 16:04:39 +0200
+>what do you mean by cripple L2CAP and use it concurrently. Explain in
+>more detail what your program is really doing 
+>
+Ok, I'll explain it in Pseudo-Code:
 
-Hi Theresa,
+DiscoveryThread does all the time {
+  InquiryInfo[] ii = do_inquiry();
+  DiscoveryInfo[] di = sdp_filter_for(my_l2cap_service, ii);
+  pass_to_UpdateThread(di):
+}
 
- > I am a desperate newbie in need of help getting Bluez working on my Axis 
-Dev
- > board 82.  I have seen some posts by others implying they somehow got 
-things
- > working on their boards.
- >
- > For those who dont know much about kernels and writing patches, is there 
-a
- > "how to" or list of instructions to help us get going.  For instance, 
-what
- > do I do first?  The latest version for the board is 2.4.26 - so am I
- > supposed to apply Marcel's patch for that kernel from the Bluez site?  If
- > so, are there any special things that I am to do in addition?
- >
- > I also saw a post that said someone had cross compiled bluez...does that
- > mean i have to put that into my makefile for the board?
- >
- > Please forgive me for not knowing much, as I am still learning about 
-things.
+UpdateThread does all the time {
+  check_for_new_DiscoveryInfo_and_add_them_to(internal_di, di);
+  do_for_all(di_item = internal_di[i]) {
+    int sock = l2cap_connect(di_item);
+    di_item.name = l2cap_read_descriptive_name(sock);
+    di_item.content = l2cap_read_website_content(sock);
+    di_item.rssi = hci_readRSSI(l2cap_sock2hci_conn(sock));
+    di_item.lq = hci_getLinkQuality(l2cap_sock2hci_conn(sock));
+    l2cap_close(sock);
+    di_item.sum = evaluate(di_item.rssi, di_item.lq);
+  }
+  sort_by_sum(di_internal);
+  show_nearest_website_content(di_internal[0]);
+}
 
-I have never done this before. Ask the Axis guys directly to provide you
-with more information. They should drop their OpenBT in favour of BlueZ
-and help people using it or ask them to send me a bunch of their boards
-for testing.
+By "cripple" I mean if one device is almost out of range (l2cap 
+connections would fail, but inquiry discovered it anyway) 
+"sdp_filter_for(my_service, ii)" takes quite long to fail by timeout. 
+And in this time, the UpdateThread doesn't seem to run eigther. The 
+whole thing hangs. I think that is because all Java-Threads belong to 
+only one Linux-Process which communicates with BlueZ. And this process 
+is blocked by SDP for up to SDP_RESPONSE_TIMEOUT (see 
+bluez-sdp/libs/utils.c, sdp_read_rsp(..)). I tried to lower this timeout 
+by applying smaller timeouts SO_SNDTIMEO and SO_RCVTIMEO to the 
+sdp_session's l2cap socket, but this doesn't seem to work because of the 
+use of select().
 
-Regards
+In my opinion there are three ways to solve this:
+1. Make SDP_RESPONSE_TIMEOUT a settable parameter
+2. Don't use select(); instead put the socket to non-blocking state 
+("fcntl(sock, F_SETFL, flags | O_NONBLOCK)") while connecting.
+3. Don't use select(); instead let the user/programmer chose to put a 
+SO_SNDTIMEO and SO_RCVTIMEO on the socket.
 
-Marcel
+2. and 3. may be combined.
 
+But probably, it is something quite different or there's an easy 
+solution. I just wanted to ask for it :-). I'll test further...
 
+>and check how many low
+>level HCI connections are opened at the same time.
+>  
+>
+I think there can only be one low level (ACL) connection to each device 
+at a time. Unfortunately, I have only 3 devices for testing. So this 
+can't be the problem.
 
-
--------------------------------------------------------
-This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
-Project Admins to receive an Apple iPod Mini FREE for your judgement on
-who ports your project to Linux PPC the best. Sponsored by IBM.
-Deadline: Sept. 13. Go here: http://sf.net/ppc_contest.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-_________________________________________________________________
-Express yourself instantly with MSN Messenger! Download today - it's FREE! 
-http://messenger.msn.click-url.com/go/onm00200471ave/direct/01/
+Regards,
+Stefan
