@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: # =?ISO-8859-1?Q?Bj=F6rn?= Specht # <bspecht@gmx.net>
+Message-ID: <20050322121551.33023.qmail@web52408.mail.yahoo.com>
+From: jose <twblr@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050323181913.12fe9a15@BigWilma>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] some basic questions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Bluetooth communication between devices running on linux
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,30 +16,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 23 Mar 2005 18:19:13 +0100
+Date: Tue, 22 Mar 2005 04:15:51 -0800 (PST)
 
-Hi all,
+Hi,
 
-what is the baswap - function used for? I had a look at the bluetooth.c and=
- it is just changing the order of the MAC-address.
+Where do I get info on:
 
-Is there some documentation available where I can read about the functions =
-and why/what they are used for?
 
-What is the difference between the ba2str and batostr functions? Why are th=
-ere 2 functions implemented?
+1. File/Data transfer between two linux desktops/PCs.
 
-Thanks a lot. A link or something else to read about this stuff would be ap=
-preciated as well!
+2. File/Data transfer between a linux desktop and a
+handheld/Simputer/PDA running on linux.
 
-Bj=F6rn
+Thanks & Rgds,
+Jose
+
+
+		
+__________________________________ 
+Do you Yahoo!? 
+Yahoo! Small Business - Try our new resources site!
+http://smallbusiness.yahoo.com/resources/ 
 
 
 -------------------------------------------------------
-This SF.net email is sponsored by Microsoft Mobile & Embedded DevCon 2005
-Attend MEDC 2005 May 9-12 in Vegas. Learn more about the latest Windows
-Embedded(r) & Windows Mobile(tm) platforms, applications & content.  Register
-by 3/29 & save $300 http://ads.osdn.com/?ad_id=6883&alloc_id=15149&op=click
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now.
+http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
