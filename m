@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Add sdptool option for browsing with L2CAP_UUID
-Message-ID: <20050405082054.GA18117@kone>
-References: <381006269.20050404171656@andric.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <381006269.20050404171656@andric.com>
+Message-ID: <42523631.6020905@thomae-privat.de>
+From: Matthias Thomae <bluez@thomae-privat.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] arm boards for embedding bluez
+References: <4251F6CB.8080209@xmission.com>
+In-Reply-To: <4251F6CB.8080209@xmission.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +18,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 5 Apr 2005 11:20:54 +0300
+Date: Tue, 05 Apr 2005 08:54:41 +0200
 
-On Mon, Apr 04, 2005, Dimitry Andric wrote:
-> Some phones (e.g. Samsung D500, Motorola MPx220, and possibly some
-> other Windows Mobile models) don't return any services if you ask them
-> for the public browse group.  You notice this, when "sdptool browse
-> xx:xx:xx:xx:xx:xx" returns immediately, without any output.
+Hi Brad,
+
+how about this:
+
+http://www.nslu2-linux.org/wiki/HowTo/BuildABlueSlug
+
+Haven't tried it myself (yet), but looking forward to the nearing Beta 
+release of OpenSlug to build a cheap and low-power bluetooth access 
+point/NAS.
+
+Regards.
+Matthias
+
+Brad Midgley wrote:
+> Hey
 > 
-> It turns out that the Windows XP Bluetooth browser asks for
-> L2CAP_UUID, which *does* work for all the phones I've tested.
-
-I can confirm this behaviour also on a Motorola A760. However, it is
-also the only phone I have encountered this.
-
-Johan
+> Does anyone have a feel for what is available now for doing embedded 
+> bluez stuff with arm? I would like to put together something with a 
+> class 1 adapter... it seems like there was talk of a board for embedding 
+> that had class 1 built in but I can't find it in the archives and 
+> googling reveals a bunch of designs that have probably been abandoned.
+> 
+> I am hoping that by doing linux on arm, it would be 
+> cheaper/smaller/cooler than the $200+ each that a small x86 barebones 
+> board costs, eg: 
+> http://www.kontron.com/products/pdproductdetail.cfm?keyProduct=32658&kps=1689&kpc=237&keySiteRegion=1 
+> 
+> 
+> but 300Mhz/IDE/VGA is overkill for this... I just want something that 
+> could stream a2dp & do voip to a headset and act as an access point for 
+> a bluetooth pda.
+> 
+> Brad
 
 
 -------------------------------------------------------
