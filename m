@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Various questions
+Subject: Re: [Bluez-users] Student query: a question about multihop
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Christoph Torens <c.torens@web.de>
+To: libo <libo@semit.com.cn>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <opsf3esskzeocfdv@debian>
-References: <opsf3esskzeocfdv@debian>
+In-Reply-To: <20041019184254.31606ee9.libo@semit.com.cn>
+References: <34204.81.199.88.27.1098106921.squirrel@ucu.ac.ug>
+	 <1098107316.21553.8.camel@pegasus>
+	 <20041019184254.31606ee9.libo@semit.com.cn>
 Content-Type: text/plain
-Message-Id: <1098183563.24465.4.camel@pegasus>
+Message-Id: <1098183402.24465.0.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,21 +20,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Oct 2004 12:59:23 +0200
+Date: Tue, 19 Oct 2004 12:56:43 +0200
 
-Hi Christoph,
+Hi,
 
-> PAN uses the bnep protocol layer. Is bnep based on rfcomm?
-> I think not, because I don't need to load rfcomm.o when using pand.
-> But looking at the figure from
-> http://www.rvs.uni-bielefeld.de/~heiko/bluetooth/bluetooth.pdf
-> (page 6) you can get this idea. (From  
-> http://www.holtmann.org/linux/bluetooth/)
-> (There are some other sources, too)
+>                        +---------+
+>                        |   GN      |
+>                        +---------+
+>                      /             \
+>                     /                \
+>                    /                  \
+>                   /                     \
+>               +--------+         +--------+
+>               | PANU 1 |          | PANU 2|
+>               +--------+         +--------+
+> I did as the HOWTO-PAN.txt said.
+> GN connect with PANU1 with bnep0 and PANU1 with bnep1. I have to allocate IPs for both of bnep0 (10.0.0.1) and bnep1 (10.0.1.1), thus PANU1 (10.0.0.2) and PANU2 (10.0.1.2) are in different subnet, and they can not ping each other.
+> I may have done something wrong. It is unrealistic to allocate IP for each bnep if there are more PANUs connect to the GN. I think there must be a better way to let those PANUs in the same subnet, and one can access the other through GN easily.
 
-this graphic is wrong. The BNEP layer is on top of L2CAP and not on top
-of RFCOMM. Take a look at my slides from www.bluez.org/talks.html for a
-correct protocol stack overview.
+there is an easier way. Use bridging.
 
 Regards
 
