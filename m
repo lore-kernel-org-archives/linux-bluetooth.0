@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41EE7C09.4040109@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
+From: mirko_3 <mirko_3@gmx.net>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluetooth headset - connects but no audio
-References: <41EE3974.1010604@fastwebnet.it> <41EE5112.1040502@dark-reality.de> <41EE4ACD.9070105@fastwebnet.it> <41EE66A2.1040106@dark-reality.de> <41EE6032.7070708@fastwebnet.it>
-In-Reply-To: <41EE6032.7070708@fastwebnet.it>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Message-ID: <20050119161516.5ab84510@mirko_3>
+In-Reply-To: <20050118195131.CD122EACF@sc8-sf-spam2.sourceforge.net>
+References: <20050118195131.CD122EACF@sc8-sf-spam2.sourceforge.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-devel] Headset connected, respondig, but silent
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,46 +18,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 19 Jan 2005 16:26:01 +0100
+Date: Wed, 19 Jan 2005 16:15:16 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi everyone,
+I've been trying to get my headset to work lately, with partial success: using the latest btsco-cvs, I manage to connect to the headset (a Jabra-250, I think), and pressing the volume/answer buttons is correctly detected by the program. I've unmuted everything in alsamixer, and set  snd cards_limit=2 in modules.conf (although I don't use modules for alsa...). Everything is as it should be, except I can neither record nor playback anything. Here's my dmesg after pressing the play button three times on xmms (the progress bar doesn't move, the song doesn't start):
 
-WiseLYNX wrote:
-| | no, it's not patched with mh1. Best thing would be to use the vanilla
-| | kernel (i.e. get it directly from kernel.org) and patch it with -mh1
-| | patchset from bluez. I'm using gentoo, too, btw, so it should work this
-| | way.
-|
-| I'd rather keeping the gentoo-dev kernel. isn't it possible to patch it?
+snd-bt-sco revision 1.4 $
+snd-bt-sco: snd-bt-scod thread starting
+snd-bt-sco: playback_open
+snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
+snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
+snd-bt-sco: playback_trigger 1
+snd-bt-sco: setting playback to bspcm
+snd-bt-sco: playback_trigger 0
+snd-bt-sco: setting playback to NULL
+snd-bt-sco: playback_open
+snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
+snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
+snd-bt-sco: playback_trigger 1
+snd-bt-sco: setting playback to bspcm
+snd-bt-sco: playback_trigger 0
+snd-bt-sco: setting playback to NULL
+snd-bt-sco: playback_open
+snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
+snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 800
+snd-bt-sco: playback_trigger 1
+snd-bt-sco: setting playback to bspcm
+snd-bt-sco: playback_trigger 0
+snd-bt-sco: setting playback to NULL
 
-Try it... I don't know. I prefer the vanilla kernels with gentoo...
-don't know why. But they work well (on my systems at least).
+Program output is normal: 
+Device is 1:0
+Voice setting: 0x0060
+RFCOMM channel 1 connected
+recieved AT+CKPD=200
+opened hwdep
+connected SCO channel
+Setting sco fd
+Done setting sco fd
+recieved AT+VGS=09
+Sending up speaker change 9
+recieved AT+VGS=08
+Sending up speaker change 8
 
-I don't know what patches are in this kernel, you can check the ebuild
-and try to find out :)
 
-using a vanilla with mh1 makes error tracking simpler, because if there
-are no other patches in the kernel nobody will scream "try the vanilla
-first..." ;)
+I really hope you can help me, as I've tried for days. Thank you all.
 
-best regards,
-~  Lars
-- --
-Lars Grunewaldt
-* software development
-* multimedia design
-skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
-web: http://www.dark-reality.de
-mail: lgw@dark-reality.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFB7nwJQWC6DTWkDAoRArQpAJ4or2rnd0D1rqyV5QxI26KEEb8WjACfZEXu
-XGvoUXsAIyixk5Wz8yM9tFU=
-=Fqe/
------END PGP SIGNATURE-----
+-- 
+Dammit Jim, I'm an actor, not a doctor.
 
 
 -------------------------------------------------------
