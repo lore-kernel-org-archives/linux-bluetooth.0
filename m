@@ -1,11 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <BAY102-F21A4FF270D92C1D291AB15D2BF0@phx.gbl>
-In-Reply-To: <1101927915.15615.13.camel@pegasus>
-From: "theresa g." <tereza99@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] hcid vs. hciconfig hci0 up
+Subject: Re: [Bluez-devel] hidd weirdness under 2.4.20
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BD226CAD-43D6-11D9-9BD7-00039390D626@pepper.com>
+References: <D041B252-43B9-11D9-9BD7-00039390D626@pepper.com>
+	 <1101929973.15615.32.camel@pegasus>
+	 <888FEE62-43D1-11D9-9BD7-00039390D626@pepper.com>
+	 <1101930622.15615.34.camel@pegasus>
+	 <F6F2876E-43D2-11D9-9BD7-00039390D626@pepper.com>
+	 <1101932186.15615.37.camel@pegasus>
+	 <BD226CAD-43D6-11D9-9BD7-00039390D626@pepper.com>
+Content-Type: text/plain
+Message-Id: <1101933300.15615.57.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,60 +24,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 13:02:28 -0800
+Date: Wed, 01 Dec 2004 21:35:00 +0100
 
-Thanks!
+Hi Michael,
 
-theresa
+> here is the dump:
+> 
+> root@(none):~# hcidump -X
+> HCIDump - HCI packet analyzer ver 1.12
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+>  > ACL data: handle 0x0001 flags 0x02 dlen 10keyboard.c: can't emulate 
+> rawmode for keycode 272
+> 
+>      L2CAP(d): cid 0x0041 len 6 [psm 0]
+>        0000: a1 02 01 00 00 00                                 ......
+> 
+> Yes -- I am running the latest mh patch.
 
-----Original Message Follows----
-From: Marcel Holtmann <marcel@holtmann.org>
-Reply-To: bluez-devel@lists.sourceforge.net
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hcid vs. hciconfig hci0 up
-Date: Wed, 01 Dec 2004 20:05:15 +0100
-
-Hi Theresa,
-
- > I got my server app running on an Axis developer's board  83 with the use 
-of
- > an RFCOMM socket on channel one for the BT comm.  After flashing my board
- > w/the new kernel (for BlueZ to work) I noticed I could not run the hcid
- > daemon w/out the board either giving msgs about no kernel access to the
- > device or even kernel panics when i put the hcid in a startup script.  
-(For
- > those familiar w/this board, I can do a network boot of the same image 
-and
- > it all works fine)
- >
- > I know this issue has nothing to do w/this list, but I wanted to know:
- >
- > What is the difference between running the hcid and using "hciconfig hci0
- > up" to bring up the device.  Since I cannot use hcid, I just use 
-hciconfig
- > to manually bring up the device and my app works fine.  Whats the 
-difference
- > between the two?  And is it better to use the daemon?
-
-the hcid brings the device up and sets some more settings based on its
-config file (for example name etc.).
+this is a mouse report (id 2) and this should not produce a keyboard
+input. Is this reproduceable with a plain 2.6.9 or the latest 2.4 with
+my -mh patch?
 
 Regards
 
 Marcel
-
-
-
-
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://productguide.itmanagersjournal.com/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
