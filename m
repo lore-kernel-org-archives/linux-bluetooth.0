@@ -1,44 +1,88 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain;
-	charset="iso-8859-2"
-Message-Id: <12800.102184-5119-1899698199-1091734133@email.seznam.cz>
-Cc: 
-Mime-Version: 1.0
-Reply-To: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
-Subject: [Bluez-users] =?us-ascii?Q?Multi=2DThread=20Problem=20with=20BlueZ?=
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Aug 2004 21:28:53 +0200 (CEST)
+Return-Path: <ramon@us.ibm.com>
+In-Reply-To: <1091661380.16182.68.camel@pegasus>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>,
+   bluez-users-admin@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: Re: [Bluez-users] Re: Can't Connect RFCOMM Socket. Too many links.
+From: Ramon A Reveron <ramon@us.ibm.com>
+Message-ID: <OF6234E0FF.802EEC59-ON85256EE7.0053B1A7-85256EE7.0055FA76@us.ibm.com>
+Date: Thu, 5 Aug 2004 09:39:10 -0600
+Content-Type: multipart/mixed; boundary="=_mixed 0055F61985256EE7_="
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Marcel:
+--=_mixed 0055F61985256EE7_=
+Content-Type: multipart/alternative; boundary="=_alternative 0055F61A85256EE7_="
 
-Just dropping a line to say that BlueZ (seemingly) has the same problem=
- we had before -- we cannot connect two devices at once to the stack --=
- when BT is sending information (say, 10 - 100kb), we can't even discov=
-er the device it's sending over .... Have you tested it with mutliple s=
-ocket connections?
 
-If you think it should work, have any ideas why it might not be working=
-?  Don't think it's the Rococo stack ...
+--=_alternative 0055F61A85256EE7_=
+Content-Type: text/plain; charset="US-ASCII"
 
-Best,
+Hi Marcel,
 
-D.
-____________________________________________________________
-Letn=ED akce na televizory Panasonic! 150.000 prvni tyden
-www.VIDEOEXPERT.cz
-Vychutnejte si Olympi=E1du ve velk=E9m stylu!
-http://ad.seznam.cz/clickthru?spotId=3D76186
+Here are the two files:
+
+
+
+
+
+Thanks for your time.
+
+Ramon
+
+
+
+
+
+
+
+Marcel Holtmann <marcel@holtmann.org>
+Sent by: bluez-users-admin@lists.sourceforge.net
+08/04/2004 07:16 PM
+ 
+        To:     Ramon A Reveron/Raleigh/IBM@IBMUS
+        cc:     BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+        Subject:        [Bluez-users] Re: Can't Connect RFCOMM Socket. Too 
+many links.
+
+
+Hi Ramon,
+
+> I'm having some problems while connecting to a serial profile device.
+> If I connect to a device using:
+> 
+> rfcomm connect 0 "device address" 1
+> 
+> the connection works perfectly. If by some reason the device
+> disconnects  (i.e. out of range), I need to wait around 50 seconds to
+> reconnect to it providing that it is back in range. 
+> If i try before the 50 seconds have pass, I get this error: "Can't
+> Connect RFCOMM Socket. Too many links."
+> 
+> Is this a normal behavior?
+
+maybe this is a link manager problem. Run "hcidump -x" to show us the
+disconnect and the reconnect. What is the output of "hciconfig -a"?
+
+> Is there a way of connecting to the device as soon as it comes back in
+> range? 
+
+Only if you start running an inquiry.
+
+> How can you specify a "Link Timeout" with BlueZ? 
+
+Check the Bluetooth specification for the appropriate HCI command.
+
+> Kernel: 2.4.19
+> BlueZ utils 2.3
+
+You should update to 2.4.19-mh18 and bluez-utils-2.9 ;)
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
@@ -50,3 +94,299 @@ _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+
+--=_alternative 0055F61A85256EE7_=
+Content-Type: text/html; charset="US-ASCII"
+
+
+<br><font size=2 face="sans-serif">Hi Marcel,</font>
+<br>
+<br><font size=2 face="sans-serif">Here are the two files:</font>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br><font size=2 face="sans-serif">Thanks for your time.</font>
+<br>
+<br><font size=2 face="sans-serif">Ramon</font>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<table width=100%>
+<tr valign=top>
+<td>
+<td><font size=1 face="sans-serif"><b>Marcel Holtmann &lt;marcel@holtmann.org&gt;</b></font>
+<br><font size=1 face="sans-serif">Sent by: bluez-users-admin@lists.sourceforge.net</font>
+<p><font size=1 face="sans-serif">08/04/2004 07:16 PM</font>
+<td><font size=1 face="Arial">&nbsp; &nbsp; &nbsp; &nbsp; </font>
+<br><font size=1 face="sans-serif">&nbsp; &nbsp; &nbsp; &nbsp; To:
+&nbsp; &nbsp; &nbsp; &nbsp;Ramon A Reveron/Raleigh/IBM@IBMUS</font>
+<br><font size=1 face="sans-serif">&nbsp; &nbsp; &nbsp; &nbsp; cc:
+&nbsp; &nbsp; &nbsp; &nbsp;BlueZ Mailing List &lt;bluez-users@lists.sourceforge.net&gt;</font>
+<br><font size=1 face="sans-serif">&nbsp; &nbsp; &nbsp; &nbsp; Subject:
+&nbsp; &nbsp; &nbsp; &nbsp;[Bluez-users] Re: Can't Connect RFCOMM
+Socket. Too many links.</font></table>
+<br>
+<br>
+<br><font size=2><tt>Hi Ramon,<br>
+<br>
+&gt; I'm having some problems while connecting to a serial profile device.<br>
+&gt; If I connect to a device using:<br>
+&gt; <br>
+&gt; rfcomm connect 0 &quot;device address&quot; 1<br>
+&gt; <br>
+&gt; the connection works perfectly. If by some reason the device<br>
+&gt; disconnects &nbsp;(i.e. out of range), I need to wait around 50 seconds
+to<br>
+&gt; reconnect to it providing that it is back in range. <br>
+&gt; If i try before the 50 seconds have pass, I get this error: &quot;Can't<br>
+&gt; Connect RFCOMM Socket. Too many links.&quot;<br>
+&gt; <br>
+&gt; Is this a normal behavior?<br>
+<br>
+maybe this is a link manager problem. Run &quot;hcidump -x&quot; to show
+us the<br>
+disconnect and the reconnect. What is the output of &quot;hciconfig -a&quot;?<br>
+<br>
+&gt; Is there a way of connecting to the device as soon as it comes back
+in<br>
+&gt; range? &nbsp;<br>
+<br>
+Only if you start running an inquiry.<br>
+<br>
+&gt; How can you specify a &quot;Link Timeout&quot; with BlueZ? <br>
+<br>
+Check the Bluetooth specification for the appropriate HCI command.<br>
+<br>
+&gt; Kernel: 2.4.19<br>
+&gt; BlueZ utils 2.3<br>
+<br>
+You should update to 2.4.19-mh18 and bluez-utils-2.9 ;)<br>
+<br>
+Regards<br>
+<br>
+Marcel<br>
+<br>
+<br>
+<br>
+<br>
+-------------------------------------------------------<br>
+This SF.Net email is sponsored by OSTG. Have you noticed the changes on<br>
+Linux.com, ITManagersJournal and NewsForge in the past few weeks? Now,<br>
+one more big change to announce. We are now OSTG- Open Source Technology<br>
+Group. Come see the changes on the new OSTG site. www.ostg.com<br>
+_______________________________________________<br>
+Bluez-users mailing list<br>
+Bluez-users@lists.sourceforge.net<br>
+https://lists.sourceforge.net/lists/listinfo/bluez-users<br>
+</tt></font>
+<br>
+--=_alternative 0055F61A85256EE7_=--
+
+--=_mixed 0055F61985256EE7_=
+Content-Type: application/octet-stream; name="hciconfig.info"
+Content-Disposition: attachment; filename="hciconfig.info"
+Content-Transfer-Encoding: base64
+
+aGNpMDoJVHlwZTogVVNCCglCRCBBZGRyZXNzOiAwMDoxMDpDNjoyMjpBMjo3MyBBQ0wgTVRVOiAx
+OTI6OCAgU0NPIE1UVTogNjQ6OAoJVVAgUlVOTklORyBQU0NBTiBJU0NBTiAKCVJYIGJ5dGVzOjc0
+NSBhY2w6MTAgc2NvOjAgZXZlbnRzOjM4IGVycm9yczowCglUWCBieXRlczo1NDcgYWNsOjkgc2Nv
+OjAgY29tbWFuZHM6MjEgZXJyb3JzOjAKCUZlYXR1cmVzOiAweGZmIDB4ZmYgMHgwZiAweDAwIDB4
+MDAgMHgwMCAweDAwIDB4MDAKCVBhY2tldCB0eXBlOiBETTEgRE0zIERNNSBESDEgREgzIERINSBI
+VjEgSFYyIEhWMyAKCUxpbmsgcG9saWN5OiBIT0xEIFNOSUZGIFBBUksgCglMaW5rIG1vZGU6IFNM
+QVZFIEFDQ0VQVCAKCU5hbWU6ICc3MDU0JwoJQ2xhc3M6IDB4MDAwMTAwCglTZXJ2aWNlIENsYXNz
+ZXM6IFVuc3BlY2lmaWVkCglEZXZpY2UgQ2xhc3M6IENvbXB1dGVyLCBVbmNhdGVnb3JpemVkCglI
+Q0kgVmVyOiAxLjEgKDB4MSkgSENJIFJldjogMHgzM2MgTE1QIFZlcjogMS4xICgweDEpIExNUCBT
+dWJ2ZXI6IDB4MzNjCglNYW51ZmFjdHVyZXI6IENhbWJyaWRnZSBTaWxpY29uIFJhZGlvICgxMCkK
+Cg==
+
+--=_mixed 0055F61985256EE7_=
+Content-Type: application/octet-stream; name="hcidump.info"
+Content-Disposition: attachment; filename="hcidump.info"
+Content-Transfer-Encoding: base64
+
+SENJRHVtcCAtIEhDSSBwYWNrZXQgYW5hbHl6ZXIgdmVyIDEuNQpkZXZpY2U6IGhjaTAgc25hcF9s
+ZW46IDEwMjggZmlsdGVyOiAweGZmZmZmZmZmCjwgSENJIENvbW1hbmQ6IENyZWF0ZSBDb25uZWN0
+aW9uKDB4MDF8MHgwMDA1KSBwbGVuIDEzCiAgQzIgNDYgMEEgOTYgQTAgMDAgMTggQ0MgMDIgMDAg
+MDAgMDAgMDEgCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cygweDBmKSBwbGVuIDQKICAwMCAw
+MSAwNSAwNCAKPiBIQ0kgRXZlbnQ6IExpbmsgS2V5IFJlcXVlc3QoMHgxNykgcGxlbiA2CiAgQzIg
+NDYgMEEgOTYgQTAgMDAgCjwgSENJIENvbW1hbmQ6IExpbmsgS2V5IFJlcXVlc3QgUmVwbHkoMHgw
+MXwweDAwMGIpIHBsZW4gMjIKICBDMiA0NiAwQSA5NiBBMCAwMCBGMSA4QyBFOSBCNCA4RCA3OCA2
+NSBGQyA1OSBBRCBEMSA5OSBFMSAwOCAKICA0OSAxNCAKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29t
+cGxldGUoMHgwZSkgcGxlbiAxMAogIDAxIDBCIDA0IDAwIEMyIDQ2IDBBIDk2IEEwIDAwIAo+IEhD
+SSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSgweDAzKSBwbGVuIDExCiAgMDAgMkEgMDAgQzIgNDYg
+MEEgOTYgQTAgMDAgMDEgMDEgCjwgQUNMIGRhdGE6IGhhbmRsZSAweDAwMmEgZmxhZ3MgMHgwMiBk
+bGVuIDEyCiAgICBMMkNBUChzKTogQ29ubmVjdCByZXE6IHBzbSAzIHNjaWQgMHgwMDQwCjwgSENJ
+IENvbW1hbmQ6IFdyaXRlIExpbmsgUG9saWN5IFNldHRpbmdzKDB4MDJ8MHgwMDBkKSBwbGVuIDQK
+ICAyQSAwMCAwRSAwMCAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cygw
+eDEzKSBwbGVuIDUKICAwMSAyQSAwMCAwMSAwMCAKPiBIQ0kgRXZlbnQ6IFBhZ2UgU2NhbiBSZXBl
+dGl0aW9uIE1vZGUgQ2hhbmdlKDB4MjApIHBsZW4gNwogIEMyIDQ2IDBBIDk2IEEwIDAwIDAxIAo+
+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSgweDBlKSBwbGVuIDYKICAwMSAwRCAwOCAwMCAy
+QSAwMCAKPiBIQ0kgRXZlbnQ6IE1heCBTbG90cyBDaGFuZ2UoMHgxYikgcGxlbiAzCiAgMkEgMDAg
+MDUgCj4gQUNMIGRhdGE6IGhhbmRsZSAweDAwMmEgZmxhZ3MgMHgwMiBkbGVuIDE2CiAgICBMMkNB
+UChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgwMDQxIHNjaWQgMHgwMDQwIHJlc3VsdCAxIHN0YXR1
+cyAyCj4gQUNMIGRhdGE6IGhhbmRsZSAweDAwMmEgZmxhZ3MgMHgwMiBkbGVuIDE2CiAgICBMMkNB
+UChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgwMDQxIHNjaWQgMHgwMDQwIHJlc3VsdCAwIHN0YXR1
+cyAwCjwgQUNMIGRhdGE6IGhhbmRsZSAweDAwMmEgZmxhZ3MgMHgwMiBkbGVuIDE2CiAgICBMMkNB
+UChzKTogQ29uZmlnIHJlcTogZGNpZCAweDAwNDEgZmxhZ3MgMHgwMDAwIGNsZW4gNAogICAgTVRV
+IDEwMjQgCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMoMHgxMykgcGxl
+biA1CiAgMDEgMkEgMDAgMDEgMDAgCj4gQUNMIGRhdGE6IGhhbmRsZSAweDAwMmEgZmxhZ3MgMHgw
+MiBkbGVuIDE0CiAgICBMMkNBUChzKTogQ29uZmlnIHJzcDogc2NpZCAweDAwNDAgZmxhZ3MgMHgw
+MDAwIHJlc3VsdCAwIGNsZW4gMAo+IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDJhIGZsYWdzIDB4MDIg
+ZGxlbiAxNgogICAgTDJDQVAocyk6IENvbmZpZyByZXE6IGRjaWQgMHgwMDQwIGZsYWdzIDB4MDAw
+MCBjbGVuIDQKICAgIE1UVSAxMDI0IAo8IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDJhIGZsYWdzIDB4
+MDIgZGxlbiAxNAogICAgTDJDQVAocyk6IENvbmZpZyByc3A6IHNjaWQgMHgwMDQxIGZsYWdzIDB4
+MDAwMCByZXN1bHQgMCBjbGVuIDAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFj
+a2V0cygweDEzKSBwbGVuIDUKICAwMSAyQSAwMCAwMSAwMCAKPCBBQ0wgZGF0YTogaGFuZGxlIDB4
+MDAyYSBmbGFncyAweDAyIGRsZW4gOAogICAgTDJDQVAoZCk6IGNpZCAweDQxIGxlbiA0IFtwc20g
+M10KICAgICAgUkZDT01NKHMpOiBTQUJNOiBjciAxIGRsY2kgMCBwZiAxIGlsZW4gMCBmY3MgMHgx
+YyAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cygweDEzKSBwbGVuIDUK
+ICAwMSAyQSAwMCAwMSAwMCAKPiBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyYSBmbGFncyAweDAyIGRs
+ZW4gOAogICAgTDJDQVAoZCk6IGNpZCAweDQwIGxlbiA0IFtwc20gM10KICAgICAgUkZDT01NKHMp
+OiBVQTogY3IgMSBkbGNpIDAgcGYgMSBpbGVuIDAgZmNzIDB4ZDcgCjwgQUNMIGRhdGE6IGhhbmRs
+ZSAweDAwMmEgZmxhZ3MgMHgwMiBkbGVuIDE4CiAgICBMMkNBUChkKTogY2lkIDB4NDEgbGVuIDE0
+IFtwc20gM10KICAgICAgUkZDT01NKHMpOiBQTiBDTUQ6IGNyIDEgZGxjaSAwIHBmIDAgaWxlbiAx
+MCBmY3MgMHg3MCBtY2NfbGVuIDgKICAgICAgZGxjaSAyIGZyYW1lX3R5cGUgMCBjcmVkaXRfZmxv
+dyAxNSBwcmkgNyBhY2tfdGltZXIgMCBmcmFtZV9zaXplIDEwMTkgbWF4X3JldHJhbnMgMCBjcmVk
+aXRzIDcKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cygweDEzKSBwbGVu
+IDUKICAwMSAyQSAwMCAwMSAwMCAKPiBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyYSBmbGFncyAweDAy
+IGRsZW4gMTgKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4gMTQgW3BzbSAzXQogICAgICBSRkNP
+TU0ocyk6IFBOIFJTUDogY3IgMCBkbGNpIDAgcGYgMCBpbGVuIDEwIGZjcyAweGFhIG1jY19sZW4g
+OAogICAgICBkbGNpIDIgZnJhbWVfdHlwZSAwIGNyZWRpdF9mbG93IDE0IHByaSA3IGFja190aW1l
+ciAwIGZyYW1lX3NpemUgMzIwIG1heF9yZXRyYW5zIDAgY3JlZGl0cyAwCjwgQUNMIGRhdGE6IGhh
+bmRsZSAweDAwMmEgZmxhZ3MgMHgwMiBkbGVuIDgKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MSBsZW4g
+NCBbcHNtIDNdCiAgICAgIFJGQ09NTShzKTogU0FCTTogY3IgMSBkbGNpIDIgcGYgMSBpbGVuIDAg
+ZmNzIDB4NTkgCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMoMHgxMykg
+cGxlbiA1CiAgMDEgMkEgMDAgMDEgMDAgCj4gQUNMIGRhdGE6IGhhbmRsZSAweDAwMmEgZmxhZ3Mg
+MHgwMiBkbGVuIDgKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4gNCBbcHNtIDNdCiAgICAgIFJG
+Q09NTShzKTogVUE6IGNyIDEgZGxjaSAyIHBmIDEgaWxlbiAwIGZjcyAweDkyIAo8IEFDTCBkYXRh
+OiBoYW5kbGUgMHgwMDJhIGZsYWdzIDB4MDIgZGxlbiAxMgogICAgTDJDQVAoZCk6IGNpZCAweDQx
+IGxlbiA4IFtwc20gM10KICAgICAgUkZDT01NKHMpOiBNU0MgQ01EOiBjciAxIGRsY2kgMCBwZiAw
+IGlsZW4gNCBmY3MgMHg3MCBtY2NfbGVuIDIKICAgICAgZGxjaSAyIGZjIDAgcnRjIDEgcnRyIDEg
+aWMgMCBkdiAxIGIxIDAgYjIgMCBiMyAwIGxlbiAwCj4gQUNMIGRhdGE6IGhhbmRsZSAweDAwMmEg
+ZmxhZ3MgMHgwMiBkbGVuIDEyCiAgICBMMkNBUChkKTogY2lkIDB4NDAgbGVuIDggW3BzbSAzXQog
+ICAgICBSRkNPTU0ocyk6IE1TQyBDTUQ6IGNyIDAgZGxjaSAwIHBmIDAgaWxlbiA0IGZjcyAweGFh
+IG1jY19sZW4gMgogICAgICBkbGNpIDIgZmMgMCBydGMgMSBydHIgMSBpYyAwIGR2IDAgYjEgMCBi
+MiAwIGIzIDAgbGVuIDAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cygw
+eDEzKSBwbGVuIDUKICAwMSAyQSAwMCAwMSAwMCAKPCBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyYSBm
+bGFncyAweDAyIGRsZW4gMTIKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MSBsZW4gOCBbcHNtIDNdCiAg
+ICAgIFJGQ09NTShzKTogTVNDIFJTUDogY3IgMSBkbGNpIDAgcGYgMCBpbGVuIDQgZmNzIDB4NzAg
+bWNjX2xlbiAyCiAgICAgIGRsY2kgMiBmYyAwIHJ0YyAxIHJ0ciAxIGljIDAgZHYgMCBiMSAwIGIy
+IDAgYjMgMCBsZW4gMAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzKDB4
+MTMpIHBsZW4gNQogIDAxIDJBIDAwIDAxIDAwIAo+IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDJhIGZs
+YWdzIDB4MDIgZGxlbiAxMgogICAgTDJDQVAoZCk6IGNpZCAweDQwIGxlbiA4IFtwc20gM10KICAg
+ICAgUkZDT01NKHMpOiBNU0MgUlNQOiBjciAwIGRsY2kgMCBwZiAwIGlsZW4gNCBmY3MgMHhhYSBt
+Y2NfbGVuIDIKICAgICAgZGxjaSAyIGZjIDAgcnRjIDEgcnRyIDEgaWMgMCBkdiAxIGIxIDAgYjIg
+MCBiMyAwIGxlbiAwCjwgQUNMIGRhdGE6IGhhbmRsZSAweDAwMmEgZmxhZ3MgMHgwMiBkbGVuIDkK
+ICAgIEwyQ0FQKGQpOiBjaWQgMHg0MSBsZW4gNSBbcHNtIDNdCiAgICAgIFJGQ09NTShkKTogVUlI
+OiBjciAxIGRsY2kgMiBwZiAxIGlsZW4gMCBmY3MgMHg4NiAKICAgICAgMjEgCj4gQUNMIGRhdGE6
+IGhhbmRsZSAweDAwMmEgZmxhZ3MgMHgwMiBkbGVuIDkKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBs
+ZW4gNSBbcHNtIDNdCiAgICAgIFJGQ09NTShkKTogVUlIOiBjciAwIGRsY2kgMiBwZiAxIGlsZW4g
+MCBmY3MgMHg1YyAKICAgICAgMDUgCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBh
+Y2tldHMoMHgxMykgcGxlbiA1CiAgMDEgMkEgMDAgMDEgMDAgCj4gSENJIEV2ZW50OiBEaXNjb25u
+IENvbXBsZXRlKDB4MDUpIHBsZW4gNAogIDAwIDJBIDAwIDA4IAo8IEhDSSBDb21tYW5kOiBDcmVh
+dGUgQ29ubmVjdGlvbigweDAxfDB4MDAwNSkgcGxlbiAxMwogIEMyIDQ2IDBBIDk2IEEwIDAwIDE4
+IENDIDAyIDAwIDAwIDAwIDAxIAo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMoMHgwZikgcGxl
+biA0CiAgMDAgMDEgMDUgMDQgCj4gSENJIEV2ZW50OiBDb25uZWN0IENvbXBsZXRlKDB4MDMpIHBs
+ZW4gMTEKICAwOSAwMCAwMCBDMiA0NiAwQSA5NiBBMCAwMCAwMSAwMCAKPCBIQ0kgQ29tbWFuZDog
+Q3JlYXRlIENvbm5lY3Rpb24oMHgwMXwweDAwMDUpIHBsZW4gMTMKICBDMiA0NiAwQSA5NiBBMCAw
+MCAxOCBDQyAwMiAwMCAwMCAwMCAwMSAKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzKDB4MGYp
+IHBsZW4gNAogIDAwIDAxIDA1IDA0IAo+IEhDSSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSgweDAz
+KSBwbGVuIDExCiAgMDkgMDAgMDAgQzIgNDYgMEEgOTYgQTAgMDAgMDEgMDAgCjwgSENJIENvbW1h
+bmQ6IENyZWF0ZSBDb25uZWN0aW9uKDB4MDF8MHgwMDA1KSBwbGVuIDEzCiAgQzIgNDYgMEEgOTYg
+QTAgMDAgMTggQ0MgMDIgMDAgMDAgMDAgMDEgCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cygw
+eDBmKSBwbGVuIDQKICAwMCAwMSAwNSAwNCAKPiBIQ0kgRXZlbnQ6IENvbm5lY3QgQ29tcGxldGUo
+MHgwMykgcGxlbiAxMQogIDA5IDAwIDAwIEMyIDQ2IDBBIDk2IEEwIDAwIDAxIDAwIAo8IEhDSSBD
+b21tYW5kOiBDcmVhdGUgQ29ubmVjdGlvbigweDAxfDB4MDAwNSkgcGxlbiAxMwogIEMyIDQ2IDBB
+IDk2IEEwIDAwIDE4IENDIDAyIDAwIDAwIDAwIDAxIAo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0
+dXMoMHgwZikgcGxlbiA0CiAgMDAgMDEgMDUgMDQgCj4gSENJIEV2ZW50OiBDb25uZWN0IENvbXBs
+ZXRlKDB4MDMpIHBsZW4gMTEKICAwOSAwMCAwMCBDMiA0NiAwQSA5NiBBMCAwMCAwMSAwMCAKPCBI
+Q0kgQ29tbWFuZDogQ3JlYXRlIENvbm5lY3Rpb24oMHgwMXwweDAwMDUpIHBsZW4gMTMKICBDMiA0
+NiAwQSA5NiBBMCAwMCAxOCBDQyAwMiAwMCAwMCAwMCAwMSAKPiBIQ0kgRXZlbnQ6IENvbW1hbmQg
+U3RhdHVzKDB4MGYpIHBsZW4gNAogIDAwIDAxIDA1IDA0IAo+IEhDSSBFdmVudDogQ29ubmVjdCBD
+b21wbGV0ZSgweDAzKSBwbGVuIDExCiAgMDkgMDAgMDAgQzIgNDYgMEEgOTYgQTAgMDAgMDEgMDAg
+CjwgSENJIENvbW1hbmQ6IENyZWF0ZSBDb25uZWN0aW9uKDB4MDF8MHgwMDA1KSBwbGVuIDEzCiAg
+QzIgNDYgMEEgOTYgQTAgMDAgMTggQ0MgMDIgMDAgMDAgMDAgMDEgCj4gSENJIEV2ZW50OiBDb21t
+YW5kIFN0YXR1cygweDBmKSBwbGVuIDQKICAwMCAwMSAwNSAwNCAKPiBIQ0kgRXZlbnQ6IExpbmsg
+S2V5IFJlcXVlc3QoMHgxNykgcGxlbiA2CiAgQzIgNDYgMEEgOTYgQTAgMDAgCjwgSENJIENvbW1h
+bmQ6IExpbmsgS2V5IFJlcXVlc3QgUmVwbHkoMHgwMXwweDAwMGIpIHBsZW4gMjIKICBDMiA0NiAw
+QSA5NiBBMCAwMCBGMSA4QyBFOSBCNCA4RCA3OCA2NSBGQyA1OSBBRCBEMSA5OSBFMSAwOCAKICA0
+OSAxNCAKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUoMHgwZSkgcGxlbiAxMAogIDAxIDBC
+IDA0IDAwIEMyIDQ2IDBBIDk2IEEwIDAwIAo+IEhDSSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSgw
+eDAzKSBwbGVuIDExCiAgMDAgMjkgMDAgQzIgNDYgMEEgOTYgQTAgMDAgMDEgMDEgCjwgQUNMIGRh
+dGE6IGhhbmRsZSAweDAwMjkgZmxhZ3MgMHgwMiBkbGVuIDEyCiAgICBMMkNBUChzKTogQ29ubmVj
+dCByZXE6IHBzbSAzIHNjaWQgMHgwMDQwCjwgSENJIENvbW1hbmQ6IFdyaXRlIExpbmsgUG9saWN5
+IFNldHRpbmdzKDB4MDJ8MHgwMDBkKSBwbGVuIDQKICAyOSAwMCAwRSAwMCAKPiBIQ0kgRXZlbnQ6
+IFBhZ2UgU2NhbiBSZXBldGl0aW9uIE1vZGUgQ2hhbmdlKDB4MjApIHBsZW4gNwogIEMyIDQ2IDBB
+IDk2IEEwIDAwIDAxIAo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSgweDBlKSBwbGVuIDYK
+ICAwMSAwRCAwOCAwMCAyOSAwMCAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFj
+a2V0cygweDEzKSBwbGVuIDUKICAwMSAyOSAwMCAwMSAwMCAKPiBIQ0kgRXZlbnQ6IE1heCBTbG90
+cyBDaGFuZ2UoMHgxYikgcGxlbiAzCiAgMjkgMDAgMDUgCj4gQUNMIGRhdGE6IGhhbmRsZSAweDAw
+MjkgZmxhZ3MgMHgwMiBkbGVuIDE2CiAgICBMMkNBUChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgw
+MDQwIHNjaWQgMHgwMDQwIHJlc3VsdCAxIHN0YXR1cyAyCj4gQUNMIGRhdGE6IGhhbmRsZSAweDAw
+MjkgZmxhZ3MgMHgwMiBkbGVuIDE2CiAgICBMMkNBUChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgw
+MDQwIHNjaWQgMHgwMDQwIHJlc3VsdCAwIHN0YXR1cyAwCjwgQUNMIGRhdGE6IGhhbmRsZSAweDAw
+MjkgZmxhZ3MgMHgwMiBkbGVuIDE2CiAgICBMMkNBUChzKTogQ29uZmlnIHJlcTogZGNpZCAweDAw
+NDAgZmxhZ3MgMHgwMDAwIGNsZW4gNAogICAgTVRVIDEwMjQgCj4gSENJIEV2ZW50OiBOdW1iZXIg
+b2YgQ29tcGxldGVkIFBhY2tldHMoMHgxMykgcGxlbiA1CiAgMDEgMjkgMDAgMDEgMDAgCj4gQUNM
+IGRhdGE6IGhhbmRsZSAweDAwMjkgZmxhZ3MgMHgwMiBkbGVuIDE0CiAgICBMMkNBUChzKTogQ29u
+ZmlnIHJzcDogc2NpZCAweDAwNDAgZmxhZ3MgMHgwMDAwIHJlc3VsdCAwIGNsZW4gMAo+IEFDTCBk
+YXRhOiBoYW5kbGUgMHgwMDI5IGZsYWdzIDB4MDIgZGxlbiAxNgogICAgTDJDQVAocyk6IENvbmZp
+ZyByZXE6IGRjaWQgMHgwMDQwIGZsYWdzIDB4MDAwMCBjbGVuIDQKICAgIE1UVSAxMDI0IAo8IEFD
+TCBkYXRhOiBoYW5kbGUgMHgwMDI5IGZsYWdzIDB4MDIgZGxlbiAxNAogICAgTDJDQVAocyk6IENv
+bmZpZyByc3A6IHNjaWQgMHgwMDQwIGZsYWdzIDB4MDAwMCByZXN1bHQgMCBjbGVuIDAKPCBBQ0wg
+ZGF0YTogaGFuZGxlIDB4MDAyOSBmbGFncyAweDAyIGRsZW4gOAogICAgTDJDQVAoZCk6IGNpZCAw
+eDQwIGxlbiA0IFtwc20gM10KICAgICAgUkZDT01NKHMpOiBTQUJNOiBjciAxIGRsY2kgMCBwZiAx
+IGlsZW4gMCBmY3MgMHgxYyAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0
+cygweDEzKSBwbGVuIDUKICAwMSAyOSAwMCAwMSAwMCAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBD
+b21wbGV0ZWQgUGFja2V0cygweDEzKSBwbGVuIDUKICAwMSAyOSAwMCAwMSAwMCAKPiBBQ0wgZGF0
+YTogaGFuZGxlIDB4MDAyOSBmbGFncyAweDAyIGRsZW4gOAogICAgTDJDQVAoZCk6IGNpZCAweDQw
+IGxlbiA0IFtwc20gM10KICAgICAgUkZDT01NKHMpOiBVQTogY3IgMSBkbGNpIDAgcGYgMSBpbGVu
+IDAgZmNzIDB4ZDcgCjwgQUNMIGRhdGE6IGhhbmRsZSAweDAwMjkgZmxhZ3MgMHgwMiBkbGVuIDE4
+CiAgICBMMkNBUChkKTogY2lkIDB4NDAgbGVuIDE0IFtwc20gM10KICAgICAgUkZDT01NKHMpOiBQ
+TiBDTUQ6IGNyIDEgZGxjaSAwIHBmIDAgaWxlbiAxMCBmY3MgMHg3MCBtY2NfbGVuIDgKICAgICAg
+ZGxjaSAyIGZyYW1lX3R5cGUgMCBjcmVkaXRfZmxvdyAxNSBwcmkgNyBhY2tfdGltZXIgMCBmcmFt
+ZV9zaXplIDEwMTkgbWF4X3JldHJhbnMgMCBjcmVkaXRzIDcKPiBIQ0kgRXZlbnQ6IE51bWJlciBv
+ZiBDb21wbGV0ZWQgUGFja2V0cygweDEzKSBwbGVuIDUKICAwMSAyOSAwMCAwMSAwMCAKPiBBQ0wg
+ZGF0YTogaGFuZGxlIDB4MDAyOSBmbGFncyAweDAyIGRsZW4gMTgKICAgIEwyQ0FQKGQpOiBjaWQg
+MHg0MCBsZW4gMTQgW3BzbSAzXQogICAgICBSRkNPTU0ocyk6IFBOIFJTUDogY3IgMCBkbGNpIDAg
+cGYgMCBpbGVuIDEwIGZjcyAweGFhIG1jY19sZW4gOAogICAgICBkbGNpIDIgZnJhbWVfdHlwZSAw
+IGNyZWRpdF9mbG93IDE0IHByaSA3IGFja190aW1lciAwIGZyYW1lX3NpemUgMzIwIG1heF9yZXRy
+YW5zIDAgY3JlZGl0cyAwCjwgQUNMIGRhdGE6IGhhbmRsZSAweDAwMjkgZmxhZ3MgMHgwMiBkbGVu
+IDgKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4gNCBbcHNtIDNdCiAgICAgIFJGQ09NTShzKTog
+U0FCTTogY3IgMSBkbGNpIDIgcGYgMSBpbGVuIDAgZmNzIDB4NTkgCj4gSENJIEV2ZW50OiBOdW1i
+ZXIgb2YgQ29tcGxldGVkIFBhY2tldHMoMHgxMykgcGxlbiA1CiAgMDEgMjkgMDAgMDEgMDAgCj4g
+QUNMIGRhdGE6IGhhbmRsZSAweDAwMjkgZmxhZ3MgMHgwMiBkbGVuIDgKICAgIEwyQ0FQKGQpOiBj
+aWQgMHg0MCBsZW4gNCBbcHNtIDNdCiAgICAgIFJGQ09NTShzKTogVUE6IGNyIDEgZGxjaSAyIHBm
+IDEgaWxlbiAwIGZjcyAweDkyIAo8IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI5IGZsYWdzIDB4MDIg
+ZGxlbiAxMgogICAgTDJDQVAoZCk6IGNpZCAweDQwIGxlbiA4IFtwc20gM10KICAgICAgUkZDT01N
+KHMpOiBNU0MgQ01EOiBjciAxIGRsY2kgMCBwZiAwIGlsZW4gNCBmY3MgMHg3MCBtY2NfbGVuIDIK
+ICAgICAgZGxjaSAyIGZjIDAgcnRjIDEgcnRyIDEgaWMgMCBkdiAxIGIxIDAgYjIgMCBiMyAwIGxl
+biAwCj4gQUNMIGRhdGE6IGhhbmRsZSAweDAwMjkgZmxhZ3MgMHgwMiBkbGVuIDEyCiAgICBMMkNB
+UChkKTogY2lkIDB4NDAgbGVuIDggW3BzbSAzXQogICAgICBSRkNPTU0ocyk6IE1TQyBDTUQ6IGNy
+IDAgZGxjaSAwIHBmIDAgaWxlbiA0IGZjcyAweGFhIG1jY19sZW4gMgogICAgICBkbGNpIDIgZmMg
+MCBydGMgMSBydHIgMSBpYyAwIGR2IDAgYjEgMCBiMiAwIGIzIDAgbGVuIDAKPiBIQ0kgRXZlbnQ6
+IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cygweDEzKSBwbGVuIDUKICAwMSAyOSAwMCAwMSAw
+MCAKPCBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyOSBmbGFncyAweDAyIGRsZW4gMTIKICAgIEwyQ0FQ
+KGQpOiBjaWQgMHg0MCBsZW4gOCBbcHNtIDNdCiAgICAgIFJGQ09NTShzKTogTVNDIFJTUDogY3Ig
+MSBkbGNpIDAgcGYgMCBpbGVuIDQgZmNzIDB4NzAgbWNjX2xlbiAyCiAgICAgIGRsY2kgMiBmYyAw
+IHJ0YyAxIHJ0ciAxIGljIDAgZHYgMCBiMSAwIGIyIDAgYjMgMCBsZW4gMAo+IEFDTCBkYXRhOiBo
+YW5kbGUgMHgwMDI5IGZsYWdzIDB4MDIgZGxlbiAxMgogICAgTDJDQVAoZCk6IGNpZCAweDQwIGxl
+biA4IFtwc20gM10KICAgICAgUkZDT01NKHMpOiBNU0MgUlNQOiBjciAwIGRsY2kgMCBwZiAwIGls
+ZW4gNCBmY3MgMHhhYSBtY2NfbGVuIDIKICAgICAgZGxjaSAyIGZjIDAgcnRjIDEgcnRyIDEgaWMg
+MCBkdiAxIGIxIDAgYjIgMCBiMyAwIGxlbiAwCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxl
+dGVkIFBhY2tldHMoMHgxMykgcGxlbiA1CiAgMDEgMjkgMDAgMDEgMDAgCjwgQUNMIGRhdGE6IGhh
+bmRsZSAweDAwMjkgZmxhZ3MgMHgwMiBkbGVuIDkKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4g
+NSBbcHNtIDNdCiAgICAgIFJGQ09NTShkKTogVUlIOiBjciAxIGRsY2kgMiBwZiAxIGlsZW4gMCBm
+Y3MgMHg4NiAKICAgICAgMjEgCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tl
+dHMoMHgxMykgcGxlbiA1CiAgMDEgMjkgMDAgMDEgMDAgCj4gQUNMIGRhdGE6IGhhbmRsZSAweDAw
+MjkgZmxhZ3MgMHgwMiBkbGVuIDkKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4gNSBbcHNtIDNd
+CiAgICAgIFJGQ09NTShkKTogVUlIOiBjciAwIGRsY2kgMiBwZiAxIGlsZW4gMCBmY3MgMHg1YyAK
+ICAgICAgMDUgCg==
+
+--=_mixed 0055F61985256EE7_=--
