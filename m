@@ -1,33 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Source sample custom Bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <6653F70C-5ECD-11D9-8017-000D9348D4BE@magnifeye.com>
-References: <4dfd570904122402134ec2fd32@mail.gmail.com>
-	 <4dfd570904122509237f2a2f48@mail.gmail.com>
-	 <1103995727.8758.31.camel@pegasus>
-	 <4dfd570904122509451e811d7a@mail.gmail.com>
-	 <1103996976.8758.34.camel@pegasus>
-	 <4dfd5709041225095410f71a46@mail.gmail.com>
-	 <1103997529.8758.36.camel@pegasus>
-	 <4dfd570904122510081a9bfa7@mail.gmail.com>
-	 <4dfd570904122510085371c17b@mail.gmail.com>
-	 <4dfd57090412251011705f52be@mail.gmail.com>
-	 <4dfd5709041225103246f6934c@mail.gmail.com>
-	 <1104000494.8758.46.camel@pegasus> <002601c4ebb8$4de24200$020ba8c0@heejune>
-	 <1104125195.9393.12.camel@pegasus>
-	 <BEB39C04-5B6A-11D9-8017-000D9348D4BE@magnifeye.com>
-	 <1104604846.4253.1.camel@pegasus>
-	 <FA69107A-5DAA-11D9-8017-000D9348D4BE@magnifeye.com>
-	 <1104776407.8894.53.camel@pegasus>
-	 <AFDBF1EE-5DB6-11D9-8017-000D9348D4BE@magnifeye.com>
-	 <1104778613.8894.62.camel@pegasus>
-	 <C17DB8CE-5E1A-11D9-8017-000D9348D4BE@magnifeye.com>
-	 <1104839435.8894.86.camel@pegasus>
-	 <6653F70C-5ECD-11D9-8017-000D9348D4BE@magnifeye.com>
-Content-Type: text/plain
-Message-Id: <1104925461.4299.8.camel@pegasus>
-Mime-Version: 1.0
+From: "Jose Bernardo Silva" <jbs@bandos.homelinux.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Dongle firmware
+Message-Id: <20050105090527.M98095@bandos.homelinux.com>
+In-Reply-To: <200501042245.58663.cijoml@volny.cz>
+References: <20050104110418.M39860@bandos.homelinux.com> <1104841297.8894.92.camel@pegasus> <20050104210042.M19007@bandos.homelinux.com> <200501042245.58663.cijoml@volny.cz>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -39,35 +19,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 Jan 2005 12:44:21 +0100
+Date: Wed, 5 Jan 2005 09:14:10 +0000
 
-Hi Jonathan,
+On Tue, 4 Jan 2005 22:45:58 +0100, Michal Semler wrote
 
-> I have looked at the hcitool.c program and I am stuck by my lack of 
-> understanding. The cmd_cmd seems like what I want to do to read data 
-> from my custom device. What I want to do is given a device address, I 
-> want to read bytes from it and occasionally write to it.  Is there a 
-> code fragment that you can point me to?
+ 
+> This dongle looks prepared for apple firmware :)
 
-the HCI raw socket uses H4 as protocol with one packet per read or write
-operation. The cmd_cmd() is not what you want, because you wanna send
-data packets and not a HCI command.
+Which means I now need to find someone with a OSX machine... :(
+ 
+> Don't think about flashing MSI, there isn't firmware for it...I own 
+> one too  :
+> ((
 
->  From the person who wrote the stack on our device.
-> 
-> This is a connect device with a ACL DH5 packet type. The transfers are 
-> standard ACL L2CAP packets from the remote. The remote appears to the 
-> host as a master device, pushing down ACL packets when a button is 
-> pressed.
+Well, when I searched for the GenericCSR.dfu, I found Jons guides, and the
+model immediately after was tested, the 6970. Too bad the 6967 doesn't work.
+I'll at least try to find the old dfu that was included in the MSI drivers,
+the one that let me upgrade to 16.4, I think I might still have it somewhere.
 
-So do it uses L2CAP or not? However if not, why don't you get your
-device fixed to response to L2CAP. Relying on ACL data packets is not
-the best idea to get this working reliable.
 
-Regards
-
-Marcel
-
+-- 
+Jose Bernardo B R Silva             | Source Mage GNU/Linux Section Guru
+jbernardo@sourcemage.org            | http://www.sourcemage.org
+http://counter.li.org #245602
+http://cosmos.oninetspeed.pt/jose.bernardo
+jbs@bandos.homelinux.com
 
 
 
