@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Sebastian Roth <sebastian.roth@esk.fhg.de>
-Message-ID: <csllc3$c6d$1@sea.gmane.org>
-References: <82721080501190249144cfac0@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] bluez-utils-2.14 compile error: make returns
+	"cannot find -lbluetooth"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <82721080501190249144cfac0@mail.gmail.com>
-Subject: [Bluez-users] Re: bluez-utils-2.14 compile error: make returns "cannot find -lbluetooth"
+References: <82721080501190249144cfac0@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1106136111.8190.87.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,23 +19,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 Jan 2005 13:55:30 +0100
+Date: Wed, 19 Jan 2005 13:01:51 +0100
 
-Hello!
+Hi,
 
-I guess your linker just can't find the bluetooth library because you 
-have installed it into a non-standard path.
- > ./configure --prefix=/usr/local/bluez
+> I'm using Yoper with a 2.6.8.1-3 kernel. I downloaded bluez-libs and
+> bluez-utils, both 2.14. Did the following:
+> (in /home/blabla/bluez-libs-2.14)
+> ./configure --prefix=/usr/local/bluez
+> make
+> (did a su)
+> make install 
+> (so far so good)
+> (now to /home/blabla/bluez-utils-2.14)
+> ./configure --prefix=/usr/local/bluez
+> make
+> (now things go crappy, read below the final lines of the output)
+> 
+> gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/local/bluez/include 
+> -I/usr/local/bluez/include -Wall -O2 -c `test -f 'hcisecfilter.c' ||
+> echo './'`hcisecfilter.c
+> gcc -I/usr/local/bluez/include  -I/usr/local/bluez/include -Wall -O2  
+> -o hcisecfilter  hcisecfilter.o  -lbluetooth
+> /usr/lib/gcc/i686-pc-linux-gnu/3.4.1/../../../../i686-pc-linux-gnu/bin/ld:
+> cannot find -lbluetooth
+> collect2: ld returned 1 exit status
+> make[2]: *** [hcisecfilter] Error 1
+> make[2]: Leaving directory `/home/blabla/bluez-utils-2.14/tools'
+> make[1]: *** [all-recursive] Error 1
+> make[1]: Leaving directory `/home/blabla/bluez-utils-2.14'
+> make: *** [all] Error 2
+> 
+> *blabla stands for a long and awkward branch of the directory tree; I
+> found it to be annoying, so I replaced it;
 
-make install runs the command `ldconfig -n /usr/local/bluez/lib' but the 
-option -n forces ldconfig just to create the library links and not to 
-update the cache. (man ldconfig)
-Add this path to your /etc/ld.so.conf and re-run ldconfig as root.
+you need to install bluez-libs first and make sure bluez-utils can find
+it.
 
-`ldconfig -p | grep bluetooth' should show libbluetooth now!
+Regards
 
-Best regards,
-Sebastian
+Marcel
+
 
 
 
