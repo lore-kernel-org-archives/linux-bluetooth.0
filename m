@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041013022808.63256.qmail@web41113.mail.yahoo.com>
-From: Sean Loh <blaze_wk@yahoo.com>
+From: Mikko Rapeli <mikko.rapeli@iki.fi>
+Subject: Re: [Bluez-users] Socket CF adaptor,
+ limited to 2-3KB/sec RFCOMM PPP connection?
+In-reply-to: <Pine.GSO.4.58.0410121425040.24690@gaia3.cc.gatech.edu>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Bluetooth 1.2 and 1.1 compatibility
+Message-id: <20041012210802.GA4827@nalle>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+References: <Pine.GSO.4.58.0410121425040.24690@gaia3.cc.gatech.edu>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,36 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 12 Oct 2004 19:28:08 -0700 (PDT)
+Date: Wed, 13 Oct 2004 00:08:02 +0300
 
-Hi!!
+On Tue, Oct 12, 2004 at 02:37:16PM -0400, Jay W. Summet wrote:
+> However, when I connect to my GPRS data provider, I only get 2.1 to 2.5
+> KBytes/second of transfer. If I use IrDA instead of bluetooth, I can
+> obtain the typical 5.1 to 5.6 KBytes/second transfer that I am expecting
+> from GPRS.
 
-I have curretnly written a program to transmit data
-over IP over Bluetooth using the PAN profile. I was
-wondering if I actually ported the program to use it
-over another notebook using the Bluetooth usb 1.2
-adapter, will bluez then still be the same. Or will
-some bluez specifications change? My program just uses
-the basic sockets to trasmit data. 
+I propose you first try to repeat this slow connection problem with plain 
+Bluetooth data transfer between Linux and the phone (OBEX or something), 
+since GPRS networks and cells may give you anything between 0 and ~50 kbps 
+of bandwidth depending on all kinds of things like network/cell load/number 
+of users etc etc. 
 
-Other questions, 
-- does bluez support the higher data
-throughputs(around 2.1 Mbps) of Bluetooth 1.2?
-- are there any bluez compliant bluetooth usb
-adapters?
-- if my program is indeed able to be ported to be used
-over the bluetooth 1.2 usb adapter, will my program
-immediately benefit from the increased data rate of
-the bluetooth 1.2 specification?
+And if the issue still exists, I'd say Marcel and other wizards would like 
+to see the hcidump, perhaps with -t ;)
 
-thanks for any help, bluez rocks!!
-
-
-		
-_______________________________
-Do you Yahoo!?
-Declare Yourself - Register online to vote today!
-http://vote.yahoo.com
+-Mikko
 
 
 -------------------------------------------------------
