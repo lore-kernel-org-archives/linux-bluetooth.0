@@ -1,41 +1,88 @@
-Return-Path: <Johan.Hedberg@nokia.com>
-Date: Wed, 16 Jun 2004 15:45:41 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] D-BUS fixes for hcid
-Message-ID: <20040616124541.GA8629@kone>
-References: <20040616112702.GA898@kone> <1087385828.4309.3.camel@pegasus> <20040616115718.GA8420@kone> <1087388298.4309.10.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@nokia.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040616115718.GA8420@kone>
+References: <20040616112702.GA898@kone> <1087385828.4309.3.camel@pegasus>
+	 <20040616115718.GA8420@kone>
+Content-Type: text/plain
+Message-Id: <1087388298.4309.10.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1087388298.4309.10.camel@pegasus>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 16 Jun 2004 14:18:18 +0200
 
-Hi Marcel,
+Hi Johan,
 
-I must admit that I hadn't looked into how the bluez-pin program works
-in D-BUS mode. It seems it should be running all the time to be able to
-receive any D-BUS requests, correct?
+> The first part with the error handling is needed because
+> dbus_pending_call_get_reply() may return NULL if a timeout occurs (a
+> reply isn't received in time). Also, if new errors are added in the
+> future it is probably better to check for the general case here:
+> dbus_message_get_type().
 
-The service activation feature of D-BUS which I have talked about is
-designed to solve the problem where some D-BUS service should be
-launched on-demand. I think the pin-helper falls exactly into this
-category, and would be IMHO more elegant if it wouldn't have to be
-running all the time but would be automatically launched by D-BUS daemon
-when needed.
+ok, but the "message == NULL" must be moved into the D-Bus library. I
+checked their source code and actually they miss a
 
-On Wed, Jun 16, 2004, ext Marcel Holtmann wrote:
-> > The second part (dbus_message_set_auto_activation) enables service
-> > activation if the PinAgent service isn't aquired by any process (i.e.
-> > the D-BUS daemon will execute the pin-helper program if needed).
-> 
-> The hcid shouldn't execute the D-Bus PIN helper.
+	_dbus_return_val_if_fail (message != NULL, ???);
 
-Not hcid, but the D-BUS daemon.
+in their function.
 
-> From my local .xession I start "bluez-pin --dbus &" and everything works
-> fine.
+> The second part (dbus_message_set_auto_activation) enables service
+> activation if the PinAgent service isn't aquired by any process (i.e.
+> the D-BUS daemon will execute the pin-helper program if needed).
 
-Ok. But by using D-BUS service activation, you wouldn't need to do this.
+The hcid shouldn't execute the D-Bus PIN helper. In case of a failure
+with the D-Bus version it should fall back to the old one.
 
-Johan
+> Do you mean that without these changes, the pin-helper is automatically
+> launched when a D-BUS message is sent by hcid to the service
+> org.bluez.PinAgent? I could not get it working without the changes. What
+> version of D-BUS are you using?
+
+I use these tools:
+
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Installed/Config-files/Unpacked/Failed-config/Half-installed
+|/ Err?=(none)/Hold/Reinst-required/X=both-problems (Status,Err: uppercase=bad)
+||/ Name           Version        Description
++++-==============-==============-============================================
+ii  bluez-hcidump  1.5-2          Analyses Bluetooth HCI packets
+ii  bluez-pin      0.23-1         Bluetooth PIN helper with D-BUS support
+ii  bluez-utils    2.7-4          Bluetooth tools and daemons
+
+And I set this in hcid.conf:
+
+        # PIN helper
+        pin_helper /usr/bin/bluez-pin;
+
+        # D-Bus PIN helper
+        dbus_pin_helper;
+
+>>From my local .xession I start "bluez-pin --dbus &" and everything works
+fine.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by The 2004 JavaOne(SM) Conference
+Learn from the experts at JavaOne(SM), Sun's Worldwide Java Developer
+Conference, June 28 - July 1 at the Moscone Center in San Francisco, CA
+REGISTER AND SAVE! http://java.sun.com/javaone/sf Priority Code NWMGYKND
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
