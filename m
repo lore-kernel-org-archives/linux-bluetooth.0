@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Philip Blundell <pb@nexus.co.uk>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Missing data in ACL packets from CSR chip
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daryl Van Vorst <daryl@wideray.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <001501c3f269$87a19f70$1a01010a@baked>
+References: <001501c3f269$87a19f70$1a01010a@baked>
 Content-Type: text/plain
-Message-Id: <1076864335.23437.70.camel@dixie.nexus.co.uk>
+Message-Id: <1076702663.18588.20.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] lmx9814
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,26 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 15 Feb 2004 16:58:55 +0000
+Date: Fri, 13 Feb 2004 21:04:24 +0100
 
-I've been trying to use BlueZ on an HP iPAQ H5500, which uses a National
-LMX9814 chip interfaced via UART.  Connecting with "hciattach /dev/tts/1
-any 921600" seems to work ok, and hcitool dev shows the device as hci0,
-but a subsequent hcitool scan fails with "connection timed out".  dmesg
-shows:
+Hi Daryl,
 
-hci_cmd_task: hci0 command tx timeout
-hci_cmd_task: hci0 command tx timeout
-h4_recv: Unknown HCI packet type 70
-h4_recv: Unknown HCI packet type f8
-h4_recv: Unknown HCI packet type f0
+> I was just trying to determine if that was the device you were referring to.
+> I wasn't looking for a quote from you. :)
 
-Is anybody successfully using one of these devices, or does anybody have
-a suggestion as to what might be going wrong here?
+as I know the additional endpoint is only for people who already bought
+the Casira development kit or the BlueLab. But to be sure ask their
+sales team.
 
-Thanks
+Regards
 
-p.
+Marcel
+
 
 
 
