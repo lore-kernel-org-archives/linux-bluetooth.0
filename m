@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] l2test-number of frames
+Subject: Re: [Bluez-users] detecting BT devices
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de4657605010801137c118137@mail.gmail.com>
-References: <2de4657605010801137c118137@mail.gmail.com>
+In-Reply-To: <b895079705010722156869ddd7@mail.gmail.com>
+References: <b895079705010722156869ddd7@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1105193094.8137.5.camel@pegasus>
+Message-Id: <1105193038.8137.3.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 08 Jan 2005 15:04:54 +0100
+Date: Sat, 08 Jan 2005 15:03:58 +0100
 
-Hi Manjunath,
+Hi Weston,
 
-> in the l2test, i am not able to send more than 512 frames. The utility
-> stops at this point every time. I want to run the utility for about
-> 5000 packets, but after 512 packets, i get the following error
-> 
->  "Send failed. Connection reset by peer(104)"....
-> 
-> i think some constant in l2cap.cc or h is causing this problem. Hope
-> you can help me this one.
+> I am aware of scanning for bluetooth devices, but is there anyway I
+> can have my linux box notify me when bt devices come in range? Or
+> something along those lines?
 
-what kernel? What utils and libs versions? What kind of devices?
+you can use the HCI raw socket in together with the periodic inquiry
+feature. However you must write a program for this by your own.
+
+> Also, anyone got reading material for using RFCONN to interact with bt
+> devices using rs232 stuff.
+
+Check the mailing list archive and the web. There are a lot of examples
+around there.
 
 Regards
 
