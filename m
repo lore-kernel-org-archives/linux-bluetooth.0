@@ -1,86 +1,55 @@
-Return-Path: <Peter.K.Martin@t-online.de>
-From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>,
-   <bluez-users@lists.sourceforge.net>
-Subject: BT unter SuSE 9.2
-Date: Wed, 8 Dec 2004 14:56:27 +0100
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAABI149cyoQEqKpLo4CgBvxAEAAAAA@t-online.de>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+In-Reply-To: <1102495339.9988.31.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] remove pairing with device?
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0002_01C4DD36.1BF6D430"
-List-ID: <bluez-users.lists.sourceforge.net>
+Message-ID: <OF4C259331.38DF59B1-ONC1256F64.00304800-C1256F64.00308C40@isbac.com>
+From: Marius Schaefer/Camberg/ISBAC <Marius.Schaefer@ISBAC.COM>
+Content-Type: text/plain; charset="US-ASCII"
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Wed, 8 Dec 2004 09:50:16 +0100
 
-This is a multi-part message in MIME format.
+Hi Marcel,
 
-------=_NextPart_000_0002_01C4DD36.1BF6D430
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+> Hi Marius,
+> 
+> > I've gotten BlueZ and OpenObex to work, so I can send files from my 
+phone 
+> > to my linux box. I read the pin from /etc/bluetooth/pin. 
+> > That works very well. But once the phone is paired with Bluez, I can 
+> > change the pin of BlueZ, but the phone stays paired and won't ever ask 
+for 
+> > the new pin. When I delete the pairing on the phone, it will ask for 
+the 
+> > new pin, I need to delete the pairing on the BlueZ side. Is that 
+possible?
+> 
+> the link keys are stored in binary form in /etc/bluetooth/link_key. Look
+> at the mailing list archive for details about that. There has been a
+> thread lately.
+> 
+That was exactly what I was looking for, many thanks!
 
-Hallo Marcel,
-now the trouble begins. I install SuSE 9.2 and wnted to start the
-bluetooth-function of my toshiba satellite pro m10, which already worked
-under 9.1 ---> but now nothing happens. When I try to start with dmabt =
-the
-response is: unable to access /dev/toshiba, although the file (?) is
-existing. The lines in modules.conf are also o.k.
-=20
-I tried to patch the toshiba_acpi, but without any result. Only a long =
-time
-of compilation, etc.
-=20
-Please give me an idea what to do to solve the problem. I have always to
-switch from Linux to Windows in order to get an internet-connection and =
-this
-is very boring.
-=20
-Regards
-Peter
+Marius
 
-------=_NextPart_000_0002_01C4DD36.1BF6D430
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<TITLE>Nachricht</TITLE>
 
-<META content=3D"MSHTML 6.00.2800.1476" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV><SPAN class=3D391574213-08122004><FONT face=3DArial size=3D2>Hallo=20
-Marcel,</FONT></SPAN></DIV>
-<DIV><SPAN class=3D391574213-08122004><FONT face=3DArial size=3D2>now =
-the trouble=20
-begins. I install SuSE 9.2 and wnted to start the bluetooth-function of =
-my=20
-toshiba satellite pro m10, which already worked under 9.1 ---&gt; but =
-now=20
-nothing happens. When I try to start with dmabt the response is: unable =
-to=20
-access /dev/toshiba, although the file (?) is existing. The lines in=20
-modules.conf are also o.k.</FONT></SPAN></DIV>
-<DIV><SPAN class=3D391574213-08122004><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D391574213-08122004><FONT face=3DArial size=3D2>I =
-tried to patch the=20
-toshiba_acpi, but without any result. Only a long time of compilation,=20
-etc.</FONT></SPAN></DIV>
-<DIV><SPAN class=3D391574213-08122004><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D391574213-08122004><FONT face=3DArial size=3D2>Please =
-give me an=20
-idea what to do to solve the problem. I have always to switch from Linux =
-to=20
-Windows in order to get an internet-connection and this is very=20
-boring.</FONT></SPAN></DIV>
-<DIV><SPAN class=3D391574213-08122004><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D391574213-08122004><FONT face=3DArial=20
-size=3D2>Regards</FONT></SPAN></DIV>
-<DIV><SPAN class=3D391574213-08122004><FONT face=3DArial=20
-size=3D2>Peter</FONT></SPAN></DIV></BODY></HTML>
-
-------=_NextPart_000_0002_01C4DD36.1BF6D430--
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now. 
+http://productguide.itmanagersjournal.com/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
