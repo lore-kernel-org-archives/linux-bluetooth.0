@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5256d0b05011019273d81fdef@mail.gmail.com>
-From: Peter Robinson <pbrobinson@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] hciconfig question
-In-Reply-To: <5f30e261050110123968721dc4@mail.gmail.com>
+Subject: Re: [Bluez-devel] sockfd_lookup missing from older kernel patches
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200501102004.11028.bluez-devel@cpinkney.org.uk>
+References: <200501102004.11028.bluez-devel@cpinkney.org.uk>
+Content-Type: text/plain
+Message-Id: <1105401255.8056.3.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <5f30e261041224131026cfa70a@mail.gmail.com>
-	 <1103931501.20258.94.camel@pegasus>
-	 <5f30e261050110123968721dc4@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -20,26 +18,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Jan 2005 11:27:42 +0800
+Date: Tue, 11 Jan 2005 00:54:15 +0100
 
-> The only 1.2 devices listed at
-> http://www.holtmann.org/linux/bluetooth/devices.html are the Apple G4
-> and the Lifetech BlueConnect (but then I saw Carlos say that isn't
-> so).
+Hi Colin,
+
+> I was updating a BlueZ package for the Sharp Zaurus PDAs that use the 2.4.18 
+> kernel. The previous package had been using BlueZ libs and utils v2.3 and 
+> patch 2.4.18-mh8 and had been working ok.
 > 
-> I'm in the market for a couple of 1.2 USB dongles I can use with the
-> latest BlueZ kernel.  Any suggestions?  I found "ANYCOM USB-120 USB
-> Adapter" on Froogle.  Any comments about Anycom?
+> With the latest userspace source and patch 2.4.18-mh15 I noticed the function 
+> sockfd_lookup had been removed from the sock.c files. This caused a 
+> unresolved symbol error upon loading the bnep module on the Zaurus.
+> 
+> I noticed in the comments on http://www.holtmann.org/linux/kernel/ that 
+> sockfd_lookup was removed on Dec 15, 2003 from kernel patches for kernels 
+> 2.4.22 and later. I presume this function has been moved into more central 
+> kernel code? Was this function supposed to be removed from the patches for 
+> kernels 2.4.21 and earlier (or at least kernel 2.4.18)?
 
->From the thread that appeared the other day on the users list can't
-you just buy one of the upgradable BT 1.1 devices like a later
-revision of the DLink BT-120 and upgrade it to the 1.2 standard.
-
-Thread here
-http://sourceforge.net/mailarchive/forum.php?thread_id=6278463&forum_id=1883
+all -mh patches for 2.4 should deal correctly with an exported or non
+exported sockfd_lookup(). I tested that a long time ago. However if you
+got problems with then simply export that function from the socket core.
 
 Regards
-Peter
+
+Marcel
+
+
 
 
 -------------------------------------------------------
