@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alain Volmat <avolmat@src.ricoh.co.jp>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <20050217053715.12789.qmail@web60907.mail.yahoo.com>
+From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
 Subject: Re: [Bluez-users] rfcomm question 3
-Message-ID: <20050217062800.GJ20495@snoopy.src.ricoh.co.jp>
-References: <1107626911.6921.179.camel@pegasus> <20050217053715.12789.qmail@web60907.mail.yahoo.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20050217053715.12789.qmail@web60907.mail.yahoo.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1107626911.6921.179.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=big5
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,18 +17,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Feb 2005 15:28:00 +0900
+Date: Thu, 17 Feb 2005 13:37:15 +0800 (CST)
 
-Hi Michael,
+Hi all!
+    I'm still doing my project. Now I face a problem
+that the T610 still cannot connect to PC. Then my
+tutor said that I have to write a sdp program to let
+the phone to connect to PC. I wish to know that is
+there any guideline or even the source code for sdp
+programming? It is urgent as my tutor said he used two
+months to do it before. 
+    Thank you very much for your kindness.
+Michael
 
-> I wish to know that is there any guideline or even the 
-> source code for sdp programming? 
 
-looking at the source of sdptool might help.
-
-Sincerely,
-
-Alain
+_______________________________________________________________________
+新年願望第一位 : 找到友緣人
+http://personals.yahoo.com.hk
 
 
 -------------------------------------------------------
