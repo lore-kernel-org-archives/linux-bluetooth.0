@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] passive inquiry 
-In-reply-to: <20041217141809.62713.qmail@web40605.mail.yahoo.com> 
-References: <20041217141809.62713.qmail@web40605.mail.yahoo.com>
-Message-ID: <17081.1103293811@csr.com>
-From: Peter Stephenson <pws@csr.com>
+Subject: Re: [Bluez-users] PAN pboblems
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E1Cf95k-0000r1-SE@sc8-sf-mx1.sourceforge.net>
+References: <E1Cf95k-0000r1-SE@sc8-sf-mx1.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1103293739.28046.102.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,38 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Dec 2004 14:30:11 +0000
+Date: Fri, 17 Dec 2004 15:28:59 +0100
 
-Paolino paperino wrote:
-> Hi,
-> i want to know if it is possible to make a "passive
-> inquiry", i explain better, a device A do an inquiry
-> no find their neighbours, it is possible for a device
-> B (in the reachability field) to know that was
-> inquiried by device A? The applican can receive an
-> event each time the device is inquiried?
+Hi,
 
-No, unfortunately that can't work with an ordinary inquiry.
-The device which is scanning only receives an ID packet, which
-contains no information about the sender.
+>     I have several questions.
+>     First ,a bluetooth device was expected to act as GN with the command "pand  --listen --role GN".But the GN could be connected by only two PANUs.The third PANU cannot conect to the GN any more. Why? And how to set the maximal user numbers of a GN?
+>     Second ,I used some bluetooth devices to form a simple adhoc network based on BNEP protocol, which can be shown as the following figure:
+>      PANU1--->GN<---PANU2
 
-There are moves afoot to add more flexible forms of inquiry to
-the specification, but that hasn't happened yet.
+sounds like a chip limitation. Add --master on the GN to force the role
+switch.
 
-pws
+>     When GN was only conncted by PANU1,the data transmitting rate could reach about 50kbps.However ,when the GN is connected by both PANU1 and PANU2 ,the data rate reduced to about 8kbps.Why? What can I do to solve this problem?
 
+The --master option should also help, because it will combine all three
+devices into one piconet and thus the GN not longer have to follow more
+than one hopping sequence.
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
+Regards
 
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
+Marcel
 
-www.mimesweeper.com
-**********************************************************************
 
 
 
