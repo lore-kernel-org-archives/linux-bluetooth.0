@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bthid 2.6.5 bad keycode
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404192354.21196.cijoml@volny.cz>
-References: <200404192354.21196.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1082412454.4403.77.camel@pegasus>
-Mime-Version: 1.0
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200404192354.21196.cijoml@volny.cz>
+Subject: [Bluez-users] bthid 2.6.5 bad keycode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,45 +17,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 20 Apr 2004 00:07:34 +0200
+Date: Mon, 19 Apr 2004 23:54:20 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> there is bug in 2.6.5 and bthid configuration.
-> It badly resolve "|" key:
-> 
-> KeyPress event, serial 28, synthetic NO, window 0x2800001,
->     root 0x3f, subw 0x0, time 645528, (104,-2), root:(695,18),
->     state 0x90, keycode 50 (keysym 0xffe1, Shift_L), same_screen YES,
->     XLookupString gives 0 characters:  ""
-> 
-> KeyPress event, serial 28, synthetic NO, window 0x2800001,
->     root 0x3f, subw 0x0, time 645982, (104,-2), root:(695,18),
->     state 0x91, keycode 111 (keysym 0xff61, Print), same_screen YES,
->     XLookupString gives 0 characters:  ""
-> 
-> KeyRelease event, serial 28, synthetic NO, window 0x2800001,
->     root 0x3f, subw 0x0, time 646121, (104,-2), root:(695,18),
->     state 0x91, keycode 111 (keysym 0xff61, Print), same_screen YES,
->     XLookupString gives 0 characters:  ""
-> 
-> KeyRelease event, serial 28, synthetic NO, window 0x2800001,
->     root 0x3f, subw 0x0, time 646842, (104,-2), root:(695,18),
->     state 0x91, keycode 50 (keysym 0xffe1, Shift_L), same_screen YES,
->     XLookupString gives 0 characters:  ""
-> 
-> It returns Print and not "|"
-> 
-> It is problem to use unix like system without | :)
+there is bug in 2.6.5 and bthid configuration.
+It badly resolve "|" key:
 
-what is your X11 keyboard setting? You need to use a pc105 keyboard
-layout to get the pipe key back.
+KeyPress event, serial 28, synthetic NO, window 0x2800001,
+    root 0x3f, subw 0x0, time 645528, (104,-2), root:(695,18),
+    state 0x90, keycode 50 (keysym 0xffe1, Shift_L), same_screen YES,
+    XLookupString gives 0 characters:  ""
 
-Regards
+KeyPress event, serial 28, synthetic NO, window 0x2800001,
+    root 0x3f, subw 0x0, time 645982, (104,-2), root:(695,18),
+    state 0x91, keycode 111 (keysym 0xff61, Print), same_screen YES,
+    XLookupString gives 0 characters:  ""
 
-Marcel
+KeyRelease event, serial 28, synthetic NO, window 0x2800001,
+    root 0x3f, subw 0x0, time 646121, (104,-2), root:(695,18),
+    state 0x91, keycode 111 (keysym 0xff61, Print), same_screen YES,
+    XLookupString gives 0 characters:  ""
 
+KeyRelease event, serial 28, synthetic NO, window 0x2800001,
+    root 0x3f, subw 0x0, time 646842, (104,-2), root:(695,18),
+    state 0x91, keycode 50 (keysym 0xffe1, Shift_L), same_screen YES,
+    XLookupString gives 0 characters:  ""
 
+It returns Print and not "|"
+
+It is problem to use unix like system without | :)
+
+Michal
 
 
 -------------------------------------------------------
