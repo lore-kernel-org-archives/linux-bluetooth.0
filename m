@@ -1,5 +1,5 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <3F82A1AE.9020607@grupopie.com>
+Message-ID: <3F82A016.2050901@grupopie.com>
 From: Paulo Marques <pmarques@grupopie.com>
 MIME-Version: 1.0
 To: theo.beisch@gmx.de
@@ -17,18 +17,46 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 07 Oct 2003 12:21:18 +0100
+Date: Tue, 07 Oct 2003 12:14:30 +0100
 
 
-Just one more thing i forgot to mention: you can try and send a similar report 
-to the bridging mailing list to see if there is some solution on the bridge side.
 
-The mailing list for bridging is at:
+Theo Beisch wrote:
 
-http://www.math.leidenuniv.nl/mailman/listinfo/bridge
+> I am using a 2.4.2 kernel (SuSE 8.2) and the bridge within it to tie a 
+> bluetooth PAN and my Laptop together under one IP address which must come 
+> from a DHCP server as I am using the constellation in various networks.
+> 
 
-I hope this helps,
 
+This kernel is quite old. You really should upgrade the kernel...
+
+
+> ...
+> 
+> While before pings to the local machine work ok and I get constant periodic 
+> reponses, after the bnep0 interface becomes part of the bridge, ping stops 
+> about every 5 instances, no longer displays the ping'd machine's name and 
+> goes down with response frequency (from normally one a second to one response 
+> every 10 or so seconds). While the response frequency remains low, after 8-10 
+> no-name resolution pings, the machine name comes back with each ping. and so 
+> on....
+
+I had similar problems with a very similar setup.
+
+The problem is that when the bnep0 interface enters the bridge, the bridge's 
+"mac address" changes. You can see that happening doing a "ifconfig pan0" before 
+the bnep0 joining the bridge and after, to see the hardware address of the pan0 
+interface.
+
+I tried to solve this by issuing "arping's" so that other machines on the 
+network would be warned about the new hardware address, but unfortunately never 
+got this to work properly... :(
+
+It has been quite a while since i've tried this, though. So maybe in recent 
+versions the bridging layer doesn't change the hardware address anymore?
+
+If you have better luck than me, please let me know.
 
 -- 
 Paulo Marques
