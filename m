@@ -5,8 +5,8 @@ To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200403171309.13660.cijoml@volny.cz>
-Subject: [Bluez-users] latest modules.conf settings for bluez
+Message-Id: <200403171304.37863.cijoml@volny.cz>
+Subject: [Bluez-users] bthid and 2.4.25-mh2
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,25 +17,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Mar 2004 13:09:13 +0100
+Date: Wed, 17 Mar 2004 13:04:37 +0100
 
-Hi Marcel,
+Marcel,
 
-I am sending my latest modules.conf. Can you look at it and tell me if it's 
-complete modules.conf for BlueZ?
-
-#BlueZ settings
-alias net-pf-31 bluez
-alias bt-proto-0 l2cap
-alias bt-proto-2 sco
-alias bt-proto-4 bnep
-alias tty-ldisc-15 hci_uart
-alias char-major-10-250 hci_vhci
-alias bt-proto-3 rfcomm
-alias char-major-10-223 uinput
-above uinput mousedev keybdev
-above bluez hci_usb
-post-install hci_usb /sbin/hciconfig hci0 lm master
+there is 100% problem in mh2 patch. I tried downgrade to simple 2.4.25 and 
+keyboard started working imeditially. Then tried upgrade to 2.4.25-mh2 and 
+keyboard stopped working.
 
 Michal
 
