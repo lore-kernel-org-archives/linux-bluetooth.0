@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] cvs software issues
+Subject: Re: [Bluez-devel] DUND features
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Dariusz Swiderski <sfires@sfires.net>
+To: Edouard Lafargue <ELafargue@montrouge.sns.slb.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <40680EB8.2070208@sfires.net>
-References: <40675F3B.5090704@sfires.net>
-	 <1080557069.2281.224.camel@pegasus>  <40680EB8.2070208@sfires.net>
+In-Reply-To: <1080560568.1688.24.camel@gryffindor>
+References: <1080560568.1688.24.camel@gryffindor>
 Content-Type: text/plain
-Message-Id: <1080561659.2281.236.camel@pegasus>
+Message-Id: <1080561385.2281.231.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,43 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 29 Mar 2004 14:00:59 +0200
+Date: Mon, 29 Mar 2004 13:56:25 +0200
 
-Hi Dariusz,
+Hi Edouard,
 
-> > it should create it if it is missing.
+>    I have read the Bluetooth DUN specifications, and it appears that
+> devices supporting DUN are supposed to implement a set of
+> AT-compatible commands in order to fully support this profile: so far
+> it does not seem that DUND is supporting anything in particular.
 > 
-> apparently it doeas not:
-> sfires@snoopy:/home/storage/software/cvs/bluez/libs2$ ./bootstrap
-> configure.in: installing `./install-sh'
-> configure.in: installing `./mkinstalldirs'
-> configure.in: installing `./missing'
-> configure.in:19: installing `./config.guess'
-> configure.in:19: installing `./config.sub'
-> configure.in:19: required file `./ltmain.sh' not found
-> compat/Makefile.am: installing `./depcomp'
+>    When using Palm-compatible devices as clients, this is not a
+> problem because it is possible to configure them to start PPP link
+> negotiation independently from link establishment. But in the case of
+> Windows clients, it creates problems because the Windows computer
+> sends AT commands and tries to dial a number to connect to the Linux
+> server offering DUN...
 > 
-> im not very goot with automake and autoconf sripts, but in utils and libs
-> this file, is pulled from cvs, and yes, i have seen the remark in attic ;)
+>    Are there plans to correct this at the moment? Alternatively, are
+> there known workarounds to enable windows-based clients to connect to
+> Linux servers running dund ? Apparently the option called "msdun" is
+> not enough...
 
-it says so, but does this mean that it is not created ;)
-
-> > There is no planned coexisting of both version and if libs2 and utils2
-> > are ready for rollout it will replace the old one.
-> 
-> ok, i can live with this, but what about hcid? its not in utils2
-
-I am not quite sure about the real future of hcid. We will have a
-replacement for it, but I want to redesign some parts of it.
-
-> > Every program that uses the old library must rewritten to use the new
-> > one. Especially sdptool, pand and dund. The other big project is writing
-> > a new sdpd.
-> 
-> so who is doing what, and where can i help?:)
-
-At the moment nobody. So feel free to take the code and clean it up and
-make it libs2 compatible.
+there is a difference between the DUN and LAN profile on the server side
+even if our program for LAN access using PPP is called dund. For the DUN
+profile you need a modem emulation (the AT command parser) on the server
+side.
 
 Regards
 
