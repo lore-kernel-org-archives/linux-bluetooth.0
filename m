@@ -1,10 +1,8 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4044A8AB.80204@realss.com>
+Message-ID: <4044A898.2080408@realss.com>
 From: Zhang Weiwu <zhangweiwu@realss.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Cc: =?gb18030?Q?=CD=F5_=D3=EE=CF=E8?= <spacenet@xmu.edu.cn>,
-   =?gb18030?Q?=D6=D3_=C3=F9?= <jamming@realss.com>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Subject: [Bluez-users] connectivity with FreeBSD bluetooth LAN access server.
 Sender: bluez-users-admin@lists.sourceforge.net
@@ -17,7 +15,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 02 Mar 2004 23:30:51 +0800
+Date: Tue, 02 Mar 2004 23:30:32 +0800
 
 Hello. I'm trying to figure out how to use freebsd connect my notebook 
 (running Sun Java Desktop, a varienty of SuSE) to my LAN. The so called 
