@@ -1,59 +1,18 @@
-Return-Path: <ABHISHEK.BHATT@motorola.com>
-Message-ID: <5987A7CB1694D811A04D0002B32C289601BF3C01@il93exb05.corp.mot.com>
-From: Bhatt Abhi-ABHATT <ABHISHEK.BHATT@motorola.com>
-To: "'Stephen Crane'" <steve.crane@rococosoft.com>,
-   Marcel Holtmann
-	 <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Return-Path: <steve.crane@rococosoft.com>
 Subject: RE: [Bluez-devel] Service level security for RFCOMM
-Date: Fri, 29 Oct 2004 10:35:32 -0500
-MIME-Version: 1.0
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Bhatt Abhi-ABHATT <ABHISHEK.BHATT@motorola.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1099061231.10164.62.camel@pegasus>
+References: 
+	 <5987A7CB1694D811A04D0002B32C289601BF3BFE@il93exb05.corp.mot.com>
+	 <1099061231.10164.62.camel@pegasus>
 Content-Type: text/plain
+Message-Id: <1099062653.28599.47.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
+Date: Fri, 29 Oct 2004 16:10:54 +0100
 List-ID: <bluez-devel.lists.sourceforge.net>
-
-Hi Steve, Marcel,
-
-> > Service level security is required for JSR-82 like Steve pointed it out. 
-> > For anyone implementing JSR-82, they would have to add this service level
-> > security themselves. It would be most useful to have it as part of bluez
-> > rather than have people implement their own way of it. 
-> 
-> actually you can't implement it in a sane way in userspace, because you
-> don't have control over the RFCOMM signalling channel.
-
-> Marcel is right here. You can try and kludge it by trying to enforce the
-> security requirements _after_ the connection has been accepted but this
-> is pretty horrible (and it's hard to prevent acceptAndOpen() returning a
-> connection which is immediately closed).
-
-Sorry for the confusion but I wasn't referring to user space at all. I was thinking of having the rfcomm service level security implemented in almost the same way as the l2cap service level security(incoming connection). The service level security options could be set using setsockopt(..) in rfcomm. This in turn could be used to set the service level settings for the l2cap socket it uses. I can draw a sequence diagram(function calls) to show how i
-picture the design. I'll do that.
-
-> > Also, currently there is no service level security in l2cap for 
-> > outgoing connections. I would like to know if someone has already 
-> > taken a stab at it and if this should be part of bluez in the 
-> > future.
-
-> > I've had a look at this recently. If I get time I will have a go at  
-> > implementing it.
-
-Steve, I would be interested to know how you intend to implement it.
-
-
-> You must convince me that this is really needed and a good idea. For 
-> what kind of application do you want to use it?
-
-> It's for the same reason as stated above: you don't want the connection to > succeed unless the security requirements can be met. If you have a client > in security mode 2 and a server in security mode 1, you want the server to > see an incoming connection _only_ if authentication/encryption have been 
-> successfully performed. You _don't_ want the server to see an incoming 
-> connection which is immediately closed.	
-
-Plus JSR-82 requires that service level security should be possible for
-outgoing connections. So for anyone trying to implement JSR-82 and using
-bluez, it is needed.
-
-Regards
-Abhi
-
 
 Hi Marcel, Abhi,
 
