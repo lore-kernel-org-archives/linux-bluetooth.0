@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41090B25.6090806@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] braindead adapters (sco)
+Subject: Re: [Bluez-users] How add correctly add SP service record to SDP
+	daemon
+From: Marcel Holtmann <marcel@holtmann.org>
+To: taylor <taylor@ms.usi.com.tw>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <019d01c47543$d6aa4c40$df0618ac@USI08844>
+References: <019d01c47543$d6aa4c40$df0618ac@USI08844>
+Content-Type: text/plain
+Message-Id: <1091090204.12651.21.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,56 +19,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 29 Jul 2004 08:35:17 -0600
+Date: Thu, 29 Jul 2004 10:36:45 +0200
 
-Hi
+Hi Taylor,
 
-I've been trying to get snd-bt-sco to work. I'm told that one possible 
-reason it's not working is if the bluetooth dongle is routing incoming 
-SCO data to PCM rather than HCI. I'm using the internal bluetooth (usb) 
-on a Toshiba Portege m200. How can I tell if it's doing sco properly?
+>  I could use those step to connect the Linux SP to Windows Series
+> profile
+>  
+> At the linux side:
+> step 1:rfcomm connect 0 <BD address> 1
+> setp 2:open minicom -s, 
+>           set the device as /dev/rfcomm0
+>           set the baud rate as 19200 8N1, no flow control
+>           exit
+> At the windows site:
+> step 1: open the hyerpterminal,
+>            set up baud rate as 19200 8N1 , no flow control
+> step 2: sucessfuly transfer the data 
+>  
+> But I hope ass the SP profile service record into SDP daemon, I do
+> thoe step
+> At the linux side
+> step 1: rfcomm bind 0 <BD Addreess> 1
+> step 2: sdp add SP 1
+>  
+> At the windows site:
+> step1: Obrowse the SP service
+> step 2: reject SP connect, the port is not correct. 
 
-jabbed:/home/bmidgley# hciconfig -a
-hci0:   Type: USB
-         BD Address: 00:03:7A:0B:44:B3 ACL MTU: 192:8  SCO MTU: 64:8
-         UP RUNNING PSCAN ISCAN
-         RX bytes:34506 acl:2267 sco:0 events:270 errors:0
-         TX bytes:1518 acl:42 sco:0 commands:19 errors:0
-         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-         Name: 'jabbed.uen.org-0'
-         Class: 0x000100
-         Service Classes: Unspecified
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP
-Subver: 0x20d
-         Manufacturer: Cambridge Silicon Radio (10)
+and your steps on the Linux side are wrong. Do you read the manpages?
 
-I also have unsuccessfully tried a belkin f8t003:
+	sdptool add --channel 1 SP
+	rfcomm listen 0 1
 
+Regards
 
-hci1:   Type: USB
-         BD Address: 00:0A:3A:50:65:42 ACL MTU: 192:8  SCO MTU: 64:8
-         UP RUNNING PSCAN ISCAN
-         RX bytes:107 acl:0 sco:0 events:14 errors:0
-         TX bytes:300 acl:0 sco:0 commands:13 errors:0
-         Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-         Name: 'jabbed.uen.org-1'
-         Class: 0x000100
-         Service Classes: Unspecified
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP 
-Subver: 0x20d
-         Manufacturer: Cambridge Silicon Radio (10)
+Marcel
 
 
--- 
-Brad
 
 
 -------------------------------------------------------
