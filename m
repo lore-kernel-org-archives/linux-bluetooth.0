@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
-Reply-To: tim@birdsnest.maths.tcd.ie
+From: Toby Fisher <toby@tjfisher.co.uk>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Problems connecting to Nokia 6310I phone.
-References: <Pine.LNX.4.58.0405302214280.8012@sebagqbbe.gwsvfure.pb.hx>
-In-Reply-To: <Pine.LNX.4.58.0405302214280.8012@sebagqbbe.gwsvfure.pb.hx>
+Message-ID: <Pine.LNX.4.58.0405302214280.8012@sebagqbbe.gwsvfure.pb.hx>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200405310213.25767.tim@birdsnest.maths.tcd.ie>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] Problems connecting to Nokia 6310I phone.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,44 +15,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 May 2004 02:13:25 +0100
+Date: Sun, 30 May 2004 22:25:33 +0100 (BST)
 
-On Sunday 30 May 2004 22:25, Toby Fisher wrote:
+Hi.
 
-> I'm using kernel 2.6.6RC1, and I almost have the connecting working with
-> Gnokii to the phone.  However, there are some weird things going on which
-> lead me to belioeve that something is wrong.
->
-> I can, using rfcomm, get a connection to the phone, however tearing it
-> down has strange results:
-> 1.  Once the connection is down, I can no longer ping the phone using
-> l2ping, though hcitool scan and info still work.
+The subject gives the outline, and a brief scan of the archives didn't 
+yield anything useful.
 
-Do you have 
-# CONFIG_BT_HCIUSB_SCO is not set
-in .config (or /proc/config.gz) ?
-On my machine (a Sony C1VFK Picturebook)
-I had more or less your problems when this was set.
+I'm using kernel 2.6.6RC1, and I almost have the connecting working with 
+Gnokii to the phone.  However, there are some weird things going on which 
+lead me to belioeve that something is wrong.
 
-> 2.  The command rfcomm release rfcomm0 yields a device not found error,
-> whereas the binding works without error.
+I can, using rfcomm, get a connection to the phone, however tearing it 
+down has strange results:
+1.  Once the connection is down, I can no longer ping the phone using 
+l2ping, though hcitool scan and info still work.
+2.  The command rfcomm release rfcomm0 yields a device not found error, 
+whereas the binding works without error.
 
-I give the command "rfcomm release 0".
-But if "rfcomm -a" says nothing,
-I would have doubts if binding did work.
+In addition to this, if I use the gnokii --monitor command I can get a 
+response from the phone, however it sends one lot of data and then seems 
+to hang - the only way to end the Gnokii process is to move to another 
+console and use the kill command, as ctrl-c doesn't work.
 
-> Oh yes, and one final thing, rfcomm -a gives no output, despite the fact
-> that I created rfcomm0 and it seems to work,
 
-Did you say "rfcomm bind 0 <phoneBTaddress> 1" first?
+I'm puzzled, as I seem almost to be there but somehow seem to be missing 
+one step.
+Oh yes, and one final thing, rfcomm -a gives no output, despite the fact 
+that I created rfcomm0 and it seems to work,
+rfcomm connect rfcomm0 00:60:57:69:CB:18
+will get me an rfcomm connection to the phone.
 
+Thanks in advance for any pointers you can offer.
 
 
 -- 
-Timothy Murphy  
-e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
-tel: +353-86-2336090, +353-1-2842366
-s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
+Toby Fisher	Email: toby@tjfisher.co.uk
+Tel.: +44(0)1480 417272	Mobile: +44(0)7974 363239
+ICQ: #61744808
 
 
 -------------------------------------------------------
