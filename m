@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Anonying PIN
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Sean Godsell <sgodsell@hotmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY12-F716TQ4rGTOlF0001e2a9@hotmail.com>
-References: <BAY12-F716TQ4rGTOlF0001e2a9@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1080687015.2773.31.camel@pegasus>
-Mime-Version: 1.0
+From: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Message-id: <8d7248bf39.8bf398d724@estudiants.urv.es>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Subject: [Bluez-users] rfcomm connection refused / Host is down  (Again)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,21 +15,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 31 Mar 2004 00:50:15 +0200
+Date: Wed, 31 Mar 2004 00:02:37 +0200
 
-Hi Sean,
+Hi!
 
-> Okay you mentioned security mode 1.   So are you saying that I can get rid 
-> of that pin request on the connecting devices?  If so what do I have to do?  
-> If you could point me in the right direction, I would really appreciate it.
+I'm using the BlueZ stack in kernel 2.4.24, and I've got an usb dongle and I try to connect to an RS232-bluetooth attached to a robot's serial port.
 
-as I already said, this is default. But you should read about the
-security mode 1. If one device want's an authorization the other must
-follow.
+So, I do hciconfig and I get
+hci0:
+Type: USB
+BD Address: 00:0A:3A:50:20:15 ACL MTU: 192:8  SCO
+MTU: 64:8
+UP RUNNING PSCAN ISCAN 
+RX bytes:8280 acl:233 sco:0 events:233 errors:0
+TX bytes:3096 acl:93 sco:0 commands:45 errors:0
 
-Regards
 
-Marcel
+When I do an hcitool -i hci0 inq, I can find the RS232 adapter, but on doing
+
+rfcomm -i hci0 connect /dev/rfcomm0 00:c0:1B:05:C8:2A 1
+
+I get a message with:
+ Can't connect RFCOMM socket: Connection refused
+or either:
+ Can't connect RFCOMM socket: Host is down
+
+
+Tom Chiverton asked if were the devices already paired.What do I need to do to pair the devices?
+
+Oh! one more thing, if I do 
+
+rfcomm -i hci0 bind /dev/rfcomm0 00:c0:1B:05:C8:2A 1
+
+The two devices get binded, but I'm still not capable to connect them!!!!
+
+Can you help me??
+
+Tank you!!!!!!
+
+Albert
+
+Thank you 
 
 
 
