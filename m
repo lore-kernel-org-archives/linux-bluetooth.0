@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41EF5879.7090005@nm.ru>
-From: George Kibardin <george_kibardin@nm.ru>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Subject: [Bluez-users] Tekram TM-304
+Content-Type: text/plain;
+	charset="us-ascii"
+Message-ID: <EFCD68F7BFDB06468769D4D9EAAA938705EE4718@scsmsx401.amr.corp.intel.com>
+From: "Pering, Trevor" <trevor.pering@intel.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] PAN and DUN
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,12 +17,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 20 Jan 2005 10:06:33 +0300
+Date: Wed, 19 Jan 2005 20:29:15 -0800
 
-My usb bluetooth dongle did not recognized by kernel (2.6.7)
-Does anybody know something about this dongle support in linux?
+I'm confused by the how-to at
+http://www.cs.ucla.edu/~cclljj/interest/notes/bluez/pand_dund.html --
+which is linked from the BlueZ how-to page.
+=20
+It does a fair bit of setup, and then has the instructions:
 
+13. on master side:=20
+sdpd
+pand --listen --master --service --sdp --role NAP
+dund --listen --sdp
 
+14. on slave side=20
+sdpd
+pand --connect <bt_addr> --sdp
+dund --connect <bt_addr> --sdp
+
+Which, is far as I can tell, is setting up both a dun and pan connection
+between the two devices -- which seems very redundant to me. The DUN
+link will set up an IP link over RFCOMM using PPP, while PAN will set up
+a direct IP link.
+
+Is this correct?  Wouldn't it be sufficient to either dun or pan, but
+not both?
+
+Thanks,
+	Trevor
 
 
 -------------------------------------------------------
