@@ -1,65 +1,69 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <n1c0l4s.l3@wanadoo.fr>
+From: nicolas <n1c0l4s.l3@wanadoo.fr>
+To: Marcel Holtmann <marcel@holtmann.org>, bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Re: inactivity of my Bt
-From: Marcel Holtmann <marcel@holtmann.org>
-To: nicolas <n1c0l4s.l3@wanadoo.fr>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200406242015.13230.n1c0l4s.l3@wanadoo.fr>
-References: <200406232055.06709.n1c0l4s.l3@wanadoo.fr>
-	 <200406241932.24780.n1c0l4s.l3@wanadoo.fr>
-	 <1088098323.4296.68.camel@pegasus>
-	 <200406242015.13230.n1c0l4s.l3@wanadoo.fr>
-Content-Type: text/plain
-Message-Id: <1088106990.4296.131.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Jun 2004 21:56:30 +0200
+Date: Thu, 24 Jun 2004 20:15:13 +0200
+References: <200406232055.06709.n1c0l4s.l3@wanadoo.fr> <200406241932.24780.n1c0l4s.l3@wanadoo.fr> <1088098323.4296.68.camel@pegasus>
+In-Reply-To: <1088098323.4296.68.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Message-Id: <200406242015.13230.n1c0l4s.l3@wanadoo.fr>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Nicolas,
-
-> > > if i enter Hidd --server  the console    tell me:
-> > >
-> > > # hidd --server
-> > > Can't listen on HID control channel: Address already in use
+Le jeudi 24 Juin 2004 19:32, Marcel Holtmann a =E9crit=A0:
+> Hi Nicolas,
+>
+> > if i enter Hidd --server  the console    tell me:
 > >
-> > then there is already one server running on that PSM. Check with ps what
-> > daemons you use.
-> >
-> 
-> USER       PID %CPU %MEM   VSZ  RSS TTY      STAT START   TIME COMMAND
-> nicolas   4344  0.0  3.1 22748 8128 ?        S    02:07   0:01 kdeinit: dcopserver --nosid
-> nicolas   4397  0.0  5.0 26560 12856 ?       S    02:08   0:05 kbluetoothd --dontforceshow
-> 
-> is kdeinit: dcopserver --nosid   my "ghost" deamon ?
+> > # hidd --server
+> > Can't listen on HID control channel: Address already in use
+>
+> then there is already one server running on that PSM. Check with ps what
+> daemons you use.
+>
 
-there must be something like hcid and hidd.
+USER       PID %CPU %MEM   VSZ  RSS TTY      STAT START   TIME COMMAND
+nicolas   4344  0.0  3.1 22748 8128 ?        S    02:07   0:01 kdeinit: dco=
+pserver --nosid
+nicolas   4397  0.0  5.0 26560 12856 ?       S    02:08   0:05 kbluetoothd =
+=2D-dontforceshow
 
-> And sometimes if i put out the batteries and i put on all work well whereas  pressing mouse button gives no result
+is kdeinit: dcopserver --nosid   my "ghost" deamon ?
 
-I have no answer for that. Here everything works perfect. May I asked
-that already. Is role switch and sniff link policy activated?
+i have not succeed to have bluetooth as service
+> > and if i push the connect but or use the mouse or the keyboard nothing
+> > work  i have to use a ps2 one and do hcitool inq  & hidd -c
+>
+> You don't have to push the connect button. Press a mouse button or any
+> key on the keyboard. If you press the connect button you unpair the
+> device.
+>
+allright i haven't understand this
 
-Regards
+> Regards
+>
+> Marcel
+>
+And sometimes if i put out the batteries and i put on all work well whereas=
+  pressing mouse button gives no result
+>
+>
+>
+> -------------------------------------------------------
+> This SF.Net email sponsored by Black Hat Briefings & Training.
+> Attend Black Hat Briefings & Training, Las Vegas July 24-29 -
+> digital self defense, top technical experts, no vendor pitches,
+> unmatched networking opportunities. Visit www.blackhat.com
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-Marcel
+=2D-=20
+Ce mail a =E9t=E9 =E9crit sous linux mandrake cooker (www.linux-mandrake.co=
+m/fr)
+avec KMail 1.6.2 (www.kde.org)
 
-
-
-
--------------------------------------------------------
-This SF.Net email sponsored by Black Hat Briefings & Training.
-Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
-digital self defense, top technical experts, no vendor pitches, 
-unmatched networking opportunities. Visit www.blackhat.com
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Kernel: 2.6.7-2mdk
+Kde 3.2.3
