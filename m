@@ -1,55 +1,34 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <003501c47389$21c2b9e0$60010f0a@matrix>
-From: "Virat Gohil" <virat4lug@hotpop.com>
-To: "Papadopoulos Giannis" <ipapadop@uth.gr>
-Cc: <bluez-users@lists.sourceforge.net>
-References: <1090829679.4104bd6fbc168@webmail.uth.gr>
-Subject: Re: [Bluez-users] vhci and RFCOMM
+Return-Path: <Michael.Albinus@alcatel.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: Printer adapter w/o SDP
+References: <87acxxxly1.fsf@gmx.de> <1090178500.4400.25.camel@pegasus>
+	<87wu11w1e3.fsf@gmx.de> <1090180872.4400.36.camel@pegasus>
+	<nq7jt0m8wd.fsf@alcatel.de> <1090776708.31693.29.camel@pegasus>
+From: Michael Albinus <michael.albinus@gmx.de>
+Date: Mon, 26 Jul 2004 10:56:42 +0200
+In-Reply-To: <1090776708.31693.29.camel@pegasus> (Marcel Holtmann's message
+ of "Sun, 25 Jul 2004 19:31:48 +0200")
+Message-ID: <nq8yd7m9it.fsf@alcatel.de>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="ISO-8859-7"
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 27 Jul 2004 08:53:36 +0530
+Content-Type: text/plain; charset=us-ascii
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi, 
+Marcel Holtmann <marcel@holtmann.org> writes:
 
-> Hi!
-> 
-<snip>
-> mordor:/home/dop # rfcomm -i 7F:00:00:01:00:0A listen /dev/rfcomm0
-> Waiting for connection on channel 1
-> Can't open RFCOMM device: No such file or directory
-> mordor:/home/dop #
-</snip>
+> Hi Michael,
 
-you should create the rfcomm devices, you can creat them as follows.
+Hi Marcel,
 
-#mknod /dev/rfcomm0 c 216 0
-#mknod /dev/rfcomm1 c 216 0
+> thanks for the device. It was a bug in the SDP part of the Bluetooth
+> library. The funny thing is that it was able to work with UUID128 and
+> UUID16, but it seems that actually nobody used UUID32 for protocol
+> identifiers before. The fix for that is in the CVS now.
 
-(for further details read the man pages of mknod)
+Thanx for the fix. I'll check it next days.
 
-Regards,
+> Regards
+>
+> Marcel
 
-Virat
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by BEA Weblogic Workshop
-FREE Java Enterprise J2EE developer tools!
-Get your free copy of BEA WebLogic Workshop 8.1 today.
-http://ads.osdn.com/?ad_id=4721&alloc_id=10040&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Best regards. Michael.
