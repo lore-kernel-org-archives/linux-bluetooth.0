@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluetooth gateway
-From: Can Burak Cilingir <canburak@cs.bilgi.edu.tr>
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1105865546.8080.13.camel@pegasus>
-References: <1105814392.14979.8.camel@portable.canb.net>
-	 <1105865546.8080.13.camel@pegasus>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-sDD03CkSV/y/3+5JJZsi"
-Message-Id: <1105907943.28744.2.camel@portable.canb.net>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] Microsoft Bluethooth "Elite" Keyboard & Mouse
+References: <20050116174616.GA2201@virgilio.it> <1105898506.8080.20.camel@pegasus> <20050116193732.GA2326@virgilio.it>
+In-Reply-To: <20050116193732.GA2326@virgilio.it>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200501162048.15898.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,39 +19,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 Jan 2005 22:39:03 +0200
+Date: Sun, 16 Jan 2005 20:48:15 +0100
 
+Dne ne 16. ledna 2005 20:37 Francesco Bochicchio napsal(a):
+> On Sun, Jan 16, 2005 at 07:01:46PM +0100, Marcel Holtmann wrote:
+> > Hi Michal,
+> >
+> > > You should use 2.6.10-mh1 and latest firmware for Digianswer dongle
+> > > (adapter use it I think)
+> >
+> > using the 2.6.10-mh1 is a good idea, but it is a Broadcom dongle with
+> > HID proxy and this don't need any extra firmware. However since the
+> > other Broadcom HID proxy that I have does the switch into HCI mode when
+> > you send a HCI_Reset (CSR HID Proxy needs an extra tool btw), the one
+> > from Microsoft may need some extra magic to fully work without problems.
+>
+> Ok. Thanks. I will try out 2.6.10-mh1 anyway.
+>
+>
+> BTW, just out of curiosity: would the MS Keyboard works with another
+> Bluetooth USB dongle?
 
---=-sDD03CkSV/y/3+5JJZsi
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+YES, You should prefer CSR based dongles!
 
-On Sun, 2005-01-16 at 09:52 +0100, Marcel Holtmann wrote:
-> Hi Can,
->=20
-> >         I am trying to build a bluetooth gateway in my home.
-> >        =20
-> >         GSM Phone --bluetooth--> laptop --cable modem--> internet
-> >        =20
-> >         I can do this on windows but not on linux. I tried with bluez +
-> >         pand in NAP mode but it didn't worked.
-> >         ( http://bluez.sourceforge.net/contrib/HOWTO-PAN )
-> >        =20
-> >         anyone did this here?
->=20
-> what kind of phone is it? I haven't seen any phone with PAN support so
-> far. If it is Symbian based phone then you need to deal with the mRouter
-> stuff to get an IP connection.
-Oh really, Mercel thanks for the keyword mRouter. I got that on Windows
-and thinking it is a Siemens software only.
->=20
-> Regards
->=20
-> Marcel
->=20
->=20
->=20
->=20
+>
+> > I need someone to donate one of these, because there is no way to buy
+> > only the dongle and I am not going to buy another Bluetooth keyboard. I
+> > have enough.
+>
+> I could consider swapping mine with one that already works with Linux :-)
+>
+>
+> Ciao
+> -----
+> FB
+>
+>
 > -------------------------------------------------------
 > The SF.Net email is sponsored by: Beat the post-holiday blues
 > Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
@@ -60,25 +63,11 @@ and thinking it is a Siemens software only.
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
---=20
-Can Burak Cilingir
-http://canb.net/
-http://tdk.org.tr/dogruyazalim.html
-icq#10720999
 
---=-sDD03CkSV/y/3+5JJZsi
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
+-- 
+S pozdravem
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.5 (GNU/Linux)
-
-iD8DBQBB6tDnUNn5mAEjWBwRAkgfAJ92F9sczXlHBqxTs/LLoz7YeZ6dhACgqgOI
-834eBSdlvSiUMARk17Tl6Lk=
-=pldz
------END PGP SIGNATURE-----
-
---=-sDD03CkSV/y/3+5JJZsi--
+Michal Semler
 
 
 -------------------------------------------------------
