@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] AUX1 and devices
+Subject: Re: [Bluez-users] IP Forwarding
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Thor Egil Skaug <paxtonrd@hotmail.com>
+To: Lalith Chakravarthi <lalithvc@yahoo.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <000001c402dd$07bf1dd0$9349edc7@thores>
-References: <000001c402dd$07bf1dd0$9349edc7@thores>
+In-Reply-To: <20040305142714.44803.qmail@web40708.mail.yahoo.com>
+References: <20040305142714.44803.qmail@web40708.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1078512042.19852.12.camel@pegasus>
+Message-Id: <1078511952.19852.9.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,14 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Mar 2004 19:40:42 +0100
+Date: Fri, 05 Mar 2004 19:39:12 +0100
 
-Hi Thor,
+Hi Lalith,
 
-> Does anyone know of any Bluetooth devices that have a HCI command for
-> sending user data in AUX1 packets?
+> I just connected my laptop to my Pc and now I want to connect to the
+> internet using my PC as the gateway. I already have the bluetooth PAN
+> network between my laptop and PC. I am working on a linux 2.4.20-8
+> kernel on both the laptop and the PC.  Also, I use proxies to connect
+> to the internet from my PC. So, could anyone please tell me the files
+> that have to be modified to enable the successful completion of my
+> internet connection thru my laptop.
 
-I don't know of any and actually I don't really care ;)
+you have to enable IP forwarding and then use iptables to create your
+NAT and masquerading for your device.
 
 Regards
 
