@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] IOGear GBU301 and Kernel 2.4.20
+Subject: Re: [Bluez-users] Apple bluetooth keyboard fun...
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Tom Watson <tsw@johana.com>
+To: patbert@patbert.com
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4115b3ef.johana@johana.com>
-References: <4115b3ef.johana@johana.com>
+In-Reply-To: <4115A5E3.8000107@patbert.com>
+References: <4115A5E3.8000107@patbert.com>
 Content-Type: text/plain
-Message-Id: <1091960044.2773.11.camel@pegasus>
+Message-Id: <1091959881.2773.6.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 08 Aug 2004 12:14:04 +0200
+Date: Sun, 08 Aug 2004 12:11:21 +0200
 
-Hi Tom,
+Hi Patrick,
 
-> I have attempted to get all the modules functional, but appear to have
-> a problem.  Somehow the driver hci_usb doesn't get connected to the
-> USB device.  I print out the USB driver info (/proc/bus/usb/devices) and
-> get ...Cls=e0(Unk.  )... where is should get 'hci_usb' as I see it.
+> I have had my apple bt keyboard working in linux for some time on my old
+> pc. I now have a new pc and I can't get the damn thing going...
 > 
-> Any other reference to 'hci0' (as in 'hciconfig hco0 up') fails since
-> it can't find the device.
-> 
-> Is there something in the hotplug configuration that I'm missing, or
-> something even more obvious (but not to me!).
-> 
-> Any help is nice.  Ask a question, and I should be able to answer
-> what I've done.
+> I am using the same bluetooth adaptor from the old pc and as far as I
+> can tell the same kernel config (as relates to bluetooth) as the old pc. 
+> This is with bluez-libs and utils 2.7.
 
-why don't include the content of /proc/bus/usb/devices?
+use bluez-libs-2.9 and bluez-utils-2.9 and kernel 2.6.8-rc3.
 
 Regards
 
