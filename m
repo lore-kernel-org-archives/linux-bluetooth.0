@@ -1,12 +1,18 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200405290256.06151.cijoml@volny.cz>
-Subject: [Bluez-users] CSR firmware
+Subject: Re: [Bluez-users] connection to Motorola V525 fails
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Moritz Bunkus <moritz@bunkus.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040528214300.GH7737@bunkus.org>
+References: <20040528154111.GD24083@bunkus.org>
+	 <1085766449.3321.50.camel@pegasus> <20040528180635.GA20450@bunkus.org>
+	 <1085770308.4516.3.camel@pegasus> <20040528201025.GA7737@bunkus.org>
+	 <1085776595.4516.24.camel@pegasus> <20040528204353.GB7737@bunkus.org>
+	 <1085777409.4516.32.camel@pegasus> <20040528205749.GE7737@bunkus.org>
+	 <1085778561.4516.34.camel@pegasus>  <20040528214300.GH7737@bunkus.org>
+Content-Type: text/plain
+Message-Id: <1085781095.4516.47.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,19 +23,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 May 2004 02:56:05 +0200
+Date: Fri, 28 May 2004 23:51:35 +0200
 
-Hi,
+Hi Moritz,
 
-have anybody downloaded firmware from csr dongle? I would like to make 
-research if is possible to change vendor ID in it and then flash it back. I 
-think it is possibly way to upgrade firmware in old dongles.
+> > this uses RFCOMM channel 8, which doesn't requests an authentication.
+> > Maybe you wanna try it ;)
+> 
+> Now I'm feeling really, really stupid. Yes, this does work nicely, in
+> both directions (with some app called 'opd', OBEX push demon, on the PC
+> side). All the time I've used the channel for the OBEX file transfer,
+> not for the push service...
 
-Can somebody give me help how download it? I have now access to 14 different 
-csr based dongles from different wendors, which have same firmware version. 
-So I'll try find differences in firmware.
+don't do so, because the phone behaviour is still wrong. It must send UA
+or DM after the SABM request.
 
-Michal
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
