@@ -1,16 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Alignment issue
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Daryl Van Vorst <daryl@wideray.com>,
-   "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092299689.4622.8.camel@imladris.demon.co.uk>
-References: <001201c47fc2$7093e4a0$1301010a@baked>
-	 <1092252699.4564.238.camel@pegasus>
-	 <1092299689.4622.8.camel@imladris.demon.co.uk>
+To: bluebee@gmail.com
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200408121654.44052.bluebee@gmail.com>
+References: <200408121654.44052.bluebee@gmail.com>
 Content-Type: text/plain
-Message-Id: <1092302834.28711.72.camel@pegasus>
+Message-Id: <1092301914.28711.54.camel@pegasus>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Re: Presentation Slides
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,40 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 12 Aug 2004 11:27:14 +0200
+Date: Thu, 12 Aug 2004 11:11:54 +0200
 
-Hi David,
+Hi Billy,
 
-> > this is what the Linux kernel is using and we will notice it if some
-> > compiler version will optimize it in future. I committed that change to
-> > CVS.
-> 
-> The Linux kernel isn't the best example to follow when it comes to
-> relying on undocumented and unguaranteed compiler behaviour. Don't be so
-> sure the kernel would notice -- we have to fix up alignment trap in the
-> kernel _anyway_ so the use of get_unaligned() is only an optimisation
-> there.
-> 
-> I'd be more inclined to play with using char * pointers in the memcpy,
-> and/or __attribute__((packed)).
+> 	I'm going to have a talk on bluetooth at the Philippine Open Source 
+> Conference 2004 regarding bluetooth and linux. The title of my talk is 
+> "Bluetooth and Linux: A Developer's Perspective". The focus of the talk is on 
+> our experiences in BlueZ. I am asking permission if I can use some of your 
+> slides in your previous presentations.  
 
-I am not an expert when it comes to specific compiler stuff and I can't
-make the best decision with my limited information. What I realized is
-that we need our own unaligned access implementation, because we can't
-rely on the asm/unaligned.h. So I started to put our own in bluetooth.h
-for general access. If this was wrong, please correct me.
+do you have a website for the conference page and your abstract? I like
+to put a link on our talks page.
 
-Some platforms can do unaligned access by themself and some are not. At
-the moment only the i386 is listed, but we should list others like AMD64
-and PowerPC. Patches and hints are welcome. For the rest the generic way
-is to use memcpy, but actually every architecture uses memmove, because
-of the GCC __builtin_memcpy problem. Some of them like Alpha and ARM are
-using specific implementations, but using the macro with memmove seems
-also to work fine there. I like to keep the unaligned macros as short as
-possible.
-
-Do anyone wrote an autoconf macro for checking if memmove works like
-expected or if it gets optimized by the compiler?
+You can use my slides if you want, but you must show me as the original
+author. In return I hope that you will make your slides online available
+after you talk, so I can link these, too.
 
 Regards
 
