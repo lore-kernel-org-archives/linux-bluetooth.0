@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de4657605010801137c118137@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
+Message-ID: <b895079705010722156869ddd7@mail.gmail.com>
+From: Weston Weems <wweems@gmail.com>
 To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] l2test-number of frames
+Subject: [Bluez-users] detecting BT devices
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 8 Jan 2005 14:43:49 +0530
+Date: Fri, 7 Jan 2005 22:15:52 -0800
 
-Hi marcel,
-in the l2test, i am not able to send more than 512 frames. The utility
-stops at this point every time. I want to run the utility for about
-5000 packets, but after 512 packets, i get the following error
+I am aware of scanning for bluetooth devices, but is there anyway I
+can have my linux box notify me when bt devices come in range? Or
+something along those lines?
 
- "Send failed. Connection reset by peer(104)"....
+Also, anyone got reading material for using RFCONN to interact with bt
+devices using rs232 stuff.
 
-i think some constant in l2cap.cc or h is causing this problem. Hope
-you can help me this one.
-
-Thanx ,
-Regards,
-Manjunath
+Thanks so much in advance!
+Weston
 
 
 -------------------------------------------------------
