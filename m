@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Frederic Detienne <fd@cisco.com>
-Reply-To: fd@cisco.com
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Kernel panic when unplugging USB dongle
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Arthur Dent <tobili@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY18-F40mWAFsTmICl00001a52@hotmail.com>
+References: <BAY18-F40mWAFsTmICl00001a52@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1087985932.9075.40.camel@metal.cisco.com>
+Message-Id: <1087981088.4209.67.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] an update
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,26 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Jun 2004 12:18:53 +0200
+Date: Wed, 23 Jun 2004 10:58:08 +0200
 
-Hi everyone,
+Hi Arthur,
 
-Just to let you know that my MX900 (Logitech BT mouse) works like a
-charm under Linux 2.6(7)-mh1. I now use hidd and the mouse is
-automatically detected. Thanks a lot to Marcel for a great
-implementation... two thumbs up!!
+> sorry for bugging you about an outdated kernel release,
+> but my system is built on the 2.4 kernel architecture...
+> 
+> Did you find out anything about a possible reason for
+> the kernel freeze of 2.4.26-mh3 upon unplugging the
+> USB dongle? Setting or unsetting CONFIG_BLUEZ_HCIUSB_SCO
+> has no influence on this behavior. This kernel freeze
+> also occures for different USB dongles so it is not restricted
+> to a specific hardware. Thanks a lot!
 
-Now, I would like to learn more about BT. Is there a good book that can
-turn a dummy into a knowledgeable Bluetooth person ? I am looking for
-something starting with an overview of the layers and services but also
-covers the protocols, algorithms (notably handshakes, encryption and
-authentication) and the bits in the air. If you recommend two or three
-books, this is still good. I just do not want to read the specs before I
-even understand the big picture.
+as I said before, I never seen such a problem. Check the latest
+2.4.27-rc1 or update to 2.6.
 
-thanks again,
+Regards
 
-	fred
+Marcel
 
 
 
