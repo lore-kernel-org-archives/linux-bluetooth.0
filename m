@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Collin R. Mulliner" <collin@betaversion.net>
+Message-ID: <20050121020742.55149.qmail@web25003.mail.ukl.yahoo.com>
+From: Dave West <westdwestd@yahoo.co.uk>
 To: bluez-devel@lists.sourceforge.net
-Message-Id: <20050120225148.2bd40d9f@coredump>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] snd_bt_sco unknown symbol snd_hwdep_new
+Cc: roger.kermode@smartinternet.com.au
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-devel] bluetooth hardware that is discoverable by default?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,34 +17,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 22:51:48 -0800
+Date: Fri, 21 Jan 2005 02:07:42 +0000 (GMT)
 
-Hi Folks,
+Hi there,
 
-I have some problems with the snd_bt_sco module... I have ALSA enabled
-in my kernel (use it for my "real" sound card).
+I have very simple requirements for a bluetooth
+'beacon' that is discoverable, but nothing else (ie.
+it responds to discovery requests, but you don't need
+to connect to it or anything).  At the moment I am
+using a D-Link USB dongle where the USB powerlines are
+soldered to an external power supply.  This supplies
+power to the beacon, but it still needs to connect to
+a linux/bluez equipped laptop (with USB power
+disconnected as it draws its power externally) to
+bring up the device and make it discoverable. 
+Immediately disconnecting the bluez laptop you then
+have a cheap standalone beacon as long as the power
+remains.
 
-any tips?
+I'm wondering is there any way to have a beacon like
+this where you don't have to connect it to a laptop
+after its been powered up to make it discoverable?  My
+searches on google and looking at the bluez code make
+me think that normally a HCISETSCAN ioctl is sent to
+the device with SCAN_INQUIRY|SCAN_PAGE option to make
+it discoverable.  My question is are there any dongles
+out there that become discoverable immediately when
+they are powered without having to send them a HCI
+command?  One of you who have written drivers for
+these things might know....
 
-dmesg:
----snip---
-snd_bt_sco: Unknown symbol snd_hwdep_new
----snap---
+Or if there aren't, can anyone suggest another way I
+might go about making or designing a cheap self
+powered bluetooth beacon that is discoverable on
+powerup?  I may want to manufacture these beacons in
+some quantity later.
 
-make modules_install
----snip---
-if [ -r System.map ]; then /sbin/depmod -ae -F System.map  2.6.10-mh1;
-fi WARNING: /lib/modules/2.6.10-mh1/extra/snd-bt-sco.ko needs unknown
-symbol snd_hwdep_new
----snap---
+Thanks,
+David
 
-thanks ... Collin
 
--- 
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-Coding without coffee is like driving without gas!
+	
+	
+		
+___________________________________________________________ 
+ALL-NEW Yahoo! Messenger - all new features - even more fun! http://uk.messenger.yahoo.com
 
 
 -------------------------------------------------------
