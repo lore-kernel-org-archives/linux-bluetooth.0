@@ -1,9 +1,9 @@
-Return-Path: <crosser@average.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Re: Reproducible kernel oops on PPP session start
-From: Eugene Crosser <crosser@average.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Eugene Crosser <crosser@average.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1074022381.2894.5.camel@pegasus>
+In-Reply-To: <1074015121.2533.11.camel@pegasus>
 References: <1073475736.6998.9.camel@pccross.average.org>
 	 <1073477754.2508.135.camel@pegasus>
 	 <1073483871.2816.9.camel@pccross.average.org>
@@ -17,22 +17,74 @@ References: <1073475736.6998.9.camel@pccross.average.org>
 	 <1073942535.5527.7.camel@pccross.average.org>
 	 <1073943342.8198.8.camel@pegasus>
 	 <1073944953.5527.16.camel@pccross.average.org>
-	 <1074015121.2533.11.camel@pegasus>  <1074022381.2894.5.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1074029444.2819.7.camel@pccross.average.org>
+	 <1074015121.2533.11.camel@pegasus>
+Content-Type: multipart/mixed; boundary="=-CvgtVNReElk5u/WqjQ4R"
+Message-Id: <1074022381.2894.5.camel@pegasus>
 Mime-Version: 1.0
-Date: Wed, 14 Jan 2004 00:32:03 +0300
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 13 Jan 2004 20:33:01 +0100
 
-On Tue, 2004-01-13 at 22:33, Marcel Holtmann wrote:
 
-> actually it is not a wrong owner entry. But the RFCOMM core layer have
-> to increment the module reference count of the L2CAP module, when we
-> accept a new incoming L2CAP connection. I am not 100% that this is the
-> right way to fix this problem, but for me it works. Please check if the
-> attached patch helps and don't breaks any other of your setups.
+--=-CvgtVNReElk5u/WqjQ4R
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Cool!  At least for me, everything works like a charm.
-Thanks a lot, Marcel!
+Hi Eugene,
 
-Eugene
+> This means that the termination of an incoming RFCOMM connections
+> decrements the reference counting of the L2CAP module. This should not
+> happen and I think we have a wrong owner entry somewhere in the RFCOMM
+> socket code, but at the moment I don't know where.
+
+actually it is not a wrong owner entry. But the RFCOMM core layer have
+to increment the module reference count of the L2CAP module, when we
+accept a new incoming L2CAP connection. I am not 100% that this is the
+right way to fix this problem, but for me it works. Please check if the
+attached patch helps and don't breaks any other of your setups.
+
+Regards
+
+Marcel
+
+
+--=-CvgtVNReElk5u/WqjQ4R
+Content-Disposition: attachment; filename=patch
+Content-Type: text/plain; name=patch; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
+
+--- 1.32/net/bluetooth/rfcomm/core.c	Fri Dec 19 19:44:32 2003
++++ edited/net/bluetooth/rfcomm/core.c	Tue Jan 13 20:25:56 2004
+@@ -1649,7 +1649,9 @@
+ 
+ 	nsock->type = sock->type;
+ 	nsock->ops  = sock->ops;
+-	
++
++	__module_get(nsock->ops->owner);
++
+ 	err = sock->ops->accept(sock, nsock, O_NONBLOCK);
+ 	if (err < 0) {
+ 		sock_release(nsock);
+
+--=-CvgtVNReElk5u/WqjQ4R--
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Perforce Software.
+Perforce is the Fast Software Configuration Management System offering
+advanced branching capabilities and atomic changes on 50+ platforms.
+Free Eval! http://www.perforce.com/perforce/loadprog.html
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
