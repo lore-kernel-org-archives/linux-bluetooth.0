@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Florian <Kimpenhaus@gmx.de>
-Content-Type: text/plain; format=flowed; charset=us-ascii
+Message-ID: <403CB92E.1000009@grupopie.com>
+From: Paulo Marques <pmarques@grupopie.com>
 MIME-Version: 1.0
-Message-ID: <opr3xmdugiqdj9uv@mail.gmx.de>
-Subject: [Bluez-users] Bluetooth Access Point elmeg D@VOS-44.dsl
+To: Matthew Reimer <mreimer@vpop.net>
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] How to configure a 723kbps connection?
+References: <lists.bluez.users.1077037423.2665.72.camel@pegasus.SOMEWHERE> <lists.bluez.users.403291AD.7080601@csr.com> <403AC9D1.1000902@vpop.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,22 +17,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Feb 2004 16:23:44 +0100
+Date: Wed, 25 Feb 2004 15:03:10 +0000
 
+Matthew Reimer wrote:
 
-hi,
+> 
+> I tried setting the divisor to 1 manually, but then bluetooth wouldn't 
+> work. Maybe PPC2003 isn't fast enough to handle interrupts at that rate?
+> 
 
-im using an elmeg D@VOS-44.dsl AP has anyone figured out how to pair and 
-connect the device
-or is it impossible too do that using bluez(at the moment)?
+That wouldn't work because the zeevo chip would also have to be configured for 
+921.6kbps. AFAIK only modems try hard to autodetected baudrate from the "at" 
+command string.
 
-
-using
-gentoo linux 2.6.3
-USB BT-Device (BT3030 Tecom)
+There is probably a good reason for the HP guys to set up the port like that. If 
+it would work at 921.6kbps they would probably use the extra bandwidth. This is 
+really a shame, because I was thinking of buying a 2215 myself, but I would like 
+to have a "full-speed" bluetooth (and Linux support) :(
 
 -- 
-Using M2, Opera's revolutionary e-mail client: http://www.opera.com/m2/
+Paulo Marques
+Software Development Department - Restinfor, Lda.
+Phone: +351 252 290600, Fax: +351 252 290601
+Web: www.grupopie.com
+
+"In a world without walls and fences who needs windows and gates?"
+
 
 
 -------------------------------------------------------
