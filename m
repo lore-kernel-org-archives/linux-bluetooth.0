@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050328111949.9192.qmail@web52408.mail.yahoo.com>
+Message-ID: <20050328105548.70974.qmail@web52406.mail.yahoo.com>
 From: jose <twblr@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] bluetooth on iPAQ
+Subject: [Bluez-devel] linux kernel patch on pda
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,22 +16,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Mar 2005 03:19:49 -0800 (PST)
+Date: Mon, 28 Mar 2005 02:55:48 -0800 (PST)
 
 hi,
 
-i use an iPAQ PocketPC, H3800 series. This does not
-have built-in bluetooth support.
+i use a pda which has linux kernel 2.4.18-rmk7,
 
-how do i enable bluetooth on this device.
+it has Intel StrongArm 206MHz SA-1110 processor: 
+
+i want to enable bluetooth on this device.Anyone
+worked on similar lines?..pls hlp
 
 rgds,
-Jose
+jose
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+
+
+
+
+		
+__________________________________ 
+Do you Yahoo!? 
+Yahoo! Small Business - Try our new resources site!
+http://smallbusiness.yahoo.com/resources/ 
 
 
 -------------------------------------------------------
