@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] USB Died
+Subject: Re: [Bluez-users] Virtual adapters
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
+To: Papadopoulos Giannis <ipapadop@uth.gr>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1089366625.6730.7.camel@pc-04.ycom.ch>
-References: <1089366625.6730.7.camel@pc-04.ycom.ch>
+In-Reply-To: <1089361087.40ee54bfe5d28@webmail.uth.gr>
+References: <1089361087.40ee54bfe5d28@webmail.uth.gr>
 Content-Type: text/plain
-Message-Id: <1089368028.4857.75.camel@pegasus>
+Message-Id: <1089368076.4857.77.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 09 Jul 2004 12:13:48 +0200
+Date: Fri, 09 Jul 2004 12:14:36 +0200
 
-Hi Alexandre,
+Hi Papadopoulos,
 
-> I'm using diNovo keyb/mice, and I always have this problem, from
-> 2.6.2-mhx to 6.7.1-mh1 and the new hipd kernel module.
-> 
-> Let me list my hardware (only the USB port I'm using for BT hub) :
-> 0000:00:10.1 USB Controller: VIA Technologies, Inc. USB (rev 80)
-> 
-> The problem is that the USB bus (?) died after some time to work (couple
-> of days), not depend what I'm doing (use keyboard, mice, or nothing).
-> 
-> There is the dmesg related :
-> uhci_hcd 0000:00:10.1: host system error, PCI problems?
-> uhci_hcd 0000:00:10.1: host controller halted, very bad!
+> Is there any way of creating virtual bluetooth adapters in BlueZ?
+> I do not have a USB BT dongle, so it would be nice to have the loopback
+> functionality...
 
-this VIA UHCI host controllers seem to be buggy in some cases. Try to
-compile your kernel without CONFIG_BT_HCIUSB_SCO.
+you can play with hciemu, but it is unsupported and does not emulate a
+full HCI device.
 
 Regards
 
