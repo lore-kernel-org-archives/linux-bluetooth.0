@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: baswap neccesity
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <cs044v$o6q$1@sea.gmane.org>
-References: <cruhvs$fj5$1@sea.gmane.org> <1105388822.8652.53.camel@pegasus>
-	 <cs044v$o6q$1@sea.gmane.org>
-Content-Type: text/plain
-Message-Id: <1105437541.8056.6.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41E39BC8.2020105@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Multiple Headsets
+References: <41E25ECD.2000505@fcse.co.uk> <41E267C4.5030906@dark-reality.de> <1105362147.8652.10.camel@pegasus> <41E2A9FC.2010405@dark-reality.de>
+In-Reply-To: <41E2A9FC.2010405@dark-reality.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,40 +18,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Jan 2005 10:59:01 +0100
+Date: Tue, 11 Jan 2005 02:26:32 -0700
 
-Hi,
+Lars,
 
-> >>I'm reading rctest.c:
-> >>In do_connect function, a call to bswap is used just before the connect 
-> >>call:
-> >>	baswap(&rem_addr.rc_bdaddr, strtoba(svr));
-> >>
-> >>In the server, baswap is again called just after the accept call
-> >>
-> >>Why is it neccesary? Why does the server listening at the other side 
-> >>expect addresses in such byte ordering?
-> > 
-> > 
-> > this is part of the specification. The textual representation and the
-> > over-air BD_ADDR is swapped.
-> > 
-> > However the code above has a memory leak. Where do you found it?
-> this piece of code is from the 'bluez-utils-2.13.tar.gz' package which 
-> is downloadable now at the web site. Precisely in function 'int 
-> do_connect(char *svr)' of rctest.c.
-> It's curious, I'm sure you'd see memory leaks where I only see flowers!
+I would be happy to document it, but I'm not sure exactly what Marcel 
+did. If the number of headsets is fixed at module insertion time then it 
+sounds like it's just good for testing.
 
-the strtoba() allocates memory that is never freed. The correct way of
-doing this address swapping and converting from a string is:
+Brad
 
-	str2ba(svr, &rem_addr.rc_bdaddr);
-
-Regards
-
-Marcel
-
-
+Lars Grunewaldt wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+> 
+> Marcel Holtmann wrote:
+> |
+> | starting with 2.6.10 the hci_usb got a module parameter "isoc". This
+> | controls the alternate setting when plugging in a dongle. The default
+> | value is 2 (or 0 if it is blacklisted device). Check the Bluetooth
+> | specification what value you have to choose for 2 x 16-bit SCO channels.
+> |
+> 
+> nice, did not know this yet. Should be added to the btsco documentation
+> *cough*
 
 
 -------------------------------------------------------
