@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Limit communication to serveral devices
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Philip Lawatsch <philip@lawatsch.at>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <412C9803.6080306@lawatsch.at>
-References: <412C9803.6080306@lawatsch.at>
-Content-Type: text/plain
-Message-Id: <1093443880.537.0.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <412C9803.6080306@lawatsch.at>
+From: Philip Lawatsch <philip@lawatsch.at>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] Limit communication to serveral devices
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,32 +15,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Aug 2004 16:24:40 +0200
+Date: Wed, 25 Aug 2004 15:45:39 +0200
 
-Hi Philip,
-
-> Call me paranoid but I would like to know if there is any way to limit 
-> all types of communication to just several devices by checking with the 
-> hardware addresses.
-> 
-> I understand that in principle not being discoverable and the pin 
-> challenge should help you with being secure but to me this is not enough.
-> 
-> I'm currently running 2 class 1 devices to serve my flat with rfcomm for 
-> dial in and I for sure do not want anyone besides me to get access to 
-> these com ports.
-> 
-> Is there anything I can do to tighten security and limit all 
-> communication to just some devices?
-
-you must change the code of the accept routine in the RFCOMM server
-program that you are using.
-
-Regards
-
-Marcel
+Hi,
 
 
+Call me paranoid but I would like to know if there is any way to limit 
+all types of communication to just several devices by checking with the 
+hardware addresses.
+
+I understand that in principle not being discoverable and the pin 
+challenge should help you with being secure but to me this is not enough.
+
+I'm currently running 2 class 1 devices to serve my flat with rfcomm for 
+dial in and I for sure do not want anyone besides me to get access to 
+these com ports.
+
+Is there anything I can do to tighten security and limit all 
+communication to just some devices?
+
+I do understand that even this is no guarantee for anything, but I'd for 
+sure feel better :)
+
+kind regards Philip
 
 
 -------------------------------------------------------
