@@ -1,9 +1,9 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <5.1.0.14.2.20030228122906.023b3ca8@mail1.qualcomm.com>
+Message-Id: <5.1.0.14.2.20030228122402.023c8850@mail1.qualcomm.com>
 To: david.libault@inventel.fr, "Daryl Van Vorst" <dvpub@telus.net>, <bluez-devel@lists.sourceforge.net>
 From: Max Krasnyansky <maxk@qualcomm.com>
 Subject: Re: [Bluez-devel] BlueZ Qualification
-Cc: Halam.Rose@7layers-UK.com
+Cc: Halam.Rose@7layers-UK.com, bluez-users@lists.sourceforge.net
 In-Reply-To: <3E26CE210187508B@mel-rta6.wanadoo.fr> (added by
 	postmaster@wanadoo.fr)
 References: <5.1.0.14.2.20030227125343.023513a0@mail1.qualcomm.com>
@@ -22,31 +22,18 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 28 Feb 2003 12:46:21 -0800
+Date: Fri, 28 Feb 2003 12:28:04 -0800
 
-At 01:01 AM 2/28/2003, David LIBAULT wrote:
->Max, can you "coordinate the efforts" for qualification ?
-I probably could. But I don't want to because I won't be very effective at it. 
-Mostly because of lack of time. When I do get free time I'd rather 
-fix bugs and implement missing features.
-So I'd prefer if somebody else will lead and coordinate the efforts.
 
->Who is going to write the test report ?
->Is Bluez going to be listed as official Bluetooth qualified stack ?
-I don't know. That's what we need to discuss.
-There are many questions (at least in my mind) like 
-- Does it make sense to have qualified stack in the official kernel ?
-Like I mentioned before I don't want to add things that simply don't make 
-sense for general stack operation only because we want to pass qualification
-(I'm talking mostly about kernel stuff here).
-In which case a separate qualified kernel package with the same API as mainstream
-kernel make sense.
+Folks,
 
-- What happens when we make changes to the stack ? Have to qualify again ?
+Let's move this discussion to the bluez-devel list.
+Please remove bluez-users from your CC list when you reply.
+(this one will be last CC).
 
-etc
-
+Thanks
 Max
+ 
 
 
 
