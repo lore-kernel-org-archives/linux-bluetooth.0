@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <41FC50C6.1080600@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-From: Stefan Bellon <sbellon@sbellon.de>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <4d35427939sbellon@sbellon.de>
-In-Reply-To: <41FC4BAF.4090201@xmission.com>
-References: <4d3382eb6csbellon@sbellon.de> <41F81D6F.3000908@xmission.com> <4d33b69105sbellon@sbellon.de> <4d348a05e8sbellon@sbellon.de> <41FC4BAF.4090201@xmission.com>
-Content-Type: text/plain
-Subject: [Bluez-users] Re: bluetooth-alsa and Jabra BT800
+Subject: Re: [Bluez-users] Re: Connection issue with headset
+References: <41FA06A5.3010904@tootai.net> <ctdn6n$sqs$1@sea.gmane.org> <4d34f3925fsbellon@sbellon.de>
+In-Reply-To: <4d34f3925fsbellon@sbellon.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,51 +18,72 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 08:51:46 +0100
+Date: Sat, 29 Jan 2005 20:13:10 -0700
 
-Brad Midgley wrote:
+stefan,
 
-> How do you know you're using the right address? 
+that's good sleuthing, but rfcomm.conf is used to bind a character 
+device in /dev (eg /dev/rfcomm1) to a bluetooth device. btsco does not 
+try to use a character device to interact with the headset... it makes a 
+straight l2cap connection for control signals and later a sco connection 
+for audio transport.
 
-Well, because of this:
+brad
 
-root@roma# hcitool info 00:07:A4:21:1D:86
-Requesting information ...
-        BD Address:  00:07:A4:21:1D:86
-        Device Name: Jabra BT800
-        LMP Version: 1.2 (0x2) LMP Subversion: 0x68d
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xfc 0xff 0x8b 0x78 0x08 0x08 0x00 0x80
-                <encryption> <slot offset> <timing accuracy> <role switch> 
-                <hold mode> <sniff mode> <park state> <RSSI> <channel quality> 
-                <SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log> 
-                <CVSD> <paging scheme> <transparent SCO> <broadcast encrypt> 
-                <enhanced iscan> <interlaced iscan> <interlaced pscan> 
-                <inquiry with RSSI> <AFH cap. slave> <AFH cap. master> 
-                <extended features> 
-
-Isn't that enough?
-
-> No sdp available doesn't look good.
-
-Hm, is this a mis-feature of the headset then? How does a handy talk to
-the headset then?
-
-> Is the headset paired with a cellphone that is in range? Some
-> embedded bluetooth radios will only talk to one device... if it
-> discovers the paired phone at power on then your laptop typically
-> won't be able to talk to it.
-
-The Jabra BT800 can be paired with 8 devices. You see a list in the
-display and can choose which one it talks to. I can verify that
-switching the communication devices works. If I select my SonyEricsson
-P900 and press the "answer" key, then voice dial on the P900 is
-initiated. If I select the computer and press the "answer" key, then
-the second light of my USB Bluetooth dongle lights up and hcidump
-displays a connection handshake whereas my P900 stays silent.
-
--- 
-Stefan Bellon
+Stefan Bellon wrote:
+> Sebastian Roth wrote:
+> 
+> 
+>>>nomade:/home/dh# btsco 00:0b:2e:06:01:2e
+>>>Device is 1:0
+>>>Voice setting: 0x0060
+>>>RFCOMM channel 6 connected
+>>
+>>You have to press the headset button now!
+> 
+> 
+> Sorry to hi-jack this thread, but I just noticed something regarding my
+> problem when I read this.
+> 
+> When I issue the above, the line "RFCOMM channel x connected" doesn't
+> appear at all. You wrote that afterwards I have to press the headset
+> button. That means, if that line doesn't appear, the problem isn't with
+> the headset, but still with my Bluetooth/rfcomm configuration of the
+> computer?
+> 
+> In that case I got an idea. As I use Bluetooth in order to connect my
+> SonyEricsson P900 to the computer as well, I have got set up a
+> /etc/bluetooth/rfcomm.conf which looks like this:
+> 
+> rfcomm1 {
+>         bind yes;
+>         device 00:0A:D9:E9:BB:0A;
+>         channel	1;
+>         comment "P900 Serial Protocol connection";
+> }
+> 
+> rfcomm11 {
+>         bind yes;
+>         device 00:0A:D9:E9:BB:0A;
+>         channel 11;
+>         comment "P900 p3nfsd connection";
+> }
+> 
+> Do I have to add something like ...
+> 
+> rfcomm2 {
+>         bind yes;
+>         device 00:07:A4:21:1D:86;
+>         channel 2;
+>         comment "Jabra BT800";
+> }
+> 
+> ... in order to make it work with btsco? In any case, adding the above
+> channel 2 configuration doesn't work. Or don't I have to touch the
+> rfcomm.conf at all?
+> 
+> Perhaps this gives some clues what I'm doing wrong?
+> 
 
 
 -------------------------------------------------------
