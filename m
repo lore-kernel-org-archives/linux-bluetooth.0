@@ -1,61 +1,38 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Peter Bergmann" <bergmann.peter@gmx.net>
-To: bluez-users@lists.sourceforge.net
+Return-Path: <lgaga@freemail.hu>
+Message-ID: <3F7C6888.5050107@freemail.hu>
+Date: Thu, 02 Oct 2003 20:03:52 +0200
+From: Lengyel Gabor <lgaga@freemail.hu>
 MIME-Version: 1.0
-Message-ID: <30847.1065160235@www33.gmx.net>
-Content-Type: text/plain; charset="iso-8859-1"
-Subject: [Bluez-users] bluetooth and wireless lan horror
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 3 Oct 2003 07:50:35 +0200 (MEST)
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] fujitsu-siemens pc card
+References: <3F7BF2EC.2080000@freemail.hu> <1065090512.1733.75.camel@pegasus>
+In-Reply-To: <1065090512.1733.75.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-users.lists.sourceforge.net>
 
-hi,
+Hi,
 
-this question/problem is (maybe) not directly related with bluez .
-i use bluez with a class 2 usb dongle together with a wireless lan
-pcmcia card.  bluez is used for a rfcomm connection to a bluetooth
-input device and works really great!  actually data is beeing 
-transmitted not very often and only a few bytes, but the rfcomm 
-connection has to be open all the time.
+> it seems that this is a serial cardbus card with a Bluetooth chip on it.
+> So please use the yenta_socket PCMCIA bridge driver and you must find
+> out which Bluetooth chip they are using.
 
-i knew that bluetooth and wireless lan use the same frequenzy band
-and that this may lead to problems but for me it's  totally unuseable!
+I did have yenta compiled in the kernel, but I recompiled the whole 
+pcmcia support as a module, so now I have a yenta_socket module 
+(loaded). Searching through the net with google, I found somewhere that 
+in /etc/default/pcmcia I probably should have PCIC=yenta_socket, so I 
+changed that (it was PCIC=i82365 before).
+However, nothing changed. :( It still does exactly the same I tried to 
+explain in my previous post. Maybe I should add some parameters to 
+yenta_socket? I am not very familiar with pcmcia, should I do anything 
+besides these to "use the yenta_socket PCMCIA bridge driver" as you said?
 
-as soosn as i move more than 10 feet away from the wlan accesspoint
-i get a packetloss from more than 30 percent even if no data is
-being transmitted via the rfcomm connection.
+> Do you got this card working with Windows? If yes, please try to get
+> access to another machine with Bluetooth running Linux and run
+> 
+> 	hcitool info <bdaddr>
 
-i dont' understand why wlan transmission is affected even if no data 
-goes over the bluez rfcomm connection!?
+I might be able to do this next Tuesday, but not until then. :(
 
-is there anything i can do about this?
-thanks a lot for any hints.
-
-cheers, pet
-
--- 
-NEU FÜR ALLE - GMX MediaCenter - für Fotos, Musik, Dateien...
-Fotoalbum, File Sharing, MMS, Multimedia-Gruß, GMX FotoService
-
-Jetzt kostenlos anmelden unter http://www.gmx.net
-
-+++ GMX - die erste Adresse für Mail, Message, More! +++
-
-
-
--------------------------------------------------------
-This sf.net email is sponsored by:ThinkGeek
-Welcome to geek heaven.
-http://thinkgeek.com/sf
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Thank You very much,
+Gabor Lengyel (Lgaga)
