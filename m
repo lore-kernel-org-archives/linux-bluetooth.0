@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Getting bluetooth working using Belkin F8T003 v2
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E1D6TKF-0005T0-Vl@sc8-sf-mx2.sourceforge.net>
-References: <E1D6TKF-0005T0-Vl@sc8-sf-mx2.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1109779773.8284.25.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <4225D4B4.7050306@rcs.ei.tum.de>
+From: Reinald Gfuellner <Reinald.Gfuellner@lpr.e-technik.tu-muenchen.de>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] EPOX BT-PM01B (new) and linux 2.4 ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,42 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 02 Mar 2005 17:09:33 +0100
+Date: Wed, 02 Mar 2005 15:59:00 +0100
 
-Hi Martin,
+Are there different Versions of Epox Presenter BT-PM01B and can
+the latest one be used with kernel 2.4  ?
 
-> Hey folks, i'm stuck with the following and have no clue what to do..
-> 
-> Trying to follow that guide
-> http://gentoo-wiki.com/HOWTO_mobile_phone%2C_Bluetooth_and_GNOME
-> 
-> i came upon the following error:
-> Code:
-> 
-> drivers/usb/class/bluetty.c: Bluetooth converter now attached to ttyUB0 (or
-> usb/ttub/0 for devfs)
-> drivers/usb/class/bluetty.c: usb_bluetooth_probe - improper number of endpoints.
-> Bluetooth driver not bound.
-> bluetty: probe of 3-3:1.1 failed with error -5
-> drivers/usb/class/bluetty.c: usb_bluetooth_probe - improper number of endpoints.
-> Bluetooth driver not bound.
-> bluetty: probe of 3-3:1.2 failed with error -5
-> 
-> when typing "dmesg"... so it seems as if it doesn't recognize my Belkin Bluetooth
-> stick, does it?
-> Tried also not using the Linux-Bluetooth but the HCI-USB bluetooth, but when
-> trying that, it complaing that it can't register rfcomm tty driver.. which shall
-> be normal since it ain't installed if not using the Linux Blueooth.. so what
-> shall i do to get bluetooth (mostly OBEX) to work with my mobile?
-> Using kernel: 2.6.11-rc3-nitro0, Belkin Bluetooth Stick, gnome-bluetooth... thx
-> in advance for any help, i'd be really happy if you could help me :)
+The device I bought recently
+	- is hdi-based
+	- has to be brought to "pairing mode" by pressing 3 buttons
+	  after poweron in order to react to hcitool scan.
 
-the correct driver is hci_usb and not bluetty.
+(Both facts are not mentioned in
+http://www.holtmann.org/linux/bluetooth/epox.html)
 
-Regards
+epox-presenter:			"no devices in range"
+epox-presenter <hw_addr>:	"socket:connection refused"
 
-Marcel
 
+The BT-PM01B works great on linux 2.6.10 using hidd --server.
+I have one 2.4.29 - System however I can not upgrade yet.
+
+Thanks
+   Reinald
 
 
 
