@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <847626459@web.de>
-MIME-Version: 1.0
-From: "Martin Mueller" <Ma.Mueller@tu-bs.de>
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset="iso-8859-1"
-Subject: [Bluez-devel] cross compiling bluez-utils
+Subject: Re: [Bluez-devel] snd-bt-sco and ACPI suspend to ram and disk
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <pan.2005.02.03.21.45.08.935510@yahoo.com>
+References: <pan.2005.02.03.21.45.08.935510@yahoo.com>
+Content-Type: text/plain
+Message-Id: <1107468588.6911.7.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,16 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 04 Feb 2005 13:24:20 +0100
+Date: Thu, 03 Feb 2005 23:09:48 +0100
 
-Hi,
+Hi Paul,
 
-does it make sense to change the line "sysconfdir='${prefix}/etc'" into "sysconfdir='${exec_prefix}/etc'" in the configure file? I found that useful while compiling the utils for an ARM platform. The /etc will be generated in the right place then.
+> I am using snd-bt-sco with my headset, and I noticed that every time that
+> snd-bt-sco kernel module is loaded, I cannot suspend to ram or to disk
+> using ACPI due to the error bellow.
+> I seems that snd-bt-sco refuses to sleep.
+> Has anyone experienced this, or is my setup broken ?
 
-Martin
-______________________________________________________________
-Verschicken Sie romantische, coole und witzige Bilder per SMS!
-Jetzt bei WEB.DE FreeMail: http://f.web.de/?mc=021193
+your setup is fine, but the snd-bt-sco is broken. The kernel thread is
+active blocking and I think the locking is also wrong. The goal is a
+ALSA library plugin for the headset support and I am not going to fix
+any part of the snd-bt-sco kernel driver.
+
+Regards
+
+Marcel
+
 
 
 
