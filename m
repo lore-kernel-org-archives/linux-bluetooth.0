@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <BAY20-F1F019D190C77973EA71AF853D0@phx.gbl>
-From: "Martin Rolsted Jensen" <mrj_ing@hotmail.com>
+Message-ID: <20050406111405.18543.qmail@web52407.mail.yahoo.com>
+From: jose <twblr@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Subject: [Bluez-devel] Bluetooth on PXA255
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] ARM linux kernel 2.4.18-rmk7
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,22 +16,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 06 Apr 2005 11:29:13 +0000
+Date: Wed, 6 Apr 2005 04:14:05 -0700 (PDT)
 
-Hello everybody!
-I am currently working on a triton1 board with a pxa255 module. I want to 
-connect a UART Bluetooth module to the board (WML-C20AH).
-The first thing I did was to configure the kernel (2.6.10) to support 
-Bluetooth. As far as I can see in the boot sequence of Linux, the ttyBT 
-interface is controlled by the standard ttyS1.
-My question is how to control/setup the device? For instant hciconfig does 
-not work.
-I am newbie to Linux :-)
+hi,
 
-Best Regards
-Martin Rolsted Jensen
+i want to install bluez on a pda with arm linux kernel
+2.4.18-rmk7. can i directly install bluez or do i have
+to first install a kernel patch?
+
+rgds,
+jose 
 
 
+		
+__________________________________ 
+Do you Yahoo!? 
+Make Yahoo! your home page 
+http://www.yahoo.com/r/hs
 
 
 -------------------------------------------------------
