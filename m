@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Can't connect RFCOMM socket: resource
-	temporarily unavailable
+Subject: Re: [Bluez-users] rfcomm question 2-AT command
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050128172646.695.qmail@web53205.mail.yahoo.com>
-References: <20050128172646.695.qmail@web53205.mail.yahoo.com>
+In-Reply-To: <20050128141322.96979.qmail@web60904.mail.yahoo.com>
+References: <20050128141322.96979.qmail@web60904.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1106939965.10580.0.camel@pegasus>
+Message-Id: <1106940245.10580.2.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,44 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Jan 2005 20:19:25 +0100
+Date: Fri, 28 Jan 2005 20:24:05 +0100
 
-Hi Filipa,
+Hi Michael,
 
-> I am have Linux 2.6.9 in my laptop and an Conceptronic
-> CBT 100U USB adapter. I installed bluez-utils-2.14 and
-> bluez-libs-2.14.
-> 
-> 'hciconfig -a' shows me my device and 'hcitool scan'
-> show me the computer of a friend (a windows pc). I can
-> do an 'l2ping' and an 'rfcomm bind' to this computer
-> without any problem. 
-> 
-> The problems arrive when I try to do 'rfcomm connect'.
-> The answer is: "Can't connect RFCOMM socket: resource
-> temporarily unavailable". 
+> I have written a program that the menu can be sent to T610 by AT
+> command. However, I face a problem. When I send one menu to the
+> mobile, there is 4-5 seconds delay. The syntax of my program is:
+> sprintf(command, "AT*EASM=\"Bt-IrConverter\",1,1,%d", item_brand+1);
+>   ret_code=put_command (command, answer, sizeof (answer), 5, 0);
+>   for (j=0; j<item_brand; j++)
+>   {
+>    sprintf(command, ",\"%s\"", device[j]);
+>    ret_code=put_command (command, answer, sizeof (answer), 5, 0);
+>    }
+>   sprintf(command, ",\"quit\",\r");
+> where the variable device[j] stores the string extracted from MySQL
+> db. So, why is that? And how can I reduce the delay?
 
-you can't use bind and connect together. Choose one.
-
-> I saw on the web and on the mailling lists that there
-> is a problem with the 'bluepin'. I checked mine and it
-> didn't work. So, I created a new file (called pin in 
-> /usr/bin/) with:
-> 
-> #!bin/sh
-> # file: /usr/bin/pin
-> echo -n "PIN: "
-> cat /etc/bluetooth/pin
-> 
-> and created a file in /etc/bluetooth/ also called pin
-> with a numerical the PIN code.
-> 
-> Still I could not make the 'rfcomm connect' work! It
-> appears a window asking for the PIN in my friend's
-> computer, but in my computer I still have the same
-> answer.
-
-Check with "hcidump -x" as root if it is really a PIN helper problem.
+check with hcidump if there is really a delay or if the phone simply
+needs that long to execute that command.
 
 Regards
 
