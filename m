@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Tamer Higazi <tamer23@myrealbox.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] What happened with bluez.org
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d1f423d3050313183529b84218@mail.gmail.com>
+References: <d1f423d3050313183529b84218@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1110766661.9456.4.camel@tux>
+Message-Id: <1110795285.8158.43.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] problems establishing connection to Cellular phone
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,32 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Mar 2005 03:17:41 +0100
+Date: Mon, 14 Mar 2005 11:14:45 +0100
 
-Hi people! 
-How do I make a stable connection to my cellular phone via bluetooth
-without that the connection is dying. 
+Hi Anderson,
 
+> I am having difficults on accessing www.bluez.org. Does anybody have
+> the same problem?
 
-I make: 
-hcitool cc MAC-ADDRESS 
-hcitool auth MAC-ADDRESS 
+actually I do ;)
 
-then I enter the pin on the mobile phone and I receive the answer: 
+I am dealing with the problem since Thursday or so. It seems that the
+current hardware is no longer reliable. Unexpected freezes and I haven't
+found the real problem yet. Maybe I have to buy a new server.
 
-HCI authentication request failed: Input/output error
+Regards
 
-
-Can somebody help me? 
-
-However I get this bluez-pin installed. In which relation does it belong
-to my problem? And if yes, how do I use it? 
-
-
-For any help, thank you
-
-
-Tamer
+Marcel
 
 
 
