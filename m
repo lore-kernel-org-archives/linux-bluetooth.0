@@ -1,50 +1,47 @@
-Return-Path: <daryl@wideray.com>
-Errors-To: <daryl@wideray.com>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Rfcomm Use Count
-Date: Wed, 22 Sep 2004 10:57:40 -0700
-Message-ID: <002d01c4a0cd$a7888b60$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1095861229.6223.32.camel@pegasus>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Improving the PIN request a little bit
+From: Marcel Holtmann <marcel@holtmann.org>
+To: GUILLON Gabriel <gabriel.guillon@c-s.fr>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4151A308.2040700@c-s.fr>
+References: <1095867826.6223.48.camel@pegasus>  <4151A308.2040700@c-s.fr>
+Content-Type: text/plain
+Message-Id: <1095870846.6223.61.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 22 Sep 2004 18:34:06 +0200
 
-Hi Marcel,
+Hi Gabriel,
 
-> after more and more thinking about that problem I am almost=20
-> sure that it
-> is right to call rfcomm_sock_kill() in the state change=20
-> function. Anyway
-> we must do this on an unlocked socket. Here is my proposal=20
-> for the final
-> patch, but we need real testing on this so that I can be sure=20
-> that there
-> are no side effects. Can anyone test it on SMP or HT systems?
+> > to the hcid. Comments?
+> 
+> Think about those who do not have X :)
 
-I manually applied your patch to my 2.4 kernel, and it seems to work =
-fine. I
-haven't been able to break it yet. Looks good. I will keep trying.
+actually this is for the non-X case. If it is all shell script driven it
+is easy to modify it without restarting hcid or whatever.
 
-Does this change make the "if (sk->state =3D=3D BT_CLOSED)" statement in
-bluez_accept_dequeue() redundant?
+Regards
 
-This is important because if somehow a socket is in BT_CLOSED state and =
-is
-in the accept queue during shutdown, then rfcomm_cleanup_listen() can't
-clean it up (because bluez_accept_dequeue() won't return it). I think =
-your
-changes make it impossible for there to ever be an rfcomm socket (or =
-l2cap
-socket) in the BT_CLOSED state in the accept queue. If that's true, then
-this isn't an issue. Thoughts?
+Marcel
 
-Do you think we've covered the case where there are incomming =
-connections
-while things are at various stages of being shut down? I think we're ok, =
-but
-I wanted to bring it up.
 
--Daryl.
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
+Project Admins to receive an Apple iPod Mini FREE for your judgement on
+who ports your project to Linux PPC the best. Sponsored by IBM.
+Deadline: Sept. 24. Go here: http://sf.net/ppc_contest.php
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
