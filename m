@@ -1,9 +1,9 @@
-Return-Path: <noring@nocrew.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] D-Bus interfaces
-From: Fredrik Noring <noring@nocrew.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Fredrik Noring <noring@nocrew.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076321200.6869.75.camel@pegasus>
+In-Reply-To: <1076311376.14742.202.camel@akka.yeti.nocrew.org>
 References: <1076265358.2670.36.camel@pegasus>
 	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
 	 <1076267396.2670.58.camel@pegasus>
@@ -16,33 +16,48 @@ References: <1076265358.2670.36.camel@pegasus>
 	 <1076284317.14742.179.camel@akka.yeti.nocrew.org>
 	 <1076287085.6869.70.camel@pegasus>
 	 <1076311376.14742.202.camel@akka.yeti.nocrew.org>
-	 <1076321200.6869.75.camel@pegasus>
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1076322129.5263.28.camel@kalkyl.roxen.com>
+Content-Type: text/plain
+Message-Id: <1076321200.6869.75.camel@pegasus>
 Mime-Version: 1.0
-Date: Mon, 09 Feb 2004 11:22:10 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Mon, 09 Feb 2004 11:06:41 +0100
 
-Marcel,
+Hi Fredrik,
 
-mån 2004-02-09 klockan 11.06 skrev Marcel Holtmann:
-> this actually depends on what you provide. The httpd provides the
-> implementation of the HTTP. We will provide a general and extend
-> interface to the HCI functions, so we call it "hci". The hcid is the
-> implementation of these functions on the server side.
+> > not this way. I want to seperate the running services/profiles. The hcid
+> > must serve "org.bluetooth.hci" as its base.
+> 
+> What would the Apache webserver use? "org.w3c.http"? Something like
+> "org.apache.httpd" fits better for a DBus interface. Similarly hcid
+> ought to use "org.bluez.hcid", I think.
 
-For example saving/loading the hcid configuration file (hcid.conf) isn't 
-about HCI functions, is it? To include such out-of-HCI-scope functions, 
-hcid should probably export interfaces beyond the HCI space:
+this actually depends on what you provide. The httpd provides the
+implementation of the HTTP. We will provide a general and extend
+interface to the HCI functions, so we call it "hci". The hcid is the
+implementation of these functions on the server side.
 
-   org.bluetooth.hci, org.bluez.hci or org.bluez.hcid.hci
-   org.bluez.hcid.conf
-   org.bluez.hcid.fuzz
-   org.bluez.hcid.*
+Regards
 
-Can I ask you to provide a list of all the standard HCI functions? Is
-the syntax/parameters/semantics defined so that exactly one HCI interface
-implementation makes sense?
+Marcel
 
-Many thanks,
-Fredrik
+
+
+
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
