@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v619)
-Message-Id: <721F30FA-17CA-11D9-8894-00039390D626@pepper.com>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-To: BlueZ List Mailing <bluez-devel@lists.sourceforge.net>
-From: Michael Frey <mfrey@pepper.com>
-Subject: [Bluez-devel] Question about hciconfig...
+Subject: Re: [Bluez-devel] ftp patch
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ka Fai Lau <iamkafai2002@yahoo.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20041005060130.18216.qmail@web13125.mail.yahoo.com>
+References: <20041005060130.18216.qmail@web13125.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1096994473.20349.76.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,20 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 6 Oct 2004 15:03:44 -0400
+Date: Tue, 05 Oct 2004 18:41:13 +0200
 
-After looking at the hciconfig code I notices that the Max speed for an 
-ericsson uart module is maxed out at 115200.
+Hi KaFai,
 
-	{ "ericsson", 0x0000, 0x0000, HCI_UART_H4,   57600,  115200, FLOW_CTL, 
-ericsson },
+> I d/l the ftp from cvs but somehow broken to me.  I have made a patch to the obex and ftp.  It is
+> a really quick patch.  Hopefully, I didn't make too many mistakes :D
 
+I applied the patch by hand now. For future patches keep our coding
+style in mind and use only -urN for creating the diff.
 
-Am I interpreting this correct?  If so why the upper limit?
+Regards
 
-UARTS can go faster than 115200.
+Marcel
 
-Michael
 
 
 
