@@ -2,12 +2,12 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] 2.6.10 multimedia keys
-References: <41D85BB7.5020506@comcast.net> <200501032144.53762.cijoml@volny.cz> <1104785779.8894.72.camel@pegasus>
-In-Reply-To: <1104785779.8894.72.camel@pegasus>
+References: <20050103135443.5D28D129932@rrzmta1.rz.uni-regensburg.de>
+In-Reply-To: <20050103135443.5D28D129932@rrzmta1.rz.uni-regensburg.de>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200501032252.57493.cijoml@volny.cz>
+  charset="iso-8859-1"
+Message-Id: <200501032253.19805.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,33 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 3 Jan 2005 22:52:57 +0100
+Date: Mon, 3 Jan 2005 22:53:19 +0100
 
-Dne po 3. ledna 2005 21:56 Marcel Holtmann napsal(a):
-> Hi Michal,
+Dne po 3. ledna 2005 14:54 Michael Firsching napsal(a):
+> > Marcel you REALLY NEED IT :) If you write support, I'll send
+> > you my scripts :)
 >
-> > Marcel pls write support for user space configuring hotkey keycodes too,
-> > coz I have multimedia keys on my laptop and those keys returns other key
-> > press keycodes than keys on MS desktop........than I can't configure it
-> > well, coz 254 returns IE key on notebook and email key on MS desktop and
-> > so on...
->
-> some parts of this are not my job. The input guys must work on it. The
-> Bluetooth HIDP is only a transport layer between L2CAP and the generic
-> HID parser and/or the input subsystem.
+> If it ever works, please post them through the group, I guess there will be
+> many happy coffee addicts ;)
 
-This is work for our driver I thought...We pass 254 to subsystem which than 
-work with it...so we should send for example 117 instead of 254 originally 
-reported.
-Am I right?
+Do you want tweak it little bit? :)
 
-Michal
+M.
 
 >
 > Regards
->
-> Marcel
->
+> Michael
 >
 >
 >
