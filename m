@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Nelson Murilo <nelson@pangeia.com.br>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20040310150142.GD1127@pangeia.com.br>
+Subject: Re: [Bluez-devel] Suspend/resume issues with bluez
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
+To: Mitsu Hadeishi <mitsu@syntheticzero.com>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <200403091754.52270.mitsu@syntheticzero.com>
+References: <200403022202.19259.mitsu@syntheticzero.com>
+	 <200403032224.08229.bluez-devel@cpinkney.org.uk>
+	 <200403091754.52270.mitsu@syntheticzero.com>
+Content-Type: text/plain
+Message-Id: <1078918707.26239.129.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] local name in hciemu
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,42 +20,58 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 10 Mar 2004 12:01:43 -0300
+Date: Wed, 10 Mar 2004 12:38:27 +0100
 
+Am Di, den 09.03.2004 schrieb Mitsu Hadeishi um 23:54:
+> Hi,
+Hi!
 
-Hi,
+> Just a note to the list regarding suspend/resume.  I have a Thinkpad T40p 
+> which was having problems with bluez and suspend/resume.  I just tried 
+> installing the Affix drivers on my Thinkpad T40p; but I had the same problem 
+> (well, it was slightly different, but the upshot was, Bluetooth didn't work 
+> when I came back from suspend).
+> 
+> So I tried a suggestion written by someone else on this list, which was not 
+> only to unload all of the Bluetooth modules, but also unload and reload the 
+> USB modules.  This DID work, at least with the Affix drivers.  Perhaps the 
+> same trick would work with the bluez drivers.
 
-I try use hciemu and try set localname of interface.
+>>From my experience simply unloading the USB host controller driver
+should be fully sufficient!
+What happens is that the host controller is first removed. With removing
+the host all devices disappear and are freed automatically.
+When the system comes back simply insmod the host controller driver
+again. The host will come back up and all devices are discovered as new
+devices and will be initialised properly.
 
-If I try:
-hciemu  -n 00:07:E0:0D:C3:48
-hciemu[9823]: HCI Emulation daemon ver 1.0 started
+It may be though that you have to wait a moment after removing the host
+controller driver module, like "sleep 1" before going to sleep. The 2.4.
+kernel still has some problems to identify in some circumstances if all
+pre-suspend actions have been performed properly.
 
-And run hciconfig I get: 
-hciconfig hci0
-hci0:   Type: VHCI
-        BD Address: 00:07:E0:0D:C3:48 ACL MTU: 1000:20  SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:0 acl:0 sco:0 events:20 errors:0
-        TX bytes:1332 acl:0 sco:0 commands:20 errors:0
+On Debian I do on suspend
 
-But hciconfig -a failed :
-hci0:   Type: VHCI
-        BD Address: 00:07:E0:0D:C3:48 ACL MTU: 1000:20  SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:0 acl:0 sco:0 events:20 errors:0
-        TX bytes:1332 acl:0 sco:0 commands:20 errors:0
-        Features: 0xff 0xff 0xff 0xff 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-Can't read local name on hci0. Input/output error(5)
+	/etc/hotplug/usb.rc stop
+	sleep 1
 
-If I try set (hciconfig hci0 name "localname")  I get same error.
+and of course the inverse on resume
 
-Any hints? 
+	/etc/hotplug/usb.rc start
 
-./nelson -murilo
+without sleeping.
+
+Works really good and also prevents some other nasty USB problems.
+
+> Mitsu
+CU
+  nils faerber
+
+-- 
+kernel concepts          Tel: +49-271-771091-12
+Dreisbachstr. 24         Fax: +49-271-771091-19
+D-57250 Netphen          D1 : +49-170-2729106
+--
 
 
 
