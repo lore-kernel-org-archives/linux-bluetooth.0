@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: sjok1 <sjok1@student.cs.ucc.ie>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <40573809@webmail.ucc.ie>
+Subject: Re: [Bluez-users] uinput and modules.conf
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403161813.51693.cijoml@volny.cz>
+References: <200403160905.27291.cijoml@volny.cz>
+	 <200403161746.03391.cijoml@volny.cz> <1079456964.3307.116.camel@pegasus>
+	 <200403161813.51693.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1079457663.3307.120.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Subject: [Bluez-users] SCO Connection
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,32 +20,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 16 Mar 2004 17:58:26 +0000
+Date: Tue, 16 Mar 2004 18:21:03 +0100
 
-Hi,
+Hi Michal,
 
-I'm writing an application that emulates a BT Headset and I'm using a Siemens 
-S55 and a Sitecom USB BT Adapter.  What I'm doing is the following:
-Send a dial command to the phone to dial a number
-Send an AT+CKPD=200 to the phone to request an audio link
-Create a socket to listen for the SCO conncetion
-Accept the connection when it arrives.
+> I don't understand???
+> 
+> > add extra syslog() statement to see where your code fails. It is working
+> > perfect with all my Bluetooth HID devices.
 
-My problem is that after I accept the SCO connection no data is transmitted 
-along the connection.  The phone recognises that a "headset" is in use, but if 
-I try to read from the connection I just get -1 returned as the num of bytes 
-read.
+syslog() is like printf(), but you get your message through syslogd. Try
+to track down where the input events are not sent to uinput. I don't see
+any problem in the current code.
 
-I checked my hciconfig revision and it shows that the SCO mapping is set to 
-HCI.
+Regards
 
-Do I need to acknowledge the connection after I accept it?  Is the phone 
-waiting for some "ready to receive" message or something?
-
-
-Thanks.
-
-Steven
+Marcel
 
 
 
