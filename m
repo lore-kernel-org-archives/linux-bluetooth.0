@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Moritz Bunkus <moritz@bunkus.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] connection to Motorola V525 fails
-Message-ID: <20040528180635.GA20450@bunkus.org>
-References: <20040528154111.GD24083@bunkus.org> <1085766449.3321.50.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Moritz Bunkus <moritz@bunkus.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040528154111.GD24083@bunkus.org>
+References: <20040528154111.GD24083@bunkus.org>
+Content-Type: text/plain
+Message-Id: <1085766449.3321.50.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="1UWUbFP1cBYEclgG"
-In-Reply-To: <1085766449.3321.50.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,76 +18,80 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 May 2004 20:06:35 +0200
+Date: Fri, 28 May 2004 19:47:29 +0200
+
+Hi Moritz,
+
+> I can't establish a working connection between my computer(s) and my
+> bluetooth mobile, a Motorola V525. At [1] (sorry, only in German) a user
+> has described how to get that exact combination to work properly, but it
+> doesn't work for me.
+> 
+> So what does work? 'hcitool scan' finds my phone. 'sdptool browse
+> 00:...' does list all the services on the phone, and I've found the
+> channel for the OBEX transfers which is 9. But using the obextool from
+> [2] fails. It does connect to the phone, and the following PIN
+> verification completes successfully. Afterwards the phone asks me if the
+> file transfer should be accepted, I hit 'yes' but that's it - no more
+> data flows between the two devices.
+> 
+> Now a bit about my system and the software revisions I've used. I've
+> tried with bluez-utils 2.4 through 2.7 (some of them Debian/unstable
+> packages, 2.5 from souce). I've tried kernels 2.4.24, 2.6.4 and 2.6.6
+> with the -mh1 patch. I've tried two different USB dongles, both are CSR
+> based, but I only have one available at the moment. Here's the output of
+> 'hciconfig -a' for this dongle:
+> 
+> hci0:   Type: USB
+>         BD Address: 00:02:72:40:45:26 ACL MTU: 192:8  SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN 
+>         RX bytes:4378 acl:44 sco:0 events:120 errors:0
+>         TX bytes:1654 acl:48 sco:0 commands:43 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+>         Link policy: RSWITCH HOLD SNIFF PARK 
+>         Link mode: SLAVE ACCEPT 
+>         Name: 'ls-bs-ws6-0'
+>         Class: 0x000100
+>         Service Classes: Unspecified
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
+>         0x20d
+>         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> This is a device by Yakumo, one of the cheaper stuff sold around
+> here. The other dongle was built by Acer, but I don't know its exact
+> description. Both are USB dongles, obviously, and they're both
+> recognized flawlessly. At the moment I don't have access to any other
+> Bluetooth hardware - neither to computers with built-in Bluetooth
+> support, nor to other dongles or devices.
+
+everything is fine so far. Stay with 2.6.6-mh2.
+
+> The remaining files are attached to this mail. The first is the
+> hcid.conf which is basically the default configuration. I've also tried
+> with enabling authentication and encryption, but basically I've left
+> both disabled for most of the tests.
+
+There is no need to change anything and keep auth and encrypt off,
+because you don't want to set your device into security mode 3.
+
+> The second file, 'motorola-v525-bluezutils24.dump', is the output of
+> 'hcidump -t -x' during the call to 'obextool push test.jpg 00:... 9'. It
+> was done with bluez-utils 2.4 (older package from Debian/unstable). The
+> third is the same but with bluez-utils 2.7 (package from [3]).
+> 
+> I hope someone can make sense of the dumps. I can also provide an
+> additional dump made by the author of [1] which shows a successful
+> transfer to his Motorola V525.
+
+Send us the binary versions of the dump (with -w and as root).
+
+Regards
+
+Marcel
 
 
---1UWUbFP1cBYEclgG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi,
-
-thanks for the quick reply.
-
-> There is no need to change anything and keep auth and encrypt off,
-> because you don't want to set your device into security mode 3.
-
-That's what I figured - I just wanted to be sure I've tried everything
-before crying for help.
-
-> Send us the binary versions of the dump (with -w and as root).
-
-Sure, here it comes. This has been done on the 2.6.6-mh2 with
-bluez-utils 2.7-2. This time I've waited until obexpush times out, so
-the complete communication has been captured.
-
-BTW: You don't have to CC me as I've subscribed.
-
-Mosu
-
--- 
-If Darl McBride was in charge, he'd probably make marriage
-unconstitutional too, since clearly it de-emphasizes the commercial
-nature of normal human interaction, and probably is a major impediment
-to the commercial growth of prostitution. - Linus Torvalds
-
---1UWUbFP1cBYEclgG
-Content-Type: application/octet-stream
-Content-Disposition: attachment; filename="motv525-bin.dump"
-Content-Transfer-Encoding: base64
-
-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
-
---1UWUbFP1cBYEclgG--
 
 
 -------------------------------------------------------
