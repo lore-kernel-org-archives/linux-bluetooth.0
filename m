@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] BlueZ and headset
-References: <200402022018.05536.cijoml@volny.cz> <1075756519.29899.193.camel@pegasus>
-In-Reply-To: <1075756519.29899.193.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200402022242.43547.cijoml@volny.cz>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200402022018.05536.cijoml@volny.cz>
+References: <200402022018.05536.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1075756519.29899.193.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,24 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 2 Feb 2004 22:42:43 +0100
+Date: Mon, 02 Feb 2004 22:15:19 +0100
 
-Dne po 2. =FAnora 2004 22:15 Marcel Holtmann napsal(a):
-> Hi Michal,
->
-> > there is a some driver for SCO using ALSA. Does anything exists for good
-> > old OSS too?
->
-> the complete SCO/eSCO stuff needs to be reworked, but I don't see any
-> future for an OSS driver. ALSA is the choosen architecture for 2.6 and
-> onwords.
+Hi Michal,
 
-Well, so implementation from:
-http://www.dcs.gla.ac.uk/~jp/snd-bluez-sco/
+> there is a some driver for SCO using ALSA. Does anything exists for good old 
+> OSS too?
 
-will never be included and you want write your own implementation?
+the complete SCO/eSCO stuff needs to be reworked, but I don't see any
+future for an OSS driver. ALSA is the choosen architecture for 2.6 and
+onwords.
 
-Michal
+Regards
+
+Marcel
+
 
 
 
