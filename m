@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] new BT mouse
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200412291136.02175.cijoml@volny.cz>
-References: <200412291136.02175.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1104316837.6319.29.camel@notepaq>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200412291136.02175.cijoml@volny.cz>
+Subject: [Bluez-users] new BT mouse
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +17,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Dec 2004 11:40:37 +0100
+Date: Wed, 29 Dec 2004 11:36:02 +0100
 
-Hi Michal,
+Hi Marcel,
 
-> there is a new BT mouse:
-> 
-> http://www.msi.com.tw/program/products/communication/cmu/pro_cmu_detail.php?UID=602
+there is a new BT mouse:
 
-anyone wanting to donate one of these to me?
+http://www.msi.com.tw/program/products/communication/cmu/pro_cmu_detail.php?UID=602
 
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
