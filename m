@@ -1,56 +1,52 @@
-Return-Path: <nacc@us.ibm.com>
-Date: Tue, 8 Feb 2005 22:36:50 -0800
-From: Nishanth Aravamudan <nacc@us.ibm.com>
-To: marcel@holtmann.org, maxk@qualcomm.com
-Cc: bluez-devel@lists.sourceforge.net, greg@kroah.com
-Subject: [PATCH 50/63] bluetooth/bfusb: change parameters of usb_{control,bulk}_msg() to msecs
-Message-ID: <20050209063650.GU1419@us.ibm.com>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] omtu, imtu
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20050209160702.56b74881@CleverSophie>
+References: <20050209140701.2cf50710@CleverSophie>
+	 <1107955171.13863.26.camel@pegasus> <20050209143858.1e0350c3@CleverSophie>
+	 <1107957430.13863.34.camel@pegasus>  <20050209160702.56b74881@CleverSophie>
+Content-Type: text/plain
+Message-Id: <1107962283.13863.65.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 09 Feb 2005 16:18:03 +0100
 
-Hi,
+Hi Bjoern,
 
-Description: Change units of parameters being passed to
-usb_{control,bulk}_msg() to milliseconds. Patch is compile-tested.
+> can you also tell me what omtu and imtu are for? I know the Maximum Transfer Unit, but what exactly do these 2? I have set them to 672 and 0 like in the rctest.c file.
 
-Signed-off-by: Nishanth Aravamudan <nacc@us.ibm.com>
+what about reading the L2CAP part of the Bluetooth specification. It is
+all there, but in short (i)ncoming MTU and (o)utgoing MTU.
 
---- 2.6.11-rc3-kj-v/drivers/bluetooth/bfusb.c	2005-02-03 16:57:40.000000000 -0800
-+++ 2.6.11-rc3-kj/drivers/bluetooth/bfusb.c	2005-02-08 14:15:10.000000000 -0800
-@@ -63,7 +63,7 @@ MODULE_DEVICE_TABLE(usb, bfusb_table);
- 
- #define BFUSB_MAX_BLOCK_SIZE	256
- 
--#define BFUSB_BLOCK_TIMEOUT	(HZ * 3)
-+#define BFUSB_BLOCK_TIMEOUT	3000
- 
- #define BFUSB_TX_PROCESS	1
- #define BFUSB_TX_WAKEUP		2
-@@ -582,7 +582,7 @@ static int bfusb_load_firmware(struct bf
- 	pipe = usb_sndctrlpipe(bfusb->udev, 0);
- 
- 	if (usb_control_msg(bfusb->udev, pipe, USB_REQ_SET_CONFIGURATION,
--				0, 1, 0, NULL, 0, HZ * USB_CTRL_SET_TIMEOUT) < 0) {
-+				0, 1, 0, NULL, 0, USB_CTRL_SET_TIMEOUT) < 0) {
- 		BT_ERR("Can't change to loading configuration");
- 		return -EBUSY;
- 	}
-@@ -623,7 +623,7 @@ static int bfusb_load_firmware(struct bf
- 	pipe = usb_sndctrlpipe(bfusb->udev, 0);
- 
-         if ((err = usb_control_msg(bfusb->udev, pipe, USB_REQ_SET_CONFIGURATION,
--				0, 2, 0, NULL, 0, HZ * USB_CTRL_SET_TIMEOUT)) < 0) {
-+				0, 2, 0, NULL, 0, USB_CTRL_SET_TIMEOUT)) < 0) {
- 		BT_ERR("Can't change to running configuration");
- 		goto error;
- 	}
-@@ -641,7 +641,7 @@ error:
- 	pipe = usb_sndctrlpipe(bfusb->udev, 0);
- 
- 	usb_control_msg(bfusb->udev, pipe, USB_REQ_SET_CONFIGURATION,
--				0, 0, 0, NULL, 0, HZ * USB_CTRL_SET_TIMEOUT);
-+				0, 0, 0, NULL, 0, USB_CTRL_SET_TIMEOUT);
- 
- 	return err;
- }
+> Is 672 the maximum? It would just be nice to know the maximum data per frame, for a good header to data proportion.
+
+The maximal value is 65535. The header/payload is not important for the
+throughput. Only matching it to the baseband packet types helps.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now.
+http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
