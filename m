@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] how to look as a printer?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: carlo@linux.it
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040402154609.GB2766@localhost>
-References: <20040402154609.GB2766@localhost>
-Content-Type: text/plain
-Message-Id: <1080922449.2836.74.camel@pegasus>
+From: Carlo Perassi <carlo@linux.it>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20040402154609.GB2766@localhost>
+Reply-To: carlo@linux.it
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] how to look as a printer?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,21 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 02 Apr 2004 18:14:09 +0200
+Date: Fri, 2 Apr 2004 17:46:09 +0200
 
-Hi Carlo,
+Hi all.
+I'd like to know how to set up my GNU/Linux to be seen as a
+bluetooth printer.
+Each URI, references etc will be quite appreciated.
+Thanks.
 
-> I'd like to know how to set up my GNU/Linux to be seen as a
-> bluetooth printer.
-> Each URI, references etc will be quite appreciated.
-
-nothing has been done so far. Feel free do provide something.
-
-Regards
-
-Marcel
-
-
+-- 
+Carlo Perassi - http://www.linux.it/~carlo/
 
 
 -------------------------------------------------------
