@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Some questions
+Subject: Re: [Bluez-users] Slaves in Sniff mode
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Dirk Vornheder <DVornheder@t-online.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200406231941.04587.dvornheder@t-online.de>
-References: <1BYJR5-1Xq5q40@cmpmail07.bbul.t-online.de>
-	 <200406221724.44949.dvornheder@t-online.de>
-	 <1087939657.4209.8.camel@pegasus>
-	 <200406231941.04587.dvornheder@t-online.de>
+To: tOpSy TuRvY <topsyturvy@nemo.student.utwente.nl>
+Cc: Peter Stephenson <pws@csr.com>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.BSO.4.58.0406231904480.29930@nemo.student.utwente.nl>
+References: <200406231606.i5NG6gLM017727@news01.csr.com>
+	 <Pine.BSO.4.58.0406231904480.29930@nemo.student.utwente.nl>
 Content-Type: text/plain
-Message-Id: <1088013813.4296.3.camel@pegasus>
+Message-Id: <1088013596.4296.1.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,19 +20,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Jun 2004 20:03:33 +0200
+Date: Wed, 23 Jun 2004 19:59:56 +0200
 
-Hi Dirk,
+Hi Assed,
 
-> > I don't see any useful in it, but it looks very weird. Too much SDP
-> > traffic. Something must be screwed up. Make me a binary dump with -w and
-> > try to get the initial connection setup.
-> >
-> 
-> Here are the file.
+> One last question on this issue. Can the GN in Bluez ask the PANU to go 
+> into sniff mode *automatically* based on some criteria (e.g. low 
+> activity), or ask it to come out of sniff mode (e.g. based on a large 
+> queue).
 
-I need a version where you log the initial creation of the HCI link. Do
-you made this dump as root?
+some time ago (a year a so) I made a proposal for adding automatic sniff
+mode to the HCI core. However nobody (not even me) has started coding
+this.
 
 Regards
 
