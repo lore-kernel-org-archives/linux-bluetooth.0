@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200404171019.52523.cijoml@volny.cz>
-Subject: [Bluez-users] l2ping acts like ping
+Subject: Re: [Bluez-users] BlueZ error in cc,cc,dc sequence
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200404170957.35029.cijoml@volny.cz>
+References: <200404162339.01392.cijoml@volny.cz>
+	 <200404170937.46434.cijoml@volny.cz> <1082187953.4489.43.camel@pegasus>
+	 <200404170957.35029.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1082189235.4489.46.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,25 +20,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Apr 2004 10:19:52 +0200
+Date: Sat, 17 Apr 2004 10:07:15 +0200
 
-Hi Marcel,
+Hi Michal,
 
-we should possibly ping from 0 not 200 like normal ping :)
+> > > when calling cc/dc/cc/dc/cc/dc it works like a charm
+> > > but cc/cc/dc makes problems - can't disconnect
+> >
+> > maybe the kernel or your Bluetooth chip don't really likes double
+> 
+> kernel 2.4.26-mh1 and CSR 16.1.1 - Microsoft wireless transceiver
 
-diff -urN bluez-utils-2.6-old/tools/l2ping.c bluez-utils-2.6/tools/l2ping.c
---- bluez-utils-2.6-old/tools/l2ping.c      Fri Apr  2 03:21:04 2004
-+++ bluez-utils-2.6/tools/l2ping.c  Sat Apr 10 14:34:19 2004
-@@ -53,7 +53,7 @@
- /* Defaults */
- bdaddr_t bdaddr;
- int size  = 20;
--int ident = 200;
-+int ident = 0;
- int delay = 1;
- int count = -1;
+if it is really a kernel problem then it is present in every kernel,
+because I never worked on it.
 
-Michal
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
