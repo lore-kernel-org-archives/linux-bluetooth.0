@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050217053715.12789.qmail@web60907.mail.yahoo.com>
-From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
-Subject: Re: [Bluez-users] rfcomm question 3
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1107626911.6921.179.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=big5
+From: soraberri <421246@posta.unizar.es>
+Message-ID: <cuvg8v$6qs$1@sea.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Profiles and Service publicing
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,23 +16,71 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Feb 2005 13:37:15 +0800 (CST)
+Date: Wed, 16 Feb 2005 14:04:49 +0100
 
-Hi all!
-    I'm still doing my project. Now I face a problem
-that the T610 still cannot connect to PC. Then my
-tutor said that I have to write a sdp program to let
-the phone to connect to PC. I wish to know that is
-there any guideline or even the source code for sdp
-programming? It is urgent as my tutor said he used two
-months to do it before. 
-    Thank you very much for your kindness.
-Michael
+Hi,
 
+This post is about a specific headset, about btsco and about SDP support 
+in BlueZ. I'm not sure if btsco is being talked here, but anyway I think 
+  this post also concerns BlueZ
 
-_______________________________________________________________________
-·s¦~Ä@±æ²Ä¤@¦ì : §ä¨ì¤Í½t¤H
-http://personals.yahoo.com.hk
+This is the context:
+· BlueZ and btsco installed and working.
+· btsco works fine with the headset (Bluetrek G2).
+· once SCO connected, pushing the TALK button on the headset leads to a 
+SCO disconnect state, but pushing TALK again will reconnect without 
+problems.
+
+But:
+· When the headset is switched OFF, the SCO channel is abrubtly 
+disconnected and the btsco daemon goes on running.
+· When I switch ON the headset again (not in the pairing mode, only 
+switch on) it won't connect to the Audio GAteway again.
+· Pushing now the TALK button breafly it enters in which I have named 
+"dumb mode" (because it is unfructuous). I have dumped what is going on 
+in the dumb mode, which I will interpret for you:
+
+The following SDP transaction is repeating again and again until the 
+headset gets tired:
+
+ > ACL data: handle 0x0029 flags 0x02 dlen 19
+     L2CAP(d): cid 0x0040 len 15 [psm 1]
+         SDP SS Req: tid 0x49 len 0xa
+           pat uuid-32 0x1112 (AG)
+           max 0x28
+           cont 00
+< ACL data: handle 0x0029 flags 0x02 dlen 14
+     L2CAP(d): cid 0x0040 len 10 [psm 1]
+         SDP SS Rsp: tid 0x49 len 0x5
+           tot 0x0 cur 0x0
+           cont 00
+
+The first is a SDP_ServiceSearch Request from the headset looking for a 
+service with UUID  of value 0x1112 (corresponds to AudioGateway).
+The second is a SDP_ServiceSearch Response from BlueZ saying that the 
+requested service is not found in the SDP database nor nothing even 
+similar, which is really true because I have not add this service 
+("sdptool add AG" is not supported)
+
+Now:
+Now is when some leak of knowledge hammers mi soul:
+· In the assumption that, some way, I could create a service record in 
+the service database specifying AudioGateway UUID, would it be enough 
+for the heaset to reconnect again?
+· I think of btsco as if it was an AudioGateway implementation (or 
+headset profile implementation) using the BLuez stack, but if it doesn't 
+register by its own the AG service in the local database, maybe it is 
+not a profile imlpementation?
+
+So:
+Please, could you give me some points to understand this? Also, if it's 
+not being possible to fix the reconnection problem because of some lack 
+of development, I would like to know where is the failure.
+
+Thank you very much
+
+Luis
+
 
 
 -------------------------------------------------------
