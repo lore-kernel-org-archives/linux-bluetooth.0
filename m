@@ -1,16 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Stephen Hemminger <shemminger@osdl.org>
-To: Diego Liziero <liziero.diego@unimore.it>
-Cc: bridge@lists.osdl.org, bluez-devel@lists.sourceforge.net
-Message-Id: <20040518153310.6ca39ef5@dell_ss3.pdx.osdl.net>
-In-Reply-To: <1084788177.21864.54.camel@igno>
-References: <1084467136.3083.27.camel@igno>
-	<20040513102829.5d5e1484@dell_ss3.pdx.osdl.net>
-	<1084472140.3354.9.camel@igno>
-	<1084788177.21864.54.camel@igno>
+Subject: Re: [Bluez-devel] Nokia 6230 info
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andreas Gaufer <andreas.gaufer@blue-cell-networks.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040518154926.4522519c.Andreas.Gaufer@blue-cell-networks.com>
+References: <1084868892.5833.45.camel@pegasus>
+	 <E1BQ0K1-0000wa-00@intern.SerNet.DE>
+	 <20040518154926.4522519c.Andreas.Gaufer@blue-cell-networks.com>
+Content-Type: text/plain
+Message-Id: <1084889148.4327.5.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] Re: [Bridge] bridging bluetooth bnep devices with kernel 2.6.6-*
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,49 +20,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 May 2004 15:33:10 -0700
+Date: Tue, 18 May 2004 16:05:48 +0200
 
-On Mon, 17 May 2004 12:02:58 +0200
-Diego Liziero <liziero.diego@unimore.it> wrote:
+Hi Andreas,
 
-> Thanks for your support.
+> just looked into the data from our field tests. We saw something that had the 
+> Device Name "Nokia 6230 Ir" and it had a diffrent feature list. Just thought 
+> this might be intresting for you :
 > 
-> I'm back with the "brige freezes when bluetooth bnep0 disconnects
-> before bnep1" issue.
+> 1080041406|dn|Nokia 6230 iR
+> 1080041406|fea|0xbf 0xee 0x0f 0x00
+> 1080041406|lmpsv|0x380
+> 1080041406|lmpv|1.1 (0x1)
+> 1080041406|mf|NokiaDanmarkAS
 > 
-> As reported in the bluez-devel mailing list, in a bridge
-> called pan0 with the interfaces bnep0, bnep1, .. bnep6
-> connected, if the interface bnep6 is disconnected first,
-> everything works fine, but if bnep0 is disconnected before
-> the others, the bridge stops to work.
-> 
-> Arping from bnep1 to the brige results in just the first
-> answer received.
-> 
-> To make it work again I have to use the following dirty hack:
->  brctl delif pan0 bnep1
->  brctl addif pan0 bnep1
-> 
-> Someone in the bluez-devel mailing list told that also setting the
-> bridge in promiscuous mode with tcpdump makes the bridge
-> back to work.
-> 
-> Now I'm removing and re-adding all the bridge components
-> when hotplug detects that a "bnep?" device ceases to exist.
-> 
-> Any better solution?
-> 
-> Regards,
-> Diego
+> Since the Mac-Adress was 00:02:EE:x:x:x this was maby a prototype of that 
+> phone. We spotted it in March in Hannover ;)
 
-Sounds like an issue with how the bnep does promiscious mode.
-Do you see messages on the console like:
-	device bnep0 left promiscious mode
+this feature list looks more correct to me.
 
-Also, the bnep driver seems to need BT_BNEP_MC_FILTER enabled
-to do multicast.  
+Regards
 
-When you remove bnep0 first, what does "brctl showstp pan0" show?
+Marcel
 
 
 
