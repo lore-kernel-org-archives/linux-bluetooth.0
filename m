@@ -1,15 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: tOpSy TuRvY <topsyturvy@nemo.student.utwente.nl>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1087942444.4209.45.camel@pegasus>
-Message-ID: <Pine.BSO.4.58.0406231319140.20827@nemo.student.utwente.nl>
-References: <E1BcqIi-0002cT-53@sc8-sf-list2.sourceforge.net>
- <Pine.BSO.4.58.0406222046050.9882@nemo.student.utwente.nl>
- <1087939830.4209.12.camel@pegasus>  <Pine.BSO.4.58.0406222346200.5451@nemo.student.utwente.nl>
- <1087942444.4209.45.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <OF55F0932D.E33A9720-ONC1256EBC.003DECCD@fr>
+From: "Nicolas RICHARD" <nicolasrichard@macif.fr>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] Slaves in Sniff mode
+Content-type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] i mail you for a friend : n1c0l4s.l3@wanadoo.fr
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,17 +15,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Jun 2004 13:23:59 +0200 (CEST)
+Date: Wed, 23 Jun 2004 13:18:46 +0200
 
-Hi,
+hi,
 
-Does anyone know if the master delays ACL transmittions to slaves in sniff 
-mode (i.e. till they become active again), or will it just keep on 
-transmitting the baseband frame till the slave eventually wakes up and can 
-send an ACK.
+i am on a 2.6.7 kernel patch with mh1
+bluez is installed
 
-Regards,
-Assed
+hci0 is on
+
+# hciconfig
+hci0: =A0 Type: USB
+=A0 =A0 =A0 =A0 BD Address: 00:50:F2:7E:3B:3F ACL MTU: 192:8 =A0SCO MTU=
+: 64:8
+=A0 =A0 =A0 =A0 UP RUNNING PSCAN ISCAN
+=A0 =A0 =A0 =A0 RX bytes:152 acl:0 sco:0 events:20 errors:0
+=A0 =A0 =A0 =A0 TX bytes:320 acl:0 sco:0 commands:18 errors:0
+
+
+but i cannot connect my Wireless IntelliMouse and optical desktop
+i obtain
+
+# hcitool inq
+Inquiring ...
+# hcitool scan
+Scanning ...
+#
+
+and kbluetoothd =A0see that my adaptater is plug
+
+do you have an idea?
+
+regards
+
+
+----
+Ce mail a =E9t=E9 =E9crit sous linux mandrake cooker (www.linux-mandrak=
+e.com/fr)
+avec KMail 1.6.2 (www.kde.org)
+
+Kernel: 2.6.7-2mdk
+Kde 3.2.3
+
+=
+
 
 
 
