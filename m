@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Tamer Higazi <tamer23@myrealbox.com>
+Message-ID: <42320F38.2030400@kawaiyume.net>
+From: BakaOnigiri <bakaonigiri@kawaiyume.net>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1110643712.7592.7.camel@tux>
-Mime-Version: 1.0
-Subject: [Bluez-users] can't initialize bluetooth dongle with CBT100U chipset!
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Java MultiThread
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,27 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 12 Mar 2005 17:08:32 +0100
+Date: Fri, 11 Mar 2005 22:35:52 +0100
 
-Hi! 
-I bought a conceptronic bluetooth stick with the CBT100U chipset.
+Hello, I am new to the list,
 
-I compiled inside the kernel 2.6.11.1 the bluetooth option (not as
-module) and loaded the module: hci_usb and the applications (deamons):
+I want to develop a piconet server in bt, I am using Gentoo distro and 
+BlueZ stack.
 
-hcid
-sdpd
+First : I use avatena BlueZ java stack, it seems to work well, first 
+question : is it good ?
+I mean, is there a better java stack ? what does i need ?
 
-After then, I run hciconfig and the output is still empty. How could it
-come? 
-
-For any help
-
-Thank you 
+Next : can someone give me an exemple of java code of a piconet server 
+that can receive more than
+one connection in the same time ?
 
 
-Tamer
-
+Thanks for all.
 
 
 -------------------------------------------------------
