@@ -1,11 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Colin Pinkney <bluez-devel@cpinkney.org.uk>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200403312311.00434.bluez-devel@cpinkney.org.uk>
-Subject: [Bluez-devel] Ambicom BT2000C CF Card Driver
+Subject: Re: [Bluez-devel] sco / csr final notes
+From: Marcel Holtmann <marcel@holtmann.org>
+To: James Courtier-Dutton <James@superbug.demon.co.uk>
+Cc: Steven Singer <steven.singer@csr.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <406B27A8.2000308@superbug.demon.co.uk>
+References: <406A9E23.9000406@soft.uni-linz.ac.at>
+	 <1080730774.2674.6.camel@pegasus> <406AAFFF.6040504@soft.uni-linz.ac.at>
+	 <406ADF3E.4020502@csr.com> <406AE027.7030000@soft.uni-linz.ac.at>
+	 <406AF150.8080105@csr.com> <406B17A4.8000607@superbug.demon.co.uk>
+	 <1080761775.2536.3.camel@pegasus>  <406B27A8.2000308@superbug.demon.co.uk>
+Content-Type: text/plain
+Message-Id: <1080764960.2536.6.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,41 +23,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 31 Mar 2004 23:11:00 +0100
+Date: Wed, 31 Mar 2004 22:29:20 +0200
 
-I've got a contact at Ambicom now that is being quite helpful with technical 
-questions and as I still have a BT2000C CF card on loan from someone I hope 
-to push forward with writing a driver for it (or modify an existing driver).
+Hi James,
 
-The Ambicom BT2000C card still uses the OX16c950 UART chip like the BT2000E 
-(which the bt950 driver is for), but now uses the CSR Bluetooth chip instead 
-of the Ericsson chip.
+> The dongle manufacturer is Mitsumi, and I cannot find any firmware files 
+> for it.
+> Does anyone know of any url that might have updated firmware for this 
+> device ?
 
-So I was wondering if there might be a quick(er) way of developing a driver. 
-Could I...
+I already talked to Mitsumi and they don't plan to provide firmware
+updates for their dongles.
 
-1) Take the OX16c950 support from the bt950_cs and combine it with, say, the 
-CSR support in btuart_cs?
+Regards
 
-or
+Marcel
 
-2) Add OX16c950 support to hciattach and use hci_uart as is?
 
-I am quite familiar with using and setting up BlueZ but I'm new to developing 
-for it, so I might be talking rubbish.
-
-Has anyone any thoughts on this? Is there a better way of going about this? 
-I'm guessing Marcel would like the support to be put in an existing driver if 
-possible, instead of having yet another driver to maintain.
-
-I will be looking through the existing driver source code, but it would be 
-nice to have a plan of attack so to speak to make it easier.
-
-Thanks,
-
--- 
-Colin Pinkney
-http://www.cpinkney.org.uk
 
 
 -------------------------------------------------------
