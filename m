@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY12-F184548D865F7C7ED1F9A4F8AB40@phx.gbl>
-From: "salvatore olgato" <sal_olg@hotmail.com>
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Subject: [Bluez-users] trusted
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200412061608.48387.wim.delvaux@adaptiveplanet.com>
+Subject: [Bluez-users] how to detect if a device is up.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,18 +17,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 15:14:50 +0000
+Date: Mon, 6 Dec 2004 16:08:48 +0100
 
-Does BlueZ impost trusted and Untrusted device?
+suppose you manage a list of 'seen' but not necessarily paired devices.
+How can you figure out if a certain device is UP or not ?
+l2ping apparently not since you need to be paired with that device or else you 
+get permission denied
 
-Does BlueZ support Authorisation and authentication, authentication only, no 
-authentication no authorisation for access service?
-
-Hi.
-
-_________________________________________________________________
-Blocca le pop-up pubblicitarie con MSN Toolbar! http://toolbar.msn.it/
-
+W
 
 
 -------------------------------------------------------
