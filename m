@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-To: <bluez-users@lists.sourceforge.net>
-Subject: AW: [Bluez-users]  Again dund
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAT2mvzXDViU6RxBXLMLKoFgEAAAAA@t-online.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1099925675.6896.158.camel@pegasus>
+Subject: Re: [Bluez-users]  Again dund
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAA+vFVNecj90SxNE/BGWtzYwEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAA+vFVNecj90SxNE/BGWtzYwEAAAAA@t-online.de>
+Content-Type: text/plain
+Message-Id: <1099925675.6896.158.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,35 +19,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 8 Nov 2004 19:09:50 +0100
+Date: Mon, 08 Nov 2004 15:54:35 +0100
 
-Hi Marcel,
-I'm not yet able to tell linux, that my bluetooth-connection is a
-ethernet-connection. I have no idea how to manage this with PPP. With =
-YaST I
-tried to define the bt-connection as a networkcard - but it doesn't =
-realy
-work.
+Hi Peter,
 
-Linux-Notebook:~ # sdptool search --bdaddr 00:0B:CE:00:01:8F lan
-Searching for lan on 00:0B:CE:00:01:8F ...
-Service Name: Netzwerkzugang
-Service RecHandle: 0x10000
-Service Class ID List:
-  "LAN Access Using PPP" (0x1102)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 1
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
+> now I have a new link_key with the right key :) :)
+> 
+> I'm able to connect via bluetooth
+> 
+> Linux-Notebook:/ # dund --connect 00:0B:CE:00:01:8F
+> 
+> Linux-Notebook:/ # dund --show
+> rfcomm0: 00:0B:CE:00:01:8F channel 1 pppd pid 6820
+> 
+> marvelous!! But now I need the next step. I want to use the
+> bluetooth-connection as/like an ethernet-connection as the BT-Modul gives me
+> the function of a switch and router with DHCP
 
-What can I do - ? - perhaps I have to install SuSE 9.2 ??!
+you get these information from PPP.
+
+> I tried to get infos of the services provided, but no result:
+> 
+> Linux-Notebook:/ # sdptool browse 00:0B:CE:00:01:8F
+> Browsing 00:0B:CE:00:01:8F ...
+> Linux-Notebook:/ # 
+
+If the public browse group is not supported you must do this with
+"sdptool search --bdaddr 00:0B:CE:00:01:8F lan". Check the manual page
+for more details.
 
 Regards
-Peter
+
+Marcel
 
 
 
