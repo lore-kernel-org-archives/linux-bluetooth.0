@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] device parking
+Subject: Re: [Bluez-users] scatternet support?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41F049EA.7000307@gmx.ch>
-References: <41F049EA.7000307@gmx.ch>
+In-Reply-To: <41F04975.4020905@gmx.ch>
+References: <41F04975.4020905@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1106266838.7955.33.camel@pegasus>
+Message-Id: <1106266775.7955.31.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,17 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 21 Jan 2005 01:20:38 +0100
+Date: Fri, 21 Jan 2005 01:19:35 +0100
 
 Hi Marco,
 
-> is it possible with bluez to use parking?
-> if yes, does that mean that 7 (6?) active connections and 248 parked 
-> connections can be handled at a time?
+> Is it possible to build a scatternet with bluez enabled devices?
+> 
+> lets say a machine is the master and has 4 connected slaves.
+> can now this master connect as slave to another machine?
+> (a kind of star-topology)
 
-BlueZ is able to handle it, but you won't find any Bluetoot chip that is
-able to do this. Normally they are limited to 7 slaves. No matter if
-they are parked or not.
+this depends on the hardware you use. A CSR based device with at least
+HCI 16.4 firmware can do this.
 
 Regards
 
