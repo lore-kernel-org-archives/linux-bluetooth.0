@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Aben Siatris <aben@webcom.sk>
+From: Richard Cox <conardcox@earthlink.net>
+Reply-To: rcox27@triad.rr.com
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] No more bluez.o in 2.6?
-References: <20040407172325.GC9593@magma.epfl.ch> <200404080948.44365.aben@webcom.sk> <20040408150950.GB5539@magma.epfl.ch>
-In-Reply-To: <20040408150950.GB5539@magma.epfl.ch>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200404101743.00181.aben@webcom.sk>
+  charset="us-ascii"
+Message-Id: <200404101126.25631.conardcox@earthlink.net>
+Subject: [Bluez-users] Hotplug
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,54 +17,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 10 Apr 2004 17:43:00 +0200
+Date: Sat, 10 Apr 2004 11:26:25 -0400
 
-> > > pppd[3693]: pppd 2.4.1 started by root, uid 0
-> > > pppd[3693]: Using interface ppp0
-> > > pppd[3693]: Connect: ppp0 <--> /dev/pts/1
-> > > dund[3704]: RFCOMM TTY creation failed. Operation
-> > > 
-> > > pppd[3693]: LCP: timeout sending Config-Requests 
-> >   ^---- same error with mi ipaq :))
-> > now i use connect to PAN and all working rights.
-> > 
-> > # /usr/bin/pand --listen --role NAP
-> > - disabled DHCP in iPAQ, using 192.168.20.2 gateway 192.168.20.1
-> > - connect (all ok)
-> > - on server - ifconfig bnep0 192.168.20.1 netmask 255.255.255.0
-> > - now routing and iptables nat :)
-> > 
-> > all working fine :)
-> 
-> That's sound great, could you give some more details on what sould be
-> done?
-> pand --listen --role NAP
-> OK
-> ifconfig bnep0 192.168.20.1 netmask 255.255.255.0
-> SIOCSIFADDR: No such device
-> bnep0: unknown interface: No such device
-> SIOCSIFNETMASK: No such device
-> 
-> And I don't have anything in /udev/bnep, how to create it in dev?
-> 
-> Thank you very much,
+Gentlemen,
+	I'm trying to get bluez running on my gentoo linux server so I can connect to 
+my IPaq 2215.  I've got a connection successfully established, but I'm trying 
+to automate it with hotplug in hopes of setting up a NAP bridge.  The docs 
+I've found so far are rather unclear on this subject, but I've created an 
+'/etc/hotplug/bluetooth.agent' script.  Right now, I'm just trying to get 
+hotplug to call that script when a connection is established to automatically 
+configure bnep0, but it only seems to get called on startup when I reboot my 
+kernel.  I had the impression that 'pand' would emit a hotplug event for 
+bnep0 when a connection is established, but I'm not so sure now.  Any 
+guidance about how I might proceed.  Thank you in advance for any information 
+you may provide.
 
-ad first, you must make connection.
-tip - add ifconfig and iptables to hotplug and
-to /etc/init.d/net.bnep0.
+Regards,
 
-tail from /var/messages
-
-Apr 10 17:23:04 gentoo_aben pand[15975]: New connection from 08:00:28:84:C2:E4 bnep0
-Apr 10 17:23:04 gentoo_aben default.hotplug[15977]: arguments (net) env (OLDPWD=/ DEVPATH=/class/net/bnep0 PATH=/bin:/sbin:/usr/sbin:/usr/bin ACTION=add PWD=/etc/hotplug HOME=/ SHLVL=2 INTERFACE=bnep0 DEBUG=yes SEQNUM=647 _=/bin/env)
-Apr 10 17:23:04 gentoo_aben default.hotplug[15977]: invoke /etc/hotplug/net.agent ()
-Apr 10 17:23:04 gentoo_aben net.agent[15977]: script=/etc/init.d/net.bnep0 in action add
-Apr 10 17:23:04 gentoo_aben net.agent[15977]: adding bnep0
-
-and now i am in lan and internet with mi ipaq
-
-(sorry for my english :)
-
+Richard
 
 
 -------------------------------------------------------
