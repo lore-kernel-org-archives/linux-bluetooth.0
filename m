@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "João Santos" <jsantos_pt@hotmail.com>
-To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <Sea2-F42DCZx4FR0rmT00041536@hotmail.com>
-Subject: [Bluez-users] sdptool setattr
+From: Florian Echtler <echtler@fs.tum.de>
+To: bluez-users@sourceforge.net
+Message-ID: <Pine.LNX.4.58.0401281748500.7233@brick>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] Telephony with BT headset?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,57 +15,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jan 2004 18:07:41 +0000
+Date: Wed, 28 Jan 2004 17:55:56 +0100 (CET)
 
-Hi all,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-Anyone can tell me how i add a attribute in my sdp record with a boolean 
-value.
-i'm trying to add the 0x0302 attr_id(Remote audio volume control) with the 
-attr_value set as boolean True.
-I have done:
+Hi everyone,
 
-[root@olivia libs]# sdptool setattr 0x804f778 0x0302 True
-Adding attrib 0x302 string "True" to record 0x804F778
+I have a BT headset lying around which came with my mobile
+phone. However, I don't use it with my mobile, so the idea
+crossed my mind that it could be possible to use the
+headset with my linux server to make phone calls using
+the ISDN system.
 
-[root@olivia libs]# sdptool get --tree 0x804f778
-Attribute Identifier : 0x0 - ServiceRecordHandle
-  Integer : 0x804f778
-Attribute Identifier : 0x1 - ServiceClassIDList
-  Data Sequence
-    UUID16 : 0x1108 - Headset
-    UUID16 : 0x1203 - GenericAudio
-Attribute Identifier : 0x4 - ProtocolDescriptorList
-  Data Sequence
-    Data Sequence
-      UUID16 : 0x0100 - L2CAP
-    Data Sequence
-      UUID16 : 0x0003 - RFCOMM
-      Channel/Port (Integer) : 0xc
-Attribute Identifier : 0x5 - BrowseGroupList
-  Data Sequence
-    UUID16 : 0x1002 - PublicBrowseGroup (SDP)
-Attribute Identifier : 0x9 - BluetoothProfileDescriptorList
-  Data Sequence
-    Data Sequence
-      UUID16 : 0x1108 - Headset
-      Version (Integer) : 0x100
-Attribute Identifier : 0x100
-  Text : "Headset"
-Attribute Identifier : 0x302 - Remote audio volume control
-  Text : "True"
+I'm quite sure that this _is_ possible, as I can receive
+and send an audio stream via ISDN4Linux, and the same
+applies (more or less) to the headset via BlueZ.
 
+The question is now whether there is already some soft-
+ware to achieve this, or whether I'll have to start
+from scratch (BTW: is there any FAQ on how to send and
+receive audio streams from a BT headset?)
 
-but as you can see the attr_value is set in the test format.
+Yours, Florian
+- -- 
+Homo homini lupus.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
 
-Thanks in advance,
-
-João Santos
-
-_________________________________________________________________
-Add photos to your e-mail with MSN 8. Get 2 months FREE*. 
-http://join.msn.com/?page=features/featuredemail
-
+iD8DBQFAF+mf7CzyshGvatgRAqjoAJ9suQTZoiT2fhkWIbsLAKtizVAGDgCgjA3b
+70qLzzv7OliPjwzILindO+U=
+=/R2/
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
