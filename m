@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4193F258.3000003@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] btsco: help with autoconf cleanup
-References: <4193B453.50005@xmission.com>	 <1100199408.12168.24.camel@pegasus>  <4193D3F5.2010505@xmission.com> <1100207774.12168.26.camel@pegasus>
-In-Reply-To: <1100207774.12168.26.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4193D3F5.2010505@xmission.com>
+References: <4193B453.50005@xmission.com>
+	 <1100199408.12168.24.camel@pegasus>  <4193D3F5.2010505@xmission.com>
+Content-Type: text/plain
+Message-Id: <1100207774.12168.26.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,32 +19,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 11 Nov 2004 16:14:32 -0700
+Date: Thu, 11 Nov 2004 22:16:14 +0100
+
+Hi Brad,
+
+> >>btw, I added a sort of placeholder "a2play.c" to the project for sending 
+> >>preencoded audio to an a2dp player. I want to make sure our autoconf 
+> >>mess is cleaned up before putting it in the build.
+> > 
+> > This is great. Does it work for you already. Do you hear any sound?
+> 
+> no, it's pretty early yet.
+> 
+> what do you suggest for packing bits together in a portable way before 
+> putting them on the wire? is there some code somewhere that you can 
+> point to that works in userspace?
+
+actually I don't understand this question. Please explain to me what do
+you wanna know.
+
+Regards
 
 Marcel
 
->>what do you suggest for packing bits together in a portable way before 
->>putting them on the wire? is there some code somewhere that you can 
->>point to that works in userspace?
-> 
-> 
-> actually I don't understand this question. Please explain to me what do
-> you wanna know.
 
-Yeah, I guess I just needed to read up more.
-
-I'm going to be assembling parts of frames like the media packet header. 
-I started looking at l2cap_build_cmd to see how you do it in kernel 
-space. I see htobs() is the equivalent of __cpu_to_le16 for 16-bit 
-values and I see the __attribute__ ((packed)) directives that result in 
-a packed struct that can be copied byte for byte into the buffer. I 
-think I'm good to go.
-
-I'll probably be running the naming for some of the structures and 
-members by you to see if they're ok to eventually go into the bluetooth 
-headers.
-
-Brad
 
 
 -------------------------------------------------------
