@@ -2,11 +2,12 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] scooped by pocketpc (a2dp)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41EA1B6E.3070303@xmission.com>
+In-Reply-To: <41F4A55D.9070701@xmission.com>
 References: <41E93682.9040907@xmission.com>
-	 <41E93B4F.1010600@dark-reality.de>  <41EA1B6E.3070303@xmission.com>
+	 <41E93B4F.1010600@dark-reality.de> <41EA1B6E.3070303@xmission.com>
+	 <41F4A55D.9070701@xmission.com>
 Content-Type: text/plain
-Message-Id: <1106569928.9269.78.camel@pegasus>
+Message-Id: <1106569711.9269.73.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,28 +20,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Jan 2005 13:32:08 +0100
+Date: Mon, 24 Jan 2005 13:28:31 +0100
 
 Hi Brad,
 
-> > writing the a2dp alsa driver should be similar to the btsco alsa part,
-> > maybe we can build one thing for both purposes, or at least keep
-> > structures similar so that both projects can support each other best!
+> I noticed that linphone from debian-testing has oss and alsa devices in 
+> its audio device selection menu.
 > 
-> well i want to try putting a2dp in a userspace driver since that might 
-> be the best way to go. (that's an issue that may not be totally worked 
-> out but i think we decided that it looks attractive enough to at least 
-> try writing alsa-lib drivers)
+> I still haven't been able to get the stubbed out alsa-lib driver to show 
+> up! I also tried a .asoundrc with
 > 
-> if it works well, we might rewrite the sco driver to be in userspace.
+> pcm.a2dpplug {
+>          type plug
+>          slave { pcm "a2dp" }
+> }
+> 
+> pcm.a2dp {
+>          type a2dp
+>          bdaddr "00:08:F4:30:05:BB"
+> }
+> 
+> since that was more like what the jack plugin is supposed to have... no 
+> luck...
 
-I like to see both drivers in userspace as an ALSA library plugin. The
-SCO driver is somewhat more interesting at the moment, because of the
-ongoing VoIP hype.
-
-There is also an SDK for ALSA library plugins planned that should make
-this development easier and possible to develop them outside the ALSA
-source code.
+the ALSA kernel drivers have an OSS emulation and so they will show up.
+This is not possible for the ALSA library plugins.
 
 Regards
 
