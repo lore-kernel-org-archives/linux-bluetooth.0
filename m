@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Dominik Behr <dominik@dominikbehr.com>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <20040209034835.15ac7289@localhost>
+Subject: Re: [Bluez-users] New pda
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?ISO-8859-1?Q?J=E9r=F4me?= Stadelmann <jerome.stadelmann@hta-bi.bfh.ch>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <000001c3f240$a8a3ed50$2d105793@N64101>
+References: <000001c3f240$a8a3ed50$2d105793@N64101>
+Content-Type: text/plain
+Message-Id: <1076685359.2671.78.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Logitech DiNovo?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,14 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 9 Feb 2004 03:48:35 -0800
+Date: Fri, 13 Feb 2004 16:15:59 +0100
 
-Hi guys.
+Hi Jerome,
 
-I have recently got me Logitech DiNovo. So far everything seems to work fine in USB boot protocol mode. Will ever Logitech bluetooth hub be supported in bluez? Or is it the classic "no documentation" problem?
+> It's not important. All I want first is to receive some voice from a
+> bluetooth transmission and play it threw the speaker of the pda.
+> What I saw is that j2me doesn't allow this, then I think embedded linux is a
+> good idea for that
 
---
-Dominik
+actually the BlueZ SCO support is not perfect and I don't know of any
+Windows CE based PDA with Headset profile. The bigger problem is to get
+a PDA with a good Bluetooth chip and firmware. Even my iPAQ 3970 has an
+old 0x72 CSR firmware. The new iPAQ's contain Zeevo chips and I don't
+think that it is good to run SCO over H4. Maybe they connected the PCM
+interface of the Bluetooth chip to the speaker, but I don't know. You
+see, many unknown variables.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
