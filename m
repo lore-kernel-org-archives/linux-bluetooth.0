@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] 2.6.0-test9 SiW works sometimes
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andreas Sundstrom <sunkan@zappa.cx>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3FA8D9AC.4080907@zappa.cx>
-References: <3FA8D9AC.4080907@zappa.cx>
-Content-Type: text/plain
-Message-Id: <1068031366.10389.175.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <3FA8D9AC.4080907@zappa.cx>
+From: Andreas Sundstrom <sunkan@zappa.cx>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] 2.6.0-test9 SiW works sometimes
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -18,53 +15,75 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 Nov 2003 12:22:46 +0100
+Date: Wed, 05 Nov 2003 12:06:20 +0100
 
-Hi Andreas,
+Hi, I have a Toshiba Laptop with a Bluetooth USB device integrated in it.
+I can use the BT device without problems in 2.4.22, but with 2.6.0-test9=20
+it doesn't work for most of the time.
 
-> I have a Toshiba Laptop with a Bluetooth USB device integrated in it.
-> I can use the BT device without problems in 2.4.22, but with 2.6.0-test9 
-> it doesn't work for most of the time.
+USB seems to be working just fine so that shouldn't be it.
 
-from the devices output I see that this device is based on a Silicon
-Wave chip and it seems that I don't have this device in my list. So what
-kind of model do you have and what is the output of "hciconfig -a".
+The problem is that most of the time a "hcitool inq/scan" just returns
+"Inquiring ..." immediatly, without any delay like it didn't do anything.
 
-> USB seems to be working just fine so that shouldn't be it.
-> 
-> The problem is that most of the time a "hcitool inq/scan" just returns
-> "Inquiring ..." immediatly, without any delay like it didn't do anything.
-> 
-> If I remove the modules and reload them over and over again it usually 
-> works after a while and when it works it stays working until I decide to 
-> reboot.
+If I remove the modules and reload them over and over again it usually=20
+works after a while and when it works it stays working until I decide to=20
+reboot.
 
-What are your kernel config settings for the HCI USB driver. I prefer
-you try it with these.
+I've tried to enable some debugging in hci_usb.c but I don't understand
+what to make out of it.. not much that seems wrong to me..
 
-	CONFIG_BT_HCIUSB=m
-	# CONFIG_BT_USB_SCO is not set
-	# CONFIG_BT_USB_ZERO_PACKET is not set
+I get one error when loading the hci_usb module though:
+hub 4-0:1.0: new USB device on port 1, assigned address 2
+hci_usb: probe of 4-1:1.1 failed with error -5
 
-> I've tried to enable some debugging in hci_usb.c but I don't understand
-> what to make out of it.. not much that seems wrong to me..
+Don't know if it's related, the device seems fine and this showes up
+even when the device happen to work.
 
-Include a "#define HCI_USB_DEBUG" after the last include directive.
+Just let me know if there is something I can provide/test debug or=20
+whatever..
 
-> I get one error when loading the hci_usb module though:
-> hub 4-0:1.0: new USB device on port 1, assigned address 2
-> hci_usb: probe of 4-1:1.1 failed with error -5
-> 
-> Don't know if it's related, the device seems fine and this showes up
-> even when the device happen to work.
+This is my BT device:
+T:  Bus=3D04 Lev=3D01 Prnt=3D01 Port=3D00 Cnt=3D01 Dev#=3D  2 Spd=3D12  M=
+xCh=3D 0
+D:  Ver=3D 1.10 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
+P:  Vendor=3D0930 ProdID=3D0502 Rev=3D 0.00
+S:  Manufacturer=3DSiW
+S:  Product=3DSiW
+S:  SerialNumber=3D9113087A0300
+C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3Da0 MxPwr=3D200mA
+I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3Dhci_usb
+E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
+E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
+E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
+I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
 
-This is a question for the USB guys. Do you have another USB Bluetooth
-dongle to test with your notebook?
-
-Regards
-
-Marcel
-
+Thanks
+/Andreas Sundstr=F6m
 
 
 
