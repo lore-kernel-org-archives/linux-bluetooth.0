@@ -1,10 +1,19 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <401A269C.7070104@ei.tum.de>
-From: Matthias Thomae <thomae@ei.tum.de>
+From: Gareth Reakes <gareth@apache.org>
+To: Terence Rudkin <trexx@pobox.com>
+cc: bluez-users@lists.sourceforge.net
+Subject: T3 Was Re: [Bluez-users] Logitech Bluetooth  Mx900+keyboard support.
+In-Reply-To: <1075346991.1793.65.camel@localhost.localdomain>
+Message-ID: <20040129050235.K80797@minotaur.apache.org>
+References: <1074457244.3254.17.camel@localhost.localdomain>
+ <1074458664.6070.73.camel@pegasus>  <1074480891.2817.10.camel@localhost.localdomain>
+  <1074514935.6070.80.camel@pegasus>  <1074568150.7831.5.camel@localhost.localdomain>
+  <20040120081245.GA1871@smartdata.ch>  <1074597908.7088.5.camel@pegasus>
+ <1075234547.3064.13.camel@localhost.localdomain>  <1075276833.12766.56.camel@pegasus>
+  <1075306699.1793.38.camel@localhost.localdomain>  <1075307541.26729.18.camel@pegasus>
+ <1075346991.1793.65.camel@localhost.localdomain>
 MIME-Version: 1.0
-To: bluez-users <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] cmtp, capidrv and kernel 2.6
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,37 +24,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Jan 2004 10:40:44 +0100
+Date: Thu, 29 Jan 2004 05:12:32 -0800 (PST)
 
-Hi Marcel et al,
 
-could anyone give a hint what changes are necessary from kernel 2.4.X to 
-2.6.X to get an isdn dialup setup via cmtp and capidrv (i4l)?
 
-I have a very well working setup for 2.4.22-mh2, essentially following 
-Marcel's (BTW excellent :) instructions from 
-http://www.holtmann.org/linux/bluetooth/isdn.html and had a quick try 
-using the same setup on an unpatched 2.6.2-rc2 vanilla kernel, getting 
-the following symptoms:
+> Now to get the Tungsten T3 talking (passcode not exchanging) , but that
+> a different thread.
 
-- cmtp and kernelcapi are loaded and connecting to an AP-X works
-- capiinfo and capiinit complain about not being able to load 
-kernelcapi, although it is already loaded
-- capidrv isn't loaded automatically any more
-- "/etc/init.d/isdnutils start" complains about /dev/isdnctrl (because 
-of missing capidrv?)
-- when modprobing capidrv the console is flooded with messages
+I have just done so if you have a problem give me a shout. The only thing
+I cant do now is look up computers on my internal subnet. I have no idea
+how to fix this yet. I wanted to be able to control my slimp3 web
+interface so if you get this working then give me a shout.
 
-I use debian/unstable with the latest isdn and capi packages (3.3-7).
+I have a three line script at home that works, so if you have any problems
+then I will mail it to you.
 
-Do I need any kernel patches (e.g. the i4l patch from 
-http://rcum.uni-mb.si/~uvp00845b/)?
-Do I have to modify the module loading definitions in /etc/modutils?
-Does pppdcapiplugin work without additional kernel patches?
-
-Regards.
-Matthias
-
+Gareth
 
 
 -------------------------------------------------------
