@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050228180217.44458.qmail@web26404.mail.ukl.yahoo.com>
-From: benbouzid imad <imad_benb@yahoo.fr>
-Subject: Re: [Bluez-users] Some documentation
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1107880993.7327.190.camel@pegasus>
+Message-ID: <4223466A.2010701@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth PC Headset - SCO connection failed
+References: <f54d86405022806312ab4142a@mail.gmail.com>
+In-Reply-To: <f54d86405022806312ab4142a@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,38 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Feb 2005 19:02:17 +0100 (CET)
+Date: Mon, 28 Feb 2005 09:27:22 -0700
 
-Hi Marcel,
+Benny
 
+> My linux kernel version is 2.4.29.
 
-> the core architecture is different, because BlueZ
-> hardware is not a network device. 
+I just fixed the docs to make it clear you need a recent 2.6 kernel.
 
-Wath do you mean?
-
->The IrDA stack made this mistake and
-> so did Affix. The
-> BlueZ uses its own hardware interface. 
-
-wich one ? hci_usb.c? affix also have one: btusb.c
-
->Our driver interface is a lot much cleaner.
- 
-Can you give more details?
-
-
-tank you for your clarifications.
-regards,
-imad
-
-
-	
-
-	
-		
-Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
-Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
+Brad
 
 
 -------------------------------------------------------
