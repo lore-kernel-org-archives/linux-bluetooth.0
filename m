@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <20050204153155.44842.qmail@web26406.mail.ukl.yahoo.com>
+From: benbouzid imad <imad_benb@yahoo.fr>
 Subject: Re: [Bluez-users] installing bluez in an access point
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050204153155.44842.qmail@web26406.mail.ukl.yahoo.com>
-References: <20050204153155.44842.qmail@web26406.mail.ukl.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1107532179.6921.44.camel@pegasus>
-Mime-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1107529254.6921.38.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,45 +17,62 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Feb 2005 16:49:39 +0100
+Date: Fri, 4 Feb 2005 16:31:55 +0100 (CET)
 
-Hi,
-
-> > Use a 2.6.10 kernel with the -mh3 patch and you have
-> > a very good kernel
-> > with the latest Bluetooth subsystem. Install
-> > bluez-{libs|utils}-2.15.
+ --- Marcel Holtmann <marcel@holtmann.org> a écrit : 
+> Hi,
 > 
-> okay I will try that, (the -mh3 patch is a kernel?) .
-
-it is a kernel patch against the vanilla 2.6.10 to add the latest
-changes to the Bluetooth subsystem.
-
-> Is there a probleme with 2035 broadcom chip? when I
-> use it with bluez I can't see it with a remote device
-> when I do an inquery or a scan.
-
-What 2035 is this? USB or UART? If USB send in the content
-of /proc/bus/usb/devices.
-
-> > You must use a DNS or DNS-Proxy server for that.
+> > how can I install bluez in a new kernel.
+> > i want to build this application in my linux
+> kernel in
+> > a dsl chip. the kenel of the chip is 2.6.
+> > 
+> > Is bluez a module of the kernel or just an
+> application
+> > in the user space? 
 > 
-> ther is a DNS server in the network and I had it IP
-> adress. but how can I tell this adresse to my bnep0
-> interface. a PANU is connected to a NAP and when I
-> ping a google with his IP adresse it works well. but
-> when I ping www.google.fr  it dosen't work because he
-> hasn't the adress of my DNS how can I tell it to
-> bnep0? is there a bash command like 
-> >>>>>>>#ifconfig bnep0 dns 10.10.10.1
+> the protocol part of BlueZ are mostly done as kernel
+> modules. Also the
+> host transport drivers are kernel drivers. The
+> profiles are implemented
+> as applications (library + utils).
+> 
+> Use a 2.6.10 kernel with the -mh3 patch and you have
+> a very good kernel
+> with the latest Bluetooth subsystem. Install
+> bluez-{libs|utils}-2.15.
 
-Enter it in /etc/resolv.conf.
+okay I will try that, (the -mh3 patch is a kernel?) .
+Is there a probleme with 2035 broadcom chip? when I
+use it with bluez I can't see it with a remote device
+when I do an inquery or a scan.
 
-Regards
 
-Marcel
+> > and if someone can help me I had a small problem
+> with
+> > DNS.
+> > How can I set a DNS IP-adress with a bash command
+> for
+> > my bnep0 interface??
+> 
+> You must use a DNS or DNS-Proxy server for that.
+
+ther is a DNS server in the network and I had it IP
+adress. but how can I tell this adresse to my bnep0
+interface. a PANU is connected to a NAP and when I
+ping a google with his IP adresse it works well. but
+when I ping www.google.fr  it dosen't work because he
+hasn't the adress of my DNS how can I tell it to
+bnep0? is there a bash command like 
+>>>>>>>#ifconfig bnep0 dns 10.10.10.1
 
 
+	
+
+	
+		
+Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
+Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
