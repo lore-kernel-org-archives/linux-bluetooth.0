@@ -1,66 +1,46 @@
-Return-Path: <liziero.diego@unimore.it>
-Subject: [patch] hciattach: added other serial speeds and small help fix.
-From: Diego Liziero <liziero.diego@unimore.it>
-Reply-To: diego.liziero@unimore.it
-To: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Content-Type: multipart/mixed; boundary="=-ly0xfpXGY3XZlvOgqYAj"
-Message-Id: <1095695153.15993.40.camel@igno>
-Mime-Version: 1.0
-Date: Mon, 20 Sep 2004 17:45:53 +0200
-List-ID: <bluez-devel.lists.sourceforge.net>
-
-
---=-ly0xfpXGY3XZlvOgqYAj
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] link_key editor
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Paul Hedderly <bulkpaul@mjr.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040920102151.GT26469@wacka.mjr.org>
+References: <20040920102151.GT26469@wacka.mjr.org>
 Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Message-Id: <1095676325.5562.88.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Mon, 20 Sep 2004 12:32:05 +0200
 
-I spent a couple of hours before understanding that to disable
-flow control in H4 modules I needed to put the word "noflow" instead
-of just omitting the word "flow" :)
+Hi Paul,
 
-That's why I propose this help change.
+> Well I think the subject says it all. Is there (preferably command line)
+> a link_key editor? I'd like to be able to list the keys and remove them
+> individually for when I'm playing with stuff.
 
-Added also other speeds (tested with a csr based module).
+the simple answer is NO.
 
-Regards,
-Diego.
+Regards
+
+Marcel
 
 
---=-ly0xfpXGY3XZlvOgqYAj
-Content-Disposition: attachment; filename=patch-bluez-utils-2.10-hciattach
-Content-Type: text/plain; name=patch-bluez-utils-2.10-hciattach; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 
---- bluez-utils-2.10/tools/hciattach.c	2004-07-25 19:09:23.000000000 +0200
-+++ bluez-utils-2.10-new/tools/hciattach.c	2004-09-20 17:00:09.000000000 +0200
-@@ -84,12 +84,18 @@
- 		return B230400;
- 	case 460800:
- 		return B460800;
-+	case 500000:
-+		return B500000;
-+	case 576000:
-+		return B576000;
- 	case 921600:
- 		return B921600;
- 	case 1000000:
- 		return B1000000;
- 	case 1152000:
- 		return B1152000;
-+	case 1500000:
-+		return B1500000;
- 	default:
- 		return B57600;
- 	}
-@@ -932,7 +938,7 @@
- {
- 	printf("hciattach - HCI UART driver initialization utility\n");
- 	printf("Usage:\n");
--	printf("\thciattach [-n] [-p] [-b] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow]\n");
-+	printf("\thciattach [-n] [-p] [-b] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow]\n");
- 	printf("\thciattach -l\n");
- }
- 
 
---=-ly0xfpXGY3XZlvOgqYAj--
+-------------------------------------------------------
+This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
+Project Admins to receive an Apple iPod Mini FREE for your judgement on
+who ports your project to Linux PPC the best. Sponsored by IBM.
+Deadline: Sept. 24. Go here: http://sf.net/ppc_contest.php
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
