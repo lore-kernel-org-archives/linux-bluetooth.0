@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: Lalith Chakravarthi <lalithvc@yahoo.com>
-Subject: Re: [Bluez-users] Shell script during bluetooth connection
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-References: <20040310124449.40181.qmail@web40704.mail.yahoo.com> <1078923303.2537.33.camel@pegasus>
-In-Reply-To: <1078923303.2537.33.camel@pegasus>
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] FujitsuSiemens BT USB Adapter
+References: <200403112106.31567.cijoml@volny.cz> <200403150011.24899.pavouk@pavouk.org>
+In-Reply-To: <200403150011.24899.pavouk@pavouk.org>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200403150028.18630.pavouk@pavouk.org>
+Message-Id: <200403150014.27515.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,106 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 15 Mar 2004 00:28:18 +0100
+Date: Mon, 15 Mar 2004 00:14:27 +0100
 
-Hi,
+Dne po 15. b=F8ezna 2004 00:11 jste napsal(a):
+> Hi,
+>
+> > is this dongle supported? If so, I'll buy it imeditially, coz its SO
+> > small!! http://pcshop.pells.cz/img.asp?stiid=3D3483
+>
+> I don't know, if this dongle is supported, but I use MSI USB dongle, which
+> works great for me and is small and cheap on Czech market.
+> This dongle is for example here:
+> http://www.alzasoft.cz/DetailPage.asp?DPG=3D44722
 
-> I don't use RedHat, but in general there is not a big difference between
-> an executable file and an executable shell script. It is important that
-> the script is mode 755. However you can also put your script directly
-> into /etc/hotplug/net.agent.
+It's about 3x bigger then FujitsuSiemens :)
 
-I use net.agent from last hotplug tools.
+Michal
 
-Older net.agent, for example in Mandrake 9.2 doesn't have support for 2.6 
-kernel (Action "add", not "register").
-
-Script /etc/hotplug/net.agent is here:
------------------------------------------------------------------------
-#!/bin/bash
-#
-# Network hotplug policy agent for Linux 2.4 kernels
-#
-# Kernel NET hotplug params include:
-#
-#       ACTION=%s [register or unregister]
-#       INTERFACE=%s
-#
-# HISTORY:
-#
-# 25-Feb-2001   Special case ppp and similar (redhat)
-# 23-Jan-2001   Log invocation of "ifup" if debugging
-# 04-Jan-2001   Initial version of "new" hotplug agent.
-#
-# $Id: net.agent,v 1.15 2003/10/07 19:56:24 kroah Exp $
-#
-
-cd /etc/hotplug
-. hotplug.functions
-# DEBUG=yes export DEBUG
-
-if [ "$INTERFACE" = "" ]; then
-    mesg Bad NET invocation: \$INTERFACE is not set
-    exit 1
-fi
-
-case $ACTION in
-add|register)
-    # Don't do anything if the network is stopped
-    if [ ! -f /var/lock/subsys/network ]; then
-       exit 0
-    fi
-
-    case $INTERFACE in
-        # interfaces that are registered after being "up" (?)
-        ppp*|ippp*|isdn*|plip*|lo*|irda*|dummy*|ipsec*|tun*|tap*)
-            debug_mesg assuming $INTERFACE is already up
-            exit 0
-            ;;
-        # interfaces that are registered then brought up
-        *)
-            # NOTE:  network configuration relies on administered state,
-            # we can't do much here without distro-specific knowledge
-            # such as whether/how to invoke DHCP, set up bridging, etc.
-
-            # RedHat and similar
-            export IN_HOTPLUG=1
-            if [ -x /sbin/ifup ]; then
-                debug_mesg invoke ifup $INTERFACE
-                exec /sbin/ifup $INTERFACE
-            else
-                mesg "how do I bring interfaces up on this distro?"
-            fi
-            ;;
-    esac
-    mesg $1 $ACTION event not handled
-    ;;
-
-*)
-    debug_mesg NET $ACTION event not supported
-    exit 1 ;;
-
-esac
----------------------------------------------------------------------------------------
-When I click "connect" on my Zaurus, my linux desktop automatically configure 
-bnep0 interface.
-Config file is here: /etc/sysconfig/network-scripts/ifcfg-bnep0
-----------------------------------------------------------
-DEVICE=bnep0
-BOOTPROTO=static
-IPADDR=192.168.130.1
-NETMASK=255.255.255.0
-ONBOOT=no
----------------------------------------------------------
-
-If you want to have debug messages about hotplug, please uncomment this line:
-"DEBUG=yes export DEBUG" in file /sbin/hotplug.
-You found now debug messages in /var/log/messages.
-
-Best regards,
-
-Pavel Ruzicka
-
+>
+> Best regards,
+>
+> Pavel Ruzicka
 
 
 -------------------------------------------------------
