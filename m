@@ -1,35 +1,60 @@
-Return-Path: <xavier@xgarreau.org>
-From: Xavier Garreau <xavier@xgarreau.org>
-To: Stefan Mischke <survivor@uni-paderborn.de>,
-   Xavier Garreau <x.garreau@prim-time.fr>
-Subject: Re: [Bluez-devel] Accessing HCI on Windows
-Date: Tue, 23 Mar 2004 21:47:40 +0100
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-References: <405FFCB9.5050507@uni-paderborn.de> <030001c410f8$62945a80$b67ba8c0@zaz1> <40607CB2.3050608@uni-paderborn.de>
-In-Reply-To: <40607CB2.3050608@uni-paderborn.de>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: "Antony C. Roberts" <acr@acroberts.com>
+To: <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200403232147.41149.xavier@xgarreau.org>
-List-ID: <bluez-devel.lists.sourceforge.net>
+	charset="us-ascii"
+In-Reply-To: <20040323173139.19B991D01C5@sc8-sf-uberspam1.sourceforge.net>
+Message-Id: <20040323183316.0D30C5EE02E@pfepb.post.tele.dk>
+Subject: [Bluez-devel] RE: Accessing HCI on Windows
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 23 Mar 2004 19:33:23 +0100
 
-> But the Com One drivers ARE Widcomm drivers. So where is the difference?
+Check out FreeBT (www.freebt.net) it's open source and includes the full
+source code to a Generic Windows Bluetooth USB Driver as well as various
+levels of HCI abstraction (with full access to the HCI layer) in C++.
 
-Ouch, i've been to their website and saw the new drivers ... What i did worked 
-with tech0776 and they were not from widcomm ...
+Regards,
+Antony C. Roberts.
 
-> Anyway I tried to install the Com One drivers by outcommenting the
-> "ExcludeFromSelect" in the .inf file. As a result, the driver
-> installation doesn't recognize the fake, but when I try to start the
-> Bluetooth Software it says "Your Bluetooth license does not include use
-> with this Bluetooth device". After clickeng "Ok" it asks for a license
-> file. The license file from my original drivers does not work (version
-> differs?). So how can I do it?
+> Hello folks,
+> 
+> I'm quite new to this "professional developer stuff" and mailing lists
+> (so far only used to forums), so sorry if I do something wrong here.
+> 
+> I'm writing a little "Location Awareness using Bluetooth"-thing for my
+> Bachelor of CS degree. On Linux, everything is fine and I just have to
+> look into the  BlueZ code. But it would be nice if there was a
+> possibility to port my work to Windows. Unfortunately I have found no
+> documentation about how to access the HCI on Windows. All I need would
+> be a simple "SendHCICommand()" or something. My Question: Does anyone
+> know how to do this? Do I have to deal with the Widcomm drivers (seem to
+> be monopolists) or is there a common way?
+> 
+> I know that this is not a Windows mailing list, but I just don't know
+> where else to ask. I'd really appreciate any help or hint. Thanks in
+> advance!
+> 
+> Kind regards
+> Stefan
 
-Well, it looks like you'll have to code the usb to H4 driver yourself ...
 
-Regards
--- 
-Xavier Garreau <xavier@xgarreau.org>
-http://www.xgarreau.org/
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
