@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Michal Semler <cijoml@volny.cz>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] BlueZ licensing inquiry
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <OF200FCC20.5703443A-ON48256FD3.001D7002-48256FD3.001DBAF3@lexmark.com>
 In-Reply-To: <OF200FCC20.5703443A-ON48256FD3.001D7002-48256FD3.001DBAF3@lexmark.com>
-References: 
-	 <OF200FCC20.5703443A-ON48256FD3.001D7002-48256FD3.001DBAF3@lexmark.com>
-Content-Type: text/plain
-Message-Id: <1112075079.9016.58.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200503290736.20676.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,23 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Mar 2005 07:44:39 +0200
+Date: Tue, 29 Mar 2005 07:36:20 +0200
 
-Hi Gail,
+It is GPL project :)
 
+Dne =FAt 29. b=F8ezna 2005 7:23 gcagasan@lexmark.com napsal(a):
 > I would like to know, what is the licensing for BlueZ?  Are there any
-> issues from a legal or licensing stand-point if we port it to another
-> OS?  
+> issues from a legal or licensing stand-point if we port it to another OS?
+>
+> thanks,
+> Gail Cagasan
+> Lexmark Research and Development Corp.
 
-the license of the BlueZ source code is GPL. However I am not sure if it
-makes sense at all to port it to another operating system. The kernel
-part is deeply based on Linux specific structures.
+=2D-=20
+S pozdravem
 
-Regards
-
-Marcel
-
-
+Michal Semler
 
 
 -------------------------------------------------------
