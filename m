@@ -1,8 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: "Sonia A." <sonia_abos@yahoo.es>
-Message-ID: <cnsd34$7uc$1@sea.gmane.org>
-Subject: [Bluez-users] connection_handle info
+To: <bluez-users@lists.sourceforge.net>
+Message-ID: <1101115999.41a1b25f6a2c3@home.euronet.nl>
+From: <jeroen.koekkoek@euronet.nl>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Bluez-users] Zeevo TC2001P
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -14,22 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Nov 2004 10:57:39 +0100
+Date: Mon, 22 Nov 2004 10:33:19 +00100 (MET)
 
-Hi everybody!
+Hey everybody,
 
-One of the parameters in the HCI_DISCONNECT primitive is the
-Connection_handle which should identify which connection we are trying to
-disconnect. Does somebody know where and how I can find this
-connection_handle
-value?
+I bought an iPAQ 2210 and installed Linux on it, the problem is I can't g=
+et=20
+bluetooth to work. The chipset used is a Zeevo TC2001P, I know questions =
+about=20
+this have been asked, but I really like to get bluetooth working. Can any=
+one=20
+tell me where to start. I am willing to port or write a driver myself.
 
-Thanx in advance,
+Regards,
 
-Sonia
-
-
-
+Jeroen Koekkoek, student
 
 
 -------------------------------------------------------
