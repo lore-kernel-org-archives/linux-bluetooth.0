@@ -1,14 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
-Reply-To: tim@birdsnest.maths.tcd.ie
-To: bluez-users@lists.sourceforge.net
+From: Toby Fisher <toby@tjfisher.co.uk>
+To: "Nicholas A. Preyss" <nalp@gmx.net>
+cc: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Problems connecting to Nokia 6310I phone.
+In-Reply-To: <20040531115424.GA24449@gmx.net>
+Message-ID: <Pine.LNX.4.58.0405311422140.6611@sebagqbbe.gwsvfure.pb.hx>
 References: <Pine.LNX.4.58.0405302214280.8012@sebagqbbe.gwsvfure.pb.hx>
-In-Reply-To: <Pine.LNX.4.58.0405302214280.8012@sebagqbbe.gwsvfure.pb.hx>
+ <200405310213.25767.tim@birdsnest.maths.tcd.ie>
+ <Pine.LNX.4.58.0405311108560.10172@sebagqbbe.gwsvfure.pb.hx>
+ <20040531115424.GA24449@gmx.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200405311453.05771.tim@birdsnest.maths.tcd.ie>
+Content-Type: TEXT/PLAIN; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,112 +21,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 May 2004 14:53:04 +0100
+Date: Mon, 31 May 2004 14:24:40 +0100 (BST)
 
-On Sunday 30 May 2004 22:25, Toby Fisher wrote:
+On Mon, 31 May 2004, Nicholas A. Preyss wrote:
 
-> Thanks in advance for any pointers you can offer.
-
-Here's a log of mine connecting to GPRS through a Nokia 6310 -
-don't know if it's any use.
-
-Script started on Mon 31 May 2004 14:35:59 IST
-[tim@martha tim]$ su
-Password:=20
-[root@martha tim]# # Bluetooth switched on on laptop and phone
-[root@martha tim]# service bluetooth restart
-Shutting down Bluetooth: =1B[60G[  =1B[0;32mOK=1B[0;39m  ]=1B
-[60G[  =1B[0;32mOK=1B[0;39m  ]=0D
-Starting Bluetooth: =1B[60G[  =1B[0;32mOK=1B[0;39m  ]=1B[60G[  =1B[0;32mOK=
-=1B[0;39m  ]=0D
-[root@martha tim]# rfcomm bind 0 $PHONE 1
-[root@martha tim]# rfcomm -a
-rfcomm0: 00:02:EE:10:A5:BE channel 1 clean=20
-[root@martha tim]# pppd debug call O2
-[root@martha tim]# # ctrl-C
-[root@martha tim]# tail -30 /var/log/messages
-May 31 14:37:44 martha chat[4014]: send (ATD*99#^M^J^M)
-May 31 14:37:44 martha chat[4014]: expect (CONNECT)
-May 31 14:37:44 martha chat[4014]: ^M
-May 31 14:37:44 martha chat[4014]: ^M
-May 31 14:37:44 martha chat[4014]: OK^M
-May 31 14:38:14 martha chat[4014]: alarm
-May 31 14:38:14 martha chat[4014]: send (ATD*99#^M^J^M)
-May 31 14:38:15 martha chat[4014]: expect (CONNECT)
-May 31 14:38:15 martha chat[4014]: ^M
-May 31 14:38:15 martha chat[4014]: CONNECT
-May 31 14:38:15 martha chat[4014]:  -- got it=20
-May 31 14:38:15 martha chat[4014]: send (^M)
-May 31 14:38:15 martha pppd[4006]: Serial connection established.
-May 31 14:38:15 martha pppd[4006]: Using interface ppp0
-May 31 14:38:15 martha pppd[4006]: Connect: ppp0 <--> /dev/rfcomm0
-May 31 14:38:18 martha pppd[4006]: PAP authentication succeeded
-May 31 14:38:18 martha pppd[4006]: kernel does not support PPP filtering
-May 31 14:38:20 martha pppd[4006]: not replacing existing default route to=
+> On  0, Toby Fisher <toby@tjfisher.co.uk> wrote:
+> > On Mon, 31 May 2004, Timothy Murphy wrote:
+> > > Do you have=20
+> > > # CONFIG_BT_HCIUSB_SCO is not set
+> > > in .config (or /proc/config.gz) ?
+> > > On my machine (a Sony C1VFK Picturebook)
+> > > I had more or less your problems when this was set.
+> >=20
+> > The problem here is that I have a usb bluetooth device, so according to=
 =20
-eth0 [192.168.3.1]
-May 31 14:38:20 martha pppd[4006]: local  IP address 62.40.51.4
-May 31 14:38:20 martha pppd[4006]: remote IP address 10.6.6.6
-May 31 14:38:20 martha pppd[4006]: primary   DNS address 62.40.32.33
-May 31 14:38:20 martha pppd[4006]: secondary DNS address 62.40.32.34
-May 31 14:38:33 martha pppd[4006]: Terminating on signal 2.
-May 31 14:38:34 martha pppd[4006]: Connection terminated.
-May 31 14:38:34 martha pppd[4006]: Connect time 0.3 minutes.
-May 31 14:38:34 martha pppd[4006]: Sent 82 bytes, received 64 bytes.
-May 31 14:38:34 martha pppd[4006]: Connect time 0.3 minutes.
-May 31 14:38:34 martha pppd[4006]: Sent 82 bytes, received 64 bytes.
-May 31 14:38:34 martha pppd[4006]: Exit.
-[root@martha tim]# exit
-exit
-[tim@martha tim]$ exit
-Script done on Mon 31 May 2004 14:41:28 IST
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D /etc/ppp/peers/O2 =3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-rfcomm0 115200 crtscts
-connect '/usr/sbin/chat -v -f /etc/ppp/O2.chat'
-debug
-modem
-lock
-receive-all
-nodetach
-noipdefault
-defaultroute
-user gprs
-password gprs
-usepeerdns
-nobsdcomp
-nodeflate
-logfile "/home/tim/ppp.log"
-noauth
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > the kernel help I need this option, so yes, I do have it.
+>=20
+> You need the HCI_USB SCO option for audio transfer, only. For example if
+> you use the Headset or Handsfree profile. For data transfer there is no
+> need for SCO support. You are using RFCOMM which uses ACL links.
+> And >=3D 2.6.6-mh1 there shouldn't be any problems with the SCO
+> support activated.
+>=20
+> Maybe you can run hcidump while your problem appears and provide here
+> the log.
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D /etc/ppp/O2.chat =3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-TIMEOUT		5
-ABORT		'\nBUSY\r'
-ABORT		'\nERROR\r'
-ABORT		'\nNO ANSWER\r'
-ABORT		'\nNO CARRIER\r'
-ABORT		'\nNO DIALTONE\r'
-ABORT		'\nRINGING\r\n\r\nRINGING\r'
-''		\rAT
-TIMEOUT		30
-OK		ATH
-# OK		ATE1
-OK		ATE0
-OK		ATV1
-OK		'AT+CGDCONT=3D1,"IP","open.internet","",0,0'
-OK		'ATD*99#\r\n'
-CONNECT-ATD*99#\r\n-CONNECT		""
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Ok, I turned off the SCO options, but have another problem which was, I=20
+think, there earlier.  Anyway, if I issue the command:
+hciconfig hci0 reset
+it eventually says that it times out initialising the device, the hcidump=
+=20
+log is very short.
 
-=2D-=20
-Timothy Murphy =20
-e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
-tel: +353-86-2336090, +353-1-2842366
-s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
+Here it is;
+
+=04=00=00=00 1=BB@0k=03=00=01=03=10=00
+
+Itseem that it doesn't like being re-initialised.
+
+Cheers.
+
+--=20
+Toby Fisher=09Email: toby@tjfisher.co.uk
+Tel.: +44(0)1480 417272=09Mobile: +44(0)7974 363239
+ICQ: #61744808
 
 
 -------------------------------------------------------
