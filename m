@@ -1,19 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] AVDTP socket?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1101059050.7250.39.camel@pegasus>
-References: <418DB442.2050801@uen.org> <41925793.3050404@xmission.com>
-	 <1100113055.25879.73.camel@pegasus> <419543B3.8050601@xmission.com>
-	 <1100306337.7349.29.camel@pegasus> <41957BC1.507@xmission.com>
-	 <1100351199.7349.50.camel@pegasus> <41970F25.4020902@xmission.com>
-	 <1100446172.21403.16.camel@pegasus> <419B7292.9080706@xmission.com>
-	 <cbf0aec9041118052714481128@mail.gmail.com>
-	 <20041121064655.0b04dd8a.henryk@ploetzli.ch>
-	 <1101059050.7250.39.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1101093515.7250.97.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41A11DDB.8080708@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] BlueZ and the ALSA support
+References: <1100995285.7250.17.camel@pegasus>	 <41A027BD.5020401@xmission.com> <1101057242.7250.34.camel@pegasus>	 <41A0D34C.8070400@dark-reality.de> <1101061573.7250.68.camel@pegasus>	 <41A0F6F4.6070707@dark-reality.de> <1101069548.7250.77.camel@pegasus>	 <41A11275.1090108@dark-reality.de> <1101077143.7250.83.camel@pegasus>
+In-Reply-To: <1101077143.7250.83.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -25,43 +18,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Nov 2004 04:18:35 +0100
+Date: Sun, 21 Nov 2004 23:59:39 +0100
 
-Hi Henryk,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> > > I have problems synthesizing the PCM audio samples but can parse all
-> > > of the example SBC streams just fine.
-> > 
-> > Ok, catched it. I reimplemented the SBC analyzer and synthesizer  in
-> > Octave which is easier to play around with and found that my C
-> > synthesizer was working fine - on wrong subband samples. The bitstream
-> > unpacker had a bug which made it shift the incoming bits once to often. 
-> > 
-> > So sbc-test from the CVS is now able to decode 4 and 8 subband mono SBC
-> > files (there's something wrong with stereo, I'll look into that
-> > shortly). 
-> 
-> I was only able to decode 01, 03, 07 and 09. All other mono test files
-> are failing. However good work, because these four sound perfect.
+Marcel Holtmann wrote:
 
-I tested again all example files before you moved the bits array
-calculation into an own function. All of them sounded good.
+|
+|>Maybe we simply have to try what happens *shudder*... any ideas whom we
+|>could ask for more information? linux usb devlist?
+|
+|
+| when you try, expect kernel freezes or crashes. The only place to ask is
+| the Linux USB developer mailing list, but I think we should first clean
+| up our URB management mess.
+|
 
-With the latest code you still overwrite the stack at some point,
-because the pcm_sample[][] array is only 2x128 and you return 2x256
-samples from sbc_synthesize_audio() function.
+Could be a good idea.
 
-I also started to write a simple SBC play program using the libao. It
-works actually quite good linking your sbc.o file, but unfortunately
-with 2 channel files the left channel is silent.
+Maybe you could point out a document or write a short description what's
+going on right now, and how it should be solved correctly? Would help a
+lot to know what exists and where we should head to - if you already
+know, that is. If not, the status quo would be interesting none the
+less, from a logical point of view, not the code.
 
-We should start a new thread and discuss a SBC library.
+regards,
+~  Lars
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-Regards
-
-Marcel
-
-
+iD8DBQFBoR3aQWC6DTWkDAoRAuGmAJ0dNDmjdu0p0ouyJtuaHJbKwsXqBwCgoR6S
+yhoEfK49TZAkC4PHG3pU8cc=
+=CPm5
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
