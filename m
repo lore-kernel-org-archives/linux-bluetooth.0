@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Rainer Dorsch <rdorsch@web.de>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Setting up an hotplug connection with USB dongles
-References: <200411282132.37941.rdorsch@web.de> <200412192323.20579.rdorsch@web.de> <1103495289.29892.85.camel@pegasus>
-In-Reply-To: <1103495289.29892.85.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-15"
-Message-Id: <200412232343.45609.rdorsch@web.de>
+From: Jan Rychter <jan@rychter.com>
+Message-ID: <m2ekhg51v9.fsf@tnuctip.rychter.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] IOGear GBU311 support
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,109 +16,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Dec 2004 23:43:45 +0100
+Date: Thu, 23 Dec 2004 10:02:50 -0800
 
-Am Sonntag, 19. Dezember 2004 23:28 schrieb Marcel Holtmann:
-> Hi Rainer,
->
-> > thanks for that very useful link.
-> >
-> > If have everything up an running, only two minor issues left on the PANU
-> > side:
-> >
-> > 1. It seems that I need to do an "hcitool scan" to make pand --search
-> > working, e.g.
-> >
-> >               hcitool scan
-> >               pand --nodetach --role PANU --search --encrypt
-> > --pidfile /var/run/pand.pid
-> >
-> > It does work without hcitool scan, when I use the BT device address
-> >
-> >               pand --connect <BT device address>
-> >
-> > 2. On the client side, I do not get dhcp to work. When I run
-> >
-> >                dhclient bnep0
-> >
-> > I see on the PANU (from syslog):
-> >
-> > Dec 19 23:07:42 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
-> > port 67 interval 5
-> > Dec 19 23:07:42 topsi dhclient: send_packet: Network is down
-> > Dec 19 23:07:47 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
-> > port 67 interval 10
-> > Dec 19 23:07:47 topsi dhclient: send_packet: Network is down
-> > Dec 19 23:07:49 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
-> > port 67 interval 10
-> > Dec 19 23:07:49 topsi dhclient: send_packet: Network is down
-> > Dec 19 23:07:57 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
-> > port 67 interval 14
-> > Dec 19 23:07:57 topsi dhclient: send_packet: Network is down
-> > Dec 19 23:07:59 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
-> > port 67 interval 1
-> > Dec 19 23:07:59 topsi dhclient: send_packet: Network is down
-> > Dec 19 23:08:00 topsi dhclient: No DHCPOFFERS received.
-> > Dec 19 23:08:00 topsi dhclient: No working leases in persistent database.
-> > Dec 19 23:08:00 topsi dhclient: Sleeping.
-> > Dec 19 23:08:11 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
-> > port 67 interval 14
-> > Dec 19 23:08:11 topsi dhclient: send_packet: Network is down
-> > Dec 19 23:08:25 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
-> > port 67 interval 15
-> > Dec 19 23:08:25 topsi dhclient: send_packet: Network is down
-> > Dec 19 23:08:40 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
-> > port 67 interval 3
-> > Dec 19 23:08:40 topsi dhclient: send_packet: Network is down
-> > Dec 19 23:08:43 topsi dhclient: No DHCPOFFERS received.
-> > Dec 19 23:08:43 topsi dhclient: No working leases in persistent database.
-> > Dec 19 23:08:44 topsi dhclient: Sleeping.
-> >
-> > There is no entry in the syslog file in the DHCP server (which is NAP).
-> > Its dhcpd.conf looks like this:
-> >
-> > # Bluetooth
-> > subnet 192.168.2.0 netmask 255.255.255.0 {
-> >   range 192.168.2.100 192.168.2.150;
-> > #  option broadcast-address 204.254.239.31;
-> >   option domain-name "vix.com";
-> >   option domain-name-servers 192.168.2.1;
-> >   option broadcast-address 192.168.2.255;
-> >   option routers 192.168.2.1;
-> > }
-> >
-> > Any ideas are welcome.
->
-> as I said, use the standard Debian stuff for configuring the network
-> interfaces. If you got problems setup a bridge that covers all the PAN
-> connections.
->
+Hi,
 
-Marcel,
+I've just bought a rather nice USB bluetooth adapter, IOgear
+GBU311. It's a class 1 device.
 
-I used the Debian standard stuff (at least, as far as I am aware of it):
+lsusb shows it as four devices:
 
-rd@topsi:~$ grep bnep0 /etc/network/interfaces
-iface bnep0 inet dhcp
-rd@topsi:~$ cat /etc/bluetooth/pan/dev-up
-#!/bin/sh
-echo running dev-up
-ifup bnep0
-rd@topsi:~$
+Bus 001 Device 016: ID 0a5c:3503 Broadcom Corp. 
+Bus 001 Device 015: ID 0a5c:3502 Broadcom Corp. 
+Bus 001 Device 014: ID 0a5c:2009 Broadcom Corp. 
+Bus 001 Device 013: ID 0a5c:3535 Broadcom Corp. 
 
-Since this did not work, I run dhclient manually for debugging purposes.
 
-Is there anything which is more "standard" I can do?
+Bus 001 Device 014: ID 0a5c:2009 Broadcom Corp.
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               1.10
+  bDeviceClass          224 Wireless
+  bDeviceSubClass         1 Radio Frequency
+  bDeviceProtocol         1 Bluetooth
+  bMaxPacketSize0        64
+  idVendor           0x0a5c Broadcom Corp.
+  idProduct          0x2009
+  bcdDevice            1.00
+  iManufacturer           1 Broadcom
+  iProduct                2 BCM92035DGL
 
-Thanks,
-Rainer
+Are there any chances that this adapter will be supported soon?
 
--- 
-Rainer Dorsch
-Alzentalstr. 28
-D-71083 Herrenberg
-07032-919495
-Icq: 32550367
+thanks,
+--J.
+
 
 
 -------------------------------------------------------
