@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2e973d2e05032514275d90da67@mail.gmail.com>
-From: WEI LI <mail.wli@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] class of a radio
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <424418CA.5030809@gmx.ch>
+References: <424418CA.5030809@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1111759476.9195.121.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] How to set up a PAN using my laptop and cellphone
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,17 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 25 Mar 2005 14:27:27 -0800
+Date: Fri, 25 Mar 2005 15:04:36 +0100
 
-I have a laptop : linux 2.4.10,  with bluez-libs, bluez-utils
-installed, and internet access.
-and a cell phone: Nokia 6620.
-Can I set up a PAN  between this two devices  and enable the cellphone
-to browser webs sharing internet access with the laptop? How to do?
+Hi Marco,
 
-Thank u very much!
+> is it possible to get the class of the radio?
+> with class I mean it it's class1 (100m), class2 (10m) or class2 (don't know 
+> the distance).
 
-WEI
+not with the standard HCI commands as far as I know.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
