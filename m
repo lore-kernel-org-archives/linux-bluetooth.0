@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <424034A3.9070207@db.db>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: Bernhard Walle <bernhard.walle@gmx.de>
-Message-ID: <d1po3h$4p2$1@sea.gmane.org>
-References: <d1n8on$1e8$1@sea.gmane.org> <423F36FF.1020903@kawaiyume.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-In-Reply-To: <423F36FF.1020903@kawaiyume.net>
-Subject: [Bluez-users] Re: Yakumo
+Content-Type: text/plain; charset=us-ascii; format=flowed
+From: db <apemaia@gmail.com>
+Subject: [Bluez-users] which dongle?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,37 +16,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Mar 2005 19:30:20 +0100
+Date: Tue, 22 Mar 2005 16:07:15 +0100
 
-Hello,
+Hi,
 
-* sir [21.03.2005 22:05]:
-> Bernhard Walle a écrit :
-> 
->>is anyone using a Yakumo USB module class 1? Can you recommend this for
->>using on Linux?
->>
->>If not, any other recommendations for cheap class 1 modules?
-> 
-> I have a Yakumo USB key, and everything works great.
-> 
-> Can somebody tell me if multiconnection if possible ?
+I need a dongle that allows inquiry_with_RSSI .
 
-What is multiconnection? Is this a Yakumo specific problem?
+Could you tell me a list of models with this feature?
 
 
-Regards,
-Bernhard
 
--- 
+regards
+--
+dB
+
+
+
+
+
+
 
 
 
 -------------------------------------------------------
-This SF.net email is sponsored by: 2005 Windows Mobile Application Contest
-Submit applications for Windows Mobile(tm)-based Pocket PCs or Smartphones
-for the chance to win $25,000 and application distribution. Enter today at
-http://ads.osdn.com/?ad_id=6882&alloc_id=15148&op=click
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now.
+http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
