@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041019173356.20094.qmail@web61203.mail.yahoo.com>
+Message-ID: <20041019172746.69185.qmail@web61205.mail.yahoo.com>
 From: g m <nyc2kiev@yahoo.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-1320892418-1098207236=:15384"
-Subject: [Bluez-users] best bang for the buck BT CF card
+Content-Type: multipart/alternative; boundary="0-2081924210-1098206866=:69046"
+Subject: [Bluez-users] ambicom bt2000e (ericsson) compact flash card compatibility
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,36 +15,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 19 Oct 2004 10:33:56 -0700 (PDT)
+Date: Tue, 19 Oct 2004 10:27:46 -0700 (PDT)
 
---0-1320892418-1098207236=:15384
+--0-2081924210-1098206866=:69046
 Content-Type: text/plain; charset=us-ascii
 
-assuming i remain unsuccessful at getting my ambicom bt2000e card running, could any of you suggest some bt cf cards that you have running successfully under 2.6.8+ kernel? and how (using current cvs, bluetooth support as a module, etc.).
+i have had success using this card under the 2.4 kernel but, none under 2.6
  
-please don't link me to: http://www.holtmann.org/linux/bluetooth/devices.html
+i am using gentoo/2.6.8 with bluetooth support built into the kernel and everything else bt as modules
  
-as the reason i ask my question is that the list doesn't specify which kernel the devices are supported under. as well, i'm also looking for the most functionality i can out of a 1.1 (assuming the 2.0s aren't yet released) device.
+i am able to hciattach with the card being recognized through the serial.cs module but, am not obtaining a MAC address nor am i able to hciconfig up
+ 
+does anyone have any suggestions with regard to getting this card up and running?
+ 
+maybe all of this has been fixed already? should i try the cvs?
  
 tia
 
 		
 ---------------------------------
 Do you Yahoo!?
-vote.yahoo.com - Register online to vote today!
---0-1320892418-1098207236=:15384
+Yahoo! Mail - Helps protect you from nasty viruses.
+--0-2081924210-1098206866=:69046
 Content-Type: text/html; charset=us-ascii
 
-<DIV>assuming i remain unsuccessful at getting my ambicom bt2000e card running, could any of you suggest some bt cf cards that you have running successfully under 2.6.8+ kernel? and how (using current cvs, bluetooth support as a module, etc.).</DIV>
+<DIV>i have had success using this card under the 2.4 kernel but, none under 2.6</DIV>
 <DIV>&nbsp;</DIV>
-<DIV>please don't link me to: <A href="http://www.holtmann.org/linux/bluetooth/devices.html">http://www.holtmann.org/linux/bluetooth/devices.html</A></DIV>
+<DIV>i am using gentoo/2.6.8 with bluetooth support built into the kernel and everything else bt as modules</DIV>
 <DIV>&nbsp;</DIV>
-<DIV>as the reason i ask my question is that the list doesn't specify which kernel the devices are supported under. as well, i'm also looking for the most functionality i can out of a 1.1 (assuming the 2.0s aren't yet released) device.</DIV>
+<DIV>i am able to hciattach with the card being recognized through the serial.cs module but, am not obtaining a MAC address nor am i able to hciconfig up</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>does anyone have any suggestions with regard to getting this card up and running?</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>maybe all of this has been fixed already? should i try the cvs?</DIV>
 <DIV>&nbsp;</DIV>
 <DIV>tia</DIV><p>
-		<hr size=1>Do you Yahoo!?<br><a
-href="http://vote.yahoo.com">vote.yahoo.com</a> - Register online to vote today!
---0-1320892418-1098207236=:15384--
+		<hr size=1>Do you Yahoo!?<br>
+<a href="http://us.rd.yahoo.com/mail_us/taglines/virus/*http://promotions.yahoo.com/new_mail/static/protection.html">Yahoo! Mail</a> - Helps protect you from nasty viruses.
+--0-2081924210-1098206866=:69046--
 
 
 -------------------------------------------------------
