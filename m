@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Douglas Russell <puggy@gentoo.org>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <200405300037.53081.puggy@gentoo.org>
-Subject: [Bluez-users] hidd
+Subject: Re: [Bluez-users] Problem with slow Speed of Socket CF Card
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Wolfgang =?ISO-8859-1?Q?M=FCes?= <wolfgang@iksw-muees.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200405291139.54618.wolfgang@iksw-muees.de>
+References: <200405291047.20701.wolfgang@iksw-muees.de>
+	 <1085821206.3932.11.camel@pegasus>
+	 <200405291139.54618.wolfgang@iksw-muees.de>
+Content-Type: text/plain
+Message-Id: <1085824617.3932.34.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,29 +20,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 May 2004 00:37:48 +0100
+Date: Sat, 29 May 2004 11:56:58 +0200
 
-=2D----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Wolfgang,
 
-I'm assuming that hidd is the equivalent of bthid from utils2 in cvs. bthid=
-=20
-works fine, but with utils-2.7 (and libs-2.7) hidd gives me:
+> > this is simple. Try "hciattach <dev> socket 460800".
+> 
+> Been there - done that.
+> 
+> "BCSP initalisation timed out"
+> 
+> 230400 Baud is the only baud rate which is working. Do I need a special
+> version of the hciattach utility?
 
-Can't open HIDP control socket: Invalid argument
+check the mailing list archives for a thread about BCSP and changing the
+baud rate. This is not very easy and the CSR guys explained it in very
+details.
 
-whatever commands I choose.
+Regards
 
-Thanks in advance for any help.
+Marcel
 
-Puggy
-=2D----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
 
-iD8DBQFAuR7QXYnvgFdTojMRAofgAKDz8GT5mhIvCTE1sRvkH3iAGWUhhwCfdC5z
-WIJ4KRbdhza1cfdFN2//0mA=3D
-=3DER31
-=2D----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
