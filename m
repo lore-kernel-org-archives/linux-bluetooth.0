@@ -1,17 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] a2play and Toshiba SR-1 Bluetooth Headset
-Message-Id: <20041126045659.6a3291f5.henryk@ploetzli.ch>
-In-Reply-To: <1101440449.6465.64.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: Henryk =?ISO-8859-1?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+In-Reply-To: <20041125105615.GA19821@snoopy.src.ricoh.co.jp>
 References: <20041125091124.GA19805@snoopy.src.ricoh.co.jp>
-	<20041125112509.75347786.henryk@ploetzli.ch>
-	<20041125105615.GA19821@snoopy.src.ricoh.co.jp>
-	<1101440449.6465.64.camel@pegasus>
+	 <20041125112509.75347786.henryk@ploetzli.ch>
+	 <20041125105615.GA19821@snoopy.src.ricoh.co.jp>
+Content-Type: text/plain
+Message-Id: <1101440449.6465.64.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Fri__26_Nov_2004_04_56_59_+0100_F0PeclmoEXMH=W1E"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -23,46 +21,66 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Nov 2004 04:56:59 +0100
+Date: Fri, 26 Nov 2004 04:40:49 +0100
 
---Signature=_Fri__26_Nov_2004_04_56_59_+0100_F0PeclmoEXMH=W1E
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Alain,
 
-Moin,
+> actually I was just about to send a new mail to the mailing list.
+> Just looking at the BlueZ page, I saw that there is a new hcidump 
+> package so after updating I clearly saw the bitpool thing. I just
+> replaced the two hardcoded bitpool min and max by the one supported
+> by my headset and I got .....
+> 
+> hum ... weird sound :-(
+> 
+> well I can recognize my music but sometimes it's going faster, slower
+> then faster again .... 
+> 
+> seems also right and left channel are not same ... well can't be sure
+> about that because the sound is very weird ... 
+> 
+> I don't know what I can do else ... just let me know.
+> 
+> did you made any other modification to the CVS ? Just got it few hours ago 
+> so I think except this min/max thing nothing has changed.
 
-Am Fri, 26 Nov 2004 04:40:49 +0100 schrieb Marcel Holtmann:
+actually the discover shows more than one endpoint:
 
-> For me it is not clear if we have to set them, ignore them or what to
-> do with them. Do we have to insert the content protection header in
-> the media payload if these capability is present?
+      AVDTP(s): Discover rsp: transaction 0
+        ACP SEID 1 - Audio Sink
+        ACP SEID 3 - Audio Sink
+        ACP SEID 4 - Audio Source
 
-Obviously we may only insert the content protection header if we request
-content protection during set configuration. However, I don't remember
-any document requiring us to do that. I think Content protection is
-completely optional and we would only use that if we were a paranoid
-Sony device that believed everybody else on the planet was after us to
-steal our music.
+But we only request information about the first SEID. We need to change
+the code to actually request the capabilities of all endpoints so that
+they at least show up in a hcidump.
 
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+You can try to hack the a2play.c to use SEID 3 instead of 1 and see what
+the audio sink on SEID 3 offers you. Run the hcidump 1.15.
 
---Signature=_Fri__26_Nov_2004_04_56_59_+0100_F0PeclmoEXMH=W1E
-Content-Type: application/pgp-signature
+However the capabilities of SEID 1 shows the content protection:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
+      AVDTP(s): Capabilities rsp: transaction 1
+        Media Transport
+        Media Codec - SBC
+          44.1kHz 48kHz 
+          Mono DualChannel Stereo JointStereo 
+          4 8 12 16 Blocks
+          4 8 Subbands
+          SNR Loudness 
+          Bitpool Range 4-64
+        Content Protection
+          02 00 
 
-iD8DBQFBpqmQIjWgKE0OA2gRAleCAJ47hhnqpYCLumePiY6n32Vjl5UUmACfeHwo
-jEoyydMwZaDDcmFXVgd3pio=
-=BLo6
------END PGP SIGNATURE-----
+For me it is not clear if we have to set them, ignore them or what to do
+with them. Do we have to insert the content protection header in the
+media payload if these capability is present?
 
---Signature=_Fri__26_Nov_2004_04_56_59_+0100_F0PeclmoEXMH=W1E--
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
