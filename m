@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <AFE91B59A185A5439840B43AB7919047A83CA5@mchp997a.mch.sbs.de>
-From: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
-To: "'Bluez-devel@lists.sourceforge.net'"
-	 <Bluez-devel@lists.sourceforge.net>
+Message-ID: <41B7113A.9030701@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Bluez-devel] Re: Re: bluez & qos
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re: snd-bt-sco problem
+References: <20041206225609.GA1177@zeus.galaxy.org.uk> <cp3mkk$m7t$1@sea.gmane.org> <20041208103449.GC2258@zeus.galaxy.org.uk>
+In-Reply-To: <20041208103449.GC2258@zeus.galaxy.org.uk>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,26 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 8 Dec 2004 17:29:39 +0100
+Date: Wed, 08 Dec 2004 15:35:38 +0100
 
-Hi all!
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-Basically I want to do the same like Jean Tourrilhes two years ago,
-hoping that chips / firmware have better QoS support meanwhile: 
-"... I"m trying to get the latency under control. I"m using BNEP with a mix
-of TCP/IP traffic, ..."
+Chris Boyle wrote:
+| On Tue, Dec 07, 2004 at 08:37:56AM +0100, Sebastian Roth wrote:
 
-I searched the mailing archiv for QoS and found a lot of firmware specific
-discussion. 
+| As mentioned in reply to Brad Midgley, this established a successful
+| connection (pressing the volume buttons affected alsamixer), but I
+| still couldn't actually get any audio to flow in either direction,
+| despite continuous SCO data packets seen with hcidump, although only in
+| one direction.
 
-What I couldnt find, but what I would need first is a kind of QoS-Howto,
-explaining generally how to realize QoS with Bluez, i.e. how to control the
-maximum poll interval.
-It would be great to have some examplary code, that adjusts
-the poll interval with the HCI_QoS_Setup command or sth. like that.
+I just wanted to point out that the volume control messages are sent
+over the HCI channel, while audio data is send over the SCO channel.
+It's likely that if there's a problem with the SCO data transfer, the
+volume buttons will still work.
 
-thanks a lot, Matthias
+With my headset, I can hear the volume increasing because the noise gets
+loader.
 
+You could also try the "loopback" mode; just don't use any audio
+software, but activate the loopback i.e. in alsamixer by unmuting and
+then press the headset button to connect.
+
+Audio should than be routed back to the headset so you can "hear
+yourself". Makes it easier to determine whether there's a bluez/sco
+problem or something with your audio setup :)
+
+good luck,
+~  Lars
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFBtxE6QWC6DTWkDAoRAqVIAKC+2cyao0HoZPqBoK1rbwO6JbIHWwCgtEBN
+lLLFf5eU+dU34SiO3lwc17g=
+=G1e+
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
