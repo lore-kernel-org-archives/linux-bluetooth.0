@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] dd - device descriptor HELP :)
+Subject: Re: [Bluez-devel] Several bluetooth dongles at time
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <de33c8be05021107172b943a1e@mail.gmail.com>
-References: <de33c8be05021107172b943a1e@mail.gmail.com>
+In-Reply-To: <420CFEAD.2000202@uni-paderborn.de>
+References: <50142.195.22.30.15.1108037990.squirrel@195.22.30.15>
+	 <1108039290.15974.33.camel@pegasus>  <420CFEAD.2000202@uni-paderborn.de>
 Content-Type: text/plain
-Message-Id: <1108149073.18099.50.camel@pegasus>
+Message-Id: <1108148607.18099.42.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,22 +19,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 11 Feb 2005 20:11:13 +0100
+Date: Fri, 11 Feb 2005 20:03:27 +0100
 
-Hi Flavio,
+Hi Matthias,
 
-> I have two USB dongles connected to my pc. Using both of them in
-> MASTER mode, when i do one connection to another bluetooth device (i
-> was testing with a cell phone) for both dongles (hci1 and hci0) the
-> device descriptor for both connections is the same!!! Shouldn't they
-> be different?
-> And, apparently, because of this, when i try to set up the second
-> connection (connet my hci1 to the cell phone, when the hci0 is
-> allready conneted), it fails.
-> function used: dd = hci_open_dev(dev_id);
+> >>2) Can i have multiple connections on the same rfcomm channel? So more
+> >>than one mobile can connect to my server at time or only one device per
+> >>channel and i have to open more than one channel?
+> > 
+> > One connection per RFCOMM channel. On the RFCOMM level there is no
+> > further multiplexing.
+> So, if I have two phones that provide one service each, but both on the 
+> same rfcomm channel i will not be able to connect to both of them, right?
 
-what are you doing? I don't understand what's your problem. Be more
-specific. Show more code or commands.
+wrong. This limit is only a point-to-point limit. If you connect to
+another phone the underlaying ACL link is different and so you won't
+have any problem.
+
+If you have a phone that provides for example FAX and DUN on channel 1
+then you can't connect to FAX and DUN at the same time.
 
 Regards
 
