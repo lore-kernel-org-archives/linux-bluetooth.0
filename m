@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?koi8-r?b?6MXEyc4=?= <hedin@hiervard.ru>
-To: bluez-users@lists.sf.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200405192102.06654.hedin@hiervard.ru>
-Subject: [Bluez-users] BT3030
+Subject: Re: [Bluez-users] rfcomm confusion
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ken <a5a33956@telus.net>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40AB4D9F.7010307@telus.net>
+References: <40AB4D9F.7010307@telus.net>
+Content-Type: text/plain
+Message-Id: <1084969555.4327.60.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,16 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 May 2004 21:02:06 +0700
+Date: Wed, 19 May 2004 14:25:55 +0200
 
-Still can't understand. I got /sys, put firmware.agent to /etc/hotpug 
-(installed linux-hotplug package) and .BIN and .HEX files to 
-/usr/lib/hotplug/firware.
+Hi Ken,
 
-After plugging in the device and loading the module `bcm203x' it still gives 
-an -5 error about failing to load some mini-driver.
+> I am trying to create a bluetooth serial connection between my linux 
+> laptop and iPAQ pda.
 
-What the problem can be, please help!
+is this a Windows or a Linux based iPAQ?
+
+> I'm using the command "rfcomm connect hci0 00:11:22:33 1" and it appears 
+> to work.
+
+The <dev> is not the HCI device. It is the RFCOMM device you wanna
+create. So use "rfcomm0" or "0" for short.
+
+> the connection shows up on the iPAQ and when I go to the status it 
+> displays 0 bytes transfered - 0 bytes received.
+
+Where do you see this?
+
+> so, now i'm trying to send some data over this connection. my 
+> expectation was that i could do something like:
+> echo "test" > /dev/rfcomm0
+> and then see 4 bytes received on the iPAQ interface, however the byte 
+> counts on the ipaq remain 0.
+
+Actually this depends on the program on the other side. If it is a
+Windows iPAQ I don't know how they count the bytes.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
