@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v619)
-Message-Id: <D041B252-43B9-11D9-9BD7-00039390D626@pepper.com>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-To: BlueZ List Mailing <bluez-devel@lists.sourceforge.net>
-From: Michael Frey <mfrey@pepper.com>
-Subject: [Bluez-devel] hidd weirdness under 2.4.20
+From: Sebastian Eichner <mail@sebastian-eichner.de>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] A2DP working :-) , voice not :-(
+References: <200412010839.06669.mailsp@sebastian-eichner.de> <200412011224.29191.mail@sebastian-eichner.de> <1101900716.18840.69.camel@pegasus>
+In-Reply-To: <1101900716.18840.69.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200412011733.49899.mail@sebastian-eichner.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,23 +19,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 1 Dec 2004 11:55:32 -0500
+Date: Wed, 1 Dec 2004 17:33:49 +0100
 
-I am currently running with great success the hidd patch for 2.4.20 
-from Marcel.  However when using a bluetooth mouse and keyboard, I get 
-the following message from the kernel.
+Okay, well, shame on me...:
+The A2DP playback worked right out of the box, so i did not notice 
+that you have to press the connect button on the headphone to 
+establish a voice connection... 8-()
+Maybe we could add a note to the documentation...
 
-keyboard.c: can't emulate rawmode for keycode 272
-keyboard.c: can't emulate rawmode for keycode 272
-keyboard.c: can't emulate rawmode for keycode 272
-keyboard.c: can't emulate rawmode for keycode 272
+Anyway, now it all is working fantastic, i can listen to music 
+streaming right from my notebook, and chat via Skype with my headset.
 
-This seems to happen quite often, and sometimes I get extra characters 
-typed into my system randomly.
+Thanks a lot for your help and your work!
+It's amazing, i think i do not need my telephone anymore... ;-)
 
-Has anyone else seen this?  What could be causing this?
-
-Michael
+Sebastian
 
 
 
