@@ -1,74 +1,40 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] New keytab storage
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Fredrik Noring <noring@nocrew.org>
+Return-Path: <noring@nocrew.org>
+Subject: Re: [Bluez-devel] [PATCH] Bluetooth address specific device
+	configuration
+From: Fredrik Noring <noring@nocrew.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1075565012.14644.176.camel@akka.yeti.nocrew.org>
-References: <1075506991.14644.114.camel@akka.yeti.nocrew.org>
-	 <1075509170.3594.36.camel@pegasus>
-	 <1075510549.14644.135.camel@akka.yeti.nocrew.org>
-	 <1075511922.3594.49.camel@pegasus>
-	 <1075541234.14644.149.camel@akka.yeti.nocrew.org>
-	 <1075562590.2720.13.camel@pegasus>
-	 <1075563628.14644.161.camel@akka.yeti.nocrew.org>
-	 <1075564322.2720.42.camel@pegasus>
-	 <1075565012.14644.176.camel@akka.yeti.nocrew.org>
-Content-Type: text/plain
-Message-Id: <1075572088.2720.59.camel@pegasus>
+In-Reply-To: <1075564788.2720.49.camel@pegasus>
+References: <1075316178.553.18.camel@akka.yeti.nocrew.org>
+	 <1075355567.26729.65.camel@pegasus>
+	 <1075405154.22564.64.camel@akka.yeti.nocrew.org>
+	 <1075406315.22564.67.camel@akka.yeti.nocrew.org>
+	 <1075563018.2720.19.camel@pegasus>
+	 <1075564164.14644.167.camel@akka.yeti.nocrew.org>
+	 <1075564788.2720.49.camel@pegasus>
+Content-Type: text/plain; charset=iso-8859-1
+Message-Id: <1075565699.14644.186.camel@akka.yeti.nocrew.org>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 31 Jan 2004 19:01:28 +0100
+Date: Sat, 31 Jan 2004 17:15:00 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Fredrik,
+lör 2004-01-31 klockan 16.59 skrev Marcel Holtmann:
+> I have seen more. Also misplaced comments ;)
 
-> > But I think we should discuss some design goals of the new device manager.
-> 
-> Great idea. What's your plan for it?
+The "char *ref" comment in hcid.h? I understand the kernel people you
+referred to before use this type of comment as well. :)
 
-one of my big goals is to have a library with a much improved API. This
-means that all HCI related functions use the hci_* prefix and follow the
-naming scheme from the HCI part of the Bluetooth specification. But the
-HCI part should not be used for common applications. These applications
-should use bt_* functions that offer an enhanced functionality. For
-example setting the local name. The hci_* part only send the HCI
-command, while the bt_* stuff also stores the name in a database so it
-can be restored after reboot. I think you get the idea.
+The other three comments do not refer to the if:s but the code inside
+each if. So I don't think these are misplaced either.
 
-> > I don't see what kind of mess in "glib-ectomy" you mean, but go ahead
-> > and send a patch for it. 
-> 
-> Some bads, I think:
-> 
->   - The API can be improved
->   - Tons of ugly (even in opionon) typedef:s
->   - No style
+More places? That's the only comments I know of...
 
-in the early days the hcid depends on glib and this code is a small
-compat layer to be free from the glib. I wrote a similar replacement for
-utils2. May you want to take a look at the helper library.
+> This is too much and not needed, because we can use memset().
 
-Regards
+Sure.
 
-Marcel
+> And of course in this case inlining the function is a good idea.
 
+Why is that?
 
-
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Fredrik
