@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <412DC001.3000307@c-lab.de>
-From: Johannes <lintner@c-lab.de>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Problems with InputStream and OutputStream
+Subject: Re: [Bluez-users] l2cap question
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Christoph Torens <c.torens@web.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <opsdbdbhfdeocfdv@debian>
+References: <opsda220m9eocfdv@debian> <1093469385.537.17.camel@pegasus>
+	 <opsdbdbhfdeocfdv@debian>
+Content-Type: text/plain
+Message-Id: <1093516424.2581.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,25 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Aug 2004 12:48:33 +0200
+Date: Thu, 26 Aug 2004 12:33:44 +0200
 
-Hi,
+Hi Christoph,
 
-I have the following problem.
-I want to communicate from a mobile phone to an PC with the BlueZ-Stack 
-and backwards.
-In the beginning, I only want to sent short Strings. the way from the 
-phone to the PC works, but the way backwards won't run.
-The server side (PC) tells me, that it send the string (6 bytes long), 
-the client (phone) do receive a connection, but the transported String 
-is empty (is.read() = -1).
-Is it possible, that the BlueZ implementation is the problem? I am sure, 
-that my source (Java) works correct  (on my opinion the problem can 
-cause on two reasons: the BlueZ Stack or the Bluetooth-Stack on my 
-mobile phone).
-I were glad if someone can tell me something about this.
+> >> Does a Bluetooth USB-Dongle use isochronus USB transfers?
+> > It uses it for SCO support.
+> 
+> I read SCO is only (or mainly?) for speech.
+> I don't use speech, but I guess it is somehow used when
+> SCO is enabled in the config?
+> Is it used by "hciconfig hci0 up", too?
+> (This is making problems with some, but not all dongles)
 
-Greetings Johannes
+show me the "hciconfig -a" and "/proc/bus/usb/devices" for these dongles
+and I will mark them with broken SCO support.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
