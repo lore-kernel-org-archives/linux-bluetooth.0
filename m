@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Georg v. Zezschwitz" <gvz@work.de>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20040329230518.GD25439@smile.2scale.net>
+Subject: Re: [Bluez-devel] cvs software issues
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dariusz Swiderski <sfires@sfires.net>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <40680EB8.2070208@sfires.net>
+References: <40675F3B.5090704@sfires.net>
+	 <1080557069.2281.224.camel@pegasus>  <40680EB8.2070208@sfires.net>
+Content-Type: text/plain
+Message-Id: <1080561659.2281.236.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Suggestion for ANSI compliance for sdp.h
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,28 +19,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 30 Mar 2004 01:05:18 +0200
+Date: Mon, 29 Mar 2004 14:00:59 +0200
 
-Hi!
+Hi Dariusz,
 
-I just discovered why I was not able to compile OBEX
-support for kdebluetooth sucessfully.
+> > it should create it if it is missing.
+> 
+> apparently it doeas not:
+> sfires@snoopy:/home/storage/software/cvs/bluez/libs2$ ./bootstrap
+> configure.in: installing `./install-sh'
+> configure.in: installing `./mkinstalldirs'
+> configure.in: installing `./missing'
+> configure.in:19: installing `./config.guess'
+> configure.in:19: installing `./config.sub'
+> configure.in:19: required file `./ltmain.sh' not found
+> compat/Makefile.am: installing `./depcomp'
+> 
+> im not very goot with automake and autoconf sripts, but in utils and libs
+> this file, is pulled from cvs, and yes, i have seen the remark in attic ;)
 
-The reason is that the configure-checks are done
-with the compile-option "-ansi".
+it says so, but does this mean that it is not created ;)
 
-This fails for "sdp.h" at line 395, as the
-C++-notation "// comment" is used here.
+> > There is no planned coexisting of both version and if libs2 and utils2
+> > are ready for rollout it will replace the old one.
+> 
+> ok, i can live with this, but what about hcid? its not in utils2
 
-There is just one occurrence of this comment-style
-in sdp.h (and 9 others in other include libraries).
+I am not quite sure about the real future of hcid. We will have a
+replacement for it, but I want to redesign some parts of it.
 
-Would you mind to change these to ANSI style?
+> > Every program that uses the old library must rewritten to use the new
+> > one. Especially sdptool, pand and dund. The other big project is writing
+> > a new sdpd.
+> 
+> so who is doing what, and where can i help?:)
 
-Kind regards,
+At the moment nobody. So feel free to take the code and clean it up and
+make it libs2 compatible.
+
+Regards
+
+Marcel
 
 
-Georg
 
 
 -------------------------------------------------------
