@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Connection with a
-	phonestaysopenafterclosingRFCOMM channel
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.44.0503022328530.31250-100000@antilope>
-References: <Pine.LNX.4.44.0503022328530.31250-100000@antilope>
-Content-Type: text/plain
-Message-Id: <1109807677.8284.41.camel@pegasus>
-Mime-Version: 1.0
+From: Victor Shcherbatyuk <victor@win.tue.nl>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Connection with a phonestaysopenafterclosingRFCOMM
+ channel
+Message-ID: <Pine.LNX.4.44.0503022328530.31250-100000@antilope>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,39 +17,66 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 03 Mar 2005 00:54:37 +0100
+Date: Wed, 2 Mar 2005 23:58:47 +0100 (MET)
 
-Hi Victor,
+Hi Marcel,
 
-> 2.6.10-mh4  - did not help
+2.6.10-mh4  - did not help
 
-so this is still a problem with the current Bluetooth subsystem.
+lsmod - /proc/modules is empty, but i have no modules (everything i 
+need is compiled into kernel)...
 
-> lsmod - /proc/modules is empty, but i have no modules (everything i 
-> need is compiled into kernel)...
+l2cap:
+72:FF:28:C6:10:00 42:E4:11:DE:0F:00 1 3 0x0040 0x0043 1024 251 0x0
+00:00:00:00:00:00 00:00:00:00:00:00 4 19 0x0000 0x0000 48 48 0x0
+00:00:00:00:00:00 00:00:00:00:00:00 4 17 0x0000 0x0000 48 48 0x0
+00:00:00:00:00:00 00:00:00:00:00:00 4 1 0x0000 0x0000 672 0 0x0
+00:00:00:00:00:00 00:00:00:00:00:00 4 3 0x0000 0x0000 1024 0 0x0
 
-Too bad, because I don't know of any other way to check the module
-reference counting. If there is something wrong we would be sure that I
-have to look for that.
+Am I missing something?
 
-> l2cap:
-> 72:FF:28:C6:10:00 42:E4:11:DE:0F:00 1 3 0x0040 0x0043 1024 251 0x0
-> 00:00:00:00:00:00 00:00:00:00:00:00 4 19 0x0000 0x0000 48 48 0x0
-> 00:00:00:00:00:00 00:00:00:00:00:00 4 17 0x0000 0x0000 48 48 0x0
-> 00:00:00:00:00:00 00:00:00:00:00:00 4 1 0x0000 0x0000 672 0 0x0
-> 00:00:00:00:00:00 00:00:00:00:00:00 4 3 0x0000 0x0000 1024 0 0x0
+Regards,
+    Victor Shcherbatyuk.
 
-The L2CAP PSM 3 for RFCOMM is still connected. It's actually that what I
-expected.
+----- Original Message ----- 
+From: "Marcel Holtmann" <marcel@holtmann.org>
+To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+Sent: Wednesday, March 02, 2005 22:52
+Subject: Re: [Bluez-devel] Connection with a 
+phonestaysopenafterclosingRFCOMM channel
 
-> Am I missing something?
 
-No, because we should simply close the DLCI 0 when no other RFCOMM
-channel is open.
+> Hi Victor,
+> 
+>> The /proc/bluetooth/rfcomm/{dlc,sock} are empty upon completion of the 
+program. hcitool con gives:
+>> > ACL 00:0f:de:11:e4:42 handle 41  state 1 in SLAVE
+> 
+> and what does /proc/bluetooth/l2cap show?
+> 
+> In general if there are no more open RFCOMM channels, the DLCI 0 should
+> be closed and this should close the L2CAP connection on PSM 3. Seems
+> like we have a bug or a wrong reference counting somewhere. Please also
+> check lsmod for the "Used by" numbers. Do you see something unexpected.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-Regards
-
-Marcel
+-- 
 
 
 
