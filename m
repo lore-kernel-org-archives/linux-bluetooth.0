@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hidp report mode in 2.6.10?
+Subject: Re: [Bluez-users] Nokia 7610 file transfer to computer
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200412072348.46144.cijoml@volny.cz>
-References: <1102459374.10705.2.camel@saag.bunker.heddley.com>
-	 <200412072348.46144.cijoml@volny.cz>
+In-Reply-To: <1102438800.21032.3.camel@nephlim.homenet>
+References: <1102381335.13235.8.camel@nephlim.homenet>
+	 <1102406104.8447.15.camel@pegasus>
+	 <1102438800.21032.3.camel@nephlim.homenet>
 Content-Type: text/plain
-Message-Id: <1102478395.8447.56.camel@pegasus>
+Message-Id: <1102478181.8447.52.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,19 +20,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 08 Dec 2004 04:59:55 +0100
+Date: Wed, 08 Dec 2004 04:56:21 +0100
 
-Hi Michal,
+Hi Stefan,
 
-> it should be finally released as Marcel 2 mounths ago promised...
-> for 2.4 too! :)
+> sorry for bad news...
+> But your solution only fixed one problem. Now I can pair the device but
+> I cannot send more than one request to the computer.
+> 
+> After send a file, a business card or pairing I can't send anything to
+> computer until either the computer or the mobile phone is rebooted.
+> 
+> Is there another way to solve it?
 
-I never promised anything for 2.4 and the report mode support will never
-go into 2.4 at any time. If I get some extra time for looking at 2.4
-then you might see some backports of 2.6 features and the boot protocol
-support. However this is on the bottom of my todo list. Feel free to
-send me backported and full documented patches for easy integration into
-my Bitkeeper tree.
+is the ACL link still open? Check with "hcitool con". Run "hcidump -X"
+as root as I told you.
 
 Regards
 
