@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] it is possible to change the N inquiry <256
+Subject: Re: [Bluez-users] BCM2035
 From: Marcel Holtmann <marcel@holtmann.org>
-To: shukri <matrix230@yahoo.com>
+To: kidd <affix_kidd@hotmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040806073201.50482.qmail@web51810.mail.yahoo.com>
-References: <20040806073201.50482.qmail@web51810.mail.yahoo.com>
+In-Reply-To: <BAY22-DAV13yhauEzcT00002d29@hotmail.com>
+References: <BAY22-DAV13yhauEzcT00002d29@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1091783942.20839.81.camel@pegasus>
+Message-Id: <1091783888.20839.79.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,14 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 06 Aug 2004 11:19:02 +0200
+Date: Fri, 06 Aug 2004 11:18:08 +0200
 
 Hi,
 
-> im quite new to this BlueZ... i would like to ask is it possible to
-> change the Ninquiry to less than 256..?
+>    I have a development kit based on BCM2035 contains both USB and
+> Uart interface.
+>    The usb interface works well in bluez.but the UART seems can't be
+> attached to hci_uart driver.
+>    When I input: hciattach ttyS0 any 115200 flow
+>    response : hci packet error.
 
-I don't know what you are talking about. What are you trying to achieve?
+this not an error response of hciattach. Copy the correct error message.
 
 Regards
 
