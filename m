@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41EE6032.7070708@fastwebnet.it>
+Message-ID: <41EE4ACD.9070105@fastwebnet.it>
 From: WiseLYNX <wiselynx.naima@fastwebnet.it>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] bluetooth headset - connects but no audio
-References: <41EE3974.1010604@fastwebnet.it> <41EE5112.1040502@dark-reality.de> <41EE4ACD.9070105@fastwebnet.it> <41EE66A2.1040106@dark-reality.de>
-In-Reply-To: <41EE66A2.1040106@dark-reality.de>
+References: <41EE3974.1010604@fastwebnet.it> <41EE5112.1040502@dark-reality.de>
+In-Reply-To: <41EE5112.1040502@dark-reality.de>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,35 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 19 Jan 2005 14:27:14 +0100
+Date: Wed, 19 Jan 2005 12:55:57 +0100
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-| Sounds like it might be the fault of the dongle, or the bluez stack has
-| an issue with it. Did you try with M$windows?
+| Do you have another dongle available to test this? I use an epox bt-dg0=
+3.
 
-no, nor I can try. my pc is M$ stuff free :)
+sure, I'll have a try with the dongle of a friend of mine. what's sure
+is that with my dongle on another computer, the headset doesn't work..
 
-| no, it's not patched with mh1. Best thing would be to use the vanilla
-| kernel (i.e. get it directly from kernel.org) and patch it with -mh1
-| patchset from bluez. I'm using gentoo, too, btw, so it should work this
-| way.
+| What kernel version do you use? Make sure it's 2.6.10 and you have the
+| -mh1 patches added.
 
-I'd rather keeping the gentoo-dev kernel. isn't it possible to patch it?
+the kernel is a 2.6.10-r5 from gentoo; I don't know if it's patched, but
+I'll check
 
-| it should. You can use this as the simplest and fool-proof testing
-| method, as it does not involve any alsa library stuff beyond the
-| snd-bt-sco-kernel module itself, so there are not many other error
-| sources than the dongle and the headself itself.
+| you might also want to try to fire up alsamixer [-c1] and enable the
+| "loopback" so that you can/should hear yourself (simply fires back the
+| audio to the headset directly).
 
-I'll have another try so..
-
-| Maybe there's a problem with the hci_usb implementation for your dongle=
-...
-
-I'll try with another dongle when I'll be able to (it belongs to a
-friend of mine, I should see him soon)
+I tried alsamixer, and could set the volume level (and even hear the
+hissing sound become louder or weaker). I can't remember if unmuting the
+loopback didn't simply work, or if I wasn't able to unmute, for a reason
+or another it didn't work :(
 
 - --
 
@@ -67,9 +63,9 @@ r%>++ y-->+
 Version: GnuPG v1.2.4 (GNU/Linux)
 Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
 
-iD8DBQFB7mAxkYE9G6fXLlgRAun5AJ9mdIGObx0aPoUBuLj06NF+IDfmWQCfc7Ov
-clpfM3jtfJh64bi2Ja4jMRE=3D
-=3D7DWM
+iD4DBQFB7krMkYE9G6fXLlgRAvA8AJIDNTQwrv4ts3S8R4hVgei/7ceKAJ0TNine
+bTEflMqvhHQXNsjSnli0TA=3D=3D
+=3DWjwi
 -----END PGP SIGNATURE-----
 
 
