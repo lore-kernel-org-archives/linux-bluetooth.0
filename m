@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hciconfig option problem
+Subject: Re: [Bluez-users] hci_uart and Ambicom BT2000E
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Varat Chaikasetsin <varat_c@hotmail.com>
+To: Daniel Jimenez <djimenez@pobox.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY14-F48FrYILoygXL00038090@hotmail.com>
-References: <BAY14-F48FrYILoygXL00038090@hotmail.com>
+In-Reply-To: <4075EAF9.8060801@pobox.com>
+References: <40743AAE.4070808@pobox.com> <1081418373.2970.6.camel@pegasus>
+	 <4075EAF9.8060801@pobox.com>
 Content-Type: text/plain
-Message-Id: <1081534665.26610.18.camel@pegasus>
+Message-Id: <1081534461.26610.15.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,16 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 09 Apr 2004 20:17:46 +0200
+Date: Fri, 09 Apr 2004 20:14:21 +0200
 
-Hi Varat,
+Hi Daniel,
 
->          I'm so sorry to say that I'm not quite understanding what you say 
-> "send me a patch for the hciemu program ". Poor me -_-.
+> > you should check how many hcid you have running. There must only be one.
+> 
+> Do you mean by doing hciconfig -a? I only see one interface that way.
 
-the hciemu only supports a small subset of HCI commands. If you miss one
-like HCI_Read_Local_Name or HCI_Write_Local_Name, go ahead and implement
-it and send me a patch.
+check it with "ps x".
+
+> > The other problem is that not every serial based PCMCIA card works right
+> > now with the 2.6 kernel. Some do and some don't and actually this is a
+> > problem in the serial subsystem, but I don't know where.
+> 
+> Interesting and disappointing. I bought this card because I thought it 
+> worked based on the hardware list :(. What can I do to find out if it's 
+> the card?
+
+I tested a Pretec card with an Ericsson chip on it and the card don't
+works either, but sometimes I get some bytes. I don't have enough time
+to dig deeper into it, but it must be possible to use these cards with
+serial_cs and hci_uart.
 
 Regards
 
