@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040503184147.83583.qmail@web61102.mail.yahoo.com>
-From: arundeep Singh <arundeep78@yahoo.com>
-To: bluez users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] configuring bluetooth device
+Subject: Re: [Bluez-users] Oops in hci_usb
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Riku Voipio <riku.voipio@iki.fi>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040501173626.GA3866@kos.to>
+References: <20040501173626.GA3866@kos.to>
+Content-Type: text/plain
+Message-Id: <1083587205.4666.0.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,36 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 3 May 2004 11:41:47 -0700 (PDT)
+Date: Mon, 03 May 2004 14:26:45 +0200
 
-I am working on 2.6.4 kernel. I am trying to configure my bluetooth usb
-dongle by widcomm on my PC. but remain unable to. 
+Hi Riku,
 
-bluez is there on the system. but i didn't find few of the config
-files. and also the there is no such device name hci0 or so in /dev
-directory.
+> Just found an oops, by usinh thinkpax x40:s enable/disable bluetooth
+> button to disable the bluetooth radio... Like I forgot to say in the
+> previous mail, please CC me, not subscribed and the archives seem not to
+> work.
 
-please tell me what are the exact step to configure a bluetooth device.
-and also to check whether it will work or not.
+do you enabled CONFIG_BT_HCIUSB_SCO in your kernel? If yes, disable it
+and try again.
 
-thanks in advance
+Regards
 
-=====
-Arundeep Singh,
-M.Tech (IS), IIIT Allahabad, 
-U.P, India. 
-ph: 09415262466, 09417066713
-http://www.i-cognition.com
-
-Don't take life seriously, as you can't come out of it alive.
+Marcel
 
 
-	
-		
-__________________________________
-Do you Yahoo!?
-Win a $20,000 Career Makeover at Yahoo! HotJobs  
-http://hotjobs.sweepstakes.yahoo.com/careermakeover 
 
 
 -------------------------------------------------------
