@@ -1,14 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Little Hexdump-Patch for hcidump
+Subject: Re: [Bluez-devel] Fighting with SCO
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Till Harbaum <till@harbaum.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200408262230.37213.till@harbaum.org>
-References: <50BF37ECE4954A4BA18C08D0C2CF88CB2364EC@exmail1.se.axis.com>
-	 <200408262035.25412.till@harbaum.org> <1093548032.2581.44.camel@pegasus>
-	 <200408262230.37213.till@harbaum.org>
+Cc: Till Harbaum <harbaum@beecon.de>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200408262229.26435.till@harbaum.org>
+References: <200408261852.56641.harbaum@beecon.de>
+	 <200408262000.07077.till@harbaum.org> <1093548184.2581.48.camel@pegasus>
+	 <200408262229.26435.till@harbaum.org>
 Content-Type: text/plain
-Message-Id: <1093559162.2581.74.camel@pegasus>
+Message-Id: <1093552593.2581.69.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,20 +21,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 27 Aug 2004 00:26:02 +0200
+Date: Thu, 26 Aug 2004 22:36:33 +0200
 
 Hi Till,
 
-> > with a deeper indentation this output will cross the 78 chars width
-> Ok, i usually use xterms and just make them wider ...
+> > do you played with the PS key settings, because the default for the Acer
+> > was sending SCO traffic over the PCM interface. Use the revision command
+> > to check where the SCO traffic is routed through.
+> No, i didn't. The factory settings of my BT-600 are:
 
-me too, but there are some people who will use hcidump on a console.
+so the guys from Acer learned something ;)
 
-> > marker and so I included it as another dump option. You must use -X to
-> > activate this ext_dump() feature.
-> Very cool, thanks a lot!
+> phobos:/home/harbaum # hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:02:72:B1:59:03 ACL MTU: 192:8  SCO MTU: 64:8
+>         HCI 16.4
+>         Chip version: BlueCore02
+>         Max key size: 56 bit
+>         SCO mapping:  HCI
+> 
+> But so says the DBT-120 dongle i did not have success with:
+> hci0:   Type: USB
+>         BD Address: 00:0D:88:C0:3C:E4 ACL MTU: 192:8  SCO MTU: 64:8
+>         HCI 15.3
+>         Chip version: BlueCore02
+>         Max key size: 56 bit
+>         SCO mapping:  HCI
+> 
+> I tried this command at work with the microsoft dongle, but the i only got 
+> 16.1 as the hci version and then the program hanged. The kernel log showed 
+> some hci timeouts.
 
-You are welcome.
+Maybe this depends on the USB host controller chip. I got reports that
+some ALI chips misbehave when it comes to ISOC transfers. If you have
+access to MacOS X you can unpack the firmware update from Apple and use
+GenericCSR.dfu and btdfu-0.3 to update your D-Link dongle to HCI 18.1
+and HID proxy. Don't try this if it is a revision B4 dongle.
+
+You should also check that the SCO support for the hci_usb driver was
+compiled in.
 
 Regards
 
