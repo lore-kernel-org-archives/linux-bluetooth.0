@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Once again: Socket CF card and Kernel 2.6
-From: Erwin Authried <eauth@softsys.co.at>
+Message-ID: <1110013987.422978238ef72@mail.orbitel.bg>
+From: Todor Todorov <dr_doom@engineer.bg>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <42294598.6010004@adamis.de>
-References: <20050226031901.GL11723@adamis.de>
-	 <1109578431.17256.9.camel@pegasus>  <20050228220209.GA8151@adamis.de>
-	 <1109665776.17256.122.camel@pegasus>  <42294598.6010004@adamis.de>
-Content-Type: text/plain
-Message-Id: <1110014266.13601.10.camel@kabel>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] BNEP connection destroing :(
+References: <1109664374.42242276c644b@mail.orbitel.bg>  <1109691651.42248d0394218@mail.orbitel.bg> <1109697370.17256.174.camel@pegasus>
+In-Reply-To: <1109697370.17256.174.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=windows-1251
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,35 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 05 Mar 2005 10:17:46 +0100
+Date: Sat,  5 Mar 2005 11:13:07 +0200
 
-On Sat, 2005-03-05 at 06:37, Mathias Adam wrote:
-> Hi,
+> Hi Todor,
 > 
-> I just got it working by doing a little change in the serial driver 
-> (8250.c). I tested it with 2.6.11 but I think it could work for any 2.6 
-> kernel.
+> > < HCI Command: Disconnect (0x01|0x0006) plen 3
+> >     handle 41 reason 0x13
+> >     Reason: Remote User Teminated Connection
 > 
-> Marcel Holtmann schrieb:
-> > I am not an serial card expert. This is a problem in the serial
-> > subsystem and a BlueZ problem.
+> this means that we terminate the connection. This is funny, because I
+> have no idea why that happens. Maybe you should use a 2.6.11-rc5 kernel
+> instead of an old 2.4 kernel.
 > 
-> That proved to be true.
+> Regards
 > 
-> Marcel: One thing I discovered while debugging this: the hci_uart driver 
-> seems to initialize the actual UART with only 230400 baud. Is this 
-> really the case or are those UARTs clocked at nonstandard (higher) 
-> frequencies so that this setting does result in a higher real baud rate?
+> Marcel
 
-I can't say for sure if that applies to your specific CF card, but
-usually PCMCIA/CF uarts are just register-compatible emulations of a
-standard uart, and the clockrate doesn't matter at all. The actual data
-rate can be very high.
+OK. After few days of testing with the latest - 2.6.11 kernel, i can confurm that the problem is fixed :).
 
-Regards,
-Erwin
-
-
+Thanks  Marcel.
 
 
 -------------------------------------------------------
