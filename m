@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41FE76DA.6000201@tootai.net>
-From: administrator tootai <admin@tootai.net>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Connection issue with headset
-References: <41FA06A5.3010904@tootai.net> <ctdn6n$sqs$1@sea.gmane.org>	 <41FE4744.5010804@tootai.net> <1107183514.7902.13.camel@pegasus>	 <41FE4F1F.9080201@tootai.net> <1107186911.7902.16.camel@pegasus>
-In-Reply-To: <1107186911.7902.16.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: Re: [Bluez-users] Can't connect RFCOMM socket
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050131163631.39991.qmail@web53205.mail.yahoo.com>
+References: <20050131163631.39991.qmail@web53205.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1107191250.7902.32.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,51 +18,71 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 Jan 2005 19:20:10 +0100
+Date: Mon, 31 Jan 2005 18:07:30 +0100
 
-Marcel Holtmann a =E9crit :
+Hi Filipa,
 
->Hi Daniel,
->
-> =20
->
->>>what is in /proc/bus/usb/devices? I think that this dongle don't has t=
-he
->>>needed USB ISOC endpoints for SCO data.
->>>=20
->>>
->>>     =20
->>>
->>This is not a dongle output, it's the headset one. Here is the output o=
-f=20
->>devices.
->>   =20
->>
->
->then forget what I said. You have a CSR dongle with HCI 16.4 and this
->should work fine.
-> =20
->
-Then is it normal that hcitool scan <btaddr> doesn't find the headset as=20
-hcitool info <btaddr> is ok? Meanwhile, I CVS the latest btsco, rebuild=20
-everything and tested with the mpg123 sample with a2play. Here the=20
-result from output:
+> Marcel, many thanks for your help, but I still
+> couldn't connect to my friend PC. So I decided to
+> connect to a mobile phone first. It is an Sony
+> Ericsson Z600.
+> 
+> The 'hcitool scan' shows me the phone and the phone
+> also recognize my laptop. After this, I did a 'rfcomm
+> bind' on the laptop.
+> 
+> When I try to connect the mobile phone to my laptop,
+> the mobile phone asks me the passkey. When I
+> introduced the PIN (the same I have defined in the
+> /etc/bluetooth/pin) the reply on the phone is 'passkey
+> mismatch'.
+> 
+> Here is the output of the 'hcidump -X':
+> HCIDump - HCI packet analyzer ver 1.16
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> > HCI Event: Connect Request (0x04) plen 10
+>   0000: b4 db c9 d9 0a 00 04 02  52 01      ........R.
+> < HCI Command: Accept Connection Request (0x01|0x0009)
+> plen 7
+>   0000: b4 db c9 d9 0a 00 01                .......
+> > HCI Event: Command Status (0x0f) plen 4
+>   0000: 00 01 09 04                         ....
+> > HCI Event: PIN code Request (0x16)plen6
+>   0000: b4 db c9 d9 0a 00                   ......
+> < HCI Command: PIN Code Request Reply (0x01|0x000d)
+> plen 23
+>   0000: b4 db c9 d9 0a 00 05 42  6c 75 65 5a 00 00 00
+> 00          .......BlueZ....
+>   0010: 00 00 00 00 00 00 00                .......
+> > HCI Event: Command Complete (0x0e) plen 10
+>   0000: 01 0d 04 00 b4 db c9 d9  0a 00      ..........
+> < HCI Command: PIN Code Request Reply (0x01|0x000d)
+> plen 23
+>   0000: b4 db c9 d9 0a 00 05 42  6c 75 65 5a 00 00 00
+> 00          .......BlueZ....
+>   0010: 00 00 00 00 00 00 00                .......
+> > HCI Event: Command Complete (0x0e) plen 10
+>   0000: 01 0d 04 00 b4 db c9 d9  0a 00      ..........
+> > HCI Event: Connect Complete (0x03) plen 11
+>   0000: 05 29 00 b4 db c9 d9 0a  00 01 00  
+> .).........
+> 
+> Could you please help me with this output? I am not
+> sure what it means, if the PIN helper is working or
+> not...
+> 
+> If it is not the PIN helper, could you give any
+> directions to look for the problem?
 
-MPEG 1.0 layer III, 128 kbit/s, 44100 Hz joint-stereo
-subbands =3D 1
-allocation method =3D 1
-channel_mode =3D 2
-blocks =3D 3
-sampling frequency =3D 2
-bitpool =3D 32
-frame len =3D 72
-Using address: 00:0b:2e:06:01:2e
-Can't connect to 2E:01:06:2E:0B:00. Invalid argument(22)
-cannot open psm_cmd =3D 0
+it looks like you have two instances of hcid running. This is bad. Kill
+one and make sure that you restart the other one. The PIN you have to
+enter in your phone is "BlueZ" according to this log.
 
-Many thanks for your help.
---=20
-Daniel
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
