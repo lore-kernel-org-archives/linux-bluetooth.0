@@ -1,21 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+Message-ID: <41A3FD27.6060400@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] audio problems with a2play
-Message-Id: <20041124034710.11f2673d.henryk@ploetzli.ch>
-In-Reply-To: <1101244496.27351.29.camel@pegasus>
-References: <41A22C0B.4050008@xmission.com>
-	<41A234FA.7020303@xmission.com>
-	<20041123033429.132bf84b.henryk@ploetzli.ch>
-	<41A2B331.4010001@xmission.com>
-	<20041123070621.50569968.henryk@ploetzli.ch>
-	<41A3471C.4000602@xmission.com>
-	<20041123203836.046fb4f4.henryk@ploetzli.ch>
-	<1101244496.27351.29.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Wed__24_Nov_2004_03_47_10_+0100_Hb+4+vbb92W0QmBh"
+References: <41A22C0B.4050008@xmission.com>	<41A234FA.7020303@xmission.com>	 <20041123033429.132bf84b.henryk@ploetzli.ch>	 <41A2B331.4010001@xmission.com>	 <20041123070621.50569968.henryk@ploetzli.ch>	 <41A3471C.4000602@xmission.com>	 <20041123203836.046fb4f4.henryk@ploetzli.ch>	 <41A3ACE2.4030501@xmission.com> <1101246735.27351.45.camel@pegasus>
+In-Reply-To: <1101246735.27351.45.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -27,42 +18,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Nov 2004 03:47:10 +0100
+Date: Tue, 23 Nov 2004 20:16:55 -0700
 
---Signature=_Wed__24_Nov_2004_03_47_10_+0100_Hb+4+vbb92W0QmBh
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Guys,
 
-Moin,
+If I'm understanding right, the payload should include the sbc_info 
+header. I thought all along that was just for the purpose of storing the 
+sbc in a file, but it sounds like the headset needs it.
 
-Am Tue, 23 Nov 2004 22:14:56 +0100 schrieb Marcel Holtmann:
+Is this closer? It doesn't sound right yet, but maybe we really do need 
+to load up the packet to be closer to the mtu in order for the headset 
+to be happy.
 
-> so should it be and I got a trace from a friend with a prototype A2DP
-> device with a Zeevo ZV4002 and a Bluetooth stack from Impulsesoft.
-> They actually do it this way, but GCT puts in 0xff 0xff.=20
+                 memcpy(buf + sizeof(packet_header), &payload_header, 
+sizeof(payload_header));
+-               size = read(fd, buf + sizeof(packet_header) + 
+sizeof(payload_header), frame_len);
++               memcpy(buf + sizeof(packet_header) + 
+sizeof(payload_header), &sbc_info, sizeof(sbc_info));
++               size = read(fd, buf + sizeof(packet_header) + 
+sizeof(payload_header) + sizeof(sbc_info), frame_len);
+                 seq_num++;
+                 if (size != frame_len) {
+                         terminate = 1;
+                 } else {
+-                       write(streamfd, buf, size + 
+sizeof(packet_header) + sizeof(payload_header));
++                       write(streamfd, buf, size + 
+sizeof(packet_header) + sizeof(payload_header) + sizeof(sbc_info));
+                 }
 
-Would you mind sharing theses traces with us? I'd really look at what
-other people do for this.
-
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
-
---Signature=_Wed__24_Nov_2004_03_47_10_+0100_Hb+4+vbb92W0QmBh
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQFBo/YzIjWgKE0OA2gRAjFBAJ9uGbvrOvwSbo82fBXlA1z4YQynGACeN8S3
-9faBqY2196IZXg85LLCfcFA=
-=7KJl
------END PGP SIGNATURE-----
-
---Signature=_Wed__24_Nov_2004_03_47_10_+0100_Hb+4+vbb92W0QmBh--
+Brad
 
 
 -------------------------------------------------------
