@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] resetting usb bt device
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Simon Vogl <vogl@soft.uni-linz.ac.at>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4062C2F9.5090808@soft.uni-linz.ac.at>
-References: <4062C2F9.5090808@soft.uni-linz.ac.at>
-Content-Type: text/plain
-Message-Id: <1080257709.2283.34.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <000a01c41299$f48241d0$fcca010a@lysydziadek>
+From: "zubiwat" <zubiwat@poczta.onet.pl>
+To: <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0007_01C412A2.562E3FD0"
+Subject: [Bluez-devel] Strange answer from HCI
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,41 +16,66 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Mar 2004 00:35:09 +0100
+Date: Thu, 25 Mar 2004 19:49:51 +0100
 
-Hi Simon,
+This is a multi-part message in MIME format.
 
-> notice that sometimes the bluez stack runs into a state where I cannot
-> connect rfcomm channels any more etc. To get into a sane mode of operation,
-> pulling and plugging the bt dongle helps normally.
-> 
-> As we build a system that will be hidden behind a wall, I need a software-
-> only solution to this. I tried to stop the bluetooth services as well as hotplug,
-> unload any dangling modules, then start hotplug and bluetooth services again and
-> I send a hci_reset to the device.
-> 
-> Unfortunately, this does not resolve my issues, but I get lots of submit failures:
-> Mar 25 07:59:46 wall6 kernel: Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
-> Mar 25 07:59:46 wall6 kernel: sco_sock_connect: sk dedfe080
-> Mar 25 07:59:46 wall6 kernel: sco_conn_ready: conn dfc92e00
-> Mar 25 07:59:46 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for pipe 18200 is zero
-> Mar 25 07:59:46 wall6 kernel: __tx_submit: hci0 tx submit failed urb f7e3fe14 type 3 err -90
-> Mar 25 07:59:47 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for pipe 18200 is zero
-> Mar 25 07:59:47 wall6 kernel: __tx_submit: hci0 tx submit failed urb f7e3fe14 type 3 err -90
-> Mar 25 07:59:47 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for pipe 18200 is zero
-> Mar 25 07:59:47 wall6 kernel: __tx_submit: hci0 tx submit failed urb f7e3fe14 type 3 err -90
-> Mar 25 07:59:47 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for pipe 18200 is zero
-> 
-> etc., as well as loads of other mysterious happenings.
+------=_NextPart_000_0007_01C412A2.562E3FD0
+Content-Type: text/plain;
+	charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 
-what kernel is this? Have you tried the uhci.o driver? What USB host
-controller do you use? What kind of dongle are you using? Try to buy
-another one.
+Hi=20
+I'm programming a microchip to work with BT and when I send some bits I =
+get in the answer sth like this: 04 10 01 FE.
+If someone knows what it means I would be greatfull for some help.
+How to set parameteres like pscan or read BD ADDR by sending bits to BT =
+dongle. Does any one knows what bits are coresponding to what commends =
+while setting parameteres of BT because I know bits for transmition from =
+Specification.
+Please help because I can't get through with it.
 
 Regards
 
-Marcel
+Maciej Zubilewicz
 
+------=_NextPart_000_0007_01C412A2.562E3FD0
+Content-Type: text/html;
+	charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-2">
+<META content=3D"MSHTML 5.50.4134.600" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hi </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>I'm programming a microchip to work =
+with BT and=20
+when I send some bits I get in the answer sth like this: 04 10 01=20
+FE.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>If someone knows what it means I would =
+be greatfull=20
+for some help.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>How to set parameteres like pscan or =
+read BD ADDR=20
+by sending bits to BT dongle. Does any one knows what bits are =
+coresponding to=20
+what commends while setting parameteres of BT because I know bits for=20
+transmition from Specification.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>Please help because I can't get through =
+with=20
+it.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Regards</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Maciej =
+Zubilewicz</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0007_01C412A2.562E3FD0--
 
 
 
