@@ -1,109 +1,45 @@
-Return-Path: <schmidt@nue.et-inf.uni-siegen.de>
-Message-ID: <413C24C6.1030102@nue.et-inf.uni-siegen.de>
-Date: Mon, 06 Sep 2004 10:50:14 +0200
-From: Michael Schmidt <schmidt@nue.et-inf.uni-siegen.de>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <00c101c493ec$bb5e4960$b67ba8c0@zaz1>
+From: "Xavier Garreau" <x.garreau@prim-time.fr>
+To: <bluez-users@lists.sourceforge.net>
+References: <413B18F9.6010101@nue.et-inf.uni-siegen.de>
+Subject: Re: [Bluez-users] no concurrent inquiry / inquiry scan and L2CAP connection as slave
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] no concurrent inquiry / inquiry scan and L2CAP
- connection as slave
-References: <413B18F9.6010101@nue.et-inf.uni-siegen.de> <1094459425.5145.19.camel@notepaq>
-In-Reply-To: <1094459425.5145.19.camel@notepaq>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 6 Sep 2004 10:37:22 +0200
 
-Hi Marcel,
+> - perform periodic device inquiries (i.e. search other devices
+>    in 'Periodic_Inquiry_Mode')
+> - perform inquiry scans (i.e. be visible for other searching devices)
 
+I have _never_ seen a slave connected device answer to an inquiry.
+Did some of you actually see this ?
 
-Marcel Holtmann schrieb:
-> Hi Michael,
-> 
-> 
->>I'm experiencing the following behavior with BlueZ and L2CAP:
->>
->>After establishing an L2CAP connection between two nodes, only the 
->>master of this connection is still able to:
->>
->>- perform periodic device inquiries (i.e. search other devices
->>   in 'Periodic_Inquiry_Mode')	
->>- perform inquiry scans (i.e. be visible for other searching devices)
->>
->>However, I would like to be able to do this as slave as well (at least, 
->>to perform inquiry scans as slave).
->>
->>Now I'm wondering whether:
->>
->>- this is a restriction of BlueZ		or
->>- this is a restriction of my BT chipsets	or
->>- this is a restriction of Bluetooth		or
->>- I'm doing (configuring) something wrong...
->>
->>My environment:
->>
->>SuSE Linux 9.0: kernel 2.4.21, bluez-libs 2.4, bluez-utils-2.3
->>
->>I have tested and verified this behavior with the BrainBoxes BL-500 and
->>BL-554 adapters.
->>I'd be very grateful if someone of you could shed some light on this topic.
-> 
-> 
-> this sounds like a chip limitation. What does "hciconfig -a" say?
-
-Here goes:
-
-BL-554:
-
-hci0:	Type: USB
-	BD Address: 02:00:F4:18:51:74 ACL MTU: 192:8  SCO MTU: 64:8
-	UP RUNNING PSCAN ISCAN
-	RX bytes:1787 acl:1 sco:0 events:92 errors:0
-	TX bytes:543 acl:1 sco:0 commands:44 errors:0
-	Features: 0xff 0xff 0x0f 0x00
-	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-	Link policy: RSWITCH HOLD SNIFF PARK
-	Link mode: SLAVE ACCEPT
-	Name: 'BlueZ (0)'
-	Class: 0x000100
-	Service Classes: Unspecified
-	Device Class: Computer, Uncategorized
-	HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1)
-	LMP Subver: 0x175
-	Manufacturer: Cambridge Silicon Radio (10)
-
-
-BL-500:
-
-hci0:	Type: UART
-	BD Address: 02:00:80:EC:7C:4A ACL MTU: 192:8  SCO MTU: 64:8
-	UP RUNNING PSCAN ISCAN
-	RX bytes:897 acl:0 sco:0 events:19 errors:0
-	TX bytes:634 acl:0 sco:0 commands:20 errors:0
-	Features: 0xff 0xff 0x0f 0x00
-	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-	Link policy: RSWITCH HOLD SNIFF PARK
-	Link mode: SLAVE ACCEPT
-	Name: 'BlueZ (0)'
-	Class: 0x000100
-	Service Classes: Unspecified
-	Device Class: Computer, Uncategorized
-	HCI Ver: 1.1 (0x1) HCI Rev: 0x135 LMP Ver: 1.1 (0x1)
-	LMP Subver: 0x135
-	Manufacturer: Cambridge Silicon Radio (10)
-
-
-Don't get confused by the apparently weird device addresses; this is 
-part of my project.
-
-
-Michael
-
-
+BR, 
 -- 
-=================================================
-Michael Schmidt
--------------------------------------------------
-Institute for Data Communications Systems
-University of Siegen, Germany
--------------------------------------------------
-http:   www.nue.et-inf.uni-siegen.de
-=================================================
+Xavier Garreau <x.garreau@prim-time.fr>
+Prim'Time Technology
+http://www.prim-time.fr/
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by BEA Weblogic Workshop
+FREE Java Enterprise J2EE developer tools!
+Get your free copy of BEA WebLogic Workshop 8.1 today.
+http://ads.osdn.com/?ad_id=5047&alloc_id=10808&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
