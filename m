@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: html email blocker
-From: Marcel Holtmann <marcel@holtmann.org>
-To: approach <wuyunb@neusoft.com>
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <loom.20040423T110033-105@post.gmane.org>
-References: <1082618249.10405.1.camel@localhost>
-	 <1082622732.1845.1.camel@merlin>  <loom.20040423T110033-105@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1082721360.1843.9.camel@merlin>
+To: bluez-devel@lists.sourceforge.net
+From: approach <wuyunb@neusoft.com>
+Message-ID: <loom.20040423T110033-105@post.gmane.org>
+References: <1082618249.10405.1.camel@localhost> <1082622732.1845.1.camel@merlin>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Re: html email blocker
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,26 +16,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 23 Apr 2004 13:56:01 +0200
+Date: Fri, 23 Apr 2004 09:09:17 +0000 (UTC)
 
-Hi,
+Marcel Holtmann <marcel <at> holtmann.org> writes:
 
->  Did you know the companies( "Toshiba", "Ericsson" etc. )have the product can 
-> support spec1.2?
+> 
+> Hi Mans,
+> 
+> > In many other mailing lists there are html mail filters to block spam.
+> > Maybe can this be installed to filter the spam messages that are sent
+> > here from time to time.
+> 
+> this list is driven by the SF.net people, so you should better ask them,
+> because I can't do anything about it.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-actually every chip manafucturer has Bluetooth 1.2 capable chips, but
-right now I have seen modules from CSR, Zeevo and Silicon Wave.
+ Thanks.
+ Did you know the companies( "Toshiba", "Ericsson" etc. )have the product can 
+support spec1.2?
+ I'm trying to develop the stack for spec1.2, and so happy to communicate with 
+you.
 
->  I'm trying to develop the stack for spec1.2, and so happy to communicate with 
-> you.
-
-Actually this mailing is for BlueZ related development and I don't have
-time to help other people to work on non-BlueZ related Bluetooth stack
-development.
-
-Regards
-
-Marcel
 
 
 
