@@ -1,47 +1,57 @@
-Return-Path: <jeffs@fairwayacademy.org>
-From: Jeff Sutherland <jeffs@fairwayacademy.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-users] Timeout message from kernel
-Date: Fri, 13 Feb 2004 18:58:51 -0500
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] HCI not working after using usb_storage
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Forever Again <erics_trip@hotmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-References: <200402121636.02074.jeffs@fairwayacademy.org> <200402131819.10939.jeffs@fairwayacademy.org> <1076715629.18588.103.camel@pegasus>
-In-Reply-To: <1076715629.18588.103.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200402131858.51524.jeffs@fairwayacademy.org>
-List-ID: <bluez-users.lists.sourceforge.net>
+In-Reply-To: <Law12-F76bdkSmLAztx0004f857@hotmail.com>
+References: <Law12-F76bdkSmLAztx0004f857@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1076715751.18588.106.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 14 Feb 2004 00:42:31 +0100
 
-On Friday 13 February 2004 18:40, Marcel Holtmann wrote:
-> Hi Jeff,
+Hi Evan,
 
-<snip>
+> I have a logitech mx900 mouse, which was working fine before. I'm running 
+> the 2.6.2 kernel on Fedora. Using the bthid daemon it was working. Then I 
+> tried to use a usb memory stick, and after using the usb_storage driver, my 
+> mouse stopped working. I check to see what was up and I noticed that my hci 
+> device was gone. When I try running hciconfig hci0 up, I get this:
+> 
+> Can't open HCI socket.: Address family not supported by protocol.
+> 
+> What do I need to do to get the mouse working again, and is it possible to 
+> use the usb_storage as well. I'm more concerned about using the mouse, but 
+> both would be nice.
 
-> Both look fine, but you should enable role switch support in hcid.conf
-> or set it by hand with hciconfig.
->
-> > Other than that sequence problem it looks like the link mostly works,
-> > still issues with most of the commands of hcitool though, on Coldfire.
->
-> Keep trying and look with hcidump at it, but we can also have a bug in
-> our tools if they are used on a ColdFire processor.
+check your log files for a kernel oops or other specific messages from
+the USB bus. If you really think that this only happen in conjunction
+with the USB storage driver then you should post this to the USB mailing
+list.
 
-I've tried the l2test -s from Coldfire several times, doing 'hciconfig hci0 
-reset' in between for good measure, always get the same results on the pc 
-end.  This looks suspiciously like an endian problem somewhere, but why would 
-receive work ok?
+Regards
 
-2test[30524]: Receiving ...
-l2test[30524]: 672 bytes in 0.06 sec, 11.49 kB/s
-l2test[30524]: seq missmatch: 1 -> 4
-l2test[30524]: 672 bytes in 0.09 sec, 7.57 kB/s
-l2test[30524]: seq missmatch: 5 -> 8
+Marcel
 
-Thanks for all your help on this.  I was really hoping once I got the buggered 
-mcfserial.c driver working that I would be done...
 
--Jeff
--- 
-Secure your email with Gnu Privacy Guard and Mozilla, the open source
-cross platform solution for Windows, Linux, and Mac OS X.
-See http://enigmail.mozdev.org/
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
