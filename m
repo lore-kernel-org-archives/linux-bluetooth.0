@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] pppd problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Tullio <julianino@inwind.it>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <003501c3f672$d6e45a20$c4648dd4@tullio>
-References: <003501c3f672$d6e45a20$c4648dd4@tullio>
-Content-Type: text/plain
-Message-Id: <1077149310.2685.16.camel@pegasus>
-Mime-Version: 1.0
+Mime-Version: 1.0 (Apple Message framework v612)
+Message-Id: <51279096-6253-11D8-9EE6-000393C5CB34@usask.ca>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+To: bluez-users@lists.sourceforge.net
+From: Carl Norum <carl.norum@usask.ca>
+Subject: [Bluez-users] Can't create socket.: No such file or directory
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +15,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Feb 2004 01:08:30 +0100
+Date: Wed, 18 Feb 2004 14:44:59 -0600
 
-Hi Tullio,
 
-> I want to use a Nokia 3650 as a modem. I have written the pppd peers
-> file and the chat script, but when I try the connection using pppd
-> call gprs there isn't any result.
+I've just finished installing BlueZ on a Mandrake machine of mine, but 
+I can't make l2ping work.  "hcitool scan" and "hcitool inq" both show 
+me the other bluetooth machine (iBook with 3Com dongle), and "hcitool 
+cc --role=m ...." appears to work too, as "hcitool con" shows the 
+connection.  l2ping however, just always says "Can't create socket.: No 
+such file or directory", and that's it.
 
-do have bound the /dev/rfcomm0 device?
+Anybody have any quick ideas about what's going on here?
 
-Regards
+-- 
+Carl J Norum
+Academic Director, IEEE NSS Student Branch
+Final Year Electrical Engineering/Computer Science Student
+University of Saskatchewan
+Saskatoon, Canada
 
-Marcel
-
+http://norum.homeunix.net/~carl/
 
 
 
