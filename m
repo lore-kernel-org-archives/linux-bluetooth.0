@@ -1,18 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Moritz Bunkus <moritz@bunkus.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] connection to Motorola V525 fails
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Moritz Bunkus <moritz@bunkus.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040528214300.GH7737@bunkus.org>
-References: <20040528154111.GD24083@bunkus.org>
-	 <1085766449.3321.50.camel@pegasus> <20040528180635.GA20450@bunkus.org>
-	 <1085770308.4516.3.camel@pegasus> <20040528201025.GA7737@bunkus.org>
-	 <1085776595.4516.24.camel@pegasus> <20040528204353.GB7737@bunkus.org>
-	 <1085777409.4516.32.camel@pegasus> <20040528205749.GE7737@bunkus.org>
-	 <1085778561.4516.34.camel@pegasus>  <20040528214300.GH7737@bunkus.org>
-Content-Type: text/plain
-Message-Id: <1085781095.4516.47.camel@pegasus>
+Message-ID: <20040528214300.GH7737@bunkus.org>
+References: <20040528154111.GD24083@bunkus.org> <1085766449.3321.50.camel@pegasus> <20040528180635.GA20450@bunkus.org> <1085770308.4516.3.camel@pegasus> <20040528201025.GA7737@bunkus.org> <1085776595.4516.24.camel@pegasus> <20040528204353.GB7737@bunkus.org> <1085777409.4516.32.camel@pegasus> <20040528205749.GE7737@bunkus.org> <1085778561.4516.34.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1085778561.4516.34.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,26 +17,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 May 2004 23:51:35 +0200
+Date: Fri, 28 May 2004 23:43:00 +0200
 
-Hi Moritz,
+Hi,
 
-> > this uses RFCOMM channel 8, which doesn't requests an authentication.
-> > Maybe you wanna try it ;)
-> 
-> Now I'm feeling really, really stupid. Yes, this does work nicely, in
-> both directions (with some app called 'opd', OBEX push demon, on the PC
-> side). All the time I've used the channel for the OBEX file transfer,
-> not for the push service...
+> this uses RFCOMM channel 8, which doesn't requests an authentication.
+> Maybe you wanna try it ;)
 
-don't do so, because the phone behaviour is still wrong. It must send UA
-or DM after the SABM request.
+Now I'm feeling really, really stupid. Yes, this does work nicely, in
+both directions (with some app called 'opd', OBEX push demon, on the PC
+side). All the time I've used the channel for the OBEX file transfer,
+not for the push service...
 
-Regards
+Sorry for being dumb ;) and thanks for the solution.
 
-Marcel
+Mosu
 
-
+-- 
+If Darl McBride was in charge, he'd probably make marriage
+unconstitutional too, since clearly it de-emphasizes the commercial
+nature of normal human interaction, and probably is a major impediment
+to the commercial growth of prostitution. - Linus Torvalds
 
 
 -------------------------------------------------------
