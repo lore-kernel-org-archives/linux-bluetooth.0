@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4084F871.5020802@csr.com>
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-To: zubiwat <zubiwat@poczta.onet.pl>
-Cc: bluez devel <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Unknown answer while connecting through RFCOMM
-References: <002201c42666$69492ee0$fcca010a@firedrake>
-In-Reply-To: <002201c42666$69492ee0$fcca010a@firedrake>
-Content-Type: text/plain; charset="us-ascii"
+Subject: Re: [Bluez-devel] business card transfer problem
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: franz keuner <franz_keuner@gmx.net>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <8333.1082451393@www65.gmx.net>
+References: <8333.1082451393@www65.gmx.net>
+Content-Type: text/plain
+Message-Id: <1082452207.29569.2.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,49 +18,127 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Apr 2004 11:16:17 +0100
+Date: Tue, 20 Apr 2004 10:10:08 +0100
 
-zubiwat wrote:
-> [a sequence of bytes]
-[...]
-> How should I answer to this packet?
+Hi Franz,
+Make sure you have the correct class-of-device setting on the Linux box.
+(See hciconfig(8).) Phones and PDAs often don't even bother doing an SDP
+search if the device-class obtained by device discovery doesn't contain
+the correct hint bits.
 
-I was going to decode your bytes here, but having looked at your posting
-history I see that you're continually posting non-BlueZ questions to
-this group.
+Cheers,
+Steve
 
-This group is soley for the development of the BlueZ Bluetooth stack,
-it's not a place to get help when developing your own stack and we will
-not do your homework for you.
-
-You are being rude. Marcel has already warned you repeatedly.
-
-If you're developing your own Bluetooth stack try the Yahoo Bluetooth
-group or go to the Bluetooth web site and try the forums there:
-
-  https://www.bluetooth.org/foundry/orgusers/forums/
-
-	- Steven
-
-PS. Not only is your understanding of Bluetooth flawed, but your
-    hardware is broken too. Your UART is corrupting bytes - the first
-    byte of your log should be 0x04 not 0x14. I suggest you try better
-    UART cables and/or a lower baud rate.
+On Tue, 2004-04-20 at 09:56, franz keuner wrote:
+> hi marcel,
+> 
+> for quite a while i had no questions concerning bluez and my Sony Ericsson
+> P900 ;-)
+> with your help i made a lot of progress.
+> 
+> now i'm trying to send and receive businesscards (version2.1) between the
+> linux computer with bluez and the mobile phone.
+> 
+> i installed the openobex package for suse 9.0 and the openobex applications.
+> 
+> i can send a businesscard from the linux computer to the mobile phone using
+> the obextest tool from the applications package.
+> 
+> but if i try to receive a businesscard from the mobile phone on the linux
+> computer with the opd program the phone reports a failure trying to transfer
+> the businesscard to the linux computer.
+> 
+> but it works if i try to send the same businesscard from the phone to a pda.
+> the pda receives the businesscard correctly.
+> 
+> and if try to receive the businesscard from the pda on the linux computer
+> with the opd program this is also working.
+> 
+> i'm sure i'm listening on the right channels. maybe the problem is that the
+> phone can't communicate with the opd program waiting for a connection...
+> 
+> do you have any ideas or hints?
+> 
+> regards,
+> 
+> franz
+> 
+> hcidump shows the following trying to the send from the phone to the linux
+> computer:
+> 
+> hcidump r
+> HCIDump - HCI packet analyzer ver 1.5
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> > HCI Event: Connect Request(0x04) plen 10
+> < HCI Command: Accept Connection Request(0x01|0x0009) plen 7
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Connect Complete(0x03) plen 11
+> < HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+> > HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
+> > HCI Event: Command Complete(0x0e) plen 6
+> < HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Connection Packet Type Changed(0x1d) plen 5
+> > ACL data: handle 0x0028 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0054
+> < ACL data: handle 0x0028 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0054 result 0 status 0
+> > HCI Event: Max Slots Change(0x1b) plen 3
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x0028 flags 0x02 dlen 12
+>     L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 0
+> < ACL data: handle 0x0028 flags 0x02 dlen 14
+>     L2CAP(s): Config rsp: scid 0x0054 flags 0x0000 result 0 clen 0
+> < ACL data: handle 0x0028 flags 0x02 dlen 12
+>     L2CAP(s): Config req: dcid 0x0054 flags 0x0000 clen 0
+> > ACL data: handle 0x0028 flags 0x02 dlen 12
+>     L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 0
+> < ACL data: handle 0x0028 flags 0x02 dlen 14
+>     L2CAP(s): Config rsp: scid 0x0054 flags 0x0000 result 0 clen 0
+> < ACL data: handle 0x0028 flags 0x02 dlen 12
+>     L2CAP(s): Config req: dcid 0x0054 flags 0x0000 clen 0
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x0028 flags 0x02 dlen 14
+>     L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x0028 flags 0x02 dlen 14
+>     L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
+> > ACL data: handle 0x0028 flags 0x02 dlen 17
+>     L2CAP(d): cid 0x40 len 13 [psm 1]
+>         SDP SS Req: tid 0x1 len 0x8
+>           pat uuid-16 0x1105 (OBEXObjPush)
+>           max 0xffff
+>           cont 00
+> < ACL data: handle 0x0028 flags 0x02 dlen 22
+>     L2CAP(d): cid 0x54 len 18 [psm 1]
+>         SDP SS Rsp: tid 0x1 len 0xd
+>           cur 0x2 tot 0x2 hndl 0x804d490 0x804d5f8
+>           cont 00
+> > ACL data: handle 0x0028 flags 0x02 dlen 14
+>     L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
+> > ACL data: handle 0x0028 flags 0x02 dlen 16
+>     L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
+>     MTU 672
+> < ACL data: handle 0x0028 flags 0x02 dlen 14
+>     L2CAP(s): Config rsp: scid 0x0054 flags 0x0000 result 0 clen 0
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > ACL data: handle 0x0028 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0055
+> < ACL data: handle 0x0028 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0055 result 0 status 0
+> > ACL data: handle 0x0028 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0055
+> < ACL data: handle 0x0028 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0055 result 4 status 0
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+> > HCI Event: Disconn Complete(0x05) plen 4
 -- 
-
-
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
 
 
