@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] host/usb-uhci.c: iso_find_start: gap in seamless
-	isochronous scheduling
+Subject: Re: [Bluez-users] Extended functions of bluetooth keyboard (diNovo)
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
+To: Oli Ellis <oliver.ellis@ntlworld.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403191230.18309.cijoml@volny.cz>
-References: <200403191230.18309.cijoml@volny.cz>
+In-Reply-To: <405B55EE.8060602@ntlworld.com>
+References: <405B55EE.8060602@ntlworld.com>
 Content-Type: text/plain
-Message-Id: <1079791305.31859.38.camel@pegasus>
+Message-Id: <1079791201.31859.35.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,18 +18,52 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 20 Mar 2004 15:01:46 +0100
+Date: Sat, 20 Mar 2004 15:00:01 +0100
 
-Hi Michal,
+Hi Oli,
 
-> I find out, that after installing your bthid driver, I gets into syslog 
-> everytime my keyboard reconnects to dongle
+> kernel 2.6.4-rc1  with added mutibytes support (anyone know when that is 
+> coming as standard?)
+
+it is part of 2.6.5-rc2.
+
+> gentoo linux with cvs utils2 and libs2. All bluetooth kernel 
+> functionality compiled directly into the kernel, not as modules.
 > 
-> host/usb-uhci.c: iso_find_start: gap in seamless isochronous scheduling
-> 
-> Can I somehow prevent this? Don't mean comment it out from kernel source :)
+> I am using bthid daemon, which I presume feeds the events from the 
+> bluetooth stack into the kernel via the uinput device (correct me if I 
+> am wrong). However, the multimedia keys creates up a log messages from 
+> bthid - for example
+> ---
+> (press either mute button on keyboard or media pad)
+> bthid[4128]: Unknown consumer usage 0xc00e3
+> bthid[4128]: Unknown consumer usage 0xc0001
+> bthid[4128]: Unknown consumer usage 0xc0001
+> bthid[4128]: Unknown consumer usage 0xc0001
+> ---
+> Some messages are odder...
+> ---
+> (press sleep (crescent) button on keyboard)
+> bthid[4128]: Unknown hid usage (0x10083 + 1)
+> bthid[4128]: Sleep button pressesd (ignored)
+> ---
+> showkey reports no keycode or scancode, and obviously nothing in xev, so 
+> I am guessing that this is a limitation in bthid. Is bthid configurable 
+> in some way?
 
-don't compile the hci_usb driver with the SCO support option ;)
+You have to fix bthid to send the correct key values to uinput. I have
+no interest in doing it, but every patch is welcome.
+
+> Also, does anyone know how to make the LCD panel on the media pad show 
+> what you want? The calculator is hard-wired into the pad, so is 
+> functional, but there is a 15 char X 3 line display and six LCD symbols. 
+> Would it be possible to send arbritrary HCI commands with hcitool? I 
+> have seen a rumour that it uses the hid++ spec, but where can I find 
+> this? (google no help...)
+
+Once I had hacked this stuff, but I lost my notes and my demo code for
+it. Check the mailing list archive if I had posted some comments about
+the media pad.
 
 Regards
 
