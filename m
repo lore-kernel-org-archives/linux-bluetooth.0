@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Two simultanous connections
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Pierre N <pierren@mac.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1080928843.9541.90.camel@localhost>
-References: <1080928843.9541.90.camel@localhost>
-Content-Type: text/plain
-Message-Id: <1080929429.2836.101.camel@pegasus>
+From: Pierre N <pierren@mac.com>
+To: bluez-users@lists.sourceforge.net
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-Y+AtRBNcjl+GSaYCsmif"
+Message-Id: <1080928843.9541.90.camel@localhost>
 Mime-Version: 1.0
+Subject: [Bluez-users] Two simultanous connections
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,28 +15,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 02 Apr 2004 20:10:29 +0200
+Date: Fri, 02 Apr 2004 20:00:43 +0200
 
-Hi Pierre,
 
-> I've been trying to setup ip net with 3 identical devices connected
-> simultanously over bluetooth. It works after a long
-> while of fiddling around. I had to go the hcitool route manually to set
-> the initial connections and then I could use dund no problem. My
-> question is: why can't I initiate a connection (hcitool cc) from a
-> device which is already connected?
+--=-Y+AtRBNcjl+GSaYCsmif
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-for some setups this depends on your Bluetooth chip. So what does
-"hciconfig -a" show? But I am not sure about what kind of network you
-are talking, because between two device there can be only _one_ ACL link
-and this means you can only use "hcitool cc" once. Actually there is no
-need for creating the ACL link manually with hcitool, because every
-higher layer will create it on demand.
+Hi,
 
-Regards
+I've been trying to setup ip net with 3 identical devices connected
+simultanously over bluetooth. It works after a long
+while of fiddling around. I had to go the hcitool route manually to set
+the initial connections and then I could use dund no problem. My
+question is: why can't I initiate a connection (hcitool cc) from a
+device which is already connected?
 
-Marcel
+--
+Pierre
 
+--=-Y+AtRBNcjl+GSaYCsmif
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQBAbapLZkVEuKKlE7gRAkbqAKDvD2P+B0MBXocoP+DHm8EmiBw0sACgr7AX
+1fr2JLlqKfug1OA+XdKrPmg=
+=tYvR
+-----END PGP SIGNATURE-----
+
+--=-Y+AtRBNcjl+GSaYCsmif--
 
 
 
