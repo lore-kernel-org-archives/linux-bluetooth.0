@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluez and OBEX File Transfer
+Subject: Re: [Bluez-users] zeevo acer dongle
 From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: Andrew Radke <andrew@radke.iig.com.au>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3F26FB4B.6060007@radke.iig.com.au>
-References: <3F229216.3060000@radke.iig.com.au>
-	<1059380203.1015.80.camel@pegasus>  <3F26FB4B.6060007@radke.iig.com.au>
+To: Maximilian Michel <michel@docomolab-euro.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>, max@3max.de
+In-Reply-To: <3F27DED9.3090706@docomolab-euro.com>
+References: <3F27DED9.3090706@docomolab-euro.com>
 Content-Type: text/plain
-Message-Id: <1059605011.1832.40.camel@pegasus>
+Message-Id: <1059603475.1831.21.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,22 +20,21 @@ List-Unsubscribe:
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 31 Jul 2003 00:43:02 +0200
+Date: 31 Jul 2003 00:17:49 +0200
 
-Hi Andrew,
+Hi Maximilian,
 
-> > I have started a btftp client, which you can found in the BlueZ CVS in
-> > the repository obex. But at the moment no btftpd exists.
-> 
-> The client will be a nice addition. Any plans on the btftpd? Anything a 
-> non-programmer can do to help? Write it in Perl maybe? :-)
+> I got an acer dongle (BT-510) containing a zeevo bluetooth chip.
+> This zeevo-dongle obviously works not so well with bluez as it keeps 
+> crashing with segfault.
+> The system I use should be well-configured, as everything works fine 
+> with csr-based devices (acer BU2 dongle).
+> So, is the zeevo-chip not supported, can it be fixed anyway?
 
-I don't have the time nor the money to work fulltime on it, so don't
-expect anything very soon.
-
-And I never read anything about a Bluetooth Perl binding, but it is
-socket programming, so maybe it is already possible. But I code in C, so
-why should I use Perl ;)
+if I remember correctly, the Zeevo chip is one of these buggy Bluetooth
+devices which have no SCO endpoints. Please send us the output of
+/proc/bus/usb/devices and try one of my latest -mh patches or the latest
+2.4.22-pre.
 
 Regards
 
