@@ -1,80 +1,59 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Belkin F8T002 PC Card problem with Bluez
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: "Alexandre Jousset@NL" <mid@gtmp.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3F50803C.607@gtmp.org>
-References: <3F4F6BF2.6080303@gtmp.org>
-	<1062170277.27784.138.camel@pegasus> <3F4F70B1.20200@gtmp.org>
-	<3F50803C.607@gtmp.org>
-Message-Id: <1062425807.13729.162.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 01 Sep 2003 16:16:41 +0200
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Ethereal-dev] Re: [Bluez-devel] bluetooth ethereal dissector
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Guy Harris <guy@alum.mit.edu>
+Cc: Paul Ionescu <paul@acorp.ro>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   ethereal-dev@ethereal.com
+In-Reply-To: <20031030035431.A18203@quadrajet.sonic.net>
+References: <1067379074.2419.24.camel@paul>
+	<1067425631.24043.224.camel@pegasus>
+	<D4C83C06-0A45-11D8-B1BA-000A958097E4@alum.mit.edu>
+	<1067482224.18114.6.camel@pegasus>
+	<FBDCA88C-0A86-11D8-B1BA-000A958097E4@alum.mit.edu>
+	<1067513580.18114.20.camel@pegasus>
+	<20031030035431.A18203@quadrajet.sonic.net>
 Content-Type: text/plain
+Message-Id: <1067518169.11791.29.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 30 Oct 2003 13:49:23 +0100
 
-Hi Alexandre,
+Hi Guy,
 
-> 	I tried with setserial to set ttyS4 to irq 3 (it gave me this value
-> once when doing setserial autoconfig) -> hang.
+> > Attached is another patch against CVS, which re-introduces the byte
+> > swapping,
 > 
-> 	I tried with setserial to set port to 0x4010 (as listed as second I/O
-> ports region with lspci), no error but hciconfig hci0 up fails with timeout.
-> 
-> 	With the original setup (irq 11 and ports at 0x4000, as the serial
-> module set them and the config that put the lines h4_recv: Unknown HCI
-> packet type xx), I wrote a small C program to read ttyS4 and print the
-> numbers on stdout. I noticed some reccurrent value so I told the program
-> to put a newline before each value 18. The output is :
-> 
-> -----------------------------------------------------------
-> 18 20 e8 36 be f0
-> 18 20 e8 36 be f8
-> 18 20 e8 36 be f8
-> 18 20 e8 36 ef 0f
-> 18 24 e8 36 ef f0
-> 18 24 e8 36 ef f0
-> 18 20 e8 9b be f8
-> 18 20 e8 36 ef 0f ff
-> 18 20 e8 36 ef 0f ff
-> 18 20 e8 9b be f8
-> 18 24 e8 36 ef f0
-> 18 20 e8 36 ef 0f
-> 18 24 e8 36 ef d0
-> 18 20 e8 36 ef d0
-> 18 20 e8 9b be f8
-> 18 20 e8 9b be f8
-> 18 20 e8 9b be f8
-> 18 20 e8 36 ef 0f
-> 18 20 e8 36 ef 0f
-> 18 20 e8 36 ef 0f
-> 18 20 e8 9b be f8
-> 18 20 e8 36 ef 0f ff
-> 18 20 e8 9b be f8
-> 18 20 e8 36 ef 41
-> 18 20 e8 36 ef 0f
-> 18 20 e8 36 ef 0f
-> -----------------------------------------------------------
-> 
-> 	So that must mean something but I don't know what. The first octet is
-> always 18, the second is either 20 or 24, the third always e8, the
-> fourth either 36 or 9b, the fifth either be or ef, the sixth either 0f
-> or d0 or f8 and when it is 0f it is sometimes followed by ff...
+> I've checked in a change to replace g_ntohs with GUINT16_FROM_LE and to
+> replace g_ntohl with GUINT32_FROM_LE.
 
-I think this is the BCSP protocol, but with wrong terminal settings or a
-wrong baud rate. Try to attach your device with BCSP and different baud
-rate settings and replug it every time to have a clean state.
+works fine now on my x86 machine.
+
+> > I also use the macro _U_ for __attribute((packed))__
+> 
+> The macro _U_ is defined as __attribute__((unused)), not
+> __attribute((packed))__.
+
+I am feeling so stupid :(
+
+> If __attribute((packed))__ is *required* in order to make it work, then
+> you need to find some *other* way to make it work - conditionally using
+> __attribute((packed))__ or not depending on whether GCC is being used or
+> not won't help.  For example, define the structure as an array of bytes,
+> or as a sequence of arrays of bytes, and use the "pletoh" macros to
+> extract values from them.
+
+It works for me now and until anyone shows us otherwise, lets leave it
+out.
 
 Regards
 
@@ -84,10 +63,11 @@ Marcel
 
 
 -------------------------------------------------------
-This sf.net email is sponsored by:ThinkGeek
-Welcome to geek heaven.
-http://thinkgeek.com/sf
+This SF.net email is sponsored by: SF.net Giveback Program.
+Does SourceForge.net help you be more productive?  Does it
+help you create better code?   SHARE THE LOVE, and help us help
+YOU!  Click Here: http://sourceforge.net/donate/
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
