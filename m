@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michael Mauch <michael.mauch@gmx.de>
+Message-ID: <424D7BDB.1040408@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20050401225851.GC13074@elmicha.333200002251-0001.dialin.t-online.de>
-References: <2e973d2e05032514275d90da67@mail.gmail.com> <42449273.2030103@xmission.com> <200503252344.53258.cijoml@volny.cz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <200503252344.53258.cijoml@volny.cz>
-Subject: [Bluez-users] Re: How to set up a PAN using my laptop and cellphone
+Subject: Re: [Bluez-users] BT Headset - snd-bt-sco - Mic operation not working
+References: <f54d864050401035565d0acd6@mail.gmail.com>
+In-Reply-To: <f54d864050401035565d0acd6@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,43 +18,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 2 Apr 2005 00:58:51 +0200
+Date: Fri, 01 Apr 2005 09:50:35 -0700
 
-Michal Semler wrote:
+what kind of failure? can you use a mixer app or the headset to turn up 
+the record volume and unmute the mic?
 
-> Worse problem probably is, that there is not any cell phone with PAN support 
-> on market ;-D
-
-Yes, but some can use dund.
-
-> Dne pá 25. b?ezna 2005 23:36 Brad Midgley napsal(a):
-> > It sounds like a very twisted idea but there's a flaw: most/all
-> > cellphones have a bluetooth radio that can only deal with one connection
-> > at a time. So your laptop can't be NATting the connection and the
-> > cellphone certainly won't.
-
-I can't see why there should be two Bluetooth connections involved.
-
-> > WEI LI wrote:
-> > > I have a laptop : linux 2.4.10,  with bluez-libs, bluez-utils
-> > > installed, and internet access.
-
-So the laptop has internet access on its own (through WLAN, LAN or a
-modem)? 
-
-As Brad pointed out, you cannot connect the laptop via Bluetooth to the
-phone and then surf the web with the phone and the laptop.
-
-> > > and a cell phone: Nokia 6620.
-> > > Can I set up a PAN  between this two devices  and enable the cellphone
-> > > to browser webs sharing internet access with the laptop? How to do?
-
-See
-<http://xoomer.virgilio.it/eim/stuff/text/notes/devices/nokia_6600.txt>
-and google for "Nokia 6620 Linux dund" or something like that.
-
-Regards...
-		Michael
+Benny wrote:
+> Dear all,
+> 
+> I am using a USB BT Dongle(CSR based) on a Linux PC(2.6.9) installed
+> with the latest snd-bt-sco driver taken from CVS.
+> 
+> I have established a bluetooth connection to a BT Mono headset using
+> the btsco application. It is working fine for Audio(xmms playing a
+> .wav file) SCO connection from PC to the BT headset(speaker).
+> 
+> But fails when I tried to test the headset MIC operation by carrying
+> out a recording operation using the sound recorder application on PC.
+> 
+> Please advice.
+> 
+> Thanks & Regards,
+> Benny
+> 
+> 
+> -------------------------------------------------------
+> This SF.net email is sponsored by Demarc:
+> A global provider of Threat Management Solutions.
+> Download our HomeAdmin security software for free today!
+> http://www.demarc.com/Info/Sentarus/hamr30
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
