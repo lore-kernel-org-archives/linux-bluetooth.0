@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Widcomm BlueConnect and Bluez
+Subject: Re: [Bluez-devel] Widcomm BlueConnect and Bluez
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Didier Alves <dsas@mega.ist.utl.pt>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000f01c3fc6f$303ed760$318388c1@zedidas>
-References: <000f01c3fc6f$303ed760$318388c1@zedidas>
+In-Reply-To: <000c01c3fc6b$95a62620$318388c1@zedidas>
+References: <000c01c3fc6b$95a62620$318388c1@zedidas>
 Content-Type: text/plain
-Message-Id: <1077804727.2754.44.camel@pegasus>
+Message-Id: <1077802051.2754.41.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,21 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Feb 2004 15:12:07 +0100
+Date: Thu, 26 Feb 2004 14:27:31 +0100
 
 Hi Didier,
 
-> > what kind of PDA is this? What kernel are you using? Make a binary
-> > hcidump and send it to us.
-> 
-> It's a Handspring Visor Pro with PalmOS 3.5.2H3.0. I read somewhere that
-> there is a problem with buffer overrun in that version of PalmOS.
+> Does anybody tried to connect a TDK CSR usb dongle using bluez and a PDA
+> with Widcomm Blueconnect 3.0 springboard? I can create rfcomm links
+> without any problem but after some time (2-10 seconds) the springboard
+> stop receiving data. The problem occurs when I try to send a stream of
+> data from the PC with bluez. It looks like there is a buffer overrun on
+> the receiver. I know that the problem is from the PDA but since that
+> Widcomm stopped working on BlueConnect, I can't get any help from them.
+> So if anybody has any ideia about what the problem is and how to resolve
+> it, please help.
 
-please run "hcitool info <bdaddr-visor>" (as root).
-
-> The Bluez kernel version is 2.3.
-
-Don't use this. A kernel with my -mh patch is enough.
+what kind of PDA is this? What kernel are you using? Make a binary
+hcidump and send it to us.
 
 Regards
 
