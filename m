@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Logitech DiNovo?
+Subject: Re: [Bluez-users] Timeout message from kernel
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Dominik Behr <dominik@dominikbehr.com>
+To: Jeff Sutherland <jeffs@fairwayacademy.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040209034835.15ac7289@localhost>
-References: <20040209034835.15ac7289@localhost>
+In-Reply-To: <200402131023.03974.jeffs@fairwayacademy.org>
+References: <200402121636.02074.jeffs@fairwayacademy.org>
+	 <200402130917.46561.jeffs@fairwayacademy.org>
+	 <1076682121.2671.53.camel@pegasus>
+	 <200402131023.03974.jeffs@fairwayacademy.org>
 Content-Type: text/plain
-Message-Id: <1076686208.2671.86.camel@pegasus>
+Message-Id: <1076686120.2671.83.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +21,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 16:30:09 +0100
+Date: Fri, 13 Feb 2004 16:28:40 +0100
 
-Hi Dominik,
+Hi Jeff,
 
-> I have recently got me Logitech DiNovo. So far everything seems to work fine in USB boot protocol mode. Will ever Logitech bluetooth hub be supported in bluez? Or is it the classic "no documentation" problem?
+> > Using l2test is easy and with -h you see all the options ;)
+> >
+> > 	One side:	l2test -r	/* listen and receive */
+> > 	Other side:	l2test -s	/* connect and send */
+> 
+> Hmmm...
+> [root@Arwen test]# ./l2test -w
+> l2test[29184]: Waiting for connection on psm 10 ...
+> 
+> /bin> l2test -r
+> l2test[79]: Waiting for connection on psm 10 ...
 
-I thought, that I already answered this question. The hid2hci programs
-supports the Logitech Bluetooth HUB, but you need a special kernel patch
-for the USB HID driver. Look at the mailing list archive.
+why don't you try what I have written? And read what "l2test -h" says.
+
+	l2test -r	/* listen and receive */
+	l2test -w	/* listen and send */
+
+Two connections that are listening. How should they connect to each
+other?
+
+> Note that from ColdFire, this fails:
+> /bin> hcitool cc --role=s 00:0A:4F:00:09:5E
+> bcsp_timed_event: Timeout, retransmitting 1 pkts
+> Can't create connection: Input/output error
+> 
+> /bin> hcitool con
+> Connections:
+> 
+> But from the pc, I get this:
+> [root@Arwen test]# hcitool cc --role=m 00:0A:4F:00:13:5F
+> Can't create connection: Connection timed out
+> 
+> But now running 'hcitool con' on Coldfire gives this:
+> /bin> hcitool con
+> Connections:
+>         > ACL 00:0A:4F:00:09:5E handle 40 state 1 lm SLAVE
+> 
+> and from the pc:
+> [root@Arwen test]# hcitool con
+> Connections:
+>         < ACL 00:0A:4F:00:13:5F handle 41 state 1 lm MASTER
+> 
+> So it seems that hcitool <> hcid, or userland <> kernel is messed up on 
+> ColdFire, is that correct?  Remember I'm still a newbie at this...
+
+Maybe this is a role switch problem. Show us both outputs from
+"hciconfig -a".
 
 Regards
 
