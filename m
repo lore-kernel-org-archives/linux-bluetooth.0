@@ -1,62 +1,60 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <40A27A5C.4080603@thomae-privat.de>
-From: Matthias Thomae <bluez@thomae-privat.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] PAN and bridge problem when bnep0 disconnects before bnep1
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 May 2004 21:26:20 +0200
+Return-Path: <SRS0+9677ac3b03026936ed9b+262+infradead.org+dwmw2@pentafluge-190310.srs.infradead.org>
+Subject: Re: [Bluez-devel] autoconf breaks portability. Film at 11.
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1084382619.25099.81.camel@pegasus>
+References: <1084268833.11301.0.camel@hades.cambridge.redhat.com>
+	 <1084368666.25099.38.camel@pegasus>
+	 <1084369122.4426.106.camel@hades.cambridge.redhat.com>
+	 <1084369703.25099.56.camel@pegasus>
+	 <1084371089.4426.148.camel@hades.cambridge.redhat.com>
+	 <1084382619.25099.81.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1084384989.4426.450.camel@hades.cambridge.redhat.com>
+Mime-Version: 1.0
+Date: Wed, 12 May 2004 19:03:09 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hello,
+On Wed, 2004-05-12 at 19:23 +0200, Marcel Holtmann wrote:
+> Hi David,
+> 
+> > I sent you proper Makefiles a long time ago. You didn't apply them :)
+> 
+> must have missed it. Please send it again.
 
-I have a BlueZ NAP setup with bridging (essentially following the PAN
-HOWTO), which works quite nicely (thanks to all developers :) except
-when the first connected bnep0 client is killed before the 2nd client
-(bnep1).
+It was October 2002. I don't seem to be able to find my list archives
+from then -- it's possible I wasn't subscribed at the time, although
+that surprises me.
 
-I am running a DHCP server on the server's bridge (pan0), and eth0 is
-NOT part of the bridge, I use IP forwarding instead.
+http://sourceforge.net/mailarchive/message.php?msg_id=2348496
+http://sourceforge.net/mailarchive/message.php?msg_id=2360924
 
-The problem is, that after bnep0 is removed (by killing it on the
-respective client with 'pand -K'), bnep1 doesn't 'work' any longer,
-meaning ping etc. don't work any more. And I couldn't find anything in
-the syslogs, except that after a while the client's DHCP client starts
-to issue DHCPDISCOVERs.
+ftp://ftp.uk.linux.org/pub/people/dwmw2/random/bluez-makefiles-3.tar.gz
 
-ifdown/ifup on bnep1 don't seem to help either, the only way I could
-find to make it work again was to issue 'pand -K' on the server and
-reconnect the clients.
+I'd have to update them and there were a couple of missing features
+('make DESTDIR=xx install' comes to mind) but I'm more than happy to do
+so if you're interested. 
 
-If bnep1 disconnects before bnep0, no problem.
+> > configure.in:19: required file `./ltmain.sh' not found
+> > compat/Makefile.am: installing `./depcomp'
+> 
+> but this isn't a problem. It says something like that, but also creates
+> every file that it complains about.
 
-I'm using quite late BlueZ versions on all machines (at least kernel
-2.6.5-mh3 and the latest Debian bluez-utils 2.6-1 and bluez-pan
-1.1rel-4), and I can reproduce the behaviour also with a Windows client
-on bnep0.
+hades /hades/bluez/libs2 $ ./configure
+-bash2: ./configure: No such file or directory
 
-Any clues?
+> Actually I think I have fixed it in both packages. The different between
+> them is that the byteswap is done in libs2 and not utils2, while it is
+> done in utils and not libs. Please reinstall libs2 from CVS and check
+> again.
 
-Regards.
-Matthias
+'cvs up' shows no changes since I tested, in either libs2 or utils2.
+
+Will try again to eliminate user error in the morning. Three hours of
+phone conferences just melted my brain...
 
 
-
--------------------------------------------------------
-This SF.Net email is sponsored by Sleepycat Software
-Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to deliver
-higher performing products faster, at low TCO.
-http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+dwmw2
