@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Thomas Chiverton <thomas.chiverton@bluefinger.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] sonyericsson t630 info
-References: <200404142157.41467.cijoml@volny.cz>
-In-Reply-To: <200404142157.41467.cijoml@volny.cz>
+Message-ID: <20040423081644.55013.qmail@web20413.mail.yahoo.com>
+From: Marian Gasparovic <marosg@yahoo.com>
+Subject: Re: [Bluez-users] bluetooth/gprs problem
+To: Fredrik Hallgarde <bluez@tedde.nu>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <1082655413.408802b54131b@webmail.natdesign.m.se>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200404230941.21139@moveAlongNothingToSeeHere>
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,35 +17,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Apr 2004 09:41:21 +0100
+Date: Fri, 23 Apr 2004 01:16:44 -0700 (PDT)
 
-On Wednesday 14 Apr 2004 20:57 pm, Michal Semler (volny.cz) wrote:
-> sending info from SE t630 for including into your list:
+Fredrik,
+--- Fredrik Hallgarde <bluez@tedde.nu> wrote:
+> Hi,
+> 
+> > Fredrik, I looked in .config and I don't know what
+> to
+> > change, can somebody here help ? I include both
+> USB
+> > and Bluetooth sections. It is 2.4.25-mh3
+> > Thank you in advance
+> > Marian
+> 
+> > # CONFIG_USB_EHCI_HCD is not set
+> > CONFIG_USB_UHCI_ALT=y
+> > # CONFIG_USB_OHCI is not set
+> 
+> Unfortunately I don't have access to that machine
+> right now but IIRC I tried
+> using EHCI or OHCI instead of UHCI. I can verify
+> that tonight and post more info
+> tonight (if my cable works) or tomorrow (New York
+> time)
+> Since you are using USB debugging, are you getting
+> any errors or similar?
+> Does other Bluetooth connections work?
 
-There is a list somewhere ?
+I am still interested in your config although I made
+some progress.
+I don't get any error messages and I don't have any
+other Bluetooth connections. But I tried my setup with
+different usb dongle and everything worked fine so
+that is why I think there is a problem with bluetooth
+driver. But I may be wrong as I am in no way exeprt in
+this area.
+Marian
 
--- 
-Tom Chiverton 
-Advanced ColdFusion Programmer
 
-Tel: +44(0)1749 834997
-email: tom.chiverton@bluefinger.com
-BlueFinger Limited
-Underwood Business Park
-Wookey Hole Road, WELLS. BA5 1AF
-Tel: +44 (0)1749 834900
-Fax: +44 (0)1749 834901
-web: www.bluefinger.com
-Company Reg No: 4209395 Registered Office: 2 Temple Back East, Temple
-Quay, BRISTOL. BS1 6EG.
-*** This E-mail contains confidential information for the addressee
-only. If you are not the intended recipient, please notify us
-immediately. You should not use, disclose, distribute or copy this
-communication if received in error. No binding contract will result from
-this e-mail until such time as a written document is signed on behalf of
-the company. BlueFinger Limited cannot accept responsibility for the
-completeness or accuracy of this message as it has been transmitted over
-public networks.***
+	
+		
+__________________________________
+Do you Yahoo!?
+Yahoo! Photos: High-quality 4x6 digital prints for 25¢
+http://photos.yahoo.com/ph/print_splash
 
 
 -------------------------------------------------------
