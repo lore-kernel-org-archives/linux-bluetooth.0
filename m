@@ -1,51 +1,124 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Geert Geurts <geert@ebm.nl>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <1079973771.5419.24.camel@geert.ebm.nl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] sendmsg: No buffer space available
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Mar 2004 17:42:51 +0100
+Return-Path: <Albert.Rybalkin@Fiserv.com>
+Message-ID: <CF8C38B8FA1ED511A92400508BE37F0B0A961D04@exchange_corp.bhcsecurities.com>
+From: "Rybalkin, Albert" <Albert.Rybalkin@Fiserv.com>
+To: "'Marcel Holtmann'" <marcel@holtmann.org>,
+   "Rybalkin, Albert"
+	 <Albert.Rybalkin@Fiserv.com>
+Cc: "'bluez-users@lists.sourceforge.net'"
+	 <bluez-users@lists.sourceforge.net>,
+   "'albertr@iral.com'"
+	 <albertr@iral.com>
+Subject: RE: [Bluez-users] panu question
+Date: Mon, 22 Mar 2004 09:00:49 -0600
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C4101E.7619E1CC"
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hello, I've got a problem with my usb-dongle...
-as soon as I put request too much traffic over ppp (a webpage is too
-much, ping is no problem) the connection is broken...
-when I try to ping over the ppp after I got the timeout on my palm, I
-get sendmsg: No buffer space available 
-when I do the same when I didn't get the timeout message yet I get a
-normal reply...
+This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
 
-I found out that I have the same problem when I try connecting via
-normal cradle/cable...
-no matter witch speed I set! well tried 19200 without success...
+------_=_NextPart_001_01C4101E.7619E1CC
+Content-Type: text/plain
 
-I'm using gentoo linux
-devfs and usbfs
-2.4.23-ck3-mh2 kernel
-bluez-kernel-2.3
-bluez-libs-2.4
-bluez-pan-1.1
-bluez-sdp-1.5
-bluez-utils-2.3-r1
+Sorry for HTML message, didn't want to offend you...
+
+On a subject matter, I tracked down the problem to BlueSoeil.
+There's a possibility to set up NAT on incoming connections to
+PAN profile, which doesn't seem to work on my Win2K PC. Basic
+PAN (without NAT) works fine, even has a lame DHCP server.
+Thanks,
+--
+Albert Rybalkin
 
 
+-----Original Message-----
+From: Marcel Holtmann [mailto:marcel@holtmann.org] 
+Sent: Sunday, March 21, 2004 12:41 PM
+To: Rybalkin, Albert
+Cc: 'bluez-users@lists.sourceforge.net'; 'albertr@iral.com'
+Subject: Re: [Bluez-users] panu question
 
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+Hi Albert,
+
+> The NAP server is win2k box running BlueSoleil 1.4.2. PANU client is 
+> linux 2.4.18 with latest BlueZ kernel patches and recent userland. The 
+> client was trying to connect with:
+
+first stop sending HTML emails, because they are ugly to read and second
+create a binary hcidump with the -w option.
+
+Regards
+
+Marcel
+
+
+------_=_NextPart_001_01C4101E.7619E1CC
+Content-Type: text/html
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+5.5.2657.73">
+<TITLE>RE: [Bluez-users] panu question</TITLE>
+</HEAD>
+<BODY>
+
+<P><FONT SIZE=3D2>Sorry for HTML message, didn't want to offend =
+you...</FONT>
+</P>
+
+<P><FONT SIZE=3D2>On a subject matter, I tracked down the problem to =
+BlueSoeil.</FONT>
+<BR><FONT SIZE=3D2>There's a possibility to set up NAT on incoming =
+connections to</FONT>
+<BR><FONT SIZE=3D2>PAN profile, which doesn't seem to work on my Win2K =
+PC. Basic</FONT>
+<BR><FONT SIZE=3D2>PAN (without NAT) works fine, even has a lame DHCP =
+server.</FONT>
+<BR><FONT SIZE=3D2>Thanks,</FONT>
+<BR><FONT SIZE=3D2>--</FONT>
+<BR><FONT SIZE=3D2>Albert Rybalkin</FONT>
+</P>
+<BR>
+
+<P><FONT SIZE=3D2>-----Original Message-----</FONT>
+<BR><FONT SIZE=3D2>From: Marcel Holtmann [<A =
+HREF=3D"mailto:marcel@holtmann.org">mailto:marcel@holtmann.org</A>] =
+</FONT>
+<BR><FONT SIZE=3D2>Sent: Sunday, March 21, 2004 12:41 PM</FONT>
+<BR><FONT SIZE=3D2>To: Rybalkin, Albert</FONT>
+<BR><FONT SIZE=3D2>Cc: 'bluez-users@lists.sourceforge.net'; =
+'albertr@iral.com'</FONT>
+<BR><FONT SIZE=3D2>Subject: Re: [Bluez-users] panu question</FONT>
+</P>
+<BR>
+
+<P><FONT SIZE=3D2>Hi Albert,</FONT>
+</P>
+
+<P><FONT SIZE=3D2>&gt; The NAP server is win2k box running BlueSoleil =
+1.4.2. PANU client is </FONT>
+<BR><FONT SIZE=3D2>&gt; linux 2.4.18 with latest BlueZ kernel patches =
+and recent userland. The </FONT>
+<BR><FONT SIZE=3D2>&gt; client was trying to connect with:</FONT>
+</P>
+
+<P><FONT SIZE=3D2>first stop sending HTML emails, because they are ugly =
+to read and second create a binary hcidump with the -w option.</FONT>
+</P>
+
+<P><FONT SIZE=3D2>Regards</FONT>
+</P>
+
+<P><FONT SIZE=3D2>Marcel</FONT>
+</P>
+
+</BODY>
+</HTML>
+------_=_NextPart_001_01C4101E.7619E1CC--
