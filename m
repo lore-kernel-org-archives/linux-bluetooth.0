@@ -1,16 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Chris Searle <usenet@chrissearle.org>
-Message-ID: <87acxo48c4.fsf@alice.chrissearle.org>
-References: <lgk6wvgqax.fsf@montgomery.empolis.no>
-	<1090572097.21828.53.camel@pegasus>
-	<lg8ydbgliv.fsf@montgomery.empolis.no>
-	<1090572685.21828.58.camel@pegasus>
-	<lg4qnzgkuz.fsf@montgomery.empolis.no>
-	<1090573758.4791.1.camel@pegasus>
+Subject: Re: [Bluez-users] TECOM BT3035
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Roman K <papa@rbcmail.ru>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200407232245.46776.papa@rbcmail.ru>
+References: <200407231440.i6NEeI5l048844@www1.pochta.ru>
+	 <1090594196.4791.52.camel@pegasus>  <200407232245.46776.papa@rbcmail.ru>
+Content-Type: text/plain
+Message-Id: <1090659888.4791.68.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: hcid config
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,27 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 25 Jul 2004 13:47:23 +0200
+Date: Sat, 24 Jul 2004 11:04:48 +0200
 
->>>>> "Marcel" == Marcel Holtmann <marcel@holtmann.org> writes:
+Hi Roman,
 
-    Marcel> these devices are not brought up by hcid. Activate
-    Marcel> "autoinit" in hcid.conf and restart the hcid.
+> I've tried to apply the patches to SuSE kernel..
+> But it looks like these patches are already applied..
+> But still not works
 
-Still not getting any further. autoinit is already yes in the config
-file (see other post).
+my patches are for a vanilla kernel and will never apply to a SuSE
+kernel. You have to upgrade your kernel or apply the patch by hand.
 
-Some more info: on hcitool inq that both devices are reporting class
-0x000000.
+Regards
 
-Manually restarting hcid makes no difference (same result as using the
-/etc/init.d script). Stopping all other bluez things (sdp, dund etc)
-then just starting hcid - no change.
+Marcel
 
-Not sure how to follow this further.
-
--- 
-Chris Searle
 
 
 
