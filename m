@@ -1,6 +1,6 @@
 Return-Path: <djimenez@pobox.com>
-Message-ID: <40743083.6000409@pobox.com>
-Date: Wed, 07 Apr 2004 11:46:59 -0500
+Message-ID: <40742FB2.7030103@pobox.com>
+Date: Wed, 07 Apr 2004 11:43:30 -0500
 From: Daniel Jimenez <djimenez@pobox.com>
 MIME-Version: 1.0
 To: Marcel Holtmann <marcel@holtmann.org>
@@ -11,8 +11,10 @@ In-Reply-To: <1081348613.8755.5.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <bluez-users.lists.sourceforge.net>
 
+
+
 Marcel Holtmann wrote:
-> Hi Daniel,
+
 > I stopped working on the bt950_cs, because it should be driven by the
 > serial_cs driver and after that you can use hci_uart for it.
 > 
@@ -23,8 +25,9 @@ Marcel Holtmann wrote:
 > 
 > Marcel
 
-Also, I looked I can't find serial_cs in 2.6.5. What is it called?
+Marcell,
 
-Thanks,
+So you recommend that I use the serial_cs and hci_uart modules for my card?
+
 -- 
 Daniel Jimenez <djimenez[at]pobox[dot]com>
