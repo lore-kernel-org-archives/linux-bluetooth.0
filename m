@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Thomas Chiverton <thomas.chiverton@bluefinger.com>
-To: tim@birdsnest.maths.tcd.ie
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] File transfer
-References: <20040210093353.99692.qmail@web40701.mail.yahoo.com> <200402161333.21502.thomas.chiverton@bluefinger.com> <200402161515.37687.tim@birdsnest.maths.tcd.ie>
-In-Reply-To: <200402161515.37687.tim@birdsnest.maths.tcd.ie>
-Cc: bluez-users@lists.sourceforge.net
+References: <20040210093353.99692.qmail@web40701.mail.yahoo.com> <200402161256.04985.ah160@student.cs.york.ac.uk> <200402161316.24806.tim@birdsnest.maths.tcd.ie>
+In-Reply-To: <200402161316.24806.tim@birdsnest.maths.tcd.ie>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-1"
-Message-Id: <200402161531.56276.thomas.chiverton@bluefinger.com>
+Message-Id: <200402161340.17143.thomas.chiverton@bluefinger.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,25 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 16 Feb 2004 15:31:56 +0000
+Date: Mon, 16 Feb 2004 13:40:17 +0000
 
-On Monday 16 February 2004 15:15 pm, Timothy Murphy wrote:
-> Sadly I've had bad experiences with Konqueror,
-> and am now committed to Mozilla as my browser.
-> I suspect you will find most Fedora users prefer Mozilla.
+On Monday 16 February 2004 13:16 pm, Timothy Murphy wrote:
+> But could one use Mozilla (which is my browser) in the same way,
+> or is the program linked in some way to Konqueror?
 
-Konq. is used as a generic browser in KDE - it's a file browser as well as a 
-web browser, and each protocol (http://, sdp://) is provided by a plugin - 
-there just isn't a plugin for Mozilla that does the same job (yet !) :-)
-Personaly I use FireFox for the web, and Konq. for files.
+No. Yes :-)
 
-> I used to compile quite a lot,
-> but my experience trying to compile with KDE
-> is that it is rarely a useful way to spend one's time ...
+> as the compilation from CVS seems far from straightforward.
 
-With a decent package manager (Fedora has yum and apt, iirc) it's easy these 
-days - just grab the *-devel packages and most of your ./configure problems 
-go away.
+It was fairly easy to build from CVS on my RedHat9 box - there is a little bug 
+in it, but if you've ever done ./configure;make before you'll be fine.
 
 -- 
 Tom Chiverton 
