@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <008401c43b7c$54a74b90$0200a8c0@pc>
-From: "Piotr Skrzypek" <bluezet@interia.pl>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-2"
-Subject: [Bluez-users] install/connection problem
+From: "Nicholas A. Preyss" <nalp@gmx.net>
+To: bluez-users@lists.sf.net
+Subject: Re: [Bluez-users] Re: Can't understand
+Message-ID: <20040516195759.GA23071@gmx.net>
+References: <200405130659.45969.hedin@hiervard.ru> <200405131627.34993.hedin@hiervard.ru> <20040513103228.GA4449@gmx.net> <200405131950.38279.hedin@hiervard.ru> <20040513163305.GA4989@gmx.net> <1084485267.25099.158.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1084485267.25099.158.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,28 +17,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 May 2004 21:31:03 +0200
+Date: Sun, 16 May 2004 21:57:59 +0200
 
-Hello
-I`m new here and i`m new in linux. I`ve just installed BlueZ files in my
-machine with kernel 2.4.24 without any patches. I have installed everything
-in bluetooth section of the kernel. Now i don`t know, maybe i shoud install
-bnep as a module, because on most tutorials i see line modprobe bnep. Or
-maybe i don`t need to do it? just leave it installed in kernel? My next step
-was install everything from bluez. Of cource i couldn`t install kde
-bluetooth because of some problems, so i must work with command line. My
-point is to make network tcp/ip connection between server machine (debian)
-and windows xp. I realised, that i can see my server from the computer with
-windows. I see it as a "BlueZ" Device, and it has no protocols. Now: how can
-i create network connection, so i can share my internet connection with the
-other pc? And how can i make some simple security configuration, because i
-don`t want anyone to connect to my bluetooth device, except that machine
-with winXP. I hope U understood me. Pleas help me - i can`t find any
-tutorial that fits to my needs.  Maybe U have some expirience?
+On  0, Marcel Holtmann <marcel@holtmann.org> wrote:
 
-See You
+> Hi Nicholas,
+> 
+> > > [root@host-81-1-226-59 hedin]# /usr/sbin/hciconfig inqmode
+> > > Can't get device info: No such device
+> > 
+> > nor "inqmode". Why do you think, these are possible arguments?
+> 
+> let me correct you, because with bluez-utils-2.7 hciconfig has a command
+> inqmode to set the inquiry mode. Check with -h or the manpage for the
+> new Bluetooth 1.2 commands
 
+you are right, i am sorry my mistake. i was still running 2.6 on my laptop.
 
+nicholas
 
 
 -------------------------------------------------------
