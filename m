@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Kill l2test server
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de4657605011007106fbd81e8@mail.gmail.com>
-References: <2de4657605011007106fbd81e8@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1105370509.8652.24.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: soraberri <421246@posta.unizar.es>
+Message-ID: <cru52v$3da$1@sea.gmane.org>
+References: <27251cb805011005263325ddce@mail.gmail.com> <OFFD66E982.58D7AFC3-ONC1256F85.004A0E9B-C1256F85.004BE1D7@isbac.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <OFFD66E982.58D7AFC3-ONC1256F85.004A0E9B-C1256F85.004BE1D7@isbac.com>
+Subject: [Bluez-users] Re: rfcomm -> /dev/dsp? (phone as headset)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,23 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 Jan 2005 16:21:49 +0100
+Date: Mon, 10 Jan 2005 15:55:49 +0100
 
-Hi Manjunath,
+Hi Marius,
 
-> For the l2test, is there a cleaner method to kill the listening
-> receiver. I am using CTRL+C right now. I am trying to kill the active
-> socket....using close(s1)...but it doesn't seem to be working.
-> I want a clean exit.
+Marius Schaefer/Camberg/ISBAC wrote:
+> I would be very interested in doing this.
+> 
+> Imagine when you are at home, your bluetooth phone acts just like a normal 
+> wireless phone. You can make phone calls without having to pay the high 
+> mobile rates and it rings when there is an incoming call on your normal 
+> phone line.
+> 
+> When your phone is out of bluetooth range, you could switch on the mailbox 
+> on your phone line or set a call forwarding to your mobile.
+> 
+> I think there are a lot more things one could imagine...
+> 
+> Marius
+> 
 
-what do you wanna kill? The active connection or the listening socket?
-If you wanna separate them, then you need to add somekind of signal
-handling.
 
-Regards
-
-Marcel
-
+That's the point. You don't have to switch between different terminals. 
+The only gadget you need is your mobile, you every time use the same 
+phone book, regardless if you are at home or not. Make all the calls 
+from the same phone everywhere and let it decide whether it is in 
+bluetooth range or not (make a cheap call or not).
 
 
 
