@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] siemens lifebook 6120
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gabor Halaszvari <fire@3hacker.hu>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200309142035.30749.fire@3hacker.hu>
-References: <200309132053.40178.fire@3hacker.hu>
-	<1063546262.28890.467.camel@pegasus>  <200309142035.30749.fire@3hacker.hu>
-Content-Type: multipart/mixed; boundary="=-UO2yWL8xfeDbtqa+O2mX"
-Message-Id: <1064253356.5641.123.camel@pegasus>
-Mime-Version: 1.0
+From: maca02@atlas.cz
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] problems pairing with Nokia 3650
+In-Reply-To: <002801c37bbf$60443a80$0201a8c0@zazoumobile>
+Message-ID: <Pine.LNX.4.55.0309172102430.9571@maca.fortech.cz>
+References: <73d8c3bd2463806fbd0544eec8b00c2b@www1.mail.volny.cz>
+ <Pine.LNX.4.55.0309152052130.4567@maca.fortech.cz> <002801c37bbf$60443a80$0201a8c0@zazoumobile>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -19,74 +18,55 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 22 Sep 2003 19:55:50 +0200
+Date: Wed, 17 Sep 2003 21:04:08 +0200 (CEST)
+
+> Coming back to your problem, try to launch sdpd but don't advert any service
+> and let us know .
+
+How to run the sdpd without adverting any service?
 
 
---=-UO2yWL8xfeDbtqa+O2mX
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+On Mon, 15 Sep 2003, Xavier GARREAU wrote:
 
-Hi Gabor,
-
-> T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-> P:  Vendor=044e ProdID=3001 Rev= 3.36
-> S:  Manufacturer=ALPS
-> S:  Product=USB BT
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=250mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-
-the problem is, that the USB Bluetooth class is not set correctly. Try
-this patch. How old is your notebook?
-
-Regards
-
-Marcel
-
-
---=-UO2yWL8xfeDbtqa+O2mX
-Content-Disposition: attachment; filename=patch-hci-usb-alps-fix
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/x-patch; name=patch-hci-usb-alps-fix; charset=ISO-8859-15
-
-diff -urN linux-2.4.22/drivers/bluetooth/hci_usb.c linux-2.4.22-mh/drivers/=
-bluetooth/hci_usb.c
---- linux-2.4.22/drivers/bluetooth/hci_usb.c	Mon Aug 25 13:44:41 2003
-+++ linux-2.4.22-mh/drivers/bluetooth/hci_usb.c	Mon Sep 22 19:53:05 2003
-@@ -76,6 +76,9 @@
- 	/* Ericsson with non-standard id */
- 	{ USB_DEVICE(0x0bdb, 0x1002) },
-=20
-+	/* ALPS Module with non-standard id */
-+	{ USB_DEVICE(0x044e, 0x3002) },
-+
- 	/* Bluetooth Ultraport Module from IBM */
- 	{ USB_DEVICE(0x04bf, 0x030a) },
-=20
-
---=-UO2yWL8xfeDbtqa+O2mX--
-
+> > > HCI Event: Connect Request(0x04) plen 10
+> > < HCI Command: Accept Connection Request(0x01|0x0009) plen 7
+> > > HCI Event: Command Status(0x0f) plen 4
+> > > HCI Event: Connect Complete(0x03) plen 11
+> > > HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
+> > < HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
+> > > HCI Event: Command Status(0x0f) plen 4
+> > > HCI Event: Connection Packet Type Changed(0x1d) plen 5
+> > > ACL data: handle 0x0029 flags 0x02 dlen 12
+> >     L2CAP(s): Connect req: psm 1 scid 0x0045
+> > < ACL data: handle 0x0029 flags 0x02 dlen 16
+> >     L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0045 result 2
+> > status 0 > HCI Event: Number of Completed Packets(0x13) plen 5
+> > > HCI Event: Max Slots Change(0x1b) plen 3
+> > > HCI Event: Disconn Complete(0x05) plen 4
+>
+> This behaviour is strange but, it seems that your phones are trying to
+> establish a sdp connection (connection request psm 1 over L2CAP). Your
+> device answers "no" to it (dcid=0 and result=2) so the sdp connection fails
+> and so goes the pairing.
+>
+> To what i know, pairing should not be done this way. First a key request
+> should occur and you have to answer with a pin code request reply. Then,
+> only when the pairing is ok the remote device should browse your sdp server.
+>
+> I build some apps dealing with bluetooth and a home made minimal windows
+> stack with the sony ericsson P800 which does it this way. That's hopeful,
+> since i haven't had the time to code sdp till now...
+>
+> Coming back to your problem, try to launch sdpd but don't advert any service
+> and let us know ...
+>
+> BR,
+> Xavier Garreau
+>
+>
+>
+>
+>
 
 
 -------------------------------------------------------
