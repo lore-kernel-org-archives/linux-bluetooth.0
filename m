@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Edd Dumbill <edd@usefulinc.com>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <1083857533.16650.25.camel@saag>
+Message-Id: <1083847496.16650.8.camel@saag>
 Mime-Version: 1.0
 Content-Type: text/plain
-Subject: [Bluez-users] /usr/include/bluetooth/bnep.h
+Subject: [Bluez-users] New Debian packages
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,12 +15,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 06 May 2004 16:32:14 +0100
+Date: Thu, 06 May 2004 13:44:56 +0100
 
-This file is now shipped in bluez-pan and
-bluez-libs: /usr/include/bluetooth/bnep.h
+New packages for version 2.6 of -utils and -libs are available from
+Debian experimental and from
+http://bluez.sourceforge.net/download/debian/
 
-Marcel, I think another release of bluez-pan is needed.
+The reason they went to experimental is because of the deprecation of
+the sdp packages.
+
+If no problems are reported, I will be uploading these to Debian
+unstable in a few days.
 
 -- Edd
 
