@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Device Busy during "hcitool info" or
-	"sdptoolsearch"
-From: Marcel Holtmann <marcel@holtmann.org>
-To: ag@new-media-artists.de
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <FJENILNPNAGPJMMDOKDCEEKKDJAA.ag@new-media-artists.de>
-References: <FJENILNPNAGPJMMDOKDCEEKKDJAA.ag@new-media-artists.de>
-Content-Type: text/plain
-Message-Id: <1071739500.3873.11.camel@pegasus>
-Mime-Version: 1.0
+Reply-To: <ag@new-media-artists.de>
+From: "Andreas Gaufer" <ag@new-media-artists.de>
+To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+Subject: AW:  [Bluez-devel] Device Busy during "hcitool info" or  "sdptoolsearch"
+Message-ID: <FJENILNPNAGPJMMDOKDCEEKKDJAA.ag@new-media-artists.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <3FE0C1B9.5090504@csr.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,33 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 18 Dec 2003 10:25:01 +0100
+Date: Thu, 18 Dec 2003 01:50:20 +0100
 
-Hi Andreas,
+Hi Steven, Marcel, List,
 
-> >In your case, the correct response to having your inquiry rejected is
-> >to back off for a few seconds and try again - either that, or find some
-> >way of sharing access to the device.
-> 
-> Sounds good to me, im actualy handling it like this. The only problem is if
-> a device is in range that does not respond to the connection attemt will
-> make the device unusable for inquiry until the connection attemt times out.
+>In your case, the correct response to having your inquiry rejected is
+>to back off for a few seconds and try again - either that, or find some
+>way of sharing access to the device.
 
-If the device runs an inquiry the kernel sets the HCI_INQUIRY flag. You
-can check this with hciconfig.
+Sounds good to me, im actualy handling it like this. The only problem is if
+a device is in range that does not respond to the connection attemt will
+make the device unusable for inquiry until the connection attemt times out.
 
-> Who decides when to timeout? I guess the host, so where can i configure
-> these timeouts?
+Who decides when to timeout? I guess the host, so where can i configure
+these timeouts?
 
-we have timers on the host stack, but the important one is the page
-timeout of the link manager. You should start reading the HCI spec. to
-see what you can set on chip level. And "man hciconfig" is also very
-helpful ;)
+Greetings
 
-Regards
-
-Marcel
-
+Andreas
 
 
 
