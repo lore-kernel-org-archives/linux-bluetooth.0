@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <3F66141E.6050201@libcon.net>
-From: =?ISO-8859-1?Q?Fredrik_Hallg=E5rde?= <fredrik@libcon.net>
+Message-ID: <002801c37bbf$60443a80$0201a8c0@zazoumobile>
+From: "Xavier GARREAU" <x.garreau@prim-time.fr>
+To: <maca02@atlas.cz>, <bluez-users@lists.sourceforge.net>
+References: <73d8c3bd2463806fbd0544eec8b00c2b@www1.mail.volny.cz> <Pine.LNX.4.55.0309152052130.4567@maca.fortech.cz>
+Subject: Re: [Bluez-users] problems pairing with Nokia 3650
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Anyone using a NEC e606 and BlueZ?
+Content-Type: text/plain;
+	charset="iso-8859-2"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -15,38 +17,42 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 15 Sep 2003 21:33:50 +0200
+Date: Mon, 15 Sep 2003 21:27:17 +0200
 
-Hi!
+> > HCI Event: Connect Request(0x04) plen 10
+> < HCI Command: Accept Connection Request(0x01|0x0009) plen 7
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Connect Complete(0x03) plen 11
+> > HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
+> < HCI Command: Change Connection Packet Type(0x01|0x000f) plen 4
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Connection Packet Type Changed(0x1d) plen 5
+> > ACL data: handle 0x0029 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0045
+> < ACL data: handle 0x0029 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0045 result 2
+> status 0 > HCI Event: Number of Completed Packets(0x13) plen 5
+> > HCI Event: Max Slots Change(0x1b) plen 3
+> > HCI Event: Disconn Complete(0x05) plen 4
 
-I have serious problems keeping the ppp-connection via bluetooth.
-The system is as follows:
-mh3-patched Linux 2.4.21
-IOGEAR GBU-301 (USB BC2033)
-NEC e606 (3G/UMTS) Mobile
+This behaviour is strange but, it seems that your phones are trying to
+establish a sdp connection (connection request psm 1 over L2CAP). Your
+device answers "no" to it (dcid=0 and result=2) so the sdp connection fails
+and so goes the pairing.
 
-Using bluefw I get hci0 working.
-Binding with rfcomm works.
-I connect with rp3-config (RedHat ppp-dialer config)
-the connection comes up, setting routing etc.
-after a few moments (10-30 sec) te connection dies.
+To what i know, pairing should not be done this way. First a key request
+should occur and you have to answer with a pin code request reply. Then,
+only when the pairing is ok the remote device should browse your sdp server.
 
-After that the bluetooth device seems stop working...
+I build some apps dealing with bluetooth and a home made minimal windows
+stack with the sony ericsson P800 which does it this way. That's hopeful,
+since i haven't had the time to code sdp till now...
 
+Coming back to your problem, try to launch sdpd but don't advert any service
+and let us know ...
 
-Any ideas? Any part of BlueZ kernelpatches I must have? (I think I 
-didn't put i zero-packets) Should I post any specific dumps/logfiles?
-
-
-TIA
-
-Fredrik
-
--- 
-********************
-Fredrik Hallgårde
-fredrik@libcon.net
-
+BR,
+Xavier Garreau
 
 
 
