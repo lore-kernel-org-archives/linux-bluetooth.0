@@ -1,11 +1,26 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT-1.2 spec device
+Subject: Re: [Bluez-users] Source sample custom Bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2de46576050103071248159461@mail.gmail.com>
-References: <2de46576050103071248159461@mail.gmail.com>
+In-Reply-To: <FA69107A-5DAA-11D9-8017-000D9348D4BE@magnifeye.com>
+References: <4dfd570904122402134ec2fd32@mail.gmail.com>
+	 <4dfd570904122509237f2a2f48@mail.gmail.com>
+	 <1103995727.8758.31.camel@pegasus>
+	 <4dfd570904122509451e811d7a@mail.gmail.com>
+	 <1103996976.8758.34.camel@pegasus>
+	 <4dfd5709041225095410f71a46@mail.gmail.com>
+	 <1103997529.8758.36.camel@pegasus>
+	 <4dfd570904122510081a9bfa7@mail.gmail.com>
+	 <4dfd570904122510085371c17b@mail.gmail.com>
+	 <4dfd57090412251011705f52be@mail.gmail.com>
+	 <4dfd5709041225103246f6934c@mail.gmail.com>
+	 <1104000494.8758.46.camel@pegasus> <002601c4ebb8$4de24200$020ba8c0@heejune>
+	 <1104125195.9393.12.camel@pegasus>
+	 <BEB39C04-5B6A-11D9-8017-000D9348D4BE@magnifeye.com>
+	 <1104604846.4253.1.camel@pegasus>
+	 <FA69107A-5DAA-11D9-8017-000D9348D4BE@magnifeye.com>
 Content-Type: text/plain
-Message-Id: <1104776590.8894.57.camel@pegasus>
+Message-Id: <1104776407.8894.53.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,32 +33,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 03 Jan 2005 19:23:10 +0100
+Date: Mon, 03 Jan 2005 19:20:07 +0100
 
-Hi Manjunath,
+Hi Jonathan,
 
-> I am looking at a BT dongle with Adaptive Frequency Hopping and power
-> control. I think I will find both these features in a Class-1 ,1.2
-> spec device.
+> The custom device I am talking to does not support a sdp server. I can 
+> see it with a hcitool scan. The call to sdptool fails to connect due to 
+> a timeout.
+> 
+> Is there a sample that shows sending bytes at a higher level?
+> 
+> I am sure that eventually I will figure it out, but just in case is 
+> there a make file or command to build rctest?
 
-you can update the D-Link DBT-120 Rev. B3.
-
-> I am looking at another feature, that is the device should be able to
-> read the piconet clock. i found that DBT-120 did not have this
-> feature. But DBT seemed to give a better LQ value. So i am a little
-> unsure about which product to purchase.
-
-As far as I know it has support for it after you flashed a HCI 18.x
-firmware into it.
- 
-> can you tell me which BT product with 1.2 spec with the above features
-> i can purchase??Will the BT products with EDR hit the market soon..
-
-The number of Bluetooth 1.2 dongles is quite limited. However you can
-flash the D-Link with the Apple firmware or get a Anycom based on a
-Silicon Wave. These are the only ones I know of. I expect the first EDR
-dongles very soon, but actually this depends on how fast CSR can deliver
-its BlueCore4 in large quantities.
+having a SDP server is nice, but you don't really need it. Simple make
+sure that you use the same RFCOMM channel on the server and on the
+client side and everything will be fine.
 
 Regards
 
