@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4201644B.5050302@ynet.sk>
-From: kevin_m <kevin_m@ynet.sk>
-MIME-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] specific bluetooth configuration
+Subject: Re: [Bluez-users] CSR USB dongle w/BT 1.2 and headset/handsfree profiles?
+References: <ctriti$j66$1@sea.gmane.org>
+In-Reply-To: <ctriti$j66$1@sea.gmane.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200502022312.51283.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,33 +19,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 03 Feb 2005 00:37:47 +0100
+Date: Wed, 2 Feb 2005 23:12:51 +0100
 
-hi,
-In my kernel (2.6.9) are this bluetooth settings:
-CONFIG_BT=y
-CONFIG_BT_L2CAP=y
-# CONFIG_BT_SCO is not set
-# CONFIG_BT_RFCOMM is not set
-CONFIG_BT_BNEP=y
-# CONFIG_BT_BNEP_MC_FILTER is not set
-# CONFIG_BT_BNEP_PROTO_FILTER is not set
-# CONFIG_BT_HIDP is not set
-#
-# Bluetooth device drivers
-#
-CONFIG_BT_HCIUART=y
-CONFIG_BT_HCIUART_H4=y
-# CONFIG_BT_HCIUART_BCSP is not set
-# CONFIG_BT_HCIVHCI is not set
-# CONFIG_NETDEVICES is not set
+D-Link DBT-120 rev B3 is your choice :)
 
-My question is, if with this configuration is possible to make stable 
-bluetooth communications(f.g. with mobile phone).And if Yes, how?
+Michal
 
-[I know that it would be more easily with another kernel configuration, 
-byt I'm interesting about this configuration(I have some reasons)]
+Dne st 2. =FAnora 2005 23:07 Jesse Guardiani napsal(a):
+> Hello,
+>
+> I've been googling, but not much luck. Does
+> anyone know of a CSR chipset based USB dongle
+> that is firmware upgradeable to BT 1.2 (or
+> ships with BT 1.2) and that also supports the
+> headset and handsfree profiles under Bluez?
+>
+> All the CSR chipset dongles I've seen so far
+> appear to be BT 1.1, but I'd really really
+> like to own an BT 1.2 dongle with AFH!
+>
+> Thanks!
 
+=2D-=20
+S pozdravem
+
+Michal Semler
 
 
 -------------------------------------------------------
