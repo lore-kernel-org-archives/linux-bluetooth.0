@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Jose Bernardo Silva" <jbs@bandos.homelinux.com>
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Dongle firmware
-Message-Id: <20050104210042.M19007@bandos.homelinux.com>
-In-Reply-To: <1104841297.8894.92.camel@pegasus>
-References: <20050104110418.M39860@bandos.homelinux.com> <1104841297.8894.92.camel@pegasus>
+References: <20050104110418.M39860@bandos.homelinux.com>
+In-Reply-To: <20050104110418.M39860@bandos.homelinux.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset=iso-8859-1
+  charset="iso-8859-1"
+Message-Id: <200501042139.33241.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,53 +19,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 4 Jan 2005 21:16:15 +0000
+Date: Tue, 4 Jan 2005 21:39:32 +0100
 
-On Tue, 04 Jan 2005 13:21:37 +0100, Marcel Holtmann wrote
-> Hi Jose,
-> 
-> > I've seen recently a few messages about new firmwares, is there a list of
-> > dongles and firmwares available?
-> > I have a Acer BT-500 and a MSI MS-6967, and I'd like to update these two.
-> 
-> you should actually ask the vendor of these dongles for updates. However
-> the ACER is a BlueCore01b and can't be updated with the 
-> GenericCSR.dfu firmware file and for the MSI I don't know. The 
-> general rule at the moment is if "hciconfig hci0 revision" don't 
-> show BlueCore02 and lsusb don't show it as a "Cambridge Silicion 
-> Radio". You shouldn't even try to update it.
-> 
+I prepare this site with howto backup, upgrade and send me firmware from=20
+dongles using Marcel's btdfu and Widcomm stack's utility to share them with=
+=20
+others.
 
-Marcel,
+It will be up in mid-February starting with about 20 firmwares from differe=
+nt=20
+dongles I have access for now.
 
-My BT-500 shows in lsusb as " ID 0a12:0001 Cambridge Silicon Radio Ltd.", and
-"hciconfig hci0 revision shows it as a BlueCore02 as follows:
-hci0:   Type: USB
-        BD Address: 00:60:57:32:96:0E ACL MTU: 192:8  SCO MTU: 64:8
-        HCI 14.7
-        Chip version: BlueCore02 (ES2)
-        Max key size: 56 bit
-        SCO mapping:  PCM
+So people SEND ME YOUR'S FIRMWARES!
 
-Does this mean I can update it? If so, where can I get that GenericCSR.dfu
-firmware, and what can I use to update?
+Still hope this doesn't violate any licence I know...
 
-As for the MSI, the lsusb output isn't very promising ("ID 0db0:1967"), even
-thoguh the output of hciconfig is similar:
-hci0:   Type: USB
-        BD Address: 00:10:DC:AF:E1:13 ACL MTU: 192:8  SCO MTU: 64:8
-        HCI 16.4
-        Chip version: BlueCore02
-        Max key size: 56 bit
-        SCO mapping:  HCI
+It is better to have list with info this dongle work with this this and thi=
+s=20
+firmware to prevent destroyed devices
 
--- 
-Jose Bernardo B R Silva             | Source Mage GNU/Linux Section Guru
-jbernardo@sourcemage.org            | http://www.sourcemage.org
-http://counter.li.org #245602
-http://cosmos.oninetspeed.pt/jose.bernardo
-jbs@bandos.homelinux.com
+Michal
 
+Dne =FAt 4. ledna 2005 12:09 Jose Bernardo Silva napsal(a):
+> I've seen recently a few messages about new firmwares, is there a list of
+> dongles and firmwares available?
+> I have a Acer BT-500 and a MSI MS-6967, and I'd like to update these two.
+>
+> Thanks!
 
 
 -------------------------------------------------------
