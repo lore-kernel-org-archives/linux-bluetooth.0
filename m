@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Elisabetta Gilli (diTEC001) - S.G.E. Srl" <ditec001@sgeweb.it>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <006a01c509f5$3bd6d660$1102a8c0@TIN.IT>
+Message-ID: <42022A83.2030502@avantwave.com>
+From: mike <mikelee@avantwave.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_006B_01C509FD.9D9B3E60"
-Subject: [Bluez-devel] Information on Scatternet
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Hardware error
+References: <41FF6E2C.7040908@avantwave.com> <41FF97A2.7080002@csr.com>
+In-Reply-To: <41FF97A2.7080002@csr.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,89 +18,73 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 3 Feb 2005 14:35:31 +0100
+Date: Thu, 03 Feb 2005 21:43:31 +0800
 
-This is a multi-part message in MIME format.
+Dear Steven
+    Thanks for information, I have checked that the error code is 0xfe. 
+Actually, i do not use cable as i am using 921600 baud rate, cable 
+increase the error rate. 
+    I am trying to modify the coding.
+ 
+    Anyways, thanks a lot
+best regard
+Mike,Lee
 
-------=_NextPart_000_006B_01C509FD.9D9B3E60
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
+Steven Singer wrote:
 
-Hello,
-I would like to know if it's possible to realize a BT scatternet made by
-some hundreds (300 for example) of piconets. Each node of the piconet (max
-5) has to connect only with the master of the piconet itself, and each
-piconet has to send and receive data, via BT, with a PC that has to  collect
-and manage the data of all the piconets. The distance between the majority
-of the piconets and the PC is greater than the max possible for a BT class 1
-device, so it's necessary that the master of each piconet work as a gateway
-for the other piconets.
-
-I hope to have been enough clear. I kindly ask you an answer for the
-feasibility of such kind of BT network, or eventually to know the max number
-of nodes that can be managed.
-
-Best regards
-
-Elisabetta Gilli
-
-------=_NextPart_000_006B_01C509FD.9D9B3E60
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Diso-8859-1">
-
-
-<META content=3D"MSHTML 6.00.2716.2200" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV>
-<DIV><FONT face=3D"Courier New" size=3D2><SPAN=20
-class=3D560551210-03022005>Hello,</SPAN></FONT></DIV>
-<DIV><FONT face=3D"Courier New" size=3D2><SPAN =
-class=3D560551210-03022005>I would like=20
-to know if it's possible to realize a BT scatternet made by some =
-hundreds (300=20
-for example) of&nbsp;piconets. Each node of the piconet (max 5)&nbsp;has =
-to=20
-connect only with the master of the piconet itself, and each piconet has =
-to send=20
-and receive&nbsp;data<SPAN class=3D430313113-03022005>, </SPAN><SPAN=20
-class=3D430313113-03022005>via BT,&nbsp;</SPAN>with a PC that has to =
-&nbsp;collect=20
-and manage the data of all the piconets. The =
-distance&nbsp;between&nbsp;the=20
-majority of the&nbsp;piconets and the PC is greater than the max =
-possible for a=20
-BT class 1 device, so it's necessary that the master of&nbsp;each =
-piconet work=20
-as a gateway for the other piconets.&nbsp;</SPAN></FONT></DIV>
-<DIV><FONT face=3D"Courier New" size=3D2><SPAN=20
-class=3D560551210-03022005></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3D"Courier New" size=3D2><SPAN =
-class=3D560551210-03022005>I hope to=20
-have been enough clear. I kindly ask you an answer for the feasibility =
-of such=20
-kind of BT network, or eventually to know the max number of nodes that =
-can be=20
-managed.</SPAN></FONT></DIV>
-<DIV><FONT face=3D"Courier New" size=3D2><SPAN=20
-class=3D560551210-03022005></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3D"Courier New" size=3D2><SPAN =
-class=3D560551210-03022005>Best=20
-regards</SPAN></FONT></DIV>
-<DIV><FONT face=3D"Courier New" size=3D2><SPAN=20
-class=3D560551210-03022005></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3D"Courier New" size=3D2><SPAN =
-class=3D560551210-03022005>Elisabetta=20
-Gilli</SPAN></FONT></DIV></DIV></BODY></HTML>
-
-------=_NextPart_000_006B_01C509FD.9D9B3E60--
-
+>mike wrote:
+>  
+>
+>> > HCI Event: Hardware Error(0x10) plen 1
+>>    
+>>
+>
+>If you find out what the parameter was to the hardware error event, you
+>might get a clue as to what was going on.
+>
+>You can look up the hardware error codes for CSR chips in the document
+>HQ Commands (bcore-sp-003Pc) on the CSR support web site if you have
+>access (www.csrsupport.com).
+>
+>The most common hardware error emitted by CSR devices running the H4
+>UART host transport is 0xfe. This indicates that the chip has lost HCI
+>synchronisation with the host. This is caused either by the host sending
+>invalid data or because of corruption of the UART traffic on the wire.
+>
+>Unfortunately, the H4 UART protocol does not support a proper error
+>recovery procedure. The only option, once this error has occurred, is
+>to issue an HCI_Reset which will, of course, tear down all existing
+>links.
+>
+>	- Steven
+>
+>
+>**********************************************************************
+>This email and any files transmitted with it are confidential and
+>intended solely for the use of the individual or entity to whom they
+>are addressed. If you have received this email in error please notify
+>the system manager.
+>
+>This footnote also confirms that this email message has been swept by
+>MIMEsweeper for the presence of computer viruses.
+>
+>www.mimesweeper.com
+>**********************************************************************
+>
+>
+>
+>-------------------------------------------------------
+>This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+>Tool for open source databases. Create drag-&-drop reports. Save time
+>by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+>Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>  
+>
 
 
 
