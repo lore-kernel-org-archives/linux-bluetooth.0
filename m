@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec0406222219c5d442b@mail.gmail.com>
-From: Albert Huang <ashuang@gmail.com>
+From: Tony Lindgren <tony@atomide.com>
 To: bluez-devel@lists.sourceforge.net
+Message-ID: <20040623031119.GA20367@atomide.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_15_9104397.1087967986687"
-Subject: [Bluez-devel] how well supported is hci_read_rssi and hci_read_link_quality?
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] AmbiCom BT2000C works with hciattach
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,54 +15,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 23 Jun 2004 01:19:46 -0400
+Date: Tue, 22 Jun 2004 20:11:20 -0700
 
-------=_Part_15_9104397.1087967986687
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi all,
 
-Hello,
+Just FYI, there was some discussion here a while back on the 
+AmbiCom BT2000C, which is different from the earlier BT2000 
+models.
 
-Does anyone have a rough estimate, or even a list, of the devices that
-support hci_read_rssi and hci_read_link_quality?  Am I correct in
-assuming that some devices supoprt it and some don't?  For example, a
-program that reads rssi and link quality that works beautifully on an
-x86 with a d-link usb bluetooth dongle doesn't seem to work at all on
-an HP ipaq h5550.  On the ipaq, the link quality is always 0 and rssi
-is always 255.
+Well turns out it works fine with serial_cs + hciattach:
 
-The attached patch changes cmd_lq in hcitool.c to print out an
-unsigned integer instead of a signed integer.
+hciattach /dev/ttyS1 csr -s 57600 57600
+or
+hciattach /dev/ttyS1 csr -s 57600 460800
+hciconfig hci0 up
+hcitool scan
+...
 
-thanks.
--albert
+Sorry if this was already old news :) Please CC me on any 
+replies, I'm not subscribing.
 
-------=_Part_15_9104397.1087967986687
-Content-Type: text/plain; name="cmd_lq.diff"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment; filename="cmd_lq.diff"
+Regards,
 
-Index: tools/hcitool.c
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-RCS file: /cvsroot/bluez/utils/tools/hcitool.c,v
-retrieving revision 1.44
-diff -u -r1.44 hcitool.c
---- tools/hcitool.c=0912 Jun 2004 09:41:17 -0000=091.44
-+++ tools/hcitool.c=0923 Jun 2004 05:17:27 -0000
-@@ -982,7 +982,7 @@
- =09=09=09=09rp.status);
- =09=09exit(1);
- =09}
--=09printf("Link quality: %d\n", rp.link_quality);
-+=09printf("Link quality: %u\n", rp.link_quality);
-=20
- =09close(dd);
- =09free(cr);
+Tony
 
-------=_Part_15_9104397.1087967986687--
 
 
 -------------------------------------------------------
