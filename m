@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY12-F189C6AE7165F49B14F54BF8AB40@phx.gbl>
-From: "salvatore olgato" <sal_olg@hotmail.com>
+Message-ID: <2de46576041206085827162a8f@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
 To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Subject: [Bluez-users] registry
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] HCI data packets
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,20 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 17:09:20 +0000
+Date: Mon, 6 Dec 2004 22:28:46 +0530
 
-Hi, Marcel.
+Hi Marcel,
 
-Does BlueZ support Security manager, service database and device database?
+Does, opening a socket and then connect() at the
+L2CAP......automatically establish an HCI connection first and then an
+L2CAP connection on top of it??  This is what HCI dump shows..
 
-Where is the information on the security (any)?
+Can I in someway just create an HCI connection first and then pump HCI data
+packet with some known payload???How can i generate the test data
+packets........... In a way, i just want  pump raw bits.....
 
-Regards.
-
-_________________________________________________________________
-Personalizza MSN Messenger con sfondi e fotografie! 
-http://www.ilovemessenger.msn.it/
-
+Thanks,
+Regards,
+Manjunath
 
 
 -------------------------------------------------------
