@@ -1,84 +1,52 @@
-Return-Path: <pierren@mac.com>
-Subject: Re: [Bluez-users] Two simultanous connections
-From: Pierre N <pierren@mac.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] new bthid and switching off sensor in mouse???
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1080929429.2836.101.camel@pegasus>
-References: <1080928843.9541.90.camel@localhost>
-	 <1080929429.2836.101.camel@pegasus>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-RyjXSTOjpzQJqZ/kJhr6"
-Message-Id: <1080993011.12261.12.camel@localhost>
-Mime-Version: 1.0
-Date: Sat, 03 Apr 2004 13:50:11 +0200
-List-ID: <bluez-users.lists.sourceforge.net>
-
-
---=-RyjXSTOjpzQJqZ/kJhr6
+In-Reply-To: <200404031108.59037.cijoml@volny.cz>
+References: <200404021906.54779.cijoml@volny.cz>
+	 <200404030054.21634.cijoml@volny.cz> <1080964638.3456.8.camel@pegasus>
+	 <200404031108.59037.cijoml@volny.cz>
 Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Message-Id: <1080984184.2839.2.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 03 Apr 2004 11:23:04 +0200
 
-hcitool -a shows "invalid option -- a".
-This is the bluetooth chip of an iPaq 3970. It's running Familiar
-stable, so it must be a pretty old bluez version. Don't know if it
-helps...
+Hi Michal,
 
-Ok, I knew I had to give more details... I create links between 3 iPaqs.
-I tried using higher layer protocols to do so. Never worked. I'm just
-trying to do a TCP/IP network so I can run XML-RPC on top of it, ssh
-etc...
+> > Actually I diffed them and for the library the only change I see is the
+> > support for big endian. The change in the bthid program was only for the
+> > udev created device node of uinput.
+> 
+> No. It strange, I tried it again and problem is still here? Can't it be 
+> problem in endian changes in libs?
 
-That's all I need. I tried to use pan, never worked, I tried to use dun
-over pan, never worked, I tried to use rfcomm never worked. Always the
-same problem:
-I could connect A to B and B to C, never B to A and C to A.=20
+it can be. Please try to find out if it is part of HCI or SDP endian
+changes.
 
-Now I went the hcitool route. Created my own connections very very
-easily. I connected B to A and C to A (A master). Ran dund _after_
-hcitool connections and everything is running great.
+Regards
 
-hcitool con on A gives me two master connections. These connections have
-been initialised from B and C as slave. So I can have two master
-connections, but I can't create them from A. First one works, second one
-doesn't, nothing happen. It's just out of curiosity.
-
---
-Pierre
+Marcel
 
 
 
-On Fri, 2004-04-02 at 20:10, Marcel Holtmann wrote:
-> Hi Pierre,
->=20
-> > I've been trying to setup ip net with 3 identical devices connected
-> > simultanously over bluetooth. It works after a long
-> > while of fiddling around. I had to go the hcitool route manually to set
-> > the initial connections and then I could use dund no problem. My
-> > question is: why can't I initiate a connection (hcitool cc) from a
-> > device which is already connected?
->=20
-> for some setups this depends on your Bluetooth chip. So what does
-> "hciconfig -a" show? But I am not sure about what kind of network you
-> are talking, because between two device there can be only _one_ ACL link
-> and this means you can only use "hcitool cc" once. Actually there is no
-> need for creating the ACL link manually with hcitool, because every
-> higher layer will create it on demand.
->=20
-> Regards
->=20
-> Marcel
->=20
->=20
 
---=-RyjXSTOjpzQJqZ/kJhr6
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQBAbqTzZkVEuKKlE7gRAl/sAKDdGOPKg13HM99hB1NECx2Lz40sjgCdF9uJ
-g5rFH3aITVWzGOyqG3mt8eI=
-=MnS3
------END PGP SIGNATURE-----
-
---=-RyjXSTOjpzQJqZ/kJhr6--
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
