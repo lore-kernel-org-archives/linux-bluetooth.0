@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Chen Bin <binch@mobilesoft.com.cn>
+Message-ID: <20041021080034.18912.qmail@web41109.mail.yahoo.com>
+From: Sean Loh <blaze_wk@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1098352217.1912.4.camel@debian>
-Mime-Version: 1.0
-Subject: [Bluez-users] how to recognize whether the connected device is a headset
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Limit to maximum UDP packet size
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,26 +15,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 21 Oct 2004 17:50:17 +0800
+Date: Thu, 21 Oct 2004 01:00:34 -0700 (PDT)
 
-Hi all,
+Hi 
 
-Thanks very much for previous help from Holtman, and I happen a new
-problem when I try to find out whether a connected device is a headset.
+I have set up a PAN between two notebooks. I've
+managed to stream data using udp packets from one
+computer to another and it works fine. My problem
+occurs when I send udp packet sizes larger than 55000
+bytes. When I do an ifconfig, it seems that bytes are
+being sent out from one computer to another but my
+program refuses to read the data from the packets. 
 
-It can't be browsed using sdptool in both connected mode and discovery
-mode(paring state), I wonder how I can know its charactics after
-connected?
+My program is just a simple program that sends data
+fro one computer to another with no fancy code. Why
+should udp behave like this?
 
-My phone  will be appeared in 3G conference next month, so I am very
-anxious about the bluetooth feature...
+Besides that I think you guys are doing a great job
+with bluez!!
 
-Holtman, any idea?
 
-Thanks in advance!
-
-Chen
-
+		
+__________________________________
+Do you Yahoo!?
+Take Yahoo! Mail with you! Get it on your mobile phone.
+http://mobile.yahoo.com/maildemo 
 
 
 -------------------------------------------------------
