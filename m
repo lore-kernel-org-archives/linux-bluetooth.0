@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Mauro Tortonesi <mtortonesi@ing.unife.it>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200407161615.20726.mtortonesi@ing.unife.it>
-Subject: [Bluez-users] bluecore3-based usb dongles
+Subject: Re: [Bluez-users] MSI MS-6970 (BToes) firmware upgrade
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pavel Ruzicka <pavouk@pavouk.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>, cijoml@volny.cz
+In-Reply-To: <200407161045.10846.pavouk@pavouk.org>
+References: <200407131225.15448.pavouk@pavouk.org>
+	 <200407152241.30155.cijoml@volny.cz> <1089959822.4517.52.camel@pegasus>
+	 <200407161045.10846.pavouk@pavouk.org>
+Content-Type: text/plain
+Message-Id: <1089968030.4517.89.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,25 +20,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 16 Jul 2004 16:15:20 +0200
+Date: Fri, 16 Jul 2004 10:53:51 +0200
 
+Hi Pavel,
 
-hi to everybody,
+> > The only dongle that can be easily updated using the Apple firmware is
+> > from D-Link. And I only had success with the B3 revision. The B4 is not
+> > working and I broke another dongle of mine.
+> 
+> Can you tell me, if firmware for D-link use different key than firmware
+> for MSI?
 
-i would like to buy a couple of usb dongles based on the bluecore 3 chip to 
-use them with bluez. 
+I don't know, but I think so. You can check the USB vendor and product
+id for your dongle. If it is not the CSR default 0a12:0001 you shouldn't
+even think about a firmware upgrade.
 
-has anyone of you already tried one of those dongles? do you have any buying 
-suggestions?
+> It's possible to get this information from DFU file?
 
--- 
-Aequam memento rebus in arduis servare mentem...
+Not that I know.
 
-Mauro Tortonesi                 mtortonesi@ing.unife.it
-                                mauro@deepspace6.net
-                                mauro@ferrara.linux.it
-Deep Space 6 - IPv6 with Linux  http://www.deepspace6.net
-Ferrara Linux User Group        http://www.ferrara.linux.it
+Regards
+
+Marcel
 
 
 
