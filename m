@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Anthony Yulo" <strikewing16th@hotmail.com>
-To: bluez-devel@lists.sourceforge.net, blueinfo@yahoogroups.com
+Subject: Re: [Bluez-devel] problems with connect()
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Christian Hennrich <tettokalle@hotmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <3FFD826F.5080808@hotmail.com>
+References: <3FFD826F.5080808@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1073583332.2563.24.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <Law11-F108gLzhVOJwn00013a60@hotmail.com>
-Subject: [Bluez-devel] Bluetoooth and Threads?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,23 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 09 Jan 2004 03:38:09 +0000
+Date: Thu, 08 Jan 2004 18:35:32 +0100
 
-Hi!
+Hi Christian,
 
-I'm just wondering if multiple threads can have their own bluetooth stack?
+> I'm working on a programm which uses sdp to connect only to PANU, 
+> creating l2cap and bnep connections. First i start the master, that 
+> inquires and then connects to the discovered devices (using sdp), that 
+> are started as slaves. 2 slaves are connected(with one L2cap and one 
+> Bnep for each slave). this works very fine. then i want to connect the 
+> third and so on... but there is the problem: the third one can't connect 
+>    with sdp on or off. the connect(socket) command fails with the error:
+> 
+> Connect failed. Function not implemented(38).
+> 
+> on the slave machine is only one program started. i tried around with 
+> different dongles, but they are not the problem. what is wrong? has 
+> anybody some idea? i don't use fork. the sockets that are created(have 
+> all different numbers(increasing)). is there any limitation of creating 
+> sockets or something like this.
+> 
+> i think the problem is the master, because on the clients there are only 
+> 2 sockets created. i only have one dongle per pc.
 
-I'm planning of a single program that uses threads, one thread does only 
-device discovery.. and then store the devices on a list/queue.. and then 
-maybe a couple of threads that reads from  the queue and send data from the 
-devices on the queue using RFCOMM.. maybe i can have seven threads since 
-this is the maximum number bluetooth allows...
+I don't even understand what your setup is, but have you checked that
+role switch is allowed? Check the connection establishment with hcidump.
 
-is this possible?
+Regards
 
-_________________________________________________________________
-Add photos to your messages with MSN 8. Get 2 months FREE*. 
-http://join.msn.com/?page=features/featuredemail
+Marcel
+
 
 
 
