@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41F35B54.4080406@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Bluetrek G2
-References: <1106218017.6052.22.camel@baroque.rococosoft.com>
-In-Reply-To: <1106218017.6052.22.camel@baroque.rococosoft.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] Compiling the bluetooth kernel part only
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <loom.20050123T062904-951@post.gmane.org>
+References: <loom.20050123T062904-951@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1106460217.8118.7.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,29 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 23 Jan 2005 01:07:48 -0700
+Date: Sun, 23 Jan 2005 07:03:37 +0100
 
-Hi
+Hi Matthias,
 
-I made notes in the docs about PCM routing. Hopefully that was it.
+> is it possible to compile the .../linux/net/bluetooth directory only? 
+> I want to test some changes. 
 
-We keep a bug list in sourceforge. If you like the look of any of them, 
-jump in.
+within a 2.6 kernel source tree you can do:
 
-Brad
+	make net/bluetooth/
+	make drivers/bluetooth/
 
-Stephen Crane wrote:
-> Hello world,
-> Just to let you know that the above headset works fine with btsco and
-> 2.6.10-mh1 on Mandrake 10.1.  (I tried it with 2.6.10 and while it was
-> detected and connected, I couldn't get any sound out of it --- could
-> have been my fault though.)
-> 
-> About the web-page: it would be useful to have a TO-DO list so people
-> could dive in and fix/implement things.
-> 
-> Nice work!
-> Steve
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
