@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000201c46de3$e513f270$5e71bfac@oemcomputer>
-From: "Daniel Stoddart" <d.stoddart@cs.ucl.ac.uk>
-To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-References: <000d01c46b72$fb6af0f0$8425b9ac@oemcomputer> <1090012501.9117.29.camel@pegasus> <000701c46c08$958becd0$af2dbeac@oemcomputer> <1090078779.4558.35.camel@pegasus> <000201c46c5a$126175d0$13e9baac@oemcomputer> <1090141152.4558.52.camel@pegasus>
-Subject: Re: [Bluez-devel] Service registering but not visible
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+Subject: Re: [Bluez-devel] SCO audio packets dropping
+From: Marcel Holtmann <marcel@holtmann.org>
+To: ubaldo <ubaldo@eja.it>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040718194607.29341.qmail@webmail.aruba.it>
+References: <20040718194607.29341.qmail@webmail.aruba.it>
+Content-Type: text/plain
+Message-Id: <1090183633.4400.42.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,17 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 19 Jul 2004 23:47:10 +0100
+Date: Sun, 18 Jul 2004 22:47:13 +0200
 
-Hi Marcel,
+Hi,
 
-I've switched from Slackware to RedHat and everything is working fine now.
-Sorry to have wasted your time and
-thanks for your help.
+> With kernel 2.4.22, hcitools 2.2 and voice set 0x0060 HV1 if I play what I 
+> recorded (aplay -f S16_LE) the voice is a little bit quicker than normal. If 
+> I set voice as 0x0040 and "aplay -f S8" everything is perfect. 
+> 
+> With kernel 2.6.6 and voice 0x0060 HV1 everything is ok until I set the 
+> packet type as HV3, then same problem as with kernel 2.4.22. 
 
-Regards,
+try 2.4.22-mh6 and don't modify the packet types. Let the link manager
+be able to choose between HV1, HV2 and HV3.
 
-Dan
+Regards
+
+Marcel
 
 
 
