@@ -1,12 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41A3ACE2.4030501@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] audio problems with a2play
-References: <41A22C0B.4050008@xmission.com>	<41A234FA.7020303@xmission.com>	<20041123033429.132bf84b.henryk@ploetzli.ch>	<41A2B331.4010001@xmission.com>	<20041123070621.50569968.henryk@ploetzli.ch>	<41A3471C.4000602@xmission.com> <20041123203836.046fb4f4.henryk@ploetzli.ch>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <20041123203836.046fb4f4.henryk@ploetzli.ch>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+References: <41A22C0B.4050008@xmission.com> <41A234FA.7020303@xmission.com>
+	 <20041123033429.132bf84b.henryk@ploetzli.ch>
+	 <41A2B331.4010001@xmission.com>
+	 <20041123070621.50569968.henryk@ploetzli.ch>
+	 <41A3471C.4000602@xmission.com>
+	 <20041123203836.046fb4f4.henryk@ploetzli.ch>
+Content-Type: text/plain
+Message-Id: <1101244496.27351.29.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,30 +23,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Nov 2004 14:34:26 -0700
+Date: Tue, 23 Nov 2004 22:14:56 +0100
 
-Henryk
-
-> Yupp, looks correct to me. So does the new hcidumps's job of decoding
-> it.
-
-good
-
->>	s_config.sbc_elements.channel_mode = 8 >> sbc_info.channel_mode;
-> 
-> Heh, that's a clever way of doing this. 
-
-I am willing to do something more conventional if this method breaks :)
+Hi Henryk,
 
 > I also saw that you were modifying the way a2play packs its frame though
 > that still doesn't look right to me. Maybe we should talk about our
 > interpretation of the specs in this case.
-
-yes, exactly. Marcel got it to work by tracing the (non-spec!) traffic 
-produced by using his headset's transmitter. We don't have the luxury of 
-capturing the traffic but we should try to follow the spec as well as we 
-can.
-
+> 
+> The way I see this we should have a media packet header from AVDTP p. 45
+> and a media payload from A2DP p. 23. The media packet header should be
+> 12 octets in length (as we don't use any CSRC). I think a2play does
+> these right, except for the timestamp (I'll come to that in a second).
+> 
 > Next thing should be media payload header from A2DP which is 1 octet in
 > length and correct, too.
 > 
@@ -49,26 +43,34 @@ can.
 > produces them. That should start with 0x9C which I can't see anywhere in
 > the a2play output.
 
-we just send one sbc frame then? I was assuming that but not sure.
-
-Are you saying we should put 0x9c in the stream or it should be in the 
-stream already? The SBC-specific stuff is definitely where my 
-understanding ends.
+so should it be and I got a trace from a friend with a prototype A2DP
+device with a Zeevo ZV4002 and a Bluetooth stack from Impulsesoft. They
+actually do it this way, but GCT puts in 0xff 0xff. I haven't find any
+combination to make my Aiptek headphone understand the one byte media
+payload header. The very ugly thing is that this headphone is actually
+A2DP qualified.
 
 > Now I saw Marcel tried adding a timestamp (which I did, too, without
 > any effects, sadly). The way I read section 4.3.3.1 of A2DP would be
 > that there should be an imaginary clock counting at the sampling
 > frequency of the SBC frames and whose value should then be put into the
 > timestamp field. Or, simply put: Count the samples sent so far. 
-> 
+
+This was only a quick and dirty hack to see how my headphone behaves if
+I fill in that field. Actually it don't cares at all. I will check the
+other A2DP trace again, because I saw that they filled in the timestamp
+value and maybe the only count the SBC frames.
+
 > I've modified the CVS to my beliefs. Please correct me if you think I'm
 > wrong.
 
-I think what we have in CVS looks better but it doesn't sound better :(
+Didn't showed up so far.
 
-Are you using the bluetake too?
+Regards
 
-Brad
+Marcel
+
+
 
 
 -------------------------------------------------------
