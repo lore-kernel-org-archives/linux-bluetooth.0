@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20041109144107.19373.qmail@webmail.aruba.it>
-References: <20040727145602.30665.qmail@webmail.aruba.it>
-            <1090940808.4845.21.camel@pegasus>
-In-Reply-To: <1090940808.4845.21.camel@pegasus>
+Message-ID: <20041109150154.25020.qmail@webmail2.aruba.it>
 From: "ubaldo" <ubaldo@eja.it>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
 Content-Type: text/plain; format=flowed; charset="iso-8859-1"
-Subject: [Bluez-devel] Re: multi rfcomm/sco connection
+Subject: [Bluez-devel] siemens s55
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,19 +16,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 09 Nov 2004 15:41:07 +0100
+Date: Tue, 09 Nov 2004 16:01:54 +0100
 
-Ciao Suriyan, 
+Does anyone tried to use the audio bluetooth features of the S55? 
 
-I was looking, few months ago, for a way to solve a problem more or less 
-like your. 
+I mean I can listen/play audio on several nokia, motorola, etc. but I find 
+no way to play with the siemens. I saw that the bluetooth-alsa people 
+support the Jabra BT200 and Siemens HHB-600 (who should work with the S55) 
+but I didn't find their mailing-list, is there one? 
 
-All what I could do was to set the headphones to HV3 and the bt-dongle too, 
-in this mode it was possible to "listen"  audio on 3 different channels, the 
-problem, for me, was that this channels were "mixed" so if with a channel I 
-was receiving 24bit with 3 channels they were 72, but I could not find a way 
-to "demux" this caos who was coming out, but I remember I found a way to 
-"create" 3 different sco connections with just one bt-(usb)-dongle.
 
 
 -------------------------------------------------------
