@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41893E1D.701@meichtry.org>
-From: Johnathon Meichtry <johnathon@meichtry.org>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Zoom Bluetooth PCMCIA Card
+Subject: Re: [Bluez-users] Network Access Point - pairing problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "D.W." <sword@gmx.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <002901c4c1da$b4d3fec0$0300a8c0@supercomputer>
+References: <002901c4c1da$b4d3fec0$0300a8c0@supercomputer>
+Content-Type: text/plain
+Message-Id: <1099512925.7125.161.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,41 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 03 Nov 2004 20:22:53 +0000
+Date: Wed, 03 Nov 2004 21:15:25 +0100
 
-Hi everyone,
+Hi Daniel,
 
-Has anyone managed to get the *Zoom Bluetooth PCMCIA card* working with 
-the btuart_cs driver?  It's man.id us is the same as the CyberBlue CF 
-Card but when inserted I get the following:
+> I use kernel 2.4.22 on an axis devboard82. The bluez stack is not the
+> latest(PAN, SDP, utils, libs are still seperate packages), because I
+> had problems porting later versions to the devboard.
 
-*btuart_config: No usable port range found
-btuart_cs: RequestIO: No more items*
+you use a version where many fixes are missing.
 
-Yet i have ample resources and when inserted in the same machine (a 
-laptop) running XP the Widcomm drivers load fine so there is no hardware 
-compat. issue.
+> But except the pairing problem at first contact it works perfectly.
+> Except the PIN (it's a static one at server side) there is no further
+> authentification necessary.
+> Security mode 2 or 3? What do you mean? Can I check it?
 
-The odd thing is that on Marcel Holtmanns pages there is one with CIS 
-data (http://www.holtmann.org/linux/bluetooth/cis.html) and in there is 
-the CIS for this card yet the 2.6 kernel btuart_cs driver is unhappy for 
-some reason.  I have tried all the other drivers (by editing 
-pcmcia/config) and none work to the point where "hciconfig dev" shows a 
-valid device.  I have even edited the source for btuart_cs and added 
-some additional IO ports but that do not seemed to have helped.  I even 
-added some additional IRQ's to pcmcia/config.opts.
+What does "hciconfig -a" say?
 
-FYI I am running Gentoo 2.6.9-rc1 with the mh3 patch applied and 
-bluez-libs v2.1, bluez- utils v2.1-r1 and bluez-kernel v2.3.
+> When I try to connect to the server at first contact, I have to enter
+> the PIN(client side) and after entering the right pin I get the
+> message :"Authentification failed." 
 
-BTW Marcel & the team if you read this post thanks for all your work on 
-bluez, I have another laptop with a Xircom CBT card in it and for months 
-it has worked well thanks to all your effort.
+Run "hcidump -x" and we can see what really happens.
 
-Johnathon
+Regards
 
-
-
+Marcel
 
 
 
