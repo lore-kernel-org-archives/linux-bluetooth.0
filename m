@@ -1,32 +1,53 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40BBAC4D.2070403@cc.hut.fi>
-From: Heikki Rantanen <hrantane@cc.hut.fi>
+Return-Path: <jd@sdf.lonestar.org>
+Date: Fri, 30 Jul 2004 08:36:42 -0500 (CDT)
+From: John Dahlstrom <jd@freeshell.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: bluez-devel@lists.sourceforge.net
+Subject: Re: Linux 2.4.27rc3 and Bluetooth
+In-Reply-To: <1090055676.4558.15.camel@pegasus>
+Message-ID: <Pine.NEB.4.60.0407300813490.24330@mx.freeshell.org>
+References: <Pine.NEB.4.60.0407131537590.12135@norge.freeshell.org>
+ <1089826204.4517.0.camel@pegasus>  <Pine.NEB.4.60.0407141844100.22049@mx.freeshell.org>
+ <1090055676.4558.15.camel@pegasus>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Dund instructions?
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Jun 2004 01:06:05 +0300
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Where can I find instructions on using the dund program? Thanks.
+Marcel,
+
+Yes, your new patch works!
+
+When the firmware file is removed and the Bluetooth card is inserted,
+the machine humbly protests as expected, without a kernel panic.
+Then, with the file copied back into place, everything runs smoothly
+upon subsequent insertions.
+
+Thank you again for your assistance.
+
+Kind regards,
+
+- John
+
+--
+http://jodarom.sdf1.org/
 
 
 
--------------------------------------------------------
-This SF.Net email is sponsored by: Oracle 10g
-Get certified on the hottest thing ever to hit the market... Oracle 10g. 
-Take an Oracle 10g class now, and we'll give you the exam FREE.
-http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+On Sat, 24 Jul 2004, Marcel Holtmann wrote:
+
+> Hi John,
+>
+>> [...]
+>
+> you are right. That is the problem. I fixed it in a different way.
+> Please try out the attached patch and report if it also works.
+>
+>> [...]
+>
+> No. The 2.6 kernel is not affected, because the hdev is a pointer in
+> that kernel series and we have the NULL pointer check in place.
+>
+> Regards
+>
+> Marcel
+>
