@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Re: Lifetech BlueConnect DOES NOT work with
-	bluez
+Subject: RE: [Bluez-devel] Question about role switch
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000e01c4cd7d$f2c02020$2c00a8c0@DISCO17G>
-References: <000e01c4cd7d$f2c02020$2c00a8c0@DISCO17G>
+In-Reply-To: <A1F0D47583A2D711919F00600819B3A45BDE4F@goofy.vitronics.com>
+References: <A1F0D47583A2D711919F00600819B3A45BDE4F@goofy.vitronics.com>
 Content-Type: text/plain
-Message-Id: <1103127746.8717.11.camel@pegasus>
+Message-Id: <1103127611.8717.7.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,24 +18,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Dec 2004 17:22:26 +0100
+Date: Wed, 15 Dec 2004 17:20:11 +0100
 
-Hi Carlos,
+Hi Richard,
 
-for what is the blue background good? This is a mailing list and not a
-beauty contest ;)
+> >>>>>>>>This is my X-scale embedded system
+> [System 1]$hciconfig -a
+> hci0:   Type: UART
+>         BD Address: 00:A0:96:08:E7:86 ACL MTU: 192:8  SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:1842 acl:20 sco:0 events:93 errors:0
+>         TX bytes:1415 acl:19 sco:0 commands:41 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'BlueZ (0)'
+>         Class: 0x000100
+>         Service Classes: Unspecified
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver: 0x175
+>         Manufacturer: Cambridge Silicon Radio (10)
+>                                
+> >>>>>>>> This is my Linux PC. 
+> >>>>>>>> I have the same USB dongle in the Linux and Windows PCs
+> [System 2]# /sbin/hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:02:72:40:3F:C2 ACL MTU: 192:8  SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:135 acl:0 sco:0 events:19 errors:0
+>         TX bytes:569 acl:0 sco:0 commands:18 errors:0
+>         Features: 0xff 0xff 0x0f 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'Linux_Rich'
+>         Class: 0x700408
+>         Service Classes: Object Transfer, Audio, Telephony
+>         Device Class: Audio/Video, Hands-free
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+>         Manufacturer: Cambridge Silicon Radio (10)
 
-> No, this dongle has a SiliconWave chipset. This chipset implements the
-> 1.2 spec, but Bluez implements 1.1 only. Specifically, on the 1.2 spec
-> the Add SCO Connection is deprecated and indicated as 'not to be
-> used'. The Bluez code (net/bluetooth/hci_conn.c) uses that command to
-> start a SCO voice connection to a headset. I'm suspecting that the
-> dongle doesn't implement the Add SCO command properly and causes my
-> problems. But nevertheless a 1.2 spec device is not required (and is
-> even discoraged) to implement it.
-
-Now we are talking about SCO support? You complained that your dongle is
-not working at all.
+everything before HCI 16.4 has not even limited scatternet support.
+Check you my CSR page for more details.
 
 Regards
 
