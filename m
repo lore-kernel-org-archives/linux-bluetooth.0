@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42134A5D.4050309@gmx.net>
-From: Marcel Partap <mpartap@gmx.net>
-MIME-Version: 1.0
+Message-ID: <de33c8be0502160425215158ad@mail.gmail.com>
+From: =?ISO-8859-1?Q?Fl=E1vio?= <flavio.henriques@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] Bluetooth-alsa question: possible to use phone itself as headset?
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] TPL (transmit power level)
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,19 +16,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 16 Feb 2005 14:27:57 +0100
+Date: Wed, 16 Feb 2005 12:25:51 +0000
 
-Hey folks,
-I got a 3650 (also named the 'play bone') and would like to spare money 
-for a headset. The phone has bluetooth and so I thought, why not use the 
-phone itself as headset? It seems this is not supported yet, but would 
-it be possible?
-Connected (wire) to the phone I also have a headset.. Could _that_ be 
-used via bluetooth? That'd be soo great, I wouldn't have to get another 
-headset. then again, I doubt... ah please just give me /your/ opinion on 
-the matter, /you/ are the devs after all.
-thanks & kind regards
-Marcel
+Hi everbody,
+I=B4m working with power control and i saw one thing that could be wrong:
+
+Transmit power level (tpl) : _1octet (signed integer);
+                                 _range: -30<=3D N<=3D20;
+                                 _units: dBm.
+
+In BlueZ the value of tpl is defined like unsigned int ( uint8_t level
+) but i think that should be an int ( int8_t level ) like is defined
+in core of bluetooth.
+
+There is any particular reason for the level to be an unsigned int??
+
+Regards Fl=E1vio!
 
 
 -------------------------------------------------------
