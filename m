@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <4dfd5709041225041648e1f356@mail.gmail.com>
+From: CoCozZ geek <cocozz@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Error when compiling bluez-utils
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4dfd5709041225041648e1f356@mail.gmail.com>
+In-Reply-To: <BAY104-F28B10D34C6CA29EC4D37E9C1A70@phx.gbl>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 References: <4dfd570904122402134ec2fd32@mail.gmail.com>
 	 <BAY104-F28B10D34C6CA29EC4D37E9C1A70@phx.gbl>
-	 <4dfd5709041225041648e1f356@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1103980205.8758.22.camel@pegasus>
-Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,23 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 25 Dec 2004 14:10:05 +0100
+Date: Sat, 25 Dec 2004 13:16:34 +0100
 
-Hi,
+I uninstalled bluez-sdp , installed bluez-utils succesfully and
+reinstalled bluez-sdp without problems.
 
-> I uninstalled bluez-sdp , installed bluez-utils succesfully and
-> reinstalled bluez-sdp without problems.
+No im following this tutorial :http://forums.gentoo.org/viewtopic.php?t=111904
 
-do you think there is a reason that the BlueZ website has no longer a
-link to the bluez-sdp download? It is deprecated. And the ChangeLog for
-bluez-utils-2.10 (besides this is not the latest version) has a clear
-statement that you need bluez-libs-2.10 at least.
+Its all OK but when I do : 
+hcitool scan
+I get :
 
-Regards
+Cocozz cocozz # hcitool scan
+Device is not available: Success
 
-Marcel
+And also :
 
+Cocozz cocozz # hcitool dev
+Devices:
 
+Any help please :(
+
+Oh .... Happy Holidays !!!
 
 
 -------------------------------------------------------
