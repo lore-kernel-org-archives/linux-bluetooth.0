@@ -1,49 +1,43 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1052870730.4609.31.camel@pegasus.local>
+Return-Path: <maxk@qualcomm.com>
+Message-Id: <5.1.0.14.2.20030513165931.0d377d88@unixmail.qualcomm.com>
+Date: Tue, 13 May 2003 17:05:42 -0700
+To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+From: Max Krasnyansky <maxk@qualcomm.com>
+Subject: RE: [Bluez-devel] Qualification Testing
+Cc: Daryl Van Vorst <daryl@wideray.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1052867997.4608.23.camel@pegasus.local>
+References: <5.1.0.14.2.20030513153902.0d3016d8@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030513095851.0d257510@unixmail.qualcomm.com>
+	<000201c31771$70577930$6400a8c0@baked>
+	<5.1.0.14.2.20030513095851.0d257510@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030513153902.0d3016d8@unixmail.qualcomm.com>
 Mime-Version: 1.0
-Subject: [Bluez-devel] RFCOMM server problem
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 14 May 2003 02:05:24 +0200
+Content-Type: text/plain; charset="us-ascii"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Max,
+At 04:19 PM 5/13/2003, Marcel Holtmann wrote:
+>so if we detect a failure in an ACL packet, we notify all L2CAP
+>connections on the ACL link that have this option set. This sounds a
+>little bit better to me. I understand you wrong at the first time and
+>now I think we should have such extra stuff.
+>
+>But I don't like the name and your meaning of this options. It sounds
+>like something that it is not and will never be. For the description of
+>this option I think it should be something like
+>
+>        "Notify me when you detect an error in the ACL payload"
+ACL is a lower lever. If baseband detects error in ACL payload it retransmits 
+a packet :).
 
-if I set up a RFCOMM server on a 2.4.20-mh7 (plus all new patches) and
-try to connect from another machine which runs 2.4.20-mh6, the
-communications stops after the initial SABM for dlci 0. The server
-didn't send the UA for this dlci. The connection establishment fails
-because of the timeout. If I don't start the server and try to establish
-the connection I see the UA for dlci 0. If I change the direction and
-put the server on the machine with the older kernel all is working fine.
+>And the option name can be L2CAP_CHECKACL. This is not very good, I
+>know, so any other proposals?
+L2CAP_LM_RELIABLE
 
-Any idea what is going wrong?
+Implementation is very very very simple and code for 2.4 is already in BK :).
+http://linux-bt.bkbits.net:8080/bt-2.4/patch@1.1163?nav=index.html|ChangeSet@-1h|cset@1.1163
 
-Regards
+We didn't even need a new socket option. Just another LM (link mode) flag. And common case 
+is not affected at all.
+Now we just need to add support for it in l2test.
 
-Marcel
-
-
-
-
--------------------------------------------------------
-Enterprise Linux Forum Conference & Expo, June 4-6, 2003, Santa Clara
-The only event dedicated to issues related to Linux enterprise solutions
-www.enterpriselinuxforum.com
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Max
