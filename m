@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] HCI Forwarding
+Subject: Re: [Bluez-devel] Zero length L2CAP packets
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <42005A510007CC0F@resmta05.ono.com> (added by postmaster@resmta05.ono.com)
-References: <42005A510007CC0F@resmta05.ono.com>
-	 (added by postmaster@resmta05.ono.com)
+Cc: Moritz Gmelin <moritz.gmelin@avetana.de>
+In-Reply-To: <200502101112.09602.harbaum@beecon.de>
+References: <200502101112.09602.harbaum@beecon.de>
 Content-Type: text/plain
-Message-Id: <1108046877.15974.57.camel@pegasus>
+Message-Id: <1108044288.15974.45.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,45 +19,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 10 Feb 2005 15:47:57 +0100
+Date: Thu, 10 Feb 2005 15:04:48 +0100
 
-Hi,
+Hi Till,
 
-> As you remember I was developing a gateway for tunneling the hci traffic
-> over TCP and be able to transfer files and play bluetooth games at long
-> distances.
-> I wrote a simple and very rudimentary C++ test program but didn't work. I
-> think the problem is the destination bluetooth address, would I need to
-> parse
-> the hci frames to set the bt address to its correct value?, I don't know
-> how to do this, I am really lost.
-> I tested the program with another friend running the same program with two
-> nokia n-gage.
+> while working on the avetana jsr82 implementation we discovered, that the bt 
+> spec as well as jsr82 allow to transmit zero length l2cap packets. IMHO the 
+> linux socket interface does not support zero length packets and a read 
+> returning zero indicates an end of file (in this case meaning that the 
+> connection has been closed).
 > 
-> If you can help me here is the source code, please feel free to modify
-> whatever
-> you want and tell me how can I solve this problem or give me a new way of
-> doing this.
-> (I marked up the important part of the main loop so you can see the main
-> idea witouth reading the full source), at the end is the program and hcidump
-> output.
-> 
-> If you want the full source (all files and makefile) tell me.
+> What happens if the other side actually sends a zero length packet? Is this 
+> dropped inside the kernel? Or will read return zero which i'll misinterpret 
+> as the eof marker? How can i distinguish between eof and a zero length 
+> packet?
 
-using C++ is actually too much for such a project, because OO is useless
-in this case and personally I don't like C++ and so I won't comment on
-your code.
+actually I see no problem with zero length L2CAP packets. I modified the
+l2test program to actually be able to send and receive them, but there
+is no problem at all. This is a socket and not a file and so you might
+use poll() or select() to detect the hangup of the connection and not
+some weird zero length magic.
 
-If you wanna do HCI forwarding then you must first use the HCI device in
-raw mode and even then I don't think that this going to work. You must
-map a lot of commands to events and vice versa. For example a connect
-request from on side must result in a create connection on the other
-side and then you must do the HCI flow control right.
-
-And yes, you must do a BD_ADDR and also connection handle translation
-for every command/event exchange. I am not sure if this will ever work,
-but even if, it is a lot of work and you need a deep understanding of
-the HCI.
+The kernel btw is dropping no packets. I see all of these zero packets
+flying from one end to the other.
 
 Regards
 
