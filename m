@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Socket CF PCMCIA
+Subject: Re: [Bluez-users] Testing Bluez with Hciemu
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050304164826.44066.qmail@web40605.mail.yahoo.com>
-References: <20050304164826.44066.qmail@web40605.mail.yahoo.com>
+In-Reply-To: <d1f423d305030409515af7cae6@mail.gmail.com>
+References: <d1f423d305030409515af7cae6@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1109965361.8058.95.camel@pegasus>
+Message-Id: <1109965306.8058.93.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,22 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Mar 2005 20:42:41 +0100
+Date: Fri, 04 Mar 2005 20:41:46 +0100
 
-Hi Andrea,
+Hi Anderson,
 
-> Hi, i've a 2.6.10 kernel from fedora  project
-> (FC2)..and a Zaurus SL6000..i've tried the CF on the
-> zaurus without succes..so i tried it on my laptop
-> (usually i use Bluez throught an USB dongle, adn wokrs
-> fine). I plug the CF, serial_cs is laoded, i try
-> hciattach but fails.
-> Somebody could explain to me how  can i make working
-> the CF...step by step?!Because i don't know where
-> smashing my head..
+> I would like to know if someone of you alredy have done tests using
+> hciemu. The fact is I installed bluez on a ARM platform that has not
+> any bluetooth device so, I would like to realize tests without having
+> the real device.
+> 
+> What kind of tests i can do with hciemu?
 
-there are problems with the 2.6 kernel, but nobody knows for sure what
-and where the problems are.
+only basic stuff is working, but you can of course create a connection
+between two hciemu virtual dongles connected over TCP/IP and thus every
+upper layer is available.
 
 Regards
 
