@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jon Valvatne <jon@valvatne.com>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1086292123.4353.27.camel@m117a.studby.ntnu.no>
-Mime-Version: 1.0
-Subject: [Bluez-users] CF cards
+Subject: Re: [Bluez-users] Howto create SCO Connections?
+References: <20040603094556.12D993DED@xprdmailfe8.nwk.excite.com>
+In-Reply-To: <20040603094556.12D993DED@xprdmailfe8.nwk.excite.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200406031326.22809.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,25 +19,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 03 Jun 2004 21:48:43 +0200
+Date: Thu, 3 Jun 2004 13:26:22 +0200
 
-Hello,
+Hi,
 
-I'm in the market for a CF card for my laptop (Thinkpad X30, built-in CF
-slot), and after checking the hardware support list on bluez.org I had
-decided on the Socket card, since that was one of the few I could find
-in my country.
+try this project: 
+http://www.dcs.gla.ac.uk/~jp/snd-bluez-sco/
+http://www.dcs.gla.ac.uk/~jp/snd-bt-sco/
 
-But in the archives of this list I stumbled across a few mentions of
-that card not working with the 2.6 kernel. Is this still true? Has there
-been any progress on solving that problem?
+It will need little modification, but it would be easy.
 
-Alternately, is there any chance the Billionton (CFBT02) or Dell
-(Truemobile 300) cards are supported or will be supported in the near
-future?
+M.
 
-Jon
-
+On Thursday 03 of June 2004 11:45, mr wrote:
+> Hi,
+>
+>
+>
+> I have built a piconet over l2cal and bnep using a desktop and a laptop.
+> Now I need to create a SCO link between them in order to transfer real time
+> audio from laptop to desktop. What do I need to do? Are there any
+> utilities/tools for this particular purpose?
+>
+>
+>
+> P.S.: The scotest works fine both ways.
+>
+> _______________________________________________
+> Join Excite! - http://www.excite.com
+> The most personalized portal on the Web!
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by the new InstallShield X.
+> From Windows to Linux, servers to mobile, InstallShield X is the one
+> installation-authoring solution that does it all. Learn more and
+> evaluate today! http://www.installshield.com/Dev2Dev/0504
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
