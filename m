@@ -1,9 +1,8 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Stuart Anderson <subscritions@nx14.com>
-Reply-To: subscritions@nx14.com
+From: Stuart Anderson <stuart@iduniken.com>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1078848748.9713.8.camel@donivin.nx14.com>
+Message-Id: <1078847668.9713.2.camel@donivin.nx14.com>
 Mime-Version: 1.0
 Subject: [Bluez-users] Missing libopenobex-1.0.so.1
 Sender: bluez-users-admin@lists.sourceforge.net
@@ -16,7 +15,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 09 Mar 2004 16:12:29 +0000
+Date: Tue, 09 Mar 2004 15:54:29 +0000
 
 hi all,
    Im following the tutorial at
@@ -34,8 +33,7 @@ lrwxrwxrwx    1 root     root           24 Mar  9 15:48
    Can anyone tell me how i can get the ObexSERVER to run?
 
 Anderson
--- 
-Anderson
+
 
 
 -------------------------------------------------------
