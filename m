@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] how to look as a printer?
+Subject: Re: [Bluez-users] RE: Logitech multimedia keys off by one
 From: Marcel Holtmann <marcel@holtmann.org>
-To: carlo@linux.it
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040402165209.GA3052@localhost>
-References: <20040402154609.GB2766@localhost>
-	 <1080922449.2836.74.camel@pegasus> <20040402161842.GA2998@localhost>
-	 <1080923569.2836.78.camel@pegasus>  <20040402165209.GA3052@localhost>
+In-Reply-To: <200404021856.17235.cijoml@volny.cz>
+References: <406C1E19.7090003@ntlworld.com>
+	 <1080911347.2836.62.camel@pegasus>  <200404021856.17235.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1080927175.2836.95.camel@pegasus>
+Message-Id: <1080927108.2836.92.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,18 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 02 Apr 2004 19:32:55 +0200
+Date: Fri, 02 Apr 2004 19:31:48 +0200
 
-Hi Carlo,
+Hi Michal,
 
-> My primary goal is to (try to) get something which looks like a
-> Bluetooth printer to my cellular phone eyes :)
-> So I just posted a question on the dev forum of my cell phone
-> manufacturer.
-> The choice of the profile you cite depends on that.
+> > the libs2 and utils2 are the next generation and they are completely
+> > independent from the current version. Actually with bluez-libs-2.6 it
+> > should be possible to port the bthid to use the old library. I fixed
+> > some internal stuff and this should make it possible to get the HID
+> > descriptor from a device.
+> 
+> GREAT! Marcel pls do it as soon as possible! :)*****
 
-for the most phones on the market you can only use OBEX push for your
-printing support.
+no time for it right now, sorry.
+
+> > At the moment I am also thinking of moving pand and dund into the utils
+> > package to lower my maintenance overhead.
+> 
+> It is a good choice.
+
+In the past there were objections against it and at the moment I haven't
+made any decision. Please comment it with pro and cons.
 
 Regards
 
