@@ -1,46 +1,34 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <26AF0D77A98E09478A577B2248F72338413FF2@sintefxch1-netapp.sintef.no>
-From: Rognlien Dag Kristian <Dag.K.Rognlien@sintef.no>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
+Return-Path: <SRS0+fc520b731e911315f002+261+infradead.org+dwmw2@pentafluge-113652.srs.infradead.org>
+Subject: Re: [Bluez-devel] DBT-120 and Apple firmware update
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Laurent Bigonville <l.bigonville@easynet.be>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1082808706.4828.9.camel@pegasus>
+References: <471106B9-95E5-11D8-A962-00306543FC98@easynet.be>
+	 <1082808706.4828.9.camel@pegasus>
 Content-Type: text/plain
-Subject: [Bluez-devel] Inquiry result with rssi in bluez libs 2.7
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 May 2004 14:34:46 +0200
+Message-Id: <1084271810.11301.28.camel@hades.cambridge.redhat.com>
+Mime-Version: 1.0
+Date: Tue, 11 May 2004 11:36:50 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
+On Sat, 2004-04-24 at 14:11 +0200, Marcel Holtmann wrote:
+> Hi Laurent,
+> 
+> > Apple has released a firmware update which add headset support under 
+> > macosx... But this update make my device incompatible with the drivers 
+> > under linux. Is it any change that it will work again?
+> 
+> you will need the hid2hci utility from CVS.
 
-Hello,
+Under what circumstances would we want to leave it in HID mode? Only
+when we have _only_ HID devices and we don't want to use them
+transparently instead of trying to use the Linux support for
+Bluetooth-HID devices?
 
-I see that hci.h has
+When we get BTHID fixed in the kernel, does it make sense to let the
+kernel convert these devices to HCI mode automatically?
 
-#define EVT_INQUIRY_RESULT_WITH_RSSI  0x02
-
-The bluetooth 1.2 spec defines this event code as 0x22
-
-Is this a typo, or is there a reason why it is set as 0x02 in hci.h?
-
-Regards,
-Dag K. W. Rognlien
-M.Sc. Computer Engineering
-SINTEF ICT
-Communication Systems
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by Sleepycat Software
-Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to deliver
-higher performing products faster, at low TCO.
-http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+dwmw2
