@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4dfd570904122402134ec2fd32@mail.gmail.com>
-From: CoCozZ geek <cocozz@gmail.com>
+From: Rainer Dorsch <rdorsch@web.de>
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Error when compiling bluez-utils
+Subject: Re: [Bluez-users] Setting up an hotplug connection with USB dongles
+References: <200411282132.37941.rdorsch@web.de> <200412192323.20579.rdorsch@web.de> <1103495289.29892.85.camel@pegasus>
+In-Reply-To: <1103495289.29892.85.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Message-Id: <200412232343.45609.rdorsch@web.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,83 +19,109 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 24 Dec 2004 11:13:47 +0100
+Date: Thu, 23 Dec 2004 23:43:45 +0100
 
-I get those errors when I compile bluez-utils ... using
-2.6.8-gentoo-r10 and gcc (GCC) 3.3.4 20040623.
+Am Sonntag, 19. Dezember 2004 23:28 schrieb Marcel Holtmann:
+> Hi Rainer,
+>
+> > thanks for that very useful link.
+> >
+> > If have everything up an running, only two minor issues left on the PANU
+> > side:
+> >
+> > 1. It seems that I need to do an "hcitool scan" to make pand --search
+> > working, e.g.
+> >
+> >               hcitool scan
+> >               pand --nodetach --role PANU --search --encrypt
+> > --pidfile /var/run/pand.pid
+> >
+> > It does work without hcitool scan, when I use the BT device address
+> >
+> >               pand --connect <BT device address>
+> >
+> > 2. On the client side, I do not get dhcp to work. When I run
+> >
+> >                dhclient bnep0
+> >
+> > I see on the PANU (from syslog):
+> >
+> > Dec 19 23:07:42 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
+> > port 67 interval 5
+> > Dec 19 23:07:42 topsi dhclient: send_packet: Network is down
+> > Dec 19 23:07:47 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
+> > port 67 interval 10
+> > Dec 19 23:07:47 topsi dhclient: send_packet: Network is down
+> > Dec 19 23:07:49 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
+> > port 67 interval 10
+> > Dec 19 23:07:49 topsi dhclient: send_packet: Network is down
+> > Dec 19 23:07:57 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
+> > port 67 interval 14
+> > Dec 19 23:07:57 topsi dhclient: send_packet: Network is down
+> > Dec 19 23:07:59 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
+> > port 67 interval 1
+> > Dec 19 23:07:59 topsi dhclient: send_packet: Network is down
+> > Dec 19 23:08:00 topsi dhclient: No DHCPOFFERS received.
+> > Dec 19 23:08:00 topsi dhclient: No working leases in persistent database.
+> > Dec 19 23:08:00 topsi dhclient: Sleeping.
+> > Dec 19 23:08:11 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
+> > port 67 interval 14
+> > Dec 19 23:08:11 topsi dhclient: send_packet: Network is down
+> > Dec 19 23:08:25 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
+> > port 67 interval 15
+> > Dec 19 23:08:25 topsi dhclient: send_packet: Network is down
+> > Dec 19 23:08:40 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255
+> > port 67 interval 3
+> > Dec 19 23:08:40 topsi dhclient: send_packet: Network is down
+> > Dec 19 23:08:43 topsi dhclient: No DHCPOFFERS received.
+> > Dec 19 23:08:43 topsi dhclient: No working leases in persistent database.
+> > Dec 19 23:08:44 topsi dhclient: Sleeping.
+> >
+> > There is no entry in the syslog file in the DHCP server (which is NAP).
+> > Its dhcpd.conf looks like this:
+> >
+> > # Bluetooth
+> > subnet 192.168.2.0 netmask 255.255.255.0 {
+> >   range 192.168.2.100 192.168.2.150;
+> > #  option broadcast-address 204.254.239.31;
+> >   option domain-name "vix.com";
+> >   option domain-name-servers 192.168.2.1;
+> >   option broadcast-address 192.168.2.255;
+> >   option routers 192.168.2.1;
+> > }
+> >
+> > Any ideas are welcome.
+>
+> as I said, use the standard Debian stuff for configuring the network
+> interfaces. If you got problems setup a bridge that covers all the PAN
+> connections.
+>
 
-Thanks :)
+Marcel,
 
-gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/include  -I/usr/include
--march=pentium4 -O3 -pipe -fomit-frame-pointer -c `test -f
-'hcisecfilter.c' || echo './'`hcisecfilter.c
-sdptool.c: In function `add_handsfree':
-sdptool.c:1130: error: `HANDSFREE_SVCLASS_ID' undeclared (first use in
-this function)
-sdptool.c:1130: error: (Each undeclared identifier is reported only once
-sdptool.c:1130: error: for each function it appears in.)
-sdptool.c:1136: error: `HANDSFREE_PROFILE_ID' undeclared (first use in
-this function)
-sdptool.c:1152: error: `SDP_SUPPORTED_FEATURES' undeclared (first use
-in this function)
-sdptool.c: In function `add_audio_source':
-sdptool.c:1583: error: `AUDIO_SOURCE_SVCLASS_ID' undeclared (first use
-in this function)
-sdptool.c:1587: error: `ADVANCED_AUDIO_PROFILE_ID' undeclared (first
-use in this function)sdptool.c:1598: error: `AVDTP_UUID' undeclared
-(first use in this function)
-sdptool.c: In function `add_audio_sink':
-sdptool.c:1642: error: `AUDIO_SINK_SVCLASS_ID' undeclared (first use
-in this function)
-sdptool.c:1646: error: `ADVANCED_AUDIO_PROFILE_ID' undeclared (first
-use in this function)sdptool.c:1657: error: `AVDTP_UUID' undeclared
-(first use in this function)
-sdptool.c: At top level:
-sdptool.c:1697: error: `HANDSFREE_SVCLASS_ID' undeclared here (not in
-a function)
-sdptool.c:1697: error: initializer element is not constant
-sdptool.c:1697: error: (near initialization for `service[7].class')
-sdptool.c:1697: error: initializer element is not constant
-sdptool.c:1697: error: (near initialization for `service[7]')
-sdptool.c:1699: error: initializer element is not constant
-sdptool.c:1699: error: (near initialization for `service[8]')
-sdptool.c:1700: error: initializer element is not constant
-sdptool.c:1700: error: (near initialization for `service[9]')
-sdptool.c:1702: error: initializer element is not constant
-sdptool.c:1702: error: (near initialization for `service[10]')
-sdptool.c:1703: error: initializer element is not constant
-sdptool.c:1703: error: (near initialization for `service[11]')
-sdptool.c:1704: error: initializer element is not constant
-sdptool.c:1704: error: (near initialization for `service[12]')
-sdptool.c:1706: error: `AUDIO_SOURCE_SVCLASS_ID' undeclared here (not
-in a function)gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/include 
--I/usr/include -march=pentium4 -O3 -pipe -fomit-frame-pointer -c `test
--f 'hciattach.c' || echo './'`hciattach.c
-sdptool.c:1706: error: initializer element is not constant
-sdptool.c:1706: error: (near initialization for `service[13].class')
-sdptool.c:1706: error: initializer element is not constant
-sdptool.c:1706: error: (near initialization for `service[13]')
-sdptool.c:1707: error: `AUDIO_SINK_SVCLASS_ID' undeclared here (not in
-a function)
-sdptool.c:1707: error: initializer element is not constant
-sdptool.c:1707: error: (near initialization for `service[14].class')
-sdptool.c:1707: error: initializer element is not constant
-sdptool.c:1707: error: (near initialization for `service[14]')
-sdptool.c:1709: error: initializer element is not constant
-sdptool.c:1709: error: (near initialization for `service[15]')
-make[2]: *** [sdptool.o] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[2]: Leaving directory
-`/var/tmp/portage/bluez-utils-2.10-r1/work/bluez-utils-2.10/tools'make[1]:
-*** [all-recursive] Error 1
-make[1]: Leaving directory
-`/var/tmp/portage/bluez-utils-2.10-r1/work/bluez-utils-2.10'
-make: *** [all] Error 2
+I used the Debian standard stuff (at least, as far as I am aware of it):
 
-!!! ERROR: net-wireless/bluez-utils-2.10-r1 failed.
-!!! Function src_compile, Line 53, Exitcode 2
-!!! (no error message)
-!!! If you need support, post the topmost build error, NOT this status message.
+rd@topsi:~$ grep bnep0 /etc/network/interfaces
+iface bnep0 inet dhcp
+rd@topsi:~$ cat /etc/bluetooth/pan/dev-up
+#!/bin/sh
+echo running dev-up
+ifup bnep0
+rd@topsi:~$
+
+Since this did not work, I run dhclient manually for debugging purposes.
+
+Is there anything which is more "standard" I can do?
+
+Thanks,
+Rainer
+
+-- 
+Rainer Dorsch
+Alzentalstr. 28
+D-71083 Herrenberg
+07032-919495
+Icq: 32550367
 
 
 -------------------------------------------------------
