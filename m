@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050304164826.44066.qmail@web40605.mail.yahoo.com>
-From: Paolino paperino <vonzoltan@yahoo.it>
-Subject: [Bluez-users] Socket CF PCMCIA
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: 6667
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Subject: Re: [Bluez-users] tx submit failed urb c4c6b014 type 3 err -19
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4227CE32.5060306@gmx.ch>
+References: <Pine.LNX.4.21.0503031418590.28800-100000@blomma.comm2000.it>
+	 <4227CE32.5060306@gmx.ch>
+Content-Type: text/plain
+Message-Id: <1109953167.8058.78.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,25 +19,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 4 Mar 2005 17:48:26 +0100 (CET)
+Date: Fri, 04 Mar 2005 17:19:27 +0100
 
-Hi, i've a 2.6.10 kernel from fedora  project
-(FC2)..and a Zaurus SL6000..i've tried the CF on the
-zaurus without succes..so i tried it on my laptop
-(usually i use Bluez throught an USB dongle, adn wokrs
-fine). I plug the CF, serial_cs is laoded, i try
-hciattach but fails.
-Somebody could explain to me how  can i make working
-the CF...step by step?!Because i don't know where
-smashing my head..
-Best regards
-Andrea S.
+Hi Marco,
+
+> > The reason I'm using multiple dongles is that I need to control more than
+> > one phone, and apparently I'm unable to open concurrent SCO links to
+> > different phones through the same dongle. 
+> 
+> Well, in my opinion this is possible... I'm able to connect with two mobile 
+> phones to one laptop with one dongle at the same time. maybe you have a 
+> dongle that doesn't support multiple connections?
+
+the SCO connections are different than the ACL links. The SCO links are
+attached to a previous established ACL link and you can have three SCO
+links attached to one ACL, but only three SCO max are allowed inside a
+piconet. However BlueZ only supports one SCO connection per ACL link.
+This is a stupid limitation, but so far nobody removed it.
+
+Regards
+
+Marcel
 
 
-		
-___________________________________ 
-Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
-http://it.messenger.yahoo.it
 
 
 -------------------------------------------------------
