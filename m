@@ -1,14 +1,22 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] bluez and billionton pcbtc1
-Cc: David Vitrant <prussia@gmail.com>
-References: <b5c638dc05032815321b2739c5@mail.gmail.com> <1112075117.9016.60.camel@pegasus> <b5c638dc05032907582bf771dc@mail.gmail.com>
-In-Reply-To: <b5c638dc05032907582bf771dc@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200503292303.38682.pavouk@pavouk.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <b5c638dc05032912313f814461@mail.gmail.com>
+References: <b5c638dc05032815321b2739c5@mail.gmail.com>
+	 <1112075117.9016.60.camel@pegasus>
+	 <b5c638dc05032907582bf771dc@mail.gmail.com>
+	 <1112114217.9016.92.camel@pegasus>
+	 <b5c638dc050329084145c6fecd@mail.gmail.com>
+	 <1112114986.9016.94.camel@pegasus>
+	 <b5c638dc05032908584e207be8@mail.gmail.com>
+	 <b5c638dc05032909155d940a3c@mail.gmail.com>
+	 <b5c638dc0503290934170df12@mail.gmail.com>
+	 <1112117903.9016.103.camel@pegasus>
+	 <b5c638dc05032912313f814461@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1112128804.9016.111.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,33 +28,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Mar 2005 23:03:38 +0200
+Date: Tue, 29 Mar 2005 22:40:04 +0200
 
-Hello,
+Hi David,
 
-before few days 17.3.2005 writes Jonathan McDowell message about
-success with Billionton card with identical ID:
-  product info: "Compact Flash", "Bluetooth Card", "", ""
-  manfid: 0x0279, 0x950b
+> ok well i tried from 9600 to 921600
+> 
+> using the:
+> 
+> hciattach ttyS14 any "number here"
+> 
+> then i did what you said and ran "hcid" and "hciconfig" in every
+> outpud it's the same (except the RX bytes and errors increase)
+> 
+> am i missing something  or does that mean that my card just doesn't
+> work with bluez :(
+> 
+> hci0:   Type: UART
+>         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
+>         DOWN INIT RUNNING
+>         RX bytes:18 acl:0 sco:0 events:0 errors:18
+>         TX bytes:4 acl:0 sco:0 commands:1 errors:0
 
-He suggests these commands:
-setserial /dev/ttyS0 baud_base 912600
-hciattach -s 912600 /dev/ttyS0 bcsp
+there are actually more options to hciattach than only changing the baud
+rate. May you look at the Windows driver *.inf to get a clue what they
+are. However if this card uses a CSR chip then
 
-(His baudrate is probably wrong. 921600 instead 912600 can be).
-But his mail have many additional informations.
-Please look at archive of mailing-list and search for message with subject:
-"Billionton(?) CF card - success".
- 
->   manfid 0x0279, 0x950b
->   funcid serial_port [post]
->   serial_interface
->     uart 16550 [space/mark/odd/even] [5/6/7/8] [1/1.5/2]
->   vers_1 7.1, "PCMCIA", "Bluetooth Card", "", ""
+	hciattach ttyS14 bcsp 115200
 
-Best regards,
+might work. It can also be possible that this card has a problem,
+because some weird things in the new serial subsystem of the kernel.
 
-Pavel Ruzicka
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
