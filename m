@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Simone Gotti <motaboy80@supereva.it>
+To: Bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Great new site!
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Max Krasnyansky <maxk@qualcomm.com>
-Cc: cijoml@volny.cz, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1074795430.1707.219.camel@localhost>
 References: <200401221516.50925.cijoml@volny.cz>
-	 <1074795430.1707.219.camel@localhost>
-Content-Type: text/plain
-Message-Id: <1074809602.3071.23.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <200401221516.50925.cijoml@volny.cz>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200401222027.42373.motaboy80@supereva.it>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,26 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Jan 2004 23:13:22 +0100
+Date: Thu, 22 Jan 2004 20:27:42 +0100
 
-Hi Folks,
+On Thursday 22 January 2004 15:16, Michal Semler (volny.cz) wrote:
+> Hi guys,
+>
+> Who designed that great Layout of BlueZ project site? :)
+> Its wonderfull :)
 
-> Holly shmolly. It's indeed awesome. The funny part is that I had no idea
-> that this was coming. I guess Marcel had a little surprise for us :).
+But or it's a deja-vu or I've already seen this site some times ago for only 
+1-2 weeks and then it disappeared. Am I wrong?
 
-surprise, surprise :)
-
-Actually the new site is online since June 2003 and I acquired the
-domain name bluez.org already in March 2003. Between Christmas and New
-Year I did the last content and layout engine updates to the site, but
-forgot to set the redirection from bluez.sf.net. And what should I say?
-I did this yesterday and here it is. Hope everybody likes it.
-
-Regards
-
-Marcel
-
-
+Bye!
+-- 
+Simone Gotti
+<motaboy80@supereva.it>
 
 
 -------------------------------------------------------
