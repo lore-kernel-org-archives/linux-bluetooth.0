@@ -1,11 +1,11 @@
 Return-Path: <jt@bougret.hpl.hp.com>
-Date: Thu, 11 Sep 2003 13:32:49 -0700
+Date: Wed, 10 Sep 2003 16:47:28 -0700
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: Max Krasnyansky <maxk@qualcomm.com>,
-   BlueZ mailing list <bluez-devel@lists.sourceforge.net>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
    Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Subject: Re: [BUG] BlueTooth socket busted in 2.6.0-test5
-Message-ID: <20030911203249.GA15575@bougret.hpl.hp.com>
+Message-ID: <20030910234728.GA8051@bougret.hpl.hp.com>
 Reply-To: jt@hpl.hp.com
 References: <20030910225810.GA7712@bougret.hpl.hp.com> <1063237174.28890.6.camel@pegasus>
 Mime-Version: 1.0
@@ -15,6 +15,7 @@ From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 On Thu, Sep 11, 2003 at 01:39:28AM +0200, Marcel Holtmann wrote:
+> Hi Jean,
 > 
 > yesterday David Woodhouse sent a patch which should fix this.
 > 
@@ -22,65 +23,7 @@ On Thu, Sep 11, 2003 at 01:39:28AM +0200, Marcel Holtmann wrote:
 > 
 > Marcel
 
-	My testing was too light :
-------------------------------------------------------
-kernel BUG at include/linux/module.h:296!
-invalid operand: 0000 [#1]
-CPU:    0
-EIP:    0060:[<d087b72d>]    Not tainted
-EFLAGS: 00010246
-EIP is at bnep_sock_create+0x69/0xb2 [bnep]
-eax: 00000000   ebx: cf46cd00   ecx: 00000020   edx: d087d860
-esi: ceac3120   edi: 00000004   ebp: ffffffa3   esp: c4031f2c
-ds: 007b   es: 007b   ss: 0068
-Process pand (pid: 1945, threadinfo=c4030000 task=ccee20a0)
-Stack: 00000010 d08ac544 d08a10f4 ceac3120 00000004 ceac3120 0000007c c033ecc0 
-       ffffff9f c01e1236 ceac3120 00000004 0000001f bffff934 c4031fa8 00000001 
-       c01e1325 0000001f 00000003 00000004 c4031f84 00000000 c4031fa8 c01e216c 
-Call Trace:
- [<d08a10f4>] bt_sock_create+0x8c/0xd0 [bluetooth]
- [<c01e1236>] sock_create+0x12e/0x200
- [<c01e1325>] sys_socket+0x1d/0x50
- [<c01e216c>] sys_socketcall+0xbc/0x260
- [<c010973d>] error_code+0x2d/0x38
- [<c0108cd3>] syscall_call+0x7/0xb
-
-Code: 0f 0b 28 01 7c bf 87 d0 b8 00 e0 ff ff 21 e0 8b 40 10 c1 e0 
- 
-------------------------------------------------------
-
-	On top of the previous patch, I've now added :
---------------------------------------------
-diff -u -p linux/net/bluetooth/bnep/sock.m1.c linux/net/blueto
-oth/bnep/sock.c 
---- linux/net/bluetooth/bnep/sock.m1.c  Thu Sep 11 13:12:02 2003
-+++ linux/net/bluetooth/bnep/sock.c     Thu Sep 11 13:22:23 2003
-@@ -173,6 +173,13 @@ static int bnep_sock_create(struct socke
-        if (sock->type != SOCK_RAW)
-                return -ESOCKTNOSUPPORT;
- 
-+       /* sk_set_owner() will use __module_get(), that require
-+        * the module to have *some* refcount... I would have though the
-+        * code in bt_sock_create() would do that, but it seems to
-+        * increase the refcount of bluetooth.o. Jean II */
-+       if(!try_module_get(THIS_MODULE))
-+               return -EPROTONOSUPPORT;
-+
-        if (!(sk = bt_sock_alloc(sock, PF_BLUETOOTH, 0, GFP_KERNEL)))
-                return -ENOMEM;
- 
-@@ -184,6 +191,7 @@ static int bnep_sock_create(struct socke
- 
-        sk->sk_destruct = NULL;
-        sk->sk_protocol = protocol;
-+       module_put(THIS_MODULE);
-        return 0;
- }
- 
---------------------------------------------
-	This is of course a very gross hack, but with both patches I
-now can use BNEP properly. Well, you get the idea...
-
-	Have fun...
+	Yep that seems to have fixed the problem.
+	Thanks a lot !
 
 	Jean
