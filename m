@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
-Reply-To: tim@birdsnest.maths.tcd.ie
+From: "Nicholas A. Preyss" <nalp@gmx.net>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Oops in hci_usb
-Cc: Riku Voipio <riku.voipio@iki.fi>
-References: <20040501173626.GA3866@kos.to>
-In-Reply-To: <20040501173626.GA3866@kos.to>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200405012222.41627.tim@birdsnest.maths.tcd.ie>
+Subject: Re: [Bluez-users] Problem with Logitech MX 900 and Apple keyboard
+Message-ID: <20040501203909.GB1900@gmx.net>
+References: <200404282247.31825.matiasbrutti@ciudad.com.ar> <200404300024.51331.matiasbrutti@ciudad.com.ar> <20040430120109.GA30493@gmx.net> <200405011203.43498.matiasbrutti@ciudad.com.ar>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200405011203.43498.matiasbrutti@ciudad.com.ar>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,22 +17,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 1 May 2004 22:22:40 +0100
+Date: Sat, 1 May 2004 22:39:09 +0200
 
-On Saturday 01 May 2004 18:36, Riku Voipio wrote:
+On  0, Matias Pablo Brutti <matiasbrutti@ciudad.com.ar> wrote:
+> 	Sorry to bother you again ... I managed to get it recognice the mouse and the 
+> keyboard .. and everythings looks .. pretty now ... I can see both .. devices 
+> and their address . the problem starts when I try to connect .. with 
+> bthid ... deamon ...  bthid -c <addrs> and ... it ask for a pin number .. and 
+> never gets connected to the devices .. in the logs .. says ... " connection 
+> failed" or permissiion denied" ... I managed to get them to actually be seen 
+> but now they do not work ;) thats funny ji ji i j.
 
-> Linux wombat 2.6.6-rc1 #1 Wed Apr 21 03:05:54 EEST 2004 i686 GNU/Linux
->
-> usb 4-1: USB disconnect, address 2
-> Unable to handle kernel NULL pointer dereference at virtual address
+Take care of your "." key, i have the impression it feels a bit
+overstressed. ;) (the keyboard whisperer)
 
-I had something very like this with 2.6.5, but it went with 2.6.6-rc2.
+Maybe you can run hcidump while trying to connect. And provide here the
+output.
 
--- 
-Timothy Murphy  
-e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
-tel: +353-86-2336090, +353-1-2842366
-s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
+
+> one more thing .... if I try to execute the bthid  by Peter Klausler .... 
+> still prints out in the logs that Can' find uimput devide .. and I have it 
+> on .. /dev/misc/uinput .. that is another .. big ???? for me .. 
+
+The above refers to the bthid of bluez ? 
+A "ls -lh /dev/misc/uinput" would be helfpul.
+
+nicholas
+P.S.: I am away the next few days, so you might need to wait or someone
+else has to take care of you.
 
 
 -------------------------------------------------------
