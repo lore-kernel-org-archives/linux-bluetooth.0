@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <41EF0C15.3040705@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-From: Paul Ionescu <i_p_a_u_l@yahoo.com>
-Message-ID: <pan.2005.01.20.08.17.45.630346@yahoo.com>
-References: <pan.2005.01.19.22.54.29.108027@yahoo.com> <1106180785.8190.151.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: hal@freedesktop.org
-Subject: [Bluez-devel] Re: Bluetooth and HAL
+Subject: Re: [Bluez-devel] bluetooth headset - connects but no audio
+References: <41EE3974.1010604@fastwebnet.it> <41EE5112.1040502@dark-reality.de> <41EE4ACD.9070105@fastwebnet.it> <41EE66A2.1040106@dark-reality.de> <41EE69F3.1030401@fastwebnet.it> <41EE989A.7030206@dark-reality.de> <41EED6AE.1080205@fastwebnet.it>
+In-Reply-To: <41EED6AE.1080205@fastwebnet.it>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,71 +18,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 10:17:49 +0200
+Date: Thu, 20 Jan 2005 02:40:37 +0100
 
-Hi Marcel,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-I'll remove the ChipVersion then, and I have some more questions:
-How do we tell if we have a BT 1.0 or BT 1.1 or BT 1.2  adapter ?
-By looking at HCI and LMP numbers ?
-Do we need a separate bluetooth.version too ?
-Do end user programs really need HCI and LMP version/revision ?
+WiseLYNX wrote:
+| | use a vanilla kernel.
+|
+| I did a try, with vanilla 2.6.10 directly from kernel.org. guess what?
+| doesn't work neither that way :(
+|
+| | no really, no idea :)
+|
+| mh.. may it be a hint the fact this (the "Permission denied" and "Too
+| many levels of symbolic links" errors) happened _after_ I applied the
+| mh1 patch?
 
+well it *should* work with this setup, as it works on my system with
+stock 2.6.10 plus mh1 patches. Anything else special, like, are you
+using an SMP kernel?
 
-Thanks,
-Paul
+Maybe it's a problem with your dongle, do you have access to another one
+to test this? (local setup: epox bt-dg03 + sony/eri. hbh-35 headset)
 
-On Thu, 20 Jan 2005 01:26:25 +0100, Marcel Holtmann wrote:
+best regards,
+~  Lars
 
-> Hi Paul,
-> 
->> I want to add bluetooth devices in HAL (Hardware Abstraction Layer).
->> This way all programs interesting in bluetooth devices can be notified
->> of the addition or removal of a bluetooth device. What should we export
->> about a bluetooth device that might be of interest for userspace
->> programs ?
->> I think of the following, but I don't know if we really need all of
->> them:
->> 
->> bluetooth.address	string (ex: 00:0d:33:44:33:c6) bluetooth.interface
->> string  (ex: hci0) bluetooth.interface_up	int
->> bluetooth.linux.driver	string   (ex: hci_usb) bluetooth.linux.ifindex	
->> int
->> bluetooth.linux.sysfs_path	string
->> bluetooth.HCI_version		int
->> bluetooth.HCI_revision		int
->> bluetooth.LMP_version		int
->> bluetooth.LMP_version		int
->> bluetooth.Manufacturer	string
->> bluetooth.ChipVersion	string
->> Maybe :
->> bluetooth.features	?
->> bluetooth.packet_types	?
->> 
->> Corrections, comments and suggestions are appreciate.
-> 
-> looks fine so far, but ChipVersion is vendor specific and not really of
-> interest. For interface_up you may should simply take all flags and then
-> the userspace application can decode it like hciconfig does. You may wanna
-> include the features, but be aware of the extended features from the
-> Bluetooth 1.2 specification. The packet_types are useless and I am going
-> to remove that support at some point. Maybe you wanna add the class of
-> device value.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> ------------------------------------------------------- This SF.Net email
-> is sponsored by: IntelliVIEW -- Interactive Reporting Tool for open source
-> databases. Create drag-&-drop reports. Save time by over 75%! Publish
-> reports on the web. Export to DOC, XLS, RTF, etc. Download a FREE copy at
-> http://www.intelliview.com/go/osdn_nl
+- --
+Lars Grunewaldt
+* software development
+* multimedia design
+skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+web: http://www.dark-reality.de
+mail: lgw@dark-reality.de
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-
+iD8DBQFB7wwUQWC6DTWkDAoRAhORAJ9dV//SYKnhv8I8JqtEO+JHyreD3gCeOT1O
+bOedFmkBNJTCTh6kEj7wF8Q=
+=pX58
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
