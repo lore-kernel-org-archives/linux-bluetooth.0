@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <423818DE.1060909@sinister.cz>
+From: Trekie <trekie@sinister.cz>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] MS-6871 isn't working
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <423818DE.1060909@sinister.cz>
-References: <42381514.3070701@sinister.cz>
-	 <1110971745.9818.131.camel@pegasus>  <423818DE.1060909@sinister.cz>
-Content-Type: text/plain
-Message-Id: <1110973336.9818.141.camel@pegasus>
-Mime-Version: 1.0
+References: <42381514.3070701@sinister.cz> <1110971745.9818.131.camel@pegasus>
+In-Reply-To: <1110971745.9818.131.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,22 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Mar 2005 12:42:16 +0100
+Date: Wed, 16 Mar 2005 12:30:38 +0100
 
-Hi David,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> Maybe bluetooth is connected to that USB hub, but I can't do anything
-> with it. I can do almost whatever you say to make it working.
-
-we have seen this problems, but I don't know what's the real problem
-behind it. I assume some USB related stuff. What kernel version do you
-use? What USB host controller is this (lspci)?
+Maybe bluetooth is connected to that USB hub, but I can't do anything
+with it. I can do almost whatever you say to make it working.
 
 Regards
 
-Marcel
+David
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
 
-
+iD8DBQFCOBjeMcA3II2AlaIRAnJOAKDGtq+Iz3QHmc9gUptt+KBdJsiM/gCgtsc3
+AaP4gEx6MaQd4Y221GnzoYw=
+=kwnM
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
