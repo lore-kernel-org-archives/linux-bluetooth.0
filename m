@@ -1,19 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Slaves in Sniff mode
+Subject: Re: [Bluez-users] automatic change of link role?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: tOpSy TuRvY <topsyturvy@nemo.student.utwente.nl>
+To: "Collin R. Mulliner" <collin@betaversion.net>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.BSO.4.58.0406231451130.835@nemo.student.utwente.nl>
-References: <E1BcqIi-0002cT-53@sc8-sf-list2.sourceforge.net>
-	 <Pine.BSO.4.58.0406222046050.9882@nemo.student.utwente.nl>
-	 <1087939830.4209.12.camel@pegasus>
-	 <Pine.BSO.4.58.0406222346200.5451@nemo.student.utwente.nl>
-	 <1087942444.4209.45.camel@pegasus>
-	 <Pine.BSO.4.58.0406231319140.20827@nemo.student.utwente.nl>
-	 <1087992990.4209.79.camel@pegasus>
-	 <Pine.BSO.4.58.0406231451130.835@nemo.student.utwente.nl>
+In-Reply-To: <20040623145218.2dcf9a2a@coredump>
+References: <20040623145218.2dcf9a2a@coredump>
 Content-Type: text/plain
-Message-Id: <1087997435.4209.104.camel@pegasus>
+Message-Id: <1087997029.4209.95.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -25,26 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Jun 2004 15:30:35 +0200
+Date: Wed, 23 Jun 2004 15:23:49 +0200
 
-Hi Assed,
+Hi Collin,
 
-> I'm wondering how the master can request an unsniff if the slave is not 
-> listening to the channel.
-> 
-> I suppose the master should delay transmission till the next sniff window 
-> starts (i.e. as Peter suggested). Of course I'm guessing that at this 
-> point it could request an unsniff if the packet to be transmitted will 
-> not fit the sniff window.
+> just a simple/stupid question. Do I have to change the link role
+> (master/slave) manually (by calling hci_switch_role) or does this happen
+> automatically if needed (the hci device is set to RSWITCH). I have a
+> program which will connect/disconnect to many different devices.
 
-everything depends on the sniff window, but the HCI also defines an exit
-sniff mode command. I don't know how this is implemented on link manager
-level.
-
-> p.s. I'm also wondering how you get the time to reply to everybodys 
-> questions!
-
-I do my best ;)
+the link policy only allows role switch, it doesn't change the role. The
+best way is to do it manually or set the link mode. The link mode can be
+set for a device or also for a L2CAP listen socket.
 
 Regards
 
