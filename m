@@ -2,11 +2,11 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Elimination of pow() in SBC code
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41A93A21.1090809@xmission.com>
+In-Reply-To: <20041128025750.00e11da4.henryk@ploetzli.ch>
 References: <1101599506.18467.6.camel@pegasus>
-	 <41A93A21.1090809@xmission.com>
+	 <20041128025750.00e11da4.henryk@ploetzli.ch>
 Content-Type: text/plain
-Message-Id: <1101648751.18467.52.camel@pegasus>
+Message-Id: <1101644100.18467.47.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,35 +19,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 28 Nov 2004 14:32:31 +0100
+Date: Sun, 28 Nov 2004 13:15:00 +0100
 
-Hi Brad,
+Hi Henryk,
 
-> that's a good idea to break the need for libm and for another 
-> int->float->int conversion
-
-we don't need -lm anymore, but there is still the math.h include and
-this is because of the fabs() function. Any ideas?
-
-> > 	scalefactor[ch][sb] = pow(2.0, (frame->scale_factor[ch][sb] + 1));
-> > 
-> > So what is the range of scale_factor[ch][sb]. From a quick testing a saw
-> > that it ranges from 0 - 15. Is this always true? If yes, then I would
-> > use a pre-calculated array for 2^x.
+> > the pow() function is the only reason for linking with -lm and it is
+> > only used in one place with a limit range of parameters.
 > 
-> or like
+> Oh yes, that occurence of pow(2.0, x) is in older code I forgot about.
+> (And before -lm was necessary for cos(), too)
 > 
->   scalefactor[ch][sb] = 4 << frame->scale_factor[ch][sb];
+> > So what is the range of scale_factor[ch][sb]. From a quick testing a
+> > saw that it ranges from 0 - 15. Is this always true? 
 > 
-> the compiler doesn't know about the limited range of scale_factor so it 
-> may actually generate a loop here.
+> Yes, scale_factor is a 4 bit integer (Table 12.13 of A2DP) and there
+> should be no way of getting it bigger. If there was this would be a bug.
+> 
+> > If yes, then I would use a pre-calculated array for 2^x.
+> 
+> Isn't 1<<x good enough for that?
 
-It must be
+stupid me. Of course power of two is done by bitshifting. I committed
+the following to the CVS:
 
-	scalefactor[ch][sb] = 2 << frame->scale_factor[ch][sb];
-
-However bitshifting is the right way to solve this and I don't see any
-problems for the compiler. We shift the integer value 2.
+	2 << frame->scale_factor[ch][sb]
 
 Regards
 
