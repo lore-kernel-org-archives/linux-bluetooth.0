@@ -1,40 +1,48 @@
-Return-Path: <mcq@cacr.caltech.edu>
-Date: Sun, 7 Mar 2004 17:11:47 -0800
-From: John McCorquodale <mcq@cacr.caltech.edu>
+Return-Path: <wim.delvaux@adaptiveplanet.com>
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: John McCorquodale <mcq@cacr.caltech.edu>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Socket G card newbie Q
-Message-ID: <20040308011147.GA19276@viz.cacr.caltech.edu>
-References: <20040307214224.GB18481@viz.cacr.caltech.edu> <1078704901.15279.6.camel@pegasus> <20040308002100.GA19049@viz.cacr.caltech.edu> <1078705579.15279.18.camel@pegasus> <20040308004811.GA19145@viz.cacr.caltech.edu> <1078707603.15279.27.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1078707603.15279.27.camel@pegasus>
+Subject: Re: bnep and refcnt
+Date: Mon, 8 Mar 2004 02:02:24 +0100
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <200403071625.01627.wim.delvaux@adaptiveplanet.com> <1078705651.15279.20.camel@pegasus>
+In-Reply-To: <1078705651.15279.20.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200403080202.24547.wim.delvaux@adaptiveplanet.com>
 List-ID: <bluez-users.lists.sourceforge.net>
 
-> > First time loading it says:
-> > bcsp_recv: Out-of-order packet arrived, expected 1 got 0
-> 
-> this is ok. You can ignore this message.
+On Monday 08 March 2004 01:27, Marcel Holtmann wrote:
+> Hi Wim,
+>
+> > after browsing the Linux 2.6 code there is a remark in net/core/dev.c
+> > that state what the problem with the following message that I get is
+> >
+> > unregister_netdevice: waiting for bnep0 to become free. Usage count = 6
+> >
+> > The comment with the function in dev.c states that this error is caused
+> > by buggy protocols that should unregister after receiving notification
+> > that the devices they are using has been unregistered.  They should call
+> > unregister_netdev which decreases the refcnt.
+>
+> looks like we need a more detailed audit for the BNEP module and some of
+> the 2.6 changes in the network device layer.
 
-Ah, what I didn't notice when it said this is that it was working!  I have an
-"up" hci0 for the first time.  An hcitool scan sees my headset.  Groovy!
-2.4.25 works.
+	I tried that but did not find anything usefull.
 
-> > Unknown device type or id
-> 
-> This looks like that your command parameters are wrong.
+	I noticed (after GREP) that the BNEP module does not have a notify function
+	(does it need one ?).
 
-Yeah, I can't actually repeat this in 2.4.25 now.  Dunno what I did a minute
-ago.
+	Hence I think we need to look for those systems (HCID?) that have a
+	reference to the bnep module.  Probably those do not unregister properly
 
-> >   2) Is there a patch for the 2.6 serial problem?
-> 
-> Not that I know of. Some cards are working and some are not.
+	How can I compile them in debug ?
 
-Now that I have it going, I'll look into this and see if I can figure out
-what's going on.  If I figure it out, I'll send a patch to -devel.
+	Thanx
 
-Thanks for your help!
+	W
 
--mcq
+>
+> Regards
+>
+> Marcel
