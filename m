@@ -1,34 +1,52 @@
-Return-Path: <ubaldo@eja.it>
-Message-ID: <20040716140215.564.qmail@webmail2.aruba.it>
-References: <20040618175410.28510.qmail@webmail.aruba.it>
-            <1087582530.4309.121.camel@pegasus>
-            <20040618183339.20830.qmail@webmail.aruba.it>
-            <1087583875.25061.2.camel@pegasus>
-            <20040618184232.25439.qmail@webmail.aruba.it>
-            <1087584576.25061.6.camel@pegasus>
-In-Reply-To: <1087584576.25061.6.camel@pegasus>
-From: "ubaldo" <ubaldo@eja.it>
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] SCO && UART
+From: Marcel Holtmann <marcel@holtmann.org>
+To: James Ho <jamesh@insi.com.tw>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: multi rfcomm/sco connection
-Date: Fri, 16 Jul 2004 16:02:15 +0200
+In-Reply-To: <loom.20040716T104017-134@post.gmane.org>
+References: <loom.20040716T104017-134@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1089972663.4517.102.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="iso-8859-1"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 16 Jul 2004 12:11:03 +0200
 
-Ciao Marcel, 
+Hi James,
 
-> actually I don't see why you need more than one SCO link in a connection
-> between two devices. However take a look at the kernel source code of
-> Linux 2.6.x and especially at net/bluetooth/hci_conn.c
+> Does anybody know HCI UART(H4 or BCSP) driver support SCO? 
 
-I explain you a bit more my situation... 
+the hci_uart driver has SCO support.
+ 
+> I am currently working on applications about Handsfree, and bluebooth 
+> module we use (CSR BlueCore2) can either wire through USB or UART 
+> interface. Will there be any problem if we use UART interface? Which 
+> driver and configuration should I use? thx. 
 
-I need to be able with a single usb-bt-dongle to play/capture audio for 
-several bt-handsfree, I tried with one and there are no problems, but if I 
-try to connect another one then I get something like "sco channel busy". 
+For UART everything depends on the baud rate of your UART and you must
+make sure that the SCO packets are sent over the HCI and not over PCM.
 
-I studied the net/bluetooth directory but I cannot find any good way to 
-achieve what I need! :) 
+Regards
 
-Am I wrong in something or is this feature really missing?
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by BEA Weblogic Workshop
+FREE Java Enterprise J2EE developer tools!
+Get your free copy of BEA WebLogic Workshop 8.1 today.
+http://ads.osdn.com/?ad_id=4721&alloc_id=10040&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
