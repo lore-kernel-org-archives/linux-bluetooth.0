@@ -1,28 +1,65 @@
-Return-Path: <sunnan@handgranat.org>
-Message-ID: <4056493B.5040000@handgranat.org>
-Date: Tue, 16 Mar 2004 01:24:27 +0100
-From: Sunnan <sunnan@handgranat.org>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] bthid on ppc
-References: <20040307221349.GA1930@stag.mark-and-erika.com>	 <1078704798.15279.3.camel@pegasus>	 <20040308054000.GB1930@stag.mark-and-erika.com>	 <405638DD.2080000@handgranat.org> <1079393759.3307.46.camel@pegasus>
-In-Reply-To: <1079393759.3307.46.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Sunnan <sunnan@handgranat.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <405638DD.2080000@handgranat.org>
+References: <20040307221349.GA1930@stag.mark-and-erika.com>
+	 <1078704798.15279.3.camel@pegasus>
+	 <20040308054000.GB1930@stag.mark-and-erika.com>
+	 <405638DD.2080000@handgranat.org>
+Content-Type: text/plain
+Message-Id: <1079393759.3307.46.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 16 Mar 2004 00:35:59 +0100
 
-Hi again, Marcel,
-Marcel Holtmann wrote:
-> the sdpd has nothing to do with it. It is the "new" SDP code that both
-> implementations carry and I think none of it is big endian safe.
+Hi Sunnan,
 
-Thanks for correcting my misinformation.
-Could you please tell me where this suspected non-big-endian safe code 
-is? (Which files and functions, etc?)
+> 
+> Seeing this thread made me take up my old efforts to get my Apple
+> wireless mouse to work on my Debian-running iBook g4 (with built-in bt),
+> but it can't be the same type of issue since I did get Peter's bthid
+> mentioned above (same name, different program than in BlueZ cvs) to
+> compile (had to change some includes and so on) and work, it doesn't
+> crash but I could only use the mouse for a few seconds at a time, then
+> it would freeze for a few seconds, then work a few seconds, and so on
+> (and I mean full seconds, not figuratively speaking).
+> That was yesterday. Today I didn't even get that working, I managed to
+> move the cursor for just a short blink, maybe half a second or so.
+> 
+> That error could be in sdpd (that's what Peter's bthid's error messages
+> hint at, or so I interpret them) or in that bthid, or somewhere else, I
+> don't know.
+> 
+> So, anyway, it's not the same issue. BlueZ cvs bthid just dies silently
+> for me (even though the other tools, sdptool, hcitool etc works fine).
 
-As I said, I've gotten the other bthid to work for repeating intervals a 
-few seconds long. I guess it could still be a big endian problem, but it 
-doesn't crash, it's just unable to read SDP (I don't even know what SDP 
-is! Embarassing, I'm going to read up on that) sometimes.
+the sdpd has nothing to do with it. It is the "new" SDP code that both
+implementations carry and I think none of it is big endian safe.
 
-one love, sunnan
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
