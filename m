@@ -1,12 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Juha =?iso-8859-1?B?WXJq9mzk?= <juha.yrjola@iki.fi>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050123113924.GA17069@salvia.homeip.net>
-References: <20050119224400.GA7881@salvia.homeip.net> <1106180379.8190.146.camel@pegasus> <20050120003408.GA8619@salvia.homeip.net> <1106182874.8190.166.camel@pegasus> <20050120090340.GA9719@salvia.homeip.net> <1106470008.8112.9.camel@pegasus>
+Subject: Re: [Bluez-devel] Alignment issue
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Daryl Van Vorst <daryl@wideray.com>,
+   "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1106233175.26551.597.camel@hades.cambridge.redhat.com>
+References: <001301c47f09$3900e650$1301010a@baked>
+	 <1092208405.4564.227.camel@pegasus>
+	 <1106231454.26551.582.camel@hades.cambridge.redhat.com>
+	 <1106232343.8190.187.camel@pegasus>
+	 <1106233175.26551.597.camel@hades.cambridge.redhat.com>
+Content-Type: text/plain
+Message-Id: <1106480346.9269.2.camel@pegasus>
 Mime-Version: 1.0
-In-Reply-To: <1106470008.8112.9.camel@pegasus>
-Subject: Re: [Bluez-devel] [PATCH] Fix too-many-keys-pressed error in hidp/core.c
-Content-Type: text/plain; charset=us-ascii
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +24,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 23 Jan 2005 13:39:24 +0200
+Date: Sun, 23 Jan 2005 12:39:06 +0100
 
-Hi Marcel,
+Hi David,
 
-On Sun, Jan 23, 2005 at 09:46:48AM +0100, Marcel Holtmann wrote:
+> > why using a do-while for put_unaligned() and not for get_unaligned(). 
+> 
+> Because get_unaligned() returns a value, and put_unaligned() does not.
+> 
+> > Is this supposed to work with each GCC version?
+> 
+> Yes.
+> 
+> > Will it also work with other compilers? 
+> 
+> Don't know; don't care. Remember, the existing code isn't guaranteed to
+> work even with gcc, let alone other compilers. Does the rest of the
+> BlueZ code compile with non-gcc compilers? Probably not... you have 122
+> other instances of '__attribute__((packed))' in the source. Including
+> the alignment stuff in include/sdp_internal.h which does it the way I'm
+> suggesting, albeit with a gratuitous '#ifdef __i386__'.
+> 
+> > What about performance? If a platform can do unaligned
+> > access by itself it should be faster than compiler tricks.
+> 
+> If the platform can do unaligned access by itself, then GCC knows that
+> and emits a direct load/store instruction. It's only if the platform
+> _can't_ do it by itself that GCC does anything different. That's why the
+> #ifdef __i386__ in include/sdp_internal.h is pointless -- GCC should
+> emit the same code even if the other version is used.
 
-> I think we should add a patch for this, but I don't like the way you did
-> it. Checking for the end value of a for-loop is not a good programming
-> practice. Using memcmp() here should be a lot better and cleaner.
+your patch results in a lot of "initialization from incompatible pointer
+type" errors in the utils and hcidump. Basically in conjunction with
+functions like ntohs() etc. How do we fix this?
 
-It depends on how you think about the problem.  If you see the data as just
-an array of bytes, memcmp() is the way to go.  If you think of it as 6
-consecutive key codes, with each one set to 1, for loop is conceptually the            
-right thing to use.
-        
-Cheers,
-Juha
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
