@@ -1,18 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] ipaq 1945
+Subject: Re: [Bluez-users] hcitool scan gives timeout on an ipaq 5500
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Nigel Magnay <nigel.magnay@gmail.com>
-Cc: Wolfgang <wood.stock@gmx.net>, bluez-users@lists.sourceforge.net
-In-Reply-To: <320075ff04092805251ce925e6@mail.gmail.com>
-References: <320075ff040925153753850d92@mail.gmail.com>
-	 <1096153758.7719.12.camel@pegasus>
-	 <320075ff040926011212538dac@mail.gmail.com>
-	 <003001c4a3ba$d064fba0$8696a8c0@marcy>
-	 <320075ff0409270050bbaf228@mail.gmail.com>
-	 <1096371841.4950.5.camel@notepaq>
-	 <320075ff04092805251ce925e6@mail.gmail.com>
+To: filipe abrantes <fla@inescporto.pt>
+Cc: bluez-users@lists.sourceforge.net, filipe_abrantes@netcabo.pt
+In-Reply-To: <47EFEB1E.7010903@inescn.pt>
+References: <47EFEB1E.7010903@inescn.pt>
 Content-Type: text/plain
-Message-Id: <1096374487.4649.5.camel@notepaq>
+Message-Id: <1096373451.4649.3.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -24,33 +18,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Sep 2004 14:28:07 +0200
+Date: Tue, 28 Sep 2004 14:10:56 +0200
 
-Hi Nigel,
+Hi Filipe,
 
-> I got a lot further, I can connect to my server now; I am just left
-> with trying to understand why I can't get bridging to work.
+> ive been using bluez on an ipaq, but im having some problems:
 > 
-> I have:
->  - router (Internet, DHCP serving 192.168.1.{100-200}) (255.255.255.0)
->  - linux box, eth0 = 192.168.1.55 (fixed), bnep0 for bluetooth
->  - iPaq connecting to bluetooth
+> how i set up bt on ipaq:
 > 
-> I can talk to the server by making bnep0 192.168.*2*.254 and fixing
-> the IP address in the ipaq (or running a dchp server on linux as
-> well), but it would be nice to not have to have another dchp server.
+> # uname -r
+> 2.4.19-rmk6-pxa1-hh36
+> # pand
+> PAN daemon version 1.1rc2
+> ..
+> # hcitool
+> hcitool - HCI Tool ver 2.2
+> # hcid --version
+> hcid: invalid option -- -
+> hcid - HCI daemon ver 2.3
 > 
-> I had thought I could bridge the interfaces, but I have tried lots of
-> things like
-> brctl addbr br0
->  brctl addif br0 eth0
->  brctl addif br0 bnep0
+> #hciattach /dev/tts/1 any 921600
+> # hciconfig
+> hci0:   Type: UART
+>         BD Address: 08:00:17:1F:C5:E4 ACL MTU: 339:4  SCO MTU: 60:9
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:88 acl:0 sco:0 events:11 errors:1
+>         TX bytes:652 acl:0 sco:0 commands:25 errors:0
 > 
-> but that just leads to aggravating things like the linux box dropping
-> off the network altogether ..
+> ... and the hcid.conf files are similar on both the ipaq and my pc
+> 
+> 
+> 
+> when i try hcitool scan on ipaq:
+> 
+> # hcitool scan
+> Scanning ...
+> Inquiry failed.: Connection timed out
+> 
+> when i try on my pc:
+> 
+> # hcitool scan
+> Scanning ...
+>         08:00:17:1F:C5:E4       ipaq
+> 
+> then when i put my pc on: pand --listen --role GN
+> ...and try to connect: pand --connect 00:10:60:A4:89:15 (on the ipaq side)
+> 
+> it doesn t establish connection.
+> 
+> but on the other end if i try  to switch roles, the pc can connect to 
+> the ipaq  (the ipaq is now GN)  then it works out ok.
 
-look at the PAN howto. It has the correct commands to setup a bridge
-when you are using Bluetooth BNEP.
+run hcidump -x as root on the iPAQ side to see what is going on.
 
 Regards
 
