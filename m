@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Message-ID: <A1F0D47583A2D711919F00600819B3A4028BA6@goofy.vitronics.com>
-From: "Williams, Richard" <Richard.Williams@VITRONICS.com>
-To: "Bluez-Devel (E-mail)" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] BlueZ startup
+Subject: Re: [Bluez-devel] Oops in hci_usb when disconnecting built-in
+	controller
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andy Ross <andy@plausible.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <40CDE884.8080809@plausible.org>
+References: <40CDE884.8080809@plausible.org>
+Content-Type: text/plain
+Message-Id: <1087237699.13792.42.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,34 +19,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 15 Jun 2004 10:00:35 -0400
+Date: Mon, 14 Jun 2004 20:28:19 +0200
 
-Hello All,
+Hi Andy,
 
-I have a single board computer x-scale processor running Linux 2.4.26. I =
-plan to have several Bluetooth devices and services on my system, such =
-as several rfcomm TTY connections, SDP, OPD, PAND all running =
-simultaneously. I want all the BT drivers and applications to start at =
-boot time.
+> I have a new laptop, a Compaq R3000Z (AMD64, but currently running a
+> 32 bit kernel).  It has a built-in USB Bluetooth device, which
+> identifies itself as ID 049f:0086.  It works great with the hci_usb
+> driver from boot.
+> 
+> The laptop also has a "wireless enable/disable" switch, which is a
+> hardware switch that when pressed drops power to the internal 802.11b
+> antenna and (apparently) disconnects the HCI controller from the USB
+> bus.  When I use this, I get a 100% repeatable oops in the hci_usb
+> driver.  The driver then locks up and refuses to unload, although the
+> rest of the kernel appears to be unaffected.
 
-The question is, in what order should the various bluetooth pieces be =
-started, and when in the boot-up cycle. Currently, I start hcid, sdp and =
-opd in /etc/rc.d/init.d/bluetooth. This seems to work OK. But if I also =
-attempt to start pand from inside /etc/rc.d/init.d/bluetooth I =
-frequently get kernel panics.
+this problem is already fixed. Try 2.6.7-rc3 or apply the -mh3 patch.
 
-How should I start up these services ?
+Regards
 
-thank you,
+Marcel
 
-Rich
-
-Richard B. Williams
-Vitronics, Inc.
-3 Corbett Way
-Eatontown, NJ 07724-2262
-732-389-0244 x29
-Richard.Williams@vitronics.com
 
 
 
