@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] how to do inquiry with RSSI in bluetooth 1.2
-	devices?
+Subject: Re: [Bluez-devel] question about hci_usb endpoint selection...
 From: Marcel Holtmann <marcel@holtmann.org>
-To: albert@csail.mit.edu
+To: Lars Grunewaldt <lgw@dark-reality.de>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <ef9938ec04101511326a6342c3@mail.gmail.com>
-References: <ef9938ec041012125930f0b8e3@mail.gmail.com>
-	 <1097658003.4643.17.camel@notepaq>
-	 <ef9938ec04101511326a6342c3@mail.gmail.com>
+In-Reply-To: <416EF4B0.6070802@dark-reality.de>
+References: <416D23A6.3010904@dark-reality.de>
+	 <1097752849.4640.37.camel@notepaq>  <416EF4B0.6070802@dark-reality.de>
 Content-Type: text/plain
-Message-Id: <1097928625.4911.30.camel@pegasus>
+Message-Id: <1097928414.4911.27.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,57 +19,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 16 Oct 2004 14:10:25 +0200
+Date: Sat, 16 Oct 2004 14:06:54 +0200
 
-Hi Albert,
+Hi Lars,
 
-> > > When I run this with the anycom bluetooth device, the very first
-> > > hci_send_req never returns.  I expected the READ_INQUIRY_MODE command
-> > > to generate a CMD_COMPLETE event, but no event is ever generated (I
-> > > tested this separately).  Also, when hcidump is run concurrently with
-> > > this program, it doesn't pick anything up (no events are read by
-> > > hcidump)  The same happens if I try to set the inquiry mode directly
-> > > without reading it first (the WRITE_INQUIRY_MODE command never
-> > > returns)
-> > 
-> > I never saw that on my dongle. Please recompile your kernel without the
-> > SCO audio support for the hci_usb driver. What kind of USB host
-> > controller are you using? What kernel version do you use?
-> 
-> I am using kernel 2.4.27, compiled from sources available in the
-> debian repository.  I recompiled without SCO audio support for hci_usb
-> and got the same result.
-> 
-> How do I find out what kind of USB host controller I'm using?  lspci
-> gives the following output:
-> 
-> 0000:00:1f.2 USB Controller: Intel Corp. 82801BA/BAM USB (Hub #1) (rev 04)
-> 0000:00:1f.3 SMBus: Intel Corp. 82801BA/BAM SMBus (rev 04)
-> 0000:00:1f.4 USB Controller: Intel Corp. 82801BA/BAM USB (Hub #2) (rev 04)
-> 
-> dmesg shows the following lines related to USB
-> 
-> usb.c: registered new driver usbdevfs
-> usb.c: registered new driver hub
-> usb-uhci.c: $Revision: 1.275 $ time 17:39:55 Oct 14 2004
-> usb-uhci.c: High bandwidth mode enabled
-> usb-uhci.c: USB UHCI at I/O 0xff80, IRQ 19
-> usb-uhci.c: Detected 2 ports
-> usb.c: new USB bus registered, assigned bus number 1
-> hub.c: USB hub found
-> usb-uhci.c: USB UHCI at I/O 0xff60, IRQ 18
-> usb-uhci.c: Detected 2 ports
-> usb.c: new USB bus registered, assigned bus number 2
-> hub.c: USB hub found
-> usb-uhci.c: v1.275:USB Universal Host Controller Interface driver
-> hub.c: new USB device 00:1f.2-2, assigned address 2
-> usb.c: USB device 2 (vend/prod 0xa12/0x1) is not claimed by any active driver.
-> BlueZ HCI USB driver ver 2.7 Copyright (C) 2000,2001 Qualcomm Inc
-> usb.c: registered new driver hci_usb
-> hub.c: new USB device 00:1f.4-1, assigned address 2
+> OK, I added hci_usb_notify(..) and it works as it should (get's the
+> notify when voice mode is changed).
 
-what is actually attached on your USB bus (check with lsusb), because
-this device is a CSR dongle and the one from your other email is not.
+you also need some extra changes from my Bitkeeper repository, because I
+fixed some locking parts around the notify framework. The number of ACL
+and SCO links are now also counted separately. You need that for
+selecting the correct alternate setting.
+
+> Now for the "real stuff"... :)
+> 
+> I think to handle the voice mode change correctly, I have to duplicate
+> the code from about line 874..922 that locates the "proper" alternate
+> setting; before this can happen, the notify function must close
+
+No, because the correct alternate setting is described in the Bluetooth
+HCI USB transport specification.
+
+> ((husb *)hdev->driver_data)->isoc_iface with
+> usb_driver_release_interface(...)
+
+Don't try to release and claim it again. You are not in the probe()
+function.
+
+> is there anything else to do? Must some buffers be dropped or free'd or
+> something? is it possible to simply re-set
+> isoc_iface, isoc_in_ep and isoc_out_ep?
+
+No simple reset. Change the alternate setting, but you maybe have to
+suspend the ISOC URBs first and then resume them. Check the USB API
+definition of it first.
+
+> Or is it in fact not neccesary to disconnect isoc_iface and only change
+> the values of isoc_in_ep and isoc_out_ep?
+
+Maybe you should look at the /proc/bus/usb/devices first, because the
+endpoint identifiers on the second interface are always the same. You
+must tell the USB core to switch the alternate setting.
 
 Regards
 
