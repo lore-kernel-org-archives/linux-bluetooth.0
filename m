@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <b8950797050111232241c3de8b@mail.gmail.com>
-From: Weston Weems <wweems@gmail.com>
-To: Bluez-users@lists.sourceforge.net
+From: "Cloudshang" <zhixiang_deng@yahoo.com.cn>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] replicate hcitool scan using bluez libs
+Content-Type: text/plain;
+      charset="GB2312"
+Message-ID: <E1CoYDE-0006kC-17@sc8-sf-mx2.sourceforge.net>
+Subject: [Bluez-users] Issues with filter
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,20 +17,59 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 11 Jan 2005 23:22:59 -0800
+Date: Wed, 12 Jan 2005 10:32:58 +0800
 
-I am a little new to the bluez libs etc, and am trying to essentiall
-call functions in the bluez libs to simulate "scan" behaviour of
-hcitool.
+Marcel Holtmann
+   I had seen Kalman-filter applied to channel estimation.Assumed=
+ the signal is smooth,in my opinion,the computation of Kalman is=
+ too complex and its precision is equal to Winner filter. So I=
+ have doubt with this application.
+   Thank you!
 
-At first I thought it was inquiry in hci.h but after running the
-tools, seems like they yeild different results. Also, device_id is id
-of the bluetooth radio in the system?
+=09
 
-Anyway I'd appreciate any guidance on the issue... 
+=3D=3D=3D=3D=3D=3D=3D 2005-01-11 13:05:00 =C4=FA=D4=DA=C0=B4=D0=C5=D6=D0=D0=B4=B5=C0=A3=BA=3D=3D=3D=3D=3D=3D=3D
 
-many thanks in advance
-Weston Weems
+>Hi,
+>
+>> =09I had seen Kalman-fiter applied to OFDM.But what is the=
+ advantage?Thank you! 
+>
+>explain what you are talking about, because I have no idea.
+>
+>Regards
+>
+>Marcel
+>
+>
+>
+>
+>-------------------------------------------------------
+>The SF.Net email is sponsored by: Beat the post-holiday blues
+>Get a FREE limited edition SourceForge.net t-shirt from=
+ ThinkGeek.
+>It's fun and FREE -- well,=
+ almost....http://www.thinkgeek.com/sfshirt
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+=3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D =3D
+=09=09=09
+
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=D6=C2
+=C0=F1=A3=A1
+ 
+=09=09=09=09 
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1Cloudshang
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1zhixiang_deng@yahoo.com.cn
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A12005-01-12
+
+
+
+
+
 
 
 -------------------------------------------------------
