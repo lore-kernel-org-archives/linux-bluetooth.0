@@ -1,35 +1,76 @@
-Return-Path: <noring@nocrew.org>
-Subject: Re: [Bluez-devel] [PATCH] New keytab storage
-From: Fredrik Noring <noring@nocrew.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1075564322.2720.42.camel@pegasus>
-References: <1075506991.14644.114.camel@akka.yeti.nocrew.org>
-	 <1075509170.3594.36.camel@pegasus>
-	 <1075510549.14644.135.camel@akka.yeti.nocrew.org>
-	 <1075511922.3594.49.camel@pegasus>
-	 <1075541234.14644.149.camel@akka.yeti.nocrew.org>
-	 <1075562590.2720.13.camel@pegasus>
-	 <1075563628.14644.161.camel@akka.yeti.nocrew.org>
-	 <1075564322.2720.42.camel@pegasus>
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1075565012.14644.176.camel@akka.yeti.nocrew.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH] Bluetooth address specific device
+	configuration
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Fredrik Noring <noring@nocrew.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   Edd Dumbill <edd@usefulinc.com>
+In-Reply-To: <1075564164.14644.167.camel@akka.yeti.nocrew.org>
+References: <1075316178.553.18.camel@akka.yeti.nocrew.org>
+	 <1075355567.26729.65.camel@pegasus>
+	 <1075405154.22564.64.camel@akka.yeti.nocrew.org>
+	 <1075406315.22564.67.camel@akka.yeti.nocrew.org>
+	 <1075563018.2720.19.camel@pegasus>
+	 <1075564164.14644.167.camel@akka.yeti.nocrew.org>
+Content-Type: text/plain
+Message-Id: <1075564788.2720.49.camel@pegasus>
 Mime-Version: 1.0
-Date: Sat, 31 Jan 2004 17:03:32 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Sat, 31 Jan 2004 16:59:49 +0100
 
-lör 2004-01-31 klockan 16.52 skrev Marcel Holtmann:
-> But I think we should discuss some design goals of the new device manager.
+Hi Fredrik,
 
-Great idea. What's your plan for it?
+> As far as I can see there is only one misplaced space and two 
+> misplaced '{' characters in the entire patch, on lines 93, 312
+> and 331 in main.c. :)
 
-> I don't see what kind of mess in "glib-ectomy" you mean, but go ahead
-> and send a patch for it. 
+I have seen more. Also misplaced comments ;)
 
-Some bads, I think:
+One other thing.
 
-  - The API can be improved
-  - Tons of ugly (even in opionon) typedef:s
-  - No style
+static void init_device_defaults(struct device_opts *device_opts)
+{
+       device_opts->name        = 0;
+       device_opts->class       = 0;
+       device_opts->pkt_type    = 0;
+       device_opts->scan        = SCAN_PAGE | SCAN_INQUIRY;
+       device_opts->link_mode   = 0;
+       device_opts->link_policy = 0;
+       device_opts->auth        = 0;
+       device_opts->encrypt     = 0;
+}
 
-Fredrik
+This is too much and not needed, because we can use memset().
+
+	memset(device_opts, 0, sizeof(*device_opts));
+	device_opts->scan = SCAN_PAGE | SCAN_INQUIRY;
+
+I know one function later it is used in the same style, but I don't like
+it either. And of course in this case inlining the function is a good
+idea.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
