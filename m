@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "blookk -" <blookk@hotmail.com>
-To: bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] UART-based bluetooth stuff
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Russell King <rmk+bt@arm.linux.org.uk>
+Cc: bluez-devel@lists.sf.net
+In-Reply-To: <20040828182216.A24467@flint.arm.linux.org.uk>
+References: <20040828182216.A24467@flint.arm.linux.org.uk>
+Content-Type: text/plain
+Message-Id: <1093716721.8035.3.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Message-ID: <BAY1-F217RtMeKbK1tH00042281@hotmail.com>
-Subject: [Bluez-devel] PAN profile of bluetooth
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,78 +18,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 30 Aug 2004 11:19:36 +0000
+Date: Sat, 28 Aug 2004 20:12:01 +0200
 
-Hello
+Hi Russel,
 
-I want to connect 2 pc using the PAN profile. I do this things:
+> I'm digging about in the 8250 serial driver in 2.6 trying to clean up
+> the way we handle all the different UART variants.  I'm aware that BT
+> can use UARTs for communication.
+> 
+> I also know that some BT CF cards have OX950 UARTs in them.  Currently
+> these do not use the on-board hardware flow control capabilities, but
+> I'd like to correct that.  Since I don't have OX950 hardware to hand,
+> it's that's difficult to check the effects of that.
+> 
+> Does bluetooth use hardware flow control?  I'm lead to believe by BT
+> test program here that some BT serial protocols do and others don't.
+> Can someone clarify this.
 
-- In server and client:
+at the moment some serial based PCMCIA or CF Bluetooth cards work and
+some don't. I have no clue why this is so and I am no expert when it
+comes to UART specific stuff. Some of these cards indeed work with a 2.4
+kernel.
 
-insmod rfcomm
-insmod l2cap
-insmod bnep
+> Has anyone seen any other 8250-compatible UART types used for bluetooth?
 
-hcid -n &
-sdpd -n &
-sdptool add LAN
+Actually I think I have most of them at home. However there are a lot
+more out there and it seems that any new PCMCIA of CF Bluetooth card is
+a serial card with a Bluetooth chip attached to its UART.
 
-- In the server:
-The file hcid.conf :    lm accept,master;
-in the console     :    pand --listen --role GN
+> Lastly, would they be willing victims^wtesters for serial patches? 8)
 
-- In the client:
-The file hcid.conf :    lm accept,master;
-in the console     :    pand --connect 00:11:22:33:44:55
+I will do and I can also add them to my -mh patches.
 
-After i do this things, the virtual interfaz "Bnep0" doesn't create.
+Regards
 
-I execute ifconfig and only appears:
+Marcel
 
-eth0      Link encap:Ethernet  HWaddr 00:0A:9B:4D:75:W3
-          inet addr:192.161.56.171  Bcast:192.161.56.255  Mask:255.255.255.0
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:22602 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:17295 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:100
-          RX bytes:17913250 (17.0 Mb)  TX bytes:2621877 (2.5 Mb)
-          Interrupt:5 Base address:0x1c00
-
-lo        Link encap:Local Loopback
-          inet addr:127.0.0.1  Mask:255.0.0.0
-          UP LOOPBACK RUNNING  MTU:16436  Metric:1
-          RX packets:116487 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:116487 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0
-          RX bytes:7500466 (7.1 Mb)  TX bytes:7500466 (7.1 Mb)
-
-In the messages of kernel appears:
-in server:
-Aug 30 09:54:39 clavijo hcid[4819]: Bluetooth HCI daemon
-Aug 30 09:54:39 clavijo hcid[4819]: HCI dev 0 up
-Aug 30 09:54:49 clavijo sdpd[4822]: Bluetooth SDP daemon
-Aug 30 10:14:30 clavijo pand[4836]: Bluetooth PAN daemon
-Aug 30 10:14:36 clavijo pand[4837]: New connection from 00:80:5A:20:6E:26 
-bnep0
-Aug 30 10:14:36 clavijo /etc/hotplug/net.agent: invoke ifup bnep0
-
-in client:
-                      Bluetooth HCI daemon
-                      HCI dev 0 up
-                      Bluetooth SDP daemon
-                      Bluetooth PAN daemon
-                      connecting to 00:11:22:33:44:55
-                      bnep0 connected
-                      /etc/hotplug/net.agent: invoke ifup bnep0
-
-I don't know if i do something wrong.
-
-
-thanks and regards
-
-_________________________________________________________________
-¿Estás pensando en cambiar de coche? Todas los modelos de serie y extras en 
-MSN Motor. http://motor.msn.es/researchcentre/
 
 
 
