@@ -1,55 +1,75 @@
-Return-Path: <steve.crane@rococosoft.com>
-Subject: Re: [Bluez-devel] SDP memory leak?
-From: Stephen Crane <steve.crane@rococosoft.com>
+Return-Path: <StefanMischke@web.de>
+Message-ID: <412F3619.40202@web.de>
+Date: Fri, 27 Aug 2004 15:24:41 +0200
+From: Stefan Mischke <StefanMischke@web.de>
+MIME-Version: 1.0
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Stefan Mischke <StefanMischke@web.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
    "Stefan Mischke (E-Mail)" <survivor@upb.de>
+Subject: Re: [Bluez-devel] SDP memory leak?
+References: <412F29D2.7000001@web.de> <1093610969.2581.119.camel@pegasus>
 In-Reply-To: <1093610969.2581.119.camel@pegasus>
-References: <412F29D2.7000001@web.de>  <1093610969.2581.119.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1093613489.5066.49.camel@baroque.rococosoft.com>
-Mime-Version: 1.0
-Date: Fri, 27 Aug 2004 14:31:30 +0100
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: StefanMischke@web.de
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-The sdp library is free (I think) of memory leaks, thanks to the wonders
-of valgrind: http://valgrind.kde.org.
+Hi!
 
-On Fri, 2004-08-27 at 13:49, Marcel Holtmann wrote:
-> Hi Stefan,
-> 
-> > I have a question about "bnep_sdp_search()" from 
-> > "bluez-pan-1.1/pand/sdp.c" (see below for the code).
-> > If I see it correctly, the memory for "sdp_list_t *srch, *rsp" is 
-> > allocated by "sdp_service_search_req()".
-> > But "bnep_sdp_search()" accesses the pointer "rsp" after it has done 
-> > "sdp_close()".
-> > So my question is: 'Who will ever free the memory allocated at "rsp" and 
-> > when?'
-> > 
-> > I quite new to this, so I probably have missed something. So sorry if 
-> > this is a stupid one :-).
-> 
-> no, I think you are right. I expect more memory leaks in the SDP code.
-> We need some people to check this and send me patches.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
-> 100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
-> Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
-> http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+Marcel Holtmann schrieb:
+
+>no, I think you are right. I expect more memory leaks in the SDP code.
+>We need some people to check this and send me patches.
+>  
+>
+Well then, I just figured out (in my own TestApp based on 
+"bnep_sdp_search()") that it simply doesn't work like this. I propose to 
+do "sdp_close()" as the last sdp_* call (as in the code below). Same 
+with dund. So there might be no memory leak but an illegal pointer 
+access. One has to correct "pand/sdp.c" and "dund/sdp.c".
+
+Regards
+Stefan
+
+<CODE>
+
+int bnep_sdp_search(bdaddr_t *src, bdaddr_t *dst, uint16_t service)
+{
+    sdp_list_t *srch, *rsp = NULL;
+    sdp_session_t *s;
+    uuid_t svclass;
+    int err, res;
+
+    switch (service) {
+    case BNEP_SVC_PANU:
+        sdp_uuid16_create(&svclass, PANU_SVCLASS_ID);
+        break;
+    case BNEP_SVC_NAP:
+        sdp_uuid16_create(&svclass, NAP_SVCLASS_ID);
+        break;
+    case BNEP_SVC_GN:
+        sdp_uuid16_create(&svclass, GN_SVCLASS_ID);
+        break;
+    }
+       
+    srch = sdp_list_append(NULL, &svclass);
+
+    s = sdp_connect(src, dst, 0);
+    if (!s) {
+        syslog(LOG_ERR, "Failed to connect to the SDP server. %s(%d)",
+                strerror(errno), errno);
+        return 0;
+    }
+
+    err = sdp_service_search_req(s, srch, 1, &rsp);
+    res = sdp_list_len(rsp);
+    sdp_close(s);
+
+    /* Assume that search is successeful
+     * if at least one record is found */
+    if (!err && res)
+        return 1;
+
+    return 0;
+}
+
+</CODE>
