@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm question 2-AT command
+Subject: Re: [Bluez-users] rfcomm question 1
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050128141322.96979.qmail@web60904.mail.yahoo.com>
-References: <20050128141322.96979.qmail@web60904.mail.yahoo.com>
+In-Reply-To: <20050128140602.29279.qmail@web60907.mail.yahoo.com>
+References: <20050128140602.29279.qmail@web60907.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1106940245.10580.2.camel@pegasus>
+Message-Id: <1106933775.9644.0.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,26 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Jan 2005 20:24:05 +0100
+Date: Fri, 28 Jan 2005 18:36:15 +0100
 
 Hi Michael,
 
-> I have written a program that the menu can be sent to T610 by AT
-> command. However, I face a problem. When I send one menu to the
-> mobile, there is 4-5 seconds delay. The syntax of my program is:
-> sprintf(command, "AT*EASM=\"Bt-IrConverter\",1,1,%d", item_brand+1);
->   ret_code=put_command (command, answer, sizeof (answer), 5, 0);
->   for (j=0; j<item_brand; j++)
->   {
->    sprintf(command, ",\"%s\"", device[j]);
->    ret_code=put_command (command, answer, sizeof (answer), 5, 0);
->    }
->   sprintf(command, ",\"quit\",\r");
-> where the variable device[j] stores the string extracted from MySQL
-> db. So, why is that? And how can I reduce the delay?
+> I'm doing a project using bluetooth. But I have something to ask.
+> Now, I make the connection between Linux PC and Sony Ericsson T610 by
+> typing "rfcomm connect 0 <adress>", and it was success. Then, I wish
+> to make the connection in this way: let T610 be the client and PC be
+> the server. When T610 searched the PC, I wish to connect them by
+> selecting the PC in the mobile. But when I entered the PIN, the mobile
+> always showed "PIN not match". Why is that? And how can I do so that
+> the connection can be created by mobile phone?
 
-check with hcidump if there is really a delay or if the phone simply
-needs that long to execute that command.
+do you have hcid running? What does "hcidump -x" as root shows when you
+connect from the mobile phone?
 
 Regards
 
