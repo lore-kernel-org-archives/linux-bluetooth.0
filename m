@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41EA83D3.9060204@tootai.net>
-From: administrator tootai <admin@tootai.net>
-MIME-Version: 1.0
-To: Bluetooth <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-users] btsco compile fail
+Subject: Re: [Bluez-users] Bluetooth Connections
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <002b01c4fbc4$b2ce8fe0$7a474e98@ecs.soton.ac.uk>
+References: <002b01c4fbc4$b2ce8fe0$7a474e98@ecs.soton.ac.uk>
+Content-Type: text/plain
+Message-Id: <1105881151.8080.15.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 Jan 2005 16:10:11 +0100
+Date: Sun, 16 Jan 2005 14:12:31 +0100
 
-Hi,
+Hi Mark,
 
-I want co compile btsco from CVS and get following error:
+> I'm would like to know if it's possible to given a known device to
+> connect tom make the connection faster, I've looked at altering the
+> inquiry code to constantly poll for any new devices and report when it
+> find devices. However I'd like to be able to make the inquiry phase
+> nice and quick because i'm only connecting to a known device. Is this
+> possible ?
 
-aclocal: configure.in: 21: macro `AM_PATH_ALSA' not found in library
-nomade:/usr/src/btsco# 
+if you know the device then the inquiry phase is not needed. Simply use
+the BD_ADDR of your device and connect (page) it.
 
-I'm running a Debian 2.6.8 kernel.
+Regards
 
-Thanks for hint.
+Marcel
 
--- 
-Daniel
+
 
 
 -------------------------------------------------------
