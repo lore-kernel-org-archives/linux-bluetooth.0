@@ -1,12 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <423826D4.7000201@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Re: [Patch] Some btsco modifications
-References: <1110683934.5056.43.camel@pc7.dolda2000.com>	 <4233C663.80109@xmission.com> <1110762698.5056.73.camel@pc7.dolda2000.com>	 <423589B1.6000403@xmission.com>	 <1110809103.5056.102.camel@pc7.dolda2000.com>	 <42368D18.2000405@xmission.com>	 <1110930125.19889.13.camel@pc7.dolda2000.com>	 <42377AFF.8030405@xmission.com> <1110938218.19889.16.camel@pc7.dolda2000.com>
-In-Reply-To: <1110938218.19889.16.camel@pc7.dolda2000.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Fredrik Tolf <fredrik@dolda2000.com>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <42377AFF.8030405@xmission.com>
+References: <1110683934.5056.43.camel@pc7.dolda2000.com>
+	 <4233C663.80109@xmission.com> <1110762698.5056.73.camel@pc7.dolda2000.com>
+	 <423589B1.6000403@xmission.com>
+	 <1110809103.5056.102.camel@pc7.dolda2000.com>
+	 <42368D18.2000405@xmission.com>
+	 <1110930125.19889.13.camel@pc7.dolda2000.com>
+	 <42377AFF.8030405@xmission.com>
+Content-Type: text/plain
+Message-Id: <1110938218.19889.16.camel@pc7.dolda2000.com>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,40 +24,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 16 Mar 2005 13:30:12 +0100
+Date: Wed, 16 Mar 2005 02:56:58 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+On Tue, 2005-03-15 at 17:17 -0700, Brad Midgley wrote:
+> Fredrik
+> 
+> > I just saw that sometimes the kernel apparently notices a broken RFCOMM
+> > channel and closes the socket. I don't know yet what might trigger it
+> > apart from an explicit disconnect.
+> 
+> wandering out of range, powering off the headset, suspending the laptop 
+> are the ones I would run into.
 
-Fredrik Tolf wrote:
-| On Tue, 2005-03-15 at 17:17 -0700, Brad Midgley wrote:
-| In a perfect world, yes. But the question is: Does the kernel actually
-| detect wandering out of range, and if so, after how long? If the kernel
-| can't detect it, is there a way of periodically pinging the headset to
-| detect it manually?
+In a perfect world, yes. But the question is: Does the kernel actually
+detect wandering out of range, and if so, after how long? If the kernel
+can't detect it, is there a way of periodically pinging the headset to
+detect it manually?
 
-Of course the kernel detects it when a device get's out of range. Not
-immediatly, but as soon as the lower level BT links break down. Pretty
-much a protocol feature...
+Fredrik Tolf
 
-best regards,
-~  Lars
 
-- --
-Lars Grunewaldt
-* software development
-* multimedia design
-skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
-web: http://www.dark-reality.de
-mail: lgw@dark-reality.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFCOCbUQWC6DTWkDAoRAj1VAJ4mDAuD1WmiOul6VsHLCFlPV9RITACgng/1
-B89iFNfImuOVEJCUOpZm56Q=
-=7kyh
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
