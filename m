@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?ISO-8859-1?B?Sm9yZ2UgQS4gR29ueuFsZXo=?= <egrojorge@terra.es>
-Reply-To: egroJorge <egroJorge@terra.es>
-Message-ID: <692442859.20040519115732@terra.es>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] sdpd crashing (in uclinux)
+Subject: Re: [Bluez-users] bthid,ppc,sdp
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Sunnan <sunnan@handgranat.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <878yfp4bmz.fsf@handgranat.org>
+References: <878yfp4bmz.fsf@handgranat.org>
+Content-Type: text/plain
+Message-Id: <1084957440.4327.28.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,27 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 May 2004 11:57:32 +0200
+Date: Wed, 19 May 2004 11:04:00 +0200
 
-Hello
+Hi Sunnan,
 
-I have already "ported" the bluez-utils to uclinux (over an ARM7DMI)
-and I realized than sdpd crash whenever other device tries to browse
-its services). I have printfed the code and followed it until I found
-out that it is the command sdp_put_unligned which is having a
-segmentation fault.
-I have seen that sdp_put_unligned is defined as a macro depending of
-the definition or not of 386 architecture. I will trie to play with
-the defines and to port hcidump in order to have more information but
-I would like to ask the list about this problem in the case I am not the
-first one.
+> I've been away from the "under-the-cover" part of geekdom for a while,
+> including bluez-user, but on whim decided to check out the new sdp
+> from cvs.
+> 
+> I just wanted to say that my mouse (Apple Wireless Mouse) works fine
+> on my iBook now, and I wanted to say thanks, and I wanted to say that
+> I'm sorry that I couldn't be of more help.
 
-(I think my system is little endian, but I will also trie to be sure of
-it today)
+then go ahead and try 2.6.6-mh1 with hidd from bluez-utils-2.7. This
+will be the official way of supporting Bluetooth HID devices.
 
-Thanks for your help!
+Regards
 
-Jorge
+Marcel
+
 
 
 
