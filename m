@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bypass for L2CAP packets
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <loom.20050125T121015-316@post.gmane.org>
-References: <loom.20050125T121015-316@post.gmane.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1106657640.8058.148.camel@pegasus>
+To: bluez-devel@lists.sourceforge.net
+From: Matthias =?utf-8?b?QnJ1bsOp?= <matthiasbrune@gmx.de>
+Message-ID: <loom.20050125T171228-190@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Re: Bypass for L2CAP packets
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,42 +16,92 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 25 Jan 2005 13:54:00 +0100
+Date: Tue, 25 Jan 2005 16:25:45 +0000 (UTC)
 
-Hi Matthias,
+Hi, 
 
-> sorry for a question to the same problem again...
-> I have a (problem) with the L2CAP layer from BlueZ.
-> I wrote a program that communicates with a mobile phone by using its ow=
-n L2CAP=20
-> layer (the program builds its own L2CAP packets for protocol testing).
-> For example I send a valid "connection request" to that phone and the p=
-hone=20
-> answers with a valid "connection response".
-> So far so good.=20
-> But then the L2CAP layer from BlueZ sends a "command reject", because t=
-his=20
-> layer doesn=B4t know about the "connection request" and cannot handle=20
-> the "connection response".
-> Ok, i understand that.=20
-> But has anybody an idea how i can communicate with my own L2CAP layer a=
-nd the=20
-> phone only without using the BlueZ L2CAP layer, because the Bluez layer=
- always=20
-> prevents a further communication?
-> Hmm... is in this case the L2CAP RAW socket the solution?
-> I=B4m stucked with that problem and i hope anybody as an idea.
+I removed the the l2cap module by using:
+1. rmmod -w (-f) l2cap
+2. modprobe -r l2cap
 
-as Xavier mentioned the easiest solution is to unload the L2CAP kernel
-module. However I looked at the code and it seems that the the kernel
-respond to packets with all idents. It should not do that, because they
-are shared between the kernel and the userspace. I think a patch for
-that is needed so that for commands from the RAW socket no responses are
-send.
+But after starting my program it is always reloaded.
+Is there any other command that prevents this reloading permanently?
 
-Regards
+Many thanks
 
-Marcel
+Matthias
+
+
+The Trace:
+L2CAP
+In/Out: From own program to mobile phone
+L2CAP: (Logical Link Control and Adaptation Protocol)
+	Length: 0x0008 (8 bytes)
+	CID: 0x0001 (Signalling Channel)
+	Code: 0x02 (Connection Request)
+		Identifier: 0x01
+		Length: 0x0004 (4 bytes)
+		PSM: 0x0003 (RFCOMM)
+		Source CID: 0x005d (Connection-oriented Data Channel)
+	DataDump:
+	08 00 01 00 02 01 04 00 03 00 5d 00               ..........].
+
+L2CAP
+In/Out: Incoming from phone
+L2CAP: (Logical Link Control and Adaptation Protocol)
+	Length: 0x000c (12 bytes)
+	CID: 0x0001 (Signalling Channel)
+	Code: 0x03 (Connection Response)
+		Identifier: 0x01
+		Length: 0x0008 (8 bytes)
+		Destination CID: 0x0040 (Connection-oriented Data Channel)
+		Source CID: 0x005d (Connection-oriented Data Channel)
+		Result: 0x0000 (Connection successful)
+		Status: 0x0000 (No further information available)
+	DataDump:
+	0c 00 01 00 03 01 08 00 40 00 5d 00 00 00 00 00   ........@.].....
+
+L2CAP
+In/Out: Incoming from phone
+L2CAP: (Logical Link Control and Adaptation Protocol)
+	Length: 0x000c (12 bytes)
+	CID: 0x0001 (Signalling Channel)
+	Code: 0x04 (Configuration Request)
+		Identifier: 0x0e
+		Length: 0x0008 (8 bytes)
+		Destination CID: 0x005d (Connection-oriented Data Channel)
+		Flags: .... ...0 [Not set] (Continuation flag not set)
+		Option Type: .000 0001 [0x1] (Maximum Transmission Unit (MTU))
+			Option Type: 0... .... [Not set] (Option must be 
+recognized; refuse the configuration request)
+			Length: 0x02 (2 bytes)
+			Maximum Transmission Unit: 0x8004 (32772 bytes)
+	DataDump:
+	0c 00 01 00 04 0e 08 00 5d 00 00 00 01 02 04 80   ........].......
+
+L2CAP
+In/Out: From BlueZ to mobile phone
+L2CAP: (Logical Link Control and Adaptation Protocol)
+	Length: 0x0006 (6 bytes)
+	CID: 0x0001 (Signalling Channel)
+	Code: 0x01 (Command Reject)
+		Identifier: 0x01
+		Length: 0x0002 (2 bytes)
+		Reason: 0x0000 (Command not understood)
+	DataDump:
+	06 00 01 00 01 01 02 00 00 00                     ..........
+
+L2CAP
+In/Out: From BlueZ to mobile phone
+L2CAP: (Logical Link Control and Adaptation Protocol)
+	Length: 0x0006 (6 bytes)
+	CID: 0x0001 (Signalling Channel)
+	Code: 0x01 (Command Reject)
+		Identifier: 0x0e
+		Length: 0x0002 (2 bytes)
+		Reason: 0x0000 (Command not understood)
+	DataDump:
+	06 00 01 00 01 0e 02 00 00 00                     ..........
 
 
 
