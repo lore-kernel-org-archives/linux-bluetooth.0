@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Key step in bluetonium setup, bcm203x does not
-	load firmware
+Subject: Re: [Bluez-users] Apple Wireless Keyboard, MX900-Hub & Mouse with
+	FC2
 From: Marcel Holtmann <marcel@holtmann.org>
-To: gonzalo briceno <gonzalohbriceno@yahoo.com>
-Cc: Luiz Fernando Capitulino <lcapitulino@conectiva.com.br>,
-   bluez-users@lists.sourceforge.net
-In-Reply-To: <20040905073705.47183.qmail@web52803.mail.yahoo.com>
-References: <20040905073705.47183.qmail@web52803.mail.yahoo.com>
+To: Tuomas Peronvuo <tuomas.peronvuo@hairstock.fi>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <302E52C4-FCAB-11D8-B286-000D93C1FAF6@hairstock.fi>
+References: <302E52C4-FCAB-11D8-B286-000D93C1FAF6@hairstock.fi>
 Content-Type: text/plain
-Message-Id: <1094459053.5145.9.camel@notepaq>
+Message-Id: <1094458880.5145.5.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,22 +19,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Sep 2004 10:24:13 +0200
+Date: Mon, 06 Sep 2004 10:21:20 +0200
 
-Hi Gonzalo,
+Hi Tuomas,
 
-> You are completely right.  I followed your instructions and my
-> Broadcom Bluetonium (bcm203x module) based chip is working.  I hope I
-> did not gloss over any section of information although I am almost
-> positive that I did not.  Anyways, any one having this problem has to
-> simply download bluez-firmware and copy the broadcom files onto
-> /usr/lib/hotplug/firmware.  
+> First of all, I apologize if this sounds  vague, but I'll give my best 
+> shot.
+> 
+> The problem:
+> 
+> Trying to get the apple wireless keyboard and mx900-bluetooth -mouse 
+> working
+> in fedora core 2 (kernel 2.6.8-1.521) via the usb mx900 bluetooth-hub.
+> 
+> Installed: Bluez libs & utils & devs.
+> 
+> I've read Marcel Holtmanns 
+> http://www.holtmann.org/linux/bluetooth/hid.html -"guide"
+> and modprobed that I certainly have the hidp-module, but I'm not sure 
+> if the selection
+> "CONFIG_BT_HIDP" is enabled/selected.
+> 
+> My first question is: how do I check if the HIDP is enabled? And if 
+> it's not, how do I enable it?
 
-the /usr/lib/hotplug/firmware was the old place for firmware files and
-we came to the conclusion that putting them into /lib/firmware is much
-better. The Debian Sarge/Sid and the upcoming SuSE 9.2 support both
-directories, so it is a problem of the hotplug package of your
-distribution.
+if "modinfo hidp" and "lsmod | grep hidp" gives you output the module is
+there and loaded.
+
+> Secondly and oddly enough, the mx900-mouse does work perfectly okay in 
+> my current setup via
+> the mx900 usb-bluetooth-hub. But when I run hcitool and try to find any 
+> devices, i get squat.
+> 
+> And the same thing with runing hidd, it also finds nothing.  My best 
+> guess is, that they both can't find
+> nothing because the CONFIG_BT_HIDP is not enabled?
+
+That is wrong. Try to switch your Logitech from HID to HCI mode with the
+hid2hci program.
+
+> Any good guide (step by step)  or advices considering the 
+> apple/hidp/mx900-hub -issue would be greatly appreciated.
+
+Every information to get this combination are there. If you need a
+special howto for your setup then write one ;)
 
 Regards
 
