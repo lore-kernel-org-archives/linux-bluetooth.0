@@ -1,52 +1,62 @@
-Return-Path: <jt@bougret.hpl.hp.com>
-Date: Mon, 9 Aug 2004 11:51:59 -0700
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] "comlicated" setup - known issues for hid
+	and	SCO?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lars Grunewaldt <lgw@dark-reality.de>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [PATCH 2.6] link trigger for AODV and +
-Message-ID: <20040809185159.GA21899@bougret.hpl.hp.com>
-Reply-To: jt@hpl.hp.com
-References: <20040805013335.GA13608@bougret.hpl.hp.com> <1091976547.2773.29.camel@pegasus>
+In-Reply-To: <4117B376.3030507@dark-reality.de>
+References: <4117A907.7010006@dark-reality.de>
+	 <1092071597.4564.17.camel@pegasus>  <4117B376.3030507@dark-reality.de>
+Content-Type: text/plain
+Message-Id: <1092073484.4564.32.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1091976547.2773.29.camel@pegasus>
-From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Mon, 09 Aug 2004 19:44:44 +0200
 
-On Sun, Aug 08, 2004 at 04:49:08PM +0200, Marcel Holtmann wrote:
-> Hi Jean,
-> 
-> no problem, I got the point. However I am not sure about applying your
-> patch. I don't like the way the event is propagated. It is a connection
-> related event and so I like to send it to the sockets that are using
-> that ACL connection. Or at least I should introduce the per device stack
-> internal events.
+Hi Lars,
 
-	The typical application is to monitor a BNEP connection (AODV
-deals with TCP/IP traffic). The L2CAP socket for the BNEP traffic is
-owned by the PAN deamon. However, you may want to feed the event
-directly to AODV without having to modify the PAN daemon and having to
-relay events.
+> | what does "hcitool info ..." say about your headset? What is the
+> | firmware version of your EPoX dongle?
+> |
+> |
+> Headset:
+> ~        BD Address:  00:0E:07:33:DE:2B
+> ~        Device Name: HBH-35
+> ~        LMP Version: 1.1 (0x1) LMP Subversion: 0x8d40
+> ~        Manufacturer: Ericsson Technology Licensing (0)
+> ~        Features: 0xbc 0x28 0x01 0x00 0x00 0x00 0x00 0x00
+> ~                <encryption> <slot offset> <timing accuracy> <role switch>
+> ~                <sniff mode> <SCO link> <HV3 packets> <CVSD>
 
-> Another question is, do we need a compile option for it? Is there any
-> disadvantage to compile it always and disable by default?
+I don't see the hold mode. This can cause problem if they form a
+scatternet. When both are connect what does "hcitool con" say?
 
-	For a (still) experimental feature, it make sense to keep it
-encapsualted. It's easier to remove #define than to add it. Your call.
+> How can I find out what firmware my dongle has? It's a BT-DG03...
 
-> > 	Patch has been tested in kernel from 2.6.1 to 2.6.8. I also
-> > have a patch for 2.4.X. Please apply...
-> 
-> I would include it into my next -mh patch for testing, but the 2.4
-> series should be closed for new features.
+Use "hciconfig hci0 revision" as root.
 
-	I know, that's why I kept it for myself.
-	Note that the patch for the poll/listen bug was only partially
-applied to 2.4.X, I have a patch for it, I still need to test it.
+Regards
 
-> Regards
-> 
-> Marcel
+Marcel
 
-	Have fun...
 
-	Jean
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by OSTG. Have you noticed the changes on
+Linux.com, ITManagersJournal and NewsForge in the past few weeks? Now,
+one more big change to announce. We are now OSTG- Open Source Technology
+Group. Come see the changes on the new OSTG site. www.ostg.com
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
