@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <f16b04cf05040500404049cda4@mail.gmail.com>
+From: hariharan veerappan <hariharanneevee@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth after suspend? 
-In-Reply-To: Message from Matija Grabnar <matija.grabnar@arnes.si>
-   of "Mon, 04 Apr 2005 22:36:25 +0200." <20050404203625.GA18079@rzenik.arnes.si>
-References: <42513AA3.1050309@arnes.si> <17461.1112620837@csr.com>  <20050404203625.GA18079@rzenik.arnes.si> 
-Message-ID: <10838.1112692850@csr.com>
-From: Peter Stephenson <pws@csr.com>
+Subject: Re: [Bluez-users] Bluepin ERROR with RFCOMM
+In-Reply-To: <1112608067.8263.25.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <f16b04cf05033022021405d585@mail.gmail.com>
+	 <1112554304.8263.0.camel@pegasus>
+	 <f16b04cf05040323102b9160a1@mail.gmail.com>
+	 <1112608067.8263.25.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,40 +21,98 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 05 Apr 2005 10:20:50 +0100
+Date: Tue, 5 Apr 2005 13:10:37 +0530
 
-Matija Grabnar wrote:
-> lsubs -v says:
-> Bus 004 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongl
-> e (HCI mode)
->   bcdDevice            8.28
+Hi Marcel,
+Thanks for your support on Obex ftp. But i am disturbing you agian
+with the problem i am facing.
 
-I think that's version 828, i.e.
+I have run the HCID, SDPD, OBEXFTPD and OPD daemon in the 
+OBEX server machine.
+Then i have run the HCID, SDPD , OPD daemon in the client machine.
+I can able to send the file from client to server.
 
-bc02x_4hci_bt1.1_16.14_encr56 2003-04-02
+But when i try to get the file from the server. i am getting the error of
 
-This could be our bug B-729 which is known to affect 16.14.  According to
-the report the chip could reset if the suspend was sufficiently long,
-typically between 1.5 and 3 minutes.  This was due to a timing error
-when we entered the very low power state required by suspend.  It's
-fixed in 16.15 and in the BT 1.2 firmware (version 18.x; version 17 wasn't
-released for bc02x).
+Browsing 00:0B:0D:33:DA:F9 ...
+No custom transport
+Connecting...bt: 1
+done
+Receiving /tmp/hci.h... failed: /tmp/hci.h
+Disconnecting...done
 
-Most things which go wrong should result in the device falling off the
-bus and reappearing, having rebooted.  If that's not your problem, there
-may be something else going on.
+When i watching the HCIDump information, i could able to find 
+out upto the L2CAP, SDP query ,L2CAP link for RFCOMM connection works fine, 
+while setting up the RFCOMM link for OBEX server gives the DISC 
+command.
 
-pws
+I had provided the client side HCIDUMP information for your kind reference
 
+< ACL data: handle 0x0028 flags 0x02 dlen 11
+    L2CAP(d): cid 0x0040 len 7 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 3 fcs 0x9a
+      81 00 03
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+> ACL data: handle 0x0028 flags 0x02 dlen 11
+    L2CAP(d): cid 0x0041 len 7 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 3 fcs 0x40
+      A0 00 03
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+> ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0041
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+> ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  01 28 00 01 00
+> ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0041
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+  28 00 13
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
+Thanks and regards
+Hariharan.v.
 
-**********************************************************************
-
+On Apr 4, 2005 3:17 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Hariharan,
+> 
+> >                  Thanks for your support. i have brought uo n\my
+> > bluetooth interface with
+> > the RFCOMM.
+> >                     Now i going into the Obex file transfer. is there
+> > any bluez utility to test
+> > the Obex and the Installation of Obex document.
+> 
+> check programs like obexftp, obextool or the btobex and btftp from the
+> BlueZ OBEX CVS repository.
+> 
+> Regards
+> 
+> Marcel
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
