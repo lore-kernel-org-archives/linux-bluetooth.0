@@ -2,10 +2,10 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] position of multiple bluetooth dongles
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200502101825.15870.cijoml@volny.cz>
-References: <420B9635.6020701@gmx.ch>  <200502101825.15870.cijoml@volny.cz>
+In-Reply-To: <420B9860.8000400@c-s.fr>
+References: <420B9635.6020701@gmx.ch>  <420B9860.8000400@c-s.fr>
 Content-Type: text/plain
-Message-Id: <1108057316.15974.93.camel@pegasus>
+Message-Id: <1108057121.15974.88.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,19 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Feb 2005 18:41:56 +0100
+Date: Thu, 10 Feb 2005 18:38:41 +0100
 
-Hi Michal,
+Hi Gabriel,
 
-> BT 1.1 dongles may interference...
-> BT 1.2 only when comunication with 1.1 devices - 1.2 devices can never 
-> interference
+> As there is a very few chance that the use the same frequency at the 
+> same time and send the same data, I think (hope?) there is no problem :)
 
-let me correct this. AFH is not for detecting used frequencies of other
-Bluetooth piconets. It only detects other wireless technologies, because
-for itself it is already protected by the hopping sequence itself. If it
-is the same hopping sequence it is the same piconet and thus it really
-wants to listen to its traffic.
+this might be one of 1600 per second. It is unlikely that the clock and
+the device address will be the same.
 
 Regards
 
