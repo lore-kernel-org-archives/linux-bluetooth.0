@@ -1,58 +1,57 @@
-Return-Path: <maxk@qualcomm.com>
-Message-Id: <5.1.0.14.2.20030717172540.0704f4c0@unixmail.qualcomm.com>
-Date: Thu, 17 Jul 2003 17:29:21 -0700
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-Id: <5.1.0.14.2.20030717172101.072ffe28@unixmail.qualcomm.com>
+To: James Courtier-Dutton <James@superbug.demon.co.uk>, bluez-devel@lists.sourceforge.net
 From: Max Krasnyansky <maxk@qualcomm.com>
-Subject: Re: [Bluez-devel] Problem with security mode 3
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1057279722.27638.1.camel@pegasus>
-References: <5.1.0.14.2.20030703173538.063183a8@unixmail.qualcomm.com>
-	<5.1.0.14.2.20030703173538.063183a8@unixmail.qualcomm.com>
+Subject: Re: [Bluez-devel] hci_usb module interrupts?
+In-Reply-To: <3F048FF4.4080609@superbug.demon.co.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 17 Jul 2003 17:25:21 -0700
 
-At 05:48 PM 7/3/2003, Marcel Holtmann wrote:
->Hi Max,
+At 01:20 PM 7/3/2003, James Courtier-Dutton wrote:
+>I have the following bluez modules loaded: -
+>hci_usb                 8088   1
+>bluez                  32356   1  [hci_usb]
 >
->> >there is a little problem with local devices in security mode 3
->> >(hciconfig hci0 auth). If you have already paired two devices, but you
->> >have used your dongle within another OS and paired it again to the same
->> >remote device. The local link key stored by the hcid is outdated. But
->> >this can not be known by the hcid and so it sends it on the next
->> >connection request. The remote device will deny the connection because
->> >of the wrong link key, but the error you get is not an authentication
->> >failure. You get the timeout error from the L2CAP layer.
->> >
->> >        < HCI Command: Write Authentication Enable(0x03|0x0020) plen 1
->> >          01 
->> >        > HCI Event: Command Complete(0x0e) plen 4
->> >          01 20 0C 00 
->> >        < HCI Command: Create Connection(0x01|0x0005) plen 13
->> >          FD 06 81 0E 04 00 18 CC 01 00 00 00 01 
->> >        > HCI Event: Command Status(0x0f) plen 4
->> >          00 01 05 04 
->> >        > HCI Event: Link Key Request(0x17) plen 6
->> >          FD 06 81 0E 04 00 
->> >        < HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
->> >          FD 06 81 0E 04 00 38 06 D7 5D E2 DD FD 10 88 EF 5A 65 66 C2 
->> >          80 26 
->> >        > HCI Event: Connect Complete(0x03) plen 11
->> >          05 00 00 FD 06 81 0E 04 00 01 00 
->> >
->> >I have looked at hci_conn_complete_evt() and l2cap_connect_cfm() and the
->> >code seems correct to me.
->> >
->> >If you try to connect again after the timeout, you will get a "Operation
->> >already in progress" error.
->> >
->> >Where is the problem?
->> Did you pull all of my latest fixes ? That bug was introduced by 
->> SO_LINGER patch (bt_sock_wait_state() to be more specific). I fixed it 
->> some time ago (should be in -pre2). The bug is unrelated to security 
->> and stuff and affects connect in general (ie it'd timeout instead of an error).
+>hciconfig hci0 down
+>No interrupts from the bluetooth device.
+>hciconfig hci0 up
+>About 100 interrupts per second from the bluetooth device.
+>hciconfig hci0 down
+>No more interrupts from the bluetooth device.
 >
->it is still present in 2.4.22-pre2 :(
-Hmm, I'll try to look at it today.
+>There is no actual data coming from the bluetooth device, as I can check with hcidump. We get a few lines of output at the transition from up to down and down to up, but nothing in between.
+>
+>Is this activity normal?
+>Does is happen with the PC card or PCI card usb adapters ?
+>It seems to me that these interrupts should not be there.
+
+Do you have SCO support compiled it ?
+Also USB is a pulled bus. ie HC pulls device. When we bring device up we submit URB read requests.
+I believe those can trigger interrupts even if there are no actual transfers.
 
 Max
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: VM Ware
+With VMware you can run multiple operating systems on a single machine.
+WITHOUT REBOOTING! Mix Linux / Windows / Novell virtual machines at the
+same time. Free trial click here: http://www.vmware.com/wl/offer/345/0
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
