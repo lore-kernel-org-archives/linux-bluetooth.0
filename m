@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40C40B2D.7040403@nue.et-inf.uni-siegen.de>
-From: Michael Schmidt <schmidt@nue.et-inf.uni-siegen.de>
-MIME-Version: 1.0
-To: d.mackie@ru.ac.za
+From: Ben Wilson <bwilson@yooser.org>
+To: Stephen Crane <steve.crane@rococosoft.com>
 Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Can you spoof/forge Bluetooth Devices/Address?
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] New Zaurus packages available
+Message-ID: <20040607050241.GA27386@stag.mark-and-erika.com>
+References: <1086340599.10892.807.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1086340599.10892.807.camel@baroque.rococosoft.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,47 +18,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 07 Jun 2004 08:29:01 +0200
+Date: Mon, 7 Jun 2004 01:02:41 -0400
 
-Hi David,
+Should this work on a 6000L?
 
-> Does anyone know if you are able to spoof or forge a Bluetooth Device
-> Address? I am wanting to pick up Bluetooth comms at one point and forward it
-> on to another device but I am wanting the repeating devices to act like the
-> original sending devices. Eg. If I have a phone that wants to communicate
-> with my PC, I can have 2 repeaters, one spoofed as the PC and one as the
-> phone.
+Has anyone gotten a CF bluetooth card to work on the 6000L?
+
+I am trying to get the AmbiCom BT2000-CF working.
+
+* On Fri, Jun 04, 2004 at 10:16:39AM +0100, I received from Stephen Crane:
+> Hi,
+> I have uploaded the following packages to the Sourceforge download site,
+> http://bluez.sourceforge.net/download/zaurus:
 > 
-> phone <-BT-> Repeater(spoof PC) <-Not BT-> Repeater(spoof phone) <-BT-> PC
-
-It is possible to change the BD_ADDR of certain BT devices. This 
-requires the use of "undocumented", vendor-proprietary commands. In the 
-source code of the Axis 'OpenBT' Bluetooth stack you can find how to do 
-this for certain Ericsson and CSR-based devices.
-
-However, you need to perform a full reset of the device in order to make 
-the change effective. Also, a device (at least the ones that I know) can 
-only have one address at a time. In other words, the BD_ADDR cannot be 
-changed on a per-packet basis.
-
-This is probably not want you want.
-
-
-Cheers,
-
-Michael
+> bluez-libs-2.7
+> bluez-hcidump-1.8
+> bluez-utils-2.7
+> bluez-kernel-2.4.18-mh14 --- BlueZ kernel modules for the 3.10 Sharp ROM
+> 
+> Let me know how you get on with them: they haven't been extensively
+> tested. Also if your favourite util is missing, ask and I might
+> include it.
+> 
+> Steve
+> -- 
+> Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+> steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by the new InstallShield X.
+> From Windows to Linux, servers to mobile, InstallShield X is the one
+> installation-authoring solution that does it all. Learn more and
+> evaluate today! http://www.installshield.com/Dev2Dev/0504
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
 
 -- 
-=================================================
-Michael Schmidt
--------------------------------------------------
-Institute for Data Communications Systems
-University of Siegen, Germany
--------------------------------------------------
-http:   www.nue.et-inf.uni-siegen.de/~schmidt/
-e-mail: schmidt@nue.et-inf.uni-siegen.de
-mobile: +49 179 7810214
-=================================================
+Ben
 
 
 -------------------------------------------------------
