@@ -3,10 +3,10 @@ Subject: Re: [Bluez-users] pand freezes upon disconnect
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bora@ai.com.tr
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E1CABHg-0000WA-SN@paris.servershost.net>
-References: <E1CABHg-0000WA-SN@paris.servershost.net>
+In-Reply-To: <E1CAAVj-0004z7-KX@paris.servershost.net>
+References: <E1CAAVj-0004z7-KX@paris.servershost.net>
 Content-Type: text/plain
-Message-Id: <1095876433.6223.79.camel@pegasus>
+Message-Id: <1095874557.6223.76.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Sep 2004 20:07:13 +0200
+Date: Wed, 22 Sep 2004 19:35:57 +0200
 
 Hi,
 
-> when i use sdpd && sdptool add NAP && pand -s -M --role NAP --autozap , 
-> I search for bluetooth services from my WinXp client(with sp2).It finds 
-> linux, and then connects and bla bla bla.So, what can be the problem, 
-> why does linux freezes after windows disconnects????
+> kernel version is 2.6.8.1 on slackware 9.1
+> these are the installed packages :
+> bluez-libs-2.10.tar.gz 
+> bluez-utils-2.10.tar.gz 
+> bluez-pin-0.24.tar.gz 
+> bluez-firmware-1.0.tar.gz 
+> 
+> bluez-hcidump-1.11.tar.gz 
+> bluez-hciemu-1.0.tar.gz 
 
-it got a connection between the Windows machine and my Debian Laptop and
-I don't see any freezes. The laptop keeps working.
-
-And btw the command "sdptool add NAP" is not needed. The pand will
-register the SDP service record by itself.
+this looks very good and I tried to reproduce it, but using Debian Sid
+with kernel 2.6.9-rc2 I am unable to create a PAN connection from a
+Windows XP SP2 machine using your pand command line. What must I do to
+reproduce it?
 
 Regards
 
