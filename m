@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41161520.5020606@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] another problem with hidd/MX900 mouse
-References: <4115F36B.8090202@dark-reality.de> <1091960169.2773.14.camel@pegasus>
-In-Reply-To: <1091960169.2773.14.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lars Grunewaldt <lgw@dark-reality.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4115F36B.8090202@dark-reality.de>
+References: <4115F36B.8090202@dark-reality.de>
+Content-Type: text/plain
+Message-Id: <1091960169.2773.14.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,34 +18,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 08 Aug 2004 13:57:20 +0200
+Date: Sun, 08 Aug 2004 12:16:09 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Lars,
 
-Marcel Holtmann wrote:
+> the MX900 works flawless now with both an Epox BTD on my notebook and
+> the docking station from Logitech on my desktop PC. Great work, thanks a
+> lot :)
+> 
+> But there is one issue not directly connected to the mouse, and I hope
+> you can help me out here.
+> 
+> hidd (I think) registers the mouse after connection as /dev/mouse2, and
+> X11 uses it without any issues - as long as the mouse is connected
+> *before* the X11-Server is started. Without a connected mouse, there's
+> no /dev/mouse2, and I don't know how to tell the X11 server "hey look
+> again the pointing device appeared".
+> 
+> Another option might be some kind of "mirror" for the device, i.e. with gpm.
+> 
+> Any ideas how to make the mouse working without restarting X11 (and all
+> running programs...)
 
-| use only /dev/input/mice for your mouse device.
-|
-| Regards
-|
-| Marcel
+use only /dev/input/mice for your mouse device.
 
-doh, to easy ;)
+Regards
 
-works great, even with pairing the mouse with desktop and notebook twice
-in a row. looks very promising :)
+Marcel
 
-cu,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFBFhUfQWC6DTWkDAoRAg49AJ4s2ZPlKlQHafCTQvRrb+pGTC/oLgCgoRRL
-oleXzdVcy3Io83m/P+vD1sc=
-=N6E6
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
