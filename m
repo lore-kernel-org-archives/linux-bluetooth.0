@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1057160821.963.76.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Problem with security mode 3
+Message-ID: <3F02DBA9.1060305@superbug.demon.co.uk>
+From: James Courtier-Dutton <James@superbug.demon.co.uk>
+MIME-Version: 1.0
+To: bluez Dev <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] Bluetooth headset problems.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -17,47 +17,30 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 02 Jul 2003 17:46:55 +0200
+Date: Wed, 02 Jul 2003 14:18:33 +0100
 
-Hi Max,
+Hi,
 
-there is a little problem with local devices in security mode 3
-(hciconfig hci0 auth). If you have already paired two devices, but you
-have used your dongle within another OS and paired it again to the same
-remote device. The local link key stored by the hcid is outdated. But
-this can not be known by the hcid and so it sends it on the next
-connection request. The remote device will deny the connection because
-of the wrong link key, but the error you get is not an authentication
-failure. You get the timeout error from the L2CAP layer.
+I am using the hstest program to try to send and receive sound from the 
+headset.
+I can record sound, but it seems that only half the sound samples are 
+getting through.
+E.g. Through the headset microphone, I could seconds in time with my watch.
+I then play the recorded sound stream.
+If I play at 8000hz, My voice is at the correct pitch, but the counting 
+is every 0.5 seconds, instead of 1 seconds.
+If I play at 4000hz, My voice is very low and sounds slow, but the 
+seconds are counted at the correct speed.
+I conclude that the bluez sco driver is only sending us half the samples.
 
-	< HCI Command: Write Authentication Enable(0x03|0x0020) plen 1
-	  01 
-	> HCI Event: Command Complete(0x0e) plen 4
-	  01 20 0C 00 
-	< HCI Command: Create Connection(0x01|0x0005) plen 13
-	  FD 06 81 0E 04 00 18 CC 01 00 00 00 01 
-	> HCI Event: Command Status(0x0f) plen 4
-	  00 01 05 04 
-	> HCI Event: Link Key Request(0x17) plen 6
-	  FD 06 81 0E 04 00 
-	< HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
-	  FD 06 81 0E 04 00 38 06 D7 5D E2 DD FD 10 88 EF 5A 65 66 C2 
-	  80 26 
-	> HCI Event: Connect Complete(0x03) plen 11
-	  05 00 00 FD 06 81 0E 04 00 01 00 
+Can anyone help ?
 
-I have looked at hci_conn_complete_evt() and l2cap_connect_cfm() and the
-code seems correct to me.
+I am using kernel 2.4.21-mh2 (kernel.org kernel patched with mh2 
+patches.) and the latest hstest etc. from bluez cvs, as of a few days ago.
 
-If you try to connect again after the timeout, you will get a "Operation
-already in progress" error.
 
-Where is the problem?
-
-Regards
-
-Marcel
-
+Cheers
+James
 
 
 
