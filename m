@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Cedric Hottier <chottier@nerim.net>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Message-Id: <200304122336.49369.chottier@nerim.net>
-Subject: [Bluez-users] btobex and fisio820/825
+Subject: RE: [Bluez-users] DB aliases (wishlist)
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: EXT-Somil.Asthana@nokia.com
+Cc: Max Krasnyansky <maxk@qualcomm.com>, tomi@virago.in-chemnitz.de, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: 
+	<E320A8529CF07E4C967ECC2F380B0CF9013E84C7@bsebe001.americas.nokia.com>
+References: 
+	<E320A8529CF07E4C967ECC2F380B0CF9013E84C7@bsebe001.americas.nokia.com>
+Content-Type: text/plain
+Message-Id: <1049985158.7671.25.camel@pegasus.local>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -17,31 +22,23 @@ List-Unsubscribe:
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 12 Apr 2003 23:36:49 +0200
+Date: 10 Apr 2003 16:32:31 +0200
 
-Hi all,
+Hi Somil,
 
-I tried to transfer some pictures from my PC to my fisio 825 with btobex.
-I had to change a little bit the obex.c file to make it work.
+>   Just a thought !! Do you really think this is necessary feature because I added a simple cmd in hcitool -i hciX lname <local_name> which calls issues HCI_CMD to write local name. It was nothing more than cut & paste from hcid/main.c file which writes local name...
 
-I removed the first OBEX_ObjectAddHeader call :
-	//OBEX_ObjectAddHeader(handle, object,
-	//	OBEX_HDR_CONNECTION, hd, 4, OBEX_FL_FIT_ONE_PACKET);
-and I replaced OBEX_FL_FIT_ONE_PACKET by 0 in the others OBEX_ObjectAddHeader 
-call.
+we don't need this, because you can use
 
-I tried to understand what does mean the OBEX_HDR_CONNECTION in reading OBEX 
-spec, but I still do not understand why this OBEX header makes the transfer 
-failed.
+	hciconfig hci0 name <local-name>
 
-Does anybody have experience on transfering files with an other phone ?
-Is the transfer failing due to a limitation of the OBEX implementation in 
-fisio ?
+and I don't see what this have to do with the mail from Paul. Such an
+aliases, hosts or devices file is for the remote devices, not the local
+ones.
 
-Cheers
+Regards
 
-Cedric
-
+Marcel
 
 
 
