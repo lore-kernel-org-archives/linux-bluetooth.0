@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] UMTS - Bluetooth - Bandwidth issue
+Subject: Re: [Bluez-users] Re: Trouble pairing with new phone...
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <7DBAFEC6A76F3E42817DF1EBE64CB02601DEF72A@FTRDMEL2.rd.francetelecom.fr>
-References: 
-	 <7DBAFEC6A76F3E42817DF1EBE64CB02601DEF72A@FTRDMEL2.rd.francetelecom.fr>
+In-Reply-To: <Pine.GSO.4.58.0502111016380.16262@gaia3.cc.gatech.edu>
+References: <Pine.GSO.4.58.0502111016380.16262@gaia3.cc.gatech.edu>
 Content-Type: text/plain
-Message-Id: <1108149309.18099.55.camel@pegasus>
+Message-Id: <1108148960.18099.47.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,28 +18,65 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Feb 2005 20:15:09 +0100
+Date: Fri, 11 Feb 2005 20:09:20 +0100
 
-Hi Bastien,
+Hi Jay,
 
-> I currently encounter bandwidth problem with a UMTS (3G) mobile phone
-> (Sony Ericsson z1010). Basically, I am using the Bluetooth link to
-> establish a ppp connection from a laptop through the phone's modem. On
-> Fedora core 3 the bandwidth is perfect, I mean I can reach the maximum
-> bandwidth achievable on UMTS (around 380 Kbit/s). 
+> >you set yourself into security mode 3 by using auth and encrypt. Are you
+> >sure that you know what you are doing?
 > 
-> My problem is on Redhat 9 (2.4.26). I do the same thing but I am
-> limited to < 104 Kbit/s. It sounds like I have a serial speed
-> bandwidth (115 200 bit/s) over Bluetooth. I also tried on Ipaq
-> (familiar v0.7.2) and it's the same problem.
+> I'm not sure of anything, but it has worked for me in the past, and I get
+> the exact same results if I comment out the auth and encrypt commands in
+> the hcid.conf file. I've left them commented out for the rest of my
+> debugging.
 
-I would assume that this is a problem with the Bluetooth stack inside
-the phone. There could be also a bug inside our RFCOMM layer. I don't
-know, because I can't test it. Bluez <-> BlueZ connection are performing
-at full piconet speed.
+The default hcid.conf is quite good and you should only change the name
+or class of device.
 
-To really track this down I would need an UMTS phone and a flatrate like
-internet access from an UMTS provider.
+> >The PIN helper can't provide a PIN as it seems. Fix this.
+> >
+> 
+> I don't think the answer is quite this simple for the following reasons:
+> 
+> 1) my hcid.conf file has
+>  security auto;
+> which if I understand it correctly is supposed to use the
+> /etc/bluetooth/pin file as opposed to the pin_helper application.
+> 
+> 1a) If I change this to "security user" the bluez-pin helper launches (but
+> my Palm T times out before I can enter the PIN on the laptop!) If I try to
+> pair the T610 phone with the laptop when "security user" is set, the
+> bluez-pin helper program DOES NOT LAUNCH, and hcidump -X says the
+> following:
+> 
+> HCIDump - HCI packet analyzer ver 1.12
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> > HCI Event: Connect Request (0x04) plen 10
+>   B2 E6 1D D9 0A 00 04 02 52 01
+> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+>   B2 E6 1D D9 0A 00 00
+
+You will only accept this connection if you become the master of the
+piconet.
+
+> > HCI Event: Command Status (0x0f) plen 4
+>   00 01 09 04
+> > HCI Event: Connect Complete (0x03) plen 11
+>   1A 29 00 B2 E6 1D D9 0A 00 01 00
+
+This mean unsupported remote feature which may lead to that the phone
+does not support the role switch. Check with "hcitool info ..." and
+report.
+
+> >Even an application with L2CAP_LM_MASTER set can force the role switch
+> >at connection creation.
+> 
+> The only applications I'm running are hcid, sdpd and rfcomm which are
+> started in my bluetooth services (rc.d) file. I even commented out the
+> "rfcomm bind all" command from my /etc/rc.d/init.d/bluetooth file, but it
+> didn't change anything.
+
+And how is the sdpd started? Do you use the -m switch?
 
 Regards
 
