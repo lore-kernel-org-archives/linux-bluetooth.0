@@ -1,71 +1,63 @@
-Return-Path: <pavouk@pavouk.org>
-From: Pavel Ruzicka <pavouk@pavouk.org>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <2de46576041127045238dc2264@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] DBT-120 firmware upgrade
-Date: Sat, 27 Nov 2004 21:30:44 +0100
-Cc: Marcel Holtmann <marcel@holtmann.org>
-References: <200411261152.29925.pavouk@pavouk.org> <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus>
-In-Reply-To: <1101579731.27074.8.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200411272130.44783.pavouk@pavouk.org>
-List-ID: <bluez-users.lists.sourceforge.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] HCI connection_handle
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 27 Nov 2004 18:22:38 +0530
 
-Hello,
+Hi marcel,
+1)
+I am trying to use the "hcitool cmd" options and i have to pass the
+connection_handle as a command parameter.
+root:]#hcitool  con
+< ACL 00:0B:0D:31:D1:BA handle 7 state 1 lm MASTER
 
-thanks for perfect explaining.
+Assuming the connection_handle to be 7, i tried to read the rssi value
 
-I have good news. I flashed my dongle, and she is not dead ;-)
+root:]#hcitool cmd 0x05 0x0005 0x0007
+I get the following
 
-Dongle now starts in HID mode. I must switch her to HCI with hid2hci.
-hid2hci says something, that it fails, but it works. I have probably old 
-version of this utility.
-Dongle in HID mode lights with power LED, but in HCI is power LED off.
-Second LED blinks in both modes.
+< HCI Command: ogf 0x05, ocf 0x0005, plen 1
+  07
+> HCI Event: 0x0e plen 4
+  01 05 14 12
 
-There are informations from hciconfig:
----------------------------------
-# hciconfig hci0 version
-hci0:   Type: USB
-        BD Address: 00:0D:88:XX:XX:XX ACL MTU: 192:8  SCO MTU: 64:8
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x632 LMP Ver: 1.2 (0x2) LMP Subver: 0x632
-        Manufacturer: Cambridge Silicon Radio (10)
-# hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:0D:88:XX:XX:XX ACL MTU: 192:8  SCO MTU: 64:8
-        Build 1586
-        Chip version: BlueCore02
-        Max key size: 128 bit
-        SCO mapping:  HCI
-[root@home network-scripts]# hciconfig hci0 features
-hci0:   Type: USB
-        BD Address: 00:0D:88:XX:XX:XX ACL MTU: 192:8  SCO MTU: 64:8
-        Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
-                <power control> <transparent SCO> <broadcast encrypt>
-                <enhanced iscan> <interlaced iscan> <interlaced pscan>
-                <inquiry with RSSI> <AFH cap. slave> <AFH class. slave>
-                <AFH cap. master> <AFH class. master> <extended features>
--------------------------------
+This means there is some error as i have got 12 instead of 00......
 
-Thank you very much one more time for everything ;-)
+Can you tell me what the problem is??
 
-Best regards,
+2) I tried using the test mode commands and I am simulatameously
+running the hcidump, which prints a unknown command type. I am just
+presuming that the commands might be working alright , only that
+hcidump doesn't decipher the test commands. Am i right??
 
-Pavel Ruzicka
+3) I was also trying to understand the hcitool.c code , can you tell
+me where the functions  "hci_for_each_device" and the like defined?
 
-> > Can somebody explain me, what does it means and if it is not problem
-> > for flashing?
->
-> but if you upload a firmware you will get the latest type and this is 2.
->
-> > Downloaded firmware is much longer than backuped. Is it OK?
->
-> The GenericCSR.dfu contains two firmware files. One HCI 18.x for chips
-> with 8 Mbit flash and a HCI 16.x for chips with 4 Mbit flash.
->
-> Marcel
+Thanks once again,
+Regards,
+Manjunath
+
+
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now. 
+http://productguide.itmanagersjournal.com/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
