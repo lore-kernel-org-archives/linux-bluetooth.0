@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] absolute clock
+Subject: Re: [Bluez-devel] sco / csr final notes
 From: Marcel Holtmann <marcel@holtmann.org>
-To: paolo2278@freemail.it
+To: Simon Vogl <vogl@soft.uni-linz.ac.at>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040331104607.18049.qmail@mail.supereva.it>
-References: <20040331104607.18049.qmail@mail.supereva.it>
+In-Reply-To: <406A9E23.9000406@soft.uni-linz.ac.at>
+References: <406A9E23.9000406@soft.uni-linz.ac.at>
 Content-Type: text/plain
-Message-Id: <1080730564.2674.2.camel@pegasus>
+Message-Id: <1080730774.2674.6.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,16 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 31 Mar 2004 12:56:04 +0200
+Date: Wed, 31 Mar 2004 12:59:34 +0200
 
-Hi Paolo,
+Hi Simon,
 
-> I have a great problem, I'd like to know wich is the structure where I can find the value of the bluetooth's absolute clock, or the function that I could call for read this value.
-> I created the hci command packet to get this information, but what I can see is only the lenght of the event parameters but not their values.
+> well now I have a heuristic that works most of the time. Looking at the
+> transmitted data, I wonder if there could be a big endian/little endian
+> switch that is toggled randomly in the firmware for the 16bit sco data.
+> 
+> Is there a lucky person with a developer kit out there who is able
+> to confirm this?
 
-about what clock are you talking? With Bluetooth 1.1 you can only read
-the clock offset of a remote device. With 1.2 you can also read the
-local and remote clock values. Look at the HCI specification.
+please remind us about what your are talking, because it seems that at
+least I forgot it. If you think you found a bug and you are able to
+reproduce it, you should make a detailed description, so the CSR guys
+can fix it.
 
 Regards
 
