@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm problems
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gene Imes <ebi7@ozob.net>
-Cc: list-bluez <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1080515964.11299.4.camel@go2>
-References: <1080515964.11299.4.camel@go2>
-Content-Type: text/plain
-Message-Id: <1080556492.2281.211.camel@pegasus>
-Mime-Version: 1.0
+From: Andreas Deresch <aderesch@fs.tum.de>
+Reply-To: Andreas Deresch <aderesch@fs.tum.de>
+To: =?iso-8859-1?q?Gary=20Martin?= <gary_martin_au@yahoo.com.au>
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Desperate newbie
+In-Reply-To: <20040328020755.5494.qmail@web21003.mail.yahoo.com>
+Message-ID: <Pine.LNX.4.56L0.0403291037080.10064@localhost>
+References: <20040328020755.5494.qmail@web21003.mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +19,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Mar 2004 12:34:53 +0200
+Date: Mon, 29 Mar 2004 10:40:57 +0200 (CEST)
 
-Hi Gene,
+On Sun, 28 Mar 2004, [iso-8859-1] Gary Martin wrote:
 
-> I have a D-Link dbt-120 dongle. This has been working fine with a
-> bluetooth GPS. However today I tried to use it and I could not connect
-> to the GPS.
-> 
-> When I plug the dbt-120 in the /dev/rfcomm0-255 are created. If I try a
-> 'cat /dev/rfcomm0' I get cat: rfcomm0 No such device. Previously a 'cat
-> /dev/rfcomm0' would return everything the GPS was sending.
-> 
-> Anyone know what is going on here?
+> Thanks for the suggestion Michal. I changed the class from 0x100; to 0x10c; in the file
+> hcid.conf, but nothing has changed. I'm glad it is not only me that is mystified.
+Try 0x120104 ("Laptop"). This has worked with my T28 and T68i.
+(Other possible settings are "Computer" and "Mobile Phone", the numerical
+values of which I don't have at hand.)
 
-you should check that "rfcomm -a" reports your bindung with the GPS
-device. Check if hcid is runninng and run "hcidump -x" to see what is
-going on. And of course find out what you have changed.
-
-Regards
-
-Marcel
-
-
+ad
 
 
 -------------------------------------------------------
