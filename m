@@ -2,15 +2,19 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Problems with MS mouse and keyboard
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Gareth Reakes <gareth@apache.org>
-Cc: "Michal Semler (volny.cz)" <cijoml@volny.cz>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20031126140017.C25686@minotaur.apache.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20031126134816.L25686@minotaur.apache.org>
 References: <20031105093947.J63252@minotaur.apache.org>
+	 <1068072643.1284.106.camel@pegasus>
+	 <20031105150230.T694@minotaur.apache.org>
+	 <20031122040102.E53230@minotaur.apache.org>
+	 <1069532556.16350.82.camel@pegasus>
+	 <20031122124825.T53230@minotaur.apache.org>
 	 <20031126131925.M25686@minotaur.apache.org>
-	 <1069882659.9032.54.camel@pegasus> <200311262254.21024.cijoml@volny.cz>
-	 <20031126140017.C25686@minotaur.apache.org>
+	 <1069882659.9032.54.camel@pegasus>
+	 <20031126134816.L25686@minotaur.apache.org>
 Content-Type: text/plain
-Message-Id: <1069884432.9032.65.camel@pegasus>
+Message-Id: <1069884332.9036.62.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -22,18 +26,20 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 26 Nov 2003 23:07:12 +0100
+Date: Wed, 26 Nov 2003 23:05:32 +0100
 
 Hi Gareth,
 
-> 	I know the ping thing works, however I don't believe that it
-> should be necessary. I think there is either something wrong with the
-> hardware, bthid or bluez. If it is bthid or bluez then I would like to try
-> and fix it so we can all benifit :)
+> 	thanks for the response. Is there someway I can simulate this with
+> hcitool (or some other tool)? If I hcitool cc to this what would you
+> expect the behaveiour to be? The mouse will go to sleep in 12 mins, but if
+> I move it and to a hcitool con after that should the device appear? Or
+> would I have to connect again? I seem to recall that there was some way of
+> showing the incoming input from the connection. If I did this without
+> bthid, then would this establish if the problem was with bthid or bluez?
 
-look at my bthid code and see how I have handled it. This was working
-for me. You need a sleep() and the correct order of closing the L2CAP
-channels. Otherwise the ACL connection would not be terminated.
+you can't use hcitool, because you have to establish the two HID L2CAP
+connections for PSM 17 and 19.
 
 Regards
 
