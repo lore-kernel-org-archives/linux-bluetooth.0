@@ -1,89 +1,59 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Will Partain <will.partain@verilab.com>
-Message-ID: <lu8ylbven9.fsf@pc22.verilab.com>
-References: <3F4F6BF2.6080303@gtmp.org> <1062170277.27784.138.camel@pegasus>
- <3F4F70B1.20200@gtmp.org> <3F50803C.607@gtmp.org>
- <1062425807.13729.162.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Belkin F8T002 PC Card problem with Bluez
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Dec 2003 11:59:22 +0000
+Return-Path: <Mitch@0Bits.COM>
+Message-ID: <3FE029FA.6010204@0Bits.COM>
+Date: Wed, 17 Dec 2003 10:03:38 +0000
+From: Mitch <Mitch@0Bits.COM>
+MIME-Version: 1.0
+To: marcel@holtmann.org, bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] NEC usb bluetooth support
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-users.lists.sourceforge.net>
 
-(I am picking up a thread about this card from back in September.)
+Ok, thanx to Marcel, i looked again, and no patches/source code changes
+are needed. The error
 
-To recap, with Belkin F8T002 card plugged into a Presario
-908EA laptop running a modified current-RH9 kernel [added a
-few lines as Alexandre Jousset suggested earlier in this
-thread]. Then with...
+	hci_usb: probe of 7-2:1.1 failed with error -5
 
-   # /etc/rc.d/init.d/pcmcia restart 
-   Shutting down PCMCIA services: cardmgr modules. 
-   Starting PCMCIA services: cardmgr. 
- 
-In the syslog for that, you see...
+is spurious, and the device still works just fine.
 
-    kernel: unloading Kernel Card Services 
-    kernel: Attached scsi CD-ROM sr0 at scsi0, channel 0, id 0, lun 0 
-    kernel: sr0: scsi3-mmc drive: 24x/24x writer cd/rw xa/form2 cdda tray 
-    kernel: Uniform CD-ROM driver Revision: 3.12 
-    kernel: Linux Kernel Card Services 3.1.22 
-    kernel:   options:  [pci] [cardbus] [pm] 
-    kernel: PCI: Assigned IRQ 10 for device 00:0a.0 
-    kernel: Yenta IRQ list 02b8, PCI irq10 
-    kernel: Socket status: 30000020 
-    kernel: cs: cb_alloc(bus 2): vendor 0x1415, device 0x950b 
-    kernel: PCI: Enabling device 02:00.0 (0000 -> 0003) 
-    kernel: ttyS4 at port 0x4000 (irq = 10) is a 16C950/954 
-    cardmgr[1508]: starting, version is 3.1.31 
-    cardmgr[1508]: watching 1 sockets 
-    cardmgr[1508]: Card Services release does not match 
-    kernel: cs: IO port probe 0x0c00-0x0cff: clean. 
-    kernel: cs: IO port probe 0x0100-0x04ff: excluding 0x200-0x207 0x378-0x3\
-    x4d0-0x4d7 
-    kernel: cs: IO port probe 0x0a00-0x0aff: clean. 
-    cardmgr[1508]: socket 0: CardBus hotplug device 
-    /sbin/hotplug: arguments (pci) env (PCI_SLOT_NAME=02:00.0 PCI_ID=1415:95\
-    /usr/sbin:/usr/bin ACTION=add PWD=/etc/hotplug PCI_SUBSYS_ID=1415:0001 S
-    CLASS=70006 _=/bin/env) 
-    /sbin/hotplug: invoke /etc/hotplug/pci.agent () 
-    /etc/hotplug/pci.agent: ... no modules for PCI slot 02:00.0 
+Another one to add to the list of working with linux bluetooth devices ;-)
 
-Anyway, it's there:
+Thanks
+Mitch
 
-    # cardctl ident 
-    Socket 0: 
-      product info: "OXSEMI", "OXCB950", "Rev A" 
-      manfid: 0x0279, 0x0001 
-      function: 2 (serial) 
+-------- Original Message --------
+Subject: Re: [Bluez-users] NEC usb bluetooth support
+Date: Tue, 16 Dec 2003 20:40:00 +0100
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mitch <mitch@0bits.com>
+CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <3FDF5C36.7080605@0bits.com>
 
-An 'hciattach' then "works", where "works" is defined to
-mean "something happened".  The simplest form
-(hciattach /dev/ttyS4 any) spews nonsense, as was seen
-earlier in this thread.
+Hi Mitch,
 
-The glorious Marcel suggested 'hciattach /dev/ttyS4 bcsp'
-(which simply replies: "BCSP initialization timed out").  He
-further suggested fiddling with baud rates and the like;
-neither Alexandre not I have had any luck with that (it
-still just times out).
+> Yup i do have an entry (see below), and i've managed to get it to load, but by
+> hacking the hci_usb.c to remove the lines
+> 
+>   	/* Check number of endpoints */
+> 	if (intf->altsetting[0].desc.bNumEndpoints < 3)
+> 		return -EIO;
+> 
+> It looks like since there's multiple interface descriptors for the device (see
+> attachment), and bNumEndpoints is only equal to 3 in one of them, then the test
+> fails and returns EIO. I don't know if this check should be removed altogether since
+> we subsequently iterate thru all the interfaces to get the endpoints.
+> 
+> hciconfig shows me 2 interfaces - is this correct ?
 
-So: Has anyone made further progress on this device and/or
-has any suggestions?  (I am serially incompetent and short
-of time, but I'll try to help if I can.)  Thanks and regards
-to all,
+this is wrong. The second interface on the USB layer is for the SCO
+audio support and in normal cases correct recognized by the driver. This
+is why the above check is in the code. If you not have three endpoints
+on the first interface it is not a USB Bluetooth device. Please check
+your device with 2.4.23.
 
-Will
+Regards
+
+Marcel
+
 
 
 
