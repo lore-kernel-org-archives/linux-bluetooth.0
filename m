@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Charles Bueche <charles@bueche.ch>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Bluez+2.6+Logitech bluetooth
-From: Frederic Detienne <fd@cisco.com>
-Reply-To: fd@cisco.com
-To: de Laurent <de_laurent@o2.pl>
-Cc: bluez-users@lists.sourceforge.net
+Message-Id: <20040516081059.46f1904b@bluez.bueche.ch>
 In-Reply-To: <20040515163903.CB06543F94@rekin8.go2.pl>
 References: <20040515163903.CB06543F94@rekin8.go2.pl>
-Content-Type: text/plain; charset=iso-8859-2
-Message-Id: <1084692905.12711.75.camel@metal.cisco.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,30 +17,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 May 2004 09:35:05 +0200
+Date: Sun, 16 May 2004 08:10:59 +0200
 
-Hi
+Hi,
 
-I think this is normal. When you boot, the USB/BT hub (the mouse base
-station) acts as a dumb RF<->HID in plain USB mode. I.e. Linux
-recognizes the base station as a USB hub with plain USB keyboard and
-mouse attached to it.
+you may want to try my cookbook at
+http://www.bueche.ch/comp/mx900/mx900.html
 
-When you switch over to HCI mode with hid2hci, the USB hub, mouse and
-keyboards disappear and a USB/BT dongle appears instead (i.e. a HCI
-"hub"). The USB/BT piece is not connected to any device yet. You
-normally have to pair the keyboard and mouse and start bthid to do the
-HCI<->HID conversion in order to make Linux see your BT devices... You
-can't type these commands since the kernel can't see your keyboard
-during that phase :-) It's a catch chicken and egg problem.
+Regs,
+Charles
 
-Try connecting a secondary keyboard for the initial pairing and make
-sure you start bthid automatically after hid2hci next time (you don't
-have to pair each time).
+On Sat, 15 May 2004 18:39:03 +0200
+de Laurent <de_laurent@o2.pl> wrote:
 
-	Fred
-
-On Sat, 2004-05-15 at 18:39, de Laurent wrote:
 > Hi!
 > I'll try to describe my problem. Please forgive me if the answer is
 > simple, but I have been searching for a week for the solution...
@@ -60,59 +47,55 @@ On Sat, 2004-05-15 at 18:39, de Laurent wrote:
 > (and others for rfcomm, bnep and sco)
 > This is how my /proc/.../devices looks like:
 >=20
-> T:  Bus=3D02 Lev=3D00 Prnt=3D00 Port=3D00 Cnt=3D00 Dev#=3D  1 Spd=3D12 =
- MxCh=3D 2
+> T:  Bus=3D02 Lev=3D00 Prnt=3D00 Port=3D00 Cnt=3D00 Dev#=3D  1 Spd=3D12  M=
+xCh=3D 2
 > B:  Alloc=3D  0/900 us ( 0%), #Int=3D  0, #Iso=3D  0
-> D:  Ver=3D 1.10 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 MxPS=3D 8 #Cfgs=3D  =
-1
+> D:  Ver=3D 1.10 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 MxPS=3D 8 #Cfgs=3D  1
 > P:  Vendor=3D0000 ProdID=3D0000 Rev=3D 2.06
 > S:  Manufacturer=3DLinux 2.6.6-mh1 uhci_hcd
 > S:  Product=3DVIA Technologies, Inc. USB (#2)
 > S:  SerialNumber=3D0000:00:11.3
 > C:* #Ifs=3D 1 Cfg#=3D 1 Atr=3D40 MxPwr=3D  0mA
-> I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 Driv=
-er=3Dhub
+> I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 Driver=
+=3Dhub
 > E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D   2 Ivl=3D255ms
 >=20
-> T:  Bus=3D01 Lev=3D00 Prnt=3D00 Port=3D00 Cnt=3D00 Dev#=3D  1 Spd=3D12 =
- MxCh=3D 2
+> T:  Bus=3D01 Lev=3D00 Prnt=3D00 Port=3D00 Cnt=3D00 Dev#=3D  1 Spd=3D12  M=
+xCh=3D 2
 > B:  Alloc=3D247/900 us (27%), #Int=3D  3, #Iso=3D  0
-> D:  Ver=3D 1.10 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 MxPS=3D 8 #Cfgs=3D  =
-1
+> D:  Ver=3D 1.10 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 MxPS=3D 8 #Cfgs=3D  1
 > P:  Vendor=3D0000 ProdID=3D0000 Rev=3D 2.06
 > S:  Manufacturer=3DLinux 2.6.6-mh1 uhci_hcd
 > S:  Product=3DVIA Technologies, Inc. USB
 > S:  SerialNumber=3D0000:00:11.2
 > C:* #Ifs=3D 1 Cfg#=3D 1 Atr=3D40 MxPwr=3D  0mA
-> I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 Driv=
-er=3Dhub
+> I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 Driver=
+=3Dhub
 > E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D   2 Ivl=3D255ms
 >=20
-> T:  Bus=3D01 Lev=3D01 Prnt=3D01 Port=3D01 Cnt=3D02 Dev#=3D  3 Spd=3D12 =
- MxCh=3D 2
-> D:  Ver=3D 1.10 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 MxPS=3D 8 #Cfgs=3D  =
-1
+> T:  Bus=3D01 Lev=3D01 Prnt=3D01 Port=3D01 Cnt=3D02 Dev#=3D  3 Spd=3D12  M=
+xCh=3D 2
+> D:  Ver=3D 1.10 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 MxPS=3D 8 #Cfgs=3D  1
 > P:  Vendor=3D0451 ProdID=3D2036 Rev=3D 1.01
 > S:  Product=3DGeneral Purpose USB Hub
 > C:* #Ifs=3D 1 Cfg#=3D 1 Atr=3Da0 MxPwr=3D100mA
-> I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 Driv=
-er=3Dhub
+> I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 Driver=
+=3Dhub
 > E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D   1 Ivl=3D255ms
 >=20
-> T:  Bus=3D01 Lev=3D02 Prnt=3D03 Port=3D00 Cnt=3D01 Dev#=3D  4 Spd=3D1.5=
- MxCh=3D 0
-> D:  Ver=3D 1.10 Cls=3D00(>ifc ) Sub=3D00 Prot=3D00 MxPS=3D 8 #Cfgs=3D  =
-1
+> T:  Bus=3D01 Lev=3D02 Prnt=3D03 Port=3D00 Cnt=3D01 Dev#=3D  4 Spd=3D1.5 M=
+xCh=3D 0
+> D:  Ver=3D 1.10 Cls=3D00(>ifc ) Sub=3D00 Prot=3D00 MxPS=3D 8 #Cfgs=3D  1
 > P:  Vendor=3D046d ProdID=3Dc703 Rev=3D24.04
 > S:  Manufacturer=3DLogitech
 > S:  Product=3DUSB Receiver
 > S:  SerialNumber=3D0C58B6
 > C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3Da0 MxPwr=3D 98mA
-> I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D03(HID  ) Sub=3D01 Prot=3D01 Driv=
-er=3Dhid
+> I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D03(HID  ) Sub=3D01 Prot=3D01 Driver=
+=3Dhid
 > E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D   8 Ivl=3D10ms
-> I:  If#=3D 1 Alt=3D 0 #EPs=3D 1 Cls=3D03(HID  ) Sub=3D01 Prot=3D02 Driv=
-er=3Dhid
+> I:  If#=3D 1 Alt=3D 0 #EPs=3D 1 Cls=3D03(HID  ) Sub=3D01 Prot=3D02 Driver=
+=3Dhid
 > E:  Ad=3D82(I) Atr=3D03(Int.) MxPS=3D   8 Ivl=3D10ms
 >=20
 > my lsmod give:
@@ -179,19 +162,18 @@ er=3Dhid
 > Printer Device Class driver
 > May 15 15:23:09 smith kernel: usb 1-2: new full speed USB device
 > using address 3
-> May 15 15:23:09 smith kernel: usb 1-2: Product: General Purpose USB Hub
-> May 15 15:23:09 smith kernel: hub 1-2:1.0: USB hub found
+> May 15 15:23:09 smith kernel: usb 1-2: Product: General Purpose USB
+> Hub May 15 15:23:09 smith kernel: hub 1-2:1.0: USB hub found
 > May 15 15:23:09 smith kernel: hub 1-2:1.0: 2 ports detected
 > May 15 15:23:09 smith kernel: usb 1-2.1: new low speed USB device
 > using address 4
 > May 15 15:23:09 smith kernel: usb 1-2.1: Product: USB Receiver
 > May 15 15:23:09 smith kernel: usb 1-2.1: Manufacturer: Logitech
 > May 15 15:23:09 smith kernel: usb 1-2.1: SerialNumber: 0C58B6
-> May 15 15:23:09 smith modprobe: FATAL: Module usbhid already in kernel.=
-=20
-> May 15 15:23:09 smith usb.agent[861]: ... can't load module usbhid
-> May 15 15:23:09 smith usb.agent[861]: missing kernel or user mode
-> driver usbhid=20
+> May 15 15:23:09 smith modprobe: FATAL: Module usbhid already in
+> kernel. May 15 15:23:09 smith usb.agent[861]: ... can't load module
+> usbhid May 15 15:23:09 smith usb.agent[861]: missing kernel or user
+> mode driver usbhid=20
 > May 15 15:23:09 smith modprobe: FATAL: Module mousedev not found.=20
 > May 15 15:23:09 smith kernel: usbcore: registered new driver hiddev
 > May 15 15:23:09 smith kernel: input: USB HID v1.10 Keyboard
@@ -221,6 +203,10 @@ er=3Dhid
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
 
+
+--=20
+Charles Bueche <charles@bueche.ch>
+sand, snow, wave, wind and net -surfer
 
 
 -------------------------------------------------------
