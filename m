@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] want duplicate inquiry results during a single
-	device inquiry
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Albert Huang <ashuang@gmail.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <ef9938ec04081309406c2abae3@mail.gmail.com>
-References: <ef9938ec04081309406c2abae3@mail.gmail.com>
+To: Jean Tourrilhes <jt@hpl.hp.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   Steven Singer <steven.singer@csr.com>
+In-Reply-To: <20040813163736.GC22763@bougret.hpl.hp.com>
+References: <20040813002514.GA21388@bougret.hpl.hp.com>
+	 <1092385877.28711.185.camel@pegasus>
+	 <20040813163736.GC22763@bougret.hpl.hp.com>
 Content-Type: text/plain
-Message-Id: <1092416317.28711.258.camel@pegasus>
+Message-Id: <1092416234.28711.256.camel@pegasus>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Re: CSR firmware question...
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,25 +21,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 13 Aug 2004 18:58:37 +0200
+Date: Fri, 13 Aug 2004 18:57:14 +0200
 
-Hi Albert,
+Hi Jean,
 
-> While experimenting with a hp ipaq running a 2.4.19 kernel, I noticed
-> that during a since device inquiry, multiple EVT_INQUIRY_RESULT events
-> could be generated from the same remote device.  The inquiry was done
-> using a raw hci socket.  On x86 PCs running the same userland code but
-> with more recent versions of bluez and the linux kernel, the duplicate
-> events are no longer generated.  Instead, during a single inquiry, a
-> response will be received from a remote device at most once.
+> > The D-Link dongle DBT-120 (Rev B3) can be updated using the Apple
+> > firmware update file. After that it will be HCI 18.1 with default boot
+> > mode set to HID.
 > 
-> I'm assuming that sometime in the recent past, kernel level caching
-> was implemented to prevent these duplicate inquiry results from
-> propagating up to user land.  Is there a way to turn this off, so that
-> all inquiry results are passed through?
+> 	This is exactly what I did. I have a rev B3, and I used Apple
+> file.
+> 	What do you mean default boot set to HID ? I look similar to
+> what I'm seeing.
 
-this is device specific and can be controlled by a HCI command. Show us
-the outputs of "hciconfig -a" for both devices.
+try running hid2hci :)
+
+If this does not work, show us /proc/bus/usb/devices.
 
 Regards
 
