@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT unter SuSE 9.2
+Subject: Re: [Bluez-users] Microsoft keyboad/mouse problem
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAkRplsTjGckiCzJYjVEyeLQEAAAAA@t-online.de>
-References: 
-	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAkRplsTjGckiCzJYjVEyeLQEAAAAA@t-online.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1102627923.7962.8.camel@pegasus>
+In-Reply-To: <41B8A67C.3060608@paytec.com>
+References: <41B8A67C.3060608@paytec.com>
+Content-Type: text/plain
+Message-Id: <1102627652.7962.4.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,27 +18,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 09 Dec 2004 22:32:02 +0100
+Date: Thu, 09 Dec 2004 22:27:32 +0100
 
-Hi Peter,
+Hi Dave,
 
-> when I'm starting kbluetoothd I get for the BT-accesspoint the
-> characteristics:
-> Typ: LAN/Networking Bluetooth Device
-> Ge=E4ndert:  01.01.1970  01:00
-> Eigent=FCmer: -
-> Rechte: drwxrwxrwx
->=20
-> then I try to reach or show the services of the BT-accesspoint but with=
-out
-> any sucess.
-> I'm not able to interpret the hcidump -x as you see it here. Please be =
-so
-> kind to help me. I have to send the PIN to the bt-accesspoint, the PIN =
-is
-> set in /etc/bluetooth/pin and in hcid.conf security is set to auto.
+> My mouse and keyboard sometimes loose their connection. I'm running 
+> 2.6.10_rc2 and hidd --server on boot. I also run a script I found around 
+> the net that runs hidd --search and/or hidd --connect with retries and 
+> delays to try to connect to the keyboard & mouse. When the connection is 
+> lost, I typically run "hidd --show" to see that it is indeed not 
+> connected then  "hidd --search" to reconnect and it USUALLY works 
+> especially since I upgraded the kernel from 2.6.8. Thankfully it is 
+> usually the mouse that is a problem, so I can do this from the same box. 
+> When "hidd --search" fails I remove and replace the batteries. I've 
+> noticed the mouse lights blinking at me, which I'm not sure is telling 
+> me the batteries are low. I checked and they weren't really that low. It 
+> sometimes seems as though the mouse desires batteries really well 
+> charged. The few times the keyboard was a problem, I ssh from another 
+> box and "hidd --search" and it works.
 
-what does "hciconfig -a" show you?
+first questions is if this is the old Microsoft desktop or new 2.0
+version of it?
+
+> 1) when the devices sleep should "hidd --show" show the device? (And the 
+> hidd server is waiting for a wakeup from the device?) I guess I should 
+> check "hidd --show" sometime when they've been inactive.
+
+When the device sniff then the connection should still be shown, but
+after a while it disconnects and then it will not be shown anymore.
+However this doesn't matter, because it will reconnect on the next touch
+to your running "hidd --server" instance.
+
+> 2) what does the blinking mouse mean (I don't have any docs with these 
+> devices).
+
+How should I know? I don't work for Microsoft ;)
+
+> 3) Should I have to push the mouse and keyboard buttoms on every reboot 
+> or just one time for the device? (should I need that second script I'm 
+> running?)
+
+You need to push the connect button only for the initial setup and there
+is no need for another script. Only "hidd --server" must run. However
+you need to push a keyboard or mouse button to initiate the reconnect.
 
 Regards
 
