@@ -4,10 +4,10 @@ From: Marcel Holtmann <marcel@holtmann.org>
 To: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
 Cc: Stephen Crane <steve.crane@rococosoft.com>,
    "'Bluez-devel@lists.sourceforge.net'" <Bluez-devel@lists.sourceforge.net>
-In-Reply-To: <AFE91B59A185A5439840B43AB791904709398A@mchp997a.mch.sbs.de>
-References: <AFE91B59A185A5439840B43AB791904709398A@mchp997a.mch.sbs.de>
+In-Reply-To: <AFE91B59A185A5439840B43AB7919047093989@mchp997a.mch.sbs.de>
+References: <AFE91B59A185A5439840B43AB7919047093989@mchp997a.mch.sbs.de>
 Content-Type: text/plain
-Message-Id: <1086279402.7542.189.camel@pegasus>
+Message-Id: <1086276720.7542.180.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,17 +19,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 03 Jun 2004 18:16:42 +0200
+Date: Thu, 03 Jun 2004 17:32:00 +0200
 
 Hi Matthias,
 
-> I tried this. The error message isnt shown anymore, of course, and using
-> lsmod 
-> I can see that hci_uart is used once now, but I am still not attached:
-> hciconfig shows nothing.
+> OK, I got the ROM 3.10 and installed the latest bluez-2.4.18...ipk
+> sucessfully. Then, I do NOT enter a BT CF Card, which I assume would wrok
+> perfectly, but I connect a BT Chip using a serial cable instead. 
+> # modprobe l2cap
+> # modprobe hci_uart
+> # hciattach /dev/ttyS0 any 115200 flow
+> fails ---->  "Can't set device: Protocol not support"
+> no matter whether I am using the hciattach kindly sended 
+> by Steve or the one that I cross compiled myself, the answer is always the
+> same. 
 
-what does dmesg when you load hci_uart? It should show its version
-number. Or try "modinfo hci_uart"
+this problem occurs when hciattach will set the device mode (H4 or BCSP)
+and I suspect your hci_uart is very old. In the beginning there was no
+switch needed, but it also only supported H4. Maybe it is enough to
+erase the ioctl(HCIUARTSETPROTO), but using a too old BlueZ stack is not
+a good idea.
 
 Regards
 
