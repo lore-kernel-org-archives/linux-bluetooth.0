@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040408114053.4136.qmail@web60304.mail.yahoo.com>
-From: =?iso-8859-1?q?Thomas=20PEYRIN?= <titom51@yahoo.fr>
-Reply-To: tpeyrin@cpe.fr
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] pin code problem - noob
+Subject: Re: [Bluez-users] hci_uart and Ambicom BT2000E
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daniel Jimenez <djimenez@pobox.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40743AAE.4070808@pobox.com>
+References: <40743AAE.4070808@pobox.com>
+Content-Type: text/plain
+Message-Id: <1081418373.2970.6.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,57 +18,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 8 Apr 2004 13:40:53 +0200 (CEST)
+Date: Thu, 08 Apr 2004 11:59:33 +0200
 
-hi !
+Hi Daniel,
 
-i'm trying to do the authentification between a palm
-m515 and my laptop with linux (suse 8.2) and a usb
-dongle (acer). But that doesn't work (the palm work
-with others devices for authentification) because it
-seems that bluez can't find the pin code. Here's the
-dump :
+> In a previous thread Marcell recommended I use serial_cs and hci_uart 
+> for my Ambicom PCMCIA bluetooth adaptor.
+> 
+> I've got serial_cs working, and it's created device /dev/ttyS1.
+> 
+> I did a hciattach /dev/ttyS1 ericsson and that returned no errors/notices.
+> 
+> hciconfig hci0 up hangs and does nothing. I can control+c out of it.
+> 
+> I do notice this in /var/log/messages:
+> 
+> hcid[6522]: HCI dev 0 registered
+> hcid[6437]: HCI dev 0 registered
+> hcid[6295]: HCI dev 0 registered
+> hcid[7097]: Can't init device hci0. Connection timed out(110)
+> hcid[7098]: Can't init device hci0. Connection timed out(110)
+> hcid[7099]: Can't init device hci0. Connection timed out(110)
 
-HCIDump - HCI packet analyzer ver 1.7
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request(0x04) plen 10
-< HCI Command: Accept Connection Request(0x01|0x0009)
-plen 7
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Link Key Request(0x17) plen 6
-< HCI Command: Link Key Request Negative
-Reply(0x01|0x000c) plen 6
-> HCI Event: Command Complete(0x0e) plen 10
-> HCI Event: PIN Code Request(0x16) plen 6
-< HCI Command: PIN Code Request Negative
-Reply(0x01|0x000e) plen 6
-> HCI Event: Command Complete(0x0e) plen 10
-> HCI Event: Connect Complete(0x03) plen 11
+you should check how many hcid you have running. There must only be one.
 
-and my hciconfig :
+The other problem is that not every serial based PCMCIA card works right
+now with the 2.6 kernel. Some do and some don't and actually this is a
+problem in the serial subsystem, but I don't know where.
 
-hci0:   Type: USB
-        BD Address: 00:02:72:B2:0E:C4 ACL MTU: 192:8 
-SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-        RX bytes:235 acl:0 sco:0 events:26 errors:0
-        TX bytes:348 acl:0 sco:0 commands:17 errors:0
+Regards
 
-but i don't understant why the palm doesn't even ask
-me for the pin code ...
-
-thanks in advance !
+Marcel
 
 
-
-	
-
-	
-		
-Yahoo! Mail : votre e-mail personnel et gratuit qui vous suit partout ! 
-Créez votre Yahoo! Mail sur http://fr.benefits.yahoo.com/
-
-Dialoguez en direct avec vos amis grâce à Yahoo! Messenger !Téléchargez Yahoo! Messenger sur http://fr.messenger.yahoo.com
 
 
 -------------------------------------------------------
