@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] another hibernate warning
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200409171209.47267.cijoml@volny.cz>
-References: <200409171209.47267.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1095416145.3280.41.camel@pegasus>
-Mime-Version: 1.0
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200409171209.47267.cijoml@volny.cz>
+Subject: [Bluez-users] another hibernate warning
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,28 +17,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Sep 2004 12:15:45 +0200
+Date: Fri, 17 Sep 2004 12:09:47 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> when hibernate compiled into kernel, this is written into dmesg:
-> hci_usb: Unknown symbol hci_free_dev
-> hci_usb: Unknown symbol hci_alloc_dev
-> hci_usb: Unknown symbol hci_unregister_dev
-> hci_usb: Unknown symbol hci_register_dev
-> 
-> dongle works fine
+when hibernate compiled into kernel, this is written into dmesg:
+hci_usb: Unknown symbol hci_free_dev
+hci_usb: Unknown symbol hci_alloc_dev
+hci_usb: Unknown symbol hci_unregister_dev
+hci_usb: Unknown symbol hci_register_dev
 
-this is not hibernate specific. I have seen this many times, but the
-module still gets loaded at some point. Maybe this has something to do
-with the MODULE_VERSION macro we use, but I am not sure. If you load the
-bluetooth.ko from a boot script you won't see this anymore.
+dongle works fine
 
-Regards
-
-Marcel
-
-
+M.
 
 
 -------------------------------------------------------
