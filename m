@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
+Message-ID: <20040701074257.94807.qmail@web20501.mail.yahoo.com>
+From: Pranab Shenoy <pranab_shenoy@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] to build a bluetooth stack that can be embedded
-Message-ID: <20040701093728.GA4505@gmx.net>
-References: <20040701074257.94807.qmail@web20501.mail.yahoo.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20040701074257.94807.qmail@web20501.mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-436630355-1088667777=:94783"
+Subject: [Bluez-devel] to build a bluetooth stack that can be embedded
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,16 +15,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 1 Jul 2004 11:37:28 +0200
+Date: Thu, 1 Jul 2004 00:42:57 -0700 (PDT)
 
-On  0, Pranab Shenoy <pranab_shenoy@yahoo.com> wrote:
-> We want to build a bluetooth stack that can be embedded in a smart 
-> device. We wanna know if its possible, if not why and if yes can we
-> build from the existing stack.
+--0-436630355-1088667777=:94783
+Content-Type: text/plain; charset=us-ascii
 
-Yes, Yes (if you follow the terms of the GPL)
+ We want to build a bluetooth stack that can be embedded in a smart device. We wanna know if its possible, if not why and if yes can we build from the existing stack.
 
-nicholas
+		
+---------------------------------
+Do you Yahoo!?
+Yahoo! Mail is new and improved - Check it out!
+--0-436630355-1088667777=:94783
+Content-Type: text/html; charset=us-ascii
+
+<DIV>&nbsp;We want to build a bluetooth stack that can be embedded in a smart device. We wanna know if its possible, if not why and if yes can we build from the existing stack.</DIV><p>
+		<hr size=1>Do you Yahoo!?<br>
+Yahoo! Mail is new and improved - <a href="http://us.rd.yahoo.com/mail_us/taglines/new/*http://promotions.yahoo.com/new_mail">Check it out!</a>
+--0-436630355-1088667777=:94783--
 
 
 -------------------------------------------------------
