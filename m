@@ -1,11 +1,26 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Jose Bernardo Silva" <jbs@bandos.homelinux.com>
+From: Jonathan Sass <jsass@magnifeye.com>
+Subject: Re: [Bluez-users] Source sample custom Bluetooth
+In-reply-to: <1104778613.8894.62.camel@pegasus>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20050104110418.M39860@bandos.homelinux.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset=iso-8859-1
-Subject: [Bluez-users] Dongle firmware
+Message-id: <C17DB8CE-5E1A-11D9-8017-000D9348D4BE@magnifeye.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=US-ASCII; format=flowed
+References: <4dfd570904122402134ec2fd32@mail.gmail.com>
+ <4dfd570904122509237f2a2f48@mail.gmail.com> <1103995727.8758.31.camel@pegasus>
+ <4dfd570904122509451e811d7a@mail.gmail.com> <1103996976.8758.34.camel@pegasus>
+ <4dfd5709041225095410f71a46@mail.gmail.com> <1103997529.8758.36.camel@pegasus>
+ <4dfd570904122510081a9bfa7@mail.gmail.com>
+ <4dfd570904122510085371c17b@mail.gmail.com>
+ <4dfd57090412251011705f52be@mail.gmail.com>
+ <4dfd5709041225103246f6934c@mail.gmail.com> <1104000494.8758.46.camel@pegasus>
+ <002601c4ebb8$4de24200$020ba8c0@heejune> <1104125195.9393.12.camel@pegasus>
+ <BEB39C04-5B6A-11D9-8017-000D9348D4BE@magnifeye.com>
+ <1104604846.4253.1.camel@pegasus>
+ <FA69107A-5DAA-11D9-8017-000D9348D4BE@magnifeye.com>
+ <1104776407.8894.53.camel@pegasus>
+ <AFDBF1EE-5DB6-11D9-8017-000D9348D4BE@magnifeye.com>
+ <1104778613.8894.62.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,20 +32,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 4 Jan 2005 11:09:32 +0000
+Date: Mon, 03 Jan 2005 22:34:59 -0800
 
-I've seen recently a few messages about new firmwares, is there a list of
-dongles and firmwares available?
-I have a Acer BT-500 and a MSI MS-6967, and I'd like to update these two.
+The stack that I am talking to only supports raw packets.
 
-Thanks!
+So far I am able to do an inquiry and see the device and get its 
+address, type and name. I am unable to connect to it.
 
--- 
-Jose Bernardo B R Silva             | Source Mage GNU/Linux Section Guru
-jbernardo@sourcemage.org            | http://www.sourcemage.org
-http://counter.li.org #245602
-http://cosmos.oninetspeed.pt/jose.bernardo
-jbs@bandos.homelinux.com
+I create a socket
+
+s = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+
+then I set up the parameters for the addr
+
+sockaddr_hci addr
+addr.hci family =  AF_BLUETOOTH;
+addr.hci_dev = 0;
+
+I then do a bind
+
+bind(s, (struct sockaddr *)&addr, sizeof(addr));
+
+I then try a connect
+
+connect(s, (struct sockaddr *) &addr, sizeof(addr)) and it fails
+
+What might I be missing here? I cannot find any samples
+
+Thank you,
+
+Jonathan
+
+
+On Jan 3, 2005, at 10:56 AM, Marcel Holtmann wrote:
+
+> Hi Jonathan,
+>
+>> This device has a custom blue tooth stack (no rfcomm). I need to
+>> inquire, connect (I can do that and see code to do it) and then to
+>> build a aclpacket and do a aclread. What is the equivalent on the 
+>> linux
+>> side?
+>
+> in this case you have to use the HCI raw socket. Otherwise you won't be
+> able to deal with ACL data packets. However every stack should at least
+> suppport L2CAP, because dealing with raw ACL data packets is never a
+> good idea.
+>
+> Regards
+>
+> Marcel
+>
+>
 
 
 
