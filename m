@@ -1,23 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+From: Sebastian Eichner <mailsp@sebastian-eichner.de>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] SBC packer done, kind of
-Message-Id: <20041124213730.46aefcb7.henryk@ploetzli.ch>
-In-Reply-To: <1101307146.27351.104.camel@pegasus>
-References: <20041123014732.3a03b10e.henryk@ploetzli.ch>
-	<1101191260.26578.43.camel@pegasus>
-	<20041123074829.7f978ce7.henryk@ploetzli.ch>
-	<1101201897.26578.54.camel@pegasus>
-	<20041123204901.776fe240.henryk@ploetzli.ch>
-	<1101243809.27351.18.camel@pegasus>
-	<20041124042114.5e1fee94.henryk@ploetzli.ch>
-	<1101272477.27351.67.camel@pegasus>
-	<41A43E8A.8030602@xmission.com>
-	<1101307146.27351.104.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Wed__24_Nov_2004_21_37_30_+0100_dtV+UR0lbsG3AbLI"
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200411250023.28429.mailsp@sebastian-eichner.de>
+Subject: [Bluez-devel] "playback drain error" with snd-bt-sco
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -29,43 +17,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Nov 2004 21:37:30 +0100
+Date: Thu, 25 Nov 2004 00:23:28 +0100
 
---Signature=_Wed__24_Nov_2004_21_37_30_+0100_dtV+UR0lbsG3AbLI
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi all,
 
-Moin,
+i would love to get my new Bluetooth headset (Bluetake BT420) running 
+with linux. So i compiled and installed the alsa-bluetooth cvs code 
+(btw: i had to add "-lsdp" to the libs in the Makefile to make it 
+compile). 
 
-Am Wed, 24 Nov 2004 15:39:06 +0100 schrieb Marcel Holtmann:
+I can load the kernel module and start btsco:
+/usr/local/bin/btsco 00:08:F4:30:03:71
+Device is 1:0
+Voice setting: 0x0060
+RFCOMM channel 5 connected
 
-> > a2play will also accept '-' for stdin now. you should try it to see
-> > if my latest change makes it work for your headset.
+But when i play a wav-file via aplay or play/dsp1, i do not hear 
+anything but get an error message in the system log:
 
-Brad, you're brilliant. a2play started working for me this morning.
+Nov 25 00:12:34 linux kernel: snd-bt-sco: playback_open
+Nov 25 00:12:34 linux kernel: snd-bt-sco: prepare ok bps: 16000 size: 
+16002 count: 4000
+Nov 25 00:12:34 linux kernel: snd-bt-sco: playback_trigger 1
+Nov 25 00:12:34 linux kernel: snd-bt-sco: setting playback to bspcm
+Nov 25 00:12:44 linux kernel: ALSA sound/core/pcm_native.c:1316: 
+playback drain error (DMA or IRQ trouble?)
+Nov 25 00:12:44 linux kernel: snd-bt-sco: playback_trigger 0
+Nov 25 00:12:44 linux kernel: snd-bt-sco: setting playback to NULL
 
-And Marcel, so are you: Now I can do
-sox foo.ogg -r 44100 -s -w -t au - | sbc/sbcenc - | ./a2play <bdaddr> -
 
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+I am using kernel 2.6.5 from SuSE-linux, so i replaced the kalloc() 
+statements with the old ones (found in cvs and did some merging). 
+Compiled and loaded fine without any errors.
 
---Signature=_Wed__24_Nov_2004_21_37_30_+0100_dtV+UR0lbsG3AbLI
-Content-Type: application/pgp-signature
+Do you have an idea whats going wrong? Or doesnt it work with 2.6.5 
+anymore at all?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQFBpPEPIjWgKE0OA2gRAvqCAKDMtWv4VKX+RM8r+RAFVr90Exg0FQCgkdTw
-PQ5J6/1uDI3Uau0jUXywQF4=
-=v4g9
------END PGP SIGNATURE-----
-
---Signature=_Wed__24_Nov_2004_21_37_30_+0100_dtV+UR0lbsG3AbLI--
+Thanks!
+ Sebastian
 
 
 -------------------------------------------------------
