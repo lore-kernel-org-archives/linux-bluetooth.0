@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Audio & Bluetooth 
-In-reply-to: <1099965952.27159.7.camel@loke> 
-References: <418FC205.7070102@tootai.net> <1099943857.29330.27.camel@pegasus> <1099954588.6339.144.camel@loke> <1099956503.29330.35.camel@pegasus> <1099965952.27159.7.camel@loke>
-Message-ID: <15251.1099994062@csr.com>
-From: Peter Stephenson <pws@csr.com>
+From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
+To: <bluez-users@lists.sourceforge.net>
+Subject: AW: [Bluez-users]  Again dund
+Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAA1bzeWnu4J0OOHk9hPKKFnwEAAAAA@t-online.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <1099939109.29330.17.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,41 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 09 Nov 2004 09:54:22 +0000
+Date: Tue, 9 Nov 2004 10:01:47 +0100
 
-Martin List-Petersen wrote:
-> Must be blind. Anyhow, i guess this doesn't sound good for sound:
-> 
-> # hciconfig hci0 revision
-> hci0:   Type: USB
->         BD Address: 00:60:57:02:7F:E1 ACL MTU: 192:8  SCO MTU: 64:8
->         HCI 12.7
->         Chip version: BlueCore01b
->         SCO mapping:  PCM
-> 
-> I have problems with no audio on this dongle. So i take it, that it
-> might be the oldish firmware.
+Hi Marcel,
 
-12.7 is prehistoric, unfortunately.  The last release for BlueCore01 was
-16.something, then we stopped supporting it.  If you want further
-improvements after that, you should get a new dongle.  All new ones
-should have at least BlueCore2 in them (we only have one BlueCore01
-customer left and they don't make dongles).
+##>I don't get your point. The ppp0 interface can be used and=20
+##>when the routing information are right then this works. It=20
+##>is not different from dialin with a modem.
 
-pws
+My telephone system works as DSL or ISDN system and has in addition a
+bluetooth accesspoint. It also gives the abilities of a switch and =
+router.
+So, I tried to initialize via YaST on DSL or ISDN the connection via
+bluetooth and expected to find ppp0 interface. But I didn't find it or =
+it
+doesn't exist already. My question is, how to establish a connection =
+that is
+able to use the ISDN or DSL functionality (router).
 
+Regards
+Peter
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
 
 
 
