@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] apple wireless keyboard
+Subject: Re: [Bluez-users] nokia wireless keyboard
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Simone Crippa <simone.crippa@gmx.net>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40C9FD7B.6000004@gmx.net>
-References: <40C9FD7B.6000004@gmx.net>
+In-Reply-To: <200406141329.45458.cijoml@volny.cz>
+References: <200406141329.45458.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1087229802.13792.33.camel@pegasus>
+Message-Id: <1087229709.13792.30.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Jun 2004 18:16:42 +0200
+Date: Mon, 14 Jun 2004 18:15:09 +0200
 
-Hi Simone,
+Hi Michal,
 
-> I bought a shiny new Apple Wireless Keyboard last week because I like to 
-> type on a "big" keyboard using my laptop, but I "hate" tethers!!!
+> new BT keyboard from nokia looks very interessant :)
 
-the Apple HID devices are a little bit problematic. May someone will
-write a nice howto for using them with hidp + hidd?
+very nice. Here is the international link for it:
+
+	http://www.nokia.com/nokia/0,,58982,00.html
+
+According to their specification page it uses HID so it should work also
+with Linux.
+
+The other two very small HID capable keyboards are the Think Outside
+Stowaway (www.thinkoutside.com) and the FrogPad (www.frogpad.com).
+
+Looks like the boom of Bluetooth is starting ;)
 
 Regards
 
