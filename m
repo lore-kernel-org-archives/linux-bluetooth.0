@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <d1b884a705020307013b729dd8@mail.gmail.com>
-From: tishzone <tishzone@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] rfcomm question 3
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050203142619.94035.qmail@web60902.mail.yahoo.com>
+References: <20050203142619.94035.qmail@web60902.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1107442481.11944.75.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Active Broadcast in BLuez
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 3 Feb 2005 16:01:14 +0100
+Date: Thu, 03 Feb 2005 15:54:41 +0100
 
-Hi there,
+Hi,
 
-Sorry for bothering you with that broadcast story again, it's just I
-have to be sure to be accurate in an article I'm writing right now..,
-so the question is, does the bluez API support Active Slave Broadcast
-as it is specified in Bluetooth 2.0? Or basically, can I use the bluez
-API to send a broadcast message from a master node, so that all the
-slaves will receive it?
+>     Now I put all parts of rctest.c in my main program
+> to test, and then I found the error message " Can't
+> set RFCOMM link mode: Protocol not available (92)",
+> and this happens in do_listen part. My T610 has
+> included  my PC in the menu of "My device". So, what
+> have I do so that the RFCOMM link can be set?
 
-Thanks a lot,
-Patrick
+you have two possibilities. First you can install a Linux kernel where
+RFCOMM link mode is supported. This is a 2.6.10-mh3 or a 2.6.11-rc3.
+Second you don't use any link mode features. Means that no master, auth,
+encrypt or secure variable should be set to 1.
+
+I really would feel better if you try to understand what the code in
+rctest.c means and actually does, instead of only copy it and then try
+to use it.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
