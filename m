@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluez-hcidump package
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Monika Hubrich <monikahubrich@aol.com>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <001301c4b071$c7b509a0$c6b6b3ac@monika>
-References: <E1CHDBt-0002Ku-0s@sc8-sf-list2.sourceforge.net>
-	 <001301c4b071$c7b509a0$c6b6b3ac@monika>
-Content-Type: text/plain
-Message-Id: <1097651859.4643.1.camel@notepaq>
-Mime-Version: 1.0
+Message-ID: <20041013022808.63256.qmail@web41113.mail.yahoo.com>
+From: Sean Loh <blaze_wk@yahoo.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Bluetooth 1.2 and 1.1 compatibility
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,28 +15,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Oct 2004 09:17:39 +0200
+Date: Tue, 12 Oct 2004 19:28:08 -0700 (PDT)
 
-Hi Monika,
+Hi!!
 
-> > > -run "hcidump -x" as root and show us the output.
-> > > 
-> > > When I type in the command hcicump -x, 
-> > > the output is: Command not found.
-> > 
-> > you have to install the bluez-hcidump package.
-> > 
-> Okay.
-> 
-> Please show me the link.
+I have curretnly written a program to transmit data
+over IP over Bluetooth using the PAN profile. I was
+wondering if I actually ported the program to use it
+over another notebook using the Bluetooth usb 1.2
+adapter, will bluez then still be the same. Or will
+some bluez specifications change? My program just uses
+the basic sockets to trasmit data. 
 
-look at www.bluez.org/download.html
+Other questions, 
+- does bluez support the higher data
+throughputs(around 2.1 Mbps) of Bluetooth 1.2?
+- are there any bluez compliant bluetooth usb
+adapters?
+- if my program is indeed able to be ported to be used
+over the bluetooth 1.2 usb adapter, will my program
+immediately benefit from the increased data rate of
+the bluetooth 1.2 specification?
 
-Regards
-
-Marcel
+thanks for any help, bluez rocks!!
 
 
+		
+_______________________________
+Do you Yahoo!?
+Declare Yourself - Register online to vote today!
+http://vote.yahoo.com
 
 
 -------------------------------------------------------
