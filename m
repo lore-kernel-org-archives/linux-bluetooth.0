@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <517CF7F08A05D4118C380000E869BFA4BDED83@emg_ntserv2>
-From: R.Schade@tu-braunschweig.de
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] DiNovo Multimedia keys... again...
+References: <413C6DCD.3060606@ipb.pt> <200409080932.34030.cijoml@volny.cz> <1094629845.5384.11.camel@notepaq>
+In-Reply-To: <1094629845.5384.11.camel@notepaq>
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] missing include-files with debian
+  charset="iso-8859-2"
+Message-Id: <200409081009.13842.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,30 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 8 Sep 2004 10:20:10 +0200
+Date: Wed, 8 Sep 2004 10:09:13 +0200
 
-Hello,
+Dne st 8. z=E1=F8=ED 2004 09:50 Marcel Holtmann napsal(a):
+> Hi Michal,
+>
+> > > try the 2.6.8-mh1 kernel patch and see if they are mapped now.
+> >
+> > Marcel did you find a way how to map those multimedia keys on MS BT
+> > keyboard?
+>
+> I didn't spent any time in looking at it. There is more stuff to do
+> first, but as I often said, I accept patches ;)
 
-I had installed Debian-stable (2.4.20) with the bluez-debian-packages (I did
-not compile the bluez-sources myself). My USB-bluetooth-dongle works fine.
-Now, I want code some little application. So I have include the
-bluetooth-headerfiles:
+You are a REAL daemon :D
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
-#include <bluetooth/hci.h>
-#include <bluetooth/hci_lib.h> 
-
-The standard include-directory is /usr/include. Directory "bluetooth" exists
-there, but contains only one headerfile (bnep.h). Why are missing the other
-bluez-headerfiles there? 
-Is this a debian-"problem" with the package and I have to install/copy/link
-the files manually? I had found the missing files at the kernel-sources and
-at the bluez-sources.
-
-Thank you for your help.
-
-Ciao, Ralf
+M.
 
 
 -------------------------------------------------------
