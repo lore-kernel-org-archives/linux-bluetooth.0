@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] pppd problems
+Subject: Re: [Bluez-users] Dongles not working
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?Jo=E3o?= Santos <jsantos_pt@hotmail.com>
+To: Raul Jimeno Mouzo <pichas23@hotmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Sea2-F5425UE9chbN2t0002c71b@hotmail.com>
-References: <Sea2-F5425UE9chbN2t0002c71b@hotmail.com>
+In-Reply-To: <Law11-F82jPkQTGpaoG00010ed1@hotmail.com>
+References: <Law11-F82jPkQTGpaoG00010ed1@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1073583234.2563.21.camel@pegasus>
+Message-Id: <1073583158.2563.19.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,18 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Jan 2004 18:33:55 +0100
+Date: Thu, 08 Jan 2004 18:32:38 +0100
 
-Hi Joao,
+Hi Raul,
 
-> [root@olivia /]# pppd
-> pppd: This system lacks kernel support for PPP.  This could be because
-> the PPP kernel module is not loaded, or because the kernel is
-> not configured for PPP.  See the README.linux file in the
-> ppp-2.3.3 distribution.
+> I have devices BT that do not work well. Is a Microtune 
+> http://www.microtune.com/products/MT0760.html) modelo MT0760
+> Can I to rewrite the flash of the devices and to obtain that they work well?
 
-this is a pppd against kernel PPP problem. Do what the text says and
-look at the README.
+nobody sent my samples of this devices. What do "hciconfig -a" say?
 
 Regards
 
