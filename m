@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bluetooth kernel patch for 2.6.1
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Max Krasnyansky <maxk@qualcomm.com>
+Subject: Re: [Bluez-devel] libtool and autoconf versions
+From: Max Krasnyansky <maxk@qualcomm.com>
+To: Edd Dumbill <edd@usefulinc.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1074626637.1707.103.camel@localhost>
-References: <1074193649.2629.23.camel@pegasus>
-	 <1074196988.2559.270.camel@localhost>  <1074198649.2629.67.camel@pegasus>
-	 <1074288307.2559.434.camel@localhost>  <1074301700.2629.124.camel@pegasus>
-	 <1074626637.1707.103.camel@localhost>
+In-Reply-To: <1074632708.23181.56.camel@saag>
+References: <1074424282.16573.52.camel@saag>
+	 <1074632525.1707.181.camel@localhost>  <1074632708.23181.56.camel@saag>
 Content-Type: text/plain
-Message-Id: <1074649003.7088.43.camel@pegasus>
+Message-Id: <1074633031.1707.190.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,43 +19,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Jan 2004 02:36:43 +0100
+Date: Tue, 20 Jan 2004 13:10:31 -0800
 
-Hi Max,
-
-> > Do you have a contact for me, so we can talk about it. I
-> > am also interested in a Bluetooth 1.2 firmware if it exists.
-> I'm actually subscribed to Broadcomm release notifications. 
-> So I'll get and email as soon as the release something. I don't think
-> that they have 1.2 support yet. Anyway this subscription and stuff is
-> kind of proprietary. One of the reasons I got it is because I'm a
-> Qualcommer :).
-
-I tried to contact the guys from Broadcom, but they never answered. This
-makes me really unhappy.
-
-> > I came around with this on 21 Dec and I thought about it for over 3
-> > weeks before I finally decided to include this patch. I am not happy
-> > with it, but doing nothing and keep the ACL link makes me even more sad.
-> > The Apple mouse with its Broadcom HID stack is even more worse than I
-> > can think about it. At http://www.holtmann.org/linux/bluetooth/hid.html
-> > you find some of my notes about Bluetooth HID devices. And the mouse
-> > never disconnects the ACL link. I checked this and it stays forever :(
+On Tue, 2004-01-20 at 13:05, Edd Dumbill wrote:
+> On Tue, 2004-01-20 at 21:02, Max Krasnyansky wrote:
+> > I'd say lets update. 
+> > btw What exactly depends on the old autoconf ? I mean if you just run
+> > ./bootstrap on the machine that has new version it just works right.
+> > At least it does on Fedora with the latest au
 > 
-> I see. Well I guess it's ok as long as it doesn't brake anything.
+> I'm talking about what's shipped in the tarballs, which uses
+> libtool1.4.  Packagers for distros rely on the tarball releases.  In the
+> (admittedly) unlikely event that changes need to be made and autoconf
+> re-run for the purposes of packaging, the old ac and libtool would be
+> needed.
+I see. Yeah, I think we should release our tarballs with new autoconf. 
+Marcel, it's time for you to upgrade ;-).
 
-Actually I must say I hope so ;)
-
-The current way of waiting 4 seconds before we kill an incoming and
-unused ACL link should be really long enough and in the most cases the
-remote device already disconnected it before the timer kicks in. However
-I haven't seen any problems in the last three weeks while I tested this
-patch on my machines.
-
-Regards
-
-Marcel
-
+Max
 
 
 
