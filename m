@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41ED434B.9060207@xmission.com>
+Message-ID: <41ED32F0.8010502@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [btsco] automake error
-References: <41ED224E.9030702@pca.it>
-In-Reply-To: <41ED224E.9030702@pca.it>
+Subject: Re: [Bluez-devel] bluetooth headset
+References: <200501181145.11573.da209@cam.ac.uk>
+In-Reply-To: <200501181145.11573.da209@cam.ac.uk>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,87 +18,109 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 Jan 2005 10:11:39 -0700
+Date: Tue, 18 Jan 2005 09:01:52 -0700
 
-thanks Luca. keep those patches coming :)
+daniel,
 
-Luca Capello wrote:
-> -----BEGIN PGP SIGNED MESSAGE-----
-> Hash: SHA1
+btsco.c (userspace) has a function detect_channel that tries to figure
+out the channel using sdp. i believe it's equivalent to running:
+
+sdptool search --bdaddr 00:0A:D9:74:B4:EA 0x1108
+
+what kind of output do you get when you search your headset?
+
+can anyone confirm that 0x1108 is the right way to find the headset
+profile over sdp?
+
+paul ionescu had a similar problem with the jabra bt 110...
+
+brad
+
+Daniel Andor wrote:
+> Hi,
 > 
-> Hello,
+> Had success with connecting to my laptop's headset profile, but not before 
+> figuring out that it doesn't work with the default channel 7, but needs to be 
+> made to use channel 8:
 > 
-> I'm new to the list, so hello to everyone :-)
+> Does't work:
+> $ ./btsco 00:0B:6B:58:92:E9
+> Device is 3:0
+> Voice setting: 0x0060
+> RFCOMM channel 7 connected
 > 
-> I just bought a Bluetake i-Phono and I was trying to test it (Debian
-> unstable, kernel 2.6.10, ALSA 1.0.8), but I got an automake error:
-> =====
-> luca@gismo:~/src/kernel/bluetooth$ cvs
-> - -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa login
-> Logging in to :pserver:anonymous@cvs.sf.net:2401/cvsroot/bluetooth-alsa
-> CVS password:
-> luca@gismo:~/src/kernel/bluetooth$ cvs
-> - -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa co btsco
-> cvs checkout: Updating btsco
-> <cut>
-> U btsco/sbc/sbcinfo.c
+> Does work:
+> $ ./btsco 00:0B:6B:58:92:E9 8
+> Device is 3:0
+> Voice setting: 0x0060
+> RFCOMM channel 8 connected
+> recieved AT+BRSF=22
+> recieved AT+CIND=?
+> opened hwdep
+> connected SCO channel
+> Setting sco fd
+> Done setting sco fd
+> recieved AT+CIND?
+> AT+CMER=3,0,0,1=15
+> Sending up speaker change 15
+> recieved AT+CHLD=?
+> recieved AT+CCWA=1
+> recieved AT+CLIP=1
 > 
-> luca@gismo:~/src/kernel/bluetooth$ cd btsco/
-> luca@gismo:~/src/kernel/bluetooth/btsco$ ./bootstrap
-> automake: unrecognized option -- `--ignore-deps'
-> Try `automake --help' for more information.
+> Details:
+> $ uname -a
+> Linux pooh 2.6.9-2-k7 #1 Sat Jan 8 15:38:24 EST 2005 i686 GNU/Linux
 > 
-> luca@gismo:~/src/kernel/bluetooth/btsco$ automake --help | grep ignore
-> luca@gismo:~/src/kernel/bluetooth/btsco$ automake --version | grep automake
-> automake (GNU automake) 1.4-p6
-> =====
+> $ sudo hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:02:72:40:AD:56 ACL MTU: 192:8  SCO MTU: 64:8
+>         UP RUNNING PSCAN ISCAN
+>         RX bytes:9550635 acl:181 sco:187095 events:359 errors:0
+>         TX bytes:9545657 acl:188 sco:187095 commands:98 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: ACCEPT MASTER
+>         Name: 'pooh'
+>         Class: 0x100100
+>         Service Classes: Object Transfer
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+>         Manufacturer: Cambridge Silicon Radio (10)
 > 
-> So, the attached patch check for automake-1.7 during the bootstrap
-> process and add an info in the README.
+> $ sudo hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:02:72:40:AD:56 ACL MTU: 192:8  SCO MTU: 64:8
+>         HCI 16.4
+>         Chip version: BlueCore02
+>         Max key size: 56 bit
+>         SCO mapping:  HCI
 > 
-> But I still have some compilation problems... (new post, IMHO it's better).
+> $ sudo hcitool info 00:0B:6B:58:92:E9
+> Requesting information ...
+>         BD Address:  00:0B:6B:58:92:E9
+>         Device Name: HANNAH
+>         LMP Version: 1.2 (0x2) LMP Subversion: 0x694a
+>         Manufacturer: Broadcom Corporation (15)
+>         Features: 0xff 0xff 0x0d 0x38 0x08 0x08 0x00 0x00
+>                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
+>                 <timing accuracy> <role switch> <hold mode> <sniff mode>
+>                 <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+>                 <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
+>                 <transparent SCO> <enhanced iscan> <interlaced iscan>
+>                 <interlaced pscan> <AFH cap. slave> <AFH cap. master>
 > 
-> Thx, bye,
-> Gismo / Luca
-> -----BEGIN PGP SIGNATURE-----
-> Version: GnuPG v1.2.5 (GNU/Linux)
-> Comment: Using GnuPG with Debian - http://enigmail.mozdev.org
-> 
-> iD8DBQFB7R1mVAp7Xm10JmkRAsS6AJ0cJCqjyaxxDdVW2HafWJFWwJbatQCdF002
-> OXtjJYOo4mfeYcpDZyGT9Y0=
-> =eIey
-> -----END PGP SIGNATURE-----
 > 
 > 
-> ------------------------------------------------------------------------
-> 
-> diff -Naur btsco_cvs-20050118-1520/bootstrap btsco/bootstrap
-> --- btsco_cvs-20050118-1520/bootstrap	2005-01-18 15:22:44.000000000 +0100
-> +++ btsco/bootstrap	2005-01-18 15:19:38.000000000 +0100
-> @@ -1,2 +1,10 @@
->  #! /bin/sh
-> -aclocal && autoheader && automake --add-missing --copy --ignore-deps && autoconf
-> +
-> +if [ ! `which automake-1.7` ]; then
-> +    echo -e "\n*** You need automake-1.7 to compile this software ***\n"
-> +    exit 1
-> +elif [ ! `automake --version | grep -q 1.7` ]; then
-> +    AUTOMAKE_VERSION="-1.7"
-> +fi
-> + 
-> +aclocal$AUTOMAKE_VERSION && autoheader && automake$AUTOMAKE_VERSION --add-missing --copy --ignore-deps && autoconf
-> diff -Naur btsco_cvs-20050118-1520/README btsco/README
-> --- btsco_cvs-20050118-1520/README	2005-01-18 15:23:32.000000000 +0100
-> +++ btsco/README	2004-11-25 01:51:40.000000000 +0100
-> @@ -37,7 +37,7 @@
->      1. The CVS repository must be checked out:
->          cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa login
->          cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa co btsco
-> -    2. After that it must be compiled, you need automake1.7 to do it:
-> +    2. After that it must be compiled:
->          ./bootstrap
->          ./configure
->          make
+> -------------------------------------------------------
+> The SF.Net email is sponsored by: Beat the post-holiday blues
+> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
 
 
 -------------------------------------------------------
