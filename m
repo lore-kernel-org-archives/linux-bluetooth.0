@@ -3,13 +3,13 @@ Subject: Re: [Bluez-users] ms explorer for bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
 To: neoclust <n1c0l4s.l3@wanadoo.fr>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <200410140046.41141.n1c0l4s.l3@wanadoo.fr>
+In-Reply-To: <200410140042.12450.n1c0l4s.l3@wanadoo.fr>
 References: <200410122022.30501.n1c0l4s.l3@wanadoo.fr>
-	 <200410131143.26811.n1c0l4s.l3@wanadoo.fr>
-	 <1097662706.4643.21.camel@notepaq>
-	 <200410140046.41141.n1c0l4s.l3@wanadoo.fr>
+	 <200410131224.13689.n1c0l4s.l3@wanadoo.fr>
+	 <1097668334.4643.24.camel@notepaq>
+	 <200410140042.12450.n1c0l4s.l3@wanadoo.fr>
 Content-Type: text/plain
-Message-Id: <1097753304.4640.47.camel@notepaq>
+Message-Id: <1097753159.4640.43.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,28 +21,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Oct 2004 13:28:24 +0200
+Date: Thu, 14 Oct 2004 13:25:59 +0200
 
 Hi Nicholas,
 
-> i don't know how but when i wanted to scan my pocket pc doing :
+> > > > I misread your email. What I think is that maybe the keyboard will only
+> > > > work if you enforce the encryption. Is this the second generation of
+> > > > the Microsoft keyboard?
+> > >
+> > > how can i know this info ?
+> >
+> > look at your box. What does it say and how does the keyboard look like?
 > 
-> hcitool scan 00:04:3E:45:A7:9F
-> 
-> the answer was :
-> 
-> $ hcitool scan 00:04:3E:45:A7:9F
-> Scanning ...
->         00:50:F2:80:A1:2B       Microsoft Keyboard
-> 
-> 
-> but i don't find how to connect him with hciconfig :(
+> my mouse: http://images.ldlc.com/photosldlc/00/00/41/13/LD0000411349_1.jpg
+> my KB       : http://images.ldlc.com/photos/00/00/24/16/ME0000241663_1.jpg
 
-use "hcitool info 00:50:F2:80:A1:2B" as root. Maybe you need to pair and
-the device is still waiting for the PIN. So enter a PIN on the number
-key of your keyboard and press enter. If a PIN box pops up on your PC
-enter the same PIN. And always run "hcidump -x" as root to see happens
-on the link.
+please do actually pictures with a digitial camera from them and publish
+that ones.
+
+> > > > Can you do a "hcitool info ..." as root to your
+> > > > keyboard?
+> > >
+> > > how can i know my <bdaddr> for my keabord  ?
+> >
+> > Press the "connect" button on the keyboard and run "hcitool scan".
+> 
+> if i let only the keyboard pluged it doesn't work better and when i plug the 
+> mouse it ( the mouse) work directly
+> 
+> I use a mdk kernel can it be a mdk bug ?
+> 
+> but i mh patches wasn't include in the kernel the mouse would not work isn't 
+> it ?
+
+As long as it is 2.6.8 or later you will have some basic HID support.
 
 Regards
 
