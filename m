@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] connection-less communication
+Subject: Re: [Bluez-users] Desperate newbie
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Lendvai =?ISO-8859-1?Q?P=E9ter?= <lendvai.peter@freemail.hu>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <freemail.20040231161557.52454@fm4.freemail.hu>
-References: <freemail.20040231161557.52454@fm4.freemail.hu>
+To: Andreas Deresch <aderesch@fs.tum.de>
+Cc: Gary Martin <gary_martin_au@yahoo.com.au>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.56L0.0403311642280.9869@localhost>
+References: <20040331134502.35044.qmail@web21006.mail.yahoo.com>
+	 <Pine.LNX.4.56L0.0403311642280.9869@localhost>
 Content-Type: text/plain
-Message-Id: <1080754111.2536.0.camel@pegasus>
+Message-Id: <1080746814.2536.16.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +20,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 31 Mar 2004 19:28:32 +0200
+Date: Wed, 31 Mar 2004 17:26:54 +0200
 
-Hi Peter,
+Hi Andreas,
 
-> I am a final year student in University of Miskolc.I study
-> telecommunications and my final project is to implement a connection-
-> less
-> communication method between linux boxes via usb bluetooth dongles.
-> I am almost beginner in programming -- even in socket programming. 
-> Could
-> anybody send me some sample code or any idea what to begin with?
-> I would like to use broadcast frames or datagram packets. Any help is
-> welcome.
+> Fine, so the only difference (apart from multisync itself) between our
+> phones is that "hcitool info <BDA>" does not work for you. The problem there
+> seems to arise at HCIGETCONNINFO and then hci_create_connection. Anybody
+> with BE hardware care to take a closer look at it? I unfortunately do not
+> own any (bluetooth capable).
 
-only a minimal group of people worked with Bluetooth broadcast so far
-and I am not one of them. Look at the mailing list archives for more
-details.
+the "hcitool info" problems should already be fixed with newer libs and
+utils versions. Look at the mailing list archives for details.
 
 Regards
 
