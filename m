@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] dumping/debuging ttySX ...
+Subject: Re: [Bluez-devel] Parameters of the Bluetooth standard in BlueZ...
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bitterlich Jean-Yves ICM MP PD TI 10 <jean-yves.bitterlich@siemens.com>
-Cc: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <0E67B9FA7DC6B24391C00208804C1E552C2D25@mchh9ena.mchh.siemens.de>
-References: 
-	 <0E67B9FA7DC6B24391C00208804C1E552C2D25@mchh9ena.mchh.siemens.de>
-Content-Type: text/plain
-Message-Id: <1077882443.2843.27.camel@pegasus>
+To: Jers <jers@inwind.it>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <001501c3fd1d$019840a0$6b821d97@userpc>
+References: <001501c3fd1d$019840a0$6b821d97@userpc>
+Content-Type: text/plain; charset=iso-8859-7
+Message-Id: <1077882359.2843.25.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,21 +18,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 27 Feb 2004 12:47:23 +0100
+Date: Fri, 27 Feb 2004 12:45:59 +0100
 
-Hi Jean-Yves,
+Hi Jers,
 
-> I'm currently adapting bluez to run a bt chip via uart. it seems that
-> modifying hciattach initialization code might be enough. however i'm having
-> trouble after initialization whenever the driver take the socket over
-> (N_HCI). for some reason, the chip sends lots of "invalid packet events" and
-> "startup events".
-> 
-> before going further, i need to know what is sent over uart (i.e. every
-> single byte in each direction). hcidump seems to be a bit too high-level.
-> what would you recommend to spy transparently the ttyS0 ?
+> At the moment I=A2m carrying out a study about Bluetooth standard. In
+> this study I modified some parameters of Inquiry and Inquiry Scan
+> procedures. Now I want to test my analytical results by real
+> experiments. I=A2d like to evaluate the discovery performances of two
+> bluetooth devices, changing:
+>=20
+> =20
+>=20
+> -         in Inquiry Scan procedure:
+>=20
+> o       Time spent in Rx (>=3D16*Tslot, according to the standard)
+>=20
+> o       The period between two consecutive inquiry scan (<2.56 sec,
+> according to the standard)
+>=20
+> -         in Inquiry procedure:
+>=20
+> o       The period between the transmission of two consecutive packets
+> (According the standard: 244.5 msec, after odd packets; 869.5 msec,
+> after even packets)
+>=20
+> o       Number of repetitions of frequencies trains.
+>=20
+> -         in both procedures:
+>=20
+> o       number of employed hops
+>=20
+> =20
+>=20
+> I suppose I can set these parameters by BlueZ, so I looked for lines
+> that manage them in all BlueZ files but I didn=A2t find.=20
+>=20
+> =20
+>=20
+> Can I change these parameters in BlueZ?
 
-what kind of Bluetooth chip is it that you use?
+you can change everything for that you find a HCI command in the
+Bluetooth specification.
 
 Regards
 
