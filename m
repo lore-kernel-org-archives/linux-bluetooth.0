@@ -1,70 +1,56 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "christian.gohmann@dsa-ac.de" <cg@dsa-ac.de>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <Pine.LNX.4.33.0310101545410.11639-100000@testcg.dsa-ac.de>
+Return-Path: <rene@soft.uni-linz.ac.at>
+Message-ID: <3F86B2CB.2090906@soft.uni-linz.ac.at>
+Date: Fri, 10 Oct 2003 15:23:23 +0200
+From: Rene Mayrhofer <rene@soft.uni-linz.ac.at>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] Stability problems with USB BT modules based on CSR chipset
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 10 Oct 2003 16:25:41 +0200 (CEST)
+To: Marcel Holtmann <marcel@holtmann.org>, bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re: command tx timeout and continuous inquiry.
+References: <3F86784F.9050608@soft.uni-linz.ac.at>	<1065778372.14923.336.camel@baroque.r	ococosoft.com> 	<3F86A88E.4090106@soft.uni-linz.ac.at>	<1065790691.14513.173.camel@pegasus>  <3F86AF96.7000904@soft.uni-linz.ac.at> <1065791594.14514.179.camel@pegasus>
+In-Reply-To: <1065791594.14514.179.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hello,
+Hi Marcel (again),
 
-I am running a COM1 USB bluetooth module (and also tried other devices
-based on the CSR chipset) and I am using kernel 2.4.19 with
-patch-2.4.19-mh12.
+Marcel Holtmann wrote:
+> it is a HCI 14.7 with max encryption of 56 bits.
+> 
+> 
+>>So it's a hardware problem ?
+> 
+> 
+> No, it's a problem of the firmware inside the dongle. Ask Acer for an
+> update if they provide one.
+Ok, I'll try to get an update (hopefully there is one...). Is my 
+conclusion correct that I am not expecting too much from the Bluetooth 
+protocol and that the following should work (and is already supported by 
+bluez in 2.4.22):
 
-When I do the following test:
+Device 1:
+- background thread for continuous inquiry with about 3 seconds between 
+the hci_inquiry calls
+- fer each MAC address found by the inquiry, another thread which uses 
+L2CAP connections (via Bluetooth address familiy sockets) to send "ping" 
+packets to measure the latency and link quality. The connection will be 
+created, a single ping packet will be sent and the connection will be 
+closed again. Then 100-500 ms delay and again opening the connection. 
+(Is it necessary to close the connection between the link quality checks 
+? I currently do that to release the devices for other communication - 
+if they support more piconets at the same time, I could also leave the 
+connection open.)
 
-  while :; do hciconfig hci0 name ; done
+Device x:
+- continuous inquiry
+- possibly communication with other devices (those connections will stay 
+up longer than the "ping" connections).
 
-I recognize after a while (1-2 minutes), that the USB module will not
-respond to USB requests anymore. I cross-checked that with an USB
-bus analyzer. It is also possible to check it with hcidump, but I wanted
-to get shure that there is no response from the physical layer.
+Am I doing anything stupid in this setup ?
 
-When I do a
-
-  hciconfig hci0 reset
-
-I am able to get the USB module alive again (in most cases). Sometimes
-the USB module will crash completely and you must unplug it.
-
-It is also interesting, that a
-
-  while :; do hciconfig hci0 class ; done
-
-runs quite stable.
-
-I think, that a local name request (which returns 252 bytes split into
-several USB return packets) is confusing the module's firmware. Short
-return packets (as with the class request) seem to be OK.
-
-My questions are:
-1. Has someone experienced similar hardware problems?
-2. Are there any timing restrictions on the HCI layer (maybe the frequency
-of HCI requests is too high and my test is not allowed) ?
-
-Thank you in advance,
-Christian Gohmann
+Thanks for your quick answers,
+Rene
 
 
-
--------------------------------------------------------
-This SF.net email is sponsored by: SF.net Giveback Program.
-SourceForge.net hosts over 70,000 Open Source Projects.
-See the people who have HELPED US provide better services:
-Click here: http://sourceforge.net/supporters.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+------------------------------------------------
+Pervasive 2004:            www.pervasive2004.org
+------------------------------------------------
