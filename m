@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41E6ED75.2060800@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] multiple BT dongles
-References: <18514.1105613960@www29.gmx.net> <1105614296.7961.162.camel@pegasus>
-In-Reply-To: <1105614296.7961.162.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] BCSP problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY104-F195C4A108FE44E68C67ADEC18A0@phx.gbl>
+References: <BAY104-F195C4A108FE44E68C67ADEC18A0@phx.gbl>
+Content-Type: text/plain
+Message-Id: <1105652767.7525.10.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,42 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Jan 2005 22:51:49 +0100
+Date: Thu, 13 Jan 2005 22:46:07 +0100
 
-Hello Marcel
+Hi,
 
-Marcel Holtmann wrote:
-> Hi Marco,
-> 
-> 
->>If i've connected multiple bluetooth dongles to my computer, is it possible
->>to seperate those two within bluez?
->>I mean controlling wich services run on wich dongle...
-> 
-> 
-> you can assign the services (application like pand) for each dongle, but
-> right now you can't make the sdpd differ between them.
+> I do not have problems with the tools, but when I make a ftp
+> connection over Bluetooth and send a file, I obtain all this BCSP
+> warnings and the transmision is very slowly, the transmision only
+> reachs 5 Kbytes/s. 
 
-I think we talk about the same thing, but just to get shure:
-If i program two different rfcomm services, that would mean that i can 
-control which service runs on which dongle?
+what hciattach command do you use? What kernel do you use?
 
->>Another little question:
->>Does anybody know a bluetooth dongle that supports inquiry scan during
->>active connections?
-> 
-> 
-> Every CSR dongle with at least HCI 16.4 firmware.
+> Other cuestion, Why the device expected 2 packets, for example, and
+> got more than 2 packets?. This occur in the warning like
+> this:  bcsp_recv: Out-of-order packet arrived, got 5 expected 2 
 
-Is the firmware updateable?
-Do i have to contact the manufacturer?
+Do you have a picture of your card somewhere? Maybe I have one at home
+for testing.
+
+Regards
+
+Marcel
 
 
-Thanks a lot for your help Marcel! As always, you're a big help!
-
-
-kind regards
-Marco Trudel
 
 
 -------------------------------------------------------
