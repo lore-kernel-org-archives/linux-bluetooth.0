@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Ludovic Wauthy" <ludovic.wauthy@baracoda.com>
-To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <407C4B88.1010102@thomae-privat.de>
+From: Matthias Thomae <bluez@thomae-privat.de>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0035_01C422F6.EE8E2A10"
-Message-Id: <20040415123454.C98561BF9578@mwinf0103.wanadoo.fr>
-Subject: [Bluez-devel] BlueZ cross compilation for ColdFire microprocessor
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] Oops with 2.6.5-mh3
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,138 +15,67 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 15 Apr 2004 14:35:39 +0200
+Date: Tue, 13 Apr 2004 22:20:24 +0200
 
-This is a multi-part message in MIME format.
+Hello Marcel et al,
 
-------=_NextPart_000_0035_01C422F6.EE8E2A10
-Content-Type: text/plain;
-	charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+I get a kernel Oops with 2.6.5-mh3 (with and without preempt) and an 
+Acer BT-700 USB dongle on a Vaio Notebook, not when unplugging it, but 
+when plugging it back in.
 
-Hi,
+ > lspci
+...
+00:07.2 USB Controller: Intel Corp. 82371AB PIIX4 USB (rev 01)
+...
 
- 
+Anything I can do?
 
-I would like to compile the BlueZ stack for own uC-Linux 2.6 kernel.
+Regards.
+Matthias
 
-I have a development kit based on a ColdFire 5282 microprocessor.
+-----------------------------------------------------------------
 
- 
+Unable to handle kernel NULL pointer dereference at virtual address 00000004
+  printing eip:
+d10b7e64
+*pde = 00000000
+Oops: 0000 [#1]
+PREEMPT
+CPU:    0
+EIP:    0060:[pg0+281624164/1069391872]    Not tainted
+EFLAGS: 00010292   (2.6.5-mh3)
+EIP is at usb_disable_interface+0x14/0x50 [usbcore]
+eax: cf6544c0   ebx: 00000000   ecx: cf806000   edx: cffef0a0
+esi: 00000001   edi: 00000000   ebp: cfe10000   esp: cf807d1c
+ds: 007b   es: 007b   ss: 0068
+Process khubd (pid: 70, threadinfo=cf806000 task=cf80b1a0)
+Stack: 00001388 0000a48c 00000002 00000001 cf95a6d0 cfe10000 d10b8158 
+cfe10000
+        cf6544c0 0000000b 00000001 00000002 00000001 00000000 00000000 
+00001388
+        00000000 cf6544c0 00000000 cf95a820 cf95a8d8 c8168e60 d110ab4c 
+cfe10000
+Call Trace:
+  [pg0+281624920/1069391872] usb_set_interface+0xb8/0x1c0 [usbcore]
+  [pg0+281963340/1069391872] hci_usb_probe+0x23c/0x4b0 [hci_usb]
+  [__wake_up_common+58/112] __wake_up_common+0x3a/0x70
+  [dput+49/544] dput+0x31/0x220
+  [pg0+281596121/1069391872] usb_probe_interface+0xb9/0xe0 [usbcore]
+  [bus_match+63/112] bus_match+0x3f/0x70
+  [device_attach+79/160] device_attach+0x4f/0xa0
+  [bus_add_device+91/160] bus_add_device+0x5b/0xa0
+  [device_add+161/304] device_add+0xa1/0x130
+  [pg0+281626005/1069391872] usb_set_configuration+0x235/0x2e0 [usbcore]
+  [pg0+281600847/1069391872] usb_new_device+0x2df/0x5c0 [usbcore]
+  [pg0+281609143/1069391872] hub_port_connect_change+0x1d7/0x2e0 [usbcore]
+  [pg0+281610340/1069391872] hub_events+0x3a4/0x470 [usbcore]
+  [pg0+281610597/1069391872] hub_thread+0x35/0x110 [usbcore]
+  [ret_from_fork+6/20] ret_from_fork+0x6/0x14
+  [default_wake_function+0/32] default_wake_function+0x0/0x20
+  [pg0+281610544/1069391872] hub_thread+0x0/0x110 [usbcore]
+  [kernel_thread_helper+5/24] kernel_thread_helper+0x5/0x18
 
-Is there someone who can help me?
-
-I tried several cross compilation but all of them have failed.
-
- 
-
-Thanks a lot.
-
-Ludovic.
-
- 
-
-
-------=_NextPart_000_0035_01C422F6.EE8E2A10
-Content-Type: text/html;
-	charset="US-ASCII"
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-
-<head>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered)">
-<style>
-<!--
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0cm;
-	margin-bottom:.0001pt;
-	font-size:12.0pt;
-	font-family:"Times New Roman";}
-a:link, span.MsoHyperlink
-	{color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{color:purple;
-	text-decoration:underline;}
-span.EmailStyle17
-	{font-family:Arial;
-	color:windowtext;}
-@page Section1
-	{size:595.3pt 841.9pt;
-	margin:70.85pt 70.85pt 70.85pt 70.85pt;}
-div.Section1
-	{page:Section1;}
--->
-</style>
-
-</head>
-
-<body lang=3DFR link=3Dblue vlink=3Dpurple>
-
-<div class=3DSection1>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-GB
-style=3D'font-size:12.0pt'>Hi,</span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-GB
-style=3D'font-size:12.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-GB
-style=3D'font-size:12.0pt'>I would like to compile the BlueZ stack for =
-own uC-Linux
-2.6 kernel.</span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-GB
-style=3D'font-size:12.0pt'>I have a development kit based on a ColdFire =
-5282
-microprocessor.</span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-GB
-style=3D'font-size:12.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-GB
-style=3D'font-size:12.0pt'>Is there someone who can help =
-me?</span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-GB
-style=3D'font-size:12.0pt'>I tried several cross compilation but all of =
-them have
-failed.</span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-GB
-style=3D'font-size:12.0pt'>&nbsp;</span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-GB
-style=3D'font-size:12.0pt'>Thanks a lot.</span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-lang=3DEN-GB
-style=3D'font-size:12.0pt'>Ludovic.</span></font></p>
-
-<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
-style=3D'font-size:
-12.0pt'>&nbsp;</span></font></p>
-
-</div>
-
-</body>
-
-</html>
-
-------=_NextPart_000_0035_01C422F6.EE8E2A10--
+Code: 80 7b 04 00 74 26 31 f6 8d 74 26 00 8b 43 0c 47 0f b6 44 30
 
 
 
