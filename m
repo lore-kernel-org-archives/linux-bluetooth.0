@@ -1,47 +1,47 @@
-Return-Path: <nils.faerber@kernelconcepts.de>
-Subject: Re: [Bluez-devel] sco link help needed
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1077729384.2919.120.camel@pegasus>
-References: <4034CA08.50500@soft.uni-linz.ac.at>
-	 <200402251359.00791.mtortonesi@ing.unife.it>
-	 <1077715546.2919.77.camel@pegasus>
-	 <200402251504.47809.mtortonesi@ing.unife.it>
-	 <1077719012.2919.94.camel@pegasus>  <1077728432.6021.522.camel@localhost>
-	 <1077729384.2919.120.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1077730057.8977.526.camel@localhost>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: "Anthony Yulo" <strikewing16th@hotmail.com>
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
-Date: Wed, 25 Feb 2004 18:27:37 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Content-Type: text/plain; format=flowed
+Message-ID: <LAW11-F70hbG9UwhcYb0001b888@hotmail.com>
+Subject: [Bluez-devel] multiple devices clarification?
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 25 Feb 2004 17:21:24 +0000
 
-Am Mi, den 25.02.2004 schrieb Marcel Holtmann um 18:16:
-> Hi Nils,
 Hi!
 
-> > > Is the PCM mapping of both dongles set to HCI? What kernel version do
-> > > you use?
-> > And if it isn't?
-> > I searched the archive but could not find a way to change it.
-> > Or is this fixed in the firmware? This would be a pity...
-> > I have just got a Fujitsu-Siemens Lifebook with builtin Blueooth (CSR
-> > chipset BlueCore01b, HCI 12.3) which reports SCOmapping to PCM...
-> the SCO mapping is a PSKEY like everything else. It is the same as for
-> the host transport or the UART setttings. You can change it if you know
-> how. Actually I don't provide any source code that is capable of
-> changing PSKEY's.
+I just want to clarify about bluez  supporting multiple devices in on 
+computer...
 
-Oh well ;)
-Many thanks for the info anyway...
+and then lookd into one of marcel's pages and it said:
 
-> Regards
-> Marcel
-CU
-  nils faerber
+"HCI 16.x Any combination of seven slaves and two masters (but not more than 
+seven devices at one time)  "..
 
--- 
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          D1 : +49-170-2729106
---
+So what does this mean? so i can't have more than two masters in one 
+computer? is that correct?
+
+_________________________________________________________________
+Protect your PC - get McAfee.com VirusScan Online 
+http://clinic.mcafee.com/clinic/ibuy/campaign.asp?cid=3963
+
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
