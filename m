@@ -1,11 +1,20 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Victor Shcherbatyuk <victor@win.tue.nl>
+Message-ID: <e1effdeb05032812481ffbe5a2@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Cc: victor.shcherbatyuk@tomtom.com
-Message-ID: <Pine.LNX.4.44.0503282103070.7184-201000@antilope>
-MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="-1685871802-1052459474-1112043321=:7184"
-Subject: [Bluez-devel] RFCOMM related oops
+Subject: Re: [Bluez-devel] Re: [Bluez-users] PANU service search
+In-Reply-To: <1112040117.9016.47.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_5223_29601721.1112042926102"
+References: <e1effdeb05032805225cf1b8dd@mail.gmail.com>
+	 <1112016560.9016.32.camel@pegasus>
+	 <e1effdeb0503280607600d1863@mail.gmail.com>
+	 <1112019482.9016.37.camel@pegasus>
+	 <e1effdeb050328110339a02eb7@mail.gmail.com>
+	 <1112037740.9016.45.camel@pegasus>
+	 <e1effdeb05032811466fe34801@mail.gmail.com>
+	 <1112040117.9016.47.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,164 +26,94 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Mar 2005 21:55:21 +0100 (MET)
+Date: Mon, 28 Mar 2005 17:48:46 -0300
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-  Send mail to mime@docserver.cac.washington.edu for more info.
-
----1685871802-1052459474-1112043321=:7184
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-
+------=_Part_5223_29601721.1112042926102
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 Hi Marcel,
 
-Some more problems...
+Sorry, I forgot clarify one point. I added the function "add_panu"
+just for convenience.
+Search for PANU service is just a small part of my project, I need solve a lot
+bluetooth issues to provide a seamless connectivity for UPnP applications.
 
-The following holds for Motorola V3 (RAZR) and Nokia 6310i (i hope i'm not 
-mistaking), and prob. some more phones I've never seen ;)
+I agree that the function "add_panu" is unncessary if we consider that
+this service is
+provided by pand daemon (pand --listen --role PANU) Therefore, another
+approach is
+add "NULL" instead of  "add_panu" in the service structure. The patch
+for this approach
+is attached. Be aware that "sdptool add panu" will run but nothing
+will be exported.
+The structure "service" is common for add and search features.
 
-The sequence leading to the oops (oops.txt):
-Open RFCOMM channel exposed as HF channel. Try to open RFCOMM channel 
-exposed as DUN channel for 3 times (first 2 fail, and finally attempt 3 
-gives success). Close RFCOMM channel for DUN. Close RFCOMM channel for HF -> 
-oops.
+I have 3 years of experience with mobile application for cell phones,
+but this is my
+first open source development. Sorry for the large amount of emails,
+but understand
+all bluez features is hard task.
 
-Looks like those phones allow only 1 RFCOMM channel to be opened. But 
-strange things happen if you try to connect, when there is 
-already a RFCOMM connection open on another channel (all this story with 
-3 attempts). 
+Please forgot my last email. When my research became more advanced/clear I will
+contact you again for support. 
 
-What I see from the log (motov3.bin):
-On attempt 2 bluez stack DISC on dlci 0 (for the reason I don't know) 
-where there are still active RFCOMM connections (HF channel, dlci 14 in 
-the log).  So when I try to close HF it oops'es... 
-
-Have it reproducible on 2 platforms (arm and i386):
-2.6.11.4 + 2.6.11-mh2 (i386)
-
-Please see the logs attached.
-
-Thanks in advance.
-
-Kind regards,
-    Victor Shcherbatyuk.
--- 
+Regards,
+Claudio.
+________________________________________
+Claudio Takahasi
+INdT - Nokia Technology Institute
+Phone: +55 81 21223034
+Recife - Pernambuco - Brazil 
 
 
----1685871802-1052459474-1112043321=:7184
-Content-Type: TEXT/plain; name="oops.txt"
-Content-Transfer-Encoding: BASE64
-Content-ID: <Pine.LNX.4.44.0503282155210.7184@antilope>
-Content-Description: 
-Content-Disposition: attachment; filename="oops.txt"
 
-VW5hYmxlIHRvIGhhbmRsZSBrZXJuZWwgTlVMTCBwb2ludGVyIGRlcmVmZXJl
-bmNlIGF0IHZpcnR1YWwgYWRkcmVzcyAwMDAwMDAwZQ0KIHByaW50aW5nIGVp
-cDoNCmMwMzdlMDNkDQoqcGRlID0gMDAwMDAwMDANCk9vcHM6IDAwMDAgWyMx
-XQ0KUFJFRU1QVCANCk1vZHVsZXMgbGlua2VkIGluOiBuZGlzd3JhcHBlcg0K
-Q1BVOiAgICAwDQpFSVA6ICAgIDAwNjA6WzxjMDM3ZTAzZD5dICAgIFRhaW50
-ZWQ6IFAgICAgICBWTEkNCkVGTEFHUzogMDAwMTAyNDYgICAoMi42LjExLjQp
-IA0KRUlQIGlzIGF0IHNvY2tfc2VuZG1zZysweGRkLzB4MTUwDQplYXg6IDAw
-MDAwMDAwICAgZWJ4OiAwMDAwMDAwNiAgIGVjeDogZGY0ZGQ1NjAgICBlZHg6
-IGRlYWJjMDAwDQplc2k6IDAwMDAwMDA0ICAgZWRpOiBkZWFiZGViNCAgIGVi
-cDogZGVhYmRkZWMgICBlc3A6IGRlYWJkZDhjDQpkczogMDA3YiAgIGVzOiAw
-MDdiICAgc3M6IDAwNjgNClByb2Nlc3MgYmx1ZXRhbGsgKHBpZDogMjY4Niwg
-dGhyZWFkaW5mbz1kZWFiYzAwMCB0YXNrPWRmNGRkNTYwKQ0KU3RhY2s6IDdm
-ZmZmZmZmIGRmY2UyODA0IDdmZmZmZmZmIGMwNDA2YTA5IDAwMDAwMDAxIGRm
-MTAzNDgwIDAwMDAwMDAxIDAwMDAwMDA0IA0KICAgICAgIDAwMDAwMDA2IGMx
-NWUwMDMwIDAwMDAwMDAwIGRlYWJkZWI0IDAwMDAwMjg2IDAwMDAwMjkyIGRl
-YWJjMDAwIGRmY2UyN2MwIA0KICAgICAgIGRmY2UyODA0IGMwM2ZkNzdkIDAw
-MDAwMDAwIGRmNGRkNTYwIGMwMTEzZmUwIDAwMDAwMDAwIDAwMDAwMDAwIDAw
-MDAwMDA3IA0KQ2FsbCBUcmFjZToNCiBbPGMwNDA2YTA5Pl0gc2NoZWR1bGVf
-dGltZW91dCsweGE5LzB4YjANCiBbPGMwM2ZkNzdkPl0gcmZjb21tX3NvY2tf
-ZGF0YV93YWl0KzB4ZGQvMHhmMA0KIFs8YzAxMTNmZTA+XSBkZWZhdWx0X3dh
-a2VfZnVuY3Rpb24rMHgwLzB4MjANCiBbPGMwMjY4OTk2Pl0gc2NydXArMHg4
-Ni8weDEwMA0KIFs8YzAxMmM3MTA+XSBhdXRvcmVtb3ZlX3dha2VfZnVuY3Rp
-b24rMHgwLzB4NjANCiBbPGMwMzdlM2U4Pl0gc29ja19haW9fcmVhZCsweDEw
-OC8weDEyMA0KIFs8YzAzN2UwZjY+XSBrZXJuZWxfc2VuZG1zZysweDQ2LzB4
-NjANCiBbPGMwM2ZhNTg0Pl0gcmZjb21tX3NlbmRfZnJhbWUrMHg1NC8weDYw
-DQogWzxjMDE1NjVlOT5dIGRvX3N5bmNfcmVhZCsweGM5LzB4MTEwDQogWzxj
-MDNmYTZlYz5dIHJmY29tbV9zZW5kX2Rpc2MrMHg2Yy8weDcwDQogWzxjMDNm
-OWZlMD5dIF9fcmZjb21tX2RsY19jbG9zZSsweGUwLzB4MTAwDQogWzxjMDNm
-YTAyMz5dIHJmY29tbV9kbGNfY2xvc2UrMHgyMy8weDQwDQogWzxjMDNmY2Uy
-Mz5dIF9fcmZjb21tX3NvY2tfY2xvc2UrMHg0My8weDYwDQogWzxjMDNmZGM0
-Yz5dIHJmY29tbV9zb2NrX3NodXRkb3duKzB4NGMvMHg4MA0KIFs8YzAzZmRj
-YTM+XSByZmNvbW1fc29ja19yZWxlYXNlKzB4MjMvMHg3MA0KIFs8YzAzN2Rm
-MDk+XSBzb2NrX3JlbGVhc2UrMHg5OS8weGYwDQogWzxjMDM3ZWE2MT5dIHNv
-Y2tfY2xvc2UrMHgzMS8weDUwDQogWzxjMDE1Nzg2ZT5dIF9fZnB1dCsweDEx
-ZS8weDE2MA0KIFs8YzAxNTZhN2U+XSBzeXNfcmVhZCsweDdlLzB4ODANCiBb
-PGMwMTAzMTE5Pl0gc3lzZW50ZXJfcGFzdF9lc3ArMHg1Mi8weDc1DQpDb2Rl
-OiAwMCA4ZCA4NCAyNCBjMCAwMCAwMCAwMCA4OSA4NCAyNCBjMCAwMCAwMCAw
-MCA4OSA4NCAyNCBjNCAwMCAwMCAwMCA4ZCA0NCAyNCAxMCA4OSA4NCAyNCBk
-NCAwMCAwMCAwMCAzMSBjMCA4OSA0NCAyNCAyOCA4OSA3NCAyNCAxYyA8OGI+
-IDQzIDA4IDg5IDc0IDI0IDBjIDg5IDdjIDI0IDA4IDg5IDVjIDI0IDA0IDg5
-IDJjIDI0IGZmIDUwIDM4IA0KIA0K
----1685871802-1052459474-1112043321=:7184
-Content-Type: APPLICATION/octet-stream; name="motov3.bin"
-Content-Transfer-Encoding: BASE64
-Content-ID: <Pine.LNX.4.44.0503282155211.7184@antilope>
-Content-Description: 
-Content-Disposition: attachment; filename="motov3.bin"
 
-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
-jw0ABA8EAAEGBAcAAQD5ZkhCvKYAAAQFBAApABY=
----1685871802-1052459474-1112043321=:7184--
+On Mon, 28 Mar 2005 22:01:57 +0200, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Claudio,
+> 
+> > The code for support search for PANU service is attached. The change
+> > is very small
+> > but will help me create a PAN for UPnP application in ad hoc scenario.
+> 
+> I applied the patch to the CVS, but I still don't get why you needed it
+> in the first place. The pand application is able to register the PANU
+> service record and search for it by itself.
+> 
+> Regards
+> 
+> Marcel
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
+------=_Part_5223_29601721.1112042926102
+Content-Type: text/x-patch; name="panu_support_2.diff"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment; filename="panu_support_2.diff"
+
+--- bluez-utils-2.15-panu2/tools/sdptool.c=092005-03-28 17:27:13.934245848 =
+-0300
++++ bluez-utils-2.15/tools/sdptool.c=092004-12-25 16:06:02.000000000 -0200
+@@ -1793,7 +1793,6 @@
+=20
+ =09{ "NAP",=09NAP_SVCLASS_ID,=09=09=09add_nap=09=09},
+ =09{ "GN",=09=09GN_SVCLASS_ID,=09=09=09add_gn=09=09},
+-=09{ "PANU",       PANU_SVCLASS_ID,                NULL            },
+=20
+ =09{ "HID",=09HID_SVCLASS_ID,=09=09=09NULL=09=09},
+ =09{ "CIP",=09CIP_SVCLASS_ID,=09=09=09NULL=09=09},
+
+------=_Part_5223_29601721.1112042926102--
 
 
 -------------------------------------------------------
