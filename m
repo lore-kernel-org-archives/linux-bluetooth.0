@@ -2,14 +2,14 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Prepare patch bluez for the CoD in hci_conn
 From: Chen Bin <binch@mobilesoft.com.cn>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1102323875.8510.78.camel@pegasus>
+In-Reply-To: <1102324476.8510.85.camel@pegasus>
 References: <1102340081.653.6.camel@debian>
 	 <1102315236.8510.55.camel@pegasus>  <1102345868.2011.2.camel@debian>
 	 <1102317505.8510.66.camel@pegasus>  <1102348405.3281.4.camel@debian>
-	 <1102322516.8510.74.camel@pegasus>  <1102352066.640.3.camel@debian>
-	 <1102323875.8510.78.camel@pegasus>
+	 <1102322516.8510.74.camel@pegasus>  <1102352748.1779.3.camel@debian>
+	 <1102324476.8510.85.camel@pegasus>
 Content-Type: text/plain; charset=gbk
-Message-Id: <1102354847.2296.3.camel@debian>
+Message-Id: <1102353672.2206.1.camel@debian>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -22,35 +22,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 07 Dec 2004 01:40:46 +0800
+Date: Tue, 07 Dec 2004 01:21:12 +0800
 
-=D4=DA 2004-12-06=D2=BB=B5=C4 10:04 +0100=A3=ACMarcel Holtmann=D0=B4=B5=C0=
+=D4=DA 2004-12-06=D2=BB=B5=C4 10:14 +0100=A3=ACMarcel Holtmann=D0=B4=B5=C0=
 =A3=BA
 > Hi Chen,
 >=20
-> > Ok, use your patch is ok, if I have find some more info in the Blueto=
-oth
-> > Spec, I will send my patch to you:)
+> > I see your patch that you patch the hci_acl_connect()=A3=ACbut why no=
+t
+> > hci_conn_add()?
+> >=20
+> > I feel the latter is more appropriate.
 >=20
-> it is only compile tested, but actually from a code review it should do
-> exactly what was requested. If you wanna test it, you must change the
-> ie->data into ie->info, because the inquiry_data change is not yet
-> merged back into mainline. A new -mh patch will follow soon.
+> no, it is not. The hci_conn_add is called at various times. It is calle=
+d
+> for incoming and outgoing connections. We don't need to do a lookup at
+> the inquiry cache for an incoming connection, because we get the value
+> within the connection request event. The hci_acl_connect() is used to
+> create an outgoing connection and it already have to lookup the other
+> parameters from the inquiry cache. Do see the point?
 >=20
 
-I have test my patch, and I will test yours too.=20
+Ok, got it. Thanks.
 
-And I wanna know which kernel version you current work on? Your new -mh
-patch will only apply to the newest kernel or olders too?
-
-I don't know much about your patch convention.
-
-> > BTW: I will remain our company's BT engineer and if the BlueZ have so=
-me
-> > part not completed, may be I can contribute to do some work:)
->=20
-> Go ahead, because every patch is welcome.
->=20
 > Regards
 >=20
 > Marcel
