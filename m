@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] phone+heaset
+Subject: Re: [Bluez-users] rfcomm shouldn't fail silently
 From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?Jo=E3o?= Santos <jsantos_pt@hotmail.com>
+To: Edd Dumbill <edd@usefulinc.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Sea2-F67d4kbAoqKLn1000424f3@hotmail.com>
-References: <Sea2-F67d4kbAoqKLn1000424f3@hotmail.com>
+In-Reply-To: <1075135629.12874.339.camel@saag>
+References: <1075133668.12874.328.camel@saag>
+	 <1075135361.25442.57.camel@pegasus>  <1075135629.12874.339.camel@saag>
 Content-Type: text/plain
-Message-Id: <1075136664.25442.90.camel@pegasus>
+Message-Id: <1075136125.25442.77.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,56 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 26 Jan 2004 18:04:24 +0100
+Date: Mon, 26 Jan 2004 17:55:25 +0100
 
-Hi Joao,
+Hi Edd,
 
-> > > >ACL data: handle 0x0028 flags 0x02 dlen 21
-> > >     L2CAP(d): cid 0x41 len 17 [psm 1]
-> > >         SDP SA Req: tid 0x53 len 0xc
-> > >           hndl 0x804f738
-> > >           max 0xff
-> > >           aid(s) 0x0302 ((null))
-> > >           cont 00
-> > > < ACL data: handle 0x0028 flags 0x02 dlen 14
-> > >     L2CAP(d): cid 0x41 len 10 [psm 1]
-> > >         SDP SA Rsp: tid 0x53 len 0x5
-> > >           cnt 0x2
-> > >
-> > >           cont 00
-> >
-> >it seems that your problem is here. The SDP record must be correct
-> >otherwise it won't work.
+> > > rfcomm shouldn't fail silently if an invalid command is given to ie.
+> > 
+> > it does not fail silently. It show the the list of bonded devices.
 > 
-> Thanks for answer my last question.
-> could you explain me better what's the problem, i think i 'm doing it right:
+> If none are bonded, it is silent :)
+> 
+> The point was there should be a usage error output.
 
-it requests the attribute 0x0302 and it is not in your record. This is
-the record for the HBH-10. Look at it and compare.
+actually the problem is an unknown command with no extra parameters. Try
+these two and see what happens:
 
-Sequence
-        Attribute 0x0000 - Service record handle
-                UINT32 0x00010000
-        Attribute 0x0001 - Service class ID list
-                Sequence
-                        UUID16 0x1203 - Generic Audio
-                        UUID16 0x1108 - Headset
-        Attribute 0x0004 - Protocol descriptor list
-                Sequence
-                        Sequence
-                                UUID16 0x0100 - L2CAP
-                        Sequence
-                                UUID16 0x0003 - RFCOMM
-                                UINT8 0x06
-        Attribute 0x0009 - Bluetooth profile descriptor list
-                Sequence
-                        Sequence
-                                UUID16 0x1108 - Headset
-                                UINT16 0x0100
-        Attribute 0x0100
-                String Headset
-        Attribute 0x0302
-                Bool True
+	rfcomm test
+	rfcomm test abc
+
+I don't care so much about it, but I will accept patches for this
+problem. Should not be so hard to fix, but at the moment I have to deal
+with some other stuff.
 
 Regards
 
