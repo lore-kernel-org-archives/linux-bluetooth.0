@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: cijoml@volny.cz, bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] FujitsuSiemens BT USB Adapter
-References: <200403112106.31567.cijoml@volny.cz> <200403150011.24899.pavouk@pavouk.org>
-In-Reply-To: <200403150011.24899.pavouk@pavouk.org>
+References: <200403112106.31567.cijoml@volny.cz>
+In-Reply-To: <200403112106.31567.cijoml@volny.cz>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200403150014.27515.cijoml@volny.cz>
+Message-Id: <200403150011.24899.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,27 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 15 Mar 2004 00:14:27 +0100
+Date: Mon, 15 Mar 2004 00:11:24 +0100
 
-Dne po 15. b=F8ezna 2004 00:11 jste napsal(a):
-> Hi,
->
-> > is this dongle supported? If so, I'll buy it imeditially, coz its SO
-> > small!! http://pcshop.pells.cz/img.asp?stiid=3D3483
->
-> I don't know, if this dongle is supported, but I use MSI USB dongle, which
-> works great for me and is small and cheap on Czech market.
-> This dongle is for example here:
-> http://www.alzasoft.cz/DetailPage.asp?DPG=3D44722
+Hi,
 
-It's about 3x bigger then FujitsuSiemens :)
+> is this dongle supported? If so, I'll buy it imeditially, coz its SO
+> small!! http://pcshop.pells.cz/img.asp?stiid=3483
 
-Michal
+I don't know, if this dongle is supported, but I use MSI USB dongle, which 
+works great for me and is small and cheap on Czech market.
+This dongle is for example here:
+http://www.alzasoft.cz/DetailPage.asp?DPG=44722
 
->
-> Best regards,
->
-> Pavel Ruzicka
+Best regards,
+
+Pavel Ruzicka
+
 
 
 -------------------------------------------------------
