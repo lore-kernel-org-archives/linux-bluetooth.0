@@ -1,47 +1,49 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth Service
-From: Marcel Holtmann <marcel@holtmann.org>
-To: zs@comp.rgu.ac.uk
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1077215650.9218.31.camel@zs>
-References: <1077215650.9218.31.camel@zs>
-Content-Type: text/plain
-Message-Id: <1077217187.2767.17.camel@pegasus>
+Return-Path: <alexandre.ghisoli@ycom.ch>
+Subject: Re: [Bluez-users] hid2usb error
+From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
+To: bluez-users@lists.sourceforge.net
+Cc: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1077215608.2767.2.camel@pegasus>
+References: <1077206432.17056.7.camel@pc-04.ycom.ch>
+	 <1077215608.2767.2.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1077216551.17051.14.camel@pc-04.ycom.ch>
 Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Feb 2004 19:59:47 +0100
+Date: Thu, 19 Feb 2004 19:49:11 +0100
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Zia,
+Hi Marcel, 
 
-> I was wondering how can I create my own Bluetooth service using Bluez? I
-> was looking for any Bluez programming guide or sumthing but no luck :(.
-> Can anyone guide/advise me about how to implement custom bluetooth
-> service?
+Can I find this patch somewhere ?
 
-what kind of service do you wanna implement?
+Thanks for your time
 
-Regards
+	..Alexandre
 
-Marcel
-
-
-
-
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Le jeu 19/02/2004 à 19:33, Marcel Holtmann a écrit :
+> Hi Alexandre,
+> 
+> > I've the Logitech diNovo Bluetooth kit, and try to use it as BT device.
+> > So, i've bluez-libs2 & bluez-utils2 to use the hid2hci tool to pass my
+> > Logitech USB HUB to an Bluetooth HUB.
+> > 
+> > Kernel 2.6.2-mh
+> > hid module loaded.
+> > 
+> > Running the hid2usb give :
+> > Invalid argument ...
+> > 
+> > After some investigations, it appear that the following line return the
+> > error (around line 240) :
+> > 
+> > err = send_report(fd, rep1, sizeof(rep1))
+> > 
+> > at the 2nd byte send (0xff 0x80)
+> 
+> you need a patch for the USB HID driver to send multiple bytes. I think
+> it is not included so far. Must be pending in Greg's list.
+> 
+> Regards
+> 
+> Marcel
+> 
