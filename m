@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Roger Larsson <roger.larsson@norran.net>
-To: bluez-users@lists.sf.net
-References: <200405290103.26485.roger.larsson@norran.net> <1086633659.2724.65.camel@localhost>
-In-Reply-To: <1086633659.2724.65.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200406082046.30496.roger.larsson@norran.net>
-Subject: [Bluez-users] Re: D-Link DBT-120 destroyed? (with bluefw)
+Subject: Re: [Bluez-users] Problem with more than 2 users
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Sean Godsell <sgodsell@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY12-F46k3Y8pEBtKa0004b06c@hotmail.com>
+References: <BAY12-F46k3Y8pEBtKa0004b06c@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1086700980.5040.9.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,39 +18,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 8 Jun 2004 20:46:30 +0200
+Date: Tue, 08 Jun 2004 15:23:00 +0200
 
-> On Fri, 2004-05-28 at 16:03, Roger Larsson wrote:
-> > Yes I know I shouldn't have...=20
-> >
-> > I was following instructions on a German site to get my DBT-120 to work
-> > in Linux. First time I skipped over that command. Second time I forgot =
-to
-> > skip it.
-> >
-> > The D-Link does not light up any more - can it be repaired?
-> >
-> > If not what USB BlueTooth adapter do you recommend?
-> > I will be using it with Ericsson phones (T610 and T39)
-> >
-> > /RogerL
+Hi Sean,
 
-On Monday 07 June 2004 20.40, Max wrote:
-> I'd suggest for you to ask this question on bluez-users@lists.sf.net.
-> And no, bluefw cannot possible kill the your DBT-120 because that
-> devices does not have permanent firmware at all. It expects driver to
-> load FW every time it's plugged in.
->
+> Okay there seems to be a problem with bluez, when more than 2 users try to 
+> connect at the same time.  I have 4 bluetooth PDA's (2 palms and 2 windows 
+> pdas).   I tried connecting any combination of three PDA's and only the 
+> first 2 will connect and work.   I tried a few different kernels as well.   
+> From 2.4.25 - 26  --  2.6.3 - 5 and all of which produce the same results 
+> only 2 PDA's can connect at one time.   I have configured 8 /dev/rfcomm#  
+> devices starting from 0 to 7.     I have hcid and sdpd running.   Then I run 
+> dund with --listen.     All the PDA's can see the PC lan server, and can 
+> connect and work.   The only problem is only 2 will work and no more.   The 
+> following are the configuration files:
+> 
+> hcid.conf:
+> options {
+>         autoinit yes;
+>         security auto;
+>         pairing multi;
+>         pin_helper /etc/bluetooth/givepin;
+> }
+> 
+> device {
+>         name "BlueZ";
+>         class 0x100;
+>         iscan enable; pscan enable;
+>         lm accept;
+>         lp hold,sniff,park;
+>         auth enable;
+>         encrypt enable;
+> }
 
-=46orgot to mention, my DBT-120 has hw revision B3.
-I am not subscribed.
+enable rswitch in link policy and don't enable auth and encrypt, because
+this is security mode 3.
 
-/RogerL
+Regards
 
-=2D-=20
-Roger Larsson
-Skellefte=E5
-Sweden
+Marcel
+
+
 
 
 -------------------------------------------------------
