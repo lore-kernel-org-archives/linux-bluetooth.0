@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] creation of Bnep0
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050302142837.62593.qmail@web26610.mail.ukl.yahoo.com>
-References: <20050302142837.62593.qmail@web26610.mail.ukl.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1109775195.8284.19.camel@pegasus>
+Message-ID: <d1f423d305030110576d2a66df@mail.gmail.com>
+From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1109520020.27107.30.camel@localhost.localdomain>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <ICGZCE$7DF6A31DCAD3E31E3169B51A8859A4C6@bol.com.br>
+	 <1109520020.27107.30.camel@localhost.localdomain>
+Subject: [Bluez-users] Re: Re:[Bluez-devel] BlueZ on CSR ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 02 Mar 2005 15:53:15 +0100
+Date: Tue, 1 Mar 2005 13:57:55 -0500
 
-Hi Benny,
+Hi Folks,
 
-> I see how you create bnep0 with the netdev.c using
-> linux/netdevice.c
-> 
-> Is it the only way for linking bnep with TCP/IP layers?
+I have a doubt about PAN. If i would like to enable PAN services
+should i dowload pan package from Bluez Site?
+Forgive me if it is a stupid question but i can not find PAN package
+at the Bluez.org download area.
 
-I do not fully understand this question, but in general it is also
-possible to use TUN/TAP and a daemon dealing with BNEP in userspace. It
-was discussed a long time ago and you will find the details in the
-mailing list archive.
+Cheers,
 
-Regards
-
-Marcel
-
-
+-- 
+Anderson Clayton B. Rodrigues
+Eng. de Software
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
