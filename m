@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <32766726.1078835177020.JavaMail.ngmail@webmail06.arcor-online.net>
-From: damou@nexgo.de
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] I-Tec Bluetooth USB -- Same Problem...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rudolf Matousek <matousek@utia.cas.cz>
+Cc: cijoml@volny.cz, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <404D8166.1060601@utia.cas.cz>
+References: <10865.30319-12503-1360465066-1076449270@seznam.cz>
+	 <1076452227.2777.28.camel@pegasus> <404D69F5.50300@utia.cas.cz>
+	 <200403090851.20295.cijoml@volny.cz>  <404D8166.1060601@utia.cas.cz>
+Content-Type: text/plain
+Message-Id: <1078833918.10671.48.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Toshiba Portege M200 internal bluetooth adapter
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,81 +20,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 9 Mar 2004 13:26:16 +0100 (CET)
+Date: Tue, 09 Mar 2004 13:05:18 +0100
 
->Hi
-Hi,
->
->It's a relief to know it works for someone at least.
->
->I think part of the trouble is I'm using libc 2.3. It's clear that the
->macro "TOSH_SMM" that won't compile invokes another macro (_IOWR) with
->the wrong
->arguments, at least for 2.3. In the unmodified sources, the third
->argument is the number '24' but the third argument is supposed to be a
->type that can be applied to sizeof() to *produce* the size (ends up
->being 24).
->
->Even so, It doesn't work for me under 2.4.25-mh1 or 2.6.4rc1-mm2. They
->both complain "Can't access Toshiba device /dev/toshiba" and strace 
->shows that the error happens with the first ioctl.
->
->/dev/toshiba is there, the "toshiba" module is loaded. I installed
->toshutils from debian using apt... I'm not sure what else to try.
->
+Hi Rudolf,
 
-I also installed toshutils using apt-get on my Knoppix Remaster CD.
+> thanks for your update. I'll test it as soon as I upgrade kernel (which 
+> will be soon).
+> 
+> BTW. are we talking about the same dongle :-D. Please could you provide 
+> the vendor and product IDs?
 
->
->ACPI is the only way I could get suspend to work. (but only in 2.6.4). 
->The APM module won't load under either kernel, but I thought that was 
->because the m200 had no APM bios.
->
+we are talking about the same dongle. I found the problem, why it
+doesn't work and of course I fixed it. Here is the mailing list thread
+about it
 
-Here 
-http://www.sfires.net/toshiba/
-you can find how to enable Bluetooth with an ACPI enabled Kernel
+	http://thread.gmane.org/gmane.linux.bluez.devel/1756
 
->
->What does lsmod show on your knoppix machine?
+However don't expect to get any information from Broadcom. They are not
+very helpful and actually some of there stuff is very ugly. For example
+it is impossible to get the Apple Bluetooth mouse (Broadcom based)
+working with the i-Tec dongle (also Broadcom based) in HID mode. All my
+other HID devices are working perfect with its HID mode. Mostly all
+Information about HID devices and HID proxy dongles can be found here
 
-Here it is:
-===========
-Module                  Size  Used by    Not tainted
-smbfs                  33008   1  (autoclean)
-toshiba                 2752   0  (autoclean)
-l2cap                  16876   1  (autoclean)
-hci_usb                 7612   1  (autoclean)
-bluez                  30308   3  (autoclean) [l2cap hci_usb]
-autofs4                 8724   1  (autoclean)
-nls_cp437               4380   0  (autoclean)
-nls_iso8859-1           2876   0  (autoclean)
-ntfs                   50784   0  (autoclean)
-i810_audio             23112   0 
-ac97_codec              9992   0  [i810_audio]
-soundcore               3364   2  [i810_audio]
-serial                 51876   0  (autoclean)
-usb-uhci               21836   0  (unused)
-usbcore                57088   1  [hci_usb usb-uhci]
-ds                      6472   1 
-yenta_socket            8640   1 
-pcmcia_core            37568   0  [ds yenta_socket]
-rtc                     6908   0  (autoclean)
-cloop                   5168   1 
-e100                   54208   1 
-00_mii                  1952   0 
-nfs                    66648   1 
-lockd                  47952   1  [nfs]
-sunrpc                 62780   1  [nfs lockd]
-af_packet              13224   0 
->
->
-cu
-Martl
->Brad
+	http://www.holtmann.org/linux/bluetooth/hid.html
 
+Regards
 
-
+Marcel
 
 
 
