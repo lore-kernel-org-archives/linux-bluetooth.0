@@ -1,84 +1,59 @@
-Return-Path: <Steven.Singer@csr.com>
-Message-ID: <3FF99466.8080209@csr.com>
-Date: Mon, 05 Jan 2004 16:44:22 +0000
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Florian Echtler <echtler@fs.tum.de>,
-   Olivier Bornet
-    <Olivier.Bornet@smartdata.ch>,
-   BlueZ Mailing List
-    <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: [Bluez-users] bthid cvs question
-References: <Pine.LNX.4.44.0312091023470.6471-100000@speare5-1-11.nmt.edu>
-    <1071020597.10655.4.camel@pegasus> <20031210080259.GF26896@smartdata.ch>
-    <1071065922.10655.60.camel@pegasus>
-    <Pine.NEB.4.58.0312202356540.10214@gaia.fachschaften.tu-muenchen.de>
-    <1071969925.2684.5.camel@pegasus>
-In-Reply-To: <1071969925.2684.5.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Apple mouse and disconnect problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Chris Hubball <chris.hubball@csr.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <7D3093619D15A841A322413C3F138E0855C2F9@exchange02.csr.com>
+References: <7D3093619D15A841A322413C3F138E0855C2F9@exchange02.csr.com>
+Content-Type: text/plain
+Message-Id: <1073320020.2508.17.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Mon, 05 Jan 2004 17:27:00 +0100
 
-Marcel Holtmann wrote:
- > [Florian Echtler wrote:]
->>Great work! Right now, I am typing this with my MS Bluetooth keyboard
->>and I haven't noticed any glitches so far (connecting to the devices
->>still is kind of a hassle, but I guess MS is to blame for that).
+Hi Chris,
+
+> There is no defined "owner" of an ACL connection mainly because the
+> L2CAP connections on top of it can be established by either end.
 > 
-> this is easy to solve. The problem is that if we don't have the device
-> in our inquiry cache we use a pscan_rep_mode with the value 0x01 for
-> connection setup, but Microsoft uses 0x02 by default. To solve the
-> glitches with the initial connection is to do an inquiry first.
+> From general interop experience, if you close the last L2CAP connection
+> on the ACL, you should also disconnect the ACL.  Not sure if you've got
+> this feature, but it's also a nice idea to add a timeout before closing
+> an ACL as it's common to open another L2CAP connection immediately after
+> e.g. SDP search followed by HID.  This saves the paging time to re-open
+> the ACL.
 
-A lot of devices use page scan repetition mode R2 by default as it's the
-lowest power mode.
+we got all these things, but we only take care of the ACL links that we
+set up. If the other side reconnects to us and had to create an ACL link
+(because none exists) we don't terminate the ACL link after the timeout.
+So the question is if it is ok if both ends call hci_disconnect? Do you
+have seen any problems both ends are trying to terminate the ACL link?
+How do the link manager handles this? I can't find any valuable comment
+in the specification or the profiles which end should terminate the ACL
+link.
 
-BlueZ's behaviour is wrong. If you do not know the page scan repetition
-mode of the device you're going to connect to then you must use R2. The
-1.1 spec does not state this explicitly, but it can be implied.
+Regards
 
-The wording has been tightened in the 1.2 spec, unfortunately, the note
-is in the baseband spec so it's not surprising that host stack authors
-miss it. Even then it's stated in a slightly unusual way. The BT 1.2
-spec states in volume 2, part B, section 8.3.2, page 137:
-
-   If the slave scan interval corresponds to R1, the repetition number is
-   at least 128; if the slave scan interval corresponds to R2 or if the
-   master has not previously read the slave's SR mode, the repetition
-   number is at least 256. If the master has not previously read the
-   slave's SR mode it shall use Npage >= 256.
-
-[It looks like an erratum has been applied incorrectly as a point has
-  been repeated - or maybe they wanted to stress it :-).]
-
-The spec states that the master must use at least 256 repetitions if it
-doesn't know the slave's SR mode and that this is the same as R2 mode.
-However, the baseband doesn't know whether the master has read the
-slave's SR mode. The baseband is told the slave's SR mode by the PSRM
-parameter of the HCI_Create_Connection command and chooses an
-appropriate number of repetitions. There isn't a PSRM parameter value
-for "unknown SR mode". This implies that the only way to obey this part
-of the spec is for the host to specify PSRM = 0x02 if it doesn't know
-the SR mode of the slave.
-
-The fastest way (on average) to connect to a device whose Bluetooth
-address you know but whose SR mode you don't know is just to page it in
-R2 mode. This is much faster than inquiring and then connecting with
-the right parameters.
-
-	- Steven
--- 
+Marcel
 
 
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
 
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
+-------------------------------------------------------
+This SF.net email is sponsored by: IBM Linux Tutorials.
+Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
+Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
+Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
