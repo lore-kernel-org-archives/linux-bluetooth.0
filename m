@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Dominik Behr <dominikbehr@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Logitech DiNovo?
-Message-Id: <20040213105658.5dcd32b7@localhost>
-In-Reply-To: <1076686208.2671.86.camel@pegasus>
-References: <20040209034835.15ac7289@localhost>
-	<1076686208.2671.86.camel@pegasus>
+Subject: Re: [Bluez-users] Problem with connection between two pc using
+	bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dirk Vornheder <DVornheder@t-online.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200402131919.56303.dvornheder@t-online.de>
+References: <1ArCh7-0SGjjc0@cmpmail09.bbul.t-online.de>
+	 <1076585404.2671.2.camel@pegasus>
+	 <200402131919.56303.dvornheder@t-online.de>
+Content-Type: text/plain
+Message-Id: <1076697866.2671.210.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,33 +21,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 10:56:58 -0800
+Date: Fri, 13 Feb 2004 19:44:26 +0100
 
-I am sorry Marcel,
-This is sourceforge lists managing program finally passing my first email that I sent from an account not registered on the mailing list. 
+Hi Dirk,
 
-I have 2.4.24-mh2 patch applied, is that enough?
-Or is the patch in cvs?
+> After using
+> 
+> pand --connect 00:04:0E:85:35:15
+> 
+> instead of 
+> 
+> pand --search
+> 
+> on both pc's everything works fine.
 
---
-Dominik
+looks like a role switch or scatternet problem. If you are using
+connect, there is no inquiry and no SDP request. Is the firmware on the
+AP-ISDN the latest?
 
-On Fri, 13 Feb 2004 16:30:09 +0100
-Marcel Holtmann <marcel@holtmann.org> wrote:
+Regards
 
-> Hi Dominik,
-> 
-> > I have recently got me Logitech DiNovo. So far everything seems to work fine in USB boot protocol mode. Will ever Logitech bluetooth hub be supported in bluez? Or is it the classic "no documentation" problem?
-> 
-> I thought, that I already answered this question. The hid2hci programs
-> supports the Logitech Bluetooth HUB, but you need a special kernel patch
-> for the USB HID driver. Look at the mailing list archive.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+Marcel
+
+
 
 
 -------------------------------------------------------
