@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] BC Flag in HCI ACL Data PACket.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Aarti Kumar <akmr2000@yahoo.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040529144553.59027.qmail@web52304.mail.yahoo.com>
-References: <20040529144553.59027.qmail@web52304.mail.yahoo.com>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1085900936.12117.111.camel@pegasus>
+Message-Id: <1085900700.12117.106.camel@pegasus>
 Mime-Version: 1.0
+Subject: [Bluez-devel] Thoughts about AVDTP support
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,27 +15,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 30 May 2004 09:08:56 +0200
+Date: Sun, 30 May 2004 09:05:00 +0200
 
-Hi Aarti,
+Hi Folks,
 
-> Right now I am trying to differentiate between the
-> packets I am sending to the master. Packets are coming
-> from the same source, but one of the packet has got
-> some information I need to process, differently. Now
-> since between two bluetooth devices there can be just
-> one acl link. I have to differentitate between the
-> incoming packets. And that can be done by setting some
-> header value of some field. The only field which i
-> could identify is the BC flag field which is not being
-> used right now. I want to set these field values and
-> then check at them at receiver hci layer and process
-> the packet seperatly.
+I think one of the next major goals of BlueZ should be the support of
+the Audio/Video Distribution Transport Protocol (AVDTP). So I spent some
+time in reading the protocol specification. The specification is very
+complex and I think most of the products will only support the basic
+mode with signal and media channel. However it took me some time to
+realize that they are using multiple L2CAP channels between two devices
+with the same PSM. I never thought that this was possible, but our L2CAP
+core already supports such configuration. Now I asked myself, why HID
+and HCRP needed two different PSM values?
 
-who said that the BC flag will be there at the other end after your
-packet is sent over the air? I don't think that you can misuse HCI flags
-to achieve your goal. The HCI is a hardware interface and not a protocol
-layer.
+To be capable of handling multiple audio and video streams nicely, I
+think we need to implement AVDTP as a kernel module. In that case we can
+make use of two different interfaces to AVDTP. One for the A2DP support
+that is directly connected to ALSA and the second should be a simple
+socket interface. I am no audio/video streaming expert, so what socket
+type is the best for this case?
+
+Before I start writing any source code, I would like to get my hands on
+a product that already uses AVDTP. I need to know what parts of this
+protocol are in use and how they handle it. Searching for an end user
+product I found one from Air2U (www.air2u.com.tw). The german reseller
+is Aiptek and they call it BT MusiCool 300
+
+	http://www.aiptek.de/index.php?mapid=31&katid1=4&detailid=11
+
+I asked them to donate one of these to me, but they said no. Actually
+not a nice company. Searching a little bit more I found out that Amazon
+is selling it for 99 EUR. This is fair price for two Bluetooth devices
+(SNK and SRC), but I decided not to buy them. My conclusion was that if
+I should really start working on AVDTP, someone else should buy me an
+end user device for testing any of my code. However there is always the
+possibility to donate money (www.bluez.org/sponsors.html) which I can
+use to buy unsupported hardware.
 
 Regards
 
