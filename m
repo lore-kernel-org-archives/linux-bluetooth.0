@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Marco Trudel" <soapy@gmx.ch>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <26398.1100503129@www2.gmx.net>
-Content-Type: text/plain; charset="us-ascii"
-Subject: [Bluez-devel] combination keys support? [5]
+Subject: Re: [Bluez-devel] combination keys support?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <27620.1100470371@www17.gmx.net>
+References: <27620.1100470371@www17.gmx.net>
+Content-Type: text/plain
+Message-Id: <1100473781.21403.95.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,72 +18,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 15 Nov 2004 08:18:49 +0100 (MET)
+Date: Mon, 15 Nov 2004 00:09:40 +0100
 
-> this is really weird. The error code 0x29 means "pairing with unit key
-> not supported",
+Hi Marco,
 
-Yes, that's what i found on google..
-check
-out:
-http://davesipaq.com/forum/showthread.php?s=b489a378fa8fe7e09f2cf7fdccea2a48&p=14360#post14360
+> here the dump starting when i enter the pin in the mobile phone:
+> 
+> ----- start -----
+> > HCI Event: PIN Code Request (0x16) plen 6
+>   8E 08 52 ED 0E 00
+> < HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
+>   8E 08 52 ED 0E 00 01 31 00 00 00 00 00 00 00 00 00 00 00 00
+>   00 00 00
+> > HCI Event: Command Complete (0x0e) plen 10
+>   01 0D 04 00 8E 08 52 ED 0E 00
+> > HCI Event: Link Key Notification (0x18) plen 23
+>   8E 08 52 ED 0E 00 B9 2F DD 2F 51 0C 91 E3 79 3C 53 8A C1 54
+>   22 50 01
+> > ACL data: handle 0x0000 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x0040 len 4 [psm 3]
+>       RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+> < ACL data: handle 0x0000 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x0040 len 4 [psm 3]
+>       RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> > HCI Event: Disconn Complete (0x05) plen 4
+>   00 00 00 29
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>   01 00 00 01 00
+> ----- stop -----
+> 
+> the mobile phone tells me "pairing and connection rejected for security
+> reason".
+> Then "disconnected from ..."
+> if i enter an wrong pin, another message appears.
 
-or a german one (your name sounds german :-)):
-http://www.pocket.at/forum/nokia6230.htm
+this is really weird. The error code 0x29 means "pairing with unit key
+not supported", but actually it sends out the link key notification. It
+tell us that the link key is a local unit key. Whatever local means in
+this case. And the PIN code request happens before the SABM on the
+control DLCI 0. There is something fundamental wrong.
 
-the first link tells that it's a firmware topic...
-what do you think in this case:
-is it a firmware topic of my usb dongle (so below bluez) or does this fall
-into the bluez field?
+What device do you use (hciconfig -a)? What kind of phone is this
+(hcitool info <bdaddr>)?
 
-btw, maybe interesting:
-trying to pair my nokia6230 on windows fails badly (with "pairing and
-connection refused for security reason"). pairing one of a friend (an older
-model) works withhout problems...
+Regards
 
-> but actually it sends out the link key notification.
-> It tell us that the link key is a local unit key. Whatever local means
-> in this case. And the PIN code request happens before the SABM on
-> the control DLCI 0. There is something fundamental wrong.
+Marcel
 
-yes...
-but i'm not that familiar with the bluetooth basics...
-so i can't do that much with this information...
- 
 
-> What device do you use (hciconfig -a)?
-It's a acer BT-500
-hci0:   Type: USB
-        BD Address: 00:04:3E:C0:C3:49 ACL MTU: 1356:5  SCO MTU: 48:1
-        UP RUNNING PSCAN ISCAN
-        RX bytes:87 acl:0 sco:0 events:11 errors:0
-        TX bytes:290 acl:0 sco:0 commands:11 errors:0
-        Features: 0xff 0x07 0x04 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BLUEZ'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x86 LMP Ver: 1.1 (0x1) LMP Subver: 0x86
-        Manufacturer: Zeevo, Inc. (18)
-
-> What kind of phone is this (hcitool info <bdaddr>)?
-it's a nokia 6230i
-i'll send you tonight a "hcitool info <bd>" if you're interestet, currently
-i haven't the phone with me...
-
-regards
-Marco
-
-PS: sorry for always breaking the thread, but i'm not on the mailinglist. if
-you hit "reply all", i could directly answer and the thread wouldn't be
-broken...
-
--- 
-NEU +++ DSL Komplett von GMX +++ http://www.gmx.net/de/go/dsl
-GMX DSL-Netzanschluss + Tarif zum supergünstigen Komplett-Preis!
 
 
 -------------------------------------------------------
