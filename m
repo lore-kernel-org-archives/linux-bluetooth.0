@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluetooth socket + rfcomm tty
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.44.0501242148470.14852-100000@antilope>
-References: <Pine.LNX.4.44.0501242148470.14852-100000@antilope>
-Content-Type: text/plain
-Message-Id: <1106601891.8058.110.camel@pegasus>
-Mime-Version: 1.0
+From: Victor Shcherbatyuk <victor@win.tue.nl>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <Pine.LNX.4.44.0501242148470.14852-100000@antilope>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-devel] bluetooth socket + rfcomm tty
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,32 +16,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Jan 2005 22:24:51 +0100
+Date: Mon, 24 Jan 2005 22:13:12 +0100 (MET)
 
-Hi Victor,
+Dear All,
+ 
+Could not find it through the archives... 
+I create a bluetooth socket and then create TTY (/dev/rfcomm0) based on it (like it is done in dund from bluez-utils). 
+Is it still allowed to use the descriptor of the open socket to send/receive data through the channel? 
+Cause when I send data to the _socket_ it looks like it is sent (like 
+ATD1234 command to the phone, I see the phone starting to dial, though it 
+stops half way for no reason), but when I'm trying to read from the socket 
+select() returns that there is data to be read, but then read() blocks.
 
-> Could not find it through the archives... 
-> I create a bluetooth socket and then create TTY (/dev/rfcomm0) based on it (like it is done in dund from bluez-utils). 
-> Is it still allowed to use the descriptor of the open socket to send/receive data through the channel? 
-> Cause when I send data to the _socket_ it looks like it is sent (like 
-> ATD1234 command to the phone, I see the phone starting to dial, though it 
-> stops half way for no reason), but when I'm trying to read from the socket 
-> select() returns that there is data to be read, but then read() blocks.
+Thanks.
 
-this is maybe possible, but it is not intended. When you converted a
-socket into a TTY the socket should be closed. Otherwise we must
-duplicate the incoming data and if one party is not reading the flow
-control will be brocken and both parties are blocked.
+Kind regards,
+       Victor.
 
-> P.S. Is there any way to check if read() is non-blocking (like ioctl() 
-> FIONREAD)?
-
-Check the fcntl() manpage.
-
-Regards
-
-Marcel
-
+P.S. Is there any way to check if read() is non-blocking (like ioctl() 
+FIONREAD)?
 
 
 
