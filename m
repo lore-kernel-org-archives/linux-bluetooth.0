@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41D3600B.8000702@avantwave.com>
-From: mike <mikelee@avantwave.com>
-MIME-Version: 1.0
+From: Clinical Science Systems <info@clinicalsciencesystems.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] rfcomm socket and rfcomm tty
-References: <41D12158.6020206@avantwave.com> <1104315958.6319.13.camel@notepaq>
-In-Reply-To: <1104315958.6319.13.camel@notepaq>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] Strange receive buffer mix-up when accessing /dev/rfcomm0 as a file
+References: <200412291538.46078.pckoster@wanadoo.nl> <1104335737.6389.3.camel@notepaq>
+In-Reply-To: <1104335737.6389.3.camel@notepaq>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200412292225.44222.info@clinicalsciencesystems.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,109 +19,124 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 30 Dec 2004 09:55:23 +0800
+Date: Wed, 29 Dec 2004 22:25:44 +0100
 
-Dear Marcel
-    Thanks for your clarification.
-    Here come to a question , i am wrting a socket rfcomm program and 
-try to use it connect to a bluetooth rfcomm channel by bluez-util rfcomm 
-listen from two different computer. My program gives out "Resource 
-temporarily unavailable" after connect system call . Here is the hcidump 
-from listening side, there is a pause from listening side when connect 
-system call fail.
+Hi Marcel,
 
- > HCI Event: Connect Request (0x04) plen 10
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Connect Complete (0x03) plen 11
-< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
- > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Connection Packet Type Changed (0x1d) plen 5
- > HCI Event: Max Slots Change (0x1b) plen 3
- > ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0040
-< ACL data: handle 0x0028 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 0x0028 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
-    MTU 1024
-< ACL data: handle 0x0028 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
-< ACL data: handle 0x0028 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
-    MTU 1024
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 0x0028 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
- > ACL data: handle 0x0028 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-------------------------------------------------------------------------------- 
-Pause here
- > ACL data: handle 0x0028 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 6 pf 1 ilen 0 fcs 0x32
- > ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-< ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Disconn Complete (0x05) plen 4
+thank you very much for your quick and great advice. I'm not quite proficient 
+yet with the stty syntax on linux, but an initial 'stty -F /dev/rfcomm0 nl' 
+solved the 0D -> 0A issue. I'll sort it out next year I guess.....
 
-    Thanks for helping
-best regard
-Mike,Lee
+My application has to be used on multiple platforms, hence my approach for 
+serial file based access.
+
+Thanks again and best wishes for 2005!
+
+Regards,
+
+Paul
+
+Op woensdag 29 december 2004 16:55, schreef Marcel Holtmann:
+> Hi Paul,
+>
+> > I've got a strange problem when reading the /dev/rfcomm0 device as a
+> > file. It boils down to a mix-up of one byte from the inputbuffer.
+> >
+> > My system information is as follows:
+> >
+> > - My transceiving USB key is a MSI PC2PC Bluetooth
+> > - Mobile device is a TMSI Mobi8e bluetooth ExG amplifier with serial
+> > service (SP) enabled and bound via "rfcomm bind 0 00:A0:96:1D:77:A8 1"
+> >
+> > Some useful system command outputs:
+> >
+> > [root@paul ~]# rpm -qa | grep bluez
+> > bluez-hcidump-1.11-1
+> > bluez-utils-2.10-2
+> > bluez-pin-0.23-3
+> > bluez-libs-2.10-2
+> > bluez-bluefw-1.0-6
+> >
+> > [root@paul ~]# uname -r
+> > 2.6.9-1.678_FC3
+> >
+> > [root@paul ~]# rfcomm
+> > rfcomm0: 00:A0:96:1D:77:A8 channel 1 closed
+> >
+> > I access the created /dev/rfcomm0 node as a standard file. Therefore I've
+> > written a small test program which is listed below. To get the device
+> > going a specific protocol is needed, but is basically boils down to
+> > sending 3 packets and waiting for acknowledge packets which are all sent
+> > and received well and then a series of packets from the mobi device,
+> > containing the measured data. These last type of packets is sent
+> > continiously from the device. I fetch them continuously using fgetc.
+> >
+> > Every packet starts with 0xAAAA (so called blocksync).
+> >
+> > The problem lies in these last type of packets. I do receive them, but
+> > there is a discrepancy between what "hcidump -x" says, and what I
+> > actually receive from the buffer. I should receive i.e.:
+> >
+> > AA AA 0D 01 00 00 80 00 00 80 00 00 80 00 00 80 00 00 80 00 00 80 00 00
+> > 80 00 00 80 00 0C 49 46
+> >
+> > but I get:
+> >
+> > AA AA >0A< 01 00 00 80 00 00 80 00 00 80 00 00 80 00 00 80 00 00 80 00 00
+> > 80 00 00 80 00 0C 49 46
+> >
+> > The 0D (13) has become a 0A (10), but the rest of the packet is totally
+> > perfect. This is the case with ALL packets received of this kind. It
+> > should be 0D according to the protocol (and hcidump).
+> > I've listed the relevant pieces of hcidump output as well as program
+> > output below (program output is in decimal notation however. 0xAA = 170,
+> > so the relevant sequence is 170 170 10 01 at the end of the output)
+> >
+> > Does anyone have a clue on what this could be? Thanks in advance for your
+> > help.
+>
+> sounds like an ASCII end of line/carrige return clash. Try to use the
+> RFCOMM socket interface directly or set your TTY to raw mode.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+-- 
+________________________________________________________________________
+
+Clinical Science Systems
+Ter Weerlaan 58
+2241 VC Wassenaar
+
+Tel.   : +31 (0)70 514 21 06
+GSM    : +31 (0)6 110 44 725
+
+URL    : http://www.clinicalsciencesystems.com
+E-mail : info@clinicalsciencesystems.com
 
 
-Marcel Holtmann wrote:
-
->Hi Mike,
->
->  
->
->>    I have little knowledge on tty structure, so i want to clarify 
->>something is that, if i want to connect to a rfcomm enabled phone. Are 
->>there any difference when i sending raw data to the phone with tty 
->>rfcomm and socket rfcomm? I ask this question because i see that from 
->>bluez-util rfcomm source code, tty connection is built up from socket 
->>first and then set the tty attr. So if i do not need tty functions, only 
->>read/write from/to external device is needed, socket rfcomm will be more 
->>simple. Am i right?
->>    
->>
->
->this is right. The RFCOMM socket is the native interface and the TTY is
->only there for legacy reasons.
->
->Regards
->
->Marcel
->
->
->
->
->-------------------------------------------------------
->SF email is sponsored by - The IT Product Guide
->Read honest & candid reviews on hundreds of IT Products from real users.
->Discover which products truly live up to the hype. Start reading now. 
->http://productguide.itmanagersjournal.com/
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->  
->
-
+ 
 
 
 -------------------------------------------------------
-The SF.Net email is sponsored by: Beat the post-holiday blues
-Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
-It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now. 
+http://productguide.itmanagersjournal.com/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
