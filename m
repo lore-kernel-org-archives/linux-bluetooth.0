@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Ville Tervo <ville.tervo@hut.fi>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] (no subject)
-Message-ID: <20040816121214.GA514@cc.hut.fi>
-References: <20040812111537.27087.qmail@webmail27.rediffmail.com> <1092310309.28711.103.camel@pegasus>
+Subject: Re: [Bluez-devel] JSR-82 Implementation
+From: Erik Tews <erik@debian.franken.de>
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1092650525.19596.1222.camel@baroque.rococosoft.com>
+References: <1092427728.5708.1.camel@localhost.localdomain>
+	 <1092650525.19596.1222.camel@baroque.rococosoft.com>
+Content-Type: text/plain
+Message-Id: <1092657726.3452.77.camel@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1092310309.28711.103.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,30 +19,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 16 Aug 2004 15:12:15 +0300
+Date: Mon, 16 Aug 2004 14:02:06 +0200
 
-On Thu, Aug 12, 2004 at 01:31:49PM +0200, Marcel Holtmann wrote:
-> Hi Abhay,
+Am Mo, den 16.08.2004 schrieb Stephen Crane um 12:02:
+> > Is there currently any implementation of the jsr-82 standard for linux,
+> > so that I can use bluetooth from my java-application? Or for any other
+> > (free) desktop-operating system? I have seen one for serial bluetooth
+> > dongels on linux (but I got only usb ones) and for Windows XP. Are there
+> > any other ones.
 > 
-> > i want to know abt the BT 1.2 support and SDIO support in BlueZ.
+> You didn't mention whether it had to be free software or not (however
+> maybe your email address makes this unnecessary :-) 
 > 
-> we have full Bluetooth 1.2 support on the HCI layer, but at the moment
-> the L2CAP retransmission and flow control feature is missing. However it
-> seems that none of the embedded stacks are having this either.
+> Anyway Rococo has one which is free (as in beer) for students and
+> hobbyists. Have a look here:
+> http://www.rococosoft.com/products/impronto.html
 
-Is someone planning to do rfc mode?
+Well, free as in freedom would be better, but free beer is ok too.
 
-> 
-> I don't know of any support for SDIO devices.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+I think the sdk is what I was looking for, because I would like to know
+if my java-application is able to talk to a real world device.
 
-
-Ville
 
 
 -------------------------------------------------------
