@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000a01c4170b$3c1e14e0$fcca010a@lysydziadek>
-From: "zubiwat" <zubiwat@poczta.onet.pl>
-To: "devel Bluetooth" <bluez-devel@lists.sourceforge.net>
+Message-ID: <4069478B.2070401@sfires.net>
+From: Dariusz Swiderski <sfires@sfires.net>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0007_01C4171B.FF86D9C0"
-Subject: [Bluez-devel] Connection
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] cvs software issues
+References: <40675F3B.5090704@sfires.net>	 <1080557069.2281.224.camel@pegasus>  <40680EB8.2070208@sfires.net> <1080561659.2281.236.camel@pegasus>
+In-Reply-To: <1080561659.2281.236.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,78 +17,63 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 31 Mar 2004 12:30:49 +0200
+Date: Tue, 30 Mar 2004 12:10:19 +0200
 
-This is a multi-part message in MIME format.
+Marcel Holtmann wrote:
+> Hi Dariusz,
+> 
+> 
+>>>it should create it if it is missing.
+>>
+>>apparently it doeas not:
+>>sfires@snoopy:/home/storage/software/cvs/bluez/libs2$ ./bootstrap
+>>configure.in: installing `./install-sh'
+>>configure.in: installing `./mkinstalldirs'
+>>configure.in: installing `./missing'
+>>configure.in:19: installing `./config.guess'
+>>configure.in:19: installing `./config.sub'
+>>configure.in:19: required file `./ltmain.sh' not found
+>>compat/Makefile.am: installing `./depcomp'
+>>
+>>im not very goot with automake and autoconf sripts, but in utils and libs
+>>this file, is pulled from cvs, and yes, i have seen the remark in attic ;)
+> 
+> 
+> it says so, but does this mean that it is not created ;)
 
-------=_NextPart_000_0007_01C4171B.FF86D9C0
-Content-Type: text/plain;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+ok, i see you are trying to pull my leg..:
+sfires@snoopy:/home/storage/software/cvs/bluez/libs2$ ls
+AUTHORS      CVS/       Makefile.am  README           bootstrap*     config.h.in   debian/   install-sh*  mkinstalldirs*
+COPYING      ChangeLog  Makefile.in  aclocal.m4       compat/        config.sub*   depcomp*  lib/         test/
+COPYING.LIB  INSTALL    NEWS         autom4te.cache/  config.guess*  configure.in  include/  missing*
 
-Hi
-I have problems with identifying bytes when I'm trying to connect to the =
-other BT. On my PC I'm looking for services and on the other BT I get =
-this answer:
-02 28 00 0C 00 08 DD 01 00 02 01 04 00 01 00 52 00 02 28 20 0C 00 08 00 =
-01 00 02 02 04 00 01 00 53 00 04 05 04 00 28 00 13
+the mkinstalldir and so on are in place, but not the ltmain.sh
 
-I think this is ACL Data Packet according to BlueZ hci.h file where it's =
-defined as :
-#define HCI_ACLDATA_PKT  0x02
+>>>There is no planned coexisting of both version and if libs2 and utils2
+>>>are ready for rollout it will replace the old one.
+>>
+>>ok, i can live with this, but what about hcid? its not in utils2
+> 
+> I am not quite sure about the real future of hcid. We will have a
+> replacement for it, but I want to redesign some parts of it.
 
-Am I wrong?
+ok, no problem, but there must be sth. to work with the pin-helper ;)
 
-Please tell me what should I do to connect 2 BT donngles to send simple =
-'a' or other ascii. What are steps while making connection between 2 BT =
-through rfcomm?
+---snip---
 
-Regards
+> At the moment nobody. So feel free to take the code and clean it up and
+> make it libs2 compatible.
 
-Maciej
+so i will
 
-------=_NextPart_000_0007_01C4171B.FF86D9C0
-Content-Type: text/html;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-2">
-<META content=3D"MSHTML 5.50.4134.600" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I have problems with identifying bytes =
-when I'm=20
-trying to connect to the other BT. On my PC I'm looking for services and =
-on the=20
-other BT I get this answer:</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>02 28 00 0C 00 08 DD 01 00 02 01 04 00 =
-01 00 52 00=20
-02 28 20 0C 00 08 00 01 00 02 02 04 00 01 00 53 00 04 05 04 00 28 00=20
-13</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I think this is ACL Data Packet =
-according to BlueZ=20
-hci.h file where it's defined as :</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>#define HCI_ACLDATA_PKT =
-&nbsp;0x02</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Am I wrong?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Please tell me what should I do to =
-connect 2 BT=20
-donngles to send simple 'a' or other ascii. What are steps while making=20
-connection between 2 BT through rfcomm?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Regards</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Maciej</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0007_01C4171B.FF86D9C0--
+greets
+-- 
+Maciej 'sfires' Swiderski
+---------------------------------------------------
+SysAdm | SecOff  | DS14145-RIPE        | DS11-6BONE
+193.178.161.0/24 | 3ffe:8010:7:2a::/64 | AS16288
+---------------------------------------------------
+A mouse is a device used to point at the xterm you want to type in.
 
 
 
