@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
 To: bluez-users@lists.sourceforge.net
-From: David Wuertele <dave-gnus@bfnet.com>
-Message-ID: <m3oenr9t1k.fsf@bfnet.com>
-References: <m365a0b8f9.fsf@bfnet.com> <20040610101649.GA7496@gmx.net>
+In-Reply-To: <E1BYQ92-00087j-DB@sc8-sf-list2.sourceforge.net>
+Message-Id: <24890.1027935-9861-691202765-1086947404@email.seznam.cz>
+Content-Type: text/plain;
+	charset="iso-8859-2"
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Thinkpad X31 @ fedora core 2, trying to connect to Nokia 6380i
+Cc: 
+Reply-To: =?us-ascii?Q?Dave=20Dev?= <alwaysgone@seznam.cz>
+Subject: [Bluez-users] =?us-ascii?Q?BlueZ=20=26=20Cygwin?=
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,29 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Jun 2004 11:17:27 -0700
+Date: Fri, 11 Jun 2004 11:50:04 +0200 (CEST)
 
-Nicholas> Seems that your PIN exchange doesn't work. What is your
-Nicholas> "security" setting in hcid.conf?
+Gang:
 
- security auto;
+Have any of you tried using BlueZ & Cygwin together?  Does it work?  If=
+ yes, how does one port and compile BlueZ in it?
 
-Nicholas> Does appear a pin windows on the mobile display?
+I'm curious...
 
-No, there was no change on my 6310i display.
-But on my laptop display I got a dialog asking for the PIN.
-Where do I get this mysterious PIN?
-I tried making one up.  Then it worked!
+Thanks in advanced....
 
-Is this PIN stored somewhere?  I see a file
-
-  /etc/bluetooth/pin
-
-but it doesn't contain the PIN that I typed into the laptop dialog and
-the phone dialog.
-
-Dave
-
+D.
+____________________________________________________________
+M=F9=BEete SMSkovat a =B9et=F8it p=F8itom kredit mobilu? Ano! Pos=EDlej=
+te SMS z pevn=E9 linky jen za 1 K=E8! www.telecom.cz/sms
+http://ad.seznam.cz/clickthru?spotId=3D75001
 
 
 -------------------------------------------------------
