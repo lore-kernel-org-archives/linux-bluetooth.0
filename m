@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] F8T001 version 1 and SuSE 9.2
+Subject: Re: [Bluez-users] "hcitool dev" shows no devices
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20050130T212956-606@post.gmane.org>
-References: <loom.20050130T212956-606@post.gmane.org>
+In-Reply-To: <41FD462C.8090001@gmx.ch>
+References: <41FD3E26.1000401@gmx.ch> <1107116116.8384.4.camel@pegasus>
+	 <41FD462C.8090001@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1107118147.8384.12.camel@pegasus>
+Message-Id: <1107118082.8384.10.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,40 +19,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 21:49:07 +0100
+Date: Sun, 30 Jan 2005 21:48:02 +0100
 
-Hi,
+Hi Marco,
 
-> I have SuSE Linux 9.2 installed with all updates, installed all bluez packages,
-> rebooted, plugged in my Belkin F8T001 USB Bluetooth dongle, KDE told me that it
-> found a new device, set it up -- enabling bluetooth daemon, configuring things
-> (left everything on default), pressed OK -- the daemon started, but nothing else
-> happened, I am unable to do anything...
+> But another question arised starting hcid:
+> The location of etc/bluetooth/pin. Is it hardcoded?
+> I crosscompiled the bluez libs/utils and hcid now tells me on start:
+> Can't open PIN file /usr/local/arm/2.95.3/arm-linux/etc/bluetooth/pin. No 
+> such file or directory(2)
 > 
-> "hcitool dev" shows:
-> Devices:
-> nothing else...
-> 
-> "lsusb" shows the device as being recognized by the USB subsystem, but seems
-> that the bluetooth subsystem is not interested in that device.
-> 
-> dmesg shows following (only bluetooth part):
-> Bluetooth: Core ver 2.6
-> NET: Registered protocol family 31
-> Bluetooth: HCI device and connection manager initialized
-> Bluetooth: HCI socket layer initialized
-> Bluetooth: L2CAP ver 2.4
-> Bluetooth: L2CAP socket layer initialized
-> Bluetooth: HIDP (Human Interface Emulation) ver 1.0
-> Bluetooth: RFCOMM ver 1.3
-> Bluetooth: RFCOMM socket layer initialized
-> Bluetooth: RFCOMM TTY layer initialized
-> usb 2-1: new full speed USB device using address 2
-> Bluetooth: HCI USB driver ver 2.7
-> usbcore: registered new driver hci_usb
+> Can I change the location of the pin-file? maybee in the hcid.conf?
 
-what is the content of /proc/bus/usb/devices? Does "hciconfig -a" shows
-you anything?
+there is no option for that. However you can provide a patch if you
+think such an option is usefull.
+
+You forgot "--sysconfdir=/etc" when you call configure as it is written
+in the README.
 
 Regards
 
