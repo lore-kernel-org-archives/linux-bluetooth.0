@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BlueLogic Wingkey problems
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20041114T133356-876@post.gmane.org>
-References: <loom.20041114T133356-876@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1100449789.21403.47.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: Andres Meyer <andres.meyer@computer.org>
+Message-ID: <loom.20041114T133356-876@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] BlueLogic Wingkey problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,38 +16,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 14 Nov 2004 17:29:49 +0100
+Date: Sun, 14 Nov 2004 16:03:07 +0000 (UTC)
 
-Hi Andres,
-
-> I just bought a BlueLogic Wingkey keyboard-trackball bluetooth combo (which I 
-> think is perfect for sofa-surfing). It does not work in a useful way. I could 
-> not find any information about this device and linux until now. 
-
-first I need some more information about this device
-
-	hcitool inq
-	hcitool scan
-	hcitool info 00:xx:xx:xx:xx:xx
-
-Then compile the libs2 CVS repository and run
-
-	./test/sdptest records 00:xx:xx:xx:xx:xx > sdp_records.txt
-
-and send me the file sdp_records.txt.
-
-> config: 
-> - vanilla 2.6.9 kernel 
-> - x86 
-> - tried with planet and epox usb bt adapters 
-> - gentoo setup, with hidd etc. installed and enabled. 
-
-Use a 2.6.9-mh3 kernel and see if this helps.
-
-Regards
-
-Marcel
-
+I just bought a BlueLogic Wingkey keyboard-trackball bluetooth combo (which I 
+think is perfect for sofa-surfing). It does not work in a useful way. I could 
+not find any information about this device and linux until now. 
+ 
+Hints? 
+ 
+Andres 
+ 
+ 
+config: 
+- vanilla 2.6.9 kernel 
+- x86 
+- tried with planet and epox usb bt adapters 
+- gentoo setup, with hidd etc. installed and enabled. 
+ 
+problems: 
+- the keyboard is detected 
+- when pressing a key, the pressed char appears, but then in about 70% of all 
+cases, some other key  stroke, eg "arrow up", follows immediately. 
+- the integrated trackball is not detected 
+- in various howtos, separate bt addresses are detected for mouse/keyboards. I 
+can only detect one bt address for the whole keyboard/trackball combo (using 
+the hcitool scan command). 
+ 
 
 
 
