@@ -1,5 +1,5 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41E51DB5.5090104@dark-reality.de>
+Message-ID: <41E51B65.2050704@dark-reality.de>
 From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
@@ -18,18 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 Jan 2005 13:53:09 +0100
+Date: Wed, 12 Jan 2005 13:43:17 +0100
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-Suriyan,
+it seems there's no need to hardcode anything in the kernel anymore,
+because there's a module
+~ parameter for hci_usb now that makes it possible to switch the
+alternate setting (by replugging
+the dongle).
 
-just wanted to say "sorry" for that html mail accusing. It just looked
-like html because
-thunderbird took a strange font.
-
-:)
+please don't use html for mails.
 - - Lars
 
 Suriyan wrote:
@@ -69,9 +69,9 @@ mail: lgw@dark-reality.de
 Version: GnuPG v1.2.3 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFB5R20QWC6DTWkDAoRAkCvAKDBW1VlwNKe+3QicKjh4VBTS5KDyQCgtges
-t3NShQAaUhKeoO9RlKzgO2E=
-=2Tlq
+iD8DBQFB5RtkQWC6DTWkDAoRAsFfAKCHVZBgoMml8Cw2vpaKit8TVc7EWACgwvE3
+tkqC5FFw0hw+bJNdkMXgn1g=
+=dVOo
 -----END PGP SIGNATURE-----
 
 
