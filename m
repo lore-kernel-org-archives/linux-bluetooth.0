@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hci_uart and Ambicom BT2000E
+Subject: Re: [Bluez-users] bt_inquiry
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Daniel Jimenez <djimenez@pobox.com>
+To: =?ISO-8859-1?Q?S=E9rgio?= Alcides Fernandes <sergiofernandes@clix.pt>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40743AAE.4070808@pobox.com>
-References: <40743AAE.4070808@pobox.com>
+In-Reply-To: <200404072157.02734.sergiofernandes@clix.pt>
+References: <200404072157.02734.sergiofernandes@clix.pt>
 Content-Type: text/plain
-Message-Id: <1081418373.2970.6.camel@pegasus>
+Message-Id: <1081417720.2970.2.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,33 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Apr 2004 11:59:33 +0200
+Date: Thu, 08 Apr 2004 11:48:40 +0200
 
-Hi Daniel,
+Hi Sergio,
 
-> In a previous thread Marcell recommended I use serial_cs and hci_uart 
-> for my Ambicom PCMCIA bluetooth adaptor.
+> When i try to compile utils2 from cvs i get the following error :
 > 
-> I've got serial_cs working, and it's created device /dev/ttyS1.
+> checking bluetooth/bluetooth.h usability... yes
+> checking bluetooth/bluetooth.h presence... yes
+> checking for bluetooth/bluetooth.h... yes
+> checking for bt_inquiry in -lbluetooth... no
+> configure: error: Bluetooth library not found
 > 
-> I did a hciattach /dev/ttyS1 ericsson and that returned no errors/notices.
 > 
-> hciconfig hci0 up hangs and does nothing. I can control+c out of it.
-> 
-> I do notice this in /var/log/messages:
-> 
-> hcid[6522]: HCI dev 0 registered
-> hcid[6437]: HCI dev 0 registered
-> hcid[6295]: HCI dev 0 registered
-> hcid[7097]: Can't init device hci0. Connection timed out(110)
-> hcid[7098]: Can't init device hci0. Connection timed out(110)
-> hcid[7099]: Can't init device hci0. Connection timed out(110)
+> i installed/compiled libs2 (from cvs) in /opt/bluetooth and 
+> added /opt/bluetooth/lib to my /etc/ld.so.conf....
 
-you should check how many hcid you have running. There must only be one.
-
-The other problem is that not every serial based PCMCIA card works right
-now with the 2.6 kernel. Some do and some don't and actually this is a
-problem in the serial subsystem, but I don't know where.
+you must run configure with --with-bluetooth=/opt/bluetooth
 
 Regards
 
