@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] registry
+Subject: Re: [Bluez-users] HCI data packets
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY12-F189C6AE7165F49B14F54BF8AB40@phx.gbl>
-References: <BAY12-F189C6AE7165F49B14F54BF8AB40@phx.gbl>
+In-Reply-To: <2de46576041206085827162a8f@mail.gmail.com>
+References: <2de46576041206085827162a8f@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1102359032.9644.48.camel@pegasus>
+Message-Id: <1102358712.9644.41.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,21 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 19:50:32 +0100
+Date: Mon, 06 Dec 2004 19:45:12 +0100
 
-Hi Salvatore,
+Hi Manjunath,
 
-> Does BlueZ support Security manager, service database and device database?
+> Does, opening a socket and then connect() at the
+> L2CAP......automatically establish an HCI connection first and then an
+> L2CAP connection on top of it??  This is what HCI dump shows..
 
-stop asking for phrases that you read somewhere. This is annoying and I
-am not sure that you fully understand what you are asking. If that is
-the case then you also wouldn't understand my answers. So what do you
-really wanna know?
+this is correct and it must work like this.
 
-> Where is the information on the security (any)?
+> Can I in someway just create an HCI connection first and then pump HCI data
+> packet with some known payload???How can i generate the test data
+> packets........... In a way, i just want  pump raw bits.....
 
-There is no simple answer to that questions. Or maybe it is. Use the
-source, Luke ;)
+You can use the HCI raw socket. This is what the library and the tools
+are doing. However be careful with the ACL packets, because some chips
+expect L2CAP frames and not random payload.
 
 Regards
 
