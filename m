@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200403251849.21765.cijoml@volny.cz>
-Subject: [Bluez-users] mh3 not in 2.4.26-pre6
+From: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Message-id: <7387c74c43.74c437387c@estudiants.urv.es>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Subject: [Bluez-users] changing kernel...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,13 +15,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Mar 2004 18:49:21 +0100
+Date: Thu, 25 Mar 2004 18:02:35 +0100
 
-Hi Marcel,
+Hello!!
 
-why is not mh3 in 2.4.26-pre6 included?
+Finally, I convinced my manager to change the
+kernel, so I will not use 2.4.18 any more.
 
-Michal
+Now, I just need you to tell me which kernel is
+suitable for a red hat 7.3 where the bluez is
+embedded and with no problems to run !!
+
+Sorry for my bad english!!
+
+Regards
+
+Albert
+
 
 
 -------------------------------------------------------
