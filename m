@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Sony DSC-FX77 and BIP
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Tom Bailly-Salins <tbaillys@free.fr>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40D043DF.4070306@free.fr>
-References: <40D043DF.4070306@free.fr>
-Content-Type: text/plain
-Message-Id: <1087391351.4309.16.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <40D043DF.4070306@free.fr>
+From: Tom Bailly-Salins <tbaillys@free.fr>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Sony DSC-FX77 and BIP
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,27 +15,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Jun 2004 15:09:12 +0200
+Date: Wed, 16 Jun 2004 14:58:07 +0200
 
-Hi Tom,
+I would like to ask two questions:
 
-> I would like to ask two questions:
-> 
->  - Does the BlueZ bluetooth library implement BIP (Basic Imaging Profile) ?
-> 
->  - Does anyone know of a frontend software on Linux that would allow me 
-> to operate a Sony DSC-FX77 bluetooth camera using BIP.
+ - Does the BlueZ bluetooth library implement BIP (Basic Imaging Profile) ?
 
-try the OBEX Push Daemon (http://oss.bdit.de/opd.html). The FX77 has no
-full BIP support. You can push or receive images and use the remote
-camera feature, but you can't retrieve any thumbnail or image from it
-using the PC and tools like gPhoto etc.
+ - Does anyone know of a frontend software on Linux that would allow me 
+to operate a Sony DSC-FX77 bluetooth camera using BIP.
 
-Regards
-
-Marcel
-
-
+Thanks a million
 
 
 -------------------------------------------------------
