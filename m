@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Little Hexdump-Patch for hcidump
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Till Harbaum <harbaum@beecon.de>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200408261844.20194.harbaum@beecon.de>
-References: <50BF37ECE4954A4BA18C08D0C2CF88CB2364EC@exmail1.se.axis.com>
-	 <200408261844.20194.harbaum@beecon.de>
-Content-Type: text/plain
-Message-Id: <1093539822.2581.32.camel@pegasus>
-Mime-Version: 1.0
+From: Till Harbaum <harbaum@beecon.de>
+To: <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200408261852.56641.harbaum@beecon.de>
+Subject: [Bluez-devel] Fighting with SCO
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,27 +16,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Aug 2004 19:03:42 +0200
+Date: Thu, 26 Aug 2004 18:52:56 +0200
 
-Hi Till,
+Hi,
 
-> in every new release of hcidump i have been replacing the built-in 
-> hexdump routine with my own one (giving the address and ascii as well).
-> 
-> Perhaps you want to use this replacement in hcidump/parser/parser.c
-> 
-> The hex output is very useful for me and e.g. just being able to see ascii 
-> strings inside rfcomm payload is something i really often need.
-> 
-> Feel free to include it into the public version if you like to ...
+i have a BlueTrek G2 bluetooth headset and i am just unable to get
+it work with bluez.
 
-please send me a patch (diff -u) and adjust a little bit your coding
-style to match the other sources of hcidump.
+I can connect to it with hstool and it even sends me the AT+VGS-Volume 
+commands and AT+CKPD=200 whenever i press the button. And if i send RING to 
+it, then it rings.
 
-Regards
+But it won't send me any sco data. I have tested this with several different 
+usb dongles (d-link dbt-120, the microsoft dongle delivered with the 
+bluetooth desktop (both csr) and a Allnet WBT-3021 (broadcom chip)).
 
-Marcel
+If i make scotest send some funny patterns to the headset i get some very 
+quiet hissing like some audio transmitter has been switched on, but no actual 
+audio signal is being transmitted.
 
+Any hints? 
+
+Regards,
+  Till
+
+BTW: Marcel: The l2cap buffer management student thesis is out ...
+
+-- 
+Dr.-Ing. Till Harbaum                       Tel.:  +49 721 4998963
+BeeCon GmbH                                 Fax:   +49 721 4998962
+Haid-und-Neu Strasse 7, 76131 Karlsruhe     Mobil: +49 179 9087904
+harbaum@beecon.de                           http://www.beecon.de
 
 
 
