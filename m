@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PAN and DUN
+Subject: Re: [Bluez-users] Piconet problems
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <EFCD68F7BFDB06468769D4D9EAAA938705EE4718@scsmsx401.amr.corp.intel.com>
-References: 
-	 <EFCD68F7BFDB06468769D4D9EAAA938705EE4718@scsmsx401.amr.corp.intel.com>
+In-Reply-To: <IAM5FF$26988C38C1B7C74AE27C3AE78F151AF6@libero.it>
+References: <IAM5FF$26988C38C1B7C74AE27C3AE78F151AF6@libero.it>
 Content-Type: text/plain
-Message-Id: <1106225706.8190.182.camel@pegasus>
+Message-Id: <1106225533.8190.178.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,39 +18,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 20 Jan 2005 13:55:06 +0100
+Date: Thu, 20 Jan 2005 13:52:13 +0100
 
-Hi Trevor,
+Hi Jers,
 
-> I'm confused by the how-to at
-> http://www.cs.ucla.edu/~cclljj/interest/notes/bluez/pand_dund.html --
-> which is linked from the BlueZ how-to page.
+> I thank you for your time but, I'm sorry,  I can't display any packet. 
 >  
-> It does a fair bit of setup, and then has the instructions:
-> 
-> 13. on master side: 
-> sdpd
-> pand --listen --master --service --sdp --role NAP
-> dund --listen --sdp
-> 
-> 14. on slave side 
-> sdpd
-> pand --connect <bt_addr> --sdp
-> dund --connect <bt_addr> --sdp
-> 
-> Which, is far as I can tell, is setting up both a dun and pan connection
-> between the two devices -- which seems very redundant to me. The DUN
-> link will set up an IP link over RFCOMM using PPP, while PAN will set up
-> a direct IP link.
-> 
-> Is this correct?  Wouldn't it be sufficient to either dun or pan, but
-> not both?
+> I changed my dongles. Their firmware is HCI 16.14: 
+>  
+> hci0:   Type: USB 
+>         BD Address: 00:08:E0:01:9E:86 ACL MTU: 192:8 SCO MTU: 64:8 
+>         UP RUNNING PSCAN ISCAN 
+>         RX bytes:2508 acl:0 sco:0 events:60 errors:0 
+>         TX bytes:465 acl:0 sco:0 commands:47 errors:0 
+>         Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00 
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+>         Link policy: RSWITCH HOLD SNIFF PARK 
+>         Link mode: SLAVE ACCEPT 
+>         Name: 'pcB' 
+>         Class: 0x000000 
+>         Service Classes: Unspecified 
+>         Device Class: Miscellaneous, 
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x33c LMP Ver: 1.1 (0x1) LMP Subver: 0x33c 
+>         Manufacturer: Cambridge Silicon Radio (10) 
+>  
+> I installed linux again (Mandrake 9.1, kernel 2.4.21) and the upgrated BlueZ packages in accordance with readme 
+> files of each packages. I tried to create a simple connection. 
+>  
+> On the master side, I run: 
+>  
+> modprobe bnep 
+> modprobe l2cap 
+> hciconfig hci0 up 
+> pand --listen --role GN 
+>  
+> On the slave side, I run; 
+>  
+> modprobe bnep 
+> modprobe l2cap 
+> hciconfig hci0 up 
+> pand -c <master_addr> 
+>  
+> At first, "hcidump -x" dispayed packets sent by the pand command. Trying several times, it showed L2CAP and in 
+> only one case I showed BNEP. However, no connection was create. 
+> Then, maybe after a reboot or a logout, hcidump shows again that pand does not send any packet,. 
+> I can't obtain again the same situation and I don't realize why.
 
-this depends on your setup. For the master it makes sense to have both
-daemons running (like some access points), but for the slave side you
-should choose one and you should prefer pand. However it seems that this
-howto is also a little bit out of date, because the --sdp doesn't exists
-anymore.
+show us the hcidump output and leave it to us to interpret it. And btw
+what about using a 2.6.10 kernel? I can't tell you anything about any
+vendor kernel.
 
 Regards
 
