@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] "hcitool dev" shows no devices
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41FD462C.8090001@gmx.ch>
-References: <41FD3E26.1000401@gmx.ch> <1107116116.8384.4.camel@pegasus>
-	 <41FD462C.8090001@gmx.ch>
-Content-Type: text/plain
-Message-Id: <1107118082.8384.10.camel@pegasus>
-Mime-Version: 1.0
+Message-Id: <200501302046.ALU31339@ms12.netsolmail.com>
+From: Chris Taylor <cht@imipolex-g.com>
+Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,29 +16,60 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 21:48:02 +0100
-
-Hi Marco,
-
-> But another question arised starting hcid:
-> The location of etc/bluetooth/pin. Is it hardcoded?
-> I crosscompiled the bluez libs/utils and hcid now tells me on start:
-> Can't open PIN file /usr/local/arm/2.95.3/arm-linux/etc/bluetooth/pin. No 
-> such file or directory(2)
-> 
-> Can I change the location of the pin-file? maybee in the hcid.conf?
-
-there is no option for that. However you can provide a patch if you
-think such an option is usefull.
-
-You forgot "--sysconfdir=/etc" when you call configure as it is written
-in the README.
-
-Regards
-
-Marcel
+Date: Sun, 30 Jan 2005 12:46:41 -0800
 
 
+>do a "make install DESTDIR=$PWD/x" and then check what it is in the
+>directory "x". Show us the result of a "find x".
+
+Okay so I did this:
+./configure --enable-bcm203x
+ make install DESTDIR=$PWD/x
+
+here's what's in x:
+
+x
+x/usr
+x/usr/sbin
+x/usr/sbin/hcid
+x/usr/sbin/hciattach
+x/usr/sbin/hciconfig
+x/usr/sbin/sdpd
+x/usr/share
+x/usr/share/man
+x/usr/share/man/man5
+x/usr/share/man/man5/hcid.conf.5
+x/usr/share/man/man8
+x/usr/share/man/man8/hcid.8
+x/usr/share/man/man8/hciattach.8
+x/usr/share/man/man8/hciconfig.8
+x/usr/share/man/man8/sdpd.8
+x/usr/share/man/man1
+x/usr/share/man/man1/hcitool.1
+x/usr/share/man/man1/l2ping.1
+x/usr/share/man/man1/sdptool.1
+x/usr/share/man/man1/ciptool.1
+x/usr/share/man/man1/rfcomm.1
+x/usr/share/man/man1/dund.1
+x/usr/share/man/man1/pand.1
+x/usr/share/man/man1/hidd.1
+x/usr/bin
+x/usr/bin/hcitool
+x/usr/bin/l2ping
+x/usr/bin/sdptool
+x/usr/bin/ciptool
+x/usr/bin/rfcomm
+x/usr/bin/dund
+x/usr/bin/pand
+x/usr/bin/hidd
+x/usr/bin/bluepin
+x/etc
+x/etc/bluetooth
+x/etc/bluetooth/hcid.conf
+x/etc/bluetooth/pin
+x/etc/bluetooth/rfcomm.conf
+
+That's it...? Thanks for your help.
 
 
 -------------------------------------------------------
