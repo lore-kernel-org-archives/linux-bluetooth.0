@@ -1,43 +1,48 @@
-Return-Path: <steve.crane@rococosoft.com>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Service level security for RFCOMM
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: James Cameron <james.cameron@hp.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1099024935.10164.11.camel@pegasus>
+In-Reply-To: <20041029044627.GI7454@hp.com>
 References: <1099024935.10164.11.camel@pegasus>
+	 <20041029044627.GI7454@hp.com>
 Content-Type: text/plain
-Message-Id: <1099042277.31284.438.camel@baroque.rococosoft.com>
+Message-Id: <1099025758.10164.16.camel@pegasus>
 Mime-Version: 1.0
-Date: Fri, 29 Oct 2004 10:31:18 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 29 Oct 2004 06:55:58 +0200
 
-On Fri, 2004-10-29 at 05:42, Marcel Holtmann wrote:
+Hi James,
 
-> actually it seems that nobody really cares about service level security
-> on the RFCOMM layer. Or people are too lazy to send in a patch. However,
-> I spent some hours with thinking about it and the core stuff of a small
-> framework for providing authentication and encrypt feedback from HCI to
-> higher level protocols is finished.
+> I'm afraid I don't understand the issues enough to know if I need the
+> feature.
 
-Perhaps this is because no-one except you and Max understands the RFComm
-state-machine? :-)
+at the moment you can trigger authentication and encryption for server
+sockets on a per PSM basis for the L2CAP. If you use RFCOMM you can't
+trigger this and especially not per RFCOMM channel.
 
-> The problem now is to change the RFCOMM state machine to deal with it
-> and reject connections in the failure case. After looking at the state
-> machine of RFCOMM, I realized that there are two posibilities when to
-> trigger the authentication. One is after we receive the PN CMD and the
-> other after the SABM for the specific channel. The specification says
-> nothing about that. What are the pros and cons?
-> 
-> And btw, who is really interested in this feature or needs it?
+Regards
 
-This is useful (and probably required, I can't remember) for JSR-82.
-Especially for people who want to encrypted/authenticated OBEX
-connections.
+Marcel
 
-Are you going to do the client-side too?
 
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+
+
+-------------------------------------------------------
+This Newsletter Sponsored by: Macrovision 
+For reliable Linux application installations, use the industry's leading
+setup authoring tool, InstallShield X. Learn more and evaluate 
+today. http://clk.atdmt.com/MSI/go/ins0030000001msi/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
