@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Sdp (and uclinux)
-From: "Jorge A." =?ISO-8859-1?Q?Gonz=E1lez?= <egrojorge@terra.es>
+Message-ID: <409AD45D.6080102@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1083877519.4420.78.camel@pegasus>
-References: <1083853467.28356.18.camel@pancho>
-	 <1083877519.4420.78.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1083925117.1946.36.camel@pancho>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] questions about BT audio headset support...
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,41 +15,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 07 May 2004 12:20:01 +0200
+Date: Fri, 07 May 2004 02:12:13 +0200
 
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> > I think the problem is -lsdp which is not found. How could I get this
-> > library??
-> 
-> if you use bluez-libs prior 2.6 than install bluez-sdp.
+Hi there,
 
-Thanks! It was totally my fault for not checking if I had the latest
-version...
+I decided to invest some of my precious time into improving audio
+support for BT headsets; I'm going to take over maintenance of the
+snd-bt-sco project.
 
-> > I dont know if this type questions are supposed to be in bluez-users or
-> > bluez-devel. If this is no the appropiate list for this questions I
-> > would be appreciate to know :D
-> 
-> For me it doesn't matter as long as you don't start cross-posting ;)
+I already did some minor improvements, but I don't know how to address
+some critical design issues.
 
-Ok, I will use this list then :D
+Right now, the way it works is this:
+there's a user space program that handles the rfcomm and sco connection
+(my enhanced version listens on open rfcomm for a connection request by
+the headset, and opens the sco channel on demand), and an alsa audio
+device driver. The device driver polls audio data to and from the
+headset; the connection is managed by the user-space program.
 
+Of course this is possibly not the best way of implementing things, but
+I'm a bit stuck here.
 
-Anyway, I am porting bluez for uClinux, by now it is working hcid (with
-the option -n, as a daemon doesnt work due to the uclinux fork
-implementation), hciattach (what a minor modification), hciconfig,
-hcitool and rfcomm (the last one is not proved) and now I am trying to
-make sdpd and sdptool to work.
+The nicest way of implementing a better audio support would be having a
+daemon that
+a) listens for an incoming rfcomm connection that is open by the headset
+itself
+b) waits for a connection attempt (say, alsa audio interface opened) and
+initiate such a connection
+c) has the (optional) possibilty of keeping an open rfcomm session.
+Reason for this one is the not-so-short rfcomm handshake time. The
+rfcomm channel does not drain to much power from the headset, so it
+might be a good idea to keep a steady connection at least as an option.
 
-My objective is communicate a device running uClinux with a PDA and be
-able to transmit serial data via rfcomm and serial port service. If
-anyone has any experience with bluez in uclinux or any other embedded
-system I would appreciate to interchange ideas and experieces about it.
+I don't have any clues how to implement this; what do you experts mean?
+Should I try to enhance sco support itself, or should this stuff
+(connection handling) be done in user-space? What is the easiest way to
+recognize incoming rfcomm connections (listener on hci devices or
+something?)
 
-Thanks again,
+I'm really new to bluetooth, but I think I can adopt. I already worked
+on some audio drivers and porting from 2.4 to 2.6 kernel, so I'm not a
+total newbie, at least, I hope so :)
 
-Jorge
+thanks for spending your time & any suggestions,
+~  Lars
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
+iD8DBQFAmtRcQWC6DTWkDAoRAm5VAJ9SOvKb0nN6T52Zmsgsyv7B9+woPQCeNyv7
+pwr9T8IISJCBLi55MoISpb0=
+=J4nD
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
