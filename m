@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Genius BT mouse
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200411231020.07547.cijoml@volny.cz>
-References: <200411231020.07547.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1101202055.26578.55.camel@pegasus>
-Mime-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-2"
+Message-ID: <200411231020.07547.cijoml@volny.cz>
+Subject: [Bluez-users] Genius BT mouse
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,19 +16,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 23 Nov 2004 10:27:35 +0100
+Date: Tue, 23 Nov 2004 10:20:07 +0100
 
-Hi Michal,
+Hi guys,
 
-> there is a new BT mouse from Genius. It should work like a charm :)
+there is a new BT mouse from Genius. It should work like a charm :)
 
-do you bought one of these? Any information on the used chipset?
-
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
