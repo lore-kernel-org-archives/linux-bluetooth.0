@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42320F52.4000808@kawaiyume.net>
-From: sir <sir@kawaiyume.net>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Java MultiThread
+Subject: Re: [Bluez-users] where is rfcomm souce code?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <310527409.26361@bjut.edu.cn>
+References: <310527409.26361@bjut.edu.cn>
+Content-Type: text/plain
+Message-Id: <1110577369.8511.4.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,23 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Mar 2005 22:36:18 +0100
+Date: Fri, 11 Mar 2005 22:42:49 +0100
 
-Hello, I am new to the list,
+Hi,
 
-I want to develop a piconet server in bt, I am using Gentoo distro and 
-BlueZ stack.
+> 	Hi, Marcel. As you said,the source code of RFCOMM protocol in Bluez could be
+> found in linux-2.6.11,but I have found some source code about rfcomm in the
+> bluez-utils-2.15. So I want to make it clearly that what is the difference between
+> them.
 
-First : I use avatena BlueZ java stack, it seems to work well, first 
-question : is it good ?
-I mean, is there a better java stack ? what does i need ?
+the need the RFCOMM source in bluez-utils-2.15 to create the RFCOMM TTY
+terminal emulation devices. It is like you need ifconfig to manage your
+local ethernet interface.
 
-Next : can someone give me an exemple of java code of a piconet server 
-that can receive more than
-one connection in the same time ?
+Regards
 
+Marcel
 
-Thanks for all.
 
 
 
