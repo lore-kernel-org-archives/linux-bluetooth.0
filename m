@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20041216134138.6218.qmail@web53205.mail.yahoo.com>
-From: Filipa Duarte <filipa_duarte@yahoo.com>
-To: BlueZ Devel <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Interwork of RFCOMM and L2CAP layers
+Subject: Re: [Bluez-devel] Re: Disconnections are not being detected
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <I8T9T2$21C7D65B476B562F8D57DF910D116070@libero.it>
+References: <I8T9T2$21C7D65B476B562F8D57DF910D116070@libero.it>
+Content-Type: text/plain
+Message-Id: <1103195434.28046.59.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,43 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 16 Dec 2004 05:41:38 -0800 (PST)
+Date: Thu, 16 Dec 2004 12:10:34 +0100
 
-Good afternoon
+Hi Andrea,
 
-I am not a kernel developer but I would like to do
-profiling in BlueZ code as part of my PhD research,
-specifically on RFCOMM/L2CAP layers. I took the source
-code from my 2.4.22 kernel. 
+> ok, but how can my program be aware of this ? it has to do some tasks in response of
+> a link-fall.....
 
-I was expecting to see some functions on the RFCOMM
-files calling functions on the L2CAP files, as RFCOMM
-is a layer on top of the L2CAP layer. However I could
-not find any (actually there is one: rfcomm_init calls
-l2cap_load; but this last function is a dummy
-function). 
+since I never needed it so far, I don't know. Check the source code of
+some unix tools or look at netlink.
 
-Could you please tell me where I could find
-information on how the RFCOMM and L2CAP layers
-interwork in the BlueZ implementation (I, of course,
-tryed Google and BlueZ web sites but I could not find
-information)?
+Regards
 
-I would be particularly grateful if someone could give
-directions on how to use the BlueZ stack in a simple
-user space mode.
+Marcel
 
-Many thanks,
-
-Filipa Duarte
-
-
-		
-__________________________________ 
-Do you Yahoo!? 
-Meet the all-new My Yahoo! - Try it today! 
-http://my.yahoo.com 
- 
 
 
 
