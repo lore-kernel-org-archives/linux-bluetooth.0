@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Question about l2ping: 0 bytes always
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <B72A22937C14184DB0AF3324476E9C791A53FC@MBOX22.stu.nus.edu.sg>
-References: <B72A22937C14184DB0AF3324476E9C791A53FC@MBOX22.stu.nus.edu.sg>
-Content-Type: text/plain
-Message-Id: <1105963645.8080.42.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="UTF-8"
+Message-ID: <B72A22937C14184DB0AF3324476E9C791A53FC@MBOX22.stu.nus.edu.sg>
+From: "Khoo Teck Ping" <eng10166@nus.edu.sg>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Question about l2ping: 0 bytes always
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,28 +17,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 17 Jan 2005 13:07:25 +0100
+Date: Mon, 17 Jan 2005 19:58:11 +0800
 
-Hi Teck,
-
-> I am able to run l2ping, attempting to send and receive packets from my linux box to my sony ericsson T630. However the output is always 
->  
-> 0 bytes from xx:xx:xx:xx:xx id x time x ms. 
->  
-> It always ends with x bytes sent, x bytes received, 0% loss. 
->  
-> Is this the correct output?
-
-according to the L2CAP part of the specification the device can send you
-whatever echo responds it wants. This includes a zero byte response and
-for security reasons this is good, because we have seen DoS attacks when
-they are unable to handle big echo packets.
-
-Regards
-
-Marcel
-
-
+RGVhciBBbGwNCiANCkkgYW0gYWJsZSB0byBydW4gbDJwaW5nLCBhdHRlbXB0aW5nIHRvIHNlbmQg
+YW5kIHJlY2VpdmUgcGFja2V0cyBmcm9tIG15IGxpbnV4IGJveCB0byBteSBzb255IGVyaWNzc29u
+IFQ2MzAuIEhvd2V2ZXIgdGhlIG91dHB1dCBpcyBhbHdheXMgDQogDQowIGJ5dGVzIGZyb20geHg6
+eHg6eHg6eHg6eHggaWQgeCB0aW1lIHggbXMuIA0KIA0KSXQgYWx3YXlzIGVuZHMgd2l0aCB4IGJ5
+dGVzIHNlbnQsIHggYnl0ZXMgcmVjZWl2ZWQsIDAlIGxvc3MuIA0KIA0KSXMgdGhpcyB0aGUgY29y
+cmVjdCBvdXRwdXQ/DQogDQpQbGVhc2UgYXNzaXN0LiANCiANClRoYW5rIFlvdSB2ZXJ5IG11Y2gu
+IA0KIA0KVGVjayBQaW5nDQogDQogDQo=
 
 
 -------------------------------------------------------
