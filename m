@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4230049C.5040108@suche.org>
-From: "suche.org" <admin@suche.org>
-MIME-Version: 1.0
+From: Florian Echtler <echtler@fs.tum.de>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: btsco and alsa driver interaction
-References: <d0ktcr$n2i$1@sea.gmane.org> <422E59A9.2040408@xmission.com> <d0meub$s51$1@sea.gmane.org>
-In-Reply-To: <d0meub$s51$1@sea.gmane.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [Bluez-devel] btsco volume commands
+In-Reply-To: <422F838B.2060700@xmission.com>
+Message-ID: <Pine.LNX.4.62.0503100052490.6694@block>
+References: <Pine.LNX.4.62.0503092351590.6694@block> <422F838B.2060700@xmission.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,31 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 10 Mar 2005 09:26:04 +0100
+Date: Thu, 10 Mar 2005 00:53:31 +0100 (CET)
 
-soraberri wrote:
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> Hi
->
-> many thanks Brad! I didn't think in the mixer before... now I think I
-> got it :O
-> (by the way, I haven't forgotten about adding support in the audio
-> gateway as you suggested one day, in order to let the headset intiate
-> an audio connection. This would require the proper SDP record in the
-> database with the proper RFCOMM channel number, and a RFCOMM socket
-> listening in the application. I made some copy-paste for the first
-> thing in sdptool code, but I haven't find the rigth place for the
-> listening socket yet... I have much left to study I guess!)
+> Florian--which headset are you using again? I remember hearing about this
+> problem on the Motorola HS-801 at least.
+That's a B-Speech Elect (http://www.b-speech.de/).
 
-Hi,
+Yours, Florian
+- -- 
+Preserve wildlife - pickle a squirrel today!
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
 
-in btso2 the listen socket can be easyly integretet.
-You aktivate hin in the main while loop. It should be no problem
-since the programm is desinged to handle multiple connections.
-But currently only supprt one since i do not know how to add an second
-headset, and have none.
-
-Cu Thomas
+iD8DBQFCL4x+7CzyshGvatgRAlq3AJ4rzItUTGoihneSWpIbE19CA2zkTgCgg08U
+d164GhXooZWvHLd/eqlVtpk=
+=yG2c
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
