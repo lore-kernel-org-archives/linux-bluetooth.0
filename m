@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] How to install Bluez after cross-compile the
-	sources
+Subject: Re: [Bluez-users] Bluetooth in promiscuous mode and passively
+	collecting traffic?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Juan Manuel <kwyjibo@ono.com>
+To: blue ranger <theblueresearcher@yahoo.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <004a01c40eb7$82153b10$14212a3e@k62300>
-References: <004a01c40eb7$82153b10$14212a3e@k62300>
+In-Reply-To: <20040320211932.69476.qmail@web60105.mail.yahoo.com>
+References: <20040320211932.69476.qmail@web60105.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1079818905.31859.44.camel@pegasus>
+Message-Id: <1079818858.31859.42.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,16 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 20 Mar 2004 22:41:45 +0100
+Date: Sat, 20 Mar 2004 22:40:58 +0100
 
-Hi Juan,
+Hi Ken,
 
-> I have cross-compiled succesfully the sources for an ARM plataform. I set
-> the option --prefix to obtain the result on a directory of my election, and
-> now, I don't know what to do for intall the compilation results in the
-> target computer, an armbase from Compulab. What should I do?
+> I am wondering if there has been any development in using current
+> Bluetooth chips in a promiscuous mode, being able to passively listen
+> to any traffic around?  From the research I've done, I know that a
+> year ago this was not really possible unless you bought a protocol
+> analyzer that is very expensive.  I am working on a Bluetooth project
+> at school and am trying to find a way to collect Bluetooth traffic
+> that is not necessarily directed at my Bluetooth chip.  Thanks for any
+> help you can give.  
 
-tar them, copy them, untar them and be happy ;)
+you can only sniff the HCI traffic between the BlueZ stack and your
+Bluetooth device.
 
 Regards
 
