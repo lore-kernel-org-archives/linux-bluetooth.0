@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040826141810.46943.qmail@web52608.mail.yahoo.com>
-From: gonzalo briceno <gonzaloother@yahoo.com>
+From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
+Reply-To: tim@birdsnest.maths.tcd.ie
 To: bluez-users@lists.sourceforge.net
+References: <412D99CA.5050209@nue.et-inf.uni-siegen.de> <412DD322.1080703@csr.com>
+In-Reply-To: <412DD322.1080703@csr.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Bluez setup and Bluetooth stack and 2.6 kernel
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200408261502.13690.tim@birdsnest.maths.tcd.ie>
+Subject: [Bluez-users] Confessions of an ignoramus - what is all this PIN stuff?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,42 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Aug 2004 07:18:10 -0700 (PDT)
+Date: Thu, 26 Aug 2004 15:02:13 +0100
 
-Marcel responded to my posting by saying:
-"the Bluetooth core layer for 2.6 is in the
-bluetooth.ko kernel module and the config options
-start with CONFIG_BT_*."
+On Thursday 26 August 2004 13:10, Steven Singer wrote:
 
-So what I gather is that the bluez.o module
-functionality is already part of the bluetooth.ko
-module.  Is there anything else I need to know in
-terms of what modules need to be loaded for things to
-work?  The reason for asking is that most
-documentation I have read so far is most likely old
-and refers to bluez.o.  To make a long story short
-does the following seem correct to get USB and
-Bluetooth to work (using kernel 2.6) barring any other
-problems: 
+> A strong BT PIN [1] should not be your main line of defence, it should
+> be merely your first line of defence.
 
-1. load usbcore
-2. load proper USB host driver (OHCI, UHCI, EHCI)
-3. load bluetooth.ko
-4. load (RFCOMM, L2CAP, BNEP, etc)
+I find this PIN business very hard to follow.
+Is there a simple account somewhere?
+(Please don't refer me to the Bluetooth Spec
+which I find more or less unintelligble.)
 
+I have two laptops, martha and william (my grandparents).
+I first linked to my Nokia 6310 with martha.
+For some reason the phone thinks william is also martha.
+Is this something to do with the fact that I always use the same PIN?
 
-p.s. I apologize for the new post relating to an
-existing post.  For the life of me I could not find
-how to reply to my previous thread.  I have done this
-before on other sourceforge lists but I cannot find it
-here.  Once again, my apologies.
-
-
-		
-__________________________________
-Do you Yahoo!?
-New and Improved Yahoo! Mail - Send 10MB messages!
-http://promotions.yahoo.com/new_mail 
+-- 
+Timothy Murphy  
+e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
+tel: +353-86-2336090, +353-1-2842366
+s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
 
 
 -------------------------------------------------------
