@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <17ca74760407280608573db26d@mail.gmail.com>
-From: Carmine Pirro <carrip@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] modify RFCOMM_DISC_TIMEOUT
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Carlos AM <Carlos@naxus.biz>
+Cc: lista bluez <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <004501c4749c$9958f280$5000005a@naxus>
+References: <004501c4749c$9958f280$5000005a@naxus>
+Content-Type: text/plain
+Message-Id: <1091017360.3673.26.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] callback for L2CAP disconnection
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,12 +18,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 28 Jul 2004 15:08:28 +0200
+Date: Wed, 28 Jul 2004 14:22:40 +0200
 
-Does BlueZ stack provides a callback mechanism for L2CAP
-connections/disconnections?
+Hi Carlos,
 
-Thank you, Carmine.
+> I think that i've finally found the origin of the errors. The kernel
+> log
+> shows:
+> 
+> (...)
+> <4> Unknown HCI packet type 01
+> (...)
+> 
+> 
+> This message is dropped every five minutes (aproximately) and the
+> packet
+> type is not always 01. It seems that the serial communication (UART)
+> with
+> the bluetooth module (EYMF2CAMM from TAIYO YUDEN) isn't very
+> confiable. Do
+> you agree?
+
+out of sync H4 streams are really a big problem. This can happen if you
+can't enable automatic flow control. To avoid this you have to use BCSP
+if it is a CSR based chip.
+
+> Then I configured the kernel with BCSP support and tried to attach the
+> device using:
+> /bluez/bluezmain hciattach -n /dev/tts/2 bcsp 115200
+> /bluez/bluezmain hciattach -n /dev/tts/2 swave 115200
+> 
+> but none of them work at all. The error message is [hcid] Can't init
+> device
+> hci0. Connection timed out(110)
+
+The swave will only work if your chip is Silicon Wave based and the BCSP
+method only works if you switch from H4 to BCSP first with the correct
+PS key settings. Contact your module manufacturer.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
