@@ -1,49 +1,80 @@
-Return-Path: <SRS0+7abe75bf9b19a3b2e46b+354+infradead.org+dwmw2@pentafluge.srs.infradead.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Alignment issue
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Woodhouse <dwmw2@infradead.org>
 Cc: Daryl Van Vorst <daryl@wideray.com>,
    "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092306154.28711.85.camel@pegasus>
+In-Reply-To: <1092312127.15466.211.camel@hades.cambridge.redhat.com>
 References: <001201c47fc2$7093e4a0$1301010a@baked>
 	 <1092252699.4564.238.camel@pegasus>
 	 <1092299689.4622.8.camel@imladris.demon.co.uk>
 	 <1092302834.28711.72.camel@pegasus>
 	 <1092304890.15466.44.camel@hades.cambridge.redhat.com>
 	 <1092306154.28711.85.camel@pegasus>
+	 <1092306935.15466.74.camel@hades.cambridge.redhat.com>
+	 <1092308407.28711.99.camel@pegasus>
+	 <1092310391.15466.178.camel@hades.cambridge.redhat.com>
+	 <1092311388.28711.117.camel@pegasus>
+	 <1092312127.15466.211.camel@hades.cambridge.redhat.com>
 Content-Type: text/plain
-Message-Id: <1092315210.15466.220.camel@hades.cambridge.redhat.com>
+Message-Id: <1092313749.28711.129.camel@pegasus>
 Mime-Version: 1.0
-Date: Thu, 12 Aug 2004 13:53:30 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 12 Aug 2004 14:29:09 +0200
 
-On Thu, 2004-08-12 at 12:22 +0200, Marcel Holtmann wrote:
-> For now I will use memmove, but we need clarification on this. I lost my
-> Sun Ultra system, so I can't do any tests.
+Hi David,
+
+> > The loading of the firmware for the 3Com PCMCIA card and the BlueFRITZ!
+> > USB dongle are done through request_firmware(). The Broadcom based
+> > dongles are an exception. I personal prefer to use the bcm203x kernel
+> > driver for loading the firmware, but this is a 2.6 only feature.
 > 
-> Please send me the additional compiler defines for architectures that
-> can do unaligned access by themself.
+> 2.6-only is _fine_. Isn't 2.4 dead yet? I'll make sure we build the
+> bcm203x driver and just drop bluez-bluefw.
 
-These should do it right on all architectures -- I've checked with a gcc
-hacker and verified that at least the get_unaligned() version does the
-right thing on both FR-V and i386. On FR-V it loads each byte and shifts
-it into place, while on i386 it just loads it.
+I don't know if 2.4 is dead, but I think for Fedora Core it makes sense
+only to package up bluez-firmware and don't compile and install bcm203x
+tool from bluez-utils. Actually this is what SuSE did.
 
-#define get_unaligned(ptr)                      \
-({                                              \
-        struct __attribute__((packed)) {        \
-                typeof(*(ptr)) __v;             \
-        }  *__p = (ptr);                        \
-        __p->__v;                               \
-})
+> > The bluez-firmware package only contains the Broadcom firmware files and
+> > it will install them by default under /lib/firmware. You need a modified
+> > firmware.agent script that also looks for firmware files in that place.
+> > We agreed on that path, but this change is not upstream at the moment.
+> > Check the Debian packages for an example of a modified script.
+> 
+> The standard place to put firmware files is /usr/lib/hotplug/firmware
+> isn't it? Is there a reason for using a different path? Can you
+> elaborate on the meaning of 'We' in the above context?
 
-#define put_unaligned(ptr, val)			\
-do {                                            \
-        struct __attribute__((packed)) {        \
-                typeof(*(ptr)) __v;             \
-        }  *__p = (ptr);                        \
-        __p->__v = (val);			\
-} while(0)
+The problem with that path was if you need the firmware before /usr is
+mounted and so we decided to use /lib/firmware.
 
--- 
-dwmw2
+This is the thread about it on the linux-hotplug mailing list:
+
+http://sourceforge.net/mailarchive/message.php?msg_id=8064672
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
