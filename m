@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Service level security for RFCOMM
+Subject: Re: [Bluez-devel] Re: hci event bug for Nokia 7650
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bhatt Abhi-ABHATT <ABHISHEK.BHATT@motorola.com>
+To: radoa <cat@pobox.sk>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5987A7CB1694D811A04D0002B32C289601BF3C03@il93exb05.corp.mot.com>
-References: 
-	 <5987A7CB1694D811A04D0002B32C289601BF3C03@il93exb05.corp.mot.com>
+In-Reply-To: <loom.20041029T203002-259@post.gmane.org>
+References: <loom.20041029T194010-621@post.gmane.org>
+	 <1099073484.6912.0.camel@pegasus> <loom.20041029T203002-259@post.gmane.org>
 Content-Type: text/plain
-Message-Id: <1099078907.6912.23.camel@pegasus>
+Message-Id: <1099076638.6912.5.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,35 +19,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Oct 2004 21:41:46 +0200
+Date: Fri, 29 Oct 2004 21:03:58 +0200
 
-Hi Abhi,
+Hi Radoa,
 
-don't forget to use the "Reply to All" button ;)
+> Kernel version is 2.6.9 with Bluetooth kernel patch 2.6.9-mh2.
+> Here is code (dst address is changed):
+> 
+> int test_connect() 
+> {
+>   struct sockaddr_l2 sa;
+>   int fd, ret;
+>   bdaddr_t *dst = {{0, 1, 2, 3, 4, 5}};
+> 
+>   // success
+>   fd = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+> 
+>   sa.l2_family = AF_BLUETOOTH;
+>   sa.l2_psm = htobs(SDP_PSM);               // 0x0001
+>   sa.l2_bdaddr = *dst; 
+> 
+>   // this will fail
+>   ret = connect(fd, (struct sockaddr *)&sa, sizeof(sa));
+> 
+>   return ret;
+> }
 
-> > it is the same. I already committed the needed stuff to the CVS and
-> > changed rctest to set them. However without a correct kernel the call of
-> > setsockopt() will fail.
-> I am not clear on what this means. Could you please explain what it is that
-> you've added and committed in to CVS ?
+actually I don't understand how that should ever work. Do you looked at
+the example code? We don't do these nasty BD_ADDR tricks. You should
+better use this one:
 
-I like to say look at my latest changes in the CVS and look at rctest,
-but it seems that the anonymous CVS is not in sync with the developer
-CVS. Again, this is a Sourceforge problem and I heard of other projects
-that had the same problems at the moment.
-
-However, I added RFCOMM_LM and RFCOMM_LM_AUTH resp. RFCOMM_LM_ENCRYPT
-with the same values as we used for their L2CAP_* counterparts. So you
-can use the setsockopt() with these values to achieve the same effect as
-you expect on L2CAP. But without a kernel that knows about RFCOMM_LM the
-setsockopt() and getsockopt() calls will fail.
-
-And btw I got the service level security for incoming RFCOMM channels
-working on my development system and I did it without modifying the
-current state machine and it is hopefully SMP safe. I think we need
-another timer on the server side that kills the connection if nobody
-wants to authenticate, but thats another thing to look at. So someone
-owes me a crate full of beer :)
+	str2ba("aa:bb:cc:dd:ee:ff", &sa.l2_bdaddr);
 
 Regards
 
