@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] where is kernel source code
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.GSO.4.60.0504012128590.11865@columbia.cs.ubc.ca>
-References: <424D493C.7010609@palmsource.com>
-	 <Pine.GSO.4.60.0504012128590.11865@columbia.cs.ubc.ca>
-Content-Type: text/plain
-Message-Id: <1112554956.8263.21.camel@pegasus>
+To: bluez-devel@lists.sourceforge.net
+From: "William M. Quarles" <walrus@bellsouth.net>
+Message-ID: <d2pkt2$e45$2@sea.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] BlueZ-pin not available
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,20 +16,9 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 03 Apr 2005 21:02:36 +0200
+Date: Sun, 03 Apr 2005 16:51:27 -0400
 
-Hi Jack,
-
-> It seems the kernel source code is not maintained in Bluez cvs now, so if 
-> I want to have a look I should just download linux kernel code. Is that 
-> right?
-
-look at www.kernel.org or any of the mirrors for example.
-
-Regards
-
-Marcel
-
+You guys have a bad link in the downloads section for BlueZ-pin.
 
 
 
