@@ -1,123 +1,57 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Sybren Stuvel <sybren@thirdtower.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/signed;
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1;
-  boundary="Boundary-03=_uiLq/aSutLxOECk";
-  charset="us-ascii"
-Message-Id: <200311050945.34166.sybren@thirdtower.com>
-Subject: [Bluez-devel] rfcomm patch
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 5 Nov 2003 09:45:20 +0100
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Bthid question
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Gareth Reakes <gareth@apache.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20031128152406.N44245@minotaur.apache.org>
+References: <20031128011412.C61007@minotaur.apache.org>
+	 <1070025957.9036.153.camel@pegasus>
+	 <20031128060135.H61007@minotaur.apache.org>
+	 <1070031670.9036.166.camel@pegasus>
+	 <20031128070531.F61007@minotaur.apache.org>
+	 <20031128125922.O44245@minotaur.apache.org>
+	 <1070057994.9033.209.camel@pegasus>
+	 <20031128143645.Y44245@minotaur.apache.org>
+	 <1070061033.9036.222.camel@pegasus>
+	 <20031128152406.N44245@minotaur.apache.org>
+Content-Type: text/plain
+Message-Id: <1070062634.12656.225.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 29 Nov 2003 00:37:15 +0100
 
+Hi Gareth,
 
---Boundary-03=_uiLq/aSutLxOECk
-Content-Type: multipart/mixed;
-  boundary="Boundary-01=_hiLq/npavUz0wTk"
-Content-Transfer-Encoding: 7bit
-Content-Description: signed data
-Content-Disposition: inline
+> OK then, I will take a look at the HID profile and the USB HID docs over
+> the weekend. Any links/tutorials you would advise reading?
 
---Boundary-01=_hiLq/npavUz0wTk
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Content-Description: body text
-Content-Disposition: inline
+you can also look at my Bluetooth slides
 
-Hi there,
+	http://www.holtmann.org/papers/bluetooth/wtc2003_slides.pdf
+	http://www.holtmann.org/papers/bluetooth/btk2003_slides.pdf
 
-I've been working with bluetooth for a few months now, trying to let BlueZ =
-(on=20
-my PC) talk to Affix (on my Zaurus). One difficulty is that rfcom doesn't=20
-flush it's stdout when a new (incoming and/or outgoing) connection has been=
-=20
-made.
+Regards
 
-With the attached patch, scripts can use rfcomm to connect via bluetooth an=
-d=20
-fork() the process in order to start using the connection (ie. by running=20
-pppd over it).
+Marcel
 
-Greetings,
-Sybren Stuvel
-=2D-=20
-(o_   Q: God, root, what is difference?
-//\   A: God can change the byte order on the CPU, root can't.
-V_/_
-
-
---Boundary-01=_hiLq/npavUz0wTk
-Content-Type: text/x-diff;
-  charset="us-ascii";
-  name="bluez-utils-2.3-rfcomm.patch"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
-	filename="bluez-utils-2.3-rfcomm.patch"
-
-=2D-- work/bluez-utils-2.3/rfcomm/main.c-orig	2003-01-27 12:42:07.000000000=
- +0100
-+++ work/bluez-utils-2.3/rfcomm/main.c	2003-11-04 17:33:13.000000000 +0100
-@@ -339,6 +339,11 @@
- 	printf("Connected %s to %s on channel %d\n", devname, dst, req.channel);
- 	printf("Press CTRL-C for hangup\n");
-=20
-+	/* Added by Sybren Stuvel <sybren AT thirdtower.com> - Flush
-+	 * stdout so other scripts can benefit from rfcomm's output and
-+	 * react to connections being made. */
-+	fflush(stdout);
-+
- 	memset(&sa, 0, sizeof(sa));
- 	sa.sa_flags   =3D SA_NOCLDSTOP;
- 	sa.sa_handler =3D SIG_IGN;
-@@ -443,6 +448,11 @@
- 	printf("Connection from %s to %s\n", dst, devname);
- 	printf("Press CTRL-C for hangup\n");
-=20
-+	/* Added by Sybren Stuvel <sybren AT thirdtower.com> - Flush
-+	 * stdout so other scripts can benefit from rfcomm's output and
-+	 * react to connections being made. */
-+	fflush(stdout);
-+
- 	memset(&sa, 0, sizeof(sa));
- 	sa.sa_flags   =3D SA_NOCLDSTOP;
- 	sa.sa_handler =3D SIG_IGN;
-
---Boundary-01=_hiLq/npavUz0wTk--
-
---Boundary-03=_uiLq/aSutLxOECk
-Content-Type: application/pgp-signature
-Content-Description: signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-
-iD8DBQA/qLiuGr4j9oVQYfARAoWKAJ41vFAxtmz7M6SHY8E75kutaqKqEQCfZ5qu
-4qUA4wSsa1cF8Byn5fvFyZs=
-=dOLj
------END PGP SIGNATURE-----
-
---Boundary-03=_uiLq/aSutLxOECk--
 
 
 
 -------------------------------------------------------
 This SF.net email is sponsored by: SF.net Giveback Program.
 Does SourceForge.net help you be more productive?  Does it
-help you create better code?   SHARE THE LOVE, and help us help
+help you create better code?  SHARE THE LOVE, and help us help
 YOU!  Click Here: http://sourceforge.net/donate/
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
