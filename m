@@ -1,18 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] audio problems with a2play
+Subject: Re: [Bluez-devel] SBC packer done, kind of
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20041124034710.11f2673d.henryk@ploetzli.ch>
-References: <41A22C0B.4050008@xmission.com> <41A234FA.7020303@xmission.com>
-	 <20041123033429.132bf84b.henryk@ploetzli.ch>
-	 <41A2B331.4010001@xmission.com>
-	 <20041123070621.50569968.henryk@ploetzli.ch>
-	 <41A3471C.4000602@xmission.com>
-	 <20041123203836.046fb4f4.henryk@ploetzli.ch>
-	 <1101244496.27351.29.camel@pegasus>
-	 <20041124034710.11f2673d.henryk@ploetzli.ch>
+In-Reply-To: <20041124042114.5e1fee94.henryk@ploetzli.ch>
+References: <20041123014732.3a03b10e.henryk@ploetzli.ch>
+	 <1101191260.26578.43.camel@pegasus>
+	 <20041123074829.7f978ce7.henryk@ploetzli.ch>
+	 <1101201897.26578.54.camel@pegasus>
+	 <20041123204901.776fe240.henryk@ploetzli.ch>
+	 <1101243809.27351.18.camel@pegasus>
+	 <20041124042114.5e1fee94.henryk@ploetzli.ch>
 Content-Type: text/plain
-Message-Id: <1101273877.27351.86.camel@pegasus>
+Message-Id: <1101272477.27351.67.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -25,26 +24,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Nov 2004 06:24:37 +0100
+Date: Wed, 24 Nov 2004 06:01:17 +0100
 
 Hi Henryk,
 
-> > so should it be and I got a trace from a friend with a prototype A2DP
-> > device with a Zeevo ZV4002 and a Bluetooth stack from Impulsesoft.
-> > They actually do it this way, but GCT puts in 0xff 0xff. 
+> > this actually reminds me again that I am not an audio expert. Can you
+> > fix it easily?
 > 
-> Would you mind sharing theses traces with us? I'd really look at what
-> other people do for this.
+> Yupp, I think I did.
 
-I actually don't know if this is possible, because it is a prototype
-device. However I tried to export the trace into a text file, but my
-viewer only shows the first 254 bytes of a L2CAP packet.
+wow, good work. I can now do things like this:
 
-In what values are you interested. The AVDTP signalling channel looks
-the same as we and the GCT devices do it. This device only selects other
-settings for the SBC stream (0x22 0x16 0x33 0x33). Also the L2CAP MTU
-for the AVDTP media channel is bigger (678 bytes) and thus it puts 5 SBC
-frames into one L2CAP packet.
+	sbcenc <au-file> | sbcinfo -
+	sbcenc <au-file> | rcplay <bdaddr> -
+
+> > The choose for libao was, because mpg321 uses it and its API is very
+> > easy. The possibility for writing to a file and playing on a soundcard
+> > with the same set of functions was also a plus. However I don't know
+> > what's the best audio library nowadays. So any comments about that are
+> > welcome.
+> 
+> Neither do I. I just put "audio file library" into the search at
+> freshmeat and it came up with that audio file library. The main reason
+> why I'd like to use that is that it supports reading of audio files.
+
+I will check what kind of library other projects prefer and what library
+is actually best maintained. So if anyone has any pointers ...
 
 Regards
 
