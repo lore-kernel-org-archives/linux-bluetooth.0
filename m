@@ -9,7 +9,7 @@ References: <1074566227.3670.24.camel@myrna>
 	 <1074597777.7088.2.camel@pegasus>  <1074697933.3020.19.camel@myrna>
 	 <1074698544.7088.102.camel@pegasus>  <1074749699.2573.17.camel@myrna>
 Content-Type: text/plain
-Message-Id: <1074775827.3071.1.camel@pegasus>
+Message-Id: <1074766609.7263.58.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,15 +21,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Jan 2004 13:50:27 +0100
+Date: Thu, 22 Jan 2004 11:16:49 +0100
 
 Hi Digger,
 
-> > My Com1 card uses also BCSP and I will try it later with 2.6.2-rc1.
-> > Please check again with this kernel, too.
+> I'll have to wait. The benh kernel, at least the rsync'd one, is at
+> 2.6.1.  Is the "BCSP initialization timed out" one that may  be specific
+> to the powerpc kernels and better dealt with on the powerpc list? Or as
+> Ben H. said regarding the serial port allocation, it is not platform
+> specific?  
 
-The Com1 card is working fine with 2.6.2-rc1. I have no other 2.6 kernel
-running at the moment, so please check if this is also problematic.
+actually I don't know why it is not working with 2.6.
 
 Regards
 
