@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200406141329.45458.cijoml@volny.cz>
-Subject: [Bluez-users] nokia wireless keyboard
+Message-Id: <s0cd9c72.077@cal01.ctech.ac.za>
+From: "Kiran Rama" <ramak@ctech.ac.za>
+To: <bluez-users@lists.sf.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] No module named gtk
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,15 +15,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Jun 2004 13:29:45 +0200
+Date: Mon, 14 Jun 2004 12:38:48 +0200
 
-Hi,
+hi
 
-new BT keyboard from nokia looks very interessant :)
+How do I fix this error?
+Where do I get the module gtk?
 
-http://mobil.idnes.cz/obrazek.html?obrazek=nokia_wireless_keyboard_00.jpg
+linux:/ # bluepin
+Traceback (most recent call last):
+  File "/bin/bluepin", line 34, in ?
+    from gtk import *
+ImportError: No module named gtk
 
-Michal
+thanks.
+--------------------------------------------------------------------
+Disclaimer 
+This e-mail transmission contains confidential information,
+which is the property of the sender.
+The information in this e-mail or attachments thereto is 
+intended for the attention and use only of the addressee. 
+Should you have received this e-mail in error, please delete 
+and destroy it and any attachments thereto immediately. 
+Under no circumstances will the Cape Technikon or the sender 
+of this e-mail be liable to any party for any direct, indirect, 
+special or other consequential damages for any use of this e-mail.
+For the detailed e-mail disclaimer please refer to 
+http://www.ctech.ac.za/polic or call +27 (0)21 460 3911
 
 
 -------------------------------------------------------
