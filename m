@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040922154930.77624.qmail@web41121.mail.yahoo.com>
-From: Sean Loh <blaze_wk@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] connectionless l2cap within PAN implementation
+Subject: Re: [Bluez-users] PAN implementation version
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Sean Loh <blaze_wk@yahoo.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040922145957.58897.qmail@web41110.mail.yahoo.com>
+References: <20040922145957.58897.qmail@web41110.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1095866471.6223.38.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,29 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Sep 2004 08:49:30 -0700 (PDT)
+Date: Wed, 22 Sep 2004 17:21:11 +0200
 
-Hi!!
+Hi Sean,
 
-I'm sorry but I can't seem to find this information.
-I'm utilising the PAN specification to stream audio
-over Bluez PAN and I was wondering is there any way
-for me to switch the l2cap packets to being
-connectionless ones (like from a command line)? If it
-can't be done from a command line, then what other
-ways are there? 
+> Starting from bluez-pan version 1 up to bluez-pan
+> version 1.1, what are the conformance of the different
+> bluez-pans to the bnep specifications?  For example,
+> does bluez-pan 1.1 conform to bnep version 0.95a or
+> bnep version 1?
 
-Because, if I'm right, the default l2cap packets are
-connection oriented within the pan profile, isn't it?
+the bluez-pan package was deprecated a long time ago. Everything you
+need is inside the bluez-utils package and in the latest Linux kernel.
 
-Thanks again!!!!!
+> Is there much of a difference between bnep0.95a and
+> bnep version 1?
+
+I don't know, because I never checked it.
+
+Regards
+
+Marcel
 
 
-		
-_______________________________
-Do you Yahoo!?
-Declare Yourself - Register online to vote today!
-http://vote.yahoo.com
 
 
 -------------------------------------------------------
