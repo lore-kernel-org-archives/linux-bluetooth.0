@@ -1,45 +1,62 @@
-Return-Path: <krose+bluez@krose.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] AMD64 HID pairing
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Kyle Rose <krose+bluez@krose.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <khnacuya23u.fsf@hunter-killer.kendall.corp.akamai.com>
 References: <khnacuya23u.fsf@hunter-killer.kendall.corp.akamai.com>
-	<1097185188.7325.75.camel@pegasus>
-From: Kyle Rose <krose+bluez@krose.org>
-Date: Thu, 07 Oct 2004 17:49:46 -0400
-In-Reply-To: <1097185188.7325.75.camel@pegasus> (Marcel Holtmann's message of
-	"Thu, 07 Oct 2004 23:39:48 +0200")
-Message-ID: <khnr7oa8ah1.fsf@hunter-killer.kendall.corp.akamai.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1097185188.7325.75.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 07 Oct 2004 23:39:48 +0200
 
-Marcel Holtmann <marcel@holtmann.org> writes:
+Hi Kyle,
 
-> this looks very weird. Especially the switching to the VT.
+> On my AMD64 system (Tyan K8W, dual Opteron 244, logitech MX 900 mouse
+> and bluetooth cradle, linux-2.6.8.1 with patch-2.6.8-mh2), I have to
+> switch to VT, do "hidd --search", and hit both buttons (on the mouse
+> and on the cradle) every time I either reboot the machine or let it
+> sit for a while.  Needless to say, this is pretty irritating.
+> 
+> What really bugs me is that this exact same hardware configuration
+> works in IA32 mode: when I reboot, I just hit the button on the mouse
+> and a few seconds later the mouse comes alive; and when I leave it sit
+> for a while, I just move it or hit a button and a few seconds later
+> the mouse comes back.
 
-I guess I wasn't very specific here.  I switch to VT because I can't
-get to a terminal without a working mouse. :) It has nothing to do
-with executing hidd --search from a VT vs. a pty.
+this looks very weird. Especially the switching to the VT. Please try to
+reproduce it with a 2.6.9-rc3-bk7 kernel.
 
-> Please try to reproduce it with a 2.6.9-rc3-bk7 kernel.
+Is the cradle in HID or in HCI mode? Do you see any other errors on
+AMD64. I fixed some 64 bit bugs, but I can't remember that any of them
+where in the HID stuff.
 
-Will do.
+Run "hcidump -X" as root whenever possible so we can see if there are
+wrong things.
 
-> Is the cradle in HID or in HCI mode?
+Regards
 
-Uh... this isn't something I've dealt with before.  When I installed
-bluez on the 32 bit system several months ago, I just turned on HIDP
-support and it simply "worked."  I didn't realize there were different
-modes here.  How do I switch the mode?  Different module?
+Marcel
 
-FWIW, "hcitool dev" gives "hci0 ...", suggesting it is in hci mode,
-which probably isn't right.
 
-> Run "hcidump -X" as root whenever possible so we can see if there are
-> wrong things.
 
-My hcidump doesn't recognize -X.  This is a new option maybe?  I'm
-using the one from the Debian AMD64 alioth repository (1.10).
 
-Cheers,
-Kyle
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
