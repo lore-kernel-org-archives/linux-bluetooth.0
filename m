@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Logitech Bluetooth  Mx900+keyboard support.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Terence Rudkin <trexx@pobox.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1074457244.3254.17.camel@localhost.localdomain>
-References: <1074457244.3254.17.camel@localhost.localdomain>
+From: Terence Rudkin <trexx@pobox.com>
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1074458664.6070.73.camel@pegasus>
+Message-Id: <1074457244.3254.17.camel@localhost.localdomain>
 Mime-Version: 1.0
+Subject: [Bluez-users] Logitech Bluetooth  Mx900+keyboard support.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,26 +15,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 18 Jan 2004 21:44:25 +0100
+Date: Sun, 18 Jan 2004 13:20:44 -0700
 
-Hi Terence,
+Hi,
 
-> Based on the archives, about a month ago, support for this did not
-> exist.  That is because of not being able to switch from HID to HCI
-> mode.   I am using the keyboard an mouse but would like to use the 
-> Bluetooth hub to connect my Palm T3.  
-> 
-> 
-> Has there been any progress on getting this to work?
-> Is there something I can do to help progress this?
+Based on the archives, about a month ago, support for this did not
+exist.  That is because of not being able to switch from HID to HCI
+mode.   I am using the keyboard an mouse but would like to use the 
+Bluetooth hub to connect my Palm T3.  
 
-read the archives again. The hid2hci program from CVS supports the
-Logitech Bluetooth hub.
 
-Regards
+Has there been any progress on getting this to work?
+Is there something I can do to help progress this?
 
-Marcel
-
+-- 
 
 
 
