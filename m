@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: "Marcin Michalak" <marcin@telscom.ch>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] Problem with Billionton PCMCIA card
-From: Marcel Holtmann <marcel@holtmann.org>
-To: marcin@telscom.ch
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4187903F.16859.61AB28E@localhost>
+Message-ID: <4187903F.16859.61AB28E@localhost>
+In-reply-to: <4187865E.12078.5F52B9D@localhost>
 References: <1099394605.10948.33.camel@pegasus>
-	 <4187903F.16859.61AB28E@localhost>
-Content-Type: text/plain
-Message-Id: <1099401399.10948.47.camel@pegasus>
-Mime-Version: 1.0
+Content-type: text/plain; charset=US-ASCII
+Reply-To: marcin@telscom.ch
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,42 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 02 Nov 2004 14:16:39 +0100
+Date: Tue, 02 Nov 2004 13:48:47 +0100
 
-Hi Marcin,
+On 2 Nov 2004 at 13:06, Marcin Michalak wrote:
 
-> > > about what kernel version and what platform are we talking? Actually
-> > > using hci_uart with BCSP and hciattach works perfect with the Zoom card.
-> > > The btuart_cs is not the way to go and I will remove this driver in the
-> > > future.
-> > 
-> >  I compiled kernel 2.6.9 with the latest patch (mh3). Platform is 
-> > laptop with Pentium IV.
-> > After removing btuart.conf I get:
-> > 
-> > cs: memory probe 0xa0000000-0xa0ffffff: clean.
-> > ttyS10 at I/O 0x100 (irq = 10) is a 16C950/954
-> > 
+> On 2 Nov 2004 at 12:23, Marcel Holtmann wrote:
 > 
->  It works with kernel 2.4.20 from RedHat 9, and doesn't hang. Still, 
-> no idea why it hangs on the other one.
-
-the serial drivers in 2.6 has changed and this might be the problem. Do
-you used the same hciattach command that I used for the Zoom card?
-
->  Thanks for the tip, you can change it on Hardware support list. The 
-> card is very cheap for PCMCIA and it is Class 1.
-
-I thought of creating a new page for the serial based Bluetooth PCMCIA
-and CF cards. I need to add the information about hciattach and with
-what kernel version they work or not.
-
-Do you wanna donate one of these cards so that I can take a look at it?
-
-Regards
-
-Marcel
-
+> > Hi Marcin,
+> > about what kernel version and what platform are we talking? Actually
+> > using hci_uart with BCSP and hciattach works perfect with the Zoom card.
+> > The btuart_cs is not the way to go and I will remove this driver in the
+> > future.
+> Hello Marcel,
+>  I compiled kernel 2.6.9 with the latest patch (mh3). Platform is 
+> laptop with Pentium IV.
+> After removing btuart.conf I get:
+> 
+> cs: memory probe 0xa0000000-0xa0ffffff: clean.
+> ttyS10 at I/O 0x100 (irq = 10) is a 16C950/954
+> 
+Hello,
+ It works with kernel 2.4.20 from RedHat 9, and doesn't hang. Still, 
+no idea why it hangs on the other one.
+ Thanks for the tip, you can change it on Hardware support list. The 
+card is very cheap for PCMCIA and it is Class 1.
+  Marcin
+----------------------------------------------------------
+Marcin Michalak		Research Engineer
+Mobile: +41 79 330 83 51	Telscom AG		
 
 
 
