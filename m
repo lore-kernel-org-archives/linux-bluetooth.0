@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <5.1.0.14.2.20030428143907.10cb0da8@unixmail.qualcomm.com>
-To: David Woodhouse <dwmw2@infradead.org>
-From: Max Krasnyansky <maxk@qualcomm.com>
-Subject: Re: [Bluez-devel] [PATCH] Fix abuse of kernel headers.
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1051313297.2850.14.camel@imladris.demon.co.uk>
-References: <5.1.0.14.2.20030425153625.081db0f0@unixmail.qualcomm.com>
-	<5.1.0.14.2.20030425104103.1040bb30@unixmail.qualcomm.com>
-	<5.1.0.14.2.20030425104103.1040bb30@unixmail.qualcomm.com>
-	<5.1.0.14.2.20030425153625.081db0f0@unixmail.qualcomm.com>
+Subject: Re: [Bluez-devel] [PATCH] Check return code of pin helper.
+From: David Woodhouse <dwmw2@infradead.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1051440611.2850.138.camel@imladris.demon.co.uk>
+References: <1051440611.2850.138.camel@imladris.demon.co.uk>
+Content-Type: text/plain
+Message-Id: <1051448314.2850.181.camel@imladris.demon.co.uk>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -22,55 +19,22 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Apr 2003 14:49:59 -0700
-Content-Type: text/plain; CHARSET=us-ascii
+Date: Sun, 27 Apr 2003 13:58:34 +0100
 
-At 04:28 PM 4/25/2003, David Woodhouse wrote:
->On Fri, 2003-04-25 at 23:49, Max Krasnyansky wrote:
->> >Take a look at the PPC version.
->
->> Looks ok to me ;-). But I do remember some problem on some arch.
->> Which was the reason why I implemented sdp_get_unaligned() instead
->> of using <asm/unaligned.h>
->
->It's wrapped in '#ifdef __KERNEL__' on the build box I used. 
-Yep. That's it. I remember some problem with get_unaligned() but I couldn't remember 
-what exactly it was. Thanks for the reminder :)
+On Sun, 2003-04-27 at 11:50, David Woodhouse wrote:
+> On Red Hat 9, the python interpreter segfaults when running bluepin if
+> hcid is started from the init script, but it all works fine if hcid was
+> started from a command prompt. This confuses me,
 
->> >I looked at that but AFAIK the C standard doesn't actually guarantee the
->> > packed structure method will work 
->
->> I don't think packet structures are in the standard. But compiler has to 
->> guarantee that. Otherwise we'd have big problems (all hci structures
->> are packed).
->
->The people I consulted weren't convinced that the compiler must generate
->code which handles the _structure_ being misaligned. Expecting it to
->emitting code to correctly read an int which is three bytes from the
->beginning of the struct is OK; expecting it to emit code which can
->handle misalignment when the member being accessed is at a normal offset
->from the start of the structure isn't necessarily safe.
-Here is what info gcc has to say about that
-"`packed'
-     The `packed' attribute specifies that a variable or structure field
-     should have the smallest possible alignment--one byte for a
-     variable, and one bit for a field, unless you specify a larger
-     value with the `aligned' attribute.
+This no longer confuses me. It's a fontconfig bug when there's no 'HOME'
+in the environment. Fixing the segfault in libfontconfig leaves bluepin
+still not working -- although setting $HOME to something bogus _does_
+work. I've worked around it in bluepin in the bluez-utils-2.3-4 package
+which should be in rawhide some time soon.
 
-     Here is a structure in which the field `x' is packed, so that it
-     immediately follows `a':
+-- 
+dwmw2
 
-          struct foo
-          {
-            char a;
-            int x[2] __attribute__ ((packed));
-          };
-"
-
-See. It doesn't matter where the field is, compiler has to generate the 
-code that can deal with any alignment.
-
-Max
 
 
 
