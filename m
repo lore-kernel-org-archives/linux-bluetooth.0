@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Test Mode
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <2de4657604113005524dc81879@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <2de4657604113005524dc81879@mail.gmail.com>
-References: <2de4657604113005524dc81879@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1101825813.9348.12.camel@notepaq>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] Test Mode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,58 +16,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 30 Nov 2004 15:43:33 +0100
+Date: Tue, 30 Nov 2004 19:22:52 +0530
 
-Hi Manjunath,
+Hi Marcel
 
-> I am trying to set my dongle for  a local loopback test. I try with a
-> "Enable device  under test command"
-> root]# hcitool cmd 0x06 0x0003
-> 
-> Hci dump output is
-> 
-> < HCI Command: Unknown (0x06|0x0003) plen 0
-> > HCI Event: Command Complete (0x0e) plen 4
->  01 03 18 00
+> > 2) I tried using the test mode commands and I am simulatameously
+> > running the hcidump, which prints a unknown command type. I am just
+> > presuming that the commands might be working alright , only that
+> > hcidump doesn't decipher the test commands. Am i right??
+>
+> What version of hcidump do you use? Show the undecoded output to us.
+>
 
-write a patch for hcidump so that these HCI commands are decoded
-correctly.
+I am using hcidump ver 1.15.
 
-> I am not getting an error.  I try to write the "write loopback method
-> command" and enable local loopback.
-> 
-> root]# hcitool cmd 0x06 0x0002 0x01
-> 
-> Hci dump output is
-> < HCI Command: Unknown (0x06|0x0002) plen 1
->  01
-> > HCI Event: Command Complete (0x0e) plen 4
->  01 02 18 11
-> 
-> Status shows 11 which is "HCI unsupported feature". I am using  a
-> version 1.1 anycom-120 usb dongle.
+I am trying to set my dongle for  a local loopback test. I try with a
+"Enable device  under test command"
+root]# hcitool cmd 0x06 0x0003
 
-I don't think that this feature is mandatory to support. I never used or
-needed it.
+Hci dump output is
 
-> Is this a problem with the firmware. Do i have to upgrade the
-> firmware and Can i do it??
+< HCI Command: Unknown (0x06|0x0003) plen 0
+> HCI Event: Command Complete (0x0e) plen 4
+ 01 03 18 00
 
-I don't know.
+I am not getting an error.  I try to write the "write loopback method
+command" and enable local loopback.
 
-> I also have another doubt......how can i generate the LMP commands
-> required for the test mode....as in LMP_test_activate PDU and several
-> other LMP commands. The test methodology only speaks about the LMP
-> PDU's. How can i generate these LMP commands for the test scenarios.
+root]# hcitool cmd 0x06 0x0002 0x01
 
-You can't generate any LMP messages from the HCI. Actually the HCI
-command should result in a call to the appropiate LMP commands.
+Hci dump output is
+< HCI Command: Unknown (0x06|0x0002) plen 1
+ 01
+> HCI Event: Command Complete (0x0e) plen 4
+ 01 02 18 11
 
-Regards
+Status shows 11 which is "HCI unsupported feature". I am using  a
+version 1.1 anycom-120 usb dongle.
+hciconfig -a gives the features as
 
-Marcel
+Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
 
+Is this a problem with the firmware. Do i have to upgrade the
+firmware and Can i do it??
 
+I also have another doubt......how can i generate the LMP commands
+required for the test mode....as in LMP_test_activate PDU and several
+other LMP commands. The test methodology only speaks about the LMP
+PDU's. How can i generate these LMP commands for the test scenarios.
+
+Thanks,
+Best Regards,
+Manjunath.
 
 
 -------------------------------------------------------
