@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net, pws@csr.com
-Subject: Re: [Bluez-users] Test Mode 
-In-Reply-To: Message from Manjunath Prabhu <manjunath.mp@gmail.com>
-   of "Mon, 06 Dec 2004 20:06:31 +0530." <2de4657604120606361751793a@mail.gmail.com>
-References: <2de4657604113010234e4e3a3f@mail.gmail.com> <1101882666.18840.23.camel@pegasus> <200412011028.iB1ASZIk030820@news01.csr.com>  <2de4657604120606361751793a@mail.gmail.com> 
-Message-ID: <25262.1102344714@csr.com>
-From: Peter Stephenson <pws@csr.com>
+Message-ID: <2de4657604120606361751793a@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Test Mode
+Cc: pws@csr.com
+In-Reply-To: <200412011028.iB1ASZIk030820@news01.csr.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <2de4657604113010234e4e3a3f@mail.gmail.com>
+	 <1101882666.18840.23.camel@pegasus>
+	 <200412011028.iB1ASZIk030820@news01.csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,38 +21,79 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 14:51:54 +0000
+Date: Mon, 6 Dec 2004 20:06:31 +0530
 
-Manjunath Prabhu wrote:
-> Can you tell me how this can be done??? I am trying to set the device
-> for loopback but not able to get through......How do I set the
-> loopback without entering the Test mode.
-
-Use HCI_write_loopback_mode.  For local this is trivial; either it
-works straight away or something is wrong.  For remote, you may need
-to have a connection already set up and I believe there may be
-restrictions as to whether you are master or slave on the link; try
-both.
-
-Since these are test modes, not designed for normal use, keep it as
-simple as possible.  Start from scratch for local loopback, start with
-just a single remote connection for remote loopback.
-
-pws
+Hi Peter,
 
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
+On Wed, 01 Dec 2004 10:28:34 +0000, Peter Stephenson <pws@csr.com> wrote:
+> 
+> 
+> > The LMP specification speaks about the Test Mode and Methodology
+> > saying that Adaptive power control, adaptive freq hopping scenarios
+> > can be imitated provided the respective LMP PDU's are sent.
+> >
+> > How do I make the HCI commands initiate these LMP PDU's? The HCI
+> > specification have only the "Test Enable" and "Read and Write
+> > Loopback"  test commands but other no commands which will result in
+> > inititating the LM to the testing modes. How do i conduct these
+> > adaptive tests?
+> 
+> It's quite deliberate that the only thing you can do with a production
+> device is put it into test mode as a slave
+> (HCI_Enable_Device_Under_Test_Mode), requiring all test instructions to
+> be sent from the master.  To do the test end you need a specialist
+> tester.  These tend to be expensive since they're aimed at manufacturers
+> doing a lot of testing.
+> 
+> You can use local and remote loopback without any extra hardware
+> support, however.  They are completely separate from the test modes you
+> are talking about.
 
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
+Can you tell me how this can be done??? I am trying to set the device
+for loopback but not able to get through......How do I set the
+loopback without entering the Test mode.
 
-www.mimesweeper.com
-**********************************************************************
-
+thanks,
+regards,
+Manjunath
+> 
+> Since the features aren't available over HCI, you need to ask somewhere
+> else.  However, if you're looking for a cheap way of using the Bluetooth
+> test modes you're probably out of luck.  Most manufacturers (including
+> us) provide some simplified but non-standard test commands you can run
+> between two modules for RF testing and characterisation.
+> 
+> --
+> Peter Stephenson <pws@csr.com>                  Software Engineer
+> CSR PLC, Churchill House, Cambridge Business Park, Cowley Road
+> Cambridge, CB4 0WZ, UK                          Tel: +44 (0)1223 692070
+> 
+> **********************************************************************
+> This email and any files transmitted with it are confidential and
+> intended solely for the use of the individual or entity to whom they
+> are addressed. If you have received this email in error please notify
+> the system manager.
+> 
+> This footnote also confirms that this email message has been swept by
+> MIMEsweeper for the presence of computer viruses.
+> 
+> www.mimesweeper.com
+> **********************************************************************
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
