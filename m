@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <4230049C.5040108@suche.org>
+From: "suche.org" <admin@suche.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: RE: [Bluez-devel] Connection withaphonestaysopenafterclosingRFCOMM channel
-Message-ID: <C70061B183DE09419568AB2060C52A951CAAA1@arion.intra.local>
-From: "Victor Shcherbatyuk" <Victor.Shcherbatyuk@tomtom.com>
-To: <bluez-devel@lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re: btsco and alsa driver interaction
+References: <d0ktcr$n2i$1@sea.gmane.org> <422E59A9.2040408@xmission.com> <d0meub$s51$1@sea.gmane.org>
+In-Reply-To: <d0meub$s51$1@sea.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,49 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 10 Mar 2005 10:35:38 +0100
+Date: Thu, 10 Mar 2005 09:26:04 +0100
 
-Hi Marcel,
+soraberri wrote:
 
-Fixes it for me too (SE630). Thanks.
+> Hi
+>
+> many thanks Brad! I didn't think in the mixer before... now I think I
+> got it :O
+> (by the way, I haven't forgotten about adding support in the audio
+> gateway as you suggested one day, in order to let the headset intiate
+> an audio connection. This would require the proper SDP record in the
+> database with the proper RFCOMM channel number, and a RFCOMM socket
+> listening in the application. I made some copy-paste for the first
+> thing in sdptool code, but I haven't find the rigth place for the
+> listening socket yet... I have much left to study I guess!)
 
-Regards,
-      Victor.=20
+Hi,
 
+in btso2 the listen socket can be easyly integretet.
+You aktivate hin in the main while loop. It should be no problem
+since the programm is desinged to handle multiple connections.
+But currently only supprt one since i do not know how to add an second
+headset, and have none.
 
-Victor Shcherbatyuk | Software Developer | TomTom |
-victor.shcherbatyuk@tomtom.com | +31 (0) 20 4469 873 office | +31 (0)
-628 186314 mobile
-
-
------Original Message-----
-From: bluez-devel-admin@lists.sourceforge.net
-[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Wednesday, March 09, 2005 18:52 PM
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Connection
-withaphonestaysopenafterclosingRFCOMM channel
-
-Hi Victor,
-
-> > Hope that explains....
->=20
-> it does not explain it, but this is what I expected. Another reference
-
-> counting problem. Maybe introduced at that time I fixed another one of
-
-> these crazy problems. Funny is that this does not result in an oops.=20
-> The easiest way to fix this is, if you send me one of these phones,=20
-> because otherwise it will take quite some time to reproduce it.
-
-try the attached patch. It fixes it for me when I tested this with a
-Nokia 6310.
-
-Regards
-
-Marcel
-
+Cu Thomas
 
 
 -------------------------------------------------------
