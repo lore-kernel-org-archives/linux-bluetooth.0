@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] easier way to program ?
+Subject: Re: [Bluez-users] using matlab to program bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Oswaldo Seiji Morelli Sakai <oswaldo.sakai@poli.usp.br>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4487C040D663894C961C8297CB8F62B81E6354@apl03.poli.usp.br>
-References: <4487C040D663894C961C8297CB8F62B81E6354@apl03.poli.usp.br>
+In-Reply-To: <4487C040D663894C961C8297CB8F62B81E6353@apl03.poli.usp.br>
+References: <4487C040D663894C961C8297CB8F62B81E6353@apl03.poli.usp.br>
 Content-Type: text/plain
-Message-Id: <1076681858.2671.49.camel@pegasus>
+Message-Id: <1076681801.2671.47.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,19 +18,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 15:17:39 +0100
+Date: Fri, 13 Feb 2004 15:16:41 +0100
 
 Hi Oswaldo,
 
-> wich is the easier way to program hci commands?
+> does someone kows if its possible to program hci commands using matlab?
 
-using C/C++.
-
-> i have to student kits(ericson) and i want to program somethig simple(i think):
-> a automatic conection between them(inquire-create conection-accept conection) 
-> does someone works with something similar in C or VB? 
-
-Take a look at the source and the test programs. It is all C.
+I don't think so.
 
 Regards
 
