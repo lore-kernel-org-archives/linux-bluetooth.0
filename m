@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Till Harbaum <harbaum@beecon.de>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <410E51C9.1020401@celar.fr>
+From: =?ISO-8859-1?Q?J=E9r=F4me_LECOMTE?= <lecomte@celar.fr>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200408021859.44496.harbaum@beecon.de>
-Subject: [Bluez-devel] L2CAP dropping packets on BlueZ based receiver
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] IPv6 Bluez and Router Advertissement
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,39 +15,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 2 Aug 2004 18:59:44 +0200
+Date: Mon, 02 Aug 2004 16:38:01 +0200
 
 Hi,
 
-i have been using bluez l2cap for quite some time now. To my BlueMP3 receiver 
-i have streamed gigabytes via l2cap with no problems using bluez as a sender 
-so far.
+I'm having a problem concerning IPv6 autoconfiguration over Bluetooth 
+with Bluez Stack.
+I set up a PICONET architecture like described in the "PAN How to". A 
+bridgde is taking care of all point-to-point bnep interfaces between the 
+master node and the slaves.
+This master node acts like a router to provide access to a MANET 802.11b 
+network and implements IPV6 technology. Ipv4 configuration works well.
+My aim is to provide IPv6 autoconfiguration to the BT slaves nodes.
+I installed RADVD on the router in order to broadcast an ipv6 prefix to 
+BT nodes but they can't achieve to auto-configure.
+The auto configuration is working through an ethernet link so the 
+problem comes from Bluetooth  I think.
+With a sniffer, router sollicication are going well from the slave to 
+the router but router advertisement (with ipv6 prefix) can't go through 
+Bluetooth links (sniffer on slaves shows that) and I don't understand why.
+Experience about this would be welcome
 
-A customer of mine now told me, that l2cap under bluez is unrealible. It was 
-hard to believe, but the follwing archive contains to little programs i wrote 
-to verify this. It's a sender and a (artifically slowed down) receiver:
+Cheers.
 
-http://www.harbaum.org/till/l2flow.tgz
-
-The sender is marking the packets with some sequence number. After about 
-80kBytes the receiver starts complaining about missing sequence numbers. 
-Since i can stream to my won hardware (and successfully slowing down the 
-transmission, since the receiving mp3 decoder is only taking the data at the 
-appropriate bandwidth) i am sure that sending data with bluez is not the 
-problem. However the receiver seems to fetch all packets from its bluetooth 
-hardware and is dropping packets if it then sees, that it has run out of 
-internal buffers.
-
-Why is that? Can this be avoided? Is this by purpose?
-
-Ciao,
-  Till
-
--- 
-Dr.-Ing. Till Harbaum                       Tel.:  +49 721 4998963
-BeeCon GmbH                                 Fax:   +49 721 4998962
-Haid-und-Neu Strasse 7, 76131 Karlsruhe     Mobil: +49 179 9087904
-harbaum@beecon.de                           http://www.beecon.de
 
 
 
