@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Switching the Logitech-Hub
+Subject: Re: [Bluez-devel] Success: switching the Logitech-Hub
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Alexander Holler <holler@ahsoftware.de>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8600000.1073220340@[192.168.207.2]>
-References: <10480000.1073193805@[192.168.207.2]>
-	 <1073212848.25261.142.camel@pegasus>  <8600000.1073220340@[192.168.207.2]>
+In-Reply-To: <9810000.1073197538@[192.168.207.2]>
+References: <9810000.1073197538@[192.168.207.2]>
 Content-Type: text/plain
-Message-Id: <1073267399.3804.8.camel@pegasus>
+Message-Id: <1073267036.3804.4.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,25 +18,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 05 Jan 2004 02:49:59 +0100
+Date: Mon, 05 Jan 2004 02:43:56 +0100
 
 Hi Alexander,
 
-> I've got no comments, it's not surprising, it's just 8 hours on this list. 
-> But I also have looked through the sources and up to now, I don't see, why 
-> this should break other devices. And it seems there are some more people 
-> with the same problem. e.g.
-> http://sourceforge.net/mailarchive/forum.php?thread_id=3345181&forum_id=5398
+> lsusb:
 > 
-> I assume there are also some more who are wondering why sending reports 
-> using hiddev doesn't work. But not everyone will find the reason. Without 
-> your help, I wouldn't have find it too.
+> Bus 001 Device 004: ID 046d:c707 Logitech, Inc.
+> Bus 001 Device 003: ID 046d:c704 Logitech, Inc.
+> Bus 001 Device 002: ID 0451:2036 Texas Instruments, Inc. TUSB2036 Hub
+> Bus 001 Device 001: ID 0000:0000
 > 
-> As the author from the patch writes, it doesn't seem to interrest anyone 
-> from the usb-devels.
+> Just be sure you have sshd up and running before switching the hub when 
+> using the diNovo Keyboard. ;)
 
-it is a good idea to repost a clean patch for 2.4 and 2.6 to the Linux
-USB developer mailing list. Turn the attention to the problem.
+I modified the hid2hci program to support switching of the Logitech
+Bluetooth wireless hub. Code is in CVS now and it should also support
+the Apple devices with HID proxy out of the box.
+
+A little bit weird is that the HID device 046d:c704 is still present
+after switching.
 
 Regards
 
