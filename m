@@ -1,61 +1,34 @@
-Return-Path: <daryl@wideray.com>
-Errors-To: <daryl@wideray.com>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Subject: Rfcomm qualification
-Date: Tue, 29 Jul 2003 13:58:20 -0700
-Message-ID: <000201c35614$251dcaf0$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="----=_NextPart_000_0003_01C355D9.78BEF2F0"
+Return-Path: <maxk@qualcomm.com>
+Message-Id: <5.1.0.14.2.20030724103726.099c2978@unixmail.qualcomm.com>
+Date: Thu, 24 Jul 2003 10:38:23 -0700
+To: Stephen Crane <steve.crane@rococosoft.com>
+From: Max Krasnyansky <maxk@qualcomm.com>
+Subject: Re: [Bluez-devel] EBADFD on RFComm connect
+Cc: bluez-devel@lists.sourceforge.net, marcel@rvs.uni-bielefeld.de
+In-Reply-To: <1059055794.9806.43.camel@baroque.rococosoft.com>
+References: <5.1.0.14.2.20030722172712.098034f8@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030722172712.098034f8@unixmail.qualcomm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-This is a multi-part message in MIME format.
+At 07:09 AM 7/24/2003, Stephen Crane wrote:
+>On Wed, 2003-07-23 at 01:33, Max Krasnyansky wrote:
+>
+>> You can not do this
+>>         while (0 > connect(s, (struct sockaddr *)&addr, sizeof(addr)))
+>>                if (errno != EBUSY) {
+>>                    perror("connect");
+>>                    return -1;
+>>                }
+>> 
+>> If connect returns EBUSY error you have to close() the socket. And it does
+>> indeed return EBUSY in your case (I ran the progs) because close() is asynchronous
+>> and that channel still exist (two connections on the same channel are not allowed 
+>> in RFCOMM). What you can do to avoid that error is to enable SO_LINGER option on that
+>> socket, in which case close() will be synchronous. 
+>
+>Thanks Max. That's fixed it. Another one for the programming manual?
+Yep.
 
-------=_NextPart_000_0003_01C355D9.78BEF2F0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-
-Marcel,
-
-We ran into another 1.0B problem with rfcomm testing. We didn't notice this
-last time because the tests were done slightly differently (without an
-automated tester).
-
-The tester acts as a 1.0B device and establishes a connection with the IUT.
-The IUT sent credits (pf bit = 1) after the MSC echange. It shouldn't.
-Attached is an hcidump of it.
-
-We'll have to get this resolved before we can check the fcon/fcoff mods.
-
-Could you take a look?
-
-Thanks,
-
--Daryl.
-
-------=_NextPart_000_0003_01C355D9.78BEF2F0
-Content-Type: application/octet-stream; name="rfc_bv_10_devB.dat"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="rfc_bv_10_devB.dat"
-
-DQABAEPspQBUkgwABAQKvMMAWwIAAAAAAQsAAABD7KUA25MMAAEJBAe8wwBbAgABBwABAEPspQBB
-oQwABA8EAAgJBA4AAQBD7KUAbdoMAAQDCwABALzDAFsCAAEACAAAAEPspQDc2gwAAQ0IBAEADgAJ
-AAEAQ+ylAGsWDQAEDgYIDQgAAQAIAAAAQ+ylAMIhDQABDwQEAQAYzAcAAQBD7KUAcDUNAAQPBAAH
-DwQIAAEAQ+ylAHWWDQAEHQUAAQAYzAcAAQBD7KUAzpYNAAQPBAAIAAAGAAEAQ+ylAC6XDQAEGwMB
-AAURAAEAQ+ylAOkpDwACASAMAAgAAQACAQQAAwBAABUAAABD7KUAMysPAAIBIBAADAABAAMBCABA
-AEAAAAAAAAgAAQBE7KUAKloAAAQTBQEBAAEAMQABAETspQA3owEAAgEgLAAoAAEABAIkAEAAAAAB
-Av8BAgL//wMWAAH/////AAAAAAAAAAD//////////xMAAABE7KUABqQBAAIBIA4ACgABAAUCBgBA
-AAAAAAAVAAAAROylAEakAQACASAQAAwAAQAEAQgAQAAAAAECAAQIAAEAROylAJgWAgAEEwUBAQAB
-AAgAAQBE7KUARiUCAAQTBQEBAAEAGAABAETspQASTwYABA0VAAEAAAGoAgAAAAAAAKhhAAD/////
-LwABAETspQCLSwgAAgEgKgAmAAEABQEiAEAAAAAAAAECAAQDFgABAAAAAAAAAAAAAAAA////////
-//8NAAEAROylAJaYCAACASAIAAQAQAADPwEcDQAAAETspQASmQgAAgEgCAAEAEAAA3MB1wgAAQBE
-7KUAiA4JAAQTBQEBAAEADQABAETspQAMHwoAAgEgCAAEAEAACz8BWQ0AAABE7KUAzh8KAAIBIAgA
-BABAAAtzAZIRAAAAROylAC8gCgACASAMAAgAQAAB7wnjBQuNqggAAQBE7KUABpYKAAQTBQEBAAEA
-CAABAETspQCOowoABBMFAQEAAQARAAEARuylANyBAwACASAMAAgAQAAD7wnhBQuNcBEAAQBG7KUA
-FNADAAIBIAwACABAAAPvCeMFC41wEQAAAEbspQCQ0AMAAgEgDAAIAEAAAe8J4QULjaoOAAAARuyl
-AOrQAwACASAJAAUAQAAJ/wEhXAgAAQBG7KUA20kEAAQTBQEBAAEACAABAEbspQDdVAQABBMFAQEA
-AQARAAEARuylAF6KBgACASAMAAgAAQAGAwQAQABAABEAAABG7KUAIZAGAAIBIAwACAABAAcDBABA
-AEAACAABAEbspQD1BAcABBMFAQEAAQAHAAEARuylABDrCAAEBQQAAQATGhoaGhoaGhoaGhoaGg==
-
-------=_NextPart_000_0003_01C355D9.78BEF2F0--
+Max
