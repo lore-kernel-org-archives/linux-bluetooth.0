@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41F82DA9.8090806@webstuhl.net>
-From: Ben Pezzei <ben@webstuhl.net>
+Message-ID: <41F7BFFE.20808@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] partly OT: pipe sound from Headset to soundcard
-References: <41F7CEF6.1050508@webstuhl.net> <41F7D274.4030208@xmission.com>
-In-Reply-To: <41F7D274.4030208@xmission.com>
+Subject: Re: [Bluez-devel] btsco/headset problems
+References: <20050125015049.GA1520@viz.cacr.caltech.edu>
+In-Reply-To: <20050125015049.GA1520@viz.cacr.caltech.edu>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,51 +18,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 27 Jan 2005 00:54:17 +0100
+Date: Wed, 26 Jan 2005 09:06:22 -0700
 
-Hi Brad,
+John,
 
-Brad Midgley schrieb:
-> I had the same thought.
+I wanted to let you know that I've looked at this message and tried to 
+imagine what is wrong and I don't have a lot of ideas.
+
+It might be that the pairing is trying to get established and require a 
+pin number. A few days ago someone reported that they had to change the 
+pin script to hardcode "0000" in order for it to work. Check the recent 
+archives.
+
+Brad
+
+John McCorquodale wrote:
+> Hi, y'all,
 > 
-> We have a way to send line in to a stereo headset but there is a delay. 
-> (see bluetooth-alsa.sf.net)
-
-Yeah, but this covers A2DP only, right?
-
-Right now, I was trying to accomplish this via asound.conf:
-something like:
-pcm.foo {
-   type multi
-   <map soundcard>
-   <map headset>
-}
-pcm.bar {
-   type route
-   slave.pcm "bar"
-   <map channels card out -> hs in>
-   <map channels card in -> hs out>
-}
-
-hope the idea is understandable
-
-http://www.alsa-project.org/alsa-doc/alsa-lib/pcm_plugins.html#pcm_plugins_route
-
-but I guess this won't work
-
-> You could write something similar that runs in userspace and copies 
-> audio streams around using sco.
-
-C hacking? ;) well, if there is really no other way, i could
-try it. Are there some docs around to dig in or just the btsco
-sources?
-
-greetings
-ben
-
-
-
-
+> I just pulled the current btsco CVS, compiled against vanilla 2.6.10-rc3,
+> trying to talk to a HBH-35.  I run btsco <addr> and it gets thru the
+> "AT+" lines, but never says "opened hwdep" no matter what I do (yes, I
+> push the button on the headset).  I can set the volume just fine with
+> alsamixer.  aplay does nothing (hangs forever) and arecord prints the
+> header and then hangs forever, which are consistent with btsco never
+> having opened the SCO.
+> 
+> stracing btsco shows that no data ever comes in on the BT file descriptor;
+> the poll just sits in its little one-second loop never rx'ing anything from
+> anybody, even when I bang on the headset button like an undersexed chihuahua
+> on speed.
+> 
+> Tried two HCIs, the socket CF G card (which, yes, works in 2.6 with suitable
+> patch for the serial driver) and the tiny little dlink USB dongle.  Exact
+> same behavior both cases.
+> 
+> I hope this is obvious to somebody?
+> 
+> -mcq
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+> Tool for open source databases. Create drag-&-drop reports. Save time
+> by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+> Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
