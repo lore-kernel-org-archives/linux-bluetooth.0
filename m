@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] NAP problem
+Subject: Re: [Bluez-users] /usr/include/bluetooth/bnep.h
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jose Angel Rodriguez <jrodriguezv@telefonica.net>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <409C1B27.1050205@telefonica.net>
-References: <409B756D.6000705@telefonica.net>
-	 <1083946390.4420.120.camel@pegasus>  <409C1B27.1050205@telefonica.net>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1083972662.4420.156.camel@pegasus>
+In-Reply-To: <200405080023.12137.cijoml@volny.cz>
+References: <1083857533.16650.25.camel@saag>
+	 <200405072351.32016.cijoml@volny.cz> <1083967722.4420.144.camel@pegasus>
+	 <200405080023.12137.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1083970579.4420.151.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,71 +20,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 08 May 2004 01:31:02 +0200
+Date: Sat, 08 May 2004 00:56:19 +0200
 
-Hi Jose,
+Hi Michal,
 
-> >>I hava a Debian Sarge PC as a NAP for a bluetooth network. The comput=
-er=20
-> >>is also connected to an ADSL.
-> >>
-> >>This is my etc/network/interfaces file:
-> >># /etc/network/interfaces -- configuration file for ifup(8), ifdown(8=
-)
-> >>
-> >># The loopback interface
-> >>auto lo
-> >>iface lo inet loopback
-> >>
-> >># The first network card - this entry was created during the Debian=20
-> >>installation# (network, broadcast and gateway are optional)
-> >>auto eth0
-> >>iface eth0 inet static
-> >>       address 192.168.0.2
-> >>       netmask 255.255.255.0
-> >>       network 192.168.0.0
-> >>       broadcast 192.168.0.255
-> >>       gateway 192.168.0.1
-> >>
-> >># bluetooth network server
-> >>iface bnep0 inet static
-> >>       address 10.0.0.1
-> >>       netmask 255.255.255.0
-> >>
-> >>eth0 is the ADSL connection an bnep0 is the bluetooth connection.
-> >>
-> >>My /etc/bluetooth/pan/dev-up file:
-> >>#!/bin/sh
-> >>ifup bnep0
-> >>
-> >>I think everytime a client connects it runs /etc/bluetooth/pan/dev-up=
-.=20
-> >>Everything was working fine, but after updating packages with apt-get=
-=20
-> >>everytime a client connects I have to configure bnep0 interface by ha=
-nd=20
-> >>(ifup bnep0).
-> >>
-> >>=BFDoes anybody know why /etc/bluetooth/pan/dev-up does not work now?=
- =BFHow=20
-> >>can I configure bnep0 interface automaticaly?
-> >>   =20
-> >>
-> >
-> >what about putting "auto bnep0" into the interfaces file ;)
-> >
-> I tried this but it doesn't work. It was working fine with this=20
-> interfaces file, but now :-(
+> > I don't really think so, because this is not an easy work and my focus
+> > is on 2.6. However I added some missing stuff to hidd and it will be
+> > enabled in bluez-utils-2.7 even if I haven't published a patch that
+> > includes the hidp kernel module so far.
+> 
+> It is needed to have hid support in 2.4 and doesn't metter which way it will 
+> be supported. But I except, that you'll make bthid deprecated when hidp 
+> kernel module will be released, so... 
 
-my fault, the auto is for the boot time. You don't need any extra stuff
-and you also don't need any PAN dev-up script. Check your hotplug
-installation why it is not working. It is not a BlueZ problem.
-
-> =BFShould /etc/bluetooth/pan/dev-up run everytime a client connects? If=
- I=20
-> run that scrip manualy everythig works fine.
-
-I don't know, because I never used it.
+don't worry too much about it, because the final release of hidp is not
+expected very soon. I am going to add a prototype to my -mh patches and
+that's it. However the bthid was never really released, so you are right
+and I will deprecate it at some point and remove it from CVS.
 
 Regards
 
