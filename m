@@ -1,76 +1,75 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3F0EF99B.6000400@superbug.demon.co.uk>
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
+Return-Path: <daryl@wideray.com>
+Errors-To: <daryl@wideray.com>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Subject: RE: Qualification testing - rfcomm
+Date: Fri, 11 Jul 2003 09:43:43 -0700
+Message-ID: <001001c347cb$97a39840$1a01010a@baked>
 MIME-Version: 1.0
-To: bluez Dev <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] Headset via usb dongle devel problems.
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 11 Jul 2003 18:53:31 +0100
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1057913731.1027.11.camel@pegasus>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
+Marcel,
 
-I have discovered that the performance of the bluez stack is a problem 
-when using the hci_usb.c driver.
-I cannot get it to send SCO packets quicker than one urb per 40ms.
-As the headset needs one urb per 3ms, this is quite a problem.
-I would also assume that other applications like file transfer over 
-bluetooth would be bad.
-Would it be ok for the hci_usb.c driver to implement say 100 urbs per 
-type. I.E. 100 output urbs for BULK, 100 output urbs for SCO etc.
-The driver would then be sent a packet from the bluez stack and then get 
-one of the 100 urbs, and send it immeadiately to the usb device 
-(usb_submit_urb). But if all 100 urbs are used up, it would block, until 
-an urb was freed (tx_complete callback).
+You're right that it doesn't check the error code, it just exits. But that
+doesn't explain why it sends 5 frames, waits for 20 seconds, and then sends
+5 more.  Shouldn't send block?
 
-Also, I need to know what the intended buffer management in the bluez 
-driver is.
-1) Application allocs some memory.
-2) Application fills memory with data
-3) Application calls bluez with pointer and length of memory.
-4) What does bluez do now?
-Does it: -
-5) memcpy the data from user memory (maybe copyfromuser), add headers to 
-it creating a packet, cutting it up into multiple packets if needed. 
-(E.g. adding connection numbers etc.)
-6) calls the low level device driver with pointer and length of packet.
-7) low level device driver queues it for output. blocks here is the 
-queue is full.
-8) Returns control back to application.
-9) low level device driver outputs the packet, and calls tx_complete 
-callback.
-10) tx_complete callback signals to higher layers in bluez that the tx 
-is complete, and the higher layers release the memory.
+I haven't yet tried to reproduce that behaviour.  So I'm not certain that
+the sequence of send 5, wait 20, send 5 repeats indefinitely.  I'll take a
+look at it shortly.
 
-For performance reasons, we should try to reduce the amount of 
-alloc/free calls, and also reduce the amount of memcpy calls.
-In my "Does it" section above, there is only one memcpy (copyfromuser), 
-but it looks like the current bluez stack does many more memcpy's than that.
+Thanks for the flow control patch...  I'll wait and see if anything comes
+out of the above stuff before sending it out for testing.
 
-Can anyone help explain what does in fact happen at the moment.
+-Daryl.
 
-Cheers
-James
-
-
-
--------------------------------------------------------
-This SF.Net email sponsored by: Parasoft
-Error proof Web apps, automate testing & more.
-Download & eval WebKing and get a free book.
-www.parasoft.com/bulletproofapps1
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> -----Original Message-----
+> From: Marcel Holtmann [mailto:marcel@rvs.uni-bielefeld.de] 
+> Sent: July 11, 2003 1:55 AM
+> To: Daryl Van Vorst
+> Cc: BlueZ Mailing List
+> Subject: Re: Qualification testing - rfcomm
+> 
+> 
+> Hi Daryl,
+> 
+> > Finally got some results on those latest rfcomm changes for 
+> > qualification. Looks like there are a few more problems. :( 
+>  But we're 
+> > close. :)
+> > 
+> > TP/RFC/BV-09-C:
+> > "Verify that the IUT handles flow control correctly when 
+> the Tester, 
+> > acting as a device conforming to Bluetooth version 1.0B, 
+> controls the 
+> > data flow using the Modem Status Command. The IUT's device 
+> role is of 
+> > no importance."
+> > 
+> > The command and console output:
+> > 
+> > root@jack-00000000:~>./rctest -s -P 1 -b 20 00:A0:96:1F:83:71
+> > rctest[351]: Connected
+> > rctest[351]: Sending ...
+> > rctest[351]: Send failed. Resource temporarily unavailable(11)
+> > 
+> > The IUT sends data in 5 frames, then stops for aboue 20s, 
+> then sends 5 
+> > more, then stops, etc. Technically, this test passed because we did 
+> > stop sending data after the tester send MSC stop to the IUT. But 
+> > something's clearly not right.
+> 
+> this looks quite right, but the rctest program don't check 
+> the error code. If it receives EAGAIN it should try again, 
+> but it aborts.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
