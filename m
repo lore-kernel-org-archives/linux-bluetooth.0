@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Once again: Socket CF card and Kernel 2.6
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <1109664374.42242276c644b@mail.orbitel.bg>
+From: Todor Todorov <dr_doom@engineer.bg>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050228220209.GA8151@adamis.de>
-References: <20050226031901.GL11723@adamis.de>
-	 <1109578431.17256.9.camel@pegasus>  <20050228220209.GA8151@adamis.de>
-Content-Type: text/plain
-Message-Id: <1109665776.17256.122.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=windows-1251
+Subject: [Bluez-users] BNEP connection destroing :(
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,59 +16,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Mar 2005 09:29:36 +0100
+Date: Tue,  1 Mar 2005 10:06:14 +0200
 
-Hi Mathias,
+Hi. I successful make a bnep connection between my laptop (with Slackware 10.0, kernel 2.4.26 with openmosix 
+patch and latest version of bluez libs and bluez pand, but i tryed also with other versions) and desktop PC with 
+Windows XP Pro, after few minutes  (not measured), on linux system the bnep0 interface was destroyed.
 
-> > what kind of 2.6 kernel is this? Give 2.6.11-rc5 a chance. Do you see
-> > anything special with dmesg?
-> 
-> Before I have tried 2.6.9-1-686 (Debian unstable) and 2.6.10 (from
-> www.kernel.org). Now I patched the 2.6.10 up to 2.6.11-rc5, but it seems
-> to behave the same - same messages in dmesg as before, still timeout
-> when running hciattach (nothing in dmesg after this command)...
-> Also the same with the -mh4 patch (against a clean 2.6.10).
-> 
-> I checked what the working 2.4.29 shows in dmesg, maybe this helps
-> somewhat:
-> 
-> Inserting the card:
-> -----
-> cs: memory probe 0x0c0000-0x0fffff: excluding 0xc0000-0xcffff
-> 0xd8000-0xfffff
-> ttyS01 at port 0x02f8 (irq = 11) is a 16C950/954
-> -----
-> 
-> modprobe hci_uart:
-> -----
-> BlueZ HCI UART driver ver 2.1 Copyright (C) 2000,2001 Qualcomm Inc
-> Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
-> -----
-> 
-> hciattach ttyS1 socket:
-> -----
-> bcsp_recv: Out-of-order packet arrived, got 1 expected 0
-> -----
-> (but the bluetooth device works despite this error)
-> 
-> One idea: is there an (easy) way to log what's going on on the ttyS1
-> device (I mean the communication between the hci_uart driver and the cf
-> card)? This way one could compare the logs of kernel 2.4 and 2.6 and
-> maybe see what's wrong...
+Attempting to reconnect with pand worked silently, but the bnep0 interface was not created. Workaround was to 
+remove and re-insert the dongle on my laptop, then i recreate the bnep connection again.
+I make a simple script for making bnep connection with windows machine:
 
-I am not an serial card expert. This is a problem in the serial
-subsystem and a BlueZ problem.
+#!/bin/sh
+hciconfig hci0 up
+#sdpd
+#sdptool add LAN
+echo "Making PAN connection"
+#pand --role PANU -c 00:10:60:A6:1C:30 --service GN
+pand --role PANU -c 00:10:60:A6:1C:30 --service PANU
+echo "Wait for connection"
+sleep 6
+echo "Bring UP BNEP"
+hcitool lst 00:10:60:A6:1C:30 0
+ifconfig bnep0 10.0.0.2 netmask 255.255.255.0
+ifconfig bnep0 up
+route add default gw 10.0.0.1
+rm /etc/resolv.conf
+touch /etc/resolv.conf
+echo "nameserver 10.13.0.1" > /etc/resolv.conf
 
-> Another question: What about the btuart_cs.ko module, what's the
-> difference to the hci_uart module?
+This is my kernel config for bluez:
 
-It only supports H:4 and is very limited and no longer supported.
+CONFIG_BLUEZ=y
+CONFIG_BLUEZ_L2CAP=y
+# CONFIG_BLUEZ_SCO is not set
+CONFIG_BLUEZ_RFCOMM=y
+CONFIG_BLUEZ_RFCOMM_TTY=y
+CONFIG_BLUEZ_BNEP=y
+# CONFIG_BLUEZ_BNEP_MC_FILTER is not set
+# CONFIG_BLUEZ_BNEP_PROTO_FILTER is not set
+# CONFIG_BLUEZ_CMTP is not set
+CONFIG_BLUEZ_HCIUSB=y
+# CONFIG_BLUEZ_USB_SCO is not set
+# CONFIG_BLUEZ_HCIUART is not set
+# CONFIG_BLUEZ_HCIBFUSB is not set
+# CONFIG_BLUEZ_HCIDTL1 is not set
+# CONFIG_BLUEZ_HCIBT3C is not set
+# CONFIG_BLUEZ_HCIBLUECARD is not set
+# CONFIG_BLUEZ_HCIBTUART is not set
+# CONFIG_BLUEZ_HCIVHCI is not set
 
-Regards
-
-Marcel
-
-
+Help me to resolve this problem.
+Thank you in advance.
 
 
 -------------------------------------------------------
