@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Alexandre Monteiro" <coser10@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Message-ID: <BAY9-F66ORQzzeOApac00031623@hotmail.com>
-Subject: [Bluez-devel] how install BlueZ on iPAQ ?
+Message-ID: <4092AACD.4040303@itelefonica.com.br>
+From: Daniel Moraes <ra002890@itelefonica.com.br>
+MIME-Version: 1.0
+To: Bluez Devel <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Bluez + USB2Serial Adaptor + UART CSR BC02 == Data at 20 kBps??
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,21 +15,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 30 Apr 2004 21:13:50 +0000
+Date: Fri, 30 Apr 2004 16:36:45 -0300
 
-Hi
+Is the combination above possible?!? How can I do to increase my UART 
+CSR troughtput?!?   In my linux doesn't matter if I stablish one  
+conection at 57600 or 460800, my bluetooth works at the same rate... 
+why?!? My speed are so slowly, I calculate then using l2ping is it 
+right?!? And they are about 3kBps...
+If anybody can solve one of my problems I will be much more happier....  
+hehehe...
 
-  Could anyone help me get BlueZ installed and configured on Familiar 0.7.2. 
-  Ideally the latter I have a 3970 iPAQ which has hcitool v2.2 and I need to 
-install the hcitool v2.6. Anyone knows how can I do it ? Which files I have 
-to install on iPAQ ?
-
-
-Sds,
-Alexandre
-
-_________________________________________________________________
-MSN Hotmail, o maior webmail do Brasil.  http://www.hotmail.com
+Thanks in advance, Daniel Moraes.
 
 
 
