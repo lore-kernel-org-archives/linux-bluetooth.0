@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040929144703.69209.qmail@web53209.mail.yahoo.com>
-From: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
-Subject: Re: [Bluez-users] obexFTP ... does it works?
-To: gabriel.guillon@c-s.fr, Bluez-users@lists.sourceforge.net
-In-Reply-To: <415AA340.7030202@c-s.fr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Message-ID: <296459384.12087@bjut.edu.cn>
+From: "Jin Pu" <jpu@emails.bjpu.edu.cn>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+Mime-Version: 1.0
+Content-Type: text/plain;
+      charset="GB2312"
+Subject: [Bluez-users] bluez-hciemu-1.0 install error- Glib Not found
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,27 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Sep 2004 07:47:03 -0700 (PDT)
+Date: Wed, 29 Sep 2004 20:15:46 +0800
+
+Good day:
+ 
+ When I want to install bluez-hciemu-1.0 into my Red
+ Hat 9, I got an error when I start ./configure to
+ generate Makefile. 
+ 
+ ---here is the error when execute ./configure ---
+ checking for GLib ...
+ checking for glib-config... not found
+ configure: error: GLib not found
+ ---then ./configure exit back to the shell---
+ 
+ I know from the README, I need GLib package before
+ install the hciemu. But I suppose that the package is
+ already installed with RedHat 9.
+ 
+ What' wrong with it and what shoud I do?
 
 
---- GUILLON Gabriel <gabriel.guillon@c-s.fr> wrote:
-> Try sdptool browse to find which channel is used by
-> the other peer.
-> Service Name: OBEX Object Push
->    "RFCOMM" (0x0003)
->      Channel: 4
 
-In my phone (a N6600) OBEX Object Push is at channel
-10 (as say Marcel) and FTP is at channel 9
-
-but they doesn't works ... 
-
-
-		
-__________________________________
-Do you Yahoo!?
-Yahoo! Mail is new and improved - Check it out!
-http://promotions.yahoo.com/new_mail
 
 
 -------------------------------------------------------
