@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Sending files from phone to ppc machine fails
+Subject: Re: [Bluez-users] Infineon ROK104001 Bluetooth Problem
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Sjoerd Simons <sjoerd@spring.luon.net>
+To: Edward Wei <Edward.Wei@Dartmouth.edu>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <20041001095814.GA5611@spring.luon.net>
-References: <20040930161652.GA10170@spring.luon.net>
-	 <1096563173.4371.5.camel@notepaq> <20040930170602.GA13427@spring.luon.net>
-	 <20041001095814.GA5611@spring.luon.net>
+In-Reply-To: <415D6B27.5080805@Dartmouth.edu>
+References: <415C6D46.1020309@Dartmouth.edu>
+	 <1096618056.5403.14.camel@notepaq>  <415D6B27.5080805@Dartmouth.edu>
 Content-Type: text/plain
-Message-Id: <1096641815.4265.13.camel@notepaq>
+Message-Id: <1096641741.4265.11.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,26 +19,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 01 Oct 2004 16:43:35 +0200
+Date: Fri, 01 Oct 2004 16:42:22 +0200
 
-Hi Sjoerd,
+Hi Edward,
 
-> > > >   Since some time i've got an Ericsson T630. Sending files via obex from
-> > > >   both my ppc and x86 machine to the phone works fine. But from the phone
-> > > >   i can only send stuff to the x86. When sending to my powerbook the
-> > > >   phone almost immediatly indicates ``connection failed''.  [...]
-> > > > 
-> > > >   Any ideas what could be going wrong here ?
-> > > 
-> > > stop hidd and see if it works then.
-> > 
-> > That does indeed solve it (should have though about trying that).
+> Oh sorry.  I put the commands right next to the hcidump of my first 
+> message.  I'll make it more specific this time.
 > 
-> Seems i was a little too fast. Now it works ``sometimes'', but most of the
-> times it takes three or four tries to send a file over. Incidentally i'm
-> working on another x86 machine today and that also works fine ?
+> There are no problems with sending to the Infineon + PXA.
+> 
+> Laptop with Kensington USB Dongle (sender)
+> # ./rctest.exec -s -P 10 xx:xx:xx:xx:xx:xx
+> 
+> Infineon ROK + PXA (receiver)
+> # ./rctest.exec
+> 
+> 
+> There are problems sending with the Infineon + PXA.
+> 
+> Laptop with Kensington USB Dongle (receiver)
+> # ./rctest.exec
+> 
+> Infineon ROK + PXA (sender)
+> # hcidump -x &
+> # ./rctest.exec -s -P 10 xx:xx:xx:xx:xx:xx
+> 
+> This is the hcidump that follows... a few packets get through, then it 
+> stalls and says "hci_cmd_task: hci0 command tx timeout".
 
-maybe there is another big endian bug somewhere, but I don't think so.
+this means that the ROK has a problem in its implementation of the HCI
+flow control. Or maybe it is on our side, but I don't think so. We
+actually don't use flow control on the receiving side, so this will of
+course work. Do you have a firmware update for the ROK?
 
 Regards
 
