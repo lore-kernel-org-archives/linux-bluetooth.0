@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Till Harbaum <harbaum@beecon.de>
-To: <bluez-devel@lists.sourceforge.net>
-References: <50BF37ECE4954A4BA18C08D0C2CF88CB2364EC@exmail1.se.axis.com>
-In-Reply-To: <50BF37ECE4954A4BA18C08D0C2CF88CB2364EC@exmail1.se.axis.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200408261844.20194.harbaum@beecon.de>
-Subject: [Bluez-devel] Little Hexdump-Patch for hcidump
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Radha Thiagarajan <rthiaga1@urbana.css.mot.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   William List <WLIST@motorola.com>
+In-Reply-To: <412CB7E9.30408@urbana.css.mot.com>
+References: <412CB7E9.30408@urbana.css.mot.com>
+Content-Type: text/plain
+Message-Id: <1093452811.537.10.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: TIOCMIWAIT & TIOCGICOUNT
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,57 +19,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Aug 2004 18:44:20 +0200
+Date: Wed, 25 Aug 2004 18:53:31 +0200
 
-Hi all,
+Hi Radha,
 
-in every new release of hcidump i have been replacing the built-in 
-hexdump routine with my own one (giving the address and ascii as well).
+> I am interested in implementing the two ioctls TIOCMIWAIT and TIOCGICOUNT 
+> for RFCOMM that mimic the serial driver behavior. Do you have any 
+> recommendations on how this could be done? My initial thought would be to 
+> put a process that calls TIOCMIWAIT to sleep and then wake it up when a 
+> MSC packet is received. The user could then call TIOCGICOUNT to 
+> retrieve which control lines have changed. Any suggestions on this topic 
+> would be greatly appreciated.
 
-Perhaps you want to use this replacement in hcidump/parser/parser.c
+I never thought about it before, so come up with a patch for it and we
+will see. Check first how other serial drivers implemented this.
 
-The hex output is very useful for me and e.g. just being able to see ascii 
-strings inside rfcomm payload is something i really often need.
+Regards
 
-Feel free to include it into the public version if you like to ...
+Marcel
 
-Regards,
-  Till
-
-
-void hex_dump(int level, struct frame *frm, int num)
-{
-	unsigned char *buf = frm->ptr;
-	register int i,n,b2c;
-
-	if ((num < 0) || (num > frm->len))
-		num = frm->len;
-
-	n = 0;
-	while(num>0) {
-	    p_indent(level, frm);
-	    printf("%04x: ", n);
-
-	    b2c = (num>16)?16:num;
-
-	    for(i=0;i<b2c;i++) printf("%02x ", buf[i]);
-	    for(i=0;i<(16-b2c);i++) printf("   ");
-	    printf("  ");
-
-	    for(i=0;i<b2c;i++) printf("%c", isprint(buf[i])?buf[i]:'.');
-	    printf("\n");
-
-	    buf  += b2c;
-	    num  -= b2c;
-	    n    += b2c;
-	}
-}
-
--- 
-Dr.-Ing. Till Harbaum                       Tel.:  +49 721 4998963
-BeeCon GmbH                                 Fax:   +49 721 4998962
-Haid-und-Neu Strasse 7, 76131 Karlsruhe     Mobil: +49 179 9087904
-harbaum@beecon.de                           http://www.beecon.de
 
 
 
