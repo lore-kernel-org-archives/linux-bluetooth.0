@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41A2B331.4010001@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] audio problems with a2play
-References: <41A22C0B.4050008@xmission.com>	<41A234FA.7020303@xmission.com> <20041123033429.132bf84b.henryk@ploetzli.ch>
-In-Reply-To: <20041123033429.132bf84b.henryk@ploetzli.ch>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Message-Id: <20041123033429.132bf84b.henryk@ploetzli.ch>
+In-Reply-To: <41A234FA.7020303@xmission.com>
+References: <41A22C0B.4050008@xmission.com>
+	<41A234FA.7020303@xmission.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="pgp-sha1";
+ boundary="Signature=_Tue__23_Nov_2004_03_34_29_+0100_ysCOMC7Tu+mYZ7.t"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,58 +21,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Nov 2004 20:49:05 -0700
+Date: Tue, 23 Nov 2004 03:34:29 +0100
 
-Henryk,
+--Signature=_Tue__23_Nov_2004_03_34_29_+0100_ysCOMC7Tu+mYZ7.t
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Are you saying the problem is in a2play or in hcidump?
+Moin,
 
-I don't know the "real" mapping between the indexed settings in the sbc 
-file format and the bitmapped settings/capabilities we use with the a2dp 
-protocol.
+Hmm, If I'm not mistaken a2play has even other problems. I tried to play
+sbc_test_01.sbc (for a start) through it while doing hcidump -x (the
+old hcidump, that is). When doing the set configuration hcidump said
 
-Are these backwards then?
+< ACL data: handle 0x002b flags 0x02 dlen 18
+    L2CAP(d): cid 0x40 len 14 [psm 25]
+      AVDTP(s): Set config cmd: transaction 0
+      04 04 01 00 07 06 00 00 81 86 02 FA=20
 
-	s_config.sbc_elements.channel_mode = 1 << sbc_info.channel_mode;
-	s_config.sbc_elements.frequency = 1 << sbc_info.sampling_frequency;
-	s_config.sbc_elements.allocation_method =
-	    1 << sbc_info.allocation_method;
-	s_config.sbc_elements.subbands = 1 << sbc_info.subbands;
-	s_config.sbc_elements.block_length = 1 << sbc_info.blocks;
+which decodes as
+ACP SEID =3D 1 (OK)
+INT SEID =3D 1 (OK)
+Media transport capability (OK)
+Media Codec capability
+	Audio (OK)
+	SBC   (OK)
+	Sampling frequency =3D 16kHz (should be 48)
+	Channel mode =3D Joint stereo (should be mono)
+	Block length =3D 4 (should be 16)
+	Subbands =3D 8 (should be 4)
+	Allocation method =3D SNR (OK)
+	Bitspool =3D 2 to 250 (OK)
 
-Brad
+As you can see the only correct parameter (apart from the hardwired
+ones) is the allocation method. All others seem to be kind of bit
+reversed. As a side note: The new hcidump AVDTP parser has the same
+problem.
 
-Henryk Plötz wrote:
-> Moin,
-> 
-> Hmm, If I'm not mistaken a2play has even other problems. I tried to play
-> sbc_test_01.sbc (for a start) through it while doing hcidump -x (the
-> old hcidump, that is). When doing the set configuration hcidump said
-> 
-> < ACL data: handle 0x002b flags 0x02 dlen 18
->     L2CAP(d): cid 0x40 len 14 [psm 25]
->       AVDTP(s): Set config cmd: transaction 0
->       04 04 01 00 07 06 00 00 81 86 02 FA 
-> 
-> which decodes as
-> ACP SEID = 1 (OK)
-> INT SEID = 1 (OK)
-> Media transport capability (OK)
-> Media Codec capability
-> 	Audio (OK)
-> 	SBC   (OK)
-> 	Sampling frequency = 16kHz (should be 48)
-> 	Channel mode = Joint stereo (should be mono)
-> 	Block length = 4 (should be 16)
-> 	Subbands = 8 (should be 4)
-> 	Allocation method = SNR (OK)
-> 	Bitspool = 2 to 250 (OK)
-> 
-> As you can see the only correct parameter (apart from the hardwired
-> ones) is the allocation method. All others seem to be kind of bit
-> reversed. As a side note: The new hcidump AVDTP parser has the same
-> problem.
-> 
+--=20
+Henryk Pl=F6tz
+Gr=FC=DFe aus Berlin
+~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
+~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+
+--Signature=_Tue__23_Nov_2004_03_34_29_+0100_ysCOMC7Tu+mYZ7.t
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+
+iD8DBQFBoqG5IjWgKE0OA2gRAtVDAJ98YeaiuV2wbAWNpAUDE0gLF72ASgCg67TC
+ML+8KNP1aB92bzfWP9i/wBQ=
+=+Zqo
+-----END PGP SIGNATURE-----
+
+--Signature=_Tue__23_Nov_2004_03_34_29_+0100_ysCOMC7Tu+mYZ7.t--
 
 
 -------------------------------------------------------
