@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <8616e2cf0501302048435f028b@mail.gmail.com>
-From: Roderick Taylor <roderick.d.taylor@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] experience with TDK PCMCIA Bluetooth Card
+	(goBlue)?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41FD9B51.2090306@cloutier-vilhuber.net>
+References: <41FD9B51.2090306@cloutier-vilhuber.net>
+Content-Type: text/plain
+Message-Id: <1107146416.7801.3.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Trouble with USB hub.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,46 +19,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 Jan 2005 12:48:16 +0800
+Date: Mon, 31 Jan 2005 05:40:16 +0100
 
-Hi,
+Hi Lars,
 
-I am having trouble with my CSR based bluetooth dongle and my USB hub.
-I am using FC2, kernel version 2.6.10-1.9_FC2
+>     after searching the list, I see few comments on the TDK PCMCIA 
+> Bluetooth card. Currently, mine is *not* working, but before I go 
+> through (upgrade kernel, patch kernel, etc.) sequence, I would like to 
+> know if anybody has actually got it working.
+> 
+> Symptoms are a collection of
+> 
+> bcsp_recv: Short BCSP packet
+> bcsp_recv: Out-of-order packet arrive
+> bcsp_recv: Error in BCSP hdr checksum
+> 
+> which I have seen reported for some cards before, but for which I 
+> haven't a solution reported.
 
-/var/log/messages 
-says
+so in general your card gets detected as serial port and normal stuff
+like "hciconfig -a" is working?
 
-Jan 31 11:32:22 localhost kernel: usb 1-2.1: new full speed USB device
-using ehci_hcd and address 7
-Jan 31 11:32:23 localhost hcid[2895]: HCI dev 0 registered
-Jan 31 11:32:23 localhost hcid[5297]: Can't init device hci0.
-Input/output error(5)
-Jan 31 11:32:23 localhost kernel: hci_usb_intr_rx_submit: hci0 intr rx
-submit failed urb cff4db94 err -28
+> The above occurs for any data transfer (OBEX or PPP) of any considerable 
+> size, and culminates in the driver "resetting" the card, and the 
+> transfer failing.
+> 
+> This is irrespective of using 'hciattach ttyS14 <speed>' or 'hciattach 
+> ttyS14 bcsp' or 'hciattach ttyS14 tdk'.
+> 
+> OS/Version:
+> SuSE 9.2, kernel 2.6.8-24.11-default #1 Fri Jan 14 13:01:26
+> bluez-utils-2.10-15
+> bluez-libs-2.10-2
 
-hciconfig hci0 up
-says the same thing
+The last time I tested this kernel I haven't found any problems, but you
+should think about a kernel update. However I just put in my IBM card
+and a Com1 card and both lock up my SMP machine when I start hciattach.
+I don't have time to really check what is going wrong here. Do anyone
+have serial based Bluetooth cards running with a SMP kernel.
 
-Can't init device hci0. Input/output error(5)
+Regards
 
-The dongle works fine if I don't use the hub.  
+Marcel
 
-In this case /var/log/messages says
 
-Jan 31 11:39:11 localhost kernel: usb 3-3: new full speed USB device
-using ohci_hcd and address 2
-Jan 31 11:39:12 localhost hcid[2895]: HCI dev 0 registered
-Jan 31 11:39:13 localhost hcid[2895]: HCI dev 0 up
-Jan 31 11:39:13 localhost hcid[2895]: Starting security manager 0
 
-hci0:   Type: USB
-        BD Address: 00:02:72:80:5D:27 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-        RX bytes:119 acl:0 sco:0 events:15 errors:0
-        TX bytes:302 acl:0 sco:0 commands:14 errors:0
-
-Rod
 
 
 -------------------------------------------------------
