@@ -1,5 +1,5 @@
 Return-Path: <noring@nocrew.org>
-Subject: Re: [Bluez-devel] D-Bus interfaces
+Subject: Re: [Bluez-devel] D-Bus support
 From: Fredrik Noring <noring@nocrew.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
@@ -8,78 +8,82 @@ References: <1076265358.2670.36.camel@pegasus>
 	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
 	 <1076267396.2670.58.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1076275689.14742.93.camel@akka.yeti.nocrew.org>
+Message-Id: <1076274445.14742.73.camel@akka.yeti.nocrew.org>
 Mime-Version: 1.0
-Date: Sun, 08 Feb 2004 22:28:09 +0100
+Date: Sun, 08 Feb 2004 22:07:25 +0100
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Marcel,
+Hi Marcel
 
-Here's an initial draft proposal for hcid DBus interfaces (as 
-currently implemented in hcid 2.4-fn8):
+On Sun, 2004-02-08 at 20:09, Marcel Holtmann wrote:
+> I already looked at your stuff. Nice work btw.
 
-	service:   "org.bluez.hcid",
-	path:      "/org/bluez/hcid/device
-	interface: "org.bluez.hcid.device
+Thanks!
 
-           // Returns a dictionary with hci devices
-           // as keys. The values are dictionaries with
-           // the configuration parameters. Example:
-           //    
-           //   { "hci0" : { "type"         : "USB",
-           //                "addr"         : "00:00:00:00:00:00",
-           //                "status"       : "up",
-           //                "name"         : "Fuzz",
-           //                "manufacturer" : "Company" },
-           //     "hci1" : { "type"         : ... } }
-           method: dict(string:dict(string:string)) list(void)
+> At the moment I am more concerned on how the D-Bus interface should
+> look like than a real implementation. 
 
-           // Returns a specific configuration dict with the
-           // parameters as above.
-           method: dict(string:string) get_conf(string hci_dev)
+I will send you the interface proposal in another e-mail. It's largely
+implemented and used by the Gnome Bluetooth Configuration tool already,
+but it's possible to modify of course.
 
-           // Activates an hci device.
-           method: void up(string hci_dev)
-  
-           // Deactivates an hci device.
-           method: void down(string hci_dev)
+> You now that an important part for me is the security. For example a 
+> user can see what devices a paired and it can delete a pairing, but 
+> it don't have to see the link key itself. This is the job of the 
+> daemon that provides this interface. The same applies for changing 
+> device settings and storing them on the harddisk.
 
-           // Deactivates an hci device.
-           method: void set_name(string hci_dev, string name)
+I agree. This is the way the new proposed hcid is implemented.
 
-	service:   "org.bluez.hcid",
-	path:      "/org/bluez/hcid/keytab
-	interface: "org.bluez.hcid.keytab
+> My favourite storage is Berkeley DB.
 
-           // Returns an array with key pairs as a dictionaries.
-           // Example:
-           //    
-           //   [ { "sba" : "00:00:00:00:00:00",
-           //       "dba" : "00:00:00:00:00:00" },
-           //     { "sba" : "00:00:00:00:00:00",
-           //       "dba" : "00:00:00:00:00:00" },
-           //     ... ]
-           method: array(dict(string:string)) list(void|string hci_dev)
+That's an interesting idea, you mentioned that before. Can you
+elaborate, please? 
 
-           // Deletes a link pair
-           method: void delete(string sba, string dba)
+Here are some advantages of using textfiles (as default) for hcid
+storage:
 
-	service:   "org.bluez.hcid",
-	path:      "/org/bluez/hcid/nametab
-	interface: "org.bluez.hcid.nametab
+   1. Textfiles are intuitive to use and debug because they work
+      with any tool (emacs, grep, awk, perl etc.)
 
-           // Returns a device name or void
-           method: void|string delete(string bdaddr)
+   2. Small to medium size storage files have always been text
+      files in Unix/Linux (/etc/passwd, /etc/hosts etc.)
 
-	path:      "/org/bluez/hcid
-	interface: "org.bluez.hcid
+   3. Textfile routines are very lightweight and efficient.
 
-           // Notifies applications that device configuration
-           // has changed.
-           signal: void device(void)
+Please understand that although it does work, applications should
+use the DBus interface instead of manipulating these files directly.
 
-           // Notifies applications that trusted key configuration
-           // has changed.
-           signal: void keytab(void)
+Here's how it's implemented in the proposed hcid. The default location
+of these files is something to discuss. File layout:
+
+   $ ls -l /etc/bluetooth/keytab*
+   -rw-r--r-- 1 root root  98 Feb  8 18:29 /etc/bluetooth/keytab
+   -rw-r--r-- 1 root root 147 Feb  8 16:56 /etc/bluetooth/keytab-
+   -rw------- 1 root root 138 Feb  8 18:29 /etc/bluetooth/keytab.shadow
+   -rw------- 1 root root 207 Feb  8 16:56 /etc/bluetooth/keytab.shadow-
+
+   $ ls -l /etc/bluetooth/nametab*
+   -rw-r--r-- 1 root root 115 Feb  8 16:00 /etc/bluetooth/nametab
+   -rw-r--r-- 1 root root  86 Feb  8 15:02 /etc/bluetooth/nametab-
+
+The dash files ("keytab-" etc.) are backup files. The "keytab" file is 
+readable by all. The "keytab.shadow" is only r/w-able by root. Contents:
+
+   $ cat /etc/bluetooth/keytab
+   # sba              dba                type    create time
+   00:03:C9:2A:C4:A8  00:07:E0:0C:1B:3F  0       1076252948
+   00:10:DC:E9:EF:20  00:80:37:AA:7A:DA  0       1076253156
+
+   $ cat /etc/bluetooth/keytab.shadow
+   # sba              dba                key
+   00:03:C9:2A:C4:A8  00:07:E0:0C:1B:3F  2f66d0364a1eea2fae680af948bb3299
+   00:10:DC:E9:EF:20  00:80:37:AA:7A:DA  2855bdc30b49254902d5deebe24c24ce
+
+   $ cat /etc/bluetooth/nametab
+   # bdaddr                name
+   00:00:08:04:DE:C8       Fuzz Buzz
+   00:80:37:AA:7A:DA       Fredrik T39
+   00:07:E0:0C:1B:3F       Fredrik TT
 
 Fredrik
