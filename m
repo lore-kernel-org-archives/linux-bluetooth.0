@@ -1,80 +1,88 @@
-Return-Path: <aklish1@urbana.css.mot.com>
-Date: Thu, 18 Dec 2003 08:57:57 -0600 (CST)
-From: Aaron Klish <aklish1@urbana.css.mot.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] New Bluetooth kernel patches available
-In-Reply-To: <1071505820.6499.80.camel@pegasus>
-Message-ID: <Pine.GSO.4.20.0312180855340.12853-100000@wombat.urbana.css.mot.com>
+Return-Path: <Steven.Singer@csr.com>
+Message-ID: <3FE1BC0A.7070707@csr.com>
+Date: Thu, 18 Dec 2003 14:39:06 +0000
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: ag@new-media-artists.de,
+   BlueZ Mailing List
+    <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Device Busy during "hcitool info" or
+    "sdptoolsearch"
+References: <FJENILNPNAGPJMMDOKDCKEKBDJAA.ag@new-media-artists.de>
+    <3FE0C1B9.5090504@csr.com> <1071699104.21804.77.camel@pegasus>
+In-Reply-To: <1071699104.21804.77.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Marcel,
-  Motorola will use the 2.4.20 patches for sometime.  We'd appreciate it
-if you could continue to maintain that line.  Thanks. 
+Marcel Holtmann wrote:
+>>The create_connection-inquiry restriction is there because both
+>>procedures need to get as much radio bandwidth as possible to work. In
+>>particular, taking bandwidth away from paging can cause spurious failed
+>>connections. In this case, create_connection wins. If you issue a
+>>create_connection while an inquiry is in progress, we will terminate
+>>the inquiry with an inquiry_complete event and start paging
+>>immediately.
+> 
+> 
+> this is a nice thing/feature to know. Is it documented anywhere in the
+> firmware release notes?
 
-Aaron
+This particular behaviour is not documented (if it were, it would be in
+our HCI implementation document (bcore-me-007Pb), not the firmware
+release note).
 
-------------
-Aaron Klish
-Bluetooth Software Engineer
-Motorola PCS
-PH# (217) 384-8598
-FX# (217) 384-8550
+The Bluetooth baseband spec says that devices should free up as much
+bandwidth as possible for inquiring and paging. It doesn't specify how
+to handle a collision between two actions that both require a lot of
+bandwidth.
 
-[X]  Motorola General Business Information
-[ ]  Motorola Internal Use Only
-[ ]  Motorola Confidential Proprietary
+Really, the host should cancel inquiry before trying to create a
+connection. However, it would be churlish for us to design our code to
+work only with perfect hosts. Where the spec allows it, a little bit of
+flexibility can make things a bit easier for all concerned (not least,
+by reducing the volume of support calls we get).
 
-On Mon, 15 Dec 2003, Marcel Holtmann wrote:
+There are several places where we do this. Most of them are not
+documented and the behaviour should not be relied on. Future versions
+of the spec may mandate a particular behaviour.
 
-> Hi Folks,
-> 
-> I spent most time of the weekend to get out a new series of patches for
-> the 2.4 kernel. Actually there are six supported kernels and the latest
-> version of each patch also touches the input subsystem and parts of the
-> CAPI implementation. People who plan to play with the Bluetooth HID
-> support should enable CONFIG_INPUT_UINPUT. The changelog and the patches
-> themself can be found here
-> 
-> 	http://www.holtmann.org/linux/kernel/
-> 
-> It seems that the acceptance of these patches is very high, because the
-> top 10 downloads are these
-> 
-> 	   2531  patch-2.4.22-mh1
-> 	   1651  patch-2.4.20-mh12
-> 	   1063  patch-2.4.21-mh2
-> 	    868  patch-2.4.21-mh3
-> 	    852  patch-2.4.20-mh10
-> 	    788  patch-2.4.20-mh11
-> 	    759  patch-2.4.21-mh4
-> 	    560  patch-2.4.18-mh9
-> 	    456  patch-2.4.20-mh6
-> 	    418  patch-2.4.19-mh12
-> 
-> Even with my set of build and test scripts the job in putting out a new
-> series of patches and backporting features to the older kernels consumes
-> too much of my time. I personally don't use these patches anymore, but
-> it seems that some people or companies still use them. At the moment I
-> am thinking of cutting the maintenance for these kernels. Who has urgent
-> needs that an older kernel version is still supported?
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.net email is sponsored by: SF.net Giveback Program.
-> Does SourceForge.net help you be more productive?  Does it
-> help you create better code?  SHARE THE LOVE, and help us help
-> YOU!  Click Here: http://sourceforge.net/donate/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
+If in doubt, whenever we get conflicting requests from the host, we
+apply the Law of Least Astonishment [1]. Mostly this involves deciding
+which course of action is going to cause least damage to the network.
+We will prioritise some behaviours over others (so activities which
+are essential to keeping an existing link up win over those that are
+merely nice).
+
+Naturally, we don't want to burn too much code space and processor
+time dealing with things the host shouldn't be doing, so we tend to
+pick simple heuristics. It's not worth trying to go for perfect
+algorithms - that would require being psychic as on different
+occasions the host may want different things.
+
+Consequently, we do tend to change our minds between firmware
+versions depending on what's easiest to implement and the feedback
+we're getting from our customers.
+
+ From BlueZ's point of view, you need to maximise the number
+Bluetooth devices you work with. You should be trying to avoid
+unspecified or manufacturer specific behaviour.
+
+	- Steven
+
+[1] http://www.schedler.org/cookie/the-tao-of-programming.html#4.0
+-- 
+
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
