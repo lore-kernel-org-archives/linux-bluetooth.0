@@ -1,91 +1,56 @@
-Return-Path: <massimiliano_cuccia@yahoo.com>
-Message-ID: <20040929102923.24388.qmail@web53206.mail.yahoo.com>
-Date: Wed, 29 Sep 2004 03:29:23 -0700 (PDT)
-From: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
-Subject: Re: [Bluez-users] compiling bluez/obex (btobex)
-To: marcel@holtmann.org
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <20040928225548.79491.qmail@web53204.mail.yahoo.com>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain;
+	charset="us-ascii"
+Message-ID: <EFCD68F7BFDB06468769D4D9EAAA938704B0A8C6@scsmsx401.amr.corp.intel.com>
+From: "Pering, Trevor" <trevor.pering@intel.com>
+To: <bluez-users@lists.sourceforge.net>
+Cc: "Light, John" <john.light@intel.com>
+Subject: [Bluez-users] BlueZ build configuratoin
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 28 Sep 2004 15:55:40 -0700
 
-> 3 - for utils, I need yacc ... so I will report
-> later 
-I installed bison from my distribution, so these are
-the results of make command:
+Hello,
 
-make  all-recursive
-make[1]: Entering directory `/home/maxc/prj/4/utils'
-Making all in hcid
-make[2]: Entering directory
-`/home/maxc/prj/4/utils/hcid'
-make[2]: Nothing to be done for `all'.
-make[2]: Leaving directory
-`/home/maxc/prj/4/utils/hcid'
-Making all in tools
-make[2]: Entering directory
-`/home/maxc/prj/4/utils/tools'
-gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/include 
--I/usr/include -Wall -O2 -c sdptool.c
-sdptool.c: In function `add_audio_source':
-sdptool.c:1583: error: `AUDIO_SOURCE_SVCLASS_ID'
-undeclared (first use in this function)
-sdptool.c:1583: error: (Each undeclared identifier is
-reported only once
-sdptool.c:1583: error: for each function it appears
-in.)
-sdptool.c:1587: error: `ADVANCED_AUDIO_PROFILE_ID'
-undeclared (first use in this function)
-sdptool.c:1598: error: `AVDTP_UUID' undeclared (first
-use in this function)
-sdptool.c: In function `add_audio_sink':
-sdptool.c:1642: error: `AUDIO_SINK_SVCLASS_ID'
-undeclared (first use in this function)
-sdptool.c:1646: error: `ADVANCED_AUDIO_PROFILE_ID'
-undeclared (first use in this function)
-sdptool.c:1657: error: `AVDTP_UUID' undeclared (first
-use in this function)
-sdptool.c: At top level:
-sdptool.c:1706: error: `AUDIO_SOURCE_SVCLASS_ID'
-undeclared here (not in a function)
-sdptool.c:1706: error: initializer element is not
-constant
-sdptool.c:1706: error: (near initialization for
-`service[13].class')
-sdptool.c:1706: error: initializer element is not
-constant
-sdptool.c:1706: error: (near initialization for
-`service[13]')
-sdptool.c:1707: error: `AUDIO_SINK_SVCLASS_ID'
-undeclared here (not in a function)
-sdptool.c:1707: error: initializer element is not
-constant
-sdptool.c:1707: error: (near initialization for
-`service[14].class')
-sdptool.c:1707: error: initializer element is not
-constant
-sdptool.c:1707: error: (near initialization for
-`service[14]')
-sdptool.c:1709: error: initializer element is not
-constant
-sdptool.c:1709: error: (near initialization for
-`service[15]')
-make[2]: *** [sdptool.o] Error 1
-make[2]: Leaving directory
-`/home/maxc/prj/4/utils/tools'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/home/maxc/prj/4/utils'
-make: *** [all] Error 2
+We are trying to cross-build the latest bluez sources on a PC for our
+arm-based prototype.  We have done this successfully for a previous
+version of the source, but something has changed since we last tried it.
+The problem seems to be that there is one shell variable CONFIGDIR that
+controls both where hcid.conf is to be installed during "make install"
+and where hcid should look for hcid.conf at run time.  When we
+cross-build, the place where hcid.conf is installed needs to be in our
+PC build tree, but hcid should still look in /etc/bluetooth on the
+target machine (after we have moved bluez across).
 
-... where are the problems?
-I only compiled libs, sdp and hcidump
-the others (pan, utils, obex, bluefw and hciemu) are
-giving errors
+We can see how to make both point to /etc/bluetooth, but then the "make
+install" fails because /etc/bluetooth is not accessible on the PC (nor
+should it be).  I can make both point to $(prefix)/etc/bluetooth, but
+then hcid wants to look there at run time.=20
+
+It seems there should be a way to set these independently. Any
+suggestions? Are we missing something from the configuration process?
+
+Thanks,
+	Trevor
 
 
-		
-_______________________________
-Do you Yahoo!?
-Declare Yourself - Register online to vote today!
-http://vote.yahoo.com
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
