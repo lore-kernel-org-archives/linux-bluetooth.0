@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] missing keys from logitech dinovo keyboard
+Subject: Re: [Bluez-devel] about the list
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Dick <dm@chello.nl>
+To: Onur Safak <linuxbluez@yahoo.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200407061222.47729.dm@chello.nl>
-References: <200407061222.47729.dm@chello.nl>
+In-Reply-To: <20040706103225.27303.qmail@web90006.mail.scd.yahoo.com>
+References: <20040706103225.27303.qmail@web90006.mail.scd.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1089110433.4504.134.camel@pegasus>
+Message-Id: <1089110303.4504.130.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,22 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 06 Jul 2004 12:40:33 +0200
+Date: Tue, 06 Jul 2004 12:38:23 +0200
 
-Hi Dick,
+Hi Onur,
 
-> I'm playing with showkey from kbd (http://freshmeat.net/projects/kbd/)
-> All keys are shown except "New" (FnF1), "Reply" (FnF2), "Forward" (FnF3), 
-> "Send" (FnF4), "Redo" (FnF6), "Print" (FnF7), "Save" (FnF8), "My 
-> Doc" (FnF10), "My Pic" (FnF11) and "My Music" (FnF12) (you get those by 
-> enabling F-Lock)
-> Undo (FnF5) and MyComp (FnF9) work though, giving keycode 144 and 145
-> I'm using 2.6.7-mh1 and bluez-(utils/libs)2.7
-> Is this a bug or am I missing something?
+> Bluetooth is a new area to me, which I need to make an application on.
+> Currently, I don't have necessary hardware / software set up. I'm
+> collecting information from documentations and articles, and so the
+> lists are important to me.
+>  
+> First of all, I need to know one thing; is this list for 'developers
+> who work with Bluez' or only for 'developers who develop the Bluez
+> code'. I've read the archive, but the topics look similar with users'
+> list.
 
-I don't know. I never checked the extra keys of my diNovo desktop, but
-maybe the HID parser didn't take them into account and transforms them
-into the correct key events. Feel free to look at the kernel code.
+the bluez-users list is for people who having problems with using BlueZ
+and the bluez-devel mailing list is for the core developers, but also
+for people who wanna start develop applications using BlueZ.
+
+I have an eye on both list, so use that one that you think fits better.
 
 Regards
 
