@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] updating the PSM in SDP..
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <00a001c4cee6$5271b4c0$0000fea9@zool>
+References: <00a001c4cee6$5271b4c0$0000fea9@zool>
 Content-Type: text/plain
-Message-Id: <1100995285.7250.17.camel@pegasus>
+Message-Id: <1100958396.7213.126.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] BlueZ and the ALSA support
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,50 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 Nov 2004 01:01:24 +0100
+Date: Sat, 20 Nov 2004 14:46:36 +0100
 
-Hi Folks,
+Hi Steffen,
 
-I spent some hours to clean up the btsco CVS repository from the ALSA
-Bluetooth project and also changed the code a little bit for easier use
-by non technical people. It should now compile and work without the need
-of reinstalling or changing any ALSA stuff. Here is a quick walktrough.
+> I have used your examples in dund.c to make a proper SDP client that
+> can advertise my protocol (L2CAP) and PSM correctly to the sdpd
+> daemon. All the attributes looks correctly and functions ok. 
+> My question is now: How do I update my SDP record (more specifically
+> the PSM attribute)?
+> I can't find any example or anything. Explaination or example files
+> are appriciated! :-)
 
-First the CVS repository must be checked out:
+I never did this. If you change the PSM maybe it is a good idea to
+delete the old one and add a new record.
 
-	cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa login
-	cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa co btsco
-
-After that is must be compiled:
-
-	./bootstrap
-	./configure
-	make
-	make install
-	make maintainer-clean
-
-And you need the kernel module:
-
-	cd kernel
-	make
-	make install
-	make clean
-
-Now go ahead and use it like before.
-
-As you may now realized the snd-bt-sco kernel driver is also inside this
-repository and with a recent 2.6 kernel there are no problems with
-compiling a kernel module outside the kernel source directory. However
-if you haven't installed the running kernel by yourself you may need to
-install the kernel source package from your distribution.
-
-Every crappy header file is now removed and the needed IOCTL and the
-HWDEP definition is added to the source directly in a compatible way.
-
-The A2DP related programs are integrated into the Makefile and they are
-also compiled, but for now they are not installed.
-
-This should make the development a lot more easier :)
+The library contains a sdp_record_update() function, but I never tried
+it so far.
 
 Regards
 
