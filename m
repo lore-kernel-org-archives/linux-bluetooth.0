@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] nokia wireless keyboard
+Subject: Re: [Bluez-users] more bluepin
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200406141329.45458.cijoml@volny.cz>
-References: <200406141329.45458.cijoml@volny.cz>
+To: Gene Imes <ebi7@ozob.net>
+Cc: list bluez <bluez-users@lists.sf.net>
+In-Reply-To: <1087081230.21739.7.camel@tr1a.ozob.net>
+References: <1087081230.21739.7.camel@tr1a.ozob.net>
 Content-Type: text/plain
-Message-Id: <1087229709.13792.30.camel@pegasus>
+Message-Id: <1087228976.13792.19.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Jun 2004 18:15:09 +0200
+Date: Mon, 14 Jun 2004 18:02:56 +0200
 
-Hi Michal,
+Hi Gene,
 
-> new BT keyboard from nokia looks very interessant :)
+> When I try to send a file from a windows box to my linux a dialog box
+> appears on the windows box and the pairing is rejected by the linux box.
+> 
+> In the log:
+> 
+> Jun 12 15:25:29 [hcid] pin_code_request (sba=08:00:46:CC:91:76,
+> dba=00:0D:88:C0:3E:DB)_
+> Jun 12 15:25:29 [hcid] PIN helper exited abnormally with code 256
+> 
+> This may be related to my previous post.
 
-very nice. Here is the international link for it:
-
-	http://www.nokia.com/nokia/0,,58982,00.html
-
-According to their specification page it uses HID so it should work also
-with Linux.
-
-The other two very small HID capable keyboards are the Think Outside
-Stowaway (www.thinkoutside.com) and the FrogPad (www.frogpad.com).
-
-Looks like the boom of Bluetooth is starting ;)
+if you got problems with the old PIN helper stuff, try the new D-Bus
+enabled PIN helper.
 
 Regards
 
