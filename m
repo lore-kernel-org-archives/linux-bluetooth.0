@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041003100129.15441.qmail@web60805.mail.yahoo.com>
-From: Tom Watson <sdc695@yahoo.com>
-Reply-To: tsw@johana.com
+Message-ID: <3eef79ed04100219111bcee37d@mail.gmail.com>
+From: Sven Ehret <sven.ehret@gmail.com>
+Reply-To: Sven Ehret <sven.ehret@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <E1CDy8R-0006ZX-0i@sc8-sf-list2.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] New bluetooth device.  Now what?
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Gentoo compile error: `HANDSFREE_SVCLASS_ID' undeclared (first use in this function)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,55 +16,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 3 Oct 2004 03:01:29 -0700 (PDT)
+Date: Sun, 3 Oct 2004 04:11:15 +0200
 
-OK, I've got the kernel stuff working to my USB dongle.  It is a D-Link
-DBT-120, and up to that point it all is OK.
+I am unable to compile any version of bluez-utils I could get my hand on.
 
-Now I want to connect to a device.  It is an Earthmate Blue Logger GPS (quite a
-nice little yellow box!).  My assumption is that eventually I want the
-equivalent of a "serial" type connection that a program similar to "minicom"
-can talk to.
+Using Gentoo, compiling portage-versions 2.7, 2.10, 2.10-r1 and newest
+version from sf.net breaks with:
 
-I've entered a few commands, and I'm a little frustrated.  How do I get
-something like this to work?
+     [some lines]
+sdptool.c: In Funktion =BBadd_handsfree=AB:
+sdptool.c:1130: error: `HANDSFREE_SVCLASS_ID' undeclared (first use in
+this function)
+sdptool.c:1130: error: (Each undeclared identifier is reported only once
+sdptool.c:1130: error: for each function it appears in.)
+sdptool.c:1136: error: `HANDSFREE_PROFILE_ID' undeclared (first use in
+this function)
+sdptool.c:1152: error: `SDP_SUPPORTED_FEATURES' undeclared (first use
+in this function)
+sdptool.c: In Funktion =BBadd_audio_source=AB:
+sdptool.c:1583: error: `AUDIO_SOURCE_SVCLASS_ID' undeclared (first use
+in this function)
+sdptool.c:1587: error: `ADVANCED_AUDIO_PROFILE_ID' undeclared (first
+use in this function)
+sdptool.c:1598: error: `AVDTP_UUID' undeclared (first use in this function)
+sdptool.c: In Funktion =BBadd_audio_sink=AB:
+sdptool.c:1642: error: `AUDIO_SINK_SVCLASS_ID' undeclared (first use
+in this function)
+sdptool.c:1646: error: `ADVANCED_AUDIO_PROFILE_ID' undeclared (first
+use in this function)
+sdptool.c:1657: error: `AVDTP_UUID' undeclared (first use in this function)
+     [and so on]
 
-Some commands that DO work are:
-[bluetooth]$ hcitool inq
-Inquiring ...
-        00:90:4B:2A:9D:9D       clock offset: 0x219e    class: 0x001f00
-[bluetooth]$ hcitool scan
-Scanning ...
-        00:90:4B:2A:9D:9D       Earthmate Blue Logger GPS
+Can anybody shed some light?
 
-Some that DON'T are:
-[bluetooth]$ rfcomm show rfcomm0
-Get info failed: No such device
-[bluetooth]$ rfcomm bind rfcomm0
-Can't create device: Operation not permitted
-
-I think I have the configuration file OK, but I'm not exactly sure.
-
-Do I need to have some configuration file setup?  The documentation isn't very
-clear here (as I can see).  Do I access this with RFCOMM??  How do I connect to
-the device with 'minicom'??  Do I need to setup some device files??
-
-I have half working, but not a full connection.  It is almost there, but not
-quite.
-
-Help.....
-
-=====
--- 
-Tom Watson
-tsw@johana.com
-
-
-		
-_______________________________
-Do you Yahoo!?
-Declare Yourself - Register online to vote today!
-http://vote.yahoo.com
+--=20
+Sven Ehret
 
 
 -------------------------------------------------------
