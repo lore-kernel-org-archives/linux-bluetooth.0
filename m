@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41FD3E26.1000401@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] "hcitool dev" shows no devices
+Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200501301948.ALU26389@ms12.netsolmail.com>
+References: <200501301948.ALU26389@ms12.netsolmail.com>
+Content-Type: text/plain
+Message-Id: <1107114746.8384.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,53 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 21:05:58 +0100
+Date: Sun, 30 Jan 2005 20:52:26 +0100
 
-Hello everybody
+Hi Chris,
 
-I've a 2.4.26 kernel. I patched it using the "patch-2.4.26-mh2.gz" from the 
-bluez homepage. *
-Then, in "make menuconfig" I selected this points:
-# Bluetooth support -> Bluetooth subsystem support
-#                      L2CAP protocol support (NEW)
-#                      RFCOMM protocol support
-#                        RFCOMM TTY support (NEW)
-# Bluetooth support -> Bluetooth device drivers -> HCI USB driver (new)
+> >it will be installed into /etc/hotplug/usb/ and you need a working and
+> >up-to-date hotplug to make this working.
+> 
+> When I did a 'make install', it completed with no errors but I don't see 
+> anything installed in /etc/hotplug/usb at all. How do I check if the install 
+> failed?
 
-Then I compiled and installed the new kernel.
-After that I compiled and installed the bluez-libs and bluez-utils.
+do a "make install DESTDIR=$PWD/x" and then check what it is in the
+directory "x". Show us the result of a "find x".
 
-Everything works well...
-Now I try "hcitool dev" but no devices are showed (I have two D-Link DBT120 
-connected to usb ports).
+Regards
 
-Any Ideas why they aren't recognized?
-Did I miss to add a feature to the kernel?
-
-kind regards
-Marco
+Marcel
 
 
-* Something gets rejected during the patch (It doesn't seem important to 
-me, but maybee it is):
-
-Makefile.rej:
-***************
-*** 1,7 ****
-   VERSION = 2
-   PATCHLEVEL = 4
-   SUBLEVEL = 26
-- EXTRAVERSION =
-
-   KERNELRELEASE=$(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
-
---- 1,7 ----
-   VERSION = 2
-   PATCHLEVEL = 4
-   SUBLEVEL = 26
-+ EXTRAVERSION = -mh2
-
-   KERNELRELEASE=$(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
 
 
 -------------------------------------------------------
