@@ -1,10 +1,21 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v618)
-Message-Id: <34A116F6-E7C6-11D8-B421-000A959E26AE@ermy.net>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-To: bluez-devel@lists.sourceforge.net
-From: Mark Thompson <lists@ermy.net>
-Subject: [Bluez-devel] L2CAP_CONN_TIMEOUT without recompiling kernel?
+Subject: Re: [Bluez-devel] Re: multi rfcomm/sco connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Radha Thiagarajan <rthiaga1@urbana.css.mot.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4112532E.1010708@urbana.css.mot.com>
+References: <20040618175410.28510.qmail@webmail.aruba.it>
+	 <1087582530.4309.121.camel@pegasus>
+	 <20040618183339.20830.qmail@webmail.aruba.it>
+	 <1087583875.25061.2.camel@pegasus>
+	 <20040618184232.25439.qmail@webmail.aruba.it>
+	 <1087584576.25061.6.camel@pegasus>
+	 <20040716140215.564.qmail@webmail2.aruba.it>
+	 <1089991775.5119.18.camel@pegasus>  <411166F7.2020500@urbana.css.mot.com>
+	 <1091662532.16182.86.camel@pegasus>  <4112532E.1010708@urbana.css.mot.com>
+Content-Type: text/plain
+Message-Id: <1091726733.20839.10.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,38 +26,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 6 Aug 2004 17:32:27 +0100
+Date: Thu, 05 Aug 2004 19:25:33 +0200
 
-Hi,
+Hi Radha,
 
-	Is there any way to change (specifically - drastically shorten) the 
-amount of time a call to connect() blocks for whilst attempting to 
-connect to a remote device?
+> Thanks for the reply. We will be using SCO over PCM.
+> Are you planning on a fix for both the problems?
 
-Hunting through the source, I've traced the delay back to 
-${KERNELSRC}/net/bluetooth/l2cap.c, specifically L2CAP_CONN_TIMEOUT, 
-which is defined as being 40 seconds in 
-/usr/include/bluetooth/bluetooth.h.
+the point is if you use SCO over PCM then the SCO socket interface is
+really useless. My idea is to add an ioctl to the L2CAP and RFCOMM
+sockets for adding and releasing a SCO link. Actually I realized that I
+never thought about incoming SCO connections for that case. Are there
+any proposals for getting a nice SCO over PCM support?
 
-Ideally I'd like a sockopt available to tune that parameter on a 
-per-app basis.  The application we're developing seeks to determine the 
-presence of a 'bunch' of devices by trying to connect and then sending 
-an L2CAP echo request packet before waiting for a valid response.
+Regards
 
-Moving to non-blocking connect() calls really isn't an option - the 
-problem isn't detecting multiple devices, it's the amount of time it 
-takes to ascertain whether a known device is present or not.
+Marcel
 
-If I'm barking in the wrong forest, please feel free to boot me 
-elsewhere :-)
-
-
-I'm using gentoo 2004.0 with linux-2.6.3-gentoo-r1 on x86.
-
-Thanks in advance,
-
---
-Mark Thompson/
 
 
 
