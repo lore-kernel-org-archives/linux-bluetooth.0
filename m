@@ -1,39 +1,78 @@
-Return-Path: <james.cameron@hp.com>
-Date: Wed, 30 Jun 2004 23:09:48 +1000
-From: James Cameron <james.cameron@hp.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] hci_acl_tx_to: hci0 ACL tx timeout
-Message-ID: <20040630130948.GJ30504@hp.com>
-References: <20040630112137.GE30504@hp.com> <1088595657.4540.19.camel@pegasus> <20040630120249.GH30504@hp.com> <1088599419.4540.24.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: James Cameron <james.cameron@hp.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040630120249.GH30504@hp.com>
+References: <20040630112137.GE30504@hp.com>
+	 <1088595657.4540.19.camel@pegasus>  <20040630120249.GH30504@hp.com>
+Content-Type: text/plain
+Message-Id: <1088599419.4540.24.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1088599419.4540.24.camel@pegasus>
-Sender: james.cameron@hp.com
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 30 Jun 2004 14:43:39 +0200
 
-On Wed, Jun 30, 2004 at 02:43:39PM +0200, Marcel Holtmann wrote:
-> I really think this is buggy hardware in the USB dongle or in the USB
-> host controller. Maybe it is also only a software problem and related to
-> the USB subsystem. I don't know.
+Hi James,
 
-Well, tell me what to try to determine where the cause is.  Surely it
-should be possible to instrument the kernel functions to gather more
-information about the problem?  Then we can say "yes, it's the
-hardware", or something else.
+> > I can't give you a definitv answer for that problem, but it seems that
+> > some Bluetooth dongles are not working very nice under heavy load. This
+> > is actually not a chip problem, because I saw chips working in one
+> > dongle and in another one it produces such timeouts.
+> 
+> Thanks.  I saw a load correlation before, but not with 2.6.6.
 
-> If it is CSR based you can try "hciconfig hci0 revision".
+I really think this is buggy hardware in the USB dongle or in the USB
+host controller. Maybe it is also only a software problem and related to
+the USB subsystem. I don't know.
 
-hci0:   Type: USB
-        BD Address: 00:02:72:01:E5:FF ACL MTU: 192:8  SCO MTU: 64:8
-        HCI 16.4
-        Chip version: BlueCore02
-        Max key size: 56 bit
-        SCO mapping:  HCI
+> > You can of course try to increase the ACL tx timeout and see if it still
+> > occurs. 
+> 
+> Oh!  How can I increase that?  I've checked hcitool and hciconfig man
+> pages, and found how to change MTU and buffer size.
 
-Does that help?  (any good?)
+Forget about that comment. I checked the kernel code and I don't think
+that increasing the timeout to more than 45 seconds makes sense.
 
--- 
-James Cameron                         http://quozl.netrek.org/
-HP Open Source, Volunteer             http://opensource.hp.com/
-PPTP Client Project, Release Engineer http://pptpclient.sourceforge.net/
+        /* ACL tx timeout must be longer than maximum
+         * link supervision timeout (40.9 seconds) */
+        if (!hdev->acl_cnt && (jiffies - hdev->acl_last_tx) > (HZ * 45))
+                hci_acl_tx_to(hdev);
+
+> > Do all of your dongles use the same Bluetooth chip?
+> 
+> Both dongles were purchased from the same source, and both look
+> identical apart from the ba.
+> 
+> I'm not sure how to get the identity of the chip, but hciconfig -a says
+> at the end ...
+> 
+>         Manufacturer: Cambridge Silicon Radio (10)
+
+If it is CSR based you can try "hciconfig hci0 revision".
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email sponsored by Black Hat Briefings & Training.
+Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
+digital self defense, top technical experts, no vendor pitches, 
+unmatched networking opportunities. Visit www.blackhat.com
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
