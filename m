@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050328105548.70974.qmail@web52406.mail.yahoo.com>
-From: jose <twblr@yahoo.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <4246DF1F.4020408@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] linux kernel patch on pda
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] A2DP btsco support
+References: <200503261356.57766.mh@intellinetservices.net> <1111894787.9195.213.camel@pegasus> <20050327154013.GC26485@externe.net>
+In-Reply-To: <20050327154013.GC26485@externe.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,29 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Mar 2005 02:55:48 -0800 (PST)
+Date: Sun, 27 Mar 2005 09:28:15 -0700
 
-hi,
+Guylhem
 
-i use a pda which has linux kernel 2.4.18-rmk7,
+> I recommand keeping standalone sbc encoder and a2play, at least for
+> those who want to use such headphones with linux PDAs (I do !)
 
-it has Intel StrongArm 206MHz SA-1110 processor: 
+the problem here is there is one way to fix timing issues in a2play and 
+a different solution for timing issues in an alsa userspace plugin. if 
+it's important to someone, it will be maintained of course.
 
-i want to enable bluetooth on this device.Anyone
-worked on similar lines?..pls hlp
+i've been hoping a company would see potential in this stuff and throw 
+in some resources. during the .com boom it would have happened :(
 
-rgds,
-jose
+> BTW I did report somes bug and proposed fixes when I was compiling
+> with gcc 2.95 for ARM. Did they make it in?
 
+i think so. check cvs to see if it all looks good.
 
-
-
-
-		
-__________________________________ 
-Do you Yahoo!? 
-Yahoo! Small Business - Try our new resources site!
-http://smallbusiness.yahoo.com/resources/ 
+thanks
+brad
 
 
 -------------------------------------------------------
