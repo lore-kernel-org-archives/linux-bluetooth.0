@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <6.1.2.0.2.20040902194629.053ab320@luna.tlmat.unican.es>
+Message-ID: <20040902141108.99034.qmail@web52807.mail.yahoo.com>
+From: gonzalo briceno <gonzalohbriceno@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-From: George <george.news@gmx.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; format=flowed
-Subject: [Bluez-users] Connect Error - Function not implemented
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Key step in bluetonium setup, bcm203x does not load firmware
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,32 +15,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 02 Sep 2004 19:54:03 +0200
+Date: Thu, 2 Sep 2004 07:11:08 -0700 (PDT)
 
-Hi all.
+I would like to know if you have instructions on
+getting the bluetonium to work with linux.  I have
+searched a lot of places and I know exactly what the
+problem is.  It is bet summarized in sourceforge as
+follows:
+"
+The Broadcom Blutonium devices need a firmware
+download before they will work like any other H:2
+compatible Bluetooth USB device. The bcm203x requests
+the firmware files BCM2033-MD.hex and BCM2033-FW.bin
+and loads them into the device. After this procedure
+the device will disconnect from the USB bus and
+reconnects as a standard H:2 device which will be
+recognized by the hci_usb driver. The firmware files
+are distributed in the bluez-firmware package.
 
-I'm developing under kernel 2.4.21 an application that involves dealing 
-with bluetooth devices.
-In order to make the application I have taken part of the code of the pand 
-(it's opensource great!!!). My application is very similar to that. It's a 
-daemon that firstly look for Bluetooth devices, if any found it tries to 
-establish a bnep connection and then it runs as a server in order to be 
-able to attend connection request. As you can see it's more or less all the 
-stuff in pand. I have also automate the bridge creation, ...
+An alternate way of loading the firmware onto such a
+device is the bcm203x program from the bluez-utils
+package, because the bcm203x kernel driver is only a
+Linux 2.6 feature. It is necessary to install hotplug
+for this. 
+"
 
-Well I have been checking the correct behaviour by running my application 
-and then connecting using pand. This way everything works ok.
+I installed bluez-firmware-1.0 and bluez-utils-2.9,
+however, the problem is not fixed.  When I look at
+/proc/bus/usb/devices the bluetonium chip is listed
+but sure enough, it does not load the usb_hci module.
 
-However when running my application on two PC I get the following error 
-from the connect statement: Function not implemented (38)
-Then if I try again with pand I still get the error.
+Any help? 
 
-What is the reason for this error?
+=====
+--
+Gonzalo Briceno
+gonzalohbriceno@yahoo.com
+267.679.1289
 
-Any help is really welcomed.
 
-TA
-
+		
+__________________________________
+Do you Yahoo!?
+Yahoo! Mail - 50x more storage than other providers!
+http://promotions.yahoo.com/new_mail
 
 
 -------------------------------------------------------
