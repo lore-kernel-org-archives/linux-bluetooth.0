@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hidp and connecting
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405141524.04481.cijoml@volny.cz>
-References: <200405141524.04481.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1084556671.25099.201.camel@pegasus>
-Mime-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200405141524.04481.cijoml@volny.cz>
+Subject: [Bluez-users] hidp and connecting
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,32 +17,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 14 May 2004 19:44:32 +0200
+Date: Fri, 14 May 2004 15:24:04 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> when hidd is not started and device wants connect, system prints errors about 
-> unknown connections.
+when hidd is not started and device wants connect, system prints errors about 
+unknown connections.
 
-what kind of errors are you talking about? You must be more specific.
+1) Maybe we should have somewhere in /etc/bluetooth list of allowed devices 
+which will be accepted without hidd runnnig?
 
-> 1) Maybe we should have somewhere in /etc/bluetooth list of allowed devices 
-> which will be accepted without hidd runnnig?
+2) When hidp and other modules compiled directly into kernel, we should under 
+single mode allow all hid devices to connect without hidd running to allow 
+users maintain their system without any daemons running
 
-Why should we accept a device when hidd is not running?
-
-> 2) When hidp and other modules compiled directly into kernel, we should under 
-> single mode allow all hid devices to connect without hidd running to allow 
-> users maintain their system without any daemons running
-
-This is impossible. If you need this, you have to go with Bluetooth
-dongles that implement HID proxy.
-
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
