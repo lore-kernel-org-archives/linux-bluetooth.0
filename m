@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <000201c3f27d$66d8e4b0$124db850@ULLA>
-From: "Zbigniew Diaczyszyn \(gmx\)" <z.dia@gmx.de>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] rfcomm: permission denied
+Subject: Re: [Bluez-users] apple wireless mouse on apple ibook (g4, builtin
+	usb)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Sunnan <sunnan@handgranat.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <402D381D.1000306@handgranat.org>
+References: <402D07B8.8030504@handgranat.org>
+	 <1076694675.2671.191.camel@pegasus>  <402D1E8C.6020301@handgranat.org>
+	 <1076702197.18588.11.camel@pegasus>  <402D381D.1000306@handgranat.org>
+Content-Type: text/plain
+Message-Id: <1076709007.18588.39.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,22 +21,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 23:03:16 +0100
+Date: Fri, 13 Feb 2004 22:50:07 +0100
 
-Hello Marcel,
+Hi Sunnan,
 
-I have compiled hcidump on my system (suse 8.2), but hcidump seems to =
-have crashed down. I had to terminate the process with Ctrl-C:
+> 2.4-6 from Debian sid, as well as utils2 from bluez cvs. hciconfig comes 
+> from that cvs checkout (though I have two version in my path, the cvs 
+> version takes precedence, while hcidump comes out of Edds bluez-hcidump 
+> package, version 1.5-2 for debian sid.
 
-linux:~ # hcidump -w info.txt
-HCIDump - HCI packet analyzer ver 1.5
-device: hci0 snap_len: 1028 filter: 0xffffffff
+the version of utils2 have a big endian problem, which I have now fixed
+in CVS. Try your version from bluez-utils-2.4. Better you call it with
+the full path "/sbin/hciconfig -a".
 
-Is this a hardware problem or a wrong compilation of hcidump?
+Regards
 
-thanks in advance
-
-Zbigniew
+Marcel
 
 
 
