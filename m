@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] FujitsuSiemens BT USB Adapter
-References: <200403112106.31567.cijoml@volny.cz> <1079086957.740.7.camel@merlin>
-In-Reply-To: <1079086957.740.7.camel@merlin>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200403121935.33877.cijoml@volny.cz>
+From: zubiwat@poczta.onet.pl
+To: bluez-users@lists.sourceforge.net
+Message-Id: <20040312160822Z2706732-18648+146257@kps3.test.onet.pl>
+Subject: [Bluez-users] rfcomm problems
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,38 +15,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 12 Mar 2004 19:35:33 +0100
+Date: Fri, 12 Mar 2004 17:08:04 +0100
 
-Marcel about 900 Kc its about 30 euro
+Hi.
 
-Michal
+I have problems with rfcomm, because when i connect two pc's I don't know how to make them to transfer files or text between tty's. One komputer uses bluez and the other one USB dongle with WinXP.
 
-Dne p=E1 12. b=F8ezna 2004 11:22 Marcel Holtmann napsal(a):
-> Hi Michal,
->
-> > is this dongle supported? If so, I'll buy it imeditially, coz its SO
-> > small!! http://pcshop.pells.cz/img.asp?stiid=3D3483
->
-> it looks like the Sony dongle and this is CSR based. So I think it
-> should work. What is the price?
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: IBM Linux Tutorials
-> Free Linux tutorial presented by Daniel Robbins, President and CEO of
-> GenToo technologies. Learn everything from fundamentals to system
-> administration.http://ads.osdn.com/?ad_id=3D1470&alloc_id=3D3638&op=3Dcli=
-ck
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+Please help because the two compueters are paired and connected using rfcomm and Serial Port. But when I try to type sth on tty nothing happens.
+
+I would be greatfull for howto or step-by-step text.
+
+Regards
+
+Maciej Zubilewicz
 
 
 -------------------------------------------------------
