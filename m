@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Sebastian Roth <sebiroth@web.de>
-Message-ID: <d09q50$7r9$1@sea.gmane.org>
-References: <004401c5207b$c13a3210$4100a8c0@benjamin> <7aa80ced05030321482f162db2@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: Fw: [Bluez-users] Re: Can't able to send data in both direction
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Cc: sebastian.roth@esk.fhg.de
 In-Reply-To: <7aa80ced05030321482f162db2@mail.gmail.com>
-Subject: [Bluez-users] Re: Fw: Re: Can't able to send data in both direction
+References: <004401c5207b$c13a3210$4100a8c0@benjamin>
+	 <7aa80ced05030321482f162db2@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1109933262.8058.21.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,17 +20,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Mar 2005 15:14:03 +0100
+Date: Fri, 04 Mar 2005 11:47:42 +0100
 
 Hi Mohan,
 
-why do you connect for each keypress?
-Just connect on programm startup then `do' `send' `while' `getch'
-and close the connection on programm shutdown.
-This should avoid the delay!
+>                   I bought a new dongle, and now the send program is
+> working on two sides.
+>                   I am facing one more problem. The send program is
+> reading a character for PC keyboard using getch()
+> function,immediately, it establishes a connection using connect() and
+> then it sends the data. This is in a do-while loop to read and send
+> the continous key press. The problem is, I am not getting all the data
+> on the recv side, what i have typed on the send side. As for I know
+> the problem is due to delay in l2cap connection establishment. Is
+> there any way to avoid the delay? Kindly suggest me.
 
-Best regards,
-Sebastian
+you must keep the connection open.
+
+Regards
+
+Marcel
+
 
 
 
