@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] NEC usb bluetooth support
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Cc: Max Krasnyansky <maxk@qualcomm.com>,
-   Stephen Crane <steve.crane@rococosoft.com>, Edd Dumbill <edd@usefulinc.com>
+To: Mitch <Mitch@0Bits.COM>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3FE0E092.9060002@0Bits.COM>
+References: <3FE0E092.9060002@0Bits.COM>
 Content-Type: text/plain
-Message-Id: <1071791711.6635.18.camel@pegasus>
+Message-Id: <1071739959.3873.17.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Release of new BlueZ libs and utils
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,51 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 19 Dec 2003 00:55:12 +0100
+Date: Thu, 18 Dec 2003 10:32:39 +0100
 
-Hi Folks,
+Hi Mitch,
 
-I don't wanna make big words about it, but after 8 months there are new
-releases of the BlueZ libs and utils packages. So let the changelogs
-speak for themselfs:
+> you explained the errors well in your previous email. The error (-5) is
+> a EIO which is generated from the secondary config of the bluetooth device
+> which is the voice SCO config which doesn't have 3 bNumEndPoints and
+> fails the test in the hci_usb_probe()
+> 
+>         if (intf->altsetting[0].desc.bNumEndpoints < 3)
+>                  return -EIO;
+> 
+> The error happens in both 2.4.23 and 2.6.0-test11, but doesn't stop the
+> device working perfectly.
 
-BlueZ libs 2.5:
-        Add decoding of Bluetooth 1.2 features.
-        Add link manager version parameter for Bluetooth 1.2.
-        Add new company identifiers.
-        Support for transmit power level.
-        Support for park, sniff and hold mode.
-        Support for role switch.
-        Support for reading the clock offset.
-        Use R1 for default value of pscan_rep_mode.
-
-BlueZ utils 2.4:
-        hcitool changes:
-                Increase number of inquiry responses.
-                Support for transmit power level.
-                Minor updates.
-        hciconfig changes:
-                Display all 8 bytes of the features.
-                Add support for reading and writing of IAC.
-                Correct decoding class of device.
-                Use Ericsson revision command for ST Microelectronics devices.
-                Display AVM firmware version with 'revision' command.
-                New code for CSR specific revision information.
-        hciattach changes:
-                Support for ST Microelectronics specific initialization.
-                Support for 3Com card version 3.0.
-                Support for TDK, IBM and Socket cards.
-                Support for initial baud rate.
-        Update man pages.
-        Fixes for some memory leaks.
-
-For the BlueZ libs I don't plan another release, because the new major
-version of the Bluetooth library is making good progress. But for the
-BlueZ Utils I want to make another release that addresses the problems
-with the pin_helper program. I think the C based bluez-pin is a good
-idea and maybe we should also integrate the DBus support into the next
-release. So I like to get comments on this and if you have patches,
-please resend them.
+now I got it. We are the origin of this error and I think simply return
+zero is the better approch, because it is not an error on interface 1
+and 2 (if you have support for DFU). I put it on my TODO list for 2.6.
 
 Regards
 
