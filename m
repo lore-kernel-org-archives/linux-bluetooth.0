@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-In-Reply-To: <4118EEEB.4010602@superbug.demon.co.uk>
-References: <4117AB9A.9010909@dark-reality.de>     <1092071356.4564.12.camel@pegasus> <4117B098.5020805@dark-reality.de>     <1092073167.4564.26.camel@pegasus>     <4117C0AB.2010609@superbug.demon.co.uk>     <1092090364.4564.46.camel@pegasus> <41180E64.1010007@dark-reality.de>     <1092140041.4564.96.camel@pegasus>     <4118C562.1050300@superbug.demon.co.uk>     <Pine.LNX.4.59.9999.0408101435250.22497@brava.dcs.gla.ac.uk> <4118DAF9.2080204@csr.com> <4118EEEB.4010602@superbug.demon.co.uk>
-Mime-Version: 1.0 (Apple Message framework v619)
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Message-Id: <3A71B5F8-EAFD-11D8-A26F-000D932E1CC8@dcs.gla.ac.uk>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-From: Jonathan Paisley <jp-www@dcs.gla.ac.uk>
-Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
-To: James Courtier-Dutton <James@superbug.demon.co.uk>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Message-ID: <001301c47f09$3900e650$1301010a@baked>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Subject: [Bluez-devel] Alignment issue
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,32 +16,59 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 19:43:53 +0100
+Date: Tue, 10 Aug 2004 11:38:25 -0700
 
+Marcel,
 
-On 10 Aug 2004, at 16:51, James Courtier-Dutton wrote:
+I ran into an alignment problem on our ARM platform. It showed up as =
+corrupt
+SDP responses. I traced it back to bt_put_unaligned() in bluetooth.h
 
-> So, I suggest we might do better if we provide a number of different=20=
+The attached patch should fix the problem (it does as far as I can =
+tell).
+The compiler probably thinks both arguments to memcpy() are aligned and =
+so
+makes an optimization which breaks the copy (because the destination is =
+not
+actually aligned). Perhaps this is a compiler bug... I'm using gcc =
+3.3.3.
+After googling and reading some discussion on the topic it seems that =
+it's
+probably not a compiler bug. I'll leave that for someone else to decide. =
+:)
 
-> ways to get sound to bluetooth devices, in order of preference.
-> 1) PCM as Carl suggests
-> 2) Bypass HCI stack and send SCO direct to USB devices. I don't think=20=
+I know I'm behind on the libs version, but I just had a look in CVS and =
+the
+code in question is the same.
 
-> one can do that for UART based devices. I don't know what is best for=20=
+Look reasonable to you?
 
-> PCI devices, as I have not looked at the PCI source code. I=20
-> concentrated on the USB source code when I tried before.
-> 3) Current HCI stack method. <- Last resort.
+Regards,
 
-=10Perhaps somebody with more bluetooth know-how can comment here, but:
+-Daryl.
 
-  1) I thought PCM was for connection from the bluetooth chip to some=20
-other hardware (e.g., a physical earpiece). That's not an option for=20
-getting audio to the computer unless the device in question has some=20
-funky other connection to the computer.
-
-  2) Isn't the SCO-over-USB standard defined in terms of the HCI=20
-protocol? How do you go about bypassing it?
+--- bluez-libs-2.8/include/bluetooth.h	2004-07-07 21:54:33.000000000 =
+-0700
++++ bluez-libs-2.8_mod/include/bluetooth.h	2004-08-09
+11:27:04.000000000 -0700
+@@ -93,10 +93,14 @@
+ #define bt_put_unaligned(val, ptr) ((void)( *(ptr) =3D (val) ))
+ #else
+ #define bt_get_unaligned(ptr) \
+-	({ __typeof__(*(ptr)) __tmp; memcpy(&__tmp, (ptr), sizeof(*(ptr)));
+__tmp; })
++	({ __typeof__(*(ptr)) __tmp; \
++	char *__tmp1 =3D (char *)(ptr); \
++	memcpy(&__tmp, __tmp1, sizeof(*(ptr))); \
++	__tmp; })
+ #define bt_put_unaligned(val, ptr) \
+ 	({ __typeof__(*(ptr)) __tmp =3D (val); \
+-	memcpy((ptr), &__tmp, sizeof(*(ptr))); \
++	char *__tmp1 =3D (char *)(ptr); \
++	memcpy(__tmp1, &__tmp, sizeof(*(ptr))); \
+ 	(void)0; })
+ #endif
+=20
 
 
 
