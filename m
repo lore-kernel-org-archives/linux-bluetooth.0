@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Toshiba and BT (SuSE 9.2)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAOihBpRJ97k2gwO2yUG25+wEAAAAA@t-online.de>
-References: 
-	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAOihBpRJ97k2gwO2yUG25+wEAAAAA@t-online.de>
-Content-Type: text/plain
-Message-Id: <1103118284.2143.237.camel@pegasus>
-Mime-Version: 1.0
+From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
+To: <bluez-users@lists.sourceforge.net>
+Subject: AW: [Bluez-users] Re: Toshiba and BT (SuSE 9.2)
+Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAOihBpRJ97k2gwO2yUG25+wEAAAAA@t-online.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <1103109183.2143.215.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,42 +18,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 15 Dec 2004 14:44:44 +0100
+Date: Wed, 15 Dec 2004 13:37:07 +0100
 
-Hi Peter,
+Hi Marcel,
+now no pand or dund is running.
 
-> ##>what the f* is this. Use "sdptool browse ..." and "sdptool 
-> ##>search ..." to find out what services/profiles this device 
-> ##>really supports, because it seems that their support don't 
-> ##>even know it.
-> 
-> the results make not really happy, isn't it so?
-> 
-> Linux-Notebook:~ # sdptool browse 00:0B:CE:00:01:8F
-> Browsing 00:0B:CE:00:01:8F ...
-> 
-> Linux-Notebook:~ # sdptool search 00:0B:CE:00:01:8F LAP
-> Unknown service 00:0B:CE:00:01:8F
-> Linux-Notebook:~ # sdptool search 00:0B:CE:00:01:8F DUN
-> Unknown service 00:0B:CE:00:01:8F
-> 
-> Linux-Notebook:~ # sdptool search LAP
-> Unknown service LAP
-> Linux-Notebook:~ # sdptool search DUN
-> Inquiring ...
-> Searching for DUN on 00:0B:CE:00:01:8F ...
-> Linux-Notebook:~ #       
+##>what the f* is this. Use "sdptool browse ..." and "sdptool=20
+##>search ..." to find out what services/profiles this device=20
+##>really supports, because it seems that their support don't=20
+##>even know it.
 
-maybe you should read the manpage of sdptool first.
+the results make not really happy, isn't it so?
 
-	sdptool search --bdaddr 00:0B:CE:00:01:8F --tree dun
-	sdptool search --bdaddr 00:0B:CE:00:01:8F --tree lan
+Linux-Notebook:~ # sdptool browse 00:0B:CE:00:01:8F
+Browsing 00:0B:CE:00:01:8F ...
 
-If you see problems don't forget to run "hcidump -X".
+Linux-Notebook:~ # sdptool search 00:0B:CE:00:01:8F LAP
+Unknown service 00:0B:CE:00:01:8F
+Linux-Notebook:~ # sdptool search 00:0B:CE:00:01:8F DUN
+Unknown service 00:0B:CE:00:01:8F
+
+Linux-Notebook:~ # sdptool search LAP
+Unknown service LAP
+Linux-Notebook:~ # sdptool search DUN
+Inquiring ...
+Searching for DUN on 00:0B:CE:00:01:8F ...
+Linux-Notebook:~ #      =20
+
+##>Also do a "hcitool info ..." for me.
+
+Perhaps this gives a way to you:
+
+Linux-Notebook:~ # hcitool info 00:0B:CE:00:01:8F
+Requesting information ...
+        BD Address:  00:0B:CE:00:01:8F
+        Device Name: Bluetooth-Modul
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x175
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot =
+offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <RSSI> <channel quality> <SCO link> <HV2
+packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging =
+scheme>
+                <power control> <transparent SCO>
 
 Regards
-
-Marcel
+Peter
 
 
 
