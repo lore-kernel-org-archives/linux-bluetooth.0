@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Packages to Use For Zaurus SL-6000L
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: murat_bog@yahoo.com
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <20041016065031.39199.qmail@web60406.mail.yahoo.com>
-References: <20041016065031.39199.qmail@web60406.mail.yahoo.com>
+Subject: Re: [Bluez-users] HID mouse doesnt reconnect after sleep if
+	bemused-bemusedlinuxserver connection is open
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041017201517.GA323918@kosh.hut.fi>
+References: <20041017125132.GA274769@kosh.hut.fi>
+	 <1098018136.4911.87.camel@pegasus> <20041017133034.GC274769@kosh.hut.fi>
+	 <1098026676.4911.96.camel@pegasus> <20041017165348.GA292044@kosh.hut.fi>
+	 <1098032261.4911.102.camel@pegasus> <20041017184054.GA306443@kosh.hut.fi>
+	 <1098042076.21553.0.camel@pegasus>  <20041017201517.GA323918@kosh.hut.fi>
 Content-Type: text/plain
-Message-Id: <1098091301.20331.84.camel@baroque.rococosoft.com>
+Message-Id: <1098048662.21553.5.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,39 +22,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 18 Oct 2004 10:21:41 +0100
+Date: Sun, 17 Oct 2004 23:31:02 +0200
 
-Hi,
+Hi Jouni,
 
-On Sat, 2004-10-16 at 07:50, Murat Bog wrote:
-> Hello,
+> > it is enough to do "hciconfig hci0 noauth noencrypt" for testing this,
+> > but if this not helps then you should buy yourself a Bluetooth dongle
+> > with at least HCI 16.4 firmware on it.
 > 
-> I am wondering which combination of Bluez packages I
-> should be installing on a Zaurus 6000L with factory
-> configuration(2.4.18-rml7-pxa3-embedix with ROM
-> version 1.12) to work with an AmbiCom BT2000CF card.
+> Ok. It is not huge problem, as I can always disconnect the bemused
+> connection for a moment to reconnect the HID mouse.
 > 
-> The latest set of packages do not seem to be working
-> together.  When I install bluez-utils-2.10_arm.ipk, it
-> reports a dependency error when used with
-> bluez-kernel-2.4.18-mh15_arm.ipk and
-> bluez-libs-2.10_arm.ipk.
-> 
-> I also see that when I run "/etc/rc.d/init.d/bluetooth
-> start" command, I get the following message:
-> 
-> "Starting Bluetooth subsystem:/usr/sbin/hcid: error
-> while loading shared libraries: libsdp.so.2: cannot
-> load shared object file: No such file or directory"
+> But still I don't quite understand why it works otherway around,
+> so if HID mouse connection is open and working, I can connect with
+> Bemused client to bemusedlinuxserver whether hcid was in security mode 3
+> or not, and both works until HID mouse is idle long enough to go in the
+> sleep mode.
 
-Pretty much all you need to know is described here:
-http://bluez.sourceforge.net/download/zaurus/README.txt
+it looks like a scatternet problem.
 
-Regards,
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+> One thing I didn't try. Although HID mouse now made a connection without
+> authentication and encryption, maybe it remembered it has to
+> authenticate and tried it just like before when hcid was in security
+> mode 3. The following hcidump may tell if this was the case for someone
+> who is used to read those dumps?
+
+The dump shows that you have more than one hcid running. This is not a
+good idea. Check you setup and control with hciconfig if auth and
+encrypt are really switched off.
+
+Regards
+
+Marcel
+
 
 
 
