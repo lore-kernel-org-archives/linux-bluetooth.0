@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Creating programs with Bluez Libraries..
-From: Bastian Ballmann <Crazydj@chaostal.de>
+From: Claes Holmerson <claes@it-slav.net>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <BAY21-F1269792B015AEB1770DB46DBB90@phx.gbl>
-References: <BAY21-F1269792B015AEB1770DB46DBB90@phx.gbl>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-e1rHLEZ7bivDWZQsSrfF"
-Message-Id: <1101492046.1308.13.camel@espy.crazydj.de>
-Mime-Version: 1.0
+Message-ID: <Pine.BSO.4.53.0411261207460.9290@vakttornet.mynet>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] LAN access devices
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,44 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Nov 2004 19:00:47 +0100
-
-
---=-e1rHLEZ7bivDWZQsSrfF
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Date: Fri, 26 Nov 2004 12:08:38 +0100 (CET)
 
 Hello,
 
-On Thu, 2004-11-25 at 23:40, LuXs Amaral wrote:
+This is not strictly a Bluez question, but anyways... I was thinking if it
+would be possible to use WAP over Bluetooth on a Bluetooth-enabled phone
+to connect to a web server running Bluez. I have a SonyEricsson K700i, and
+as far as I can tell, it does not support the LAN access profile. I don't
+know whether that is required or if there are other ways to accomplish
+this. Are there devices that support this? Not even SonyEricsson P910
+seems to do so.
 
-> I am startting a project using some Bluetooth USB Dongles (concemptronic)=
-=20
-> and i need to creat programs to communicate between them.
+If it was possible, the phone could be used to control things on a
+headless "home/media server", like a MythTV server. A WAP interface could
+be built to control things such as MP3 playback or recording of tv
+programs for example.
 
-Maybe this will help you:=20
-https://ds.ccc.de/083/bluetoothfunandprofit
-The article is in German, but you can use the example code.
-Have fun && Greets
-
-Basti
---=20
-Time is a bitch.
-
---=-e1rHLEZ7bivDWZQsSrfF
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQBBp29O3rCd3KdGxg4RAg3TAKCfrJaQLN5+qvqp4yA/oO+x/VirRgCdGkNv
-YOhokODP9P2dDDmwJR4+J5c=
-=VaIT
------END PGP SIGNATURE-----
-
---=-e1rHLEZ7bivDWZQsSrfF--
-
+Thanks,
+Claes
 
 
 -------------------------------------------------------
