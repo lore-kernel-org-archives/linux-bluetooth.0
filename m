@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Zero length L2CAP packets
+Subject: Re: [Bluez-devel] pand Connection refused(111) when connecting to
+	a Belkin NAP
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Moritz Gmelin <moritz.gmelin@avetana.de>
-Cc: Till Harbaum <harbaum@beecon.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <2def10fdd2a185bcddd4562929cd1417@avetana.de>
-References: <200502101112.09602.harbaum@beecon.de>
-	 <1108044288.15974.45.camel@pegasus>
-	 <2def10fdd2a185bcddd4562929cd1417@avetana.de>
+To: Creative Monsters <lta@creativemonsters.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <420F483D.20802@creativemonsters.com>
+References: <27345483$110790477642094908d86d51.65090625@config17.schlund.de>
+	 <1107908002.14624.3.camel@pegasus>  <420F483D.20802@creativemonsters.com>
 Content-Type: text/plain
-Message-Id: <1109031428.7626.84.camel@pegasus>
+Message-Id: <1109031323.7626.81.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -22,24 +21,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Feb 2005 01:17:08 +0100
+Date: Tue, 22 Feb 2005 01:15:23 +0100
 
-Hi Moritz,
+Hi,
 
-> I just tried writing a 0-length packet on my open L2CAP Connection and 
-> I cannot see anything happening with hcidump. The remote end is a Mac. 
-> But I guess that I should see anything regardless of the remote end. 
-> 1-byte packets and more get transferred correctly but
+> I'm not sure why the 'Segfault' happens, or what to do to check
+> it.  :-s
 > 
-> write (fd, "foo", 0);
 > 
-> on my open L2CAP Descriptor fd does not give any reaction in hcidump.
+> Version-wise, I'm running...
 > 
-> my version of bluez is libbluetooth1 2.11-1
+> 
+> ( i )   bluez-pin-0.23-3
+> 
+> ( ii )   bluez-hcidump-1.11-1
+> 
+> ( iii )   bluez-libs-2.10-2
+> 
+> ( iv )   bluez-bluefw-1.0-6
+> 
+> ( v )   bluez-utils-2.10-2
+> 
+> 
+> ... on the 64-bit version of Fedora Core 3 ( I'm running an AMD64 ).
 
-update the library and utils and also the kernel. Maybe you need to use
-send() for sending 0 byte payload, because this is what is used in the
-l2test program.
+install the latest version of these packages.
 
 Regards
 
