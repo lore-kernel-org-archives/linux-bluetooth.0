@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <311713603.20826@bjut.edu.cn>
-From: "Jin Pu" <jpu@emails.bjpu.edu.cn>
-To: "bluez-users@lists.sourceforge.ne" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] receiving files from the phone
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <freemail.20050224201238.65123@fm1.freemail.hu>
+References: <freemail.20050224201238.65123@fm1.freemail.hu>
+Content-Type: text/plain
+Message-Id: <1111704550.9195.3.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain;
-      charset="GB2312"
-Subject: [Bluez-users] RFCOMM Problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,16 +18,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 25 Mar 2005 9:37:22 +0800
+Date: Thu, 24 Mar 2005 23:49:09 +0100
 
-  Hi,
-      Can the RFCOMM of Bluez support that One USB Bluetooth Dongle  connects with Multiple PDAs or mobile phones simultaneity. 
+Hi,
 
+> I'd like to transfer files from a nokia phone to the PC. How
+> can I achieve this?
+> What are the transfer rates you've experienced?
+> 
+> What I've already tried:
+> 
+> linux 2.4.28 + affix bluetooth driver + btctl utility's OBEX
+> FTP commands:
+> it works, but only with 13-15kbyte/sec receiving speed
+> 
+> liunx 2.6.10 + the kernels inbuilt bluez driver and the
+> following programs:
+> 
+> btftp from the bluez CVS (receiving speed about 25kbyte/sec)
+> KDE's bluetooth utilities which have an obex FTP transfer
+> utility it could receive
+> at a rate of 20kbyte/sec.
+> 
+> My question is how to debug what makes transfer so slow?
+> What rates have you exprienced using obex ftp and object
+> push? (I'm particularly interested in the phone>PC direction).
+> Any other possibilities for file transfer apart from obex
+> ftp and object push?
 
-      Thanks a lot.
+I can't tell you anything about the Affix stack, but the BlueZ part of
+RFCOMM is doing quite good. However sometimes the phone is the limit
+here and RFCOMM + OBEX adds a lot of unneeded overhead.
 
+Regards
 
-      Jin Pu
+Marcel
 
 
 
