@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Bc. Michal Semler" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] MX900 page updated
-References: <20040624205328.47bf51ee@bluez.bueche.ch>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Charles Bueche <charles@bueche.ch>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <20040624205328.47bf51ee@bluez.bueche.ch>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200406250026.19454.cijoml@volny.cz>
+References: <20040624205328.47bf51ee@bluez.bueche.ch>
+Content-Type: text/plain
+Message-Id: <1088107922.4296.135.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,32 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 25 Jun 2004 00:26:18 +0200
+Date: Thu, 24 Jun 2004 22:12:02 +0200
 
-Hi,
+Hi Charles,
 
-remove hid2hci working for others :) It works for all :) remove not needed 
-uinput module and for Marcel
-
-how about 8 buttons on mouse? Did you make some research about it?
-
-Michal
-
-On Thursday 24 of June 2004 20:53, Charles Bueche wrote:
-> Hi all,
->
 > now that gentoo has a 2.6.7 kernel, I have tried Marcel's mh patch with
 > success, and I have updated my page about my setup :
->
-> 	http://www.bueche.ch/comp/mx900/mx900.html
->
-> Feedback welcome.
->
+
+aren't there any Gentoo packages for bluez-libs and bluez-utils?
+
 > I'm not sure wheter I still need the uinput module since I switched to
 > hidd. I remember Marcel saying uinput is not needed with hidd. So who
 > sends events to /dev/input/mice ? hidd directly ?
->
-> Charles
+
+You don't need uinput anymore. The HIDP Module will do this all by
+itself. On my presentation at LinuxTag tomorrow I am going to show how
+this all works. I created some nice new graphics ;)
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
