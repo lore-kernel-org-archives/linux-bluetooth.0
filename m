@@ -1,53 +1,22 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] pand/main.c, restore signals for dev-up
-	script
-From: Marcel Holtmann <marcel@holtmann.org>
-To: James Cameron <james.cameron@hp.com>
+Return-Path: <james.cameron@hp.com>
+Date: Mon, 28 Jun 2004 22:06:12 +1000
+From: James Cameron <james.cameron@hp.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040628120612.GF8871@hp.com>
-References: <20040627133325.GA23996@hp.com>
-	 <1088366793.3774.70.camel@pegasus> <20040627233437.GD28828@hp.com>
-	 <1088408656.3774.136.camel@pegasus> <20040628085356.GA8871@hp.com>
-	 <1088413518.3774.167.camel@pegasus> <20040628095541.GB8871@hp.com>
-	 <1088417629.3774.177.camel@pegasus> <20040628101927.GC8871@hp.com>
-	 <1088419197.3774.183.camel@pegasus>  <20040628120612.GF8871@hp.com>
-Content-Type: text/plain
-Message-Id: <1088427271.3774.198.camel@pegasus>
+Subject: Re: [Bluez-devel] [PATCH] pand/main.c, restore signals for dev-up script
+Message-ID: <20040628120612.GF8871@hp.com>
+References: <20040627133325.GA23996@hp.com> <1088366793.3774.70.camel@pegasus> <20040627233437.GD28828@hp.com> <1088408656.3774.136.camel@pegasus> <20040628085356.GA8871@hp.com> <1088413518.3774.167.camel@pegasus> <20040628095541.GB8871@hp.com> <1088417629.3774.177.camel@pegasus> <20040628101927.GC8871@hp.com> <1088419197.3774.183.camel@pegasus>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Jun 2004 14:54:31 +0200
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1088419197.3774.183.camel@pegasus>
+Sender: james.cameron@hp.com
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi James,
+On Mon, Jun 28, 2004 at 12:39:57PM +0200, Marcel Holtmann wrote:
+> [...] The remote address is available via "pand -l".
 
-> > [...] The remote address is available via "pand -l".
-> 
-> Neat.  Another way to get it.  ;-)  But this way activates pand again,
-> so dev-up remains the most efficient way to get this address.
+Neat.  Another way to get it.  ;-)  But this way activates pand again,
+so dev-up remains the most efficient way to get this address.
 
-what do you wanna do with that information? Actually I never needed it.
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.Net email sponsored by Black Hat Briefings & Training.
-Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
-digital self defense, top technical experts, no vendor pitches, 
-unmatched networking opportunities. Visit www.blackhat.com
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+James Cameron
