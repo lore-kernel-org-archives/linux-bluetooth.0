@@ -1,50 +1,50 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <James@superbug.demon.co.uk>
+Message-ID: <4041512B.6050703@superbug.demon.co.uk>
+Date: Sun, 29 Feb 2004 02:40:43 +0000
+From: James Courtier-Dutton <James@superbug.demon.co.uk>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] [PATCH] Fix to enable bluez SCO USB urbs.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: James Courtier-Dutton <James@superbug.demon.co.uk>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4041512B.6050703@superbug.demon.co.uk>
-References: <403FD968.6010004@superbug.demon.co.uk>
-	 <1077972736.2843.60.camel@pegasus>  <4041512B.6050703@superbug.demon.co.uk>
-Content-Type: text/plain
-Message-Id: <1078022369.1942.2.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 29 Feb 2004 03:39:29 +0100
+References: <403FD968.6010004@superbug.demon.co.uk> <1077972736.2843.60.camel@pegasus>
+In-Reply-To: <1077972736.2843.60.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi James,
+Marcel Holtmann wrote:
+> Hi James,
+> 
+> 
+>>Here is a patch for /usr/src/linux-2.6.3/drivers/bluetooth/hci_usb.c
+>>
+>>Without the interval set, the latest kernel 2.6.3 usb code will reject 
+>>the usb_submit_urb().
+>>
+>>Without this patch no ISOC urbs are submitted, and thus no SCO data is 
+>>passed.
+> 
+> 
+> the same patch is already in 2.6.4-rc1.
+> 
+> 
+>>The proper fix would really be to only enable these when a SCO 
+>>connection is actually open.
+> 
+> 
+> Of course. Send me patches for it.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+Where do I get the most up to date bluetooth kernel modules?
+I cannot find them in the sf.net CVS.
+I also cannot find any info on where to get them on the www.bluez.org 
+web site.
 
-> Where do I get the most up to date bluetooth kernel modules?
-> I cannot find them in the sf.net CVS.
-> I also cannot find any info on where to get them on the www.bluez.org
-> web site.
 
-as soon as I have a set of three or more full tested patches, I push
-them for inclusion into 2.6 and I update the latest 2.6 -mh patch at
-http://www.bluez.org/patches.html
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Cheers
+James
