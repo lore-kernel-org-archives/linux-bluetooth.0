@@ -1,20 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth Access Point elmeg D@VOS-44.dsl
+Subject: Re: [Bluez-users] link_key_request problems
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Florian <Kimpenhaus@gmx.de>
+To: wim delvaux <wim.delvaux@adaptiveplanet.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <opr4anrqloqdj9uv@mail.gmx.de>
-References: <opr3xmdugiqdj9uv@mail.gmx.de>
-	 <1077725935.2919.116.camel@pegasus>  <opr3xs5louqdj9uv@mail.gmx.de>
-	 <1077734547.2919.147.camel@pegasus>  <opr3xydd1hqdj9uv@mail.gmx.de>
-	 <1077740936.2884.2.camel@pegasus>  <opr3x23lc1qdj9uv@mail.gmx.de>
-	 <1077747171.2884.5.camel@pegasus>  <opr3x77rphqdj9uv@mail.gmx.de>
-	 <1077753099.2754.1.camel@pegasus>  <opr3x8uqadqdj9uv@mail.gmx.de>
-	 <1077757118.2754.4.camel@pegasus>  <opr3yb4dsoqdj9uv@mail.gmx.de>
-	 <1077758327.2754.9.camel@pegasus>  <opr31ccpcoqdj9uv@mail.gmx.de>
-	 <1077895848.2843.50.camel@pegasus>  <opr4anrqloqdj9uv@mail.gmx.de>
+In-Reply-To: <200403031516.12967.wim.delvaux@adaptiveplanet.com>
+References: <200402250154.18963.wim.delvaux@adaptiveplanet.com>
+	 <200402250351.06911.wim.delvaux@adaptiveplanet.com>
+	 <1077715714.2919.80.camel@pegasus>
+	 <200403031516.12967.wim.delvaux@adaptiveplanet.com>
 Content-Type: text/plain
-Message-Id: <1078334647.10857.36.camel@pegasus>
+Message-Id: <1078325166.2787.108.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -26,51 +21,68 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 03 Mar 2004 18:24:07 +0100
+Date: Wed, 03 Mar 2004 15:46:06 +0100
 
-Hi Florian,
+Hi Wim,
 
-> > you can use
-> >
-> > 	dund --nodetach --connect 00:0B:CE:00:01:8E --msdun call lap
-> >
-> > and create a /etc/ppp/peers/lap file with your PPP settings. But that is
-> > now up to you, because I don't know what your AP is expecting.
-> 
-> at first thanks for your fast help!!!! In the end it works I can connect 
-> to the AP
-> using PAP and ppp.(little trick - after conection is established I have to 
-> use route
-> to set a gateway "route add default gw 192.168.1.110" ip the AP gave my 
-> dongel)
-
-you can also do this with pppd. Look for "defaultroute".
-
-> I did not belive that I get it working so quick despite the fact that I 
-> use Linux
-> for about 3 weeks now.
-> But I have still some questions.
-> 
-> When plugging in the dongel  I have to use bluefw 00X/00Y for the firmware 
-> to be loaded
-> into the dongel. Is it possible to automate this?
-
-Yes. You can use Linux Hotplug for this. Look at the mailing list
-archive for more details about it. With 2.6 you can try the bcm203x
-kernel driver for the firmware loading.
-
-> Why is the 2nd light on the dongel off when it is connected?
-
-This is dongle specific, so I can't tell you.
-
-> P.S.: As promised I ll write a howto for this AP but I need some more 
-> testing time. ;) 
-
-Go ahead and do it.
+write a binary version do disk (with -w) and post it or use -x.
 
 Regards
 
 Marcel
+
+> hcidump attached :
+> 
+> > HCI Event: Connect Request(0x04) plen 10
+>   . . . . . . . . . .
+> < HCI Command: Accept Connection Request(0x01|0x0009) plen 7
+>   . . . . . . .
+> > HCI Event: Command Status(0x0f) plen 4
+>   . . . .
+> > HCI Event: Link Key Request(0x17) plen 6
+>   . . . . . .
+> < HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
+>   . . . . . . . B . . 3 . . . . i . c . .
+>   . b
+> > HCI Event: Role Change(0x12) plen 8
+>   . . . . . . . .
+> > HCI Event: Command Complete(0x0e) plen 10
+>   . . . . . . . . . .
+> > HCI Event: Connect Complete(0x03) plen 11
+>   . ( . . . . . . . . .
+> 
+> or RAW
+> 
+> > 04 04 0A 96 85 0D C7 02 00 12 01 12 01
+> < 01 09 04 07 96 85 0D C7 02 00 00
+> > 04 0F 04 00 01 09 04
+> > 04 17 06 96 85 0D C7 02 00
+> < 01 0B 04 16 96 85 0D C7 02 00 F5 42 F5 95 33 1E 18 AF B9 69
+>   87 63 F4 EA DA 62
+> > 04 12 08 00 96 85 0D C7 02 00 00
+> > 04 0E 0A 01 0B 04 00 96 85 0D C7 02 00
+> > 04 03 0B 05 28 00 96 85 0D C7 02 00 01 00
+> 
+> In the syslog I see ...
+> 
+> Mar  3 15:09:05 localhost hcid[10515]: link_key_request 
+> (sba=00:60:57:02:71:A2, dba=00:02:C7:0D:85:96)
+> 
+> On the Ipaq (3800) I see similar messages but the ascii content of the message 
+> is different
+> 
+> Raw output there is ...
+> 
+> HCIDump - HCI packet analyzer ver 1.5
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> > 04 12 08 00 A2 71 02 57 60 00 01 
+> > 04 17 06 A2 71 02 57 60 00 
+> < 01 0B 04 16 A2 71 02 57 60 00 16 66 2E EB B9 33 32 1B EE A8 
+>   15 F7 11 CA B1 CF 
+> > 04 0E 0A 01 0B 04 00 A2 71 02 57 60 00 
+> > 04 03 0B 05 28 00 A2 71 02 57 60 00 01 00 
+> 
+> The only solution is still to remove the link_key file
 
 
 
