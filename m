@@ -3,12 +3,11 @@ Subject: Re: [Bluez-users] Sony DSC-FX77 and BIP
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Tom Bailly-Salins <tbaillys@free.fr>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40D068F3.3050702@free.fr>
+In-Reply-To: <40D05E6A.402@free.fr>
 References: <40D043DF.4070306@free.fr> <1087391351.4309.16.camel@pegasus>
-	 <40D05E6A.402@free.fr> <1087399176.4309.24.camel@pegasus>
-	 <40D068F3.3050702@free.fr>
+	 <40D05E6A.402@free.fr>
 Content-Type: text/plain
-Message-Id: <1087427312.4309.32.camel@pegasus>
+Message-Id: <1087399176.4309.24.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,14 +19,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Jun 2004 01:08:32 +0200
+Date: Wed, 16 Jun 2004 17:19:36 +0200
 
 Hi Tom,
 
-> Do you have the BIP profile specifications ? If you do I would really 
-> like a copy.
+> Thank you for the info, but about the DSC-FX77 support for BIP it
+> seems that Sony has everything running very well between their own
+> hardware.
 
-you will find it at www.bluetooth.org
+read the BIP profile specification and read my mail again ;)
+
+> Is that only a partial implementation of BIP ? If not, my 2 questions
+> remain:
+>  - Is there an application like "Remote Camera" or "Network Smart
+> Capture" that runs under linux.
+
+No.
+
+>  - And if not, can I use a library like BlueZ to make one ?
+
+You must use BlueZ and OpenOBEX.
 
 Regards
 
