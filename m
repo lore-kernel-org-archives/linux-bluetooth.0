@@ -2,13 +2,13 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Michal Semler <cijoml@volny.cz>
 Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] hidp and hidd related bugs
-References: <200405120030.54220.cijoml@volny.cz> <1084368090.25099.22.camel@pegasus>
-In-Reply-To: <1084368090.25099.22.camel@pegasus>
+Subject: Re: [Bluez-users] DHCPD and Bluetooth
+References: <004501c4383b$36b36950$80c8fea9@Perigee.Perigeellc.com> <40A25476.7080609@mWare.ca> <007e01c4384a$64f7e700$80c8fea9@Perigee.Perigeellc.com>
+In-Reply-To: <007e01c4384a$64f7e700$80c8fea9@Perigee.Perigeellc.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200405122109.01893.cijoml@volny.cz>
+Message-Id: <200405122103.08265.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,69 +19,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 May 2004 21:09:01 +0200
+Date: Wed, 12 May 2004 21:03:07 +0200
 
-On Wednesday 12 of May 2004 15:21, Marcel Holtmann wrote:
-> Hi Michal,
->
-> > I did little research and here is output:
-> >
-> > keys which are not reported in xev:
-> > Eigene Dateien
-> > Eigene Bilder
-> > Eigene Musik
-> > Messenger
-> > Abmelden
-> >
-> > Reported badly
-> > Rechner is reported like Pause
-> > Standby like Print
-> >
-> > Do you want send keycodes which reports bthid in 2.4.26 to have the same
-> > hotkeys events?
->
-> you own a german keyboard ;)
+On Wednesday 12 of May 2004 19:55, Rob Taft wrote:
+> Changing my OS isn't exactly an option at this point.
 
-Yes :) Microsoft don't sell it on our market and boarder is so near... :)
-
->
-> However I can't help you in that case, because I have little interest to
-> fix this. The HID parser that is used by the HIDP kernel module is the
-> same parser as in the USB HID driver.
-
-I know, I looked at it to fix it, but it's silly. When I use table from bthid, 
-colona doesn't work as with bthid - as expected :) I'll have time to make 
-closer look after graduate...
-
-> In some near future they will be 
-> joined to use the same generic parser. The parser in bthid was written
-> for the Microsoft keyboard and maybe did some assumptions that are wrong
-> for other keyboards.
-
-I have MS keyboard :)
-
-> Try to get the buttons work with current HIDP and 
-> some external programs like hotkeys.
-
-I described problem with hidp - with bthid only colona key doesn't work
-
->
-> > hidd --killall wants atribute BDADDR
->
-> Silly typo. I only tested "-K" and that was working. It is fixed in CVS
-> now.
-
-Nice :)
-
-I find out, that l2ping pings from 200 not 0 - you remembered to include my 
-minor fix
-
->
-> Regards
->
-> Marcel
+All distributions have hotplug scripts inside. Just use you package system and 
+install it
 
 Michal
+
+>   ----- Original Message -----
+>   From: Mykel
+>   To: Rob Taft
+>   Cc: bluez-users@lists.sourceforge.net
+>   Sent: Wednesday, May 12, 2004 12:44 PM
+>   Subject: Re: [Bluez-users] DHCPD and Bluetooth
+>
+>
+>   I know Slackware has hotplug scripts. You might want to look there.
+>
+>   Myke
+>
+>
+>   Rob Taft wrote:
+>     I currently have a setup where I have a Bluetooth adapter on a Linux
+> box, and one on Windows.  Everything is configured properly.  I connect
+> from the Windows Bluetooth adapter to the Linux one via "Local Area
+> Connection 2" in XP over TCP/IP.  I manually type "ifconfig bnep0
+> 192.168.3.1" to assign the adapter an IP, then I have to restart DHCPD to
+> acquire an IP address over Bluetooth.  This all works great.
+>
+>     My first question is:  Is there a way to recognize when a connection is
+> made, so I can create a script or some code to automatically set bnep0 to
+> 192.168.3.1 and restart the dhcp server?
+>
+>     I only have 2 Bluetooth adapters.  What if I used a 3rd from windows to
+> connect to Linux at the same time another one is connected.  Will it allow
+> multiple connections?  Will it show up as bnep1 or still use bnep0?
+>
+>
+>
+>     Rob Taft, Software Engineer
+>     Perigee, A Division of Sensis Corporation
+>     rtaft@sensis.com
+>     315-453-7842, Ext. 25
 
 
 -------------------------------------------------------
