@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Error compiling bluez-utils for buildroot/ARM
+Subject: Re: [Bluez-devel] Handling a Hardware Error event on iPAQ h5550
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4239536C.5030202@amplex.dk>
-References: <4239536C.5030202@amplex.dk>
+In-Reply-To: <Pine.LNX.4.33.0503171141200.22782-100000@redbean.intranet.gw-instruments.de>
+References: 
+	 <Pine.LNX.4.33.0503171141200.22782-100000@redbean.intranet.gw-instruments.de>
 Content-Type: text/plain
-Message-Id: <1111058060.11792.63.camel@pegasus>
+Message-Id: <1111057586.11792.58.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,28 +19,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Mar 2005 12:14:20 +0100
+Date: Thu, 17 Mar 2005 12:06:26 +0100
 
-Hi Stephan,
+Hi Peter,
 
-> If I add  --libdir=${TARGET_DIR}/usr/lib  (which expands to 
-> --libdir=/home/sth/au/buildroot/build_arm/root/usr/lib) to the 
-> configure command, the configuring succeeds, but compilation fails:
-> 
-> ...
-> 
-> /home/sth/au/buildroot/build_arm/staging_dir/bin/arm-linux-uclibc-gcc 
-> -I/usr/include -DDBUS_API_SUBJECT_TO_CHANGE  -Os -pipe    -o hcid 
-> main.o security.o storage.o lib.o parser.o lexer.o kword.o 
-> glib-ectomy.o     -L/home/sth/au/buildroot/build_arm/root/usr/lib 
-> -lbluetooth
-> lexer.o(.text+0x7e0): In function `yy_get_next_buffer':
-> : undefined reference to `_IO_getc'
-> collect2: ld returned 1 exit status
+> I'm not that familiar with the architecture of BlueZ but with the
+> experiences for our own stack I can tell you this is not trivial. The main
+> problem here is that the Bluetooth Stack is not stateless. One possible
+> solution is to feed the reset done event to the higher layers (l2cap). But
+> than L2cap must be modified to correctly shut down all connections. It
+> would be easier if the HCI layer tracks the state of all ACL and SCO
+> connections (Marcel ??). Than a reset done event can be handled like a
+> unexpected link loss on all active connections and the higher layers do
+> not need any modifications (hopefully).
 
-this looks like we have a problem with the generated code for the
-parser. Try to remove parser.[ch] and lexer.c. Maybe you need to add
-another library for the target platform to provide _IO_getc().
+we can do this and actually calling "hcitool cc" does this already, but
+it waits indeed for a timeout of the HCI_Disconnect.
+
+> It may be much simpler trying to find the cause of the data corruption.
+
+This is really the best thing to do, because H:4 is a stupid protocol if
+you run it over hardware. For stack internal use it is perfect.
+
+Hopefully 3-Wire UART will come at some time and make the H:4 obsolete.
 
 Regards
 
