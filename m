@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <b5c638dc05032815321b2739c5@mail.gmail.com>
+From: David Vitrant <prussia@gmail.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <OF200FCC20.5703443A-ON48256FD3.001D7002-48256FD3.001DBAF3@lexmark.com>
-From: gcagasan@lexmark.com
-Content-Type: multipart/alternative; boundary="=_alternative 001DBAF048256FD3_="
-Subject: [Bluez-users] BlueZ licensing inquiry
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] bluez and billionton pcbtc1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,28 +16,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Mar 2005 13:23:12 +0800
+Date: Mon, 28 Mar 2005 18:32:51 -0500
 
-This is a multipart message in MIME format.
---=_alternative 001DBAF048256FD3_=
-Content-Type: text/plain; charset="us-ascii"
+I saw this in the list of adapters.. pcbtc1 but i can't get it to work
+in my laptop.. any ideas or thoughts on if it works or not with
+bluez..
 
-I would like to know, what is the licensing for BlueZ?  Are there any 
-issues from a legal or licensing stand-point if we port it to another OS? 
-
-thanks,
-Gail Cagasan
-Lexmark Research and Development Corp.
---=_alternative 001DBAF048256FD3_=
-Content-Type: text/html; charset="us-ascii"
-
-
-<br><font size=2 face="Courier New">I would like to know, what is the licensing for BlueZ? &nbsp;Are there any issues from a legal or licensing stand-point if we port it to another OS? </font>
-<br>
-<br><font size=2 face="Courier New">thanks,</font>
-<br><font size=2 face="Courier New">Gail Cagasan</font>
-<br><font size=2 face="Courier New">Lexmark Research and Development Corp.</font>
---=_alternative 001DBAF048256FD3_=--
+dGV
 
 
 -------------------------------------------------------
