@@ -1,11 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <005e01c4f320$e16dd0b0$6f04a8c0@ZBOX>
-From: "Suriyan" <suriyan@netgadgets.co.th>
-To: <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_005B_01C4F35B.8D9719C0"
-Subject: [Bluez-devel] Re: Re: multi rfcomm/sco connection
+Subject: Re: [Bluez-devel] rfcomm socket and rfcomm tty
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41DBA21D.7010707@avantwave.com>
+References: <41D12158.6020206@avantwave.com>
+	 <1104315958.6319.13.camel@notepaq>  <41D3600B.8000702@avantwave.com>
+	 <1104604967.4253.4.camel@pegasus>  <41D8F10B.5050207@avantwave.com>
+	 <1104745873.8894.44.camel@pegasus>  <41DA46A2.9060801@avantwave.com>
+	 <1104839485.8894.88.camel@pegasus>  <41DBA21D.7010707@avantwave.com>
+Content-Type: text/plain
+Message-Id: <1104925179.4299.2.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,61 +22,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 5 Jan 2005 19:20:01 +0700
+Date: Wed, 05 Jan 2005 12:39:39 +0100
 
-This is a multi-part message in MIME format.
+Hi Mike,
 
-------=_NextPart_000_005B_01C4F35B.8D9719C0
-Content-Type: text/plain;
-	charset="windows-874"
-Content-Transfer-Encoding: quoted-printable
+>     It is 2.6.5, which is default kernel of Fedora 2.
+>     Does it the problem on kernel?Actually, i really no idea for that.
 
-Hi Marcel,
+I have an idea for that. Try a 2.6.10 and see if this oops still
+appears.
 
-I just found lastest patch in hci_usb.c that pass alternate setting =
-(isoc) as kernel module parameter but it's still static solution to =
-support more than one SCO connection over single bluetooth adapter. Are =
-you working on dynamically support? I have try to do this a few week ago =
-but I stuck on usb_set_interface() function since I cannot meet it's =
-pre-conditions.
+Regards
 
-Thanks.
-
-Best Regards,
-Suriyan.
-
-------=_NextPart_000_005B_01C4F35B.8D9719C0
-Content-Type: text/html;
-	charset="windows-874"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dwindows-874">
-<META content=3D"MSHTML 6.00.2800.1458" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2><FONT size=3D3>Hi Marcel,<BR><BR>I just =
-found lastest=20
-patch in hci_usb.c that pass alternate setting (isoc) as kernel module=20
-parameter&nbsp;but it's still static solution to support more than =
-one&nbsp;SCO=20
-connection over&nbsp;single bluetooth&nbsp;adapter.&nbsp;Are =
-you&nbsp;working on=20
-dynamically support? I have try to do this a few week ago but I stuck on =
-
-usb_set_interface() function since I cannot meet it's=20
-pre-conditions.</FONT></FONT></DIV>
-<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial>Thanks.</FONT></DIV>
-<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial>Best Regards,</FONT></DIV>
-<DIV><FONT face=3DArial>Suriyan.</FONT></DIV>
-<DIV>&nbsp;</DIV></BODY></HTML>
-
-------=_NextPart_000_005B_01C4F35B.8D9719C0--
+Marcel
 
 
 
