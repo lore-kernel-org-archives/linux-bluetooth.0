@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Jose Vazquez" <josemvd@hotmail.com>
+From: "Nicholas A. Preyss" <nalp@gmx.net>
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Problems connecting to Nokia 6310I phone.
+Message-ID: <20040531141035.GA24637@gmx.net>
+References: <Pine.LNX.4.58.0405302214280.8012@sebagqbbe.gwsvfure.pb.hx> <200405310213.25767.tim@birdsnest.maths.tcd.ie> <Pine.LNX.4.58.0405311108560.10172@sebagqbbe.gwsvfure.pb.hx> <20040531115424.GA24449@gmx.net> <Pine.LNX.4.58.0405311422140.6611@sebagqbbe.gwsvfure.pb.hx>
 Mime-Version: 1.0
-Content-Type: text/html
-Message-ID: <BAY8-F95LvRHU1QvJeG0004d848@hotmail.com>
-Subject: [Bluez-users] Problems trying to configure my bluetooth device
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <Pine.LNX.4.58.0405311422140.6611@sebagqbbe.gwsvfure.pb.hx>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,19 +17,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 May 2004 11:21:46 -0400
+Date: Mon, 31 May 2004 16:10:36 +0200
 
-<html><div style='background-color:'><DIV class=RTE>
-<P>Hi:</P>
-<P>I am a newbie to linus, probably thats why i am having problems. Anyway i downloaded the rpms and run them&nbsp; to install the bluez software, i have moved to the root and checked in etc/bluetooth, but the directory is empty. I need bluez to run the btscanner program which only runs under linux. </P>
-<P>I tried the comand hciconfig -a and it shows nothing, unfortunately your website does not have a step by step installation manual or something similar. The device i am using is a Anycom bt 220 usb, linux redhat, kernel 2.4. </P>
-<P>Could you please tell me in a detailed way whats remaining for me to get working the device, i downloaded and have run the frollowing rpm's :</P>
-<P>bluefw, hcidump, libs, pan, sdp, and utils, all of them in their latest version, my guess is that probably i have to had some configuration file or something similar to get up and running the device, i will appreciate a lot any detailed help you could give me.</P>
-<P>&nbsp;</P>
-<P>Thanks a lot</P>
-<P>&nbsp;</P>
-<P>Jose Vazquez</P>
-<P><BR><BR>&nbsp;</P></DIV></div><br clear=all><hr>Help STOP spam with <a href="http://g.msn.com/8HMBEN/2731??PS=47575">the new MSN 8 </a> and get 2 months FREE*</html>
+On  0, Toby Fisher <toby@tjfisher.co.uk> wrote:
+> On Mon, 31 May 2004, Nicholas A. Preyss wrote:
+> > [..]
+> > You need the HCI_USB SCO option for audio transfer, only. For example if
+> > you use the Headset or Handsfree profile. For data transfer there is no
+> > need for SCO support. You are using RFCOMM which uses ACL links.
+> > And >=3D 2.6.6-mh1 there shouldn't be any problems with the SCO
+> > support activated.
+> >=20
+> > Maybe you can run hcidump while your problem appears and provide here
+> > the log.
+>=20
+> Ok, I turned off the SCO options, but have another problem which was, I=
+=20
+> think, there earlier.  Anyway, if I issue the command:
+> hciconfig hci0 reset
+> it eventually says that it times out initialising the device, the hcidump=
+=20
+> log is very short.
+>=20
+> Here it is;
+>=20
+> =04=00=00=00 1=BB@0k=03=00=01=03=10=00
+>=20
+> Itseem that it doesn't like being re-initialised.
+
+After reset the device doesn't respind anymore. I have no clue why, but
+this is a common error, seems to be a misbehaviour of the dongle. You
+can't do much about it then just reinsert the dongle.
+
+nicholas
 
 
 -------------------------------------------------------
