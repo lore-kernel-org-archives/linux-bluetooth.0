@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Telephony with BT headset?
+Subject: Re: [Bluez-users] hci0 problem after timeout
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Matthias Thomae <thomae@ei.tum.de>
+To: Rafael Vidal Aroca <rafael@3WT.com.br>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4018CCA1.9060605@ei.tum.de>
-References: <4018CCA1.9060605@ei.tum.de>
+In-Reply-To: <40183939.1000209@3WT.com.br>
+References: <40170986.70105@3WT.com.br> <1075276651.12766.52.camel@pegasus>
+	 <4017D6E9.6030700@3WT.com.br> <1075306737.26729.3.camel@pegasus>
+	 <40182154.6030709@3WT.com.br> <1075323686.26729.41.camel@pegasus>
+	 <40182452.2040509@3WT.com.br> <1075324208.26729.44.camel@pegasus>
+	 <40183939.1000209@3WT.com.br>
 Content-Type: text/plain
-Message-Id: <1075500623.3594.6.camel@pegasus>
+Message-Id: <1075354132.26729.48.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,31 +22,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 30 Jan 2004 23:10:23 +0100
+Date: Thu, 29 Jan 2004 06:28:52 +0100
 
-Hi Matthias,
+Hi Rafael,
 
-> > I have a BT headset lying around which came with my mobile
-> > phone. However, I don't use it with my mobile, so the idea
-> > crossed my mind that it could be possible to use the
-> > headset with my linux server to make phone calls using
-> > the ISDN system.
-> > 
-> > I'm quite sure that this _is_ possible, as I can receive
-> > and send an audio stream via ISDN4Linux, and the same
-> > applies (more or less) to the headset via BlueZ.
-> 
-> There is a telephone application http://www.antcom.de/ant-phone/ which I
-> have tried with a cable headset.
+>     Well, i managed to make the connection i wanted using ppp over a 
+> rfcomm channel. I works great with no timeouts :-)
 
-has anyone tried this application with the capidrv? For example with a
-AVM B1. I own one, but mine is build into the wrong machine for such
-tests and I need it there. I run some tests with a BlueFRITZ! AP-ISDN
-and call management stuff seems to work, but I don't hear anything on my
-soundcard.
-
-Is there anyone who will spend some time in adding native CAPI support
-to this application?
+I can't explain, why this works and BNEP not. Maybe you should try the
+latest 2.4.25-pre or 2.6.2-rc.
 
 Regards
 
