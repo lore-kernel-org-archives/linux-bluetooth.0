@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <41C864A3.6010300@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-From: Marcus Better <marcus@better.se>
-Message-ID: <loom.20041221T214657-660@post.gmane.org>
-References: <41C80A43.4030105@better.se> <41C864A3.6010300@xmission.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Re: snd-bt-sco and Motorola HS801 success
+Subject: Re: [Bluez-devel] snd-bt-sco and Motorola HS801 success
+References: <41C80A43.4030105@better.se>
+In-Reply-To: <41C80A43.4030105@better.se>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,56 +18,47 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 21 Dec 2004 20:50:59 +0000 (UTC)
+Date: Tue, 21 Dec 2004 11:00:03 -0700
 
-Brad Midgley <bmidgley <at> xmission.com> writes: 
-> IIRC, btsco (the daemon) prints out what AT commands are being send and  
-> received during volume changes. What does it print when you try to use  
-> alsamixer? 
- 
-Here's the output, with some comments: 
- 
-# btsco 00:0b:2e:21:9e:1c 
-Device is 2:0 
-Voice setting: 0x0060 
-RFCOMM channel 1 connected 
-speaker volume: 7 mic volume: 1 
-recieved AT+CCWA=1 
-recieved AT+VGS=9 
-Sending up speaker change 9 
-    <here the headset button is pressed> 
-recieved AT+CKPD=200 
-opened hwdep 
-    <few seconds delay here> 
-connected SCO channel 
-Setting sco fd 
-Done setting sco fd 
-    <pressed "volume up" on headset> 
-recieved AT+VGS=10 
-Sending up speaker change 10 
-    <pressed "volume down" on headset> 
-recieved AT+VGS=9 
-Sending up speaker change 9 
-    <pressed "volume down" on headset> 
-recieved AT+VGS=8 
-Sending up speaker change 8 
-    <changing volumes using alsamixer> 
-speaker volume: 9 mic volume: 1 
-speaker volume: 8 mic volume: 1 
-speaker volume: 8 mic volume: 5 
-speaker volume: 8 mic volume: 6 
-speaker volume: 8 mic volume: 5 
-speaker volume: 8 mic volume: 6 
-speaker volume: 6 mic volume: 6 
-    <pressed "volume up" on headset> 
-    <apparently the alsamixer setting is now forgotten> 
-recieved AT+VGS=9 
-Sending up speaker change 9 
-    <pressed headset button again to hang up> 
-recieved AT+CKPD=200 
-disconnected SCO channel 
- 
+Marcus,
 
+I added your model to the docs.
+
+IIRC, btsco (the daemon) prints out what AT commands are being send and 
+received during volume changes. What does it print when you try to use 
+alsamixer?
+
+I can't try alsamixer (my setup isn't working after a kernel change), 
+but in the past I've had no trouble using gnome-volume-control to change 
+the volume from the computer side.
+
+Brad
+
+Marcus Better wrote:
+> Hi all,
+> 
+> I just wanted to report success using snd-bt-sco with my Motorola HS801 
+> headset. I am able to play and record sound through the headset.
+> 
+> The only minor glitch seems to be the volume control. I can change the 
+> volume with the buttons on the headset, but using alsamixer has no 
+> effect. Moreover, alsamixer shows both the "Master" and "Mic" controls 
+> in the "playback" view, and no controls in the "capture" view.
+> 
+> Thanks for the nice work!
+> 
+> Marcus
+> 
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now. 
+> http://productguide.itmanagersjournal.com/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
