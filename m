@@ -1,219 +1,421 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: nospam02@van-schelve.de
+Message-Id: <200212111244.gBBCihC22523@s01.canserver.net>
+To: "BlueZ Users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Message-ID: <45258A4365C6B24A9832BFE224837D552B126E@sjdcex01.int.exodus.net>
-From: "Maksim Yevmenkin" <Maksim.Yevmenkin@cw.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Patch for bluez-hcidump-1.5
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
+Subject: [Bluez-users] Bluetooth Init Script with automatic Handy detection.
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 6 Dec 2002 21:04:10 -0800
-Content-Type: multipart/mixed; boundary="=-CHfyMtrMgQW6TGoI7/nC"
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Wed, 11 Dec 2002 13:44:43 +0100
+Content-Type: text/plain; CHARSET=iso-8859-1
+
+Hello together.
+
+Maybe someone of you are interested in my solution about how to make
+a gprs connection over a bluetooth connection to a mobile phone.
+Round about 10000 Users in our company are working with it and
+allthough they are using bluez so Thanx to all developers for their
+well done work.
+
+If any suggestions or questions, you can sent me a mail.
+
+-------------------------------------------------------------
+#!/bin/bash
+#/etc/init.d/connectBT
+#set -x
+#####################################################################
+###########
+# Script : connectBT
+# Purpose: makes a Bluetooth connection between Laptop and Handy for
+use of GPRS
+# Autor  : Hans-Gerd van Schelve
+# Date	 : 2002-11-13
+# Version: 2.0
+#####################################################################
+###########
+#Globale Section						    =20
+	 #
+#--------------------------------------------------------------------
+----------#
+RFCOMMSTATUS=3D0
+PAIRING=3D0
+SYSLOG=3D/var/log/sys.log
+CONFOK=3D1
+EINGABEOK=3D1
+CONFFILE=3D"/etc/bluetooth/handy.conf"
+LINKKEY=3D"/etc/bluetooth/link_key"
+INQTEMPFILE=3D"/tmp/handyinquiery.tmp"
+source /etc/LVM.conf		# Globale config File
+source /etc/init.d/functions	# Neccessary functions like echol a.
+s. o.
+timestamp $BOOTLOG
+#--------------------------------------------------------------------
+----------#
+# Only start if it is an T30 and we are mobile....
+#--------------------------------------------------------------------
+----------#
+if [ "$BLUETOOTH_START" !=3D "yes" ]; then
+  echol -n "No need to use bluetooth"
+  true ; evaluate_retval
+  exit 0
+else
+   if $(tpblth status | grep "Bluetooth daugher card not found" >&
+/dev/null); then
+      echol -n "Can not start bluetooth because this is not a
+bluetooth system"
+      true ; evaluate_retval
+      exit 0
+   fi
+fi
+
+#--------------------------------------------------------------------
+----------#
+# used functions						    =20
+	 #
+#--------------------------------------------------------------------
+----------#
+function func_bluetooth_init() {
+   if (tpblth status | grep "Power status =3D Off" >& /dev/null ) ;
+then
+      tpblth power-on >& /dev/null
+      sleep 5
+      insmod ussp >& /dev/null
+      hcid >& /dev/null
+      sleep 2
+   fi
+}
+
+function func_stop() {
+   for i in pppd rfcomm hcid; do
+      while (ps aux | grep $i | grep -v grep | grep -v killall) >&
+/dev/null; do
+	 killall $i >& /dev/null
+	 sleep 1
+      done
+   done
+   rmmod ussp >& /dev/null
+   tpblth power-off >& /dev/null
+   sleep 5
+   for i in ppp_async ppp_generic slhc l2cap hci_usb bluez; do
+      while (lsmod | grep $i) >& /dev/null; do
+	  rmmod $i
+      done
+   done
+   sleep 2
+   echol -n "Disconnected from LVM" $BOOTLOG
+}
+
+function func_rfcomm_connect() {
+   rfcomm 0 $CONFHANDYID >& /dev/null &
+   sleep 3
+   if ! [ $PAIRING =3D 0 ]; then
+      PID=3D""
+      PID=3D`/bin/pidof -s hcid`
+      echo ""
+      echo "Sie haben eine neue Handykonfiguration erzeugt. Dies
+setzt"
+      echo "vorraus, dass Sie am Mobiltelefon die Pairing Pin
+eingeben."
+      while [ ! "$SAVING_OK" -a ! "REPLACING_OK" ]; do
+	 SAVING_OK=3D`grep $PID $SYSLOG | grep "Saving link key"`
+	 REPLACING_OK=3D`grep $PID $SYSLOG | grep "Replacing link key"`
+	 sleep 1
+      done
+      if [ "$CONFHANDYTYPE" =3D "Nokia" ]; then
+	 echo ""
+	 echo
+"--------------------------------------------------------------------
+"
+	 echo "Stellen Sie nun sicher, dass Sie diesen Laptop in die
+Liste der "
+	 echo "bekannten Ger=E4te an Ihrem Handy aufgenommen haben.
+Dr=FCcken Sie  "
+	 echo "Return, sobald dies der Fall ist...		    =20
+	 "
+	 echo
+"--------------------------------------------------------------------
+"
+	 read FILLER
+      fi
+      echo ""
+      echo
+"--------------------------------------------------------------------
+"
+      echo " Die Bluetooth Verbindung wird nun neu aufgebaut. Bitte
+haben Sie"
+      echo " noch einen Moment Geduld."
+      echo
+"--------------------------------------------------------------------
+"
+      echo ""
+      func_stop
+      func_bluetooth_init
+      rfcomm 0 $CONFHANDYID >& /dev/null &
+      sleep 10
+   fi
+   echo ATZ 2>/dev/null >/dev/ttu/0
+   RFCOMMSTATUS=3D$?
+   if [ $RFCOMMSTATUS !=3D 0 ]; then
+      killall rfcomm >& /dev/null
+      echo -n "."
+   fi
+}
+
+function func_write_conffile() {
+   if (printf
+"CONFHANDYID=3D$CONFHANDYID\nCONFHANDYTYPE=3D$CONFHANDYTYPE\n" \
+      > $CONFFILE 2>/dev/null); then
+      echol "Die Konfigurationsdatei wurde erfolgreich aktualisiert."
+      chmod 600 $CONFFILE
+   else
+      echol "Probleme bei der Erzeugung der Konfigurationsdatei: [ $?
+]"
+      exit 1
+   fi
+}
+
+function func_update_conffile() {
+   if [ "$CONFHANDYTYPE" =3D "" ]; then
+      CONFHANDYID=3D$(cat $CONFFILE)
+      CONFHANDYTYPE=3D"Nokia"
+      func_write_conffile
+   fi
+}
+
+function func_search_handies() {
+   ### User cannot change the class ID but Phone name so use
+   ### Class ID to identify Phone Vendor......=20
+   CONFHANDYID=3D""
+   while [ "$CONFHANDYID" =3D "" ]; do
+      sleep 2
+      hcitool inq 10 | grep -v Inq | \
+	  egrep '0x500204|0x520204|0x502204|0x522204|0x720204' | \
+	  sed -e 's/0x500204/Nokia/' \
+	  -e 's/0x520204/Nokia/' \
+	  -e 's/0x502204/Nokia/' \
+	  -e 's/0x522204/Sony-Ericsson/' \
+	  -e 's/0x720204/Siemens-S55/' | \
+	  awk '{print $1 " " $6}' \
+	  > $INQTEMPFILE
+     =20
+      BTMACARRAY=3D($(cat $INQTEMPFILE | awk '{print $1}'))
+      BTCLASSARRAY=3D($(cat $INQTEMPFILE | awk '{print $2}'))
+      RECORDS=3D$(wc -l $INQTEMPFILE | awk {'print $1'})
+     =20
+      if [ $RECORDS -eq 0 ]; then
+	 echo ""
+	 echo
+"--------------------------------------------------------------------
+"
+	 echo "Es konnte kein bluetoothf=E4higes Mobiltelefon gefunden
+werden."
+	 echo "Bitte vergewissern Sie Sich, dass Ihr Mobiltelefon
+aktiv ist,"
+	 echo "Bluetooth eingeschaltet ist und sich das Telefon in
+Reichweite"
+	 read -p "befindet. Bitte dr=FCcken Sie zur Best=E4tigung
+Return." EINGABE
+	 echo
+"--------------------------------------------------------------------
+"
+	 case $EINGABE in
+	    "backdoor")
+		 exit 0
+	    ;;
+	     =20
+	    "*")
+		 echol "Erneute Suche nach Ger=E4ten wird durchgef=FChrt"
+	    ;;
+	     =20
+	 esac
+	=20
+      elif [ $RECORDS -eq 1 ]; then
+	 CONFHANDYID=3D${BTMACARRAY[0]}
+	 CONFHANDYTYPE=3D${BTCLASSARRAY[0]}
+	 echo "Das folgende Ger=E4t wurde erkannt und wird verwendet:"
+	 echo " ---->	$CONFHANDYID --- $CONFHANDYTYPE   <----"
+	 func_write_conffile
+	=20
+      elif [ $RECORDS -gt 1 ]; then
+	 PS3=3D"Bitte w=E4hlen Sie Ihr Handy aus der Liste aus: "
+	 declare -i REPLY     =20
+	 echo
+"--------------------------------------------------------------------
+"
+	 echo "Liste der erkannten Mobiltelefone...		    =20
+	 "
+	 echo
+"--------------------------------------------------------------------
+"
+	 select HANDY in `sed $INQTEMPFILE -e 's/ /@/'`; do
+	    if [ $REPLY -gt $RECORDS -o $REPLY =3D 0 ]; then
+	       clear
+	    else
+	       INDEX=3D$(($REPLY - 1))
+	       CONFHANDYID=3D${BTMACARRAY[$INDEX]}
+	       CONFHANDYTYPE=3D${BTCLASSARRAY[$INDEX]}
+	       func_write_conffile
+	       break
+	    fi
+	 done
+      fi
+   done
+   PAIRING=3D1  =20
+}
+
+function func_gprs_connect() {
+
+### Create the secrete files under /etc/ppp/
+
+   if test -e /etc/ppp/chap-secrets; then
+      rm /etc/ppp/chap-secrets
+   fi
+   echo "$USER	    *	    $PASS" > /etc/ppp/chap-secrets
+   chmod 600 /etc/ppp/chap-secrets
+
+   if test -e /etc/ppp/pap-secrets; then
+      rm /etc/ppp/pap-secrets
+   fi
+   echo "$USER	    *	    $PASS" > /etc/ppp/pap-secrets
+   chmod 600 /etc/ppp/pap-secrets
+
+### These are the possible Dial Strings...
+
+   case "$CONFHANDYTYPE" in
+      "Nokia")
+	 /usr/sbin/pppd /dev/ttu/0 57600 mru 2000 connect 'chat -v ""
+ATZ OK AT+CGDCONT=3D1,\"IP\",\"$APN\" OK "ATD *99#" CONNECT'\
+	 noauth -chap defaultroute noipdefault persist
+ipcp-accept-local noccp novj nobsdcomp nodeflate name $USER debug
+      ;;
+	=09
+      "Siemens-S55")
+	 /usr/sbin/pppd /dev/ttu/0 57600 mru 2000 connect 'chat -v ""
+ATZ OK AT+CGDCONT=3D1,\"IP\",\"$APN\" OK "ATD *98*1#" CONNECT'\
+	 noauth -pap defaultroute noipdefault persist
+ipcp-accept-local noccp novj nobsdcomp nodeflate name $USER debug
+      ;;
+	=09
+      "Sony-Ericsson")
+	 /usr/sbin/pppd /dev/ttu/0 57600 mru 2000 connect 'chat -v ""
+ATZ OK AT+CGDCONT=3D1,\"IP\",\"$APN\" OK "ATD *99#" CONNECT'\
+	 noauth -chap defaultroute noipdefault persist
+ipcp-accept-local noccp novj nobsdcomp nodeflate name $USER debug
+      ;;
+
+   esac
+
+   CONN_ON=3D""
+   PID=3D
+   PID=3D`/bin/pidof -s pppd`
+   sleep 3
+   while [ ! "$CONN_OK" ]; do
+      sleep 1
+      CONN_FAILED=3D`grep $PID $SYSLOG | grep "Connection terminated"`
+      CONN_OK=3D`grep $PID $SYSLOG | grep "local	IP"`
+      if [ "$CONN_OK" ]; then
+	 IP_ADDR=3D`echo $CONN_OK | awk -F"address " '{print $2}'`
+	 echol $IP_ADDR
+	 echol "" $BOOTLOG
+	 echol -n "Connection established (local IP: '$IP_ADDR') "
+$BOOTLOG
+	 true; evaluate_retval $BOOTLOG
+	 echol -n "Setting new hostname" $BOOTLOG
+	 HOSTNAME=3D$(host $IP_ADDR | awk '{ print $5 }'|cut -d"." -f1)
+	 ### If there is no valid dns-record for recived IP Address
+in DNS set HOSTNAME to current IP Address ###
+	 if [ "$HOSTNAME" =3D "3(NXDOMAIN)" ]; then
+	    /bin/hostname $IP_ADDR
+	 else
+	    /bin/hostname $HOSTNAME
+	 fi
+      fi
+   done
+}
+
+#####################################################################
+#########
+#  Here we go.....						    =20
+       #
+#####################################################################
+#########
+
+case $1 in
+   "start")
+      func_bluetooth_init
+      if [ -e $CONFFILE -a -r $CONFFILE ]; then
+	 if $(grep CONFHANDYTYPE $CONFFILE >& /dev/null); then
+	    source $CONFFILE
+	 else
+	    func_update_conffile
+	 fi
+      else
+	 sleep 2
+	 func_search_handies
+      fi=20
+      func_rfcomm_connect
+      while [ $RFCOMMSTATUS !=3D 0 ]; do
+	 func_rfcomm_connect
+	 if ! [ $RFCOMMSTATUS =3D 0 ]; then
+	    echo " "
+	    echo
+"--------------------------------------------------------------------
+"
+	    echo "Eine Verbindung zu Ihrem $CONFHANDYTYPE Handy (
+$CONFHANDYID )"
+	    echo "konnte nicht hergestellt werden. =DCberpr=FCfen Sie
+bitte, ob das Ger=E4t"
+	    echo "eingeschaltet ist und sich in Reichweite befindet."
+
+	    echo "Dr=FCcken Sie zur Best=E4tigung bitte Return!"
+	    echo
+"--------------------------------------------------------------------
+"
+	    trap "" 1 2 3 5 6 7 15
+	       EINGABE=3D0
+	       read EINGABE
+	    trap - 1 2 3 5 6 7 15
+	    case $EINGABE in
+	       "pairing")
+		  func_search_handies
+	       ;;
+	       "backdoor")=20
+		  exit 0
+	       ;;
+	    esac
+	 fi
+	 done
+	 func_gprs_connect
+   ;;
+  =20
+   "stop")
+      func_stop
+      evaluate_retval
+   ;;
+
+   *)
+      echo "Usage: $0 {start|stop}"
+   ;;
+  =20
+esac
 
 
---=-CHfyMtrMgQW6TGoI7/nC
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; CHARSET=Windows-1252
-
-Dear BlueZ-Developers,
-
-please find attached patch for the bluez-hcidump-1.5 package.
-here is the quick summary of the changes
-
-1) __uXXX types replaced with uXXX_t=20
-2) minor fix for l2cap parser
-3) minor fix for hcidump.1 man page
-4) get_unaligned stuff fix
-
-Note: after applying the patch you still need to move
-hcidump.8 to hcidump.1
-
-i also re-arranged #include lines .c files and removed #include
-lines from the headers. this way it much easier to port, because
-it is clear which headers are used and what needs to be ported.
-i would appreciate if any new code in BlueZ will follow this
-simple rules.=20
-
-please review and if there are no objections commit.
-
-thanks,
-max
-
-
---=-CHfyMtrMgQW6TGoI7/nC
-Content-Transfer-Encoding: base64
-Content-Description: bluez-hcidump-1.5.diff.gz
-Content-Disposition: attachment; filename="bluez-hcidump-1.5.diff.gz"
-Content-Type: application/x-gzip; NAME=bluez-hcidump-1.5.diff.gz
-
-H4sICDF88T0AA2JsdWV6LWhjaWR1bXAtMS41LmRpZmYA7Dxrc+LGsp/hV0wcVxYQYCSwjfHx1rK2
-N+sbv8p4Kzknu4cIIYzOColIwo8k+99vd8+MNHqAtZvNqVu3slWLpJme7ul39yA8dWYz1gpWbOKu
-7N9ac8uZrhbLlt7ebfuBc7dzYX60Z45rt81FHkSdrbZarRJIKhe+xy79e2bsss7+oNsZ9PaZ0ekY
-VU3TNlOovAkcdmJbjO3BikG3N9jt8aWvXrGWrjf3mEafr15VmcAxHl29uzk+HbEjOdK24rt5AnZ+
-Mjw5YQzAlmYQ2sGO60z4Xds1q6zaWpje+GJ4qSLqV7WCUR2g2elPtzfD8cnZ6BZmtmsSrF6dlhW3
-420ShuOVErfjZcTdA7HtlhI3LM2Ie3ew203EfaA395lGn18s7r9a2Gx4fH51PDwfX/RoJvKX4zCw
-pk5Q3zEt17dMt73oCevpIj/8ggyd3x5fXVyfnZ/SyvOz17dXV+d11mot/Kl9ZPmLJUgJZo6P6/B5
-cvpmhNezy+PzdyendD+8GB9fX785H35Pj+o9TiUT/K7Kjo/PT4ga4IQNnF3+UEjbdbyPBHR+sg4X
-rjoRty2fbb8ikfaBcSkhkgGOkVj1ghkQrRB2SqRVdnlz9eYNDHuBP5uR8Ayj09QNpokriq/yKliw
-1kwqart2+tMp6AkQVJCjyx9wj4k1xNuWQ1ev/+f0+HaUhgKbqXOB0E5ajhdGpusSb4NqCzAvPoox
-4CLkihndnpzd1IkHFEAd4F65ThgdveBjnLEXh+x9VVMQ6oOq9ixCnRBqKYS6gpBVXEMMx6MzP2AO
-A/fe3naNQzb1CY4xywxttrW97Wzh5HvYJoQj1mj3G3VG6GEOr4xADmm/AkRfD4KY7dC0+P3U92x+
-p+4CVoh9kDK7vWa3A8rkV1Im4HiMjn6xrbmPuNkfLLSnrGWzF+HOv9uN9+/bOzsvfpH0UGJrgAHy
-507rwGz99qGxvb1+ETyIdSC9KDC9EDa8qL/4pb29DVs5FPIh8C3yu9Ht8Px8fDK8HYKWtmfcOfPa
-3+HItySGz18qBf9ZtPUsba00bT1Dm2sRzX/lZR1grWGnQMm0/7+Y7P954+RxsIwtPguZMb1C+EJL
-exZSNSzFUgawRsT9yqvt2uXVzQVkU2G1dYq4F8MfTkUawlsRyFXDpDj6LBikm5SRDlIk312WIJr2
-hw1k096AOe1bdjt3QgYSsa3ID55ehCxcTeSjY4fMDGy28MPIfYJdT+2lDR8eyO3JX4EfeMyaIhbH
-i3wWze0Fg0TKgpXHfllARfWCPTjR3F9F7M53vDuACPzV3RyuQDQuuSj89jp7zT7T8LIngy/+++MP
-MHMnYrq0yZmjKE3WcG1/oBReoroSpdVcKcRaqOaZ3zIXA3434M/A7yoInXswg+m9Q9O0qS5VR72u
-LPfWihaeZFC7vrn6/gaeaeaoFUptxxaGKXWgPqjk1WHcRkF2Txl0OHGodMlauVLo/EkMZChVYQSW
-a5te68727MCxhJD2+6S5fVQgConDIFohihFbmGAh8N8OWgWziV2mht8nPplGpuxEFqRTiIzpkfdy
-I3Igt4d4QsEHFXnk+y5GpgSlHEw/5fDJCdUbEVHaP9XptEfGM1MzMhObwFj2Nfai5xPil+xFgcvM
-yWH70bbWLcnMFTpBAp4ZB0yIIxmw5rb1MY8uP6y6OKC58iic5fvAgdJhPdeyxh1aQTuZdG8b2tUY
-iDpObFb1XaZDs9od9PY2NavphUqragx295STgWa/C61dc59iV6t9+5a9PT47eXdxzXS2RfQMgt5i
-r4HGv9jWueOtHtnoKYwgkg+nC8cDuwvMyPG9LUAwessuhxencdRl71vsGoMs4mVoDRxo9M/Lq+vR
-2QieXkuBsp9b8w8wMAnSo/4Ssctru93+8IH9DGkhsgMA5/ggLB3fnF3fnl1dwsD5NWKIN1EFzZrT
-kAXmQ7wNBq6N+WYW+DwjifTjM5NYBdeI5mxq3zuWzWoPc8eaUzKbQEYJl7blzByocjB3YVJjfG9I
-9Ya1HNaE2GDPzJUbMUhjCDADO42YeW86rjmBiAKpqU50lwH4ZYiEQyuwbQ83hqE1bDL73sYpeKiS
-I6E9mmy+gmniiBBhgdVmV0QfDPupSeRIcny/7CFwoggQE2+YTkEeJgAFAAkQlAOnTdpMvJTKbbGe
-A3DikPpD+9cV7Ati4gIubS7/KxI9qvOWZH/GWvOq1j6ZotHaiwkQE5aEo1FiZfB4FTKyKrgdzbn5
-aO3LhTQAfJhmjYhAYyNCcES0ZG8gnrFhwAFJefF4gOPEvhx5yI08xndmfBcilGt7d6DqeHCJg9ej
-i2Qkiu9u+B23UL5T1Tz5Zj/HIlErz9ikVmCTQInE0axqwnUgEDxnlO2sVSJc1jKrWmKa7E9YZmje
-29OqJqiQzeUtsw0FaGmrrGrSLEnu0iy19muXtSLzjrUenCnI5ySEsbMI1TWvsmvO7So073gqIMaw
-qAxVi3ags/gHWOVPLyHUnRDboEJgl3QGQGc3aLQ/oftz7SxWIF/YLLLnmQuQ8IwlmRO2n1Vrm53N
-mOdHLNYn4MLNODMe0loQHEVABOIEaUdNoQRlN4X6zVFTuQuQO5Twyy229X5203w/u4bw/f7f70ml
-LdTAEUwJmEQCuImEbj58NtkEynua5NEH5USqRPpn1RYfBUwWaF9acCqiPrDUVh/WbxVNKr9VHj2g
-y1iuIrllMnGgFkfeJukFGSFpJiwJj4N1ZLBoc3lG0Ej5dM5UE/OEmkLYbZ7HQOERHh/ZVpMhe8TW
-3H4ENt5Anw+eFyAW6yPqHRnxqVThHs3HWfS0pIJ36ZpPGNtRAaYb+lgcxQ4LOFMUzRRFM7Qc56vT
-HI6Oz85SugxRlxBeC1TpmcsWzJAmCaLaGtngpwvzUQZk8Kdl4Ft2iDLlG8GoxVUDMGm7WSKtZbjI
-04JBIkOTgozM4NeBH/kWVMojOyBDuIBRZ+lCoRrEtGBhWn9RSppRiFYYUHMMLhI5EAsgBoChgPmp
-4k3huEnhgGQBSG4gZeBh9wAPeVAVQuSqGppcPyh0kZ/fnJ3fnt6MeAwRmQk9DmInrLNboQ12Sc5H
-R04oVo7OgsE76vMHSiBJRrH7jyMfBj4SvGGZS/kQWr68DWaYQuKJqYBhE89exvGY8jeG0aqWi7E8
-G8Wprkz01DB68lQYyESYCp2UlL4wfMo9K7XFrYLuMyJjmjF+6EG41EACYSoJkJynBxZn93g3Sl1z
-zaPN2siXZPck+sUCSUsDWsxcHJQY0htnJWNhVVODYUZHCTtQlGEQQkJfKRDh1xkY/qhEMaOElPm1
-SRElCno5WkpdWdXKxLVkqaw+xbpSgaoG8HWWU9i9CTaZYI5ANicioChBalYglGTRDSy6XQUeSIgq
-WgxPUGuWC09a+9TlxZqMUdobik/s88JTmw3XhKcB0liI+ES3Mj7RA49PdBvHJz4xjWEoQPFGDCOX
-tYiWGO0h2vBYyg9BV9RHEW8yFU1s1/fulDo+kXwmhhIdgViLEaMQ/hRa8kAsol8/STtpknVKVLhx
-AcNTxfDd7dsrTBU/ir5x8sQuzEdnwX4IzNB7Mr3w4xP7Bxjrx1e/rkwXRdaGj5ew/Pqavk4F5FBI
-w7o35iRwfnN89r3teWbgQNUmRtp3fOTVcu64zjLkGMgO5Aa09tAroDz8leVoc9gcNQDdRK/0+Y21
-4YTFKnN+Y6VeNjgY7B4MjFLnN1bm/KazNzCUNzuMbtPQ8QtJvODBKmuw7bOpctLdvGd62+Dvkezo
-+o5B50ecPoqRnT4u2TYu3MEvzr51PMtdTW32jzCagtTmLzNjrjPJDK7wBGiaGQTTXTh+mBmdWRD2
-cUxTcD6FOxgUCJalxx3f4vCZ8dCnAJTZ3AZEK86KQtazIwf+7zgeTagL7CDw8pxDzrzLDC4fphms
-MYMKujtI+Uu+WXWxGS6S7WqbkMaa0Io0oRVtUivUhFakNKbudSILlJ34LsNNAgEmhnNlfWi+wcrn
-ZXxoXvkRwtsbeyJcobc/6JbyobnqQ/rBoKsPjK56BtrDI9AenYDuNCCX7TSqrIInVFi8tOiARqQb
-0zPdp9/soAIAx/7yCfY3j1jtuI7oOi340EvGSka0u3pTB//lF/TfT4eoEFDkyoooLI/n04D9Xm1V
-xuOVvleB8uCQP/QrTnK7NKfivmtUonAc2lb8zBiDkRUNaZUVFG363jjimPhzHx4Jm/JIGPlz14AB
-iTQ9xLGyT2w8NiOwPqh/7PGY1Wokr2m9DpPfQtoBV2N43jd+e3IzHp3965TVQuc325/VMqzW8e2V
-50xKfHmHSbkwNKfmN5lWCpCsZGQv0Uo6+wMdrETfZF75xYmJ7e4OOrtKmO439V0I03RRwzRfTDGa
-W+ROp7/T1VmnO9CNgd6HKjo0nXSMXhc7tXUxckPU0wqiHiuIPOxLckAxxjiOZmP380G9RPT8enGN
-vrfcpZe34MK/cI7Bt+QXx1vqIGkTh9SdorhtPNP0csyltVE0sVw3MRsTzqxUgqW540hCietdD/95
-fjU8Gd8MfxyjG/IYY0aOxay5GbAG5KjxwrTM6TSQHjkL8LyyMQsWdZLF3j6Fqr04VMUo7n1nSpY8
-tnwvCny3BhECGpl7222yHDbsMyNovsypHYx5twM+LyJcn61WznSMsUGJRuogq+BypykaJRzgLIRJ
-wENwdsQ6MjzyNu2IIZerfg1ZUgOZAp+QLFoCLFeWY4deb6hpmuBQzFVC6GKtOavhyjowRLllr9s8
-gOyyuw+XNUKzoQUb249QaYfQ9m6UnSqo9Tyt3T6JLqYE0wT1Hes89hNZiQZ0Lebi+ZRoNgiGqO3P
-pHyMno4vBhjdXfFiQFURDEbaPyUOkTSxk4Y2CRT8CEn6WS0nOTK38BkJrhdCyYyG7d+mjMbnS2Q0
-DlgZmREbru4YZBS9h28475bJaGJxJqNh75HKaIZBGc0wUhmNL6aMpqsZzdAF/bnvRtAiehuTWmHy
-Wpft/k5q6aS2Jk9hWuKhchJGBuy5Ro4DD/Wqlp6Q7kFz4GOJD+MIDdALjugX/A0fTAs9nh16qiOj
-OXyeI0MRKEK9HLDj4pZ222QTZ9pknjtJPDxdzCo4lDE7qWgFbyomxesJGfrywxwPLjEstF7idwkv
-WYeYB7IVRAf+3+BCbNQJaBkFiCmZlMTUecRcAeoAUCNADB+dLoXKyoQyUTLeters5UtmHJKU+13K
-wfxCL5vBisA2P9JaqRJ9QBNSCIDPQElVsORXt1yTe2Ia0ynwJSDJxrNQxTSNHM1uCZrwUSucMuoQ
-T4zdvZK74niKZxVU6a1/Kt9pYEm4ISzTdImoTHCV25UNPSK9D6HzLrZXIijztemY3OunfndidHmX
-0c12GbSWh2RDxOTuDpLvC/L5g6C/m4z/WpNhGFQj8guqTVSIjudi7c7DKH/zomQkZRVAP5Zr8ACh
-gR9HLAlCMnD6S8ufortOIn8e1gCs9ZKPKfWTfzcDCGsxHfOpMQzU8lBWFspSoJT4upGmCreRrAq4
-kbJsEGCeB19nxmrLMT9fr+GXDuO3x2d13uV0O1ipa/yyRhmm5X6WIhBeUUKNkDTqBdqYg77cjGT4
-mCLnKY+GCgiO1OMUOXPNuxAAkCzd12IUisw2klLg1lJLMukGglLc3xTIm+Szpl4mVXQNfLOaX9ao
-IrT8z1IFwn8FVZSV4xr2R8dXJdjv9Yl9uigVFbLxJZ1RvlJh+UaosGKhd7sr8lHTDpmsiFotdK+y
-WZS+dduURwVAiUwqIL/wyE5dnepwjL0S2VSs5vl0/8t7nL9z6l94cNehH2V0hOus6YdwH1N7Jt3n
-94zzF/g5HWeozgaeQOfffHqM7w4qR95vh5cn56fj2+Fr+KRjb73D98d/D9EXpx4isilI5H2E32f/
-nMPz4XDj/sHkldOPcJHihCbVQ46QswDj2f0fn50oRCtGR3xtsUuhaVdGJgk+AnhCw3fd+aAc/qen
-9A/YRQm209GLmVOoWYj7mqoNaFKfhc9oSwT+wL4D27KDlHwb2H+pQj5UIemMkcfhffo19378857A
-jvBVh8t35+cotvV84KES3ZdjIwH/K7jo06+U+t0MF4rskqSl8sQLHoAC3VHGcbwmi41M3oIJJXwV
-LlGtT3mihWn2pBkCb/Qux5FiNo73YR2DB3tNvcM0fuGt8acCVqa2W8DKVOElhPsMM9lFSXGU5oYv
-TbODa6Im7lJxzp+ND1mXpKG4XnA8UR/gTOcDCGFKbst/j9/nv8eX7pdllJNBewLx5pWWMBfTz8Kq
-G/tK+tF3+V8R2O2ur+Ys3/PGQViqmqMsPJYroKArbG+ysY/HOiHlGr6zeRQz/w0tR/ZFKdd6SQqt
-43eSlYq06DwUqqbeJFsWvO6BFSKz/CoPaiR8YIcrN6qrdEAWq7CedT7+bQbwOIPGJhrfm66o4YBH
-Uiid1qf1SV9opJbEFR2tUo7xM0d7OJIc7fFDJBEmGvLgSv4jEGNQbbHMP7GAc9YQka9Rh/VYNj8D
-HatJLshS7G2m6HKKILMyFF1BkSQWU0Rnkmx3SB9UDB4cUI9OF8V6yWy5KVJlUd5yC7qQvPnmmy+l
-0+PezNLzaIrrzX8dvnQoKkRZ5ETJKdsROzeOh8nX+4dyFgm28rPU4OwbWATxi/AROkEEktC5Nxnd
-OtgdNbNbFod5lcB84M1Q5isnDP54+qjuUC4+TGbE7pIZLbOmQFLppTkAnncqn5jtgsFimEGJHuF3
-SIaI6TsNdgxxy7bwNVfXDkP8EhaeXWwTSDJ9qjn4hUsmf2ZBIuWhSdjrIT+Z5lEt5YGJbXEW0iBS
-sSkolubTEOfWG/rV/gHf9EG86XXaEcLJC4Phe4v0arIiEWAptubCcC0NNGWhGyBZRUr0m0KR8o1t
-YLXXI/3wC7L6e7YtAHc/zLl62q9zjpkkJtovP1X5Dv9Qz3h0O7y5FftCbKlcV7L7Fp3PhvZbQpTo
-vyXoFzbgqeVKB66n/mzV2g5cLuctePfrtuAbOm0L4TPg//Xuu2A7uY78zzfeqUb58yys6EW/DER5
-C5vT1yVX4Fj4w+fOAL+y2PhXurLLM6/Pdge9jIX1yML2igxszg3sQBjYwY7RZXoXDaxnsP+EVmBC
-5br2/VnQA1R6/iqwipX0WccmmVeFsopdeabr3Hn2VLz4kwpGGDawxKg08I178RZDBe/HFHaoZO30
-mt0e9U9d+SbGDm9KVz/9xGYrjwJ0iD86mjxFNgsfzCW+f87ZThfzVJmKdyoKqiANEK8g/i/sxcK/
-t/EV9mVAPyhld5bFf3CyChH5ZAXR2fEQ0lo+IS1NHigQesl1bVmnP+dS+x1oo/j82XgMmW0JwTw6
-lIRq30EhAWNQmvF3DyOoI3D+Ux39PM2DrJPXs5GcsDZW/TEWDGpUTo5Wi2bTtZOeLZf0w6QIFcsz
-rUEiadHqwbVQ1nmu4o5vzRLlHKkBH2s443V60XyaNyPLm6Hw5lEFklalQJlrhhKOob6nJV2jJMdU
-4W9YIjnGxgE+1nDM+4Si+TTHvSzHvQzHbpZjjnIDx3s9vv29XkmO93qS4+IlkmNA3ICPHEdyEv8f
-ZXxNwIMbRYulFA4RLESlzJfAlhZlPytKGgBA/Bt7JElEie9JzMQ/2YF3qRjVu7uZAy+AL5Yy9WDc
-K4wCd28KNTTc+G6ek/yzOBJJuerDXHSGjfi1OtCaLJYbbm6wZD7mv2baVPFJiBL5WIJ+YT6Ol2fe
-YNgfGMXvSacTslxOCfl/27va3rZxJPw5+yuIXXSRdN3Uki3bcXoFuklaBEizRZoCBfYWQiLLG2MT
-2SvZ3Rxw99+PM6T4Tkm25V56dwHaRBRJzQxnyHn4Moz4YZYu38MAjme33uGDcRKGrnk+YRtnf9pg
-ReZ/fuGFzf8HuC86CsuYlmLBgAL866v9hySJYQvTAUnymDLwa5nw4jX6rEmuLA28O7uOTy9Ozvdh
-9/EB2cffh1RpvqR5nNxl5NUr2OLzT8JewL6oAI8JvEB7w8OsMVMQgFr7cDKOzaTjJ5/jzi8+Xcbm
-wNgkDUycrVWDPpEmKkHTBdIokqdwMr2fEJj+RpTGeIYnsTwvfxLayclMfO+0BIniZwadn8jH9t8e
-3s6WxaFyGkSvF52gzmLamdwns840KVSHpJYCZYRvSoSndgcdAHLhCbP8zWh96PAWU16evfzwdj/B
-GQllMabcEbCHTTfd/x70Cwh8Nvl79n2HSHUzCPUMsagGUGiZFkt1Ds9Wmg5x9vquwk596RA2c2Xo
-GB0EUMfYS2THzCCM6ju+eXqIY9yoqwlD1WNWJX69nJxieWhV0kZRJD6B0MqyjQViFt61QEa4MCIn
-oHzM+tufUjydbsOvXnrXDB8NMdL0aHOGH4pkY3aNsrtmNgj76NOFwqcT5k+Nvo7RfFGnx14+jaJu
-PttjE0bVLlspE0uZlIQXr+l/sKBzmNN+dZYtVhTNWuks0EPHUSbxlEm8ZR7nmZH7kep3ByZkzfWd
-H/e1fIuHgwM2JetY2nHnrW68+2LjxtOL7rrxBmiRwWBkjlA45D2bEOrizfMx/YsOU2Lso0TCvrpk
-RmEQ/o256qSyuUZ/XYUeRSiT0UDaLW3/JE8ndFSuYzKr7aC8XGZN+qfW2Ay7yGbYHchFgfIHMhd3
-83xpVcFS4Tle6HMKalnz6+XHj+VyqHF2Qix82kcilEVVWGwgJhnCaUpvYN3q7A05UHlR6YICh7h1
-sPTY7MrgNXPewuEAJTQc6jsaucey0SmRjvAyXec/1Ldkz24BQ/qO7aDEUg0m98aT4hy5VkyKlzma
-g/A7jCbxZpGTMMSDXUOKgZuDcOs8fG8cdTUQPkIM7oTgbE68PEbQf0kpgDUXpKAynoQFv5XzqVdv
-T355/z6GeIp7PcSh/MX11aezvUBse8FgpcEAfrNtfVPY/hbHF+fX1xdn8dnl6fmby/jn8+u352cX
-p44tchBF5iFdUmD5cFP8IbSJwoMYwsuMAwGncHocYIOSVsAtGTRNSaIVzpb/sBJQ55RUOpRqT9Op
-8kiBY6DnZUO1kcaGabVc6QcYaY6MiSNj4siYFuE41E5JKZKRqZpwZLIqH5kqRWSmCSnJF1xQagKT
-lUwpxaUVkvzpyZJFpQJVbnqyO3vizp64s3MZVgRFMNTQtZeTe0ertLCU1KGi4cYqGupaGD4lLZRf
-1SzHpZ5u5Qy3V87Q0rzwyWueRodpSzgJoKkfWTxUa6vURdTUH9J76jewDnpCEcDP5+/Mnvegvusl
-3t5P6xv1jtPduVoK7jACV3eu9foe5XMrqFOTnSpv24bTiDx65OrqzO7Q6jG9fatL191W4enftcGg
-UvG8KurTaJ8BOO3FZ16aFEl7PTCxu2BXF0Q8Xam7v11Pa8MnraJho+5zE/0LvwlNazBS7aIrRm89
-6HWOYA9LEMDvzdxiffVCeBzpjdL+Sa4qpqq3YqVmHKksstLymVWgNLKhCVo1VULQqHWZLoN1PFCJ
-mxv6cjysopZnqKJD/YxGxiqDvYwIHAURYoMgqDUSpVLFNy9KQghNyApcImffQYKCiG2f9JKElcsl
-JKoqRFvOYQlVTClU+0WrwGF78Utb7TLWlEZsczpLKhE5l5H4aK3I5edrSGRyN0m+0/rXX7u/aSch
-ZVpDQlw0mJMGW0lJVaRSSAYDDvrrW7lajDIL27VuToO0SMMx3212zSiYZTO21wyizjJqVlRyGAdV
-RKJ9UELblvcS4JyDwQYuzMEMVYNeDYeswTp9WFmiis+SApeQnRODIG5Btj555dYCHBGMJpBpdbQ1
-sSkjnyCxwrZaI8pHj8vGLLFV2M52BDawID2boM9vSW1RVNrT+48nL7htuEzjS9iPYYi5uS881jFN
-dJdS9xt1yA7D90RxS2dq7skX3W5Mu2If0rw3yz+z/E7xRZk6M4qx71ZJThGCqw0xXEyNlG5V/Hob
-qg89w+XoVwnh1sB6rCrluWe7KP1q7jTynTpawDru73wNo9dlZzi65Qy9MWjBEhVYlao5/G+ofe/l
-S11e4qlQVKrQG76o0WxGoA+hKbQHuPTWC8TysLODwsTSZD3sSS+7dLg3Jp/TWFrk1cVHxSIJDwIb
-RhhzRASAsV0WSfGGTJV6i6uPfdVulSeDOZFZszo9oV4A94UqgA+Xao/EwnxEeFiy1+uJw5Jb8Q+O
-BHUQAJh2EDCyCyfTokd4o97dsF3ncB0BhKSfky4EK8c46nB5Zc6OHbGei4oPRng3tGc0oBfQV3wK
-WNmMp/fzv5TURT6j0tRqUlE8lVcMAfeVU0KscljHGgey3MPNY5zd5vNpnKd4w6rxXa+plZxUYXed
-H9Xv0VhSMH3JVRVGV3hTsIjBnszu4NCkZD0j1G3wUh8VUQcjanpwFjEK4HcLNigckTIKE3NINuxF
-MqUT3HD61QPxddTtQPeag2yOWD7oP6n2mjnEbR/ic9DuodaD+XcG8f0Yvhb810B8DeGbAL9lfE/+
-GwD+uth0XXi/lZD+8/iefA2A7wXmYv60RNNNuh4bq6/fy6yPzMk3AM3JU8TmTsE9JXBOvi46r4Li
-wh4YenXhaQfeNgC5BtY1HG9akonNTQztRto2IDchu4np6+1xPSxO1FFf+tka5tbReFAhBQudm2jb
-QuPBuuw1B+OE3z7ArpaPgm8KjXPiB0GndwTUH8HvJwnITQ4YVGV9wc4guA65TUBusGPhbQcmXwuC
-m5sysnY4dqNjAzu7cbETQhvg2MTOuwfLNjS24bMXFPtQtI2MHfD5CYFlQ1ky2T09aXhcpADz4/jz
-588cGQPOb7hft5hUhijF1w126mI+vH8BL33rYXSUo3HUZJsuK2sFJ9VCfeMJWceFQliWha3oizvf
-4OIGOprRKqL/hyZtdkLWvMJH5XBXQUuDqIvh/YP+kYjvr0UicwfaQK2JJyke+XNft/OcZM4wAXxX
-TqPiYpZlj+V1XraCL3ksYZ7t9Wt2FQC+pR1YPJs8yrd494E6KeOpXXvv+oDM4P0GdFu0Y3gHU75w
-H/vq4TbN4S5R2JbOFo8x/BK1oZhXQt32+R+rBQ9vyBN/O6TD+z3uTxL3/AxxCj8Y9sspfN5wnFp3
-8ymnj+k/FtuPFygPqOBJCPgzcx6IcB19kRWKoWutOpXYENTR6sB/YszCeAVKKo4EGD9wn39ECSH4
-8fRDfHoWfzq/vB6LSPdwACQMxQEQL/1wJ9N+PZHabU+MRuNKJxb+/TkpNGozcQPREEMFhwNxalSN
-N5HVNtwkLdZvOPbmebG4ny2rGhEq36QR9fqxRViprDxjxOKNlTecILfiBXlFMnLAxxkmnWEpnQpS
-G9z6ZVFE5IY5addaj4Rlf9QDztdmbaKWEMB3zCOts0CEeBdVjVqCB0L7gBiuIW54WIkO1LzUsdDZ
-shrqsP2ux5kWWRVlNnL7GhO1IeiQDA2TxeTD5uuJ5qvjbEO2XPTzBuYU0aqg6WWyRT5DjSxuS79X
-np/8F7u3yEE19QTMWLGMqqWM5YsHkBt2m476BFNLLcyvr1ZUsfK8J9UycgZgjVwVizHUQEehZ3i/
-N/6BcQqwXn40X4f8YS3/FF3m6Z+tsW9Xty33Hz+Sq/TP5qwPIvR++oO+8H5EeIebR1myDF0FX606
-PQoctagfdnWbCMgMjVyaUrLK4yL/QtsgiZNsWbo/nM1jXDqHvo6crPI8zZb8hverNJnnk5P5CjrX
-l6K25XzZrLbr+fLm3l2XYtPtEKdU2AZ9xKFu61gaHkf+qT+KzJPaNcEEipt27c6qbmu7e7OW3UVd
-vGYl6gZ6FAltpNMDuFaJpk2Ls6prQzRr6EgUYMSJKOg5RLOOXNrWmR0ozbpaE+JAHYWj7bWmbbVp
-R2+gOO2bjl2CaqRDKKb+AFzLqF/eb8oonDS9E5G6sTTvYrLy3OJF9oSoeEg8Hox6qcUBZ85WZgWz
-JnuqZFw1KJ22pxLynR6zD9zrD6efvKHA7fdrzMxVHKPH1w1n5u62mJmzTs/3xz31NvkemwnAX9Di
-dCwDvVH2sbPBy315y4iQhXp5y1J9MCNtLQzfe2k8M8e6apuDVK5j5RoXo4X2IkrvvwEogEmkDaUA
-AA==
-
---=-CHfyMtrMgQW6TGoI7/nC--
+-------------------------------------------------------
+This sf.net email is sponsored by:
+With Great Power, Comes Great Responsibility=20
+Learn to use your power at OSDN's High Performance Computing Channel
+http://hpc.devchannel.org/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
