@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Message-ID: <C1B29E01A9B748458D51DBBE04E4B9EA2E5837@7layers.7layers-uk.com>
-From: "Halam Rose" <Halam.Rose@7layers-uk.com>
-Cc: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Bluetooth listing fee change
+Subject: Re: [Bluez-users] CSR firmware
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Steven Singer <steven.singer@csr.com>
+Cc: cijoml@volny.cz, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40BC8DC7.70809@csr.com>
+References: <200405290256.06151.cijoml@volny.cz>
+	 <1085820898.3932.6.camel@pegasus> <200405291108.06457.cijoml@volny.cz>
+	 <1085901284.12117.118.camel@pegasus> <40BC67F0.3030608@csr.com>
+	 <1086090904.4702.16.camel@pegasus>  <40BC8DC7.70809@csr.com>
+Content-Type: text/plain
+Message-Id: <1086101484.4702.47.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,62 +21,75 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 1 Jun 2004 15:52:36 +0100
+Date: Tue, 01 Jun 2004 16:51:24 +0200
 
-First with the news, even when its bad!
+Hi Steven,
 
-The Bluetooth SIG have announced that from July 1st the Listing Fee will
-be raised to $10,000 for Adopter Members rather  than the current $7500.
-The fee of $5000 for Associate members stands, but you need to be
-planning a number of Bluetooth products for the Associate membership fee
-to be worth paying (Adaptor membership is free).
+> > What we need to know is the public key of the boot loader, so we can
+> > check the signature of the firmware file. Actually I don't know how to
+> > do that, because we don't get access to the boot loader over USB or
+> > UART.
+> 
+> I don't know of a way for you to get the public key out of the boot
+> loader.
 
-This has caused a lively debate among those of us charged with
-collecting the fees on behalf of the Bluetooth SIG.
+maybe over SPI, but then I don't need it anymore, because I can simply
+replace the boot loader ;)
 
-If you want to rush through any products before 1st July please contact
-me urgently.
+> > Is it easy to check if a firmware don't uses a signature? Will CSR
+> > publish their public key?
+> 
+> There's not much point in us publishing our public key if you can't
+> read it out of the loader to check.
 
-Halam=20
+The only point is to check if a firmware is signed with your key.
 
+> It's been pointed out to me that as well as trashing the module or
+> compromising the radio performance, putting the wrong firmware onto a
+> module could compromise the USB performance and might take down the
+> USB bus or the host itself (for example, some modules have I/O lines
+> connected to the USB bus, some have them connected to an external radio
+> amplifier, I can't imagine a host would take too kindly to having its
+> USB lines toggled at 1600 Hz).
+> 
+> CSR is certainly not prepared to handle the volume of support calls
+> that incorrect firmware is likely to generate and I suspect that the
+> BlueZ developers, the Linux USB developers and Microsoft (if people
+> plug their mutilated dongles into Windows PCs) are unwilling to handle
+> the calls either.
+> 
+> Signing is meant to prevent these problems. Just because some module
+> manufacturers have failed to implement it correctly does not mean that
+> taking firmware from one of these modules (or another manufacturer's
+> web site) and putting on another is a good thing.
+> 
+> It might be worth building a list of good module manufacturers/OEMs
+> who regularly release up to date, tested and signed firmware.
+> 
+> [I know this is a change of position from my last mail, but the more
+> I think about this, the less comfortable I am about putting firmware
+> on modules it wasn't designed for.]
 
-Halam Rose
-Bluetooth Qualification Body
-Tel: +44 (0)1763 262524
-Fax: +44 (0)1763 261177=20
+But the problem is that some manufacturers are very lazy. With the HCI
+16.x firmware you reached a point, where I would say, that your firmware
+can be used without any problems. Also for newer profiles like HID and
+A2DP, but earlier versions had problems. One of the most annoying thing
+is if you can't use a Bluetooth HID device, because the latency is too
+bad. If you use an USB dongle, I would simply say that you should buy a
+new one, but in case of a notebook you really got into troubles. I've
+seen that Sony provides an update for some of their notebooks and it
+should be possible to extract the DFU file, but in the case of some IBM
+notebooks you are lost.
 
-Halam.Rose@7layers-uk.com
-http://www.7layers-uk.com
+However right now there is no easy way to download a new DFU file into a
+CSR dongle. So even if the module/dongle/notebook manufacturer gives you
+the right firmware file, you can do an update with Linux. Actually I had
+written some code for it, but non of it is public at the moment and I
+don't wanna publish it.
 
--------------------------------------------------------------------------=
--------------------------------------------------------------------------=
+Regards
 
-Don't miss your chance to meet us at:=20
-+ Wireless Connectivity World, 8 - 10 June 2004, RAI, Amsterdam, The =
-Netherlands, Booth 615=20
-+ International Microwave Symposium & Exhibition, 6 - 11 June 2004, Fort =
-Worth, Texas, Booth 419
--------------------------------------------------------------------------=
--------------------------------------------------------------------------=
-
-This communication is from 7 Layers UK Ltd., Melbourn Science Park, =
-Cambridge Road, Melbourn, Hertfordshire SG8 6HB, England.
-This email (including any attachments) is intended only for BlueZ =
-Mailing List. It may contain confidential or privileged
-information. If you are not the intended recipient, please do not read, =
-distribute, copy or otherwise use this communication or
-the information in it. Any views or opinions expressed in this email may =
-be solely those of the author and are not necessarily
-those of 7 Layers UK Ltd. WARNING: Although 7 Layers UK Ltd have taken =
-all reasonable precautions to ensure that viruses
-are not present in this email, the company can accept no responsibility =
-for any loss of data arising from the use of this email
-or its attachments. If you have received this communication in error, =
-please notify us by email (postmaster@7layers-UK.com)
-or by telephone +44 (0) 1763 262524 and then delete the email and any =
-copies of it.
--------------------------------------------------------------------------=
--------------------------------------------------------------------------=
+Marcel
 
 
 
