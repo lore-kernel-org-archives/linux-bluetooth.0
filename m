@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] inquiry_info device class to string
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Stephen Crane <steve.crane@rococosoft.com>
 To: bluez@spamzed.com
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: bluez-devel@lists.sourceforge.net
 In-Reply-To: <275070-2200410219819354@M2W046.mail2web.com>
 References: <275070-2200410219819354@M2W046.mail2web.com>
 Content-Type: text/plain
-Message-Id: <1098183795.24465.7.camel@pegasus>
+Message-Id: <1098177829.4538.121.camel@baroque.rococosoft.com>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,10 +18,11 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 19 Oct 2004 13:03:15 +0200
+Date: Tue, 19 Oct 2004 10:23:49 +0100
 
-Hi Ed,
+Hi,
 
+On Tue, 2004-10-19 at 09:19, postmaster@spamzed.com wrote:
 > Im sort of new to bluetooth and bt development but its going ok so far. Im
 > writing a little tool which displays all current devices in range. Since my
 > code uses ripped parts from hcitool scan i can succesfully enumerate the
@@ -35,15 +36,13 @@ Hi Ed,
 > forced to use a sdptool query since some 'light' devices dont have it
 > onboard, like headsets etc
 
-it is not the Bluetooth specification directly. It is in the assigned
-numbers document on the Bluetooth website:
+See hciconfig.c in bluez-utils.
 
-	https://www.bluetooth.org/foundry/assignnumb/document/baseband
-
-Regards
-
-Marcel
-
+Cheers,
+Steve
+-- 
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
 
 
