@@ -1,53 +1,53 @@
-Return-Path: <noring@nocrew.org>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Jason Van Patten <jvp@lateapex.net>
+Message-Id: <200309131519.h8DFJqD07132@localhost.lateapex.net>
 Subject: Re: [Bluez-users] IBM Thinkpad A31p and Bluetooth
-From: Fredrik Noring <noring@nocrew.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: jvp@lateapex.net, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1063449127.28890.407.camel@pegasus>
-References: <200309130612.h8D6CKs06276@localhost.lateapex.net>
-	 <1063441693.19165.31.camel@h9n1fls20o980.bredband.comhem.se>
-	 <1063449127.28890.407.camel@pegasus>
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1063473896.18942.35.camel@h9n1fls20o980.bredband.comhem.se>
-Mime-Version: 1.0
-Date: Sat, 13 Sep 2003 19:24:56 +0200
-List-ID: <bluez-users.lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+Reply-To: jvp@lateapex.net
+In-Reply-To: <1063441693.19165.31.camel@h9n1fls20o980.bredband.comhem.se> from "Fredrik Noring" at Sep 13, 2003 10:28:13 AM
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 13 Sep 2003 11:19:52 -0400 (EDT)
 
-lör 2003-09-13 klockan 12.32 skrev Marcel Holtmann:
-> Please, can someone post the result of a SDP search with --tree option
-> for the OBEX push profile.
+At Sat Sep 13 04:28:13 2003, Fredrik Noring wrote:
+> I don't know if it's possible to get jpilot or gnome-pilot running with
+> Bluetooth, but pilot-xfer works atleast:
+> 
+>      1) Make your Palm able to connect to the computer using 
+>         PPP over Bluetooth. (This is somewhat complicated - search for
+>         "linux bluetooth ppp tungsten" or similar to get some howtos.)
+> 
+>      2) Run "pilot-xfer -p net:any -s ." etc. 
 
-Sure. Does the result indicate anything?
+Thanks for the pointer, that seems to have done the trick.  Jpilot will use
+net:any as a device to sync the Palm after the PPP-over-BT is configured.
 
-	Fredrik
+It's a few extra steps than I wanted to take, but oh well.  It works.
 
-# sdptool search --tree OPUSH 00:07:E0:0C:1B:3F
-Inquiring ...
-Searching for OPUSH on 00:07:E0:0C:1B:3F ...
-Attribute Identifier : 0x0 - ServiceRecordHandle
-  Integer : 0x10001
-Attribute Identifier : 0x1 - ServiceClassIDList
-  Data Sequence
-    UUID16 : 0x1105 - OBEXObjectPush
-Attribute Identifier : 0x4 - ProtocolDescriptorList
-  Data Sequence
-    Data Sequence
-      UUID16 : 0x0100 - L2CAP
-    Data Sequence
-      UUID16 : 0x0003 - RFCOMM
-      Channel/Port (Integer) : 0x1
-    Data Sequence
-      UUID16 : 0x0008 - OBEX
-Attribute Identifier : 0x6 - LanguageBaseAttributeIDList
-  Data Sequence
-    Integer : 0x656e
-    Integer : 0x8cc
-    Integer : 0x100
-Attribute Identifier : 0x100
-  Text : "OBEX Object Push"
-Attribute Identifier : 0x303
-  Data Sequence
-    Integer : 0x1
-    Integer : 0x2
-    Integer : 0x3
-    Integer : 0xff
+Thanks!
+
+jas
+-- 
+Jason Van Patten
+AOL IM: Jason VP 
+
+
+
+-------------------------------------------------------
+This sf.net email is sponsored by:ThinkGeek
+Welcome to geek heaven.
+http://thinkgeek.com/sf
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
