@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] installing bluez-hciemu-1.0 on Debian--GLib
-	not	found
+Subject: Re: [Bluez-users] Power control
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Tehyih D Wan <tdwan@MIT.EDU>
+To: Brunelli Davide <dbrunelli@deis.unibo.it>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1082563268.40869ac41cfc3@webmail.mit.edu>
-References: <1081889721.407c53b90c5d4@webmail.mit.edu>
-	 <1082161011.4489.30.camel@pegasus>
-	 <1082563268.40869ac41cfc3@webmail.mit.edu>
+In-Reply-To: <40869C77.4030103@deis.unibo.it>
+References: <40869C77.4030103@deis.unibo.it>
 Content-Type: text/plain
-Message-Id: <1082565326.23959.48.camel@pegasus>
+Message-Id: <1082565205.23959.45.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,26 +18,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Apr 2004 18:35:26 +0200
+Date: Wed, 21 Apr 2004 18:33:26 +0200
 
-Hi Debbie,
+Hi,
 
-> I looked in hciemu.c and the only reference I found to Glib was the #include
-> <glib.h> line.  Should I change this to say glib-2.0?  Or is there another
-> source file I should look at?
+> how can I set power transmission in bluez?
 
-check for yourself, because I don't have time to look into that source.
-
-> I did get the emulator installed (at least, I no longer get configuration
-> errors) by installing the glib1.2-dev library.  However, I'm not able to
-> emulate any devices.  Typing "hciemu localhost:11" gives no errors, but when I
-> try "hciconfig hci11 up" I get a message that there is no such device.  I run
-> /etc/init.d/bluetooth start before everything but that does not seem to make a
-> difference.  Suggestions on what log files or messages I can look for to see
-> what is wrong?
-
-maybe you should better use localhost:100011 or any higher port number
-and the new device will be hci0.
+nowhere. This is done inside the link manager.
 
 Regards
 
