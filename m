@@ -1,60 +1,54 @@
-Return-Path: <Mitch@0Bits.COM>
-Message-ID: <3FE029FA.6010204@0Bits.COM>
-Date: Wed, 17 Dec 2003 10:03:38 +0000
-From: Mitch <Mitch@0Bits.COM>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: jirka@dopis.cz
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: marcel@holtmann.org, bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] NEC usb bluetooth support
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200312171020.50300.jirka@dopis.cz>
+Subject: [Bluez-users] rfcomm failing after PIN is entered on nokia 6310i
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Wed, 17 Dec 2003 10:20:50 +0100
 
-Ok, thanx to Marcel, i looked again, and no patches/source code changes
-are needed. The error
+Hi all.
 
-	hci_usb: probe of 7-2:1.1 failed with error -5
+I'm setting up a bluetooth connection between
+my server and Nokia 6310i phone. This connection
+was working (phone and server was paired), but now
+I'm asked by phone for entering a PIN (maybe i've
+changed USB bluetooth dongle, because i have
+2 units).
 
-is spurious, and the device still works just fine.
+After typing
 
-Another one to add to the list of working with linux bluetooth devices ;-)
+# rfcomm connect rfcomm0
 
-Thanks
-Mitch
+(i'm sure that rfcomm0 is well configured in a rfcomm.conf)
+i must confirm the conection on the phone and then
+i'm asked by the phone for a PIN number. After inserting 
+the same PIN as in /etc/bluetooth/pin i see:
 
--------- Original Message --------
-Subject: Re: [Bluez-users] NEC usb bluetooth support
-Date: Tue, 16 Dec 2003 20:40:00 +0100
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mitch <mitch@0bits.com>
-CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-References: <3FDF5C36.7080605@0bits.com>
+uran:/home/kodoub# rfcomm connect rfcomm0
+Can't connect RFCOMM socket: Resource temporarily unavailable
 
-Hi Mitch,
+My pin_helper is a bash script with echo "PIN:XXXXX".
+The same problem i have also on my second computer.
+I'm using Debian with different kernels on these
+computers (patched Linux version 2.4.20-k7-mh8 and
+Linux version 2.4.22). I'm sure that i solved this
+problem in the past after a days, but i've forget
+the solution. Please, can anybody help me remember
+what is bad?
 
-> Yup i do have an entry (see below), and i've managed to get it to load, but by
-> hacking the hci_usb.c to remove the lines
-> 
->   	/* Check number of endpoints */
-> 	if (intf->altsetting[0].desc.bNumEndpoints < 3)
-> 		return -EIO;
-> 
-> It looks like since there's multiple interface descriptors for the device (see
-> attachment), and bNumEndpoints is only equal to 3 in one of them, then the test
-> fails and returns EIO. I don't know if this check should be removed altogether since
-> we subsequently iterate thru all the interfaces to get the endpoints.
-> 
-> hciconfig shows me 2 interfaces - is this correct ?
-
-this is wrong. The second interface on the USB layer is for the SCO
-audio support and in normal cases correct recognized by the driver. This
-is why the above check is in the code. If you not have three endpoints
-on the first interface it is not a USB Bluetooth device. Please check
-your device with 2.4.23.
-
-Regards
-
-Marcel
-
-
+Thanx, Jirka.
 
 
 -------------------------------------------------------
