@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Achim Bohnet <ach@mpe.mpg.de>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200403310134.14280.ach@mpe.mpg.de>
-Subject: [Bluez-users] bug link_key: no connection after AP was once accessed with Win XP AVM tools
+Subject: Re: [Bluez-users] rfcomm connection refused / Host is down  (Again)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <8d7248bf39.8bf398d724@estudiants.urv.es>
+References: <8d7248bf39.8bf398d724@estudiants.urv.es>
+Content-Type: text/plain
+Message-Id: <1080687740.2773.46.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,66 +18,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 31 Mar 2004 01:34:14 +0200
+Date: Wed, 31 Mar 2004 01:02:20 +0200
 
-Hi,
-to explore my AVM AP-X I once used WinXP.  After rebooting into
-linux.  ciptool was unable to connect to the AP.  Fix/hack was to
-shutdown hcid, move /etc/bluetooth/link_key away and restart hcid.
-(I'm proud of this wild guess that fixed it ;)
-Then I got a pin prompt again and everything started working again.
+Hi Albert,
 
-With the 'unusable-after-winxp-usage' link_key file I get
+do you really think that posting the same message again after 9 hours
+makes any difference. Actually I am going to ignore such postings.
 
-# ciptool connect 00:04:0E:85:34:F3
-Can't connect L2CAP socket: Connection timed out
+> I'm using the BlueZ stack in kernel 2.4.24, and I've got an usb dongle and I try to connect to an RS232-bluetooth attached to a robot's serial port.
+> 
+> So, I do hciconfig and I get
+> hci0:
+> Type: USB
+> BD Address: 00:0A:3A:50:20:15 ACL MTU: 192:8  SCO
+> MTU: 64:8
+> UP RUNNING PSCAN ISCAN 
+> RX bytes:8280 acl:233 sco:0 events:233 errors:0
+> TX bytes:3096 acl:93 sco:0 commands:45 errors:0
+> 
+> 
+> When I do an hcitool -i hci0 inq, I can find the RS232 adapter, but on doing
+> 
+> rfcomm -i hci0 connect /dev/rfcomm0 00:c0:1B:05:C8:2A 1
+> 
+> I get a message with:
+>  Can't connect RFCOMM socket: Connection refused
+> or either:
+>  Can't connect RFCOMM socket: Host is down
 
-# hcidump -x gives:
-HCIDump - HCI packet analyzer ver 1.5
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Create Connection(0x01|0x0005) plen 13
-  F3 34 85 0E 04 00 18 CC 02 00 00 00 01
-> HCI Event: Command Status(0x0f) plen 4
-  00 01 05 04
-> HCI Event: Link Key Request(0x17) plen 6
-  F3 34 85 0E 04 00
-< HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
-  F3 34 85 0E 04 00 EE 90 55 76 1E 90 F2 DB 52 22 16 F7 5E 15
-  A7 F5
-> HCI Event: Connect Complete(0x03) plen 11
-  05 00 00 F3 34 85 0E 04 00 01 00
+the question is if hcid is running and the PIN helper is working. Run
+"hcidump -x" (as root) and show us what happens on connect.
 
-I use debian testing with 2.6.4 and
-ii  bluez-hcidump              1.5-2                      Analyses Bluetooth HCI packets
-ii  bluez-pan                  1.1rel-3                   Personal area networking for Bluetooth devices
-ii  bluez-pin                  0.22-1                     Bluetooth PIN helper with D-BUS support
-ii  bluez-sdp                  1.5-2                      BlueZ Bluetooth SDP daemon and tool
-ii  bluez-utils                2.4-6                      Utilities for controlling Bluetooth devices
+Regards
 
-Here's hcid.conf
+Marcel
 
-allee(0) ~ $ tcgrep -v '^(\s*#|$)' /etc/bluetooth/hcid.conf
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        pin_helper /usr/bin/bluepin.ach;
-}
-device {
-        name "%h-%d";
-        class 0x100;
-        iscan enable; pscan enable;
-        lm accept;
-        lp rswitch,hold,sniff,park;
-        auth enable;
-        encrypt enable;
-}
 
--- 
-  To me vi is Zen.  To use vi is to practice zen. Every command is
-  a koan. Profound to the user, unintelligible to the uninitiated.
-  You discover truth everytime you use it.
-                                      -- reddy@lion.austin.ibm.com
 
 
 -------------------------------------------------------
