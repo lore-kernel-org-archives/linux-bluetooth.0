@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Rfcomm not found
+Subject: Re: [Bluez-users] Problems with PCMCIA Bluetooth card (cbt100c)
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Daniel Moraes(BotuRoot)" <ra002890@itelefonica.com.br>
+To: Eiko Oltmanns <eiko.oltmanns@web.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <402F917D.2050905@itelefonica.com.br>
-References: <402F917D.2050905@itelefonica.com.br>
+In-Reply-To: <200402141823.34699.eiko.oltmanns@web.de>
+References: <200402141823.34699.eiko.oltmanns@web.de>
 Content-Type: text/plain
-Message-Id: <1076855942.14758.60.camel@pegasus>
+Message-Id: <1076855735.14758.57.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,16 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 Feb 2004 15:39:03 +0100
+Date: Sun, 15 Feb 2004 15:35:35 +0100
 
-Hi Daniel,
+Hi Eiko,
 
-> I'm trying to install Bluez over my Conectiva Linux 9 with kernel 2.4.21 
-> Cl9 but It doesn't find the rfcomm module!! I cant load it with modprobe 
->    rfcomm. I have already done the alias in the modules.conf.
+> I have problems with using the conceptronic pcmcia card (cbt100c). The hotplug 
+> system (on a Suse 9.0 system) doesn't detect the card correctly. It detects a 
+> modem a loads 'serial_cs.o'. Obviously this can't work. 
 
-maybe the Connectiva guys don't build the module for you. Install you
-own kernel.
+this is correct if the card offers an UART. You have to use hciattach to
+attach the serial device to the Bluetooth core.
 
 Regards
 
