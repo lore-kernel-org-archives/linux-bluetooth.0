@@ -1,66 +1,50 @@
-Return-Path: <lintner@c-lab.de>
-Message-ID: <41342BF8.2040703@c-lab.de>
-Date: Tue, 31 Aug 2004 09:42:48 +0200
-From: Johannes <lintner@c-lab.de>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problems with InputStream and OutputStream
-References: <1324.1093866265@www49.gmx.net>	 <1093867195.5620.16.camel@pegasus>  <41331EBB.9000606@gmx.de> <1093869614.5620.24.camel@pegasus>
-In-Reply-To: <1093869614.5620.24.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Modifying Device Class....
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Stennett <praefectus@gmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1aef622504083013322eccbeb4@mail.gmail.com>
+References: <1aef622504083013322eccbeb4@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1093899829.5620.105.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 30 Aug 2004 23:03:50 +0200
 
-Hi,
+Hi David,
 
-the BTMidServ runs on the Linux side as the server.
+> I know that the Bluetooth spec has different devices classes (0x100,
+> etc...) ... my question is, can we create our own?  That way, if I
+> created a client to find only (0x12345), my BlueZ box could have a
+> device class of 0x12345 or something) .... or, is this not possible?
 
-hcitool info throws an error, although my server is running.
-    gotland:~# hcitool info 00027280B16F
-    Requesting information ...
-    Can't create connection: Input/output error
+in general it is only a 3 byte value and you can use everything you like
+as long as the other side knows about it. I think there are some free
+values and extension bits that you should use for that and not using
+some free choosen value.
 
-or
+Regards
 
-    gotland:~# hcitool info 00:02:72:80:B1:6F
-    Device is not available or not connected.
-
-the hci-interface is running
-    gotland:~# hciconfig hci0
-    hci0:   Type: USB
-        BD Address: 00:02:72:80:B1:6F ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:126 acl:0 sco:0 events:16 errors:0
-        TX bytes:316 acl:0 sco:0 commands:14 errors:0
-
-
-bye John
+Marcel
 
 
 
-Marcel Holtmann wrote:
 
->Hi Johannes,
->
->  
->
->>the relevant parts of the sources are attached (the important parts are 
->>the BTMidServ.java and the method doConnect() in BTServiceSearchUI.java).
->>I hope the comments and Info-Messages will be enough declarations.
->>
->>I use Debian Linux with a 2.6.7 Kernel and KDE version 3.2.3.
->>The phone is a Siemens SX1 with firmwareversion 10. It uses a Symbian OS 
->>Serie 60.
->>The USB-dongle is from Acer and should be supported from BlueZ.
->>    
->>
->
->and what do you use on the Linux side? Please run a "hcitool info ..."
->as root for me.
->
->Regards
->
->Marcel
->
->  
->
+-------------------------------------------------------
+This SF.Net email is sponsored by BEA Weblogic Workshop
+FREE Java Enterprise J2EE developer tools!
+Get your free copy of BEA WebLogic Workshop 8.1 today.
+http://ads.osdn.com/?ad_id=5047&alloc_id=10808&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
