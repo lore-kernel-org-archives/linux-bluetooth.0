@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040616074907.41675.qmail@web90104.mail.scd.yahoo.com>
-From: karthik bala guru <bluekarthik@yahoo.com>
-Subject: Re: [Bluez-users] bluetooth headset
-To: fisch <fisch@conne-island.de>, bluez-users@lists.sourceforge.net
-In-Reply-To: <1087328697.2026.1.camel@localhost>
-MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-33130420-1087372147=:41576"
+Subject: Re: [Bluez-users] Epox Barton keyboard: HID create error 53
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Matthias Thomae <bluez@thomae-privat.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40CF4B17.2010806@thomae-privat.de>
+References: <40CDE18C.70703@thomae-privat.de>
+	 <1087255678.13792.51.camel@pegasus>  <40CE96A8.3020407@thomae-privat.de>
+	 <1087284859.13792.67.camel@pegasus>  <40CEC020.6050107@thomae-privat.de>
+	 <1087292887.13792.81.camel@pegasus>  <40CF4B17.2010806@thomae-privat.de>
+Content-Type: text/plain
+Message-Id: <1087339715.13792.104.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,53 +21,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Jun 2004 00:49:07 -0700 (PDT)
+Date: Wed, 16 Jun 2004 00:48:35 +0200
 
---0-33130420-1087372147=:41576
-Content-Type: text/plain; charset=us-ascii
+Hi Matthias,
 
-Hi fisch,
-It should have come up with the handset. Check out there first Fisch.
- 
-karthik bala guru
+> > someone has to fix the HID parser to get it working with the keyboard
+> > and the presenter from EPoX. I am a little bit busy in getting the boot
+> > protocol support ready, so that we can at least include HID boot support
+> > into the mainline kernel. The full report protocol support has to wait
+> > until the kernel gets its device independent HID support.
+> 
+> Alright, thank you meanwhile.
 
-fisch <fisch@conne-island.de> wrote:
-hi,
-is there anywhere a howto for setting up a bluetooth headset? I have a
-USB-Bluetooth-Dongle and a Plantronics M3000 headset.
-bye
-fisch
--- 
-fisch 
+feel free to investigate and send me a patch.
+
+> > Please do so. I want to compare it with my devices. The keyboard looks
+> > the same as mine. It seems they only choosed a newer CSR firmware.
+> 
+> Hopefully a better one ;)
+
+I think my EPoX keyboard and mouse were a prototype and this is why I
+had a different build id. The SPD records and the HID descriptor are the
+same.
+
+Regards
+
+Marcel
 
 
-
--------------------------------------------------------
-This SF.Net email is sponsored by The 2004 JavaOne(SM) Conference
-Learn from the experts at JavaOne(SM), Sun's Worldwide Java Developer
-Conference, June 28 - July 1 at the Moscone Center in San Francisco, CA
-REGISTER AND SAVE! http://java.sun.com/javaone/sf Priority Code NWMGYKND
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-		
----------------------------------
-Do you Yahoo!?
-Yahoo! Mail - Helps protect you from nasty viruses.
---0-33130420-1087372147=:41576
-Content-Type: text/html; charset=us-ascii
-
-<DIV>Hi fisch,</DIV>
-<DIV>It should have come up with the handset. Check out there first Fisch.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>karthik bala guru</DIV>
-<DIV><BR><B><I>fisch &lt;fisch@conne-island.de&gt;</I></B> wrote:</DIV>
-<BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">hi,<BR>is there anywhere a howto for setting up a bluetooth headset? I have a<BR>USB-Bluetooth-Dongle and a Plantronics M3000 headset.<BR>bye<BR>fisch<BR>-- <BR>fisch <FISCH@CONNE-ISLAND.DE><BR><BR><BR><BR>-------------------------------------------------------<BR>This SF.Net email is sponsored by The 2004 JavaOne(SM) Conference<BR>Learn from the experts at JavaOne(SM), Sun's Worldwide Java Developer<BR>Conference, June 28 - July 1 at the Moscone Center in San Francisco, CA<BR>REGISTER AND SAVE! http://java.sun.com/javaone/sf Priority Code NWMGYKND<BR>_______________________________________________<BR>Bluez-users mailing list<BR>Bluez-users@lists.sourceforge.net<BR>https://lists.sourceforge.net/lists/listinfo/bluez-users<BR></BLOCKQUOTE><p>
-		<hr size=1>Do you Yahoo!?<br>
-<a href="http://us.rd.yahoo.com/mail/taglines/*http://promotions.yahoo.com/new_mail/static/protection.html">Yahoo! Mail</a> - Helps protect you from nasty viruses.
---0-33130420-1087372147=:41576--
 
 
 -------------------------------------------------------
