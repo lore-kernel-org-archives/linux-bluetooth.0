@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Alain Volmat <avolmat@src.ricoh.co.jp>
 To: bluez-users@lists.sourceforge.net
-From: Jesse Guardiani <jesse@wingnet.net>
-Message-ID: <ctpi9c$g83$1@sea.gmane.org>
-References: <cteadv$tbe$1@sea.gmane.org> <1106961349.10580.7.camel@pegasus> <ctonm5$814$1@sea.gmane.org>
+Subject: Re: [Bluez-users] rfcomm question 3
+Message-ID: <20050202031659.GA7073@snoopy.src.ricoh.co.jp>
+References: <1107245676.8848.27.camel@pegasus> <20050202024903.71368.qmail@web60905.mail.yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Anycom USB-240 & firmware
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20050202024903.71368.qmail@web60905.mail.yahoo.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,119 +18,142 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Feb 2005 22:44:31 -0500
+Date: Wed, 2 Feb 2005 12:16:59 +0900
 
-Jesse Guardiani wrote:
+Hi Michael,
 
-> Marcel Holtmann wrote:
-> 
->> Hi Jesse,
->> 
->>> I recently bought an Anycom USB-240. It ships
->>> with BT 1.1 firmware, as depicted below, but
->>> it *should* be BT 1.2 capable hardware.
->>> 
->>> % hciconfig -a
->>> hci0:   Type: USB
->>>         BD Address: 00:0B:0D:34:1F:E0 ACL MTU: 120:20  SCO MTU: 64:0
->>>         UP RUNNING PSCAN ISCAN
->>>         RX bytes:254 acl:0 sco:0 events:43 errors:0
->>>         TX bytes:416 acl:0 sco:0 commands:30 errors:0
->>>         Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
->>>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->>>         Link policy: RSWITCH HOLD SNIFF PARK
->>>         Link mode: SLAVE ACCEPT
->>>         Name: 'BlueZ (0)'
->>>         Class: 0x100100
->>>         Service Classes: Object Transfer
->>>         Device Class: Computer, Uncategorized
->>>         HCI Ver: 1.1 (0x1) HCI Rev: 0x0 LMP Ver: 1.1 (0x1) LMP Subver:
->>>         0x757 Manufacturer: Silicon Wave (11)
->>> 
->>> My interest in Bluetooth is primarily tied to
->>> audio right now. I've been doing a lot of work
->>> with SIP phones lately so I've ordered a BT 1.2
->>> Logitech Mobile Freedom Headset to play with.
->>> It should arrive in a week or two.
->>> 
->>> Anyway, the Logitech headset is BT 1.2 capable
->>> so I'd like to upgrade my USB-240 firmware to
->>> 1.2 also (freq hopping to avoid my 802.11b nets,
->>> etc...), but this post on the Anycom website
->>> claims that the USB-240's headset and handsfree
->>> profiles don't work well under Linux with BT
->>> 1.2 firmware:
->>>     http://tinyurl.com/5pqnm
->>> 
->>> So in the interest of NOT frying my shiny new
->>> USB-240, does anyone on this list currently use
->>> a USB-240 with a headset or handsfree profile
->>> device? Which firmware do you use?
->> 
->> if you wanna play with audio then you should better buy a dongle with a
->> CSR chip.
-> 
-> Well, my headset arrived today and is currently in it's 4 hour
-> charge cycle. We'll see if the Anycom is Anygood for audio. :)
+> So I wish to know which one is about socket based programming?
+The one using socket :D
+By saying so, you can already remove the first one. It is only for
+handling Bluetooth address, as the comment says.
 
-Nope. No luck. I get this issue:
-    http://tinyurl.com/5dhtl
+The second function is about connection, not listening.
+I haven't found the 3rd function you mention about, or maybe I just
+misread your email ... reading source code without indentation is not
+that simple.
 
-Hissing, volume buttons work, both from amixer and from headset's volume
-buttons, but no audio. When I try to send audio, I get this:
+Basically RFCOMM socket programming is just very standard socket programm=
+ing.
+in very short, to start listening,
+	socket
+	bind (specifying RFCOMM port)
+	setsockopt (for MTU ... I guess)
+	listen
+	accept
+	..
 
-[21:35]jesse@trevarthan:[~]% aplay -B 1000000 -D plughw:Headset /usr/home/jesse/.kde3.3/share/sounds/maximize.wav
-Playing WAVE '/usr/home/jesse/.kde3.3/share/sounds/maximize.wav' : Signed 16 bit Little Endian, Rate 22050 Hz, Mono
-ALSA lib pcm_hw.c:592:(snd_pcm_hw_drain) SNDRV_PCM_IOCTL_DRAIN failed: Input/output error
-
-In addition, if I disconnect the headset by pushing the function button, the
-hissing stops, and I get confirmation that the SCO connection has been dropped:
-
-[22:07]jesse@trevarthan:[~]% btsco 00:0D:44:36:E6:F4
-Device is 0:0
-Voice setting: 0x0060
-RFCOMM channel 1 connected
-recieved AT+CKPD=200
-opened hwdep
-connected SCO channel
-Setting sco fd
-Done setting sco fd
-recieved AT+VGS=13
-Sending up speaker change 13
-recieved AT+CKPD=200
-disconnected SCO channel
-
-Pressing the connect button on the headset after this yields
-this output:
-
-recieved AT+CKPD=200
-opened hwdep
-
-But then it hangs and I have to physically remove the dongle
-from the USB port and replug it to get things working again.
-
-I'm using a patched (mh3) Gentoo 2.6.10-r6 kernel. Everything
-but the VERSION hunk applied successfully.
-
-Is this an irreparable incompatibility with the Silicon Wave
-chipset? I'm willing to do any debugging and/or patching
-necessary, but my guess is that Marcel already has plenty of
-these chipsets laying around.
-
-If there's no hope, can anyone recommend a USB BT 1.2 dongle,
-hopefully with flash upgradeable firmware, that works well
-with Bluez in headset and handsfree profile modes?
-
-Thanks!
-
--- 
-Jesse Guardiani, Systems Administrator
-WingNET Internet Services,
-P.O. Box 2605 // Cleveland, TN 37320-2605
-423-559-LINK (v)  423-559-5145 (f)
-http://www.wingnet.net
+Alain
 
 
+
+
+
+
+
+* Ka Kin Cheung [Wed,  2 Feb 2005 at 10:49 +0800]
+<quote>
+> Hi Marcel,
+>     I've found one powerpoint you made about Bluetooth programming on L=
+inux in Wireless Technologies Congress 2003. But I don't know for those t=
+hree programs you put, which one is describing about the PC listening the=
+ mobile in RFCOMM channel. Let me put here.
+> For Handling of Bluetooth device addresses
+> #include <bluetooth/bluetooth.h>
+> void main(int argc, char *argv[])
+> {
+> bdaddr_t bdaddr;
+> char *str, addr[18];
+> str2ba("00:a5:b4:c3:d2:e1", &bdaddr);
+> ba2str(&bdaddr, addr);
+> str =3D batostr(&bdaddr);
+> printf("%s %s\n", addr, str);
+> free(str);
+> bacpy(&bdaddr, BDADDR_ANY);
+> }
+>=20
+> For definition of the socket data types
+> static int rfcomm_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t channel=
+)
+> {
+> struct sockaddr_rc addr;
+> int sk;
+> if ((sk =3D socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < 0)
+> return -1;
+> addr.rc_family =3D AF_BLUETOOTH;
+> bacpy(&addr.rc_bdaddr, src);
+> addr.rc_channel =3D 0;
+> if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+> close(sk);
+> return -1;
+> }
+> addr.rc_family =3D AF_BLUETOOTH;
+> bacpy(&addr.rc_bdaddr, dst);
+> addr.rc_channel =3D channel;
+> if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+> close(sk);
+> return -1;
+> }
+> So I wish to know which one is about socket based programming? Thanks a=
+ lot!
+> Michael
+>=20
+> Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Michael,
+>=20
+> > I thank Marcel here for help on initializing
+> > connection from mobile to PC. Now, before I can do
+> > that, I initialize the rfcomm connection from PC to
+> > mobile, and then run my project program. The syntax is
+> > as follows:
+> > snprintf (tmp, sizeof (tmp), "t68_remote_v2 (%s)",
+> > modemname);
+> > tmp[sizeof (tmp) - 1] =3D 0;
+> > openlogfile (tmp, logfile, LOG_DAEMON, loglevel);
+> > set_alarmhandler (alarmhandler, alarmlevel,
+> > modemname);
+> > openmodem ();
+> > setmodemparams ();
+> > But now, when I initialize the connection from mobile
+> > to PC, once I run the program, "/dev/rfcomm0: No such
+> > device" is shown. So, I wish to know how can I modify
+> > the program by changing some syntax from that I post
+> > here? Or is there any program that I can include in my
+> > main program? Thank you very much.
+>=20
+> if you wanna connect from a mobile phone to a machine running BlueZ you
+> need to write an application that listens on a RFCOMM channel. This is
+> about socket programming and you convert this socket later in to a TTY
+> with a /dev/rfcommX device node, but actually unless you have some
+> legacy application like pppd this should not be needed. What you need i=
+s
+> to do direct socket programming. It is as easy as using a TTY and I
+> posted detailed information about how to change a TTY based program int=
+o
+> a socket based program years ago. Check the mailing list archive.
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+> Tool for open source databases. Create drag-&-drop reports. Save time
+> by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+> Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>=20
+>=20
+>=20
+> ---------------------------------
+> =E6=96=B0=E5=B9=B4=E9=A1=98=E6=9C=9B=E7=AC=AC=E4=B8=80=E4=BD=8D :  =E6=89=
+=BE=E5=88=B0=E5=8F=8B=E7=B7=A3=E4=BA=BA=20
+</quote>
 
 
 -------------------------------------------------------
