@@ -1,12 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <001901c4dcfb$d2909810$6401000a@zool>
-From: "Steffen Larsen" <zool@zool.dk>
-To: <bluez-devel@lists.sourceforge.net>
-References: <00a001c4cee6$5271b4c0$0000fea9@zool> <1100958396.7213.126.camel@pegasus>  <00f101c4dca6$93973a60$6401000a@zool> <1102478767.8447.65.camel@pegasus>
-Subject: Re: [Bluez-devel] updating the PSM in SDP..
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+Subject: Re: [Bluez-devel] Re: Problems with anycom usb dongle
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <cp6fpq$167$1@sea.gmane.org>
+References: <20041206225609.GA1177@zeus.galaxy.org.uk>
+	 <cp3mkk$m7t$1@sea.gmane.org> <1102407664.8447.20.camel@pegasus>
+	 <cp3rr7$1vv$1@sea.gmane.org> <1102411047.8447.28.camel@pegasus>
+	 <cp4a8v$959$1@sea.gmane.org> <1102425729.8447.41.camel@pegasus>
+	 <cp4df4$i6l$1@sea.gmane.org> <1102439143.8447.47.camel@pegasus>
+	 <cp6fpq$167$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1102496771.9988.35.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,32 +23,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 8 Dec 2004 08:59:19 +0100
+Date: Wed, 08 Dec 2004 10:06:11 +0100
 
-> Hi Steffen,
->
-> > > The library contains a sdp_record_update() function, but I never tried
-> > > it so far.
-> >
-> > hmmm.. I tried this sdp_record_update() function, but I can't make it
-work.
-> > Anyone in here, who have tried it, where it actually worked?
->
-> then send me a patch for the library that makes it working.
+Hi Sebastian,
 
-Surely I will.. But I have to have some spare time at first. :-)
+> the point about link manager isn't really clear to me.
+> In the spec on page 572 about HCI - Add_SCO_Connection the description
+> starts with this phrase "This command will cause the link manager to
+> create a SCO connection ...". Does this mean LMP?
+> I've scaned the spec and search the internet but can't find an explicit
+> answer. Do LMP and L2CAP work "hand-in-hand" or are they alternative?
+> If they are cooperating the mentioned part (page 226) does matter I
+> think.
 
-> > Well the deletion and adding a new record of cause works fine, but it
-could
-> > be nicer to have a update function instead. ;-)
->
-> As I said, maybe changing a PSM and keeping the record is not a good
-> idea. If you change the PSM then the service is also changed, right?
+the link manager runs on the chip and L2CAP is part of the host protocol
+stack. And in between we have the HCI. As far as I know, the connection
+handle from the link manager must not be the same connection handle used
+on the HCI. Feel free to correct me, because I never really looked under
+the HCI layer in that detail.
 
-Yes yes for sure.. But I wanted to change the attribute that contained the
-PSM integer value, through the update function.
+Regards
 
-/Steffen
+Marcel
+
 
 
 
