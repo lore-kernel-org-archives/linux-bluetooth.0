@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Sebastian Eichner <mail@sebastian-eichner.de>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] A2DP working :-) , voice not :-(
-References: <200412010839.06669.mailsp@sebastian-eichner.de> <200412011224.29191.mail@sebastian-eichner.de> <1101900716.18840.69.camel@pegasus>
-In-Reply-To: <1101900716.18840.69.camel@pegasus>
+Message-ID: <41ADE875.5050405@suche.org>
+From: "suche.org" <admin@suche.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200412011733.49899.mail@sebastian-eichner.de>
+To: bluez-devel@lists.sourceforge.net
+Content-Type: multipart/mixed;
+ boundary="------------050805050000010600050109"
+Subject: [Bluez-devel] btsco2 Patch
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,22 +17,115 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 1 Dec 2004 17:33:49 +0100
+Date: Wed, 01 Dec 2004 16:51:17 +0100
 
-Okay, well, shame on me...:
-The A2DP playback worked right out of the box, so i did not notice 
-that you have to press the connect button on the headphone to 
-establish a voice connection... 8-()
-Maybe we could add a note to the documentation...
+This is a multi-part message in MIME format.
+--------------050805050000010600050109
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Anyway, now it all is working fantastic, i can listen to music 
-streaming right from my notebook, and chat via Skype with my headset.
+Hi,
 
-Thanks a lot for your help and your work!
-It's amazing, i think i do not need my telephone anymore... ;-)
+this patch fix some problems:
+1. use nonblocking socket on rfcomm connect this allow to wait for more 
+than one headset
+2. Before seting the SCO filedescriptor to the kernel ir send -1 for 
+closing the actual one.
++ If an SCO connection is lost from last time it become close and with 
+the next try is available again
+3. Move the SCO loopback testroutine to poll informations
+4. Handle Headset disconnect (power off)
 
-Sebastian
+Cu Thomas
 
+p.s. I hope this tine the patch is in correct format
+
+--------------050805050000010600050109
+Content-Type: text/plain;
+ name="btsco2.c.diff"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="btsco2.c.diff"
+
+LS0tIGJ0c2NvMi5jLm9yaWcJMjAwNC0xMi0wMSAxNTowNjoxMy4wMDAwMDAwMDAgKzAxMDAK
+KysrIGJ0c2NvMi5jCTIwMDQtMTItMDEgMTY6NDE6MzQuNjk4OTc5NjkyICswMTAwCkBAIC05
+MSw2ICs5MSw3IEBACiB7CiAJc3RydWN0IHNvY2thZGRyX3JjIGFkZHI7CiAJaW50IHNrOwor
+CWludCBvcHQ7CiAKIAlzayA9IHNvY2tldChQRl9CTFVFVE9PVEgsIFNPQ0tfU1RSRUFNLCBC
+VFBST1RPX1JGQ09NTSk7CiAJaWYgKHNrIDwgMCkKQEAgLTEwNSwxMiArMTA2LDE4IEBACiAJ
+CXJldHVybiAtMTsKIAl9CiAKKwkvKiBUcnkgdG8gdXNlIG5vbiBibG9ja2luZyBJTyAqLwor
+CW9wdCA9IDE7CisJaW9jdGwgKHNrLCBGSU9OQklPICAsICZvcHQpOworCQogCW1lbXNldCgm
+YWRkciwgMCwgc2l6ZW9mKGFkZHIpKTsKIAlhZGRyLnJjX2ZhbWlseSA9IEFGX0JMVUVUT09U
+SDsKIAliYWNweSgmYWRkci5yY19iZGFkZHIsIGRzdCk7CiAJYWRkci5yY19jaGFubmVsID0g
+Y2hhbm5lbDsKIAogCWlmIChjb25uZWN0KHNrLCAoc3RydWN0IHNvY2thZGRyICopICZhZGRy
+LCBzaXplb2YoYWRkcikpIDwgMCkgeworCQlpZiAoZXJybm8gPT0gRUFHQUlOKQorCQkJcmV0
+dXJuIHNrOwogCQljbG9zZShzayk7CiAJCXJldHVybiAtMTsKIAl9CkBAIC0zMDAsMTAgKzMw
+NywxMCBAQAogCiAJaWYgKGhlYWRzZXQgPT0gTlVMTCkKIAkJcmV0dXJuIDA7CisJLyogZGlz
+Y29ubmVjdCBTQ08gc3RyZWFtICovCisJYnRfc2NvX3NldF9mZChoZWFkc2V0LT5oYW5kbGUs
+IC0xKTsKIAlpZiAoaGVhZHNldC0+c2NvX2ZkICE9IC0xKSB7CiAJCS8qIGNsb3NlIGJ0X3Nj
+byBhdWRpbyBoYW5kbGUgKi8KLQkJYnRfc2NvX3NldF9mZChoZWFkc2V0LT5oYW5kbGUsIC0x
+KTsKLQkJLyogZGlzY29ubmVjdCBTQ08gc3RyZWFtICovCiAJCWNsb3NlKGhlYWRzZXQtPnNj
+b19mZCk7CiAJCWhlYWRzZXQtPnNjb19mZCA9IC0xOwogCQlmcHJpbnRmKHN0ZGVyciwgImRp
+c2Nvbm5lY3RlZCBTQ08gY2hhbm5lbFxuIik7CkBAIC00MDEsMTYgKzQwOCwxMyBAQAogCXJl
+dHVybiAxOwogfQogCi1zdGF0aWMgdm9pZCBoZWFkc2V0X2Rlc3Ryb3koc3RydWN0IHNfaGVh
+ZHNldCAqaGVhZHNldCkKK3N0YXRpYyB2b2lkIGhlYWRzZXRfY2xvc2Uoc3RydWN0IHNfaGVh
+ZHNldCAqaGVhZHNldCkKIHsKIAlpZiAoaGVhZHNldCA9PSBOVUxMKQogCQlyZXR1cm47Ci0J
+aWYgKGhlYWRzZXQtPnNjb19mZCAhPSAtMSkgewogCQlidF9zY29fc2V0X2ZkKGhlYWRzZXQt
+PmhhbmRsZSwgLTEpOworCWlmIChoZWFkc2V0LT5zY29fZmQgIT0gLTEpIAogCQljbG9zZSho
+ZWFkc2V0LT5zY29fZmQpOwotCX0KLQotCXNsZWVwKDEpOwogCWlmIChoZWFkc2V0LT5yZmNv
+bW1fZmQgIT0gLTEpIAogCQljbG9zZShoZWFkc2V0LT5yZmNvbW1fZmQpOwogCWlmIChoZWFk
+c2V0LT5oYW5kbGUgIT0gTlVMTCkgCkBAIC00MTgsNiArNDIyLDcgQEAKIAloZWFkc2V0LT5z
+Y29fZmQgPSAtMTsKIAloZWFkc2V0LT5yZmNvbW1fZmQgPSAtMTsKIAloZWFkc2V0LT5oYW5k
+bGUgPSBOVUxMOworCXNsZWVwKDEpOwogfQogCiBzdGF0aWMgdm9pZCBjbGVhbnVwKHZvaWQp
+CkBAIC00MjYsNyArNDMxLDggQEAKIAlha3RfaGVhZHNldCA9IGZpcnN0OwogCXdoaWxlIChh
+a3RfaGVhZHNldCAhPSBOVUxMKSB7CiAJCXN0cnVjdCBzX2hlYWRzZXQgKm5leHQgPSBha3Rf
+aGVhZHNldC0+bmV4dDsKLQkJaGVhZHNldF9kZXN0cm95KGFrdF9oZWFkc2V0KTsKKwkJaGVh
+ZHNldF9jbG9zZShha3RfaGVhZHNldCk7CisJCWZyZWUoYWt0X2hlYWRzZXQpOwogCQlha3Rf
+aGVhZHNldCA9IG5leHQ7CiAJCX0KIH0KQEAgLTUxMywxMCArNTE5LDYgQEAKIAkJc3RyMmJh
+KGFyZ3ZbMV0sICZha3RfaGVhZHNldC0+YmRhZGRyKTsKIAkJYWt0X2hlYWRzZXQtPmNoYW5u
+ZWwgPSBhdG9pKGFyZ3ZbMl0pOwogCQkvKiBvcGVuIGh3ZGVwIG9uIGF1ZGlvIGRldmljZSAq
+LwotCQlpZiAoKGVyciA9IHNuZF9od2RlcF9vcGVuKCZha3RfaGVhZHNldC0+aGFuZGxlLCBo
+d2RlcF9uYW1lLCBPX1JEV1IpKSA8IDApIHsKLQkJCWZwcmludGYoc3RkZXJyLCAiYnRzY28g
+b3BlbiAoJWktJWkpOiAlc1xuIiwgY2FyZCwgZGV2LCBzbmRfc3RyZXJyb3IoZXJyKSk7Ci0J
+CQlyZXR1cm4gLTE7Ci0JCX0KIAkJYnJlYWs7CiAJZGVmYXVsdDoKIAkJdXNhZ2UoKTsKQEAg
+LTU0OCwxMyArNTUwLDI2IEBACiAJCQkJCQkmYWt0X2hlYWRzZXQtPmJkYWRkciwKIAkJCQkJ
+CWFrdF9oZWFkc2V0LT5jaGFubmVsKSkgPCAwKQogCQkJCQlmcHJpbnRmKHN0ZGVyciwgIkNh
+bid0IGNvbm5lY3QgUkZDT01NIGNoYW5uZWwiKTsKLQkJCQllbHNlCisJCQkJZWxzZSB7CiAJ
+CQkJCWZwcmludGYoc3RkZXJyLCAiUkZDT01NIGNoYW5uZWwgJWkgY29ubmVjdGVkXG4iLCBh
+a3RfaGVhZHNldC0+Y2hhbm5lbCk7CisJCQkJCWlmICgoZXJyID0gc25kX2h3ZGVwX29wZW4o
+JmFrdF9oZWFkc2V0LT5oYW5kbGUsIGh3ZGVwX25hbWUsIE9fUkRXUikpIDwgMCkgeworCQkJ
+CQkJZnByaW50ZihzdGRlcnIsICJDYW4gbm90IG9wZW4gc291ZG5jYXJkICVzIGZvciBIZWFk
+c2V0XG4iLCBod2RlcF9uYW1lKTsKKwkJCQkJCWNsb3NlKGFrdF9oZWFkc2V0LT5yZmNvbW1f
+ZmQpOworCQkJCQkJYWt0X2hlYWRzZXQtPnJmY29tbV9mZCA9IC0xOworCQkJCQl9CisJCQkJ
+fQogCQkJfQogCQkJaWYgKGFrdF9oZWFkc2V0LT5yZmNvbW1fZmQgIT0gLTEpIHsKIAkJCQlw
+ZmRzW25mZHNdLmZkID0gYWt0X2hlYWRzZXQtPnJmY29tbV9mZDsKKwkJCQlwZmRzW25mZHNd
+LmV2ZW50cyA9IFBPTExJTnxQT0xMRVJSOworCQkJCW5mZHMrKzsKKwkJCX0KKyNpZmRlZiBU
+RVNUCisJCQlpZiAoYWt0X2hlYWRzZXQtPnNjb19mZCAhPSAtMSkgeworCQkJCXBmZHNbbmZk
+c10uZmQgPSBha3RfaGVhZHNldC0+c2NvX2ZkOwogCQkJCXBmZHNbbmZkcysrXS5ldmVudHMg
+PSBQT0xMSU47CiAJCQl9CisjZW5kaWYKIAkJCWlmIChha3RfaGVhZHNldC0+aGFuZGxlICE9
+IE5VTEwpIHsKIAkJCQkvKiBwb2xsaW5nIGRhdGEgZnJvbSBod2RlcCBpbnRlcmZhY2UgKi8K
+IAkJCQluZmRzICs9IHNuZF9od2RlcF9wb2xsX2Rlc2NyaXB0b3JzKGFrdF9oZWFkc2V0LT5o
+YW5kbGUsICZwZmRzW25mZHNdLCAxKTsKQEAgLTU3NCwxNiArNTg5LDE2IEBACiAJCQkJaWYg
+KHBmZHNbal0uZmQgPT0gYWt0X2hlYWRzZXQtPnJmY29tbV9mZCkgewogCQkJCQlpZiAocGZk
+c1tqXS5yZXZlbnRzICYgUE9MTElOKQogCQkJCQkJaGVhZHNldF9mcm9tX2J0KGFrdF9oZWFk
+c2V0KTsKKwkJCQkJaWYgKHBmZHNbal0ucmV2ZW50cyAmIFBPTExFUlIpCisJCQkJCQloZWFk
+c2V0X2Nsb3NlKGFrdF9oZWFkc2V0KTsKIAkJCQkJY29udGludWU7CiAJCQkJfQogI2lmZGVm
+IFRFU1QKIAkJCQlpZiAocGZkc1tqXS5mZCA9PSBha3RfaGVhZHNldC0+c2NvX2ZkKSB7CiAJ
+CQkJCS8qIEp1c3QgZm9yIHRlc3Rpbmc7IGhhbmRsZWQgYnkga2VybmVsIGRyaXZlciAqLwot
+CQkJCQlmZF9zZXQgcmZkczsKLQkJCQkJaWYgKDAgJiYgRkRfSVNTRVQoYWt0X2hlYWRzZXQt
+PnNjb19mZCwgJnJmZHMpKSB7CisJCQkJCWlmICgwICYmIHBmZHNbal0ucmV2ZW50cyAmIFBP
+TExJTikgewogCQkJCQkJaW50IGk7CiAJCQkJCQl1bnNpZ25lZCBjaGFyIGJ1ZlsyMDQ4XTsK
+LQogCQkJCQkJbWVtc2V0KGJ1ZiwgMCwgc2l6ZW9mKGJ1ZikpOwogCQkJCQkJcmxlbiA9IHJl
+YWQoYWt0X2hlYWRzZXQtPnNjb19mZCwgYnVmLCBzaXplb2YoYnVmKSk7CiAJCQkJCQl3cml0
+ZShha3RfaGVhZHNldC0+c2NvX2ZkLCBidWYsIHJsZW4pOwpAQCAtNTk0LDcgKzYwOSw5IEBA
+CiAJCQkJfQogI2VuZGlmCiAJCQkJLyogVm9sdW1lIHBvbGxpbmcgKHNvdW5kIGNhcmQpICov
+Ci0JCQkJaWYgKCFzbmRfaHdkZXBfcG9sbF9kZXNjcmlwdG9yc19yZXZlbnRzIChha3RfaGVh
+ZHNldC0+aGFuZGxlLCAmcGZkc1tqXSwgMSwgJnJldmVudHMpICYmIHJldmVudHMgJiBQT0xM
+SU4pIAorCQkJCWlmIChha3RfaGVhZHNldC0+aGFuZGxlICE9IE5VTEwpCisJCQkJCWlmICgh
+c25kX2h3ZGVwX3BvbGxfZGVzY3JpcHRvcnNfcmV2ZW50cyAoIGFrdF9oZWFkc2V0LT5oYW5k
+bGUsICZwZmRzW2pdLCAxLCAmcmV2ZW50cykgJiYgCisJCQkJCQkJcmV2ZW50cyAmIFBPTExJ
+TikgCiAJCQkJCWhlYWRzZXRfdm9sdW1lX2Zyb21jYXJkIChha3RfaGVhZHNldCk7CiAJCQl9
+CiAJCX0K
+--------------050805050000010600050109--
 
 
 -------------------------------------------------------
