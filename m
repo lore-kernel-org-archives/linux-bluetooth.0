@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Piconet Routing
+Subject: Re: [Bluez-devel] Sharing link keys with windows?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Stefan Mischke <survivor@uni-paderborn.de>
+To: Fred Schaettgen <buez-devel@schaettgen.de>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4174026A.1080209@uni-paderborn.de>
-References: <4173F86A.3050801@uni-paderborn.de>
-	 <1098120822.11765.5.camel@pegasus>  <4174026A.1080209@uni-paderborn.de>
+In-Reply-To: <200410182008.22134.buez-devel@schaettgen.de>
+References: <200410181951.02650.buez-devel@schaettgen.de>
+	 <1098122330.11765.10.camel@pegasus>
+	 <200410182008.22134.buez-devel@schaettgen.de>
 Content-Type: text/plain
-Message-Id: <1098142954.5415.7.camel@pegasus>
+Message-Id: <1098127168.20808.1.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,35 +20,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 19 Oct 2004 01:42:35 +0200
+Date: Mon, 18 Oct 2004 21:19:28 +0200
 
-Hi Stefan,
+Hi Fred,
 
-> > > Since Bluetooth uses Time Division Duplex, a slave is not allowed to 
-> > > talk to another slave in the same Piconet. The logical consequence must 
-> > > be that the data is routed over the master. I've used l2test to check if 
-> > > l2cap does this kind of routing automatically. It doesn't but rather 
-> > > creates a new, direct acl link to the remote slave device (scatternet). 
-> > > I don't know how it is with rfcomm, but I suppose it's the same. My 
-> > > question: Is there any automatic Piconet Routing inside BlueZ or does 
-> > > one have to implement it by oneself?
-> > >     
-> > you must do it by yourself, because even if the master manages to put
-> > all devices into the same piconet the connections are point to point.
-> > 
-> >   
-> TCP connections are also point to point, but since it's built on top
-> of IP, it goes (transparently) over many routers. Before I tested it,
-> I thought the link manager would take care of this. How does the
-> communiction of many BT devices work in practice? Who manages this
-> routing, since one device can only be point-to-point-connected to 2
-> devices (an this doesn't work really smooth)? There must be one
-> controlling instance. One cannot let the different applications handle
-> this, can one?
+> > > If I switch between Windows and Linux I have to re-pair devices each time
+> > > I boot the other system and try to use a service that requires
+> > > authentication. Is there a utility to copy the link keys from Linux to
+> > > Windows, so that both BlueZ and the MS-Stack use the same keys?
+> >
+> > I don't know of any tools, but I think there was a discussion about that
+> > some time ago and it seems that the Widcomm stack is storing the link
+> > keys somewhere in the Windows registry.
+> 
+> So does the MS-Stack..
+> Then I'll go ahead and try it myself. If you don't know such a tool, then it 
+> doesn't exist I guess. Uhm, btw. you are not going to change the structure of 
+> the link_key file during the next weeks, do you?
 
-this is true, but the problem is, that a slave does not know to which
-other slaves a master is connected. There is no routing stuff like in IP
-and you can't retrieve these information from the HCI layer.
+I am working on the kernel based security manager and the new structure
+of the link keys file will be ASCII based. So there will be change, but
+actually I don't know when this will be ready for public review.
 
 Regards
 
