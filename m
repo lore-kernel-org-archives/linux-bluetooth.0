@@ -1,48 +1,51 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alexandre Boeglin <alex@boeglin.org>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] File size limit and nokia 6230
-Message-ID: <20040812090328.GA9639@boeglin.org>
-References: <411A542B.2090707@clifford.net> <1092299195.28711.8.camel@pegasus> <411B2BEB.8030201@clifford.net> <200408121046.02700.cijoml@volny.cz>
+Return-Path: <alain@rillette.src.ricoh.co.jp>
+Date: Thu, 12 Aug 2004 17:58:31 +0900
+From: Alain Volmat <avolmat@src.ricoh.co.jp>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Brendan Simon <BrendanSimon@fastmail.fm>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Toshiba SDIO support
+Message-ID: <20040812085831.GA8267@snoopy.src.ricoh.co.jp>
+References: <411B14FB.10707@fastmail.fm> <1092298792.28711.5.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-In-Reply-To: <200408121046.02700.cijoml@volny.cz>
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 12 Aug 2004 11:03:28 +0200
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1092298792.28711.5.camel@pegasus>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Le jeudi 12 ao=FBt 2004 =E0 10:46, Bc. Michal Semler a =E9crit :
-> No, there aren't :) ussp-push works with inbox only too. But You better=
- spam=20
+Hi All,
 
-Yes, there is : obexftp (at least from what the manpage tells) is a
-command line tool that supports bluetooth, obex, and directories.
+moreover before speaking about SDIO devices, the question is 
+are there any SDIO controller supported by Linux ? Several laptop
+have SDIO support (hardware) but I don't think it is usable
+under Linux (or I missed that news). I think only SD memory is
+supported now.
 
-http://triq.net/obex/
+Alain
 
-Regards,
-Alex
---=20
-Alexandre Boeglin
-e. mail : alex@boeglin.org | Jabber : boeglin@jabber.org
-ICQ UIN : 38852646 | Website : http://www.boeglin.org/
-GPG fingerprint : 6B02 86CA A79E FA83 2FF0  3B83 14DE 4187 39C1 2786
-
-
--------------------------------------------------------
-SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
-100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
-Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
-http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+* Marcel Holtmann [Thu, 12 Aug 2004 at 10:19 +0200]
+<quote>
+> Hi Brendan,
+> 
+> > Does anyone know if the Toshiba SDIO Bluetooth device is supported under 
+> > Linux ?
+> > If so, what kernel version and/or what Bluez version?
+> 
+> not that I know of and Toshiba didn't sent me such a card for testing.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+> 100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+> Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+> http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+</quote>
