@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] L2CAP raw socket patch
+Subject: Re: [Bluez-devel] usb to serial verification
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Collin R. Mulliner" <collin@betaversion.net>
+To: Torez Smith <torez@us.ibm.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040210232330.4cf4935d.collin@betaversion.net>
-References: <20040210124942.393a6da0.collin@betaversion.net>
-	 <1076451408.2777.13.camel@pegasus>
-	 <20040210232330.4cf4935d.collin@betaversion.net>
+In-Reply-To: <OFFB852EAA.3DE1580F-ON87256E36.00730EA0-86256E36.00738AB6@us.ibm.com>
+References: 
+	 <OFFB852EAA.3DE1580F-ON87256E36.00730EA0-86256E36.00738AB6@us.ibm.com>
 Content-Type: text/plain
-Message-Id: <1076452346.2777.31.camel@pegasus>
+Message-Id: <1076452078.2777.24.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,16 +19,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Feb 2004 23:32:26 +0100
+Date: Tue, 10 Feb 2004 23:27:58 +0100
 
-Hi Collin,
+Hi Torez,
 
-> > BTW this patch is wrong, because we must keep the case statements.
-> > Otherwise the kernel log will be filled with unneeded error messages.
-> 
-> ups ... will make a new one and post it again.
+> is there a way to determine if your usb to serial profile is working?
 
-I already attached it to my response ;)
+there is no USB to serial profile.
+
+> I have a usb bluetooth dongle on one machine and a serial dongle
+> connected to comm1 on another machine. I am able to pair the two
+> dongles and have connected the usb dongle to /dev/rfcomm0.
+
+What kind of serial dongle is this? Normal serial dongles must be
+attached with hciattach.
 
 Regards
 
