@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Radu Maurer <a400@gmx.de>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Apple keyboard
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Radu Maurer <a400@gmx.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040211151146.GA19818@mail.gmx.de>
-References: <20040210175802.GA17705@mail.gmx.de>
-	 <1076451979.2777.21.camel@pegasus>  <20040211151146.GA19818@mail.gmx.de>
-Content-Type: text/plain
-Message-Id: <1076515215.2696.36.camel@pegasus>
+Message-ID: <20040211151146.GA19818@mail.gmx.de>
+References: <20040210175802.GA17705@mail.gmx.de> <1076451979.2777.21.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1076451979.2777.21.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,29 +17,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Feb 2004 17:00:15 +0100
+Date: Wed, 11 Feb 2004 16:11:46 +0100
 
-Hi Radu,
-
-> /var/log/daemon.log sais:
-> bthid[19500]: Bluetooth HID service started
+On Di, 10 Feb, 2004 at 23:26:19 +0100, Marcel Holtmann wrote:
+> Hi Radu,
 > 
-> then I try to connect:
-> 	bthid -c <Apple Keyboard Address>
+> > What is the method of choice to get an Apple BT keyboard running with
+> > linux?
 > 
-> I switch on the keyboard, the green LED on the back side starts to blink.
-> 
-> after a few seconds I get the message:
-> bthid[19500]: Connection failed: Function not implemented (38)
+> start here http://www.bueche.ch/comp/mx900/mx900.html
 
-this can be a paring problem, because the Apple HID devices don't allow
-unencrypted connections. Run "hcidump -w <file>" so I can see what is on
-the HCI layer.
+thanks Marcel, I followed the instructions there.
+- recompiled the 2.4.24 kernel with your patch for uinput.
+- got libs2 and utils2 from bluez cvs and compiled them
+  (as debian packages).
 
-Regards
+- made /dev/input/uinput device.
 
-Marcel
+- installed: 
+bluetooth-hci_0.1-1_i386.deb
+bluetooth-hid_0.1-1_i386.deb
+bluez-utils_0.1-1_i386.deb
+libbluetooth2-dev_0.1-1_i386.deb
+libbluetooth2_0.1-1_i386.deb
+libbluez1-dev_0.1-1_i386.deb
+libbluez1_0.1-1_i386.deb
 
+- started bthid:
+	bthid --daemon
+
+/var/log/daemon.log sais:
+bthid[19500]: Bluetooth HID service started
+
+then I try to connect:
+	bthid -c <Apple Keyboard Address>
+
+I switch on the keyboard, the green LED on the back side starts to blink.
+
+after a few seconds I get the message:
+bthid[19500]: Connection failed: Function not implemented (38)
+
+where do i go from here?
+
+thanks
+Radu
 
 
 
