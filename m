@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Installing Bluez
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41FA486F.9040000@gmx.ch>
-References: <41F81653.4030601@gmx.ch> <1106778292.28444.60.camel@pegasus>
-	 <41F81FAF.8040002@gmx.ch> <1106847147.3998.17.camel@pegasus>
-	 <41FA486F.9040000@gmx.ch>
-Content-Type: text/plain
-Message-Id: <1106933995.9644.5.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: Paul Ionescu <i_p_a_u_l@yahoo.com>
+Message-ID: <pan.2005.01.28.23.47.36.751719@yahoo.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] does anyone knows of such a bluetooth device ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,23 +16,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Jan 2005 18:39:55 +0100
+Date: Sat, 29 Jan 2005 01:47:37 +0200
 
-Hi Marco,
+Hi,
 
-> I expect it to pe for the 2.6.10 Kernel and hope that it's usuable with the 
-> 2.6.7 one...
-> How bad is the 2.6.7 patch? Wher can I download it?
+I am looking for a bluetooth serial adapter, or more precisely a half of
+a serial cable replacement, that works with a usual BT adapter on a
+PC/Laptop.
 
-the latest 2.6.7 patch includes almost the same of the Bluetooth
-subsystem that is in 2.6.8. So you miss the patches for two kernel
-releases and actually I counted them. There are 33 patches between the
-2.6.7 and 2.6.10 kernel. The ones from the patch-2.6.10-mh2 are not
-included in this count.
+Details:
+I have to connect from a computer to several RS232 serial ports of several
+equipment for configuring it. Could be routers/switches/PBX or anything
+that has a serial interface for management.
+Now, I want to use Bluetooth for configuring these devices, but not using
+the regular serial cable replacements, because usually they are symmetric,
+and require 2 BT devices, one at the managed equipment, and the other at
+the PC, and which are already paired one with the other. 
+I already have a laptop with integrated bluetooth, so I only need some
+adapters that implements the Serial Profile, and that do conversion from
+bluetooth to RS232. 
+Encryption support would be nice. 
+Powering the bluetooth  serial adapter device from the managed serial port
+is also a plus. 
+A class 2 device (10 meters) is enough.
 
-Regards
+If anybody knows of such a device, or something close to it, I'd
+appreciate some pointers to it.
 
-Marcel
+Thanks,
+Paul Ionescu
 
 
 
