@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <200501310806.ALV29436@ms12.netsolmail.com>
-From: Chris Taylor <cht@imipolex-g.com>
-Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Bluez-users] Trouble with USB hub.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <8616e2cf0501302048435f028b@mail.gmail.com>
+References: <8616e2cf0501302048435f028b@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1107147488.7801.5.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +18,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 Jan 2005 00:06:24 -0800
+Date: Mon, 31 Jan 2005 05:58:08 +0100
+
+Hi Roderick,
+
+> I am having trouble with my CSR based bluetooth dongle and my USB hub.
+> I am using FC2, kernel version 2.6.10-1.9_FC2
+> 
+> /var/log/messages 
+> says
+> 
+> Jan 31 11:32:22 localhost kernel: usb 1-2.1: new full speed USB device
+> using ehci_hcd and address 7
+> Jan 31 11:32:23 localhost hcid[2895]: HCI dev 0 registered
+> Jan 31 11:32:23 localhost hcid[5297]: Can't init device hci0.
+> Input/output error(5)
+> Jan 31 11:32:23 localhost kernel: hci_usb_intr_rx_submit: hci0 intr rx
+> submit failed urb cff4db94 err -28
+> 
+> hciconfig hci0 up
+> says the same thing
+> 
+> Can't init device hci0. Input/output error(5)
+> 
+> The dongle works fine if I don't use the hub.  
+
+known problem, but I don't have a solution. For me this looks like a USB
+problem and you might wanna ask the USB guys for help.
+
+Regards
+
+Marcel
 
 
->this can only mean that the libusb developer package is not installed.
->Check when you call configure for something like:
->
->checking usb.h usability... yes
->checking usb.h presence... yes
->checking for usb.h... yes
->checking for usb_open in -lusb... yes
->checking for usb_get_busses in -lusb... yes
->checking for usb_interrupt_read in -lusb... yes
-
-Aha! I installed the libusb developer package and the firmware utility 
-installed and it work fine now! Thanks for your help.
 
 
 -------------------------------------------------------
