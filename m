@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Bc. Michal Semler" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] A new Microsoft's transceiver!
-References: <200409101056.29447.cijoml@volny.cz> <1094822572.5311.3.camel@notepaq>
-In-Reply-To: <1094822572.5311.3.camel@notepaq>
+From: "pat" <pat@xvalheru.org>
+To: "BlueZ" <bluez-users@lists.sourceforge.net>
+Message-Id: <20040910155027.M37511@xvalheru.org>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200409101415.44114.cijoml@volny.cz>
+	charset=iso-8859-1
+Subject: [Bluez-users] newbe: rfcomm_recv_frame: bad checksum in packet
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,34 +16,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Sep 2004 14:15:44 +0200
+Date: Fri, 10 Sep 2004 17:57:09 +0200
 
-Only answer is F**K :(
+Hi All,
 
-Michal :)
+I have installed the BlueZ to my laptop because I want to use GPRT through the
+Bluetooth. I have scripts and the rest configured and I'm able to connect and
+upload some data, but within 30 seconds the connection go down. The system log
+contains only this line "rfcomm_recv_frame: bad checksum in packet". Could
+someone help me ???
 
-Dne p=E1 10. z=E1=F8=ED 2004 15:22 jste napsal(a):
-> Hi Michal,
->
-> > In Microsofts very good demo:
-> > http://www.microsoft.com/hardware/mouseandkeyboard/features/docs/blueto=
-ot
-> >h.html
-> >
-> > is shown a new transceiver! It should be 1.2 compatible and we should t=
-ry
-> > upgrade an old one!
-> >
-> > Marcel maybe it's chance for you to get back working your destroyed
-> > transceiver
->
-> the good news are that it is Bluetooth 1.2 compatible, but the bad one
-> is that it uses a Broadcom chip and so there is no chance to update the
-> old one.
->
-> Regards
->
-> Marcel
+Slackware 10; 2.4.26 from distribution
+MSI Bluetooth pc2pc
+bluez-firmware-1.0.tar.gz
+bluez-hcidump-1.11.tar.gz
+bluez-hciemu-1.0.tar.gz
+bluez-libs-2.10.tar.gz
+bluez-pin-0.23.tar.gz
+bluez-utils-2.10.tar.gz
+Nokia 6230
+
+Thanks to all
+
+     Pat
+
 
 
 -------------------------------------------------------
