@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200412091507.44608.wim.delvaux@adaptiveplanet.com>
-Subject: [Bluez-users] bluez freezes kernel on Ipaq
+Subject: Re: [Bluez-users] BT unter SuSE 9.2
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAPFR022I+ek2ATkOW7ZKVBgEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAPFR022I+ek2ATkOW7ZKVBgEAAAAA@t-online.de>
+Content-Type: text/plain
+Message-Id: <1102599865.9988.210.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,15 +19,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 9 Dec 2004 15:07:44 +0100
+Date: Thu, 09 Dec 2004 14:44:25 +0100
 
-Hi all,
+Hi Peter,
 
-it looks like if you perform bluez actions (which I do not know) from two 
-different applications at the same time, there are chances that the kernel 
-freezes (i.e. complete hang of the system even with serial console connected.
+> ##>maybe you simply have to run YaST once and activate Bluetooth.
+> 
+> In the meantime, I'm able to establish a connection to teh Bluetooth-Modul.
+> I solved the problem by the boot-command pci=noapci
 
-W
+to what? Either it is "noapic" or "noacpi".
+
+> after this I was able to start dmabt and now, the bluetooth-function of my
+> notebook is identified by kbluetoothd! What is to be done in order to start
+> dmabt automatically on the right time?
+
+Do you configured it with YaST? Otherwise the deamons might not start
+and don't forget to set your PIN.
+
+> ##>
+> ##>> At the moment I'm working with Windows, also connected by the 
+> ##>> BT-device to my network.
+> 
+> But, when I try to find the use the LAN-Service of the BT-Accesspoint I get
+> get teh message
+> Authorization failure
+> 
+> The BT-accesspoint is asking for a PIN and I think it's acting as a master.
+> So I'm not able to send the right PIN. I changed in hcid.conf the PIN-asking
+> from auto to none and user, witout any success. The BT-accesspoint requires
+> a PIN, it is not possible to set this routine out of function.
+
+Don't touch it. Check with "hcidump -X" what is going on.
+
+Regards
+
+Marcel
+
 
 
 
