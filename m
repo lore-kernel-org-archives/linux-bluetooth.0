@@ -1,33 +1,54 @@
-Return-Path: <pavouk@pavouk.org>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-users] MSI MS-6970 (BToes) firmware upgrade
-Date: Thu, 15 Jul 2004 21:59:46 +0200
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-References: <200407131225.15448.pavouk@pavouk.org> <1089826413.4517.4.camel@pegasus>
-In-Reply-To: <1089826413.4517.4.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200407152159.47024.pavouk@pavouk.org>
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Unknown HCI packet type / 3CRWB6096B
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jan Sykora <Jan.Sykora@fel.cvut.cz>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <40F65E84.3020104@fel.cvut.cz>
+References: <40F3BD15.30908@fel.cvut.cz> <1089826519.4517.7.camel@pegasus>
+	 <40F65E84.3020104@fel.cvut.cz>
+Content-Type: text/plain
+Message-Id: <1089888965.3569.24.camel@notepaq>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 15 Jul 2004 12:56:05 +0200
 
-Hi,
+Hi Jan,
 
-> > Where can I get firmware upgrade for MSI MS-6970 (BToes) USB dongle?
-> > I looked at manufacturer pages and google, but nothing.
->
-> do you got a *.dfu file for your dongle from MSI?
+> Unfortunately it did not help. I have now
+> 
+> kppp with CRTSCTS flow control and
+> 
+> hciattach /dev/ttyS17 any 115200 flow
+> 
+> and I am getting the same error messages.
+> 
+> Do you have any other hints? Thanks.
 
-Yes, I have file fw525.dfu from original installation CD.
-File is available for example here:
-http://home.online.no/~edg-edva/fw525.dfu
+the best would to switch the CSR chip into BCSP mode and us this. I
+don't own the version 3.0 of that card, so I can't do any tests.
 
-On web is available newer software, but without newer firmware.
-Only firmware updater software, but without *.dfu file.
+Regards
 
-Windows software tells me, that I have 525 firmware in my dongle.
+Marcel
 
-Best regards,
 
-Pavel Ruzicka
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by BEA Weblogic Workshop
+FREE Java Enterprise J2EE developer tools!
+Get your free copy of BEA WebLogic Workshop 8.1 today.
+http://ads.osdn.com/?ad_id=4721&alloc_id=10040&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
