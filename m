@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41E85F57.10504@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] recording btsco traffic
-References: <pan.2005.01.14.18.04.15.317521@yahoo.com>
-In-Reply-To: <pan.2005.01.14.18.04.15.317521@yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: Paul Ionescu <i_p_a_u_l@yahoo.com>
+Message-ID: <pan.2005.01.14.23.44.15.944533@yahoo.com>
+References: <pan.2005.01.14.17.46.40.72959@yahoo.com> <41E853A9.5030304@xmission.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] Re: btsco and Jabra BT 110 experience
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,32 +17,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 14 Jan 2005 17:09:59 -0700
+Date: Sat, 15 Jan 2005 00:44:18 +0100
 
-Paul
+Hi Brad,
 
-> Is it possible to record a phone conversation with btsco ?
-> Like dumping all in and out traffic in a big stereo .wav file, where left
-> channel should be incoming traffic and right channel should be outgoing
-> traffic.
-> I mean, btsco already sees this traffic, how hard would be to save it in
-> also in a file ?
+I appended some info bellow.
+For some reason, btsco does not work with specified channel, but btsco2
+does.
+
+here is the info without specified channel:
+ ./btsco 00:07:A4:1D:FB:56
+Device is 1:0
+Voice setting: 0x0060
+RFCOMM channel 1 connected
+recieved AT+CKPD=200
+opened hwdep
+connected SCO channel
+Setting sco fd
+Done setting sco fd
+recieved AT+VGS=15
+Sending up speaker change 15
+
+
+and with specified channel (using btsco2 as btsco does not work here):
+ ./btsco2 00:07:A4:1D:FB:56 2
+Device is 1:0
+Voice setting: 0x0060
+RFCOMM channel 2 connected
+recieved AT+BRSF=24
+recieved AT+CIND=?
+opened hwdep
+connected SCO channel
+Setting sco fd
+Done setting sco fd
+
+
+
+On Fri, 14 Jan 2005 16:20:09 -0700, Brad Midgley wrote: 
+> it sounds like you're saying the automatic channel detection incorrectly
+> chooses channel 1 instead of 2. can you tell me what btsco prints out when
+> it's launched without the channel specified?
 > 
-> Or this can be done with some ALSA magic ? Some routing of both incoming
-> and outgoing audio to a virtual alsa device from which one can record ?
+> Brad
 
-is your phone conversation using a voip application on the computer?
 
-currently you'd have to get your voip app to record the call.
-
-if we get everything moved into userspace, you could modify the alsa 
-driver to do stuff like that.
-
-i don't know if there's an alsa trick. maybe one of their userspace 
-drivers can act like a man-in-the-middle between your voip app and the 
-btsco kernel driver.
-
-Brad
 
 
 -------------------------------------------------------
