@@ -1,88 +1,57 @@
-Return-Path: <maxk@qualcomm.com>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Qualification Testing
-From: Max Krasnyansky <maxk@qualcomm.com>
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
 To: Daryl Van Vorst <daryl@wideray.com>
-Cc: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Cc: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <000301c31656$73bb2930$5796fea9@baked>
 References: <000301c31656$73bb2930$5796fea9@baked>
 Content-Type: text/plain
-Message-Id: <1052514852.10457.163.camel@localhost.localdomain>
+Message-Id: <1052505389.1214.74.camel@pegasus.local>
 Mime-Version: 1.0
-Date: 09 May 2003 14:15:04 -0700
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 09 May 2003 20:36:21 +0200
 
-On Fri, 2003-05-09 at 11:11, Daryl Van Vorst wrote:
-> > > >>         3.) TP/COS/CFD/BV-02: Tests that IUT is able to perform 
-> > > >> negotiation while the tester rejects the configuration of a data 
-> > > >> channel. The IUT sends a configuration request and the tester 
-> > > >> rejects it. The IUT should send another configuration 
-> > request, but 
-> > > >> it does not.
-> > > >
-> > > >Currently the channel is closed if they reject our config request, 
-> > > >because we don't know how to proceed if they don't like 
-> > our settings. 
-> > > >We can sent them again, but they will be rejected again. For this 
-> > > >case I also have to read the L2CAP in detail.
-> > > Yeah we talked about that. Test is stupid. I'm not sure how to fix 
-> > > that without
-> > > affecting general logic. 
-> > 
-> > I put this to the last item on the list. At the moment I 
-> > don't care, but I will spent some time to look at it.
-> 
+Hi Daryl,
+
 > Not sure if you saw a slightly more recent post from me.  The test isn't
 > quite as stupid as it seems. When the tester rejects the config request, it
 > gives desired configuration values inside that response. We're supposed to
 > return those values in the next config request (providing we like them well
 > enough). It'll accept those values. This behaviour makes sense to me now.
 > Thoughts?
-It's still stupid :).
-First of all there is an inconsistency between core spec and test spec.
-Core spec says that response to config reject is implementation specific
-and implementation may chose to close the channel. So test spec has
-test case to test _implementation specific_ thing :)
-It also doesn't make much sense if you think about real applications.
 
-> > > >>         4.) TP/COS/RCO/BI-01, BI-02: These tests verify that the 
-> > > >> IUT performs a consistency check on the data. Both tests 
-> > send two 
-> > > >> packets to the IUT. In each test, the first packet has a 
-> > mistake. 
-> > > >> In BI-01 the first packet is too short by one byte, and in BI-02 
-> > > >> the first packet is too long by one byte. In both cases 
-> > the stack 
-> > > >> must correctly receive the second packet, but not the first. The 
-> > > >> data should be discarded in the case of the 
-> > inconsistencies, and an 
-> > > >> error reported to the application.
-> > > >
-> > > >It seems that we can't handle this case complete correctly, if the 
-> > > >data was put only in one fragment. But in the basics this 
-> > should work 
-> > > >and the malformed packets should be dropped. Did you have 
-> > a detailed 
-> > > >log of this test which shows us byte by byte which request 
-> > was sent?
-> > > Hmm, how should we return error to the application. Most socket app 
-> > > close
-> > > the socket than read() returns error. i.e. Even if we fix 
-> > the kernel to
-> > > return some BT specific error, test will fail on other apps 
-> > which will 
-> > > simply close the socket.
-> > > Also are those corrupted data packets or signaling packets ?
-> > > If signalling we're not supposed to return error to all 
-> > L2CAP apps are we ? ;-)
-> > 
-> > The test should pass if we correctly drop those wrong 
-> > packets. But we need to see how the test acts. We need a 
-> > "hcidump -w <file>". 
-> 
+I have seen your post, but I don't have started to look deeper into it.
+
 > I sent a raw HCI dump for the two test cases in another message to the list
 > yesterday. Is that enough information?
-Should be enough. I think I found a bug in that code. We'd incorrectly
-handle that case when received l2cap frame is larger than length in the
-header. I'll fix that.
 
-Max 
+Please send me the binary dump file, because it is easier for me to work
+with it.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+Enterprise Linux Forum Conference & Expo, June 4-6, 2003, Santa Clara
+The only event dedicated to issues related to Linux enterprise solutions
+www.enterpriselinuxforum.com
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
