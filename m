@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hci.c  hacked
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY104-F16C20570F646F1FC09FE46C1990@phx.gbl>
-References: <BAY104-F16C20570F646F1FC09FE46C1990@phx.gbl>
-Content-Type: text/plain
-Message-Id: <1104148357.20913.32.camel@justakiss>
+Message-ID: <BAY104-F16C20570F646F1FC09FE46C1990@phx.gbl>
+From: "blookk -" <blookk@hotmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Subject: [Bluez-users] hci.c  hacked
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +16,65 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 27 Dec 2004 12:52:37 +0100
+Date: Mon, 27 Dec 2004 11:36:54 +0000
 
-Am Mon, den 27.12.2004 schrieb blookk - um 12:36:
-> Hello Marcel!
-> 
-> When I compiled the BlueZ for ARM7TDMI with uclibc 0.9.19  I detect a 
-> problem in "hci.c" . In "poll" call because seems that my arquitecture 
-> doesn't support this call. I modified the "hci.c" and use "select" instead 
-> of "poll". The modification is this:
-> 
-The "poll" system call is unsupported in uClinux-2.0. With 2.4, it works
-fine. If you are using 2.0, you can't use Bluez anyway.
 
-Regards,
-Erwin
+Hello Marcel!
+
+When I compiled the BlueZ for ARM7TDMI with uclibc 0.9.19  I detect a 
+problem in "hci.c" . In "poll" call because seems that my arquitecture 
+doesn't support this call. I modified the "hci.c" and use "select" instead 
+of "poll". The modification is this:
+
+		if (to) {
+			struct pollfd p;
+			int n;
+
+			//p.fd = dd; p.events = POLLIN;
+
+			n = select( dd + 1, &temp_rfds, NULL, NULL, &tv );
+			printf("Descriptor in select: %d\n",n);
+			printf("timeover: %d\n",to);
+			switch( n )
+			{
+			    case -1: // Error
+			        goto failed;
+				break;
+
+			    case 0:  // Timeout
+			        continue;
+				break;
+
+			    default: // Data...
+			        printf( "The file descriptor with data\n" );
+				if( FD_ISSET( dd, &temp_rfds ) )
+				{
+				     printf( "The file descriptor was signaled\n" );
+				}
+				break;
+			}
+
+			//while ((n = poll(&p, 1, to)) < 0) {
+			//printf("(4.3.4)\n");
+			//	if (errno == EAGAIN || errno == EINTR)
+			//		continue;
+			//	goto failed;
+			//}
+
+			//if (!n) {
+			//	errno = ETIMEDOUT;
+			//	goto failed;
+			//}
+
+			to -= 10;
+			if (to < 0) to = 0;
+
+		}
+
+with this changes the program don't work , but I don't know why.
+Do you know where is the problem?
+
+Regards.
 
 
 
