@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Question for the Mailing List
+Subject: Re: [Bluez-users] SuSE 9.1 Pro and Epox Barton wireless desktop
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Monika Hubrich <monikahubrich@aol.com>
+To: Ulrich Wisser <u.wisser@publisher.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <001601c47a50$36024fb0$8b1cb7ac@monika>
-References: <001601c47a50$36024fb0$8b1cb7ac@monika>
+In-Reply-To: <1091648489.4237.2.camel@dorette.Entenhausen>
+References: <1091568946.3759.18.camel@dorette.Entenhausen>
+	 <1091569567.16182.36.camel@pegasus>
+	 <1091648489.4237.2.camel@dorette.Entenhausen>
 Content-Type: text/plain
-Message-Id: <1091662770.16182.91.camel@pegasus>
+Message-Id: <1091661690.16182.74.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,34 +20,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Aug 2004 01:39:30 +0200
+Date: Thu, 05 Aug 2004 01:21:30 +0200
 
-Hi Monika,
+Hi Ulrich,
 
-> I use suse linux 8.2 since one week.
+> > > has anybody got that combination running?
+> > > When I plug in my BT-DG03BF USB bluetooth dongle "hcitool dev" does not
+> > > show any device. Please find the /var/log/messages below.
+> > > 
+> > > Any idea how to get the dongle working? The keyboard and mouse?
+> > 
+> > the dongle of the Barton desktop is a HID proxy dongle. You must run
+> > hid2hci first before you will see it with hciconfig.
 > 
-> Can anybody help me, to go online with the pcmcia-card from pico
-> (sphinx) and the bluetooth-modem (sphinx-electronics).
-> There are lots of questions:
-> works the connection between the pcmcia-card (pico) and the
-> bluetooth-modem (pico-sphinx)?
-> My modem requires the pin 12345 for the first connection between the
-> pcmcia-card and the modem. 
-> How can I send this pin to the modem? (How can I communicate between
-> the pcmcia-Card and the modem? e.a. for the internet-connection)
->   
-> I've already added my pico-card to the file /etc/pcmcia/config.
-> 
-> But what must I do now?
+> which I would love to do, but it seems the SuSE 9.1 Pro does not include
+> the hid2hci tool.
 
-check that your card works correctly. Do this with "hciconfig -a". If it
-is shown, then start "hcid" and call "rfcomm connect 0 <bdaddr> 1".
+that's maybe true. However the upcoming SuSE 9.2 will include it ;)
 
-For more information look at the mailing list archives and check my
-articles and slides:
+> Can I download and compile from SF or do I need to upgrade all bluez
+> packages in that case?
 
-	http://www.holtmann.org/papers/bluetooth/uptimes2003.html
-	http://www.bluez.org/talks.html
+It should be possible to compile only hid2hci. Download bluez-utils-2.9
+and run configure. Make sure that the USB library is installed. Then
+change to the tools directory and type "make hid2hci". Then you should
+get the hid2hci binary that you can copy everywhere you like.
 
 Regards
 
