@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Peter Wippich <pewi@gw-instruments.de>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <Pine.LNX.4.33.0412011855510.2707-100000@redbean.intranet.gw-instruments.de>
+Message-ID: <41AE065F.9040601@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] Cross Compile Blues ....
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] btsco2
+References: <200412010839.06669.mailsp@sebastian-eichner.de>	 <200412010943.33419.mail@sebastian-eichner.de>	 <1101894192.18840.44.camel@pegasus>	 <200412011224.29191.mail@sebastian-eichner.de>  <41ADAC67.10706@suche.org>	 <1101901302.18840.72.camel@pegasus>  <41ADB1C2.8070805@suche.org> <1101902920.18840.79.camel@pegasus> <41ADD32D.2060502@suche.org>
+In-Reply-To: <41ADD32D.2060502@suche.org>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,45 +18,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 1 Dec 2004 19:08:12 +0100 (CET)
+Date: Wed, 01 Dec 2004 10:58:55 -0700
 
+Thomas
 
-Dear All,
+> a) How should btsco2 Handle Multiple Headset in the Parameter ?
+> - ./btsco2 <mac1> <mac2> <mac3>
+> - ./btsco2 <mac1> -1 <mac2> 1 <mac3> 2
+> Where -1 in the Channel Parameter stand for Autodetec
 
-I'm trying to cross compile bluez-libs / utils (Vers. 2.11). Actually, I
-can compile fine, but I've the following problems:
+the argument list is fine, but this is showing how we need to improve 
+things. btsco needs to be split into three parts:
 
-a) when I compile the libraries I'm unable to find a configure which
-allows me to have the libraries installed on the the build system but with
-a load path of the target system (/usr/lib). Here is the configure I use
+* connection processor: keep saved state about what headsets are paired, 
+available, connected, alsa device mappings, etc. We should get it to add 
+a new headset while it's running via dbus events. (We will have to get 
+it to talk to dbus for connect/disconnect events and control anyway)
 
-./configure --prefix=$XPREFIX --host=$TARGET --build=i686-pc-linux-gnu \
-            --with-kernel=$LINUX_DIR \
-            --libdir=$XPREFIX/lib --includedir=$XPREFIX/include
+* audio processor: the audio processing part of btsco will need to be 
+separated out and put into alsa-lib.
 
-where XPREFIX is the path to the target root file system on my build
-system, TARGET is arm-linux  LINUX_DIR is the path to the linux sources
-for the target system. What I need is some configuration which installs
-the library files in $XPREFIX/lib and builds the libraries for RUN PATH
-/lib. Does anybody know how t get this working ????
+* gui for telling the connection processor to 
+discover/add/delete/connect/disconnect to a service on a headset
 
-b) the same problem occurs with the CONFIGDIR define in config.h.
-It is always set to $XPREFIX/etc/bluetooth
-instead of just /etc/bluetooth
+> c) Is there any Plan to allow th BT-SCO Sound driver in kernel Space to 
+> handle mor than one bluetooth as sound device.
+> Nice would be an option to tell the driver how many sound device he 
+> sould allocate.
 
-Any help is very welcome !!!
+it's been talked about. I don't exactly understand the problem so I 
+pasted the discussion into the sourceforge bug item.
 
-Thank you and best regards,
+> Fixed Problems from btsco:
+> 1) If headset is not available on start the server try to connect it 
+> every 3 seconds
+> Open:
+> 1) Detect if headset disconnects and close sco/rfcomm socket and tell 
+> the kernel space
+> 2) An rfcomm listener for inbound connections where headset initiate the 
+> connection.
 
-Peter
+fine.
 
-
-|	Peter Wippich 			Voice: +49 30 46776411		|
-|	G&W Instruments GmbH		fax:   +49 30 46776419		|
-|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
-|	D-13355 Berlin  / Germany					|
-
-
+brad
 
 
 -------------------------------------------------------
