@@ -1,15 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Re: pand connection to XP SP2 fails
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1103113315.4099.118.camel@justakiss>
+From: Erwin Authried <eauth@softsys.co.at>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <1103110592.2143.218.camel@pegasus>
 References: <1103024795.4097.65.camel@justakiss>
 	 <1103024932.2143.156.camel@pegasus> <1103025459.4095.68.camel@justakiss>
 	 <cpmnro$2p5$1@sea.gmane.org>  <1103036073.4095.101.camel@justakiss>
 	 <1103107355.2143.185.camel@pegasus>  <1103110263.4099.109.camel@justakiss>
-	 <1103110592.2143.218.camel@pegasus>  <1103113315.4099.118.camel@justakiss>
+	 <1103110592.2143.218.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1103113688.2143.232.camel@pegasus>
+Message-Id: <1103113315.4099.118.camel@justakiss>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -22,22 +22,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 15 Dec 2004 13:28:08 +0100
+Date: Wed, 15 Dec 2004 13:21:55 +0100
 
-Hi Erwin,
+Am Mit, den 15.12.2004 schrieb Marcel Holtmann um 12:36:
+> Hi Erwin,
+> 
+> > yes, this works fine (with pand --service PANU ...).
+> 
+> please do a "sdptool browse|search ..." with the --tree option. May we
+> can get the service from the SDP record and use a good default. Does a
+> simple "pand --connect ..." without any extra options work for you?
+> 
+> Regards
+> 
+> Marcel
 
-> a simple "pand --connect ..." doesn't work, it results in the 
-> "Protocol error(71)" from pand. It seems that pand defaults to remote
-> service "NAP", I wonder if there is (or should be) some kind of fallback
-> mechanism  that tries GN and PANU as well.
+a simple "pand --connect ..." doesn't work, it results in the 
+"Protocol error(71)" from pand. It seems that pand defaults to remote
+service "NAP", I wonder if there is (or should be) some kind of fallback
+mechanism  that tries GN and PANU as well.
 
-there is no need for a fallback. We should simply use the information
-from the SDP search if nothing else is specified on the command line.
-Will anyone volunteer to look at this and create a patch?
-
-Regards
-
-Marcel
+Regards,
+Erwin 
 
 
 
