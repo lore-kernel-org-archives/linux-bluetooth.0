@@ -1,13 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Reply-To: <ag@new-media-artists.de>
-From: "Andreas Gaufer" <ag@new-media-artists.de>
-To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-Subject: AW:  [Bluez-devel] Device Busy during "hcitool info" or  "sdptoolsearch"
-Message-ID: <FJENILNPNAGPJMMDOKDCEEKKDJAA.ag@new-media-artists.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Subject: Re: [Bluez-devel] Device Busy during "hcitool info" or
+	"sdptoolsearch"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Steven Singer <steven.singer@csr.com>
+Cc: ag@new-media-artists.de,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <3FE0C1B9.5090504@csr.com>
+References: <FJENILNPNAGPJMMDOKDCKEKBDJAA.ag@new-media-artists.de>
+	 <3FE0C1B9.5090504@csr.com>
+Content-Type: text/plain
+Message-Id: <1071699104.21804.77.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,24 +21,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 18 Dec 2003 01:50:20 +0100
+Date: Wed, 17 Dec 2003 23:11:44 +0100
 
-Hi Steven, Marcel, List,
+Hi Steven,
 
->In your case, the correct response to having your inquiry rejected is
->to back off for a few seconds and try again - either that, or find some
->way of sharing access to the device.
+> The create_connection-inquiry restriction is there because both
+> procedures need to get as much radio bandwidth as possible to work. In
+> particular, taking bandwidth away from paging can cause spurious failed
+> connections. In this case, create_connection wins. If you issue a
+> create_connection while an inquiry is in progress, we will terminate
+> the inquiry with an inquiry_complete event and start paging
+> immediately.
 
-Sounds good to me, im actualy handling it like this. The only problem is if
-a device is in range that does not respond to the connection attemt will
-make the device unusable for inquiry until the connection attemt times out.
+this is a nice thing/feature to know. Is it documented anywhere in the
+firmware release notes?
 
-Who decides when to timeout? I guess the host, so where can i configure
-these timeouts?
+Regards
 
-Greetings
+Marcel
 
-Andreas
 
 
 
