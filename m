@@ -1,83 +1,183 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20040616112702.GA898@kone>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="4Ckj6UjgE2iN1+kY"
-Subject: [Bluez-devel] D-BUS fixes for hcid
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 16 Jun 2004 14:27:02 +0300
-
-
---4Ckj6UjgE2iN1+kY
+Return-Path: <dyonutz@yahoo.com>
+Message-ID: <20040616111157.53863.qmail@web50904.mail.yahoo.com>
+Date: Wed, 16 Jun 2004 04:11:57 -0700 (PDT)
+From: ionut dediu <dyonutz@yahoo.com>
+Subject: Re: [Bluez-devel] Problem with read on RFCOMM Sockets
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1087339769.13792.106.camel@pegasus>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
+Hi
 
-There are some problems with the current D-BUS pin-request handling in
-hcid. The attached patch tries to address those.
+Here is the source code. For testing the receiving of
+data I tried commenting the select loop, and do just
+receiveData, and I get the same results: read returns
+the correct number of bytes, but in the buffer is
+copied just one byte of data. Please tell me if I'm
+doing smth wrong. Thanks a lot.
 
-Also, the bluez-pin package will need to provide a D-BUS service file
-(bluez.service) so that the D-BUS daemon can activate it when needed.
-This file goes usually in /usr/lib/dbus-1.0/services and it's contents
-should be something like the following:
+#include <unistd.h>
+#include <syslog.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
-[D-BUS Service]
-Name=org.bluez.PinAgent
-Exec=/usr/bin/bluez-pin
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/select.h>
 
-You'll also need the following line in /etc/dbus-1/system.conf (at least
-the debian package of D-BUS doesn't have it):
-<servicedir>/usr/lib/dbus-1.0/services</servicedir>
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/rfcomm.h>
 
-br,
-Johan
+#define BT_LOCAL_ADDR "00:0C:76:D3:4C:D3"
+#define BT_REM_NOKIA_ADDR "00:60:57:D2:27:66"
 
---4Ckj6UjgE2iN1+kY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="hcid-dbus.diff"
+#define DIM 256
+#define STDIN 0
+#define STDOUT 1
 
---- dbus.c.orig	2004-06-16 13:57:51.000000000 +0300
-+++ dbus.c	2004-06-16 14:05:51.000000000 +0300
-@@ -75,7 +75,8 @@
- 
- 	message = dbus_pending_call_get_reply(call);
- 
--	if (dbus_message_is_error(message, WRONG_ARGS_ERROR))
-+	if (message == NULL ||
-+	    dbus_message_get_type(message) == DBUS_MESSAGE_TYPE_ERROR)
- 		goto error;
- 
- 	dbus_message_iter_init(message, &iter);
-@@ -131,6 +132,8 @@
- 	dbus_message_iter_append_byte_array(&iter,
- 			(unsigned char *) &ci->bdaddr, sizeof(ci->bdaddr));
- 
-+	dbus_message_set_auto_activation(message, TRUE);
-+
- 	if (dbus_connection_send_with_reply(connection, message,
- 						&pending, TIMEOUT) == FALSE) {
- 		syslog(LOG_ERR, "D-BUS send failed");
+char userBuf[DIM];
+char remoteBuf[DIM];
 
---4Ckj6UjgE2iN1+kY--
+int clientSocket = 0;
+
+int do_connect(char * remAddr)
+{
+	struct sockaddr_rc rem_addr, loc_addr;
+	int s;
+
+	if ((s = socket(PF_BLUETOOTH, SOCK_STREAM,
+BTPROTO_RFCOMM)) < 0) {
+		syslog(LOG_ERR, "Can't create socket. %s(%d)",
+strerror(errno), errno);
+		return -1;
+	}
+
+	memset(&loc_addr, 0, sizeof(loc_addr));
+	loc_addr.rc_family = AF_BLUETOOTH;
+	str2ba(BT_LOCAL_ADDR, &loc_addr.rc_bdaddr);
+	if (bind(s, (struct sockaddr *) &loc_addr,
+sizeof(loc_addr)) < 0) {
+		printf("Can't bind socket. %s(%d)", strerror(errno),
+errno);
+		exit(1);
+	}
+
+	memset(&rem_addr, 0, sizeof(rem_addr));
+	rem_addr.rc_family = AF_BLUETOOTH;
+	baswap(&rem_addr.rc_bdaddr, strtoba(remAddr));
+	rem_addr.rc_channel = 4;
+	if (connect(s, (struct sockaddr *)&rem_addr,
+sizeof(rem_addr)) < 0 ) {
+		printf("Can't connect. %s(%d)\n", strerror(errno),
+errno);
+		close(s);
+		return -1;
+	}
+
+	printf("Connected\n");
+
+	return s;
+
+}
+
+int receiveData()
+{
+	int noBytesRead = 0;
+	memset(remoteBuf, 0, DIM);
+	noBytesRead = read(clientSocket, remoteBuf, DIM);
+	if(noBytesRead == -1)
+	{
+		printf("Can't read. %s(%d)\n", strerror(errno),
+errno);
+		exit(-1);
+	}
+	if(noBytesRead == 0)
+	{
+		printf("Disconnected\n");
+		exit(0);
+	}
+	printf("REMOTE[%d](strlen = %d) : %s\n", noBytesRead,
+strlen(remoteBuf), remoteBuf);
+	return noBytesRead;
+//	write(STDOUT, buf, strlen(buf));
+}
+
+int sendData()
+{
+	memset(userBuf, 0, DIM);
+	read(STDIN, userBuf, DIM);
+	if(write(clientSocket, userBuf, strlen(userBuf)) !=
+strlen(userBuf))
+	{
+		printf("Can't write. %s(%d)\n", strerror(errno),
+errno);
+		return -1;
+	}
+	return 0;
+}
+
+int main(int argc, char** argv)
+{
+	fd_set read_fds;	//fd_set used in select()
+	fd_set tmp_fds;		//fd_set temporary fds
+	int fdmax;		//maximum no of file descriptors
+	int i = 0;
+
+	clientSocket = do_connect(BT_REM_NOKIA_ADDR);
+	FD_SET(clientSocket, &read_fds);
+	FD_SET(STDIN, &read_fds);
+	fdmax = clientSocket;
+/*	while(1)
+	{
+		receiveData();
+	}*/
+	// main loop
+	while(1)
+	{
+		tmp_fds = read_fds;
+		if(select(fdmax + 1, &tmp_fds, NULL, NULL, NULL) ==
+-1)
+		{
+			printf("ERROR in select. %s(%d)\n",
+strerror(errno), errno);
+			exit(errno);
+		}
+		else
+		{
+			for(i = 0; i <= fdmax; i++)
+			{
+				if(FD_ISSET(i, &tmp_fds))
+				{
+					// received data from the bluetooth end point
+		    			if(i == clientSocket)
+					{
+						receiveData();
+					}
+					// received input data from the user
+					if(i == STDIN)
+					{
+						sendData();
+					}
+				}
+			}
+		}
+	}
+
+	close (clientSocket);
+	return 0;
+}
 
 
--------------------------------------------------------
-This SF.Net email is sponsored by The 2004 JavaOne(SM) Conference
-Learn from the experts at JavaOne(SM), Sun's Worldwide Java Developer
-Conference, June 28 - July 1 at the Moscone Center in San Francisco, CA
-REGISTER AND SAVE! http://java.sun.com/javaone/sf Priority Code NWMGYKND
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
+	
+		
+__________________________________
+Do you Yahoo!?
+New and Improved Yahoo! Mail - 100MB free storage!
+http://promotions.yahoo.com/new_mail 
