@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth 1.2 and HID Proxy
+Subject: Re: [Bluez-users] Connects... Then disconnects
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
+To: Ned Lowe <ned@nedlowe.co.uk>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200406061210.52170.cijoml@volny.cz>
-References: <1086429803.16316.44.camel@pegasus>
-	 <200406052338.15162.cijoml@volny.cz> <1086476014.16316.129.camel@pegasus>
-	 <200406061210.52170.cijoml@volny.cz>
+In-Reply-To: <000101c44b92$64dcb1f0$0202a8c0@chumpi>
+References: <000101c44b92$64dcb1f0$0202a8c0@chumpi>
 Content-Type: text/plain
-Message-Id: <1086536540.4765.35.camel@pegasus>
+Message-Id: <1086534440.4765.2.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,73 +18,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 06 Jun 2004 17:42:20 +0200
+Date: Sun, 06 Jun 2004 17:07:20 +0200
 
-Hi Michal,
+Hi Ned,
 
-> > currently I am preparing a site with notes about firmware upgrade and
-> > DFU. I will also summarize the public statements of the CSR signature
+> I was hoping you could help me with a rather annoying problem I am
+> experiencing.
 > 
-> Site is nice, but you should provide screenshoots of steps how to use MacOS to 
-> extract that firmware. Many people (including me) don't know how to work with 
-> MacOS :)
-
-I don't either. Can anyone with Mac OS X write some small words how to
-extract GenericCSR.dfu from the BluetoothFWUpdate1.1.dmg file?
-
-Btw the best way is to reverse engineer the Apple UDIF disk image format
-and provide an open source tool for it.
-
-> > and so on. However don't expect a howto for getting firmware from one
-> > device into another. I am not concerned in upgrading of any dongle,
-> > because today an USB Bluetooth dongle is so cheap that you can buy
-> > yourself a new one if the firmware is too old. I paid 14 EUR for my
-> > D-Link dongle at eBay. 
+> I have just set up the Belkin F8T003 Bluetooth USB Adapter under
+> Mandrake 10.0.  I am trying to connect (not simultaneously) to two
+> machines, one XP and the other an Apple PowerBook.
 > 
-> This is bad way. We as customers should make a preasure to vendors to allow us 
-> upgrade our devices for free! I better spend my 14 euros in cinema with my 
-> girl :) When device allow me to upgrade it's functionality, vendors should 
-> allow us to do it. And if not, other vendors will support us and then we 
-> should make preasure to vendors via market to allow us upgrading our devices.
-> And those how will block us to do it, we should turn them bankrupt via market.
-
-You can't look at it with this naive view. The problem is much more
-complex. I have contacts to many "Bluetooth companies" here in Germany,
-but most of their products are build in Japan, Taiwan etc. The European
-headquarters are better support and sales centers, because in most cases
-they can't influence any decisions. Most companies I talked to are
-willing to help, but actually they can't, because they don't have the
-resources to do so.
-
-My resources are limited, too. Only asking for firmware upgrade and
-other information doesn't help. Start doing something and I mean start
-writing code that allows us to work with. We still miss the DFU download
-functionality and a PS Tool program for Linux.
-
-> To firmware licencing. I think you can share your extracted firmware, because 
-> of this:
+> I can connect from Linux to my XP box no problem:
 > 
-> Re: [Bluez-users] CSR firmware
-> From:
-> Carl Orsborn <cjo@csr.com>
-> To: 
-> cijoml@volny.cz
-> Date: 
-> 30.5.2004 09:58
+> rfcomm connect rfcomm0 xx:xx:xx...
 > 
-> SNIP
-> >This is great on Intersil. They allow users to upgrade their firmwares in 
-> >their wifi cards.
-> >
-> We also allow it, but we have provided the means to prevent it.
+> I can *see* my Apple PowerBook Bluetooth adapter from Linux and
+> vice-versa, and can pair from the PowerBook.  However if I run the above
+> command:
 > 
-> Carl
-> SNIP
+> rfcomm connect rfcomm0 yy:yy:yy...
+> 
+> for the PowerBook connection, then I get:
+> 
+> Can't connect RFCOMM socket: Connection refused
+> 
+> The funny thing is that the PowerBook connection listing shows a
+> connection being established for about one second, then loses it.
 
-I don't get that point, but of course you can upload the firmware from
-an already updated dongle. Actually I don't think that I am going to
-provide such a firmware file. Maybe someone else and then I will link,
-but without written permission from Apple I don't think so.
+you need a service that is listening on that RFCOMM channel on the
+PowerBook side.
 
 Regards
 
