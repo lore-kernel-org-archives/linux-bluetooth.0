@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Anssi Saari <as@sci.fi>
+From: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Message-ID: <20040402111506.GA15425@sci.fi>
-References: <20040328220800.36896.qmail@web60302.mail.yahoo.com> <200403290028.48289.cijoml@volny.cz> <1080514616.2281.178.camel@pegasus> <20040401102919.GA6987@sci.fi> <1080816007.3059.18.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1080816007.3059.18.camel@pegasus>
-Subject: [Bluez-users] Re: Bluetooth security in bluez ?
+Message-id: <918378fefe.8fefe91837@estudiants.urv.es>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Host is down
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,29 +15,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 2 Apr 2004 14:15:06 +0300
+Date: Fri, 02 Apr 2004 09:02:47 +0200
 
-On Thu, Apr 01, 2004 at 12:40:08PM +0200, Marcel Holtmann wrote:
-> Hi Anssi,
-> 
-> > > setting auth and encrypt in hcid.conf enables security mode 3, which is
-> > > not what most people want. Leave it off and use security mode 1/2 and
-> > > let the remote device trigger the security mechanism.
-> > 
-> > How can you tell whether a connection is encrypted or not in Bluez if
-> > security mode is 2?
-> 
-> check with "hcitool con"
-> 
-> Connections:
->         < ACL 00:0A:xx:xx:xx:xx handle 43 state 1 lm MASTER ENCRYPT 
+Hi Marcel!
+When I do hciconfig -a , the prompt shows me:
 
-Great, thanks. Are RFCOMM connections for dialup usually encrypted? I
-have Bray & Sturman's BT book, but it only mentions in passing that
-"RFCOMM will enforce security for dialup networking" where it talks
-about the security manager.
+hci0:
+Type: USB
+	BD Address: 00:0A:3A:50:14:BC ACL MTU: 192:8  SCO
+MTU: 64:8
+	UP RUNNING PSCAN ISCAN 
+	RX bytes:2486 acl:0 sco:0 events:59 errors:0
+	TX bytes:472 acl:0 sco:0 commands:44 errors:0
+	Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+	Link policy: HOLD SNIFF PARK 
+	Link mode: SLAVE ACCEPT 
+	Name: 'BlueZ (0)'
+	Class: 0x000100
+	Service Classes: Unspecified
+	Device Class: Computer, Uncategorized
+	HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1)
+LMP Subver: 0x20d
+	Manufacturer: Cambridge Silicon Radio (10)
 
-Anssi
+
+
+I've tried changing the link mode to MASTER and to
+ACCEPT MASTER but I get the same message when I try
+to rfcomm with the rs232 adapter: "Host is down".
+
+Thank you for your help!!!
+
+Albert
+
+>>>>>>>>>>>>>>>>>>>
+>Hi Albert,
+
+>> I'm using rh7.3 with kernel 2.4.24.
+>> I've installed bluez-libs-2.5, bluez-utils-2.5,
+>> bluez-sdp1.5, bluez-pan1.1, buez-hcidump-1.8,
+>> bluez-hciemu-1.0 and bluez-bluefw-1.0, and I have >an
+>> usb-dongle that I want to rfcomm with an rs232
+>> adapter in a robot.
+
+>what do "hciconfig -a" show?
+
+>Regards
+
+>Marcel
+
 
 
 
