@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200412040251.25791.wim.delvaux@adaptiveplanet.com>
-Subject: [Bluez-users] nonblocking connect : Wrong return code ?
+Subject: Re: [Bluez-users] how to interpret  'link quality' value
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200412031515.02372.wim.delvaux@adaptiveplanet.com>
+References: <200412031515.02372.wim.delvaux@adaptiveplanet.com>
+Content-Type: text/plain
+Message-Id: <1102084671.8479.18.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,31 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 4 Dec 2004 02:51:25 +0100
+Date: Fri, 03 Dec 2004 15:37:51 +0100
 
-when using a nonblocking socket,
+Hi Wim,
 
-when the connect is requested the errno that is returned is 11. (resource 
-temporarily unavailable)
+> can anybody tell me the range for a 'link' quality
+> Is there a range ?
 
-Man page says that it should be EINPROGRESS (which is 115).
+this value is vendor specific. For a CSR chip I have this information on
+my webpage.
 
-Man page for connect says :
+Regards
 
-EINPROGRESS : 
-
-The socket is non-blocking and the connection cannot be completed immediately.  
-It is possible to select(2) or poll(2) for completion by selecting
-
-but
-
-EAGAIN :
-
-No more free local ports or insufficient entries in the routing cache
+Marcel
 
 
-EAGAIN is a proper return code for this situations for read or write but not 
-for connect ...
 
 
 -------------------------------------------------------
