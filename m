@@ -1,90 +1,46 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000a01c41299$f48241d0$fcca010a@lysydziadek>
-From: "zubiwat" <zubiwat@poczta.onet.pl>
-To: <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0007_01C412A2.562E3FD0"
-Subject: [Bluez-devel] Strange answer from HCI
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Mar 2004 19:49:51 +0100
+Return-Path: <nils.faerber@kernelconcepts.de>
+Subject: Re: [Bluez-devel] Renaming USB HID driver
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
+To: Herr Philip Blundell <pb@nexus.co.uk>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   Vojtech Pavlik <vojtech@suse.cz>, Greg Kroah-Hartman <greg@kroah.com>
+In-Reply-To: <1080142065.2648.39.camel@mill.nexus.co.uk>
+References: <1079963694.2663.247.camel@pegasus>
+	 <1080037332.7098.83.camel@localhost>
+	 <1080142065.2648.39.camel@mill.nexus.co.uk>
+Content-Type: text/plain
+Message-Id: <1080225946.7098.120.camel@localhost>
+Mime-Version: 1.0
+Date: Thu, 25 Mar 2004 15:45:46 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-This is a multi-part message in MIME format.
+Am Mi, den 24.03.2004 schrieb Philip Blundell um 16:27:
+> On Tue, 2004-03-23 at 10:22, Nils Faerber wrote:
+> > For example I am currently working on Linux for PDAs. Some of them can
+> > be attached to external keyboards, mostly serial. Having a cleanly
+> > abstracted HID layer would make it possible to have those properly
+> > supported. Currently this is done by a pretty ugly hack calling
+> > handle_scancode() or similar :(
+> I don't think this would actually help much for those keyboards.  As far
+> as I know, none of the common PDA keyboards speak HID; they all use some
+> custom serial protocol for event reporting.  You can avoid the gruesome
+> handle_scancode() stuff by injecting EV_KEY events into the input stack,
+> either via input_report_key() within the kernel, or via uinput from
+> user-space.
 
-------=_NextPart_000_0007_01C412A2.562E3FD0
-Content-Type: text/plain;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+Ah, yes indeed, that make more sense.
+So pls ignore my post ;)
 
-Hi=20
-I'm programming a microchip to work with BT and when I send some bits I =
-get in the answer sth like this: 04 10 01 FE.
-If someone knows what it means I would be greatfull for some help.
-How to set parameteres like pscan or read BD ADDR by sending bits to BT =
-dongle. Does any one knows what bits are coresponding to what commends =
-while setting parameteres of BT because I know bits for transmition from =
-Specification.
-Please help because I can't get through with it.
+I was about almost about to start digging through HID parsing and
+thinking about emulating it...
 
-Regards
+> p.
+CU
+  nils faerber
 
-Maciej Zubilewicz
-
-------=_NextPart_000_0007_01C412A2.562E3FD0
-Content-Type: text/html;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-2">
-<META content=3D"MSHTML 5.50.4134.600" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I'm programming a microchip to work =
-with BT and=20
-when I send some bits I get in the answer sth like this: 04 10 01=20
-FE.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>If someone knows what it means I would =
-be greatfull=20
-for some help.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>How to set parameteres like pscan or =
-read BD ADDR=20
-by sending bits to BT dongle. Does any one knows what bits are =
-coresponding to=20
-what commends while setting parameteres of BT because I know bits for=20
-transmition from Specification.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Please help because I can't get through =
-with=20
-it.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Regards</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Maciej =
-Zubilewicz</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0007_01C412A2.562E3FD0--
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+kernel concepts          Tel: +49-271-771091-12
+Dreisbachstr. 24         Fax: +49-271-771091-19
+D-57250 Netphen          D1 : +49-170-2729106
+--
