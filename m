@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <001b01c50500$ccb54da0$020ba8c0@heejune>
-From: "Heejune AHN" <heejune@snut.ac.kr>
-To: <bluez-users@lists.sourceforge.net>
-References: <41F81653.4030601@gmx.ch>
+Message-ID: <20050127105629.59179.qmail@web60810.mail.yahoo.com>
+From: Tom Watson <sdc695@yahoo.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <20050127041300.5F2441341F@sc8-sf-spam2.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset="ISO-8859-1"
-Subject: [Bluez-users] Workaround for the bug in gnu arm linker while using sdpd program
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Bluetooth virtual keyboard
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,17 +17,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Jan 2005 15:15:44 +0900
+Date: Thu, 27 Jan 2005 02:56:29 -0800 (PST)
 
-SGksDQoNCldoZW4gYW55b25lIHJ1bnMgInNkcGQiIGluIGFybS1iYXNlZCBwbGF0Zm9ybSwgdGhl
-IHByb2Nlc3Mgd2lsbCBkaWVzIGltbWVkaWF0ZWx5Lg0KSXQgaXMgYmVjYXVzZSB0aGUgY3Jvc3Mt
-Y29tcGlsZXIgcHJvYmxlbSAobWF5YmUgZHVlIHRvIHRoZSBvbmUgcGF0aCBsaW5raW5nIG9mIHRo
-ZSBsaW5rZXIpLg0KVG8gc29sdmUgdGhlIHByb2JsZW0sIG1vdmUgdGhlICJzZHBfYXR0cmlkX2Nv
-bXBfZnVuYyIgaW4gdGhlIHNkcC5jIChibHVlemxpYikgb24gdGhlIHRvcCBvZiB0aGUgZmlsZS4N
-Ck9XLiB0aGUgc2ltYm9sIHdpbGwgYmUgbGlua2VkIGF0IDAgYWRkcmVzcywgYW5kIGdvdCBhIHNl
-Z21lbnRhdGlvbiBmYXVsdCENCg0KSGVlanVuZQ0K
+Has anyone used the virtual keyboard described at:
+http://www.itechdynamic.com/html/border25.htm
+While this looks very interesting, it also looks like a power hog.
+
+I would appreciate a user update or comments.
+
+Thanks.
+
+=====
+-- 
+Tom Watson
+tsw@johana.com
 
 
+		
+__________________________________ 
+Do you Yahoo!? 
+Take Yahoo! Mail with you! Get it on your mobile phone. 
+http://mobile.yahoo.com/maildemo 
 
 
 -------------------------------------------------------
