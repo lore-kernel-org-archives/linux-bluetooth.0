@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4063F661.9020802@dfki.de>
-From: Yannick Djoumbou Feunang <feunang@dfki.de>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Documentation
+Subject: Re: [Bluez-users] bluetooth ipaq problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?ISO-8859-1?Q?S=E9bastien?= Delneste <seb@pong.be>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040326055326.GA1687@pong.be>
+References: <20040325194812.GA28260@pong.be>
+	 <1080258707.2283.57.camel@pegasus>  <20040326055326.GA1687@pong.be>
+Content-Type: text/plain
+Message-Id: <1080291979.2285.4.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,32 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Mar 2004 10:22:41 +0100
+Date: Fri, 26 Mar 2004 10:06:19 +0100
 
-Dear users,
-> 
-> I'm working on a Bluetooth project . I installed openobex /openobexapps 
-> on my Pc and it works.The PC makes connection with the handy and send 
-> files.But now i want to understand how it does.
-> I 've the sdp_lib.h/sdptool.c  and then hci_lib.h/hcitool.c but still 
-> don't really undertand it.
-> Do you have some documentation about  the functions(e.g hci_inquiry(), 
-> sdp_data_alloc(),..) used in those tool-files and what the really do 
-> ?Wich parameters they exactly take and give?
-> It would be a great help for me.
-> 
-> I also need a documentation about obexftp and obex synchronization.
-> I installed teh obexftp files.but i don't really know how to use it for  
-> file management from my pc  to my Bluetooth-handy and vice-versa.
-> 
-> Until today i can send vcards, sms and pictures to my bluetoot_handy but 
-> it does't walk vice versa-The handy can't make a connection with the PC 
-> although it automatically registered the Bluetooth-Adapter adress  of 
-> the PC.Can you tell me PLeaaaaaaassseeeee how i can master that.
-> 
-> I hope you can help me and will be very happy to become this help.
-> 
-> Yours sincerely
+Hi Sebastien,
+
+> > you, but actually I think you broke it. Btw you never had to do this
+> > modifications, because the iPAQ is working out of the box ;)
+> Well, now, it is working out-of-the-box, but it hasn't always been
+> true... it used to be required, otherwise I wouldn't even know that CSR PS exist
+
+you wrote six month ago and actually at that time we already support the
+BCSP protocol ;)
+
+Regards
+
+Marcel
+
 
 
 
