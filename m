@@ -1,16 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Radu Maurer <a400@gmx.de>
+To: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Cc: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Apple keyboard
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Radu Maurer <a400@gmx.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040213113749.GA13481@mail.gmx.de>
-References: <20040210175802.GA17705@mail.gmx.de>
-	 <1076451979.2777.21.camel@pegasus> <20040211151146.GA19818@mail.gmx.de>
-	 <1076515215.2696.36.camel@pegasus> <20040213105035.GA10464@mail.gmx.de>
-	 <1076669640.2671.27.camel@pegasus>  <20040213113749.GA13481@mail.gmx.de>
-Content-Type: text/plain
-Message-Id: <1076673365.2671.30.camel@pegasus>
+Message-ID: <20040213114108.GB13481@mail.gmx.de>
+References: <20040210175802.GA17705@mail.gmx.de> <1076451979.2777.21.camel@pegasus> <20040211151146.GA19818@mail.gmx.de> <200402111722.13334.cijoml@volny.cz>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200402111722.13334.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,32 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 12:56:05 +0100
+Date: Fri, 13 Feb 2004 12:41:08 +0100
 
-Hi Radu,
-
-> > So it is a pairing problem. Check the keyboard manual how the pairing
-> > procedure should work. Maybe it has a default PIN or you have to use the
-> > num pad for input.
+On Mi, 11 Feb, 2004 at 17:22:12 +0100, Michal Semler (volny.cz) wrote:
+> Hi,
 > 
-> The manual just sais to follow the instructions on screen :-(
-> There is no default PIN in the manual.
-> I tested it on windows 2000: there you get a PIN written on the screen,
-> which you have to type on the keyboard.
+> switch encrypt and auth off in hcid.conf and try again
 
-then you must make sure that the hcid PIN helper works perfect. To be
-sure replace it with a simple executable shell script.
+I think these are off, since they are commented out in hcid.conf:
 
-	#!/bin/sh
-	echo "PIN:0000"
+        # Authentication and Encryption
+        #auth enable;
+        #encrypt enable;
 
-Try again and enter the PIN "0000" on your keyboard.
-
-Regards
-
-Marcel
-
-
+thanks
+Radu
 
 
 -------------------------------------------------------
