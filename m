@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Thor Egil Skaug" <paxtonrd@hotmail.com>
-To: steven.singer@csr.com
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] AUX1 packets
-Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY1-F9yDAGmbSTM5TP00003ee1@hotmail.com>
+From: Simone Gotti <simone.gotti@email.it>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] OBEX retrieval
+References: <20040301153858.88049.qmail@web40708.mail.yahoo.com>
+In-Reply-To: <20040301153858.88049.qmail@web40708.mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200403011719.33854.simone.gotti@email.it>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,61 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 01 Mar 2004 09:02:36 -0800
+Date: Mon, 1 Mar 2004 17:19:33 +0100
 
-I am doing research on quality of service and fault tolerance in distributed 
-systems,
-and what I am working on is a configurable middleware with QoS 
-(MicroQoSCORBA).
-Currently I am researching meaningful QoS mechanisms for wireless 
-transports, and right
-now I am focusing on Bluetooth.
+On Monday 01 March 2004 16:38, Lalith Chakravarthi wrote:
+> Hi
+>
+> I have been able to push a few files from my computer to the phone
+> using the obextool push command. I would like to know how to get the
+> files from the phone to the computer. The phone that I have is a
+> Motorola V-600 and it has a very limited option settings from its side.
+> So, do advise me how to go about it. I have a Linux 2.4.19 kernel, if
+> that helps.
+>
+> regards
+> Lalith
 
-Middleware is supposed to mask all these things for the user (application 
-designer),
-including the different mechanisms for getting Bluetooth or whatever 
-wireless or wired
-transport to achieve the QoS that he/she expects.
+Hi,
 
-So I am doing a lot of tests by playing around with the things you can do to 
-make a BT connection
-behave differently, to define a QoS space. In other wireless transports 
-there are other switches
-to play with. I am not necessarily looking to prove that a certain thing 
-works, but also to prove
-it doesn't.
+Have you tried kde-bluetooth?
+We have a obex-server, obex-client and a lot of other utilities.
 
-What I wanted to do was let the middleware decide on the packet types for 
-Bluetooth,
-and since the same logic will be at both ends, both transports will choose 
-the same packet
-type as the link quality changes. Which makes sense since the time between a 
-request is
-sent from a client to a reply is sent from a server could be enough to have 
-a decent change
-in link quality.
+If you prefer a command line tool use the obextest program from the 
+openobex-apps or the ussp-push program.
 
-Bringing me to the next question:
-
-If I issue create_connection with a DH5 packet, the LM knows it can use DH5 
-and DM1.
-If I later issue change_conn_packet_type with DH3, is the LM allowed to 
-switch to
-DH5 behind my back if it wants to? Or is there a stored bit pattern in the 
-LM of the
-packet types that I allow that gets overwritten completely with the pattern 
-in change_conn_pt?
-
-I understand that the more meaningful thing to do is allowing all DH and DM 
-packets, and let
-the LM decide.
-
-Thor
-
-_________________________________________________________________
-Click, drag and drop. My MSN is the simple way to design your homepage. 
-http://click.atdmt.com/AVE/go/onm00200364ave/direct/01/
-
+Bye!
+-- 
+Simone Gotti
+<simone.gotti@email.it>
 
 
 -------------------------------------------------------
