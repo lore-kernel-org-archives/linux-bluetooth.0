@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040318065836.9531.qmail@web40704.mail.yahoo.com>
-From: Lalith Chakravarthi <lalithvc@yahoo.com>
-To: bluez-users <bluez-users@lists.sourceforge.net>
+From: dwillis@stx.rr.com
+To: bluez-users@lists.sourceforge.net
+Message-ID: <6605513.1079531506650.JavaMail.teamon@b112.teamon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Data across Bluetooth Connection - Not file transfer
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] network quits working with x
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,29 +15,85 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Mar 2004 22:58:36 -0800 (PST)
+Date: Wed, 17 Mar 2004 07:52:57 -0600 (CST)
 
-Hi...
+can anyone help me?  i sent this saturday and haven't had any 
+responses.  thanks.
 
-I want to know how data maybe sent across an established bluetooth
-connection? 
+i have a sony ericsson t610 phone from t-mobile (usa) and the 
+internet works just fine, but only as long as i'm at the console.
+when i use netscape, mozilla, konquerer, or anything else i soon loose 
+the ability to transmit and receive any data, even though the 
+connection is still there.  anyone have any clues?
 
-I actually want to keep checking if a particular message  (possibly in
-the header or something) has been recieved over the bluetooth
-connection and do a corresponding action (possibly run a program) when
-that happens. 
+facts about my system:
 
-Could anyone help me out with this? I dont want to read a file and
-implement the program after reading it, as this will be a high traffic
-utilisation. Please do advise...
+Linux version 2.4.20-highmem-ll-pe-mh14-xp (root@tiburon) (gcc version 
+3.2.3 20030422 (Gentoo Linux 1.4 3.2.3-r1, propolice)) #2 Sat Feb 14 
+14:25:30 CST 2004
 
-Regards
-Lalith
+XFree86 Version 4.3.0
 
-__________________________________
-Do you Yahoo!?
-Yahoo! Mail - More reliable, more storage, less spam
-http://mail.yahoo.com
+d-link dbt-120 bluetooth usb dongle.
+
+AMD Athlon(tm) XP 2400+
+
+how i connect:
+# modprobe hci_usb
+# modprobe uhci
+# hciconfig hci0 up
+# hciconfig
+# rfcomm bind 0 00:0A:D9:7B:1F:EA 1
+# pppd call gprs2
+
+pppd scripts:
+
+/etc/ppp/peers/gprs2:
+--
+/dev/rfcomm0 57600
+connect '/usr/sbin/chat -v -f /etc/ppp/peers/chat-gprs2'
+noauth
+defaultroute
+debug
+--
+
+/etc/ppp/peers/chat-gprs2:
+--
+TIMEOUT         5
+ECHO            ON
+ABORT           '\nBUSY\r'
+ABORT           '\nERROR\r'
+ABORT           '\nNO ANSWER\r'
+ABORT           '\nNO CARRIER\r'
+ABORT           '\nNO DIALTONE\r'
+ABORT           '\nRINGING\r\n\r\nRINGING\r'
+#''              \rAT
+#TIMEOUT         20
+#OK              ATE1
+#OK              'AT+cgdcont=1,"IP","internet2.voicestream.com"'
+#OK              ATD*99***2#
+#CONNECT
+
+'' AT
+TIMEOUT 240
+OK ATE0
+OK ATV1
+OK AT+CGMI
+OK AT+CIMI
+#OK 'AT+CGDCONT=1,"IP","216.155.175.170"'
+OK AT+CGQREQ=1,0,0,0,0,0
+OK AT+CGQMIN=1,0,0,0,0,0
+OK ATDT*99***2#
+TIMEOUT 22
+CONNECT ""
+--
+
+thanks.
+
+-dave
+-- 
+(I*NT*p)    42.99803% - Major Geek    102 of 114:
+computers let you take laziness to a whole new level. - mrak
 
 
 -------------------------------------------------------
