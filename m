@@ -1,33 +1,45 @@
-Return-Path: <SRS0+90beb6b14d6b6a49cdac+275+infradead.org+dwmw2@baythorne-093005.srs.infradead.org>
-Subject: Re: [Bluez-devel] Bluetooth, Mobile IPv6 and PAN profile
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Wang Haiguang <wanghg@i2r.a-star.edu.sg>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1085407211.9779.22.camel@pegasus>
-References: <LMEOKMJFKNFFHEAEDGDEGEDNCHAA.wanghg@i2r.a-star.edu.sg>
-	 <1085407211.9779.22.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1085473805.27156.219.camel@imladris.demon.co.uk>
+Message-Id: <1085418504.9779.26.camel@pegasus>
 Mime-Version: 1.0
-Date: Tue, 25 May 2004 09:30:05 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Subject: [Bluez-devel] Checking the Apple Bluetooth updates
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Mon, 24 May 2004 19:08:24 +0200
 
-On Mon, 2004-05-24 at 16:00 +0200, Marcel Holtmann wrote:
-> I've never done this nor have I tested IPv6 together with PAN, but the
-> BNEP is only an ethernet emulation and so everything that's working over
-> ethernet should work over BNEP, too.
+Hi Folks,
 
-IPv6 over PAN works fine for me. If you're using radvd on the access
-point and you are adding each bnep%d connection to a bridge, then make
-sure you poke radvd each time a device is added. When radvd starts up
-there are no devices on the bridge so it seems to have MAC address
-00:00:00:00:00:00. 
+I wanna check what Apple has in their Bluetooth updates, but they only
+deliver *.dmg files and I found no way to extract or burn them under
+Linux. Is there any Mac OS X user that can convert them for me into a
+tar file or any other archive that I can access with Linux?
 
-cf. https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=103469
-and https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=104421
+Regards
 
-This is all working in Fedora Core 2.
+Marcel
 
--- 
-dwmw2
+http://www.apple.com/downloads/macosx/apple/bluetoothfirmwareupdater.html
+http://www.apple.com/support/downloads/wirelesskeyboardmousefirmwareupdate.html
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: Oracle 10g
+Get certified on the hottest thing ever to hit the market... Oracle 10g. 
+Take an Oracle 10g class now, and we'll give you the exam FREE.
+http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
