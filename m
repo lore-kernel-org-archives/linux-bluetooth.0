@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4117B098.5020805@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
-References: <4117AB9A.9010909@dark-reality.de> <1092071356.4564.12.camel@pegasus>
-In-Reply-To: <1092071356.4564.12.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] "comlicated" setup - known issues for hid and
+	SCO?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lars Grunewaldt <lgw@dark-reality.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4117A907.7010006@dark-reality.de>
+References: <4117A907.7010006@dark-reality.de>
+Content-Type: text/plain
+Message-Id: <1092071597.4564.17.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,39 +19,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 09 Aug 2004 19:12:56 +0200
+Date: Mon, 09 Aug 2004 19:13:17 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Lars,
 
-Marcel Holtmann wrote:
-| Hi Lars,
-|
-|
-|>A while ago I decided that I might want to take over the snd-bt-sco
-|>project.
-|
-| you can use this mailing list and you can also post patches here.
-|
-| And as I said before, the best way is to extend the current SCO kernel
-| module with an ALSA interface, because the basic idea of snd-bt-sco is
-| wrong.
+> right now I'm using two BT devices with my Epox dongle, an MX900 mice
+> and a Sony Ericcson HBH-35 Headset with snd-bt-sco (voice mode 0x0060,
+> before you ask ;)
 
-I think you are absolutly right, but can you explain a bit more what you
-have in mind? No code fragments or stuff, just how you think this might
-be structured and integrated best. I think you are the person who knows
-most about this topic.
+what does "hcitool info ..." say about your headset? What is the
+firmware version of your EPoX dongle?
 
-thanks,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+> both devices work fluently when used without the other, but when I use
+> headset and mouse at the same time there are various problems during
+> connect, scan and usage.
+> 
+> The main usage problem was that the sco layer got scrambled audio
+> (sounded much like random data) on about every third sco connection.
+> After a while, mouse and headset began to block each other, and the
+> stack seemed to get more and more, well, muddy. After some more
+> connection retries even the mouse, before only "hanging" when the
+> headset tried to connect, stopped working fully.
+> 
+> dmesg only noticed this:
+> 
+> hci_scodata_packet: hci0 SCO packet for unknown connection handle 76
+> 
+> When even connection was impossible, I plugged the BT dongle out and put
+> it back in. After reloading the hid module and programs the mouse and
+> headset worked again.
 
-iD8DBQFBF7CYQWC6DTWkDAoRAqvUAKCjj1RzXu+OHjGa8rpw39r09ldRhwCguZd8
-ys/yzAvmczrpsrUd5LzqDMg=
-=ui6U
------END PGP SIGNATURE-----
+I think that is a hardware problem. A protocol analyser would help to
+track this down ;)
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
