@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Nicholas A. Preyss" <nalp@gmx.net>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] MTU and MRU for Bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Nicholas A. Preyss" <nalp@gmx.net>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040505211012.GA11210@gmx.net>
-References: <opr7hpnaqeqdj9uv@mail.gmx.de>
-	 <1083692600.4666.57.camel@pegasus>  <20040505211012.GA11210@gmx.net>
-Content-Type: text/plain
-Message-Id: <1083790231.4420.40.camel@pegasus>
+Message-ID: <20040505211012.GA11210@gmx.net>
+References: <opr7hpnaqeqdj9uv@mail.gmx.de> <1083692600.4666.57.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1083692600.4666.57.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,28 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 May 2004 22:50:31 +0200
+Date: Wed, 5 May 2004 23:10:12 +0200
 
-Hi Nicholas,
+On  0, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> some suggestions for suitable values for MTU / MRU when using pppd and PAP?
+> 
+> are these values not related to the upper protocols like TCP/IP? The
+> underlaying RFCOMM protocol is a stream, so you don't have a MTU.
 
-> I think, he wants a MTU size that doesn't lead to fragmentation on the
-> carrying transport medium. I think this doesn't make much sense due to
-> the "short" packets of bluetooth, and the fact that L2CAP packets can be
-> up to 2^16 bytes large.
+I think, he wants a MTU size that doesn't lead to fragmentation on the
+carrying transport medium. I think this doesn't make much sense due to
+the "short" packets of bluetooth, and the fact that L2CAP packets can be
+up to 2^16 bytes large.
 
-actually there is no proof that choosing a different MTU on the L2CAP
-level gives you any performance improvements. However a too small MTU
-decreases the performance and this is why we are using 1024 even if 672
-is the default MTU. Some time ago we discussed this and until now nobody
-really proofed that a different MTU is better or that we should make the
-L2CAP MTU for RFCOMM configurable, because some upper layer will improve
-if we do so. Proof it to me and we will see ;)
-
-Regards
-
-Marcel
-
-
+nicholas
 
 
 -------------------------------------------------------
