@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41D85016.3090305@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] btsco questions
-References: <pan.2005.01.02.14.10.41.509677@yahoo.com>
-In-Reply-To: <pan.2005.01.02.14.10.41.509677@yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-users] Setting up an hotplug connection with USB dongles
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200501021837.34836.rdorsch@web.de>
+References: <200411282132.37941.rdorsch@web.de>
+	 <200501021451.09711.rdorsch@web.de> <1104674297.8894.3.camel@pegasus>
+	 <200501021837.34836.rdorsch@web.de>
+Content-Type: text/plain
+Message-Id: <1104687680.8894.17.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +20,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 02 Jan 2005 12:48:38 -0700
+Date: Sun, 02 Jan 2005 18:41:20 +0100
 
-Paul,
+Hi Rainer,
 
-> I don't have a headset device, so I am trying to connect it the other way
-> around, to a NOKIA 6310i phone with support for AudioGateway and Headset
-> profile.
+> > if you use "auto bnep0" and hotplug is configured to deal also with the
+> > network interface then bnep0 will be brought up at the time the kernel
+> > created it. No need to run ifup/ifdown manually.
+> 
+> Hmm....do I enable that with in /etc/default/hotplug
+> 
+> # NET_AGENT_POLICY
+> # - how to manage network interfaces with ifupdown? 'all', 'auto' or 'hotplug'
+> NET_AGENT_POLICY=hotplug
 
-If you want to do things this way, you'll either have to write code for 
-it or use one of the projects that is implementing the headset 
-profile... so far we are implementing the AG side only.
+I had no problem with 'hotplug', but you can also try to use 'auto'.
 
-see the first two links at http://bluetooth-alsa.sourceforge.net/
+Regards
 
-brad
+Marcel
+
+
 
 
 -------------------------------------------------------
