@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hcid hotplug initialisation?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076323204.5263.34.camel@kalkyl.roxen.com>
-References: <1076323204.5263.34.camel@kalkyl.roxen.com>
+From: Fredrik Noring <noring@nocrew.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1076323641.6869.98.camel@pegasus>
+Message-Id: <1076323204.5263.34.camel@kalkyl.roxen.com>
 Mime-Version: 1.0
+Subject: [Bluez-devel] hcid hotplug initialisation?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,25 +15,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 09 Feb 2004 11:47:21 +0100
+Date: Mon, 09 Feb 2004 11:40:04 +0100
 
-Hi Fredrik,
+Hi
 
-> Regarding hcid initilisation, what about having the hotplug stuff
-> starting hcid instead of /etc/init.d/hcid? 
-> 
-> That way hcid can be installed without using cpu/memory resources
-> and it will work automatically when a user inserts some Bluetooth
-> device.
+Regarding hcid initilisation, what about having the hotplug stuff
+starting hcid instead of /etc/init.d/hcid? 
 
-no. The bluetooth.agent is only for device specific configuration and
-not for starting a deamon. However hcid watches all interfaces and
-bluetooth.agent would be called for every device. Multiple running
-hcid's will mess up the security manager.
+That way hcid can be installed without using cpu/memory resources
+and it will work automatically when a user inserts some Bluetooth
+device.
 
-Regards
-
-Marcel
+Fredrik
 
 
 
