@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <420BDA1B.7040708@web.de>
-From: Andreas Millinger <andreas.millinger@web.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-devel] PCMCIA/hciattach problem
+Subject: Re: [Bluez-devel] Re: Re: Re: hciattach problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <420BBA0B.5090405@web.de>
+References: <420BBA0B.5090405@web.de>
+Content-Type: text/plain
+Message-Id: <1108065658.15974.126.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,53 +18,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 10 Feb 2005 23:03:07 +0100
+Date: Thu, 10 Feb 2005 21:00:58 +0100
 
-Hello Marcel,
+Hi Andreas,
 
->so no SMP and no PREEMPT. This means that this can't be a deadlock and
->there should be no problem, but you can try to disable the REGPARM.
->  
+> >please try 2.6.11-rc3-bk7 and what does "modinfo bluetooth" say?
+> modinfo bluetooth:
+> filename:       /lib/modules/2.6.10-mh3/kernel/net/bluetooth/bluetooth.ko
+> author:         Maxim Krasnyansky <maxk@qualcomm.com>, Marcel Holtmann 
+> <marcel@holtmann.org>
+> description:    Bluetooth Core ver 2.7
+> version:        2.7
+> license:        GPL
+> alias:          net-pf-31
+> vermagic:       2.6.10-mh3 PENTIUMIII REGPARM gcc-3.3
+> depends:
+> srcversion:     DAE2F0A0D8CBDE079A024DB
+> 
+> I will try 2.6.11-rc3-bk7.
 
-I have done some tests with different PCMCIA-Cards. It seams, that this 
-problem doesn`t depend on the bluetooth subsystem. With other cards, 
-there is also a error when shuting down (but no freez). And when no card 
-is in PCMCIA there is a error, too:
+so no SMP and no PREEMPT. This means that this can't be a deadlock and
+there should be no problem, but you can try to disable the REGPARM.
 
-FATAL: Module yenta_socket is in use
+Regards
 
-output of lspci is:
+Marcel
 
-0000:00:00.0 Host bridge: VIA Technologies, Inc. VT8605 [ProSavage PM133]
-0000:00:01.0 PCI bridge: VIA Technologies, Inc. VT8605 [PM133 AGP]
-0000:00:05.0 Ethernet controller: Realtek Semiconductor Co., Ltd. 
-RTL-8139/8139C/8139C+ (rev 10)
-0000:00:06.0 Communication controller: Ambient Technologies Inc HaM 
-controllerless modem (rev02)
-0000:00:07.0 ISA bridge: VIA Technologies, Inc. VT82C686 [Apollo Super 
-South] (rev 40)
-0000:00:07.1 IDE interface: VIA Technologies, Inc. 
-VT82C586A/B/VT82C686/A/B/VT823x/A/C PIPC Bus Master IDE (rev 06)
-0000:00:07.2 USB Controller: VIA Technologies, Inc. VT82xxxxx UHCI USB 
-1.1 Controller (rev 1a)
-0000:00:07.4 ISA bridge: VIA Technologies, Inc. VT82C686 [Apollo Super 
-ACPI] (rev 40)
-0000:00:07.5 Multimedia audio controller: VIA Technologies, Inc. 
-VT82C686 AC97 Audio Controller (rev 50)
-0000:00:0c.0 CardBus bridge: O2 Micro, Inc. OZ6933 Cardbus Controller 
-(rev 01)
-0000:00:0c.1 CardBus bridge: O2 Micro, Inc. OZ6933 Cardbus Controller 
-(rev 01)
-0000:00:0d.0 FireWire (IEEE 1394): Agere Systems (former Lucent 
-Microelectronics) FW323 (rev 04)
-0000:01:00.0 VGA compatible controller: S3 Inc. 86C380 [ProSavageDDR 
-K4M266] (rev 02)
 
-What to do now? If I should post on the kernel mailing list, where do I 
-find the kernel mailing list? And what information is needed?
-
-Best regards
-Andreas
 
 
 -------------------------------------------------------
