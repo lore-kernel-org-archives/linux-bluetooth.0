@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] btsco and Nokia HDW-3 headset not working
-From: James Fitzsimons <james.fitzsimons@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <f68b8ee1050323043862bc4c6d@mail.gmail.com>
-References: <1111528750.12076.18.camel@localhost>
-	 <42409B3B.1080906@xmission.com> <f68b8ee1050323043862bc4c6d@mail.gmail.com>
+Subject: Re: [Bluez-devel] Trouble compiling bluez-hcidump-1.18
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <423021C200007A66@resmta01.ono.com>
+References: <423021C200007A66@resmta01.ono.com>
 Content-Type: text/plain
-Message-Id: <1111619908.16128.6.camel@localhost>
+Message-Id: <1111618010.1916.19.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,47 +18,50 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 23 Mar 2005 23:18:28 +0000
+Date: Wed, 23 Mar 2005 23:46:50 +0100
 
-On Wed, 2005-03-23 at 12:38, James Fitzsimons wrote:
-> On Tue, 22 Mar 2005 15:24:59 -0700, Brad Midgley <bmidgley@xmission.com> wrote:
-> > This is not the latest cvs version. It's silent unless you specify "-v"
-> > flag. Where did you get the kernel module and btsco daemon you are trying?
+Hi,
 
-> That may be the case, I built this a few weeks ago. I will update
-> tonight. I am using an ebuild produced by someone in the gentoo
-> community, however I am pretty sure it gets the kernel modules and
-> btsco daemon source from cvs. I will check this and rebuild to see if
-> that helps.
+> Untar, ./configure and then make and I get this:
+> 
+> make  all-recursive
+> make[1]: Entering directory `/root/bluez-hcidump-1.18'
+> Making all in parser
+> make[2]: Entering directory `/root/bluez-hcidump-1.18/parser'
+> gcc -DHAVE_CONFIG_H -I. -I. -I..     -Wall -O2 -c `test -f 'parser.c' ||
+> echo './'`parser.c
+> gcc -DHAVE_CONFIG_H -I. -I. -I..     -Wall -O2 -c `test -f 'hci.c' || echo
+> './'`hci.c
+> hci.c: In function `command_dump':
+> hci.c:707: error: `OCF_CHANGE_CONN_LINK_KEY' undeclared (first use in this
+> function)
+> hci.c:707: error: (Each undeclared identifier is reported only once
+> hci.c:707: error: for each function it appears in.)
+> hci.c: In function `cmd_complete_dump':
+> hci.c:966: error: `OCF_SET_AFH_CLASSIFICATION' undeclared (first use in this
+> function)
+> hci.c:998: error: `OCF_READ_LINK_QUALITY' undeclared (first use in this function)
+> hci.c:1001: error: `OCF_READ_CLOCK' undeclared (first use in this function)
+> hci.c: In function `event_dump':
+> hci.c:1376: error: `EVT_CHANGE_CONN_LINK_KEY_COMPLETE' undeclared (first
+> use in this function)
+> hci.c: In function `hci_dump':
+> hci.c:1505: error: `HCI_VENDOR_PKT' undeclared (first use in this function)
+> make[2]: *** [hci.o] Error 1
+> make[2]: Leaving directory `/root/bluez-hcidump-1.18/parser'
+> make[1]: *** [all-recursive] Error 1
+> make[1]: Leaving directory `/root/bluez-hcidump-1.18'
+> make: *** [all] Error 2
+> 
+> I have no idea where the problem is... Any suggestions?
 
-Ok, I've just rebuilt using the latest cvs version. I am still having
-the same issue where I can connect to the headset, volume etc works, but
-no sound (eg from XMMS).
+make sure that bluez-libs-2.15 is installed. This is clearly stated in
+the ChangeLog file as an requirement.
 
-Output:
-athos root # btsco -v 00:03:89:67:8F:F7
-btsco v0.4
-Device is 2:0
-Voice setting: 0x0060
-RFCOMM channel 1 connected
-recieved AT+CKPD=200
-speaker volume: 11 mic volume: 1
-driver is in use
-connected SCO channel
-Done setting sco fd
-recieved AT+VGS=15
-Sending up speaker change 15
-recieved AT+VGS=11
-Sending up speaker change 11
-recieved AT+VGS=15
-Sending up speaker change 15
+Regards
 
-Any ideas? 
+Marcel
 
-Thanks very much for your help,
-James
--- 
-It's 5.50 a.m.... Do you know where your stack pointer is ?
 
 
 
