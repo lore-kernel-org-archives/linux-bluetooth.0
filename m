@@ -1,18 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] audio problems with a2play
+Subject: Re: [Bluez-devel] SBC packer done, kind of
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20041124035850.4c086e3a.henryk@ploetzli.ch>
-References: <41A22C0B.4050008@xmission.com> <41A234FA.7020303@xmission.com>
-	 <20041123033429.132bf84b.henryk@ploetzli.ch>
-	 <41A2B331.4010001@xmission.com>
-	 <20041123070621.50569968.henryk@ploetzli.ch>
-	 <41A3471C.4000602@xmission.com>
-	 <20041123203836.046fb4f4.henryk@ploetzli.ch>
-	 <41A3ACE2.4030501@xmission.com>
-	 <20041124035850.4c086e3a.henryk@ploetzli.ch>
+In-Reply-To: <1101272477.27351.67.camel@pegasus>
+References: <20041123014732.3a03b10e.henryk@ploetzli.ch>
+	 <1101191260.26578.43.camel@pegasus>
+	 <20041123074829.7f978ce7.henryk@ploetzli.ch>
+	 <1101201897.26578.54.camel@pegasus>
+	 <20041123204901.776fe240.henryk@ploetzli.ch>
+	 <1101243809.27351.18.camel@pegasus>
+	 <20041124042114.5e1fee94.henryk@ploetzli.ch>
+	 <1101272477.27351.67.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1101272785.27351.73.camel@pegasus>
+Message-Id: <1101278049.27351.98.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -25,24 +25,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 24 Nov 2004 06:06:25 +0100
+Date: Wed, 24 Nov 2004 07:34:09 +0100
 
 Hi Henryk,
 
-> Hmm, I made it behaving to the specs (I think) (and yes, this time I
-> actually made sure I committed it) and don't hear anything now. 
+> > > this actually reminds me again that I am not an audio expert. Can you
+> > > fix it easily?
+> > 
+> > Yupp, I think I did.
+> 
+> wow, good work. I can now do things like this:
+> 
+> 	sbcenc <au-file> | sbcinfo -
+> 	sbcenc <au-file> | rcplay <bdaddr> -
 
-I think that all GCT based devices (1310:0100) will never behave like in
-the specification defined.
-
-Basically these two 0xff 0xff bytes mean nothing, but some values harm
-and others don't. At the moment I am using these values:
-
-	buf[12] = 0x80 >> sbc_info.sampling_frequency
-		| 0x08 >> sbc_info.channel_mode;
-	buf[13] = 0x80 >> sbc_info.blocks
-		| 0x08 >> sbc_info.subbands
-		| 0x01 << sbc_info.allocation_method;
+when using sbcenc in a pipe with rcplay I get a delay for the first bits
+of music that should be played. This is only on the first call of the
+program or after the kernel removed it from its cache. Do you have any
+idea what might causes this?
 
 Regards
 
