@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <006301c4182a$33c55540$fcca010a@lysydziadek>
-From: "zubiwat" <zubiwat@poczta.onet.pl>
-To: "devel Bluetooth" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0060_01C4183A.F73434A0"
-Subject: [Bluez-devel] Zubilewicz
+Subject: Re: [Bluez-devel] hid2hci not working with Logitech diNovo
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Julian Scheel <julian@jusst.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200404010050.30919.julian@jusst.de>
+References: <200404010024.48742.julian@jusst.de>
+	 <1080772414.2536.15.camel@pegasus>  <200404010050.30919.julian@jusst.de>
+Content-Type: text/plain
+Message-Id: <1080803843.2610.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,57 +19,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 1 Apr 2004 22:45:00 +0200
+Date: Thu, 01 Apr 2004 09:17:23 +0200
 
-This is a multi-part message in MIME format.
+Hi Julian,
 
-------=_NextPart_000_0060_01C4183A.F73434A0
-Content-Type: text/plain;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+> > I have seen this error with 2.6, but the switching still works. Check
+> > with hciconfig if you got your Bluetooth device.
+> 
+> thanks for your quick reply, but the device isn't listed with hciconfig, and 
+> it doesn't stops working, which I assume should happen after switching this, 
+> but before loading the bluetooth hid-drivers, shouldn't it?
 
-Hi=20
-I'm connected through L2CAP and what should I send now to connect =
-RFCOMM. I know that it should be SABM and I should wait for UA but how =
-to do this?
-Where is a command to do this and how it looks like. RFCOMM packets are =
-insight L2CAP as a command?
-Can anyone tell me what it's like?
+testing with the latest 2.6.5-rc3-bk1 it reports success, but after that
+my kernel freezes. I have not enough time to dig deep enough into it, so
+feel free to provide a patch if you found the problem.
 
-Regards=20
+Regards
 
-Maciej
+Marcel
 
-------=_NextPart_000_0060_01C4183A.F73434A0
-Content-Type: text/html;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-2">
-<META content=3D"MSHTML 5.50.4134.600" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I'm connected through L2CAP and what =
-should I send=20
-now to connect RFCOMM. I know that it should be SABM and I should wait =
-for UA=20
-but how to do this?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Where is a command to do this and how =
-it looks=20
-like.&nbsp;RFCOMM packets are insight L2CAP as a command?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Can anyone tell me what it's =
-like?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Regards </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Maciej</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0060_01C4183A.F73434A0--
 
 
 
