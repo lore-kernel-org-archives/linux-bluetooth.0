@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: martin f krafft <madduck@madduck.net>
+From: Pavel Ruzicka <pavouk@pavouk.org>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] pairing with headset
-Message-ID: <20040922075030.GC8233@cirrus.madduck.net>
-References: <20040921190606.GA11925@cirrus.madduck.net> <200409220107.46086.pavouk@pavouk.org>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="b5gNqxB1S1yM7hjW"
-In-Reply-To: <200409220107.46086.pavouk@pavouk.org>
+Cc: martin f krafft <madduck@madduck.net>
+References: <20040921190606.GA11925@cirrus.madduck.net>
+In-Reply-To: <20040921190606.GA11925@cirrus.madduck.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200409220107.46086.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,64 +19,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Sep 2004 09:50:30 +0200
+Date: Wed, 22 Sep 2004 01:07:46 +0200
 
+Hi,
 
---b5gNqxB1S1yM7hjW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> I am using a 2.6.8.1 kernel and successfully communicate with my
+> Nokia 6230. Today, I got a Jabra BT 250 headset, which also works
+> fine.
 
-also sprach Pavel Ruzicka <pavouk@pavouk.org> [2004.09.22.0107 +0200]:
-> You must hold headset button for about 7 seconds, when blue LED on
-> Jabra goes permanently ON. Now is headset in pairing mode, and you
-> will see it in hcitool scan. Jabra BT250 is visible only in
-> pairing mode. Probably due to security reasons.
+I have Jabra BT250 too.
 
-Oh, okay; now I got it working.
+When you want to pair your Jabra in Bluez, you must set PIN to 0000, which
+is Jabras default.
+You must hold headset button for about 7 seconds, when blue LED on Jabra goes
+permanently ON. Now is headset in pairing mode, and you will see it in
+hcitool scan. Jabra BT250 is visible only in pairing mode. Probably due to
+security reasons.
 
-> This headset can be paired only with one device.
+This headset can be paired only with one device.
+Do you have some other experience?
 
-That's really annoying.
+Other problem is, that I don't know if there are some working bluez sound 
+driver. I doesn't test it.
 
-> Do you have some other experience?
+> What's going on? Can the phone only pair with one other device? Or
+> is the problem elsewhere?
 
-No, but I will let you know.
+Best regards,
 
-> Other problem is, that I don't know if there are some working bluez sound=
-=20
-> driver. I doesn't test it.
-
-It is being worked on.
-
-http://sourceforge.net/projects/bluetooth-alsa
-http://www.gargan.org/linux/snd-bt-sco/
-
---=20
-martin;              (greetings from the heart of the sun.)
-  \____ echo mailto: !#^."<*>"|tr "<*> mailto:" net@madduck
-=20
-invalid/expired pgp subkeys? use subkeys.pgp.net as keyserver!
-spamtraps: madduck.bogus@madduck.net
-=20
-"twenty-four hour room-service must be one of the
- premiere achievements of modern civilization."
-                                          -- special agent dale cooper
-
---b5gNqxB1S1yM7hjW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.5 (GNU/Linux)
-
-iD8DBQFBUS7GIgvIgzMMSnURAkqJAJ98lMVR/mtsaX3naaiMiJUGNWfiewCdHC1b
-ofYOcMyHdn1XUnqZlzRSXKc=
-=5aYZ
------END PGP SIGNATURE-----
-
---b5gNqxB1S1yM7hjW--
+Pavel Ruzicka
 
 
 -------------------------------------------------------
