@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Pretec and Ambicom BT2000E driver
-Cc: Daniel Jimenez <djimenez@pobox.com>
-References: <200404100030.49916.pavouk@pavouk.org> <200404110036.47661.pavouk@pavouk.org> <40789619.3020608@pobox.com>
-In-Reply-To: <40789619.3020608@pobox.com>
+Message-ID: <40789619.3020608@pobox.com>
+From: Daniel Jimenez <djimenez@pobox.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200404111007.27696.pavouk@pavouk.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Pretec and Ambicom BT2000E driver
+References: <200404100030.49916.pavouk@pavouk.org> <1081593241.3028.7.camel@pegasus> <200404110036.47661.pavouk@pavouk.org>
+In-Reply-To: <200404110036.47661.pavouk@pavouk.org>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,26 +17,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 11 Apr 2004 10:07:27 +0200
+Date: Sat, 10 Apr 2004 19:49:29 -0500
 
-Hello,
 
-> > This cards works now with bt2000e_cs.o but sometimes my Zaurus freezes
-> > when removing card...
->
-> What kernel does it work on? I'm trying to figure out HOW to compile it!
+Pavel Ruzicka wrote:
+> Hello,
+> 
 
-I use this card on Sharp Zaurus SL-C860, which is ARM architecture.
-Kernel 2.4.18-rmk7-pxa3-embedix. There are not possible to use newer
-kernel.
-I use precompiled driver.
-I don't know, how to compile driver. Maybe write to kernel tree and edit 
-Makefile /usr/src/linux/drivers/bluetooth.
-But I'am not kernel expert.
+> This cards works now with bt2000e_cs.o but sometimes my Zaurus freezes when 
+> removing card...
+> 
+> Best regards,
+> 
+> Pavel Ruzicka
+> 
 
-Best regards,
+What kernel does it work on? I'm trying to figure out HOW to compile it!
 
-Pavel Ruzicka
+-- 
+Daniel Jimenez <djimenez[at]pobox[dot]com>
+
 
 
 -------------------------------------------------------
