@@ -1,14 +1,18 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Error message
-References: <200405211611.38038.welpan@gmx.de>
-In-Reply-To: <200405211611.38038.welpan@gmx.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200405211832.10484.cijoml@volny.cz>
+Subject: Re: [Bluez-users] Unresolved Symbols
+From: Marcel Holtmann <marcel@holtmann.org>
+To: the-flash@web.de
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040521161754.GB17561@mcmabrruq.sirius.net>
+References: <20040520090502.GA4352@mcmabrruq.sirius.net>
+	 <1085044940.4327.135.camel@pegasus>
+	 <20040520114752.GA3125@mcmabrruq.sirius.net>
+	 <1085056072.4327.166.camel@pegasus>
+	 <20040521161644.GA17561@mcmabrruq.sirius.net>
+	 <20040521161754.GB17561@mcmabrruq.sirius.net>
+Content-Type: text/plain
+Message-Id: <1085156734.22191.12.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,71 +23,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 21 May 2004 18:32:09 +0200
+Date: Fri, 21 May 2004 18:25:34 +0200
 
-Hi,
+Hi Florian,
 
-currently BlueZ doesn't support SCO and Marcel has not time to implement it. 
-Feel free and patch our sources.
+> But, now the problem is that gnokii does not seem to be able to find my  
+> bluetooth libraries/include files. I have installed bluez-libs-2.7 with  
+> the --prefix=/usr option. Doing a 'configure --prefix=/usr' in the  
+> gnokii-0.6.1 source directory gives
+> 
+> checking for the bluetooth support...
+> checking for the struct sockaddr_rc in <bluetooth/rfcomm.h>... no
+> checking for the MacOS X bluetooth support...
+> checking CoreFoundation/CoreFoundation.h usability... no
+> checking CoreFoundation/CoreFoundation.h presence... no
+> checking for CoreFoundation/CoreFoundation.h... no
+> checking IOBluetooth/Bluetooth.h usability... no
+> checking IOBluetooth/Bluetooth.h presence... no
+> checking for IOBluetooth/Bluetooth.h... no
+> checking IOBluetooth/IOBluetoothUserLib.h usability... no
+> checking IOBluetooth/IOBluetoothUserLib.h presence... no
+> checking for IOBluetooth/IOBluetoothUserLib.h... no
 
-Michal
+actually this is a question for the Gnokii guys and you should look at
+"./configure --help", because "--with-bluetooth" looks like a good
+starting point.
 
-On Friday 21 of May 2004 16:11, Alex wrote:
-> Hello Everybody.
->
-> Okay this is  my first mail in this list, so I am sorry for mistakes.
->
-> I try to connect a Headset with a dongle.
->
-> The problem begins if  I plug in my dongle  and boot my System, my System
-> hangs.
-> So i plugged my dongle after booting my System i get this message:
->
-> hci_scodata_packet :hci0 sco packet unknown connection for handle 0
->
-> I killed this message and  make : hciconfig
-> Nothing is found
->
-> I make this in KDE-Shell
-> no Error message , hciconfig find my dongle
-> I can scan for headset and find it, but i cant get any connection.
->
-> I make hcidump, I get this message:
->
-> SCO data: handle 0x0000 dlen0
->
->
-> That can I do, to connect my headset.
->
->
-> My System: Debian unstable
->                    Kernel 2.6.6
-> installed bluez packages:
-> 		   bluez-bluefw
->   		   bluez-hcidump
->                    bluez-utils
-> 		   bluez-pan
->                    bluez-pin
->
-> P.S.:  Sorry, I am german, and my english is not so fine.
->
->
->
->
->
->
->
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: Oracle 10g
-> Get certified on the hottest thing ever to hit the market... Oracle 10g.
-> Take an Oracle 10g class now, and we'll give you the exam FREE.
-> http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+Regards
+
+Marcel
+
+
+
+
 
 
 -------------------------------------------------------
