@@ -1,10 +1,18 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Forever Again" <erics_trip@hotmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: one more thing (was Re: [Bluez-users] apple wireless mouse on
+	apple ibook (g4, builtin	usb))
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Sunnan <sunnan@handgranat.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <402D56EB.9010600@handgranat.org>
+References: <402D07B8.8030504@handgranat.org>
+	 <1076694675.2671.191.camel@pegasus>  <402D1E8C.6020301@handgranat.org>
+	 <1076702197.18588.11.camel@pegasus>  <402D381D.1000306@handgranat.org>
+	 <1076709007.18588.39.camel@pegasus>  <402D4959.10704@handgranat.org>
+	 <1076711341.18588.57.camel@pegasus>  <402D56EB.9010600@handgranat.org>
+Content-Type: text/plain
+Message-Id: <1076714576.18588.98.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <Law12-F76bdkSmLAztx0004f857@hotmail.com>
-Subject: [Bluez-users] HCI not working after using usb_storage
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,25 +23,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 23:29:04 +0000
+Date: Sat, 14 Feb 2004 00:22:56 +0100
 
-I have a logitech mx900 mouse, which was working fine before. I'm running 
-the 2.6.2 kernel on Fedora. Using the bthid daemon it was working. Then I 
-tried to use a usb memory stick, and after using the usb_storage driver, my 
-mouse stopped working. I check to see what was up and I noticed that my hci 
-device was gone. When I try running hciconfig hci0 up, I get this:
+Hi Sunnan,
 
-Can't open HCI socket.: Address family not supported by protocol.
+> slowstorm/home/sunnan% hcitool inq
+> Inquiring ...
 
-What do I need to do to get the mouse working again, and is it possible to 
-use the usb_storage as well. I'm more concerned about using the mouse, but 
-both would be nice.
+make sure your mouse is visible.
 
-Evan
+> slowstorm/home/sunnan% hcitool dev
+> Devices:
+>          hci0    00:0D:93:04:19:15
+> slowstorm/home/sunnan% hcitool info 00:0D:93:04:19:15
+> Device is not available or not connected.
 
-_________________________________________________________________
-Choose now from 4 levels of MSN Hotmail Extra Storage - no more account 
-overload! http://click.atdmt.com/AVE/go/onm00200362ave/direct/01/
+This can't work, because you try to connect to your local device ;)
+
+Regards
+
+Marcel
+
 
 
 
