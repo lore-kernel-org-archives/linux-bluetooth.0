@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] BTHID instructions...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Michael Frey <mfrey@pepper.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <F849ADA4-7D17-11D8-BFCD-00039390D626@pepper.com>
-References: <F849ADA4-7D17-11D8-BFCD-00039390D626@pepper.com>
-Content-Type: text/plain
-Message-Id: <1080081008.2515.52.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <001701c41123$058cfd30$fcca010a@lysydziadek>
+From: "zubiwat" <zubiwat@poczta.onet.pl>
+To: <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0014_01C4112B.6422E190"
+Subject: [Bluez-devel] Please help me
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,20 +16,56 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Mar 2004 23:30:08 +0100
+Date: Tue, 23 Mar 2004 23:05:53 +0100
 
-Hi Michael,
+This is a multi-part message in MIME format.
 
-> Can someone point me in the direction of how to build and install the 
-> new BTHID stuff?  I was just on the Bluez website and did not find any 
-> mention of it.
+------=_NextPart_000_0014_01C4112B.6422E190
+Content-Type: text/plain;
+	charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 
-take a look at this HOWTO http://www.bueche.ch/comp/mx900/mx900.html
+Hi=20
+I need help with some programming. If someone knows the table of bits =
+who are as hci commands I would be greatfull because I'm programming =
+microchip to work as a bluez under linux and I get some bits from BT =
+device but howto interprete them.
+I would be greatfull for some help.
 
 Regards
 
-Marcel
+Maciej Zubilewicz
 
+------=_NextPart_000_0014_01C4112B.6422E190
+Content-Type: text/html;
+	charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-2">
+<META content=3D"MSHTML 5.50.4134.600" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Hi </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>I need help with some programming. If =
+someone knows=20
+the table of bits who are as hci commands I would be greatfull because =
+I'm=20
+programming microchip to work as a bluez under linux and I get some bits =
+from BT=20
+device but howto interprete them.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>I would be greatfull for some =
+help.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Regards</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Maciej =
+Zubilewicz</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0014_01C4112B.6422E190--
 
 
 
