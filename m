@@ -1,93 +1,58 @@
-Return-Path: <welpan@gmx.de>
-From: Alex <welpan@gmx.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [Bluez-users] Error message
-Date: Tue, 25 May 2004 00:09:20 +0200
-References: <200405211611.38038.welpan@gmx.de> <200405212051.07773.welpan@gmx.de> <1085167255.22191.37.camel@pegasus>
-In-Reply-To: <1085167255.22191.37.camel@pegasus>
-Cc: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-15"
-Message-Id: <200405250009.20559.welpan@gmx.de>
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vitaliy Pronkin <vit@mifki.ru>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1085360239.5329.19.camel@n-vit>
+References: <loom.20040523T164826-243@post.gmane.org>
+	 <1085324502.8309.19.camel@pegasus>
+	 <loom.20040523T170840-699@post.gmane.org>
+	 <1085326200.8309.22.camel@pegasus>  <1085327326.29252.169.camel@n-vit>
+	 <1085328263.8309.25.camel@pegasus>  <1085328722.23050.175.camel@n-vit>
+	 <1085351626.8309.91.camel@pegasus>  <1085360239.5329.19.camel@n-vit>
+Content-Type: text/plain
+Message-Id: <1085377686.9779.2.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-users] Re: help me
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Mon, 24 May 2004 07:48:07 +0200
 
-Am Freitag, 21. Mai 2004 21:20 schrieben Sie:
-> Hi Alex,
->
-> > > However disable CONFIG_BT_HCIUSB_SCO and try again.
-> >
-> > That was it, the dongle is running.
->
-> send us the full /proc/bus/usb/devices from your system. I think we have
-> to blacklist the SCO support for this device.
->
-Sorry my emailclient has the mailinglist marked as spam.
+Hi,
 
-Here my  /proc/bus/usb/devices :
+> It seems that I found the problem. 
+> Don't know why, but select() in main loop of sdpd never returns, even if
+> there's some data in socket.
+> I implemented some temporary solution to test - I created two threads,
+> one for l2cap sockets and one for local. Each of them runs accept() in a
+> loop. And in main loop I left only check_active(). So now I don't use
+> select() function and it works - at least PDA can get list of services
+> from laptop.
 
+I read something about non working select() on LKML, but I thought this
+was 2.6. However you should update your kernel to the latest -pre from
+Marcelo and or use the latest stable with my -mh patch.
 
-T:  Bus=03 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=480 MxCh= 6
-B:  Alloc=  0/800 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 2.00 Cls=09(hub  ) Sub=00 Prot=01 MxPS= 8 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.6-mh1 ehci_hcd
-S:  Product=Silicon Integrated Systems [SiS] USB 2.0 Controller
-S:  SerialNumber=0000:00:03.2
-C:* #Ifs= 1 Cfg#= 1 Atr=40 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=256ms
+Regards
 
-T:  Bus=02 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 3
-B:  Alloc= 60/900 us ( 7%), #Int=  1, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.6-mh1 ohci_hcd
-S:  Product=Silicon Integrated Systems [SiS] USB 1.0 Controller (#2)
-S:  SerialNumber=0000:00:03.1
-C:* #Ifs= 1 Cfg#= 1 Atr=40 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
-
-T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS= 8 #Cfgs=  1
-P:  Vendor=0400 ProdID=0807 Rev= 1.00
-C:* #Ifs= 2 Cfg#= 1 Atr=80 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=00(>ifc ) Sub=00 Prot=00 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-
-T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 3
-B:  Alloc=  0/900 us ( 0%), #Int=  0, #Iso=  0
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.6-mh1 ohci_hcd
-S:  Product=Silicon Integrated Systems [SiS] USB 1.0 Controller
-S:  SerialNumber=0000:00:03.0
-C:* #Ifs= 1 Cfg#= 1 Atr=40 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
+Marcel
 
 
-Best regards
 
-Alex
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: Oracle 10g
+Get certified on the hottest thing ever to hit the market... Oracle 10g. 
+Take an Oracle 10g class now, and we'll give you the exam FREE.
+http://ads.osdn.com/?ad_id=3149&alloc_id=8166&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
