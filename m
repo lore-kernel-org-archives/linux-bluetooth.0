@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <310455012.15401@bjut.edu.cn>
-From: "Jin Pu" <jpu@emails.bjpu.edu.cn>
-To: "bluez-users@lists.sourceforge.ne" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] how to build  rctest?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <310444981.01696@bjut.edu.cn>
+References: <310444981.01696@bjut.edu.cn>
+Content-Type: text/plain
+Message-Id: <1110449108.14717.0.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain;
-      charset="GB2312"
-Subject: [Bluez-users] Re: how to build rctest?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,13 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Mar 2005 20:0:28 +0800
+Date: Thu, 10 Mar 2005 11:05:08 +0100
 
-   Thanks,  Marcel.
+Hi,
 
+>     I want to use the rctest,but i can't build it,anyone could help me? Thanks a lot.
 
-                    Jin Pu
-=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1
+run configure with --enable-test.
+
+Regards
+
+Marcel
 
 
 
