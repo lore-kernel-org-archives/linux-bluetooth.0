@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] inquiry with rssi
+Subject: Re: [Bluez-users] HCIDump Usage
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <42492B72.6010701@gmx.ch>
-References: <42492056.9040601@gmx.ch> <1112091034.9016.64.camel@pegasus>
-	 <42492B72.6010701@gmx.ch>
+In-Reply-To: <d1f423d305032907072dc78400@mail.gmail.com>
+References: <d1f423d305032907072dc78400@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1112109506.9016.73.camel@pegasus>
+Message-Id: <1112109452.9016.71.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,17 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Mar 2005 17:18:26 +0200
+Date: Tue, 29 Mar 2005 17:17:32 +0200
 
-Hi Marco,
+Hi Anderson,
 
-> Can you please provide an example?
-> I'm not that experienced in bluetooth programming as you are...
+> I am really newbie on using HCIDump and I would like to know if it is
+> possible that i could use to extract information like:
+> 1) package losses
+> 2) package errors
 > 
-> It would be sensefull to have a codesnippet like that in the 
-> mailinglistarchive as well...
+> Forgive me if this message is a little out of topic.
 
-actually there is such a code snippet in the mailing list archive.
+the answer is a simple no, because the underlaying ACL link is reliable.
 
 Regards
 
