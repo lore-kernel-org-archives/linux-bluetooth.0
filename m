@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] simple relay scatternet and a question
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <265ff2abcc101.heejune@snut.ac.kr>
-References: <265ff2abcc101.heejune@snut.ac.kr>
-Content-Type: text/plain
-Message-Id: <1107245443.8848.23.camel@pegasus>
-Mime-Version: 1.0
+From: =?euc-kr?B?vsjI8cHY?= <heejune@snut.ac.kr>
+To: bluez-users@lists.sourceforge.net
+Cc: 
+MIME-Version: 1.0
+Message-ID: <265ff2abcc101.heejune@snut.ac.kr>
+Content-Type: multipart/alternative;
+	boundary="DC81438675.1107241349198.MailEdge"
+Subject: [Bluez-users] simple relay scatternet and a question
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,57 +18,81 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Feb 2005 09:10:43 +0100
+Date: Tue, 1 Feb 2005 16:02:29 +0900
 
-Hi,
+--DC81438675.1107241349198.MailEdge
+Content-Type: text/plain;charset=euc-kr
+Content-Transfer-Encoding: base64
 
-> I  am working on contrcuting a simple relay scatternet with CSR-based
-> USB dongle.
-> 
-> Yesterday I made it that 4 dongle relay data from top to down and dwon
-> to top, writing a utility code based on rfcomm program in bluez-util.
-> 
-> I works fine!
-> 
->  
-> 
->     A ------------------>B-----------------> C ------------------> D
-> 
->        M                        S   M                      S     M
-> S
-> 
->  
-> 
->  
-> 
-> But, while I am running it serveral time. I got a one difficult
-> problem "Can't bind: Address already in Use!"
-> 
-> This is old problem in TCP/IP socket program, when the server clashes
-> without close the socket, so that the well-kown (or fixed anyway)
-> 
-> cannot be resused again for a several minutes in typical TCP/IP socket
-> program.   
-> 
->  
-> 
-> But! what is the port in rfcomm socket? Is this channel numer? or
-> board address?.
-> 
-> And Can I use socketopt system call for the rfcomm socket ?  for
-> RESUSE option!
-> 
-> Also, the socket address is not freed for even 30 minutes, while
-> usually TCP/IP port is can be resued after several minutes!
-> 
-> What part of kernel stack has something with this??? rfcomm.o ???? 
+RGVhciBCbHVlemVycywNCg0KSSAgYW0gd29ya2luZyBvbiBjb250cmN1dGluZyBhIHNpbXBsZSBy
+ZWxheSBzY2F0dGVybmV0IHdpdGggQ1NSLWJhc2VkIFVTQiBkb25nbGUuDQpZZXN0ZXJkYXkgSSBt
+YWRlIGl0IHRoYXQgNCBkb25nbGUgcmVsYXkgZGF0YSBmcm9tIHRvcCB0byBkb3duIGFuZCBkd29u
+IHRvIHRvcCwgd3JpdGluZyBhIHV0aWxpdHkgY29kZSBiYXNlZCBvbiByZmNvbW0gcHJvZ3JhbSBp
+biBibHVlei11dGlsLg0KSSB3b3JrcyBmaW5lIQ0KDQogICAgQSAtLS0tLS0tLS0tLS0tLS0tLS0+
+Qi0tLS0tLS0tLS0tLS0tLS0tPiBDIC0tLS0tLS0tLS0tLS0tLS0tLT4gRA0KICAgICAgIE0gICAg
+ICAgICAgICAgICAgICAgICAgICBTICAgTSAgICAgICAgICAgICAgICAgICAgICBTICAgICBNICAg
+ICAgICAgICAgICAgICAgICAgIFMNCg0KDQpCdXQsIHdoaWxlIEkgYW0gcnVubmluZyBpdCBzZXJ2
+ZXJhbCB0aW1lLiBJIGdvdCBhIG9uZSBkaWZmaWN1bHQgcHJvYmxlbSAiQ2FuJ3QgYmluZDogQWRk
+cmVzcyBhbHJlYWR5IGluIFVzZSEiDQpUaGlzIGlzIG9sZCBwcm9ibGVtIGluIFRDUC9JUCBzb2Nr
+ZXQgcHJvZ3JhbSwgd2hlbiB0aGUgc2VydmVyIGNsYXNoZXMgd2l0aG91dCBjbG9zZSB0aGUgc29j
+a2V0LCBzbyB0aGF0IHRoZSB3ZWxsLWtvd24gKG9yIGZpeGVkIGFueXdheSkNCmNhbm5vdCBiZSBy
+ZXN1c2VkIGFnYWluIGZvciBhIHNldmVyYWwgbWludXRlcyBpbiB0eXBpY2FsIFRDUC9JUCBzb2Nr
+ZXQgcHJvZ3JhbS4gICANCg0KQnV0ISB3aGF0IGlzIHRoZSBwb3J0IGluIHJmY29tbSBzb2NrZXQ/
+IElzIHRoaXMgY2hhbm5lbCBudW1lcj8gb3IgYm9hcmQgYWRkcmVzcz8uDQpBbmQgQ2FuIEkgdXNl
+IHNvY2tldG9wdCBzeXN0ZW0gY2FsbCBmb3IgdGhlIHJmY29tbSBzb2NrZXQgPyAgZm9yIFJFU1VT
+RSBvcHRpb24hDQpBbHNvLCB0aGUgc29ja2V0IGFkZHJlc3MgaXMgbm90IGZyZWVkIGZvciBldmVu
+IDMwIG1pbnV0ZXMsIHdoaWxlIHVzdWFsbHkgVENQL0lQIHBvcnQgaXMgY2FuIGJlIHJlc3VlZCBh
+ZnRlciBzZXZlcmFsIG1pbnV0ZXMhDQpXaGF0IHBhcnQgb2Yga2VybmVsIHN0YWNrIGhhcyBzb21l
+dGhpbmcgd2l0aCB0aGlzPz8/IHJmY29tbS5vID8/Pz8gDQoNClBsZWFzZSBraW5kbHkgY29tbWVu
+dCB0aGlzLg0KDQoNClRoYW5rcy4K
 
-what kernel version do you use and what about showing us your code?
 
-Regards
+--DC81438675.1107241349198.MailEdge
+Content-Type: text/html;charset=euc-kr
+Content-Transfer-Encoding: base64
 
-Marcel
+PGh0bWw+PGJvZHkgYmFja2dyb3VuZD0nJz4KPHN0eWxlPjwhLS0NClAge21hcmdpbi10b3A6IDA7
+IG1hcmdpbi1ib3R0b206IDA7IGZvbnQtRmFtaWx5OiBndWxpbTsgZm9udC1TaXplOiA5cHQ7fQ0K
+LS0+PC9zdHlsZT4NCjxQPkRlYXIgQmx1ZXplcnMsPC9QPg0KPFA+Jm5ic3A7PC9QPg0KPFA+SSZu
+YnNwOyBhbSB3b3JraW5nIG9uIGNvbnRyY3V0aW5nIGEgc2ltcGxlIHJlbGF5IHNjYXR0ZXJuZXQg
+d2l0aCBDU1ItYmFzZWQgVVNCIGRvbmdsZS48L1A+DQo8UD5ZZXN0ZXJkYXkgSSBtYWRlIGl0IHRo
+YXQgNCBkb25nbGUgcmVsYXkgZGF0YSBmcm9tIHRvcCB0byBkb3duIGFuZCBkd29uIHRvIHRvcCwg
+d3JpdGluZyBhIHV0aWxpdHkgY29kZSBiYXNlZCBvbiByZmNvbW0gcHJvZ3JhbSBpbiBibHVlei11
+dGlsLjwvUD4NCjxQPkkgd29ya3MgZmluZSE8L1A+DQo8UD4mbmJzcDs8L1A+DQo8UD4mbmJzcDsm
+bmJzcDsmbmJzcDsgQSAtLS0tLS0tLS0tLS0tLS0tLS0mZ3Q7Qi0tLS0tLS0tLS0tLS0tLS0tJmd0
+OyBDIC0tLS0tLS0tLS0tLS0tLS0tLSZndDsgRDwvUD4NCjxQPiZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyBNJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IFMmbmJzcDsmbmJzcDsg
+TSZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyZuYnNwOyZuYnNwOyBTJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IE0mbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgUzwv
+UD4NCjxQPiZuYnNwOzwvUD4NCjxQPiZuYnNwOzwvUD4NCjxQPkJ1dCwgd2hpbGUgSSBhbSBydW5u
+aW5nIGl0IHNlcnZlcmFsIHRpbWUuIEkgZ290IGEgb25lIGRpZmZpY3VsdCBwcm9ibGVtICJDYW4n
+dCBiaW5kOiBBZGRyZXNzIGFscmVhZHkgaW4gVXNlISI8L1A+DQo8UD5UaGlzIGlzIG9sZCBwcm9i
+bGVtIGluIFRDUC9JUCBzb2NrZXQgcHJvZ3JhbSwgd2hlbiB0aGUgc2VydmVyIGNsYXNoZXMgd2l0
+aG91dCBjbG9zZSB0aGUgc29ja2V0LCBzbyB0aGF0IHRoZSB3ZWxsLWtvd24gKG9yIGZpeGVkIGFu
+eXdheSk8L1A+DQo8UD5jYW5ub3QgYmUgcmVzdXNlZCBhZ2FpbiBmb3IgYSBzZXZlcmFsIG1pbnV0
+ZXMgaW4gdHlwaWNhbCBUQ1AvSVAgc29ja2V0IHByb2dyYW0uJm5ic3A7Jm5ic3A7IDwvUD4NCjxQ
+PiZuYnNwOzwvUD4NCjxQPkJ1dCEgd2hhdCBpcyB0aGUgcG9ydCBpbiByZmNvbW0gc29ja2V0PyBJ
+cyB0aGlzIGNoYW5uZWwgbnVtZXI/Jm5ic3A7b3IgYm9hcmQgYWRkcmVzcz8uPC9QPg0KPFA+QW5k
+IENhbiBJIHVzZSBzb2NrZXRvcHQgc3lzdGVtIGNhbGwgZm9yIHRoZSByZmNvbW0gc29ja2V0ID8m
+bmJzcDsgZm9yIFJFU1VTRSBvcHRpb24hPC9QPg0KPFA+QWxzbywgdGhlIHNvY2tldCBhZGRyZXNz
+IGlzIG5vdCBmcmVlZCBmb3IgZXZlbiAzMCBtaW51dGVzLCB3aGlsZSB1c3VhbGx5IFRDUC9JUCBw
+b3J0IGlzIGNhbiBiZSByZXN1ZWQgYWZ0ZXIgc2V2ZXJhbCBtaW51dGVzITwvUD4NCjxQPldoYXQg
+cGFydCBvZiBrZXJuZWwgc3RhY2sgaGFzIHNvbWV0aGluZyB3aXRoIHRoaXM/Pz8gcmZjb21tLm8g
+Pz8/PyA8L1A+DQo8UD4mbmJzcDs8L1A+DQo8UD5QbGVhc2Uga2luZGx5IGNvbW1lbnQgdGhpcy48
+L1A+DQo8UD4mbmJzcDs8L1A+DQo8UD4mbmJzcDs8L1A+DQo8UD5UaGFua3MuPC9QPg0KPFA+Jm5i
+c3A7PC9QPg0KPFA+Jm5ic3A7PC9QPg0KPFA+PEJSPiZuYnNwOzwvUD48L2JvZHk+PC9odG1sPgo8
+aW1nIGJvcmRlcj0wIHdpZHRoPTEgaGVpZ2h0PTEgc3JjPSdodHRwOi8vbWFpbC5zbnV0LmFjLmty
+L21lL2pzcC9pbmJveC9kaXNwUmVjdkNvbmZpcm1Gb3JTZW50LmpzcD9hY3Rpb25LaW5kPWluc2Vy
+dCZzVXNlcklEPWhlZWp1bmUmc01zZ0lEPTI2NWZmMmFiY2MxMDEmc0VNYWlsPWJsdWV6LXVzZXJz
+QGxpc3RzLnNvdXJjZWZvcmdlLm5ldCZzTmFtZT0nID4K
 
+
+--DC81438675.1107241349198.MailEdge--
 
 
 
