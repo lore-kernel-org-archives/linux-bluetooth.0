@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Patrick Duchstein <patrick-bluez.org@prote.st>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <20040809164445.4c304eb5.patrick-bluez.org@prote.st>
+Subject: Re: [Bluez-users] IOGear GBU301 and Kernel 2.4.20
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Tom Watson <tsw@johana.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <411733d1.johana@johana.com>
+References: <411733d1.johana@johana.com>
+Content-Type: text/plain
+Message-Id: <1092046722.21815.10.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Bluetooth transmission rates
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,28 +18,62 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 9 Aug 2004 16:44:45 +0200
+Date: Mon, 09 Aug 2004 12:18:42 +0200
 
-Hi,
+Hi Tom,
 
-I did some timing measurements for packet round-trips between two
-Bluetooth hosts comparing the different ACL packet types, resulting in
-the plot located at http://www.duchstein.com/perf-packettype-kbu.eps
-One side is linux with the BlueZ stack and a CSR chip, other side is my
-own stack using an Ericsson ROK 101 007.
+> > > > this is a Broadcom BCM2033 dongle without firmware loaded. Install the
+> > > > bluez-firmware package and use the bcm203x kernel driver from a recent
+> > > > 2.6 kernel or compile bluez-utils-2.9 with bcm203x support.
+> > > > 
+> > > OK, This ought to be simple but...
+> > > [ bluez-utils-2.9]# ./configure --prefix=/usr --mandir=/usr/share/man
+> > > --sysconfdir=/etc --enable-bcm203x
+> > > 
+> > > Then...
+> > > make clean    {I hadn't done the 'enable-bcm...'}
+> > > 
+> > > and then
+> > > make
+> > > 
+> > > But it goes for a while and I get...
+> > > gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/include -Wall -g -O2 -c `test -f
+> > > 'bcm203x.c' || echo './'`bcm203x.c
+> > > cc1: warning: changing search order for system directory "/usr/include"
+> > > cc1: warning:   as it has already been specified as a non-system directory
+> > > bcm203x.c: In function `load_firmware':
+> > > bcm203x.c:118: warning: implicit declaration of function `usb_interrupt_read'
+> > > gcc -I/usr/include -Wall -g -O2   -o bcm203x  bcm203x.o -L/usr/lib -lusb
+> > > bcm203x.o: In function `load_firmware':
+> > > ...../bluez-utils-2.9/extra/bcm203x.c:118: undefined reference to
+> > > `usb_interrupt_read'
+> > > ...../bluez-utils-2.9/extra/bcm203x.c:133: undefined reference to
+> > > `usb_interrupt_read'
+> > > 
+> > > This doesn't look too good.  Am I doing something wrong here??
+> > 
+> > you must install the development package of the USB library.
+> > 
+> 
+> Well, I thought I had installed it.  I've got a RedHat system and I
+> installed 'libusb-devel-0.1.6-3.i386.rpm' (from RH9.0 CD set).  I then
+> again attempted the 'make' to only get the same results (no routine
+> 'usb_interrupt_read').
+> 
+> Hopefully I haven't done anything more silly.
+> I looked in /usr/lib and saw 'libusb.a' is this the correct library module?
+> 
+> If not, where should it be, and its name??
 
-I now have some trouble interpreting these measurements, two facts I
-cannot explain:
-1. why is the transmission rate for packets with very small payload so
-low among all packet types? Shouldn't it be equal to larger payload
-sizes, as long as the packet type is the same?
-2. the raise in transmission rate starting at a payload size of 192
-bytes stems from fragmentation due to a limited buffer size of one of
-the host controllers (CSR:192 bytes). But shouldn't it be a big step
-instead of a slow increase then?
+I never checked this before, but it seems that you need at least version
+0.1.8 of that library. Prior versions don't have support for reading
+from interrupt endpoints.
 
-Thanks in advance for any help,
-Patrick
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
