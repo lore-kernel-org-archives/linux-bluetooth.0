@@ -1,70 +1,47 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Embedded bluetooth recommendations
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Wiebe Baron <Wiebe.Baron@Wirelessvalue.nl>
+Return-Path: <echtler@fs.tum.de>
+Date: Mon, 25 Oct 2004 10:37:03 +0200 (CEST)
+From: Florian Echtler <echtler@fs.tum.de>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <006201c4ba6b$d39682e0$a900a8c0@wivd10>
-References: <006201c4ba6b$d39682e0$a900a8c0@wivd10>
-Content-Type: text/plain
-Message-Id: <1098693859.24932.18.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 25 Oct 2004 10:44:19 +0200
+Subject: Re: [Bluez-users] Disabling HID Boot Protocol
+In-Reply-To: <1098676850.6465.76.camel@pegasus>
+Message-ID: <Pine.LNX.4.61.0410250918550.25313@block.bubble>
+References: <Pine.LNX.4.61.0410241307180.7693@block.bubble>
+ <1098618588.6465.5.camel@pegasus>  <Pine.LNX.4.61.0410241829170.12604@block.bubble>
+ <1098676850.6465.76.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Wiebe,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> I have a question about embedded Bluetooth. I'm working on a feedback
-> control project which involves 8 devices. Up till now a module has
-> been used with integrated stack but this is unable to support an
-> RFCOMM link with seven slaves and the response time of a scatternet is
-> unacceptable so I'm now looking for a multiprocessor solution with a
-> separate stack. 
+> > However, still no reaction from the multimedia keys, at least none
+> > in hcidump. Perhaps I should try 2.6.9-mh1?
+> You see nothing in hcidump, when you press them? That is strange. What
+> are the first HIDP messages for the keyboard in hcidump?
+The first HIDP thing the keyboard says after connection:
 
-are you talking about seven RFCOMM links on the same ACL link or about
-seven different ACL links. If you really wanna work with piconet where
-the master controls 7 slaves you should use a CSR chip, because all
-other Bluetooth chips are acting somekind weird. However even with the
-CSR stuff you must make sure that at least a HCI 18.2 firmware is used.
+> ACL data: handle 0x002c flags 0x02 dlen 14
+    L2CAP(d): cid 0x41 len 10 [psm 19]
+      HIDP: Data: Input report
+      01 00 00 2C 00 00 00 00 00 
+> ACL data: handle 0x002c flags 0x02 dlen 14
+    L2CAP(d): cid 0x41 len 10 [psm 19]
+      HIDP: Data: Input report
+      01 00 00 00 00 00 00 00 00 
 
-> I'm currently experimenting with a sharp LH79520 with embedded Linux
-> from metrowerks and Bluez but this seems to be overkill because the
-> application requirements themselves are minimal (7 way cable
-> replacement).
+I recorded a BT dump which shows the keyboard connecting and two
+keypresses (Space and the mute button). If desired, I can send it
+to you personally.
 
-The Sharp uses an ARM7TDMI. Actually this is really overkill and then
-you should better buy a Bluetooth chip that itself uses this ARM chip
-like Zeevo etc. However then the above point comes in ...
+Yours, Florian
+- -- 
+Homo homini lupus.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
 
-> Does anyone have a suggestion of a combination of stack, operating
-> system and microprocessor that is known to work together and has
-> minimum requirements in terms of RAM, ROM and processor speed (cost)?
-
-I am not a microprocessor expert, but actually every processor with
-Linux support should be useable and BlueZ is of course the best choice
-for a Bluetooth stack.
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
-Use IT products in your business? Tell us what you think of them. Give us
-Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
-http://productguide.itmanagersjournal.com/guidepromo.tmpl
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+iD8DBQFBfLsy7CzyshGvatgRAlE/AKCper8BaJ0etNXCu4Saa3SxMprNTwCgwSAf
+aXZusBCfbu3mcSaNMSd+Ooc=
+=+QKh
+-----END PGP SIGNATURE-----
