@@ -1,13 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <40AA11AB.6010307@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] question: what does this patch from snd-bt-sco
- do?
-References: <40A9E6CB.4010505@dark-reality.de>	 <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk>	 <40A9EE51.2080102@dark-reality.de> <1084881439.5833.108.camel@pegasus>
-In-Reply-To: <1084881439.5833.108.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+	do?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lars Grunewaldt <lgw@dark-reality.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <40A9F4F4.4080601@dark-reality.de>
+References: <40A9E6CB.4010505@dark-reality.de>
+	 <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk>
+	 <40A9EE51.2080102@dark-reality.de>  <40A9F4F4.4080601@dark-reality.de>
+Content-Type: text/plain
+Message-Id: <1084881575.5833.112.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,46 +21,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 May 2004 15:37:47 +0200
+Date: Tue, 18 May 2004 13:59:35 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Lars,
 
-Marcel Holtmann wrote:
-| Hi Lars,
-|
-|
-|>I already looked up the voice number stuff in the core docs, and was
-|>able to find out that 0x0140 is ideal right now (MU_LAW encoded). Works
-|>here, already.
-|
-|
-| for this you must use alternate setting 1, because it is 8 bit.
-|
+> just wanted to mention that one single SCO connection at a time is
+> sufficent right now, IMO; I don't think that most people will need more
+> than one (open) connection for audio right now. Of course, if the core
+> definition says there must be more than one, we have to implement it.
 
-um, sorry - what's an alternate setting? I mean, what exactly is "set" here?
+the difference is 8-bit, 16-bit and the number of SCO connections.
 
-I have a working setup with
-hciconfig hci0 voice 0x0140
-the above kernel patch and the default snd-bt-sco driver stuff (of
-course alsa codec information has changed from PCM to MU_LAW)
+> Or is SCO used for anything else but audio?
 
-so I don't exactly know that this alternate setting means :)
+With Bluetooth 1.2 and eSCO it will be possible to use it for data
+transmission. We have to adapt full eSCO support at some time.
 
-Or is it a setting that makes the 8bit-modes possible without using that
-kernel patch?
+Regards
 
-sorry, but I'm a bit new to Bluez :)
-~  Lars
+Marcel
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFAqhGqQWC6DTWkDAoRAruDAJ4+ovPkHM6M7YvCI2nh6T82RcXy+QCfV8xf
-Cc+MRgtEf1rE96S3NHmcV/g=
-=mc1o
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
