@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluez and billionton pcbtc1
+Subject: Re: [Bluez-users] BlueZ licensing inquiry
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <b5c638dc05032815321b2739c5@mail.gmail.com>
-References: <b5c638dc05032815321b2739c5@mail.gmail.com>
+In-Reply-To: <OF200FCC20.5703443A-ON48256FD3.001D7002-48256FD3.001DBAF3@lexmark.com>
+References: 
+	 <OF200FCC20.5703443A-ON48256FD3.001D7002-48256FD3.001DBAF3@lexmark.com>
 Content-Type: text/plain
-Message-Id: <1112075117.9016.60.camel@pegasus>
+Message-Id: <1112075079.9016.58.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +19,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Mar 2005 07:45:17 +0200
+Date: Tue, 29 Mar 2005 07:44:39 +0200
 
-Hi David,
+Hi Gail,
 
-> I saw this in the list of adapters.. pcbtc1 but i can't get it to work
-> in my laptop.. any ideas or thoughts on if it works or not with
-> bluez..
+> I would like to know, what is the licensing for BlueZ?  Are there any
+> issues from a legal or licensing stand-point if we port it to another
+> OS?  
 
-what does "dump_cis" says about this card.
+the license of the BlueZ source code is GPL. However I am not sure if it
+makes sense at all to port it to another operating system. The kernel
+part is deeply based on Linux specific structures.
 
 Regards
 
