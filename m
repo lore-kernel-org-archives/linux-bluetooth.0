@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Colin Pinkney <bluez-devel@cpinkney.org.uk>
+From: Till Harbaum <harbaum@beecon.de>
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [SPAM?]:  [Bluez-devel] baswap neccesity
+Cc: soraberri <421246@posta.unizar.es>
+References: <cruhvs$fj5$1@sea.gmane.org>
+In-Reply-To: <cruhvs$fj5$1@sea.gmane.org>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-1"
-Message-Id: <200501102004.11028.bluez-devel@cpinkney.org.uk>
-Subject: [Bluez-devel] sockfd_lookup missing from older kernel patches
+Message-Id: <200501101947.53084.harbaum@beecon.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,65 +20,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Jan 2005 20:04:10 +0000
+Date: Mon, 10 Jan 2005 19:47:52 +0100
 
 Hi,
 
-I was updating a BlueZ package for the Sharp Zaurus PDAs that use the 2.4.18 
-kernel. The previous package had been using BlueZ libs and utils v2.3 and 
-patch 2.4.18-mh8 and had been working ok.
+On Monday 10 January 2005 19:36, soraberri wrote:
+> Why is it neccesary? Why does the server listening at the other side
+> expect addresses in such byte ordering?
+It's not the server on the other side but the local bluetooth chip that wants 
+to receive the address in the reverse order. If you want to know why this is 
+you'll probably have to ask someone from the Bluetooth SIG.
 
-With the latest userspace source and patch 2.4.18-mh15 I noticed the function 
-sockfd_lookup had been removed from the sock.c files. This caused a 
-unresolved symbol error upon loading the bnep module on the Zaurus.
-
-I noticed in the comments on http://www.holtmann.org/linux/kernel/ that 
-sockfd_lookup was removed on Dec 15, 2003 from kernel patches for kernels 
-2.4.22 and later. I presume this function has been moved into more central 
-kernel code? Was this function supposed to be removed from the patches for 
-kernels 2.4.21 and earlier (or at least kernel 2.4.18)?
-
-When I stuck the code below back into bnep/sock.c the module loaded properly 
-(although I need to test functionality a bit more as I got the code from the 
-patch 2.4.18-mh8).
-
-<<<<<
-static inline struct socket *socki_lookup(struct inode *inode)
-{
-       return &inode->u.socket_i;
-}
-
-static struct socket *sockfd_lookup(int fd, int *err)
-{
-       struct file *file;
-       struct inode *inode;
-       struct socket *sock;
-
-       if (!(file = fget(fd))) {
-               *err = -EBADF;
-               return NULL;
-       }
-
-       inode = file->f_dentry->d_inode;
-       if (!inode->i_sock || !(sock = socki_lookup(inode))) {
-               *err = -ENOTSOCK;
-               fput(file);
-               return NULL;
-       }
-
-       if (sock->file != file) {
-               printk(KERN_ERR "socki_lookup: socket file changed!\n");
-               sock->file = file;
-       }
-       return sock;
-}
->>>>>
-
-Regards,
+Till
 
 -- 
-Colin Pinkney
-http://www.cpinkney.org.uk
+Dr.-Ing. Till Harbaum                       Tel.:  +49 721 4998963
+BeeCon GmbH                                 Fax:   +49 721 4998962
+Haid-und-Neu Strasse 7, 76131 Karlsruhe     Mobil: +49 179 9087904
+harbaum@beecon.de                           http://www.beecon.de
 
 
 -------------------------------------------------------
