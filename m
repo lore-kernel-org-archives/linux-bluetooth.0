@@ -1,17 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth Access Point elmeg D@VOS-44.dsl
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Florian <Kimpenhaus@gmx.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <opr3x77rphqdj9uv@mail.gmx.de>
-References: <opr3xmdugiqdj9uv@mail.gmx.de>
-	 <1077725935.2919.116.camel@pegasus>  <opr3xs5louqdj9uv@mail.gmx.de>
-	 <1077734547.2919.147.camel@pegasus>  <opr3xydd1hqdj9uv@mail.gmx.de>
-	 <1077740936.2884.2.camel@pegasus>  <opr3x23lc1qdj9uv@mail.gmx.de>
-	 <1077747171.2884.5.camel@pegasus>  <opr3x77rphqdj9uv@mail.gmx.de>
-Content-Type: text/plain
-Message-Id: <1077753099.2754.1.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <403D1EB6.8000806@3WT.com.br>
+From: Rafael Vidal Aroca <rafael@3WT.com.br>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] [Familiar] Bluetooth service to receive files
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,29 +15,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Feb 2004 00:51:39 +0100
+Date: Wed, 25 Feb 2004 19:16:22 -0300
 
-Hi Florian,
+	
+	When i ran Pocket PC 2002 on my iPaq it had a bluetooth service wich i 
+don't know wich was that allowed iPaq to receive files sent from Cell 
+Phones.
 
-> I have changed hcid.conf & restarted hcid - nothing happend, but I have 
-> run
-> 
-> sdptool browse
-> Inquiring ...
-> Failed to connect to SDP server on 00:0B:CE:00:01:8E: Function not 
-> implemented
-> 
-> for some reason service is not discoverd.
+	For example, i could take a picture on a Nokia cell with camera, and 
+send via bluetooth. My pda just asked if i accept that file and received 
+the file upon confirmation.
 
-run "hcidump -x" again and show us the output of "hciconfig -a".
+	I'd like to know if it's possible to set this in Familiar Linux?
+Does anyone know which service is this? How to configure?
 
-> found patch-2.6.3-mh.gz does it make anything easier?
+	Thanks.
 
-No. It only contains small changes which are not related.
-
-Regards
-
-Marcel
+Rafael
 
 
 
