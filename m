@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: David Woodhouse <dwmw2@infradead.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1094482974.14552.38891.camel@hades.cambridge.redhat.com>
+From: "blookk -" <blookk@hotmail.com>
+To: Richard.Williams@VITRONICS.com, bluez-devel@lists.sf.net
+Subject: RE: [Bluez-devel] PAN profile of bluetooth
 Mime-Version: 1.0
-Subject: [Bluez-devel] BNEP corruption.
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Message-ID: <BAY1-F364M0o1hjFvlG00043d8d@hotmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,41 +15,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 06 Sep 2004 16:02:55 +0100
-
-Using a PCMCIA bluetooth card I see this frequently... 
-
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Out-of-order packet arrived, got 2 expected 1
-bcsp_recv: Out-of-order packet arrived, got 3 expected 1
-bcsp_recv: Out-of-order packet arrived, got 4 expected 1
-bcsp_recv: Short BCSP packet
-bcsp_recv: Out-of-order packet arrived, got 7 expected 6
-bcsp_recv: Out-of-order packet arrived, got 0 expected 6
-bcsp_recv: Out-of-order packet arrived, got 1 expected 6
-bcsp_recv: Error in BCSP hdr checksum
-
-At some point I'll investigate -- I thought we were supposed to be using
-flow control so that really shouldn't happen. But more concerning is the
-fact that this leads to silent corruption in network traffic -- we seem
-to be bypassing checksums on packets received by BNEP. Let's not do
-that:
-
---- net/bluetooth/bnep/core.c~	2004-08-14 06:37:26.000000000 +0100
-+++ net/bluetooth/bnep/core.c	2004-09-06 15:28:05.749950320 +0100
-@@ -384,7 +384,7 @@
- 	
- 	s->stats.rx_packets++;
- 	nskb->dev       = dev;
--	nskb->ip_summed = CHECKSUM_UNNECESSARY;
-+	nskb->ip_summed = CHECKSUM_NONE;
- 	nskb->protocol  = eth_type_trans(nskb, dev);
- 	netif_rx_ni(nskb);
- 	return 0;
+Date: Mon, 06 Sep 2004 14:59:34 +0000
 
 
--- 
-dwmw2
+Hello Rich
+
+I haven't got the /etc/bluetooth/pan/dev-up file, but I make a ping 
+192.168.40.1 and  it works correctly.
+
+regards
+
+
+
+&gt;From: &quot;Williams, Richard&quot; 
+&lt;Richard.Williams@VITRONICS.com&gt;
+&gt;To: &quot;blookk -&quot; 
+&lt;blookk@hotmail.com&gt;,&lt;bluez-devel@lists.sf.net&gt;
+&gt;Subject: RE: [Bluez-devel] PAN profile of bluetooth
+&gt;Date: Mon, 30 Aug 2004 11:51:08 -0400
+&gt;
+&gt;Hello,
+&gt;
+&gt;Did you make sure the /etc/bluetooth/pan/dev-up file is correct and 
+present
+&gt;on both your devices, master and slave ? If this file isn't there, you 
+won't
+&gt;get the bnep process started.
+&gt;
+&gt;Regard,
+&gt;
+&gt;Rich
+&gt;
+
+_________________________________________________________________
+Acepta el reto MSN Premium: Correos más divertidos con fotos y textos 
+increíbles en MSN Premium. Descárgalo y pruébalo 2 meses gratis. 
+http://join.msn.com?XAPID=1697&DI=1055&HL=Footer_mailsenviados_correosmasdivertidos
 
 
 
