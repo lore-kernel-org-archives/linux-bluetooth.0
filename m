@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Broadcomm usb dongle problems.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E1CYXHQ-0006VU-6W@sc8-sf-mx2.sourceforge.net>
-References: <E1CYXHQ-0006VU-6W@sc8-sf-mx2.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1101691937.9527.3.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41AA747D.5020800@vdsoft.org>
+From: Vladimir Dvorak <dvorakv@vdsoft.org>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] BCM203x - firmware load failed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,54 +16,69 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Nov 2004 02:32:17 +0100
-
-Hi,
-
-> Well it looks like that from the all dongles in the world I bought the one
-> that is have problems.
-> 
-> I will appreciate any help with this issue.
-> 
-> Here is the info:
-> 
-> [root@anubis ~]# hciconfig -a
-> hci0:   Type: USB
->         BD Address: 00:0C:55:FA:3E:21 ACL MTU: 377:10  SCO MTU: 16:0
->         UP RUNNING
->         RX bytes:159 acl:0 sco:0 events:23 errors:0
->         TX bytes:837 acl:0 sco:0 commands:23 errors:0
->         Features: 0xff 0xff 0x0d 0x38 0x08 0x08 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
-> Can't read local name on hci0. Input/output error(5)
-> [root@anubis ~]# hcid -n
-> hcid[8179]: Bluetooth HCI daemon
-> hcid[8179]: Starting security manager 0
-> hcid[8181]: Can't set scan mode on hci0. Device or resource busy(16)
-> hcid[8181]: Can't set auth on hci0. Device or resource busy(16)
-> hcid[8181]: Can't set encrypt on hci0. Device or resource busy(16)
-> hcid[8179]: Exit.
-> [root@anubis ~]# lsusb
-> Bus 003 Device 001: ID 0000:0000
-> Bus 002 Device 006: ID 0a5c:3503 Broadcom Corp.
-> Bus 002 Device 005: ID 0a5c:3502 Broadcom Corp.
-> Bus 002 Device 004: ID 0a5c:2009 Broadcom Corp.
-> Bus 002 Device 003: ID 0a5c:3535 Broadcom Corp.
-> Bus 002 Device 001: ID 0000:0000
-> Bus 001 Device 001: ID 0000:0000
-
-this is the one that still has problems. What kernel are you using? If
-the latest 2.6.10-rc2 or 2.6.9-mh4 are not working then someone needs to
-send me one of these so I can take a closer look at the problem. The
-dongle 0a5c:200a from Broadcom is working fine.
-
-Regards
-
-Marcel
+Date: Mon, 29 Nov 2004 01:59:41 +0100
 
 
+Hi *,
+
+I have a problem with Belkin Bluetooth USB adapter based on BCM203x 
+chip. When I plug this dongle into USB port, kernel returns:
+
+Bluetooth: Broadcom Blutonium firmware driver ver 1.0
+bcm203x_probe: Mini driver request failed
+bcm203x: probe of 2-1:1.0 failed with error -5
+usbcore: registered new driver bcm203x
+
+I am using :
+
+# cat /proc/versions
+Linux version 2.6.9-9-amd64-k8 (root@athlon.lowpingbastards.de) (gcc 
+version 3.4.2 (Debian 3.4.2-3)) #1 Wed Nov 10 19:02:19 CET 2004
+
+#lspci
+0000:00:00.0 Host bridge: VIA Technologies, Inc.: Unknown device 0282
+0000:00:00.1 Host bridge: VIA Technologies, Inc.: Unknown device 1282
+0000:00:00.2 Host bridge: VIA Technologies, Inc.: Unknown device 2282
+0000:00:00.3 Host bridge: VIA Technologies, Inc.: Unknown device 3282
+0000:00:00.4 Host bridge: VIA Technologies, Inc.: Unknown device 4282
+0000:00:00.7 Host bridge: VIA Technologies, Inc.: Unknown device 7282
+0000:00:01.0 PCI bridge: VIA Technologies, Inc. VT8237 PCI bridge 
+[K8T800 South]
+0000:00:0a.0 Ethernet controller: Marvell Technology Group Ltd. Yukon 
+Gigabit Ethernet 10/100/1000Base-T Adapter (rev 13)
+0000:00:0c.0 Network controller: RaLink Ralink RT2500 802.11 Cardbus 
+Reference Card (rev 01)
+0000:00:0f.0 RAID bus controller: VIA Technologies, Inc. VIA VT6420 SATA 
+RAID Controller (rev 80)
+0000:00:0f.1 IDE interface: VIA Technologies, Inc. 
+VT82C586A/B/VT82C686/A/B/VT823x/A/C PIPC Bus Master IDE (rev 06)
+0000:00:10.0 USB Controller: VIA Technologies, Inc. VT82xxxxx UHCI USB 
+1.1 Controller (rev 81)
+0000:00:10.1 USB Controller: VIA Technologies, Inc. VT82xxxxx UHCI USB 
+1.1 Controller (rev 81)
+0000:00:10.2 USB Controller: VIA Technologies, Inc. VT82xxxxx UHCI USB 
+1.1 Controller (rev 81)
+0000:00:10.3 USB Controller: VIA Technologies, Inc. VT82xxxxx UHCI USB 
+1.1 Controller (rev 81)
+0000:00:10.4 USB Controller: VIA Technologies, Inc. USB 2.0 (rev 86)
+0000:00:11.0 ISA bridge: VIA Technologies, Inc. VT8237 ISA bridge 
+[K8T800 South]
+0000:00:11.5 Multimedia audio controller: VIA Technologies, Inc. 
+VT8233/A/8235/8237 AC97 Audio Controller (rev 60)
+0000:00:18.0 Host bridge: Advanced Micro Devices [AMD] K8 NorthBridge
+0000:00:18.1 Host bridge: Advanced Micro Devices [AMD] K8 NorthBridge
+0000:00:18.2 Host bridge: Advanced Micro Devices [AMD] K8 NorthBridge
+0000:00:18.3 Host bridge: Advanced Micro Devices [AMD] K8 NorthBridge
+0000:01:00.0 VGA compatible controller: nVidia Corporation NV18 
+[GeForce4 MX 440 AGP 8x] (rev c1)
+
+
+The same configuration is working for me on other hardware very well.
+
+Could you have a look please ? Thank you.
+
+
+Vladimir
 
 
 -------------------------------------------------------
