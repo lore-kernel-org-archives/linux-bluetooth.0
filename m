@@ -1,15 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Bluetooth kernel patch for 2.6.1
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Max Krasnyansky <maxk@qualcomm.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1074287664.2559.422.camel@localhost>
+In-Reply-To: <1074288307.2559.434.camel@localhost>
 References: <1074193649.2629.23.camel@pegasus>
-	 <1074196213.2559.255.camel@localhost>  <1074197813.2629.52.camel@pegasus>
-	 <1074287664.2559.422.camel@localhost>
+	 <1074196988.2559.270.camel@localhost>  <1074198649.2629.67.camel@pegasus>
+	 <1074288307.2559.434.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1074302399.2629.137.camel@pegasus>
+Message-Id: <1074301700.2629.124.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: BCM2033 firmware loader
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,38 +20,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 17 Jan 2004 02:19:59 +0100
+Date: Sat, 17 Jan 2004 02:08:20 +0100
 
 Hi Max,
 
-> > actually I never got bluefw working stable with 2.6. The usbfs interface
-> > causes troubles which I can't explain. Maybe the problems are caused by
-> > my hardware, but I don't know. I also want to avoid using bulk transfer
-> > over ISOC endpoint to make OHCI happy and it seems that inside the
-> > kernel there exists no more problems for the OHCI chips. 
-> You mean Bulk over Interrupt. BlueFW doesn't send Bulk over Isoc.
+> No. I have several email with Broadcomm engineer who explained how
+> protocol works. That's pretty much it. He didn't mention any additional
+> stuff.
 
-of course. I mixed it, maybe because I talked about ISOC transfer and
-the HCI USB driver problem on the Linux USB mailing list ;)
+I have a nice USB dump from the Windows driver. Of course it uses an
+older firmware and mini driver, but it also issues another status
+command before selecting the memory. I decided not to include it,
+because I can't decode the extra information and it makes the driver
+more complex. Do you have a contact for me, so we can talk about it. I
+am also interested in a Bluetooth 1.2 firmware if it exists.
 
-> > So after I made
-> > my experiences with the request_firmware() interface and the bfusb
-> > driver I decided to give it a try and the bcm203x driver was born.
-> 
-> I see. I have no problem with implementation in fact it's very clean and
-> nice. My only concern is that if it can be done from user space it
-> should be done in user-space thing :). I mean nobody is going to unload
-> this bcm203x module after fw download is complete. Yeah it's small but
-> it's still a waste. I'd rather fix usbfs if it's broken. Greg and
-> Johannes will happily accept patches ;-). 
+> I'm trying to remember scenario where it was a problem (ie us killing
+> incoming connection) but it simply vanished from my memory :).
 
-I simply agree with you on all points. If I found enough time to look at
-my usbfs problems I will try to fix them.
+I talked a little bit with Steven and Chris from CSR about it (look at
+the archive) and of course there can be a problem with some link manager
+implementation if both sides issue HCI_Disconnect at the same time. This
+is why I choose the double time if we disconnect an incoming connection
+to be safe for BlueZ <-> BlueZ connections.
 
-On the other hand it is also possible to make the firmware loading
-routine of the bcm203x driver a compile time option of the hci_usb
-driver. Of course this is also a waste inside the kernel, but you don't
-have an extra module to load. Do you think this is a better approach?
+> But I still think it's not right, even though spec does not say who must
+> close the connection (are you sure it doesn't btw ?). That Bluetooth
+> mouse must have its reasons for keeping connection and if you kill it
+> most likely they just reconnect immediately.
+
+I came around with this on 21 Dec and I thought about it for over 3
+weeks before I finally decided to include this patch. I am not happy
+with it, but doing nothing and keep the ACL link makes me even more sad.
+The Apple mouse with its Broadcom HID stack is even more worse than I
+can think about it. At http://www.holtmann.org/linux/bluetooth/hid.html
+you find some of my notes about Bluetooth HID devices. And the mouse
+never disconnects the ACL link. I checked this and it stays forever :(
 
 Regards
 
