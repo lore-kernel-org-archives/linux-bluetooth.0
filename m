@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41E9B834.4060809@dark-reality.de>
+Message-ID: <41E9B493.5050102@dark-reality.de>
 From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: scooped by pocketpc (a2dp)
-References: <41E93682.9040907@xmission.com>	 <pan.2005.01.15.16.35.03.165547@yahoo.com> <5256d0b0501151629332f7660@mail.gmail.com>
-In-Reply-To: <5256d0b0501151629332f7660@mail.gmail.com>
+Subject: Re: [Bluez-devel] how do I disconnect btsco when the headset is gone/down
+ ?
+References: <pan.2005.01.15.17.32.11.742730@yahoo.com>
+In-Reply-To: <pan.2005.01.15.17.32.11.742730@yahoo.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,18 +19,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 16 Jan 2005 01:41:24 +0100
+Date: Sun, 16 Jan 2005 01:25:55 +0100
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-Peter Robinson wrote:
-| Yes I use gnomemeeting with alsa at the moment but I haven't had time
-| to get my headset working properly under Linux.
+Paul Ionescu wrote:
+| Hi all,
+| Even if the headset is disconnected, the btsco program does not sense this
+| fact and is still using the resources.
+| I have to manually Ctrl-C or kill it.
 |
+| Is it only my case, or this is how is behaving right now ?
 
-Works very well with a Sony HBH-35 :)
-- - Lars
+Yes, that is how it behaves. Maybe the socket wait should be changed so
+it notices the RFCOMM disconnect properly?
+
+regards,
+~  Lars
+
 
 - --
 Lars Grunewaldt
@@ -42,9 +50,9 @@ mail: lgw@dark-reality.de
 Version: GnuPG v1.2.3 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFB6bgzQWC6DTWkDAoRAmYxAJ49vrQgq6YdX9ZKFzMvtF+rwfuuxwCgpp5J
-YvvCmOWlmiZtQe8D9yzYIDI=
-=kyMe
+iD8DBQFB6bSTQWC6DTWkDAoRAt7HAJ97txy6TegDufC4WC8VZ3EP5dZFVACfUYti
+/xHDBYS1NmnKF2lTFcVk4To=
+=Htga
 -----END PGP SIGNATURE-----
 
 
