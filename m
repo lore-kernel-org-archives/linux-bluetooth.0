@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Toshiba and BT (SuSE 9.2)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAIlEyQgujTUypH+pFEc3nRgEAAAAA@t-online.de>
-References: 
-	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAIlEyQgujTUypH+pFEc3nRgEAAAAA@t-online.de>
-Content-Type: text/plain
-Message-Id: <1103294863.28046.109.camel@pegasus>
-Mime-Version: 1.0
+From: Fred Schaettgen <bluez-user@schaettgen.de>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] passive inquiry
+References: <20041217141809.62713.qmail@web40605.mail.yahoo.com>
+In-Reply-To: <20041217141809.62713.qmail@web40605.mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200412171534.03946.bluez-user@schaettgen.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,28 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Dec 2004 15:47:43 +0100
+Date: Fri, 17 Dec 2004 15:34:03 +0100
 
-Hi Peter,
+On Friday 17 December 2004 15:18, Paolino paperino wrote:
+> Hi,
+> i want to know if it is possible to make a "passive
+> inquiry", i explain better, a device A do an inquiry
+> no find their neighbours, it is possible for a device
+> B (in the reachability field) to know that was
+> inquiried by device A? The applican can receive an
+> event each time the device is inquiried?
 
-> thanks a lot for your professional help. I will try to get the information
-> how to connect to the network from my local linux-user group.
+No, that is not possible in general. 
+The bluetooth chip responds to the inquiry without generating any HCI events. 
+You can see SDP requests, since those are handled by the Bluetooth stack, but 
+that won't help you much I guess. Maybe there are vendor-specific commands to 
+make that possible, but I don't know about any.
 
-this PPP stuff is crap. If you plan to buy yourself a new router, try to
-get one with PAN support. What I forgot to tell you is that you can add
-any pppd option at the end of your dund command line. So maybe adding
-"noauth defaultrouter" after the BD_ADDR is enough to let you use the
-internet connection.
+Fred
 
-> At the moment I'm not able to configure dund and ppp0 by YaST.
-
-I am not sure if this will really work.
-
-Regards
-
-Marcel
-
-
+-- 
+Fred Schaettgen
+bluez-devel@schaettgen.de
 
 
 -------------------------------------------------------
