@@ -1,12 +1,19 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5987A7CB1694D811A04D0002B32C289601BF3C16@il93exb05.corp.mot.com>
-From: Bhatt Abhi-ABHATT <ABHISHEK.BHATT@motorola.com>
-To: "'bluez-devel@lists.sourceforge.net'"
-	 <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C4C01F.10E68FE2"
-Subject: [Bluez-devel] Possible bug in hci_core.h ?
+Subject: RE: [Bluez-devel] Service level security for RFCOMM
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: Bhatt Abhi-ABHATT <ABHISHEK.BHATT@motorola.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1099310550.28599.132.camel@baroque.rococosoft.com>
+References: 
+	 <5987A7CB1694D811A04D0002B32C289601BF3BFE@il93exb05.corp.mot.com>
+	 <1099061231.10164.62.camel@pegasus>
+	 <1099062653.28599.47.camel@baroque.rococosoft.com>
+	 <1099068050.10164.69.camel@pegasus>
+	 <1099310550.28599.132.camel@baroque.rococosoft.com>
+Content-Type: text/plain
+Message-Id: <1099311470.16247.82.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,134 +24,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 1 Nov 2004 08:28:33 -0600
+Date: Mon, 01 Nov 2004 13:17:50 +0100
 
-This message is in MIME format. Since your mail reader does not understand
-this format, some or all of this message may not be legible.
+Hi Steve,
 
-------_=_NextPart_001_01C4C01F.10E68FE2
-Content-Type: text/plain
+> > However this also leads to a security problem, because I can scan the
+> > RFCOMM ports of a remote device without forcing the security mechanism.
+> > I only have to do the PN exchange and then disconnect. What should a
+> > remote device do when a PN CMD comes in for a channel without a service
+> > behind it?
+> 
+> If the spec says that authentication can only happen on receipt of SABM,
+> then I guess this leaves it open to port scans. 
+> 
+> However, does this really matter? If you want to protect _all_ services,
+> use security mode 3. If you're in security mode 2, it's most likely that
+> you can do SDP searches without performing a security procedure and
+> discover open channels that way.
 
- 
+yes, it matters, because security mode 3 is never the answer to any
+security related problems. You still need a very good policy engine
+behind the security manager to protect your device. I would advice
+anybody not to use security mode 3, even if the device supports only a
+single service. A single trust model is not working.
 
-Version: Kernel 2.6.9 with bluez patch 2.6.9-mh3
+> > Sorry, I don't get the point. Why should a client care about security
+> > mode 2, when it want to connect to a server in security mode 1. Actually
+> > the server must know what services to protect and not the client. If you
+> > have such server running, then this is a wrong designed server from my
+> > point of view.
+> 
+> Well, for example, a client may wish to authenticate a server before
+> connecting to it, irrespective of the security the service wants for
+> itself.
 
-File: hci_core.h
-
-Line: 234
-
- 
-
-Shouldn't line 234 be h->acl_num--; 
-
- 
-
-229: static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_conn *c)
-
-230: {
-
-231:          struct hci_conn_hash *h = &hdev->conn_hash;
-
-232:          list_del(&c->list);
-
-233:          if (c->type == ACL_LINK)
-
-234:                  h->acl_num++;
-
-235:          else
-
-236:                  h->sco_num--;
-
-237: }
-
- 
+I still don't see the full need behind this, but send in a clean patch
+for it and I will apply it. There should be no problem to support it.
 
 Regards
 
-Abhi
+Marcel
 
 
-------_=_NextPart_001_01C4C01F.10E68FE2
-Content-Type: text/html
-Content-Transfer-Encoding: base64
-
-PGh0bWw+DQoNCjxoZWFkPg0KPE1FVEEgSFRUUC1FUVVJVj0iQ29udGVudC1UeXBlIiBDT05URU5U
-PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9VVMtQVNDSUkiPg0KDQoNCjxtZXRhIG5hbWU9R2VuZXJhdG9y
-IGNvbnRlbnQ9Ik1pY3Jvc29mdCBXb3JkIDEwIChmaWx0ZXJlZCkiPg0KDQo8c3R5bGU+DQo8IS0t
-DQogLyogRm9udCBEZWZpbml0aW9ucyAqLw0KIEBmb250LWZhY2UNCgl7Zm9udC1mYW1pbHk6Ik1T
-IE1pbmNobyI7DQoJcGFub3NlLTE6MiAyIDYgOSA0IDIgNSA4IDMgNDt9DQpAZm9udC1mYWNlDQoJ
-e2ZvbnQtZmFtaWx5OiJcQE1TIE1pbmNobyI7DQoJcGFub3NlLTE6MiAyIDYgOSA0IDIgNSA4IDMg
-NDt9DQogLyogU3R5bGUgRGVmaW5pdGlvbnMgKi8NCiBwLk1zb05vcm1hbCwgbGkuTXNvTm9ybWFs
-LCBkaXYuTXNvTm9ybWFsDQoJe21hcmdpbjowaW47DQoJbWFyZ2luLWJvdHRvbTouMDAwMXB0Ow0K
-CWZvbnQtc2l6ZToxMi4wcHQ7DQoJZm9udC1mYW1pbHk6IlRpbWVzIE5ldyBSb21hbiI7fQ0KYTps
-aW5rLCBzcGFuLk1zb0h5cGVybGluaw0KCXtjb2xvcjpibHVlOw0KCXRleHQtZGVjb3JhdGlvbjp1
-bmRlcmxpbmU7fQ0KYTp2aXNpdGVkLCBzcGFuLk1zb0h5cGVybGlua0ZvbGxvd2VkDQoJe2NvbG9y
-OnB1cnBsZTsNCgl0ZXh0LWRlY29yYXRpb246dW5kZXJsaW5lO30NCnAuTXNvUGxhaW5UZXh0LCBs
-aS5Nc29QbGFpblRleHQsIGRpdi5Nc29QbGFpblRleHQNCgl7bWFyZ2luOjBpbjsNCgltYXJnaW4t
-Ym90dG9tOi4wMDAxcHQ7DQoJZm9udC1zaXplOjEwLjBwdDsNCglmb250LWZhbWlseToiQ291cmll
-ciBOZXciO30NCnAuTXNvQXV0b1NpZywgbGkuTXNvQXV0b1NpZywgZGl2Lk1zb0F1dG9TaWcNCgl7
-bWFyZ2luOjBpbjsNCgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7DQoJZm9udC1zaXplOjEyLjBwdDsN
-Cglmb250LWZhbWlseToiVGltZXMgTmV3IFJvbWFuIjt9DQpzcGFuLkVtYWlsU3R5bGUxNw0KCXtm
-b250LWZhbWlseTpBcmlhbDsNCgljb2xvcjp3aW5kb3d0ZXh0O30NCkBwYWdlIFNlY3Rpb24xDQoJ
-e3NpemU6OC41aW4gMTEuMGluOw0KCW1hcmdpbjoxLjBpbiA3Ny45NXB0IDEuMGluIDc3Ljk1cHQ7
-fQ0KZGl2LlNlY3Rpb24xDQoJe3BhZ2U6U2VjdGlvbjE7fQ0KLS0+DQo8L3N0eWxlPg0KDQo8L2hl
-YWQ+DQoNCjxib2R5IGxhbmc9RU4tVVMgbGluaz1ibHVlIHZsaW5rPXB1cnBsZT4NCg0KPGRpdiBj
-bGFzcz1TZWN0aW9uMT4NCg0KPHAgY2xhc3M9TXNvUGxhaW5UZXh0Pjxmb250IHNpemU9MiBmYWNl
-PSJDb3VyaWVyIE5ldyI+PHNwYW4gc3R5bGU9J2ZvbnQtc2l6ZToNCjEwLjBwdCc+Jm5ic3A7PC9z
-cGFuPjwvZm9udD48L3A+DQoNCjxwIGNsYXNzPU1zb1BsYWluVGV4dD48Zm9udCBzaXplPTIgZmFj
-ZT0iQ291cmllciBOZXciPjxzcGFuIHN0eWxlPSdmb250LXNpemU6DQoxMC4wcHQnPlZlcnNpb246
-IEtlcm5lbCAyLjYuOSB3aXRoIGJsdWV6IHBhdGNoIDIuNi45LW1oMzwvc3Bhbj48L2ZvbnQ+PC9w
-Pg0KDQo8cCBjbGFzcz1Nc29QbGFpblRleHQ+PGZvbnQgc2l6ZT0yIGZhY2U9IkNvdXJpZXIgTmV3
-Ij48c3BhbiBzdHlsZT0nZm9udC1zaXplOg0KMTAuMHB0Jz5GaWxlOiBoY2lfY29yZS5oPC9zcGFu
-PjwvZm9udD48L3A+DQoNCjxwIGNsYXNzPU1zb1BsYWluVGV4dD48Zm9udCBzaXplPTIgZmFjZT0i
-Q291cmllciBOZXciPjxzcGFuIHN0eWxlPSdmb250LXNpemU6DQoxMC4wcHQnPkxpbmU6IDIzNDwv
-c3Bhbj48L2ZvbnQ+PC9wPg0KDQo8cCBjbGFzcz1Nc29QbGFpblRleHQ+PGZvbnQgc2l6ZT0yIGZh
-Y2U9IkNvdXJpZXIgTmV3Ij48c3BhbiBzdHlsZT0nZm9udC1zaXplOg0KMTAuMHB0Jz4mbmJzcDs8
-L3NwYW4+PC9mb250PjwvcD4NCg0KPHAgY2xhc3M9TXNvUGxhaW5UZXh0Pjxmb250IHNpemU9MiBm
-YWNlPSJDb3VyaWVyIE5ldyI+PHNwYW4gc3R5bGU9J2ZvbnQtc2l6ZToNCjEwLjBwdCc+U2hvdWxk
-bid0IGxpbmUgMjM0IGJlIDxiPjxzcGFuIHN0eWxlPSdmb250LXdlaWdodDpib2xkJz5oLSZndDth
-Y2xfbnVtLS07PC9zcGFuPjwvYj4NCjwvc3Bhbj48L2ZvbnQ+PC9wPg0KDQo8cCBjbGFzcz1Nc29Q
-bGFpblRleHQ+PGZvbnQgc2l6ZT0yIGZhY2U9IkNvdXJpZXIgTmV3Ij48c3BhbiBzdHlsZT0nZm9u
-dC1zaXplOg0KMTAuMHB0Jz4mbmJzcDs8L3NwYW4+PC9mb250PjwvcD4NCg0KPHAgY2xhc3M9TXNv
-UGxhaW5UZXh0Pjxmb250IHNpemU9MiBmYWNlPSJDb3VyaWVyIE5ldyI+PHNwYW4gc3R5bGU9J2Zv
-bnQtc2l6ZToNCjEwLjBwdCc+MjI5OiBzdGF0aWMgaW5saW5lIHZvaWQgaGNpX2Nvbm5faGFzaF9k
-ZWwoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHN0cnVjdA0KaGNpX2Nvbm4gKmMpPC9zcGFuPjwvZm9u
-dD48L3A+DQoNCjxwIGNsYXNzPU1zb1BsYWluVGV4dD48Zm9udCBzaXplPTIgZmFjZT0iQ291cmll
-ciBOZXciPjxzcGFuIHN0eWxlPSdmb250LXNpemU6DQoxMC4wcHQnPjIzMDogezwvc3Bhbj48L2Zv
-bnQ+PC9wPg0KDQo8cCBjbGFzcz1Nc29QbGFpblRleHQ+PGZvbnQgc2l6ZT0yIGZhY2U9IkNvdXJp
-ZXIgTmV3Ij48c3BhbiBzdHlsZT0nZm9udC1zaXplOg0KMTAuMHB0Jz4yMzE6Jm5ic3A7ICZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBzdHJ1Y3QNCmhjaV9jb25uX2hh
-c2ggKmggPSAmYW1wO2hkZXYtJmd0O2Nvbm5faGFzaDs8L3NwYW4+PC9mb250PjwvcD4NCg0KPHAg
-Y2xhc3M9TXNvUGxhaW5UZXh0Pjxmb250IHNpemU9MiBmYWNlPSJDb3VyaWVyIE5ldyI+PHNwYW4g
-c3R5bGU9J2ZvbnQtc2l6ZToNCjEwLjBwdCc+MjMyOiZuYnNwOyAmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgbGlzdF9kZWwoJmFtcDtjLSZndDtsaXN0KTs8L3NwYW4+
-PC9mb250PjwvcD4NCg0KPHAgY2xhc3M9TXNvUGxhaW5UZXh0Pjxmb250IHNpemU9MiBmYWNlPSJD
-b3VyaWVyIE5ldyI+PHNwYW4gc3R5bGU9J2ZvbnQtc2l6ZToNCjEwLjBwdCc+MjMzOiZuYnNwOyAm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgJm5ic3A7IGlmIChjLSZndDt0eXBlID09IEFD
-TF9MSU5LKTwvc3Bhbj48L2ZvbnQ+PC9wPg0KDQo8cCBjbGFzcz1Nc29QbGFpblRleHQ+PGZvbnQg
-c2l6ZT0yIGZhY2U9IkNvdXJpZXIgTmV3Ij48c3BhbiBzdHlsZT0nZm9udC1zaXplOg0KMTAuMHB0
-Jz4yMzQ6Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOw0KPGI+PGZvbnQg
-Y29sb3I9cmVkPjxzcGFuIHN0eWxlPSdjb2xvcjpyZWQ7Zm9udC13ZWlnaHQ6Ym9sZCc+aC0mZ3Q7
-YWNsX251bSsrOzwvc3Bhbj48L2ZvbnQ+PC9iPjwvc3Bhbj48L2ZvbnQ+PC9wPg0KDQo8cCBjbGFz
-cz1Nc29QbGFpblRleHQ+PGZvbnQgc2l6ZT0yIGZhY2U9IkNvdXJpZXIgTmV3Ij48c3BhbiBzdHls
-ZT0nZm9udC1zaXplOg0KMTAuMHB0Jz4yMzU6Jm5ic3A7ICZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyBlbHNlPC9zcGFuPjwvZm9udD48L3A+DQoNCjxwIGNsYXNzPU1z
-b1BsYWluVGV4dD48Zm9udCBzaXplPTIgZmFjZT0iQ291cmllciBOZXciPjxzcGFuIHN0eWxlPSdm
-b250LXNpemU6DQoxMC4wcHQnPjIzNjombmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7DQpoLSZndDtzY29fbnVtLS07PC9zcGFuPjwvZm9udD48L3A+DQoNCjxwIGNsYXNzPU1z
-b1BsYWluVGV4dD48Zm9udCBzaXplPTIgZmFjZT0iQ291cmllciBOZXciPjxzcGFuIHN0eWxlPSdm
-b250LXNpemU6DQoxMC4wcHQnPjIzNzogfTwvc3Bhbj48L2ZvbnQ+PC9wPg0KDQo8cCBjbGFzcz1N
-c29QbGFpblRleHQ+PGZvbnQgc2l6ZT0yIGZhY2U9IkNvdXJpZXIgTmV3Ij48c3BhbiBzdHlsZT0n
-Zm9udC1zaXplOg0KMTAuMHB0Jz4mbmJzcDs8L3NwYW4+PC9mb250PjwvcD4NCg0KPHAgY2xhc3M9
-TXNvTm9ybWFsPjxmb250IHNpemU9MyBmYWNlPSJUaW1lcyBOZXcgUm9tYW4iPjxzcGFuIHN0eWxl
-PSdmb250LXNpemU6DQoxMi4wcHQnPlJlZ2FyZHM8L3NwYW4+PC9mb250PjwvcD4NCg0KPHAgY2xh
-c3M9TXNvTm9ybWFsPjxmb250IHNpemU9MyBmYWNlPSJUaW1lcyBOZXcgUm9tYW4iPjxzcGFuIHN0
-eWxlPSdmb250LXNpemU6DQoxMi4wcHQnPkFiaGk8L3NwYW4+PC9mb250PjwvcD4NCg0KPC9kaXY+
-DQoNCjwvYm9keT4NCg0KPC9odG1sPg0K
-
-------_=_NextPart_001_01C4C01F.10E68FE2--
 
 
 -------------------------------------------------------
