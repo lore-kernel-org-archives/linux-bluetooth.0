@@ -1,5 +1,5 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41A6F4FA.9030201@prim-time.fr>
+Message-ID: <41A6F456.5040005@prim-time.fr>
 From: Xavier Garreau <x.garreau@prim-time.fr>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
@@ -18,12 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Nov 2004 10:18:50 +0100
+Date: Fri, 26 Nov 2004 10:16:06 +0100
 
-Sorry for my previous mail, I just noticed the session is kept open 
-until service record is unregistered ...
+>>I never used sdp api, did any of you wrote some white paper about 
+>>bluetooth programming involving sdp (i found 
+>>http://www.holtmann.org/papers/bluetooth/wtc2003_slides.pdf but it's not 
+>>dealing with sdp)
+> 
+> the programs dund and pand show you how to advertise a SDP record.
 
-Regards...
+Thank you very much Marcel, this was a useful answer, as usual !
+
+I just have another (amybe silly) question ...
+
+In bluez/pan/pand/sdp.c
+     function bnep_sdp_register
+
+if sdp_record_register is succesful, the sdp_session is not closed 
+whereas it is evrywhere else (when something fails).
+
+Does it means that sdp_record_register closes the sdp_session when it is 
+successful ? That would mean we need to di sdp_connect foreach record we 
+have to add (I know, we usually only have only one to do at a time, but 
+that seems "strange" to me)
+
+Regards !
+Xavier Garreau
 
 
 -------------------------------------------------------
