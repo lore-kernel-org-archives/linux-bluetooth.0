@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041013133844.49389.qmail@web40627.mail.yahoo.com>
-From: Paolino paperino <vonzoltan@yahoo.it>
-Subject: [Bluez-users] rfcomm sockets problems
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200410131143.26811.n1c0l4s.l3@wanadoo.fr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Subject: Re: [Bluez-users] ms explorer for bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+To: neoclust <n1c0l4s.l3@wanadoo.fr>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <200410131224.13689.n1c0l4s.l3@wanadoo.fr>
+References: <200410122022.30501.n1c0l4s.l3@wanadoo.fr>
+	 <200410131143.26811.n1c0l4s.l3@wanadoo.fr>
+	 <1097662706.4643.21.camel@notepaq>
+	 <200410131224.13689.n1c0l4s.l3@wanadoo.fr>
+Content-Type: text/plain
+Message-Id: <1097668334.4643.24.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,45 +21,98 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Oct 2004 15:38:44 +0200 (CEST)
+Date: Wed, 13 Oct 2004 13:52:14 +0200
 
-Hi,
-I've used the test program rctest to test the
-capability of open a connection between two linux
-boxes with bt. Well the protocol seems (l2test) to be
-instable, when i transmit  a sequence of packets
-composed of only 1 bytes, the reader loose some
-packets. The command lines i use are:
-rctest -s -b 1 -N 1024 <addr> (sender, client)
-and
-rctest -d -b 1 (receiver, server)
+Hi Nicholas,
 
-I see the source code and i put an usleep pause after
-the send call in the function void send_mode(int
-s)...with this pause all seems work, but when i try to
-send packet bigger than 1019 bytes other problem
-arises, for example if i send a packet of 1024 bytes
-then the packet will be braked in two packets, one of
-1019 e the other of 5. In the case i send many packets
-bigger than 1019, some data is lost, the receiver
-receive less bytes of what are sended.
+> > I misread your email. What I think is that maybe the keyboard will only
+> > work if you enforce the encryption. Is this the second generation of the
+> > Microsoft keyboard? 
+> 
+> how can i know this info ?
 
-rfcomm socket must be realiable sequence stream, but
-is not so, i can't understand where is the problem, if
-mine or Bluez stack's.
-Anybody could tell me if he had the same problems!!
-I use Fedora Core 2, kernel  2.6.8-1.521 and bluez
-libs/utils 2.8.
+look at your box. What does it say and how does the keyboard look like?
 
-Thanks
+> > Can you do a "hcitool info ..." as root to your 
+> > keyboard?
+> 
+> how can i know my <bdaddr> for my keabord  ?
+
+Press the "connect" button on the keyboard and run "hcitool scan".
+
+> > Run also "hcidump -x" as root and show it to us. 
+> 
+> # hcidump -x
+> HCIDump - HCI packet analyzer ver 1.12
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 2A 00 00 00 00
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 2A 00 02 70 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 03 FE 00
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 2A 00 00 00 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 0C EC 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 00 FE 00
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 2A 00 02 12 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 01 00 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 00 FF 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 01 FF 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 01 00 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 01 FF 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 02 FF 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 01 FF 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 01 FF 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 02 FD 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 01 00 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 02 FD 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 01 FE 00
+> > ACL data: handle 0x002a flags 0x02 dlen 10
+>     L2CAP(d): cid 0x0041 len 6 [psm 0]
+>       A1 02 00 01 00 00
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 2A 00 00 00 00
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 2A 00 02 70 00
+
+Please don't connect the mouse when doing any testing with the keyboard.
+
 Regards
- Andrea S.
+
+Marcel
 
 
-		
-___________________________________ 
-Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
-http://it.messenger.yahoo.it
 
 
 -------------------------------------------------------
