@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Motorola HS810 problems
+Subject: Re: [Bluez-users] TECOM BT3035
 From: Marcel Holtmann <marcel@holtmann.org>
-To: rtaylor@hcvwireless.com
+To: Roman K <papa@rbcmail.ru>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1090833153.3497.4005.camel@localhost>
-References: <1090833153.3497.4005.camel@localhost>
+In-Reply-To: <200407260936.55023.papa@rbcmail.ru>
+References: <200407231440.i6NEeI5l048844@www1.pochta.ru>
+	 <200407232245.46776.papa@rbcmail.ru> <1090659888.4791.68.camel@pegasus>
+	 <200407260936.55023.papa@rbcmail.ru>
 Content-Type: text/plain
-Message-Id: <1090826963.31693.68.camel@pegasus>
+Message-Id: <1090825950.31693.55.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,42 +20,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 26 Jul 2004 09:29:23 +0200
+Date: Mon, 26 Jul 2004 09:12:31 +0200
 
-Hi Roderick,
+Hi Roman,
 
-> I have a Motorola HS810 headset.
-> 
-> To pair with BlueZ, I put the headset in paring mode and use the command
-> 
-> hcitool cc <bd_addr>
-> 
-> I've set the pin helper to output PIN#:0000 and The blue light on the
-> headset flashes 10 times to indicate that paring was successful.  But
-> hcitool has given an error message.
-> 
-> sh-2.03# hcitool cc 00:07:A4:2A:47:50
-> Can't create connection: Connection timed out
-> sh-2.03# hcitool con
-> Connections:
->         < ACL 00:07:A4:2A:47:50 handle 42 state 1 lm MASTER AUTH ENCRYPT
-> sh-2.03#
+> I have only one last question. Have you tested your patch with THIS device (I 
+> mean 3035 not it's family).
 
-the output for the PIN helper must be "PIN:0000" and why the hell are
-you trying to pair with "hcitool cc ...". You can only pair a device
-with that command if your or the peer device is in security mode 3.
+I don't know if it was from Tecom, but it was the Broadcom version of
+HID proxy. The hci_usb drivers states it as BCM2035 with the USB vendor
+and product id of 0a5c:200a. Check for yourself.
 
-> When I try and use hstest.  I get 
-> 
-> .sh-2.03# ./hstest play 12345.wav  00:07:A4:2A:47:50
-> Voice setting: 0x0060
-> Can't connect RFCOMM channel: Connection refused
-> sh-2.03#
-> 
-> I am trying to get sound to play out of the headset.
+> It looks like SuSE kernel uses you patches (when your patch trying to create a 
+> file it reports that file already exists and most hunk are rejected because 
+> of they are previously applied).
 
-Check if the RFCOMM channel is correct and let the pairing work in
-background when it is really needed.
+Of course they do. Everyone uses my patches, because I send them back to
+mainline if I know that they are working. The -mh patches are against a
+vanilla kernel and you couldn't expect that they apply cleanly to any of
+the vendor kernel out there. No matter if it is SuSE or RedHat.
+
+> SuSE usually uses a lot of patches (MUCH more then vanilla) and It usually  
+> supports MUCH more hardware then RedHat..
+> But  in this case something wrong...
+
+Maybe they haven't picked up that patch. So what? Use the latest vanilla
+2.4 kernel or extract that hunk that I told you from the kernel tree and
+apply it by hand. Or simply update to SuSE 9.1 with a 2.6 kernel.
 
 Regards
 
