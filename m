@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm question 1
+Subject: Re: [Bluez-users] Anycom USB-240 & firmware
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050129053222.47103.qmail@web60910.mail.yahoo.com>
-References: <20050129053222.47103.qmail@web60910.mail.yahoo.com>
+In-Reply-To: <200501291214.34032.cijoml@volny.cz>
+References: <cteadv$tbe$1@sea.gmane.org> <1106961349.10580.7.camel@pegasus>
+	 <200501291214.34032.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1107007411.10735.16.camel@pegasus>
+Message-Id: <1107007115.10735.10.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,38 +19,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 Jan 2005 15:03:31 +0100
+Date: Sat, 29 Jan 2005 14:58:35 +0100
 
-Hi Michael,
+Hi Michal,
 
->     Of course, hcid is running. Then when I typed
-> "hcidump -x", and then choose the computer in mobile
-> phone, after I entered the PIN, the following occurs:
-> [root@cm218-253-8-120 root]# hcidump -x
-> HCIDump - HCI packet analyzer ver 1.16
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> > HCI Event: Connect Request (0x04) plen 10
->   A8 D8 DD D9 0A 00 04 02 52 01
-> < HCI Command: Accept Connection Request (0x01|0x0009)
-> plen 7
->   A8 D8 DD D9 0A 00 01
-> > HCI Event: Command Status (0x0f) plen 4
->   00 01 09 04
-> > HCI Event: PIN Code Request (0x16) plen 6
->   A8 D8 DD D9 0A 00
-> < HCI Command: PIN Code Request Reply (0x01|0x000d)
-> plen 23
->   A8 D8 DD D9 0A 00 05 42 6C 75 65 5A 00 00 00 00 00
-> 00 00 00
->   00 00 00
-> > HCI Event: Command Complete (0x0e) plen 10
->   01 0D 04 00 A8 D8 DD D9 0A 00
-> > HCI Event: Connect Complete (0x03) plen 11
->   05 29 00 A8 D8 DD D9 0A 00 01 00
-> But the mobile shows "PIN not match". So how can I do?
+> these dongles can really be updated to 1.2 at least via Widcomm stack
+> 
+> http://notebooky.idnes.cz/recenze/anycomblueusb120050118.html
+> 
+> Site is in czech, but pictures says more then thousand words :D
 
-run "hcidump -X" and you might see your PIN. I guess it is "BlueZ" and
-why are you using security mode 3?
+what program from the CD or Internet is used to update them? A guy at
+Anycom told me that their Bluetooth 1.2 dongles are ROM only. Maybe the
+older ones had a flash chip inside.
 
 Regards
 
