@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Evolution 2 and Multisync
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andy Beuth <bluez@beuth.info>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1098697111.3801.3.camel@localhost>
-References: <1098697111.3801.3.camel@localhost>
+From: Andy Beuth <bluez@beuth.info>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1098698800.24932.23.camel@pegasus>
+Message-Id: <1098697111.3801.3.camel@localhost>
 Mime-Version: 1.0
+Subject: [Bluez-users] Evolution 2 and Multisync
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,17 +15,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 25 Oct 2004 12:06:40 +0200
+Date: Mon, 25 Oct 2004 11:38:31 +0200
 
-Hi Andy,
+Hello,
 
-> is there any Plan to release Multisync evolution2 plugin??
+is there any Plan to release Multisync evolution2 plugin??
 
-this is the wrong mailing list. Look at www.multisync.org
+Greetings
 
-Regards
-
-Marcel
+Andy Beuth
 
 
 
