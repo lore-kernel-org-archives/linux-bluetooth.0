@@ -3,12 +3,11 @@ Subject: Re: [Bluez-devel] Pairing fails with RFCOMM
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Nils Faerber <nils.faerber@kernelconcepts.de>
 Cc: bluez-devel@lists.sf.net
-In-Reply-To: <1076339124.1169.67.camel@localhost>
+In-Reply-To: <1076337219.2892.57.camel@localhost>
 References: <1076087010.964.75.camel@localhost>
 	 <1076097441.14418.40.camel@pegasus>  <1076337219.2892.57.camel@localhost>
-	 <1076338869.6869.174.camel@pegasus>  <1076339124.1169.67.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1076339281.6869.176.camel@pegasus>
+Message-Id: <1076338869.6869.174.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,15 +19,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 09 Feb 2004 16:08:01 +0100
+Date: Mon, 09 Feb 2004 16:01:09 +0100
 
 Hi Nils,
 
-> But maybe we should mention this in some FAQ. I guess that more programs
-> than minicom will have some timeout logic like this and that other users
-> might stumble accreoss the same problem sooner or later.
+> It seems that minicom implements a timeout on open()ing the tty. This
+> times out before the authentication took place. When using rfcomm
+> connect first or using cat the connect works.
+> So this is indeed not a BlueZ/RFCOMM problem, because IMHO there is no
+> real way to fix it (only possible solution would be to always allow
+> open()ing the port, paired or not, connected or not).
 
-of course. Send me an entry for our FAQ and I'll add it.
+this is not really a solution, because it moves the detection of
+Bluetooth connection errors out of the scope.
 
 Regards
 
