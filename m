@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "franz keuner" <franz_keuner@gmx.net>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <16619.1079606404@www34.gmx.net>
-Content-Type: text/plain; charset="iso-8859-1"
-Subject: [Bluez-devel] Service Record Problem
+Subject: Re: [Bluez-devel] pan on zaurus
+From: Philip Blundell <pb@nexus.co.uk>
+To: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
+Cc: "'Bluez-devel@lists.sourceforge.net'" <Bluez-devel@lists.sourceforge.net>
+In-Reply-To: <AFE91B59A185A5439840B43AB7919047093912@mchp997a.mch.sbs.de>
+References: <AFE91B59A185A5439840B43AB7919047093912@mchp997a.mch.sbs.de>
+Content-Type: text/plain
+Message-Id: <1079570413.9385.21.camel@dixie.nexus.co.uk>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,49 +18,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 18 Mar 2004 11:40:04 +0100 (MET)
+Date: Thu, 18 Mar 2004 00:40:13 +0000
 
-hello,
+On Wed, 2004-03-17 at 19:28, Kutschenreuter Matthias wrote:
+> Now I cannot understand, why my software fails on Zaurus, 
+> using the same commands as the official PAN, that doesnt fail.
 
-thanks for your help with my last problem.
+I suggest you run both programs under strace and look for difference in
+the syscalls that they make.  There should be nothing special about the
+ARM other than the structure-packing issue that you mentioned.
 
-now i have a problem with service registration. i register a service using
-the Java Bluetooth APIs. it creates a service record with an uuid of length
-128. that seems to be predetermined.
-
-if i search for services on the device i can't find that specific service.
-but if i scan for SP services i receive the following message:
-  ...
-  Service Name: Service Name
-Service RecHandle: 0x1000a
-Service Class ID List:
-  "Error: This is uuid128" (0xabcd0000-1000-8000-0080-5f9b34fb0000)
-  "Serial Port" (0x1101)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 5
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Serial Port" (0x1101)
-..
-
-if i use a pda (pocket pc) with bluetooth support and search for services i
-find the service without a problem.
-
-so my question is: what can i do to find that service using bluez and the
-"normal" sdptool search browse command?
-
-thanks in advance and regards,
-
-franz
-
--- 
-+++ NEU bei GMX und erstmalig in Deutschland: TÜV-geprüfter Virenschutz +++
-100% Virenerkennung nach Wildlist. Infos: http://www.gmx.net/virenschutz
+p.
 
 
 
