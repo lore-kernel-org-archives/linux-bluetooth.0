@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hidp report mode in 2.6.10?
+Subject: Re: [Bluez-users] valgrind complains
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1102459374.10705.2.camel@saag.bunker.heddley.com>
-References: <1102459374.10705.2.camel@saag.bunker.heddley.com>
+In-Reply-To: <200412080123.07501.wim.delvaux@adaptiveplanet.com>
+References: <200412080123.07501.wim.delvaux@adaptiveplanet.com>
 Content-Type: text/plain
-Message-Id: <1102478483.8447.59.camel@pegasus>
+Message-Id: <1102478579.8447.62.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,16 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 08 Dec 2004 05:01:23 +0100
+Date: Wed, 08 Dec 2004 05:02:59 +0100
 
-Hi Edd,
+Hi Wim,
 
-> It doesn't look like hid report mode made it into 2.6.10-rc3.  Are you
-> planning for it to be part of 2.6.10?
+> about unintialized values in the following code
+> 
+>  struct hci_dev_info di;
+> 
+>          di.dev_id = dev_id;
+> 
+>          if( ioctl( fd, HCIGETDEVINFO, (void*)&di) != 0 )
+>               continue;  // uh ?
+> 
+>  printf( "%s\n", di.name ); // here valgrind complains on the third character
+> 
+> 
+> Should I perhaps memset ? is name field null terminated ?
 
-my plan is to push the generic HID parser support into 2.6.10 when it is
-out and everything works like expected. If this happens the report mode
-support will come with no costs.
+maybe you should include the filename to let us know where to look.
 
 Regards
 
