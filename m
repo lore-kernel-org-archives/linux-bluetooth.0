@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Qualification Testing
+Subject: RE: [Bluez-devel] Qualification Testing
 From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
 To: Max Krasnyansky <maxk@qualcomm.com>
-Cc: Daryl Van Vorst <daryl@wideray.com>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1052545687.10456.235.camel@localhost.localdomain>
-References: <000c01c313f5$b57ae030$1a01010a@baked>
-	<000c01c313f5$b57ae030$1a01010a@baked>
-	<5.1.0.14.2.20030508171149.01c082c0@unixmail.qualcomm.com>
-	<1052442873.1069.35.camel@pegasus.local>
-	<1052545687.10456.235.camel@localhost.localdomain>
-Message-Id: <1052584255.1133.13.camel@pegasus.local>
+Cc: Daryl Van Vorst <daryl@wideray.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1052547309.10456.259.camel@localhost.localdomain>
+References: <000801c31684$627d9f80$1a01010a@baked>
+	<1052526375.1214.130.camel@pegasus.local>
+	<1052547309.10456.259.camel@localhost.localdomain>
+Content-Type: text/plain
+Message-Id: <1052565910.1288.187.camel@pegasus.local>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -23,68 +22,45 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 10 May 2003 18:30:48 +0200
-Content-Type: text/plain
+Date: 10 May 2003 13:25:02 +0200
 
 Hi Max,
 
-> > > >>         5.) Once an RFCOMM channel is established, the IUT must exchange
-> > > >> MSC's (modem status commands) before sending data. That is, it must send an
-> > > >> MSC, wait for a response, wait for the sender's MSC, and respond to it
-> > > >> before sending data. Our device sent an MSC and then immediately started
-> > > >> sending data when we used rctest. This applies to many test cases.
-> > > >
-> > > >We send the MSC after the UA. But we also go into BT_CONNECTED state and
-> > > >in this state you can also start sending data. We should maybe go from
-> > > >BT_CONNECT -> BT_CONFIG and only switch to BT_CONNECTED after the
-> > > >successful exchange of MSC.
-> > > I remember thinking about that. But they way I interpreted spec was that we
-> > > don't have to wait for MSC response. 
-> > > This should be easy to fix.
-> > 
-> > I leave this up to you to fix.
-> > 
-> > > btw When CFC is not enabled we will have to wait for MSC from the other side. Notice that we set
-> > > THROTTLED flag in that case. Which is cleared by the MSC or more credits.
-> > > So I guess we can just always set that flag and clear it when we get MSC which will fix the MSC 
-> > > test case without messing with the state machine.
-> > 
-> > Sounds reasonable to me.
+> > The main problem is that wrong packets should not arrive at the L2CAP
+> > layer. If they do and we decect them (like a length mismatch), we have
+> > to close down all channels and remove the infected ACL link.
+> The key words is 'should not' here. I've seen it happen because of USB problems
+> or UART H4 problems. Not the wrong length but missing fragments and
+> stuff.  
+
+and that's so stupid about this test. If you have problems with this, it
+is not the fault of the L2CAP layer. You have to look for problems in
+the HCI transport layer. Anyway I never had these problems with USB, I
+only see them with a out of sync H4 driver.
+
+> > Max, what do you think? This way is a little bit radical, but I think it
+> > is an acceptable way of handling these errors. And with this method we
+> > will pass this test.
+> Yeah, I think it's a bit to aggressive. BNEP connection, for example,
+> survives missing frags and pretty much anything else just fine. 
 > 
-> Ok. I've fixed that (and pushed changes to BK). My idea about 
-> with TX_THROTTLED flag didn't work. Well, it worked but only in 
-> one direction :). Changing state machine would've been fairly big
-> change and could've affected compatibility.
-> So I added a simple logic to track MSC exchange state. Works beautifully
+> I'd rather keep the current code. Which I fixed btw to correctly drop
+> frame if first fragment is too long. It was a real bug which could cause
+> kernel oops in certain conditions.
 
-I like to see this logic in the state machine, but I agree with with you
-that it is not the right time for changing it. Your patch works also
-fine for me and I have a new 2.4.20 with all patches up and running.
+Please don't understand me wrong. I like the current code, because it
+gives us a chance to survice bad packets and didn't blow up the code
+with some nasty checks that can't help us in this situation.
 
-Daryl, so it is now up to you to do your tests with Cetecom again and
-see what we pass and what we fail. The RFCOMM layer should now perform
-perfect, but the L2CAP config stuff will still fail. You can use
-2.4.18-mh4 and apply these 5 patches from the bt-2.4 repository to it:
+Daryl, can you please check with Cetecom what is really needed to pass
+this test. From my understanding we do all right, because we notifier
+the application (ok, in this case the complete Linux system) with an
+error message in the syslog.
 
-ChangeSet@1.1162, 2003-05-09 21:11:49-07:00
-  [Bluetooth] RFCOMM must wait for MSC exchange to complete before sending the data.
-
-ChangeSet@1.1161, 2003-05-09 16:41:45-07:00
-  [Bluetooth] Detect and log error condition when first L2CAP fragment is too long.
-
-ChangeSet@1.1160, 2003-05-09 11:55:22-07:00
-  [Bluetooth] L2CAP config req/rsp handling fixes. 
-
-ChangeSet@1.1126.3.2, 2003-05-09 03:22:06+02:00
-  [Bluetooth] Handle priority bits in parameter negotiation
-
-ChangeSet@1.1126.3.1, 2003-05-09 02:07:07+02:00
-  [Bluetooth] Send the correct values in RPN response
-
-Max, please go ahead and forward them to Marcelo and Linus. If you have
-some extra time, please update my repositories with the new stuff.
-
-I will make some new -mh patches on monday or tuesday.
+How must the testing application react on these errors. Is it enough to
+put an error on the screen, or must it close the L2CAP connection. I
+think we should write a test application which reads the syslog and
+deals with the L2CAP error messages in some way.
 
 Regards
 
