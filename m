@@ -1,76 +1,63 @@
-Return-Path: <Steven.Singer@csr.com>
-Message-ID: <3FE0C1B9.5090504@csr.com>
-Date: Wed, 17 Dec 2003 20:51:05 +0000
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Device Busy during "hcitool info" or
+	"sdptoolsearch"
+From: Marcel Holtmann <marcel@holtmann.org>
 To: ag@new-media-artists.de
-CC: Marcel Holtmann <marcel@holtmann.org>,
-   BlueZ Mailing List
-    <bluez-devel@lists.sourceforge.net>
-Subject: Re: AW: [Bluez-devel] Device Busy during "hcitool info" or
-    "sdptoolsearch"
-References: <FJENILNPNAGPJMMDOKDCKEKBDJAA.ag@new-media-artists.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <FJENILNPNAGPJMMDOKDCKEKBDJAA.ag@new-media-artists.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+References: <FJENILNPNAGPJMMDOKDCKEKBDJAA.ag@new-media-artists.de>
+Content-Type: text/plain
+Message-Id: <1071689683.27571.108.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 17 Dec 2003 20:34:43 +0100
 
-Andreas Gaufer wrote:
+Hi Andreas,
+
+> hciconfig revision tells me that both chips have HCI 16.4 (bc02x) so i
+> checked hcidump -x , heres whats happening:
+> 
+> Wokring inq:
+> < HCI Command: Inquiry(0x01|0x0001) plen 5
+>   33 8B 9E 08 0A
+> > HCI Event: Command Status(0x0f) plen 4
+>   00 01 01 04
+> 
 > Not wokring inq:
 > < HCI Command: Inquiry(0x01|0x0001) plen 5
 >   33 8B 9E 08 0A
-> 
-> >HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Command Status(0x0f) plen 4
 >   0C 01 01 04
+> 
+> Do i guess right when i think that the differing "0C" means "Command
+> disallowed" like discribed in BT 1.2 Core Spec, Vol 2, Core System Package,
+> Part D (Error Codes) ?
 
-CSR firmware will issue this error code if you try to start an inquiry
-while an inquiry or a create_connection is already in progress.
+the error code is correct and this is a problem of the firmware on the
+chip. For me this is working fine on any CSR chip with HCI 16.x.
 
-The inquiry-inquiry restriction is there to protect against hosts who
-have lost control of what they're doing. If we accepted the second
-inquiry, how many inquiry_complete events should we issue?
+Regards
 
-The create_connection-inquiry restriction is there because both
-procedures need to get as much radio bandwidth as possible to work. In
-particular, taking bandwidth away from paging can cause spurious failed
-connections. In this case, create_connection wins. If you issue a
-create_connection while an inquiry is in progress, we will terminate
-the inquiry with an inquiry_complete event and start paging
-immediately.
-
-Once paging has finished and the baseband connection is complete then we
-will allow the host to inquire again.
-
-Since a Bluetooth chip is connected to one host and since the chip is
-an embedded device with limited resources, we expect the host to handle
-the multiplexing of requests. We expect the host's state to be
-synchronised to ours - if it isn't, we're in trouble.
-
-It is unreasonable to expect that multiple applications can issue
-arbitrary HCI commands and expect the to complete as if they had sole
-access to the device (consider what would happen with ACL flow control
-tokens).
-
-SDP searching and similar activities will take over the radio to inquire
-and make connections. It is therefore expected that other simultaneous
-actions will fail.
-
-In your case, the correct response to having your inquiry rejected is
-to back off for a few seconds and try again - either that, or find some
-way of sharing access to the device.
-
-	- Steven
--- 
+Marcel
 
 
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
 
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
+-------------------------------------------------------
+This SF.net email is sponsored by: IBM Linux Tutorials.
+Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
+Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
+Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
