@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Anssi Saari <as@sci.fi>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20040306085928.GA7480@sci.fi>
+Subject: Re: [Bluez-users] Broadcast and reassembly
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Thor Egil Skaug <paxtonrd@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <000101c402dd$9f3316d0$9349edc7@thores>
+References: <000101c402dd$9f3316d0$9349edc7@thores>
+Content-Type: text/plain
+Message-Id: <1078526281.19852.48.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] PAN almost working, but not quite...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,42 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 6 Mar 2004 10:59:28 +0200
+Date: Fri, 05 Mar 2004 23:38:02 +0100
 
+Hi Thor,
 
-Hello,
+> I am experiencing some problems when reassembling active broadcast
+> messages when the
+> (hci) num_broadcast_retransmissions is set > 0 (at the sender), and with
+> a decent L2CAP message size,
+> > 100 bytes.
+> 
+> I constantly get start_fragments and continuing_fragments that are out
+> of order, and since
+> the l2cap header is the only way I can know when I am done reading one
+> message and can expect
+> another, this is troublesome. I thought the device was supposed to
+> deliver messages in order?
+> 
+> Has anyone ever implemented this, and hopefully had the same
+> experiences?
 
-I'm trying to get my Windows XP laptop to talk to my Linux PC and it's
-almost working. I'm running pand --listen --role NAP on Linux, Windows thinks
-it's connected and has an IP address 172.16.0.3 and on Linux I get a
-log message saying "pand[23934]: New connection from 00:05:16:58:73:30
-bnep0". Bnep0 comes up and has an IP address:
+I never worked with any kind of broadcast and Bluetooth. Some people
+tried this before, but nobody came up with a patch or something else.
+This can be your job ;)
 
-bnep0     Link encap:Ethernet  HWaddr 00:04:76:C8:43:EC  
-          inet addr:172.16.0.1  Bcast:172.16.255.255  Mask:255.255.255.0
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:4 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000 
-          RX bytes:16 (16.0 b)  TX bytes:100 (100.0 b)
- 
-I even see the UDP noise Windows likes to make in my firewall log:
+Regards
 
-Mar 6 10:21:23 REJECT UDP SRC=172.16.0.3:137 DST=172.16.255.255:137
-Mar 6 10:22:32 REJECT UDP SRC=172.16.0.3:138 DST=172.16.255.255:138
-Mar 6 10:27:06 REJECT UDP SRC=172.16.0.3:138 DST=172.16.255.255:138
-Mar 6 10:34:15 REJECT UDP SRC=172.16.0.3:137 DST=172.16.255.255:137
-Mar 6 10:34:16 REJECT UDP SRC=172.16.0.3:137 DST=172.16.255.255:137
-Mar 6 10:34:17 REJECT UDP SRC=172.16.0.3:137 DST=172.16.255.255:137
-Mar 6 10:34:33 REJECT UDP SRC=172.16.0.3:138 DST=172.16.255.255:138
+Marcel
 
-But I can't ping or use any other TCP program in either direction.
-Even with the firewall disabled. It's just destination unreachable in
-both ends. 
-
-Any hints? Or does anyone know of a live Linux CD that includes Bluez? I
-have both Knoppix 3.3 and Morphix 0.41 around, but neither seems to have
-the userland parts included, although there is driver support available.
 
 
 
