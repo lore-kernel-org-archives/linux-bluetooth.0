@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20040415232702.GA24097@gmx.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] kernel oops when usb dongle plugged in with module loaded
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----_=_NextPart_001_01C42328.741C8E76"
+Message-ID: <E65CD2CAB74C80498703D6EF7624BB4C4ACAF0@zmaex.zma.zoran.com>
+From: "Lan Zhang" <Lan.Zhang@Zoran.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Palm problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,97 +16,142 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 16 Apr 2004 01:27:02 +0200
+Date: Thu, 15 Apr 2004 16:30:12 -0400
 
-Hi,
+This is a multi-part message in MIME format.
 
-I face the same problem as Matthias Thomae with an Acer BT600 and
-utils/libs 2.6. I investigated the Oops after reinserting usb dongle
-problem a bit. And  noticed that it Oops only, when hci_usb module had
-been loaded before the dongle was plugged in. So unloading the module
-before plugging in the device and everthing works fine (of course only
-when the module was loaded thereafter automaticalls or manually).
-If you pull out the dongle and then unload the module, you can reinsert
-the BT dongle. If you manually modprobe the module before plugging in
-the device, it Oops too.
+------_=_NextPart_001_01C42328.741C8E76
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-I tested  2.6.4 which doesn't seem to be affected, but 2.6.5 and
-2.6.5-mh3 show this behaviour.
+Hi, Marcel:
 
-I added the oops from  my syslog:
-Apr 16 00:28:41 thinkpad kernel: drivers/usb/core/usb.c: usb_hotplug
-Apr 16 00:28:41 thinkpad kernel: usb 2-1: registering 2-1:1.0 (config
-#1, interface 0)
-Apr 16 00:28:41 thinkpad kernel: drivers/usb/core/usb.c: usb_hotplug
-Apr 16 00:28:41 thinkpad kernel: hci_usb 2-1:1.0: usb_probe_interface
-Apr 16 00:28:41 thinkpad kernel: hci_usb 2-1:1.0: usb_probe_interface -
-got id
-Apr 16 00:28:42 thinkpad kernel: Unable to handle kernel NULL pointer
-dereference at virtual address 00000004
-Apr 16 00:28:42 thinkpad kernel:  printing eip:
-Apr 16 00:28:42 thinkpad kernel: c0255489
-Apr 16 00:28:42 thinkpad kernel: *pde = 00000000
-Apr 16 00:28:42 thinkpad kernel: Oops: 0000 [#1]
-Apr 16 00:28:42 thinkpad kernel: PREEMPT 
-Apr 16 00:28:42 thinkpad kernel: CPU:    0
-Apr 16 00:28:42 thinkpad kernel: EIP:
-0060:[usb_disable_interface+11/53]    Not tainted
-Apr 16 00:28:42 thinkpad kernel: EFLAGS: 00010246   (2.6.5-mh3) 
-Apr 16 00:28:42 thinkpad kernel: EIP is at
-usb_disable_interface+0xb/0x35
-Apr 16 00:28:42 thinkpad kernel: eax: ccbdc000   ebx: 00000000   ecx:
-cfd92000   edx: c0e96c80
-Apr 16 00:28:42 thinkpad kernel: esi: 00000002   edi: 00000000   ebp:
-ccbdc000   esp: cfd93d44
-Apr 16 00:28:42 thinkpad kernel: ds: 007b   es: 007b   ss: 0068
-Apr 16 00:28:42 thinkpad kernel: Process khubd (pid: 5,
-threadinfo=cfd92000 task=c12ba080)
-Apr 16 00:28:42 thinkpad kernel: Stack: ccbdc000 00000002 00000001
-c0e966b0 c02556f5 00000001 00000002 00000001 
-Apr 16 00:28:42 thinkpad kernel:        00000000 00000000 00001388
-00000000 c0e96c80 00000000 c0e96a80 c0e96b38 
-Apr 16 00:28:42 thinkpad kernel:        c0e96d80 d088b942 c12babc0
-c12babe0 00000018 00000003 00000002 00000001 
-Apr 16 00:28:42 thinkpad kernel: Call Trace:
-Apr 16 00:28:42 thinkpad kernel:  [usb_set_interface+147/354]
-usb_set_interface+0x93/0x162
-Apr 16 00:28:42 thinkpad kernel:
-[__crc_blk_queue_make_request+2092763/2906822] hci_usb_probe+0x216/0x44a
-[hci_usb]
-Apr 16 00:28:42 thinkpad kernel:  [printk+288/368] printk+0x120/0x170
-Apr 16 00:28:42 thinkpad kernel:  [usb_probe_interface+170/187]
-usb_probe_interface+0xaa/0xbb
-Apr 16 00:28:42 thinkpad kernel:  [bus_match+50/91] bus_match+0x32/0x5b
-Apr 16 00:28:42 thinkpad kernel:  [device_attach+58/135]
-device_attach+0x3a/0x87
-Apr 16 00:28:42 thinkpad kernel:  [sysfs_create_group+72/121]
-sysfs_create_group+0x48/0x79
-Apr 16 00:28:42 thinkpad kernel:  [bus_add_device+84/140]
-bus_add_device+0x54/0x8c
-Apr 16 00:28:42 thinkpad kernel:  [device_add+148/271]
-device_add+0x94/0x10f
-Apr 16 00:28:42 thinkpad kernel:  [usb_set_configuration+521/664]
-usb_set_configuration+0x209/0x298
-Apr 16 00:28:42 thinkpad kernel:  [usb_new_device+702/1370]
-usb_new_device+0x2be/0x55a
-Apr 16 00:28:42 thinkpad kernel:  [hub_port_connect_change+432/675]
-hub_port_connect_change+0x1b0/0x2a3
-Apr 16 00:28:42 thinkpad kernel:  [hub_events+867/1061]
-hub_events+0x363/0x425
-Apr 16 00:28:42 thinkpad kernel:  [hub_thread+43/236]
-hub_thread+0x2b/0xec
-Apr 16 00:28:42 thinkpad kernel:  [ret_from_fork+6/20]
-ret_from_fork+0x6/0x14
-Apr 16 00:28:42 thinkpad kernel:  [default_wake_function+0/12]
-default_wake_function+0x0/0xc
-Apr 16 00:28:42 thinkpad kernel:  [hub_thread+0/236] hub_thread+0x0/0xec
-Apr 16 00:28:42 thinkpad kernel:  [kernel_thread_helper+5/11]
-kernel_thread_helper+0x5/0xb
-Apr 16 00:28:42 thinkpad kernel: 
-Apr 16 00:28:42 thinkpad kernel: Code: 80 7b 04 00 74 1f 31 f6 8b 43 0c
-83 c7 01 0f b6 54 30 02 83 
-Apr 16 00:28:42 thinkpad usb.agent[1680]: kernel driver hci_usb already
-loaded
+Thanks for your answer before, I bought a new dongle and the problem is
+gone.=20
+
+The problem now is the palm i705, I used BtPrint try to send data to my
+linux box, and of course I set my linux class to printer, the problem
+looks happened in rfcomm level. I used hcidump to catch the stream data,
+and it is been attached. I think it is rfcomm channel problem. Could you
+take several min to look at the file and give me some suggestion?=20
+
+Thanks a lot.=20
+
+Regards,
+Lan
+=20
+
+
+
+------_=_NextPart_001_01C42328.741C8E76
+Content-Type: application/octet-stream;
+	name="hcidump.log"
+Content-Transfer-Encoding: base64
+Content-Description: hcidump.log
+Content-Disposition: attachment;
+	filename="hcidump.log"
+
+SENJRHVtcCAtIEhDSSBwYWNrZXQgYW5hbHl6ZXIgdmVyIDEuNQpkZXZpY2U6IGhjaTAgc25hcF9s
+ZW46IDEwMjggZmlsdGVyOiAweGZmZmZmZmZmCj4gSENJIEV2ZW50OiBDb25uZWN0IFJlcXVlc3Qo
+MHgwNCkgcGxlbiAxMAogIDEzIDRBIDBEIEMyIDUwIDAwIDE0IDAxIDEwIDAxIAo8IEhDSSBDb21t
+YW5kOiBBY2NlcHQgQ29ubmVjdGlvbiBSZXF1ZXN0KDB4MDF8MHgwMDA5KSBwbGVuIDcKICAxMyA0
+QSAwRCBDMiA1MCAwMCAwMSAKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzKDB4MGYpIHBsZW4g
+NAogIDAwIDAxIDA5IDA0IAo+IEhDSSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSgweDAzKSBwbGVu
+IDExCiAgMDAgMjggMDAgMTMgNEEgMEQgQzIgNTAgMDAgMDEgMDAgCjwgSENJIENvbW1hbmQ6IFdy
+aXRlIExpbmsgUG9saWN5IFNldHRpbmdzKDB4MDJ8MHgwMDBkKSBwbGVuIDQKICAyOCAwMCAwRSAw
+MCAKPiBIQ0kgRXZlbnQ6IE1heCBTbG90cyBDaGFuZ2UoMHgxYikgcGxlbiAzCiAgMjggMDAgMDUg
+Cj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlKDB4MGUpIHBsZW4gNgogIDAxIDBEIDA4IDAw
+IDI4IDAwIAo8IEhDSSBDb21tYW5kOiBDaGFuZ2UgQ29ubmVjdGlvbiBQYWNrZXQgVHlwZSgweDAx
+fDB4MDAwZikgcGxlbiA0CiAgMjggMDAgMTggQ0MgCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1
+cygweDBmKSBwbGVuIDQKICAwMCAwMSAwRiAwNCAKPiBIQ0kgRXZlbnQ6IENvbm5lY3Rpb24gUGFj
+a2V0IFR5cGUgQ2hhbmdlZCgweDFkKSBwbGVuIDUKICAwMCAyOCAwMCAxOCBDQyAKPiBBQ0wgZGF0
+YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMTIKICAgIEwyQ0FQKHMpOiBDb25uZWN0
+IHJlcTogcHNtIDEgc2NpZCAweDAwNDAKPCBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyOCBmbGFncyAw
+eDAyIGRsZW4gMTYKICAgIEwyQ0FQKHMpOiBDb25uZWN0IHJzcDogZGNpZCAweDAwNDAgc2NpZCAw
+eDAwNDAgcmVzdWx0IDAgc3RhdHVzIDAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQg
+UGFja2V0cygweDEzKSBwbGVuIDUKICAwMSAyOCAwMCAwMSAwMCAKPiBBQ0wgZGF0YTogaGFuZGxl
+IDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMTIKICAgIEwyQ0FQKHMpOiBDb25maWcgcmVxOiBkY2lk
+IDB4MDA0MCBmbGFncyAweDAwMDAgY2xlbiAwCjwgQUNMIGRhdGE6IGhhbmRsZSAweDAwMjggZmxh
+Z3MgMHgwMiBkbGVuIDE0CiAgICBMMkNBUChzKTogQ29uZmlnIHJzcDogc2NpZCAweDAwNDAgZmxh
+Z3MgMHgwMDAwIHJlc3VsdCAwIGNsZW4gMAo8IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZsYWdz
+IDB4MDIgZGxlbiAxMgogICAgTDJDQVAocyk6IENvbmZpZyByZXE6IGRjaWQgMHgwMDQwIGZsYWdz
+IDB4MDAwMCBjbGVuIDAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cygw
+eDEzKSBwbGVuIDUKICAwMSAyOCAwMCAwMSAwMCAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21w
+bGV0ZWQgUGFja2V0cygweDEzKSBwbGVuIDUKICAwMSAyOCAwMCAwMSAwMCAKPiBBQ0wgZGF0YTog
+aGFuZGxlIDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMTQKICAgIEwyQ0FQKHMpOiBDb25maWcgcnNw
+OiBzY2lkIDB4MDA0MCBmbGFncyAweDAwMDAgcmVzdWx0IDAgY2xlbiAwCj4gQUNMIGRhdGE6IGhh
+bmRsZSAweDAwMjggZmxhZ3MgMHgwMiBkbGVuIDE3Cj4gQUNMIGRhdGE6IGhhbmRsZSAweDAwMjgg
+ZmxhZ3MgMHgwMSBkbGVuIDYKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4gMTkgW3BzbSAxXQog
+ICAgICAgIFNEUCBTUyBSZXE6IHRpZCAweDAgbGVuIDB4ZQogICAgICAgICAgcGF0IHV1aWQtMTYg
+MHgxMTA1IChPQkVYT2JqUHVzaCkgdXVpZC0xNiAweDAxMDAgKEwyQ0FQKSB1dWlkLTE2IDB4MDAw
+MyAoUkZDT01NKQogICAgICAgICAgbWF4IDB4MQogICAgICAgICAgY29udCAwMCAKPCBBQ0wgZGF0
+YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMTgKICAgIEwyQ0FQKGQpOiBjaWQgMHg0
+MCBsZW4gMTQgW3BzbSAxXQogICAgICAgIFNEUCBTUyBSc3A6IHRpZCAweDAgbGVuIDB4OQogICAg
+ICAgICAgY3VyIDB4MSB0b3QgMHgxIGhuZGwgMHg4MDRkNTU4CiAgICAgICAgICBjb250IDAwIAo+
+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzKDB4MTMpIHBsZW4gNQogIDAx
+IDI4IDAwIDAxIDAwIAo+IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZsYWdzIDB4MDIgZGxlbiAx
+Nwo+IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZsYWdzIDB4MDEgZGxlbiA0CiAgICBMMkNBUChk
+KTogY2lkIDB4NDAgbGVuIDE3IFtwc20gMV0KICAgICAgICBTRFAgU0EgUmVxOiB0aWQgMHgxIGxl
+biAweGMKICAgICAgICAgIGhuZGwgMHg4MDRkNTU4CiAgICAgICAgICBtYXggMHhmZmZmCiAgICAg
+ICAgICBhaWQocykgMHgwMDA0IChQcm90b2NvbERlc2NMaXN0KQogICAgICAgICAgY29udCAwMCAK
+PCBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMzYKICAgIEwyQ0FQKGQp
+OiBjaWQgMHg0MCBsZW4gMzIgW3BzbSAxXQogICAgICAgIFNEUCBTQSBSc3A6IHRpZCAweDEgbGVu
+IDB4MWIKICAgICAgICAgIGNudCAweDE4CiAgICAgICAgICBhaWQgMHgwMDA0IChQcm90b2NvbERl
+c2NMaXN0KQogICAgICAgICAgICAgdXVpZC0xNiAweDAxMDAgKEwyQ0FQKQogICAgICAgICAgICAg
+dXVpZC0xNiAweDAwMDMgKFJGQ09NTSkgdWludCAweDQKICAgICAgICAgICAgIHV1aWQtMTYgMHgw
+MDA4IChPQkVYKQoKICAgICAgICAgIGNvbnQgMDAgCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29t
+cGxldGVkIFBhY2tldHMoMHgxMykgcGxlbiA1CiAgMDEgMjggMDAgMDEgMDAgCj4gQUNMIGRhdGE6
+IGhhbmRsZSAweDAwMjggZmxhZ3MgMHgwMiBkbGVuIDE3Cj4gQUNMIGRhdGE6IGhhbmRsZSAweDAw
+MjggZmxhZ3MgMHgwMSBkbGVuIDQKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4gMTcgW3BzbSAx
+XQogICAgICAgIFNEUCBTQSBSZXE6IHRpZCAweDIgbGVuIDB4YwogICAgICAgICAgaG5kbCAweDgw
+NGQ1NTgKICAgICAgICAgIG1heCAweGZmZmYKICAgICAgICAgIGFpZChzKSAweDAwMDQgKFByb3Rv
+Y29sRGVzY0xpc3QpCiAgICAgICAgICBjb250IDAwIAo8IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4
+IGZsYWdzIDB4MDIgZGxlbiAzNgogICAgTDJDQVAoZCk6IGNpZCAweDQwIGxlbiAzMiBbcHNtIDFd
+CiAgICAgICAgU0RQIFNBIFJzcDogdGlkIDB4MiBsZW4gMHgxYgogICAgICAgICAgY250IDB4MTgK
+ICAgICAgICAgIGFpZCAweDAwMDQgKFByb3RvY29sRGVzY0xpc3QpCiAgICAgICAgICAgICB1dWlk
+LTE2IDB4MDEwMCAoTDJDQVApCiAgICAgICAgICAgICB1dWlkLTE2IDB4MDAwMyAoUkZDT01NKSB1
+aW50IDB4NAogICAgICAgICAgICAgdXVpZC0xNiAweDAwMDggKE9CRVgpCgogICAgICAgICAgY29u
+dCAwMCAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cygweDEzKSBwbGVu
+IDUKICAwMSAyOCAwMCAwMSAwMCAKPiBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAy
+IGRsZW4gMTcKPiBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAxIGRsZW4gNAogICAg
+TDJDQVAoZCk6IGNpZCAweDQwIGxlbiAxNyBbcHNtIDFdCiAgICAgICAgU0RQIFNBIFJlcTogdGlk
+IDB4MyBsZW4gMHhjCiAgICAgICAgICBobmRsIDB4ODA0ZDU1OAogICAgICAgICAgbWF4IDB4ZmZm
+ZgogICAgICAgICAgYWlkKHMpIDB4MDAwNCAoUHJvdG9jb2xEZXNjTGlzdCkKICAgICAgICAgIGNv
+bnQgMDAgCjwgQUNMIGRhdGE6IGhhbmRsZSAweDAwMjggZmxhZ3MgMHgwMiBkbGVuIDM2CiAgICBM
+MkNBUChkKTogY2lkIDB4NDAgbGVuIDMyIFtwc20gMV0KICAgICAgICBTRFAgU0EgUnNwOiB0aWQg
+MHgzIGxlbiAweDFiCiAgICAgICAgICBjbnQgMHgxOAogICAgICAgICAgYWlkIDB4MDAwNCAoUHJv
+dG9jb2xEZXNjTGlzdCkKICAgICAgICAgICAgIHV1aWQtMTYgMHgwMTAwIChMMkNBUCkKICAgICAg
+ICAgICAgIHV1aWQtMTYgMHgwMDAzIChSRkNPTU0pIHVpbnQgMHg0CiAgICAgICAgICAgICB1dWlk
+LTE2IDB4MDAwOCAoT0JFWCkKCiAgICAgICAgICBjb250IDAwIAo+IEhDSSBFdmVudDogTnVtYmVy
+IG9mIENvbXBsZXRlZCBQYWNrZXRzKDB4MTMpIHBsZW4gNQogIDAxIDI4IDAwIDAxIDAwIAo+IEFD
+TCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZsYWdzIDB4MDIgZGxlbiAyMQogICAgTDJDQVAoZCk6IGNp
+ZCAweDQwIGxlbiAxNyBbcHNtIDFdCiAgICAgICAgU0RQIFNBIFJlcTogdGlkIDB4NCBsZW4gMHhj
+CiAgICAgICAgICBobmRsIDB4ODA0ZDU1OAogICAgICAgICAgbWF4IDB4ZmZmZgogICAgICAgICAg
+YWlkKHMpIDB4MDMwMyAoKG51bGwpKQogICAgICAgICAgY29udCAwMCAKPCBBQ0wgZGF0YTogaGFu
+ZGxlIDB4MDAyOCBmbGFncyAweDAyIGRsZW4gMzEKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4g
+MjcgW3BzbSAxXQogICAgICAgIFNEUCBTQSBSc3A6IHRpZCAweDQgbGVuIDB4MTYKICAgICAgICAg
+IGNudCAweDEzCiAgICAgICAgICBhaWQgMHgwMzAzICh1bmtub3duKQogICAgICAgICAgICAgdWlu
+dCAweDEgdWludCAweDIgdWludCAweDMgdWludCAweDQgdWludCAweDUgdWludCAweDYKCiAgICAg
+ICAgICBjb250IDAwIAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzKDB4
+MTMpIHBsZW4gNQogIDAxIDI4IDAwIDAxIDAwIAo+IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZs
+YWdzIDB4MDIgZGxlbiAyMQogICAgTDJDQVAoZCk6IGNpZCAweDQwIGxlbiAxNyBbcHNtIDFdCiAg
+ICAgICAgU0RQIFNBIFJlcTogdGlkIDB4NSBsZW4gMHhjCiAgICAgICAgICBobmRsIDB4ODA0ZDU1
+OAogICAgICAgICAgbWF4IDB4ZmZmZgogICAgICAgICAgYWlkKHMpIDB4MDMwMyAoKG51bGwpKQog
+ICAgICAgICAgY29udCAwMCAKPCBBQ0wgZGF0YTogaGFuZGxlIDB4MDAyOCBmbGFncyAweDAyIGRs
+ZW4gMzEKICAgIEwyQ0FQKGQpOiBjaWQgMHg0MCBsZW4gMjcgW3BzbSAxXQogICAgICAgIFNEUCBT
+QSBSc3A6IHRpZCAweDUgbGVuIDB4MTYKICAgICAgICAgIGNudCAweDEzCiAgICAgICAgICBhaWQg
+MHgwMzAzICh1bmtub3duKQogICAgICAgICAgICAgdWludCAweDEgdWludCAweDIgdWludCAweDMg
+dWludCAweDQgdWludCAweDUgdWludCAweDYKCiAgICAgICAgICBjb250IDAwIAo+IEhDSSBFdmVu
+dDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzKDB4MTMpIHBsZW4gNQogIDAxIDI4IDAwIDAx
+IDAwIAo+IEFDTCBkYXRhOiBoYW5kbGUgMHgwMDI4IGZsYWdzIDB4MDIgZGxlbiAxMgogICAgTDJD
+QVAocyk6IERpc2Nvbm4gcmVxOiBkY2lkIDB4MDA0MCBzY2lkIDB4MDA0MAo8IEFDTCBkYXRhOiBo
+YW5kbGUgMHgwMDI4IGZsYWdzIDB4MDIgZGxlbiAxMgogICAgTDJDQVAocyk6IERpc2Nvbm4gcnNw
+OiBkY2lkIDB4MDA0MCBzY2lkIDB4MDA0MAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRl
+ZCBQYWNrZXRzKDB4MTMpIHBsZW4gNQogIDAxIDI4IDAwIDAxIDAwIAo+IEhDSSBFdmVudDogRGlz
+Y29ubiBDb21wbGV0ZSgweDA1KSBwbGVuIDQKICAwMCAyOCAwMCAxMyAK
+
+------_=_NextPart_001_01C42328.741C8E76--
 
 
 -------------------------------------------------------
