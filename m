@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-To: <bluez-users@lists.sourceforge.net>
-Subject: AW: [Bluez-users]  Again dund
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAA1bzeWnu4J0OOHk9hPKKFnwEAAAAA@t-online.de>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-In-Reply-To: <1099939109.29330.17.camel@pegasus>
+Subject: Re: [Bluez-users] USB/Bluetooth dongle doesn't work in hub
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <qszr7n3lgkp.fsf@timepilot.gpcc.itd.umich.edu>
+References: <qszekj3j47n.fsf@timepilot.gpcc.itd.umich.edu>
+	 <1099959115.29330.40.camel@pegasus>
+	 <qszzn1rhnmh.fsf@timepilot.gpcc.itd.umich.edu>
+	 <qszr7n3lgkp.fsf@timepilot.gpcc.itd.umich.edu>
+Content-Type: text/plain
+Message-Id: <1099985025.29330.52.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +21,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 9 Nov 2004 10:01:47 +0100
+Date: Tue, 09 Nov 2004 08:23:45 +0100
 
-Hi Marcel,
+Hi Scott,
 
-##>I don't get your point. The ppp0 interface can be used and=20
-##>when the routing information are right then this works. It=20
-##>is not different from dialin with a modem.
+> >> This looks like an USB problem to me. Update your kernel to the latest
+> >> Bitkeeper snapshot and try again.
+> 
+> I downloaded a new kernel with:
+> 
+>     bk clone http://linux-mh.bkbits.net/bluetooth-2.6
+> 
+> , compiled and booted, and I still am getting roughly the same error:
+> 
+>     Nov  9 00:36:06 localhost usb.agent[4258]: Setup hci_usb for USB product 50d/81/828
+>     Nov  9 00:36:06 localhost hcid[3688]: HCI dev 1 registered
+>     Nov  9 00:36:06 localhost kernel: hci_usb_intr_rx_submit: hci1 intr rx submit failed urb d0d01e94 err -28
+>     Nov  9 00:36:06 localhost hcid[4281]: Can't init device hci1. Input/output error(5)
+>     Nov  9 00:36:06 localhost usb.agent[4195]: Setup 0x00 0x00 for USB product 50d/81/828
+>     Nov  9 00:36:07 localhost usb.agent[4231]: Setup 0x00 0x00 for USB product 50d/81/828
+>     Nov  9 00:36:07 localhost usb.agent[4258]: Setup 0x00 0x00 for USB product 50d/81/828
+> 
+> As before, they work fine when plugged directly into the laptop.
 
-My telephone system works as DSL or ISDN system and has in addition a
-bluetooth accesspoint. It also gives the abilities of a switch and =
-router.
-So, I tried to initialize via YaST on DSL or ISDN the connection via
-bluetooth and expected to find ppp0 interface. But I didn't find it or =
-it
-doesn't exist already. My question is, how to establish a connection =
-that is
-able to use the ISDN or DSL functionality (router).
+go ahead and report this problem to the USB mailing list, because it is
+not a Bluetooth problem and I don't know why this fails.
 
 Regards
-Peter
+
+Marcel
 
 
 
