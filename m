@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Guylhem Aznar <bluez-devel@externe.net>
-To: bluez-devel@lists.sourceforge.net
-Cc: bmidgley@xmission.com
-Message-ID: <20050318171309.GB25843@externe.net>
+Subject: Re: [Bluez-devel] RFCOMM connection loss on SCO disconnect
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: victor.shcherbatyuk@tomtom.com
+In-Reply-To: <Pine.LNX.4.44.0503180007380.11381-300000@antilope>
+References: <Pine.LNX.4.44.0503180007380.11381-300000@antilope>
+Content-Type: text/plain
+Message-Id: <1111160332.9600.21.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] strange HP bluetooth headset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,116 +19,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 18 Mar 2005 12:13:09 -0500
+Date: Fri, 18 Mar 2005 16:38:52 +0100
 
-Hello
+Hi Victor,
 
-I have purchased HP Bluetooth stereo headphones:
-http://www.shopping.hp.com/cgi-bin/hpdirect/shopping/scripts/product_deta=
-il/product_detail_view.jsp?product_code=3DFA303A%23AC3&catLevel=3D5
+> I have the following problem. A device running bluez is configured to be 
+> HF. 
+> At the moment of incoming call, the deivece is connected to the phone (AG) 
+> on RFCOMM channel, while listening on SCO channel. From this moment 
+> there are two scenarios. 
+> 1) With the phones supporting in-band ringing, the phone opens SCO 
+> channel to the device and starting to send a ring tone over SCO while 
+> sending RING over RFCOMM
+> 2) With the phones not supporting in-band ringing, RING is sent over 
+> RFCOMM, and when we pick-up, SCO channel is open from the phone to the 
+> device.
+> 
+> The problem comes when I hang up from the calling side after a 
+> conversation is finished. The phones 2) close? SCO channel, and leave 
+> RFCOMM channel open, while the phones 1) close SCO channel and then the 
+> device sends disconnect for the RFCOMM channel handle, breaking RFCOMM 
+> link. ( I might be mistaking interpretating the log... ) I do not really 
+> expect the RFCOMM to be disconnected, as I still need to be able to send 
+> some ATs to the  phone....
+> 
+> This behaviour seems inconsistent, I tried to figure out what is going on 
+> from the logs, but it is kind of tricky (at least for me ;) ). I've 
+> included logs for both of the cases (nokia.txt for the type 1) phones, and 
+> sony.txt for the type 2 phonnes). Both logs start at the moment of 
+> incoming call when RFCOMM links are already established, and finish after 
+> I hang-up. I skipped most of the SCO packets cause there are a lot ( -- 
+> denotes skip )
+> 
+> May be you can comment on this, cause I do not see at the moment what is 
+> the cause of the problem.
 
-I thought they would work with sbcenc/a2play - they don't. The audio
-is crackled, ie. I have approx 0.2 seconds with audio, 0.2 seconds
-without, and so on.
+if you don't catch the initial L2CAP connection setup then you should
+add a --psm=3 to hcidump so it assumes that every unknown L2CAP cids are
+RFCOMM connections. Redo this for the Nokia logfile or send in the
+binary dumps.
 
-They don't work at all with rcplay - can't find a channel.
+Regards
 
-Here's some info from the device:
-Requesting information ...
-        BD Address:  00:0D:44:2A:09:00
-        Device Name: BT-Headphones
-        LMP Version: 1.2 (0x2) LMP Subversion: 0x3d
-        Manufacturer: Zeevo, Inc. (18)
-        Features: 0xff 0x07 0x04 0x78 0x18 0x18 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offs=
-et>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-               <park state> <RSSI> <channel quality> <power control>
-                <enhanced iscan> <interlaced iscan> <interlaced pscan>
-                <inquiry with RSSI> <AFH cap. slave> <AFH class.  slave>
-                <AFH cap. master> <AFH class. master>
-
-Here is the browse:
-Browsing 00:0D:44:2A:09:00 ...
-Service Name: Audio Sink
-Service RecHandle: 0x110b
-Service Class ID List:
-  "" (0x110b)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 25
-  "" (0x0019)
-    uint16: 0x100
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "" (0x110d)
-    Version: 0x0100
-
-Service Name: Remote Controller
-Service RecHandle: 0x110e
-Service Class ID List:
-  "" (0x110e)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 23
-  "" (0x0017)
-    uint16: 0x100
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "" (0x110e)
-    Version: 0x0100
-
-a2play reports:
-subbands =3D 0
-allocation method =3D 1
-channel_mode =3D 0
-blocks =3D 3
-sampling frequency =3D 3
-bitpool =3D 18
-frame len =3D 38
+Marcel
 
 
-So I took rcplay source and tried to hardcode a channel in - 25 of
-course.
-
-This didn't really help:
-$ ./rcplay 00:0D:44:2A:09:00 test.sbc
-Can't get channel number - defaulting to 25: Success
-Channel : 25
-Can't open connection: Connection refused
-
-However after that, using a2play I can play audio much better. It
-plays much too fast, without any distortion however. So I guess
-there's some capability settings I'm missing.
-
-a2play reports:
-subbands =3D 1
-allocation method =3D 1
-channel_mode =3D 2
-blocks =3D 3
-sampling frequency =3D 2
-bitpool =3D 32
-frame len =3D 72
-
-Any suggestion ?
-
---=20
-Bien =E0 vous - Best regards,
-Guylhem P. Aznar
-
---=20
-*@externe.net                                            http://externe.n=
-et
-P=E9rim=E9/Deprecated:    @oeil.qc.ca, @metalab.unc.edu, @ibiblio.org, @7=
-un.org
-GPG: 92EB37C1 DD11C9C9 20519D01 E8FA1B11 42975AF7 http://externe.net/pubk=
-ey
 
 
 -------------------------------------------------------
