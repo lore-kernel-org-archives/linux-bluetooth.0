@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Stephen Hemminger <shemminger@osdl.org>
-To: Marcel Holtmann <marcel@holtman.org>,
-   Maxim Krasnyansky
- <maxk@qualcomm.com>
-Cc: bluez-devel@lists.sourceforge.net
-Message-Id: <20040622144148.13ef5b10@dell_ss3.pdx.osdl.net>
+To: BlueZ mailing list <bluez-devel@lists.sourceforge.net>
+Message-ID: <20040622171857.GA8829@bougret.hpl.hp.com>
+Reply-To: jt@hpl.hp.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] [PATCH] change inquiry_cache to hci_inquiry_cache to avoid possible
- name conflicts
+Content-Type: text/plain; charset=us-ascii
+From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
+Subject: [Bluez-devel] Re: inquiry scan mode and page scan mode questions
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,99 +16,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Jun 2004 14:41:48 -0700
+Date: Tue, 22 Jun 2004 10:18:57 -0700
 
-This patch changes the inquiry_XXX function to be either local to hci_core.c
-or change name from inquiry_cache_lookup to hci_inquiry_cache_lookup to try and
-reduce the potential for namespace conflicts.  There could be USB or SCSI or other
-code that uses an inquiry_cache.
+Albert Huang wrote :
+> 
+> My immediate goal is to understand why 10.24 s is the recommended
+> duration for an inquiry, and to see if it's possible to decrease the
+> average time to discover a bluetooth device.
 
-Signed-off-by: Stephen Hemminger <shemminger@osdl.org>
+	Ha, ha ! Inquiry is one of the greatest pain of
+BlueTooth. Everybody wants to decrease this time, but unfortunately
+there is not much wiggle room.
+	One of the idea is that if you do periodic inquiry, it would
+be nice to do shorter Inquiry more often so as not to degrade your
+latency. Not possible.
 
-diff -Nru a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
---- a/include/net/bluetooth/hci_core.h	2004-06-22 14:38:03 -07:00
-+++ b/include/net/bluetooth/hci_core.h	2004-06-22 14:38:03 -07:00
-@@ -195,10 +195,8 @@
- 	return jiffies - e->timestamp;
- }
- 
--struct inquiry_entry *inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr);
--void inquiry_cache_update(struct hci_dev *hdev, struct inquiry_info *info);
--void inquiry_cache_flush(struct hci_dev *hdev);
--int  inquiry_cache_dump(struct hci_dev *hdev, int num, __u8 *buf);
-+struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr);
-+void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_info *info);
- 
- /* ----- HCI Connections ----- */
- enum {
-diff -Nru a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
---- a/net/bluetooth/hci_core.c	2004-06-22 14:38:03 -07:00
-+++ b/net/bluetooth/hci_core.c	2004-06-22 14:38:03 -07:00
-@@ -287,7 +287,7 @@
- EXPORT_SYMBOL(hci_dev_get);
- 
- /* ---- Inquiry support ---- */
--void inquiry_cache_flush(struct hci_dev *hdev)
-+static void inquiry_cache_flush(struct hci_dev *hdev)
- {
- 	struct inquiry_cache *cache = &hdev->inq_cache;
- 	struct inquiry_entry *next  = cache->list, *e;
-@@ -301,7 +301,7 @@
- 	}
- }
- 
--struct inquiry_entry *inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr)
-+struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr)
- {
- 	struct inquiry_cache *cache = &hdev->inq_cache;
- 	struct inquiry_entry *e;
-@@ -314,14 +314,14 @@
- 	return e;
- }
- 
--void inquiry_cache_update(struct hci_dev *hdev, struct inquiry_info *info)
-+void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_info *info)
- {
- 	struct inquiry_cache *cache = &hdev->inq_cache;
- 	struct inquiry_entry *e;
- 
- 	BT_DBG("cache %p, %s", cache, batostr(&info->bdaddr));
- 
--	if (!(e = inquiry_cache_lookup(hdev, &info->bdaddr))) {
-+	if (!(e = hci_inquiry_cache_lookup(hdev, &info->bdaddr))) {
- 		/* Entry not in the cache. Add new one. */
- 		if (!(e = kmalloc(sizeof(struct inquiry_entry), GFP_ATOMIC)))
- 			return;
-@@ -335,7 +335,7 @@
- 	cache->timestamp = jiffies;
- }
- 
--int inquiry_cache_dump(struct hci_dev *hdev, int num, __u8 *buf)
-+static int inquiry_cache_dump(struct hci_dev *hdev, int num, __u8 *buf)
- {
- 	struct inquiry_cache *cache = &hdev->inq_cache;
- 	struct inquiry_info *info = (struct inquiry_info *) buf;
-diff -Nru a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
---- a/net/bluetooth/hci_event.c	2004-06-22 14:38:03 -07:00
-+++ b/net/bluetooth/hci_event.c	2004-06-22 14:38:03 -07:00
-@@ -486,7 +486,7 @@
- 
- 	hci_dev_lock(hdev);
- 	for (; num_rsp; num_rsp--)
--		inquiry_cache_update(hdev, info++);
-+		hci_inquiry_cache_update(hdev, info++);
- 	hci_dev_unlock(hdev);
- }
- 
-@@ -508,7 +508,7 @@
- 		memcpy(tmp.dev_class, &info->dev_class, 3);
- 		tmp.clock_offset      = info->clock_offset;
- 		info++;
--		inquiry_cache_update(hdev, &tmp);
-+		hci_inquiry_cache_update(hdev, &tmp);
- 	}
- 	hci_dev_unlock(hdev);
- }
+	I don't want to go into details, but just to give you general
+pointers.
+	The killer is the backoff, in 10.7.4 it specifies that the
+node doing Inquiry scan has to wait between 0 and 1023 slots before
+sending an Inquiry response.
+	Then, you have interference, collision, time shift and all
+kind of nastiness over the channel. If the Inquiry and Inquiry scan
+happen to be on the same frequency at the same time, it's not
+guaranteed to go through.
+
+	In practical term, a one-shot Inquiry need to be 6.4 s to have
+a good probability of detection at close range. If you do periodic
+Inquiry, you can go down to 3.84 s, but expect a few periods before
+the node is discovered. Those are from one of my unpublished paper.
+
+	Have fun...
+
+	Jean
+
 
 
 -------------------------------------------------------
