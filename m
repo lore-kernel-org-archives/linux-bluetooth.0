@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] bluetooth socket + rfcomm tty
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.44.0501291742500.13497-100000@antilope>
+References: <Pine.LNX.4.44.0501291742500.13497-100000@antilope>
 Content-Type: text/plain
-Message-Id: <1107191003.7902.27.camel@pegasus>
+Message-Id: <1107019605.10735.22.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] News about the Broadcom BCM92035DGL
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,26 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 31 Jan 2005 18:03:23 +0100
+Date: Sat, 29 Jan 2005 18:26:45 +0100
 
-Hi,
+Hi Victor,
 
-the Broadcom dongles with the USB product id 0x2009 like the IOgear
-GBU311 need a special HCI vendor command to switch from HID into full
-HCI. Without this command the dongle is working, but only responses to
-commands in the OGF_INFO_PARAM class. This command is 3B FC 01 00 and
-the last byte toggles between HCI and HID mode.
+> I use TTY because I want to provide AT command communication and PPP over 
+> the same channel, in my case I send a number of AT commands, then start 
+> pppd over the channel (converted to TTY) and then, after it is finished, I 
+> want to send AT commands again. I want to do this all without reopening 
+> bluetooth connection with the phone, which is being closed when pppd 
+> finishes on TTY. I also can open a TTY from my application, so pppd can 
+> not close the connection on exit (cause there are still open descriptors) 
+> - but 
+> sending commands through an open TTY works strange to me... 
 
-< HCI Command: Vendor (0x3f|0x003b) plen 1
-  0000: 00                                                .
-> HCI Event: Command Complete (0x0e) plen 4
-  0000: 01 3b fc 00                                       .;..
-
-Right now I have no solution how to integrate this so that it works
-nicely, because I don't wanna pollute the Bluetooth core with Broadcom
-specific hacks. However you can execute "hcitool cmd 3f 3b 00" by hand
-and after that the mouse and keyboard devices provided by this dongle
-should disconnect and you can fully use the Bluetooth part.
+check if your TTY is set to raw mode and actually you should look at
+dund, because this provides most of this functionality. And using pppd
+you can also define post-connection scripts.
 
 Regards
 
