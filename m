@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v612)
-Message-Id: <51279096-6253-11D8-9EE6-000393C5CB34@usask.ca>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-To: bluez-users@lists.sourceforge.net
-From: Carl Norum <carl.norum@usask.ca>
-Subject: [Bluez-users] Can't create socket.: No such file or directory
+Subject: Re: [Bluez-users] hcidump, was: rfcomm: permission denied
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Zbigniew Diaczyszyn (gmx)" <z.dia@gmx.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <003b01c3f65e$371ef400$dc4db850@ULLA>
+References: <000d01c3f343$d89f1ad0$e04db850@ULLA>
+	 <1076855680.14758.55.camel@pegasus>  <000b01c3f599$04aaf520$de4bb850@ULLA>
+	 <1077058491.2665.131.camel@pegasus>  <003b01c3f65e$371ef400$dc4db850@ULLA>
+Content-Type: text/plain
+Message-Id: <1077147114.2685.11.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,26 +20,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Feb 2004 14:44:59 -0600
+Date: Thu, 19 Feb 2004 00:31:54 +0100
 
+Hi Zbigniew,
 
-I've just finished installing BlueZ on a Mandrake machine of mine, but 
-I can't make l2ping work.  "hcitool scan" and "hcitool inq" both show 
-me the other bluetooth machine (iBook with 3Com dongle), and "hcitool 
-cc --role=m ...." appears to work too, as "hcitool con" shows the 
-connection.  l2ping however, just always says "Can't create socket.: No 
-such file or directory", and that's it.
+> Right. After I had started the hcid daemon. The USB dongle is placed in the notebook.
+> 
+> Just for understanding: 
+> the adress I get from hciconfig is the adress from my USB dongle, and I have to bind it to rfcomm?
 
-Anybody have any quick ideas about what's going on here?
+yes, hciconfig shows you the local address of your device. For rfcomm
+you have to use the remote address.
 
--- 
-Carl J Norum
-Academic Director, IEEE NSS Student Branch
-Final Year Electrical Engineering/Computer Science Student
-University of Saskatchewan
-Saskatoon, Canada
+Regards
 
-http://norum.homeunix.net/~carl/
+Marcel
+
 
 
 
