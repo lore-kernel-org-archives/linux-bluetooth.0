@@ -1,12 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] how to do asynchronous device inquiry?
+Subject: Re: [Bluez-devel] [PATCH] pand/main.c, restore signals for dev-up
+	script
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Albert Huang <ashuang@gmail.com>
+To: James Cameron <james.cameron@hp.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <ef9938ec040628194321db5d9c@mail.gmail.com>
-References: <ef9938ec040628194321db5d9c@mail.gmail.com>
+In-Reply-To: <20040629052317.GQ20139@hp.com>
+References: <20040628085356.GA8871@hp.com>
+	 <1088413518.3774.167.camel@pegasus> <20040628095541.GB8871@hp.com>
+	 <1088417629.3774.177.camel@pegasus> <20040628101927.GC8871@hp.com>
+	 <1088419197.3774.183.camel@pegasus> <20040628120612.GF8871@hp.com>
+	 <1088427271.3774.198.camel@pegasus> <20040628224803.GA20139@hp.com>
+	 <1088465177.6030.221.camel@pegasus>  <20040629052317.GQ20139@hp.com>
 Content-Type: text/plain
-Message-Id: <1088500888.6030.261.camel@pegasus>
+Message-Id: <1088499480.6030.239.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,20 +24,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 29 Jun 2004 11:21:29 +0200
+Date: Tue, 29 Jun 2004 10:58:01 +0200
 
-Hi Albert,
+Hi James,
 
-> Can somone point me to an example of how to do an asynchronous device
-> inquiry using bluez?  I'd like to start an inquiry with an ioctl or
-> something like that, and then be notified either with signals or by
-> polling as devices are discovered.  If this is currently not possible,
-> can you point me to which source files I could modify that would allow
-> me to do this?  Thanks!
+> > from my view it is better to use "net.agent" and "pand -l" for this job.
+> 
+> Yes, I know.  I don't know why you think that though, since using dev-up
+> costs less in dependencies and execution time.  You've proposed removing
+> dev-up on the grounds that I had problems with it, and that you've never
+> used it; which suggests that you think that cost of maintenance is more
+> critical.  I'm just guessing.
 
-you must use the HCI raw socket interface for it. Some time ago I posted
-example code for integration into the GNOME Bluetooth subsystem. Check
-the mailing list archives.
+I like to have only one and clear way to achieve a goal. And this is the
+Linux hotplug mechanism from my view. However dev-up is in pand and
+there was a bug, so I applied your patch. But be aware of that I might
+remove it in a new major release, now I know of it ;)
 
 Regards
 
