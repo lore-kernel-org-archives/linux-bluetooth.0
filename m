@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041222161314.65249.qmail@web11610.mail.yahoo.com>
-From: "Bhaskar S. Manda" <bhaskar_manda@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Anybody using Socket CF Bluetooth version F on Zaurus
+Subject: Re: [Bluez-users] help on project!!!!
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Simi Manuel <roses_3@operamail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041222133512.69B1323CF7@ws5-3.us4.outblaze.com>
+References: <20041222133512.69B1323CF7@ws5-3.us4.outblaze.com>
+Content-Type: text/plain
+Message-Id: <1103729756.20258.50.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,17 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Dec 2004 08:13:14 -0800 (PST)
+Date: Wed, 22 Dec 2004 16:35:56 +0100
 
 Hi,
 
-Has anyone gotten this card (Socket CF Bluetooth, version F) to work on
-a Zaurus. If so, please post what ROM, kernel version, and Bluez or
-Affix  packages you are using. My card is detected by PCMCIA, but the
-dtl1_cs modules doesn't see it. So I can see it in "cardctl ident", but
-no driver is loaded, and hciconfig doesn't see it.
+first if you ask on the mailing list, you reply to the mailing list.
 
-Thanks.
+> but i am not understanding its documentation and i didnt get its source code....rather than the code,i need to know how simply it can be done since mine is a 2 months project.
+
+You don't get the source code, then you might try something else. The
+code is available for free. You can download it from the BlueZ webpage
+and you will find it inside the Linux kernel source. So use it, Luke ;)
+
+And once again. If you have a problem describe it in detail and describe
+what you wanna do. Otherwise no one is able to help you. If you don't
+know what you wanna do, then try something else.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
