@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Marcin Michalak" <marcin@telscom.ch>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
 Subject: Re: [Bluez-devel] Problem with Billionton PCMCIA card
-Message-ID: <4187903F.16859.61AB28E@localhost>
-In-reply-to: <4187865E.12078.5F52B9D@localhost>
-References: <1099394605.10948.33.camel@pegasus>
-Content-type: text/plain; charset=US-ASCII
-Reply-To: marcin@telscom.ch
+From: Marcel Holtmann <marcel@holtmann.org>
+To: marcin@telscom.ch
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4187865E.12078.5F52B9D@localhost>
+References: <418775F2.13601.5B50785@localhost>
+	 <4187865E.12078.5F52B9D@localhost>
+Content-Type: text/plain
+Message-Id: <1099399565.10948.43.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,18 +19,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 02 Nov 2004 13:48:47 +0100
+Date: Tue, 02 Nov 2004 13:46:05 +0100
 
-On 2 Nov 2004 at 13:06, Marcin Michalak wrote:
+Hi Marcin,
 
-> On 2 Nov 2004 at 12:23, Marcel Holtmann wrote:
-> 
-> > Hi Marcin,
 > > about what kernel version and what platform are we talking? Actually
 > > using hci_uart with BCSP and hciattach works perfect with the Zoom card.
 > > The btuart_cs is not the way to go and I will remove this driver in the
 > > future.
-> Hello Marcel,
+> 
 >  I compiled kernel 2.6.9 with the latest patch (mh3). Platform is 
 > laptop with Pentium IV.
 > After removing btuart.conf I get:
@@ -37,15 +35,24 @@ On 2 Nov 2004 at 13:06, Marcin Michalak wrote:
 > cs: memory probe 0xa0000000-0xa0ffffff: clean.
 > ttyS10 at I/O 0x100 (irq = 10) is a 16C950/954
 > 
-Hello,
- It works with kernel 2.4.20 from RedHat 9, and doesn't hang. Still, 
-no idea why it hangs on the other one.
- Thanks for the tip, you can change it on Hardware support list. The 
-card is very cheap for PCMCIA and it is Class 1.
-  Marcin
-----------------------------------------------------------
-Marcin Michalak		Research Engineer
-Mobile: +41 79 330 83 51	Telscom AG		
+>  What command should I use? I loaded hci_uart (modprobe) and tried 
+> hciattach with bcsp, but the system hangs completely:-( No reaction, 
+> nothing...
+
+with the Zoom card I used a simple command like "hciattach ttyS10 bcsp".
+However my serial port got IRQ 3 and device ttyS6 assigned, but that
+shouldn't be a problem. May you wanna give 2.6.10-rc1-bk11 a try or get
+the oops when the systems hangs.
+
+Another thing you can try is to check the *.inf file that comes with the
+Windows driver for useful information and if this card really uses BCSP
+by default and not H4.
+
+Regards
+
+Marcel
+
+
 
 
 
