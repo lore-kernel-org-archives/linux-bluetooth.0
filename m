@@ -1,26 +1,44 @@
-Return-Path: <bluez@thomae-privat.de>
-Message-ID: <40E272CE.3090705@thomae-privat.de>
-Date: Wed, 30 Jun 2004 09:59:10 +0200
-From: Matthias Thomae <bluez@thomae-privat.de>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <40E241EF.7000607@mWare.ca>
+From: Mykel <Mykel@mWare.ca>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Epox Barton keyboard: HID create error 53
-References: <40CDE18C.70703@thomae-privat.de>	 <1087255678.13792.51.camel@pegasus>  <40CE96A8.3020407@thomae-privat.de>	 <1087284859.13792.67.camel@pegasus>  <40CEC020.6050107@thomae-privat.de>	 <1087292887.13792.81.camel@pegasus>  <40CF4B17.2010806@thomae-privat.de>	 <1087339715.13792.104.camel@pegasus>  <40D7DDAD.2040908@thomae-privat.de>	 <1087897207.4328.89.camel@pegasus> <40D8D39E.3070301@thomae-privat.de>	 <40E024AD.1000101@thomae-privat.de> <1088452526.6030.86.camel@pegasus>	 <40E12F15.9040805@thomae-privat.de> <1088500144.6030.249.camel@pegasus>	 <40E1C91C.8030500@thomae-privat.de> <1088543513.6030.332.camel@pegasus>
-In-Reply-To: <1088543513.6030.332.camel@pegasus>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Subject: [Bluez-users] Apple BT Keyboard?
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Wed, 30 Jun 2004 00:30:39 -0400
 
-Hello Marcel,
+I've been flagging the discussions about it in the past few weeks, but 
+I'm not up with the whole process of what I'm supposed to do, and I 
+haven't been able to piece it together from what I've seen.
 
-Marcel Holtmann wrote:
-> don't rely on that you will get a fixed device very soon. I reported
-> that bug to EPoX, but I don't expect anything. I will fix it directly in
-> the hidd and swap the bytes in the HID descriptor before handling the
-> connection over to the HIDP module.
+I have my MX900 working in 2.4.26 using bthid & hcid.... I don't seem to 
+have hidd... (I have to press the Connect button and do a bthid -c $ADDR 
+after leaving the mouse 20min or the first time I use it.)
 
-I think I could live very well with a quirk, if it makes the device 
-work. I didn't plan to use other BT stacks anyway :)
+What do I need to get the keyboard working? Is it worthwhile attempting 
+this with 2.4? Slackware 10 is out and I'm playing with it in 2.6, but I 
+have many other requirements (I'm an on site network tech, lots of fancy 
+stuff in my kernel) so I'm not stable in 2.6 yet.
 
-Regards.
-Matthias
+Myke
+
+
+-------------------------------------------------------
+This SF.Net email sponsored by Black Hat Briefings & Training.
+Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
+digital self defense, top technical experts, no vendor pitches, 
+unmatched networking opportunities. Visit www.blackhat.com
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
