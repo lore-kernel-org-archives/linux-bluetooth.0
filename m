@@ -1,59 +1,33 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <daryl@wideray.com>
+Errors-To: <daryl@wideray.com>
 From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-Message-ID: <000a01c31687$c06757a0$1a01010a@baked>
+To: "'Max Krasnyansky'" <maxk@qualcomm.com>
+Cc: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Qualification Testing
+Date: Fri, 9 May 2003 16:40:33 -0700
+Message-ID: <000801c31684$627d9f80$1a01010a@baked>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Subject: [Bluez-devel] Qualification - L2CA_DisconnectCfm
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 9 May 2003 17:04:39 -0700
+In-Reply-To: <1052520660.10456.220.camel@localhost.localdomain>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Max, Marcel,
+Max,
 
-In order to pass TP/COS/CED/BV-08 we're supposed to be able to indicate tha=
-t
-there was a timeout waiting for an L2CAP disconnect confirm from the remote
-device. I'm waiting for clarification that this is indeed necessary.
+> I was going to just drop the frame and log an error. The=20
+> thing is, if the packet header is corrupted (i.e. wrong=20
+> length, etc) we can't really trust its content. I mean if=20
+> length is wrong how do we know that CID is right. It means=20
+> that we don't really know which channel should be closed=20
+> (i.e. which app should be notified).
 
-The test works like this:
+Here's Cetecom's response to your comment:
 
-1. We send a disconnect request
-2. The tester ignores it.
-3. optionally - we resend the disconnect request following a timeout patter=
-n
-where each retransmission happens after a delay equal to twice the previous
-delay.
-4. After 60 seconds the channel must be closed - we indicated to the app
-that the channel is indeed closed (even though we didn't get a confirmation
-from the remote side) and indicate that a timeout ocurred.
+"Good point ! I agree, in a messed up remote L2CAP stack, CID could be wron=
+g
+as well if length is wrong. But I think it is a good approach to check
+first, if that CID exists and if yes, notify the app about that channel."
 
-I think there's a standard way of doing that sort of thing by setting a
-socket option which causes close() to block until things are closed. Not
-sure though.
-
-Can we do this with BlueZ?
+So how about we do this:  As above, if it exists then we close it. If not,
+we log an error.
 
 -Daryl.
-
-
-
--------------------------------------------------------
-Enterprise Linux Forum Conference & Expo, June 4-6, 2003, Santa Clara
-The only event dedicated to issues related to Linux enterprise solutions
-www.enterpriselinuxforum.com
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
