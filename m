@@ -1,5 +1,5 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4063F68E.2050800@dfki.de>
+Message-ID: <4063F661.9020802@dfki.de>
 From: Yannick Djoumbou Feunang <feunang@dfki.de>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
@@ -15,7 +15,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Mar 2004 10:23:26 +0100
+Date: Fri, 26 Mar 2004 10:22:41 +0100
 
 Dear users,
 > 
