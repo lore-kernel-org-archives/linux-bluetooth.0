@@ -1,69 +1,47 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <SRS0+53c6f9e0eda5ea539b39+515+infradead.org+dwmw2@canuck.srs.infradead.org>
 Subject: Re: [Bluez-devel] Alignment issue
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Woodhouse <dwmw2@infradead.org>
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: Daryl Van Vorst <daryl@wideray.com>,
    "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1106233175.26551.597.camel@hades.cambridge.redhat.com>
+In-Reply-To: <1106232343.8190.187.camel@pegasus>
 References: <001301c47f09$3900e650$1301010a@baked>
 	 <1092208405.4564.227.camel@pegasus>
 	 <1106231454.26551.582.camel@hades.cambridge.redhat.com>
 	 <1106232343.8190.187.camel@pegasus>
-	 <1106233175.26551.597.camel@hades.cambridge.redhat.com>
 Content-Type: text/plain
-Message-Id: <1106244883.13562.3.camel@pegasus>
+Date: Thu, 20 Jan 2005 14:59:35 +0000
+Message-Id: <1106233175.26551.597.camel@hades.cambridge.redhat.com>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 19:14:43 +0100
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi David,
-
-> > Will it also work with other compilers? 
+On Thu, 2005-01-20 at 15:45 +0100, Marcel Holtmann wrote:
 > 
-> Don't know; don't care. Remember, the existing code isn't guaranteed to
-> work even with gcc, let alone other compilers. Does the rest of the
-> BlueZ code compile with non-gcc compilers? Probably not... you have 122
-> other instances of '__attribute__((packed))' in the source. Including
-> the alignment stuff in include/sdp_internal.h which does it the way I'm
-> suggesting, albeit with a gratuitous '#ifdef __i386__'.
+> why using a do-while for put_unaligned() and not for get_unaligned(). 
 
-oh yes, there is other stuff that must be cleaned up.
+Because get_unaligned() returns a value, and put_unaligned() does not.
 
-> > What about performance? If a platform can do unaligned
-> > access by itself it should be faster than compiler tricks.
-> 
-> If the platform can do unaligned access by itself, then GCC knows that
-> and emits a direct load/store instruction. It's only if the platform
-> _can't_ do it by itself that GCC does anything different. That's why the
-> #ifdef __i386__ in include/sdp_internal.h is pointless -- GCC should
-> emit the same code even if the other version is used.
+> Is this supposed to work with each GCC version?
 
-Your patch is now in (after I reworked the tab vs. space problem). And
-everyone should start testing these on various platforms.
+Yes.
 
-Regards
+> Will it also work with other compilers? 
 
-Marcel
+Don't know; don't care. Remember, the existing code isn't guaranteed to
+work even with gcc, let alone other compilers. Does the rest of the
+BlueZ code compile with non-gcc compilers? Probably not... you have 122
+other instances of '__attribute__((packed))' in the source. Including
+the alignment stuff in include/sdp_internal.h which does it the way I'm
+suggesting, albeit with a gratuitous '#ifdef __i386__'.
 
+> What about performance? If a platform can do unaligned
+> access by itself it should be faster than compiler tricks.
 
+If the platform can do unaligned access by itself, then GCC knows that
+and emits a direct load/store instruction. It's only if the platform
+_can't_ do it by itself that GCC does anything different. That's why the
+#ifdef __i386__ in include/sdp_internal.h is pointless -- GCC should
+emit the same code even if the other version is used.
 
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
-Tool for open source databases. Create drag-&-drop reports. Save time
-by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
-Download a FREE copy at http://www.intelliview.com/go/osdn_nl
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+dwmw2
