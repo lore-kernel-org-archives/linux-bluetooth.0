@@ -2,7 +2,7 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: "Jose Bernardo Silva" <jbs@bandos.homelinux.com>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Dongle firmware
-Message-Id: <20050105090527.M98095@bandos.homelinux.com>
+Message-Id: <20050105091412.M93367@bandos.homelinux.com>
 In-Reply-To: <200501042245.58663.cijoml@volny.cz>
 References: <20050104110418.M39860@bandos.homelinux.com> <1104841297.8894.92.camel@pegasus> <20050104210042.M19007@bandos.homelinux.com> <200501042245.58663.cijoml@volny.cz>
 MIME-Version: 1.0
@@ -19,7 +19,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 5 Jan 2005 09:14:10 +0000
+Date: Wed, 5 Jan 2005 09:14:12 +0000
 
 On Tue, 4 Jan 2005 22:45:58 +0100, Michal Semler wrote
 
