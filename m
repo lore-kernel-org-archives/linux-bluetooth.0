@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Microsoft Bluethooth "Elite" Keyboard & Mouse
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050116193732.GA2326@virgilio.it>
-References: <20050116174616.GA2201@virgilio.it>
-	 <200501161851.01291.cijoml@volny.cz> <1105898506.8080.20.camel@pegasus>
-	 <20050116193732.GA2326@virgilio.it>
-Content-Type: text/plain
-Message-Id: <1106011174.8190.57.camel@pegasus>
-Mime-Version: 1.0
+From: Michal Semler <cijoml@volny.cz>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] hid2hci error?
+References: <200501170104.12868.cijoml@volny.cz> <1105981171.8190.30.camel@pegasus>
+In-Reply-To: <1105981171.8190.30.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200501171913.06134.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,30 +19,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 18 Jan 2005 02:19:34 +0100
+Date: Mon, 17 Jan 2005 19:13:05 +0100
 
-Hi Francesco,
+Should be in 2.6.11
 
-> BTW, just out of curiosity: would the MS Keyboard works with another Bluetooth USB dongle?
+Michal
 
-you can use any dongle you like. And as Michal said, you should prefer a
-CSR one with at least HCI 16.4 firmware. Will make your life a lot more
-easier.
+Dne po 17. ledna 2005 17:59 Marcel Holtmann napsal(a):
+> Hi Michal,
+>
+> > Vojtech fixed bug in usb and this is our problem he seid.
+> >
+> > usb 2-1: usbfs: USBDEVFS_CONTROL failed cmd hid2hci rqt 64 rq 0 len 0 ret
+> > -84
+>
+> is this patch already in the mainline kernel or only in Vojtech's input
+> repository?
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> The SF.Net email is sponsored by: Beat the post-holiday blues
+> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-> > I need someone to donate one of these, because there is no way to buy
-> > only the dongle and I am not going to buy another Bluetooth keyboard. I
-> > have enough.
-> 
-> I could consider swapping mine with one that already works with Linux :-)
+-- 
+S pozdravem
 
-I have a lot of dongles at home, but I can't give any of them away. I
-need them for testing when I change specific stuff.
-
-Regards
-
-Marcel
-
-
+Michal Semler
 
 
 -------------------------------------------------------
