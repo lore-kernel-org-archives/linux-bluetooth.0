@@ -1,49 +1,56 @@
-Return-Path: <daryl@wideray.com>
-Errors-To: <daryl@wideray.com>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
+Return-Path: <maxk@qualcomm.com>
+Message-Id: <5.1.0.14.2.20030513105017.0d234df0@unixmail.qualcomm.com>
+Date: Tue, 13 May 2003 11:00:18 -0700
+To: "Daryl Van Vorst" <daryl@wideray.com>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
+From: Max Krasnyansky <maxk@qualcomm.com>
+Subject: RE: [Bluez-devel] Qualification - L2CA_DisconnectCfm
 Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Qualification Testing
-Date: Tue, 13 May 2003 11:36:08 -0700
-Message-ID: <000801c3197e$8591e290$1a01010a@baked>
-MIME-Version: 1.0
+In-Reply-To: <000d01c318e4$32a57460$1a01010a@baked>
+References: <1052783343.1132.159.camel@pegasus.local>
+Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <5.1.0.14.2.20030513104050.0d251ee8@unixmail.qualcomm.com>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Max,
+At 05:11 PM 5/12/2003, Daryl Van Vorst wrote:
+>Marcel,
+>
+>The behaviour you list below makes sense to me. I think there's supposed to
+>be a 60 second timeout instead of 5 seconds, but that seems a bit excessive
+>to me. Does it matter? If we close L2CAP and then the remote side sends an
+>L2CAP_DISCONN_RSP, does the fact that we've already closed the channel cause
+>any different packets to be exchanged?
+No. If they don't send rsp within 5 second we simply kill this channel.
+And if we receive rsp for already closed channel we ignore it.
 
-> >Max - You mentioned that the spec says that what the stack 
-> does with a 
-> >config reject can be implementation specific. I just had a 
-> look at the 
-> >spec and couldn't find it. Could you tell me where to look 
-> in the spec?
-> 
-> section 6.1 
-> page 297
-> 
-> "Since all L2CAP implementations are capable to support a 
-> minimum L2CAP packet size, see Section 4 on page 280, MTU is 
-> not really a negotiated value but rather an informational 
-> parameter to the remote device that the local device can 
-> accommodate in this channel an MTU larger than the minimum 
-> required. In the unlikely case that the remote device is only 
-> willing to send L2CAP packets in this channel that are larger 
-> than the MTU announced by the local device, then this 
-> Configuration Request will receive a negative response in 
-> which the remote device will include the value of MTU that is 
-> indented to transmit. In this case, it is implementation 
-> specific on whether the local device will continue the 
-> configuration process or even maintain this channel."
+>The only advantage that I see in the capability of a blocking close is
+>completeness. I can't think of a scenario where it really matters, but you
+>never know what someone will cook up.
+>
+>I don't believe the application actually needs to know that the
+>disconnection was normal, just that it has definitely been disconnected. I'm
+>a little fuzzy on the definition of "disconnected". Telling the app that
+>there was a timeout is optional.
+What we need is SO_LINGER option support. Application doesn't care so much about
+the disconnect itself but it does care if all the data that it had written to a 
+socket has been sent.
+i.e. 
+        connect(sk);
+        send(sk, stuff, sizeof(stuff));
+        close(sk);
 
-What about flowspec and flush timeout?
+Some apps want close() to sleep until all data has been sent and connection was 
+successfully closed.
 
-In section 6.4.2 FlushTO is listed as one of the items in the response path
-(along with MTU and InFlow). But in section 7.5 only MTU and InFlow are
-listed.
+>If the stack closing the L2CAP connection and then receiving an
+>L2CAP_DISCONN_RSP afterwards does not cause any different traffic to occurr
+>(ie: the remote side can't tell the difference), then we're probably ok. Is
+>this true?  
+Yes, remote side cannot tell whether a local app is sleeping on close() or not. 
 
-I sent the above quote to Cetecom last week. They responded saying that MTU
-isn't the only negotiated parameter.
+>Then the only difference between what we do and what the spec
+>says is _when_ the "L2CA_DisconnectCfm" gets sent to the app. In our case,
+>it would be immediately (i.e.: close() returned success). In the test case,
+>it is 60 seconds after sending the disconnect request.
+Yes. But SO_LINGER support is still useful for real life apps. I'll look in to it.
 
--Daryl.
+Max
