@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bandwidth when using serial cable
+Subject: Re: [Bluez-devel] Getting in touch with libs2 and utils2
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
-Cc: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <AFE91B59A185A5439840B43AB7919047093816@mchp997a.mch.sbs.de>
-References: <AFE91B59A185A5439840B43AB7919047093816@mchp997a.mch.sbs.de>
+To: Charles Bueche <charles@bueche.ch>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1071695000.6361.13.camel@bluez.bueche.ch>
+References: <1071436139.4356.124.camel@pegasus>
+	 <1071695000.6361.13.camel@bluez.bueche.ch>
 Content-Type: text/plain
-Message-Id: <1071698979.21800.74.camel@pegasus>
+Message-Id: <1071698576.21803.65.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,28 +19,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 17 Dec 2003 23:09:39 +0100
+Date: Wed, 17 Dec 2003 23:02:57 +0100
 
-Hi Matthias,
+Hi Charles,
 
-> I work with several Bluetooth Chips, but they have
-> one commonality: they all have to be connected via serial
-> cable. Am I right, that attaching with
-> 	hciattach /dev/ttyS0 any 115200 
-> limits the data rate to 115,2 Kbit/s, which is the
-> speed of serial cable? I am not talking about any 'baseband'
-> datarate or l2ping, I am talking about the user data rate, 
-> lets say for transfering a 10 MBit file.
+> success !!! Works much better than the hacked bthid under gentoo
+> 2.6test11.
+> 
+> I followed your guide below (preceded by a cvs checkout of course). I
+> then ran 
+> 
+> - hcid (from the gentoo bluez packages)
+> - /opt/bluetooth/sbin/bthid --daemon
+> - moving mouse --> discover message in syslog : WORKS. YOUPI !!!
 
-I can't remeber that he was using a serial connection, but in case of a
-limited serial connection to the Bluetooth module, the data rate of the
-BNEP transmission is also limited.
+this is good to hear.
 
-> Did anyone get higher throughput than this 115, 
-> when using serial cables? 
+> I don't have any other Bluetooth hardware (beside my Ericsson T68 which
+> isn't a HID device AFAIK), so I can't make much more tests.
 
-You can use many chips with higher baud rates. Look at the source code
-of hciattach what kind of special setting we support.
+I have and even 7 HID devices in one piconet are working fine.
+
+> Apparently, gentoo creates the uinput device in /dev/misc instead of the
+> usual /dev/input. Thanks to Marcel for testing both in parser.c !
+
+It is the normal way of doing this ;)
 
 Regards
 
