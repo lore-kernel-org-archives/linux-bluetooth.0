@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Error while setting RFCOMM security options
+Subject: Re: [Bluez-devel] bluez-utils 2.7 default configuration
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Julien Campana <juliencampana@yahoo.fr>
+To: "Nicholas A. Preyss" <nalp@gmx.net>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1084285384.893.17.camel@fischer>
-References: <1084285384.893.17.camel@fischer>
+In-Reply-To: <20040511192919.GB28581@gmx.net>
+References: <20040511192919.GB28581@gmx.net>
 Content-Type: text/plain
-Message-Id: <1084368321.25099.29.camel@pegasus>
+Message-Id: <1084368229.25099.26.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,20 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 May 2004 15:25:22 +0200
+Date: Wed, 12 May 2004 15:23:49 +0200
 
-Hi Julien,
+Hi Nicholas,
 
-> This programm outputs the following message: 
-> WARNING can't set link Mode (reason: Protocol not available)
-> 
-> Why? The L2CAP protocol is available as well as the RFCOMM protocol on
-> my machine (l2ping actually works and my program exchanges data over
-> RFCOMM without any problem).
-> 
-> Am I wrong in the way of setting these security flags?
+> i don't get the point why there is a difference in the configuration
+> file in /etc/default/bluetooth and the init script. Or the other way
+> around: why is hidd and hid2hci activated by default?
+> I don't see any sense in this.
 
-why do you think that you can set L2CAP options on a RFCOMM socket ;)
+the bluez-utils-2.7 now contains sdpd, pand, dund and hidd. So there was
+a need for a new init script that is able to start each of these daemons
+on bootup. I enabled hidd by default, because it didn't harm if it is
+started and hid2hci makes also sense. Why should it not be started?
 
 Regards
 
