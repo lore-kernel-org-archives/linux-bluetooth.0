@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Anderson Clayton" <omap@uol.com.br>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <FHELLALOGPIKNIIPNJLPGEIFCAAA.omap@uol.com.br>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-In-Reply-To: <1104622566.8286.2.camel@pegasus>
-Subject: [Bluez-devel] Bluz APi
+Subject: Re: [Bluez-devel] Continuous Inquiry
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY12-F35563885BF49C62DF2513EAB9E0@phx.gbl>
+References: <BAY12-F35563885BF49C62DF2513EAB9E0@phx.gbl>
+Content-Type: text/plain
+Message-Id: <1104622566.8286.2.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,17 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 1 Jan 2005 20:36:12 -0200
+Date: Sun, 02 Jan 2005 00:36:06 +0100
 
+Hi,
 
+> If I do Inquiry in batches of  1.28 seconds, will that affect Inquiry 
+> response from other devices? ...due to the Inquiry Scan Window traversing 
+> the same frequencies again !
+> 
+> I tested the batch approach with the two Socket CF+PCMCIA cards I have and 
+> seem to work fine... but maybe it wont work when there are more devices from 
+> different vendors ?
 
-Dear friends,
+I think this will lead into problems some time. Use the HCI raw socket
+directly and read every inquiry result event.
 
+Regards
 
-I am a freshman in the bluez world and I would apreciate if someone could
-help me on finding a guide of the bluez api.
+Marcel
 
-AND HAPPY NEW YEAR FOR EVERYBODY
 
 
 
