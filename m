@@ -1,61 +1,44 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Qualification - L2CA_DisconnectCfm
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: Daryl Van Vorst <daryl@wideray.com>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>, "'Max Krasnyansky'" <maxk@qualcomm.com>
-In-Reply-To: <000701c318d7$e6598e90$1a01010a@baked>
-References: <000701c318d7$e6598e90$1a01010a@baked>
-Content-Type: text/plain
-Message-Id: <1052783343.1132.159.camel@pegasus.local>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 13 May 2003 01:48:56 +0200
+Return-Path: <daryl@wideray.com>
+Errors-To: <daryl@wideray.com>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>, "'Max Krasnyansky'" <maxk@qualcomm.com>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Qualification Testing
+Date: Mon, 12 May 2003 16:37:14 -0700
+Message-ID: <000901c318df$6b11ad00$1a01010a@baked>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1052584255.1133.13.camel@pegasus.local>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Daryl,
+Marcel,
 
-> What happens when you close an L2CAP connection?
+> Daryl, so it is now up to you to do your tests with Cetecom 
+> again and see what we pass and what we fail. The RFCOMM layer 
+> should now perform perfect, but the L2CAP config stuff will 
+> still fail. You can use 2.4.18-mh4 and apply these 5 patches 
+> from the bt-2.4 repository to it:
 
-if you close() the L2CAP connection, we send a L2CAP_DISCONN_REQ and set
-a timeout of 5 seconds. In the case of L2CAP_DISCONN_RSP or the timeout,
-we close the L2CAP channel.
+Great work guys! Thanks!
 
-Max, please correct me if this is wrong, because I am not 100% sure.
+I'll hold off on more testing until we've figured out a solution for the
+L2CAP config stuff. More than likely something else will come out the
+woodwork too, but probably not much. A number of tests had to be postponed
+due to the previous failures.
 
-> There is a test (see below) where the IUT sends an L2CAP disconnect request
-> but the tester ignores it (doesn't send a disconnect response). To pass the
-> test we must at least show an "L2CAP_DisconnectCfm" to the application.
-> Indicating that a timeout ocurred is optional.
+Re: l2cap config stuff:
 
-I don't understand why the application needs to now if the L2CAP channel
-is correctly disconnected? We close the L2CAP socket and the rest has to
-be done by the kernel. If the link is dead and the other side didn't
-response, waiting 60 seconds won't help. Or did you see any advantage of
-a blocking close()?
+We don't need any more logs or anything for that do we?  I think we're just
+trying to understand what it is exactly that we're supposed to do and why.
 
-Regards
+Max - You mentioned that the spec says that what the stack does with a
+config reject can be implementation specific. I just had a look at the spec
+and couldn't find it. Could you tell me where to look in the spec?  Is the
+following quote from section 5.5 Configure Response what you were referring
+to?
 
-Marcel
+"The decision on the amount of time (or messages) spent arbitrating the
+channel parameters before terminating the negotiation is left to the
+implementation."
 
-
-
-
--------------------------------------------------------
-Enterprise Linux Forum Conference & Expo, June 4-6, 2003, Santa Clara
-The only event dedicated to issues related to Linux enterprise solutions
-www.enterpriselinuxforum.com
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-Daryl.
