@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Belkin CF card (F8T020)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jason Bell <jaseb@enigmastation.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040122200857.A20723@enigmastation.com>
-References: <20040122200857.A20723@enigmastation.com>
-Content-Type: text/plain
-Message-Id: <1074821288.3071.86.camel@pegasus>
+From: Jason Bell <jaseb@enigmastation.com>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20040122200857.A20723@enigmastation.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Belkin CF card (F8T020)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,25 +15,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jan 2004 02:28:09 +0100
+Date: Thu, 22 Jan 2004 20:08:57 -0500
 
-Hi Jason,
+Hi
 
-> I've read through a lot of the BlueZ docs and got a basic build installed.  On closer inspection it seems that the Belkin PDA CF card is not supported.
-> 
-> I ran a plain BlueZ install to see if anything would happen, it appears not.
-> 
-> When I run 'hciconfig' I get the error message:
-> 
-> Can't open HCI socket.: Address family not supported by protocol.
-> 
-> Is there anything I, (or anyone else) can do?
+I've read through a lot of the BlueZ docs and got a basic build installed.  On closer inspection it seems that the Belkin PDA CF card is not supported.
 
-what kernel modules do you have loaded?
+I ran a plain BlueZ install to see if anything would happen, it appears not.
 
-Regards
+When I run 'hciconfig' I get the error message:
 
-Marcel
+Can't open HCI socket.: Address family not supported by protocol.
+
+Is there anything I, (or anyone else) can do?
+
+Regards and thanks
+Jase Bell
+
 
 
 
