@@ -1,64 +1,50 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] D-Link DBT-120]
-From: Gene Imes <gene@ozob.net>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1078495197.7338.1.camel@tr1a.ozob.net>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Mar 2004 07:59:58 -0600
+Return-Path: <Steven.Singer@csr.com>
+Message-ID: <40486C25.2030100@csr.com>
+Date: Fri, 05 Mar 2004 12:01:41 +0000
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
+To: Thor Egil Skaug <paxtonrd@hotmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+   BlueZ Mailing List
+    <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] HCI_switch_role
+References: <000b01c4023c$a57de0c0$9349edc7@thores>
+    <1078447750.2762.45.camel@pegasus>
+In-Reply-To: <1078447750.2762.45.camel@pegasus>
+Content-Type: text/plain; charset="us-ascii"
+List-ID: <bluez-users.lists.sourceforge.net>
 
-On Fri, 2004-03-05 at 05:52, Marcel Holtmann wrote:
-> Hi Gene,
+Marcel Holtmann wrote:
+> Thor Egil Skaug wrote:
+>> Is a slave allowed to switch role to master?
 > 
-> > Disregard my previous post. 2.6.4-rc1-mm2 has fixed this problem.
-> 
-> I had now the same problem with 2.6.4-rc2. Please try to find the patch
-> from 2.6.4-rc1-mm2 that fixes your problem, because this needs to be
-> send to Linus before he releases 2.6.4 (final).
-> 
-> Regards
-> 
-> Marcel
+> every side can switch the role.
 
+Strictly, both sides can attempt to initiate a switch. Both sides are
+also allowed to refuse.
 
-Marcel, I am not sure which patch fixes this but I was rebooting once
-and pulled the DBT-120 out and got an oops or whatever. As much as I
-could see looked like it may be the USB stuff.
+Provided the baseband supports it (check the features) and the link
+manager has been told to allow it (check the link policy) then it
+should be OK (barring a burst of radio noise that knocks out critical
+radio packets - in which case, just try again).
 
-There is only one USB patch from rc1-mm1 to rc1-mm2 the URL is:
+Note that although you can read the features for both sides, you can
+check only the local link policy. However, instead of all that, you may
+as well just go ahead and try to switch.
 
-http://kernel.org/pub/linux/kernel/people/akpm/patches/2.6/2.6.4-rc1/2.6.4-rc1-mm2/broken-out/bk-usb.patch
-
-I am not sure how to check the patch and see if it is the one. I hope
-this helps.
-
-Here is the URL for all of the patches:
-
-http://kernel.org/pub/linux/kernel/people/akpm/patches/2.6/2.6.4-rc1/2.6.4-rc1-mm2/
-
-
-Thanks,
-
-Gene
+	- Steven
+-- 
 
 
 
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
