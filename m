@@ -1,13 +1,22 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
+Message-ID: <47518.80.146.5.247.1103059383.squirrel@schrell.de>
+In-Reply-To: <1103018205.2143.130.camel@pegasus>
+References: <35275.80.146.4.18.1102802831.squirrel@schrell.de>
+    <1102804861.8750.2.camel@pegasus>
+    <50745.80.146.4.18.1102837718.squirrel@schrell.de>
+    <1102838764.8750.32.camel@pegasus>
+    <33016.80.146.4.18.1102847912.squirrel@schrell.de>
+    <1102851736.8750.34.camel@pegasus>
+    <51140.80.146.12.98.1102958276.squirrel@schrell.de>
+    <1102968114.2143.13.camel@pegasus>
+    <48713.80.146.12.98.1103017007.squirrel@schrell.de>
+    <1103018205.2143.130.camel@pegasus>
+Subject: Re: [Bluez-users] SOLVED: Dell Inspiron 8600 was: 'hciconfig -a'   
+     ok, but 'hcitools scan' shows no devices
+From: "Andreas Schrell" <as@schrell.de>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] pand connection to XP SP2 fails
-References: <1103024795.4097.65.camel@justakiss>
-In-Reply-To: <1103024795.4097.65.camel@justakiss>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200412142239.17110.cijoml@volny.cz>
+Content-Type: text/plain;charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,34 +28,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Dec 2004 22:39:17 +0100
+Date: Tue, 14 Dec 2004 22:23:03 +0100 (CET)
 
-Look what MS stack knows:
 
-http://qualweb.bluetooth.org/Template2.cfm?LinkQualified=3DQualifiedProduct=
-s&Details=3DYes&ProductID=3D956
+Hi Marcel,
 
-It should work with our pand
+tried it with USB snoopy but didn't get it to work. The Windows Programs can
+distinguish between switching off from command tray and <FN><F2>. Both
+must be switched on, from command tray under Windows. <FN><F2> works from
+Windows and from Linux also. I can live with this solution.
 
-Michal
+Thank you
+Andreas
 
-Dne =FAt 14. prosince 2004 12:46 Erwin Authried napsal(a):
-> I want to establish a pand connection to XP/SP2 with a MSI-6967 dongle.
-> I have installed the MSI driver for WinXP with SP2. The client is a
-> Laptop with a CBT100C card, Linux 2.4.22-mh7, bluez-libs+utils 2.12.
-> When I try to connect to the XP box with
->   pand --role PANU -c <ADR>
-> Windows is asking for the Pin. After entering the correct pin, I'm
-> always getting the following pand error:
+
+
+
+> Hi Andreas,
 >
-> ...
-> pand[15249]: Connecting to <ADR>
-> hcid[15183]: link_key_request (sba=3D..., dab=3D...)
-> pand[15249]: Connect to <ADR> failed. Protocol error(71)
+>> no I used Windows sometimes. And as far as I rember I disabled the
+>> Bluetooth in the taskbar. Perhaps some Dell-specific code. Is there a
+>> Windows tool like hcidump? Maybe I can trace what happens when disabling
+>> or enabling it under Win.
 >
-> I'm able to connect to a PC running Bluez with the same setup.
+> if it is the Widcomm stack then you have something like SpyLite or so,
+> but the Microsoft stack I don't know. However USBsnoopy can also do the
+> job.
 >
-> -Erwin
+> Regards
+>
+> Marcel
 >
 >
 >
@@ -60,6 +71,9 @@ Dne =FAt 14. prosince 2004 12:46 Erwin Authried napsal(a):
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+
 
 
 -------------------------------------------------------
