@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41FF6E2C.7040908@avantwave.com>
-From: mike <mikelee@avantwave.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] Hardware error
+Subject: Re: [Bluez-devel] btsco
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1107217417.9566.5.camel@linux.site>
+References: <1107212460.6703.9.camel@linux.site>
+	 <1107209370.8848.4.camel@pegasus>  <1107214572.4223.1.camel@linux.site>
+	 <1107212183.8848.6.camel@pegasus>  <41FEB971.7060302@dark-reality.de>
+	 <1107217417.9566.5.camel@linux.site>
+Content-Type: text/plain
+Message-Id: <1107214443.8848.10.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,55 +21,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 01 Feb 2005 19:55:24 +0800
+Date: Tue, 01 Feb 2005 00:34:03 +0100
 
-Dear All
-    When i try to send file though bluetooth, there is a hardware error 
-in hcidump. I am using serial dongle with CSR BC02 external chip set, 
-hci firmware ver 18.1.  And then both side will halt at the bluetooth 
-read/write system call. I want to find out is it the problem from my 
-hardware or anything else. Do anyone have ideas?
+Hi Dave,
 
- > HCI Event: Number of Completed Packets(0x13) plen 5
- > HCI Event: Number of Completed Packets(0x13) plen 5
-< ACL data: handle 0x002a flags 0x02 dlen 20
-    L2CAP(d): cid 0x62 len 16 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 12 fcs 0x40
-< ACL data: handle 0x002a flags 0x02 dlen 192
- > HCI Event: Number of Completed Packets(0x13) plen 5
- > HCI Event: Number of Completed Packets(0x13) plen 5
-< ACL data: handle 0x002a flags 0x01 dlen 139
-    L2CAP(d): cid 0x62 len 327 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 322 fcs 0x40
- > HCI Event: Hardware Error(0x10) plen 1
- > ACL data: handle 0x002a flags 0x02 dlen 9
-    L2CAP(d): cid 0x40 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 1 ilen 0 fcs 0x86 credits 3
-< ACL data: handle 0x002a flags 0x02 dlen 20
-    L2CAP(d): cid 0x62 len 16 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 12 fcs 0x40
-< ACL data: handle 0x002a flags 0x02 dlen 192
+> I think the docs a pretty good, it just would help a bit if they made
+> reference to where the dependent packages could be downloaded from.
 
+maybe we should adjust the names according to the distribtuion, because
+all of them tend to name development packages different.
 
-hci0:   Type: UART
-        BD Address: 00:08:E0:01:49:6A ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:149871 acl:2811 sco:0 events:12828 errors:0
-        TX bytes:1847648 acl:15873 sco:0 commands:307 errors:0
-        Features: 0xff 0xff 0x8b 0x78 0x18 0x18 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'mike (0)'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x490 LMP Ver: 1.2 (0x2) LMP Subver: 
-0x490
-        Manufacturer: Cambridge Silicon Radio (10)
+> Wih my problem specifically, alsa-devel-1.0-6.8 is installed, so I'm not
+> sure what the problem is.
 
-best regard
-Mike,Lee
+The alsa-devel package contains /usr/share/aclocal/alsa.m4 and so
+everything should work.
+
+Regards
+
+Marcel
 
 
 
