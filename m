@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <422CA521.40303@emenaker.com>
-From: Joe Emenaker <joe@emenaker.com>
-MIME-Version: 1.0
+Message-ID: <d1f423d305030711427248a3e9@mail.gmail.com>
+From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Automatically accepting pairing from a mouse?
-References: <4227A238.5030003@emenaker.com> <1109933159.8058.19.camel@pegasus>
-In-Reply-To: <1109933159.8058.19.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] PAN Configuration
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,29 +16,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 07 Mar 2005 19:01:53 +0000
+Date: Mon, 7 Mar 2005 15:42:19 -0400
 
-Marcel Holtmann wrote:
+Hi folks,
 
->it is enought to edit /etc/default/bluez-utils to contain
->
->	HIDD_ENABLED=1
->	HIDD_OPTIONS="--server"
->
->and then restart the Bluetooth subsystem. The next time your mouse will
->reconnect and this will be handled by the running hidd.
->  
->
-I was so certain that this wasn't going to work that I was getting ready 
-to step through the process and capture output from "hcitool" etc. to 
-show you that it wasn't working when.... uh.... it worked. :)
+I am trying to create a PAN using PAND. Actually I am following the
+"Personal Networking Area How-To" which can be found at Bluez.org.
+Let explain what i am doing:
 
-Strangely, I had HIDD_ENABLED=1, and HIDD_OPTIONS="-i 00:0E:A1:01:FD:A7 
---server"
+In both sides (GN and PANU)
 
-What was the "-i" option doing which made it not work?
+# modprobe bnep
+# hcid
+# sdpd
 
-- Joe
+on the GN side
+
+# pand --listen --role GN
+
+on the PANU side
+
+# pand --connect <GN address>
+
+after this command, I get the following messages using dmesg
+
+parport0: FIFO is stuck
+parport0: BUSY timeout (1) in compat_write_block_pio
+FIFO write timed out
+parport0: FIFO is stuck
+parport0: BUSY timeout (1) in compat_write_block_pio
+FIFO write timed out
+parport0: FIFO is stuck
+parport0: BUSY timeout (1) in compat_write_block_pio
+FIFO write timed out
+parport0: FIFO is stuck
+parport0: BUSY timeout (1) in compat_write_block_pio
+FIFO write timed out
+
+and I can not find the bnep0 network interface.
+
+am I doing something wrong?
+
+any help is very welcome
+
+cheers,
+
+
+
+-- 
+Anderson Clayton B. Rodrigues
+Eng. de Software
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
