@@ -1,11 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <412F29D2.7000001@web.de>
-From: Stefan Mischke <StefanMischke@web.de>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-CC: "Stefan Mischke (E-Mail)" <survivor@upb.de>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] SDP memory leak?
+Subject: Re: [Bluez-devel] Re: Disconnections are not being detected.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vlad <vkorolev@nist.gov>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <loom.20040827T021529-764@post.gmane.org>
+References: <loom.20040820T185934-862@post.gmane.org>
+	 <1093073294.3544.12.camel@notepaq>
+	 <003f01c48755$3dfe6a70$0301a8c0@zazoumobile>
+	 <1093083055.3650.7.camel@notepaq> <loom.20040827T021529-764@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1093606399.2581.101.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,64 +21,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 27 Aug 2004 14:32:18 +0200
+Date: Fri, 27 Aug 2004 13:33:20 +0200
 
-Hello,
+Hi Vlad,
 
-I have a question about "bnep_sdp_search()" from 
-"bluez-pan-1.1/pand/sdp.c" (see below for the code).
-If I see it correctly, the memory for "sdp_list_t *srch, *rsp" is 
-allocated by "sdp_service_search_req()".
-But "bnep_sdp_search()" accesses the pointer "rsp" after it has done 
-"sdp_close()".
-So my question is: 'Who will ever free the memory allocated at "rsp" and 
-when?'
+> But the official L2CAP specification.  (Version 1.1) says (page 288):
+> 
+> 	Result: 2 octets The result field indicates the outcome of
+> 	the connection request. The result value of 0x0000 indicates
+> 	success while a non-zero value indicates the connection request
+> 	failed or is pending. A logical channel is established on the
+> 	receipt of a successful result. Table 5.5 defines values for
+> 	this field. If the result field is not zero. The DCID and SCID
+> 	fields should be ignored when the result field indicates the
+> 	connection was refused.
+> 
+> So although the BlueZ behavior is correct from common sense perspective,
+> but it is not correct from the specification perspective. I am not sure
+> what does version 1.2 of the spec say about this subject.
 
-I quite new to this, so I probably have missed something. So sorry if 
-this is a stupid one :-).
+it is still the same for the 1.2 specification, but it is simply wrong
+and stupid. You need at least the SCID to match the connect response to
+a previous connect request. Otherwise this response is meaningless.
 
-Kind regards
-Stefan
+What we did wrong is sending the command reject for a response. I will
+fix this, but this won't fix your problem. If we don't know for what
+L2CAP channel we get a connection refused response, we can't do anything
+else then waiting for a timeout event.
 
-<CODE>
-int bnep_sdp_search(bdaddr_t *src, bdaddr_t *dst, uint16_t service)
-{
-    sdp_list_t *srch, *rsp = NULL;
-    sdp_session_t *s;
-    uuid_t svclass;
-    int err;
+Check the bluetooth.org pages if they had an erratum for that and if not
+ping them to correct it. Also write to SE about that.
 
-    switch (service) {
-    case BNEP_SVC_PANU:
-        sdp_uuid16_create(&svclass, PANU_SVCLASS_ID);
-        break;
-    case BNEP_SVC_NAP:
-        sdp_uuid16_create(&svclass, NAP_SVCLASS_ID);
-        break;
-    case BNEP_SVC_GN:
-        sdp_uuid16_create(&svclass, GN_SVCLASS_ID);
-        break;
-    }
-       
-    srch = sdp_list_append(NULL, &svclass);
+Regards
 
-    s = sdp_connect(src, dst, 0);
-    if (!s) {
-        syslog(LOG_ERR, "Failed to connect to the SDP server. %s(%d)",
-                strerror(errno), errno);
-        return 0;
-    }
+Marcel
 
-    err = sdp_service_search_req(s, srch, 1, &rsp);
-    sdp_close(s);
-
-    /* Assume that search is successeful
-     * if at least one record is found */
-    if (!err && sdp_list_len(rsp))
-        return 1;
-
-    return 0;
-} </CODE>
 
 
 
