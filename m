@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] struct usb_iso_packet_descriptor
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000e01c50bab$c6c6d600$0100a8c0@hppav>
+Message-ID: <000e01c50bab$c6c6d600$0100a8c0@hppav>
+From: "Oliver" <urnenfel@tiscali.es>
+To: <bluez-devel@lists.sourceforge.net>
 References: <848611830@web.de> <1107618796.6921.156.camel@pegasus>
-	 <000e01c50bab$c6c6d600$0100a8c0@hppav>
-Content-Type: text/plain
-Message-Id: <1107627122.6921.182.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
+Subject: [Bluez-devel] struct usb_iso_packet_descriptor
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,24 +20,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 05 Feb 2005 19:12:02 +0100
+Date: Sat, 5 Feb 2005 18:54:40 +0100
 
-Hi Oliver,
+Actually just that:
 
-> Actually just that:
-> 
-> I found this definition into the hci_usb.c source and I don't know where 
-> does it come from
-> 
-> struct usb_iso_packet_descriptor
+I found this definition into the hci_usb.c source and I don't know where 
+does it come from
 
-you are kidding me, right? You know the utilities find and grep? So grep
-along the includes inside the Linux kernel source. Since the prefix is
-usb_ the first guess would be linux/usb.h.
+struct usb_iso_packet_descriptor
 
-Regards
+thanks in advance
 
-Marcel
 
 
 
