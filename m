@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Kernel crash USB dongle removing 2.6.5
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Pavel Ruzicka <pavouk@pavouk.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404050101.17882.pavouk@pavouk.org>
-References: <200404050101.17882.pavouk@pavouk.org>
-Content-Type: text/plain
-Message-Id: <1081120090.4635.5.camel@pegasus>
-Mime-Version: 1.0
+From: Pavel Ruzicka <pavouk@pavouk.org>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200404050101.17882.pavouk@pavouk.org>
+Subject: [Bluez-users] Kernel crash USB dongle removing 2.6.5
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 05 Apr 2004 01:08:10 +0200
+Date: Mon, 5 Apr 2004 01:01:17 +0200
 
-Hi Pavel,
+Hello,
 
-> On kernel 2.6.5 (and 2.6.4) when I remove my Bluetooth USB dongle MSI 6970, 
-> that kernel crash with Lost Interrupt messages.
-> 
-> I have SCO support disabled in kernel.
-> 
-> I use uhci_hcd with VIA chipset.
-> 
-> With kernel 2.6.3 this works.
-> 
-> Where can be a problem?
-> In bluetooth or USB driver?
+On kernel 2.6.5 (and 2.6.4) when I remove my Bluetooth USB dongle MSI 6970, 
+that kernel crash with Lost Interrupt messages.
 
-this is an USB problem. Post your report to the Linux USB mailing list.
+I have SCO support disabled in kernel.
 
-Regards
+I use uhci_hcd with VIA chipset.
 
-Marcel
+With kernel 2.6.3 this works.
 
+Where can be a problem?
+In bluetooth or USB driver?
 
+Best regards,
+
+Pavel Ruzicka
 
 
 -------------------------------------------------------
