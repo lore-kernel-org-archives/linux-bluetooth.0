@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <37D1FAB2FA7B7E4993785B956F853C73181463@ednex506.dsto.defence.gov.au>
-From: "Wodecki, Victor (Contractor)" <Victor.Wodecki@dsto.defence.gov.au>
-To: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] HCI Events and errors
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+Subject: Re: [Bluez-devel] HCI Events and errors
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <37D1FAB2FA7B7E4993785B956F853C73181460@ednex506.dsto.defence.gov.au>
+References: 
+	 <37D1FAB2FA7B7E4993785B956F853C73181460@ednex506.dsto.defence.gov.au>
+Content-Type: text/plain
+Message-Id: <1107314311.20994.9.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,199 +19,80 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 2 Feb 2005 14:35:39 +1030
+Date: Wed, 02 Feb 2005 04:18:31 +0100
 
-Marcel,
+Hi Victor,
 
-> what does "hciconfig -a" say? If I remember correctly then there is
-> neither a CSR nor a Zeevo chip in this model.
-
-hci0:   Type: UART
-        BD Address: 08:00:17:1A:F3:43 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes: 600 acl:0 sco:0 events:28 errors:0
-        TX bytes: 326 acl:0 sco:0 commands:13 errors:0
-        Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1
-        Link policy:
-        Link mode: MASTER
-        Name: 'Testing'
-        Class: 0xff0100
-        Service Classes: Positioning, Networking, Rendering, Capturing, Object
-Transfer, Audio, n
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x180 LMP Ver: 1.1 (0x1) LMP Subver: 0x180
-        Manufacturer: RTX Telecom A/S (21)
-
-> > One end of the link is the ipaq, the other
-> > is a desktop machine with a USB bluetooth dongle.
+> I've been experimenting with bluetooth on a HP iPAQ h5550 with a modified
+> kernel, with mixed success.
 > 
-> Who is sending to whom?
+> The h5550 is running a kernel based on the handhelds.org CVS tree (hh36?)
+> plus a recent BlueZ, Mipv6, etc.  The ipaq can receive bluetooth data at
+> a good rate (observed 690 kbps), but has problems transmitting.
 
-The PC does the listen() and accept(), the ipaq does the connect(), then
-the ipaq repeatedly calls send() and usleep().  The test program is
-loosely based on l2test.c.
+what does "hciconfig -a" say? If I remember correctly then there is
+neither a CSR nor a Zeevo chip in this model.
 
-> > BlueZ was correctly sending ACL packets for each, but after a
-> > while the lower layers stop working and presumably the sk_buf's just
-> > queue up unserviced.
+> The tests are done with a program which opens and writes to an l2cap
+> socket, repeatedly sending messages of arbitrary size and with arbitrary
+> delays between each message.  One end of the link is the ipaq, the other
+> is a desktop machine with a USB bluetooth dongle.
+
+Who is sending to whom?
+
+> If I reduce the effective outgoing rate by using a suitable combination
+> of message size and delay between messages, outgoing communications can
+> be sustained, but not beyond roughly 50kpbs or so.  Above this approximate
+> rate, the data is sent successfully for a few minutes, until the
+> application code receives a 'resource unavailable' error after a send()
+> call.
 > 
-> Show me that part, because I don't believe that this is an allocation
-> problem inside BlueZ.
+> hcidump shows that the data flows for a while, at some point gets a HCI
+> Hardware Error event, and then data soon ceases to flow.  I've enabled
+> debug messages in the bluez modules, and it shows that the eventual error
+> at send() is due to bluez being unable to allocate a sk_buf for an outgoing
+> fragment.  BlueZ was correctly sending ACL packets for each, but after a
+> while the lower layers stop working and presumably the sk_buf's just queue
+> up unserviced.
 
-I've pasted the important parts at the end of this email, the full trace
-is quite long but is available on request.  The hardware error mentioned
-above can be seen at timestamp 10:29:54.4732445.
+Show me that part, because I don't believe that this is an allocation
+problem inside BlueZ.
 
-Thanks for your quick response.  I'll see how I go with adding the 'reset'
-functionality, to see what difference it makes.
+> Subsequent bluetooth comms, eg 'hcitool inq', result in timeouts, needing
+> a reload of the stack before things will work again.
+> 
+> Looking at a combination of the BlueZ code, the hcidump trace, and the kernel
+> log, shows that after the last successful message is sent, the stack appears
+> to have received a HCI event with event code 0x10 from the HCI controller.
+> 
+> According to the Bluetooth spec (v1.1), a HCI event packet with event code
+> of 0x10 is a HCI Hardware Error Event.  There is no #define for this in
+> hci.h, probably need something like HCI_EV_HARDWARE_ERROR.
+> 
+> Appendix H:4 (HCI UART Transport layer), section 4 reads: "If the UART 
+> synchronization is lost in the communication from Host to Host Controller,
+> then the Host Controller shall send a Hardware Error Event to tell the
+> Host about the synchronization error. The Host Controller will then expect
+> to receive an HCI_Reset command from the Host in order to perform a reset.
+> The Host Controller will also use the HCI_Reset command in the byte stream
+> from Host to Host Controller to re-synchronize."
+> 
+> So it appears that the BlueZ code (hci_event_packet()) is not handling the
+> hardware error event, it just falls out the bottom of the switch statement
+> when instead it should be detecting the condition and somehow sending the
+> HCI_Reset command.
 
-A random healthy exchange:
+We don't handle hardware errors. Feel free to play with adding a reset
+in that case and see if it helps. I doubt it, because using H4 with a
+buggy UART is always a bad thing. In general the HCI flow control should
+prevent us to send to much data to the chip. However we don't have flow
+control for the other way round. It is on the todo list.
 
-10:29:51.0445595 l2cap_sock_sendmsg: sock c7177340, sk c72a24a0
-10:29:51.0446535 l2cap_chan_send: sk c72a24a0 len 506
-10:29:51.0447065 hci_send_acl: hci0 conn c738c660 flags 0x0
-10:29:51.0447185 hci_send_acl: hci0 frag c71b6220 len 196
-10:29:51.0447305 hci_send_acl: hci0 frag c74d98c0 len 196
-10:29:51.0447425 hci_send_acl: hci0 frag c74d92c0 len 130
-10:29:51.0447545 hci_tx_task: hci0 acl 4 sco 9
-10:29:51.0447645 hci_sched_acl: hci0
-10:29:51.0447735 hci_low_sent: conn c738c660 quote 4
-10:29:51.0447845 hci_sched_acl: skb c71b6220 len 196
-10:29:51.0447965 hci_send_frame: hci0 type 2 len 196
-10:29:51.0448075 hci_uart_send_frame: hci0: type 2 len 196
-10:29:51.0448195 h4_enqueue: hu c7ced400 skb c71b6220
-10:29:51.0448315 hci_uart_tx_wakeup:
-10:29:51.0448405 hci_sched_acl: skb c74d98c0 len 196
-10:29:51.0448515 hci_send_frame: hci0 type 2 len 196
-10:29:51.0448625 hci_uart_send_frame: hci0: type 2 len 196
-10:29:51.0448745 h4_enqueue: hu c7ced400 skb c74d98c0
-10:29:51.0448865 hci_uart_tx_wakeup:
-10:29:51.0448955 hci_sched_acl: skb c74d92c0 len 130
-10:29:51.0449055 hci_send_frame: hci0 type 2 len 130
-10:29:51.0449285 hci_uart_send_frame: hci0: type 2 len 130
-10:29:51.0449405 h4_enqueue: hu c7ced400 skb c74d92c0
-10:29:51.0449515 hci_uart_tx_wakeup:
-10:29:51.0449815 hci_low_sent: conn 00000000 quote 0
-10:29:51.0449925 hci_sched_sco: hci0
-10:29:51.0450015 hci_low_sent: conn 00000000 quote 0
-10:29:51.0450125 hci_uart_tty_wakeup:
-10:29:51.0450215 hci_uart_tx_wakeup:
-10:29:51.0801355 h4_recv: hu c7ced400 count 8 rx_state 0 rx_count 0
-10:29:51.0801955 h4_recv: Event packet
-10:29:51.0802045 h4_recv: Event header: evt 0x13 plen 5
-10:29:51.0802195 h4_check_data_len: len 5 room 1046
-10:29:51.0802305 h4_recv: Complete data
-10:29:51.0802395 hci_recv_frame: hci0 type 4 len 7
-10:29:51.0802505 hci_rx_task: hci0
-10:29:51.0802615 hci_event_packet: hci0 evt 0x13
-10:29:51.0802745 hci_num_comp_pkts_evt: hci0 num_hndl 1
-10:29:51.0835815 hci_tx_task: hci0 acl 3 sco 9
-10:29:51.0836385 hci_sched_acl: hci0
-10:29:51.0836495 hci_low_sent: conn 00000000 quote 0
-10:29:51.0836615 hci_sched_sco: hci0
-10:29:51.0836735 hci_low_sent: conn 00000000 quote 0
+Regards
 
-The penultimate healthy (?) exchange, which contains the hardware error:
+Marcel
 
-10:29:54.4645405 l2cap_sock_sendmsg: sock c7177340, sk c72a24a0
-10:29:54.4646345 l2cap_chan_send: sk c72a24a0 len 506
-10:29:54.4646865 hci_send_acl: hci0 conn c738c660 flags 0x0
-10:29:54.4646985 hci_send_acl: hci0 frag c74d92c0 len 196
-10:29:54.4647105 hci_send_acl: hci0 frag c71b6220 len 196
-10:29:54.4647225 hci_send_acl: hci0 frag c74d9440 len 130
-10:29:54.4647345 hci_tx_task: hci0 acl 4 sco 9
-10:29:54.4647455 hci_sched_acl: hci0
-10:29:54.4647545 hci_low_sent: conn c738c660 quote 4
-10:29:54.4647655 hci_sched_acl: skb c74d92c0 len 196
-10:29:54.4647765 hci_send_frame: hci0 type 2 len 196
-10:29:54.4647875 hci_uart_send_frame: hci0: type 2 len 196
-10:29:54.4647995 h4_enqueue: hu c7ced400 skb c74d92c0
-10:29:54.4648115 hci_uart_tx_wakeup:
-10:29:54.4648205 hci_sched_acl: skb c71b6220 len 196
-10:29:54.4648325 hci_send_frame: hci0 type 2 len 196
-10:29:54.4648435 hci_uart_send_frame: hci0: type 2 len 196
-10:29:54.4648555 h4_enqueue: hu c7ced400 skb c71b6220
-10:29:54.4648665 hci_uart_tx_wakeup:
-10:29:54.4648755 hci_sched_acl: skb c74d9440 len 130
-10:29:54.4648865 hci_send_frame: hci0 type 2 len 130
-10:29:54.4649085 hci_uart_send_frame: hci0: type 2 len 130
-10:29:54.4649205 h4_enqueue: hu c7ced400 skb c74d9440
-10:29:54.4649325 hci_uart_tx_wakeup:
-10:29:54.4649615 hci_low_sent: conn 00000000 quote 0
-10:29:54.4649725 hci_sched_sco: hci0
-10:29:54.4649815 hci_low_sent: conn 00000000 quote 0
-10:29:54.4649925 hci_uart_tty_wakeup:
-10:29:54.4650015 hci_uart_tx_wakeup:
-10:29:54.4731195 h4_recv: hu c7ced400 count 4 rx_state 0 rx_count 0
-10:29:54.4731785 h4_recv: Event packet
-10:29:54.4731885 h4_recv: Event header: evt 0x10 plen 1
-10:29:54.4732025 h4_check_data_len: len 1 room 1046
-10:29:54.4732135 h4_recv: Complete data
-10:29:54.4732235 hci_recv_frame: hci0 type 4 len 3
-10:29:54.4732335 hci_rx_task: hci0
-10:29:54.4732445 hci_event_packet: hci0 evt 0x10
-10:29:54.5151125 h4_recv: hu c7ced400 count 8 rx_state 0 rx_count 0
-10:29:54.5151715 h4_recv: Event packet
-10:29:54.5151815 h4_recv: Event header: evt 0x13 plen 5
-10:29:54.5151965 h4_check_data_len: len 5 room 1046
-10:29:54.5152075 h4_recv: Complete data
-10:29:54.5152165 hci_recv_frame: hci0 type 4 len 7
-10:29:54.5152275 hci_rx_task: hci0
-10:29:54.5152385 hci_event_packet: hci0 evt 0x13
-10:29:54.5152525 hci_num_comp_pkts_evt: hci0 num_hndl 1
-10:29:54.5184605 hci_tx_task: hci0 acl 3 sco 9
-10:29:54.5185165 hci_sched_acl: hci0
-10:29:54.5185285 hci_low_sent: conn 00000000 quote 0
-10:29:54.5185405 hci_sched_sco: hci0
-10:29:54.5185525 hci_low_sent: conn 00000000 quote 0
 
-10:29:54.5545355 l2cap_sock_sendmsg: sock c7177340, sk c72a24a0
-10:29:54.5546305 l2cap_chan_send: sk c72a24a0 len 506
-10:29:54.5546835 hci_send_acl: hci0 conn c738c660 flags 0x0
-10:29:54.5546955 hci_send_acl: hci0 frag c71b6220 len 196
-10:29:54.5547075 hci_send_acl: hci0 frag c74d92c0 len 196
-10:29:54.5547195 hci_send_acl: hci0 frag c74d9440 len 130
-10:29:54.5547315 hci_tx_task: hci0 acl 3 sco 9
-10:29:54.5547415 hci_sched_acl: hci0
-10:29:54.5547505 hci_low_sent: conn c738c660 quote 3
-10:29:54.5547625 hci_sched_acl: skb c71b6220 len 196
-10:29:54.5547735 hci_send_frame: hci0 type 2 len 196
-10:29:54.5547845 hci_uart_send_frame: hci0: type 2 len 196
-10:29:54.5547965 h4_enqueue: hu c7ced400 skb c71b6220
-10:29:54.5548085 hci_uart_tx_wakeup:
-10:29:54.5548165 hci_sched_acl: skb c74d92c0 len 196
-10:29:54.5548285 hci_send_frame: hci0 type 2 len 196
-10:29:54.5548395 hci_uart_send_frame: hci0: type 2 len 196
-10:29:54.5548515 h4_enqueue: hu c7ced400 skb c74d92c0
-10:29:54.5548625 hci_uart_tx_wakeup:
-10:29:54.5548715 hci_sched_acl: skb c74d9440 len 130
-10:29:54.5548825 hci_send_frame: hci0 type 2 len 130
-10:29:54.5548945 hci_uart_send_frame: hci0: type 2 len 130
-10:29:54.5549175 h4_enqueue: hu c7ced400 skb c74d9440
-10:29:54.5549285 hci_uart_tx_wakeup:
-10:29:54.5549575 hci_sched_sco: hci0
-10:29:54.5549665 hci_low_sent: conn 00000000 quote 0
-10:29:54.5549775 hci_uart_tty_wakeup:
-10:29:54.5549865 hci_uart_tx_wakeup:
-
-The first 'bad' exchange.  The following pattern is repeated many times
-in the log file.
-
-10:29:54.6440825 l2cap_sock_sendmsg: sock c7177340, sk c72a24a0
-10:29:54.6441405 l2cap_chan_send: sk c72a24a0 len 506
-10:29:54.6441935 hci_send_acl: hci0 conn c738c660 flags 0x0
-10:29:54.6442055 hci_send_acl: hci0 frag c71b6220 len 196
-10:29:54.6442175 hci_send_acl: hci0 frag c74d92c0 len 196
-10:29:54.6442295 hci_send_acl: hci0 frag c74d9440 len 130
-10:29:54.6442415 hci_tx_task: hci0 acl 0 sco 9
-10:29:54.6442515 hci_sched_acl: hci0
-10:29:54.6442605 hci_sched_sco: hci0
-10:29:54.6442695 hci_low_sent: conn 00000000 quote 0
-
--- 
-
-This email remains the property of the Australian Defence Organisation and is subject to the jurisdiction of section 70 of the Crimes Act 1914.  If you have received this email in error, you are requested to contact the sender and delete the email.
 
 
 -------------------------------------------------------
