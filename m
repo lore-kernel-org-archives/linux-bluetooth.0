@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] New bluez
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403221149.14848.cijoml@volny.cz>
-References: <200403221149.14848.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1079954153.2663.96.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <016701c40ffc$8a07f8d0$b67ba8c0@zaz1>
+From: "Xavier Garreau" <x.garreau@prim-time.fr>
+To: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
+References: <405E6C9E.1030600@india.hp.com> <1079937432.2663.78.camel@pegasus>  <405EBCDD.3090402@india.hp.com> <1079951177.2663.90.camel@pegasus>
+Subject: Re: [Bluez-users] l2test problem
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +17,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Mar 2004 12:15:53 +0100
+Date: Mon, 22 Mar 2004 11:57:54 +0100
 
-Hi Michal,
+> yes, they are the uint16 numbers besides the uuid16 protocol UUID for
+> L2CAP, but why do you want them? You asked about a mobile phone and most
+> of them are based on the higher layer RFCOMM. So far I haven't seen any
+> phone that support BNEP, HID or HCRP. And this means that in your case
+> only two PSM's are supported. PSM 1 for the SDP requests and PSM 3 for
+> the RFCOMM protocol.
 
-> you are real daemon! :) Latest week was real bluez-storm weak in releasing new 
-> versions :)
+Symbian Phones like Nokia 3650 allows you to use an L2CAP (or higher) api
+for application programming.
 
-I tried to clear my TODO list, but actually it fills again every week :(
+But as with other bluetooth applications, you of course must have a server
+llistening on a given PSM for it to answer "Connection accepted" (0).
 
-> Does doc exist for new features in bluez-utils?
+mohalik, you should have a look at development papers from Sony Ericcson
+(and maybe nokia) on symbian bluetooth programming (Basically, they also
+provide a socket interface).
 
-If there was a manpage I hopefully updated it. If not feel free to send
-me a patch or write a manpage from scratch ;)
+http://developer.sonyericsson.com/ (you'll have to create an account first)
 
-Regards
-
-Marcel
-
+BR,
+-- 
+Xavier Garreau <x.garreau@prim-time.fr>
+Prim'Time Technology
+http://www.prim-time.fr/
 
 
 
