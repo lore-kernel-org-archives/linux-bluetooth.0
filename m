@@ -1,10 +1,27 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Logitech MX900 mouse with Dell Inspiron 8600
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: Charles Bueche <charles@bueche.ch>
+Cc: Olivier Bornet <Olivier.Bornet@smartdata.ch>,
+   BlueZ Developers List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1071432083.6305.24.camel@bluez.bueche.ch>
+References: <1070218289.8534.30.camel@bluez.bueche.ch>
+	 <20031201093804.A1281@schnell.us.cray.com> <1070380522.19169.52.camel@saag>
+	 <1070380907.19169.55.camel@saag> <1070482683.18058.6.camel@bluez.bueche.ch>
+	 <1070483755.24159.114.camel@pegasus> <20031204085314.GA1780@smartdata.ch>
+	 <1071001915.13464.33.camel@bluez.bueche.ch>
+	 <20031209224217.GE26896@smartdata.ch>
+	 <1071043970.8979.5.camel@bluez.bueche.ch>
+	 <20031210083002.GG26896@smartdata.ch>
+	 <1071330995.4307.27.camel@bluez.bueche.ch>
+	 <1071333541.27252.177.camel@pegasus>
+	 <1071341513.4307.36.camel@bluez.bueche.ch>
+	 <1071342247.1548.6.camel@pegasus> <1071410118.5988.8.camel@bluez.bueche.ch>
+	 <1071411737.4356.56.camel@pegasus>
+	 <1071432083.6305.24.camel@bluez.bueche.ch>
 Content-Type: text/plain
-Message-Id: <1071505820.6499.80.camel@pegasus>
+Message-Id: <1071432572.4358.104.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] New Bluetooth kernel patches available
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,39 +32,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 15 Dec 2003 17:30:20 +0100
+Date: Sun, 14 Dec 2003 21:09:32 +0100
 
-Hi Folks,
+Hi Charles,
 
-I spent most time of the weekend to get out a new series of patches for
-the 2.4 kernel. Actually there are six supported kernels and the latest
-version of each patch also touches the input subsystem and parts of the
-CAPI implementation. People who plan to play with the Bluetooth HID
-support should enable CONFIG_INPUT_UINPUT. The changelog and the patches
-themself can be found here
+> > this shouldn't be needed, because the mouse reconnects if you start
+> > moving it. The only thing you need is a HID server process on your host.
+> 
+> I have to test more. What is your command line for this ? I use
+> /data/util/bthid-0.8-2.6/bthid -m -d -p 600 00:07:61:08:7E:2E
 
-	http://www.holtmann.org/linux/kernel/
+I used Peter's code only once, but I remember that you must use -l to
+fork a server process.
 
-It seems that the acceptance of these patches is very high, because the
-top 10 downloads are these
+> You do a very good job in that limited time, given all these beginners
+> like me asking basic stuff on mailing lists :-)
 
-	   2531  patch-2.4.22-mh1
-	   1651  patch-2.4.20-mh12
-	   1063  patch-2.4.21-mh2
-	    868  patch-2.4.21-mh3
-	    852  patch-2.4.20-mh10
-	    788  patch-2.4.20-mh11
-	    759  patch-2.4.21-mh4
-	    560  patch-2.4.18-mh9
-	    456  patch-2.4.20-mh6
-	    418  patch-2.4.19-mh12
-
-Even with my set of build and test scripts the job in putting out a new
-series of patches and backporting features to the older kernels consumes
-too much of my time. I personally don't use these patches anymore, but
-it seems that some people or companies still use them. At the moment I
-am thinking of cutting the maintenance for these kernels. Who has urgent
-needs that an older kernel version is still supported?
+Thank you.
 
 Regards
 
