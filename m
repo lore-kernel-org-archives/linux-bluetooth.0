@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <420CFEAD.2000202@uni-paderborn.de>
-From: Matthias Schnelte <schnelte@uni-paderborn.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Several bluetooth dongles at time
-References: <50142.195.22.30.15.1108037990.squirrel@195.22.30.15> <1108039290.15974.33.camel@pegasus>
-In-Reply-To: <1108039290.15974.33.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+To: BlueZ mailing list <bluez-devel@lists.sourceforge.net>
+Message-ID: <20050211174824.GA5840@bougret.hpl.hp.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+From: Jean Tourrilhes <jt@hpl.hp.com>
+Subject: [Bluez-devel] Re: Lower granularity for INQUIRY interval
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +16,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 11 Feb 2005 18:51:25 +0000
+Date: Fri, 11 Feb 2005 09:48:24 -0800
 
->>2) Can i have multiple connections on the same rfcomm channel? So more
->>than one mobile can connect to my server at time or only one device per
->>channel and i have to open more than one channel?
+Steven Singer <steven.singer <at> csr.com> wrote :
 > 
-> One connection per RFCOMM channel. On the RFCOMM level there is no
-> further multiplexing.
-So, if I have two phones that provide one service each, but both on the 
-same rfcomm channel i will not be able to connect to both of them, right?
-Why is that? I mean, it is all brought done to l2cap connections and 
-l2cap is not limited in that case.
-Hmm, so the only solution is to use l2cap instead of rfcomm, right?
+> Catalin Drula wrote:
+> > Is there a way to perform INQUIRY for intervals with
+> > a lower granularity than 1.28 seconds? I know the Bluetooth
+> > specification says no.
+> 
+> To inquire for less than 10.24 seconds is a bad idea. Unless you
+> inquire for a single contiguous block lasting 10.24 seconds you do not
+> have a good probability of picking up all devices.
+> 
+> Note that, for example, 8 consecutive 1.28 second inquiries is not
+> guaranteed to work.
 
-Matthias
+	Actually, if you look in the actual Inquiry response protocol,
+you can see that it is guaranteed to not work at all, because of the
+random backoff (10.7.4) you will never get any answer in 1.28 sec.
+	I wish the Inquiry protocol was not designed this way, because
+designed more straightforwardly, doing periodic inquiry for a shorter
+time and more frequently *could* have the same probability of
+discovery (over time, not per Inquiry), the same overhead, but
+guarantee much shorter connection latency.
+	By the way, the whole Inquiry process is why you can't use
+BlueTooth for any kind of location beacon or casual discovery.
+	More info on my experiment on the topic in my "On-Demand
+BlueTooth" paper.
+	http://www.hpl.hp.com/personal/Jean_Tourrilhes/Papers/papers.html
+
+	Have fun...
+
+	Jean
 
 
 -------------------------------------------------------
