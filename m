@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <s0ed6fd7.083@cal01.ctech.ac.za>
-From: "Angelo binc2" <binc2@ctech.ac.za>
-To: <bluez-devel@lists.sourceforge.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] Setting environment variables in Java Studio
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Message-ID: <A1F0D47583A2D711919F00600819B3A4028BAE@goofy.vitronics.com>
+From: "Williams, Richard" <Richard.Williams@VITRONICS.com>
+To: "Bluez-Devel (E-mail)" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] SCO question
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,37 +16,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 08 Jul 2004 16:01:03 +0200
+Date: Thu, 8 Jul 2004 09:12:51 -0400
 
-Hi all, 
 
-I have just taken over some development with Bluez and java and
-Bluetooth. Everything was installed but this guy was using a text editor
-as an IDE so I downloaded the Sun Java Studio Mobility 6, for my
-development environment. 
+Hi,
 
-My problem is that when I open up previous java files with references
-to the javax.* libraries the IDE gives me errors basically saying that
-it cant find the libraries. I cant seem to find out how to tell the IDE
-where to look for the javax.* libraries? 
+I'm getting back to a BT headset <-> LINUX project that I had abandoned =
+some months ago. I have an X-scale single board computer running Linux =
+2.4.26 with the latest Bluez patches. I have a Sony Ericsson HBH-35 =
+headset that I'm trying to get to work with my computer. I have an =
+Anycomm USB BT dongle.
 
-How do I go about fixing this? I am running SuSE 9.0
+I have done the following:
+modprobe hci_usb
+modprobe rfcomm
+modprobe sco
+hcid
+hciconfig hci0 up
+hciconfig hci0 voice 0x0040
+.... My Pin file is set up for a pin of "0000" - required by the =
+headset.
 
-thanks in advance
-Angelo
---------------------------------------------------------------------
-Disclaimer 
-This e-mail transmission contains confidential information,
-which is the property of the sender.
-The information in this e-mail or attachments thereto is 
-intended for the attention and use only of the addressee. 
-Should you have received this e-mail in error, please delete 
-and destroy it and any attachments thereto immediately. 
-Under no circumstances will the Cape Technikon or the sender 
-of this e-mail be liable to any party for any direct, indirect, 
-special or other consequential damages for any use of this e-mail.
-For the detailed e-mail disclaimer please refer to 
-http://www.ctech.ac.za/polic or call +27 (0)21 460 3911
+hcitool scan works OK and finds the headset
+
+l2ping works OK and pairs with the headset.
+
+hstest record t1.wav 00:0A:D9:74:97:19 1
+<<<This gives output:
+Voice setting: 0x0040
+RFCOMM channel connected
+Can't connect SCO audio channel: Connection refused.
+
+I know that the socket connect statement in sco_connect() in hstest is =
+failing.
+Any ideas of the cause of this ?
+
+
+thanks very much,
+
+Rich
+
+
+
+Richard B. Williams
+Vitronics, Inc.
+3 Corbett Way
+Eatontown, NJ 07724-2262
+732-389-0244 x29
+Richard.Williams@vitronics.com
+
 
 
 -------------------------------------------------------
