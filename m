@@ -1,46 +1,65 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Bluetooth URL updates: www.bluez.org
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Petri T. Koistinen" <petri.koistinen@iki.fi>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.58.0402050206210.3075@dsl-hkigw4m08.dial.inet.fi>
-References: <Pine.LNX.4.58.0402050206210.3075@dsl-hkigw4m08.dial.inet.fi>
-Content-Type: text/plain
-Message-Id: <1075944752.2783.90.camel@pegasus>
+Return-Path: <jt@bougret.hpl.hp.com>
+Date: Wed, 4 Feb 2004 17:11:02 -0800
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Max Krasnyansky <maxk@qualcomm.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: L2CAP non-blocking socket nasty race conditions
+Message-ID: <20040205011102.GA23352@bougret.hpl.hp.com>
+Reply-To: jt@hpl.hp.com
+References: <20040204015825.GA2217@bougret.hpl.hp.com> <1075879044.13285.151.camel@pegasus> <20040204175832.GB16590@bougret.hpl.hp.com> <1075924727.2783.47.camel@pegasus> <20040204214541.GA20129@bougret.hpl.hp.com> <1075942818.2783.70.camel@pegasus>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 05 Feb 2004 02:32:32 +0100
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1075942818.2783.70.camel@pegasus>
+From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Petri,
+On Thu, Feb 05, 2004 at 02:00:18AM +0100, Marcel Holtmann wrote:
+> Hi Jean,
+> 
+> > 	I could find an informal arrangement if you want my code, like
+> > "for your eyes only", but it's also not totally trivial to setup.
+> 
+> not needed, because it is very clear where the problem is. But thanks
+> for the offer.
+> 
+> > 	Yes, the accept() code is right, what's wrong is obviously the
+> > "poll" code that should not indicate socket readyness before the
+> > socket is really ready.
+> > 	The more "correct" way would be to change the "poll()" code to
+> > really test child socket readyness instead of just testing
+> > sk_ack_backlog. But, the poll code would get very ugly quickly.
+> > 	One of the simplest way would be to increase sk_ack_backlog
+> > only when the socket change to the BT_CONNECTED state (as opposed to
+> > immediately when we add it to the parent queue). I would need to
+> > understand where and how exactly is sk_ack_backlog used.
+> > 	Another solution if we can't use sk_ack_backlog is to use our
+> > own counter to count the number of child ready, or a flag, or whatever
+> > mechanism.
+> 
+> I don't see what sk_ack_backlog have to do with it. Can you explain this
+> to me?
 
-> Little updates, don't know if these are correct, but at least
-> bluez.sourceforge.net seems to redirect to www.bluez.org.
+	See below.
 
-at the moment I want to keep bluez.sf.net in these files. But thanks for
-the patch.
+> I haven't tested this yet, but I think the problem is the extra check in
+> bt_sock_poll() for the accept_q:
+> 
+>         if (!skb_queue_empty(&sk->sk_receive_queue) || 
+>                         !list_empty(&bt_sk(sk)->accept_q) ||
+>                         (sk->sk_shutdown & RCV_SHUTDOWN))
+>                 mask |= POLLIN | POLLRDNORM;
 
-Regards
+	Wrong. The client may only receive packet and never send
+packets, and anyway those packets would go to the child socket, not
+the parent socket (remember, we are before accept(), so we are polling
+the parent/listening socket). You really need to test the *childs* of
+this socket (i.e. those guys in accept_q).
+	One way to do this is to have a counter counting the number of
+child sockets in CONNECTED mode but not yet dequeued. One idea is to
+reuse sk_ack_backlog to do this.
 
-Marcel
+> Regards
+> 
+> Marcel
 
-
-
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+	Jean
