@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] IOGear GBU301 and Kernel 2.4.20
-From: Marcel Holtmann <marcel@holtmann.org>
-To: tsw@johana.com
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040809050753.17815.qmail@web60801.mail.yahoo.com>
-References: <20040809050753.17815.qmail@web60801.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1092031016.2773.60.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <004a01c47dd4$45be1380$df0618ac@USI08844>
+From: "taylor" <taylor@ms.usi.com.tw>
+To: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0047_01C47E17.53419110"
+Subject: [Bluez-users] Adpat PAN profile to Samba Server
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,46 +16,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 09 Aug 2004 07:56:56 +0200
+Date: Mon, 9 Aug 2004 13:46:51 +0800
 
-Hi Tom,
+This is a multi-part message in MIME format.
 
-> > this is a Broadcom BCM2033 dongle without firmware loaded. Install the
-> > bluez-firmware package and use the bcm203x kernel driver from a recent
-> > 2.6 kernel or compile bluez-utils-2.9 with bcm203x support.
-> > 
-> OK, This ought to be simple but...
-> [ bluez-utils-2.9]# ./configure --prefix=/usr --mandir=/usr/share/man
-> --sysconfdir=/etc --enable-bcm203x
-> 
-> Then...
-> make clean    {I hadn't done the 'enable-bcm...'}
-> 
-> and then
-> make
-> 
-> But it goes for a while and I get...
-> gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/include -Wall -g -O2 -c `test -f
-> 'bcm203x.c' || echo './'`bcm203x.c
-> cc1: warning: changing search order for system directory "/usr/include"
-> cc1: warning:   as it has already been specified as a non-system directory
-> bcm203x.c: In function `load_firmware':
-> bcm203x.c:118: warning: implicit declaration of function `usb_interrupt_read'
-> gcc -I/usr/include -Wall -g -O2   -o bcm203x  bcm203x.o -L/usr/lib -lusb
-> bcm203x.o: In function `load_firmware':
-> ...../bluez-utils-2.9/extra/bcm203x.c:118: undefined reference to
-> `usb_interrupt_read'
-> ...../bluez-utils-2.9/extra/bcm203x.c:133: undefined reference to
-> `usb_interrupt_read'
-> 
-> This doesn't look too good.  Am I doing something wrong here??
+------=_NextPart_000_0047_01C47E17.53419110
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
 
-you must install the development package of the USB library.
+Dear,
+   Yesterday, an idea come to my mind. I adpat the Bluez Profile to =
+Samba server. Really, it could work. User could share the file and =
+printer from Samba server. IT is a good solution for me. We doesn't need =
+the wire more at office.
 
-Regards
+Taylor Shieh
+Engineer, Bluetooth Module Section
+New Technology Development Dept., R&D Division
+Tel:886-49-2325876 Ext:2188
+ =20
+   
+------=_NextPart_000_0047_01C47E17.53419110
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
 
-Marcel
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dbig5">
+<META content=3D"MSHTML 6.00.2800.1400" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT size=3D2>Dear,</FONT></DIV>
+<DIV><FONT size=3D2>&nbsp;&nbsp; Yesterday, an idea come to my mind. I =
+adpat the=20
+Bluez Profile to Samba server. Really, it could work. User could share =
+the file=20
+and printer from Samba server. IT is a good solution for me. We doesn't =
+need the=20
+wire more at office.</FONT></DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2>Taylor Shieh<BR>Engineer, Bluetooth Module =
+Section<BR>New=20
+Technology Development Dept., R&amp;D Division<BR>Tel:886-49-2325876=20
+Ext:2188</FONT></DIV>
+<DIV><FONT size=3D2>&nbsp; </FONT></DIV>
+<DIV><FONT size=3D2>&nbsp; &nbsp;</FONT></DIV></BODY></HTML>
 
+------=_NextPart_000_0047_01C47E17.53419110--
 
 
 
