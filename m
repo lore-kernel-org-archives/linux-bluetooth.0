@@ -1,15 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Alberto Garcia Hierro <tcpdevil@linuxlover.org>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] hid2hci: No devices in HCI mode found
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Alberto Garcia Hierro <tcpdevil@linuxlover.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200410081543.46448.tcpdevil@linuxlover.org>
-References: <3eef79ed04100803094fd88c74@mail.gmail.com>
-	 <1097234566.4407.1.camel@pegasus>
-	 <200410081543.46448.tcpdevil@linuxlover.org>
-Content-Type: text/plain
-Message-Id: <1097246961.4407.18.camel@pegasus>
-Mime-Version: 1.0
+References: <3eef79ed04100803094fd88c74@mail.gmail.com> <1097234566.4407.1.camel@pegasus>
+In-Reply-To: <1097234566.4407.1.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart4030798.IYHRrjd9Lx";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Message-Id: <200410081543.46448.tcpdevil@linuxlover.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,24 +20,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 08 Oct 2004 16:49:22 +0200
+Date: Fri, 8 Oct 2004 15:43:46 +0200
 
-Hi Alberto,
+--nextPart4030798.IYHRrjd9Lx
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
->  I think there isn't any problems in the Gentoo package. I'm pretty sure the 
-> problem is a bad configuration. Change HID2DCI_ENABLE=true to 
-> HID2DCI_ENABLE=false in /etc/conf.d/bluetooth and the message will 
-> dissappear.
+El Viernes, 8 de Octubre de 2004 13:22, Marcel Holtmann escribi=F3:
+> Hi Sven,
+>
+> > running Gentoo Linux. I searched the web like crazy but did not get
+> > much or even helpful information.
+>
+> don't care about that message, because not so much people have a HID
+> Proxy Bluetooth dongle. Talk to the Gentoo package maintainer and tell
+> him/her to use the -q switch to suppress this message.
 
-actually it is safe to run hid2hci every time at boot even if you don't
-own a HID Proxy Bluetooth dongle, but in that case you shouldn't see any
-error messages. So using the -q switch is better.
+Hi Sven and Marcel,
+ I think there isn't any problems in the Gentoo package. I'm pretty sure th=
+e=20
+problem is a bad configuration. Change HID2DCI_ENABLE=3Dtrue to=20
+HID2DCI_ENABLE=3Dfalse in /etc/conf.d/bluetooth and the message will=20
+dissappear.
 
-Regards
+Regards,
+ Alberto
+=2D-=20
+/* Alberto Garc=EDa Hierro (Skyhusker) */
 
-Marcel
+--nextPart4030798.IYHRrjd9Lx
+Content-Type: application/pgp-signature
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.9.10 (GNU/Linux)
 
+iD8DBQBBZpmS4O6JklHkL2cRApHlAJ9MgZkb2rXRemI0XMYYVzBPVjyzagCfaHVO
+SipKzHSyjszfdWv2qO91Riw=
+=UUwA
+-----END PGP SIGNATURE-----
+
+--nextPart4030798.IYHRrjd9Lx--
 
 
 -------------------------------------------------------
