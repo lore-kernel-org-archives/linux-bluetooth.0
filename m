@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <1379.193.136.143.20.1077809745.squirrel@webmail.rnl.ist.utl.pt>
 Subject: RE: [Bluez-devel] Widcomm BlueConnect and Bluez
-From: <dsas@rnl.ist.utl.pt>
-To: <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1077804727.2754.44.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Didier Alves <dsas@mega.ist.utl.pt>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000f01c3fc6f$303ed760$318388c1@zedidas>
 References: <000f01c3fc6f$303ed760$318388c1@zedidas>
-        <1077804727.2754.44.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain
+Message-Id: <1077804727.2754.44.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,44 +18,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 26 Feb 2004 15:35:45 -0000 (WET)
+Date: Thu, 26 Feb 2004 15:12:07 +0100
 
-> Hi Didier,
->
->> > what kind of PDA is this? What kernel are you using? Make a binary
->> hcidump and send it to us.
->>
->> It's a Handspring Visor Pro with PalmOS 3.5.2H3.0. I read somewhere
->> that there is a problem with buffer overrun in that version of PalmOS.
->
-> please run "hcitool info <bdaddr-visor>" (as root).
->
->> The Bluez kernel version is 2.3.
->
-> Don't use this. A kernel with my -mh patch is enough.
->
-> Regards
->
-> Marcel
+Hi Didier,
 
-# hcitool info 00:80:37:16:32:D2
-Requesting information ...
-BD Address:  00:80:37:16:32:D2
-Device Name: My BlueConnect
-LMP Version: 1.1 (0x1) LMP Subversion: 0x8b40
-Manufacturer: Ericsson Mobile Comunications (0)
-Features: 0xff 0xfb 0x01 0x00
-	<3-slot packets> <5-slot packets> <encryption> <slot offset>
-	<timing accuracy> <role switch> <hold mode> <sniff mode>
-	<park mode> <RSSI> <SCO link> <HV2 packets>
-	<HV3 packets> <u-law log> <A-law log> <CVSD>
+> > what kind of PDA is this? What kernel are you using? Make a binary
+> > hcidump and send it to us.
+> 
+> It's a Handspring Visor Pro with PalmOS 3.5.2H3.0. I read somewhere that
+> there is a problem with buffer overrun in that version of PalmOS.
 
-I use this version of bluez kernel because I need to make some changes in
-bluez modules (qos parameters...). Can I make these changes with mh?
+please run "hcitool info <bdaddr-visor>" (as root).
 
-Thanks.
+> The Bluez kernel version is 2.3.
 
-Didier
+Don't use this. A kernel with my -mh patch is enough.
+
+Regards
+
+Marcel
 
 
 
