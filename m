@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] how to identify power class
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1103280955.4097.172.camel@justakiss>
-References: <1103280955.4097.172.camel@justakiss>
+From: Erwin Authried <eauth@softsys.co.at>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
 Content-Type: text/plain
-Message-Id: <1103281494.6317.0.camel@notepaq>
+Message-Id: <1103280955.4097.172.camel@justakiss>
 Mime-Version: 1.0
+Subject: [Bluez-users] how to identify power class
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,18 +16,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 17 Dec 2004 12:04:54 +0100
+Date: Fri, 17 Dec 2004 11:55:55 +0100
 
-Hi Erwin,
+Hi,
+is it possible to get the power class (1,2,3) of a bluetooth device by
+software (hciconfig, ...)? 
 
-> is it possible to get the power class (1,2,3) of a bluetooth device by
-> software (hciconfig, ...)? 
-
-not that I know of.
-
-Regards
-
-Marcel
+-Erwin
 
 
 
