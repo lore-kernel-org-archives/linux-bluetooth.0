@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Linux 2.6.10-rc1 HID problems
+Subject: Re: [Bluez-users] Socket CF Rev G or H working?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Edd Dumbill <edd@usefulinc.com>
+To: "Jay W. Summet" <summetj@cc.gatech.edu>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1098722840.6927.4.camel@saag>
-References: <1098722840.6927.4.camel@saag>
+In-Reply-To: <Pine.GSO.4.58.0410261602020.4862@gaia3.cc.gatech.edu>
+References: <Pine.GSO.4.58.0410261602020.4862@gaia3.cc.gatech.edu>
 Content-Type: text/plain
-Message-Id: <1098827078.14036.125.camel@pegasus>
+Message-Id: <1098826982.14036.123.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,23 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 26 Oct 2004 23:44:38 +0200
+Date: Tue, 26 Oct 2004 23:43:02 +0200
 
-Hi Edd,
+Hi Jay,
 
-> Running Linux 2.6.10-rc1 I've got the following HID related problems:
-> 
-> * the multimedia keys on my Apple Bluetooth keyboard no longer work
-> (showkey shows nothing)
-> 
-> * the microsoft bluetooth mouse no longer generates scroll wheel events
-> (xev shows nothing)
-> 
-> hidd is running with --master (the apple keyboard won't successfully
-> reconnect otherwise).
+> I have an offer from Socket to replace my Rev F card with their latest
+> card (rev H).  (It is my understanding that cards after rev G use the new
+> CSR chipset.) But, they don't know if it's supported under Linux.
 
-this sounds like boot mode and actually 2.6.10-rc1 only supports the
-boot mode. For using the report mode, you have to apply my -mh1 patch.
+ask them for a test device and tell them to also send me one.
+
+> Does anybody have a Socket CF bluetooth adaptor, REV G or H that works for
+> you?
+
+We have problems with some serial based cards. They got detected correct
+with a 2.6 kernel, but they don't work as expected. Some of them do and
+others don't. Using the latest 2.6.10-rc1 this may have changed, because
+there was some ongoing work in the serial subsystem. However I don't
+know, because I am not an expert in this area.
 
 Regards
 
