@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Gregoire Favre <Gregoire.Favre@freesurf.ch>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] No more bluez.o in 2.6?
-Message-ID: <20040409124008.GA29582@magma.epfl.ch>
-References: <20040407172325.GC9593@magma.epfl.ch> <20040407214322.GA14396@magma.epfl.ch> <1081417632.2970.0.camel@pegasus> <20040408150029.GA5539@magma.epfl.ch>
+Subject: Re: [Bluez-users] error compiling utils2
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?ISO-8859-1?Q?S=E9rgio?= Alcides Fernandes <sergiofernandes@clix.pt>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200404082156.34239.sergiofernandes@clix.pt>
+References: <200404082156.34239.sergiofernandes@clix.pt>
+Content-Type: text/plain
+Message-Id: <1081461944.5880.15.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20040408150029.GA5539@magma.epfl.ch>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,44 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 9 Apr 2004 14:40:08 +0200
+Date: Fri, 09 Apr 2004 00:05:44 +0200
 
-On Thu, Apr 08, 2004 at 05:00:29PM +0200, Gregoire Favre wrote:
-> Now, some kernels recompilation later, I still have a problem which I
-> don't know how to solve:
->=20
-> dund[3539]: DUN daemon ver 1.1
-> dund[3554]: New connection from 00:...
-> pppd[3561]: pppd 2.4.1 started by root, uid 0
-> pppd[3561]: Using interface ppp0
-> pppd[3561]: Connect: ppp0 <--> /dev/rfcomm0
-> pppd[3561]: Cannot determine ethernet address for proxy ARP
-> pppd[3561]: local  IP address 192.168.1.2
-> pppd[3561]: remote IP address 172.31.130.67
-> pppd[3561]: IPCP terminated by peer
-> pppd[3561]: Hangup (SIGHUP)
-> pppd[3561]: Modem hangup
-> pppd[3561]: Connection terminated.
-> pppd[3561]: Connect time 0.8 minutes.
-> pppd[3561]: Sent 571 bytes, received 322 bytes.
-> pppd[3561]: Exit.
+Hi Sergio,
 
-> ...
+> Thks Marcel, but now i get this error compiling utils2:
+> 
+> /root/utils2/hci/hciconfig.c:56: undefined reference to `ba2str'
+> hciconfig.o(.text+0x38):/root/utils2/hci/hciconfig.c:58: undefined reference 
+> to `hci_typetostr'
 
-> http://www-jcsu.jesus.cam.ac.uk/~ned21/tech/tungsten_linux.html
+all of them end up in a linking error. Follow this HOWTO
 
-Just beacuse someone could have the same problem I did have: I just
-commented out the proxyarp option in peers/dun and my palm was able to
-try to connect to my linux box over ssh (without success due to my ssh2
-or??? but I can see the try to connect on my logs in the linux box) :-)
+	http://www.bueche.ch/comp/mx900/mx900.html
 
-Sorry for all my emails and thank for all who contributed in BlueZ !!!
+Regards
 
-	Gr=E9goire
-_________________________________________________________________________=
-_
-http://algebra.epfl.ch/greg ICQ:16624071 mailto:Gregoire.Favre@freesurf.c=
-h
+Marcel
+
+
 
 
 -------------------------------------------------------
