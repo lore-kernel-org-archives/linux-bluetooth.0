@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Mikko Rapeli <mikko.rapeli@iki.fi>
-In-reply-to: <20040708205303.GD2581@nalle>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Message-id: <20040708211107.GE2581@nalle>
+From: Steven Yap <syap@shaw.ca>
+Subject: Re: [Bluez-users] Trouble connecting to a Sony Ericsson T610 phone.
+In-reply-to: <cone.1089163591.829830.5657.500@commodore.email-scan.com>
+To: bluez-users@lists.sourceforge.net
+Message-id: <1089275408.4954.39.camel@obsolescence>
 MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-References: <20040708205303.GD2581@nalle>
-Subject: [Bluez-users] Re: rfcomm and a freezing SE t610
+Content-type: text/plain
+References: <cone.1089163591.829830.5657.500@commodore.email-scan.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,32 +17,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 09 Jul 2004 00:11:07 +0300
+Date: Thu, 08 Jul 2004 01:30:08 -0700
 
-On Thu, Jul 08, 2004 at 11:53:03PM +0300, Mikko wrote:
-> Is the phone only one to blame? Is there a way to send some more hangup
-> messages to the phone and hope that it catches them and stops the GPRS
-> and rfcomm connections? 
+On Tue, 2004-07-06 at 18:26, Sam Varshavchik wrote:
+> I'm using a Belkin USB dongle to try to connect to my T610 phone.  I'm 
+> running bluez 2.5 on Fedora Core 2 x86_64.
 
-*doink*, as usual I found a way immediately after sending the question
-out: add more PPP hangup characters.
+I have a T616 and running Debian "sid" with bluez 2.7 on x86.
 
-Now, my hangup chat script seems to have enough (more than just one pair
-of) \K's and +++ATH's:
-exec /usr/sbin/chat -V -s -S    \
-ABORT           "BUSY"          \
-ABORT           "ERROR"         \
-ABORT           "NO DIALTONE"   \
-""              "\K"            \
-""              "\K"            \
-""              "\K"            \
-""              "+++ATH"        \
-""              "+++ATH"        \
-""              "+++ATH"        
+> "hcitool scan" does list the phone.  And the "Add New Device" option on the 
+> phone does show the PC, after a brief delay.  But if I tell the phone to go 
+> ahead and connect to the PC, enter a PIN, the phone spins for a while, then 
+> reports "Bluetooth connection failed" .  On the PC side nothing happens.
 
-Now the t610 seems to work as it should.
+Did you install a PIN helper like bluez-pin to let you enter a PIN
+value for pairing? 
 
--Mikko
+-- 
+Steven Yap <syap@shaw.ca>
 
 
 -------------------------------------------------------
