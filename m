@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Wolfgang =?iso-8859-15?q?M=FCes?= <wolfgang@iksw-muees.de>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Problem with slow Speed of Socket CF Card
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Wolfgang =?ISO-8859-1?Q?M=FCes?= <wolfgang@iksw-muees.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405291139.54618.wolfgang@iksw-muees.de>
-References: <200405291047.20701.wolfgang@iksw-muees.de>
-	 <1085821206.3932.11.camel@pegasus>
-	 <200405291139.54618.wolfgang@iksw-muees.de>
-Content-Type: text/plain
-Message-Id: <1085824617.3932.34.camel@pegasus>
-Mime-Version: 1.0
+References: <200405291047.20701.wolfgang@iksw-muees.de> <1085821206.3932.11.camel@pegasus>
+In-Reply-To: <1085821206.3932.11.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Message-Id: <200405291139.54618.wolfgang@iksw-muees.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,28 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 May 2004 11:56:58 +0200
+Date: Sat, 29 May 2004 11:39:54 +0200
 
-Hi Wolfgang,
+Hello Marcel,
 
-> > this is simple. Try "hciattach <dev> socket 460800".
-> 
-> Been there - done that.
-> 
-> "BCSP initalisation timed out"
-> 
-> 230400 Baud is the only baud rate which is working. Do I need a special
-> version of the hciattach utility?
+Am Samstag, 29. Mai 2004 11:00 schrieb Marcel Holtmann:
 
-check the mailing list archives for a thread about BCSP and changing the
-baud rate. This is not very easy and the CSR guys explained it in very
-details.
+> this is simple. Try "hciattach <dev> socket 460800".
 
-Regards
+Been there - done that.
 
-Marcel
+"BCSP initalisation timed out"
 
+230400 Baud is the only baud rate which is working. Do I need a special
+version of the hciattach utility?
 
+best regards
+Wolfgang M=FCes
 
 
 -------------------------------------------------------
