@@ -1,81 +1,50 @@
-Return-Path: <Peter.K.Martin@t-online.de>
-From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-To: <bluez-users@lists.sourceforge.net>,
-   "'Marcel Holtmann'" <marcel@holtmann.org>
-Subject: Conflict bluetooth and soundcard
-Date: Wed, 22 Dec 2004 10:27:32 +0100
-Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAklRz+OMPMEe49ORKn91EJAEAAAAA@t-online.de>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_002B_01C4E810.DC2C7B80"
-List-ID: <bluez-users.lists.sourceforge.net>
+From: "Simi Manuel" <roses_3@operamail.com>
+To: bluez-users@lists.sourceforge.net
+Message-Id: <20041222012315.32170416118@ws5-2.us4.outblaze.com>
+Subject: [Bluez-users] help on project!!!!
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+Reply-To: bluez-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Wed, 22 Dec 2004 02:23:15 +0100
 
-This is a multi-part message in MIME format.
+hello
 
-------=_NextPart_000_002B_01C4E810.DC2C7B80
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+is there anyone interested in implementing bluetooth stack in C.i need cert=
+ain clareifications...
 
-Hi Marcel,
-again thanks a lot for your help. The problem of the bt-connection to =
-the
-accesspoint seems to be solved. I have a littel additional question. =
-There
-seems to be a confict between dmabt and the soundcard. When the =
-soundcard is
-correctly installed, dmabt give the massage can't access bt-device. Then =
-I
-reboot linux with the bootoption ACPI=3Doldboot --> dmabt works without =
-any
-message and I'm able to reinstall the soundcard by YaST. But the next =
-boot
-without bootoption give the same result, so I can use either dmabt or
-soundcard, They seem to use the same irq or dma-channel. How is this to =
-be
-changed for dmabt???
-=20
-Regards
-Peter
 
-------=_NextPart_000_002B_01C4E810.DC2C7B80
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+interseted ones,i mean those interseted in helping me out,plz reply to this=
+ id....
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<TITLE>Nachricht</TITLE>
 
-<META content=3D"MSHTML 6.00.2800.1479" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV><SPAN class=3D161311709-22122004><FONT face=3DArial size=3D2>Hi=20
-Marcel,</FONT></SPAN></DIV>
-<DIV><SPAN class=3D161311709-22122004><FONT face=3DArial size=3D2>again =
-thanks a lot=20
-for your help. The problem of the bt-connection to the =
-accesspoint&nbsp;seems to=20
-be&nbsp;solved. I have a littel additional question. There seems to be a =
-confict=20
-between dmabt and the soundcard. When the soundcard is correctly =
-installed,=20
-dmabt give the massage can't access bt-device. Then I reboot linux with =
-the=20
-bootoption ACPI=3Doldboot --&gt; dmabt works without any message and I'm =
-able to=20
-reinstall the soundcard by YaST. But the next boot without bootoption =
-give the=20
-same result, so I can use either dmabt or soundcard, They seem to use =
-the same=20
-irq or dma-channel. How is this to be changed for =
-dmabt???</FONT></SPAN></DIV>
-<DIV><SPAN class=3D161311709-22122004><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D161311709-22122004><FONT face=3DArial=20
-size=3D2>Regards</FONT></SPAN></DIV>
-<DIV><SPAN class=3D161311709-22122004><FONT face=3DArial=20
-size=3D2>Peter</FONT></SPAN></DIV></BODY></HTML>
+bye
 
-------=_NextPart_000_002B_01C4E810.DC2C7B80--
+
+--=20
+_____________________________________________________________
+Web-based SMS services available at http://www.operamail.com.
+=46rom your mailbox to local or overseas cell phones.
+
+Powered by Outblaze
+
+
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now. 
+http://productguide.itmanagersjournal.com/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
