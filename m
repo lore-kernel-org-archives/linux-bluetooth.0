@@ -1,16 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] D-BUS fixes for hcid
+Subject: Re: [Bluez-devel] Extremely slow printing?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@nokia.com>
-Cc: Achim Bohnet <ach@mpe.mpg.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040617094802.GA4566@kone>
-References: <20040616112702.GA898@kone> <20040616124541.GA8629@kone>
-	 <1087391183.4309.13.camel@pegasus> <200406161558.56578.ach@mpe.mpg.de>
-	 <20040616141845.GA8921@kone> <1087399222.4309.26.camel@pegasus>
-	 <20040617094802.GA4566@kone>
+To: Jon Valvatne <jon@valvatne.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1087440365.2624.75.camel@localhost.localdomain>
+References: <1087431069.6361.26.camel@localhost.localdomain>
+	 <1087432013.4309.43.camel@pegasus>
+	 <1087438456.2624.64.camel@localhost.localdomain>
+	 <1087440365.2624.75.camel@localhost.localdomain>
 Content-Type: text/plain
-Message-Id: <1087473910.23809.14.camel@localhost>
+Message-Id: <1087473569.23809.7.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -22,26 +21,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Jun 2004 14:05:10 +0200
+Date: Thu, 17 Jun 2004 13:59:30 +0200
 
-Hi Johan,
+Hi Jon,
 
-> > > It would be nice to know how the D-BUS designers have thought about
-> > > this kinds of problems.
-> > 
-> > feel free to come up with a solution for this.
+> Oops... please disregard the last part of my previous message. It turns
+> out, of course, that the data being sent to the printer is *much* larger
+> than the original 250K of the postscript file. I haven't dealt much with
+> non-postscript printers before, so this is all a bit new to me. The size
+> of the raw data being sent to the printer is over 7 megabytes, which
+> means a speed of 30 seconds over bluetooth just won't be possible.
 > 
-> Unfortunately I don't have one. Would it still be possible to add the
-> dbus_message_set_auto_activation function call to the code? This will
-> not change the behaviour in any way if the service is already aquired
-> (i.e. bluez-pin is running), but will allow more flexibility if someone
-> decides that they want to use D-BUS activation (for example in an
-> embeded system where you only have one display and don't want to have
-> unecessary processes taking up memory all the time).
+> And I suppose the difference between the Windows and Linux results could
+> be explained by a difference in data size; maybe the Windows printer
+> driver generates a smaller raw data file. I'll have to investigate this
+> further.
+> 
+> So now my only question is: Is it expected/normal for the BlueZ CUPS
+> backend to only manage about 400kbps when transferring data to the
+> printer? Is there anything that can be done to speed this up?
 
-right now I don't see where this helps. If you work embedded, you don't
-need the D-Bus support. Use the old PIN helper stuff and write a shell
-script or program that handles the input of the PINs.
+actually this depends on the hardware in your printer. The max transfer
+rate should be something about 700kbps, but this is not a must. Mostly
+the reasons for this are differnt link manager implementations or an
+UART that isn't running with full speed. Check your Bluetooth devices
+with "hciconfig -a" and "hcitool info <printer-bdaddr>".
 
 Regards
 
