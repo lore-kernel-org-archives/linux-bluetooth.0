@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Release of new BlueZ libs and utils
+Subject: Re: [Bluez-users] Re: Release of new BlueZ libs and utils
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Edd Dumbill <edd@usefulinc.com>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1073154814.8729.66.camel@saag>
+In-Reply-To: <200401032054.35896.cijoml@volny.cz>
 References: <1071791711.6635.18.camel@pegasus>
-	 <1073147533.8729.53.camel@saag>  <1073148476.8729.56.camel@saag>
-	 <1073149849.25261.97.camel@pegasus>  <1073154814.8729.66.camel@saag>
+	 <200401021818.31606.cijoml@volny.cz> <1073086511.25261.67.camel@pegasus>
+	 <200401032054.35896.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1073212685.25261.138.camel@pegasus>
+Message-Id: <1073212505.25261.134.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,33 +20,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 04 Jan 2004 11:38:05 +0100
+Date: Sun, 04 Jan 2004 11:35:05 +0100
 
-Hi Edd,
+Hi Michal,
 
-> No, I've not tried BlueZ<->BlueZ, it happened with my SE P800 connecting
-> back to BlueZ.  
+> > this is more problematic than you think. The general problem is money of
+> > course, because a qualification is expensive. 
 > 
-> Occasionally it gets a bit further, then hangs:
-> 
-> > ACL data: handle 0x002a flags 0x02 dlen 8
->     L2CAP(d): cid 0x41 len 4 [psm 3]
->       RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-> < ACL data: handle 0x002a flags 0x02 dlen 8
->     L2CAP(d): cid 0x169 len 4 [psm 3]
->       RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> > HCI Event: Number of Completed Packets(0x13) plen 5
-> > ACL data: handle 0x002a flags 0x02 dlen 18
->     L2CAP(d): cid 0x41 len 14 [psm 3]
->       RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
->       dlci 2 frame_type 0 credit_flow 15 pri 0 ack_timer 0 frame_size
-> 667 max_retrans 0 credits 3
-> < ACL data: handle 0x002a flags 0x02 dlen 8
->     L2CAP(d): cid 0x169 len 4 [psm 3]
->       RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73
+> Hmmmm when there was man telling us about BT on our uni, he told us, that 
+> qualification is free???? Are you really sure with payments???
 
-how long is the time between these two packets? Is there really a
-listening socket for this channel?
+there is at minimum the listing fee of 7500 $ and you have to pay a BQB
+to run the needed tests.
+
+> > the biggest problem is that I don't have access to protocol and profile
+> > testers. We have to know what tests fail and what we pass. If we know
+> > how to run these test the whole qualification process can be done by
+> > everyone.
+> 
+> Where can be RFCs of tests taken? Only in Ericsson?
+
+For example with a Rhode & Schwarz PTW60 or the BITE from Cetecom. In
+some cases the Tracer/Trainer from CATC would be enough to be sure that
+our implementation passes the qualification tests.
 
 Regards
 
