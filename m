@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Simone Gotti <simone.gotti@email.it>
+From: Russell Neches <russell@ccs.neu.edu>
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] crash on remove
-References: <20040310182158.GA9279@naginata.ccs.neu.edu> <200403102346.11707.simone.gotti@email.it> <20040310234112.GA4871@omocha.vort.org>
-In-Reply-To: <20040310234112.GA4871@omocha.vort.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200403110111.31218.simone.gotti@email.it>
+Message-ID: <20040310234112.GA4871@omocha.vort.org>
+References: <20040310182158.GA9279@naginata.ccs.neu.edu> <404F84BC.4020406@xmission.com> <20040310223504.GA3398@omocha.vort.org> <200403102346.11707.simone.gotti@email.it>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200403102346.11707.simone.gotti@email.it>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +17,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 11 Mar 2004 01:11:31 +0100
+Date: Wed, 10 Mar 2004 18:41:13 -0500
 
-On Thursday 11 March 2004 00:41, Russell Neches wrote:
-> > Hi!, I think it's a SCO support problem .
->
-> Those bastards! Death to SCO!
->
-> Oh. SCO. Synchronous Connection Oriented.
->
-> > I think that Marcel Holtmann spoked about this a lot of times on the
-> > mailinglists. You have to disable the SCO support in the hci_usb
-> > module to avoid this problem. I've read that probably it's a usb uchi
-> > isochronous problem.
->
-> Hmm... Do you have a link?
+> Hi!, I think it's a SCO support problem .
 
-I've found this, but there are many others.
-http://www.ussg.iu.edu/hypermail/linux/kernel/0311.0/0135.html
+Those bastards! Death to SCO! 
 
-Bye!
--- 
-Simone Gotti
-<simone.gotti@email.it>
+Oh. SCO. Synchronous Connection Oriented.
+
+> I think that Marcel Holtmann spoked about this a lot of times on the
+> mailinglists. You have to disable the SCO support in the hci_usb
+> module to avoid this problem. I've read that probably it's a usb uchi
+> isochronous problem.
+
+Hmm... Do you have a link?
+
+Russell
 
 
 -------------------------------------------------------
