@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <4211C910.1020204@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-From: Sebastian Roth <sebastian.roth@esk.fhg.de>
-Message-ID: <cuso8n$4g1$2@sea.gmane.org>
-References: <cusgdr$4g1$1@sea.gmane.org> <4211C910.1020204@dark-reality.de>
-Mime-Version: 1.0
+Subject: Re: [Bluez-devel] snd-bt-sco built-in
+References: <cusgdr$4g1$1@sea.gmane.org>
+In-Reply-To: <cusgdr$4g1$1@sea.gmane.org>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <4211C910.1020204@dark-reality.de>
-Subject: [Bluez-devel] Re: snd-bt-sco built-in
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,47 +18,62 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 15 Feb 2005 13:02:52 +0100
+Date: Tue, 15 Feb 2005 11:04:00 +0100
 
-Hi Lars,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-thanks for your fast reply!
+Sebastian Roth wrote:
+| Hi,
+|
+| I'm trying to build snd-bt-sco directly into the kernel.
 
- > | I'm trying to build snd-bt-sco directly into the kernel.
- >
- > why?
-I'm working on a project in which a "communication-server" should use
-bluetooth headsets...
-So I want to have the kernel with all functions built-in. If this is
-not possible I'll have to load it on startup. ;-(
+why?
+
+| As other soundcard drivers can be built in I think this is no problem
+| with the kernel or ALSA-core.
+| Can someone please point me to why this is happening or is it known
+| that snd-bt-sco is working as module only?
+
+I think nobody ever tried to compile it into the kernel, and I definitly
+never did. I think it's not written with that in mind.
+
+I can't tell for sure why this function is failing this way. Did you
+build snd-hw-dep and put it in the kernel, too? If it's missing than
+that could be the problem. I think the dynamic loader would notice in a
+module, but propably not if the kernel itself is missing it.
+
+best regards,
+~   Lars
+
+|
+| -------------------------------------------------------
+| SF email is sponsored by - The IT Product Guide
+| Read honest & candid reviews on hundreds of IT Products from real users.
+| Discover which products truly live up to the hype. Start reading now.
+| http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+| _______________________________________________
+| Bluez-devel mailing list
+| Bluez-devel@lists.sourceforge.net
+| https://lists.sourceforge.net/lists/listinfo/bluez-devel
+|
 
 
- > I can't tell for sure why this function is failing this way. Did you
- > build snd-hw-dep and put it in the kernel, too? If it's missing than
- > that could be the problem.
-That was my first guess too! But it's built-in
+- --
+Lars Grunewaldt
+* software development
+* multimedia design
+skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+web: http://www.dark-reality.de
+mail: lgw@dark-reality.de
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-grep SND /boot/config-2.6.10-mh4-sr1 | grep -v "^#"
-CONFIG_SND=y
-CONFIG_SND_TIMER=y
-CONFIG_SND_PCM=y
-CONFIG_SND_HWDEP=y
-CONFIG_SND_RAWMIDI=y
-CONFIG_SND_SEQUENCER=y
-CONFIG_SND_OSSEMUL=y
-CONFIG_SND_MIXER_OSS=y
-CONFIG_SND_PCM_OSS=y
-CONFIG_SND_SEQUENCER_OSS=y
-CONFIG_SND_RTCTIMER=m
-CONFIG_SND_AC97_CODEC=y
-CONFIG_SND_EMU10K1=y
-CONFIG_SND_USB_AUDIO=y
-CONFIG_SND_BT_SCO=y
-
-
-Best regards,
-Sebastian
-
+iD8DBQFCEckQQWC6DTWkDAoRAgOZAJ9HKs/CoqCdoIuBAou5UlUcrPisYQCglwlJ
+ai8YKl5y0NI5RV7HMv1Lczw=
+=QLIf
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
