@@ -1,103 +1,76 @@
-Return-Path: <maxk@qualcomm.com>
-Message-Id: <5.1.0.14.2.20030722165832.098360c8@unixmail.qualcomm.com>
-Date: Tue, 22 Jul 2003 17:07:29 -0700
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-From: Max Krasnyansky <maxk@qualcomm.com>
-Subject: Re: [Bluez-devel] Problem with security mode 3
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1057279722.27638.1.camel@pegasus>
-References: <5.1.0.14.2.20030703173538.063183a8@unixmail.qualcomm.com>
-	<5.1.0.14.2.20030703173538.063183a8@unixmail.qualcomm.com>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Re: Version 3 libs/utils
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Max Krasnyansky <maxk@qualcomm.com>
+Cc: Stephen Crane <steve.crane@rococosoft.com>, Philip Blundell <pb@nexus.co.uk>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <5.1.0.14.2.20030722125704.097cd218@unixmail.qualcomm.com>
+References: <5.1.0.14.2.20030721173324.096d96b0@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030717163326.07385478@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030630170200.0e4c3e28@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030630170200.0e4c3e28@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030717163326.07385478@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030721173324.096d96b0@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030722125704.097cd218@unixmail.qualcomm.com>
+Content-Type: text/plain
+Message-Id: <1058909609.2854.68.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; CHARSET=us-ascii
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 22 Jul 2003 23:33:22 +0200
 
-At 05:48 PM 7/3/2003, Marcel Holtmann wrote:
->Hi Max,
->
->> >there is a little problem with local devices in security mode 3
->> >(hciconfig hci0 auth). If you have already paired two devices, but you
->> >have used your dongle within another OS and paired it again to the same
->> >remote device. The local link key stored by the hcid is outdated. But
->> >this can not be known by the hcid and so it sends it on the next
->> >connection request. The remote device will deny the connection because
->> >of the wrong link key, but the error you get is not an authentication
->> >failure. You get the timeout error from the L2CAP layer.
->> >
->> >        < HCI Command: Write Authentication Enable(0x03|0x0020) plen 1
->> >          01 
->> >        > HCI Event: Command Complete(0x0e) plen 4
->> >          01 20 0C 00 
->> >        < HCI Command: Create Connection(0x01|0x0005) plen 13
->> >          FD 06 81 0E 04 00 18 CC 01 00 00 00 01 
->> >        > HCI Event: Command Status(0x0f) plen 4
->> >          00 01 05 04 
->> >        > HCI Event: Link Key Request(0x17) plen 6
->> >          FD 06 81 0E 04 00 
->> >        < HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
->> >          FD 06 81 0E 04 00 38 06 D7 5D E2 DD FD 10 88 EF 5A 65 66 C2 
->> >          80 26 
->> >        > HCI Event: Connect Complete(0x03) plen 11
->> >          05 00 00 FD 06 81 0E 04 00 01 00 
->> >
->> >I have looked at hci_conn_complete_evt() and l2cap_connect_cfm() and the
->> >code seems correct to me.
->> >
->> >If you try to connect again after the timeout, you will get a "Operation
->> >already in progress" error.
->> >
->> >Where is the problem?
->> Did you pull all of my latest fixes ? That bug was introduced by 
->> SO_LINGER patch (bt_sock_wait_state() to be more specific). I fixed it 
->> some time ago (should be in -pre2). The bug is unrelated to security 
->> and stuff and affects connect in general (ie it'd timeout instead of an error).
->
->it is still present in 2.4.22-pre2 :(
+Hi Max,
 
-I can't reproduce that. I just did like you said paired two device, saved link_key file,
-repaired them and restored old link_key file. So my laptop that is running latest and greatest
-2.4.BK has old key now. I even got exactly the same hcidump traces.
+> >Should we keep the kernel inquiry interface? The kernel inside inquiry
+> >cache is a nice thing and works in the background like a charm :)
+> You mean HCI_INQUIRY ioctl, right ? I'm not sure about that one.
+> We'll certainly keep inquiry cache. Cache doesn't really depend on ioctl.
 
-< HCI Command: Write Authentication Enable(0x03|0x0020) plen 1
-  01 
+yes, I meant the ioctl. The kernel inquiry cache is a nice thing and
+maybe we should provide read only access to it from the userspace.
 
-[root@champ bluetooth]# l2ping 00:04:23:00:3D:06
-Can't connect.: Permission denied
+> >What about the idea to integrate the inquiry into the library or into
+> >the Bluetooth master daemon.
+> I don't see a need for forwarding inquiry results from a daemon. It can be 
+> done in a simple way in the kernel, just like I explained in prev emails
+> (ie kernel parsing hci_inquiry command).
 
-> HCI Event: Command Complete(0x0e) plen 4
-  01 20 0C 00 
-< HCI Command: Create Connection(0x01|0x0005) plen 13
-  06 3D 00 23 04 00 18 CC 01 00 00 00 01 
-> HCI Event: Command Status(0x0f) plen 4
-  00 01 05 04 
-> HCI Event: Link Key Request(0x17) plen 6
-  06 3D 00 23 04 00 
-< HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
-  06 3D 00 23 04 00 EC 91 7B 09 2F C9 17 F6 0D A4 1F 51 99 D7 
-  98 7E 
-> HCI Event: Command Complete(0x0e) plen 10
-  01 0B 04 00 06 3D 00 23 04 00 
-> HCI Event: Connect Complete(0x03) plen 11
-  05 28 00 06 3D 00 23 04 00 01 00 
+My concern is the HCI_INQUIRY ioctl, because it don't really fits the
+possibilities and specification details of the inquiry command. But I
+don't know what the best way is here and with Bluetooth 1.2 we can also
+get the RSSI from an inquiry result.
 
-[root@champ utils]# sdptool browse 00:04:23:00:3D:06
-Failed to connect to SDP server on 00:04:23:00:3D:06: Permission denied
+At the moment I think additional ioctl's for accessing the inquiry cache
+will make it possible to use the inquiry command in a more dynamic way:
 
-< HCI Command: Create Connection(0x01|0x0005) plen 13
-  06 3D 00 23 04 00 18 CC 01 00 00 00 01 
-> HCI Event: Command Status(0x0f) plen 4
-  00 01 05 04 
-> HCI Event: Link Key Request(0x17) plen 6
-  06 3D 00 23 04 00 
-< HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
-  06 3D 00 23 04 00 EC 91 7B 09 2F C9 17 F6 0D A4 1F 51 99 D7 
-  98 7E 
-> HCI Event: Command Complete(0x0e) plen 10
-  01 0B 04 00 06 3D 00 23 04 00 
-> HCI Event: Connect Complete(0x03) plen 11
-  05 28 00 06 3D 00 23 04 00 01 00 
+	- get number of inquiry cache entries
+	- copy first n inquiry cache entries to my buffer
+	- flush inquiry cache
 
-As you see I get correct error and no timeouts. If I remove link_key from 
-laptop I can pair again and everything works fine.
+Comments? Ideas?
 
-Max
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: VM Ware
+With VMware you can run multiple operating systems on a single machine.
+WITHOUT REBOOTING! Mix Linux / Windows / Novell virtual machines at the
+same time. Free trial click here: http://www.vmware.com/wl/offer/345/0
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
