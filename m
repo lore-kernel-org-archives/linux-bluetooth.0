@@ -1,74 +1,44 @@
-Return-Path: <jt@bougret.hpl.hp.com>
-Date: Tue, 16 Sep 2003 12:53:33 -0700
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Stephen Crane <steve.crane@rococosoft.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Fred =?iso-8859-1?q?Sch=E4ttgen?= <bluez-devel@schaettgen.de>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] [PATCH] More SDP UUIDs...
-Message-ID: <20030916195333.GA25068@bougret.hpl.hp.com>
-Reply-To: jt@hpl.hp.com
-References: <20030915221624.GA17085@bougret.hpl.hp.com> <1063712005.22723.27.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1063712005.22723.27.camel@pegasus>
-From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+References: <20030915221624.GA17085@bougret.hpl.hp.com> <1063712005.22723.27.camel@pegasus> <1063717418.3674.276.camel@hades.cambridge.redhat.com>
+In-Reply-To: <1063717418.3674.276.camel@hades.cambridge.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200309161740.31300.bluez-devel@schaettgen.de>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 16 Sep 2003 17:40:31 +0200
 
-On Tue, Sep 16, 2003 at 01:33:20PM +0200, Marcel Holtmann wrote:
-> Hi Jean,
-> 
-> > 	I've just realised that you didn't keep the UUID and attribute
-> > list of sdptool in sync. The patch below correct this.
-> 
-> I have applied your patch, thanks.
+On Tuesday 16 September 2003 15:03, David Woodhouse wrote:
+..
+> Feature request: Please can we make sdpd retain its knowledge of apps
+> which have registered with it over a restart, much like portmap does?
 
-	While you are at it, would you mid to do the following :
-	o rename sdp_uuid_cmp() to sdp_uuid128_cmp(). The current name
-totally confused me.
-	o add in the library the following function :
-------------------------------------------------
-/*
- * UUID comparison function
- * returns 0 if uuidValue1 == uuidValue2 else -1
- */
-int sdp_uuid16_cmp(const void *p1, const void *p2)
-{
-	const uuid_t *u1 = (const uuid_t *)p1;
-	const uuid_t *u2 = (const uuid_t *)p2;
-	return memcmp(&u1->value.uuid16, &u2->value.uuid16, sizeof(uint16_t));
-}
-------------------------------------------------
+I'm not sure if this question goes in the same direction, but what happened to 
+the idea of a general purpose rfcomm-inetd, which also sets up sdp records 
+for its clients? Maybe I'm not really up-to-date, and I didn't find too much 
+about it in the archives.. is there one already?
 
-> > 	Also : I believe that having in the sdp library all the
-> > functions xxx2str() (uuid2str, sdp_proto_uuid2strn...) and their
-> > associated data (struct tupla ServiceClass...) is not
-> > necessary.
-> > 	Realistically, only sdptool or a graphical equivalent would
-> > use those functions, the vast majority of users of the library would
-> > be like 'pand' and only create or search SDP records.
-> > 	Moving this functionality to sdptool would allow to reduce
-> > further the size of the SDP library.
-> 
-> I like to keep this functions in the library, because they are a good
-> for debugging and they can be shared between any graphical and terminal
-> SDP tools. Anyway it seems to me like a good idea to have a compile
-> switch to disable the string arrays and let the functions return NULL
-> instead. People which care about the library size can use it.
+Fred
 
-	Or make it two libraries.
 
-> My work on the 4th (or maybe 5th) generation of a SDP library is making
-> good progress and I hope that I will have clean code for publishing very
-> soon.
 
-	I hope you will keep the --tree browsing option in sdptool,
-because the default browsing is useless for advanced stuff. The
-display might be ugly, but at least it display everything and the
-basic infrastructure is sound.
-
-> Regards
-> 
-> Marcel
-
-	Have fun...
-
-	Jean
+-------------------------------------------------------
+This sf.net email is sponsored by:ThinkGeek
+Welcome to geek heaven.
+http://thinkgeek.com/sf
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
