@@ -1,14 +1,19 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Bc. Michal Semler" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] 2.6.8-mh2 hotkeys not working and hcidump freezes laptop
-References: <200409281043.57935.cijoml@volny.cz> <1096373367.4649.1.camel@notepaq>
-In-Reply-To: <1096373367.4649.1.camel@notepaq>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200409281433.01986.cijoml@volny.cz>
+Subject: Re: [Bluez-users] ipaq 1945
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nigel Magnay <nigel.magnay@gmail.com>
+Cc: Wolfgang <wood.stock@gmx.net>, bluez-users@lists.sourceforge.net
+In-Reply-To: <320075ff04092805251ce925e6@mail.gmail.com>
+References: <320075ff040925153753850d92@mail.gmail.com>
+	 <1096153758.7719.12.camel@pegasus>
+	 <320075ff040926011212538dac@mail.gmail.com>
+	 <003001c4a3ba$d064fba0$8696a8c0@marcy>
+	 <320075ff0409270050bbaf228@mail.gmail.com>
+	 <1096371841.4950.5.camel@notepaq>
+	 <320075ff04092805251ce925e6@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1096374487.4649.5.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,31 +24,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Sep 2004 14:33:01 +0200
+Date: Tue, 28 Sep 2004 14:28:07 +0200
 
-Dne =FAt 28. z=E1=F8=ED 2004 14:09 jste napsal(a):
-> Hi Michal,
->
-> > I tried your latest mh patch in 2.6.9-rc2 and hotkeys stopped working. I
-> > tried to run hcidump 1.12 to get whats happens when key is pressed and
-> > then laptop totally freezes.
->
-> that is bad. Please produce an oops for me. Is vanilla 2.6.9-rc2-bk14
-> working as expected?
+Hi Nigel,
 
-Marcel how? When I start hcidump and press any key, kernel freezes - only=20
-press reset button helps. When not started, keyboard works, but hotkeys=20
-returns nothink.
-When I disconnect keyboard and move mouse or dumps rfcomm data, everything=
-=20
-works.
+> I got a lot further, I can connect to my server now; I am just left
+> with trying to understand why I can't get bridging to work.
+> 
+> I have:
+>  - router (Internet, DHCP serving 192.168.1.{100-200}) (255.255.255.0)
+>  - linux box, eth0 = 192.168.1.55 (fixed), bnep0 for bluetooth
+>  - iPaq connecting to bluetooth
+> 
+> I can talk to the server by making bnep0 192.168.*2*.254 and fixing
+> the IP address in the ipaq (or running a dchp server on linux as
+> well), but it would be nice to not have to have another dchp server.
+> 
+> I had thought I could bridge the interfaces, but I have tried lots of
+> things like
+> brctl addbr br0
+>  brctl addif br0 eth0
+>  brctl addif br0 bnep0
+> 
+> but that just leads to aggravating things like the linux box dropping
+> off the network altogether ..
 
-M.
+look at the PAN howto. It has the correct commands to setup a bridge
+when you are using Bluetooth BNEP.
 
->
-> Regards
->
-> Marcel
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
