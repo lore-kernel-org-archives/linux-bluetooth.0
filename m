@@ -1,17 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Connection pcmcia pico bluetooth and modem /
-	hciconfig: command not found
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Moni <monikahubrich@aol.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20040806T212903-229@post.gmane.org>
-References: <001601c47a50$36024fb0$8b1cb7ac@monika>
-	 <1091662770.16182.91.camel@pegasus>
-	 <loom.20040806T193121-781@post.gmane.org>
-	 <loom.20040806T212903-229@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1091877496.20839.145.camel@pegasus>
-Mime-Version: 1.0
+From: "kidd" <affix_kidd@hotmail.com>
+To: <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0026_01C47C71.C1131B20"
+Message-ID: <BAY22-DAV10ew8k69RK00007d15@hotmail.com>
+Subject: [Bluez-users] Re:BCM2035
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,24 +16,65 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 07 Aug 2004 13:18:16 +0200
+Date: Sat, 7 Aug 2004 11:29:08 +0800
 
-Hi Monika,
+This is a multi-part message in MIME format.
 
-> When I type in the command hciconfig -a to the shell (as root),
-> the shell shows me the error: command not found.
-> What can I do?
+------=_NextPart_000_0026_01C47C71.C1131B20
+Content-Type: text/plain;
+	charset="gb2312"
+Content-Transfer-Encoding: base64
 
-your SuSE 8.2 may not contain the correct BlueZ packages, so you must
-install them from the source or update to a SuSE 9.1. The source
-packages can be found at www.bluez.org/download.html and you can follow
-the instructions in the README and INSTALL file.
+VGhhbmtzIE1hcmNlbDoNCiAgVGhlcmUgYXJlIHRoZSByZWFsbHkgbWVzc2FnZSA6DQogaDRfcmVj
+djpVbmtub3duIEhDSSBwYWNrZXQgdHlwZSAwMC4NCiBEb3NlIGFueXRoaW5nIG5lZWQgdG8gY2hh
+bmdlICxwbGVhc2UgZ3VpZGUgbWUuDQoNCiBUaGFua3MgYWdhaW4uDQoga2lkZA0KLS0tLS0gT3Jp
+Z2luYWwgTWVzc2FnZSAtLS0tLSANCkZyb206ICJNYXJjZWwgSG9sdG1hbm4iIDxtYXJjZWxAaG9s
+dG1hbm4ub3JnPg0KVG86ICJraWRkIiA8YWZmaXhfa2lkZEBob3RtYWlsLmNvbT4NCkNjOiAiQmx1
+ZVogTWFpbGluZyBMaXN0IiA8Ymx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Pg0KU2Vu
+dDogRnJpZGF5LCBBdWd1c3QgMDYsIDIwMDQgNToxOCBQTQ0KU3ViamVjdDogUmU6IFtCbHVlei11
+c2Vyc10gQkNNMjAzNQ0KDQoNCj4gSGksDQo+IA0KPiA+ICAgIEkgaGF2ZSBhIGRldmVsb3BtZW50
+IGtpdCBiYXNlZCBvbiBCQ00yMDM1IGNvbnRhaW5zIGJvdGggVVNCIGFuZA0KPiA+IFVhcnQgaW50
+ZXJmYWNlLg0KPiA+ICAgIFRoZSB1c2IgaW50ZXJmYWNlIHdvcmtzIHdlbGwgaW4gYmx1ZXouYnV0
+IHRoZSBVQVJUIHNlZW1zIGNhbid0IGJlDQo+ID4gYXR0YWNoZWQgdG8gaGNpX3VhcnQgZHJpdmVy
+Lg0KPiA+ICAgIFdoZW4gSSBpbnB1dDogaGNpYXR0YWNoIHR0eVMwIGFueSAxMTUyMDAgZmxvdw0K
+PiA+ICAgIHJlc3BvbnNlIDogaGNpIHBhY2tldCBlcnJvci4NCj4gDQo+IHRoaXMgbm90IGFuIGVy
+cm9yIHJlc3BvbnNlIG9mIGhjaWF0dGFjaC4gQ29weSB0aGUgY29ycmVjdCBlcnJvciBtZXNzYWdl
+Lg0KPiANCj4gUmVnYXJkcw0KPiANCj4gTWFyY2VsDQo+IA0KPiANCj4=
 
-Regards
+------=_NextPart_000_0026_01C47C71.C1131B20
+Content-Type: text/html;
+	charset="gb2312"
+Content-Transfer-Encoding: base64
 
-Marcel
+PCFET0NUWVBFIEhUTUwgUFVCTElDICItLy9XM0MvL0RURCBIVE1MIDQuMCBUcmFuc2l0aW9uYWwv
+L0VOIj4NCjxIVE1MPjxIRUFEPg0KPE1FVEEgaHR0cC1lcXVpdj1Db250ZW50LVR5cGUgY29udGVu
+dD0idGV4dC9odG1sOyBjaGFyc2V0PWdiMjMxMiI+DQo8TUVUQSBjb250ZW50PSJNU0hUTUwgNi4w
+MC4yODAwLjE0NTgiIG5hbWU9R0VORVJBVE9SPg0KPFNUWUxFPjwvU1RZTEU+DQo8L0hFQUQ+DQo8
+Qk9EWSBiZ0NvbG9yPSNmZmZmZmY+DQo8RElWPlRoYW5rcyBNYXJjZWw6PEJSPiZuYnNwOyBUaGVy
+ZSBhcmUgdGhlIHJlYWxseSBtZXNzYWdlIA0KOjxCUj4mbmJzcDtoNF9yZWN2OlVua25vd24gSENJ
+IHBhY2tldCB0eXBlIDAwLjxCUj4mbmJzcDtEb3NlIGFueXRoaW5nIG5lZWQgdG8gDQpjaGFuZ2Ug
+LHBsZWFzZSBndWlkZSBtZS48QlI+PEJSPiZuYnNwO1RoYW5rcyBhZ2Fpbi48QlI+Jm5ic3A7a2lk
+ZDxCUj4tLS0tLSANCk9yaWdpbmFsIE1lc3NhZ2UgLS0tLS0gPEJSPkZyb206ICJNYXJjZWwgSG9s
+dG1hbm4iICZsdDs8QSANCmhyZWY9Im1haWx0bzptYXJjZWxAaG9sdG1hbm4ub3JnIj5tYXJjZWxA
+aG9sdG1hbm4ub3JnPC9BPiZndDs8QlI+VG86ICJraWRkIiANCiZsdDs8QSANCmhyZWY9Im1haWx0
+bzphZmZpeF9raWRkQGhvdG1haWwuY29tIj5hZmZpeF9raWRkQGhvdG1haWwuY29tPC9BPiZndDs8
+QlI+Q2M6IA0KIkJsdWVaIE1haWxpbmcgTGlzdCIgJmx0OzxBIA0KaHJlZj0ibWFpbHRvOmJsdWV6
+LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCI+Ymx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9y
+Z2UubmV0PC9BPiZndDs8QlI+U2VudDogDQpGcmlkYXksIEF1Z3VzdCAwNiwgMjAwNCA1OjE4IFBN
+PEJSPlN1YmplY3Q6IFJlOiBbQmx1ZXotdXNlcnNdIA0KQkNNMjAzNTxCUj48QlI+PEJSPiZndDsg
+SGksPEJSPiZndDsgPEJSPiZndDsgJmd0OyZuYnNwOyZuYnNwOyZuYnNwOyBJIGhhdmUgYSANCmRl
+dmVsb3BtZW50IGtpdCBiYXNlZCBvbiBCQ00yMDM1IGNvbnRhaW5zIGJvdGggVVNCIGFuZDxCUj4m
+Z3Q7ICZndDsgVWFydCANCmludGVyZmFjZS48QlI+Jmd0OyAmZ3Q7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+IFRoZSB1c2IgaW50ZXJmYWNlIHdvcmtzIHdlbGwgaW4gDQpibHVlei5idXQgdGhlIFVBUlQgc2Vl
+bXMgY2FuJ3QgYmU8QlI+Jmd0OyAmZ3Q7IGF0dGFjaGVkIHRvIGhjaV91YXJ0IA0KZHJpdmVyLjxC
+Uj4mZ3Q7ICZndDsmbmJzcDsmbmJzcDsmbmJzcDsgV2hlbiBJIGlucHV0OiBoY2lhdHRhY2ggdHR5
+UzAgYW55IDExNTIwMCANCmZsb3c8QlI+Jmd0OyAmZ3Q7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHJlc3Bv
+bnNlIDogaGNpIHBhY2tldCBlcnJvci48QlI+Jmd0OyANCjxCUj4mZ3Q7IHRoaXMgbm90IGFuIGVy
+cm9yIHJlc3BvbnNlIG9mIGhjaWF0dGFjaC4gQ29weSB0aGUgY29ycmVjdCBlcnJvciANCm1lc3Nh
+Z2UuPEJSPiZndDsgPEJSPiZndDsgUmVnYXJkczxCUj4mZ3Q7IDxCUj4mZ3Q7IE1hcmNlbDxCUj4m
+Z3Q7IDxCUj4mZ3Q7IA0KPEJSPiZndDs8L0RJVj48L0JPRFk+PC9IVE1MPg0K
 
-
+------=_NextPart_000_0026_01C47C71.C1131B20--
 
 
 -------------------------------------------------------
