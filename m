@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <847649876@web.de>
+Message-ID: <42036A83.8090309@web.de>
+From: Andreas Millinger <andreas.millinger@web.de>
 MIME-Version: 1.0
-From: "Martin Mueller" <Ma.Mueller@tu-bs.de>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] cross compiling bluez-utils
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: [Bluez-devel] hciattach problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,21 +16,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 04 Feb 2005 13:44:47 +0100
+Date: Fri, 04 Feb 2005 13:28:51 +0100
 
-Hi Marcel,
+Hello,
 
-> > does it make sense to change the line "sysconfdir='${prefix}/etc'" into "sysconfdir='${exec_prefix}/etc'" in the configure file? I found that useful while compiling the utils for an ARM platform. The /etc will be generated in the right place then.
-> 
-> explain what the differences are. However the acinclude.m4 is a little
-> bit more complex and there are other corner cases.
+I have also a Problem with hciattach. As written in a Thread befor a kill of hciattach causes a System freez. Also the System hangs, when I want to shutdown the System at shuting down PCMCIA. I have tested with different kernels an bluez-utils/lib versions. I have found out, that with kernel 2.6.10 and bluez-utils/lib 2.14 the problem isn't there. With patch mh1 it works also. But with patch mh2 or kernel 2.6.11-rc2 or with kernel 2.6.10 and utils/lib 2.15 the freez is also there. I have a 3com Version 3 PCMCIA Card.
 
-just curious - I have no real idea what I am doing... If I compile it the way it is the /etc/bluetooth/ files will be generated in the cross compiler folders. It looks a little lost there. If I change that to the exec_prefix area, it will be directly put into my ramdisk where the /sbin files and all the rest go.
+Best regards
 
-Martin
-______________________________________________________________
-Verschicken Sie romantische, coole und witzige Bilder per SMS!
-Jetzt bei WEB.DE FreeMail: http://f.web.de/?mc=021193
+Andreas
+
+
 
 
 
