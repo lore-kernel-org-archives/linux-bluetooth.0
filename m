@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Mathias Adam <a2@adamis.de>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Socket CF PCMCIA
-Message-ID: <20050304203308.GB3984@adamis.de>
-References: <20050304164826.44066.qmail@web40605.mail.yahoo.com> <1109965361.8058.95.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050304164826.44066.qmail@web40605.mail.yahoo.com>
+References: <20050304164826.44066.qmail@web40605.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1109965361.8058.95.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1109965361.8058.95.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,31 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 4 Mar 2005 21:33:09 +0100
+Date: Fri, 04 Mar 2005 20:42:41 +0100
 
-On 04.03.05 20:42:41, Marcel Holtmann wrote:
-> there are problems with the 2.6 kernel, but nobody knows for sure what
-> and where the problems are.
+Hi Andrea,
 
-I asked here last week about the same problems with the socket bt card
-and 2.6 and didn't succeed yet.
-It seems that it's a problem within the 8250 serial driver (got that
-from the linux-pcmcia mailing list). I'm still investigating a little
-about that but don't think that I'll find a solution as I'm no linux
-kernel expert...
+> Hi, i've a 2.6.10 kernel from fedora  project
+> (FC2)..and a Zaurus SL6000..i've tried the CF on the
+> zaurus without succes..so i tried it on my laptop
+> (usually i use Bluez throught an USB dongle, adn wokrs
+> fine). I plug the CF, serial_cs is laoded, i try
+> hciattach but fails.
+> Somebody could explain to me how  can i make working
+> the CF...step by step?!Because i don't know where
+> smashing my head..
 
+there are problems with the 2.6 kernel, but nobody knows for sure what
+and where the problems are.
 
 Regards
 
-Mathias
+Marcel
 
 
---=20
-Zwei Dinge sind zu unserer Arbeit n=F6tig: Unerm=FCdliche Ausdauer und di=
-e
-Bereitschaft, etwas, in das man viel Zeit und Arbeit gesteckt hat,
-wieder wegzuwerfen.                                      - Albert Einstei=
-n
 
 
 -------------------------------------------------------
