@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+Message-ID: <41A234FA.7020303@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Message-Id: <20041123014732.3a03b10e.henryk@ploetzli.ch>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="pgp-sha1";
- boundary="Signature=_Tue__23_Nov_2004_01_47_32_+0100_Yp/O6Dh8y4VQE+6E"
-Subject: [Bluez-devel] SBC packer done, kind of
+Subject: Re: [Bluez-devel] audio problems with a2play
+References: <41A22C0B.4050008@xmission.com>
+In-Reply-To: <41A22C0B.4050008@xmission.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,45 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Nov 2004 01:47:32 +0100
+Date: Mon, 22 Nov 2004 11:50:34 -0700
 
---Signature=_Tue__23_Nov_2004_01_47_32_+0100_Yp/O6Dh8y4VQE+6E
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+hey
 
-Moin,
+> * how did you decide to put 2 0xff bytes in the CSRC section of the 
+> media packet header? Why isn't this CSRC a multiple of 4 bytes like the 
+> spec suggests on avdtp p. 46?
+> 
+> * what is the CSRC? (spec says "The CSRC list identifies the 
+> contributing sources for the payload contained in this packet")
 
-Ok, I'm now basically finished with sbc_pack_frame (joint stereo is not
-handled yet). Though I tested it only with mono and two simple test
-signals (one impulse and a sawtooth) because I can't load audio data
-from files. (Marcel?)
+csrc wasn't the right thing to look into... the csrc count (cc) is 0, so 
+if I'm reading this right, the two 0xff values are actually bleeding 
+into the payload header and the first byte of the payload.
 
-Next thing (after joint stereo) would be some cleanup of sbc.c and
-finally convertion to kernel indentation. I tried the Lindent script but
-don't like what it does to the code, because most of it is nested in
-some kind of for(blk ..) { for(ch ..) { for(sb ..) { ... } } } structure
-and wasting a full 8 columns (out of the precious 80) for each of those
-loops doesn't feel right to me.
-
---=20
-Henryk Pl=F6tz
-Gr=FC=DFe aus Berlin
-~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
-~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
-
---Signature=_Tue__23_Nov_2004_01_47_32_+0100_Yp/O6Dh8y4VQE+6E
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-
-iD8DBQFBooipIjWgKE0OA2gRAqJsAKCzwbw8Wb5jGxiG07Rw8Da+uS722wCgwMAt
-ZhOrZier+RwSiW2cKJtTOtc=
-=DrYM
------END PGP SIGNATURE-----
-
---Signature=_Tue__23_Nov_2004_01_47_32_+0100_Yp/O6Dh8y4VQE+6E--
+brad
 
 
 -------------------------------------------------------
