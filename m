@@ -1,17 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm socket message: function not implemented
+Subject: Re: [Bluez-users] Selection of PtP connection type
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Zbigniew Diaczyszyn (gmx)" <z.dia@gmx.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <000b01c3fa66$4dccee30$4c4bb850@ULLA>
-References: <000d01c3f343$d89f1ad0$e04db850@ULLA>
-	 <1076855680.14758.55.camel@pegasus>  <000b01c3f599$04aaf520$de4bb850@ULLA>
-	 <1077058491.2665.131.camel@pegasus>  <003b01c3f65e$371ef400$dc4db850@ULLA>
-	 <1077147114.2685.11.camel@pegasus>  <000601c3f8c9$98e2c820$3d4bb850@ULLA>
-	 <1077415764.2716.21.camel@pegasus>  <000b01c3f98e$697f79a0$494db850@ULLA>
-	 <1077486947.2832.20.camel@pegasus>  <000b01c3fa66$4dccee30$4c4bb850@ULLA>
+To: Pavel Ruzicka <pavouk@pavouk.org>
+Cc: Simi Winiker <simi@winiker.ch>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200402240031.54845.pavouk@pavouk.org>
+References: <200402230026.24596.pavouk@pavouk.org>
+	 <1077521957.1788.7.camel@kant.winiker.ch>
+	 <200402240031.54845.pavouk@pavouk.org>
 Content-Type: text/plain
-Message-Id: <1077580779.2880.4.camel@pegasus>
+Message-Id: <1077580666.2880.1.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -23,20 +21,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 24 Feb 2004 00:59:39 +0100
+Date: Tue, 24 Feb 2004 00:57:46 +0100
 
-Hi Zbigniew,
+Hi Pavel,
 
-> So I will not lose hope to get working the BT interface ...
+> I created /etc/sysconfig/network-scripts/ifcfg-bnep0
+> -------------------------
+> DEVICE=bnep0
+> BOOTPROTO=static
+> IPADDR=192.168.130.1
+> NETMASK=255.255.255.0
+> ONBOOT=no
+> -------------------------
+> When I want to connect, I must run on desktop  "pand -s -rNAP", next run
+> "connect" on Zaurus, and next "ifup bnep0" on desktop.
 > 
-> Attached you will find the binary file in hcidump.log and the files for the pinhelper-stuff: bluepin is just an cat-command.
+> How can I automate process on desktop side?
 
-the /bin/bluepin script should look like this
-
-	#!/bin/sh
-	echo "PIN:0000"
-
-and you must make sure that the script is executable.
+you can start pand from an init script. The automatic ifup is specific
+to your distribution.
 
 Regards
 
