@@ -1,18 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jean Tourrilhes <jt@hpl.hp.com>
-Cc: Max Krasnyansky <maxk@qualcomm.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040204214541.GA20129@bougret.hpl.hp.com>
-References: <20040204015825.GA2217@bougret.hpl.hp.com>
-	 <1075879044.13285.151.camel@pegasus>
-	 <20040204175832.GB16590@bougret.hpl.hp.com>
-	 <1075924727.2783.47.camel@pegasus>
-	 <20040204214541.GA20129@bougret.hpl.hp.com>
-Content-Type: text/plain
-Message-Id: <1075942818.2783.70.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: L2CAP non-blocking socket nasty race conditions
+From: "Petri T. Koistinen" <petri.koistinen@iki.fi>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <Pine.LNX.4.58.0402050206210.3075@dsl-hkigw4m08.dial.inet.fi>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-devel] [PATCH] Bluetooth URL updates: www.bluez.org
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,46 +15,123 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 05 Feb 2004 02:00:18 +0100
+Date: Thu, 5 Feb 2004 02:35:52 +0200 (EET)
 
-Hi Jean,
+Hi!
 
-> 	I could find an informal arrangement if you want my code, like
-> "for your eyes only", but it's also not totally trivial to setup.
+Little updates, don't know if these are correct, but at least
+bluez.sourceforge.net seems to redirect to www.bluez.org.
 
-not needed, because it is very clear where the problem is. But thanks
-for the offer.
+Petri
 
-> 	Yes, the accept() code is right, what's wrong is obviously the
-> "poll" code that should not indicate socket readyness before the
-> socket is really ready.
-> 	The more "correct" way would be to change the "poll()" code to
-> really test child socket readyness instead of just testing
-> sk_ack_backlog. But, the poll code would get very ugly quickly.
-> 	One of the simplest way would be to increase sk_ack_backlog
-> only when the socket change to the BT_CONNECTED state (as opposed to
-> immediately when we add it to the parent queue). I would need to
-> understand where and how exactly is sk_ack_backlog used.
-> 	Another solution if we can't use sk_ack_backlog is to use our
-> own counter to count the number of child ready, or a flag, or whatever
-> mechanism.
+--- linux-2.6/drivers/bluetooth/Kconfig.orig	2004-02-05 02:24:39.000000000 +0200
++++ linux-2.6/drivers/bluetooth/Kconfig	2004-02-05 02:25:08.000000000 +0200
+@@ -113,7 +113,7 @@
+ 	     HP Bluetooth Card
 
-I don't see what sk_ack_backlog have to do with it. Can you explain this
-to me?
+ 	  The HCI BT3C driver uses external firmware loader program provided in
+-	  the BlueFW package. For more information, see <http://bluez.sf.net>.
++	  the BlueFW package. For more information, see <http://www.bluez.org/>.
 
-I haven't tested this yet, but I think the problem is the extra check in
-bt_sock_poll() for the accept_q:
-
-        if (!skb_queue_empty(&sk->sk_receive_queue) || 
-                        !list_empty(&bt_sk(sk)->accept_q) ||
-                        (sk->sk_shutdown & RCV_SHUTDOWN))
-                mask |= POLLIN | POLLRDNORM;
-
-Regards
-
-Marcel
+ 	  Say Y here to compile support for HCI BT3C devices into the
+ 	  kernel or say M to compile it as module (bt3c_cs).
 
 
+--- linux-2.6/net/bluetooth/Kconfig.orig	2004-02-05 02:14:50.000000000 +0200
++++ linux-2.6/net/bluetooth/Kconfig	2004-02-05 02:17:46.000000000 +0200
+@@ -29,7 +29,7 @@
+ 	  To use Linux Bluetooth subsystem, you will need several user-space
+ 	  utilities like hciconfig and hcid.  These utilities and updates to
+ 	  Bluetooth kernel modules are provided in the BlueZ packages.
+-	  For more information, see <http://bluez.sourceforge.net/>.
++	  For more information, see <http://www.bluez.org/>.
+
+ 	  If you want to compile Bluetooth Core as module (bluetooth) say M here.
+
+
+--- linux-2.6/net/bluetooth/bnep/Kconfig.orig	2004-02-05 02:05:01.000000000 +0200
++++ linux-2.6/net/bluetooth/bnep/Kconfig	2004-02-05 02:05:40.000000000 +0200
+@@ -8,8 +8,7 @@
+ 	  PAN (Personal Area Network).
+
+ 	  To use BNEP, you will need user-space utilities provided in the
+-	  BlueZ-PAN package.
+-	  For more information, see <http://bluez.sourceforge.net>.
++	  BlueZ-PAN package. For more information, see <http://www.bluez.org/>.
+
+ 	  Say Y here to compile BNEP support into the kernel or say M to
+ 	  compile it as module (bnep).
+
+
+--- linux-2.6/MAINTAINERS.orig	2004-02-05 02:10:04.000000000 +0200
++++ linux-2.6/MAINTAINERS	2004-02-05 02:11:47.000000000 +0200
+@@ -343,7 +343,7 @@
+ P:	Maxim Krasnyansky
+ M:	maxk@qualcomm.com
+ L:	bluez-devel@lists.sf.net
+-W:	http://bluez.sf.net
++W:	http://www.bluez.org/
+ S:	Maintained
+
+ BLUETOOTH RFCOMM LAYER
+@@ -351,7 +351,7 @@
+ M:	marcel@holtmann.org
+ P:	Maxim Krasnyansky
+ M:	maxk@qualcomm.com
+-W:	http://bluez.sf.net
++W:	http://www.bluez.org/
+ S:	Maintained
+
+ BLUETOOTH BNEP LAYER
+@@ -359,7 +359,7 @@
+ M:	marcel@holtmann.org
+ P:	Maxim Krasnyansky
+ M:	maxk@qualcomm.com
+-W:	http://bluez.sf.net
++W:	http://www.bluez.org/
+ S:	Maintained
+
+ BLUETOOTH CMTP LAYER
+@@ -373,7 +373,7 @@
+ M:	marcel@holtmann.org
+ P:	Maxim Krasnyansky
+ M:	maxk@qualcomm.com
+-W:	http://bluez.sf.net
++W:	http://www.bluez.org/
+ S:	Maintained
+
+ BLUETOOTH HCI UART DRIVER
+@@ -381,7 +381,7 @@
+ M:	marcel@holtmann.org
+ P:	Maxim Krasnyansky
+ M:	maxk@qualcomm.com
+-W:	http://bluez.sf.net
++W:	http://www.bluez.org/
+ S:	Maintained
+
+ BLUETOOTH HCI BCM203X DRIVER
+@@ -423,7 +423,7 @@
+ BLUETOOTH HCI VHCI DRIVER
+ P:	Maxim Krasnyansky
+ M:	maxk@qualcomm.com
+-W:	http://bluez.sf.net
++W:	http://www.bluez.org/
+ S:	Maintained
+
+ BONDING DRIVER
+
+
+--- linux-2.6/CREDITS.orig	2004-02-05 02:22:13.000000000 +0200
++++ linux-2.6/CREDITS	2004-02-05 02:23:14.000000000 +0200
+@@ -1728,7 +1728,7 @@
+ N: Maxim Krasnyansky
+ E: maxk@qualcomm.com
+ W: http://vtun.sf.net
+-W: http://bluez.sf.net
++W: http://www.bluez.org/
+ D: Author of the Universal TUN/TAP driver
+ D: Author of the Linux Bluetooth Subsystem (BlueZ)
+ D: Various other kernel patches, cleanups and fixes
 
 
 -------------------------------------------------------
