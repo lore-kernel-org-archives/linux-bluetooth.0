@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200404120349.34338.wim.delvaux@adaptiveplanet.com>
-Subject: [Bluez-devel] 2.6.5 problems turned to 2.6.3 but also problems
+Subject: Re: [Bluez-devel] RFCOMM problemms
+From: Marcel Holtmann <marcel@holtmann.org>
+To: zubiwat@poczta.onet.pl
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040410173436Z154500-21126+67709@kps2.test.onet.pl>
+References: <20040410173436Z154500-21126+67709@kps2.test.onet.pl>
+Content-Type: text/plain
+Message-Id: <1081703869.5398.82.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,50 +18,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 12 Apr 2004 03:49:34 +0200
+Date: Sun, 11 Apr 2004 19:17:50 +0200
 
-Hi all,
+Hi Maciej,
 
-I have checked the devel list like greg pointed me out and after applying all 
-patches but with no help I turned back to 2.6.3.
+> I have problems with a connection through RFCOMM. I have ACL and L2CAP
+> channels but when I'm trying to make connection using RFCOMM it doesn't want
+> to answer - I mean remote BT device.
+> I'm sending SABM packet to start multiplexer working. According to
+> specification I should wait for UA packet but I can't get this packet.
+> Remote device is silent until it sends me disconnection request and is
+> closing ACL channel.
+> What can be the cause of this, why the remote device doesn't want to answer
+> with UA.
+> If any one knows why it's happening like this then please tell me because I
+> looked almost every where and I couldn't find a solution.
+> It's very important to me !!!
 
-However There I get bluetooth errors too.
+please stop posting non BlueZ related question like this to our mailing
+lists. I already told you that I am not going to answer them and as you
+have seen nobody else do. Everything you need to know is written in the
+Bluetooth specification and with hcidump you can see how BlueZ treats
+RFCOMM connections.
 
-hci_usb_isoc_rx_submit : hci0 isoc rx submit failed urb cec4e814 err -22
+Regards
 
-Two times
+Marcel
 
-removing the usb dongle causes a kernel oops
 
-call trace is  (Typed over by hand)
 
-EIP is at uhci_remove_pending_qhs+0x63/0xb8 [uhci_hcd]
-...
-process : hcid
-
-calltrace :
-
-	uhci_irq+0x90/0x159 [uhci_hcd]
-	usb_hcd_irq+0x36/0x67 [usbbcore]
-	handle_IRQ_event+0x3a/0x64
-	do_IRQ+0x94/0x136
-	common_interrupt+0x18/0x20
-
-That means that for I do not know what reason my two systems are completely 
-messed up because of usb/bluetooth problems (*** crying tears like rivers 
-***)
-
-I tried with 2.4.25/2.4.26-rc2 2.6.3/2.6.5 and mm  and even applied patches on 
-bluez download site
-
-Then I can insert my dongle but when I unplug I get A WHOLE LOT of 
-
-'bad atomic while scheduling'
-and a call trace with top function schedule
-
-HELP
-
-W
 
 
 -------------------------------------------------------
