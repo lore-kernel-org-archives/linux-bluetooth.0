@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Michael Zanetti <michael_zanetti@gmx.net>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <41B88BFD.8000907@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200412091834.34528.michael_zanetti@gmx.net>
-Subject: [Bluez-devel] snd-bt-sco
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re: starting btsco-in-libalsa
+References: <41B81ACB.1080807@xmission.com> <1102589835.9988.114.camel@pegasus> <41B83BA8.5010001@suche.org>
+In-Reply-To: <41B83BA8.5010001@suche.org>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,22 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 9 Dec 2004 18:34:34 +0100
+Date: Thu, 09 Dec 2004 10:31:41 -0700
 
-Hi!
+Thomas,
 
-I've got a Logitech HS01 Bluetooth Headset and it works with the Bluetooth 
-Alsa drivers except the Mic produces a noise so that recording or Skypeing is 
-nearly impossible.
+> i think this goes to the wrong direction.
+> 1. Even if there exist alsa library for many programms it is sufficent 
+> to use /dev/dsp and /dev/audio.
+> This mean that the soundcard driver should work independent of the alsa 
+> library.
+...
+> So what are the grounds for moving btsco to the lib inseat of moving it 
+> to the module ?
 
-I've installed kernel-2.6.9-gentoo-r9, patched it with the patch on the Bluez 
-homepage and installed btsco-cvs-0.2.
+I think Marcel explained sufficiently that this is how we can get 
+handsfree and a2dp profiles working properly in the audio driver.
 
-Any ideas how to stop that noise?
+When we get the libalsa stuff going, there will be overlap in function 
+with the current kernel module and daemon, but we can keep the kernel 
+module in our project. As with everything open source, it'll be 
+maintained by people who care about it.
 
-Thank you all for your great job on this Bluetooth Project!!!
-
-Michael
+Brad
 
 
 -------------------------------------------------------
