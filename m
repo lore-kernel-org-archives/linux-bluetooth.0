@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <ac72cfc80502190517509a7859@mail.gmail.com>
-From: Emiliano Heyns <emiliano.heyns@gmail.com>
+Message-ID: <421735F6.2050300@debiancolombia.org>
+From: "Fredy P." <digitalfredy@debiancolombia.org>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] hcitool scan times
-In-Reply-To: <4216700F.5010106@gmx.ch>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <ac72cfc805021801246a15de74@mail.gmail.com>
-	 <421638BC.2020808@gmx.ch> <ac72cfc8050218143042696ba4@mail.gmail.com>
-	 <4216700F.5010106@gmx.ch>
+Content-Type: text/plain;
+	charset=ISO-8859-1;
+	format=flowed
+Subject: [Bluez-users] bluez logo
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,55 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 19 Feb 2005 14:17:17 +0100
+Date: Sat, 19 Feb 2005 07:49:58 -0500
 
-On Fri, 18 Feb 2005 23:45:35 +0100, Marco Trudel <mtrudel@gmx.ch> wrote:
-> > OK, thanks. This could actually work to my benefit if I disable the
-> > hcitool cache --
-> 
-> you're welcome...
-> 
-> > the device could take the time the user takes from
-> > walking into range to being at the device for detecting,
-> 
-> I don't know what you mean with this...
->
->  > if you walk
-> > out of range before that you were only passing the device. Good. Now I
-> > only have to look at average office walking speeds to see how great I
-> > want this radius to be :)
-> 
-> I don't understand that as well, but it sounds very interesting. Can you
-> explain what you're doing? Just curious...
+Hi all!
+I make any desings for the bluetooth logo ( http://pwp.etb.net.co/pulidol=
+opez/img/bluez/ ), what do=20
+you think about it?
 
-We have a kiosk where you have to select your name from a list before
-you can do anything useful. You pick your name from a scrollist. What
-I want to try is to install a bluetooth adapter on the device, allow
-people to register their BT toys (phone, palm, whatever), and have the
-device scan for BT devices in the vicinity. If it recognizes a
-registered device, it could pre-select your name from the list, for
-convenience.
+--=20
+Suerte and F.S.Fv.
 
-If BT scan was super-fast, anyone standing at the device would be
-bothered by anyone else passing by with a BT gadget active. With a 13
-sec discovery time, and given the right range,  passers-by would be
-out of range before actually being picked up. And if the range is just
-wide enough, the scan would start at the edge of that range, and would
-finish some seconds after you're standing at the device. It'd take
-some tweaking, but since people usually slow their pace before
-stopping, it could work.
+ATT: Fredy P.
+___________________________________________________
+F.S.Fv. es acr=F3nimo de Free Software Forever
+http://www.fsf.org/philosophy/free-sw.es.html
 
- > by the way: do you know that a device does not have to answer to an
-> inquiry? if a device is busy or just decides to not answer to an inquiry,
-> that's ok (defined in bluetooth specification, my experience showed this as
-> well)...
-
-If we'll be using this (it's just a friday afternoon experiment at
-this point) it's just an add-on for convenience. There will actually
-only be a minority of our users that will be carrying active BT
-gadgets.
-
-Emiliano
+Normas b=E1sicas de comportamiento en el ciberespacio
+http://www.netiqueta.org/
 
 
 -------------------------------------------------------
