@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jeff Sutherland <jeffs@fairwayacademy.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Message-ID: <002801c3f55d$e5c9d800$7b6b7b8c@guang>
+From: "Guang" <m9187@cn.ee.ccu.edu.tw>
+To: <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200402170924.31121.jeffs@fairwayacademy.org>
-Subject: [Bluez-users] Mysterious problem with l2test on Coldfire 5282
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0025_01C3F5A0.F39DBF80"
+Subject: [Bluez-users] headset connection problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,26 +16,123 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Feb 2004 09:24:31 -0500
+Date: Tue, 17 Feb 2004 21:56:52 +0800
 
-Using the l2test program on Motorola 5282 (uClinux) I have a strange behaviour 
-when using l2test -s from the Moto board.  Using the -d (dump) mode to 
-receive packets from a PC running l2test I see what appears to be the packet 
-sequence number in the first 4 bytes of data (little endian), followed by a 2 
-byte packet length, then data payload.  When dumping data from the PC the 
-packet sequence number increments by 1 each time, which, I believe, is the 
-expected behaviour.  However, when sending from the Moto board to the PC, the 
-packet sequence number increments by 4 each time. ?????  L2test send looks 
-ok, the sequence number is just seq++; so something must be going on in hcid, 
-right?  Or maybe it's dropping 3 out of 4 send packets for some reason.  
-Maybe something cocked up with the socket ops in l2test?  ?????  Debugging 
-pointers, please...
+This is a multi-part message in MIME format.
 
--Jeff
--- 
-Secure your email with Gnu Privacy Guard and Mozilla, the open source
-cross platform solution for Windows, Linux, and Mac OS X.
-See http://enigmail.mozdev.org/
+------=_NextPart_000_0025_01C3F5A0.F39DBF80
+Content-Type: text/plain;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+Hi  everybody:
+I  find  a small problem which  Bluez communicate to headset.
+ I  have a PC(red hat linux8.0), and headset( sony ericsson HBH-65).
+And I inital bluez;
+[root@Bluez bluetooth}#  hcid
+[root@Bluez bluetooth}#  hciconfig
+hci0:  Type:USB
+          BD Address:  00:AA:.................
+
+[root@Bluez bluetooth}#  hcitool  scan
+Scanning ...
+               00:0A:0A:AA:AA:AA     HBH-65
+
+[root@Bluez bluetooth}# modprobe  l2cap
+[root@Bluez bluetooth}#  modprobe  rfcomm
+[root@Bluez bluetooth}#  l2ping 00:0A:0A:AA:AA:AA
+Can't connect. : Permission denied
+[root@Bluez bluetooth}# sdptool browse 00:0A:0A:AA:AA:AA
+Failed to connect to SDP server on 00:0A:0A:AA:AA:AA  : Permission =
+denied
+
+What   is   happen?  Why  does headset deny permission? Should I enter  =
+PIN number to tell headset ,or  others solution?
+
+Please help me , thank you very much.
+
+
+
+
+
+
+
+
+
+
+
+------=_NextPart_000_0025_01C3F5A0.F39DBF80
+Content-Type: text/html;
+	charset="big5"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dbig5">
+<META content=3D"MSHTML 6.00.2800.1400" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT size=3D2>Hi&nbsp; everybody:</FONT></DIV>
+<DIV><FONT size=3D2>I&nbsp; find&nbsp; a small problem&nbsp;which =
+&nbsp;Bluez=20
+communicate to headset.</FONT></DIV>
+<DIV><FONT size=3D2>&nbsp;I&nbsp; have a PC(red hat linux8.0), and =
+headset(=20
+sony&nbsp;ericsson HBH-65).</FONT></DIV>
+<DIV><FONT size=3D2>And I inital bluez;</FONT></DIV>
+<DIV><FONT size=3D2>[root@Bluez bluetooth}#&nbsp; hcid</FONT></DIV>
+<DIV><FONT size=3D2>[root@Bluez =
+bluetooth}#&nbsp;&nbsp;hciconfig</FONT></DIV>
+<DIV><FONT size=3D2>hci0:&nbsp; Type:USB</FONT></DIV>
+<DIV><FONT =
+size=3D2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BD=20
+Address:&nbsp; 00:AA:.................</FONT></DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2>[root@Bluez bluetooth}#&nbsp; hcitool&nbsp; =
+scan</FONT></DIV>
+<DIV><FONT size=3D2>Scanning ...</FONT></DIV>
+<DIV><FONT=20
+size=3D2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;=20
+00:0A:0A:AA:AA:AA&nbsp;&nbsp;&nbsp;&nbsp; HBH-65</FONT></DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2>
+<DIV><FONT size=3D2>[root@Bluez bluetooth}#&nbsp;modprobe&nbsp; =
+l2cap</FONT></DIV>
+<DIV><FONT size=3D2>[root@Bluez bluetooth}#&nbsp; modprobe&nbsp;=20
+rfcomm</FONT></DIV></FONT></DIV>
+<DIV><FONT size=3D2>
+<DIV><FONT size=3D2>
+<DIV><FONT size=3D2>[root@Bluez bluetooth}#&nbsp; l2ping=20
+00:0A:0A:AA:AA:AA</FONT></DIV>
+<DIV><STRONG><EM>Can't connect. : Permission denied</EM></STRONG></DIV>
+<DIV><FONT size=3D2>[root@Bluez bluetooth}#&nbsp;sdptool browse=20
+00:0A:0A:AA:AA:AA</FONT></DIV>
+<DIV><STRONG>Failed to connect to SDP server on 00:0A:0A:AA:AA:AA&nbsp; =
+:=20
+Permission denied</STRONG></DIV></FONT></DIV></FONT></DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2>What&nbsp;&nbsp; is&nbsp;&nbsp; happen?&nbsp; =
+Why&nbsp; does=20
+headset deny permission?&nbsp;Should I enter &nbsp;PIN number to tell =
+headset=20
+,or&nbsp; others solution?</FONT></DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2>Please help me , thank you very much.</FONT></DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT size=3D2></FONT>&nbsp;</DIV></BODY></HTML>
+
+------=_NextPart_000_0025_01C3F5A0.F39DBF80--
 
 
 
