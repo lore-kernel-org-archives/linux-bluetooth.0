@@ -1,46 +1,36 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <416A35E4.209@yahoo.co.uk>
-From: Jurgens du Toit <dutoitjj@yahoo.co.uk>
+Return-Path: <krose@jihl.valley-of-wind.krose.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] AMD64 HID pairing
+References: <khnacuya23u.fsf@hunter-killer.kendall.corp.akamai.com>
+	<1097185188.7325.75.camel@pegasus>
+	<khnr7oa8ah1.fsf@hunter-killer.kendall.corp.akamai.com>
+	<1097186322.7325.79.camel@pegasus>
+	<khnk6u289o5.fsf@hunter-killer.kendall.corp.akamai.com>
+	<87ekk82ar4.fsf@nausicaa.krose.org> <1097342518.12972.3.camel@pegasus>
+	<87zn2v1xry.fsf@nausicaa.krose.org> <1097359976.12972.5.camel@pegasus>
+	<877jpz1ath.fsf@nausicaa.krose.org>
+	<1097395131.12972.20.camel@pegasus>
+From: Kyle Rose <krose@krose.org>
+Date: Sun, 10 Oct 2004 18:05:09 -0400
+In-Reply-To: <1097395131.12972.20.camel@pegasus> (Marcel Holtmann's message of
+	"Sun, 10 Oct 2004 09:58:51 +0200")
+Message-ID: <87acuu6xgq.fsf@jihl.valley-of-wind.krose.org>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] bluez sdp and kernel
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 11 Oct 2004 09:27:32 +0200
+Content-Type: text/plain; charset=us-ascii
+Sender: Kyle Rose <krose@jihl.valley-of-wind.krose.org>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi.
+Marcel Holtmann <marcel@holtmann.org> writes:
 
-I'm trying to compile a multisync plugin, but it complains that it can't 
-find the bluez-kernel and bluez-sdp packages. I looked on bluez's site, 
-but can't find any references to these packages there. I googled, but 
-only found some debian packages.
+> Do you tried the bluez-utils from CVS?
 
-What gives?
-Jrgns
--- 
-We are not enemies, but friends. We must not be enemies. Though passion 
-may have strained, it must not break, our bonds of affection. The mystic 
-chords of memory, stretching from every battle-field and patriot grave 
-to every living heart and hearthstone all over this broad land, will yet 
-swell the chorus of the Union when again touched, as surely they will 
-be, by the better angels of our nature.
+Well, I'll be a sonofabitch.  With the CVS bluez-utils, it works
+fine.  I'd be interested in figuring out what made the difference.  I
+may just try recompiling Debian's source package with gcc-3.4 to see
+if the compiler makes the difference.
 
+Thanks, Marcel.
 
--------------------------------------------------------
-This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
-Use IT products in your business? Tell us what you think of them. Give us
-Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
-http://productguide.itmanagersjournal.com/guidepromo.tmpl
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Cheers,
+Kyle
