@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Sebastian Roth <sebastian.roth@esk.fhg.de>
-Message-ID: <ctob73$ph0$1@sea.gmane.org>
-References: <41FA06A5.3010904@tootai.net> <ctdn6n$sqs$1@sea.gmane.org> <41FE4744.5010804@tootai.net>
+Subject: Re: [Bluez-users] Bnep/Broadcast
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41FFAE36.4070400@student.ethz.ch>
+References: <41FF8E7E.9000509@student.ethz.ch>
+	 <1107267619.9652.31.camel@pegasus>  <41FFA828.9050109@student.ethz.ch>
+	 <1107274227.9652.52.camel@pegasus>  <41FFAE36.4070400@student.ethz.ch>
+Content-Type: text/plain
+Message-Id: <1107275618.9652.59.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-In-Reply-To: <41FE4744.5010804@tootai.net>
-Subject: [Bluez-users] Re: Connection issue with headset
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,32 +20,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 01 Feb 2005 17:37:11 +0100
+Date: Tue, 01 Feb 2005 17:33:38 +0100
 
-Hi Daniel,
+Hi Patrick,
 
->>> nomade:/home/dh# btsco 00:0b:2e:06:01:2e
->>> Device is 1:0
->>> Voice setting: 0x0060
->>> RFCOMM channel 6 connected
->>
->>
->> You have to press the headset button now!
-I wanted to say that you have to press the button like on a cd-player.
-First turn on your cd-player or headset ;-) then start btsco and now
-push the button once more!
+> ...thank you for the answer marce. The reason I ask all this stuff is 
+> because I heard in Bluetooth is there is some pico-wide broadcast 
+> mechanism called ASB or Active Slave Broadcast and I wondered how this 
+> is mapped to Bnep.
 
+there is no mapping. BNEP is point-to-point and then you use TCP/IP on
+top of it.
 
-> I check further and still I can't get it work. If I do a hcitool scan no
-> device is found. But the info command is working:
-My headset has a so called "scan mode". I have to turn it off and press
-the button for a long time. Now the LED is blinking alternately red and
-green. Only in this mode it show's up on hcitool scan! btw no address
-is needed when scanning for devices.
-$ hcitool scan
+Regards
 
-Regards,
-Sebastian
+Marcel
+
 
 
 
