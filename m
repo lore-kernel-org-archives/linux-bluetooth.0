@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20040430122351.GA30746@gmx.net>
+From: Kyler Laird <Kyler@Lairds.com>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] What Bluetooth CF cards do developers use?
+Message-ID: <20040429192040.GD6969@snout>
+Reply-To: kyler-dated-1083525592.1d1452@lairds.com
+References: <20040428135604.GD1862@snout> <1083161388.4000.40.camel@pegasus> <20040428141637.GE1862@snout> <1083162180.4000.45.camel@pegasus> <20040429181311.GN1862@snout> <1083265520.4000.114.camel@pegasus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] HCI RESET with CSR
+In-Reply-To: <1083265520.4000.114.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,16 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 30 Apr 2004 14:23:51 +0200
+Date: Thu, 29 Apr 2004 14:20:40 -0500
 
-Hi,
+On Thu, Apr 29, 2004 at 09:05:20PM +0200, Marcel Holtmann wrote:
 
-i am a bit curious whether anyone else experiencing the problem that the
-dongle doesn't answer after the HCI_RESET command was issued. In the
-Changelog of 2.6.4-rc3 is a note about this problem with CSR chip and
-firmware prior 12.X. But I still see this problem with 16.4.
+> Right now 2.6.5-mh3 and 2.6.6-rc2 has every needed fix in it,
 
-nicholas
+Oh...I've been using 2.6.5-mh3.
+
+I suppose I should provide some information?
+
+--kyler
+
 
 
 -------------------------------------------------------
