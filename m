@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42272E36.3070503@tomtom.com>
-From: Dimitry Andric <dimitry.andric@tomtom.com>
-MIME-Version: 1.0
+Message-ID: <d1f423d3050304053873e95ba1@mail.gmail.com>
+From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/mixed;
- boundary="------------030803030000040302090002"
-Subject: [Bluez-devel] sdptool segfaults
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] Crosscompiling Bluez - Tutorial
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,154 +16,186 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 03 Mar 2005 16:33:10 +0100
+Date: Fri, 4 Mar 2005 08:38:26 -0500
 
-This is a multi-part message in MIME format.
---------------030803030000040302090002
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi folks,
 
-Hi,
 
-I'm getting a weird segfault in sdptool, when I'm browsing the DUN
-service of a Samsung D500.  It crashes in sdp_get_profile_descs:
+I made a short tutorial of how compiling Bluez to ARM plataform using
+the Scratchbox Crosscompiling environment. Maybe someone can think it
+is usefull. Any sugestiong will be welcome.
 
-(gdb) run search --bdaddr 00:12:47:11:0B:06 DUN
-Starting program: /bin/sdptool search --bdaddr 00:12:47:11:0B:06 DUN
-Searching for DUN on 00:12:47:11:0B:06 ...
-Service Name: Dial-up networking
-Service RecHandle: 0x10002
-Service Class ID List:
- "Dialup Networking" (0x00001103)
-Protocol Descriptor List:
- "L2CAP" (0x00000100)
- "RFCOMM" (0x00000003)
-   Channel: 4
 
-Program received signal SIGSEGV, Segmentation fault.
-sdp_get_profile_descs (rec=0x28a58, profDescSeq=0xbefffcec)
-   at /home/dim/src/bluez/bluez-libs/src/sdp.c:1528
-1528                    sdp_data_t *pVnum = seq->val.dataseq->next;
-(gdb) bt
-#0  sdp_get_profile_descs (rec=0x28a58, profDescSeq=0xbefffcec)
-   at /home/dim/src/bluez/bluez-libs/src/sdp.c:1528
-#1  0x0000a6a4 in print_service_attr (rec=0x2aab0)
-   at /home/dim/src/bluez/bluez-utils/tools/sdptool.c:904
-#2  0x0000cde0 in do_search (bdaddr=0xbefffd6c, context=0xbefffd74)
-   at /home/dim/src/bluez/bluez-utils/tools/sdptool.c:1999
-#3  0x0000d094 in cmd_search (argc=94880, argv=0x18050)
-   at /home/dim/src/bluez/bluez-utils/tools/sdptool.c:2150
-#4  0x0000d55c in main (argc=4, argv=0xbefffe08)
-   at /home/dim/src/bluez/bluez-utils/tools/sdptool.c:2319
-(gdb) p seq->val.dataseq->next
-Cannot access memory at address 0x32
-(gdb) p seq->val.dataseq      $1 = (sdp_data_t *) 0x1a
+Cheers,
 
-I've got no idea why val.dataseq turns out to be invalid here... It
-looks more like a UUID, it's certainly not a pointer.
 
-I attached a HCI dump of the discovery; sdptool seems to crash on the
-following part:
+BEGIN OF TUTORIAL
++--------------------------------------------------------------------------=
+-----------+
 
-> ACL data: handle 42 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0040 len 10 [psm 1]
-        SDP SSA Rsp: tid 0x2 len 0x5
-          count 2
-          record #0
-              aid 0x0000 (SrvRecHndl)
-                 uint 0x10002
-              aid 0x0001 (SrvClassIDList)
-                 < uuid-32 0x1103 (DUN) >
-              aid 0x0004 (ProtocolDescList)
-                 < < uuid-32 0x0100 (L2CAP) > <
-                 uuid-32 0x0003 (RFCOMM) uint 0x4 > >
-              aid 0x0100 (SrvName)
-                 str "Dial-up networking"
-              aid 0x0009 (BTProfileDescList)
-                 < uuid-32 0x1103 (DUN) >
-          cont 00
+Authors: Anderson Rodrigues (ext-anderson.rodrigues@indt.org.br)
+Eduardo Valentin (ebv@dcc.ufam.edu.br)
+Date: 28/01/2005
+Revision: 1.0
+By: Raoni Novellino (raoni.novellino@indt.org.br)
 
-You can compare this to some DUN searches that do not cause a crash.
-For example, a SE K700 gives:
+1. Objective
 
-> ACL data: handle 42 flags 0x02 dlen 101
-    L2CAP(d): cid 0x0040 len 97 [psm 1]
-        SDP SSA Rsp: tid 0x0 len 0x5c
-          count 89
-          record #0
-              aid 0x0000 (SrvRecHndl)
-                 uint 0x10000
-              aid 0x0001 (SrvClassIDList)
-                 < uuid-16 0x1103 (DUN) uuid-16 0x1201 (Networking) >
-              aid 0x0004 (ProtocolDescList)
-                 < < uuid-16 0x0100 (L2CAP) > <
-                 uuid-16 0x0003 (RFCOMM) uint 0x1 > >
-              aid 0x0005 (BrwGrpList)
-                 < uuid-16 0x1002 (PubBrwsGrp) >
-              aid 0x0009 (BTProfileDescList)
-                 < < uuid-16 0x1103 (DUN) uint 0x100 > >
-              aid 0x0100 (SrvName)
-                 str "Dial-up Networking"
-              aid 0x0305 (unknown)
-                 bool 0x0
-          cont 00
+This short tutorial aims to show how to configure and install Bluez
+bluetooth stack and tools on Innovator 1510, it includes a bluetooth device
+emulator that allows the execution of tests.
 
-And a Nokia 6310i gives:
+2. Dependencies
 
-> ACL data: handle 43 flags 0x01 dlen 16
-    L2CAP(d): cid 0x0040 len 108 [psm 1]
-        SDP SSA Rsp: tid 0x0 len 0x67
-          count 100
-          record #0
-              aid 0x0000 (SrvRecHndl)
-                 uint 0x10002
-              aid 0x0001 (SrvClassIDList)
-                 < uuid-16 0x1103 (DUN) uuid-16 0x1201 (Networking) >
-              aid 0x0004 (ProtocolDescList)
-                 < < uuid-16 0x0100 (L2CAP) > <
-                 uuid-16 0x0003 (RFCOMM) uint 0x1 > >
-              aid 0x0005 (BrwGrpList)
-                 < uuid-16 0x1002 (PubBrwsGrp) >
-              aid 0x0006 (LangBaseAttrIDList)
-                 < uint 0x656e uint 0x6a uint 0x100 >
-              aid 0x0009 (BTProfileDescList)
-                 < < uuid-16 0x1103 (DUN) uint 0x100 > >
-              aid 0x0100 (SrvName)
-                 str "Dial-up networking"
-          cont 00
+a) Kernel source linux-2.6.10.tar.bz2 from www.kernel.org
+b) patch-2.6.10-omap1.gz from www.muru.com
+c) patch-2.6.10-mh2.gz http://www.bluez.org/patches.html
+d) bluez-libs-2.14.tar.gz from http://www.bluez.org/download.html
+e) bluez-utils-2.14.tar.gz from http:/www.bluez.org/download.html
+f) bluez-hciemu-1.1.tar.gz from http://www.bluez.org/download.html
+g) glib-2.6.0.tar.bz2 from http://www.gtk.org
 
-So AFAICS, the difference is that most (?) phones use a uuid-16 for
-BTProfileDescList (at least for the DUN item), while the Samsung uses
-a uuid-32.  Does anyone know if this is actually allowed?  I'd guess
-the specific integer type shouldn't matter, so if it doesn't, sdptool
-probably shouldn't crash on it.
+3. Preparing the Kernel Image
 
---------------030803030000040302090002
-Content-Type: application/octet-stream;
- name="sdpsearch.hcidump"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="sdpsearch.hcidump"
+OBS: We are assuming that you have scratchbox fully installed and right
+configured to allow kernel compilation and the following commands are all
+executed inside the scratchbox environment (excepted when indicated).
+See section A for more details.
 
-EQAAANFj8z+iowAAAQUEDQYLEUcSABjMAgAAAAEHAAEA0WPzP6V7BAAEDwQAAQUEDgABANVj
-8z/QJAIABAMLACoABgsRRxIAAQARAAAA1WPzP3YlAgACKiAMAAgAAQACAQQAAQBAAAgAAADV
-Y/M/xSUCAAENCAQqAA8ACAABANVj8z90OwIABBMFASoAAQAJAAEA1WPzP/BBAgAEDgYBDQgA
-KgAKAAEA1WPzP19KAgAEIAcGCxFHEgABBgABANVj8z/JTgIABBsDKgAFFQABANVj8z/Y1QIA
-AiogEAAMAAEAAwEIAEEAQAABAAIAFQABANVj8z/D2gIAAiogEAAMAAEAAwEIAEEAQAAAAAAA
-EQAAANVj8z8Y2wIAAiogDAAIAAEABAIEAEEAAAAIAAEA1WPzP+bzAgAEEwUBKgABABMAAQDV
-Y/M/r0gDAAIqIA4ACgABAAUCBgBAAAAAAAAVAAEA1WPzP19UAwACKiAQAAwAAQAEAQgAQAAA
-AAECMAATAAAA1WPzP+BUAwACKiAOAAoAAQAFAQYAQQAAAAAAHQAAANVj8z+mXgMAAiogGAAU
-AEEABgAAAA81AxkRA///NQUKAAD//wAIAAEA1WPzP/1uAwAEEwUBKgABAAgAAQDVY/M/2ncD
-AAQTBQEqAAEAOQABANVj8z861QMAAiogNAAwAEAABwAAACsAJjYASzYASAkAAAoAAQACCQAB
-NQUaAAARAwkABDUQNQUaAAABADUHAgAoHwAAANVj8z/c1wMAAiogGgAWAEEABgABABE1AxkR
-A///NQUKAAD//wIAKAgAAQDVY/M/5fEDAAQTBQEqAAEAOQABANVj8z9cTwQAAiogNAAwAEAA
-BwABACsAJhoAAAADCAQJAQAlEkRpYWwtdXAgbmV0d29ya2luZwkACTUFGgAAAgACHwAAANVj
-8z/FUQQAAiogGgAWAEEABgACABE1AxkRA///NQUKAAD//wIAAggAAQDVY/M/92sEAAQTBQEq
-AAEAEwABANVj8z+rwAQAAiogDgAKAEAABwACAAUAAhEDABEAAADVY/M/N88EAAIqIAwACAAB
-AAYDBABBAEAACAABANVj8z8R5gQABBMFASoAAQARAAEA1WPzPyE/BQACKiAMAAgAAQAHAwQA
-QQBAAAcAAADXY/M/pC0FAAEGBAMqABMHAAEA12PzP+w6BQAEDwQAAQYEBwABANdj8z+4UwUA
-BAUEACoAFg==
---------------030803030000040302090002--
+a) Unpack linux-2.6.10.tar.bz2 inside your home directory in scratchbox
+b) Apply the patch-2.6.10-omap1.gz to the source (patch -p1 <
+patch-2.6.10-omap1)
+c) Apply the patch-2.6.10-mh2.gz to the source (patch -p1 <
+patch-2.6.10-mh2)
+d) Execute commands:
+make omap_1510_innovator_defconfig
+make menuconfig
+d) Make sure that the following options are selected:
+
+<*> Networking support --->
+<*> Bluetooth subsystem support --->
+<*> L2CAP protocol support
+Bluetooth device drivers --->
+<*> HCI VHCI (Virtual HCI device) driver (Utilizado para realizar testes)
+
+e) Compile the kernel image using the following comand:
+make uImage
+f) Compile and install he kernel modules:
+fakeroot make modules
+fakeroot make modules_install
+g) Copy the necessaries files to your target filesystem directory:
+
+OBS: These commands must be executed outside the scratchbox as root user.
+
+# cp -a
+/scratchbox/users/<your_user_name>/home/<your_user_name>/linux-2.6.10/arch/=
+arm/boot/uImage
+/<your_tftp_boot_directory>
+
+# cp -a
+/scratchbox/users/<your_user_name>/targets/<your_target_name>/lib/modules/2=
+.6.10-mh2-omap1/<your_nfs_file_system_directory>/lib/modules
+
+4. Compiling and installing the bluez-tools
+
+a) Unpack the bluez-libs-2.14 source into your home directory in scratchbox
+b) Create a directory called usr into your home directory in scratchbox
+c) Configure the compilation as follows:
+cd bluez-libs-2.14
+/configure --prefix=3D/home/<your_user_name>/usr
+d) Compile and install:
+make
+make install
+e) Unpack the bluez-utils-2.14 source into your home directory in
+scratchbox and enter into bluez-utils-2.14 directory
+f) Edit the file tools/Makefile.in and change the following line:
+CFLAGS =3D @CFLAGS@
+to
+CFLAGS =3D @CFLAGS@ -L/home/<your_user_name>/usr/lib
+g) Configure the compilation as follows:
+cd bluez-utils-2.14
+./configure --prefix=3D/home/<your_user_name>/usr --enable-test
+h) Compile and install:
+make
+make install
+i) Copy the necessaries files to your target filesystem directory:
+
+OBS: These command must be executed outside the scratchbox as root user.
+
+cp -a /scratchbox/users/<your_user_name>/home/<your_user_name>/usr/*
+/<your_nfs_file_system_directory>/usr/
+
+5. Compiling and installing Bluez HCIEmu
+
+a) Extract glib-2.6.0 into the scratchbox environment
+b) In order to configure the glib compilation execute the following
+commands:
+> ./configure --prefix=3D/usr/local --with-threads=3Dnone
+> make
+> make install
+
+c) Extract bluez-hciemu-1.1.tar.gz inside the scratchbox environment;
+d) In order to configure the compilation execute the following command:
+> ./configure --prefix=3D/home/<your_user_name>/usr/ --disable-glibtest
+e) Edit the Makefile and change the CFLAG variable to:
+-Wall -O2 -I/usr/local/include/glib-2.0
+-I/usr/local/lib/glib-2.0/include -L/usr/local/lib -l glib-2.0
+f) Compile:
+> make
+g) Copy the hciemu directory to your <your_nfs_file_system_directory>
+OBS: this command must be executed outside of the scratchbox environment
+# cp -r
+/scratchbox/users/<your_user_name>/home/<your_user_name>/bluez-hciemu-1.1
+/<your_nfs_file_system_directory>/usr/local
+
+6. Testing bluetooth
+
+a) Execute the following commands at the omapinnovator prompt:
+# mknod /dev/vhci c 10 250
+'Creates the HCI interfaces
+# ./hciemu localhost:10
+# ./hciemu localhost:11
+'Activates the HCI interfaces
+# hciconfig hci0 up '
+# hciconfig hci1 up
+'Show the available HCI interfaces
+# hciconfig
+
+You can also send a virtual ping to these virtual devices using the
+following command:
+# l2ping <BD Address>
+
+A. Compiling U-boot-1.1.1
+
+a) Download U-boot-1.1.1 from:
+http://sourceforge.net/project/showfiles.php?group_id=3D65938
+
+b) Unpack U-boot inside the scratchbox environment
+
+c) Get into the U-boot directory
+> cd u-boot-1.1.1
+
+d) Configure Make:
+> make omap1510inn_config
+
+c) Compile U-boot
+> make all (you will have some errors. Don=B4t mind)
+> make all (Now the file we want has been generated)
+
+d) Verify if there is a file named "mkimage"
+> ls tools/
+
+e ) Copy this file to your scratchbox \usr\bin directory:
+> cp tools/mkimage /usr/bin
+
+OBS: All commands must be executed inside the scratchbox environment.
++--------------------------------------------------------END OF
+TUTORIAL--------------------------------------------
+
+--=20
+Anderson Clayton B. Rodrigues
+Eng. de Software
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
