@@ -1,57 +1,61 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: Daryl Van Vorst <daryl@wideray.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000201c35614$251dcaf0$1a01010a@baked>
-References: <000201c35614$251dcaf0$1a01010a@baked>
-Content-Type: text/plain
-Message-Id: <1059519805.26914.127.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: Rfcomm qualification
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 30 Jul 2003 01:03:18 +0200
+Return-Path: <daryl@wideray.com>
+Errors-To: <daryl@wideray.com>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Subject: Rfcomm qualification
+Date: Tue, 29 Jul 2003 13:58:20 -0700
+Message-ID: <000201c35614$251dcaf0$1a01010a@baked>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="----=_NextPart_000_0003_01C355D9.78BEF2F0"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Daryl,
+This is a multi-part message in MIME format.
 
-> We ran into another 1.0B problem with rfcomm testing. We didn't notice this
-> last time because the tests were done slightly differently (without an
-> automated tester).
-> 
-> The tester acts as a 1.0B device and establishes a connection with the IUT.
-> The IUT sent credits (pf bit = 1) after the MSC echange. It shouldn't.
-> Attached is an hcidump of it.
+------=_NextPart_000_0003_01C355D9.78BEF2F0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-the problem is that the tester don't sends a PN CMD (btw is this really
-allowed?) and so we use RFCOMM_MAX_CREDITS at two points (once for the
-session and for every DLC). If the PN CMD is present and shows us a 1.0b
-device we set credits to zero and don't make use of credit based flow
-control. It seems that the default value of credits must be zero and not
-RFCOMM_MAX_CREDITS.
+Marcel,
 
-Regards
+We ran into another 1.0B problem with rfcomm testing. We didn't notice this
+last time because the tests were done slightly differently (without an
+automated tester).
 
-Marcel
+The tester acts as a 1.0B device and establishes a connection with the IUT.
+The IUT sent credits (pf bit = 1) after the MSC echange. It shouldn't.
+Attached is an hcidump of it.
 
+We'll have to get this resolved before we can check the fcon/fcoff mods.
 
+Could you take a look?
 
+Thanks,
 
--------------------------------------------------------
-This SF.Net email sponsored by: Free pre-built ASP.NET sites including
-Data Reports, E-commerce, Portals, and Forums are available now.
-Download today and enter to win an XBOX or Visual Studio .NET.
-http://aspnet.click-url.com/go/psa00100003ave/direct;at.aspnet_072303_01/01
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-Daryl.
+
+------=_NextPart_000_0003_01C355D9.78BEF2F0
+Content-Type: application/octet-stream; name="rfc_bv_10_devB.dat"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="rfc_bv_10_devB.dat"
+
+DQABAEPspQBUkgwABAQKvMMAWwIAAAAAAQsAAABD7KUA25MMAAEJBAe8wwBbAgABBwABAEPspQBB
+oQwABA8EAAgJBA4AAQBD7KUAbdoMAAQDCwABALzDAFsCAAEACAAAAEPspQDc2gwAAQ0IBAEADgAJ
+AAEAQ+ylAGsWDQAEDgYIDQgAAQAIAAAAQ+ylAMIhDQABDwQEAQAYzAcAAQBD7KUAcDUNAAQPBAAH
+DwQIAAEAQ+ylAHWWDQAEHQUAAQAYzAcAAQBD7KUAzpYNAAQPBAAIAAAGAAEAQ+ylAC6XDQAEGwMB
+AAURAAEAQ+ylAOkpDwACASAMAAgAAQACAQQAAwBAABUAAABD7KUAMysPAAIBIBAADAABAAMBCABA
+AEAAAAAAAAgAAQBE7KUAKloAAAQTBQEBAAEAMQABAETspQA3owEAAgEgLAAoAAEABAIkAEAAAAAB
+Av8BAgL//wMWAAH/////AAAAAAAAAAD//////////xMAAABE7KUABqQBAAIBIA4ACgABAAUCBgBA
+AAAAAAAVAAAAROylAEakAQACASAQAAwAAQAEAQgAQAAAAAECAAQIAAEAROylAJgWAgAEEwUBAQAB
+AAgAAQBE7KUARiUCAAQTBQEBAAEAGAABAETspQASTwYABA0VAAEAAAGoAgAAAAAAAKhhAAD/////
+LwABAETspQCLSwgAAgEgKgAmAAEABQEiAEAAAAAAAAECAAQDFgABAAAAAAAAAAAAAAAA////////
+//8NAAEAROylAJaYCAACASAIAAQAQAADPwEcDQAAAETspQASmQgAAgEgCAAEAEAAA3MB1wgAAQBE
+7KUAiA4JAAQTBQEBAAEADQABAETspQAMHwoAAgEgCAAEAEAACz8BWQ0AAABE7KUAzh8KAAIBIAgA
+BABAAAtzAZIRAAAAROylAC8gCgACASAMAAgAQAAB7wnjBQuNqggAAQBE7KUABpYKAAQTBQEBAAEA
+CAABAETspQCOowoABBMFAQEAAQARAAEARuylANyBAwACASAMAAgAQAAD7wnhBQuNcBEAAQBG7KUA
+FNADAAIBIAwACABAAAPvCeMFC41wEQAAAEbspQCQ0AMAAgEgDAAIAEAAAe8J4QULjaoOAAAARuyl
+AOrQAwACASAJAAUAQAAJ/wEhXAgAAQBG7KUA20kEAAQTBQEBAAEACAABAEbspQDdVAQABBMFAQEA
+AQARAAEARuylAF6KBgACASAMAAgAAQAGAwQAQABAABEAAABG7KUAIZAGAAIBIAwACAABAAcDBABA
+AEAACAABAEbspQD1BAcABBMFAQEAAQAHAAEARuylABDrCAAEBQQAAQATGhoaGhoaGhoaGhoaGg==
+
+------=_NextPart_000_0003_01C355D9.78BEF2F0--
