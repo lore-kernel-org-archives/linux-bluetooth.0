@@ -1,73 +1,88 @@
-Return-Path: <jt@bougret.hpl.hp.com>
-Date: Fri, 13 Aug 2004 09:37:36 -0700
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Steven Singer <steven.singer@csr.com>
-Subject: Re: CSR firmware question...
-Message-ID: <20040813163736.GC22763@bougret.hpl.hp.com>
-Reply-To: jt@hpl.hp.com
-References: <20040813002514.GA21388@bougret.hpl.hp.com> <1092385877.28711.185.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Alignment issue
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1092397956.10618.102.camel@hades.cambridge.redhat.com>
+References: <001201c47fc2$7093e4a0$1301010a@baked>
+	 <1092252699.4564.238.camel@pegasus>
+	 <1092299689.4622.8.camel@imladris.demon.co.uk>
+	 <1092302834.28711.72.camel@pegasus>
+	 <1092304890.15466.44.camel@hades.cambridge.redhat.com>
+	 <1092306154.28711.85.camel@pegasus>
+	 <1092306935.15466.74.camel@hades.cambridge.redhat.com>
+	 <1092308407.28711.99.camel@pegasus>
+	 <1092310391.15466.178.camel@hades.cambridge.redhat.com>
+	 <1092311388.28711.117.camel@pegasus>
+	 <1092312127.15466.211.camel@hades.cambridge.redhat.com>
+	 <1092317787.28711.150.camel@pegasus>
+	 <1092384465.4186.37.camel@imladris.demon.co.uk>
+	 <1092387952.28711.217.camel@pegasus>
+	 <1092397956.10618.102.camel@hades.cambridge.redhat.com>
+Content-Type: text/plain
+Message-Id: <1092400824.28711.226.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1092385877.28711.185.camel@pegasus>
-From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 13 Aug 2004 14:40:24 +0200
 
-On Fri, Aug 13, 2004 at 10:31:17AM +0200, Marcel Holtmann wrote:
-> Hi Jean,
+Hi David,
+
+> I was overriding CFLAGS when I invoked make, because otherwise other
+> stuff (like -m32) gets omitted. Can we do this in acinclude.m4?
 > 
-> > 	A few questions regarding CSR firmware : what's a commonly
-> > available BT USB dongle with a recent CSR firmware.
+> -	CFLAGS="-Wall -O2"
+> +	if (test "${CFLAGS}" = ""); then
+> +		CFLAGS="-Wall -O2"
+> +	fi
+> +
+
+I was thinking of something like that, but actually never included it
+until now. Fix is in CVS for libs, utils and hcidump.
+
+> OK. I think I'm not supposed to ship a cvs snapshot -- I have to wait
+> for 2.10. But I've isolated just the patch in question and added it into
+> the bluez-utils-2.9-2 RPM, with the above change to inherit CFLAGS if
+> they're already set.
+
+I will use memmove for unaligned access and release libs and utils
+tomorrow or the day after tomorrow. I like to test your unaligned code a
+little bit more before making a release with it.
+
+> > I did it this way, but there were reports of Sparc platforms where the
+> > resulting binary should be run-tested.
 > 
-> as I know there are only dongles with HCI 16.14 firmware available.
-
-	And...
-
-> > 	I'm hitting various bugs with the CSR firmware in my D-Link
-> > USB dongles (0x1bb), where I can easilly deadlock the dongle. My 3Com
-> > dongle, which has a more recent firmware (0x20e), behave much better,
-> > but not perfect.
-> > 	D-Link doesn't provide a firmware updater, but, beeing
-> > fearless, I tried to firmware upgrade a D-Link dongle and ended up
-> > with a dead dongle (can't even put back the original firmware on it).
-> > 	From the release notes, the latest CSR firmwares have zillions
-> > of bug fixes. I really wonder how I can enjoy the bug fixes.
+> Hmmm. Can I revise my original answer.... don't. If the user asks for
+> it, do it. Else don't.
 > 
-> The D-Link dongle DBT-120 (Rev B3) can be updated using the Apple
-> firmware update file. After that it will be HCI 18.1 with default boot
-> mode set to HID.
+> Random behavioural changes based on the characteristics of the system we
+> _happen_ to build on today are probably a bad thing. Just build as
+> configured and don't try to auto-adapt to _anything_ :)
 
-	This is exactly what I did. I have a rev B3, and I used Apple
-file.
-	What do you mean default boot set to HID ? I look similar to
-what I'm seeing.
+Don't worry. You still have to use --enable-pie to activate it even if
+configure finds out that the compile supports it.
 
-> Maybe other revisions of the D-Link dongle don't work
-> and I already put some of dongles to death while playing with firmware
-> upgrade.
+Regards
 
-	Yep, seems easy.
+Marcel
 
-> > P.S. : Marcel, do you have a version of btdfu that can write the
-> > firmware image to the dongle ? Or some documentation ?
-> 
-> I never announced the new version of the btdfu, but now as you asked for
-> it, here it is:
-> 
-> 	http://www.holtmann.org/linux/bluetooth/btdfu-0.3.tar.gz
-> 
-> Use it at your own risk, because you can kill your dongle !!!
 
-	Actually, I realised that I can't even use that, the dongle no
-longer has a control pipe. Grrr....
 
-> Read what the CSR guys had written about signed firmware and that it is
-> not possible to move firmware from one manufacturer to another !!!
 
-	Yep, I read that, I won't comment to stay polite.
-
-> Regards
-> 
-> Marcel
-
-	Jean
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
