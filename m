@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Hans Bausewein <hans@comerwell.xs4all.nl>
+Subject: Re: [Bluez-users] Send voice packets over bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Broadcom Corporation (Firmware 105.105.074) USB dongle
-Message-ID: <20041105133336.GA28921@comerwell.xs4all.nl>
-References: <20041030124433.GA9232@comerwell.xs4all.nl> <1099143692.10448.14.camel@pegasus> <20041030152320.GA9566@comerwell.xs4all.nl> <1099150958.16247.12.camel@pegasus> <20041030155712.GA9715@comerwell.xs4all.nl> <1099152611.16247.23.camel@pegasus> <20041030195917.GA10109@comerwell.xs4all.nl> <1099167789.6644.6.camel@notepaq> <20041102214045.GA20691@comerwell.xs4all.nl> <1099432696.7125.8.camel@pegasus>
+In-Reply-To: <2de4657604110503294e6f6465@mail.gmail.com>
+References: <2de4657604110503294e6f6465@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1099656148.6919.1.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1099432696.7125.8.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 5 Nov 2004 14:33:36 +0100
+Date: Fri, 05 Nov 2004 13:02:28 +0100
 
-On Tue, Nov 02, 2004 at 10:58:16PM +0100, Marcel Holtmann wrote:
-> I don't expect to get one from them. Some companies have some stupid
-> rules for test hardware for open source developers. And actually I think
-> this is a Broadcom problem, because they are not very helpful when it
-> comes to Linux support. On the other hand you get CSR and these guys
-> helped out in so many ways. Go and buy a CSR based dongle, because this
-> is better spent money and you will have less trouble.
+Hi Manjunath,
 
-R&D at MyCom has tested the new dongle using RedHat 9 and it worked.
-Maybe it is a problem with other software from Debian (or just my
-configuration). I have to be at home to check this. The computer is off.
+> i am  trying a scenario where i can send voice packets(generated
+> through some application) over bluetooth. I want my 2  machines which
+> have USB bluetooth dongles attached, to communicate  with voice
+> packets.
+> hope some of u can suggest some application. I am using linux boxes.
 
-I'd like to ask them some more details. Exact versions of the kernel and
-bluez-utils. More? Maybe some output from hciconfig?
+check out the scotest program, but be aware of that you can only send
+voice data in the correct format over the Bluetooth SCO links.
 
-Hans
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
