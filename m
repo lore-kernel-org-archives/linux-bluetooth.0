@@ -1,31 +1,62 @@
-Return-Path: <dwmw2@infradead.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] [PATCH] More SDP UUIDs...
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Jean Tourrilhes <jt@hpl.hp.com>,
-   Stephen Crane <steve.crane@rococosoft.com>,
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jean Tourrilhes <jt@hpl.hp.com>
+Cc: Stephen Crane <steve.crane@rococosoft.com>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1063756197.29942.17.camel@pegasus>
+In-Reply-To: <20030917003609.GA27263@bougret.hpl.hp.com>
 References: <20030915221624.GA17085@bougret.hpl.hp.com>
-	 <1063712005.22723.27.camel@pegasus>
-	 <1063717418.3674.276.camel@hades.cambridge.redhat.com>
-	 <1063756197.29942.17.camel@pegasus>
+	<1063712005.22723.27.camel@pegasus>
+	<20030916195333.GA25068@bougret.hpl.hp.com>
+	<1063755753.29942.9.camel@pegasus>
+	<20030917000637.GA26969@bougret.hpl.hp.com>
+	<1063758501.29942.47.camel@pegasus>
+	<20030917003609.GA27263@bougret.hpl.hp.com>
 Content-Type: text/plain
-Message-Id: <1063779740.788.66.camel@imladris.demon.co.uk>
+Message-Id: <1063760338.29941.59.camel@pegasus>
 Mime-Version: 1.0
-Date: Wed, 17 Sep 2003 07:22:20 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 17 Sep 2003 02:58:52 +0200
 
-On Wed, 2003-09-17 at 01:49 +0200, Marcel Holtmann wrote:
-> Hi David,
+Hi Jean,
+
+> > I forgot to mention that I started from scratch and the output you see
+> > above is a textual presentation of the new internal data structure. The
+> > core attributes id's and the UUID16's are decoded into strings, because
+> > they are unique. All other meanings of some data elements depends on
+> > others. I have to add some checks which makes sure that this is a valid
+> > SDP record, before I can do this.
 > 
-> > Feature request: Please can we make sdpd retain its knowledge of apps
-> > which have registered with it over a restart, much like portmap does?
-> 
-> actually I don't know how we can do this, but I put a note on my feature
-> list for the new SDP server.
+> 	Well... What was wrong with the code I wrote in listattr.c ?
+> It did all of that properly and simply, and it was trivial to add new
+> UUIDs and attributes. I don't see what you have gained here...
 
-I don't know either -- but portmap does seem to get it right. 
+there was nothing wrong with that code and I think my final code for
+that part will look very similar. My problem is the current API itself,
+because it is a mess and if you have to do more complicated things with
+SDP you are simply lost.
 
--- 
-dwmw2
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This sf.net email is sponsored by:ThinkGeek
+Welcome to geek heaven.
+http://thinkgeek.com/sf
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
