@@ -1,10 +1,21 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40E1E51A.3080106@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Re: Headset with snd-bt-sco
+Subject: Re: [Bluez-users] Epox Barton keyboard: HID create error 53
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Matthias Thomae <bluez@thomae-privat.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40E1C91C.8030500@thomae-privat.de>
+References: <40CDE18C.70703@thomae-privat.de>
+	 <1087255678.13792.51.camel@pegasus>  <40CE96A8.3020407@thomae-privat.de>
+	 <1087284859.13792.67.camel@pegasus>  <40CEC020.6050107@thomae-privat.de>
+	 <1087292887.13792.81.camel@pegasus>  <40CF4B17.2010806@thomae-privat.de>
+	 <1087339715.13792.104.camel@pegasus>  <40D7DDAD.2040908@thomae-privat.de>
+	 <1087897207.4328.89.camel@pegasus> <40D8D39E.3070301@thomae-privat.de>
+	 <40E024AD.1000101@thomae-privat.de> <1088452526.6030.86.camel@pegasus>
+	 <40E12F15.9040805@thomae-privat.de> <1088500144.6030.249.camel@pegasus>
+	 <40E1C91C.8030500@thomae-privat.de>
+Content-Type: text/plain
+Message-Id: <1088543513.6030.332.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,38 +26,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Jun 2004 15:54:34 -0600
+Date: Tue, 29 Jun 2004 23:11:53 +0200
 
-Hi
+Hi Matthias,
 
-I get the same result when either using the bluetrek 1.0 headset or the 
-jabra 200 (upgraded to handsfree profile) headset.
+> > I will notify EPoX about it, so they can correct their bug. We must
+> > introduce a quirk for it, but I don't know how to trigger. The keyboard
+> > don't uses Bluetooth DeviceID and the presenter DeviceID is also wrong.
+> > At Cebit I told them that they should take care of DeviceID :(
+> 
+> Ok. Please keep me (or the list) up-to-date on your findings, I'd like 
+> to know if I have to return this device to the dealer...
 
-Can anyone confirm that snd-bt-sco still works with the hbh-60? The 
-previous maintainer is not working on it any more unfortunately...
+don't rely on that you will get a fixed device very soon. I reported
+that bug to EPoX, but I don't expect anything. I will fix it directly in
+the hidd and swap the bytes in the HID descriptor before handling the
+connection over to the HIDP module.
 
-Brad
+Regards
 
-On  0, Lasse Jansen <l.jansen@gm...> wrote:
-  > Hi all,
-  > I have some problems with making my BT headset work. Bluetooth works, I
-  > can e.g. exchange files with my T610. For the Headset I downloaded the
-  > snd-bt-sco driver (http://www.dcs.gla.ac.uk/~jp/snd-bt-sco/),
-  > kernel-2.6.4 and alsa-1.0.3 as said in the README. Everything went fine,
-  > when I run
-  > | btsco-0.2/btsco 00:0D:FD:00:7B:CC 1
-  > I hear a little background noise. When I increase/decrease the volume at
-  > the headset, it will be printed on the screen, so there is a connection.
-  >
-  > But when I try to play a sound file, nothing happens. E.g.
-  > | aplay -D plughw:Headset /usr/kde/3.2/share/sounds/KDE_Logout_new.wav
-  > hangs in a loop. Xmms says "couldn"t open audio".
-  > I have deactivated the "loopback" option in the mixer settings.
-  >
-  > Any ideas?
+Marcel
 
--- 
-Brad
+
 
 
 -------------------------------------------------------
