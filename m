@@ -1,8 +1,8 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <01ae01c4e0f9$b64b1930$6401000a@zool>
+Message-ID: <018c01c4e0f8$de417700$6401000a@zool>
 From: "Steffen Larsen" <zool@zool.dk>
 To: <bluez-devel@lists.sourceforge.net>
-References: <00c901c4df6a$f8c11f70$6401000a@zool> <1102764489.19086.15.camel@pegasus>  <016d01c4df70$a8e297d0$6401000a@zool> <1102767035.19086.18.camel@pegasus> <01a901c4df7a$666d4da0$6401000a@zool> <002d01c4df96$cc2e2080$6401000a@zool> <1102783440.19086.28.camel@pegasus> <003901c4df9e$a3fead20$6401000a@zool> <1102786636.19086.34.camel@pegasus> <00b001c4dfa9$f3bc0870$6401000a@zool> <018c01c4e0f8$de417700$6401000a@zool>
+References: <00c901c4df6a$f8c11f70$6401000a@zool> <1102764489.19086.15.camel@pegasus>  <016d01c4df70$a8e297d0$6401000a@zool> <1102767035.19086.18.camel@pegasus> <01a901c4df7a$666d4da0$6401000a@zool> <002d01c4df96$cc2e2080$6401000a@zool> <1102783440.19086.28.camel@pegasus> <003901c4df9e$a3fead20$6401000a@zool> <1102786636.19086.34.camel@pegasus> <00b001c4dfa9$f3bc0870$6401000a@zool>
 Subject: Re: [Bluez-devel] piconet..
 MIME-Version: 1.0
 Content-Type: text/plain;
@@ -18,153 +18,104 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 13 Dec 2004 10:54:18 +0100
-
-Sorry!.. Was to quick on the 'send' button!
-
-My problem was that I used the:
-
-bacpy(&loc_addr.l2_bdaddr, local_bdaddr);
-
-instead of :
-bacpy(&loc_addr.l2_bdaddr, BDADDR_ANY);
-
-Before I bind my address and PSM..
-
-Thus binding my PSM and all to a hardcoded address instead of BDADDR_ANY..
-My mistake! doh!..
-Well sorry for all the fuss and mail spam I caused.. But thanks for all your
-answers anyways. It is cool that a mailing list is functioning the way this
-do: quick and good answers! :-)
+Date: Mon, 13 Dec 2004 10:48:15 +0100
 
 
-/Steffen Larsen
+HI Marcel and other!,
+
+I found out what I did wrong. All my sockets and fork()'ing just worked
+fine. My problem was that I tried to make:
+
 
 ----- Original Message -----
 From: "Steffen Larsen" <zool@zool.dk>
 To: <bluez-devel@lists.sourceforge.net>
-Sent: Monday, December 13, 2004 10:48 AM
+Sent: Saturday, December 11, 2004 6:50 PM
 Subject: Re: [Bluez-devel] piconet..
 
 
+> Hi Marcel,
 >
-> HI Marcel and other!,
->
-> I found out what I did wrong. All my sockets and fork()'ing just worked
-> fine. My problem was that I tried to make:
->
->
-> ----- Original Message -----
-> From: "Steffen Larsen" <zool@zool.dk>
-> To: <bluez-devel@lists.sourceforge.net>
-> Sent: Saturday, December 11, 2004 6:50 PM
-> Subject: Re: [Bluez-devel] piconet..
->
->
-> > Hi Marcel,
-> >
-> > > > I got the two others:
-> > > >
-> > > >  hci0: Type: USB
-> > > > BD Address: 00:01:53:00:14:EE ACL MTU: 192:8 SCO MTU: 64:8
-> > > > UP RUNNING PSCAN ISCAN
-> > > > RX bytes:81 acl:0 sco:0 events:10 errors:0
-> > > > TX bytes:39 acl:0 sco:0 commands:10 errors:0
-> > > > Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-> > > > Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-> > > > Link policy:
-> > > > Link mode: SLAVE ACCEPT
-> > > > Name: 'knoglen'
-> > > > Class: 0x000000
-> > > > Service Classes: Unspecified
-> > > > Device Class: Miscellaneous,
-> > > > HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
-0x20d
-> > > > Manufacturer: Cambridge Silicon Radio (10)
-> > > >
-> > > > hci0: Type: USB
-> > > > BD Address: 00:01:53:00:0D:B5 ACL MTU: 192:8 SCO MTU: 64:8
-> > > > UP RUNNING PSCAN ISCAN
-> > > > RX bytes:87 acl:0 sco:0 events:11 errors:0
-> > > > TX bytes:39 acl:0 sco:0 commands:10 errors:0
-> > > > Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-> > > > Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-> > > > Link policy:
-> > > > Link mode: SLAVE ACCEPT
-> > > > Name: 'JESPER'
-> > > > Class: 0x000000
-> > > > Service Classes: Unspecified
-> > > > Device Class: Miscellaneous,
-> > > > HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
-0x20d
-> > > > Manufacturer: Cambridge Silicon Radio (10)
+> > > I got the two others:
 > > >
-> > > these two are HCI 16.4 and so there should be no problem. See my CSR
-> > > page why it is good to have HCI 16.x at least.
+> > >  hci0: Type: USB
+> > > BD Address: 00:01:53:00:14:EE ACL MTU: 192:8 SCO MTU: 64:8
+> > > UP RUNNING PSCAN ISCAN
+> > > RX bytes:81 acl:0 sco:0 events:10 errors:0
+> > > TX bytes:39 acl:0 sco:0 commands:10 errors:0
+> > > Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+> > > Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+> > > Link policy:
+> > > Link mode: SLAVE ACCEPT
+> > > Name: 'knoglen'
+> > > Class: 0x000000
+> > > Service Classes: Unspecified
+> > > Device Class: Miscellaneous,
+> > > HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+> > > Manufacturer: Cambridge Silicon Radio (10)
 > > >
-> > > > > so far so good, but check with "hciconfig hci0 revision" for the
-> > > > > firmware version. This one is too old. It should be HCI 16.4 or
-> newer,
-> > > > > but if this is a DBT-120 Rev. B3 you might have a chance to update
-> it.
-> > > >
-> > > > Well. It is the B3 revision, so I would be able to do that. :-)
+> > > hci0: Type: USB
+> > > BD Address: 00:01:53:00:0D:B5 ACL MTU: 192:8 SCO MTU: 64:8
+> > > UP RUNNING PSCAN ISCAN
+> > > RX bytes:87 acl:0 sco:0 events:11 errors:0
+> > > TX bytes:39 acl:0 sco:0 commands:10 errors:0
+> > > Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+> > > Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+> > > Link policy:
+> > > Link mode: SLAVE ACCEPT
+> > > Name: 'JESPER'
+> > > Class: 0x000000
+> > > Service Classes: Unspecified
+> > > Device Class: Miscellaneous,
+> > > HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+> > > Manufacturer: Cambridge Silicon Radio (10)
+> >
+> > these two are HCI 16.4 and so there should be no problem. See my CSR
+> > page why it is good to have HCI 16.x at least.
+> >
+> > > > so far so good, but check with "hciconfig hci0 revision" for the
+> > > > firmware version. This one is too old. It should be HCI 16.4 or
+newer,
+> > > > but if this is a DBT-120 Rev. B3 you might have a chance to update
+it.
 > > >
-> > > I suppose you do that (at your own risk of course).
-> > >
-> > > > Hmm.. This dosn't really answer my question. I am using fork()., and
-> > would
-> > > > like to get my application to work. I tried to compare it towards
-the
-> > > > l2test, but couldn't see that much difference. And the l2test works
-> with
-> > the
-> > > > same dongles; connecting two clients against one server. Can you
-point
-> > > > somewhere in my code, where I should do some changes, so it could
-> work??
-> > >
-> > > Getting the fork stuff right is not very easy. You must carefully
-think
-> > > about what file descriptors to close at what time and in what process.
-I
-> > > am not going to check your code for such mistakes, because it will
-take
-> > > me too much time and the other reason is that it is C++ and not C.
+> > > Well. It is the B3 revision, so I would be able to do that. :-)
 > >
-> > I understand. I have been spending alot of time in it my self. I will
-look
-> > deeper into the socket, and which of them that have been closed and at
-> which
-> > time... But I think I have checked this a million times.. But I will try
-> > again! :-)
+> > I suppose you do that (at your own risk of course).
 > >
-> > > Update the dongle or try to swap the pre HCI 16.4 one. The master
-option
-> > > can help, but you must choose the master device carefully.
+> > > Hmm.. This dosn't really answer my question. I am using fork()., and
+> would
+> > > like to get my application to work. I tried to compare it towards the
+> > > l2test, but couldn't see that much difference. And the l2test works
+with
+> the
+> > > same dongles; connecting two clients against one server. Can you point
+> > > somewhere in my code, where I should do some changes, so it could
+work??
 > >
-> > Yes I can try to swap the devices. You mention that the master device
-> should
-> > be carefully choosen. I what way?
-> > I have just assumed that my server should be the master, and thats that.
-> > What should I taken in to consideration?
-> >
-> > -Once again thanks for all the quick answers! :-)
-> >
-> > /Steffen Larsen
-> >
-> >
-> >
-> > -------------------------------------------------------
-> > SF email is sponsored by - The IT Product Guide
-> > Read honest & candid reviews on hundreds of IT Products from real users.
-> > Discover which products truly live up to the hype. Start reading now.
-> > http://productguide.itmanagersjournal.com/
-> > _______________________________________________
-> > Bluez-devel mailing list
-> > Bluez-devel@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> >
+> > Getting the fork stuff right is not very easy. You must carefully think
+> > about what file descriptors to close at what time and in what process. I
+> > am not going to check your code for such mistakes, because it will take
+> > me too much time and the other reason is that it is C++ and not C.
+>
+> I understand. I have been spending alot of time in it my self. I will look
+> deeper into the socket, and which of them that have been closed and at
+which
+> time... But I think I have checked this a million times.. But I will try
+> again! :-)
+>
+> > Update the dongle or try to swap the pre HCI 16.4 one. The master option
+> > can help, but you must choose the master device carefully.
+>
+> Yes I can try to swap the devices. You mention that the master device
+should
+> be carefully choosen. I what way?
+> I have just assumed that my server should be the master, and thats that.
+> What should I taken in to consideration?
+>
+> -Once again thanks for all the quick answers! :-)
+>
+> /Steffen Larsen
 >
 >
 >
