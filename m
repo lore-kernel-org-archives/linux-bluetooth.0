@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] kernel panic
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ladislav Lhotka <lada@lhotka.elsatnet.cz>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1087722591.6692.14.camel@missotis.lhotkovi.cz>
-References: <1087722591.6692.14.camel@missotis.lhotkovi.cz>
+From: Ladislav Lhotka <lada@lhotka.elsatnet.cz>
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1087726146.25061.33.camel@pegasus>
+Message-Id: <1087722591.6692.14.camel@missotis.lhotkovi.cz>
 Mime-Version: 1.0
+Subject: [Bluez-users] kernel panic
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,31 +15,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 20 Jun 2004 12:09:06 +0200
+Date: Sun, 20 Jun 2004 11:09:51 +0200
 
-Hi Ladislav,
+Hi,
 
-> I have been quite succesful with setting up Bluetooth on IBM ThinkPad
-> T41p with Gentoo Linux (kernel 2.6.5-gentoo-r1). The only serious
-> problem is that after enabling BT with Fn-F5 and doing
-> 
-> /etc/init.d/bluetooth start
-> 
-> I can neither disable BT with Fn-F5 nor shutdown the system - in both
-> cases the system hangs with
-> 
-> <0>Kernel panic: Fatal exception in interrupt
-> In interrupt handler - not syncing
-> 
-> Does anyone have a similar experience? What more info can I provide?
+I have been quite succesful with setting up Bluetooth on IBM ThinkPad
+T41p with Gentoo Linux (kernel 2.6.5-gentoo-r1). The only serious
+problem is that after enabling BT with Fn-F5 and doing
 
-sounds like the bugs in the hci_usb driver. Install 2.6.7.
+/etc/init.d/bluetooth start
 
-Regards
+I can neither disable BT with Fn-F5 nor shutdown the system - in both
+cases the system hangs with
 
-Marcel
+<0>Kernel panic: Fatal exception in interrupt
+In interrupt handler - not syncing
 
+Does anyone have a similar experience? What more info can I provide?
 
+Thanks, Lada
+
+-- 
+Ladislav Lhotka <lada@lhotka.elsatnet.cz>
 
 
 -------------------------------------------------------
