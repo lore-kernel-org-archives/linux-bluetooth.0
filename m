@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <406005DB.2090109@ntlworld.com>
-From: Oli Ellis <oliver.ellis@ntlworld.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] dinovo multimedia keys
+Subject: Re: [Bluez-users] usb-ohci
+From: Marcel Holtmann <marcel@holtmann.org>
+To: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <6385e5f7e2.5f7e26385e@estudiants.urv.es>
+References: <6385e5f7e2.5f7e26385e@estudiants.urv.es>
+Content-Type: text/plain
+Message-Id: <1080042940.26745.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,40 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 23 Mar 2004 09:39:39 +0000
+Date: Tue, 23 Mar 2004 12:55:40 +0100
 
-I have had a poke around utils2/hid/, specifically parser.c and 
-uinput.h. Correct me if I am wrong, but I am figuring that bthid 
-collects events from hcid and converts them into events that the kernel 
-input system can understand. (uinput.h repeats the kernel's input.h key 
-definitions.)
+Hi Albert,
 
-My question is, are the consumer keymaps in parser.c some sort of 
-immutable bluetooth standard or just what your personal keyboard is? For 
-example, you have the following for volumes:
-        case 0xe2:    butt = KEY_MUTE;    break;
-        case 0xe9:    butt = KEY_VOLUMEUP;    break;
-        case 0xea:    butt = KEY_VOLUMEDOWN;    break;
-Whereas, my dinovo works with
-        case 0xe3:    butt = KEY_MUTE;    break;
-        case 0xea:    butt = KEY_VOLUMEUP;    break;
-        case 0xeb:    butt = KEY_VOLUMEDOWN;    break;
-What sort of keyboard do you have?
+> The output in lspci says that on my motherboard
+> there is usb-ohci,but the thing is that I don't know
+> if the host controller can be the cause why my
+> device doesn't seem to be plugged in when doing
+> hciconfig.
+> 
+> So, if my motherboard has usb-ohci, I wouldn't be
+> able to load usb-uhci, but I don't know if my
+> usb-bluetooth can just work with usb-uhci or if it
+> should work with usb-ohci.
 
-Presumably for now it would not matter if the events reported to the 
-kernel input system did not match what was written on the button labels, 
-as most people use, for example, gnome acme, which maps arbitrary keys 
-to program executions. However, the names in kernel input.h must be 
-there for a reason. I think the long term plan is for things like X to 
-read /dev/eventX, where it might become important to get it right. Does 
-this mean that bthid should become configurable?
+what you are saying makes no sense. Send us the output of lspci, lsusb,
+lsmod and dmesg so we know what's really on your motherboard.
 
-I am happy to help with this as best I can (patches, testing etc), but 
-my c/c++ is a little flaky...
+Regards
 
-    Regards,
-       
-        Oli Ellis
+Marcel
+
+
 
 
 -------------------------------------------------------
