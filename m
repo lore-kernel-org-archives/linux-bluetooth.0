@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Socket error: No such file or directory
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41A705AA000053C5@mta02.ono.com>
-References: <41A705AA000053C5@mta02.ono.com>
-Content-Type: text/plain
-Message-Id: <1102093587.8479.25.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41A705AA000053C5@mta02.ono.com>
+From: kwyjibo@ono.com
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-15"
+Subject: [Bluez-devel] Socket error: No such file or directory
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,26 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 03 Dec 2004 18:06:27 +0100
+Date: Fri, 3 Dec 2004 17:57:24 +0100
 
 Hi,
 
-> I'm trying to open a socket with this:
-> 
-> servSockBluez = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)
-> 
-> but I get an error: "No such file or directory", wich I don't understant
-> it at all.
-> 
-> What's exactly the problem?
+I'm trying to open a socket with this:
 
-sounds like your kernel has no RFCOMM support or the kernel module is
-not loaded.
+servSockBluez =3D socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)
 
-Regards
+but I get an error: "No such file or directory", wich I don't understant
+it at all.
 
-Marcel
+What's exactly the problem?
 
+Thanks in advance.
 
 
 
