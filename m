@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Sebastian Roth <sebiroth@web.de>
-Message-ID: <cvg3ls$t62$1@sea.gmane.org>
-References: <20050222164005.71253.qmail@web26409.mail.ukl.yahoo.com> <20050222172313.48745.qmail@web26410.mail.ukl.yahoo.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] Driver version problems..hci_usb & bluetooth
+	parser
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <20050222172313.48745.qmail@web26410.mail.ukl.yahoo.com>
-Subject: [Bluez-users] Re: Driver version problems..hci_usb & bluetooth parser
+References: <20050222172313.48745.qmail@web26410.mail.ukl.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1109095826.8506.28.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,23 +19,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Feb 2005 21:15:39 +0100
+Date: Tue, 22 Feb 2005 19:10:26 +0100
 
-Hi!
+Hi,
 
+> when I tape
+> #modprobe -f hci_usb
+> it works, I can do an hciconfig hci0 up  an using
+> hcitool etc...
+> 
+> 
+> dmesg tells:
 > hci_usb: no version for "struct_module" found: kernel
 > tainted.
 > hci_usb: no version magic, tainting kernel.
-Try google or some other great magic tool ;-)
-Seems to me that the kernel image was not compiled from
-exactly the same sources.
-IMHO it's better to compile a complete new kernel and not
-only some modules and try to load them into the
-distribution kernel (this is just my guess about what might
-be the problem so please complain if I'm wrong)
+> Bluetooth: HCI USB driver ver 2.7 
+> usbcore: registered new driver hci_usb 
+> 
+> I don't understand where is the matter. But is it
+> possible that HCI USB driver is a ver 2.7 and the
+> Bluetooth: Core ver 2.6 in the same kernel?
 
-Best regards,
-Sebastian
+this is no problem. All modules have there own version number.
+
+Regards
+
+Marcel
+
 
 
 
