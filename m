@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Ville Tervo <ville.tervo@hut.fi>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] (no subject)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ville Tervo <ville.tervo@hut.fi>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040816121214.GA514@cc.hut.fi>
-References: <20040812111537.27087.qmail@webmail27.rediffmail.com>
-	 <1092310309.28711.103.camel@pegasus>  <20040816121214.GA514@cc.hut.fi>
-Content-Type: text/plain
-Message-Id: <1092659350.4375.141.camel@pegasus>
+Message-ID: <20040816121214.GA514@cc.hut.fi>
+References: <20040812111537.27087.qmail@webmail27.rediffmail.com> <1092310309.28711.103.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1092310309.28711.103.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,29 +17,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 16 Aug 2004 14:29:10 +0200
+Date: Mon, 16 Aug 2004 15:12:15 +0300
 
-Hi Ville,
-
-> > > i want to know abt the BT 1.2 support and SDIO support in BlueZ.
-> > 
-> > we have full Bluetooth 1.2 support on the HCI layer, but at the moment
-> > the L2CAP retransmission and flow control feature is missing. However it
-> > seems that none of the embedded stacks are having this either.
+On Thu, Aug 12, 2004 at 01:31:49PM +0200, Marcel Holtmann wrote:
+> Hi Abhay,
 > 
-> Is someone planning to do rfc mode?
+> > i want to know abt the BT 1.2 support and SDIO support in BlueZ.
+> 
+> we have full Bluetooth 1.2 support on the HCI layer, but at the moment
+> the L2CAP retransmission and flow control feature is missing. However it
+> seems that none of the embedded stacks are having this either.
 
-some time ago I started with it and found a bug in our L2CAP info
-request/response code in the kernel. I stopped working on, because I
-realized that the config exchange must be redesigned to better fit for
-RFC mode and also QoS in the future. There are more important things to
-do first.
+Is someone planning to do rfc mode?
 
-Regards
+> 
+> I don't know of any support for SDIO devices.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
 
-Marcel
 
-
+Ville
 
 
 -------------------------------------------------------
