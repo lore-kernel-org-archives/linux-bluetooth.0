@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <B1B1B17A05AFD4119CDB00508B6A9070011AE522@EPPIEX3>
-From: Kharisma Esguerra <kharisma.esguerra@eppi.epson.com.ph>
-To: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-devel] installing bluez in windows 98/2000
+Subject: Re: [Bluez-devel] Bluez-devel]
+From: Marcel Holtmann <marcel@holtmann.org>
+To: blookk - <blookk@hotmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY1-F42k6kvXsn2Yf00002fe32@hotmail.com>
+References: <BAY1-F42k6kvXsn2Yf00002fe32@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1096917898.20349.57.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,20 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 5 Oct 2004 11:06:54 +0800
+Date: Mon, 04 Oct 2004 21:24:59 +0200
 
-Hi!
+Hi,
 
-I'm really a newbie and hope you have mercy on me.
-Is it possible to install BlueZ in windows 98 and 2000?
+> When I load with "insmod" rfcomm, the kernel give me this error:
+> "
+> Oct  4 19:03:22 clavijo modprobe: modprobe: Can't locate module bt-proto-0
+> Oct  4 19:03:22 clavijo kernel: rfcomm_add_listener: Create socket failed -2
+> "
+> Which is the solution?
 
-Ma. Kharisma V. Esguerra
-System Engineer I
-Epson Precision (Philippines), Inc. - Cebu Office
-Module 7A, e-Office, Asiatown I.T. Park,
-Apas, Cebu City, 6000 Philippines
-Tel. Nos. (+63 32) 412-7511 to 13
-Fax No. (+63 32) 412-7514
+do a "modprobe l2cap" first.
+
+Regards
+
+Marcel
 
 
 
