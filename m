@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] CSR USB dongle w/BT 1.2 and headset/handsfree profiles?
-References: <ctriti$j66$1@sea.gmane.org>
-In-Reply-To: <ctriti$j66$1@sea.gmane.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200502022312.51283.cijoml@volny.cz>
+From: Jesse Guardiani <jesse@wingnet.net>
+Message-ID: <ctriti$j66$1@sea.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] CSR USB dongle w/BT 1.2 and headset/handsfree profiles?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,31 +16,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 2 Feb 2005 23:12:51 +0100
+Date: Wed, 02 Feb 2005 17:07:15 -0500
 
-D-Link DBT-120 rev B3 is your choice :)
+Hello,
 
-Michal
+I've been googling, but not much luck. Does
+anyone know of a CSR chipset based USB dongle
+that is firmware upgradeable to BT 1.2 (or
+ships with BT 1.2) and that also supports the
+headset and handsfree profiles under Bluez?
 
-Dne st 2. =FAnora 2005 23:07 Jesse Guardiani napsal(a):
-> Hello,
->
-> I've been googling, but not much luck. Does
-> anyone know of a CSR chipset based USB dongle
-> that is firmware upgradeable to BT 1.2 (or
-> ships with BT 1.2) and that also supports the
-> headset and handsfree profiles under Bluez?
->
-> All the CSR chipset dongles I've seen so far
-> appear to be BT 1.1, but I'd really really
-> like to own an BT 1.2 dongle with AFH!
->
-> Thanks!
+All the CSR chipset dongles I've seen so far
+appear to be BT 1.1, but I'd really really
+like to own an BT 1.2 dongle with AFH!
 
-=2D-=20
-S pozdravem
+Thanks!
 
-Michal Semler
+-- 
+Jesse Guardiani, Systems Administrator
+WingNET Internet Services,
+P.O. Box 2605 // Cleveland, TN 37320-2605
+423-559-LINK (v)  423-559-5145 (f)
+http://www.wingnet.net
+
+
 
 
 -------------------------------------------------------
