@@ -1,91 +1,83 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <3DE3D017.2210011B@exodus.net>
-From: Maksim Yevmenkin <myevmenk@exodus.net>
-MIME-Version: 1.0
-To: Max Krasnyansky <maxk@qualcomm.com>
-CC: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] BlueZ HCIDump 1.5 has been released
-References: <5.1.0.14.2.20021125101006.078e54a0@mail1.qualcomm.com>
-	<5.1.0.14.2.20021126085633.07976128@mail1.qualcomm.com>
-Content-Type: text/plain; charset=us-ascii
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 26 Nov 2002 11:48:39 -0800
+Return-Path: <maxk@qualcomm.com>
+Message-Id: <5.1.0.14.2.20021126092054.0798bff0@mail1.qualcomm.com>
+Date: Tue, 26 Nov 2002 10:02:33 -0800
+To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+From: Max Krasnyansky <maxk@qualcomm.com>
+Subject: Re: [Bluez-devel] Reuse of H4 and BCSP code
+In-Reply-To: <1038260639.772.57.camel@pegasus.local>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hello Max,
+Marcel,
 
-[...]
-
-> >or I'm missing something.
-> No you're not. HCIDump code does need some audit.
-
-ok :)
-
-> >Also I have a HUGE favor to ask :) Would it be too hard to not
-> >use *any* Linux specific stuff? Here I'm talking about things
-> >like
-> >
-> >1) data types: __u8, __u16 etc. Would it be possible to
-> >   use standard <sys/types.h>
-> Yeah. We converted all headers and stuff but forgot about hcidump.
-> btw We use <stdint.h> instead of <sys/types.h> i.e. uint32_t, etc.
+>the current hci_uart.o driver supports H4 and BCSP HCI protocols and the
+>code from it should be reusable by the other drivers two. For example
+>most PCMCIA cards are a kind of serial cards with an UART on it. The
+>only difference is how the UART would be used to talk to the Bluetooth
+>chips and many times you need some extra code. If this Bluetooth chip is
+>one from CSR their are two protocols available two use and you can
+>switch between them if you like (and autodetection would be great). So
+>it should be possible to reuse the H4 and the BCSP code, which will make
+>some PCCARD drivers a little bit smaller.
 >
-> >2) Any stuff from <asm/*.h> including "get_unaligned()"
-> Sure.
-> 
-> >3) Man page is very strange. Mdoc macros are used seems to
-> >   be Linux (new mdoc?) specific.
-> No idea what you're talking about :). Looks perfectly ok to me.
+>The current driver which can reuse the code are:
+>
+>bluecard_cs:    H4
+>bt3c_cs:        H4
+>btuart_cs:      H4 and BCSP
+>bt950_cs:       H4 and BCSP
+>hci_uart:       H4 and BCSP
+>
+>At the moment I see two ways of doing this, but maybe there are more of
+>them.
+>
+>1. Let the hci_uart driver export some function to let the drivers
+>register. Maybe something like:
+>
+>        hci_register_uart       (which later calls hci_register_dev)
+>        hci_unregister_uart     (which later calls hci_unregister_dev)
+>
+>2. Make the code in hci_h4.c and hci_bcsp.c linkable against the driver.
+>
+>Both versions have advantages and disadvantages. The first one keeps the
+>size of the driver module small, but you always need another module to
+>interface with the HCI core. The second one need no other modules, but
+>the code for the UART protocols are in every driver.
 
-well, how about the following
+3. Move H4 and BCSP to a separate module hci_uart_proto (or whatever) and
+export 
+        hci_uart_get_proto(XXX) 
+        hci_uart_put_proto(XXX)
+        etc
 
-1) Some macros have wrong capitalization. For example: .SH and .PP
-   i think it should be .Sh and .Pp
+4. Make all H4/BCSP _cs look like normal TTY (with minimal TTY functionality) 
+and use hciattach + hci_uart.o
 
-2) Use of .TH macro with hardwired "Linux System Administration".
-   Instead i would suggest to use something like
+>>>From me personal view of it I don't like to have too much modules and I
+>would go with the second possibility. But anyway for both methods some
+>parts of the BCSP init code have to be moved to the kernel space.
 
-   .Dd November, 12 2002
-   .Dt HCIDUMP 1
-   .Os
+Believe it or not but I actually prefer #4 :). I know I know, I was the one who
+said that we should try to avoid TTY layers if possible. But it's becoming 
+more and more troublesome. I don't like the idea of moving BCSP initialization
+and H4/BCSP auto-detection into the kernel. In order to keep it in the user space 
+we need some interface for hciattach. And TTY provides perfect interface 
+for what hciattach needs to do.
+So far I haven't seen any Bluetooth HCI performance issues related to the 
+TTY layer. We set tty->low_latency flag and get data right of the ring buffer.
+And we don't have to support complete TTY functionally, just stuff that we need
+i.e. set baudrate, read/write, etc.
+btw In 2.5.x TTY layer has been cleaned up and doesn't look as bad as in 2.4.
 
-3) Use of .B macro where .Nm should be used.
+#1 Is essentially reinventing TTY interface. i.e. HW drivers register to a
+generic layer i.e. TTY (or HCI in our case).
+#2 Is unnecessary bloating. I'd rather do #3.
 
-4) SYNOPSIS section probably should use .Op Fl opt Ar arg macro.
+But the biggest disadvantage of 1,2 and 3 is lack of interface for the user space.
+If you remember BCSP discussions, there was an issue of properly resetting HCI device
+(i.e. HCI and all the way up) if HW problems were detected. With hciattach it's easy,
+hci_uart sends SIGHUP -> hciattach closes TTY -> HCI device unregistered -> hciattach 
+reopens TTY. It's not that simple without hciattach.
 
-5) All lists and list items probably should use .Bl, .It and
-   .El macros.
-
-6) AUTHORS section probably should use .An Name Aq e-mail macro.
- 
-7) man page has name hcidump.8 (i.e. section 8) but the page itself
-   says its section 1.
-
-> >It would make porting so much easier. Should I made the patches
-> >and submit them ?
-> Yes, by all means.
-
-ok.
-
-thanks,
-max
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: Get the new Palm Tungsten T 
-handheld. Power & Color in a compact size! 
-http://ads.sourceforge.net/cgi-bin/redirect.pl?palm0002en
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Max
