@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] accessing info on paired devices
+Subject: Re: [Bluez-users] SCO route way!!
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Pall Thayer <palli@pallit.lhi.is>
+To: Chen Bin <binch@mobilesoft.com.cn>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <41570BC9.6090109@pallit.lhi.is>
-References: <41570BC9.6090109@pallit.lhi.is>
+In-Reply-To: <1096249564.1725.0.camel@debian>
+References: <1096249564.1725.0.camel@debian>
 Content-Type: text/plain
-Message-Id: <1096359364.4684.28.camel@notepaq>
+Message-Id: <1096359291.4684.26.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Sep 2004 10:16:04 +0200
+Date: Tue, 28 Sep 2004 10:14:51 +0200
 
-Hi Pall,
+Hi Chen,
 
-> I'm working on a little project that would have to automatically scan 
-> for bluetooth devices (using a little perl script) and then attempt to 
-> connect to them. However, I would prefer if it would only attempt to 
-> connect to devices that have already been paired with the computer (via 
-> bluetooth usb-dongle) and ignore discovered devices that have not been 
-> paired. So, how can I find out which of the discovered devices have been 
-> paired?
+> I am developing Bluetooth on Smart Phone, I have a question about
+> bluetooth voice, I don't know whether it is suitable to ask this
+> question here. 
 
-if there exists a link key for this device then they are paired, but the
-problem is that security mode 1 not demands to pair two devices.
+yes, this is the wrong mailing list until you start using Linux and
+BlueZ on your smart phone ;)
+
+> My chip is TI BRF6100, I can change data between my board and the BT usb
+> dongle, and it can connect to the bluetooth headset, but it can't play
+> any music to it. 
+> 
+> The rfcomm connection has been connected and I can receive the AT
+> command from the headset.Using hcidump, I found that the SCO link is
+> added, but then there is no SCO traffic in the channel. 
+> 
+> The chip can support SCO data route from hci or direct to the baseband
+> from codec. I think the default choice of the chip is baseband. 
+> 
+> How can I choose the SCO route method? Is it a standard HCI command or
+> vendor-specific command? 
+
+There are two ways, SCO over HCI and SCO over PCM. There is no standard
+HCI command to switch between them. They are all vendor specific or
+preset by the chip manufacturer and not changeable.
 
 Regards
 
