@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Dave Henriksen <dhenriksen@optibrand.com>
-To: bluez-devel@lists.sourceforge.net
+Subject: RE: RE : [Bluez-devel] Audio to headset
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Williams, Richard" <Richard.Williams@VITRONICS.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <A1F0D47583A2D711919F00600819B3A4ED37@goofy.vitronics.com>
+References: <A1F0D47583A2D711919F00600819B3A4ED37@goofy.vitronics.com>
 Content-Type: text/plain
-Message-Id: <1074718139.2978.7.camel@linux.local>
+Message-Id: <1074705820.7088.104.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] pand Connection refused(111) when connecting to a Belkin NAP
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,30 +18,18 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 21 Jan 2004 12:48:59 -0800
+Date: Wed, 21 Jan 2004 18:23:40 +0100
 
-Hi,
+Hi Richard,
 
-I'm wondering what may be causing a "Connection refused(111)" message
-when I issue a "pand --connect 00:02:72:00:DC:F1" command to connect to 
-a Belkin NAP.   The proper pins are setup, and I can l2ping the NAP, I
-just can't get pand to connect to it.  Any help would be greatly
-appreciated.   I know that when I do networking through this NAP on the
-Windows side, I need to specify and id/password combination in addition
-to a pin.  I'm not sure how to do this in Linux.
+> I am about to start a bluetooth headset project, but for an embedded system running an x-scale processor and linux 2.4.19. Will I need to upgrade to the 2.4.24 as Marcel suggests ? 
 
-Thanks,
+you can use patch-2.4.19-mh14 if you like.
 
-Dave H
+Regards
 
-log info:
+Marcel
 
-Jan 21 11:28:51 linux pand[2711]: PAN daemon ver 1.1
-Jan 21 11:28:51 linux pand[2711]: Connecting to 00:02:72:00:DC:F1
-Jan 21 11:28:53 linux hcid[2690]:
-link_key_request(sba=00:0D:88:AC:BE:C5, dba=0 0:02:72:00:DC:F1)
-Jan 21 11:28:54 linux pand[2711]: Connect to 00:02:72:00:DC:F1 failed.
-Connection refused(111)
 
 
 
