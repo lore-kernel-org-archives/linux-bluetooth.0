@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hidp and hidd related bugs
+Subject: Re: [Bluez-users] Can't understand
 From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
+To: Hedin <andrewthegreat@mail.ru>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405120030.54220.cijoml@volny.cz>
-References: <200405120030.54220.cijoml@volny.cz>
+In-Reply-To: <200405121820.59166.andrewthegreat@mail.ru>
+References: <200405121820.59166.andrewthegreat@mail.ru>
 Content-Type: text/plain
-Message-Id: <1084368090.25099.22.camel@pegasus>
+Message-Id: <1084367829.25099.16.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,40 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 May 2004 15:21:30 +0200
+Date: Wed, 12 May 2004 15:17:09 +0200
 
-Hi Michal,
+Hi Hedin,
 
-> I did little research and here is output:
+> I have Redhat 9.0 with 2.6.6-mh1 patched kernel and all modules compiled.
+> I have Tecom BT3030 Dongle.
 > 
-> keys which are not reported in xev:
-> Eigene Dateien
-> Eigene Bilder
-> Eigene Musik
-> Messenger
-> Abmelden
+> I compiled bluez-libs-2.7 and bluez-utils-2.7. After some effort (big effort!) 
+> I managed to compile bluez-pin (why is it needed - no word anywhere...).
 > 
-> Reported badly
-> Rechner is reported like Pause
-> Standby like Print
-> 
-> Do you want send keycodes which reports bthid in 2.4.26 to have the same 
-> hotkeys events?
+> I also installed all other modules without problems, except bluez-bluefw. It 
+> gives following errors:
 
-you own a german keyboard ;)
-
-However I can't help you in that case, because I have little interest to
-fix this. The HID parser that is used by the HIDP kernel module is the
-same parser as in the USB HID driver. In some near future they will be
-joined to use the same generic parser. The parser in bthid was written
-for the Microsoft keyboard and maybe did some assumptions that are wrong
-for other keyboards. Try to get the buttons work with current HIDP and
-some external programs like hotkeys.
-
-> hidd --killall wants atribute BDADDR 
-
-Silly typo. I only tested "-K" and that was working. It is fixed in CVS
-now.
+the bluez-bluefw was never ported to work on 2.6 systems. You can use
+the bcm203x firmware loader driver instead. For some more information
+take a look here http://www.bluez.org/drivers.html
 
 Regards
 
