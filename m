@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Final sound support in BlueZ
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405191405.41365.cijoml@volny.cz>
-References: <200405191405.41365.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1084969362.4327.56.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <40AB4D9F.7010307@telus.net>
+From: Ken <a5a33956@telus.net>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] rfcomm confusion
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,19 +15,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 May 2004 14:22:42 +0200
+Date: Wed, 19 May 2004 05:05:51 -0700
 
-Hi Michal,
+I am trying to create a bluetooth serial connection between my linux 
+laptop and iPAQ pda.
+I'm using the command "rfcomm connect hci0 00:11:22:33 1" and it appears 
+to work.
+the connection shows up on the iPAQ and when I go to the status it 
+displays 0 bytes transfered - 0 bytes received.
 
-> do you work on sco support for BlueZ which will allow us finally talk to BT 
-> headsets? In our market are selled BT enabled repros too.
+so, now i'm trying to send some data over this connection. my 
+expectation was that i could do something like:
+echo "test" > /dev/rfcomm0
+and then see 4 bytes received on the iPAQ interface, however the byte 
+counts on the ipaq remain 0.
 
-I am not working on any SCO or eSCO support at the moment. There are
-many other parts that need my attention.
+does it make sense to try and send data this way? if not, can anybody 
+suggest how i should be trying to send data over an rfcomm connection?
 
-Regards
-
-Marcel
+thanks!
+ken
 
 
 
