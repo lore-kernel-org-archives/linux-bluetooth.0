@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] What happened with bluez.org
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d1f423d3050313183529b84218@mail.gmail.com>
-References: <d1f423d3050313183529b84218@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1110795285.8158.43.camel@pegasus>
+Message-ID: <d1f423d3050313183529b84218@mail.gmail.com>
+From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] What happened with bluez.org
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +16,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Mar 2005 11:14:45 +0100
+Date: Sun, 13 Mar 2005 18:35:12 -0800
 
-Hi Anderson,
-
-> I am having difficults on accessing www.bluez.org. Does anybody have
-> the same problem?
-
-actually I do ;)
-
-I am dealing with the problem since Thursday or so. It seems that the
-current hardware is no longer reliable. Unexpected freezes and I haven't
-found the real problem yet. Maybe I have to buy a new server.
-
-Regards
-
-Marcel
+Hi folks,
 
 
+I am having difficults on accessing www.bluez.org. Does anybody have
+the same problem?
+
+thanks
+
+
+-- 
+Anderson Clayton B. Rodrigues
+Eng. de Software
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
