@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Reduce bluetooth signal
+Subject: Re: [Bluez-devel] sdptool segfaults
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050302175243.48514.qmail@web50408.mail.yahoo.com>
-References: <20050302175243.48514.qmail@web50408.mail.yahoo.com>
+In-Reply-To: <1109865262.6722.84.camel@baroque.rococosoft.com>
+References: <42272E36.3070503@tomtom.com>
+	 <1109865262.6722.84.camel@baroque.rococosoft.com>
 Content-Type: text/plain
-Message-Id: <1109852828.8284.110.camel@pegasus>
+Message-Id: <1109884671.8058.8.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,15 +19,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 03 Mar 2005 13:27:08 +0100
+Date: Thu, 03 Mar 2005 22:17:51 +0100
 
-Hi Dikaios,
+Hi Steve,
 
-> I am currently working on a project and I would like to reduce the bluetooth signal strength of my
-> iPaq. Any ideas how I can do that? 
+> This looks to me like the Samsung is formatting the profile descriptor
+> list incorrectly. I guess it should be a sequence of sequences of
+> { UUID, version } whereas the Samsung just formats it as a sequence.
 
-I don't know of any way to do that. However if you find a HCI command
-for it, then it is possible.
+any idea on how to deal with these wrong profile descriptors?
 
 Regards
 
