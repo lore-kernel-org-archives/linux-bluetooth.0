@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Printer adapter w/o SDP
+Subject: Re: [Bluez-users] Trouble sending from device (K700i)
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Michael Albinus <michael.albinus@gmx.de>
+To: niklas adolfsson <niklas.adolfsson@home.se>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <87acxxxly1.fsf@gmx.de>
-References: <87acxxxly1.fsf@gmx.de>
+In-Reply-To: <40FAB231.1020400@home.se>
+References: <40FA3DBD.5010401@home.se> <1090142232.4558.60.camel@pegasus>
+	 <40FA48B4.1010101@home.se> <1090144899.4558.65.camel@pegasus>
+	 <40FAB231.1020400@home.se>
 Content-Type: text/plain
-Message-Id: <1090178500.4400.25.camel@pegasus>
+Message-Id: <1090173546.4400.21.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,70 +20,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 18 Jul 2004 21:21:40 +0200
+Date: Sun, 18 Jul 2004 19:59:06 +0200
 
-Hi Michael,
+Hi Niklas,
 
-> I have a bt printer adapter with a broken SDP:
-> 
-> magdalene:~# sdptool browse
-> Inquiring ...
-> Browsing 00:0C:55:00:B2:B4 ...
-> Service Name: BrightCom SPP print Server
-> Service RecHandle: 0x4f4a0001
-> Service Class ID List:
->   "Error: This is uuid32" (0x00001101)
-> Protocol Descriptor List:
->   "Error: " (0x00000100)
->   "Error: " (0x00000003)
->     uint8: 0x1
-> Language Base Attr List:
->   code_ISO639: 0x656e
->   encoding:    0x6a
->   base_offset: 0x100
->   code_ISO639: 0x6672
->   encoding:    0x6a
->   base_offset: 0x110
-> 
-> Service Name: BrightCom OPP Server
-> Service RecHandle: 0x4f4a0002
-> Service Class ID List:
->   "Error: This is uuid32" (0x00001105)
-> Protocol Descriptor List:
->   "Error: " (0x00000100)
->   "Error: " (0x00000003)
->     uint8: 0x2
->   "Error: " (0x00000008)
-> Language Base Attr List:
->   code_ISO639: 0x656e
->   encoding:    0x6a
->   base_offset: 0x100
->   code_ISO639: 0x6672
->   encoding:    0x6a
->   base_offset: 0x110
-> Profile Descriptor List:
->   "Error: This is uuid32" (0x00001105)
->     Version: 0x0100
+> < ACL data: handle 0x0029 flags 0x02 dlen 11
+>     L2CAP(d): cid 0x46 len 7 [psm 3]
+>       RFCOMM(d): UIH: cr 0 dlci 8 pf 0 ilen 3 fcs 0x80
+>       A0 00 03
+> < ACL data: handle 0x0029 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x46 len 4 [psm 3]
+>       RFCOMM(s): DISC: cr 0 dlci 8 pf 1 ilen 0 fcs 0x49
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+>   01 29 00 01 00
+> > ACL data: handle 0x0029 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x40 len 4 [psm 3]
+>       RFCOMM(s): DISC: cr 1 dlci 8 pf 1 ilen 0 fcs 0x28
+> < ACL data: handle 0x0029 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x46 len 4 [psm 3]
+>       RFCOMM(s): UA: cr 1 dlci 8 pf 1 ilen 0 fcs 0x2
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+>   01 29 00 01 00
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+>   01 29 00 01 00
+> > ACL data: handle 0x0029 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x40 len 4 [psm 3]
+>       RFCOMM(s): UA: cr 0 dlci 8 pf 1 ilen 0 fcs 0x63
+> < ACL data: handle 0x0029 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x46 len 4 [psm 3]
+>       RFCOMM(s): DM: cr 1 dlci 8 pf 1 ilen 0 fcs 0xe3
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+>   01 29 00 01 00
 
-this is not broken SDP. They use UUID32 which is fine, but actually not
-quite the normal way.
-
-What libs and utils versions are you using?
-
-> It is bound via serial protocol:
-> 
-> magdalene:~# rfcomm
-> rfcomm0: 00:0C:55:00:B2:B4 channel 1 clean 
-
-Who said that this needed?
-
-> But I'm unable to use it as CUPS printer ("Can't get service
-> information"). The CUPS URI is "bluetooth://000C5500B2B4/spp".
-> 
-> Is there a way to bind it to CUPS without SDP? I hoped specifying the
-> protocol in the URI would be sufficient.
-
-No, because you still need to get the RFCOMM channel number.
+so the trouble is that the DLCI 0 will never gets closed and so the
+L2CAP PSM 3 will never be close and so on the ACL link can't be closed.
+Right now I am not sure what device is buggy here. The BlueZ or your
+phone. Please install a 2.6.8-rc2 vanilla kernel and try again and I
+need a binary dump of the full communication from your phone to BlueZ.
+Do this with "hcidump -w <file>" as root.
 
 Regards
 
