@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] ftp patch
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ka Fai Lau <iamkafai2002@yahoo.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20041005060130.18216.qmail@web13125.mail.yahoo.com>
-References: <20041005060130.18216.qmail@web13125.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1096994473.20349.76.camel@pegasus>
+To: bluez-devel@lists.sourceforge.net
+From: Gerd Flaig <gerd@schlund.de>
+Message-ID: <ivwty5w81v.fsf@im.use.schlund.de>
+References: <B1B1B17A05AFD4119CDB00508B6A9070011AE522@EPPIEX3>
+	<1096963071.20349.64.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-devel] Re: installing bluez in windows 98/2000
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,20 +17,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 05 Oct 2004 18:41:13 +0200
+Date: Tue, 05 Oct 2004 16:31:24 +0200
 
-Hi KaFai,
+Marcel Holtmann <marcel@holtmann.org> writes:
 
-> I d/l the ftp from cvs but somehow broken to me.  I have made a patch to the obex and ftp.  It is
-> a really quick patch.  Hopefully, I didn't make too many mistakes :D
+>> I'm really a newbie and hope you have mercy on me.
+>> Is it possible to install BlueZ in windows 98 and 2000?
+>
+> there is a simple answer to this: NO.
 
-I applied the patch by hand now. For future patches keep our coding
-style in mind and use only -urN for creating the diff.
+doesn't vmware tunnel USB devices to the virtual machine on request?
+Maybe the emulation is good enough...  ;)
 
-Regards
-
-Marcel
-
+       Goodbyte, Gerd.
+-- 
+Gerd Flaig                     Technik                gerd@schlund.de
+Bei Schlund + Partner AG       Brauerstraﬂe 48      D-76135 Karlsruhe
+ Physics is like sex: sure, it may give some practical results,
+ but that's not why we do it. -- Richard Feynman
 
 
 
