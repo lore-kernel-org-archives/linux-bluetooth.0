@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jiri Kaderavek <jiri.kaderavek@webstep.net>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200312171019.20938.jiri.kaderavek@webstep.net>
-Subject: [Bluez-users] rfcomm failing after PIN is entered on nokia 6310i
+Subject: Re: [Bluez-users] Performance of Bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Richard van Dok <rdok@home.nl>
+Cc: bluez-users@lists.sf.net
+In-Reply-To: <4322.192.168.127.20.1071611970.squirrel@cp257602-a.dbsch1.nb.home.nl>
+References: 
+	 <4322.192.168.127.20.1071611970.squirrel@cp257602-a.dbsch1.nb.home.nl>
+Content-Type: text/plain; charset=iso-8859-15
+Message-Id: <1071612564.27571.33.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,39 +19,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Dec 2003 10:19:20 +0100
+Date: Tue, 16 Dec 2003 23:09:24 +0100
 
-Hi all.
+Hi Richard,
 
-I'm setting up a bluetooth connection between
-my server and Nokia 6310i phone. This connection
-was working (phone and server was paired), but now
-I'm asked by phone for entering a PIN (maybe i've
-changed USB bluetooth dongle, because i have
-2 units).
+> I'm writing this mail because I have a question about the Bluez bluetoo=
+th
+> stack on Linux Redhat 7.3 (on a Clarkconnect box, in fact). I recently
+> installed the software using the information found here:
+> http://www.harbaum.org/till/palm/bluetooth/index.html
+>=20
+> First: everything works! It's great, I can even use MobileTS on a Sony
+> Cli=E9 with PalmOS to take over the screen of windows systems. This was=
+n't
+> possible before, when the bluetooth stack was running on my Xp system.
+>=20
+> One question remains: the throughput of the Bluez stack is less than ha=
+lf
+> the amount I got under Windows. This might be due to an error I constan=
+tly
+> get in /var/log/messages when connected over Bluetooth. It states:
+> rfcomm_send_data: Flow stopped, to credits (0) on DLCI 4, returning <va=
+lue>
+> <value> differs. Often seen values are 0, 328, 984, 656, 1312 and so on.
 
-After typing
+you should have said that you are using rfcommd. This software part of
+BlueZ is deprecated and replaced with a kernel implementation of the
+RFCOMM protocol. In conjunction with dund it should work perfect for
+you. However you might have to update your kernel. See my patches for
+more details.
 
-# rfcomm connect rfcomm0
+Regards
 
-(i'm sure that rfcomm0 is well configured in a rfcomm.conf)
-i must confirm the conection on the phone and then
-i'm asked by the phone for a PIN number. After inserting 
-the same PIN as in /etc/bluetooth/pin i see:
+Marcel
 
-uran:/home/kodoub# rfcomm connect rfcomm0
-Can't connect RFCOMM socket: Resource temporarily unavailable
 
-My pin_helper is a bash script with echo "PIN:XXXXX".
-The same problem i have also on my second computer.
-I'm using Debian with different kernels on these
-computers (patched Linux version 2.4.20-k7-mh8 and
-Linux version 2.4.22). I'm sure that i solved this
-problem in the past after a days, but i've forget
-the solution. Please, can anybody help me remember
-what is bad?
-
-Thanx, Jirka.
 
 
 -------------------------------------------------------
