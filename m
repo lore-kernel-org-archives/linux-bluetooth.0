@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hidp patches for 2.6.7
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Dick <dm@chello.nl>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200406192039.33760.dm@chello.nl>
-References: <200406192039.33760.dm@chello.nl>
-Content-Type: text/plain
-Message-Id: <1087718872.25061.31.camel@pegasus>
-Mime-Version: 1.0
+From: Dick <dm@chello.nl>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200406192039.33760.dm@chello.nl>
+Subject: [Bluez-devel] hidp patches for 2.6.7
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,20 +16,11 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 20 Jun 2004 10:07:52 +0200
+Date: Sat, 19 Jun 2004 20:39:33 +0200
 
-Hi Dick,
-
-> I'd like to use hidp from linux 2.6.7, could someone create a patch for it?
-
-I am a little bit busy at the moment, but I try to get a new -mh patch
-out later this day. However I can't promise anything.
-
-Regards
-
-Marcel
-
-
+I'd like to use hidp from linux 2.6.7, could someone create a patch for it?
+Thanks in advance,
+Dick
 
 
 -------------------------------------------------------
