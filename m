@@ -1,8 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Ryan Hitch <bandm@bandmatch.co.uk>
-Message-Id: <E1Cq1Ah-0001CT-Rp@server1.dnsblock.com>
-Subject: [Bluez-users] Re: IOGear GBU311 support
+From: Can Burak Cilingir <canburak@cs.bilgi.edu.tr>
+To: Bluez-users@lists.sourceforge.net
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-KXBltiCjOnIDnLSYTFnx"
+Message-Id: <1105814392.14979.8.camel@portable.canb.net>
+Mime-Version: 1.0
+Subject: [Bluez-users] bluetooth gateway
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -14,35 +16,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 Jan 2005 03:33:47 +0000
-
-Evening all!
-
-With regards to posting below (couldn't figure out how to do a direct reply on SF, so have cut an paste, hence lack of '>'s and the top posting).
-
-Marcel : I also have one of these chipset based dongles and would very much like to use in Linux, although I can't donate one to you (being skint, and the device being a gift), I would be happy to loan it you (and include return postage for when you've finished with it).  Let me know if this is of any help to you - email direct at 'bandm@bandmatch.co.uk' if you like.
-
-Regards,
-Ryan
- 
+Date: Sat, 15 Jan 2005 20:39:52 +0200
 
 
-Hi Jan,
- 
- > I"ve just bought a rather nice USB bluetooth adapter, IOgear
- > GBU311. It"s a class 1 device.
- > 
- > lsusb shows it as four devices:
- > 
- > Bus 001 Device 014: ID 0a5c:2009 Broadcom Corp. 
- 
- this is the problematic one. The 0a5c:200a works fine. As long as nobody
- donates one of these to me I can"t take a deeper look why this one makes
- so much problems.
- 
- Regards
- 
- Marcel
+--=-KXBltiCjOnIDnLSYTFnx
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+        I am trying to build a bluetooth gateway in my home.
+       =20
+        GSM Phone --bluetooth--> laptop --cable modem--> internet
+       =20
+        I can do this on windows but not on linux. I tried with bluez +
+        pand in NAP mode but it didn't worked.
+        ( http://bluez.sourceforge.net/contrib/HOWTO-PAN )
+       =20
+        anyone did this here?
+       =20
+        ps: my bluetooth adapter works on linux. i can send and receive
+        files via obex.
+--=20
+Can Burak Cilingir
+http://canb.net/
+http://tdk.org.tr/dogruyazalim.html
+icq#10720999
+
+--=-KXBltiCjOnIDnLSYTFnx
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+
+iD8DBQBB6WN3UNn5mAEjWBwRAuFAAJ9AtnhJhc7kE2eb41w/N4ehnAJipgCgjPjH
+tiQdDFd+3Nhs50Fso/jc6X8=
+=jVW7
+-----END PGP SIGNATURE-----
+
+--=-KXBltiCjOnIDnLSYTFnx--
 
 
 -------------------------------------------------------
