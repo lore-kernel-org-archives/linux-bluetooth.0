@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <423987E2.20601@amplex.dk>
+From: Stephan Henningsen <sth@amplex.dk>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-From: Catalin Drula <catalin.drula@imag.fr>
-Message-ID: <loom.20050317T164923-411@post.gmane.org>
-References: <Pine.GSO.4.33.0503171103450.12042-100000@horus.imag.fr> <Pine.LNX.4.33.0503171141200.22782-100000@redbean.intranet.gw-instruments.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Re: Handling a Hardware Error event on iPAQ h5550
+Subject: Re: [Bluez-devel] Error compiling bluez-utils for buildroot/ARM
+References: <4239536C.5030202@amplex.dk> <1111058060.11792.63.camel@pegasus> <423983A5.6010207@amplex.dk>
+In-Reply-To: <423983A5.6010207@amplex.dk>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,47 +18,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Mar 2005 15:59:06 +0000 (UTC)
+Date: Thu, 17 Mar 2005 14:36:34 +0100
 
-Peter Wippich <pewi <at> gw-instruments.de> writes:
- 
-> It may be much simpler trying to find the cause of the data corruption.
-> Do you have hardware handshake enabled ??
-> Have you tried different baud rates ??
-> Do you get any errors from the UART driver (like FiFo overruns) ??
-> Have you tried to modify the UART FiFo settings ??
+> Bluez-libs: --------------------------------------------------------
+> 
+> I cannot get bluez-libs installed where I want; The header files and the 
+> library files seem to install relative to different paths.
 
-Well, I'm over 5 weeks into finding the cause of the data corruption. 
-At first there were indeed overruns when receving. It turns out that 
-on the processor of this device (Intel XScale PXA255) there's a HWUART 
-(a UART with HW flow control capabilities) connected to the same lines 
-as the "default" UART for communicating with the BT controller 
-(this default UART is called BTUART). Changing to the HWUART solved the 
-overruns problem. 
- 
-The problems now occur on the sending direction (host to controller). 
-There is hardware flow control although the controller never deasserts 
-the RTS (never tells the host to stop sending). There are no FIFO 
-overruns, the FIFO does not overfill or anything like that. 
-
-The speed of communication and the parameter appear to be hard coded in 
-the BT module as 921600, 8N1 so there's not much to do there.
-
-In fact even with an artificial slow-down of the sending stream (down to 
-a few K/sec) these corrupted bytes still show. I could not correlate them
-with anything else even after weeks of testing and instrumenting the 
-kernel. There's really not much else that I can think of that could be 
-wrong on the host side. I am unsure if the same problem occurs under 
-Windows CE on this device, but apparently it does not. 
-
-Catalin
-
-
-
-
-
-
-
+This part works now.  Seems like I did mess up the parameters after 
+all.  So bluez-libs compiles and installes correctly now, ie. no 
+errors and the files appear in the tree as expected.
 
 
 -------------------------------------------------------
