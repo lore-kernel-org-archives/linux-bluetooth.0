@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: David Wuertele <dave-gnus@bfnet.com>
-Message-ID: <m3y8noqpc2.fsf@bfnet.com>
+Subject: Re: [Bluez-users] BT3030
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?koi8-r?Q?=E8=C5=C4=C9=CE?= <hedin@hiervard.ru>
+Cc: bluez-users@lists.sf.net
+In-Reply-To: <200405192102.06654.hedin@hiervard.ru>
+References: <200405192102.06654.hedin@hiervard.ru>
+Content-Type: text/plain
+Message-Id: <1084975835.4327.70.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Are there ANY ultralight notebooks with built-in bluetooth?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,18 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 May 2004 10:49:49 -0700
+Date: Wed, 19 May 2004 16:10:35 +0200
 
-I'm looking for a 3-lb 12" notebook with built-in bluetooth.  I can
-not find any such animal.  I've looked at the Vaio TR2/3A, they all
-use the external USB dongle.  I've looked at the Thinkpad X40, it uses
-an external USB dongle.  I've looked at Protege R100, it has nothing.
+Hi,
 
-Can anyone recommend an ultralight in current production with built-in
-bluetooth?
+> Still can't understand. I got /sys, put firmware.agent to /etc/hotpug 
+> (installed linux-hotplug package) and .BIN and .HEX files to 
+> /usr/lib/hotplug/firware.
+> 
+> After plugging in the device and loading the module `bcm203x' it still gives 
+> an -5 error about failing to load some mini-driver.
 
-Thanks,
-Dave
+is CONFIG_HOTPLUG enabled in your kernel? Are the executable bits of
+/etc/hotplug/firmware.agent set? For more detailed logs enable the debug
+option in your hotplug scripts.
+
+Regards
+
+Marcel
+
 
 
 
