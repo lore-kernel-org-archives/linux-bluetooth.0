@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <000801c3f505$976e0f80$7b6b7b8c@guang>
-From: "Guang" <m9187@cn.ee.ccu.edu.tw>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0005_01C3F548.A5203E30"
-Subject: [Bluez-users] SCO module
+Subject: Re: [Bluez-users] L2CAP connectionless
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Michel Planques <mplanque@laas.fr>
+Cc: kdesai@mail.smu.edu,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3902.82.255.26.193.1076967794.squirrel@www.laas.fr>
+References: <38F76B90B82C0A4A822651EACE4FF8E9C23322@s31xs2>
+	 <1076922085.2840.46.camel@pegasus>
+	 <3902.82.255.26.193.1076967794.squirrel@www.laas.fr>
+Content-Type: text/plain
+Message-Id: <1076972404.2840.60.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,50 +21,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Feb 2004 11:24:45 +0800
+Date: Tue, 17 Feb 2004 00:00:04 +0100
 
-This is a multi-part message in MIME format.
+Hi Michel,
 
-------=_NextPart_000_0005_01C3F548.A5203E30
-Content-Type: text/plain;
-	charset="big5"
-Content-Transfer-Encoding: quoted-printable
+> As I know, a L2CAP link is connection oriented, so I don't understand how
+> the connectionless mode is working.
 
-Hi all:
-We know that there is a modules "soc.o" and "hcitool.o"   in red hat  =
-linux8.0 , and we can type "hcitool" command to do we want to do ,for =
-example: hcitool  inq , and bluetooth device will inquire others =
-bluetooth devices. My question is that does soc have any command to =
-excute ? How do we to use this sco module? Does Bluez support sco ?
+it supports both, but the most used is the connection oriented.
 
- 
-------=_NextPart_000_0005_01C3F548.A5203E30
-Content-Type: text/html;
-	charset="big5"
-Content-Transfer-Encoding: quoted-printable
+> I already searched informations about SOCK_DGRAM implementation in Bluez
+> and never found anything : even in this mailing list (maybe I'm blind !)
+> If anybody could point me on some informations ...
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dbig5">
-<META content=3D"MSHTML 6.00.2800.1400" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT size=3D2>Hi all:</FONT></DIV>
-<DIV><FONT size=3D2>We know that there is a modules "soc.o"&nbsp;and =
-"hcitool.o"=20
-&nbsp; in red hat&nbsp; linux8.0&nbsp;, and we can type "hcitool" =
-command to do=20
-we want to do ,for example: hcitool&nbsp; inq , and bluetooth device =
-will=20
-inquire others bluetooth devices. My question is that does soc have any =
-command=20
-to excute ? How do we to use this sco module? Does Bluez support sco=20
-?</FONT></DIV>
-<DIV><FONT size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT size=3D2>&nbsp;</FONT></DIV></BODY></HTML>
+Some time ago Max includes support for SOCK_DGRAM and there was a
+discussion about it, but I wasn't involved in it.
 
-------=_NextPart_000_0005_01C3F548.A5203E30--
+Regards
+
+Marcel
+
 
 
 
