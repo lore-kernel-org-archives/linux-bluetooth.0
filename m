@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41E2A9FC.2010405@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Multiple Headsets
-References: <41E25ECD.2000505@fcse.co.uk> <41E267C4.5030906@dark-reality.de> <1105362147.8652.10.camel@pegasus>
-In-Reply-To: <1105362147.8652.10.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41E267C4.5030906@dark-reality.de>
+References: <41E25ECD.2000505@fcse.co.uk> <41E267C4.5030906@dark-reality.de>
+Content-Type: text/plain
+Message-Id: <1105362147.8652.10.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,41 +18,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 10 Jan 2005 17:14:52 +0100
+Date: Mon, 10 Jan 2005 14:02:27 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Lars,
 
-Marcel Holtmann wrote:
-|
-| starting with 2.6.10 the hci_usb got a module parameter "isoc". This
-| controls the alternate setting when plugging in a dongle. The default
-| value is 2 (or 0 if it is blacklisted device). Check the Bluetooth
-| specification what value you have to choose for 2 x 16-bit SCO channels.
-|
+> first, it would be a good idea to update to the latest available sources
+> (that is, 2.6.10 kernel and mh10 patchset).
+> 
+> I think we do support multiple sco connections now, but you must either
+> use 8-bit-audio (by hacking the btsco stuff) or hack the kernel.
+> 
+> The problem in short: the hci_usb driver that handles the bt dongles
+> needs to know how many data has to be send. So if using two 16bit
+> channels, it needs to switch to the 32bit-mode, not the 16bit mode that
+> is used by default.
+> 
+> This switching is not handled automatically by now (or, not handled in
+> any way to be precise), and while we are talking about it a lot, I think
+> nobody fixed this by now (this includes me).
 
-nice, did not know this yet. Should be added to the btsco documentation
-*cough*
+starting with 2.6.10 the hci_usb got a module parameter "isoc". This
+controls the alternate setting when plugging in a dongle. The default
+value is 2 (or 0 if it is blacklisted device). Check the Bluetooth
+specification what value you have to choose for 2 x 16-bit SCO channels.
 
-thanks for the remark,
-~  Lars
+Regards
+
+Marcel
 
 
-- --
-Lars Grunewaldt
-* software development
-* multimedia design
-skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
-web: http://www.dark-reality.de
-mail: lgw@dark-reality.de
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFB4qn7QWC6DTWkDAoRAkWXAJ0U0TDWnqjPDn1liNLOX4FEHgGSXwCfUnvO
-olUo1KgMjDR1gfLomfjWHWQ=
-=Jpbt
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
