@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY12-F40DEFAD638359C4B89FA248AC60@phx.gbl>
-From: "salvatore olgato" <sal_olg@hotmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth Printing (Belkin Print Server)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41A2089D.5030100@phaldor.co.uk>
+References: <41A2089D.5030100@phaldor.co.uk>
+Content-Type: text/plain
+Message-Id: <1101139759.15086.14.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Subject: [Bluez-users] Bluetooth Security
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,15 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Nov 2004 17:29:51 +0000
+Date: Mon, 22 Nov 2004 17:09:19 +0100
 
-Hello Marcel,
-I want information for implementation of Bluetooth security with BlueZ.
+Hi Dave,
 
-Best regards.
+>     I have taken Marcels advice and moved to SUSE 9.2 after trying
+> Debian on the way. I could not get Debian to work with SATA and so it
+> was a non starter for this system. SUSE works a treat with SATA,
+> wireless LAN card and everything but my bluetooth print server. I
+> cannot find any services for this device, my phone shows up fine as
+> does a windows bluetooth enabled machine. I have included results from
+> some commands, please let me know if  there are any others I should
+> run. Any help would be greatly appreciated as I have very little hair
+> left.
 
-_________________________________________________________________
-Blocca le pop-up pubblicitarie con MSN Toolbar! http://toolbar.msn.it/
+what do you actually wanna do? If you wanna print to your Bluetooth
+printer then setup a new CUPS printer with "bluetooth://0002724080A3/"
+as URI and simply use it.
+
+Regards
+
+Marcel
+
 
 
 
