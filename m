@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm question 1
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050131134152.20060.qmail@web60903.mail.yahoo.com>
-References: <20050131134152.20060.qmail@web60903.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1107181340.7902.9.camel@pegasus>
+Message-ID: <20920897.1107179456716.JavaMail.ngmail@webmail-01.arcor-online.net>
+From: jschindele@nexgo.de
+To: bluez-users@lists.sourceforge.net
+Subject: Aw: Re: [Bluez-users] Problem Connecting to Logitech HS01-V14
+In-Reply-To: <1107118940.8384.19.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1107118940.8384.19.camel@pegasus> <200501261244.47898.jschindele@arcor.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,100 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 Jan 2005 15:22:20 +0100
+Date: Mon, 31 Jan 2005 14:50:56 +0100 (CET)
 
-Hi Michael,
+> only use "auth" and "encrypt" (which means security mode 3) when you
+> know what you are doing. It is off by default for a reason.
 
->     Here is the content of /etc/bluetooth/hcid.conf
-> #
-> # HCI daemon configuration file.
-> #
-> # $Id: hcid.conf,v 1.7 2004/12/13 14:16:03 holtmann
-> Exp $
-> #
->  
-> # HCId options
-> options {
->         # Automatically initialize new devices
->         autoinit yes;
->  
->         # Security Manager mode
->         #   none - Security manager disabled
->         #   auto - Use local PIN for incoming
-> connections
->         #   user - Always ask user for a PIN
->         #
->         security auto;
->  
->         # Pairing mode
->         #   none  - Pairing disabled
->         #   multi - Allow pairing with already paired
-> devices
->         #   once  - Pair once and deny successive
-> attempts
->         pairing multi;
->  
->         # PIN helper
->         pin_helper /usr/bin/bluepin;
->  
->         # D-Bus PIN helper
->         #dbus_pin_helper;
-> }
->  
-> # Default settings for HCI devices
-> device {
->         # Local device name
->         #   %d - device id
->         #   %h - host name
->         #name "BlueZ (%d)";
->         name "cm218-253-8-120.hkcable.com.hk:%d"
->         # Local device class
->         class 0x3e0100;
->  
->         # Default packet type
->         #pkt_type DH1,DM1,HV1;
->  
->         # Inquiry and Page scan
->         iscan enable; pscan enable;
->  
->         # Default link mode
->         #   none   - no specific policy
->         #   accept - always accept incoming
-> connections
->         #   master - become master on incoming
-> connections,
->         #            deny role switch on outgoing
-> connections
->         lm accept;
->  
->         # Default link policy
->         #   none    - no specific policy
->         #   rswitch - allow role switch
->         #   hold    - allow hold mode
->         #   sniff   - allow sniff mode
->         #   park    - allow park mode
->         lp rswitch,hold,sniff,park;
->  
->         # Authentication and Encryption (Security Mode
-> 3)
->         #auth enable;
->         #encrypt enable;
-> }
-> How can I modify the Security Mode?
+I thought that "auth" is equal with pairing (giving the PIN)
+=20
+> You provide a link key, but it seems that the link key is wrong or
+> oudated (if you used it under Windows). The final result is then an
+> authentication error. This can happen with security mode 3.
+=20
+How can i generate such a link Key or where i get a new one from ?
+Can I perhaps reset the device's link key ?
 
-this setting is fine. It is in security mode 1/2, but your hcidump was a
-little bit strange, because it looked like security mode 3 and normally
-mobile phones are not in that mode.
+But in all cases thank you very much for your quick answer.
 
-> Also, how can I change the PIN of my Linux PC? 
+Gru=DF J=FCrgen=20
 
-For incoming connection the PIN is in /etc/bluetooth/pin and you need to
-restart hcid after you changed it.
-
-Regards
-
-Marcel
-
+Arcor-DSL: die echte Flatrate f=FCr alle Bandbreiten. Jetzt ohne Einrichtun=
+gspreis
+einsteigen oder wechseln. Arcor-DSL ist in vielen Anschlussgebieten verf=FC=
+gbar.
+http://www.arcor.de/home/redir.php/emf-dsl-1
 
 
 
