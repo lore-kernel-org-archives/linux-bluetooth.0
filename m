@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4219DBCF.6040300@teltronic.es>
-From: Esteban Monturus <emonturus@teltronic.es>
-MIME-Version: 1.0
+From: "Janice M. Ballesteros" <janice@asti.dost.gov.ph>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] how get differenced two simultaneous bnep interfaces with the same
- IP address in a single Bluetooth dongle?
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200502211623.57809.janice@asti.dost.gov.ph>
+Subject: [Bluez-users] multiple instances of OPUSH server
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,37 +17,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 21 Feb 2005 14:02:07 +0100
+Date: Mon, 21 Feb 2005 16:23:57 +0800
 
-    Hi all.
+Halu!
 
-    I am working with a single USB dongle in a Linux laptop with BlueZ 
-and two PAN-profile access points connected to the same LAN. Each access 
-point is implemented with a PC with bridge-utils and bluez packets 
-installed. I stablish two simultaneous PAN connectionsfrom the laptop: 
-each one to a different access point. Having both connections would 
-prevent the loss of data between the LAN and the laptop. I would like to 
-receive all the packets through both connections, in order to have 
-redundancy.
+How do I enable support for multiple instances of an Obex server. Im using 
+OPD. What Im trying to do is setup two OPD servers on my computer. Two 
+bluetooth dongles will be used. One of the dongles listen to rfcomm channel 
+10 and the other to channel 3. I want one instance of OPD to listen to rfcomm 
+channel 10 on /dev/rfcomm0 and the other one to channel 3 on /dev/rfcomm1.
 
-    I configure both resulting bnep interfaces to have the same IP 
-address, since I don't want the other side of the communication to know 
-the existence of two different paths. When I do "ifconfig" in the  
-laptop, I realize that both bnep interfaces show the same hardware 
-address, which would let my laptop receive each packet from the LAN 
-twice. But the reality is that only one of the interfaces at a time 
-receives the packets.
+If I run one instance of opd on channel 10, it works fine but when I try to 
+run the 2nd opd on channel 3 i get the error message:
+opd[4561]: Failed to register BtOBEX server on RFCOMM channel 10. (-1 / 98)
+It seems that everytime I run opd, its default rfcomm device is /dev/rfcomm0. 
+Note: error 98 stands for " Address already in use "
 
-    For example, when "ping" my laptop from a computer connected to the 
-LAN, only bnep0 receives ICMP requests, and bnep1 doesn't. If I use the 
-metrics of the routing table to force bnep1 to answer the ping, then 
-ICMP requests start to be received by bnep1, and bnep0 receives nothing now.
+How do I make OPD run on a specified rfcomm device (say on /dev/rfcomm1)?
+I tried looking at the code of OPD but I cant seem to find how to change the 
+default rfcomm device. I also tried binding my bluetooth dongles to specified 
+rfcomm devices and channels but it still doesnt work.
 
-    I would like to know if this issue depends on the bnep 
-implementation and also would like to know how can the net make 
-differences between both interfaces, as they have same MAC and IP addresses.
+Any help/insight is greatly appreciated. 
+Many thanks. :)
 
-    Thanks a lot.
+-jan
 
 
 -------------------------------------------------------
