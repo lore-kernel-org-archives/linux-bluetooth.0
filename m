@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4062C2F9.5090808@soft.uni-linz.ac.at>
-From: Simon Vogl <vogl@soft.uni-linz.ac.at>
-MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Subject: [Bluez-devel] resetting usb bt device
+From: Julien Campana <juliencampana@yahoo.fr>
+Message-ID: <loom.20040324T174933-510@post.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Direct use of the function =?utf-8?b?c2RwX3NlbmRfcmVxX3c0X3JzcA==?=
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,66 +15,74 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Mar 2004 12:31:05 +0100
+Date: Wed, 24 Mar 2004 17:02:26 +0000 (UTC)
 
-hi,
-notice that sometimes the bluez stack runs into a state where I cannot
-connect rfcomm channels any more etc. To get into a sane mode of operatio=
-n,
-pulling and plugging the bt dongle helps normally.
+Hi everybody,
 
-As we build a system that will be hidden behind a wall, I need a software=
--
-only solution to this. I tried to stop the bluetooth services as well as =
-hotplug,
-unload any dangling modules, then start hotplug and bluetooth services ag=
-ain and
-I send a hci_reset to the device.
+I've already sent this message
+to bluez-devel@lists.sourceforge.net but I do not
+know if the lists are the same. So, sorry if it commes twice:)
 
-Unfortunately, this does not resolve my issues, but I get lots of submit =
-failures:
-Mar 25 07:59:46 wall6 kernel: Written 2000,2001 by Maxim Krasnyansky <max=
-k@qualcomm.com>
-Mar 25 07:59:46 wall6 kernel: sco_sock_connect: sk dedfe080
-Mar 25 07:59:46 wall6 kernel: sco_conn_ready: conn dfc92e00
-Mar 25 07:59:46 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for p=
-ipe 18200 is zero
-Mar 25 07:59:46 wall6 kernel: __tx_submit: hci0 tx submit failed urb f7e3=
-fe14 type 3 err -90
-Mar 25 07:59:47 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for p=
-ipe 18200 is zero
-Mar 25 07:59:47 wall6 kernel: __tx_submit: hci0 tx submit failed urb f7e3=
-fe14 type 3 err -90
-Mar 25 07:59:47 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for p=
-ipe 18200 is zero
-Mar 25 07:59:47 wall6 kernel: __tx_submit: hci0 tx submit failed urb f7e3=
-fe14 type 3 err -90
-Mar 25 07:59:47 wall6 kernel: usb-uhci.c: uhci_submit_urb: pipesize for p=
-ipe 18200 is zero
+I'm trying to extend JBlueZ, which links BlueZ and java, 
+in order to
+make it JSR82 compatible (Java Bluetooth Spetification). 
 
-etc., as well as loads of other mysterious happenings.
+BlueZ uses sdp_record_t structures to store the 
+list of all service attributes 
+and I'm trying to modify it in order 
+to get some Java Objects (with JNI) instead. 
 
-Is there a proper way to reset this device other than soldering a paralle=
-l-port controlled
-power switch?
+To do this, I want to re-implement 
+the "sdp_service_search_attr_req" function. 
 
-SImon
+But the project do not compile because some 
+sdp fucntions cannot not be linked. 
 
+I'm getting the following error message:
+/tmp/ccvRmUPO.o(.text+0x158e): In
+function`my_sdp_service_search_attr_req(sdp_session_t*, _sdp_list
+const*, sdp_attrreq_type_t, _sdp_list const*, _sdp_list**): 
+undefined reference
+to `sdp_send_req_w4_rsp(sdp_session_t*, char*,char*, int, int*)
 
---=20
-_______________________________________________________________________
-Dr. Simon Vogl
-Institut f=C3=BCr Pervasive Computing, Johannes Kepler Universit=C3=A4t L=
-inz
-Altenberger Stra=C3=9Fe 69, A-4040 Linz, Austria
+The function my_sdp_service_search_attr_req has EXACTLY 
+the same implementation
+as the official function 
+sdp_service_search_attr_req. (I aim to change it but I
+first want to understand how it works).
 
-Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
-mailto: vogl@soft.uni-linz.ac.at,  http://www.soft.uni-linz.ac.at/
+I use the following gcc command (java headers for JNI
++/home/julien/bluez/include 
+to get the "sdp_internal.h" header):
 
+gcc -I /home/java/include -I /home/java/include/linux
+-I/home/julien/bluez/include 
+BlueZ.cpp -o ../bin/jbluez -lsdp-lbluetooth -lstdc++ 
 
+The undefined function can be found into 
+the installed bluetooth library:
+nm --dynamic /usr/lib/libsdp.so.2 | grep sdp_send
+00002080 T sdp_send_req
+000021c0 T sdp_send_req_w4_rsp
 
+I use debian (Knoppix 3.1 with kernel 2.4.20: I know its an old one),
+libsdp
+1-5-2, libbluetooth 2-5-1, gcc 3.3 (Debian).
 
+I've tried to compile the project on three different 
+machines (2 Knoppix with
+different kernels and a Suse) and the problem remains.
 
+The same problem occurs with following sdp functions:
+sdp_extract_seqtype,
+sdp_extract_pdu, 
+sdp_gen_pdu.
+
+Does anybody have an idea?
+
+Thank you for your help.
+
+Julien Campana
 
 
 
