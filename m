@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Claes Holmerson <claes@it-slav.net>
+From: Pavel Ruzicka <pavouk@pavouk.org>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.BSO.4.53.0411261207460.9290@vakttornet.mynet>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] LAN access devices
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200411261152.29925.pavouk@pavouk.org>
+Subject: [Bluez-users] DBT-120 firmware upgrade
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +17,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Nov 2004 12:08:38 +0100 (CET)
+Date: Fri, 26 Nov 2004 11:52:29 +0100
 
 Hello,
 
-This is not strictly a Bluez question, but anyways... I was thinking if it
-would be possible to use WAP over Bluetooth on a Bluetooth-enabled phone
-to connect to a web server running Bluez. I have a SonyEricsson K700i, and
-as far as I can tell, it does not support the LAN access profile. I don't
-know whether that is required or if there are other ways to accomplish
-this. Are there devices that support this? Not even SonyEricsson P910
-seems to do so.
+I want to upgrade DBT-120 Ver B3 (details below).
+I read instructions on http://www.holtmann.org/linux/bluetooth/dfu.html
+I have downloaded BluetoothFWUpdate1.2.dmg.
+On web is version 1.1, but when I try to download it, then version 1.2
+is saved on to disk.
 
-If it was possible, the phone could be used to control things on a
-headless "home/media server", like a MythTV server. A WAP interface could
-be built to control things such as MP3 playback or recording of tv
-programs for example.
+There are 3 dfu files:
+md5sum and name:
+--------------------------------
+f1cb8ce8d3222af2bb6b512f99be62c7  DeskTop.dfu
+00acbb467c76a1bca899f888fc23a779  GenericCSR.dfu
+f16c41fa42e04d77a9df6ae8c2d40c82  Portable.dfu
 
-Thanks,
-Claes
+Is this right GenericCSR.dfu for DBT-120 B3?
+I mean correct md5sum.
+
+I know, that flashing with btdfu is without warranty, but do you think that it 
+will works?
+
+Best regards,
+
+Pavoel Ruzicka
+
+Dongle details:
+---------------------
+# hciconfig hci0 version
+hci0:   Type: USB
+        BD Address: 00:0D:88:XX:XX:XX ACL MTU: 192:8  SCO MTU: 64:8
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x1bb LMP Ver: 1.1 (0x1) LMP Subver: 0x1bb
+        Manufacturer: Cambridge Silicon Radio (10)
+# hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:0D:88:8E:B9:F0 ACL MTU: 192:8  SCO MTU: 64:8
+        HCI 15.3
+        Chip version: BlueCore02
+        Max key size: 56 bit
+        SCO mapping:  HCI
+-------------------------
 
 
 -------------------------------------------------------
