@@ -1,44 +1,37 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40E94DEA.4030402@dodgyware.com>
-From: yaboo <yaboo@dodgyware.com>
-Reply-To: yaboo@dodgyware.com
+Return-Path: <bluez@thomae-privat.de>
+Message-ID: <40E9567C.4010408@thomae-privat.de>
+Date: Mon, 05 Jul 2004 15:24:12 +0200
+From: Matthias Thomae <bluez@thomae-privat.de>
 MIME-Version: 1.0
-To: list-bluez <bluez-users@lists.sourceforge.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Info: Stereo Headset
+References: <40E27583.7080705@thomae-privat.de> <1088587039.22940.20.camel@pegasus>
+In-Reply-To: <1088587039.22940.20.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] gps software
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 05 Jul 2004 22:47:38 +1000
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi
+Hi Marcel,
 
-Been using my gps unit with bluetooth recently and would like to ask 
-people what software under linux is best to use. Also would like to have 
-maps for Australia.
+I asked, this is what I got today:
 
-Also whats the best windows/win ce software also to use.
+ > thank you for interesting in our products.
+ > I am sorry to give you just no technical Information.
+ > But our Bluetooth Head will come soon and then you can find all
+ > Informations on our website.
 
-thanks.
-
-regards
-
-Joseph
+Regards.
+Matthias
 
 
--------------------------------------------------------
-This SF.Net email sponsored by Black Hat Briefings & Training.
-Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
-digital self defense, top technical experts, no vendor pitches, 
-unmatched networking opportunities. Visit www.blackhat.com
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Marcel Holtmann wrote:
+>>Just for you information, I've noticed another Bluetooth Stereo Headset:
+>>http://www.anubisline.com/english/articlec.asp?id=20602
+>>It is available e.g. from www.avitos.com for 50 Euros.
+>>
+>>However, I have't found any technical information (protocols etc.) yet.
+> 
+> 
+> please try to find it out. Ask them if this headphone support AVDTP,
+> GAVDP or A2DP. The word stereo is a little bit misleading here, because
+> even with eSCO you won't get any stereo sound.
