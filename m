@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: Fw: [Bluez-users] Re: Can't able to send data in both direction
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Cc: sebastian.roth@esk.fhg.de
-In-Reply-To: <7aa80ced05030321482f162db2@mail.gmail.com>
-References: <004401c5207b$c13a3210$4100a8c0@benjamin>
-	 <7aa80ced05030321482f162db2@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1109933262.8058.21.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20050303141105.35566.qmail@web40610.mail.yahoo.com>
+From: Paolino paperino <vonzoltan@yahoo.it>
+Subject: Re: [Bluez-users] Zaurus SL6000 & Socket CF
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: 6667
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,28 +17,89 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Mar 2005 11:47:42 +0100
-
-Hi Mohan,
-
->                   I bought a new dongle, and now the send program is
-> working on two sides.
->                   I am facing one more problem. The send program is
-> reading a character for PC keyboard using getch()
-> function,immediately, it establishes a connection using connect() and
-> then it sends the data. This is in a do-while loop to read and send
-> the continous key press. The problem is, I am not getting all the data
-> on the recv side, what i have typed on the send side. As for I know
-> the problem is due to delay in l2cap connection establishment. Is
-> there any way to avoid the delay? Kindly suggest me.
-
-you must keep the connection open.
-
-Regards
-
-Marcel
+Date: Thu, 3 Mar 2005 15:11:05 +0100 (CET)
 
 
+--- Erwin Authried <eauth@softsys.co.at> wrote:
+> Am Don, den 03.03.2005 schrieb Paolino paperino um
+> 12:48:
+> > --- Erwin Authried <eauth@softsys.co.at> wrote:
+> > > Am Don, den 03.03.2005 schrieb Paolino paperino
+> um
+> > > 12:07:
+> > > > Hi!
+> > > > I've installed on my Zaurus this ipk from
+> Bluez
+> > > site:
+> > > > bluez-libs_2.8
+> > > > bluez-hcidump 1.9
+> > > > bluez-utils 2.8
+> > > > bluez-kernel-2.4.18-mh14
+> > > > 
+> > > > I've loaded the modules by hand with insmod
+> > > > hci_uart
+> > > > bluez
+> > > > l2cap
+> > > > 
+> > > > now i must  attach to the serial device:
+> > > > hciattach /dev/ttySX socket
+> > > > As X i tried 0 and 1 and this get me this
+> error:
+> > > "BCSP
+> > > > initialization timeout".
+> > > > 
+> > > > If as X i use 2, 3 i get "Can't open serial
+> port:
+> > > No
+> > > > such device"
+> > > > 
+> > > > without hciattaching i can't use Bluez,
+> anybody
+> > > could
+> > > > hilight me?
+> > > > Thannk's
+> > > > Best regards 
+> > > >  Andrea S.
+> > > have you loaded serial_cs first? The kernel will
+> > > report the tty that is
+> > > used for the CF card.
+> > > 
+> > > Regards,
+> > > Erwin
+> > 
+> > No but, my zaurus has got it insmod serial_cs
+> fails to
+> > find the module...where can i get it?
+> > 
+> > Andrea S.
+> > 
+> you have to enable standard (8250/16550) serial
+> support as well as
+> pcmcia serial support in the kernel. The module will
+> be placed into
+> modules/pcmcia.
+> 
+> Regards,
+> Erwin
+> 
+Thank's
+i think zaurus come with a kernel with serial support
+compiled into, my modules/pcmcia contains 3 object
+files:
+memory_cs.o
+prism2_cs.o
+sharpzdc_cs.o
+I loaded prism2 and also sharpzdc_cs but nothing
+change...exists a precompiled kernel in ipk form, or i
+should download , cross compile, make ipk and install?
+Thank's
+Andrea S.
+
+
+		
+___________________________________ 
+Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
+http://it.messenger.yahoo.it
 
 
 -------------------------------------------------------
