@@ -1,70 +1,66 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] pand Connection refused(111) when connecting to
-	a Belkin NAP
-From: Marcel Holtmann <marcel@holtmann.org>
-To: lta@creativemonsters.com
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <27345483$110790477642094908d86d51.65090625@config17.schlund.de>
-References: <27345483$110790477642094908d86d51.65090625@config17.schlund.de>
-Content-Type: text/plain
-Message-Id: <1107908002.14624.3.camel@pegasus>
+Return-Path: <nacc@us.ibm.com>
+Date: Tue, 8 Feb 2005 16:12:32 -0800
+From: Nishanth Aravamudan <nacc@us.ibm.com>
+To: gregkh@us.ibm.com, marcel@holtmann.org, maxk@qualcomm.com, jt@hpl.hp.com,
+   perex@suse.cz, linux-dvb-maintainer@linuxtv.org, johnpol@2ka.mipt.ru
+Cc: linux-usb-devel@lists.sourceforge.net, bluez-devel@lists.sourceforge.net,
+   irda-users@lists.sourceforge.net, alsa-devel@alsa-project.org,
+   linux-dvb@linuxtv.org, sensors@stimpy.netroedge.com
+Subject: [PATCH 1/63] usb/message: make usb_{control,bulk}_msg() use msecs
+Message-ID: <20050209001232.GC5661@us.ibm.com>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 09 Feb 2005 01:13:22 +0100
+Content-Type: text/plain; charset=us-ascii
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Leon,
+Hi,
 
-> I have exactly the same problem as Dave Henriksen !!!  :-(
-> 
-> 
-> RFCOMM works ( connects ) fine, but PAND simply fails with "Connection
-> refused(111)".
-> 
-> 
-> My log tells me...
-> 
-> Feb  8 23:12:32 slave kernel: hciconfig[3728]: segfault at
-> 00000000000000a9 rip 0000002a957d2c0c rsp 0000007fbfffef50 error 4
+Sent to everyone so that build and compile tests will be possible. Only Greg
+should need to pull this into a tree, though, to send upstream.
 
-first I would check why this segfault happens.
+Thanks,
+Nish
 
-> Feb  8 23:29:24 slave kernel: Bluetooth: BNEP (Ethernet Emulation) ver
-> 1.2
-> Feb  8 23:29:24 slave kernel: Bluetooth: BNEP filters: protocol
-> multicast
-> Feb  8 23:29:24 slave pand[3760]: Bluetooth PAN daemon
-> Feb  8 23:29:24 slave pand[3760]: Connecting to 00:02:72:00:EB:4D
-> Feb  8 23:29:28 slave pand[3760]: Connect to 00:02:72:00:EB:4D failed.
-> Connection refused(111)
+Description: Change the units of the timeout parameter in both usb_control_msg()
+and usb_bulk_msg() from jiffies to milliseconds. This is the core patch upon
+which the remaining ones will be built. Patch is compile-tested.
 
-Second the PSM is not supported. Is you device really supporting the PAN
-profile. Check with sdptool for a PAN service.
+Signed-off-by: Nishanth Aravamudan <nacc@us.ibm.com>
 
-What is the version of your utils?
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--- 2.6.11-rc3-kj-v/drivers/usb/core/message.c	2005-02-03 16:57:40.000000000 -0800
++++ 2.6.11-rc3-kj/drivers/usb/core/message.c	2005-02-08 16:07:32.000000000 -0800
+@@ -98,7 +98,7 @@ int usb_internal_control_msg(struct usb_
+ 	usb_fill_control_urb(urb, usb_dev, pipe, (unsigned char *)cmd, data,
+ 			     len, usb_api_blocking_completion, NULL);
+ 
+-	retv = usb_start_wait_urb(urb, timeout, &length);
++	retv = usb_start_wait_urb(urb, msecs_to_jiffies(timeout), &length);
+ 	if (retv < 0)
+ 		return retv;
+ 	else
+@@ -115,7 +115,7 @@ int usb_internal_control_msg(struct usb_
+  *	@index: USB message index value
+  *	@data: pointer to the data to send
+  *	@size: length in bytes of the data to send
+- *	@timeout: time in jiffies to wait for the message to complete before
++ *	@timeout: time in msecs to wait for the message to complete before
+  *		timing out (if 0 the wait is forever)
+  *	Context: !in_interrupt ()
+  *
+@@ -163,7 +163,7 @@ int usb_control_msg(struct usb_device *d
+  *	@data: pointer to the data to send
+  *	@len: length in bytes of the data to send
+  *	@actual_length: pointer to a location to put the actual length transferred in bytes
+- *	@timeout: time in jiffies to wait for the message to complete before
++ *	@timeout: time in msecs to wait for the message to complete before
+  *		timing out (if 0 the wait is forever)
+  *	Context: !in_interrupt ()
+  *
+@@ -196,7 +196,7 @@ int usb_bulk_msg(struct usb_device *usb_
+ 	usb_fill_bulk_urb(urb, usb_dev, pipe, data, len,
+ 			  usb_api_blocking_completion, NULL);
+ 
+-	return usb_start_wait_urb(urb,timeout,actual_length);
++	return usb_start_wait_urb(urb,msecs_to_jiffies(timeout),actual_length);
+ }
+ 
+ /*-------------------------------------------------------------------*/
