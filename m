@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <405722BE.4040306@nokia.com>
-From: Tuomo Tikkanen <Tuomo.Tikkanen@nokia.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Is briding necessary?
+Subject: Re: [Bluez-users] Question regarding rfcomm-timeout
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Thomas Eller <te@identisys.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40570F3F.90607@identisys.de>
+References: <40570F3F.90607@identisys.de>
+Content-Type: text/plain
+Message-Id: <1079448460.3307.96.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,40 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 16 Mar 2004 17:52:30 +0200
+Date: Tue, 16 Mar 2004 15:47:40 +0100
 
-Dear all,
+Hi Thomas,
 
-We have a Linux application which captures IP packets from given network 
-interface. Our current configuration is such that we have a bridge (br0) 
-containing eth1 and bnep0 interfaces and its working wonderfully.
+> I'm using the rfcomm executable from bluez-utils to connect to a 
+> bluetooth device. It looks like this:
+> 
+> rfcomm connect 0 xx:xx:xx:xx:xx:xx 1
+> 
+> If the remote device is not present the rfcomm-connect ends with a 
+> timeout after ~20s with the error-message: "Can't connect..... ...Host 
+> is down."
+> 
+> Where can i push this 20s-timeout down to a lower value ???
+> 
+> I see in the source-code that a socket-connection is made, so possibly 
+> there may be a parameter that can be configured through the 
+> proc-filesystem ?!?
 
-However we would like to have only bnep0 interface so that there would 
-not be need for eth1 device. We have tried to use this bnep0-only 
-approach, but it is not working properly. What we see is:
+the timeout you talk about is the page timeout and it is a HCI specific
+parameter.
 
-1) PAN connection itself is successfully established
-2) bnep0 interface is up
-3) we can ping from mobile phone (device connected with PAN to Linux), 
-but we don't get replies back to mobile phone. We see though that ping 
-packets flow through our software to both directions i.e. ping-replies 
-are written to bnep0 too.
-4) the state 3) stays there until we ping/traceroute the mobile phone 
-from the machine where the bnep0 interface is. After ping/traceroute 
-command the reply-ping packets start to flow to mobile phone too.
+Regards
 
-This is rather odd behavior and because we are not expert of PAN nor 
-Bluez we are wondering what could reason for above behavior. With 
-"bridge solution" there is no need to poll back the mobile connected via 
-bnep0/br0 instead everything works just fine after the bluetooth 
-connection is established. Can the bnep0 interface be actually used 
-instead of eth# or br# interface at all?
+Marcel
 
--- 
-<< Tuomo-Markus Tikkanen <> Tuomo.Tikkanen@nokia.com >>
-<< Nokia Research Center <>  Phone: +358 71 803 6480 >>
-<< P.O. Box 407          <> Mobile: +358 50 483 6480 >>
-<< FIN-00045 NOKIA GROUP <>    FAX: +358 71 803 6210 >>
 
 
 
