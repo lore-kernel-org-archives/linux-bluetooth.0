@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050302135711.65673.qmail@web40607.mail.yahoo.com>
-From: Paolino paperino <vonzoltan@yahoo.it>
-Subject: Re: [Bluez-users] passive inquiry
+Message-ID: <f54d86405030108254b6085b@mail.gmail.com>
+From: Benny <bennyvasanth@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <41C2F2DB.5010204@csr.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Subject: Re: [Bluez-users] Bluetooth PC Headset - SCO connection failed
+In-Reply-To: <4223466A.2010701@xmission.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <f54d86405022806312ab4142a@mail.gmail.com>
+	 <4223466A.2010701@xmission.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,22 +19,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 2 Mar 2005 14:57:11 +0100 (CET)
+Date: Tue, 1 Mar 2005 21:55:09 +0530
 
-Hi,
-I'm using BLuez under my linux laptop and writed a
-java native lib that use Bluez, now i would to port
-the software under Zaurus...i've a question, do know
-where i could find a precompiled toolchain for cross
-compiling for the Zaurus? And can i use it?
- Andrea S.
+Thanks Brad for your suggestion and now we got the Headset working
+after upgrading our linux kernel to 2.6.9 and using latest CVS file
+from the ALSA-Bluetooth project(btsco).
+
+We need to transfer additional data(full duplex between a linux PC and
+the Headset) parallely apart from the headset functionality. Is this
+possible?
+
+Please advice.
+
+Thanks & Regards,
+Benny
 
 
-
-		
-___________________________________ 
-Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
-http://it.messenger.yahoo.it
+On Mon, 28 Feb 2005 09:27:22 -0700, Brad Midgley <bmidgley@xmission.com> wrote:
+> Benny
+> 
+> > My linux kernel version is 2.4.29.
+> 
+> I just fixed the docs to make it clear you need a recent 2.6 kernel.
+> 
+> Brad
 
 
 -------------------------------------------------------
