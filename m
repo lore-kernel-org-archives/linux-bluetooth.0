@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41A11DDB.8080708@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] BlueZ and the ALSA support
-References: <1100995285.7250.17.camel@pegasus>	 <41A027BD.5020401@xmission.com> <1101057242.7250.34.camel@pegasus>	 <41A0D34C.8070400@dark-reality.de> <1101061573.7250.68.camel@pegasus>	 <41A0F6F4.6070707@dark-reality.de> <1101069548.7250.77.camel@pegasus>	 <41A11275.1090108@dark-reality.de> <1101077143.7250.83.camel@pegasus>
-In-Reply-To: <1101077143.7250.83.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41A11275.1090108@dark-reality.de>
+References: <1100995285.7250.17.camel@pegasus>
+	 <41A027BD.5020401@xmission.com> <1101057242.7250.34.camel@pegasus>
+	 <41A0D34C.8070400@dark-reality.de> <1101061573.7250.68.camel@pegasus>
+	 <41A0F6F4.6070707@dark-reality.de> <1101069548.7250.77.camel@pegasus>
+	 <41A11275.1090108@dark-reality.de>
+Content-Type: text/plain
+Message-Id: <1101077143.7250.83.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,41 +22,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 21 Nov 2004 23:59:39 +0100
+Date: Sun, 21 Nov 2004 23:45:43 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Lars,
 
-Marcel Holtmann wrote:
+> | To be honest, I don't know. This ISOC stuff is still a mystery to me and
+> | so far I don't know of any Linux driver that is using the ISOC transfers
+> | and have to change the alternate setting at the same time. Selecting it
+> | at probe() time is very easy.
 
-|
-|>Maybe we simply have to try what happens *shudder*... any ideas whom we
-|>could ask for more information? linux usb devlist?
-|
-|
-| when you try, expect kernel freezes or crashes. The only place to ask is
-| the Linux USB developer mailing list, but I think we should first clean
-| up our URB management mess.
-|
+> Maybe we simply have to try what happens *shudder*... any ideas whom we
+> could ask for more information? linux usb devlist?
 
-Could be a good idea.
+when you try, expect kernel freezes or crashes. The only place to ask is
+the Linux USB developer mailing list, but I think we should first clean
+up our URB management mess.
 
-Maybe you could point out a document or write a short description what's
-going on right now, and how it should be solved correctly? Would help a
-lot to know what exists and where we should head to - if you already
-know, that is. If not, the status quo would be interesting none the
-less, from a logical point of view, not the code.
+Regards
 
-regards,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+Marcel
 
-iD8DBQFBoR3aQWC6DTWkDAoRAuGmAJ0dNDmjdu0p0ouyJtuaHJbKwsXqBwCgoR6S
-yhoEfK49TZAkC4PHG3pU8cc=
-=CPm5
------END PGP SIGNATURE-----
+
 
 
 -------------------------------------------------------
