@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40335E98.9070405@bris.ac.uk>
-From: George Billios <gb3080@bristol.ac.uk>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Many hci devices (?)
+Subject: Re: [Bluez-users] headset connection problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Guang <m9187@cn.ee.ccu.edu.tw>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <003301c3f5c1$9e11b640$7b6b7b8c@guang>
+References: <002801c3f55d$e5c9d800$7b6b7b8c@guang>
+	 <1077032640.2665.14.camel@pegasus>  <003301c3f5c1$9e11b640$7b6b7b8c@guang>
+Content-Type: text/plain
+Message-Id: <1077086400.2665.168.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,45 +19,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Feb 2004 12:46:16 +0000
+Date: Wed, 18 Feb 2004 07:40:00 +0100
 
-Hello,
-I have a Bluetooth USB dongle which in general works fine. The only 
-problem is that if I run hciconfig I get multiple devices:
+Hi Guang,
 
-hci0:   Type: USB
-         BD Address: 00:04:61:80:84:25 ACL MTU: 192:8  SCO MTU: 64:8
-         UP RUNNING PSCAN ISCAN
-         RX bytes:87 acl:0 sco:0 events:11 errors:0
-         TX bytes:39 acl:0 sco:0 commands:10 errors:0
+> > run "hcidump -w <file>" (as root) and show us the dump.
+> 
+> 
+> sorry, how do i use the "hcidump " command?
+> For example, "hcidump -w <file> " ,what does the "file" mean?
 
-hci1:   Type: VHCI
-         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
-         DOWN
-         RX bytes:0 acl:0 sco:0 events:0 errors:0
-         TX bytes:4 acl:0 sco:0 commands:1 errors:0
+the run of "hcidump -w dumpfile" produces a file named "dumpfile". If
+you think you are finished press CTRL-C and send us the file.
 
-hci2:   Type: VHCI
-         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
-         DOWN
-         RX bytes:0 acl:0 sco:0 events:0 errors:0
-         TX bytes:0 acl:0 sco:0 commands:0 errors:0
+Regards
 
-hci3:   Type: VHCI
-         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
-         DOWN
-         RX bytes:0 acl:0 sco:0 events:0 errors:0
-         TX bytes:0 acl:0 sco:0 commands:0 errors:0
+Marcel
 
-I get the above order (the USB dongle on hci0) only if I start the 
-computer with the dongle plugged in. If I start the computer and then 
-plug the dongle in, it gets hci3 while the other "devices" get 
-hci0,hci1,hci2,hci4 .  This is a problem because I'm using kde-bluetooth 
-which only connects through device hci0.
-My question is what are these devices and how can I make the USB Dongle 
-take hci0?
 
-Thank you
 
 
 -------------------------------------------------------
