@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050405194029.57905.qmail@web50910.mail.yahoo.com>
-From: tasos <tas0s@yahoo.com>
+Subject: Re: [Bluez-users] Can anybody help plz?
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Upload question in /tmp
+In-Reply-To: <20050405114604.26990.qmail@webmail18.rediffmail.com>
+References: <20050405114604.26990.qmail@webmail18.rediffmail.com>
+Content-Type: text/plain
+Message-Id: <1112714081.12406.45.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,24 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 5 Apr 2005 12:40:28 -0700 (PDT)
+Date: Tue, 05 Apr 2005 17:14:41 +0200
 
-Hello people i'm new at bluez.I would like to know if
-the following is possible:
-When someone uploads something then the files go to
-/tmp.Which source code file do this work?
-I would like,depending on the id of the bluetooth
-device,the files to stored in specific 
-directories.Suppose 10 users upload something,i want
-those files to go to specific directories.
-Thank you in advanced!
+Hi,
+
+> I have a small problem in understanding the blueZ source code for
+> kernel 2.6.11.I am unable to find out exactly how the kernel
+> implementations of the l2cap layer,hcilayer and rfcomm layer are
+> interacting amongst themselves ?As well as how they interact with the
+> user space libraries?
+> 
+> I have seen some functions in l2cap.c calling functions from
+> hci_core.c which have been put as EXPORT_SYMBOL() in hci_core.c.
+> Is it the way they are communicating or am i missing something?
+
+the module interaction is done by the exported symbols as you already
+realized. The upper layer modules like RFCOMM, BNEP etc. are using the
+L2CAP socket interface inside the kernel. All userspace tools are using
+the ioctls and the socket interfaces.
+
+Regards
+
+Marcel
 
 
-		
-__________________________________ 
-Yahoo! Messenger 
-Show us what our next emoticon should look like. Join the fun. 
-http://www.advision.webevents.yahoo.com/emoticontest
 
 
 -------------------------------------------------------
