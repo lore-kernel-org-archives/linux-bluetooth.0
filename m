@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Catalin Drula <Catalin.Drula@imag.fr>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <Pine.GSO.4.33.0411161011350.22188-100000@horus.imag.fr>
+Message-ID: <4199A0B9.1040606@soft.uni-linz.ac.at>
+From: Simon Vogl <vogl@soft.uni-linz.ac.at>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] SOCK_STREAM behaving like SOCK_SEQPACKET?
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] btsco: help with autoconf cleanup
+References: <4193B453.50005@xmission.com> <1100539910.8191.6949.camel@hades.cambridge.redhat.com> <41991FA3.5060009@xmission.com>
+In-Reply-To: <41991FA3.5060009@xmission.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,32 +18,53 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 16 Nov 2004 10:15:33 +0100 (CET)
+Date: Tue, 16 Nov 2004 07:39:53 +0100
 
-Hi,
+you might want to look at
+http://www.soft.uni-linz.ac.at/_wiki/tiki-index.php?page=3DProjectBluezHa=
+ndsfree
+that should do what you are looking for...
+simon
 
-I have a small application that communicates over an L2CAP channel
-(thus through a SOCK_SEQPACKET socket). The thread that does the
-L2CAP communication has also some UNIX domain sockets open (AF_UNIX,
-SOCK_STREAM) through which it communicates to other threads.
+Brad Midgley wrote:
 
-The trouble is that these latter sockets (UNIX domain, SOCK_STREAM) behave
-like SOCK_SEQPACKET sockets, in that if I do not need read all the
-available data at once, it is gone (a second call to read() blocks). As
-far as I know this is not expected behavior for SOCK_STREAM sockets so I
-have a couple of possible explanations:
+> David
+>
+>> Does btsco work only with headsets or should it also work with mobile
+>> phones?
+>
+>
+> no, btsco doesn't but bluez could. I've added this answer and a link=20
+> to our page at http://bluetooth-alsa.sourceforge.net/
+>
+> brad
+>
+>
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: InterSystems CACHE
+> FREE OODBMS DOWNLOAD - A multidimensional database that combines
+> robust object and relational technologies, making it a perfect match
+> for Java, C++,COM, XML, ODBC and JDBC. www.intersystems.com/match8
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez=
+-devel=20
+>
 
-1. Linux kernel bug
-2. Bluez bug
 
-which causes a SOCK_STREAM socket to act like a SOCK_SEQPACKET.
 
-The system is a Fedora Core 2 with kernel 2.6.8-1.521. I have tried the
-kernel 2.6.9-mh3 now and the problem still occurs.
+--=20
+_______________________________________________________________________
+Dr. Simon Vogl
+Institut f=FCr Pervasive Computing, Johannes Kepler Universit=E4t Linz =20
+Altenberger Stra=DFe 69, A-4040 Linz, Austria =20
+ =20
+Tel: +43 732 2468-8517, Fax: +43 732 2468-8426 =20
+mailto: vogl@soft.uni-linz.ac.at,  http://www.soft.uni-linz.ac.at/
 
-Any ideas are greatly appreciated, thanks,
 
-Catalin
+
 
 
 
