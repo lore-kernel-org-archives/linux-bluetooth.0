@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <200411291815.iATIFK0a022472@news01.csr.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] DBT-120 firmware upgrade 
-In-reply-to: <1101749410.7562.21.camel@pegasus> 
-References: <200411261152.29925.pavouk@pavouk.org> <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus> <200411272130.44783.pavouk@pavouk.org> <1101588637.27074.22.camel@pegasus> <41AB14DD.3010807@csr.com> <1101731638.10115.0.camel@pegasus> <41AB1AF5.3030901@csr.com> <1101749410.7562.21.camel@pegasus>
-From: Peter Stephenson <pws@csr.com>
+Subject: Re: [Bluez-users] DBT-120 firmware upgrade
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41AB1AF5.3030901@csr.com>
+References: <200411261152.29925.pavouk@pavouk.org>
+	 <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus>
+	 <200411272130.44783.pavouk@pavouk.org> <1101588637.27074.22.camel@pegasus>
+	 <41AB14DD.3010807@csr.com> <1101731638.10115.0.camel@pegasus>
+	  <41AB1AF5.3030901@csr.com>
+Content-Type: text/plain
+Message-Id: <1101749410.7562.21.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,37 +22,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Nov 2004 18:15:19 +0000
+Date: Mon, 29 Nov 2004 18:30:10 +0100
 
-Marcel Holtmann wrote:
-> # hciconfig hci0 revision
-> hci0:   Type: USB
->         BD Address: 00:C0:DF:xx:xx:xx ACL MTU: 192:8  SCO MTU: 64:8
->         Build 1354
->         Chip version: BlueCore02
->         Max key size: 56 bit
->         SCO mapping:  HCI
+Hi Steven,
+
+> > do you have the full build information for my web page?
 > 
-> I assume that this is also a HCI 18.2, right?
+> Oops, I should have enclosed that:
+> 
+>   0x632 1586 bc02x_8unified_fl_bt1.2_18_0408131143_encr128 2004-08-13
 
-That's not a production build and I can't find any record of it being
-sent to anyone.  Very, very interesting.  It should be functionally
-similar to 18.2
+thanks for this one, but actually I have another one:
 
-pws
+# hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:C0:DF:xx:xx:xx ACL MTU: 192:8  SCO MTU: 64:8
+        Build 1354
+        Chip version: BlueCore02
+        Max key size: 56 bit
+        SCO mapping:  HCI
 
+I assume that this is also a HCI 18.2, right?
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
+Regards
 
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
+Marcel
 
-www.mimesweeper.com
-**********************************************************************
 
 
 
