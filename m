@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Tobias Sprafke" <webmaster@baxter-net.de>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <DGELJAKAPGMFDACACGBEGEHNCCAA.webmaster@baxter-net.de>
+From: Mitsu Hadeishi <mitsu@syntheticzero.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
-	charset="us-ascii"
-Subject: [Bluez-devel] Bluez on Axis DevBoard 82
+  charset="us-ascii"
+Message-Id: <200403022202.19259.mitsu@syntheticzero.com>
+Subject: [Bluez-devel] Suspend/resume issues with bluez
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,42 +16,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 3 Mar 2004 11:46:32 +0100
+Date: Tue, 2 Mar 2004 22:02:19 -0500
 
-Hi all,
+Hi, just thought I'd run this issue past you folks.  I'm running the bluez 
+stack and utilities from Debian unstable on kernel 2.4.22-x1 (Xandros Desktop 
+2) on a Thinkpad T40p.  It seems to run fine when I first boot; I am able to 
+discover other devices, they can discover me.  I am a newbie trying to use 
+this protocol stack; so I haven't yet gotten any applications to work yet.  
+However, it seems to function, basically.
 
-we need help to compile and install Bluez on the Axis Devboard 82 with a
-cross-compiler.
+The problem is bluez never seems to work again after a suspend/resume.  I have 
+tried shutting down the Bluetooth card (you can do with with Fn-F5 on a 
+Thinkpad) before suspending, as well as doing hciconfig hci0 down, and even 
+rmmod rfcomm, rmmod hci_usb (rmmod l2cap never seems to work) before 
+suspending, and then modprobe them back afterwards.  Though my machine does 
+not hang or crash when coming back from suspend, the Bluetooth card never 
+works again.  hciconfig -a prints nothing.
 
-The DevBoard-Software is running on our computer and we flashed the new
-kernel on the DevBoard successful.
+Interestingly, before I installed the bluez stack, whenever I hit Fn-F5 it 
+would freeze my machine.  Now, it doesn't freeze it, but correctly toggles 
+the little LED saying Bluetooth is active/inactive.  When bluez is working, 
+Fn-F5 makes hciconfig -a report the device there, then Fn-F5 again will make 
+hciconfig -a report nothing.  But after a suspend/resume, Fn-F5 will *still* 
+toggle the Bluetooth LED, but hciconfig -a never shows a card.
 
-We solved the kernel part of bluez as well, but we don't know, how to
-configure and install the other parts.
-We need the packages bluez-libs, -utils, -sdp and -pan on the DevBoard.
+Rebooting the system causes bluez to work again.
 
-Can somebody give as an example for how to compile such a package with
-cris-gcc?
-
-Regards
-Tobias Sprafke
-
-Mobile: +49 (0) 177 64 32 313
-Fon:    +49 (0) 208 75 10 123
-E-Mail: tobias.sprafke@baxter-net.de
-
-Have a lot of fun ... :-)
-
-FYI:
-We currenty use:
-Axis Devboard 82 (Linux Kernel 2.4.22)
-CSR Casira Bluetooth Devboard
-(Connected via USB)
-
-We have installed on our computer:
-Redhat 9 (with BlueZ)
-Cris 1.54
-Devboead_82 R1_91
+Mitsu
+-- 
+http://www.syntheticzero.com/
 
 
 
