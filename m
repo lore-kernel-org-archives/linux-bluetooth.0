@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: "William M. Quarles" <walrus@bellsouth.net>
-Message-ID: <d2pkt2$e45$2@sea.gmane.org>
+Subject: Re: [Bluez-devel] Remote name cache ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <424D493C.7010609@palmsource.com>
+References: <424D493C.7010609@palmsource.com>
+Content-Type: text/plain
+Message-Id: <1112554905.8263.19.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] BlueZ-pin not available
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,9 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 03 Apr 2005 16:51:27 -0400
+Date: Sun, 03 Apr 2005 21:01:45 +0200
 
-You guys have a bad link in the downloads section for BlueZ-pin.
+Hi Fred,
+
+> Is there any development for a "remote friendly name" cache planned in 
+> BlueZ ?
+
+yes it is, but I was too busy lately to get it finally done.
+
+Regards
+
+Marcel
+
 
 
 
