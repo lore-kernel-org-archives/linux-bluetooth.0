@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] A PAN newbie
+Subject: Re: [Bluez-users] Adresse resolution in BlueZ
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <42393EF0.3090301@prim-time.fr>
-References: <a0580c510503160953311ea8e2@mail.gmail.com>
-	 <42393EF0.3090301@prim-time.fr>
+In-Reply-To: <20050317092024.80833.qmail@web26605.mail.ukl.yahoo.com>
+References: <20050317092024.80833.qmail@web26605.mail.ukl.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1111058168.11792.67.camel@pegasus>
+Message-Id: <1111055255.11792.53.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,30 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Mar 2005 12:16:08 +0100
+Date: Thu, 17 Mar 2005 11:27:35 +0100
 
-Hi Xavier,
+Hi Benny,
 
-> > ####
-> > GN:
-> > ####
-> > 
-> > Edited the file /etc/bluetooth/hci.conf and enabled the "lm accept,
-> > master" option.
-> > 
-> > # hcid -f /etc/bluetooth/hci.conf
-> > # sdpd
-> > # sdptool add GN 
-> > # modprobe bnep
-> > # pand --listen --role GN -n
+> > This BNEP virtual network card is as dumb as a
+> normal 
+> > Ethernet network card. The networklayer knows our
+> MAC
+> > address (BD_ADDR) and 
 > 
-> Sorry if I'm wrong but i think the newest version of pand do the sdp 
-> stuff (you don't need sdptool add GN)
-> 
-> Please correct me if I'm wrong ...
+> Actually I'm talking about the peer MAC address.
 
-this is correct. The latest pand and dund version add the SDP record
-unless you call them with --nosdp.
+you know that even BNEP is point-to-point and so you know the MAC
+address of the peer, because it is the remote BD_ADDR of the underlaying
+ACL link.
 
 Regards
 
