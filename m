@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <db972f4304081918374eb047c6@mail.gmail.com>
-From: Ricky Soh <rickysoh@gmail.com>
-Reply-To: Ricky Soh <rickysoh@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] l2test help
+From: Marcel Holtmann <marcel@holtmann.org>
+To: pierre francois <pierre_francois1981@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY12-F14EWmRj4fXIA0007c10e@hotmail.com>
+References: <BAY12-F14EWmRj4fXIA0007c10e@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1092931225.18082.49.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Newbie2
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,26 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 20 Aug 2004 09:37:14 +0800
+Date: Thu, 19 Aug 2004 18:00:25 +0200
 
-I have bought a bluetooth dongle and is working in linux environment.
-However, i have problem getting rfcomm and hcitool to work. I did a
-hciconfig and see that the device is up and working. However when i
-try to connect to it using
+Hi Pierre,
 
-rfcomm -i hciX  connect hci0
+> I installed all the Bluez package. But when i tried to use the letest
+> command i got the message: 
+> bash: l2test: command not found 
+> If anyone can help me i will apreciate lot. 
 
-I got: can't connect RFcomm socket: Host is down. When i did hcitool cc method:
+it is not installed by default. You can use --enable-test with the
+latest utils to get it installed.
 
-hcitool -i hci0 cc --role=m 00:01:...
-Can't create connection: Connection timed out
-or 
-Can't create connection: Input/output error
+Regards
 
-Sorry, i am new in this field. Could anyone give me some pointers?
+Marcel
 
-Sincerely
-Ric
+
 
 
 -------------------------------------------------------
