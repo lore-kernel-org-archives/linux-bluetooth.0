@@ -1,9 +1,9 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050302152111.60949.qmail@web26605.mail.ukl.yahoo.com>
-From: BZ Benny <bennybbz@yahoo.fr>
-Subject: Re: [Bluez-users] creation of Bnep0
+Message-ID: <20050302135711.65673.qmail@web40607.mail.yahoo.com>
+From: Paolino paperino <vonzoltan@yahoo.it>
+Subject: Re: [Bluez-users] passive inquiry
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1109775195.8284.19.camel@pegasus>
+In-Reply-To: <41C2F2DB.5010204@csr.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
@@ -17,67 +17,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 2 Mar 2005 16:21:11 +0100 (CET)
+Date: Wed, 2 Mar 2005 14:57:11 +0100 (CET)
 
-Tanks Marcel,
-
-It's exactly wath I wanted to know.
-
-I will see that in the archive. But i think that you
-choose to create it in the kernel for better
-performance.
-
-regards
-benny
+Hi,
+I'm using BLuez under my linux laptop and writed a
+java native lib that use Bluez, now i would to port
+the software under Zaurus...i've a question, do know
+where i could find a precompiled toolchain for cross
+compiling for the Zaurus? And can i use it?
+ Andrea S.
 
 
- --- Marcel Holtmann <marcel@holtmann.org> a écrit : 
-> Hi Benny,
-> 
-> > I see how you create bnep0 with the netdev.c using
-> > linux/netdevice.c
-> > 
-> > Is it the only way for linking bnep with TCP/IP
-> layers?
-> 
-> I do not fully understand this question, but in
-> general it is also
-> possible to use TUN/TAP and a daemon dealing with
-> BNEP in userspace. It
-> was discussed a long time ago and you will find the
-> details in the
-> mailing list archive.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
->
--------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT
-> Products from real users.
-> Discover which products truly live up to the hype.
-> Start reading now.
->
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
->  
 
-
-	
-
-	
 		
-Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
-Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
+___________________________________ 
+Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
+http://it.messenger.yahoo.it
 
 
 -------------------------------------------------------
