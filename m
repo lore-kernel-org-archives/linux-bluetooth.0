@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Rainer Dorsch <rdorsch@web.de>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200411282132.37941.rdorsch@web.de>
-Subject: [Bluez-users] Setting up an hotplug connection with USB dongles
+Subject: Re: [Bluez-users] State of snd-bt-sco
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200411281307.43051.carlosarazevedo@netcabo.pt>
+References: <200411281307.43051.carlosarazevedo@netcabo.pt>
+Content-Type: text/plain
+Message-Id: <1101664326.18467.56.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,79 +18,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 28 Nov 2004 21:32:37 +0100
+Date: Sun, 28 Nov 2004 18:52:06 +0100
 
-Hello,
+Hi Carlos,
 
-I am wondering, if there is a way to setup a hotplug connection between two 
-Linux machines using two bluetooth dongles. One of them is a NAP (with 
-Internet access) and booted first, the other box a PANU.
+> Is snd-bt-sco (from the CVS) currently working ? I can get btsco (the app) to 
+> connect to the headset 
+> (http://sourceforge.net/mailarchive/forum.php?thread_id=6030842&forum_id=1883)
+> and get the following :
+> 
+> Device is 1:0
+> Voice setting: 0x0060
+> RFCOMM channel 1 connected
+> recieved AT+CKPD=200
+> opened hwdep
+> connected SCO channel
+> Setting sco fd
+> Done setting sco fd
+> recieved AT+VGS=04
+> Sending up speaker change 4
+> 
+> but when I run aplay (aplay -D hw:1 prompt-copia1.wav) or arecord it exits 
+> with
+> 
+> Playing WAVE 'prompt-copia1.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, 
+> Mono
+> aplay: pcm_write:1118: write error: Input/output error
+> 
+> I've sprinkled the kernel driver with dprintks but apparently there is no data 
+> going from the SCO socket to the ALSA driver.
 
-My problem is that I need the pand running on both sides first before I can do 
-an ifconfig for the bnep0 interface on the NAP.
+for me it is working. What is the output of "hciconfig -a"? What kernel
+are you running and what Linux distribution do you use? Do you checked
+with hcidump what packets are sent?
 
+> By the way both in btsco and in the driver there's some structs and other 
+> variables declared inside the code (not at the top of the function). GCC 
+> 2.95.x doesn't like it, so it would be nice if they were moved upstream.
 
+What about sending in a patch?
 
-What I did on both Debian Linux systems is:
+Regards
 
-Add a file
-
-/etc/hotplug/usb/libbt.usermap
-
-The file contains a line for an epox DG02A dongle
-
-epoxbt                0x0003 0x0a12   0x0001    0x0000       0x0000       0x00         
-0x00            0x00            0x00            0x00            0x00            
-0x00000000
-
-with the vendor ID (here 0x0a12) and the product ID (here 0x0001).
-
-Then add the script epoxbt to the same directory:
-
-# cat epoxbt
-echo "Load epox bluetooth dongle..."
-
-modprobe bnep
-pand --master --listen --role NAP
-#
-
-and 
-
-topsi:~# cat /etc/hotplug/usb/epoxbt
-#!/bin/bash
-
-echo "Load epox bluetooth dongle..."
-modprobe bnep
-pand --role PANU --connect <BT-ID>
-topsi:~#
+Marcel
 
 
-Then I do on the NAP an 
-
-# ifconfig 192.128.2.1
-
-and on the PANU
-
-# dhclient
-
-This works fine, I can access the Internet from the PANU.
-
-
-The problem is that the ifconfig on the NAP fails when I do not have the PANU 
-connected before....thus I can't add the network configuration part into the 
-expobt scripts.
-
-Does anyone have an idea or pointer for that problem.
-
-Thanks,
-Rainer
-
--- 
-Rainer Dorsch
-Alzentalstr. 28
-D-71083 Herrenberg
-07032-919495
-Icq: 32550367
 
 
 -------------------------------------------------------
