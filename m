@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Paul Ionescu <i_p_a_u_l@yahoo.com>
-Message-ID: <pan.2005.01.02.14.10.41.509677@yahoo.com>
+Subject: Re: [Bluez-users] MTU in l2test
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <2de4657604123007015c2c9461@mail.gmail.com>
+References: <2de4657604123007015c2c9461@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1104674721.8894.10.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] btsco questions
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,31 +18,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 02 Jan 2005 16:10:41 +0200
+Date: Sun, 02 Jan 2005 15:05:21 +0100
 
-Hi all,
+Hi Manjunath,
 
-I am trying to play with btsco from CVS.
-I have kernel 2.6.10 and bluez-libs-2.10, bluez-utils-2.10.
-I don't have a headset device, so I am trying to connect it the other way
-around, to a NOKIA 6310i phone with support for AudioGateway and Headset
-profile.
+> I am varying the mtu and data size variables in the l2test program.
+> From the docs, I learnt that maximum L2CAP payload is 65535 bytes. I
+> am unable to set the data size above 45000 bytes inspite of setting my
+> MTU to 65535 (both on the sender and the receiver).
+> I get an error saying "Send failed. Resource temporarily unavailable".
+>  Hope you can help me with this one.
 
-btsco is connecting fine to the phone, the phone shows the headset icon
-on the screen, so it senses a headset connection, then when the phone
-rings, I can see a lot of SCO packets in hcidump, but arecord does not
-record anything.
-I tried to aplay some wav file, but it does not seem to work as I don't
-see any SCO packets in hcidump when I try it.
-I even tried to activate the loopback option in alsa mixer, in order to
-send back the same echo, but still nothing.
+the MTU is different for incoming and outgoing side. With what kind of
+device and what commands lines are you testing these.
 
-Is btsco supposed to work in this scenario ?
+> Also, in the l2test, is the data channel connectionless(6 byte L2CAP
+> header) or connection oriented(4 byte L2CAP header).I am asking this
+> because the code seems to have a 6-byte offset for the header which
+> means the data channel might be connectionless but i am also able to
+> see the "connection request" and "configuration request" which is a
+> feature of connection oriented data channels.
 
-Any thoughts ?
+Actually the connectionless L2CAP is not really supported and maybe
+somekind of buggy. Feel free to send in any improvements.
 
-Thanks,
-Paul
+> Also, how is that I am able to see the packet size of ACL Data in "HCI
+> dump", say a 339 byte packet for DH5 packets. Isn't this supposed to
+> happen at the Baseband?
+
+The HCI sends up the ACL data and actually for most chips it is the same
+size as on the baseband. As far as I know this is not recommanded, but
+it is a good way to not introduce too much overhead for the chip. The
+final SAR is done by the L2CAP layer.
+
+Regards
+
+Marcel
 
 
 
