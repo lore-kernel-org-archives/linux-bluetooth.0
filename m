@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4214AFB1.4010109@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Message-ID: <20050217144332.7302.qmail@web60902.mail.yahoo.com>
+From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
+Subject: Re: [Bluez-users] rfcomm question 3
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Profiles and Service publicing
-References: <cuvg8v$6qs$1@sea.gmane.org>
-In-Reply-To: <cuvg8v$6qs$1@sea.gmane.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <4214A5E1.4090207@gmx.ch>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-900559180-1108651411=:6267"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,50 +17,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Feb 2005 07:52:33 -0700
+Date: Thu, 17 Feb 2005 22:43:31 +0800 (CST)
 
-Hi
+--0-900559180-1108651411=:6267
+Content-Type: text/plain; charset=big5
+Content-Transfer-Encoding: 8bit
 
-> The first is a SDP_ServiceSearch Request from the headset looking for a 
-> service with UUID  of value 0x1112 (corresponds to AudioGateway).
-> The second is a SDP_ServiceSearch Response from BlueZ saying that the 
-> requested service is not found in the SDP database nor nothing even 
-> similar, which is really true because I have not add this service 
-> ("sdptool add AG" is not supported)
+Hi Marco!
+ 
+>question: what do you expect? my pc usually starts a britney spears mp3 >and
+>makes a couple of somersaults...
+>no, serious: what do you expect??? nothing will happen after that because
+>the pc waits for a client connection.
+My expect is to see if my phone can connect to mobile phone, address can be seen by putting the address on the screen. (Of course, it will be done by myself). But unfortunately, nothing to see because I can't find an option on T610 that can connect to PC even though I put the PC into "My device" list.
+ 
+I've borrowed books for socket programming, don't worry about this. But I don't understand why sdp programming is not needed, instead of the word said by my tutor.
 
-We need sdptool to support ag for one thing. I hadn't realized it wasn't 
-supported (I have always been initiating computer->headset but we want 
-to support headset->computer)
+>you've to write a client program for that runs on the mobile phone.
+>if i remember right, the T610 hasn't support for jsr82. I don't know if
+>you're able to do c programming on it and have access to the bluetooth >system.
+>i use a nokia 6230, there you have mdip2.0 and jsr83. so it's no problem at
+>all...
+    Thx for suggestion.
+Michael
 
-If you are comfortable with it, get the sdptool from cvs (to make sure 
-it hasn't been added recently) and add ag support. It's likely a table 
-somewhere with the uuid value and "ag" string. Submit patches here.
 
-> · In the assumption that, some way, I could create a service record in 
-> the service database specifying AudioGateway UUID, would it be enough 
-> for the heaset to reconnect again?
 
-There are more details to take care of probably, but we need to try it 
-to find out.
 
-> · I think of btsco as if it was an AudioGateway implementation (or 
-> headset profile implementation) using the BLuez stack, but if it doesn't 
-> register by its own the AG service in the local database, maybe it is 
-> not a profile imlpementation?
+---------------------------------
+·s¦~Ä@±æ²Ä¤@¦ì :  §ä¨ì¤Í½t¤H 
 
-We are trying to implement the profile completely. The profile is not 
-finished if it doesn't advertise the service.
+--0-900559180-1108651411=:6267
+Content-Type: text/html; charset=big5
+Content-Transfer-Encoding: 8bit
 
-> 
-> So:
-> Please, could you give me some points to understand this? Also, if it's 
-> not being possible to fix the reconnection problem because of some lack 
-> of development, I would like to know where is the failure.
-
-Yes, it is a shortcoming of the current system. We want to fix it but we 
-need more good developers trying stuff like you are and fixing stuff.
-
-Brad
+<DIV>Hi Marco!</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&gt;question: what do you expect? my pc usually starts a britney spears mp3 &gt;and<BR>&gt;makes a couple of somersaults...<BR>&gt;no, serious: what do you expect??? nothing will happen after that because<BR>&gt;the pc waits for a client connection.</DIV>
+<DIV>My expect is to see if my phone can connect to mobile phone, address can be seen by putting the address on the screen. (Of course, it will be done by myself). But unfortunately, nothing to see because I can't find an option on T610 that can connect to PC even though I put the PC into "My device" list.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>I've borrowed books for socket programming, don't worry about this. But I don't understand why sdp programming is not needed, instead of the word said by my tutor.<BR><BR>&gt;you've to write a client program for that runs on the mobile phone.<BR>&gt;if i remember right, the T610 hasn't support for jsr82. I don't know if<BR>&gt;you're able to do c programming on it and have access to the bluetooth &gt;system.<BR>&gt;i use a nokia 6230, there you have mdip2.0 and jsr83. so it's no problem at<BR>&gt;all...</DIV>
+<DIV>&nbsp;&nbsp;&nbsp;&nbsp;Thx for suggestion.<BR>Michael<BR></DIV><p><br><hr size=1>·s¦~Ä@±æ²Ä¤@¦ì :  <a href=http://hk.personals.yahoo.com>§ä¨ì¤Í½t¤H </a><br>
+--0-900559180-1108651411=:6267--
 
 
 -------------------------------------------------------
