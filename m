@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Apple BT connection problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mammoth <mathias.adler@mammoth.se>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41E5228E.8090902@mammoth.se>
-References: <200501130131.07302.mathias@mammoth.se>
-	 <1105532015.7961.49.camel@pegasus>  <41E5228E.8090902@mammoth.se>
-Content-Type: text/plain
-Message-Id: <1105537774.7961.81.camel@pegasus>
-Mime-Version: 1.0
+From: "Michael Firsching" <michael.firsching@gmx.net>
+To: <bluez-users@lists.sourceforge.net>
+Subject: RE: [Bluez-users] Apple BT connection problem
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <1105532015.7961.49.camel@pegasus>
+Message-Id: <20050112133556.290DC12B103@rrzmta1.rz.uni-regensburg.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,23 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 Jan 2005 14:49:34 +0100
+Date: Wed, 12 Jan 2005 14:35:47 +0100
 
-Hi Mathias,
 
-even your email client has a Reply-to-All button. Use it!
+> 
+> we saw that problem and it only occurs when you configured 
+> another input device through YaST. It is unclear what 
+> triggers this problem. Using a vanilla kernel I wasn't able 
+> to reproduce it. What other input devices are in your machine?
 
-> The only input device I have is a regular keyboard and a USB mouse.
-> The USB mouse is configured as a  KEY Genius Netscroll+  /dev/mouse in
-> SaX and intelliMouse Explorer (USB) is choosen in yast.
+I am having the same problems with SUSE 9.2, kernel 2.6.10, a EPOX dongle a
+MX900 mouse and a M$ Bluetooth keyboard. I can not creat connections on boot
+and have to connect the devices manually every time. Connecting is only
+possible after pressing the connect buttons of the devices or removing the
+batteries on the keyboard.
 
-as I said, the real reason has never been tracked down, but you can try
-to remove the mouse from your SaX configuration and see if it works.
+Error messages and config is identical to snik1`s...
 
-Regards
-
-Marcel
-
+Regards 
+Michael
 
 
 
