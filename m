@@ -1,16 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm
-From: Marcel Holtmann <marcel@holtmann.org>
-To: mohalik@india.hp.com
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <410616CA.7090102@india.hp.com>
-References: <200401302209.52396.raydar@nwlink.com>
-	 <4100F85D.5080200@india.hp.com> <1090583514.4791.42.camel@pegasus>
-	 <4101C6BE.3010707@india.hp.com> <1090659535.4791.60.camel@pegasus>
-	 <410616CA.7090102@india.hp.com>
-Content-Type: text/plain
-Message-Id: <1090918378.4650.13.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <003501c47389$21c2b9e0$60010f0a@matrix>
+From: "Virat Gohil" <virat4lug@hotpop.com>
+To: "Papadopoulos Giannis" <ipapadop@uth.gr>
+Cc: <bluez-users@lists.sourceforge.net>
+References: <1090829679.4104bd6fbc168@webmail.uth.gr>
+Subject: Re: [Bluez-users] vhci and RFCOMM
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="ISO-8859-7"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,23 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 27 Jul 2004 10:52:59 +0200
+Date: Tue, 27 Jul 2004 08:53:36 +0530
 
-Hi Swarup,
+Hi, 
 
-> Upgrading to 2.6.8-rc2 helped. Now there is no freezing.
+> Hi!
 > 
-> By the way, is this the referece counting bug you and Eugene Crosser
-> discussed some time ago?
+<snip>
+> mordor:/home/dop # rfcomm -i 7F:00:00:01:00:0A listen /dev/rfcomm0
+> Waiting for connection on channel 1
+> Can't open RFCOMM device: No such file or directory
+> mordor:/home/dop #
+</snip>
 
-point me to the thread in the mailing list archive and I can tell you,
-but we had two bad reference counting problem and I can't remember if it
-this one was mentioned by Eugene Crosser or not.
+you should create the rfcomm devices, you can creat them as follows.
 
-Regards
+#mknod /dev/rfcomm0 c 216 0
+#mknod /dev/rfcomm1 c 216 0
 
-Marcel
+(for further details read the man pages of mknod)
 
+Regards,
+
+Virat
 
 
 
