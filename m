@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <275070-2200410219819354@M2W046.mail2web.com>
-Reply-To: bluez@spamzed.com
-From: "postmaster@spamzed.com" <postmaster@spamzed.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] inquiry_info device class to string
+Subject: Re: [Bluez-devel] Piconet Routing
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stefan Mischke <survivor@uni-paderborn.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4174026A.1080209@uni-paderborn.de>
+References: <4173F86A.3050801@uni-paderborn.de>
+	 <1098120822.11765.5.camel@pegasus>  <4174026A.1080209@uni-paderborn.de>
+Content-Type: text/plain
+Message-Id: <1098142954.5415.7.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,38 +19,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 19 Oct 2004 04:19:35 -0400
+Date: Tue, 19 Oct 2004 01:42:35 +0200
 
+Hi Stefan,
 
-Hi there
+> > > Since Bluetooth uses Time Division Duplex, a slave is not allowed to 
+> > > talk to another slave in the same Piconet. The logical consequence must 
+> > > be that the data is routed over the master. I've used l2test to check if 
+> > > l2cap does this kind of routing automatically. It doesn't but rather 
+> > > creates a new, direct acl link to the remote slave device (scatternet). 
+> > > I don't know how it is with rfcomm, but I suppose it's the same. My 
+> > > question: Is there any automatic Piconet Routing inside BlueZ or does 
+> > > one have to implement it by oneself?
+> > >     
+> > you must do it by yourself, because even if the master manages to put
+> > all devices into the same piconet the connections are point to point.
+> > 
+> >   
+> TCP connections are also point to point, but since it's built on top
+> of IP, it goes (transparently) over many routers. Before I tested it,
+> I thought the link manager would take care of this. How does the
+> communiction of many BT devices work in practice? Who manages this
+> routing, since one device can only be point-to-point-connected to 2
+> devices (an this doesn't work really smooth)? There must be one
+> controlling instance. One cannot let the different applications handle
+> this, can one?
 
-Im sort of new to bluetooth and bt development but its going ok so far=2E =
-Im
-writing a little tool which displays all current devices in range=2E Since=
- my
-code uses ripped parts from hcitool scan i can succesfully enumerate the
-device address and name, my question is , how do I parse  the device_class=
+this is true, but the problem is, that a slave does not know to which
+other slaves a master is connected. There is no routing stuff like in IP
+and you can't retrieve these information from the HCI layer.
 
-item from the inquiry_info structure ? Say device ID is 001, i want to
-convert it to an human readable string like 001 =3D=3D Phone, 002 =3D=3D A=
-udio
-etc=2E=2E=2E where can i find an translation list for this ? after a heavy=
- google
-battle i found a PalmOS site which mentions the bluetooth specs, but the
-prop is , i can find only parts of it and my 'bluetooth unreveiled' book i=
-s
-currently beeing shipped to me (i hope its mentioned there)=2E I hope im n=
-ot
-forced to use a sdptool query since some 'light' devices dont have it
-onboard, like headsets etc
+Regards
 
-thanks for the help !
-
-Ed=2E
-
---------------------------------------------------------------------
-mail2web - Check your email from the web at
-http://mail2web=2Ecom/ =2E
+Marcel
 
 
 
