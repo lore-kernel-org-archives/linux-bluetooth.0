@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Vesa Halttunen <vesuri@jormas.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1105049361.6048.9.camel@pc.vesuri.net>
-Mime-Version: 1.0
-Subject: [Bluez-users] Keyboard & mouse operate in boot protocol mode causing extra
- keyboard events with 2.6.10-mh1 and bluez-libs/utils 2.13
+Subject: Re: [Bluez-users] Zoom 4312 PCMCIA Bluetooth freezes laptop
+References: <opsj5ahvnzdfsa41@dfavro-3>  <opsj5r1azldfsa41@dfavro-3> <1105014703.4299.31.camel@pegasus>
+From: "David Favro" <dfavro@users.sourceforge.net>
+Content-Type: text/plain; format=flowed; delsp=yes; charset=utf-8
+MIME-Version: 1.0
+Message-ID: <opsj66u506dfsa41@dfavro-3>
+In-Reply-To: <1105014703.4299.31.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,33 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 07 Jan 2005 00:09:21 +0200
+Date: Thu, 06 Jan 2005 15:22:07 -0500
 
-Hello,
+On Thu, 06 Jan 2005 13:31:43 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
 
-a couple of months back I had a problem with extraneous keyboard events;
-when I typed "sources" I got "sourceces" and so on. This was fixed by
-applying an -mh kernel patch that had HID report protocol mode support.
-2.6.9-mh3 and bluez-libs/utils 2.10 worked fine but now I upgraded to
-2.6.10-mh1 and bluez-libs/utils 2.13 and this problem is back again.
+> maybe you should simple test a vanilla 2.6.10 or later. The reports
+> about the RedHat kernel are not the bests lately and I am not going to
+> debug any of their kernels.
 
-hidd --list gives me
+Right.  I am having other problems with that kernel acting flaky, such as ACPI, so I'm just going to stay away from it.  I've now got the whole set-up including the mouse now working on (Fedora's previously released) 2.6.8 kernel and I'm going to stick with that for a while.  Thanks for the help!
 
-00:07:61:19:9E:A9 HID Boot Device [046d:b301] connected [boot-protocol]
-00:07:61:19:FA:68 HID Boot Device [046d:b001] connected [boot-protocol]
-
-so it seems it's not using the HID report protocol but the boot
-protocol. hidd --list also used to show the correct names of the devices
-(Logitech MX900 Mouse etc.) instead of just HID Boot Device.
-
-What can I do to make hidd use the HID report protocol mode (or whatever
-is necessary to fix this problem)?
-
-Thanks,
-
--Vesa
--- 
-
+Cheers,
+David Favro
+Meta-Dynamic Solutions, LLC
+dfavro@users.sourceforge.net
 
 
 -------------------------------------------------------
