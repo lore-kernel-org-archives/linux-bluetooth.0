@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Changing baud default in CSR
-From: Marcel Holtmann <marcel@holtmann.org>
-To: zubiwat@poczta.onet.pl
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200403041254.47428.zubiwat@poczta.onet.pl>
-References: <200403041254.47428.zubiwat@poczta.onet.pl>
-Content-Type: text/plain
-Message-Id: <1078401373.5347.8.camel@pegasus>
-Mime-Version: 1.0
+From: zubiwat@poczta.onet.pl
+Reply-To: zubiwat@poczta.onet.pl
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200403041254.47428.zubiwat@poczta.onet.pl>
+Subject: [Bluez-devel] Changing baud default in CSR
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,24 +17,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 04 Mar 2004 12:56:13 +0100
+Date: Thu, 4 Mar 2004 12:54:47 +0100
 
-Hi Maciej,
+Can any one help me?
+I have to change the default baud base in chip because it is set to 921600 and 
+I have to use microchip to translate this 921600 to 115200. Now it is the 
+only way for me to connect to my BT through RS232. I want to change this 
+default baud to be able to connect directly to my BT through RS232 without 
+any microchip between them.
+Please help to find a command or sth to change this - offcourse if it's 
+possible.
 
-> I have to change the default baud base in chip because it is set to 921600 and 
-> I have to use microchip to translate this 921600 to 115200. Now it is the 
-> only way for me to connect to my BT through RS232. I want to change this 
-> default baud to be able to connect directly to my BT through RS232 without 
-> any microchip between them.
-> Please help to find a command or sth to change this - offcourse if it's 
-> possible.
+Regards 
 
-look for the pskey tool.
-
-Regards
-
-Marcel
-
+Maciej Zubilewicz
 
 
 
