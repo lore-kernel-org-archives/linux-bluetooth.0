@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Pairing a keyboard
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041125075755.GC2505@frostnet.net>
-References: <20041125064110.GA2505@frostnet.net>
-	 <1101367010.7538.78.camel@pegasus>  <20041125075755.GC2505@frostnet.net>
-Content-Type: text/plain
-Message-Id: <1101371606.7538.95.camel@pegasus>
+Message-ID: <20041125075755.GC2505@frostnet.net>
+References: <20041125064110.GA2505@frostnet.net> <1101367010.7538.78.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1101367010.7538.78.camel@pegasus>
+From: Chris Frost <chris@frostnet.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,27 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Nov 2004 09:33:26 +0100
+Date: Wed, 24 Nov 2004 23:57:55 -0800
 
-Hi Chris,
+On Thu, Nov 25, 2004 at 08:16:49AM +0100, Marcel Holtmann wrote:
+> who said that pairing works by calling "hcitool cc ..."? You should use
+> the "hidd --connect ..." command instead.
 
-> > The bluepin script must echo "PIN:0000".
-> 
-> Aha, that gets it. Thank you.
-> 
-> Do you know if I should I read about/look into putting the keyboard to
-> sleep after inactivity? I have read in a couple places on the web that apple's
-> devices do not go to sleep themselves, but perhaps what I read was old and
-> bluez does this automatically now?
-
-the hidd has a --timeout option you can use, but we don't support the
-automatic switch into sniff mode.
-
-Regards
-
-Marcel
+No one did; I had tried hidd --connect but got the same errors. Sorry about
+this mistake, thanks for the correction.
 
 
+> The bluepin script must echo "PIN:0000".
+
+Aha, that gets it. Thank you.
+
+Do you know if I should I read about/look into putting the keyboard to
+sleep after inactivity? I have read in a couple places on the web that apple's
+devices do not go to sleep themselves, but perhaps what I read was old and
+bluez does this automatically now?
+
+-- 
+Chris Frost  |  <http://www.frostnet.net/chris/>
+-------------+----------------------------------
+Public PGP Key:
+   Email chris@frostnet.net with the subject "retrieve pgp key"
+   or visit <http://www.frostnet.net/chris/about/pgp_key.phtml>
 
 
 -------------------------------------------------------
