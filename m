@@ -1,10 +1,17 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v613)
-Message-Id: <F849ADA4-7D17-11D8-BFCD-00039390D626@pepper.com>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-From: Michael Frey <mfrey@pepper.com>
-Subject: [Bluez-devel] BTHID instructions...
+Subject: Re: [Bluez-devel] Accessing HCI on Windows
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Xavier Garreau <xavier@xgarreau.org>
+Cc: Stefan Mischke <survivor@uni-paderborn.de>,
+   Xavier Garreau <x.garreau@prim-time.fr>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200403232147.41149.xavier@xgarreau.org>
+References: <405FFCB9.5050507@uni-paderborn.de>
+	 <030001c410f8$62945a80$b67ba8c0@zaz1> <40607CB2.3050608@uni-paderborn.de>
+	 <200403232147.41149.xavier@xgarreau.org>
+Content-Type: text/plain
+Message-Id: <1080075380.2515.44.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,14 +22,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Mar 2004 17:18:11 -0500
+Date: Tue, 23 Mar 2004 21:56:20 +0100
 
-Can someone point me in the direction of how to build and install the 
-new BTHID stuff?  I was just on the Bluez website and did not find any 
-mention of it.
+Hi,
 
-Thanks in advance,
-Michael Frey
+> > But the Com One drivers ARE Widcomm drivers. So where is the difference?
+> 
+> Ouch, i've been to their website and saw the new drivers ... What i did worked 
+> with tech0776 and they were not from widcomm ...
+
+lets stop this thread now, because this mailing list is for Linux and
+Bluetooth ;)
+
+Regards
+
+Marcel
+
 
 
 
