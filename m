@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <320075ff040925153753850d92@mail.gmail.com>
-From: Nigel Magnay <nigel.magnay@gmail.com>
-Reply-To: Nigel Magnay <nigel.magnay@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] obexFTP ... does it works?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040925213557.18900.qmail@web53207.mail.yahoo.com>
+References: <20040925213557.18900.qmail@web53207.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1096149821.7719.7.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] ipaq 1945
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,29 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 25 Sep 2004 23:37:15 +0100
+Date: Sun, 26 Sep 2004 00:03:42 +0200
 
-Hi there
+Hi Massimiliano,
 
-I'm having a bit of trouble. I'm using kernel 2.6.8.1, and I'm trying
-to get my iPaq 1945 to be able to connect via bluetooth to the
-internet, though to start with I'm just trying to get it to connect to
-the host computer.
+> I installed linux suse 9.1 and some rpm from suse and
+> now I have a bt support.
+> 
+> I read in the suse help center a command line that can
+> send files to my cell phones (Nokia 6600)
+> here it is:
+> obexftp -b xx:xx:xx:xx:xx:xx -B 10 -p pippo.jpg
+> 
+> (xx:xx:xx:xx:xx:xx is the addr I read using hcitool
+> scan)
+> (I don't know what is the -B 10 option)
 
-I think everything is working correctly - I have the stack up and
-running, I can get my bnep0 interface up, and assign it an ip address
-- e.g. 192.168.1.56. I can then ping that address from linux, and I
-can browse it as an internet connection on my ipaq, and connect to it.
+have you tried to look this up with "man obexftp"? It is the Bluetooth
+RFCOMM channel number of the FTP service.
 
-Problem is, neither IE nor Pocket puTTY can use the connection (I try
-to ssh to 192.168.1.55, my linux box). I don't know if I'm just
-missing something, but I've read all the guides and I'm just confused
-as to whether I'm trying something that isn't possible.
+> I already installed obexftp 1.0.1 but it doesn't works
+> ... 
+> it says failed
+> anyone can help me to understand why?
+> others operation works correctly, so I can send a file
+> (note or image) to my linux (using opd) from my phone.
+> 
+> The same operation works if i use the KDEBluetooth
+> framework ... but I need a command line tool
 
-Has anyone got some pointers for me?
+There is a tool call btobex in the BlueZ obex CVS repository that might
+work.
 
-tia,
-Nigel
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
