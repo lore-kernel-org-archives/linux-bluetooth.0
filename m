@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Riku Voipio <riku.voipio@iki.fi>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Oops in hci_usb
-Message-ID: <20040503193747.GA21331@kos.to>
-References: <20040501173626.GA3866@kos.to> <1083587205.4666.0.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20040503184147.83583.qmail@web61102.mail.yahoo.com>
+From: arundeep Singh <arundeep78@yahoo.com>
+To: bluez users <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1083587205.4666.0.camel@pegasus>
+Subject: [Bluez-users] configuring bluetooth device
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,56 +15,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 3 May 2004 22:37:48 +0300
+Date: Mon, 3 May 2004 11:41:47 -0700 (PDT)
 
-On Mon, May 03, 2004 at 02:26:45PM +0200, Marcel Holtmann wrote:
-> Hi Riku,
-> do you enabled CONFIG_BT_HCIUSB_SCO in your kernel? If yes, disable it
-> and try again.
+I am working on 2.6.4 kernel. I am trying to configure my bluetooth usb
+dongle by widcomm on my PC. but remain unable to. 
 
-Thanks for everyone for help!
+bluez is there on the system. but i didn't find few of the config
+files. and also the there is no such device name hci0 or so in /dev
+directory.
 
-Getting rid SCO option and updating to 2.6.6-RC3 makes the bluetooth 
-on x40 work like a charm, no more oops and pairing worked first try. 
-I can try 2.6.6-RC3 with CONFIG_BT_HCIUSB_SCO if you want to track 
-the problem deeper. 
+please tell me what are the exact step to configure a bluetooth device.
+and also to check whether it will work or not.
 
-Attached are hcitool info/hconfig -a of the gadgets:
+thanks in advance
 
-Thinkpad x40
-hci0:   Type: USB
-        BD Address: 00:20:E0:74:xx:xx ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:18298 acl:611 sco:0 events:344 errors:0
-        TX bytes:5109 acl:203 sco:0 commands:69 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'wombat-0'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x222 LMP Ver: 1.1 (0x1) LMP Subver: 0x222
-        Manufacturer: Cambridge Silicon Radio (10)
+=====
+Arundeep Singh,
+M.Tech (IS), IIIT Allahabad, 
+U.P, India. 
+ph: 09415262466, 09417066713
+http://www.i-cognition.com
 
-Siemens S55
-        BD Address:  00:01:E3:04:xx:xx
-        Device Name: xxxx
-        LMP Version: 1.1 (0x1) LMP Subversion: 0x555
-        Manufacturer: Infineon Technologies AG (9)
-        Features: 0xef 0xea 0x19 0x00 0x00 0x00 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <role switch> <hold mode> <sniff mode> <RSSI>
-                <SCO link> <HV3 packets> <u-law log> <A-law log>
-                <CVSD> <transparent SCO>
+Don't take life seriously, as you can't come out of it alive.
 
 
--- 
-Riku Voipio  	       | riku.voipio at iki.fi         |
-kirkkonummentie 33     |    +358 44 5000343          --+--
-02140 Espoo            |                               |
-dark> A bad analogy is like leaky screwdriver          |
+	
+		
+__________________________________
+Do you Yahoo!?
+Win a $20,000 Career Makeover at Yahoo! HotJobs  
+http://hotjobs.sweepstakes.yahoo.com/careermakeover 
 
 
 -------------------------------------------------------
