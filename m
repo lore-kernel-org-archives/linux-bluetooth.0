@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Vardhman Jain <vardhman@students.iiit.net>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.44.0503062141150.12145-100000@students.iiit.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] (no subject)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nishanth Aravamudan <nacc@us.ibm.com>
+Cc: Max Krasnyansky <maxk@qualcomm.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   kernel-janitors@lists.osdl.org
+In-Reply-To: <20050228185834.GB3261@us.ibm.com>
+References: <20050228185834.GB3261@us.ibm.com>
+Content-Type: text/plain
+Message-Id: <1110025351.8168.0.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: [PATCH] bluetooth/bluecard_cs: remove
+ interruptible_sleep_on_timeout() usage
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,38 +22,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 6 Mar 2005 21:42:27 +0530 (IST)
+Date: Sat, 05 Mar 2005 13:22:31 +0100
 
+Hi Nish,
 
- I am in need of a solution to help me use the obex-server programmatically.
+> This patch should not have the oops problems that the original did.
 
-        What I need to do is whenever a file is recieved at the server I 
-get some kind of callback or signal, so I can call some other 
-program/function which was waiting for files from bluetooth. I need this 
-to be done in a for loop until the remote device disconnects. It would be 
-great If I can call the file recieving code as a waiting function call in 
-my code. 
+this version is working and applied to my tree.
 
-	Any help or pointers are appreciated.
+Regards
 
-
-Vardhman
-
-
-
-
-
-
--- 
-Vardhman Jain
-IV Year B.Tech. CSE
-IIIT-Hyderabad
-
-presence on net:
-    http://students.iiit.net/~vardhman
-    http://vardhman.blogspot.com
-1) My Box said: "Install Win2k or better ..." So I installed GNU/Linux.
-2) What you are is God's gift to you and what you become is your gift to God.
+Marcel
 
 
 
