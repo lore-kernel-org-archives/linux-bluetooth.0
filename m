@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Andreas Gaufer <Andreas.Gaufer@blue-cell-networks.com>
+Message-ID: <40AA11AB.6010307@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Message-Id: <20040518154926.4522519c.Andreas.Gaufer@blue-cell-networks.com>
-In-Reply-To: <E1BQ0K1-0000wa-00@intern.SerNet.DE>
-References: <1084868892.5833.45.camel@pegasus>
-	<E1BQ0K1-0000wa-00@intern.SerNet.DE>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] Nokia 6230 info
+Subject: Re: [Bluez-devel] question: what does this patch from snd-bt-sco
+ do?
+References: <40A9E6CB.4010505@dark-reality.de>	 <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk>	 <40A9EE51.2080102@dark-reality.de> <1084881439.5833.108.camel@pegasus>
+In-Reply-To: <1084881439.5833.108.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,43 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 May 2004 15:49:26 +0200
+Date: Tue, 18 May 2004 15:37:47 +0200
 
-On Tue, 18 May 2004 10:51:37 +0200 (CEST)
-Lutz Pressler <Lutz.Pressler@SerNet.DE> wrote (on BlueZ-Users):
-> > please run "hcitool info <bdaddr-6230>" for me, so I can put this phone
-> > on my list.
-> >
-> Requesting information ...
->         BD Address:  00:E0:03:39:C9:AB
->         Device Name: Nokia 6230 LP
->         LMP Version: 1.1 (0x1) LMP Subversion: 0x380
->         Manufacturer: Cambridge Silicon Radio (10)
->         Features: 0xbf 0xee 0x00 0x09
->                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
->                 <timing accuracy> <role switch> <sniff mode> <RSSI>
->                 <channel quality> <SCO link> <HV3 packets> <u-law log>
->                 <A-law log>
-> 
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-Hi Marcel,
+Marcel Holtmann wrote:
+| Hi Lars,
+|
+|
+|>I already looked up the voice number stuff in the core docs, and was
+|>able to find out that 0x0140 is ideal right now (MU_LAW encoded). Works
+|>here, already.
+|
+|
+| for this you must use alternate setting 1, because it is 8 bit.
+|
 
-just looked into the data from our field tests. We saw something that had the 
-Device Name "Nokia 6230 Ir" and it had a diffrent feature list. Just thought 
-this might be intresting for you :
+um, sorry - what's an alternate setting? I mean, what exactly is "set" here?
 
-1080041406|dn|Nokia 6230 iR
-1080041406|fea|0xbf 0xee 0x0f 0x00
-1080041406|lmpsv|0x380
-1080041406|lmpv|1.1 (0x1)
-1080041406|mf|NokiaDanmarkAS
+I have a working setup with
+hciconfig hci0 voice 0x0140
+the above kernel patch and the default snd-bt-sco driver stuff (of
+course alsa codec information has changed from PCM to MU_LAW)
 
-Since the Mac-Adress was 00:02:EE:x:x:x this was maby a prototype of that 
-phone. We spotted it in March in Hannover ;)
+so I don't exactly know that this alternate setting means :)
 
-Greetings
+Or is it a setting that makes the 8bit-modes possible without using that
+kernel patch?
 
-Andy
+sorry, but I'm a bit new to Bluez :)
+~  Lars
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFAqhGqQWC6DTWkDAoRAruDAJ4+ovPkHM6M7YvCI2nh6T82RcXy+QCfV8xf
+Cc+MRgtEf1rE96S3NHmcV/g=
+=mc1o
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
