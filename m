@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050121020742.55149.qmail@web25003.mail.ukl.yahoo.com>
-From: Dave West <westdwestd@yahoo.co.uk>
 To: bluez-devel@lists.sourceforge.net
-Cc: roger.kermode@smartinternet.com.au
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-devel] bluetooth hardware that is discoverable by default?
+From: Paul Ionescu <i_p_a_u_l@yahoo.com>
+Message-ID: <pan.2005.01.21.01.42.29.140990@yahoo.com>
+References: <pan.2005.01.21.01.14.47.519771@yahoo.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] Re: hci_usb question
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,51 +17,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 21 Jan 2005 02:07:42 +0000 (GMT)
+Date: Fri, 21 Jan 2005 03:42:30 +0200
 
-Hi there,
+On Fri, 21 Jan 2005 03:14:48 +0200, Paul Ionescu wrote:
 
-I have very simple requirements for a bluetooth
-'beacon' that is discoverable, but nothing else (ie.
-it responds to discovery requests, but you don't need
-to connect to it or anything).  At the moment I am
-using a D-Link USB dongle where the USB powerlines are
-soldered to an external power supply.  This supplies
-power to the beacon, but it still needs to connect to
-a linux/bluez equipped laptop (with USB power
-disconnected as it draws its power externally) to
-bring up the device and make it discoverable. 
-Immediately disconnecting the bluez laptop you then
-have a cheap standalone beacon as long as the power
-remains.
+> Also hci_usb creates 3 USB interfaces for my BT dongle. What are these 3
+> USB interfaces for ?
+> 
 
-I'm wondering is there any way to have a beacon like
-this where you don't have to connect it to a laptop
-after its been powered up to make it discoverable?  My
-searches on google and looking at the bluez code make
-me think that normally a HCISETSCAN ioctl is sent to
-the device with SCAN_INQUIRY|SCAN_PAGE option to make
-it discoverable.  My question is are there any dongles
-out there that become discoverable immediately when
-they are powered without having to send them a HCI
-command?  One of you who have written drivers for
-these things might know....
+I just looked in the specs and some other places and found it:
 
-Or if there aren't, can anyone suggest another way I
-might go about making or designing a cheap self
-powered bluetooth beacon that is discoverable on
-powerup?  I may want to manufacture these beacons in
-some quantity later.
+One bluetooth bulk endpoint
+One bluetooth isochronous endpoint
+One firmware upgrade endpoint
+
+And it seems that hci_usb only claims bluetooth USB Wireless Controller
+class E0, and firmware upgrade which is USB class FE is left unclaimed.
+
+So, if hic_usb would claim also USB class FE, then it would not appear as
+red in usbview.
 
 Thanks,
-David
+Paul
 
 
-	
-	
-		
-___________________________________________________________ 
-ALL-NEW Yahoo! Messenger - all new features - even more fun! http://uk.messenger.yahoo.com
 
 
 -------------------------------------------------------
