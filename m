@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] dual boot keyboard wont connect
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Walt <idunno2468@hotmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <412E57F2.6040303@hotmail.com>
-References: <412E57F2.6040303@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1093558926.2581.72.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <412E57F2.6040303@hotmail.com>
+From: Walt <idunno2468@hotmail.com>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] dual boot keyboard wont connect
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,33 +15,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 27 Aug 2004 00:22:06 +0200
+Date: Thu, 26 Aug 2004 17:36:50 -0400
 
-Hi Walter,
+I dual boot with windows xp, and use the MS wireless desktop bluetooth.  
+When I switch to windows, i get a message about a bluetooth device 
+requesting authorization.  I have to manually remove the device, hold 
+the reset button on the keyboard, and then rescan for the keyboard.  
+When I switch back to linux, all I get is the following in my log:
+localhost hcid[8848]: link_key_request (sba=00:50:F2:7D:43:AF, 
+dba=00:50:F2:80:32:90)
+I hold the reset, then hidd -connect 00:50:F2:80:32:90.  The mouse works 
+great through all of this.
 
-> I dual boot with windows xp, and use the MS wireless desktop bluetooth.  
-> When I switch to windows, i get a message about a bluetooth device 
-> requesting authorization.  I have to manually remove the device, hold 
-> the reset button on the keyboard, and then rescan for the keyboard.  
-> When I switch back to linux, all I get is the following in my log:
-> localhost hcid[8848]: link_key_request (sba=00:50:F2:7D:43:AF, 
-> dba=00:50:F2:80:32:90)
-> I hold the reset, then hidd -connect 00:50:F2:80:32:90.  The mouse works 
-> great through all of this.
-> 
-> My guess is that the keyboard requires authentication: in windows i must 
-> type in a set of numbers and press enter or it doesnt work. At least, 
-> thats the only difference that I can see with the way it connects.
+My guess is that the keyboard requires authentication: in windows i must 
+type in a set of numbers and press enter or it doesnt work. At least, 
+thats the only difference that I can see with the way it connects.
 
-actually dual booting with a Bluetooth keyboard is not really possible
-unless you store the link key on the Bluetooth dongle. Do you enabled
-the auth option in hcid.conf?
+Currently using 2.6.8-mh1, bluez-libs/utils-2.10
 
-Regards
-
-Marcel
-
-
+Thanks,
+Walter
 
 
 -------------------------------------------------------
