@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Prepare patch bluez for the CoD in hci_conn
-From: Chen Bin <binch@mobilesoft.com.cn>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1102315236.8510.55.camel@pegasus>
-References: <1102340081.653.6.camel@debian>
-	 <1102315236.8510.55.camel@pegasus>
-Content-Type: text/plain; charset=gbk
-Message-Id: <1102345868.2011.2.camel@debian>
+Subject: Re: [Bluez-devel] Re: [PATCH] - for BT HID fixes + beginning of
+	ctrl handling
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1102315086.6245.1.camel@localhost>
+References: <1101930555.6182.15.camel@localhost>
+	 <1101933187.15615.54.camel@pegasus>  <1101982200.6274.24.camel@localhost>
+	 <1101987344.15615.109.camel@pegasus>  <1102315086.6245.1.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1102315745.8510.64.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,68 +21,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 06 Dec 2004 23:11:08 +0800
+Date: Mon, 06 Dec 2004 07:49:05 +0100
 
-Hi Marcel,
+Hi Matthew,
 
-I have done this. I searched the BT spec and find two places which will
-let us know the CoD value, and I simply test it, it works find.
+> > Actually a schedule should not harm in any way. If you think we really
+> > need it then I would prefer the same as a looked() versus __unlocked()
+> > functions.
+> 
+> Like you I want to keep things simple here, but I want to also avoid the
+> effects of giving up the processor to readily.  Also I want to avoid the
+> complications of more locks.  The reply messages are being sent inside
+> the global? Bluetooth HID lock.  We have to be careful about the context
+> that this is all happening within.  If you are that concerned about the
+> third function schedule parameter, I will create 2 separate control
+> message sending functions as they are only 3-4 lines long.
 
-Ok, next step is to make an interface(maybe ioctl) to let the user get
-the CoD value, is it needed(if there has been a interface which can get
-the entire hci_conn structure)? If it is not needed, I will send you the
-patch now.
+maybe we have to move the hidp_schedule() call around. Don't duplicate
+code even if they are only 3-4 lines long.
 
+> > > Thinking about how best to look after all the code and patching.
+> > > Putting all the BT code into a version control system here is looking to
+> > > be quite sensible to make the patching easier to handle.  If we were not
+> > > patching core.c for the report mode support, this would be a lot easier
+> > > and cleaner.
+> > 
+> > I don't see any need for it at the moment. Once we get your HIDP core
+> > stuff ready, I will try to merge it back mainline as soon as possible.
+> > Every change after that should be minimal.
+> > 
+> 
+> This first patch is only phase 1 in a 3 stage process.  Next 2 steps
+> will be just as big and invasive.  After this probably half of the BT
+> HID may be changed around quite significantly.  Please accept Debug code
+> code changes I make, as I need these to get debug code to compile for my
+> own use.  The version control system is so that I can more easily keep
+> track of what I am doing.
 
-Chen
-=D4=DA 2004-12-06=D2=BB=B5=C4 07:40 +0100=A3=ACMarcel Holtmann=D0=B4=B5=C0=
-=A3=BA
->                               =B7=A2=BC=FE=C8=CB:=20
-> Marcel Holtmann
-> <marcel@holtmann.org>
->                               =BB=D8=B8=B4=D6=C1:=20
-> bluez-devel@lists.sourceforge.net
->                               =CA=D5=BC=FE=C8=CB:=20
-> BlueZ Mailing List
-> <bluez-devel@lists.sourceforge.net>
->                                =D6=F7=CC=E2:=20
-> Re: [Bluez-devel] Prepare patch
-> bluez for the CoD in hci_conn
->                                =C8=D5=C6=DA:=20
-> Mon, 06 Dec 2004 07:40:36 +0100
-> (14:40 CST)
->=20
-> Hi Chen,
->=20
-> > Do you remember that I have asked a CoD question in this list and
-> you
-> > ask me to do a patch to let the CoD value in hci_conn? Now I have
-> time
-> > to do this work and I have something to clarify for I am not a bluez
-> > member before and I am not very fimiliar with BlueZ.
-> >=20
-> > This time I just want to keep the remote CoD value in hci_conn when
-> a
-> > connection is done. But as you know, sometimes it is impossible for
-> us
-> > to get the CoD of the remote class without a prestage inquiry. So,
-> not
-> > every CoD value in hci_conn is valid. I will check the BT spec to
-> find a
-> > right way to tell the user whether the CoD is valid.
-> >=20
-> > Is it enough that I add a field to hci_conn and when the connection
-> is
-> > done I update the field?
->=20
-> you need only to add a "__u8 dev_class[3]" field to the data structure
-> and if you don't know the current value for CoD. For example for an
-> outgoing connection, where the value is not in the inquiry cache, then
-> you simply put 0x000000 in there.
->=20
-> Regards
->=20
-> Marcel
+The debug code is for the development stage. After the merge back we
+remove it and leave only a minimal amount of debug code in there. That
+is also the reason why no config option for it exists even if the define
+looks like one.
+
+Regards
+
+Marcel
+
 
 
 
