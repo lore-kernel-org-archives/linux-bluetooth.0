@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] headset connection problem
+Subject: Re: [Bluez-users] Mysterious problem with l2test on Coldfire 5282
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Guang <m9187@cn.ee.ccu.edu.tw>
+To: Jeff Sutherland <jeffs@fairwayacademy.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <002801c3f55d$e5c9d800$7b6b7b8c@guang>
-References: <002801c3f55d$e5c9d800$7b6b7b8c@guang>
+In-Reply-To: <200402170924.31121.jeffs@fairwayacademy.org>
+References: <200402170924.31121.jeffs@fairwayacademy.org>
 Content-Type: text/plain
-Message-Id: <1077032640.2665.14.camel@pegasus>
+Message-Id: <1077032602.2665.12.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,34 +18,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Feb 2004 16:44:00 +0100
+Date: Tue, 17 Feb 2004 16:43:23 +0100
 
-Hi Guang,
+Hi Jeff,
 
-> I  find  a small problem which  Bluez communicate to headset.
->  I  have a PC(red hat linux8.0), and headset( sony ericsson HBH-65).
-> And I inital bluez;
-> [root@Bluez bluetooth}#  hcid
-> [root@Bluez bluetooth}#  hciconfig
-> hci0:  Type:USB
->           BD Address:  00:AA:.................
->  
-> [root@Bluez bluetooth}#  hcitool  scan
-> Scanning ...
->                00:0A:0A:AA:AA:AA     HBH-65
->  
-> [root@Bluez bluetooth}# modprobe  l2cap
-> [root@Bluez bluetooth}#  modprobe  rfcomm
-> [root@Bluez bluetooth}#  l2ping 00:0A:0A:AA:AA:AA
-> Can't connect. : Permission denied
-> [root@Bluez bluetooth}# sdptool browse 00:0A:0A:AA:AA:AA
-> Failed to connect to SDP server on 00:0A:0A:AA:AA:AA  : Permission
-> denied
->  
-> What   is   happen?  Why  does headset deny permission? Should I enter
-> PIN number to tell headset ,or  others solution?
+> Using the l2test program on Motorola 5282 (uClinux) I have a strange behaviour 
+> when using l2test -s from the Moto board.  Using the -d (dump) mode to 
+> receive packets from a PC running l2test I see what appears to be the packet 
+> sequence number in the first 4 bytes of data (little endian), followed by a 2 
+> byte packet length, then data payload.  When dumping data from the PC the 
+> packet sequence number increments by 1 each time, which, I believe, is the 
+> expected behaviour.  However, when sending from the Moto board to the PC, the 
+> packet sequence number increments by 4 each time. ?????  L2test send looks 
+> ok, the sequence number is just seq++; so something must be going on in hcid, 
+> right?  Or maybe it's dropping 3 out of 4 send packets for some reason.  
+> Maybe something cocked up with the socket ops in l2test?  ?????  Debugging 
+> pointers, please...
 
-run "hcidump -w <file>" (as root) and show us the dump.
+maybe this code in send_mode() is the problem
+
+	*(uint32_t *) buf = htobl(seq++);
+	*(uint16_t *)(buf+4) = htobs(data_size);
+
+Replace it with
+
+	*(uint32_t *) buf = htobl(seq);
+	*(uint16_t *)(buf+4) = htobs(data_size);
+	seq++;
+
+I am not a uClinux or compiler expert, so this is only guess.
 
 Regards
 
