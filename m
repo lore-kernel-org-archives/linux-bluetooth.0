@@ -1,14 +1,18 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?iso-8859-1?Q?J=E9r=F4me_Stadelmann?= <jerome.stadelmann@hta-bi.bfh.ch>
-To: <bluez-users@lists.sourceforge.net>
-Message-ID: <001901c3e56c$2222a3b0$2d105793@N64101>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] SuSE and Audio
+Subject: Re: [Bluez-users] hci0 problem after timeout
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rafael Vidal Aroca <rafael@3WT.com.br>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40182452.2040509@3WT.com.br>
+References: <40170986.70105@3WT.com.br> <1075276651.12766.52.camel@pegasus>
+	 <4017D6E9.6030700@3WT.com.br> <1075306737.26729.3.camel@pegasus>
+	 <40182154.6030709@3WT.com.br> <1075323686.26729.41.camel@pegasus>
+	 <40182452.2040509@3WT.com.br>
+Content-Type: text/plain
+Message-Id: <1075324208.26729.44.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Id: <bluez-users.lists.sourceforge.net>
@@ -17,22 +21,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jan 2004 07:58:28 +0100
+Date: Wed, 28 Jan 2004 22:10:09 +0100
 
-Hello everybody
+Hi Rafael,
 
-I'm actually a nb with linux, but I have to develop an application with =
-some
-audio bluetooth transmission. Actually I have a SuSE 9.0 distribution.
-Marcel (Holtmann) said that I have to patch my kernel, but his patch =
-doesn't
-work with the SuSE kernel source. And I don't know how to do it easily
-without having to configure all my computer.
+>     Unfortunatly, i don't have access to any other bluetooth dongle :-(
 
-Please, can somebody help me or give me a hint?
-Thanks
+this is actually bad. Maybe a friend or a colleague has one that you can
+borrow for testing.
 
-Jerome
+Regards
+
+Marcel
+
 
 
 
