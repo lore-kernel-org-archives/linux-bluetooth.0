@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050303110744.23882.qmail@web40621.mail.yahoo.com>
-From: Paolino paperino <vonzoltan@yahoo.it>
-Subject: [Bluez-users] Zaurus SL6000 & Socket CF
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: 6667
+Message-ID: <42264BBF.7040507@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth PC Headset - SCO connection failed
+References: <f54d86405022806312ab4142a@mail.gmail.com>	 <4223466A.2010701@xmission.com> <f54d86405030108254b6085b@mail.gmail.com>
+In-Reply-To: <f54d86405030108254b6085b@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,40 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 3 Mar 2005 12:07:44 +0100 (CET)
+Date: Wed, 02 Mar 2005 16:26:55 -0700
 
-Hi!
-I've installed on my Zaurus this ipk from Bluez site:
-bluez-libs_2.8
-bluez-hcidump 1.9
-bluez-utils 2.8
-bluez-kernel-2.4.18-mh14
+Benny
 
-I've loaded the modules by hand with insmod
-hci_uart
-bluez
-l2cap
+> We need to transfer additional data(full duplex between a linux PC and
+> the Headset) parallely apart from the headset functionality. Is this
+> possible?
 
-now i must  attach to the serial device:
-hciattach /dev/ttySX socket
-As X i tried 0 and 1 and this get me this error: "BCSP
-initialization timeout".
+It's not clear what you're asking since most (all?) headsets only 
+support audio data.
 
-If as X i use 2, 3 i get "Can't open serial port: No
-such device"
+I believe you can open an rfcomm connection to the headset and transfer 
+data in parallel to audio if your headset knew what to do with it.
 
-without hciattaching i can't use Bluez, anybody could
-hilight me?
-Thannk's
-Best regards 
- Andrea S.
-
-
-
-		
-___________________________________ 
-Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
-http://it.messenger.yahoo.it
+Brad
 
 
 -------------------------------------------------------
