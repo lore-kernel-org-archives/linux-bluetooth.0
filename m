@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PICO Bluetooth Modem and PCMCIA Card
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Monika Hubrich <monikahubrich@aol.com>
+Subject: Re: [Bluez-users] problems with bytestream + rfcomm socket problems
+From: Diego Liziero <liziero.diego@unimore.it>
+Reply-To: diego.liziero@unimore.it
+To: Paolino paperino <vonzoltan@yahoo.it>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <001801c4b14b$402bc390$5f5ab5ac@monika>
-References: <001801c4b14b$402bc390$5f5ab5ac@monika>
+In-Reply-To: <20041013143813.89912.qmail@web40626.mail.yahoo.com>
+References: <20041013143813.89912.qmail@web40626.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1097752576.4640.31.camel@notepaq>
+Message-Id: <1097742403.20102.20.camel@igno>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,21 +19,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 14 Oct 2004 13:16:16 +0200
+Date: Thu, 14 Oct 2004 10:26:43 +0200
 
-Hi Monika,
+Hello Andrea,
 
-> This is the output of hcidump -x:
-> HCIDump - HCI packet analyzer ver 1.12
-> device: hci0 snap_len: 1028 filter: 0xffffffff
+On Wed, 2004-10-13 at 16:38, Paolino paperino wrote:
+> Thanks Diego,
+> Now i've tested the rctest (without the usleep that
+> i've inserted) on a machine with kernel 2.4.18 and
+> bluez libs/utils 2.2(USB dongle digicom), and the
+> receive function doesn't give any prblems, work well,
+> doesn't loose any byte...is this a bug in the kernel i
+> use?!
 
-and now do something. Otherwise there is another problem deeper in the
-hardware or some of the drivers.
+Here it works with kernels 2.6.7-2.tmb.6mdk (mandrake)
+and 2.6.9-rc3-mm3-ecn-retry (debian).
+Sorry, I don't have a RedHat.
 
-Regards
+> PS The USB dongle i use with the kernel 2.6 is a Trust
+> BT180
 
-Marcel
+Try to switch the Bluetooth dongle and see if it is
+it's fault.
 
+> Thanks 
+> Andrea S.
+
+Diego.
 
 
 
