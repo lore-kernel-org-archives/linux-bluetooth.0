@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: soraberri <421246@posta.unizar.es>
-Message-ID: <cpp4n0$4b3$1@sea.gmane.org>
+Subject: Re: [Bluez-users] Re: Toshiba and BT (SuSE 9.2)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAx68NEbhABUCCBVz+cCM6sAEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAx68NEbhABUCCBVz+cCM6sAEAAAAA@t-online.de>
+Content-Type: text/plain
+Message-Id: <1103107570.2143.189.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] fedora3-BluetrekG2 log
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,165 +21,90 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
 Date: Wed, 15 Dec 2004 11:46:10 +0100
 
-This is something like a log of what I've done in order to give headset 
-support to a Fedora Core 3 new fresh installation. It is specific to the 
-Bluetrek G2 headset.
+Hi Peter,
 
-____________________________________
+> ##>
+> ##>this time the connection is refused, because of a security 
+> ##>issue. I assume that the link key you send is wrong. Remove 
+> ##>the link_key file from /etc/bluetooth/ and disable pand and 
+> ##>dund settings in YaST and then restart your system. Then try 
+> ##>"dund -n -c ...".
+> ##>
+> 
+> When, at first, dund --search --persist was still active, I got immediately
+> - after removing link_key file - a connection to the AP. Then I disabled the
+> dund and pand settings in YaST.
 
-0.-  I installed Fedora Core 3, workstation installation set. 
-Additionally, I selected gnome-bluetooth package. The installed kernel 
-is 2.6.9-1.667, and the current bluez rpms are the following:
+and you may make sure that no pand or dund is running.
 
-[root@castejon ~]# rpm -qa | grep bluez
-bluez-hcidump-1.11-1
-bluez-utils-2.10-2
-bluez-pin-0.23-3
-bluez-libs-2.10-2
-bluez-bluefw-1.0-6
+> Before I started, I removed again link_key file. Here are the results
+> 
+> Linux-Notebook:~ # dmabt
+> Linux-Notebook:~ # hcitool scan
+> Scanning ...
+>         00:0B:CE:00:01:8F       Bluetooth-Modul
+> Linux-Notebook:~ # dund -n -c 00:0B:CE:00:01:8F
+> dund[6943]: Bluetooth DUN daemon
+> dund[6943]: Searching for LAP on 00:0B:CE:00:01:8F
+> dund[6943]: Failed to connect to the SDP server. Connection refused(111)
+> Linux-Notebook:~ #
+> 
+> Linux-Notebook:~ # hcidump -x
+> HCIDump - HCI packet analyzer ver 1.11
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>   8F 01 00 CE 0B 00 18 CC 01 00 AD FC 01
+> > HCI Event: Command Status (0x0f) plen 4
+>   00 01 05 04
+> > HCI Event: Role Change (0x12) plen 8
+>   00 8F 01 00 CE 0B 00 01
+> > HCI Event: Connect Complete (0x03) plen 11
+>   00 29 00 8F 01 00 CE 0B 00 01 00
+> < ACL data: handle 0x0029 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0040
+> < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+>   29 00 0F 00
+> > HCI Event: Command Complete (0x0e) plen 6
+>   01 0D 08 00 29 00
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>   01 29 00 01 00
+> > HCI Event: Max Slots Change (0x1b) plen 3
+>   29 00 05
+> > HCI Event: Link Key Request (0x17) plen 6
+>   8F 01 00 CE 0B 00
+> < HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
+>   8F 01 00 CE 0B 00
+> > HCI Event: Command Complete (0x0e) plen 10
+>   01 0C 04 00 8F 01 00 CE 0B 00
+> > HCI Event: PIN Code Request (0x16) plen 6
+>   8F 01 00 CE 0B 00
+> < HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
+>   8F 01 00 CE 0B 00 07 36 31 33 31 32 39 31 00 00 00 00 00 00
+>   00 00 00
+> > HCI Event: Command Complete (0x0e) plen 10
+>   01 0D 04 00 8F 01 00 CE 0B 00
+> > HCI Event: Link Key Notification (0x18) plen 23
+>   8F 01 00 CE 0B 00 5D 3C F6 8F 76 A6 EF 83 C6 68 B2 C4 0F FE
+>   E2 C2 00
+> > ACL data: handle 0x0029 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 4 status 0
 
-I didn't touch anything relevant for the system behaviour now.
-____________________________________
+now the access to the SDP server of your AP is failing with no
+ressources. This is weird. Try to run a "sdptool browse...".
 
-1.- I tried to look for Fedora rpm's updated versions of these packages 
-but I didn't find them.
-____________________________________
+> In the meantime I got a email from ELMEG the producer of the AP. They told
+> me that the AP uses the LAP via DUN. So it must be possible to establish a
+> connection to the AP and the router. If the connection is active, what have
+> I to do to use it? In windows I have to initialize COM as kableconnection
+> between two computers and to enable the usage of this COM by the
+> BT-connection.
 
-2.- For headset support I went to http://bluetooth-alsa.sourceforge.net/ 
-and try to follow the build process. Nevertheless I found myself in some 
-newbie troubles:
-____________________________________
+LAP and DUN are two different profiles. I don't get what you mean.
 
-3.- I checked out the CVS repository
+Regards
 
-	cvs -d:pserver:anonymous@cvs.sf.net:/cvsroot/bluetooth-alsa co btsco
-____________________________________
+Marcel
 
-4.- I tried to compile
-
-         ./bootstrap
-         ./configure
-____________________________________
-
-5- I got the following error:
-	...some info...
-	./configure: line 3249: XIPH_PATH_AO: command not found
-	...some info...
-____________________________________
-
-6.- As Marcel indicated in 
-http://sourceforge.net/mailarchive/message.php?msg_id=10127139, the 
-problem solves by installing libao-devel package (I found it at rpmfind.net)
-____________________________________
-
-7.- Now I went back to point 4 and try to compile again
-	./bootstrap
-         ./configure
-	make
-At this point make spat out lots of errors but all related to  not 
-finding bluetooth.h and other libs, and blah, blah, blah..
-____________________________________
-
-8.- I downloaded and installed very successfully bluez-libs-2.12.tar.gz 
-from http://www.bluez.org/download.html with ./configure, make, make 
-install stuff,
-____________________________________
-
-9.- I went back to point 7 and installed btsco without problems
-	
-         make
-         make install
-         make maintainer-clean
-
-         cd kernel
-         make
-         make install
-         make clean
-____________________________________
-
-10.- Now, as indicated by Marcel I run depmod -e (does depmod -a also 
-works?) because I was having problems for the next point, trying to load 
-the snd_bt_sco module so I did:
-	
-	depmod -e
-	modprobe snd_bt_sco
-
-I guess the system is now prepared to meet a headset...
-____________________________________
-		
-11.- From this point I'll log the steps I follow each time I wish to 
-connect the headset,from a well known state (reboot), well, except that 
-I already have to run manually "modprobe snd_bt_sco" because I haven't 
-fix that "alias snd-card-0 snd_bt_sco" line in modules.conf (it seems 
-that in this distribution the file is named modprobe.conf and has 
-different format?) So, first of all I will stop the esound controller in 
-case it's running
-
-         esdctl stop
-____________________________________
-
-12.- I Set up local bluetooth device and daemon
-	hciconfig hci0 up
-	hcid
-____________________________________
-
-13.- At this moment I powered on the headset and brougth it to scanning 
-mode (so the led is flicking in red and fashion blue)
-____________________________________
-
-14.- Run the btsco daemon with the headset's BT address
-
-	[root@panzano ~]# btsco 00:06:C5:04:BB:54
-	Device is 1:0
-
-At this time, a notification window pops up claiming for the pin code. 
-(Default is 0000). Entering the correct pin results in some interesting 
-output from btsco:
-	Device is 1:0
-	Voice setting: 0x0060
-	RFCOMM channel 1 connected
-____________________________________
-
-15.- btsco daemon was waiting for a confirmation so I should push the 
-headset connect button. It suddenly shout a big bip (be careful, it 
-hurts) and the connection is stablished (I can hear the channel noise)
-The output from btsc is now something like this
-
-[root@panzano ~]# btsco 00:06:C5:04:BB:54
-Device is 1:0
-Voice setting: 0x0060
-RFCOMM channel 1 connected
-recieved AT+CKPD=200
-opened hwdep
-connected SCO channel
-Setting sco fd
-Done setting sco fd
-recieved AT+VGS=09
-Sending up speaker change 9
-recieved AT+VGS=10
-Sending up speaker change 10
-recieved AT+CKPD=200
-....
-____________________________________
-
-16.- now I can send audio from the headset with something like
-         [root@panzano ~]# aplay -B 1000000 -D plughw:Headset sound.wav
-	or
-	[root@panzano ~]# aplay -D plughw:Headset sound.wav
-
-altough I have noticed that something like
-	aplay -B 1000000 -D plughw:Headset /other/path/to/sound.wav
-won't work
-____________________________________
-
-17.- My purpose now is to be able to terminate VoIP calls at the 
-headset. Maybe it could be done easily redirecting all sound stream to 
-the snd-card-0 device, or maybe it's difficult enough to figure out? I 
-don't know, is somebody doing this by now?
-
-______________________
-
-thanks to all, your information and development is being great
 
 
 
