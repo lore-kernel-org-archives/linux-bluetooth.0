@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Georges A.K." <georgesak@spymac.com>
-To: bluez-users@lists.sourceforge.net
-Reply-to: georgesak@spymac.com
-Message-id: <200408261425.58063.georgesak@spymac.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Handsfree
+Subject: Re: [Bluez-users] Re: Bluez setup and Bluetooth stack and 2.6
+	kernel
+From: Marcel Holtmann <marcel@holtmann.org>
+To: gonzalo briceno <gonzaloother@yahoo.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040826141810.46943.qmail@web52608.mail.yahoo.com>
+References: <20040826141810.46943.qmail@web52608.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1093530808.2581.30.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,16 +19,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Aug 2004 14:25:57 -0400
+Date: Thu, 26 Aug 2004 16:33:28 +0200
 
-Hi everyone, I'm new to this mailing list.
-I have a question, and hope to get an answer ! I'm trying to use my bluetrek 
-B2 headset with my computer. The problem I have is that the headset keeps 
-sending me the command AT+CIND=? which is a command in the handsfree profile. 
-But I want to use the headset in the headset profile. How can I force it ?
+Hi Gonzalo,
 
-Thanks.
-Georges
+> So what I gather is that the bluez.o module
+> functionality is already part of the bluetooth.ko
+> module.  Is there anything else I need to know in
+> terms of what modules need to be loaded for things to
+> work?  The reason for asking is that most
+> documentation I have read so far is most likely old
+> and refers to bluez.o.  To make a long story short
+> does the following seem correct to get USB and
+> Bluetooth to work (using kernel 2.6) barring any other
+> problems: 
+> 
+> 1. load usbcore
+> 2. load proper USB host driver (OHCI, UHCI, EHCI)
+> 3. load bluetooth.ko
+> 4. load (RFCOMM, L2CAP, BNEP, etc)
+
+this is correct, but you can leave step 1 and 3 out, because the module
+dependency will take of that these are also loaded. However you forgot
+the Bluetooth hardware driver. In general this is the hci_usb driver for
+the H:2 transport protocol support.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
