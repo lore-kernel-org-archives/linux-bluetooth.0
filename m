@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Diego Liziero <liziero.diego@unimore.it>
-To: Stephen Hemminger <shemminger@osdl.org>
-Cc: bridge@lists.osdl.org, bluez-devel@lists.sourceforge.net
-In-Reply-To: <1084472140.3354.9.camel@igno>
-References: <1084467136.3083.27.camel@igno>
-	 <20040513102829.5d5e1484@dell_ss3.pdx.osdl.net>
-	 <1084472140.3354.9.camel@igno>
+Subject: Re: [Bluez-devel] l2cap and multiple connections
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vladimeros Vladimerou <vladimer@legend.me.uiuc.edu>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.44.0405141244120.5838-100000@elegy.mie.uiuc.edu>
+References: <Pine.LNX.4.44.0405141244120.5838-100000@elegy.mie.uiuc.edu>
 Content-Type: text/plain
-Message-Id: <1084788177.21864.54.camel@igno>
+Message-Id: <1084557367.25099.211.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: [Bridge] bridging bluetooth bnep devices with kernel 2.6.6-*
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,59 +18,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 17 May 2004 12:02:58 +0200
+Date: Fri, 14 May 2004 19:56:07 +0200
 
-Thanks for your support.
+Hi Vlad,
 
-I'm back with the "brige freezes when bluetooth bnep0 disconnects
-before bnep1" issue.
-
-As reported in the bluez-devel mailing list, in a bridge
-called pan0 with the interfaces bnep0, bnep1, .. bnep6
-connected, if the interface bnep6 is disconnected first,
-everything works fine, but if bnep0 is disconnected before
-the others, the bridge stops to work.
-
-Arping from bnep1 to the brige results in just the first
-answer received.
-
-To make it work again I have to use the following dirty hack:
- brctl delif pan0 bnep1
- brctl addif pan0 bnep1
-
-Someone in the bluez-devel mailing list told that also setting the
-bridge in promiscuous mode with tcpdump makes the bridge
-back to work.
-
-Now I'm removing and re-adding all the bridge components
-when hotplug detects that a "bnep?" device ceases to exist.
-
-Any better solution?
-
-Regards,
-Diego
-
-On Thu, 2004-05-13 at 20:15, Diego Liziero wrote:
-> Sorry, I've been too quick in writing without realizing
-> that the patch had been already posted to this mailing list.
+> > you should step down to a book for socket programming. Which actually
+> > means bind() once and accept() often ;)
 > 
-> This patch solved everything.
+>   I know this is how it's normally done, but since
+> I was using HCI before, and connections had to be initiated by the
+> "master", I thought the method I mentioned was the way to use.
 > 
-> Thank you.
-> 
-> BTW, there is another issue that may be related to the bridge
-> that is being discussed on bluez-devel mailing list:
-> 
-> http://thread.gmane.org/gmane.linux.bluez.devel/2160
-> 
-> Regards,
-> 
-> Diego
-> 
-> On Thu, 2004-05-13 at 19:28, Stephen Hemminger wrote:
-> > 2.6.6 got too picky about multiple interfaces with the same
-> > address. This patch has been already integrated for later releases.
-> 
+>   So, from what your saying, I should listen() and accept() at the 
+> bluetooth "master"? Is there an implicit role-change command
+> happening somewhere, cause if I accept at the "master", otherwise,
+> that would mean that the connection is initiated by the "slave", which
+> is not as the bluetooth spec, right? How does it work?
+
+the master is the device that creates the connection. That is what the
+Bluetooth specification says. This means that an access point for
+example is not a master per se, but it can tell a client to become
+slave. Look at the L2CAP socket options for the master link policy.
+
+> "eSCO"? Never heard about that. Thanks, I'll look into that.
+
+It is part of the Bluetooth 1.2 specification.
+
+Regards
+
+Marcel
+
 
 
 
