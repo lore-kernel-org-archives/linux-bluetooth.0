@@ -1,35 +1,74 @@
-Return-Path: <jt@bougret.hpl.hp.com>
-Date: Thu, 12 Aug 2004 17:25:14 -0700
-To: Marcel Holtmann <marcel@holtmann.org>,
-   BlueZ mailing list <bluez-devel@lists.sourceforge.net>,
-   Steven Singer <steven.singer@csr.com>
-Subject: CSR firmware question...
-Message-ID: <20040813002514.GA21388@bougret.hpl.hp.com>
-Reply-To: jt@hpl.hp.com
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Alignment issue
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Daryl Van Vorst <daryl@wideray.com>,
+   "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1092312127.15466.211.camel@hades.cambridge.redhat.com>
+References: <001201c47fc2$7093e4a0$1301010a@baked>
+	 <1092252699.4564.238.camel@pegasus>
+	 <1092299689.4622.8.camel@imladris.demon.co.uk>
+	 <1092302834.28711.72.camel@pegasus>
+	 <1092304890.15466.44.camel@hades.cambridge.redhat.com>
+	 <1092306154.28711.85.camel@pegasus>
+	 <1092306935.15466.74.camel@hades.cambridge.redhat.com>
+	 <1092308407.28711.99.camel@pegasus>
+	 <1092310391.15466.178.camel@hades.cambridge.redhat.com>
+	 <1092311388.28711.117.camel@pegasus>
+	 <1092312127.15466.211.camel@hades.cambridge.redhat.com>
+Content-Type: text/plain
+Message-Id: <1092317787.28711.150.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 12 Aug 2004 15:36:27 +0200
 
-	Hi guys,
+Hi David,
 
-	A few questions regarding CSR firmware : what's a commonly
-available BT USB dongle with a recent CSR firmware.
+> > is it worth to include such a patch and make it optional?
+> 
+> Yes, I suspect it would. I'll have a look at it when I get a spare
+> moment and offer you a patch.
 
-	Long story :
-	I'm hitting various bugs with the CSR firmware in my D-Link
-USB dongles (0x1bb), where I can easilly deadlock the dongle. My 3Com
-dongle, which has a more recent firmware (0x20e), behave much better,
-but not perfect.
-	D-Link doesn't provide a firmware updater, but, beeing
-fearless, I tried to firmware upgrade a D-Link dongle and ended up
-with a dead dongle (can't even put back the original firmware on it).
-	From the release notes, the latest CSR firmwares have zillions
-of bug fixes. I really wonder how I can enjoy the bug fixes.
+I looked at the patches from the bluez-utils source RPM and actually I
+can include optional PIE support for you. A simple patch for that is
+easy and actually I already did that. From what I saw, this is a GCC 3.4
+only feature and you give -pie at linking time and not at compile time
+of the sources itself. Is this correct? What is the best way to detect
+PIE support in the compiler?
 
-	Thanks in advance...
+And please don't do this
 
-	Jean
+        # Authentication and Encryption
+-       #auth enable;
+-       #encrypt enable;
++       auth enable;
++       encrypt enable;
 
-P.S. : Marcel, do you have a version of btdfu that can write the
-firmware image to the dongle ? Or some documentation ?
+in the bluez-utils-2.3-conf.patch. If you do that then you are going to
+set your local device in security mode 3 and this is not what you want.
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
