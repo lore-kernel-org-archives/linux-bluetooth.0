@@ -1,57 +1,52 @@
-Return-Path: <mark@thummb.com>
-From: "Mark Coetser" <mark@thummb.com>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>
-Cc: "'BlueZ Mailing List'" <bluez-users@lists.sourceforge.net>
-Subject: RE: [Bluez-users] Using my linux box as an internet gateway for myi-mate/xda
-Date: Sun, 24 Oct 2004 13:54:07 +0200
-Message-ID: <000401c4b9c0$2b053f00$f500000a@citadel>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
-In-Reply-To: <1098618444.6465.1.camel@pegasus>
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Disabling HID Boot Protocol
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Florian Echtler <echtler@fs.tum.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.61.0410241307180.7693@block.bubble>
+References: <Pine.LNX.4.61.0410241307180.7693@block.bubble>
+Content-Type: text/plain
+Message-Id: <1098618588.6465.5.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sun, 24 Oct 2004 13:49:48 +0200
 
-Hi Marcel
+Hi Florian,
 
-This is my core firewall and policy is that we use stable, except for
-certain packages which are backported for functionality, surely this
-should work on debian woody anyway ? 
+> I'm using a MS Bluetooth Optical Desktop and would like to
+> use the hotkeys again. I have kernel 2.6.8.1-mh1 and bluez-utils
+> 2.10.. According to the mailing list archives, this version of 
+> hidp.ko should already support report mode, however, I couldn't
+> find any description on how to enable it. I suppose it's necessary
+> to pass the correct "-b <subclass>" parameter to hidd?
 
-Mark Adrian Coetser
-http://www.thummb.com
-Cel: 0833046633
-
------Original Message-----
-From: Marcel Holtmann [mailto:marcel@holtmann.org] 
-Sent: 24 October 2004 01:47 PM
-To: Mark Coetser
-Cc: BlueZ Mailing List
-Subject: Re: [Bluez-users] Using my linux box as an internet gateway for
-myi-mate/xda
-
-
-Hi Mark,
-
-> System info
-> 
-> Debian woody
-> 
-> Uname -a
-> Linux fw1.mid 2.6.7 #1 SMP Sat Oct 23 12:41:48 SAST 2004 i686 unknown
-> 
-> dpkg -l | grep bluez
-> ii  bluez-hcidump  1.5-2          Analyses Bluetooth HCI packets
-> ii  bluez-pan      1.1rel-1       Personal area networking for
-Bluetooth
-> devic
-> ii  bluez-sdp      1.1-1          BlueZ Bluetooth SDP daemon and tool
-> ii  bluez-utils    2.3-1.woody.1  Utilities for controlling Bluetooth
-> devices
-
-maybe this will work with Debian Woody, but these versions of the BlueZ
-userspace utilities are outdated. I think you should better switch to
-Debian Sarge.
+the subclass parameter is only for overriding the value if the SDP
+records are wrong. Check with hidd and if it tells you something about
+boot mode then you are in boot mode, otherwise it uses report mode
+automaticly. So what does "hidd --show" say?
 
 Regards
 
 Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
