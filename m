@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] JSR-82 Implementation
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: Erik Tews <erik@debian.franken.de>
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1092427728.5708.1.camel@localhost.localdomain>
-References: <1092427728.5708.1.camel@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1092650525.19596.1222.camel@baroque.rococosoft.com>
+From: "john smith" <roofass@hotmail.com>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Alignment issue
 Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Message-ID: <BAY22-F42hUaRTpCkEW000285a5@hotmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,31 +15,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 16 Aug 2004 11:02:05 +0100
+Date: Mon, 16 Aug 2004 09:48:58 +0000
 
-Hi Erik,
+> > > Why are these macros even here? ISTR Max having some reason not to use
+> > > <asm/unaligned.h> but surely that's what it's there for...
+> >
+> > No, asm/unaligned.h is there for kernel code only.
+>
+>the rule is to not include headers from the kernel source code in any
+>user space program or library. Even if some people try to bend this rule
+>I will follow as much as I can.
 
-On Fri, 2004-08-13 at 21:08, Erik Tews wrote:
-> Hi
-> 
-> Is there currently any implementation of the jsr-82 standard for linux,
-> so that I can use bluetooth from my java-application? Or for any other
-> (free) desktop-operating system? I have seen one for serial bluetooth
-> dongels on linux (but I got only usb ones) and for Windows XP. Are there
-> any other ones.
+Hi, I'm new to Linux prog. and I'm a bit confused. Does this mean there's a 
+problem with bluez/utils/tools/l2ping.c which contains:
 
-You didn't mention whether it had to be free software or not (however
-maybe your email address makes this unnecessary :-) 
+   #include <asm/types.h>
+   #include <asm/byteorder.h>
 
-Anyway Rococo has one which is free (as in beer) for students and
-hobbyists. Have a look here:
-http://www.rococosoft.com/products/impronto.html
 
-Regards,
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+Or are the above includes System kernel headers ( which as far as I 
+understand are OK for user-space apps. to link to) rather than Kernel source 
+headers.
+
+Bye for now,
+
+John
+
+_________________________________________________________________
+Express yourself with cool new emoticons http://www.msn.co.uk/specials/myemo
 
 
 
