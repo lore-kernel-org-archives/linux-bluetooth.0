@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Apple Wireless Keyboard, MX900-Hub & Mouse with
-	FC2
+Subject: Re: [Bluez-users] newbie fedora2 & bluez questions
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Tuomas Peronvuo <tuomas.peronvuo@hairstock.fi>
+To: David Zhu <saki96@yahoo.com>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <302E52C4-FCAB-11D8-B286-000D93C1FAF6@hairstock.fi>
-References: <302E52C4-FCAB-11D8-B286-000D93C1FAF6@hairstock.fi>
+In-Reply-To: <20040901183311.1763.qmail@web11601.mail.yahoo.com>
+References: <20040901183311.1763.qmail@web11601.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1094458880.5145.5.camel@notepaq>
+Message-Id: <1094458705.5145.1.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,50 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Sep 2004 10:21:20 +0200
+Date: Mon, 06 Sep 2004 10:18:25 +0200
 
-Hi Tuomas,
+Hi David,
 
-> First of all, I apologize if this sounds  vague, but I'll give my best 
-> shot.
+> I tried following the many howto guides on the web but
+> I always seem to have problems after a certain step. 
+> So I hope I'm not offending anyone with what may be a
+> really simple issue.  Here we go...
 > 
-> The problem:
+> I have a DLink DBT-120 Rev 4 USB Bluetooth adapter,
+> which I have confirmed is supported on the hardware
+> page.
 > 
-> Trying to get the apple wireless keyboard and mx900-bluetooth -mouse 
-> working
-> in fedora core 2 (kernel 2.6.8-1.521) via the usb mx900 bluetooth-hub.
+> I've installed the necessary packages from the fedora
+> core 2:
 > 
-> Installed: Bluez libs & utils & devs.
+> bluez-libs-2.5-2.1
+> bluez-utils-2.4-3
+> gnome-bluetooth-0.4.1-7
+> bluez-sdp-1.5-2.1
 > 
-> I've read Marcel Holtmanns 
-> http://www.holtmann.org/linux/bluetooth/hid.html -"guide"
-> and modprobed that I certainly have the hidp-module, but I'm not sure 
-> if the selection
-> "CONFIG_BT_HIDP" is enabled/selected.
+> I'm running kernel 2.6.8
 > 
-> My first question is: how do I check if the HIDP is enabled? And if 
-> it's not, how do I enable it?
-
-if "modinfo hidp" and "lsmod | grep hidp" gives you output the module is
-there and loaded.
-
-> Secondly and oddly enough, the mx900-mouse does work perfectly okay in 
-> my current setup via
-> the mx900 usb-bluetooth-hub. But when I run hcitool and try to find any 
-> devices, i get squat.
+> so when I do a "hcitool scan" I am able to find:
+> 00:02:EE:E0:2A:E6       Nokia 6820
 > 
-> And the same thing with runing hidd, it also finds nothing.  My best 
-> guess is, that they both can't find
-> nothing because the CONFIG_BT_HIDP is not enabled?
+> but when I do a "sdptool browse" I always get 
+> Inquiring ...
+> Failed to connect to SDP server on 00:02:EE:E0:2A:E6:
+> Function not implemented
 
-That is wrong. Try to switch your Logitech from HID to HCI mode with the
-hid2hci program.
-
-> Any good guide (step by step)  or advices considering the 
-> apple/hidp/mx900-hub -issue would be greatly appreciated.
-
-Every information to get this combination are there. If you need a
-special howto for your setup then write one ;)
+you enabled auth and encrypt and this means you set your device into
+security mode 3. Don't do this and check my previous mails in the
+mailing list archive for more details.
 
 Regards
 
