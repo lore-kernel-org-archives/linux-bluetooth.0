@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Can't connect RFCOMM socket
+Subject: Re: [Bluez-users] how to obtain address for rfcomm connection
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <csm972$gnu$1@sea.gmane.org>
-References: <csm972$gnu$1@sea.gmane.org>
+In-Reply-To: <1106164863.12437.44.camel@justakiss>
+References: <1106148402.12428.21.camel@justakiss>
+	 <1106154308.8190.128.camel@pegasus>  <1106164863.12437.44.camel@justakiss>
 Content-Type: text/plain
-Message-Id: <1106167097.8190.133.camel@pegasus>
+Message-Id: <1106167013.8190.131.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 Jan 2005 21:38:17 +0100
+Date: Wed, 19 Jan 2005 21:36:53 +0100
 
-Hi,
+Hi Erwin,
 
-> First of all thanks again for your time, maybe this is another proof of 
-> my lack of basic knowledge, but I've trying a lot and can't get ride of 
-> this error (I know this error is in many mails arround the list, but I 
-> have not find the particular remedy for mine)
-> 
-> When I try:
-> 
->   rfcomm connect rfcomm0 00:10:60:A5:8F:8A 5
-> 
-> I get:
-> 
-> Can't connect RFCOMM socket: Connection refused
+> the phone (ericsson t630) didn't connect to a specific service, there's
+> a menu entry for discovering new devices. After a few seconds, the names
+> of the discovered devices show up. When one of them is selected, the
+> phone shows a prompt for entering the pincode, and the link key is saved
+> on the Linux system. The purpose of the system is a tcp/ip transmission
+> from the Linux system via GSM/GPRS. On the Linux system, no selection or
+> entry should be necessary, the ppp over rfcomm connection should come up
+> automatically or by pressing a button.
 
-the dump shows that there is no service running on RFCOMM channel on the
-other side.
+establish a OBEX push service on your device and after you send a vCard
+from your phone you get the BD_ADDR.
 
 Regards
 
