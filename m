@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41ADD32D.2060502@suche.org>
-From: =?ISO-8859-15?Q?Thomas_Lu=DFnig?= <bluez@suche.org>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-References: <200412010839.06669.mailsp@sebastian-eichner.de>	 <200412010943.33419.mail@sebastian-eichner.de>	 <1101894192.18840.44.camel@pegasus>	 <200412011224.29191.mail@sebastian-eichner.de>  <41ADAC67.10706@suche.org>	 <1101901302.18840.72.camel@pegasus>  <41ADB1C2.8070805@suche.org> <1101902920.18840.79.camel@pegasus>
-In-Reply-To: <1101902920.18840.79.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-devel] btsco2
+Subject: Re: [Bluez-devel] BTsco
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41ADB1C2.8070805@suche.org>
+References: <200412010839.06669.mailsp@sebastian-eichner.de>
+	 <200412010943.33419.mail@sebastian-eichner.de>
+	 <1101894192.18840.44.camel@pegasus>
+	 <200412011224.29191.mail@sebastian-eichner.de>  <41ADAC67.10706@suche.org>
+	 <1101901302.18840.72.camel@pegasus>  <41ADB1C2.8070805@suche.org>
+Content-Type: text/plain
+Message-Id: <1101902920.18840.79.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,36 +22,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 15:20:29 +0100
+Date: Wed, 01 Dec 2004 13:08:40 +0100
 
-Hi,
+Hi Thomas,
 
-i have some Questions:
+> > this looks a way better. I am going to check it in as btsco2.c
+> >   
+> Uhps the S must be came in when is saved the source :-(
 
-a) How should btsco2 Handle Multiple Headset in the Parameter ?
-- ./btsco2 <mac1> <mac2> <mac3>
-- ./btsco2 <mac1> -1 <mac2> 1 <mac3> 2
-Where -1 in the Channel Parameter stand for Autodetec
+your version is now in the CVS as btsco2.c and I already fixed a bunch
+of coding style mistakes that were still present (especially the missing
+static declarations). There are still some more things that are not nice
+and you should read the kernel coding style paper from Greg.
 
-b) How tell the User what  BT Device to use for the headset(s)
+Regards
 
-c) Is there any Plan to allow th BT-SCO Sound driver in kernel Space to 
-handle mor than one bluetooth as sound device.
-Nice would be an option to tell the driver how many sound device he 
-sould allocate.
+Marcel
 
-Fixed Problems from btsco:
-1) If headset is not available on start the server try to connect it 
-every 3 seconds
-Open:
-1) Detect if headset disconnects and close sco/rfcomm socket and tell 
-the kernel space
-2) An rfcomm listener for inbound connections where headset initiate the 
-connection.
 
-I think Open.1 i can fix.
 
-Cu Thomas
 
 
 -------------------------------------------------------
