@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4215A788.9070205@yahoo-inc.com>
-From: "Vegard B. Havdal" <vegardh@yahoo-inc.com>
-MIME-Version: 1.0
+From: "Janice M. Ballesteros" <janice@asti.dost.gov.ph>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Am stuck; HP laptop, Fedora
+References: <20050218033309.99437.qmail@web60904.mail.yahoo.com>
+In-Reply-To: <20050218033309.99437.qmail@web60904.mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="big5"
+Message-Id: <200502181551.45751.janice@asti.dost.gov.ph>
+Subject: [Bluez-users] multiple instances of OPUSH server
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,62 +19,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 18 Feb 2005 09:30:00 +0100
+Date: Fri, 18 Feb 2005 15:51:45 +0800
 
+Halu!
 
-Hello, I've spent some time getting BT to work on my HP NC6000 laptop, 
-now looking for any clues. To put it shortly, I think I have everything 
-installed right, but when I for instance fire up gnome-obex-send, it 
-will hang when I scan for devices.
+How do I enable support for multiple instances of an Obex server. Im using 
+OPD. What Im trying to do is setup two OPD servers on my computer. Two 
+bluetooth dongles will be used. One of the dongles listen to rfcomm channel 
+10 and the other to channel 3. I want one instance of OPD to listen to rfcomm 
+channel 10 on /dev/rfcomm0 and the other one to channel 3 on /dev/rfcomm1.
 
-More detail:
+If I run one instance of opd on channel 10, it works fine but when I try to 
+run the 2nd opd on channel 3 i get the error message:
+opd[4561]: Failed to register BtOBEX server on RFCOMM channel 10. (-1 / 98)
+It seems that everytime I run opd, its default rfcomm device is /dev/rfcomm0. 
+Note: error 98 stands for " Address already in use "
 
-I have FC2 with the 2.6.9-1.11_FC2 kernel. I got the latest bluez-libs 
-and bluez-utils compiled fine:
+How do I make OPD run on a specified rfcomm device (say on /dev/rfcomm1)?
+I tried looking at the code of OPD but I cant seem to find how to change the 
+default rfcomm device. I also tried binding my bluetooth dongles to specified 
+rfcomm devices and channels but it still doesnt work.
 
--rw-r--r--  1 root root 55116 Feb 17 22:17 /usr/lib/libbluetooth.a
--rwxr-xr-x  1 root root   835 Feb 17 22:17 /usr/lib/libbluetooth.la
-lrwxrwxrwx  1 root root    22 Feb 17 22:17 /usr/lib/libbluetooth.so -> 
-libbluetooth.so.1.0.15
-lrwxrwxrwx  1 root root    22 Feb 17 22:17 /usr/lib/libbluetooth.so.1 -> 
-libbluetooth.so.1.0.15
--rwxr-xr-x  1 root root 59773 Feb 17 22:17 /usr/lib/libbluetooth.so.1.0.15
-[vegardh@dhcp-244 vegardh]$
+Any help/insight is greatly appreciated. 
+Many thanks. :)
 
-The kernel module is the one that was in the kernel in the first place, 
-I haven't compiled that:
-
-author:         Maxim Krasnyansky <maxk@qualcomm.com>, Marcel Holtmann 
-<marcel@holtmann.org>
-description:    Bluetooth Core ver 2.6
-version:        2.6 21CCA1EA2920D6252535138
-license:        GPL
-alias:          net-pf-31
-vermagic:       2.6.9-1.11_FC2 686 REGPARM 4KSTACKS gcc-3.3
-depends:
-
-And the device itself is on the USB:
-
-T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=049f ProdID=0086 Rev= 8.02
-S:  Manufacturer=ACTIONTEC
-S:  Product=Bluetooth by hp
-
-The BT works from Windows.
-
-With obex_test I get this, can't get more debug or something from it:
-
-[vegardh@dhcp-244 vegardh]$ obex_test -b
-Using Bluetooth RFCOMM transport
-OBEX Interactive test client/server.
- > s
-Server register error! (Bluetooth)
-
-I'd appreciate any clues, either from someone with experience with this 
-laptop and linux, or if I've overlooked something.
-
-Vegard
+-jan
 
 
 -------------------------------------------------------
