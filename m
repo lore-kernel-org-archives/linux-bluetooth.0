@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050128141322.96979.qmail@web60904.mail.yahoo.com>
-From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <41FA486F.9040000@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="0-891329071-1106921601=:95083"
-Subject: [Bluez-users] rfcomm question 2-AT command
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Installing Bluez
+References: <41F81653.4030601@gmx.ch> <1106778292.28444.60.camel@pegasus>	 <41F81FAF.8040002@gmx.ch> <1106847147.3998.17.camel@pegasus>
+In-Reply-To: <1106847147.3998.17.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,42 +18,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Jan 2005 22:13:21 +0800 (CST)
+Date: Fri, 28 Jan 2005 15:13:03 +0100
 
---0-891329071-1106921601=:95083
-Content-Type: text/plain; charset=big5
-Content-Transfer-Encoding: 8bit
+Hello Marcel
 
-Hi Marcel!
-I have written a program that the menu can be sent to T610 by AT command. However, I face a problem. When I send one menu to the mobile, there is 4-5 seconds delay. The syntax of my program is:
-sprintf(command, "AT*EASM=\"Bt-IrConverter\",1,1,%d", item_brand+1);
-  ret_code=put_command (command, answer, sizeof (answer), 5, 0);
-  for (j=0; j<item_brand; j++)
-  {
-   sprintf(command, ",\"%s\"", device[j]);
-   ret_code=put_command (command, answer, sizeof (answer), 5, 0);
-   }
-  sprintf(command, ",\"quit\",\r");
-where the variable device[j] stores the string extracted from MySQL db. So, why is that? And how can I reduce the delay?
-Thank you very much.
-Michael
+I expect it to pe for the 2.6.10 Kernel and hope that it's usuable with the 
+2.6.7 one...
+How bad is the 2.6.7 patch? Wher can I download it?
+
+kind regards
+Marco
 
 
-
----------------------------------
-新年願望第一位 :  找到友緣人 
-
---0-891329071-1106921601=:95083
-Content-Type: text/html; charset=big5
-Content-Transfer-Encoding: 8bit
-
-<DIV>Hi Marcel!</DIV>
-<DIV>I have written a program that the menu can be sent to T610 by AT command. However, I face a problem. When I send one menu to the mobile, there is 4-5 seconds delay. The syntax of my program is:</DIV>
-<DIV>sprintf(command, "AT*EASM=\"Bt-IrConverter\",1,1,%d", item_brand+1);<BR>&nbsp;&nbsp;ret_code=put_command (command, answer, sizeof (answer), 5, 0);<BR>&nbsp;&nbsp;for (j=0; j&lt;item_brand; j++)<BR>&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;sprintf(command, ",\"%s\"", device[j]);<BR>&nbsp;&nbsp;&nbsp;ret_code=put_command (command, answer, sizeof (answer), 5, 0);<BR>&nbsp;&nbsp;&nbsp;}<BR>&nbsp;&nbsp;sprintf(command, ",\"quit\",\r");</DIV>
-<DIV>where the variable device[j] stores the string extracted from MySQL db. So, why is that? And how can I reduce the delay?</DIV>
-<DIV>Thank you very much.</DIV>
-<DIV>Michael</DIV><p><br><hr size=1>新年願望第一位 :  <a href=http://hk.personals.yahoo.com>找到友緣人 </a><br>
---0-891329071-1106921601=:95083--
+Marcel Holtmann wrote:
+> Hi Marco,
+> 
+> 
+>>>You should use 2.6.10 and apply that patch. The patch for 2.6.7 is
+>>>outdated.
+>>
+>>Ok. I'll use the patch. (It's easier anyway :-))
+>>Can I apply the 2.6.10 patch to my 2.6.7 kernel? Or do I have to use the 
+>>2.6.10 kernel?
+> 
+> 
+> it is named patch-2.6.10-mh2. So what do you think ;)
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+> Tool for open source databases. Create drag-&-drop reports. Save time
+> by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+> Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+> 
 
 
 -------------------------------------------------------
