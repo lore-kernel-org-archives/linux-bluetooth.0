@@ -1,45 +1,56 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Message-id: <91ff49438f.9438f91ff4@estudiants.urv.es>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Subject: [Bluez-users] need to patch 2.4.24 kernel?
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 01 Apr 2004 11:36:37 +0200
+Return-Path: <gary_martin_au@yahoo.com.au>
+Message-ID: <20040401090917.60642.qmail@web21005.mail.yahoo.com>
+Date: Thu, 1 Apr 2004 19:09:17 +1000 (EST)
+From: =?iso-8859-1?q?Gary=20Martin?= <gary_martin_au@yahoo.com.au>
+Subject: Re: [Bluez-users] Desperate newbie
+To: bluez-users@lists.sourceforge.net
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+   Thomas Chiverton <thomas.chiverton@bluefinger.com>,
+   Andreas Deresch <aderesch@fs.tum.de>
+In-Reply-To: <1080746814.2536.16.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hello
+Thank you to Andreas, Marcel and Tom for your assistance. I
+assumed that the problems I am having connecting to my phone were
+the result of me misconfiguring something eg. hcid.conf. But
+Marcel and Andreas seem to intimate that it may be a problem in
+Bluez for PowerPC. I find it hard to believe that there aren't
+other Linux PPC users successfully using Bluez to synchronise
+their phones.
+Bluetooth connectivity is an important function for today's
+computer users --- I can't be the only one!
 
-I find that some utils like l2test,scotest, hciemud
-and hcidump cannot be found in the system, so I
-would like to know if I need to patch this kernel
-with one of your patches or do I need to install
-bluez-utlis and bluez-libs (I thought they were
-included in the kernel) in order to have these utils??.
+> > Fine, so the only difference (apart from multisync itself)
+> between our
+> > phones is that "hcitool info <BDA>" does not work for you. The
+> problem there
+> > seems to arise at HCIGETCONNINFO and then
+> hci_create_connection.
+Sometimes I have "object push" on the phone, and I can send files
+to Linux. Sometimes I can't. This change appears after I have
+connected the phone under Mac OS X. Does the Bluetooth adapter
+retain information from one operating system to the other? Even
+when I delete the device "Mac OS X" on the phone and pair it with
+"debian-0", the phone retains services that aren't available in
+Linus, and refreshing the services on the phone makes them
+disappear
 
-Yhank you and sorry for my bad english!!!
 
-;)
+> Marcel wrote
+> On the other side I think that the userspace part still have 
+some
+missing byteswap operations, so try to isolate them and I will try
 
-Albert
+to
+fix them as soon as possible.
+Am I to isolate missing byteswap operations? I'm afraid I don't
+know how to do this?
 
+Regards,
 
+Gary Martin
 
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Find local movie times and trailers on Yahoo! Movies.
+http://au.movies.yahoo.com
