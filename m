@@ -1,61 +1,46 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: Mauro Tortonesi <mtortonesi@ing.unife.it>
-Cc: BlueZ mailing list <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: bluez & qos
-Message-ID: <20040205172242.GB5417@bougret.hpl.hp.com>
+Return-Path: <jt@bougret.hpl.hp.com>
+Date: Thu, 5 Feb 2004 09:19:19 -0800
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Max Krasnyansky <maxk@qualcomm.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: L2CAP non-blocking socket nasty race conditions
+Message-ID: <20040205171919.GA5417@bougret.hpl.hp.com>
 Reply-To: jt@hpl.hp.com
-References: <20040204015825.GA2217@bougret.hpl.hp.com> <200402041223.29088.mtortonesi@ing.unife.it> <20040204174648.GA16590@bougret.hpl.hp.com> <200402051146.55939.mtortonesi@ing.unife.it>
+References: <20040204214541.GA20129@bougret.hpl.hp.com> <1075942818.2783.70.camel@pegasus> <20040205011102.GA23352@bougret.hpl.hp.com> <1075944624.2783.87.camel@pegasus> <20040205014030.GA23802@bougret.hpl.hp.com> <1075947705.2783.117.camel@pegasus> <20040205022635.GA24757@bougret.hpl.hp.com> <1075948602.2783.129.camel@pegasus> <20040205033019.GA25518@bougret.hpl.hp.com> <1075988978.2783.140.camel@pegasus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <200402051146.55939.mtortonesi@ing.unife.it>
+In-Reply-To: <1075988978.2783.140.camel@pegasus>
 From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 5 Feb 2004 09:22:42 -0800
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Thu, Feb 05, 2004 at 11:46:55AM +0100, Mauro Tortonesi wrote:
+On Thu, Feb 05, 2004 at 02:49:38PM +0100, Marcel Holtmann wrote:
+> Hi Jean,
 > 
-> i think the "open a HCI socket and send HCI commands" approach (which indeed 
-> has many advantages) is a bit too low-level to be used in standard 
-> applications as a way for setting QoS over Bluez.
-> since QoS is semantically an attribute of a connection, it would be nice to 
-> have ioctl(2) commands for setting QoS parameters on a given connection.
-
-	Aggregating the QoS of the various sockets into a generic QoS
-that you can pass to the HCI is not a trivial problem. You can not
-guarantee that there will only be one socket per handle.
-
-> > 	Not that the main issue will be firware support. For example
-> > the QoS feature I needed is not implemented in the CSR firmware.
+> > 	So, in other words I've just moved a tight loop from my code
+> > to the kernel code (or glibc). Which means it seems that we only have
+> > half of the solution (or maybe it's normal poll behavior ?).
 > 
-> do you mean that most of the firmware of the Bluetooth chips in commerce do 
-> not support/implement HCI QoS commands (such as OGF 0x0002 OCF 0x0007)? what 
-> version of CSR firmware are you talking about?
+> I had the attached patch in mind. Please check if this also works for
+> you, because it should produce less code execution. I think we can also
+> remove the list_empty() check from bt_sock_listen_poll(), because the
+> list_for_each_safe() gives us the same result.
 
-	No, I'm saying "the QoS feature I *needed*". I want QoS
-*events*, most firmware don't support that.
+	This should produce the same result. I'll try.
+	Personally, I prefer commented code ;-)
 
-> Mauro Tortonesi
+> > 	I think at that point we will need to get advice from the
+> > network gurus on how socket notification works.
+> 
+> I already checked the IPV4 code and they also work with an accept queue,
+> but at the moment I don't understand when they put the new socket on it
+> and how they keep track of it.
 
-	Ciao.
+	Actually, I will double check, because I belive that it may be
+normal behavior. More later.
+	Thanks !
+
+> Regards
+> 
+> Marcel
 
 	Jean
-
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
