@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
-To: bluez-users@lists.sourceforge.net
+From: Toby Fisher <toby@tjfisher.co.uk>
+To: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
+cc: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Problems connecting to Nokia 6310I phone.
-Message-ID: <20040531115424.GA24449@gmx.net>
-References: <Pine.LNX.4.58.0405302214280.8012@sebagqbbe.gwsvfure.pb.hx> <200405310213.25767.tim@birdsnest.maths.tcd.ie> <Pine.LNX.4.58.0405311108560.10172@sebagqbbe.gwsvfure.pb.hx>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <Pine.LNX.4.58.0405311108560.10172@sebagqbbe.gwsvfure.pb.hx>
+In-Reply-To: <200405310213.25767.tim@birdsnest.maths.tcd.ie>
+Message-ID: <Pine.LNX.4.58.0405311108560.10172@sebagqbbe.gwsvfure.pb.hx>
+References: <Pine.LNX.4.58.0405302214280.8012@sebagqbbe.gwsvfure.pb.hx>
+ <200405310213.25767.tim@birdsnest.maths.tcd.ie>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,29 +19,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 May 2004 13:54:24 +0200
+Date: Mon, 31 May 2004 11:09:57 +0100 (BST)
 
-On  0, Toby Fisher <toby@tjfisher.co.uk> wrote:
-> On Mon, 31 May 2004, Timothy Murphy wrote:
-> > Do you have 
-> > # CONFIG_BT_HCIUSB_SCO is not set
-> > in .config (or /proc/config.gz) ?
-> > On my machine (a Sony C1VFK Picturebook)
-> > I had more or less your problems when this was set.
+On Mon, 31 May 2004, Timothy Murphy wrote:
+
+> On Sunday 30 May 2004 22:25, Toby Fisher wrote:
 > 
-> The problem here is that I have a usb bluetooth device, so according to 
-> the kernel help I need this option, so yes, I do have it.
+> > I'm using kernel 2.6.6RC1, and I almost have the connecting working with
+> > Gnokii to the phone.  However, there are some weird things going on which
+> > lead me to belioeve that something is wrong.
+> >
+> > I can, using rfcomm, get a connection to the phone, however tearing it
+> > down has strange results:
+> > 1.  Once the connection is down, I can no longer ping the phone using
+> > l2ping, though hcitool scan and info still work.
+> 
+> Do you have 
+> # CONFIG_BT_HCIUSB_SCO is not set
+> in .config (or /proc/config.gz) ?
+> On my machine (a Sony C1VFK Picturebook)
+> I had more or less your problems when this was set.
 
-You need the HCI_USB SCO option for audio transfer, only. For example if
-you use the Headset or Handsfree profile. For data transfer there is no
-need for SCO support. You are using RFCOMM which uses ACL links.
-And >= 2.6.6-mh1 there shouldn't be any problems with the SCO
-support activated.
+The problem here is that I have a usb bluetooth device, so according to 
+the kernel help I need this option, so yes, I do have it.
 
-Maybe you can run hcidump while your problem appears and provide here
-the log.
+Cheers.
 
-nicholas
+-- 
+Toby Fisher	Email: toby@tjfisher.co.uk
+Tel.: +44(0)1480 417272	Mobile: +44(0)7974 363239
+ICQ: #61744808
 
 
 -------------------------------------------------------
