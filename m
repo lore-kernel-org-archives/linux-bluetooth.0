@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: jan d tux <janice@asti.dost.gov.ph>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1075714467.1546.49.camel@Asgard>
-Mime-Version: 1.0
-Subject: [Bluez-users] bizzare result when getting the bluetooth address
+Message-ID: <20040202045646.51663.qmail@web40406.mail.yahoo.com>
+From: beichuang <beichuang@yahoo.com>
+Reply-To: beichuang@yahoo.com
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Problem with OBEX Object Push Service Description
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,64 +16,82 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 02 Feb 2004 17:34:27 +0800
+Date: Sun, 1 Feb 2004 20:56:46 -0800 (PST)
 
-Good day to all.
+Hello, 
 
-Can anybody help me figure out why the bluetooth address I am getting is
-not right?
+I want to make an OBEX Object Push server and wish
+this server can be discovered by other BT devices.
 
-What I am trying to do is get the bluetooth address of the sender/peer
-to my obex server.
+Before I do that, I used the command to add a OBEX
+service as the command line:
 
-Here are the obex calls I made:
---------
-	handle = OBEX_Init(OBEX_TRANS_BLUETOOTH, obex_event, 0);
+#sdptool -add --channel=5 OPUSH
 
-	BtOBEX_ServerRegister(handle, NULL, OBEX_PUSH_HANDLE);
+However, I cannot discover this service from other
+devices (my iPAQ 5550) although the device can be
+found.
 
-	btobex_accept(handle);
+I have then tested to send a vcard to my desktop from
+iPAQ. It sopped after the prompt "connected with
+BlueZ(0)" 
 
-	OBEX_HandleInput(handle, 1);
+I have also compared the SDP information with any
+other OPUSH server on Windows 2000, which works with
+my iPAQ.
+But it seems the information is the same.
 
-	//get addresss
-	
-	fd = OBEX_GetFD(handle);
-	if( fd < 0 )
-		return 0;
+Here below is the SDP details for the OBEX push server
 
-	getpeername(fd,(struct sockaddr *)&sa,&len)
-		return 0;
+Attribute Identifier : 0x0 - ServiceRecordHandle
+  Integer : 0x804d130
+Attribute Identifier : 0x1 - ServiceClassIDList
+  Data Sequence
+    UUID16 : 0x1105 - OBEXObjectPush
+Attribute Identifier : 0x4 - ProtocolDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x0100 - L2CAP
+    Data Sequence
+      UUID16 : 0x0003 - RFCOMM
+      Channel/Port (Integer) : 0x3
+    Data Sequence
+      UUID16 : 0x0008 - OBEX
+Attribute Identifier : 0x5 - BrowseGroupList
+  Data Sequence
+    UUID16 : 0x1002 - PublicBrowseGroup (SDP)
+Attribute Identifier : 0x9 -
+BluetoothProfileDescriptorList
+  Data Sequence
+    Data Sequence
+      UUID16 : 0x1105 - OBEXObjectPush
+      Version (Integer) : 0x100
+Attribute Identifier : 0x100
+  Text : "OBEX Object Push"
+Attribute Identifier : 0x303
+  Data Sequence
+    Integer : 0x1
+    Integer : 0x2
+    Integer : 0x3
+    Integer : 0x4
+    Integer : 0x5
+    Integer : 0x6
 
-	baswap(&bdaddr, &sa.rc_bdaddr);
-	printf("\tADDRESS: %s\n", batostr(&bdaddr));
---------
+
+Anyone can find the reason why it is not interoperable
+with my iPAQ? I can just not find any error with the
+comparison with another working OBEX server.
+
+Thanks and regards
+
+/B.C.
 
 
-when i run the program, i was able to get the following:
-        channel: 10	
-        family: 31
-        ADDRESS 2: 00:0A:00:02:EE:69 -> this is not the bluetooth
-address of the sender!!! Its address is 00:02:EE:69:E1:88. The last for
-digits displayed are the 1st four digits of the device's real address. I
-tried it with another device and the result is the same, from the
-original address (00:E0:03:74:38:8E) to 00:0A:00:E0:03:74.
 
-Bdw, I am using openobex.
-
-Any help would be appreciated.
-
-
-Thanks :)
-
-
-Also, thanks to Marcel for replying to my first email: Getting remote
-device address & name using obex commands
-
--- 
-
-~jan
-
+__________________________________
+Do you Yahoo!?
+Yahoo! SiteBuilder - Free web site building tool. Try it!
+http://webhosting.yahoo.com/ps/sb/
 
 
 -------------------------------------------------------
