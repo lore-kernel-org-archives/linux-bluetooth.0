@@ -1,6 +1,6 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41FBBD4B.5080603@tootai.net>
-From: administrator tootai <admin@tootai.net>
+Message-ID: <41FBBC46.8020601@tootai.com>
+From: daniel huhardeaux <daniel.huhardeaux@tootai.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Re: Connection issue with headset
@@ -18,7 +18,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 Jan 2005 17:43:55 +0100
+Date: Sat, 29 Jan 2005 17:39:34 +0100
 
 Sebastian Roth a =E9crit :
 
@@ -34,8 +34,8 @@ Hi Sebastian
 >
 > You have to press the headset button now!
 
-Headset was already on ;-) The only other information I receive when
-plying with alsamixer is "speaker volume: 10 mic volume: 10" I also
+Headset was already on ;-) The only other information I receive when=20
+plying with alsamixer is "speaker volume: 10 mic volume: 10" I also=20
 tried to switch on the headset after launching btsco, same result.
 
 Do you know what's the meaning of this 2 errors in hcidump?
@@ -145,12 +145,16 @@ C:* #Ifs=3D 1 Cfg#=3D 1 Atr=3Dc0 MxPwr=3D  0mA
 I:  If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D09(hub  ) Sub=3D00 Prot=3D00 Driver=
 =3Dhub
 E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D   2 Ivl=3D255ms
-dh@nomade:~/music$
+dh@nomade:~/music$=20
 
 Thanks a lot for your help.
 
 --=20
-Daniel
+Daniel  Huhardeaux       ______ _____ _____ ______ ______ __
+enum    +48 32 285 5276 /_   _// _  // _  //_   _// __  // /
+IAX FWD  +1 7009 422493  / /  / // // // /  / /  / /_/ // /
+sip:101 h323:121  @voip./_/  /____//____/  /_/  /_/ /_//_/.com
+
 
 
 -------------------------------------------------------
