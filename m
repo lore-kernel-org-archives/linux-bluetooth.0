@@ -1,9 +1,9 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: Fwd: [Bluez-users] trying to send data at HCI level
+Subject: Re: [Bluez-users] trying to send data at HCI level
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Mohan K <kmohangda@gmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <7aa80ced050222024634dce552@mail.gmail.com>
+In-Reply-To: <7aa80ced0502220231161c0a3@mail.gmail.com>
 References: <7aa80ced0502212224cce2126@mail.gmail.com>
 	 <1109055931.8506.0.camel@pegasus>
 	 <7aa80ced0502212319181c8835@mail.gmail.com>
@@ -12,10 +12,8 @@ References: <7aa80ced0502212224cce2126@mail.gmail.com>
 	 <7aa80ced0502220057379ef414@mail.gmail.com>
 	 <1109066181.8506.6.camel@pegasus>
 	 <7aa80ced0502220231161c0a3@mail.gmail.com>
-	 <1109068760.8506.13.camel@pegasus>
-	 <7aa80ced050222024634dce552@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1109069504.8506.16.camel@pegasus>
+Message-Id: <1109068760.8506.13.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -28,17 +26,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Feb 2005 11:51:44 +0100
+Date: Tue, 22 Feb 2005 11:39:20 +0100
 
 Hi Mohan,
 
->               Whether I want to establish the connection between two
-> PC's, like L2CAP?. Can I directly read or write using the raw socket?
->               I saw a function "hci_create_connection" in hci.c! 
+>              Thanks a lot. Is there any API function available in
+> blueZ to send and recv the data at HCI level. I am using USB bluetooth
+> dongles on the both PC's
 
-HCI is the host controller interface and you should not use it for
-direct communication between two devices. It is the hardware abstraction
-of Bluetooth. Use L2CAP instead.
+since this is a raw socket you can also use read() and write(), but you
+must conform to the H:4 host transport specification.
 
 Regards
 
