@@ -1,107 +1,115 @@
-Return-Path: <fmvel@rnl.ist.utl.pt>
-Subject: Re: [Bluez-users] Linux-2.6, Zaapa USB Dongle - can't find near
-	devices
-From: Filipe Veloza <fmvel@rnl.ist.utl.pt>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1086434730.16316.82.camel@pegasus>
-References: <1086372047.8985.14.camel@castle.budism.pt>
-	 <200406042022.58589.cijoml@volny.cz>  <1086374092.4424.24.camel@pegasus>
-	 <1086434351.6274.2.camel@castle.budism.pt>
-	 <1086434730.16316.82.camel@pegasus>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-ER51wnWuHTCQUttRCGCc"
-Message-Id: <1086534124.9206.2.camel@castle.budism.pt>
-Mime-Version: 1.0
-Date: Sun, 06 Jun 2004 16:02:04 +0100
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth 1.2 and HID Proxy
+References: <1086429803.16316.44.camel@pegasus> <200406052338.15162.cijoml@volny.cz> <1086476014.16316.129.camel@pegasus>
+In-Reply-To: <1086476014.16316.129.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200406061210.52170.cijoml@volny.cz>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sun, 6 Jun 2004 12:10:51 +0200
 
+On Sunday 06 of June 2004 00:53, Marcel Holtmann wrote:
+> Hi Michal,
+>
+> > pls start new webpage on bluez which will collect all known doglech which
+> > we know reflash with newer firmware and pls try describe step-by-step
+> > howto.
+>
+> currently I am preparing a site with notes about firmware upgrade and
+> DFU. I will also summarize the public statements of the CSR signature
 
---=-ER51wnWuHTCQUttRCGCc
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Site is nice, but you should provide screenshoots of steps how to use MacOS to 
+extract that firmware. Many people (including me) don't know how to work with 
+MacOS :)
 
-Apperently now I can bring the device up ( maybe the command was worng
-:P SORRY ). but there's still something that's doesn't feel right but
-that would be another issue.
+> and so on. However don't expect a howto for getting firmware from one
+> device into another. I am not concerned in upgrading of any dongle,
+> because today an USB Bluetooth dongle is so cheap that you can buy
+> yourself a new one if the firmware is too old. I paid 14 EUR for my
+> D-Link dongle at eBay. 
 
-This is solved thanks for the help ppl.
+This is bad way. We as customers should make a preasure to vendors to allow us 
+upgrade our devices for free! I better spend my 14 euros in cinema with my 
+girl :) When device allow me to upgrade it's functionality, vendors should 
+allow us to do it. And if not, other vendors will support us and then we 
+should make preasure to vendors via market to allow us upgrading our devices.
+And those how will block us to do it, we should turn them bankrupt via market.
 
-I take the chance to annouce ( if anyone is interested ) I got a linux
-box l2ping with a Nokia Ngage mogile using a Zaapa USB dongle.
+> The problem what I see is that the dongle 
+> manufacturers are too lazy to get out the Bluetooth 1.2 capable dongles.
+> For the CSR based BlueCore02 based dongles they only have to change
+> their firmware and can sell it as a complete new product. If they
+> started with a 8 Mbit flash from the beginning they don't even have to
+> change their design.
+>
+> The other point is the HID Proxy support. Actually people are asking me
+> where they can buy such dongles. I can't tell them, because I don't
+> know. And again, every BlueCore02 with 8 Mbit flash can use HID Proxy.
+> So where is the problem? I think Apple is doing this the right way. They
+> really support their hardware. The question is why D-Link can't provide
+> an update for the dongle ;)
 
-Maybe you can add to the support page in order to help others finding
-this info.
+To firmware licencing. I think you can share your extracted firmware, because 
+of this:
 
-On Sat, 2004-06-05 at 12:25, Marcel Holtmann wrote:
-> Hi Filipe,
->=20
-> > here goes anyway :P
-> >=20
-> > [~]hciconfig -a
-> > hci0:   Type: USB
-> >         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
-> >         DOWN
-> >         RX bytes:0 acl:0 sco:0 events:0 errors:0
-> >         TX bytes:0 acl:0 sco:0 commands:0 errors:0
-> >         Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> >         Packet type: DM1 DH1 HV1
-> >         Link policy:
-> >         Link mode: SLAVE ACCEPT
->=20
-> you said you've tried to bring up the device. Try again, because
-> "hciconfig hci0 up" should bring it at least up.
->=20
-> If it still fails look at dmesg or the syslog for any errors.
->=20
-> > T:  Bus=3D02 Lev=3D01 Prnt=3D01 Port=3D00 Cnt=3D01 Dev#=3D  2 Spd=3D12 =
- MxCh=3D 0
-> > D:  Ver=3D 1.10 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 MxPS=3D 8 #Cfgs=3D  =
-1
-> > P:  Vendor=3D0b7a ProdID=3D07d0 Rev=3D 1.34
-> > S:  SerialNumber=3D3E402C78
-> > C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3Dc0 MxPwr=3D100mA
-> > I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3D00(>ifc ) Sub=3D00 Prot=3D00 Driv=
-er=3Dhci_usb
-> > E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D   8 Ivl=3D1ms
-> > E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-> > E:  Ad=3D03(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-> > I:  If#=3D 1 Alt=3D 0 #EPs=3D 0 Cls=3Dfe(app. ) Sub=3D01 Prot=3D00 Driv=
-er=3D(none)
->=20
-> You are right this is a Zeevo chip, but it is the old TC2001. I don't
-> know if it helps, but try 2.6.6-mh3 or at 2.6.7-rc2-bk5.
->=20
+Re: [Bluez-users] CSR firmware
+From:
+Carl Orsborn <cjo@csr.com>
+To: 
+cijoml@volny.cz
+Date: 
+30.5.2004 09:58
+
+SNIP
+>This is great on Intersil. They allow users to upgrade their firmwares in 
+>their wifi cards.
+>
+We also allow it, but we have provided the means to prevent it.
+
+Carl
+SNIP
+
+>
 > Regards
->=20
+>
 > Marcel
->=20
->=20
->=20
->=20
+
+Michal
+
+>
+>
+>
+>
 > -------------------------------------------------------
 > This SF.Net email is sponsored by the new InstallShield X.
-> >From Windows to Linux, servers to mobile, InstallShield X is the one
+> From Windows to Linux, servers to mobile, InstallShield X is the one
 > installation-authoring solution that does it all. Learn more and
 > evaluate today! http://www.installshield.com/Dev2Dev/0504
 > _______________________________________________
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
---=20
-Filipe Veloza <fmvel@rnl.ist.utl.pt>
 
-PGP ( ID:0xB8ED711C SERVER:pgp.mit.edu )
 
---=-ER51wnWuHTCQUttRCGCc
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-
-iD8DBQBAwzHsjygwsrjtcRwRAkytAKCLHB11pSuRpdrGCa8HM/Cai0UQQwCgp//Z
-7MnP0+JmGu2kE+29yEJAhcc=
-=MFip
------END PGP SIGNATURE-----
-
---=-ER51wnWuHTCQUttRCGCc--
+-------------------------------------------------------
+This SF.Net email is sponsored by the new InstallShield X.
+>From Windows to Linux, servers to mobile, InstallShield X is the one
+installation-authoring solution that does it all. Learn more and
+evaluate today! http://www.installshield.com/Dev2Dev/0504
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
