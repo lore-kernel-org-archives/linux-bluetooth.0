@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000e01c4cd7d$f2c02020$2c00a8c0@DISCO17G>
-From: "Carlos Azevedo" <carlosarazevedo@netcabo.pt>
-To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <41A91C87.50805@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_000B_01C4CD7D.F2B26480"
-Subject: [Bluez-devel] Re: Re: Lifetech BlueConnect DOES NOT work with bluez
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] snd-bt-sco kernel mods deprecated
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,85 +16,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 18 Nov 2004 14:50:29 -0000
+Date: Sat, 27 Nov 2004 17:32:07 -0700
 
-This is a multi-part message in MIME format.
+Hey
 
-------=_NextPart_000_000B_01C4CD7D.F2B26480
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+FYI, I tagged the old 2.6.9 kernel mods as 'deprecated' and removed them 
+from HEAD. I put a readme file there in case anyone checks out the old 
+'kernel' cvs module thinking it's the place to go.
 
-Hi Marcel,
+For review, the kernel module still functions the same way but now it is 
+built outside the kernel and doesn't require any patching. It can be 
+found under the btsco cvs module in the 'kernel' directory.
 
-No, this dongle has a SiliconWave chipset. This chipset implements the =
-1.2 spec, but Bluez implements 1.1 only. Specifically, on the 1.2 spec =
-the Add SCO Connection is deprecated and indicated as 'not to be used'. =
-The Bluez code (net/bluetooth/hci_conn.c) uses that command to start a =
-SCO voice connection to a headset. I'm suspecting that the dongle =
-doesn't implement the Add SCO command properly and causes my problems. =
-But nevertheless a 1.2 spec device is not required (and is even =
-discoraged) to implement it.
-The hcidump indicates that the connection is established but on shut =
-down (when the SCO socket is closed) a first disconnect exchange is =
-concluded but SCO data keeps coming in. The Bluez code complains about =
-those packets (in hci_scodata_packet) and only after a second disconnect =
-exchange does the SCO data stop.
-I'm now trying to use the Create Synchronous Connection (as per 1.2 =
-spec) instead to see if this works.
-By the way hcidump 1.16 reports the Create command as an Accept one =
-(0x01|0x0028).
-
-Carlos A. R. Azevedo
-------=_NextPart_000_000B_01C4CD7D.F2B26480
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1400" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#d9e9f9>
-<DIV><FONT face=3DArial size=3D2>Hi Marcel,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>No, this dongle has a SiliconWave =
-chipset. This=20
-chipset implements the 1.2 spec, but Bluez implements 1.1 only. =
-Specifically, on=20
-the 1.2 spec the Add SCO Connection is deprecated and indicated as 'not =
-to be=20
-used'. The Bluez code (net/bluetooth/hci_conn.c) uses that command to =
-start a=20
-SCO voice connection to a headset. I'm suspecting that the dongle =
-doesn't=20
-implement the Add SCO command properly and causes my problems. But =
-nevertheless=20
-a 1.2 spec device is not required (and is even discoraged) to implement=20
-it.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>The hcidump indicates that the =
-connection is=20
-established but on shut down (when the SCO socket is closed) a first =
-disconnect=20
-exchange is concluded but SCO data keeps coming in. The Bluez code =
-complains=20
-about those packets (in hci_scodata_packet) and only after a second =
-disconnect=20
-exchange does the SCO data stop.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I'm now trying to&nbsp;use the Create =
-Synchronous=20
-Connection (as per 1.2 spec) instead to see if this works.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>By the way hcidump 1.16 reports the =
-Create command=20
-as an Accept one (0x01|0x0028).</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Carlos A. R. =
-Azevedo</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_000B_01C4CD7D.F2B26480--
+Brad
 
 
 
