@@ -1,101 +1,75 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <AFE91B59A185A5439840B43AB7919047A83D75@mchp997a.mch.sbs.de>
-From: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
-To: "'Bluez-devel@lists.sourceforge.net'" <Bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
+Return-Path: <steve.crane@rococosoft.com>
+Subject: Re: [Bluez-devel] confusion about libs/sdp.c -
+	sdp_service_search_req()
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1109579650.17256.29.camel@pegasus>
+References: <ef9938ec05022511243993f46d@mail.gmail.com>
+	 <1109579650.17256.29.camel@pegasus>
 Content-Type: text/plain
-Subject: [Bluez-devel] scotest cant receive
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Feb 2005 14:04:37 +0100
+Date: Mon, 28 Feb 2005 12:20:38 +0000
+Message-Id: <1109593239.14742.131.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi all,
+Hi Albert, Marcel,
 
-I have a problem with scotest on Linux (same with hsplay). I can send SCO
-packets, I can see them
-physical being sent indicated by blinking LEDs. But I cant receive any SCO
-packets.
-I tried with two different chipset (features and revision see below), I am
-sure that
-at least the Infineon works for SCO traffic (under Symbian OS).
+The documentation is incorrect: the correct behaviour of
+sdp_service_search_req() is that it returns a list of service record
+handles --- you then use sdp_search_attr_req() to fetch attributes of
+interest. Alternatively, you can use sdp_search_attr_req() to perform a
+combined search.
 
-I tried with different kernels 2.4.19, 2.4.21, 2.6.9, with SCO support
-build-in.
+I have fixed the comment in CVS.
 
-But it's always the same: 
-- hcidump of the sender indicates SCO packets sent (< SCO data: handle
-0x002c dlen 64)
-and error messages: CSR chipset says "HCI Event: Hardware Error", Infineon
-says "Data overfolw", 
-but both are still sending.
-- hcidump on the receiver side shows no SCO packets and no Errors 
-- /var/log/messages looks inconspicuous (Wait for connection, Connected from
-.., Receiving..).
-- The last output of scotest itself is "Sending..." resp. "Receiving...",
-but
-no packets are shown.
-- It is the "recv" in the function recv_mode in scotest.c, that blocks
-forever.
-- lsmod shows module "sco" Used by 1 and it shows that "bluez" is used by
-"sco" and "hci_uart".
+Thanks,
+Steve
 
-
-I found no SCO-HOWTO. So what I am doing is just
-hcid, hciattach and "scotest -r" resp "scotest -s <remote BDADDR>"
-
-Has anyone an idea, what is going wrong?
-
-Thanks, Matthias
-
-
-
-CSR:
-linux:~ # hciconfig hci0 revision
-hci0:   Type: UART
-        BD Address: 00:60:57:0A:5D:0B ACL MTU: 192:8  SCO MTU: 64:8
-        HCI 16.4 (bc02x)
-linux:~ # hciconfig hci0 features
-hci0:   Type: UART
-        BD Address: 00:60:57:0A:5D:0B ACL MTU: 192:8  SCO MTU: 64:8
-        Features: 0xff 0xff 0x0b 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park mode> <RSSI> <channel quality> <SCO link>
-                <HV2 packets> <HV3 packets> <u-law log> <A-law log>
-                <CVSD> <paging scheme> <transparent SCO>
-
-Infineon:
-linux:~ # hciconfig hci0 revision
-hci0:   Type: UART
-        BD Address: 00:06:57:0A:5D:0B ACL MTU: 339:5  SCO MTU: 120:6
-        Unsupported manufacturer
-linux:~ # hciconfig hci0 features
-hci0:   Type: UART
-        BD Address: 00:06:57:0A:5D:0B ACL MTU: 339:5  SCO MTU: 120:6
-        Features: 0xef 0xfb 0x1d 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <role switch> <hold mode> <sniff mode> <park mode>
-                <RSSI> <SCO link> <HV2 packets> <HV3 packets>
-                <u-law log> <A-law log> <CVSD> <power control>
-                <transparent SCO>
-
-
-
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+On Mon, 2005-02-28 at 09:34 +0100, Marcel Holtmann wrote:
+> Hi Albert,
+> 
+> > the documentation for sdp_service_search_req() states that it outputs
+> > an sdp_list_t * of sdp_record_t * (list of sdp service records)
+> > 
+> > reading through the code, it appears that it actually returns a list
+> > of uint32_t * data structures.
+> > 
+> > line 2721:
+> >         extract_record_handle_seq(pdata, rsp, rec_count, &scanned);
+> > 
+> > 
+> > line 2523:
+> > static void extract_record_handle_seq(char *pdu, sdp_list_t **seq, int
+> > count, int *scanned)
+> > {
+> >     sdp_list_t *pSeq = *seq;
+> >     char *pdata = pdu;
+> >     int n;
+> >  
+> >     for (n = 0; n < count; n++) {
+> >         uint32_t *pSvcRec = (uint32_t *) malloc(sizeof(uint32_t));
+> >         *pSvcRec = ntohl(bt_get_unaligned((uint32_t *) pdata));
+> >         pSeq = sdp_list_append(pSeq, pSvcRec);
+> >         pdata += sizeof(uint32_t);
+> >         *scanned += sizeof(uint32_t);
+> >     }
+> >     *seq = pSeq;
+> > }
+> > 
+> > I think this will cause segfaults when you try to sdp_record_free the
+> > records in the list (it does for me).
+> > 
+> > perhaps it shold read something more like:
+> >         sdp_record_t *pSvcRec = (sdp_record_t*) malloc(sizeof(sdp_record_t));
+> >         pSvcRec->attrlist = pSvcRec->pattern = 0;
+> >         pSvcRec->handle = ntohl(bt_get_unaligned((uint32_t *) pdata));
+> >         pSeq = sdp_list_append(pSeq, pSvcRec);
+> 
+> Steve, any thoughts on this one?
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
