@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] error about rctest
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <310528459.09297@bjut.edu.cn>
-References: <310528459.09297@bjut.edu.cn>
-Content-Type: text/plain
-Message-Id: <1110577407.8511.6.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <42320F52.4000808@kawaiyume.net>
+From: sir <sir@kawaiyume.net>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Java MultiThread
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,29 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Mar 2005 22:43:27 +0100
+Date: Fri, 11 Mar 2005 22:36:18 +0100
 
-Hi,
+Hello, I am new to the list,
 
->   I have run the rctest,but I got the following messages:
-> 
-> root@EDK root]# rctest -n -i hci0 -P 1 00:02:5B:00:A5:A5
-> 
-> rctest[1324]: Can't get RFCOMM connection information: Protocol not available (92)
->              ~~~~~~~the error is born at the call to getsockopt(sk, SOL_RFCOMM, RFCOMM_CONNINFO, &conn, &optlen) in rctest.c
-> 
-> rctest[1324]: Connected [handle 0, class 0x000000]
->              ~~~~~~~Dose this indicate that  rfcomm connection is completed successfully?
-> rctest[1324]: Receiving ...
-> 
->                     Could you give me a clue to avoid this error?
+I want to develop a piconet server in bt, I am using Gentoo distro and 
+BlueZ stack.
 
-install a Linux 2.6.11 kernel.
+First : I use avatena BlueZ java stack, it seems to work well, first 
+question : is it good ?
+I mean, is there a better java stack ? what does i need ?
 
-Regards
+Next : can someone give me an exemple of java code of a piconet server 
+that can receive more than
+one connection in the same time ?
 
-Marcel
 
+Thanks for all.
 
 
 
