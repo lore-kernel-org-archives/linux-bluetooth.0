@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de4657605010302474a44519e@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
+From: Rainer Dorsch <rdorsch@web.de>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] MTU in l2test
-In-Reply-To: <1104674721.8894.10.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-References: <2de4657604123007015c2c9461@mail.gmail.com>
-	 <1104674721.8894.10.camel@pegasus>
+Subject: Re: [Bluez-users] Setting up an hotplug connection with USB dongles
+References: <200411282132.37941.rdorsch@web.de> <1104687680.8894.17.camel@pegasus> <200501031114.37391.rdorsch@web.de>
+In-Reply-To: <200501031114.37391.rdorsch@web.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Message-Id: <200501031142.58854.rdorsch@web.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,45 +19,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 3 Jan 2005 16:17:12 +0530
+Date: Mon, 3 Jan 2005 11:42:58 +0100
 
-On Sun, 02 Jan 2005 15:05:21 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Manjunath,
-> 
-> > I am varying the mtu and data size variables in the l2test program.
-> > From the docs, I learnt that maximum L2CAP payload is 65535 bytes. I
-> > am unable to set the data size above 45000 bytes inspite of setting my
-> > MTU to 65535 (both on the sender and the receiver).
-> > I get an error saying "Send failed. Resource temporarily unavailable".
-> >  Hope you can help me with this one.
-> 
-> the MTU is different for incoming and outgoing side. With what kind of
-> device and what commands lines are you testing these.
-
-I am using anycom-120 dongles and using the l2test utility.  I am also
-setting the incoming and outgoing mtu values (imtu and omtu variables)
-to the same value, say 65000 bytes. My 'datasize' is about 45000
-bytes. I get the error as mentioned above.
-
-thanks,
-Regards,
-manjunath
-
-> 
-> 
-> Regards
-> 
-> Marcel
-> 
-> -------------------------------------------------------
-> The SF.Net email is sponsored by: Beat the post-holiday blues
-> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
-> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+Am Montag, 3. Januar 2005 11:14 schrieb Rainer Dorsch:
+> Hi Marcel,
 >
+> Am Sonntag, 2. Januar 2005 18:41 schrieb Marcel Holtmann:
+> > Hi Rainer,
+> >
+> > > > if you use "auto bnep0" and hotplug is configured to deal also with
+> > > > the network interface then bnep0 will be brought up at the time the
+> > > > kernel created it. No need to run ifup/ifdown manually.
+> > >
+> > > Hmm....do I enable that with in /etc/default/hotplug
+> > >
+> > > # NET_AGENT_POLICY
+> > > # - how to manage network interfaces with ifupdown? 'all', 'auto' or
+> > > 'hotplug' NET_AGENT_POLICY=hotplug
+> >
+> > I had no problem with 'hotplug', but you can also try to use 'auto'.
+>
+> yes, with auto it works out of the box. Setting it back to hotplug made it
+> stopping working, because in my /etc/network/interfaces
+>
+> mapping hotplug
+>   script echo
+>   map bnep0
+>
+> was missing.
+>
+> Now the interfaces come up without the ifup.
+>
+
+I need to take that back. Only with auto I get the usb device working 
+reliably...
+
+Rainer
+
+
+-- 
+Rainer Dorsch
+Alzentalstr. 28
+D-71083 Herrenberg
+07032-919495
+Icq: 32550367
 
 
 -------------------------------------------------------
