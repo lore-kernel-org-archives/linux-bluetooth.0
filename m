@@ -1,61 +1,48 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: Bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Release of new BlueZ libs and utils
-References: <1071791711.6635.18.camel@pegasus> <200401021818.31606.cijoml@volny.cz> <1073086511.25261.67.camel@pegasus>
-In-Reply-To: <1073086511.25261.67.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200401032054.35896.cijoml@volny.cz>
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 3 Jan 2004 20:54:35 +0100
+Return-Path: <edd@usefulinc.com>
+Subject: Re: [Bluez-users] Release of new BlueZ libs and utils
+From: Edd Dumbill <edd@usefulinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1073149849.25261.97.camel@pegasus>
+References: <1071791711.6635.18.camel@pegasus>
+	 <1073147533.8729.53.camel@saag>  <1073148476.8729.56.camel@saag>
+	 <1073149849.25261.97.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1073154814.8729.66.camel@saag>
+Mime-Version: 1.0
+Date: Sat, 03 Jan 2004 18:33:34 +0000
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Dne sobota 03 leden 2004 00:35 Marcel Holtmann napsal(a):
-> Hi Michal,
->
-> > > I am no expert for this, but my understanding is that we can't use the
-> > > Bluetooth logo until the stack got its qualification. I think the best
-> > > way is to replace this logo. Maybe we should start an official BlueZ
-> > > logo contest.
-> >
-> > Hmmm and why not to get it to qualificate? I think it's free and without
-> > payment?
->
-> this is more problematic than you think. The general problem is money of
-> course, because a qualification is expensive. 
+On Sat, 2004-01-03 at 17:10, Marcel Holtmann wrote:
+> this can never be a libs problem, because L2CAP and RFCOMM are only
+> kernel related. However having this problem is somekind odd. Do it only
+> happens on BlueZ <-> BlueZ connections?
 
-Hmmmm when there was man telling us about BT on our uni, he told us, that 
-qualification is free???? Are you really sure with payments???
+No, I've not tried BlueZ<->BlueZ, it happened with my SE P800 connecting
+back to BlueZ.  
 
-But from my point of view
-> the biggest problem is that I don't have access to protocol and profile
-> testers. We have to know what tests fail and what we pass. If we know
-> how to run these test the whole qualification process can be done by
-> everyone.
+Occasionally it gets a bit further, then hangs:
 
-Where can be RFCs of tests taken? Only in Ericsson?
+> ACL data: handle 0x002a flags 0x02 dlen 8
+    L2CAP(d): cid 0x41 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+< ACL data: handle 0x002a flags 0x02 dlen 8
+    L2CAP(d): cid 0x169 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x002a flags 0x02 dlen 18
+    L2CAP(d): cid 0x41 len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 2 frame_type 0 credit_flow 15 pri 0 ack_timer 0 frame_size
+667 max_retrans 0 credits 3
+< ACL data: handle 0x002a flags 0x02 dlen 8
+    L2CAP(d): cid 0x169 len 4 [psm 3]
+      RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x002a flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0169
+< ACL data: handle 0x002a flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0169
+> HCI Event: Number of Completed Packets(0x13) plen 5
 
-Michal
-
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: IBM Linux Tutorials.
-Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
-Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
-Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+-- Edd
