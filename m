@@ -1,49 +1,42 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Return-Path: <pander@users.sourceforge.net>
+Message-ID: <416E403C.4040101@users.sourceforge.net>
+Date: Thu, 14 Oct 2004 11:00:44 +0200
+From: Pander <pander@users.sourceforge.net>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] modprobe: FATAL: Error inserting hci_usb
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Pander <pander@users.sourceforge.net>
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <416E403C.4040101@users.sourceforge.net>
-References: <416D745B.7020208@users.sourceforge.net>
-	 <1097737908.4640.4.camel@notepaq>  <416E403C.4040101@users.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1097745084.4640.26.camel@notepaq>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 14 Oct 2004 11:11:24 +0200
+References: <416D745B.7020208@users.sourceforge.net> <1097737908.4640.4.camel@notepaq>
+In-Reply-To: <1097737908.4640.4.camel@notepaq>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Pander,
-
-> > I have seen this too, but sometimes it still works. Check with lsmod if
-> > the module is loaded.
+Marcel Holtmann wrote:
+> Hi Pander,
 > 
-> Hi Marcel, it works althought the FATAL is being reported.
+> 
+>>I'm have build linux kernel 2.6.8.1 with Debian testing distro on a 
+>>PowerPC (PowerBook G4). All went well and booted oke except for 
+>>bleutooth support:
+>>
+...
+>>modprobe: FATAL: Error inserting hci_usb 
+>>(/lib/modules/2.6.8.1-pbg4/kernel/drivers/bluetooth/hci_usb.ko): Unknown 
+>>symbol in module, or unknown parameter (see dmesg)
+>>
+>>I also patched the 2.6.8.1 kernel source with patch-2.6.8-mh2 but that 
+>>resulted in the same error. dmesg says the same as above. Does anyone 
+>>know how to fix this?
+> 
+> 
+> I have seen this too, but sometimes it still works. Check with lsmod if
+> the module is loaded.
 
-please don't ask me why this happens. Ask this on the kernel mailing
-list, because it seems that it is a general module problem.
+Hi Marcel, it works althought the FATAL is being reported.
 
-Regards
+Thanks,
 
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
-Use IT products in your business? Tell us what you think of them. Give us
-Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
-http://productguide.itmanagersjournal.com/guidepromo.tmpl
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Pander
+> Regards
+> 
+> Marcel
