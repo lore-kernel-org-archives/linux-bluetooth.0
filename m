@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bluetrek G2
+Subject: Re: [Bluez-devel] PAND error: Function not implemented(38)
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1106218017.6052.22.camel@baroque.rococosoft.com>
-References: <1106218017.6052.22.camel@baroque.rococosoft.com>
+In-Reply-To: <IAM1IW$205B23707D0A369DE13B2731D4A79F3F@libero.it>
+References: <IAM1IW$205B23707D0A369DE13B2731D4A79F3F@libero.it>
 Content-Type: text/plain
-Message-Id: <1106225327.8190.172.camel@pegasus>
+Message-Id: <1106224398.8190.170.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,12 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 13:48:47 +0100
+Date: Thu, 20 Jan 2005 13:33:18 +0100
 
-Hi Steve,
+Hi Andi,
 
-when you sign your emails, please make sure that your public key is
-available to everyone. Otherwise don't sign emails to this mailing list.
+> making a pan connection on my linux box gives me the error:
+> 
+> pand[3093]: Bluetooth PAN daemon version 2.13
+> pand[3093]: Connecting to 00:10:60:A7:48:84
+> pand[3093]: Connect to 00:10:60:A7:48:84 failed. Function not implemented(38)
+> 
+> All the modules are loaded (bnep included) , and all other hci operations work.
+> Even bnep connection can be created using the same host as slave with
+> pand -listen.
+
+run "hcidump -X" as root while you are trying to connect and then show
+us the output.
 
 Regards
 
