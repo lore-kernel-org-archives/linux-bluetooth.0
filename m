@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <1025.200.207.51.132.1092265776.squirrel@webmail.ic.unicamp.br>
-From: ra002890@ic.unicamp.br
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Subject: [Bluez-users] Problems with bcsp ...
+Subject: Re: [Bluez-users] AVM BlueFritz with Linux Kernel 2.6.3-15mdk
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Sigrid Kronenberger <skronenberger@web.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040811231204.18574a27@localhost>
+References: <20040811231204.18574a27@localhost>
+Content-Type: text/plain
+Message-Id: <1092262417.4564.259.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,42 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Aug 2004 20:09:36 -0300 (BRT)
+Date: Thu, 12 Aug 2004 00:13:37 +0200
 
- Hello Everybody...
+Hi Sigrid,
 
-  I'm trying to make a ftp connection trought my embedded linux device
-running bluez and my desktop running bluez too, but I receive these
-messages that destroy my ftp aplication! Somebody could help me?  The
-messages are:
+> I'm using Mandrake 10.0 Official with the updated Kernel 2.6.3-15mdk. I
+> have an USB Bluetooth dongle from AVM (BlueFritz) which don't work... :(
+> 
+> I've copied the firmware to the /usr/lib/hotplug/firmware directory.
+> hotplugd starts at boot time. I've changed to an older version of the
+> AVM-firmware, because Marcel told me, that this Kernel won't work with
+> the newest firmware. 
+> 
+> I've downloaded and installed the newest version of bluez-libs,
+> bluez-utils, bluezs-pin, bluez-firmware, bluez-hcidump and bluez-hciemu.
+> (I've compiled myself, no rpm-packages) Source for the software: 
+> http://www.bluez.org/download.html. 
+> 
+> When I'm typing "hciconfig" in a console, nothing happens... 
 
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Out-of-order packet arrived, got 0 expected 7
+are the hotplug scripts installed (look for /etc/hotplug/firmware.agent)
+and show us the content of /proc/bus/usb/devices after you plugged in
+the dongle.
 
-ftp> bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Out-of-order packet arrived, got 5 expected 4
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Out-of-order packet arrived, got 5 expected 4
-bcsp_recv: Out-of-order packet arrived, got 6 expected 4
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Out-of-order packet arrived, got 5 expected 4
-bcsp_recv: Out-of-order packet arrived, got 6 expected 4
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Out-of-order packet arrived, got 5 expected 4
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Out-of-order packet arrived, got 5 expected 4
-bcsp_recv: Out-of-order packet arrived, got 7 expected 4
-bcsp_recv: Error in BCSP hdr checksum
-bcsp_recv: Out-of-order packet arrived, got 5 expected 4
-bcsp_recv: Checksum failed: computed 86fc received 0a6b
-bcsp_recv: Out-of-order packet arrived, got 7 expected 6
-bcsp_recv: Out-of-order packet arrived, got 0 expected 6
-bcsp_recv: Out-of-order packet arrived, got 1 expected 6
+Regards
 
-How could I strip this messages from bluez if they are only for debugging?
-Thanks a lot for other doubts that you have solved for me!
+Marcel
 
-Bluez is the best.....
+
 
 
 -------------------------------------------------------
