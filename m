@@ -5,8 +5,8 @@ To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200408142332.10700.cijoml@volny.cz>
-Subject: [Bluez-users] hidd not reports it's version
+Message-Id: <200408142331.27222.cijoml@volny.cz>
+Subject: [Bluez-users] bluez-utils Makefile fault
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,11 +17,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 14 Aug 2004 23:32:10 +0200
+Date: Sat, 14 Aug 2004 23:31:27 +0200
 
 Hi Marcel,
 
-hidd doesn't report it's version when called hidd --help
+when make uninstall and then make a new ones in bluez-utils, all my 
+configurated files were replaced with default conf files :(
+PLS add some kind of check (md5sum??)
 
 Michal
 
