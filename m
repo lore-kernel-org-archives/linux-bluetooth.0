@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41A580FF.7040906@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] xtrememac dropped bluetooth
+Message-ID: <20041125064110.GA2505@frostnet.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+From: Chris Frost <chris@frostnet.net>
+Subject: [Bluez-users] Pairing a keyboard
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +16,50 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 Nov 2004 23:51:43 -0700
+Date: Wed, 24 Nov 2004 22:41:10 -0800
 
-Guys,
+When trying to pair with an apple wireless keyboard, hcitool cc errors
+"Can't create connection: Input/output error". I was hoping someone
+might have a suggestion on what to look into.
 
-I only noticed recently that these xtrememac.com guys were promising a 
-class 1 device supporting a2dp (about a year ago!). They say they've 
-shelved the product. Too bad... I don't think there are any class 1 
-headsets (a2dp or no)
+The details:
+I'm kernel 2.6.9-mh4 and bluez 2.11 on an x86 with a D-Link DBT-120.
+After starting hcid I run "hcitool cc <addr>" and get the error above.
+I've included "hcidump -x"'s transcript at the bottom of this email.
+bluepin does not work on my installation (pygtk seems broken), so I wrote
+a script to echo "0000" to stdout. This may well be my problem? I do not know
+if this is the format hcid is expecting or if it is the initial pin apple
+sets. I did read that the mouse uses this pin, this is the only reason for
+my choice. For my hcid.conf file, security is auto, pin_helper is set to this
+script, and auth and encrypt are commented out.
 
-Class 1 headset(s) + asterisk pbx + voice-commands + streaming a2dp 
-audio would be an extrememly slick setup...
+I am able "hcitool scan" to see the keyboard. I'm also able to pair with
+an ericsson phone. The phone, however, may not use a pin?
 
-Brad
+
+hcidump output:
+
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+  4B 9A 3B 95 0A 00 18 CC 02 00 00 00 01 
+> HCI Event: Command Status (0x0f) plen 4
+  00 01 05 04 
+> HCI Event: PIN Code Request (0x16) plen 6
+  4B 9A 3B 95 0A 00 
+< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+  4B 9A 3B 95 0A 00 
+> HCI Event: Command Complete (0x0e) plen 10
+  01 0E 04 00 4B 9A 3B 95 0A 00 
+> HCI Event: Connect Complete (0x03) plen 11
+  18 29 00 4B 9A 3B 95 0A 00 01 00 
+
+
+thanks for any suggestions or pointers!
+-- 
+Chris Frost  |  <http://www.frostnet.net/chris/>
+-------------+----------------------------------
+Public PGP Key:
+   Email chris@frostnet.net with the subject "retrieve pgp key"
+   or visit <http://www.frostnet.net/chris/about/pgp_key.phtml>
 
 
 -------------------------------------------------------
