@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: James Cameron <james.cameron@hp.com>
-To: Dave Henriksen <dhenriksen@optibrand.com>
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Ideal mru and mtu ?
-Message-ID: <20040630232127.GK30504@hp.com>
-References: <1088608978.4959.9.camel@linux.site>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1088608978.4959.9.camel@linux.site>
+Message-ID: <40E346A8.2050209@mip.sdu.dk>
+From: Peter Favrholdt <pfavr@mip.sdu.dk>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] snd-bt-sco
+References: <40E33BF2.7010705@mip.sdu.dk>
+In-Reply-To: <40E33BF2.7010705@mip.sdu.dk>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,25 +17,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 1 Jul 2004 09:21:27 +1000
+Date: Thu, 01 Jul 2004 01:03:04 +0200
 
-An ideal MTU would be the largest that works over the total network path
-from the FTP client to the FTP server.
+Hi again,
 
-pppd's mru option determines how it negotiates this option with the
-peer.  The negotiated mru forms the basis for the interface MTU.  The
-MTU can be changed up and down after interface creation, using "ifconfig
-ppp0 mtu".
+Well, I figured out I didn't have the /dev/snd/* device files
 
-pppd running over bluetooth just believes it has a byte stream to the
-peer.  There may be bluetooth specific reasons to choose an MTU that
-matches on the air packet sizes, in order to reduce latency, but if your
-goal is mainly FTP my guess is that latency isn't important.
+So now it almost works. The headset seems connected. I can use alsamixer (and 
+the volume buttons on the headset changes the volume in the mixer window). 
+hciconfig shows data is flowing at a steady rate from the microphone:
 
--- 
-James Cameron                         http://quozl.netrek.org/
-HP Open Source, Volunteer             http://opensource.hp.com/
-PPTP Client Project, Release Engineer http://pptpclient.sourceforge.net/
+hci0:   Type: USB
+         BD Address: 00:0B:0D:20:79:21 ACL MTU: 339:4  SCO MTU: 64:0
+         UP RUNNING PSCAN ISCAN
+         RX bytes:8895374 acl:72 sco:329395 events:232 errors:0
+         TX bytes:3768 acl:151 sco:0 commands:47 errors:0
+
+But no sound
+
+I'll try some more.
+
+BR
+
+Peter
+
+Peter Favrholdt wrote:
+> Hi bluez developers,
+> 
+> I'm not sure if this is the right forum. I'm probably in-between 
+> alsa-user, bluez-user, kernel-user? But here goes anyway:-)
+> 
+> I just tried getting the Logitech HS01 bluetooth headset working on 
+> kernel 2.6.6 (debian unstable), using the ALSA driver from 
+> http://www.dcs.gla.ac.uk/~jp/snd-bt-sco/
+> 
+> Anyone had success with getting a headset working?
+> 
+> I know this driver is a hack, but it would be cool to have skype working 
+> using a headset under linux.
+> 
+> BR
+> 
+> Peter
+> 
+> --- cut: long and windy story about my adventures ---
+<snip>
 
 
 -------------------------------------------------------
