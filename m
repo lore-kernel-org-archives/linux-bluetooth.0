@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] RFCOMM service level security testing
+Subject: Re: [Bluez-devel] Problem with Billionton PCMCIA card
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1099151759.16247.18.camel@pegasus>
-References: <1099151759.16247.18.camel@pegasus>
+To: marcin@telscom.ch
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4187903F.16859.61AB28E@localhost>
+References: <1099394605.10948.33.camel@pegasus>
+	 <4187903F.16859.61AB28E@localhost>
 Content-Type: text/plain
-Message-Id: <1099433039.7125.13.camel@pegasus>
+Message-Id: <1099401399.10948.47.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -17,26 +19,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 02 Nov 2004 23:03:59 +0100
+Date: Tue, 02 Nov 2004 14:16:39 +0100
 
-Hi Folks,
+Hi Marcin,
 
-> I released patch-2.6.9-mh3 some minutes ago and it contains the first
-> experimental version of the service level security implementation for
-> the RFCOMM layer.
+> > > about what kernel version and what platform are we talking? Actually
+> > > using hci_uart with BCSP and hciattach works perfect with the Zoom card.
+> > > The btuart_cs is not the way to go and I will remove this driver in the
+> > > future.
+> > 
+> >  I compiled kernel 2.6.9 with the latest patch (mh3). Platform is 
+> > laptop with Pentium IV.
+> > After removing btuart.conf I get:
+> > 
+> > cs: memory probe 0xa0000000-0xa0ffffff: clean.
+> > ttyS10 at I/O 0x100 (irq = 10) is a 16C950/954
+> > 
 > 
-> The libs CVS is also updated to add the specific defines for using it
-> and rctest got some extra paramters for it, but it seems that the CVS
-> service for anonymous access from Sourceforge is broken and so most of
-> you won't get these modification. However this is not a big problem,
-> because you can use L2CAP_LM, L2CAP_LM_AUTH etc. for it. The values
-> behind these defines are identical and so this should work at least for
-> testing this new feature.
-> 
-> Please test this and send reports back to the mailing list.
+>  It works with kernel 2.4.20 from RedHat 9, and doesn't hang. Still, 
+> no idea why it hangs on the other one.
 
-what's up? Has nobody tested this new feature so far? The Sourceforge
-CVS is now back in sync and rctest has all needed options.
+the serial drivers in 2.6 has changed and this might be the problem. Do
+you used the same hciattach command that I used for the Zoom card?
+
+>  Thanks for the tip, you can change it on Hardware support list. The 
+> card is very cheap for PCMCIA and it is Class 1.
+
+I thought of creating a new page for the serial based Bluetooth PCMCIA
+and CF cards. I need to add the information about hciattach and with
+what kernel version they work or not.
+
+Do you wanna donate one of these cards so that I can take a look at it?
 
 Regards
 
