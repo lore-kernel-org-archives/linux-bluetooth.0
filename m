@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <41CAECC5.8000006@cc.gatech.edu>
+From: Jay Summet <summetj@cc.gatech.edu>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] get remote bt address
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+References: <2de4657604122303546f813ecf@mail.gmail.com>	 <1103803109.20258.79.camel@pegasus> <2de465760412230418552a4af6@mail.gmail.com>
 In-Reply-To: <2de465760412230418552a4af6@mail.gmail.com>
-References: <2de4657604122303546f813ecf@mail.gmail.com>
-	 <1103803109.20258.79.camel@pegasus>
-	 <2de465760412230418552a4af6@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1103822368.28433.187.camel@justakiss>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,22 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Dec 2004 18:19:28 +0100
+Date: Thu, 23 Dec 2004 11:05:25 -0500
 
-Am Don, den 23.12.2004 schrieb Manjunath Prabhu um 13:18:
+Manjunath Prabhu wrote:
 
 > Also, which would be the best Bluetooth PCMCIA card , the ones with
 > linux drivers , for 2.6 kernels?
-> 
-the Conceptronic CBT100C is a class 1 card for < EUR 50,-.
-I have used it with 2.4.20uc1 (uClinux) with success. With "regular"
-Linux (2.4.22), the socket driver needed a small patch because the card
-is encoded as a low voltage+3.3V card and wasn't powered up at all. 
+I'm using a Zoom bluetooth adapter (Class 1, w/ 100m claimed range and pop-out 
+antenna) with 2.6.8 and am very happy with it. (It's also inexpensive to buy 
+online...)
 
-Regards,
-Erwin
+Keep in mind that I only need it to do 6kbps to talk with my phone, so I've 
+never tested it under a high-throughput situation, but I know of no reason it 
+wouldn't work as well as any other bluetooth card...
 
+more comments:
+http://www.summet.com/x31/zoom.html
 
+Jay
 
 
 -------------------------------------------------------
