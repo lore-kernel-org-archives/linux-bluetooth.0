@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] DBT-120 and Siemens S65
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <6ae1569005030604105d08a56e@mail.gmail.com>
-References: <6ae1569005030604105d08a56e@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1110111350.8302.9.camel@pegasus>
+Message-ID: <6ae1569005030604105d08a56e@mail.gmail.com>
+From: Adis Beglerovic <emerge.gentoo@gmail.com>
+To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] DBT-120 and Siemens S65
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,40 +16,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 06 Mar 2005 13:15:50 +0100
+Date: Sun, 6 Mar 2005 13:10:21 +0100
 
-Hi Adis,
+Hi
+Trying to connect my mobile phone and PC using blue tooth.
 
-> Trying to connect my mobile phone and PC using blue tooth.
-> 
-> 1.Added needed stuff in my kernel 2.6.11 on gentoo box.
-> When I plug inn my Dlink DBT-120 lights are ON and hcitools scan reports
-> this:
-> Scanning ...
->        00:01:E3:3C:79:45       Bash
-> where bash is my mobile phone.
-> and link quality is -->hcitool lq 00:01:E3:3C:79:45
-> Link quality: 255
-> 
-> Does this means that blue tooth works?
+1.Added needed stuff in my kernel 2.6.11 on gentoo box.
+When I plug inn my Dlink DBT-120 lights are ON and hcitools scan reports
+this:
+Scanning ...
+       00:01:E3:3C:79:45       Bash
+where bash is my mobile phone.
+and link quality is -->hcitool lq 00:01:E3:3C:79:45
+Link quality: 255
 
-if "hciconfig -a" doesn't show any errors it is working.
+Does this means that blue tooth works?
+2.How do I connect to devices?
+3. What tools can use for file transfer ?
 
-> 2.How do I connect to devices?
-
-This depends on what you wanna do, but in general you will setup a
-RFCOMM connection with the "rfcomm" tool.
-
-> 3. What tools can use for file transfer ?
-
-The Gnome desktop and also KDE have some nice Bluetooth integration that
-allows you to send and receive files.
-
-Regards
-
-Marcel
-
-
+Thanks
 
 
 -------------------------------------------------------
