@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: zubiwat@poczta.onet.pl
-Reply-To: zubiwat@poczta.onet.pl
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200403041254.47428.zubiwat@poczta.onet.pl>
-Subject: [Bluez-devel] Changing baud default in CSR
+Subject: Re: [Bluez-devel] Suspend/resume issues with bluez
+From: Paul Ionescu <paul@acorp.ro>
+To: Mitsu Hadeishi <mitsu@syntheticzero.com>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <200403022202.19259.mitsu@syntheticzero.com>
+References: <200403022202.19259.mitsu@syntheticzero.com>
+Message-Id: <1078379087.17118.22.camel@t40>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,20 +18,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 4 Mar 2004 12:54:47 +0100
+Date: Thu, 04 Mar 2004 07:44:47 +0200
 
-Can any one help me?
-I have to change the default baud base in chip because it is set to 921600 and 
-I have to use microchip to translate this 921600 to 115200. Now it is the 
-only way for me to connect to my BT through RS232. I want to change this 
-default baud to be able to connect directly to my BT through RS232 without 
-any microchip between them.
-Please help to find a command or sth to change this - offcourse if it's 
-possible.
+Hi Mitsu,
 
-Regards 
+On T40* the bluetooth adapter is an USB one, so you can try to remove
+all USB modules before suspend, and load them again after resume.
 
-Maciej Zubilewicz
+On Wed, 2004-03-03 at 05:02, Mitsu Hadeishi wrote:
+> Hi, just thought I'd run this issue past you folks.  I'm running the bluez 
+> stack and utilities from Debian unstable on kernel 2.4.22-x1 (Xandros Desktop 
+> 2) on a Thinkpad T40p.  It seems to run fine when I first boot; I am able to 
+> discover other devices, they can discover me.  I am a newbie trying to use 
+> this protocol stack; so I haven't yet gotten any applications to work yet.  
+> However, it seems to function, basically.
+> 
+> The problem is bluez never seems to work again after a suspend/resume.  I have 
+> tried shutting down the Bluetooth card (you can do with with Fn-F5 on a 
+> Thinkpad) before suspending, as well as doing hciconfig hci0 down, and even 
+> rmmod rfcomm, rmmod hci_usb (rmmod l2cap never seems to work) before 
+> suspending, and then modprobe them back afterwards.  Though my machine does 
+> not hang or crash when coming back from suspend, the Bluetooth card never 
+> works again.  hciconfig -a prints nothing.
+> 
+> Interestingly, before I installed the bluez stack, whenever I hit Fn-F5 it 
+> would freeze my machine.  Now, it doesn't freeze it, but correctly toggles 
+> the little LED saying Bluetooth is active/inactive.  When bluez is working, 
+> Fn-F5 makes hciconfig -a report the device there, then Fn-F5 again will make 
+> hciconfig -a report nothing.  But after a suspend/resume, Fn-F5 will *still* 
+> toggle the Bluetooth LED, but hciconfig -a never shows a card.
+> 
+> Rebooting the system causes bluez to work again.
+> 
+> Mitsu
 
 
 
