@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY101-F1422133B054DDDB019EEE9A78C0@phx.gbl>
-From: "Russell Turner" <russellturner@hotmail.com>
+Message-ID: <41E85F57.10504@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Subject: [Bluez-users] Microsoft bluetooth mouse - wheel support
+Subject: Re: [Bluez-users] recording btsco traffic
+References: <pan.2005.01.14.18.04.15.317521@yahoo.com>
+In-Reply-To: <pan.2005.01.14.18.04.15.317521@yahoo.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,29 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 15 Jan 2005 08:07:53 +0000
+Date: Fri, 14 Jan 2005 17:09:59 -0700
 
-Hi Everyone,
-  I have successfully upgraded my Debian kernel to 2.6.10 (including the 
-patch-2.6.10-mh1) and connected my mouse by
+Paul
 
-modprobe hidp
-hidd --server
+> Is it possible to record a phone conversation with btsco ?
+> Like dumping all in and out traffic in a big stereo .wav file, where left
+> channel should be incoming traffic and right channel should be outgoing
+> traffic.
+> I mean, btsco already sees this traffic, how hard would be to save it in
+> also in a file ?
+> 
+> Or this can be done with some ALSA magic ? Some routing of both incoming
+> and outgoing audio to a virtual alsa device from which one can record ?
 
-But no scroll wheel support! If I type "hidd --show" I get
-00:50:F2:E8:5E:FA HID Boot Device [045e:0098] connected [boot-protocol]
+is your phone conversation using a voip application on the computer?
 
-So it seems that I get only a boot-mode connection. If I run xev it shows no 
-activity when I use the scroll-wheel.
+currently you'd have to get your voip app to record the call.
 
-Can anyone please help me about how I can get scroll-wheel support for my 
-lovely blue mouse!
+if we get everything moved into userspace, you could modify the alsa 
+driver to do stuff like that.
 
-Thanks.
+i don't know if there's an alsa trick. maybe one of their userspace 
+drivers can act like a man-in-the-middle between your voip app and the 
+btsco kernel driver.
 
-Russell.
-
-
+Brad
 
 
 -------------------------------------------------------
