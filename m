@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000c01c4128d$71bc96d0$0200a8c0@wincomp>
-From: "Keith Pemberton" <kbpember@cox.net>
-To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <406490EC.7000703@soft.uni-linz.ac.at>
+From: Simon Vogl <vogl@soft.uni-linz.ac.at>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-devel] Any true bluetooth drivers?
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] handsfree application
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,12 +15,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Mar 2004 11:20:17 -0600
+Date: Fri, 26 Mar 2004 21:22:04 +0100
 
-Can anyone point me in the direction of a driver that are being created that
-use the Bluez API?  Thanks!
+hi,
+i put an updated version of my handsfree application online. While I 
+still haven't solved the problems
+with the inverted sco channels, I have implemented a heuristic to detect 
+this event which works in
+~80-90% of all cases.
 
-Keith
+Furthermore, you can control the behavior of the via an named pipe or 
+via stdin - its straightforward,
+docs may follow at some later time (in short: you can save audio streams 
+from phone or from mic to file,
+play audio, toggle skip-byte behavior etc).
+
+A nice weekend to you all
+Simon
+
+-- 
+_______________________________________________________________________
+Dr. Simon Vogl
+Institut für Pervasive Computing, Johannes Kepler Universität Linz
+Altenberger Straße 69, A-4040 Linz, Austria
+
+Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
+mailto: vogl@soft.uni-linz.ac.at,  http://www.soft.uni-linz.ac.at/
 
 
 
