@@ -1,14 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] blue-fw not working for USB Belkin F8T001
-	in	Gentoo Linux
+Subject: Re: [Bluez-users] blue-fw not working for USB Belkin F8T001 in
+	Gentoo Linux
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Alex Holland <ah160@york.ac.uk>
+To: Marc Hansen <Marc.Hansen@gmx.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3FFC03A3.5090807@york.ac.uk>
+In-Reply-To: <20040107152304.0cb33bf1@hemma.giessen.de>
 References: <3FFBFC34.3050509@york.ac.uk>
-	 <1073479827.2508.143.camel@pegasus>  <3FFC03A3.5090807@york.ac.uk>
+	 <1073479827.2508.143.camel@pegasus>
+	 <20040107152304.0cb33bf1@hemma.giessen.de>
 Content-Type: text/plain
-Message-Id: <1073491974.2508.173.camel@pegasus>
+Message-Id: <1073486955.2508.152.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,15 +21,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 07 Jan 2004 17:12:54 +0100
+Date: Wed, 07 Jan 2004 15:49:16 +0100
 
-Hi Alex,
+Hi Marce,
 
-> Any plans to backport the -mh2 patch to 2.4? The Gentoo devs would 
-> probably be interested, they're patch crazy :)
+> Where are the patches for 2.6.0?
+> http://www.holtmann.org/linux/kernel/
+> seems to be wrong!?
 
-I have a backport of the driver, but it crashes on 2.4 after unlinking
-the URB and I have no time for further investigations.
+no it is not wrong. The 2.6.0 patches are not listed.
+
+	http://www.holtmann.org/linux/kernel/patch-2.6.0-mh2.gz
 
 Regards
 
@@ -38,10 +41,10 @@ Marcel
 
 
 -------------------------------------------------------
-This SF.net email is sponsored by: Perforce Software.
-Perforce is the Fast Software Configuration Management System offering
-advanced branching capabilities and atomic changes on 50+ platforms.
-Free Eval! http://www.perforce.com/perforce/loadprog.html
+This SF.net email is sponsored by: IBM Linux Tutorials.
+Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
+Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
+Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
