@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Lutz Pressler <Lutz.Pressler@SerNet.DE>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Message-Id: <E1BPzXe-0005fC-00@intern.SerNet.DE>
-Subject: [Bluez-users] Nokia 6230: "pairing and conn. rejected for security reasons"
+Subject: Re: [Bluez-users] Bluez+2.6+Logitech bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Di Pietro Nicolas <potens@swing.be>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1084826611.10503.23.camel@darthvader.linuxkot.kap>
+References: <20040515163903.CB06543F94@rekin8.go2.pl>
+	 <20040516081059.46f1904b@bluez.bueche.ch> <1084708456.4184.0.camel@pegasus>
+	 <1084826611.10503.23.camel@darthvader.linuxkot.kap>
+Content-Type: text/plain
+Message-Id: <1084835041.5833.40.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,33 +20,64 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 18 May 2004 10:01:38 +0200 (CEST)
+Date: Tue, 18 May 2004 01:04:01 +0200
 
-Hello,
+Hi Nicolas,
 
-searching through the archives gave me no clue.
+> Just to say to you that, I've tried the new hidd and hidp modules
+> (from a patched against patch-2.6.6-mh1 2.6.6 kernel)
+> but it change a few (the only thing that has changed is when I halt
+> or reboot the computer after have done hid2hci, there is no more
+> Ooops when stopping usb
+> 
+> darthvader root # hidd
+> Can't open HIDP control socket: Address family not supported by protocol
 
-In contrast to Nokia 6310i, I'm not able to pair my Nokia 6230 (firmware
-3.15) and bluez (two 2.4 systems tried, one beeing SuSE 9.0 with
-kernel 2.5.21-251 and bluez-utils-2.3-57, bluez-libs-2.4-31).
+this shouldn't happen, because the kernel knows which module it has to
+load.
 
-After entering the correct pin (giving the wrong one yields other error)
-in the phone's pairing dialogue, the 6230 only aborts with
-"pairing and conn. rejected for security reasons".
+> darthvader root # hidd --server
+> darthvader root # May 17 22:33:48 darthvader hidd[14177]: Bluetooth HID
+> daemon
+> darthvader root #
+> darthvader root # lsmod
+> 
+> hidp                   24000  0
+> l2cap                  20676  1 hidp
+> bluetooth              41124  2 hidp,l2cap
 
-hcid.conf is more or less default, works with 6310i and can be sent on
-request.
+This is problematic, because after the start of hidd, the hidp must hold
+a reference count of 2. Check the syslog for any errors.
 
-Acer USB adapter (vend/prod 0xb7a/0x7d0).
+> darthvader root # hid2hci
+> Switching device 046d:c704 to HCI mode was successful
+> darthvader root # May 17 22:26:22 darthvader usb 2-2.2: new full speed
+> USB device using address 5
 
-Any idea? Thanks a lot,
-  Lutz
+At this point hciconfig should report your device.
 
--- 
-  _              |  Lutz Pressler          |  Tel: ++49-551-3700002
- |_     |\ |     |  Service Network GmbH   |  FAX: ++49-551-3700009
- ._|ER  | \|ET   |  Bahnhofsallee 1b       |   mailto:lp@SerNet.DE
-Service Network  |  D-37081 Goettingen     |  http://www.SerNet.DE/
+> darthvader bluetooth # lsusb
+> Bus 003 Device 001: ID 0000:0000
+> Bus 002 Device 005: ID 046d:c707 Logitech, Inc.
+> Bus 002 Device 004: ID 046d:c704 Logitech, Inc.
+> Bus 002 Device 003: ID 045e:0040 Microsoft Corp. Wheel Mouse Optical
+> Bus 002 Device 002: ID 0451:2036 Texas Instruments, Inc. TUSB2036 Hub
+> Bus 002 Device 001: ID 0000:0000
+> Bus 001 Device 001: ID 0000:0000
+
+The Bluetooth dongle hasn't changed from HID mode to HCI mode.
+
+> PS:Thank a lot for the bluez stack under Linux...
+>   :Is it something right tha when I switch to hci the blue button on   
+>    the bt hub doesn't work anymore ??? Until I disconnect the hub and 
+>    reboot the computer
+
+How should it work if you are in HCI mode ;)
+
+Regards
+
+Marcel
+
 
 
 
