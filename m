@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41B91658.2020103@avantwave.com>
-From: mike <mikelee@avantwave.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-users] Nokia 7610 phone & logitech DiNovo keyboard /
+	MX900 mouse
+From: Laurence Orchard <laurence@orchards.org.uk>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Problem with using HCI_UART driver
+In-Reply-To: <1102315314.8510.57.camel@pegasus>
+References: <1102035154.4258.14.camel@localhost>
+	 <1102042749.7350.33.camel@pegasus>  <1102291223.4219.3.camel@localhost>
+	 <1102315314.8510.57.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1102639996.4112.10.camel@localhost>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,37 +21,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Dec 2004 11:22:00 +0800
+Date: Fri, 10 Dec 2004 00:53:15 +0000
 
-Dear all
-    I have a strange problem with using hciattach to a uart bluetooth 
-device . I use a script to attach the device , but i need to attach two 
-times to get the build ID.
+On Mon, 2004-12-06 at 07:41 +0100, Marcel Holtmann wrote:
+> Hi Laurence,
+> 
+> > I have now upgraded to Fedora Core 3
+> > kernel-2.6.9-1.667
+> > bluez-bluefw-1.0-6
+> > bluez-hcidump-1.11-1
+> > bluez-utils-2.10-2
+> > bluez-libs-2.10-2
+> > bluez-libs-devel-2.10-2
+> > 
+> > the problem more or less is the same, start Bluetooth, keyboard & mouse
+> > stop working.
+> > 
+> > Same question as before, how do I set it up so the system will recognise
+> > my phone, keyboard & mouse.
+> 
+> make sure that "hidd --server" is started somewhere in the boot script.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-hciconfig -a :
-hci0:   Type: UART
-        BD Address: 00:08:E0:01:49:6A ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:189 acl:0 sco:0 events:21 errors:0
-        TX bytes:351 acl:0 sco:0 commands:21 errors:0
-        Features: 0xff 0xff 0x8b 0x78 0x18 0x18 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'mike'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x490 LMP Ver: 1.2 (0x2) LMP Subver: 
-0x490
-        Manufacturer: Cambridge Silicon Radio (10)
+Yes hidd --server --search
 
-script :
-hciattach -s 921600 /dev/ttyS1 csr 921600 flow
-hciattach -s 921600 /dev/ttyS1 csr 921600 flow
+run at boot S26hidd in rc5.d
+after S25bluetooth
 
+still the same problem, debugging is very difficult without a mouse or
+keyboard. Can't query system, all I can do is press the reset button!
 
-Mike,Lee
+laurence
+-- 
+
 
 
 -------------------------------------------------------
