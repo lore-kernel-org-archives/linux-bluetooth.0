@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Carlo Perassi <carlo@linux.it>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] how to look as a printer?
-Message-ID: <20040402165209.GA3052@localhost>
-Reply-To: carlo@linux.it
-References: <20040402154609.GB2766@localhost> <1080922449.2836.74.camel@pegasus> <20040402161842.GA2998@localhost> <1080923569.2836.78.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: carlo@linux.it
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040402161842.GA2998@localhost>
+References: <20040402154609.GB2766@localhost>
+	 <1080922449.2836.74.camel@pegasus>  <20040402161842.GA2998@localhost>
+Content-Type: text/plain
+Message-Id: <1080923569.2836.78.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1080923569.2836.78.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 2 Apr 2004 18:52:09 +0200
+Date: Fri, 02 Apr 2004 18:32:49 +0200
 
-> this depends on what profile your printer emulator should support. You
-> have to choose of one or more from the serial port, HCRP, OBEX push, BIP
-> and BPP printing.
+Hi Carlo,
 
-My primary goal is to (try to) get something which looks like a
-Bluetooth printer to my cellular phone eyes :)
-So I just posted a question on the dev forum of my cell phone
-manufacturer.
-The choice of the profile you cite depends on that.
+> I was wondering what should I study first.
 
--- 
-Carlo Perassi - http://www.linux.it/~carlo/
+this depends on what profile your printer emulator should support. You
+have to choose of one or more from the serial port, HCRP, OBEX push, BIP
+and BPP printing.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
