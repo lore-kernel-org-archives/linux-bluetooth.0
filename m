@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040309161702.24407.qmail@web40713.mail.yahoo.com>
-From: Lalith Chakravarthi <lalithvc@yahoo.com>
-Subject: Re: [Bluez-users] timeout after rfcomm or pan connection
-To: Christoph Torens <c.torens@web.de>
-Cc: bluez-users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <opr4lpzclieocfdv@debian>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Stuart Anderson <subs@iduniken.com>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1078848325.9713.5.camel@donivin.nx14.com>
+Mime-Version: 1.0
+Subject: [Bluez-users] Missing libopenobex-1.0.so.1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,60 +15,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 9 Mar 2004 08:17:02 -0800 (PST)
+Date: Tue, 09 Mar 2004 16:05:25 +0000
 
-Hi Christopher
+hi all,
+   Im following the tutorial at
+http://www.frasunek.com/HOWTO-Nokia7650-Bluetooth.txt and ive got down
+to the stage of running runing ObexSERVER at the bottom of step five but
+when i do i get the error:
+    "obexserver: error while loading shared libraries:
+libopenobex-1.0.so.1: cannot open shared object file: No such file or
+directory"
+   I've searched for libopenobex-1.0.so.1 and found it in:
+[root@donivin openobex-1.0.1]# ls -al
+/usr/local/lib/libopenobex-1.0.so.1
+lrwxrwxrwx    1 root     root           24 Mar  9 15:48
+/usr/local/lib/libopenobex-1.0.so.1 -> libopenobex-1.0.so.1.0.0
+   Can anyone tell me how i can get the ObexSERVER to run?
 
-I have worked on the 2.4.20-8 kernel ... if it helps, go on with
-reading this...
+Anderson
+-- 
+Anderson
 
-first check if all the modules are there (I know this is the basic
-stuff but most errors creep up from here)
-
-motospin> lsmod
-
-and you should see bluez, usb-uhci, hci_usb, rfcomm, l2cap and bnep
-modules there (doesnt hurt to have extra modules!!)
-
-make sure you have connected both the dongles and that they are 
-up and running.
-
-then, get the daemons running
-motospin> hcid
-motospin> sdpd
-
-motospin2> hcid
-motospin2> sdpd
-
-then on the server side run the pand
-
-motospin> pand --listen --role GN
-
-and on the client side
-
-motospin2> pand --connect --search 20 (20 is the time out value)
-
-and then do the ifconfig bnep0 on both the sides..
-
-motospin> ifconfig bnep0 10.0.0.1
-
-motospin2> ifconfig bnep 10.0.0.2
-
-I was able to establish a connection between a laptop with a USB dongle
-and a PC with a USB dongle... both on the 2.4.20-8 kernel. I set up the
-PS as the gateway and connectd to the net from the laptop also!!!
-
-Hopefully you can also do the same...
-
-regards
-lalith
-
-
-
-__________________________________
-Do you Yahoo!?
-Yahoo! Finance: Get your refund fast by filing online.
-http://taxes.yahoo.com/filing.html
 
 
 -------------------------------------------------------
