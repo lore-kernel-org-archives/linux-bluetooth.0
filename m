@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Vesa Halttunen <vesuri@jormas.com>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1087765554.4781.67.camel@pegasus>
-References: <1087757523.839.10.camel@pc.vesuri.net>
-	 <1087767604.4781.52.camel@pegasus>  <1087760721.1232.5.camel@pc.vesuri.net>
-	 <1087770579.4781.59.camel@pegasus> <1087763282.1232.17.camel@pc.vesuri.net>
-	 <1087765554.4781.67.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1087764428.551.3.camel@pc.vesuri.net>
-Mime-Version: 1.0
-Subject: [Bluez-users] Re: Jerky MX900 mouse movement with 2.6.7-mh1, hidp and hidd
+Subject: Re: [Bluez-users] Re: Jerky MX900 mouse movement with 2.6.7-mh1, hidp and hidd
+References: <1087757523.839.10.camel@pc.vesuri.net> <1087770579.4781.59.camel@pegasus> <1087763282.1232.17.camel@pc.vesuri.net>
+In-Reply-To: <1087763282.1232.17.camel@pc.vesuri.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200406202236.32282.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,47 +19,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 20 Jun 2004 23:47:08 +0300
+Date: Sun, 20 Jun 2004 22:36:31 +0200
 
-Hi,
+edit your hcid.conf  and modify:
 
-On Mon, 2004-06-21 at 00:05, Marcel Holtmann wrote:
-> actually if you use the default hcid.conf from bluez-utils-2.7 and
-> startup hcid this should be all done at device init. If not, then you
-> must use "hciconfig hci0 lp ..." for it.
+        # Default link policy
+        #   none    - no specific policy
+        #   rswitch - allow role switch
+        #   hold    - allow hold mode
+        #   sniff   - allow sniff mode
+        #   park    - allow park mode
+        #
+        #lp hold,sniff;
+        #
+        lp hold,sniff,park,rswitch;
 
-ah, yes. Role switching and sniff mode were already enabled in my
-hcid.conf.
+Michal
 
-> hci0:   Type: USB
->         BD Address: 00:02:xx:xx:xx:xx ACL MTU: 384:8  SCO MTU: 64:8
->         Link policy: RSWITCH HOLD SNIFF PARK 
 
-That's what my Link policy says as well with "hciconfig hci0 lp".
-
-> > hcitool con shows the keyboard and the mouse as follows:
-> > Connections:
-> >         > ACL ..:..:..:..:..:.. handle 44 state 1 lm MASTER
-> >         > ACL ..:..:..:..:..:.. handle 41 state 1 lm MASTER
-> This is the outgoing case and that is never a problem. But the devices
-> reconnect and then you will see two slaves and this means scatternet.
-
-OK. I disconnected the devices and saw them reconnect and for a second
-they were marked as SLAVEs but then became MASTERs. I guess that's how
-it should be?
-
-So... everything seems to be fine, but still, mouse movement is jerky.
-I tried switching hyperthreading off because I couldn't think of
-anything else but this didn't help.
-
-Any suggestions? :)
-
-Thanks,
-
--Vesa
--- 
-            · Vesa Halttunen - http://www.jormas.com/~vesuri/ ·
-
+On Sunday 20 of June 2004 22:28, Vesa Halttunen wrote:
+> On Mon, 2004-06-21 at 01:29, Marcel Holtmann wrote:
+> > > > Do you enabled role switch and sniff mode support?
+> > >
+> > > No, I didn't. Should I, and if so, how?
+> >
+> > you really should, because I have seen that HID devices don't really
+> > like if they can't switch into sniff mode. And if you don't enable role
+> > switch your host can't become the master and so can't join your mouse
+> > and keyboard into one piconet. Thus you get a scatternet and this can
+> > cause troubles.
+>
+> I'm sorry but I don't know how. Could someone tell me?
+>
+> hcitool con shows the keyboard and the mouse as follows:
+>
+> Connections:
+>         > ACL ..:..:..:..:..:.. handle 44 state 1 lm MASTER
+>         > ACL ..:..:..:..:..:.. handle 41 state 1 lm MASTER
+>
+> I don't even know whether the device(s) are in the correct mode or not.
+> I've been trying to gather bits and pieces of information together but
+> so far no luck. I tried "hcitool cmd 0x02 0x0003" which, according to
+> http://www.lisha.ufsc.br/~guto/teaching/ish/ine5346-2003-1/work/bluetooth/h
+>ci_commands.html MIGHT put a device to "sniff mode" but at least nothing
+> changed.
+>
+> Thanks,
+>
+> -Vesa
 
 
 -------------------------------------------------------
