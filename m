@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] About rfcomm socket
+Subject: Re: [Bluez-devel] using select()?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41AD2B86.6010002@avantwave.com>
-References: <41AD2B86.6010002@avantwave.com>
+In-Reply-To: <000a01c4d733$8609ce30$6401000a@zool>
+References: <000a01c4d733$8609ce30$6401000a@zool>
 Content-Type: text/plain
-Message-Id: <1101882506.18840.18.camel@pegasus>
+Message-Id: <1101882219.18840.12.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,26 +18,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 07:28:26 +0100
+Date: Wed, 01 Dec 2004 07:23:39 +0100
 
-Hi Mike,
+Hi Steffen,
 
->     I have tried to fork two process, One use socket system call - 
-> accept at rfcomm channel 2, and another try to connect to a bluetooth 
-> device thought channel 3. But i found that i can not use a 3rd device to 
-> connect to the listen channel 2 at the same time.
+> Is there anyware some examples or any source code in the BlueZ utils.
+> where they use the standard network select() function?
 
-show us the source code for that.
-
->     I am using bluez-lib-2.6, utils-2.6. ,hci-uart and linux-2.4.18 
-> patched with patch-2.4.18-mh15.
-
-The bluez-libs and bluez-utils are at version 2.11 and you should update
-both of them.
-
->     My question is simple, Could bluez be multi-tasking?
-
-You may not be able to do some crazy things, but in general yes.
+there is no difference between using select() with BlueZ. You use poll()
+or select() as you used to. Check the manual pages for more help.
 
 Regards
 
