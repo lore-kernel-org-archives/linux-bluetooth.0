@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Keyboarch encryption howto?
+Subject: Re: [Bluez-users] security mode 3
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200411241701.07891.cijoml@volny.cz>
-References: <200411241701.07891.cijoml@volny.cz>
+In-Reply-To: <BAY12-F7DA5E202CE09ED8BA6E418AB80@phx.gbl>
+References: <BAY12-F7DA5E202CE09ED8BA6E418AB80@phx.gbl>
 Content-Type: text/plain
-Message-Id: <1101313747.27351.122.camel@pegasus>
+Message-Id: <1101313630.27351.119.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 Nov 2004 17:29:07 +0100
+Date: Wed, 24 Nov 2004 17:27:10 +0100
 
-Hi Michal,
+Hi,
 
-> is there any howto where described how to start encryption on BT keyboard?
+> Does BlueZ support security mode 3 (link-level security) of Bluetooth ?
 
-there exists a hidd version that can enable the keyboard encryption
-after the connection (-E switch). I haven't really tried it and it maybe
-not work as expected with some devices. This should be fixed some time
-with the new policy manager inside the kernel.
-
-> Is my MS keyboard (CSR based) supported?
-
-Yes, it supports encryption.
+it supports all three security modes, but actually using mode 3 is
+normally not a good choice. However you can set your local device into
+security mode 3 with "hciconfig hci0 auth encrypt".
 
 Regards
 
