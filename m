@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Kyler Laird <Kyler@Lairds.com>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] What Bluetooth CF cards do developers use?
-Message-ID: <20040429181311.GN1862@snout>
-Reply-To: kyler-dated-1083521560.f4658e@lairds.com
-References: <20040428135604.GD1862@snout> <1083161388.4000.40.camel@pegasus> <20040428141637.GE1862@snout> <1083162180.4000.45.camel@pegasus>
+Subject: Re: [Bluez-devel] syntax for advertising a service with specific
+	uuid
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nikita Tovstoles <Nikita.Tovstoles@Sun.COM>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <409032AC.4020906@sun.com>
+References: <40902623.8060509@sun.com> <1083190769.4000.90.camel@pegasus>
+	 <409032AC.4020906@sun.com>
+Content-Type: text/plain
+Message-Id: <1083192495.4000.100.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1083162180.4000.45.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,40 +20,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 29 Apr 2004 13:13:11 -0500
+Date: Thu, 29 Apr 2004 00:48:15 +0200
 
-On Wed, Apr 28, 2004 at 04:23:00PM +0200, Marcel Holtmann wrote:
+Hi Nikita,
 
-> > > Starting with 2.6.6-rc2 the Anycom
-> > > CF-300 is finally supported. Actually the card works in my development
-> > > machine.
-> > 
-> > Sounds like a winner.  I'll look for it.
+> >I prefer you read the manpage of sdptool. The get command needs the
+> >record handle of the previous created record.
+> >  
+> >
+> "man sdptool" returns nothing. the only thing i can look at is "sdptool 
+> --help". if that's not what you were referring to, where is sdptool's 
+> manpage?
 > 
-> Don't blame me if it don't works in a Zaurus ;)
+> %sdptool add --help
+>  add [--channel] service
 
-I'd be happy to just get it working in my Toughbook for now.  I inserted
-it and got "cs: pcmcia_socket0: unable to apply power."
+come on, check you MANPATH or look at the CVS
 
-I'll try it in the Zaurus later.
+http://cvs.sourceforge.net/viewcvs.py/bluez/utils/tools/sdptool.1?view=markup
 
-Thanks for the recommendation.
+Regards
 
-> > I thought USB might be the answer so last week I bought two USB Bluetooth
-> > adapters (Belkin and Kensington).  Only one (barely) fits in the USB slot
-> > of my Toughbook.  The other fits enough to make contact but if I happen
-> > to bump either one out of the socket the kernel crashes.  That's not
-> > what I need when I'm on the road.
-> 
-> The USB related kernel oopses should all be fixed with the upcoming
-> 2.6.6, I hope.
+Marcel
 
-Yea!  Will a BlueZ patch be required or is it all going to be in the
-kernel this time?
-
-Thank you.
-
---kyler
 
 
 
