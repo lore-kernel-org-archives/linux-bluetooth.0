@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041020134908.38016.qmail@web40608.mail.yahoo.com>
-From: Paolino paperino <vonzoltan@yahoo.it>
-Subject: Re: [Bluez-users] problems with bytestream + rfcomm socket problems
-To: diego.liziero@unimore.it
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <1097742403.20102.20.camel@igno>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Subject: Re: [Bluez-users] Bridging bluetooth and a cellular modem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: prem@songbirdtech.com
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1098262358.41762756cf86c@www.songbirdtech.com>
+References: <1098262358.41762756cf86c@www.songbirdtech.com>
+Content-Type: text/plain
+Message-Id: <1098267631.13853.9.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,29 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 20 Oct 2004 15:49:08 +0200 (CEST)
+Date: Wed, 20 Oct 2004 12:20:30 +0200
 
-Thank's Diego
-it wasn't a prblem of dongle or bluez, because i've
-tested all the USB dongles with two kernel 2.6.8  of
-Fedora's, and all works fine, i'will try to test with
-the latest 2.4.27 series, i think the prblem was in
-the ker 2.4.18 i used.
+Hi Prem,
 
-> Try to switch the Bluetooth dongle and see if it is
-> it's fault.
+> I am fairly new to telephony and need some help with understanding the transfer
+> of voice to and from a bluetooth headset.
 > 
-> > Thanks 
-> > Andrea S.
+> I am developing a device which makes use of a GSM/GPRS cellular modem to
+> transfer data over the Internet using GPRS. But this same modem (Siemens MC35)
+> will also have to handle voice calls - that is, when a call comes in, the voice
+> must be captured and transferred over a bluetooth connection to a bluetooth
+> headset .. and conversely, the voice must be transferred from the bluetooth
+> headset down to the modem.
 > 
-> Diego.
+> I have been trying to figure out how to use the BlueZ SCO APIs to do this - is
+> this possible at all and if so how is this done?
+
+it is possible if your Bluetooth module support SCO over HCI, but then
+this is still not very easy to realize. If the MC35 has an external PCM
+or so then use this and connect it to the PCM of your Bluetooth module.
+
+> Also, does BlueZ work on the MIPS processor ? I am using AMD Alchemy Au1500
+> MIPS32 based processor.
+
+The general answer is yes. However I can't give you a 100% guarantee,
+because I don't have access to any kind of this platforms for testing.
+
+Regards
+
+Marcel
 
 
-
-		
-___________________________________ 
-Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
-http://it.messenger.yahoo.it
 
 
 -------------------------------------------------------
