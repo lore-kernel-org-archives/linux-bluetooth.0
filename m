@@ -1,42 +1,67 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <31555.80.63.28.114.1075193693.squirrel@acroberts.com>
-From: "Antony C. Roberts" <acr@acroberts.com>
-To: bluez-devel@lists.sourceforge.net
-Reply-To: acr@acroberts.com
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Subject: [Bluez-devel] Windows Port
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 27 Jan 2004 09:54:53 +0100 (CET)
-
-Hi,
-
-Is anybody working on a Windows port? I did a lot of the work on
-Digianswers Windows stack (certainly the inovator back in the day) and I
-would passionately like to see the current lack of BT support in Windows
-resolved.
-
-So if there are any porting projects in progress, please let me know.
-
-Regards,
-Antony C. Roberts.
+Return-Path: <crosser@average.org>
+Subject: Re: [Bluez-devel] Device specific pins
+From: Eugene Crosser <crosser@average.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Dave Henriksen <dhenriksen@optibrand.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1075151423.25442.135.camel@pegasus>
+References: <1075153448.2906.2.camel@linux.local>
+	 <1075151423.25442.135.camel@pegasus>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-D024Sp+niSuJ3/GUoVZE"
+Message-Id: <1075187139.9727.29.camel@pccross.average.org>
+Mime-Version: 1.0
+Date: Tue, 27 Jan 2004 10:05:39 +0300
+List-ID: <bluez-devel.lists.sourceforge.net>
 
 
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--=-D024Sp+niSuJ3/GUoVZE
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, 2004-01-27 at 00:10, Marcel Holtmann wrote:
+
+> > Just wondering if there is any way to have pins that vary depending upo=
+n
+> > what device you are connecting to.   Currently, I just use
+> > /etb/bluetooth/givepin to supply a pin, but this pin must be the same
+> > for every device that my Linux laptop connects to.
+>=20
+> this is a planned future for the new security manager which also
+> includes one-time PIN codes.
+>=20
+> For the current version you must do it by yourself in a pin-helper
+> script. The BD_ADDR of the remote device is one of the parameters.
+
+Do you think it might be right to leave "low level" PIN management as it
+is now, via an executable helper?  It is very much the same way as
+kernel "hotplug" works.  So it can stay the same even if hcid eventually
+becomes a kernel thread.
+
+The "real" PIN management, with the database, GUI prompt boxes etc.
+could be isolated from the BT stack, helper executable being the only
+interface.
+
+E.g., a Gnome or KDE applet could listen on a unix domain socket.  The
+helper, when invoked, would try to talk over this socket, and if the
+latter is not present or nobody listens on it, default to preexisting
+database.  This way, both fancy GUI dialogues and unattended operation
+could be implemented rather easily.
+
+Sorry if I say stupid or trivial things, I did not really try to learn
+how these things are currently done in Blues..
+
+Eugene
+
+--=-D024Sp+niSuJ3/GUoVZE
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (GNU/Linux)
+
+iD8DBQBAFg3Cfrw/cIw6UWkRAlM3AJ4rxJx7rUObHFPaWuZaZTz8ERF7IgCglkFn
+pw2Ixz9KZldMGv4GITbrC8M=
+=yB62
+-----END PGP SIGNATURE-----
+
+--=-D024Sp+niSuJ3/GUoVZE--
