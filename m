@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Michael Klose <mk@pottklose.de>
-Message-ID: <loom.20050113T121909-801@post.gmane.org>
+Subject: Re: [Bluez-users] multiple BT dongles
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <18514.1105613960@www29.gmx.net>
+References: <18514.1105613960@www29.gmx.net>
+Content-Type: text/plain
+Message-Id: <1105614296.7961.162.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Buetooth Printserver
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,31 +18,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Jan 2005 11:34:46 +0000 (UTC)
+Date: Thu, 13 Jan 2005 12:04:56 +0100
 
-Dear all,
+Hi Marco,
 
-I am using the testing branch of Debian. I installed bluez-cups to print.
-To start with, connecting my printer via USB cables works fine and it is easy 
-to install via browser or KDE printer setup. But as soon as I switch to 
-bluetooth the problem starts.
-All bluetooth parts are recognized correctly (hcitools dev and scan display the 
-usb bluetooth dongle in my pc and the bluetooth printserver correctly).
+> If i've connected multiple bluetooth dongles to my computer, is it possible
+> to seperate those two within bluez?
+> I mean controlling wich services run on wich dongle...
 
-Documentation concerning bluetooth printing starts only with the URI syntax. 
-But there is no hint, howto or guide explaining the steps before. How do I 
-start to setup the bluetooth printer connection. Where can I find such a 
-description?
+you can assign the services (application like pand) for each dongle, but
+right now you can't make the sdpd differ between them.
 
-Apart from that, using the CUPS setup via browser and localhost:631 does not 
-display the bluetooth interface in the interface list (although bluez-cups is 
-installed).
+> Another little question:
+> Does anybody know a bluetooth dongle that supports inquiry scan during
+> active connections?
 
-Many thanks for your support.
+Every CSR dongle with at least HCI 16.4 firmware.
 
-Best Regards
+Regards
 
-Michael Klose
+Marcel
+
 
 
 
