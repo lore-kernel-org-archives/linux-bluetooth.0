@@ -1,45 +1,53 @@
-Return-Path: <nils.faerber@kernelconcepts.de>
-Subject: Re: [Bluez-devel] Renaming USB HID driver
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Vojtech Pavlik <vojtech@suse.cz>, Greg Kroah-Hartman <greg@kroah.com>
-In-Reply-To: <1079963694.2663.247.camel@pegasus>
-References: <1079963694.2663.247.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1080037332.7098.83.camel@localhost>
-Mime-Version: 1.0
-Date: Tue, 23 Mar 2004 11:22:13 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <405FFCB9.5050507@uni-paderborn.de>
+From: Stefan Mischke <survivor@uni-paderborn.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Accessing HCI on Windows
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 23 Mar 2004 10:00:41 +0100
 
-Am Mo, den 22.03.2004 schrieb Marcel Holtmann um 14:54:
-> Hi Folks,
-Hello!
+Hello folks,
 
-> my plan is to move the HID parser out of the USB subsystem and provide a
-> general HID parser implementation under drivers/hid/ which could then be
-> used by the USB and the Bluetooth subsystem drivers. To avoid any naming
-> conflict due and after the development I suggest to rename the USB HID
-> module from hid.ko to usbhid.ko (see attached patch).
-[...]
-> Comments?
+I'm quite new to this "professional developer stuff" and mailing lists 
+(so far only used to forums), so sorry if I do something wrong here.
 
-Maybe as additional motivation for a better abstraction, like Marcel
-porposed, I would like to mention other keyboard devices on other Linux
-platforms that could benefit from this!
-For example I am currently working on Linux for PDAs. Some of them can
-be attached to external keyboards, mostly serial. Having a cleanly
-abstracted HID layer would make it possible to have those properly
-supported. Currently this is done by a pretty ugly hack calling
-handle_scancode() or similar :(
+I'm writing a little "Location Awareness using Bluetooth"-thing for my 
+Bachelor of CS degree. On Linux, everything is fine and I just have to 
+look into the  BlueZ code. But it would be nice if there was a 
+possibility to port my work to Windows. Unfortunately I have found no 
+documentation about how to access the HCI on Windows. All I need would 
+be a simple "SendHCICommand()" or something. My Question: Does anyone 
+know how to do this? Do I have to deal with the Widcomm drivers (seem to 
+be monopolists) or is there a common way?
 
-> Regards
-> Marcel
-CU
-  nils faerber
+I know that this is not a Windows mailing list, but I just don't know 
+where else to ask. I'd really appreciate any help or hint. Thanks in 
+advance!
 
--- 
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          D1 : +49-170-2729106
---
+Kind regards
+Stefan
+
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
