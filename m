@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] hidp and hidd related bugs
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405122109.01893.cijoml@volny.cz>
-References: <200405120030.54220.cijoml@volny.cz>
-	 <1084368090.25099.22.camel@pegasus>  <200405122109.01893.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1084389639.25099.106.camel@pegasus>
-Mime-Version: 1.0
+References: <200405120030.54220.cijoml@volny.cz> <1084368090.25099.22.camel@pegasus>
+In-Reply-To: <1084368090.25099.22.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200405122109.01893.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,25 +19,69 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 May 2004 21:20:39 +0200
+Date: Wed, 12 May 2004 21:09:01 +0200
 
-Hi Michal,
+On Wednesday 12 of May 2004 15:21, Marcel Holtmann wrote:
+> Hi Michal,
+>
+> > I did little research and here is output:
+> >
+> > keys which are not reported in xev:
+> > Eigene Dateien
+> > Eigene Bilder
+> > Eigene Musik
+> > Messenger
+> > Abmelden
+> >
+> > Reported badly
+> > Rechner is reported like Pause
+> > Standby like Print
+> >
+> > Do you want send keycodes which reports bthid in 2.4.26 to have the same
+> > hotkeys events?
+>
+> you own a german keyboard ;)
 
-> I find out, that l2ping pings from 200 not 0 - you remembered to include my 
-> minor fix
+Yes :) Microsoft don't sell it on our market and boarder is so near... :)
 
-I reverted it, because of this
+>
+> However I can't help you in that case, because I have little interest to
+> fix this. The HID parser that is used by the HIDP kernel module is the
+> same parser as in the USB HID driver.
 
-        /* Get next available identificator.
-         *    1 - 199 are used by kernel.
-         *  200 - 254 are used by utilities like l2ping, etc 
-         */
+I know, I looked at it to fix it, but it's silly. When I use table from bthid, 
+colona doesn't work as with bthid - as expected :) I'll have time to make 
+closer look after graduate...
 
-Regards
+> In some near future they will be 
+> joined to use the same generic parser. The parser in bthid was written
+> for the Microsoft keyboard and maybe did some assumptions that are wrong
+> for other keyboards.
 
-Marcel
+I have MS keyboard :)
 
+> Try to get the buttons work with current HIDP and 
+> some external programs like hotkeys.
 
+I described problem with hidp - with bthid only colona key doesn't work
+
+>
+> > hidd --killall wants atribute BDADDR
+>
+> Silly typo. I only tested "-K" and that was working. It is fixed in CVS
+> now.
+
+Nice :)
+
+I find out, that l2ping pings from 200 not 0 - you remembered to include my 
+minor fix
+
+>
+> Regards
+>
+> Marcel
+
+Michal
 
 
 -------------------------------------------------------
