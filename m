@@ -2,11 +2,13 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Michal Semler <cijoml@volny.cz>
 Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] colona key problem in 2.6 and bthid
+References: <200405102355.12055.cijoml@volny.cz> <1084243988.25099.5.camel@pegasus>
+In-Reply-To: <1084243988.25099.5.camel@pegasus>
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200405120030.54220.cijoml@volny.cz>
-Subject: [Bluez-users] hidp and hidd related bugs
+Message-Id: <200405112215.21743.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,27 +19,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 12 May 2004 00:30:54 +0200
+Date: Tue, 11 May 2004 22:15:21 +0200
+
+On Tuesday 11 of May 2004 04:53, Marcel Holtmann wrote:
+> Hi Michal,
+>
+> > under 2.6.6 doesn't work colona key - when pressed, non reply to console.
+> > 2.4.26 works fine with the same bthid
+>
+> I don't know why. Must be the input subsystem.
+>
+> Regards
+>
+> Marcel
 
 Hi Marcel,
 
-I did little research and here is output:
-
-keys which are not reported in xev:
-Eigene Dateien
-Eigene Bilder
-Eigene Musik
-Messenger
-Abmelden
-
-Reported badly
-Rechner is reported like Pause
-Standby like Print
-
-Do you want send keycodes which reports bthid in 2.4.26 to have the same 
-hotkeys events?
-
-hidd --killall wants atribute BDADDR 
+with hidd and hidp colona key works under 2.6.6 :)
+Those were probably some shadows on moon
 
 Michal
 
