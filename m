@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] RFCOMM connection
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY1-F35NpqhNPPzQT400022b78@hotmail.com>
-References: <BAY1-F35NpqhNPPzQT400022b78@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1100710701.7607.14.camel@pegasus>
+From: "blookk -" <blookk@hotmail.com>
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Message-ID: <BAY1-F35NpqhNPPzQT400022b78@hotmail.com>
+Subject: [Bluez-devel] RFCOMM connection
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,34 +16,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 17 Nov 2004 17:58:21 +0100
+Date: Wed, 17 Nov 2004 16:50:25 +0000
 
-Hi Carlos,
 
-> I am doing some pobes with RFCOMM.
-> 
-> Betwen two PC, the connection RFCOMM gives me a problem:
-> " Can't connect RFCOMM socket: Connection refused  ".
-> 
-> In server side i write:
-> rfcomm listen /dev/rfcomm0
-> 
-> In client side I write:
-> rfcomm connect /dev/rfcomm0 00:11:22:33:44:55  1
-> 
-> In both sides I load the modules rfcomm and l2cap and launch the demons sdpd 
-> and hcid.
-> 
-> I do not know why occurs this.  I think the pc do not accept connections, 
-> because i try the connection with a other module  is not a pc and all works 
-> correctly.
+Hello!
 
-run "hcidump -x" as root and you will see what happens.
+I am doing some pobes with RFCOMM.
+
+Betwen two PC, the connection RFCOMM gives me a problem:
+" Can't connect RFCOMM socket: Connection refused  ".
+
+In server side i write:
+rfcomm listen /dev/rfcomm0
+
+In client side I write:
+rfcomm connect /dev/rfcomm0 00:11:22:33:44:55  1
+
+In both sides I load the modules rfcomm and l2cap and launch the demons sdpd 
+and hcid.
+
+I do not know why occurs this.  I think the pc do not accept connections, 
+because i try the connection with a other module  is not a pc and all works 
+correctly.
 
 Regards
 
-Marcel
+Carlos.
 
+_________________________________________________________________
+La información más fresca desde diferentes puntos de vista en la Revista de 
+Prensa de MSN. http://es.newsbot.msn.com/
 
 
 
