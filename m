@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Pairing a keyboard
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041125064110.GA2505@frostnet.net>
-References: <20041125064110.GA2505@frostnet.net>
-Content-Type: text/plain
-Message-Id: <1101367010.7538.78.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41A580FF.7040906@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] xtrememac dropped bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,34 +16,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Nov 2004 08:16:49 +0100
+Date: Wed, 24 Nov 2004 23:51:43 -0700
 
-Hi Chris,
+Guys,
 
-> When trying to pair with an apple wireless keyboard, hcitool cc errors
-> "Can't create connection: Input/output error". I was hoping someone
-> might have a suggestion on what to look into.
+I only noticed recently that these xtrememac.com guys were promising a 
+class 1 device supporting a2dp (about a year ago!). They say they've 
+shelved the product. Too bad... I don't think there are any class 1 
+headsets (a2dp or no)
 
-who said that pairing works by calling "hcitool cc ..."? You should use
-the "hidd --connect ..." command instead.
+Class 1 headset(s) + asterisk pbx + voice-commands + streaming a2dp 
+audio would be an extrememly slick setup...
 
-> I'm kernel 2.6.9-mh4 and bluez 2.11 on an x86 with a D-Link DBT-120.
-> After starting hcid I run "hcitool cc <addr>" and get the error above.
-> I've included "hcidump -x"'s transcript at the bottom of this email.
-> bluepin does not work on my installation (pygtk seems broken), so I wrote
-> a script to echo "0000" to stdout. This may well be my problem? I do not know
-> if this is the format hcid is expecting or if it is the initial pin apple
-> sets. I did read that the mouse uses this pin, this is the only reason for
-> my choice. For my hcid.conf file, security is auto, pin_helper is set to this
-> script, and auth and encrypt are commented out.
-
-The bluepin script must echo "PIN:0000".
-
-Regards
-
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
