@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050218032831.77410.qmail@web60909.mail.yahoo.com>
-From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
-Subject: Re: [Bluez-users] rfcomm question 3
+From: Fred Schaettgen <bluez-user@schaettgen.de>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <4214CE86.3010701@gmx.ch>
+Subject: Re: [Bluez-users] local device class...
+References: <01LKX8B5H2GA00ECYA@beacon.nuigalway.ie>
+In-Reply-To: <01LKX8B5H2GA00ECYA@beacon.nuigalway.ie>
+Cc: Triona Ryan <triona.ryan@nuigalway.ie>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=big5
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200502172355.12550.bluez-user@schaettgen.de>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,102 +20,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 18 Feb 2005 11:28:30 +0800 (CST)
+Date: Thu, 17 Feb 2005 23:55:12 +0100
 
-Hi Marco!
-   I think it is a need to explain the whole things
-here so that you can understand.
-   My purpose of my project is to use bluetooth mobile
-devices (now are T610 and iPAQ 3970, where iPAQ is
-running on Windows CE 3.0) to act as remote control on
-IR devices (now is doing for AV devices such as TV,
-CD, VCD, DVD and VCR). The OS used is Linux, and the
-main programming language is C. At first, I connected
-PC to T610, and it successed and the remote control on
-AV devices using T610 was also successful. But my
-supervisor said that the approach should be that the
-PC act as server, so that the connection from
-bluetooth mobile device to PC is needed. Then I tried
-hard to find out how the T610 can connect to PC. Now
-T610 can search my PC and then add in the "My device"
-list. But when I looked at the "Service list", the
-"Local service cannot found" statement was shown.
-Then, my tutor said that sdp (service discovery
-protocol) is needed for T610. So, my work is now
-mainly on how to do for sdp so that the T610 can
-connect to PC. If this is successful, then the next
-thing that I have to do is to  connect the iPAQ
-running on Windows CE to the PC to access my main
-program that runs on Linux. 
-    Regarding to your questions and comments in the
-prevoius mail:
-1.>> My expect is to see if my phone can connect to
-mobile phone,
-  >I assume you mean if your phone can connect to the
-pc.
-  >How do you wanna see this? What behavior do you
-excactly expect?
-  Your assumption is correct, and then after I can see
-the address of T610, what I wish to see is the menu
-can be sent throught AT command to the phone and then
-try to do the remote control using T610.
-2.>> But unfortunately, nothing to see because I can't
-find an option   >>on T610 that can connect to PC even
-though I put the PC into "My >>device" list.
->As I said, you need to programm this yourself (and
-install it on your
->mobile phone)...
-   The main point is, as the menu for my program can
-be sent to T610 using AT command and the C main
-program on the Linux PC can get my choice from T610
-and then do the corresponding things, I wish to know
-why an extra program is needed to write and then
-install on my phone? And is there any contradiction
-with sdp?
-3. >how should I know what he needed the sdp for?
-Actually you should >explain us what he needed the sdp
-for.
-    The situation is when I connect from PC to T610,
-the "accessories" i.e. the menu that I wish to use is
-sent through AT command to the phone, and then I can
-use. When I check the "service list", I see "object
-push" in the list. But then when I change the
-connection approach that from T610 to PC, no service
-can be found in the "Service list". Then my tutor said
-the sdp is needed for T610 so that the service on the
-PC can be found and then the connection from T610 to
-PC can be done.
-    By the way, my tutor is Hong Kong people, and you
-may not know him.
-4.>>>you've to write a client program for that runs on
-the mobile >>>phone. if i remember right, the T610
-hasn't support for jsr82. I >>>don't know if you're
-able to do c programming on it and have access >>>to
-the bluetooth system. i use a nokia 6230, there you
-have mdip2.0 and jsr83. so it's no problem at all...
->>Thx for suggestion.
->that wasn't a suggestion. you have to do this!
-But the problem is, my project can only use T610 and
-iPAq at this instant, and the language used for this
-project is C. So, is there any other alternative that
-can do the thing same as that you said before?
+On Thursday 17 February 2005 20:42, Triona Ryan wrote:
+> Ok, I seem to be very much ignored.
+>
+> Thanks very much
 
-    Here are the things that I concern now:
-1. How to do for sdp so that the mobile devices can
-connect to PC (and the main point is, this can be done
-when I run my main program)
-2. As my iPAq is running on Windows CE and the program
-used on it will be written in Visual eMbedded C++, but
-AT command is used for T610, so how can I solve this
-"contradiction" and that the choice from my iPAQ can
-be known by my main program?
-    I do hope that you can understand what I face now.
-Thank you very much.
-Michael
+You're welcome :P
+Maybe you're waiting so long (about 9 hours already!) for an answer because 
+those misplaced wh itespace and linebreaks scared the readers? Or it's just 
+because no one tried hard enough to figure out what you tried to achieve by 
+doing what.
+So in short: you want to send files to another PC and it's not working, right? 
+Do you have an obex server running? Which one? Did it register with the SDP 
+server (hint: sdptool --help)? The device class has very little to do with 
+that. 
 
-_______________________________________________________________________
-新年願望第一位 : 找到友緣人
-http://personals.yahoo.com.hk
+> However, IF there's any
+> one out there using this list EXCEPT for one on-going thread, could someone
+> plea se check their hciconfig -a and see if their device class matches
+> their services . I'm using college lab computers, and I installed BT on one
+
+The device class is not meant to match all your services. 
+That's what the sdp server is for.
+
+..
+> computer a few week s ago, and it gave me 0x100 as device class, but last
+> week I installed all on an other computer, and I got 0x3e0100. They're ALL
+> linked to the SAME lan, and SAME computers etc. I changed the first
+> computer to ox100100, to set Object Transfer , which immediately worked,
+> but the other one is set already and isn't registeri ng the service. Why
+
+"Is set already"? Set the device class to 0x100100? What makes you think it 
+isn't registering the service? Did you actually check the sdp server or are 
+you talking about the device class?
+
+Fred
+
+-- 
+Fred Schaettgen
+bluez-devel@schaettgen.de
 
 
 -------------------------------------------------------
