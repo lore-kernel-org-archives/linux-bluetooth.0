@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <001a01c500fc$a37ffdc0$a14c12ac@stu.nus.edu.sg>
-From: "Khoo Teck Ping" <eng10166@nus.edu.sg>
-To: <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0015_01C5013F.AD589BC0"
-Subject: [Bluez-devel] Question about the command hcitool -i hci0 cmd <ogf><ocf>
+To: bluez-devel@lists.sourceforge.net
+From: Paul Ionescu <i_p_a_u_l@yahoo.com>
+Message-ID: <pan.2005.01.22.19.24.42.369346@yahoo.com>
+References: <41F0EB0A.1020302@webstuhl.net> <41F0FE84.8030401@dark-reality.de> <41F128F4.2020006@webstuhl.net> <41F13638.1080207@dark-reality.de> <41F25C4B.6040709@webstuhl.net> <pan.2005.01.22.15.35.18.929419@yahoo.com> <41F290CB.9010504@webstuhl.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-devel] Re: Re: Again: Problems with Dongle, Headset or btsco
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,50 +17,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 23 Jan 2005 11:35:45 +0800
+Date: Sat, 22 Jan 2005 21:24:43 +0200
 
-This is a multi-part message in MIME format.
+On Sat, 22 Jan 2005 18:43:39 +0100, Ben Pezzei wrote:
 
-------=_NextPart_000_0015_01C5013F.AD589BC0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+> Hi ,
+> 
+> Paul Ionescu schrieb:
+> 
+>> How do you know the dongle can't be re-initialized ? What does it say
+>> when you launch again btsco ?
+> 
+> After disconnecting via Headset (press Button) and connecting again the
+> btsco looks like:
+>    disconnected SCO channel
+>    recieved AT+CKPD=200
+>    opened hwdep
+>    Can't connect SCO audio channel
+>    : Connection timed out
 
-Dear All
+you can try to disconnect btsco (with ^C)
+verify with
+hcitool con
+that you don't have any connections still active after you disconnect
+btsco, (if they are, delete them with hictool dc MAC_OF_HEADSET)
+and then try again to connect with btsco.
 
-Regarding the command hcitool -i hci0 cmd <ogf><ocf>, may I know if =
-there exists a full listing of all possible hex numbers for <ogf><ocf> =
-and their corresponding functions?
+I had this problem and I solved this way.
 
-Thank You.
+> Same when exiting ctrl+c btsco and start it again
+> 
+>> I was able to use gnomemeeting, mplayer and other programs that use alsa
+>> or oss.
+>> For mplayer I used -ao alsa:device=hw=Headset -srate 8000 -channels 1
+> 
+> no X installed ;(
 
-Teck Ping
-------=_NextPart_000_0015_01C5013F.AD589BC0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+You don't need X for mplayer
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2900.2523" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial>Dear All</FONT></DIV>
-<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial>Regarding the command hcitool -i hci0 cmd=20
-&lt;ogf&gt;&lt;ocf&gt;, may I know if there exists a full listing of all =
-
-possible hex numbers for &lt;ogf&gt;&lt;ocf&gt; and their corresponding=20
-functions?</FONT></DIV>
-<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial>Thank You.</FONT></DIV>
-<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial>Teck Ping</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0015_01C5013F.AD589BC0--
 
 
 
