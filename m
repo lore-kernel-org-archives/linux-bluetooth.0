@@ -1,10 +1,20 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41A22C0B.4050008@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] audio problems with a2play
+Subject: Re: [Bluez-devel] AVDTP socket?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20041122053213.2685bedd.henryk@ploetzli.ch>
+References: <418DB442.2050801@uen.org> <41925793.3050404@xmission.com>
+	 <1100113055.25879.73.camel@pegasus> <419543B3.8050601@xmission.com>
+	 <1100306337.7349.29.camel@pegasus> <41957BC1.507@xmission.com>
+	 <1100351199.7349.50.camel@pegasus> <41970F25.4020902@xmission.com>
+	 <1100446172.21403.16.camel@pegasus> <419B7292.9080706@xmission.com>
+	 <cbf0aec9041118052714481128@mail.gmail.com>
+	 <20041121064655.0b04dd8a.henryk@ploetzli.ch>
+	 <1101059050.7250.39.camel@pegasus> <1101093515.7250.97.camel@pegasus>
+	 <20041122053213.2685bedd.henryk@ploetzli.ch>
+Content-Type: text/plain
+Message-Id: <1101130102.15086.9.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,34 +26,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 22 Nov 2004 11:12:27 -0700
+Date: Mon, 22 Nov 2004 14:28:22 +0100
 
-Guys
+Hi Henryk,
 
-The iPhono stopped producing recognizable sound using a2play a few days 
-ago... but even the most successful transfers with a2play have been 
-mixed with static.
+> > With the latest code you still overwrite the stack at some point,
+> > because the pcm_sample[][] array is only 2x128 and you return 2x256
+> > samples from sbc_synthesize_audio() function.
+> 
+> Ahh, thanks. I broke it when I moved the superfluous (I thought)
+> assignment of current_sample=0 out of the channel for loop. Should work
+> now again.
+> 
+> > I also started to write a simple SBC play program using the libao. It
+> > works actually quite good linking your sbc.o file, but unfortunately
+> > with 2 channel files the left channel is silent.
+> 
+> If that was a result of the abovementioned bug it should work now again.
 
-I'm convinced we need a media payload header. Page 23 of the A2DP spec 
-shows how the media payload header should look.
+yes. Everything works now like it should.
 
-I tried changing a2play to send media_payload_header instead of 
-sbc_frame_header and I got "quiet" noise when I did that. I tried 
-various frame counts with no luck.
+> > We should start a new thread and discuss a SBC library.
+> 
+> Sure. I should have the bitstream packer working sometime soon and will
+> then post again.
 
-I need to get a better idea of what is going on...
+I re-arranged some stuff in the CVS again and the sbc directory is now
+also using autoconf/automake. However the sbc.h is now sbc_internal.h
+and the new sbc.h is the header file of the new SBC library. The sbcdec
+program is using libao to play the SBC file on your soundcard. However
+the libao library can also write the data to a file in AU or WAV format,
+but this is not implemented at the moment.
 
-* which frame exactly is a2play's calc_frame_length measuring? Is it the 
-same "sbc frame" that they're talking about in a2dp p.24?
+Can't wait to write the sbcenc program. Keep on with the good work.
 
-* how did you decide to put 2 0xff bytes in the CSRC section of the 
-media packet header? Why isn't this CSRC a multiple of 4 bytes like the 
-spec suggests on avdtp p. 46?
+And we need to add a clear license statement to the source files. I like
+to put the SBC library under LGPL and the programs under GPL. Is this
+fine with you?
 
-* what is the CSRC? (spec says "The CSRC list identifies the 
-contributing sources for the payload contained in this packet")
+Regards
 
-Brad
+Marcel
+
+
 
 
 -------------------------------------------------------
