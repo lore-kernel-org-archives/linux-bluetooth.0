@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Gaufer <Andreas.Gaufer@blue-cell-networks.com>
-To: tim@birdsnest.maths.tcd.ie
-Cc: bluez-users@lists.sourceforge.net
+From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
+Reply-To: tim@birdsnest.maths.tcd.ie
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Problems connecting to Nokia 6310I phone.
-Message-Id: <20040531061149.3d168e0d.Andreas.Gaufer@blue-cell-networks.com>
-In-Reply-To: <200405310213.25767.tim@birdsnest.maths.tcd.ie>
 References: <Pine.LNX.4.58.0405302214280.8012@sebagqbbe.gwsvfure.pb.hx>
-	<200405310213.25767.tim@birdsnest.maths.tcd.ie>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <Pine.LNX.4.58.0405302214280.8012@sebagqbbe.gwsvfure.pb.hx>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200405310213.25767.tim@birdsnest.maths.tcd.ie>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,29 +19,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 May 2004 06:11:49 +0200
+Date: Mon, 31 May 2004 02:13:25 +0100
 
-On Mon, 31 May 2004 02:13:25 +0100
-Timothy Murphy <tim@birdsnest.maths.tcd.ie> wrote:
+On Sunday 30 May 2004 22:25, Toby Fisher wrote:
 
-> On Sunday 30 May 2004 22:25, Toby Fisher wrote:
-> 
-> > Oh yes, and one final thing, rfcomm -a gives no output, despite the fact
-> > that I created rfcomm0 and it seems to work,
-> 
-> Did you say "rfcomm bind 0 <phoneBTaddress> 1" first?
-> 
-To my understanding you dont have to bind a /dev/rfcommX to connect. Using bind
-means that you "prepare" that /dev/rfcommX to connect to the peer when someone uses
-the /dev/rfcommX. If you use the rfcomm connect /dev/rfcommX <bd-adress> <channel> 
-this connection will be made instantly and will be closed after ctrl-c or 
-dissconect of the peer.
-The channel number must be the number of the channel on the phone you want to connect.
-To find the channelnumber of a profile use sdptool and its browse or serach command.
+> I'm using kernel 2.6.6RC1, and I almost have the connecting working with
+> Gnokii to the phone.  However, there are some weird things going on which
+> lead me to belioeve that something is wrong.
+>
+> I can, using rfcomm, get a connection to the phone, however tearing it
+> down has strange results:
+> 1.  Once the connection is down, I can no longer ping the phone using
+> l2ping, though hcitool scan and info still work.
 
-Greetings
+Do you have 
+# CONFIG_BT_HCIUSB_SCO is not set
+in .config (or /proc/config.gz) ?
+On my machine (a Sony C1VFK Picturebook)
+I had more or less your problems when this was set.
 
-Andy
+> 2.  The command rfcomm release rfcomm0 yields a device not found error,
+> whereas the binding works without error.
+
+I give the command "rfcomm release 0".
+But if "rfcomm -a" says nothing,
+I would have doubts if binding did work.
+
+> Oh yes, and one final thing, rfcomm -a gives no output, despite the fact
+> that I created rfcomm0 and it seems to work,
+
+Did you say "rfcomm bind 0 <phoneBTaddress> 1" first?
+
+
+
+-- 
+Timothy Murphy  
+e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
+tel: +353-86-2336090, +353-1-2842366
+s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
 
 
 -------------------------------------------------------
