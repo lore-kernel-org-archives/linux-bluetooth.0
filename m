@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Riku Voipio <riku.voipio@iki.fi>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20040501171104.GA3539@kos.to>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Pairing problems(?)
+From: Matias Pablo Brutti <matiasbrutti@ciudad.com.ar>
+Reply-To: matiasbrutti@ciudad.com.ar
+To: "Nicholas A. Preyss" <nalp@gmx.net>, bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Problem with Logitech MX 900 and Apple keyboard
+References: <200404282247.31825.matiasbrutti@ciudad.com.ar> <200404300024.51331.matiasbrutti@ciudad.com.ar> <20040430120109.GA30493@gmx.net>
+In-Reply-To: <20040430120109.GA30493@gmx.net>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <200405011203.43498.matiasbrutti@ciudad.com.ar>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,110 +19,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 1 May 2004 20:11:04 +0300
+Date: Sat, 1 May 2004 12:03:33 -0300
 
-Hi,
-
-I'm having problems pairin and hci_usb device and siemens s55 mobile
-phone..  Everything seems to work fine, the mobile asks for pin, but
-the actual connections time out.
-
- nchip@wombat:~$ hcitool scan
- Scanning ...
-	00:01:E3:xx:xx:xx       Satu87
-
- nchip@wombat:~$ sdptool search --bdaddr 00:01:E3:xx:xx:xx DUN
- Failed to connect to SDP server on 00:01:E3:xx:xx:xx: Connection timed out
-
-Thats when the phone asks for pin, and I enter the same one as in the
-givepin script I wrote.
-
-< HCI Command: Create Connection(0x01|0x0005) plen 13
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Link Key Request(0x17) plen 6
-< HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
-> HCI Event: Command Complete(0x0e) plen 10
-> HCI Event: PIN Code Request(0x16) plen 6
-< HCI Command: PIN Code Request Reply(0x01|0x000d) plen 23
-> HCI Event: Command Complete(0x0e) plen 10
-> HCI Event: Link Key Notification(0x18) plen 23
-> HCI Event: Connect Complete(0x03) plen 11
-< ACL data: handle 0x002a flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-< HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
-> HCI Event: Command Complete(0x0e) plen 6
-> HCI Event: Max Slots Change(0x1b) plen 3
-(here is a long wait)
-> HCI Event: Mode Change(0x14) plen 6
-< HCI Command: Disconnect(0x01|0x0006) plen 3
-> HCI Event: Command Status(0x0f) plen 4
-> HCI Event: Disconn Complete(0x05) plen 4
-
-After the connection ends, the phone asks if it should add womba-0 to
-known devices. even atfer adding to known devices, connections fail.
-Trying to connect or send stuff from phone to bluez causes just an
-internal bluetooth error.
-
-I tried with and without auth/encrypt. Can anyone hint with me what I am
-doing wrong?
-
-rfcomm fails too:
-
-  $ rfcomm
-  rfcomm0: 00:01:E3:xx:xx:xx channel 1 clean
-  $ rfcomm connect 0
-  Can't connect RFCOMM socket: Resource temporarily unavailable
-
-hcid.conf:
-
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        pin_helper /etc/bluetooth/givepin;
-}
-device {
-        name "%h-%d";
-        class 0x100;
-        iscan enable; pscan enable;
-        lm accept;
-        lp hold,sniff,park;
-        auth enable;
-        encrypt enable;
-}
-
-givepin:
-
-#!/bin/sh
-echo "PIN:1234"
-
-Linux wombat 2.6.6-rc1 #1 Wed Apr 21 03:05:54 EEST 2004 i686 GNU/Linux
-
-hciconfig -a
-
-hci0:   Type: USB
-        BD Address: 00:20:E0:74:49:2C ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-        RX bytes:9239 acl:4 sco:0 events:675 errors:0
-        TX bytes:6880 acl:58 sco:0 commands:371 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DH1 HV1
-        Link policy: HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'wombat-0'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x222 LMP Ver: 1.1 (0x1) LMP Subver: 0x222
-        Manufacturer: Cambridge Silicon Radio (10)
+=2D----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
 
+Dear Nicholas :=20
 
--- 
-Riku Voipio  	       | riku.voipio at iki.fi         |
-kirkkonummentie 33     |    +358 44 5000343          --+--
-02140 Espoo            |                               |
-dark> A bad analogy is like leaky screwdriver          |
+	Sorry to bother you again ... I managed to get it recognice the mouse and =
+the=20
+keyboard .. and everythings looks .. pretty now ... I can see both .. devic=
+es=20
+and their address . the problem starts when I try to connect .. with=20
+bthid ... deamon ...  bthid -c <addrs> and ... it ask for a pin number .. a=
+nd=20
+never gets connected to the devices .. in the logs .. says ... " connection=
+=20
+failed" or permissiion denied" ... I managed to get them to actually be see=
+n=20
+but now they do not work ;) thats funny ji ji i j.......=20
+
+Well .. hopefully your or someone that reads this will be able to figure ou=
+t=20
+some posible problem .. =20
+
+one more thing .... if I try to execute the bthid  by Peter Klausler ....=20
+still prints out in the logs that Can' find uimput devide .. and I have it=
+=20
+on .. /dev/misc/uinput .. that is another .. big ???? for me ..=20
+
+
+well .. thanks for everything .. until now .. you have been really hepful .=
+=2E.=20
+really apreciate it ..=20
+
+
+Matias P. Brutti=20
+=2D----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iQEVAwUBQJO8SWXJj+mzTB70AQJmXgf/SsdBoYCscfghjOO1CCMsFPH26LpfKnNM
+k9JlcrWQrmVl1IuSKwRr0r0LbaOzQcQUj9fADt/qiVoT/r3KzpQYW6YhV7vK7Ng/
+8UI6iHj6y7jvweLNYZlgSwIcxMw/UjFT0G3fgakdsx6t6Ta4O5o3tXGKryzItx0b
+G7yJW8zJPzv5+qbMRcH0A9JMcgUy0KHvOvCWZb5OPd4V3T4my4gwHlLvYdkgDDGy
+cVYs3uST7fvNCBk4dTd+nRxYKvT3VfyyI8S8f4AEjTbOI2unqjq+7jLxzFUJ8PnE
+D+whWs8X3nglRGuG7riuZl2DHVPb3fr+KQBAB6QGOYqHOSCElMC9/A=3D=3D
+=3DTUzh
+=2D----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
