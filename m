@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040228140120.70051.qmail@web20727.mail.yahoo.com>
-From: Gigie Lertriniva <gigie_lertriniva@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] hciemu pb: can't set scan mode
+Subject: Re: [Bluez-users] hotplug USB dongle problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pavel Ruzicka <pavouk@pavouk.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200402281424.55149.pavouk@pavouk.org>
+References: <200402281424.55149.pavouk@pavouk.org>
+Content-Type: text/plain
+Message-Id: <1077976353.2843.82.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,25 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 28 Feb 2004 06:01:20 -0800 (PST)
+Date: Sat, 28 Feb 2004 14:52:33 +0100
 
-Hi,
+Hi Pavel,
 
-I created a fake Bluetooth device on my PC using
-hciemu. I can see it with hciconfig, get its status to
-"UP and RUNNING" but I fail to put it to PSCAN:
+> I have configured Mandrake9.2 desktop with USB dongle.
+> I have kernel 2.6.2
+> When system is started, script /etc/rc.d/init.d/bluetooth
+> is executed and runs "hcid" and "sdpd". It's probably OK
+> 
+> When I plug in USB dongle, I want to run "pand --listen --role NAP".
+> I made /etc/hotplug/bluetooth.agent script, which is executed by hotplug 
+> mechanism after inserting bluetooth dongle.
+> bluetooth.agent:
 
-bash-2.05b# hciconfig hci1 pscan
-Can't set scan mode on hci1. Invalid request code(56)
+don't start pand from bluetooth.agent script. Start it from the init
+script.
 
-What could be a reason for this problem?
+Regards
 
-Gigie
+Marcel
 
-__________________________________
-Do you Yahoo!?
-Get better spam protection with Yahoo! Mail.
-http://antispam.yahoo.com/tools
+
 
 
 -------------------------------------------------------
