@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Peter Wippich <pewi@gw-instruments.de>
+To: "Bluez-Devel (E-mail)" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Question about role switch
+In-Reply-To: <A1F0D47583A2D711919F00600819B3A45BDE4E@goofy.vitronics.com>
+Message-ID: <Pine.LNX.4.33.0412151538050.2124-100000@redbean.intranet.gw-instruments.de>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: RE: [Bluez-devel] Question about role switch
-Message-ID: <A1F0D47583A2D711919F00600819B3A45BDE4F@goofy.vitronics.com>
-From: "Williams, Richard" <Richard.Williams@VITRONICS.com>
-To: <bluez-devel@lists.sourceforge.net>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,74 +17,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 15 Dec 2004 09:57:51 -0500
-
-Hello Peter,
-
->>>>>>>>This is my X-scale embedded system
-[System 1]$hciconfig -a
-hci0:   Type: UART
-        BD Address: 00:A0:96:08:E7:86 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:1842 acl:20 sco:0 events:93 errors:0
-        TX bytes:1415 acl:19 sco:0 commands:41 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ (0)'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver: =
-0x175
-        Manufacturer: Cambridge Silicon Radio (10)
-                              =20
->>>>>>>> This is my Linux PC.=20
->>>>>>>> I have the same USB dongle in the Linux and Windows PCs
-[System 2]# /sbin/hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:02:72:40:3F:C2 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:135 acl:0 sco:0 events:19 errors:0
-        TX bytes:569 acl:0 sco:0 commands:18 errors:0
-        Features: 0xff 0xff 0x0f 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'Linux_Rich'
-        Class: 0x700408
-        Service Classes: Object Transfer, Audio, Telephony
-        Device Class: Audio/Video, Hands-free
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: =
-0x20d
-        Manufacturer: Cambridge Silicon Radio (10)
-
-
-Thanks very much,
-
-Rich Williams
-
-
-                                                                 =20
-
------Original Message-----
-From: Peter Wippich [mailto:pewi@gw-instruments.de]
-Sent: Wednesday, December 15, 2004 9:42 AM
-To: Bluez-Devel (E-mail)
-Subject: Re: [Bluez-devel] Question about role switch
-
+Date: Wed, 15 Dec 2004 15:41:31 +0100 (CET)
 
 
 Hi Richard,
 
 what Baseband Hardware are you using on your systems ? What Firmware
 Version in case you are using CSR baseband ? Newer CSR Firmware supports
-limited scatternet (1 Master even if Slave in a Pico Net), older =
-firmware
+limited scatternet (1 Master even if Slave in a Pico Net), older firmware
 doesn't support this. So if the Hardware on your Windows PC supports
-limitted Scatternet and the other hardware does not, this may exlain =
-what
+limitted Scatternet and the other hardware does not, this may exlain what
 you observe.
 
 Ciao,
@@ -97,21 +39,13 @@ On Wed, 15 Dec 2004, Williams, Richard wrote:
 > Hello Marcel,
 >
 > I have three systems:
-> 1. an Intel X-scale single board computer, Linux 2-4-20 with latest =
-bluez patches
+> 1. an Intel X-scale single board computer, Linux 2-4-20 with latest bluez patches
 > 2. a desktop PC, Linux 2.4.20 with latest bluez patches.
 > 3. Windows 2000 PC
 >
-> I have the bluez stack running on system 1, and I'm able to scan it, =
-connect to it and run higher level protocols such as obex and pan. As I =
-add more features to system 1, I find that some other commands from =
-system 2 no longer work. For example, I start pand running on system 1 =
-as the master, I am unable to do an hcitool info from system 2 towards =
-system 1. I'm suspecting that after I start pand --master, system 1 is =
-not performing the role switch from master to slave ????
+> I have the bluez stack running on system 1, and I'm able to scan it, connect to it and run higher level protocols such as obex and pan. As I add more features to system 1, I find that some other commands from system 2 no longer work. For example, I start pand running on system 1 as the master, I am unable to do an hcitool info from system 2 towards system 1. I'm suspecting that after I start pand --master, system 1 is not performing the role switch from master to slave ????
 >
-> But look at later in the dump, the Windows system is able to connect =
-just fine.
+> But look at later in the dump, the Windows system is able to connect just fine.
 >
 > Any ideas ??
 >
@@ -121,9 +55,7 @@ just fine.
 >
 > Rich Williams
 >
-> =
--------------------------------------------------------------------------=
--------------------
+> --------------------------------------------------------------------------------------------
 > Here's the hcidump's from system 1, as I add each new protocol:
 >
 >
@@ -168,8 +100,7 @@ just fine.
 > > HCI Event: Disconn Complete (0x05) plen 4
 >
 >
-> >>>>>>>On system 1, I start sdpd, then do an hcitool info =
-00:A0:96:08:E7:86
+> >>>>>>>On system 1, I start sdpd, then do an hcitool info 00:A0:96:08:E7:86
 > >>>>>>>from system 2 and this works OK:
 > [System 1]$sdpd
 > [System 1]$hcidump
@@ -190,8 +121,7 @@ just fine.
 >
 >
 >
-> >>>>>>>On system 1, I start opd, then do an hcitool info =
-00:A0:96:08:E7:86
+> >>>>>>>On system 1, I start opd, then do an hcitool info 00:A0:96:08:E7:86
 > >>>>>>>from system 2 and this works OK:
 >
 > [System 1]$opd --daemonize --sdp --channel 10 --path /mnt/cf/images
@@ -214,8 +144,7 @@ just fine.
 >
 >
 >
-> >>>>>>>On system 1, I start pand, then do an hcitool info =
-00:A0:96:08:E7:86
+> >>>>>>>On system 1, I start pand, then do an hcitool info 00:A0:96:08:E7:86
 > >>>>>>>from system 2 and this always fails:
 >
 > [System 1]$pand --listen --master --role NAP
@@ -227,15 +156,12 @@ just fine.
 > > HCI Event: Command Status (0x0f) plen 4
 > > HCI Event: Connect Complete (0x03) plen 11
 >
->                                                                        =
-     $
+>                                                                             $
 > [System 1]$
 >
 > >>>>>>> Windows dump <<<<<<<<<
-> >>>>>>>From system 3 - the Windows system, I use the Bluetooth Wizard =
-to examine
-> >>>>>>>system 1, and this works OK. Of course, I don't have access to =
-what's
+> >>>>>>>From system 3 - the Windows system, I use the Bluetooth Wizard to examine
+> >>>>>>>system 1, and this works OK. Of course, I don't have access to what's
 > >>>>>>>actually going on inside the Windows system
 >
 > [System 1]$hcidump
@@ -300,8 +226,7 @@ what's
 >         Class: 0x000100
 >         Service Classes: Unspecified
 >         Device Class: Computer, Uncategorized
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP =
-Subver: 0x175
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x175 LMP Ver: 1.1 (0x1) LMP Subver: 0x175
 >         Manufacturer: Cambridge Silicon Radio (10)
 >
 > [System 1]$ps
@@ -325,8 +250,7 @@ Subver: 0x175
 >   179 root       1244 S    /flash/bin/button -p 178
 >   185 root       1204 S    hcid: processing events
 >   190 root       1240 S    sdpd
->   195 root       1308 S    opd: waiting for incomming OBEX connections =
-on chann
+>   195 root       1308 S    opd: waiting for incomming OBEX connections on chann
 >   198 root       1240 S    /sbin/pand --listen --master --role NAP
 >   202 root       1504 R    ps
 > [System 1]$
@@ -345,14 +269,10 @@ on chann
 >         LMP Version: 1.1 (0x1) LMP Subversion: 0x175
 >         Manufacturer: Cambridge Silicon Radio (10)
 >         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->                 <3-slot packets> <5-slot packets> <encryption> <slot =
-offset>
->                 <timing accuracy> <role switch> <hold mode> <sniff =
-mode>
->                 <park state> <RSSI> <channel quality> <SCO link> <HV2 =
-packets>
->                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging =
-scheme>
+>                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
+>                 <timing accuracy> <role switch> <hold mode> <sniff mode>
+>                 <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+>                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
 >                 <power control> <transparent SCO>
 >
 >
@@ -364,14 +284,10 @@ scheme>
 >         LMP Version: 1.1 (0x1) LMP Subversion: 0x175
 >         Manufacturer: Cambridge Silicon Radio (10)
 >         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->                 <3-slot packets> <5-slot packets> <encryption> <slot =
-offset>
->                 <timing accuracy> <role switch> <hold mode> <sniff =
-mode>
->                 <park state> <RSSI> <channel quality> <SCO link> <HV2 =
-packets>
->                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging =
-scheme>
+>                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
+>                 <timing accuracy> <role switch> <hold mode> <sniff mode>
+>                 <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+>                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
 >                 <power control> <transparent SCO>
 >
 >
@@ -383,14 +299,10 @@ scheme>
 >         LMP Version: 1.1 (0x1) LMP Subversion: 0x175
 >         Manufacturer: Cambridge Silicon Radio (10)
 >         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->                 <3-slot packets> <5-slot packets> <encryption> <slot =
-offset>
->                 <timing accuracy> <role switch> <hold mode> <sniff =
-mode>
->                 <park state> <RSSI> <channel quality> <SCO link> <HV2 =
-packets>
->                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging =
-scheme>
+>                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
+>                 <timing accuracy> <role switch> <hold mode> <sniff mode>
+>                 <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+>                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
 >                 <power control> <transparent SCO>
 > [System 2]#
 >
@@ -426,17 +338,6 @@ scheme>
 |	D-13355 Berlin  / Germany					|
 
 
-
-
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.=20
-http://productguide.itmanagersjournal.com/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
