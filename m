@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: "Nicholas A. Preyss" <nalp@gmx.net>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] to build a bluetooth stack that can be embedded
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Pranab Shenoy <pranab_shenoy@yahoo.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040701074257.94807.qmail@web20501.mail.yahoo.com>
+Message-ID: <20040701093728.GA4505@gmx.net>
 References: <20040701074257.94807.qmail@web20501.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1088690625.4540.228.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20040701074257.94807.qmail@web20501.mail.yahoo.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,24 +17,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 01 Jul 2004 16:03:45 +0200
+Date: Thu, 1 Jul 2004 11:37:28 +0200
 
-Hi Pranab,
-
->  We want to build a bluetooth stack that can be embedded in a smart
+On  0, Pranab Shenoy <pranab_shenoy@yahoo.com> wrote:
+> We want to build a bluetooth stack that can be embedded in a smart 
 > device. We wanna know if its possible, if not why and if yes can we
 > build from the existing stack.
 
-Linux is already working in many embedded or smart devices and the BlueZ
-Bluetooth stack is known to work perfect on different hardware platform.
-So I don't see any need write an own Bluetooth stack, but of course you
-are free to do it.
+Yes, Yes (if you follow the terms of the GPL)
 
-Regards
-
-Marcel
-
-
+nicholas
 
 
 -------------------------------------------------------
