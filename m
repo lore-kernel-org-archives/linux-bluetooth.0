@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alberto Garcia Hierro <tcpdevil@linuxlover.org>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Can't get BT working on an iBook G4
-References: <200408140030.10263.tcpdevil@linuxlover.org> <200408140048.14641.cijoml@volny.cz>
-In-Reply-To: <200408140048.14641.cijoml@volny.cz>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200408140140.08096.tcpdevil@linuxlover.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alberto Garcia Hierro <tcpdevil@linuxlover.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200408140030.10263.tcpdevil@linuxlover.org>
+References: <200408140030.10263.tcpdevil@linuxlover.org>
+Content-Type: text/plain
+Message-Id: <1092439865.4501.68.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,36 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 14 Aug 2004 01:40:07 +0200
+Date: Sat, 14 Aug 2004 01:31:05 +0200
 
-El S=E1bado, 14 de Agosto de 2004 00:48, Bc. Michal Semler escribi=F3:
-> Possibly you need activate device with hid2hci tool
->
-> Michal
+Hi Alberto,
 
+> 	I'm trying to setup BT on my iBook G4 (builtin BT), but i can't. As far as I 
+> know, it's a usb device, so i modprobe hci_usb. Then, i tryed with hcitool, 
+> but it doesn't show any device:
 
-Thanks a lot, it's working fine now:
+show us the content of /proc/bus/usb/devices and we can tell you more.
 
+Regards
 
-americana ~ $ hid2hci -0
-Switching device 05ac:1000 to HCI mode was successful
-americana ~ $ hciconfig
-hci0:   Type: USB
-        BD Address: 00:0D:93:03:63:8E ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:107 acl:0 sco:0 events:14 errors:0
-        TX bytes:300 acl:0 sco:0 commands:13 errors:0
+Marcel
 
 
-	By the way, is this mentioned in the docs at www.bluez.org? I couldn't  fi=
-nd=20
-any reference to hid2hci. Anyway, I would like to know something more about=
-=20
-hid2hci. Coul you point to somewhere with docs about it?=20
-=09
-=2D-=20
-Regards,
-/* Alberto Garc=EDa Hierro (Skyhusker) */
 
 
 -------------------------------------------------------
