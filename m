@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] /usr/include/bluetooth/bnep.h
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Edd Dumbill <edd@usefulinc.com>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1083862669.16650.28.camel@saag>
+In-Reply-To: <200405070028.06843.cijoml@volny.cz>
 References: <1083857533.16650.25.camel@saag>
-	 <1083862218.4420.62.camel@pegasus>  <1083862669.16650.28.camel@saag>
+	 <200405062127.11184.cijoml@volny.cz> <1083877306.4420.72.camel@pegasus>
+	 <200405070028.06843.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1083919105.4420.115.camel@pegasus>
+Message-Id: <1083918493.4420.109.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,27 +20,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 07 May 2004 10:38:25 +0200
+Date: Fri, 07 May 2004 10:28:14 +0200
 
-Hi Edd,
+Hi Michal,
 
-> > I will also deprecate bluez-pan and move dund and pand into the
-> > bluez-utils package. You can expect the bluez-utils-2.7 this weekend.
-> 
-> Just when I thought my life was getting simpler :-)
+> can you write more info about this module? What will it take care of?
+> Only Human Interface Device Protocol? And hidd will serve events to it to 
+> decode them instead of doing it by hidd?
 
-sorry for that, but actually your life (like mine) will be much easier
-after the 2.7 release. You only have to decide how many packages you are
-going to build from the bluez-utils source. However with that release we
-have one init script (please name it /etc/init.d/bluetooth) that will do
-the complete start and stop of all Bluetooth daemons if they are
-activated.
-
-> btw, the section number in the l2ping and hciconfig man pages now
-> mismatches the suffix of the man pages. should be 8 rather than 1 if I
-> remember correctly.
-
-The l2ping was already corrected and I fixed hciconfig now. Thanks.
+the hidp kernel module is designed to implement only HIDP. It works
+mostly the same way as BNEP and CMTP, but it needs a lot more
+information from the SDP database of the remote device. Thus the
+structures had to evolve over time and now I think I found the perfect
+match on what the kernel has to know and what not. You can look at the
+hidp_connadd_req struct in libs/include/hidp.h and see what I mean. The
+problem of hidd at the moment is that it only fills in the sockets and
+the report descriptor data. Once hidd had given the connection to the
+hidp module everything else is done inside the kernel. This means that
+you can even stop and restart hidd without losing your input device.
 
 Regards
 
