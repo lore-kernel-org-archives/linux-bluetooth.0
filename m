@@ -2,9 +2,9 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Gene Imes <ebi7@ozob.net>
 To: list bluez <bluez-users@lists.sf.net>
 Content-Type: text/plain
-Message-Id: <1087081230.21739.7.camel@tr1a.ozob.net>
+Message-Id: <1087080981.21738.3.camel@tr1a.ozob.net>
 Mime-Version: 1.0
-Subject: [Bluez-users] more bluepin
+Subject: [Bluez-users] bluepin
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,22 +15,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 12 Jun 2004 18:00:30 -0500
+Date: Sat, 12 Jun 2004 17:56:21 -0500
 
-When I try to send a file from a windows box to my linux a dialog box
-appears on the windows box and the pairing is rejected by the linux box.
+Sorry about that. I inadvertantly tacked this to another thread. My
+apologies.
 
-In the log:
+Anyone know how to fix this:
 
-Jun 12 15:25:29 [hcid] pin_code_request (sba=08:00:46:CC:91:76,
-dba=00:0D:88:C0:3E:DB)_
-Jun 12 15:25:29 [hcid] PIN helper exited abnormally with code 256
-
-This may be related to my previous post.
+gene@tr1a:~> bluepin
+Xlib: connection to ":0.0" refused by server
+Xlib: No protocol specified
+ 
+Traceback (most recent call last):
+  File "/usr/bin/bluepin", line 39, in ?
+    import gtk
+  File "/usr/lib/python2.3/site-packages/gtk-2.0/gtk/__init__.py", line
+43, in ?    from _gtk import *
+RuntimeError: could not open display
 
 Thanks,
 
 Gene
+
+
 
 
 
