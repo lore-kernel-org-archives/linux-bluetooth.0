@@ -1,35 +1,64 @@
-Return-Path: <jp-www@dcs.gla.ac.uk>
-Date: Sun, 12 Oct 2003 13:25:45 +0100 (BST)
-From: Jonathan Paisley <jp-www@dcs.gla.ac.uk>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: Max Krasnyansky <maxk@qualcomm.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Bluetooth update for 2.4.23-pre2
-In-Reply-To: <1065723861.14514.91.camel@pegasus>
-Message-ID: <Pine.LNX.4.54.999.0310121324110.10464@sibu.dcs.gla.ac.uk>
-References: <5.1.0.14.2.20031008180324.059f6750@unixmail.qualcomm.com>
- <5.1.0.14.2.20030912095921.030764b0@unixmail.qualcomm.com>
- <5.1.0.14.2.20030912095921.030764b0@unixmail.qualcomm.com>
- <5.1.0.14.2.20031008180324.059f6750@unixmail.qualcomm.com>
- <5.1.0.14.2.20031009103605.05a94590@unixmail.qualcomm.com>
- <1065723861.14514.91.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Alexandros Karypidis <karypid@inf.uth.gr>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200310101836.54089.karypid@inf.uth.gr>
+Subject: [Bluez-devel] Lost L2CAP packet problems in 2.6.0-test5
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 10 Oct 2003 18:36:54 +0300
 
-On Thu, 9 Oct 2003 8:24pm +0200, Marcel Holtmann wrote:
+Hi all,
 
-> > btw How about fixing it in 2.6 and leaving 2.4 alone ?
-> > I don't think we will ever have decent Voice support in 2.4 anyway.
-> > For example ALSA driver will definitely go into 2.6 not 2.4.
->
-> the ALSA support is not the point, because you can use the SCO socket
-> for 2.4 for now and it is working fine for me. I think we should drop
-> this for 2.4.23 and wait until 2.4.24-pre.
+I am having some problems with the last packet sent over an L2CAP connection 
+using 2.6.0-test5.
 
-Have you had a chance to try or look at my snd-bluez-sco ALSA driver yet?
-I'm interested to hear your thoughts on its design.
+The short description:
 
-	http://www.dcs.gla.ac.uk/~jp/snd-bluez-sco/
+I have a program which runs correctly on 2.4.22. It is a simple packet 
+exchange over an L2CAP connection among peers A and B. When I run it using 
+2.6.0, it always loses the last packet sent from peer A to peer B.
 
-Thanks.
+Peer A closes the connection after sending the last packet. IMPORTANT: Peer A 
+is a custom-built embedded device which does not even have an OS. It is a 
+dumb device which does not have a real BT stack. It simply repeats a sequence 
+of HCI commands which results in an L2CAP connection establishment, a couple 
+of small packets being exchanged (less than 100 bytes payload) and then the 
+connection being torn down.
+
+Now, I am pretty sure that A operates correctly, because whenever I run the 
+client B on a computer with the 2.4.22 kernel (tested both with BlueZ and 
+Affix stacks), everything works perfectly.
+
+Whenever I run client B on a computer with the 2.6.0-test5 kernel, the last 
+packet sent from A before the connection is closed is lost.
+
+-- 
+In theory, there is no difference between theory and practice.
+In practice, there is. -- Yogi Berra.
+
+Alexandros Karypidis
+University of Thessaly
+Computer & Communications Engineering dept.
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: SF.net Giveback Program.
+SourceForge.net hosts over 70,000 Open Source Projects.
+See the people who have HELPED US provide better services:
+Click here: http://sourceforge.net/supporters.php
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
