@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040723020716.88264.qmail@web40806.mail.yahoo.com>
-From: Scott Mace <scottymace@yahoo.com>
+From: Dominik Blystak <Dominik.Blystak@pro-open.de>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] New Device that works
+Content-Type: text/plain
+Message-Id: <1090530634.2168.13.camel@localhost>
+Mime-Version: 1.0
+Subject: [Bluez-users] p3nfs drops connection
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,51 +15,132 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Jul 2004 19:07:16 -0700 (PDT)
+Date: Thu, 22 Jul 2004 23:10:34 +0200
 
-I didn't see this on your list of working hardware. 
-It's a USB bluetooth dongle branded CompUSA.  It sells
-for around $30  Anyway, here are the outputs:
-hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:10:60:A4:CB:33 ACL MTU: 192:8 
-SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:282820 acl:1988 sco:4638 events:1935
-errors:0
-        TX bytes:538062 acl:2788 sco:4295 commands:98
-errors:0
-        Features: 0xff 0xff 0x0f 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2
-HV3
-        Link policy: HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'Bluez (0)'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1
-(0x1) LMP Subver: 0x20d
-        Manufacturer: Cambridge Silicon Radio (10)
+Hi,
 
-hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:10:60:A4:CB:33 ACL MTU: 192:8 
-SCO MTU: 64:8
-        HCI 16.4 (bc02x)
+I hope nobody gets offended that I'm writing with an p3nfs issue to the
+bluez-users list, but I believe that somebody around here might have
+some experience with that tool and is willing to help a blueZ newbie ;)
+
+The problem is, that my Siemens SX1 drops every p3nfs connection attemp.
+As described in the manual I'm bringing up BT and the nfsclient on the
+phone. Then I type:
+
+#rfcomm bind 0 00:01:E3:2E:91:81 11
+#p3nfsd -series60 -tty /dev/rfcomm0 -dir /mnt/sx1
+
+The phone reacts with a message ("do you wish to allow this connec..")
+and after pushing the "ok" button the connection drops.
+The phone's lcd shows at first, "OK" and then "Connection closed
+(-2147483647)"
+
+At the terminal I get this output:
+
+> p3nfsd: version 5.15, using /dev/rfcomm0 (115200), mounting on
+/mnt/sx1
+> p3nfsd: to stop the server do "ls /mnt/sx1/exit". (pid 2361)
+> nfs mount /mnt/sx1: (errno 19) No such device
+
+I put an hcidump (see bottom) on that problem to get further information
+but im unexperienced in blueZ and I don't know what to do.
 
 
-It worked with no fiddling in Gentoo using
-kbluetoothd.
-Scott
+
+Thanks a lot
+
+Dominik Blystak
 
 
-	
-		
-__________________________________
-Do you Yahoo!?
-Vote for the stars of Yahoo!'s next ad campaign!
-http://advision.webevents.yahoo.com/yahoo/votelifeengine/
+
+#hcidump
+HCIDump - HCI packet analyzer ver 1.5
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Create Connection(0x01|0x0005) plen 13
+> HCI Event: Command Status(0x0f) plen 4
+> HCI Event: Connect Complete(0x03) plen 11
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> HCI Event: Command Complete(0x0e) plen 6
+> HCI Event: Max Slots Change(0x1b) plen 3
+> ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x004f scid 0x0040 result 1 status 2
+> ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x004f scid 0x0040 result 0 status 0
+< ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x004f flags 0x0000 clen 4
+    MTU 1024
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 0
+< ACL data: handle 0x0028 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x004f flags 0x0000 result 0 clen 0
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 4
+    MTU 672
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x4f len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x40 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+< ACL data: handle 0x0028 flags 0x02 dlen 18
+    L2CAP(d): cid 0x4f len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 22 frame_type 0 credit_flow 15 pri 7 ack_timer 0 frame_size
+667 max_retrans 0 credits 7
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 18
+    L2CAP(d): cid 0x40 len 14 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 22 frame_type 0 credit_flow 14 pri 7 ack_timer 0 frame_size
+667 max_retrans 0 credits 3
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x4f len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 22 pf 1 ilen 0 fcs 0xb8
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x40 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 22 pf 1 ilen 0 fcs 0x73
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(d): cid 0x4f len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 22 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x4f len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 22 pf 1 ilen 0 fcs 0x59
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(d): cid 0x40 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 22 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(d): cid 0x4f len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 22 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 1 b2 0 b3 0 len 0
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x40 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 22 pf 1 ilen 0 fcs 0x73
+< ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x4f len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x004f scid 0x0040
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> HCI Event: Number of Completed Packets(0x13) plen 5
+> ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x004f scid 0x0040
+< HCI Command: Disconnect(0x01|0x0006) plen 3
+> HCI Event: Command Status(0x0f) plen 4
+> HCI Event: Disconn Complete(0x05) plen 4
+
+
 
 
 -------------------------------------------------------
