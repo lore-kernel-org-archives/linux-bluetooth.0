@@ -1,98 +1,64 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <3FA8D9AC.4080907@zappa.cx>
-From: Andreas Sundstrom <sunkan@zappa.cx>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] 2.6.0-test9 SiW works sometimes
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 05 Nov 2003 12:06:20 +0100
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] hid2hci and Logitech Hub
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alexander Holler <holler@ahsoftware.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <10920000.1072457386@[192.168.207.2]>
+References: <8430000.1072356496@[192.168.207.2]>
+	 <1072363056.2876.75.camel@pegasus>  <30700000.1072366993@[192.168.207.2]>
+	 <1072369721.2876.90.camel@pegasus>  <19230000.1072404120@[192.168.207.2]>
+	 <1072406653.2876.98.camel@pegasus>  <27150000.1072412780@[192.168.207.2]>
+	 <1072451203.2640.11.camel@pegasus>  <10920000.1072457386@[192.168.207.2]>
+Content-Type: text/plain
+Message-Id: <1072466121.2640.26.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 26 Dec 2003 20:15:22 +0100
 
-Hi, I have a Toshiba Laptop with a Bluetooth USB device integrated in it.
-I can use the BT device without problems in 2.4.22, but with 2.6.0-test9=20
-it doesn't work for most of the time.
+Hi Alexander,
 
-USB seems to be working just fine so that shouldn't be it.
+> I've looked somewhat deeper into it. When your description is right, it 
+> seems that the problem is in the usb-hid-parser. According to your 
+> discovery, the report 16 should have 6 fields, each 8 bits wide (I've read 
+> some hid-pages ;) ).
 
-The problem is that most of the time a "hcitool inq/scan" just returns
-"Inquiring ..." immediatly, without any delay like it didn't do anything.
+it have 6 fields, each 8 bits wide. Logitech uses the same report for
+control of the Mediapad and I already have proven that it works.
 
-If I remove the modules and reload them over and over again it usually=20
-works after a while and when it works it stays working until I decide to=20
-reboot.
+> I've now put some printk's to hid_register_field in hid-core.c, the parser 
+> only registers only one field for report 16. So hiddev is correct and it 
+> complains about trying to send 6 fields with report 16.
 
-I've tried to enable some debugging in hci_usb.c but I don't understand
-what to make out of it.. not much that seems wrong to me..
+So the HID parser must be fixed first. Keep on looking at it.
 
-I get one error when loading the hci_usb module though:
-hub 4-0:1.0: new USB device on port 1, assigned address 2
-hci_usb: probe of 4-1:1.1 failed with error -5
+> Isn't there any free parser for Windows which outputs the report 
+> descriptions (just for checking before looking deeper into the linux 
+> parser)?
 
-Don't know if it's related, the device seems fine and this showes up
-even when the device happen to work.
+I don't know of anyone.
 
-Just let me know if there is something I can provide/test debug or=20
-whatever..
+Regards
 
-This is my BT device:
-T:  Bus=3D04 Lev=3D01 Prnt=3D01 Port=3D00 Cnt=3D01 Dev#=3D  2 Spd=3D12  M=
-xCh=3D 0
-D:  Ver=3D 1.10 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
-P:  Vendor=3D0930 ProdID=3D0502 Rev=3D 0.00
-S:  Manufacturer=3DSiW
-S:  Product=3DSiW
-S:  SerialNumber=3D9113087A0300
-C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3Da0 MxPwr=3D200mA
-I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3Dhci_usb
-E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
-E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+Marcel
 
-Thanks
-/Andreas Sundstr=F6m
 
 
 
 -------------------------------------------------------
-This SF.net email is sponsored by: SF.net Giveback Program.
-Does SourceForge.net help you be more productive?  Does it
-help you create better code?   SHARE THE LOVE, and help us help
-YOU!  Click Here: http://sourceforge.net/donate/
+This SF.net email is sponsored by: IBM Linux Tutorials.
+Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
+Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
+Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
