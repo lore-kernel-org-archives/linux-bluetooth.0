@@ -1,75 +1,123 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41F25C4B.6040709@webstuhl.net>
-From: Ben Pezzei <ben@webstuhl.net>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Again: Problems with Dongle, Headset or btsco
-References: <41F0EB0A.1020302@webstuhl.net> <41F0FE84.8030401@dark-reality.de> <41F128F4.2020006@webstuhl.net> <41F13638.1080207@dark-reality.de>
-In-Reply-To: <41F13638.1080207@dark-reality.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 22 Jan 2005 14:59:39 +0100
+Return-Path: <nacc@us.ibm.com>
+Date: Fri, 21 Jan 2005 11:17:33 -0800
+From: Nishanth Aravamudan <nacc@us.ibm.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Max Krasnyansky <maxk@qualcomm.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   kernel-janitors@lists.osdl.org
+Subject: [UPDATE PATCH 17/39] net/capi: use wait_event_interruptible_timeout()
+Message-ID: <20050121191733.GE3340@us.ibm.com>
+References: <20050120234754.GE2600@us.ibm.com> <1106267887.7955.40.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1106267887.7955.40.camel@pegasus>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Lars,
-
-Lars Grunewaldt schrieb:
-> | I guess the Problem has to do with the SCO or ALSA Stuff
+On Fri, Jan 21, 2005 at 01:38:07AM +0100, Marcel Holtmann wrote:
+> Hi Nishanth,
 > 
-> sco, not alsa I think. The alsa stuff is only needed to transmit the sco
-> data to the alsa functions and vice versa, so it's unlikly that the
-> impossibility of reconnecting on a new sco channel is the problem. More
-> likely the sco channel is not terminated correctly in the first place.
+> > Description: Use wait_event_interruptible_timeout() instead of custom
+> > wait-queue code. The first replacement is the most complicated as the various
+> > return conditions each indicate different things, apparently. The same effects
+> > are made after wait_event_interruptible_timeout() returns.
+> 
+> the first one makes the code look ugly. Remove it and re-submit.
 
-ok. Is it possible that the SCO Part of this dongle is somehow broken?
-Obviously the RFCOMM Part is working fine.
+Thanks for the input. Fixed below.
 
-Since the hwdep module is part of the alsa-libs it looks like
-the dongle can't be re-initialized (as a soundcard) after a
-disconnect.
+-Nish
 
-Question: when connected via btsco and trying to play
-some sound with:
-aplay -D plughw:Headset soundfile
-Does soundfile need to have the correct samplerate,frequency,etc
-as the Headset?
-I am also able to set speaker and capture volume of the Headset
-with alsamixer -c 1
+Description: Use wait_event_interruptible_timeout() instead of custom
+wait-queue code. Remove the now unused variables in both functions.
 
-unfortunately
-arecord -D plughw:Headset z1.out
-Recording WAVE 'z1.out' : Unsigned 8 bit, Rate 8000 Hz, Mono
-
-only creates a 44 Byte big file z1.out with the header but
-no content
-
-Last Question: Which are other methods to send/receive
-data from/to the headset beside aplay / arecord?
-
-eg cat /dev/snd/pcmC1D0c > z1.out ? :)
-
-greetings
-b
+Signed-off-by: Nishanth Aravamudan <nacc@us.ibm.com>
 
 
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
-Tool for open source databases. Create drag-&-drop reports. Save time
-by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
-Download a FREE copy at http://www.intelliview.com/go/osdn_nl
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--- 2.6.11-rc1-kj-v/net/bluetooth/cmtp/capi.c	2005-01-15 16:55:44.000000000 -0800
++++ 2.6.11-rc1-kj/net/bluetooth/cmtp/capi.c	2005-01-21 11:14:47.000000000 -0800
+@@ -35,6 +35,7 @@
+ #include <linux/socket.h>
+ #include <linux/ioctl.h>
+ #include <linux/file.h>
++#include <linux/wait.h>
+ #include <net/sock.h>
+ 
+ #include <linux/isdn/capilli.h>
+@@ -442,10 +443,8 @@ static void cmtp_register_appl(struct ca
+ 
+ static void cmtp_release_appl(struct capi_ctr *ctrl, __u16 appl)
+ {
+-	DECLARE_WAITQUEUE(wait, current);
+ 	struct cmtp_session *session = ctrl->driverdata;
+ 	struct cmtp_application *application;
+-	unsigned long timeo = CMTP_INTEROP_TIMEOUT;
+ 
+ 	BT_DBG("ctrl %p appl %d", ctrl, appl);
+ 
+@@ -460,20 +459,8 @@ static void cmtp_release_appl(struct cap
+ 	cmtp_send_interopmsg(session, CAPI_REQ, application->mapping, application->msgnum,
+ 				CAPI_FUNCTION_RELEASE, NULL, 0);
+ 
+-	add_wait_queue(&session->wait, &wait);
+-	while (timeo) {
+-		set_current_state(TASK_INTERRUPTIBLE);
+-
+-		if (application->state == BT_CLOSED)
+-			break;
+-
+-		if (signal_pending(current))
+-			break;
+-
+-		timeo = schedule_timeout(timeo);
+-	}
+-	set_current_state(TASK_RUNNING);
+-	remove_wait_queue(&session->wait, &wait);
++	wait_event_interruptible_timeout(session->wait,
++			(application->state == BT_CLOSED), CMTP_INTEROP_TIMEOUT);
+ 
+ 	cmtp_application_del(session, application);
+ }
+@@ -543,8 +530,6 @@ static int cmtp_ctr_read_proc(char *page
+ 
+ int cmtp_attach_device(struct cmtp_session *session)
+ {
+-	DECLARE_WAITQUEUE(wait, current);
+-	unsigned long timeo = CMTP_INTEROP_TIMEOUT;
+ 	unsigned char buf[4];
+ 
+ 	BT_DBG("session %p", session);
+@@ -554,30 +539,17 @@ int cmtp_attach_device(struct cmtp_sessi
+ 	cmtp_send_interopmsg(session, CAPI_REQ, 0xffff, CMTP_INITIAL_MSGNUM,
+ 				CAPI_FUNCTION_GET_PROFILE, buf, 4);
+ 
+-	add_wait_queue(&session->wait, &wait);
+-	while (timeo) {
+-		set_current_state(TASK_INTERRUPTIBLE);
+-
+-		if (session->ncontroller)
+-			break;
+-
+-		if (signal_pending(current))
+-			break;
+-
+-		timeo = schedule_timeout(timeo);
+-	}
+-	set_current_state(TASK_RUNNING);
+-	remove_wait_queue(&session->wait, &wait);
+-
++	ret = wait_event_interruptible_timeout(session->wait,
++			session->ncontroller, CMTP_INTEROP_TIMEOUT);
++	
+ 	BT_INFO("Found %d CAPI controller(s) on device %s", session->ncontroller, session->name);
+ 
+-	if (!timeo)
++	if (!ret)
+ 		return -ETIMEDOUT;
+ 
+ 	if (!session->ncontroller)
+ 		return -ENODEV;
+ 
+-
+ 	if (session->ncontroller > 1)
+ 		BT_INFO("Setting up only CAPI controller 1");
+ 
