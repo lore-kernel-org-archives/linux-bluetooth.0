@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] what API to use to disconnect an rfcomm
-	connection
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200412110213.37305.wim.delvaux@adaptiveplanet.com>
-References: <200412110213.37305.wim.delvaux@adaptiveplanet.com>
-Content-Type: text/plain
-Message-Id: <1102756108.19086.1.camel@pegasus>
-Mime-Version: 1.0
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200412110213.37305.wim.delvaux@adaptiveplanet.com>
+Subject: [Bluez-users] what API to use to disconnect an rfcomm connection
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,31 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 11 Dec 2004 10:08:28 +0100
+Date: Sat, 11 Dec 2004 02:13:37 +0100
 
-Hi Wim,
+Hi all,
 
-> if you started 
-> 
-> rfcomm x XXXXXXXXXX y &
-> and the connection to XXXXXXXXXXX is running,
-> 
-> How can other application terminate that connection  (much like pand -k addr)
-> 
-> What API (ioctl ?) should be used ? Code samples ?>
+if you started 
 
-the use of ACL connections is tracked with reference counting and as
-long as there is a upper layer connection using the ACL link it is not
-closed. If the last one is gone, the disconnect timer is started and
-after the timeout the ACL link is terminated.
+rfcomm x XXXXXXXXXX y &
+and the connection to XXXXXXXXXXX is running,
 
-I hope you asked for this otherwise I don't understand your question.
+How can other application terminate that connection  (much like pand -k addr)
 
-Regards
+What API (ioctl ?) should be used ? Code samples ?>
 
-Marcel
-
-
+W
 
 
 -------------------------------------------------------
