@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] connectionless l2cap within PAN implementation
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Sean Loh <blaze_wk@yahoo.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040922154930.77624.qmail@web41121.mail.yahoo.com>
-References: <20040922154930.77624.qmail@web41121.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1095869928.6223.58.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20040922154930.77624.qmail@web41121.mail.yahoo.com>
+From: Sean Loh <blaze_wk@yahoo.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] connectionless l2cap within PAN implementation
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +15,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Sep 2004 18:18:48 +0200
+Date: Wed, 22 Sep 2004 08:49:30 -0700 (PDT)
 
-Hi Sean,
+Hi!!
 
-> I'm sorry but I can't seem to find this information.
-> I'm utilising the PAN specification to stream audio
-> over Bluez PAN and I was wondering is there any way
-> for me to switch the l2cap packets to being
-> connectionless ones (like from a command line)? If it
-> can't be done from a command line, then what other
-> ways are there? 
-> 
-> Because, if I'm right, the default l2cap packets are
-> connection oriented within the pan profile, isn't it?
+I'm sorry but I can't seem to find this information.
+I'm utilising the PAN specification to stream audio
+over Bluez PAN and I was wondering is there any way
+for me to switch the l2cap packets to being
+connectionless ones (like from a command line)? If it
+can't be done from a command line, then what other
+ways are there? 
 
-nobody really used the connectionless L2CAP with success I think and I
-can't remember that BNEP is defined for connectionless L2CAP.
+Because, if I'm right, the default l2cap packets are
+connection oriented within the pan profile, isn't it?
 
-Regards
-
-Marcel
+Thanks again!!!!!
 
 
+		
+_______________________________
+Do you Yahoo!?
+Declare Yourself - Register online to vote today!
+http://vote.yahoo.com
 
 
 -------------------------------------------------------
