@@ -6,7 +6,7 @@ Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <1065537273.29878.613.camel@idoru.kc.de>
 References: <1065537273.29878.613.camel@idoru.kc.de>
 Content-Type: text/plain
-Message-Id: <1065539062.5470.79.camel@pegasus>
+Message-Id: <1065538541.5470.73.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,28 +18,40 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 07 Oct 2003 17:04:16 +0200
+Date: 07 Oct 2003 16:55:35 +0200
 
 Hi Nils,
 
+> I made a mistake and bought a Bluetooth headset ;)
+
+no comment. We talk again after you got a Bluespoon Digital ;)
+
+> New toy... and now I am desperately trying to get a sound from it.
+> After some struggeling hstest connects but the headset does not play a
+> single beep.
+> When hstest connects I get the following:
+> 
+> Voice setting: 0x0040
+> RFCOMM channel connected
+> SCO audio channel connected (handle 43, mtu 64)
+> AT+VGS=4
+> 
 > and the headset beeps a single time.
 > After that nothing obvious happens anymore.
 > What does the AT command mean? It seems to come from the headset, right?
 > Would hstest need to respond at least with OK?
 
-forgot something :(
+If you use 2.4.22-mh1 for example you have a hci_usb driver which allows
+you to drive one SCO channel with 16 bit PCM (voice setting 0x0060). My
+hstest code operates with 8 bit, so you must change this. When I have a
+little bit more time I should modify the hstest program to call sox and
+mpg123 as needed. I already have done this, but I don't remember where I
+stored the code :(
 
-You must make sure that your local device routes the SCO traffic of the
-HCI interface. If your local device is CSR based, the CVS version of
-hciconfig can show you this.
+> Oh, BTW: This headset is a C-Tech BT101, seems a quite common low-price
+> one...
 
-	# hciconfig hci0 revision
-	hci0:   Type: USB 
-	        BD Address: 00:50:xx:xx:xx:xx ACL MTU: 192:8  SCO MTU: 64:8
-	        HCI 16.1.1
-	        Chip version: BlueCore02
-	        Max key size: 128 bit
-	        SCO mapping:  HCI
+Please send the output from "hcitool info <bdaddr>".
 
 Regards
 
