@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Florian Echtler <echtler@fs.tum.de>
 To: bluez-users@lists.sourceforge.net
-From: Sebastian Roth <sebiroth@web.de>
-Message-ID: <cvad1d$8tb$1@sea.gmane.org>
-References: <Pine.LNX.4.61.0502191116450.10610@block.bubble> <cv89g9$399$1@sea.gmane.org> <Pine.LNX.4.61.0502200852440.15784@block.bubble>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <Pine.LNX.4.61.0502200852440.15784@block.bubble>
-Subject: [Bluez-users] Re: strange btsco error
+Subject: Re: [Bluez-users] Re: strange btsco error
+In-Reply-To: <cv89g9$399$1@sea.gmane.org>
+Message-ID: <Pine.LNX.4.61.0502200852440.15784@block.bubble>
+References: <Pine.LNX.4.61.0502191116450.10610@block.bubble> <cv89g9$399$1@sea.gmane.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,37 +18,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 20 Feb 2005 17:18:16 +0100
+Date: Sun, 20 Feb 2005 08:59:24 +0100 (CET)
 
-Hi Florian,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-I think your answer is a bit confusing.
+> > [root@block:/usr/src/btsco-20040219][0] $ ./btsco 00:0D:FD:.....
+> > Device is 2:0
+> > Error: btsco open (2-0): No such device or address
+> Is your headset in the list of ALSA devices and the ALSA soundsystem
+> started? (cat /proc/asound/cards)
 
-> 1. No, it isn't. However, this should not matter, as I stated that this
->    error happens _before_ any bluetooth specific code is executed, in
->    btsco.c, line 356: snd_hwdep_open().
-> 
-> 2. cat /proc/asound/cards:
-> 
-> 0 [CK8            ]: NFORCE - NVidia CK8
->                      NVidia CK8 with ALC650F at 0xe8000000, irq 21
-> 1 [U0x46d0x8b0    ]: USB-Audio - USB Device 0x46d:0x8b0
->                      USB Device 0x46d:0x8b0 at usb-0000:00:02.0-2.4, full speed
-> 2 [Headset        ]: Bluetooth SCO - BT Headset
->                      BT Headset 1
+1. No, it isn't. However, this should not matter, as I stated that this
+   error happens _before_ any bluetooth specific code is executed, in
+   btsco.c, line 356: snd_hwdep_open().
 
-As your output of 2. shows it _is_ in the list. That's good!
+2. cat /proc/asound/cards:
 
-I found a thread in the mailing list:
-http://thread.gmane.org/gmane.linux.bluez.devel/4000
+0 [CK8            ]: NFORCE - NVidia CK8
+                     NVidia CK8 with ALC650F at 0xe8000000, irq 21
+1 [U0x46d0x8b0    ]: USB-Audio - USB Device 0x46d:0x8b0
+                     USB Device 0x46d:0x8b0 at usb-0000:00:02.0-2.4, full speed
+2 [Headset        ]: Bluetooth SCO - BT Headset
+                     BT Headset 1
 
-Are you able to open the device using alsamixer as suggested by Lars
-Grunewaldt?
+Yours, Florian
+- -- 
+Preserve wildlife - pickle a squirrel today!
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
 
-Best regards,
-Sebastian
-
-
+iD8DBQFCGENg7CzyshGvatgRApfpAJ9imiZYq35qYnj975JU7E0/IaC3LACfWx2h
+06k/NCPJ4OTlOljCSCbI66U=
+=XN1E
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
