@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42439ADA.5000006@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Hp bluetooth headset a2dp
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] a2dp timing
+In-Reply-To: <20050325002021.85942.qmail@web52801.mail.yahoo.com>
+References: <20050325002021.85942.qmail@web52801.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1111710700.9195.37.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,31 +18,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Mar 2005 22:00:10 -0700
+Date: Fri, 25 Mar 2005 01:31:40 +0100
 
-Hi
+Hi Shawn,
 
-We've had problems with a2dp timing that I've been ignoring.
+> > > I also have the Aiptek and Bluetake ones.  I just noticed that so
+> > much
+> > > activity with A2DP has been happening while I was not paying
+> > attention,
+> > > so I will try to do some testing.
+> > 
+> > The Aiptek is not conforming to the specification. However the SBC
+> > over
+> > RFCOMM is a nice feature.
+> 
+> Is SBC over RFCOMM the only method they support?  Or is their "not
+> conforming" just in small points?
 
-For one, a2play crams frames into the headset just as fast as it can. 
-Sometimes this is too fast. So we need to clock it so things are 
-staggered properly. Does the SBC encoder give us a clue about timing 
-between frames?
+the SBC over RFCOMM is additional.
 
-Second, if the headset wanders out of range, the player stops and starts 
-up where it left off when the headset is back. If we're pacing things 
-properly, we need to drop frames instead when this happens. I'm thinking 
-if it results in a legal SBC stream that I'll drop entire SBC frames in 
-the main loop with something like:
+> I noticed that they don't work with either our phone or the BlueSoleil
+> but wasn't sure why.  And they do say in the manual that they support
+> A2DP, and explain how to bond them, enter pin "0000" etc.  I emailed
+> tech support but haven't got a response yet.
+> 
+> Too bad - IMO those are the only ones so far that are actually
+> comfortable.  The iPAQ ones aren't too bad either.
 
-	frame_len = read_header(fd, &sbc_info);
-	bytes_read = read(fd, killbuffer, frame_len);
+You will find almost every information about that in the mailing list
+archive. However the problem with the Aiptek is that it conforms to
+AVDTP, but then it does not conform to A2DP when it comes to sending the
+actual SBC stream.
 
-Are there other timing issues I need to think about? Does it get so 
-messy that I need to watch jitter? I can only vaguely remember this 
-stuff from my networking classes...
+Regards
 
-Brad
+Marcel
+
+
 
 
 -------------------------------------------------------
