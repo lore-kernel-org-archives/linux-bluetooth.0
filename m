@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de4657604120606361751793a@mail.gmail.com>
+Message-ID: <2de46576041206055023c98e57@mail.gmail.com>
 From: Manjunath Prabhu <manjunath.mp@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Test Mode
-Cc: pws@csr.com
-In-Reply-To: <200412011028.iB1ASZIk030820@news01.csr.com>
+Subject: Re: [Bluez-users] Link Quality
+In-Reply-To: <1102339845.9644.23.camel@pegasus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-References: <2de4657604113010234e4e3a3f@mail.gmail.com>
-	 <1101882666.18840.23.camel@pegasus>
-	 <200412011028.iB1ASZIk030820@news01.csr.com>
+References: <2de465760412060523287f7d5c@mail.gmail.com>
+	 <1102339845.9644.23.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -21,68 +19,49 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 6 Dec 2004 20:06:31 +0530
+Date: Mon, 6 Dec 2004 19:20:23 +0530
 
-Hi Peter,
+Hi Marcel,
 
 
-On Wed, 01 Dec 2004 10:28:34 +0000, Peter Stephenson <pws@csr.com> wrote:
+On Mon, 06 Dec 2004 14:30:45 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Manjunath,
 > 
+> > The LM decides which packets to use to send data based on link quality.
+> > How can I read or trace the  packet type I am using currently? Or
+> > rather if the packet type changes...will an event be generated? Do the
+> > packet types change dynamically......as the link quality varies???
 > 
-> > The LMP specification speaks about the Test Mode and Methodology
-> > saying that Adaptive power control, adaptive freq hopping scenarios
-> > can be imitated provided the respective LMP PDU's are sent.
-> >
-> > How do I make the HCI commands initiate these LMP PDU's? The HCI
-> > specification have only the "Test Enable" and "Read and Write
-> > Loopback"  test commands but other no commands which will result in
-> > inititating the LM to the testing modes. How do i conduct these
-> > adaptive tests?
+> the link manager has a list of packet types it is able to use and it
+> will use them. There exists a command to change the packet types of an
+> already created connection and this command will also create an event
+> that informs you that the packet types have changed. Besides this you
+> can only guess from the size of ACL data packets what packet type the
+> link manager is using and this is not an exact science.
 > 
-> It's quite deliberate that the only thing you can do with a production
-> device is put it into test mode as a slave
-> (HCI_Enable_Device_Under_Test_Mode), requiring all test instructions to
-> be sent from the master.  To do the test end you need a specialist
-> tester.  These tend to be expensive since they're aimed at manufacturers
-> doing a lot of testing.
+> > Can I somehow avoid FEC checks???May be by using DH packets......but I
+> > know you say I shouldn't change packet types??? Is there someother
+> > method to do so.
 > 
-> You can use local and remote loopback without any extra hardware
-> support, however.  They are completely separate from the test modes you
-> are talking about.
+> No, because DM1 is always allowed.
+After a connection is established, I can change the packet to any of
+the DH types and avoid FEC........did you mean that even then DM1 is
+allowed.
 
-Can you tell me how this can be done??? I am trying to set the device
-for loopback but not able to get through......How do I set the
-loopback without entering the Test mode.
+Does, opening a socket and then connect() at the
+L2CAP......automatically establish an HCI connection first and then an
+L2CAP connection on top of it??  This is what HCI dump shows..
 
-thanks,
-regards,
+Can I in someway just create an HCI connection and then pump HCI data
+packet with some known payload??? In a way, just pump raw bits.....
+
+Thanks,
+Regards,
 Manjunath
 > 
-> Since the features aren't available over HCI, you need to ask somewhere
-> else.  However, if you're looking for a cheap way of using the Bluetooth
-> test modes you're probably out of luck.  Most manufacturers (including
-> us) provide some simplified but non-standard test commands you can run
-> between two modules for RF testing and characterisation.
+> Regards
 > 
-> --
-> Peter Stephenson <pws@csr.com>                  Software Engineer
-> CSR PLC, Churchill House, Cambridge Business Park, Cowley Road
-> Cambridge, CB4 0WZ, UK                          Tel: +44 (0)1223 692070
-> 
-> **********************************************************************
-> This email and any files transmitted with it are confidential and
-> intended solely for the use of the individual or entity to whom they
-> are addressed. If you have received this email in error please notify
-> the system manager.
-> 
-> This footnote also confirms that this email message has been swept by
-> MIMEsweeper for the presence of computer viruses.
-> 
-> www.mimesweeper.com
-> **********************************************************************
-> 
-> 
-> 
+> Marcel
 > 
 > -------------------------------------------------------
 > SF email is sponsored by - The IT Product Guide
