@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Pairing multiple devices
+Subject: Re: [Bluez-users] Selection of PtP connection type
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Alex Eiser <alexe@ed.ca>
+To: Pavel Ruzicka <pavouk@pavouk.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <6AC5A768-65C5-11D8-9539-000A959C67D2@ed.ca>
+In-Reply-To: <200402230026.24596.pavouk@pavouk.org>
 References: <200402230026.24596.pavouk@pavouk.org>
-	 <6AC5A768-65C5-11D8-9539-000A959C67D2@ed.ca>
 Content-Type: text/plain
-Message-Id: <1077521546.2832.62.camel@pegasus>
+Message-Id: <1077521034.2832.52.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,36 +18,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 23 Feb 2004 08:32:26 +0100
+Date: Mon, 23 Feb 2004 08:23:54 +0100
 
-Hi Alex,
+Hi Pavel,
 
-> I have several bluetooth devices, which I am having a hard time getting 
-> them all connected at the same time.
+> I want to connect my Desktop Mandrake linux with my Sharp Zaurus.
+> On desktop side I want automatic solution. Only insert USB dongle.
 > 
-> The problem is that, one device (a Logitech MS 900) doesn't seem to 
-> work if I have encryption and authentication enabled.
+> On Zaurus side I have network connector with PPP connection support,
+> (it's works with my Nokia 6310i phone), and with PAN support.
+> I want only click "connect" on Zaurus side.
+> 
+> I read many FAQ, but many of them are outdated or not complete.
+> I know, there are ppp over rfcomm, ppp over bnep, bridge over bnep, or 
+> anything else? I'am a little confused about it.
 
-and this is correct. Read the HID profile for more details.
+there is no PPP over BNEP, because BNEP itself is an ethernet emulation.
 
-> However my apple wireless keyboard does not work with out those options 
-> enabled.
+> What is the preferred way of connecting two devices today?
 
-The Apple mouse is wrong here, because the HID device must not decide
-this. In the case of HID the host stack must trigger the authentication.
+The preferred way is to use the PAN profile (BNEP).
 
-> With encryption and authentication on, the mouse does not have a 
-> successful pairing. (always failing on the key request)
+> ----------------------------------------------------------------------
+> Other problem is with automatic configuring. For autoloading
+> of kernel modules I have in kernel 2.6.3 autoloader, and in /etc/modprobe.conf
+> I have this:
+> # bluetooth stuff
+> alias net-pf-31 bluez
+> alias bt-proto-0 l2cap
+> alias bt-proto-2 sco
+> alias bt-proto-3 rfcomm
+> alias bt-proto-4 bnep
+> alias tty-ldisc-11 hci_usb
+> 
+> This works for me, but Is it the right way?
 
-With auth and encrypt set in hcid.conf or with hciconfig you enable
-security mode 3 and this is not what you really want. Disable it and let
-the device decide when to ask for authentication.
+No.
 
-> Is there a way to specify that a specific connect uses (or doesn't use) 
-> encryption and authentication?
+	alias net-pf-31 bluetooth	(for 2.4 this is bluez)
+	alias bt-proto-0 l2cap
+	alias bt-proto-2 sco
+	alias bt-proto-3 rfcomm
+	alias bt-proto-4 bnep
+	alias bt-proto-5 cmtp
+	alias tty-ldisc-15 hci_uart
 
-See above. You are in security mode 3, but what you want is security
-mode 2.
+> Where can I place configuration for automatic configuring and removing 
+> interface?
+
+Start hcid. And you can make use of bluetooth.agent.
 
 Regards
 
