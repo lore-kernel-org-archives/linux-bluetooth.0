@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Missing libopenobex-1.0.so.1
-From: Stuart Anderson <subscritions@nx14.com>
-Reply-To: subscritions@nx14.com
-To: Thomas Chiverton <thomas.chiverton@bluefinger.com>
-Cc: bluez-users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403091629.40690.thomas.chiverton@bluefinger.com>
-References: <1078847668.9713.2.camel@donivin.nx14.com>
-	 <200403091629.40690.thomas.chiverton@bluefinger.com>
+Subject: Re: [Bluez-users] diNovo kbd / mice / mediapad
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1078857187.2354.3.camel@amd-01.home>
+References: <1078857187.2354.3.camel@amd-01.home>
 Content-Type: text/plain
-Message-Id: <1078873320.12219.0.camel@donivin.nx14.com>
+Message-Id: <1078873003.10671.100.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,19 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 09 Mar 2004 23:02:00 +0000
+Date: Tue, 09 Mar 2004 23:56:43 +0100
 
-Thanks man that was my problem, the LD_LIBARY_PATH was empty
+Hi Alexandre,
 
-On Tue, 2004-03-09 at 16:29, Thomas Chiverton wrote:
-> On Tuesday 09 Mar 2004 15:54 pm, you said:
-> >    Can anyone tell me how i can get the ObexSERVER to run?
+> Charles Bueche has updated his website (MX900 mouse) to add this nano
+> HOWTO for the use of Logitech's diNovo keyboard, mouse and MediaPad.
 > 
-> Have you run ldconfig -v ?
-> Does it find the libary ?
-> Is your LD_LIBARY_PATH / ld.so.conf correct ?
--- 
-Anderson
+> Please, don't hesitate to make comments.
+> 
+> http://www.bueche.ch/comp/mx900/feedback/ghisoli_alexandre_mx900_with_hub.txt
+
+nice ;)
+
+However the name of the USB host controller module is uhci-hcd and I
+don't find the multi-byte patch for hid-core.c in 2.6.3 or in the latest
+snapshot. It seems that Vojtech Pavlik haven't sent it to Linus.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
