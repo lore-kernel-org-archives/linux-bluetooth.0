@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Bluetooth and HAL
+Subject: Re: [Bluez-devel] Bluetrek G2
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Cc: hal@freedesktop.org
-In-Reply-To: <pan.2005.01.20.08.17.45.630346@yahoo.com>
-References: <pan.2005.01.19.22.54.29.108027@yahoo.com>
-	 <1106180785.8190.151.camel@pegasus>
-	 <pan.2005.01.20.08.17.45.630346@yahoo.com>
+In-Reply-To: <1106218017.6052.22.camel@baroque.rococosoft.com>
+References: <1106218017.6052.22.camel@baroque.rococosoft.com>
 Content-Type: text/plain
-Message-Id: <1106225440.8190.175.camel@pegasus>
+Message-Id: <1106225327.8190.172.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,26 +18,12 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 13:50:40 +0100
+Date: Thu, 20 Jan 2005 13:48:47 +0100
 
-Hi Paul,
+Hi Steve,
 
-> I'll remove the ChipVersion then, and I have some more questions:
-> How do we tell if we have a BT 1.0 or BT 1.1 or BT 1.2  adapter ?
-> By looking at HCI and LMP numbers ?
-
-it is the HCI_version and LMP_version. They can be different, but in
-general they show the same version of the specification.
-
-> Do we need a separate bluetooth.version too ?
-
-No.
-
-> Do end user programs really need HCI and LMP version/revision ?
-
-Only if they wanna display some information about the device. Otherwise
-they are useless, because the kernel or the Bluetooth library will hide
-the differences.
+when you sign your emails, please make sure that your public key is
+available to everyone. Otherwise don't sign emails to this mailing list.
 
 Regards
 
