@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] TPL (transmit power level)
+Subject: Re: [Bluez-devel] Code questions
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <de33c8be0502160425215158ad@mail.gmail.com>
-References: <de33c8be0502160425215158ad@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Message-Id: <1109028291.7626.45.camel@pegasus>
+In-Reply-To: <1108566885.11909.29.camel@g-necml5-146.rd.francetelecom.fr>
+References: <1108566885.11909.29.camel@g-necml5-146.rd.francetelecom.fr>
+Content-Type: text/plain
+Message-Id: <1109027849.7626.38.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,25 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 22 Feb 2005 00:24:51 +0100
+Date: Tue, 22 Feb 2005 00:17:29 +0100
 
-Hi Flavio,
+Hi Emmanuel,
 
-> I=B4m working with power control and i saw one thing that could be wron=
-g:
->=20
-> Transmit power level (tpl) : _1octet (signed integer);
->                                  _range: -30<=3D N<=3D20;
->                                  _units: dBm.
->=20
-> In BlueZ the value of tpl is defined like unsigned int ( uint8_t level
-> ) but i think that should be an int ( int8_t level ) like is defined
-> in core of bluetooth.
->=20
-> There is any particular reason for the level to be an unsigned int??
+> I've looked to the code of BlueTooth in the linux 2.6.10 kernel, and
+> I've a few questions : 
+> 
+> - I've noticed that OCF_PIN_CODE_REPLY and OCF_PIN_CODE_NEG_REPLY are
+> defined in include/net/bluetooth/hci.h, but never used in the code; and
+> that the function hci_pin_code_request_evt() is void. Does it mean that
+> the current BlueZ implementation doesn't support PIN codes? (Just making
+> sure.)
 
-no, because this is bug. Thanks for spotting it. If you see more of
-them, then simply send in a patch for it.
+currently these events are handled by the hcid, but for the upcoming
+security and profile manager they will be moved inside the kernel.
+
+> - Is the PIN Code Request event masked away (I think it is, because I
+> also read the BlueTooth Specification, and it doesn't allow not reacting
+> to this event), and in this case, were is it masked? I didn't found the
+> masking in the code.
+
+Nothing is masked away.
+
+> - I've noticed the same for other events (that they were not treated).
+> Are they also just masked away, and, if yes, were in the code do this
+> masking happens?
+
+Explain what you mean.
 
 Regards
 
