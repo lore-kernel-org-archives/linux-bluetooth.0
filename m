@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <40A9E6CB.4010505@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Cc: linux-usb-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] question: what does this patch from snd-bt-sco do?
+Subject: Re: [Bluez-devel] problem with hstest
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mr Jie Liu <s4048156@student.uq.edu.au>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <2260c2221e01.221e012260c2@uq.edu.au>
+References: <2260c2221e01.221e012260c2@uq.edu.au>
+Content-Type: text/plain
+Message-Id: <1084875050.5833.84.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,48 +18,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 May 2004 12:34:51 +0200
+Date: Tue, 18 May 2004 12:10:50 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi,
 
-there's a kernel patch in snd-bt-sco, and it would  be great if someone
-could explain what it does:
+>   I am using Anycom's USB 220 and it is not based on CSR chip. Here is the device information of it on my computer:
+> [root@tom sbin]# ./hciconfig hci0 version
+> hci0:   Type: USB
+>         BD Address: 00:0B:0D:21:9E:81 ACL MTU: 339:4  SCO MTU: 64:0
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x93 LMP Ver: 1.1 (0x1) LMP Subver: 0x93
+>         Manufacturer: Transilica, Inc. (24)
+> [root@tom sbin]# ./hciconfig hci0 features
+> hci0:   Type: USB
+>         BD Address: 00:0B:0D:21:9E:81 ACL MTU: 339:4  SCO MTU: 64:0
+>         Features: 0xff 0xff 0x3d 0x00
+>                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
+>                 <timing accuracy> <role switch> <hold mode> <sniff mode>
+>                 <park mode> <RSSI> <channel quality> <SCO link>
+>                 <HV2 packets> <HV3 packets> <u-law log> <A-law log>
+>                 <CVSD> <power control> <transparent SCO>
+> [root@tom sbin]# ./hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:0B:0D:21:9E:81 ACL MTU: 339:4  SCO MTU: 64:0
+>         Unsupported manufacturer
+> 
+> Is there any other way I could figure out if the sco packets are routed through HCI or PCM interface? Can I trace it by hcidump?
 
-*****
-- --- linux-2.6.4-orig/drivers/bluetooth/hci_usb.c	2004-03-11
-02:55:44.000000000 +0000
-+++ linux-2.6.4/drivers/bluetooth/hci_usb.c	2004-03-13
-23:52:27.000000000 +0000
-@@ -851,7 +851,12 @@
+I don't have any detailed information about the Transilica chip. Run
+"hcidump -x" as root and if you see SCO packets then this dongles routes
+the SCO data over HCI, otherwise it goes over the PCM.
 
-~ #ifdef CONFIG_BT_HCIUSB_SCO
-~ 				case USB_ENDPOINT_XFER_ISOC:
-- -					if (ep->desc.wMaxPacketSize < size || a > 2)
-+					/* Use only the 9 byte
-+					  "One voice channel with 8 bit encoding"
-+					  endpoint until there is support for changing
-+					  the endpoint dynamically. See
-+					   Bluetooth 1.1 Part H:2, section 2.1 */
-+					if (ep->desc.wMaxPacketSize != 9)
-~ 						break;
-~ 					size = ep->desc.wMaxPacketSize;
-****
+And btw. do you activated the HCIUSB_SCO kernel option and do this
+dongle really have the needed ISOC interface? You must check the content
+of /proc/bus/usb/devices.
 
-Also, it would be interesting to know if this patch for kernel 2.6.4 is
-still nessesary for newer kernels (2.6.6 to be specific), because I want
-to "port" snd-bt-sco to alsa 1.0.4 and kernel 2.6.6.
+Regards
 
-thanks in advance,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+Marcel
 
-iD8DBQFAqebKQWC6DTWkDAoRAsATAJ43Iinhsajz11AA15HWB8jgnXhVXQCfUMkU
-nAKI5G5kkz+1dLD9A/+SgPo=
-=7SjZ
------END PGP SIGNATURE-----
+
 
 
 -------------------------------------------------------
