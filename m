@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] getting bluetooth v1.2
-From: Adam Goode <adam@evdebs.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1111943294.9195.250.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4247F63F.70206@gmx.ch>
 References: <25911.1111942263@www59.gmx.net>
-	 <1111943294.9195.250.camel@pegasus>
+	 <1111943294.9195.250.camel@pegasus>  <4247EEE0.8010002@gmx.ch>
+	 <1112011490.9016.27.camel@pegasus>  <4247F63F.70206@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1112024952.30560.2.camel@lynx.auton.cs.cmu.edu>
+Message-Id: <1112015700.9016.30.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,30 +20,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Mar 2005 10:49:12 -0500
+Date: Mon, 28 Mar 2005 15:15:00 +0200
 
-On Sun, 2005-03-27 at 19:08 +0200, Marcel Holtmann wrote:
+Hi Marco,
 
-> The revision on a D-Link DBT-120 is a hardware revision. It is possible
-> to update the Rev. 4 dongles, but not with the btdfu program. The flash
-> timing are not correct.
+> > check with "hciconfig hci0 revision" as root what BlueCore chip is on it
+> > and no, these are not the problematic dongles.
 > 
+> it's a BlueCore02
+> 
+> >>so, an update to bt v1.2 wouldn't make sense to me...
+> > 
+> > What does "lsusb" tells you?
+> 
+> it think you mean this line:
+> Bus 002 Device 008: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle
 
-This fixes btdfu for me with Rev. 4 dongles. 
+and if this chip now contains 8 Mbit flash you get a good chance to
+upgrade it with HCI 18.x firmware and so get Bluetooth 1.2 support.
 
+Regards
 
---- dfu.c~      2004-06-16 20:02:01.000000000 -0400
-+++ dfu.c       2005-03-03 14:07:53.000000000 -0500
-@@ -33,7 +33,7 @@
- #include "dfu.h"
-
- #define DFU_PACKETSIZE         0x03ff          /* CSR default value:
-1023 */
--#define DFU_TIMEOUT            100
-+#define DFU_TIMEOUT            1000
-
- int dfu_detach(struct usb_dev_handle *udev, int intf)
- {
+Marcel
 
 
 
