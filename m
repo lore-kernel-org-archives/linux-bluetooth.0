@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Thomas Chiverton <thomas.chiverton@bluefinger.com>
+From: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm connection refused / Host is down
-References: <8934986c29.86c2989349@estudiants.urv.es>
-In-Reply-To: <8934986c29.86c2989349@estudiants.urv.es>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200403301650.34805.thomas.chiverton@bluefinger.com>
+Message-id: <8934986c29.86c2989349@estudiants.urv.es>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Subject: [Bluez-users] rfcomm connection refused / Host is down
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,38 +15,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 30 Mar 2004 16:50:34 +0100
+Date: Tue, 30 Mar 2004 17:02:25 +0200
 
-On Tuesday 30 Mar 2004 16:02 pm, you said:
-> I get a message with:
->  Can't connect RFCOMM socket: Connection refused
-> or either:
-> Can't connect RFCOMM socket: Host is down
+Hi!
 
-Are the devices already paired ?
+I'm using the BlueZ stack in kernel 2.4.24, and I've
+got an usb dongle and I try to connect to an
+RS232-bluetooth attached to a robot's serial port.
 
--- 
-Tom Chiverton 
-Advanced ColdFusion Programmer
+So, I do hciconfig and I get
+hci0:
+Type: USB
+	BD Address: 00:0A:3A:50:20:15 ACL MTU: 192:8  SCO
+MTU: 64:8
+	UP RUNNING PSCAN ISCAN 
+	RX bytes:8280 acl:233 sco:0 events:233 errors:0
+	TX bytes:3096 acl:93 sco:0 commands:45 errors:0
 
-Tel: +44(0)1749 834997
-email: tom.chiverton@bluefinger.com
-BlueFinger Limited
-Underwood Business Park
-Wookey Hole Road, WELLS. BA5 1AF
-Tel: +44 (0)1749 834900
-Fax: +44 (0)1749 834901
-web: www.bluefinger.com
-Company Reg No: 4209395 Registered Office: 2 Temple Back East, Temple
-Quay, BRISTOL. BS1 6EG.
-*** This E-mail contains confidential information for the addressee
-only. If you are not the intended recipient, please notify us
-immediately. You should not use, disclose, distribute or copy this
-communication if received in error. No binding contract will result from
-this e-mail until such time as a written document is signed on behalf of
-the company. BlueFinger Limited cannot accept responsibility for the
-completeness or accuracy of this message as it has been transmitted over
-public networks.***
+
+When I do an hcitool -i hci0 inq, I can find the
+RS232 adapter, but on doing
+rfcomm -i hci0 connect /dev/rfcomm0 00:c0:1B:05:C8:2A 1
+
+I get a message with:
+ Can't connect RFCOMM socket: Connection refused
+or either:
+Can't connect RFCOMM socket: Host is down
+
+Can anybody help me??
+
+Thank you!!!
+
+Albert
+
 
 
 -------------------------------------------------------
