@@ -1,16 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Help needed (Fedora Core 2)
+Subject: Re: [Bluez-users] missing libsdp
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ricky Soh <rickysoh@gmail.com>
+To: Christoph Torens <c.torens@web.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <db972f43040912183766fef4f9@mail.gmail.com>
-References: <db972f43040909203314e6825d@mail.gmail.com>
-	 <20040910034429.37672.qmail@web11605.mail.yahoo.com>
-	 <db972f43040909223675a4a082@mail.gmail.com>
-	 <1094997279.5695.2.camel@pegasus>
-	 <db972f43040912183766fef4f9@mail.gmail.com>
+In-Reply-To: <opsd8mhqi6eocfdv@debian>
+References: <opsd8mhqi6eocfdv@debian>
 Content-Type: text/plain
-Message-Id: <1095072018.5695.35.camel@pegasus>
+Message-Id: <1095071938.5695.33.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -22,16 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Sep 2004 12:40:18 +0200
+Date: Mon, 13 Sep 2004 12:38:58 +0200
 
-Hi Ricky,
+Hi Christoph,
 
-> If bluez is installed properly, i should be able to see bluez under
-> lsmod right? And l2test and scotest command are bluez command too, why
-> are they missing? Please help.
+> I just compiled bluez-libs-2.10 and bluez-utils-2.10
+> everything went fine, but starting hcitool I get this message:
+> 
+> hcitool: error while loading shared libraries: libsdp.so.2: cannot open  
+> shared object file: No such file or directory
 
-with a 2.6 kernel the core module is named bluetooth.ko and not bluez.o
-and the l2test and scotest commands are never installed by default.
+the libsdp is no longer needed. Sounds like there is an old install of
+hcitool. Check that you only have one hcitool program installed on your
+system.
+
+> I cross compiled it, so that _might_ be a source of error.
+> To be exact I did for bluez-libs:
+> ./configure --host=arm-linux
+> 
+> and for bluez-utils I did:
+> ./configure --host=arm-linux  
+> --with-bluez=/home/sordid/downloads/bluez-libs-2.10_installDESTDIR/usr/  
+> --with-usb=/opt/arcom/arm-linux/src/linux-source-2.4.21-rmk1-pxa1-arcom1/drivers/usb/  
+> --enable-debug --enable-test --enable-initscripts
+> 
+> I thought the USB command is ment for cross-compiling,
+> so I gave the sources for arm-linux USB as the path.
+> Thats right?
+
+We never include kernel headers, so this is wrong. And as the help text
+of the USB option says it, you can specify the prefix of the USB library
+with it.
 
 Regards
 
