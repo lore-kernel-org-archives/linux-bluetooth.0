@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] [ECONNRESET]Problem with last buffer readed with
-	a read or recv
+Subject: Re: [Bluez-users] Socket willing to provide technical support to
+	BlueZ
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Paolino paperino <vonzoltan@yahoo.it>
+To: "Jay W. Summet" <summetj@cc.gatech.edu>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041020140143.52337.qmail@web40611.mail.yahoo.com>
-References: <20041020140143.52337.qmail@web40611.mail.yahoo.com>
+In-Reply-To: <Pine.GSO.4.58.0410201013001.18317@gaia3.cc.gatech.edu>
+References: <Pine.GSO.4.58.0410201013001.18317@gaia3.cc.gatech.edu>
 Content-Type: text/plain
-Message-Id: <1098288811.13853.30.camel@pegasus>
+Message-Id: <1098288689.13853.28.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,37 +19,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 20 Oct 2004 18:13:31 +0200
+Date: Wed, 20 Oct 2004 18:11:29 +0200
 
-Hi Andrea,
+Hi Jay,
 
-> I writed a RFCOMM cleint side socket and its servere
-> side. The server sends an arbitrary sequence of 2048
-> bytes throught the write function. The client side
-> read as far as it receive a 0 or -1 frem the read.
-> The code is like this:
-> char *buffer[2048];
-> do {
->    tmpPtr += nread;		
->    nread = recv(fd, buffer, length, 0);
-> } while (nread > 0);
+> After complaining about lack of Linux support, I received the following
+> message from Socket (www.socketcom.com):
 > 
-> The problem arise when the server correctly send its
-> last bucket, the client must read it (read 2048
-> bytes), at the next read the client must get an EOF
-> (0) value from the recv...but this not happen it
-> receive -1 and errno=ECONNRESET. The same code works
-> as expected using TCP streams, but when it is used
-> over RFCOMM SOCK_STREAM it causes this anomaly.
 > 
-> Somebody could explain what happens, why the recv call
-> doesn't return a 0 when last data are reached on the
-> stream, but give an error message?
+> "Thank you for your comments Jay, I will forward them to our Bluetooth
+> product manager. We are open to working with the BlueZ dev team however
+> they have not attempted to contact us at this time for any assistance. We
+> are open to dialog with the dev team as it would help us in the long run
+> to have support for Linux.
+> 
+> Donnie
+> Socket Communications Technical Support"
 
-are you sure that your client/server code is correct, because until you
-don't close the socket on the server side, the client can't receive any
-additional information. It simply blocks. Show us the full code for both
-sides.
+this is a wrong statement. We (Max and I) discussed this back in August
+2002 with Martin Croome (martin@socketcom.com) for the revision E and F
+cards. They asked me to sign a NDA which I didn't sign and no further
+communication happened.
+
+If they wanna improve the Linux support for their cards then they should
+send me some of them (including the older Nokia based ones) and include
+any needed specification documents (without signing a NDA) to improve
+our drivers.
+
+And btw it is not so hard to find out my email address ;)
 
 Regards
 
