@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] getting bluetooth v1.2
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20242.1112026706@www42.gmx.net>
-References: <1112015700.9016.30.camel@pegasus>
-	 <20242.1112026706@www42.gmx.net>
-Content-Type: text/plain
-Message-Id: <1112030513.9016.40.camel@pegasus>
+Message-ID: <d1f423d3050328085166da3261@mail.gmail.com>
+From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] creating the bnep0 device
+In-Reply-To: <1112006473.9016.0.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <424780AA.4020705@coloradocollege.edu>
+	 <1112006473.9016.0.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,31 +19,94 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Mar 2005 19:21:53 +0200
+Date: Mon, 28 Mar 2005 08:51:41 -0800
 
-Hi Marco,
-
-> so it doesn't mather that i've a silicon dongle?
-> (i need the bt v1.2 only because the rssi inquiry)
-> or isn't it a silicon one?
-
-you dongle is a Cambridge Silicon Radio (CSR for short) and the other
-one is Silicon Wave (SiW for short). Read it more carefully.
-
-> what is now the procedure?
-> - getting the btdfu program
-> - fix it (Adam Goode told how)
-> - download the 18.x firmware. where can i get it?
-> - install it...
-
-If you are lucky, then yes. The GenericCSR.dfu is inside the MacOS X
-Bluetooth update you can download from the Apple site.
-
-Regards
-
-Marcel
+Hi Jonathan,
 
 
+As Marcel has menssioned you should connect the devices using PAND
+first. When the connection is ok the bnep0 is created automatically by
+PAND. Ex:
+
+GN side
+
+pand --listen --role GN
+
+PANU side:
+pand --connect <bdaddr> --role PANU
+
+If everything got OK you can apply an IP address at both sides
+
+GN side:
+#ifconfig bnep0 10.0.0.1
+
+PANU side:
+#ifconfig bnep0 10.0.0.2
+
+so you can try ping one of these addresses 
+
+hope it helps.
+
+all the best
+
+On Mon, 28 Mar 2005 12:41:13 +0200, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Jonathan,
+> 
+> > I have a pretty remedial question involving setting up bluettoth in
+> > Linux, but I don't think that I've seen any answers in the documentation
+> > or mailing list.
+> >
+> > I'm using kernel 2.6.11 with a LinkSys USBBT100 adaptor.  The adaptor
+> > can scan and ping other bluetooth devices with l2ping, but I'm having
+> > problems getting bnep0 recognized as a network interface.
+> >
+> > ifconfig bnep0 returns
+> > bnep0: error fetching interface information: Device not found
+> >
+> > The fedora utility sees bnep0, but cannot activate it and returns
+> > SIOCGIFFLAGS: No such device
+> > when I try to deactivate it.
+> >
+> > I get the same results when I use bluez/benp compiled into the kernel or
+> > loading them as modules.  /var/log/messages has the bluetooth messages:
+> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: L2CAP ver 2.7
+> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: L2CAP socket layer initialized
+> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM ver 1.5
+> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM socket layer
+> > initialized
+> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM TTY layer initialized
+> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: BNEP (Ethernet Emulation)
+> > ver 1.2
+> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: BNEP filters: protocol
+> > multicast
+> > Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: HIDP (Human Interface
+> > Emulation) ver 1.1
+> >
+> > Does anyone have suggestions to get bnep0 off the ground?
+> 
+> what about using "pand --connect" before you try to use "ifconfig".
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+
+
+-- 
+Anderson Clayton B. Rodrigues
+Eng. de Software
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
