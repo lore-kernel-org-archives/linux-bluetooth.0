@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <d1f423d30504060521634cdacb@mail.gmail.com>
-From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
+Message-ID: <BAY20-F1F019D190C77973EA71AF853D0@phx.gbl>
+From: "Martin Rolsted Jensen" <mrj_ing@hotmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] ARM linux kernel 2.4.18-rmk7
-In-Reply-To: <20050406111405.18543.qmail@web52407.mail.yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <20050406111405.18543.qmail@web52407.mail.yahoo.com>
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Subject: [Bluez-devel] Bluetooth on PXA255
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,49 +16,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 6 Apr 2005 08:21:06 -0400
+Date: Wed, 06 Apr 2005 11:29:13 +0000
 
-Hi Jose,
+Hello everybody!
+I am currently working on a triton1 board with a pxa255 module. I want to 
+connect a UART Bluetooth module to the board (WML-C20AH).
+The first thing I did was to configure the kernel (2.6.10) to support 
+Bluetooth. As far as I can see in the boot sequence of Linux, the ttyBT 
+interface is controlled by the standard ttyS1.
+My question is how to control/setup the device? For instant hciconfig does 
+not work.
+I am newbie to Linux :-)
 
-
-Well, you should apply the patch and configure your kernel properly
-and then compile it. But I strongly recomend that you use a newer
-kernel if you can. I posted and little tutorial of how using bluez on
-OMAP 1510 ARM Platform and maybe it can help you at the beggining.
-
-all the best
-
-On Apr 6, 2005 7:14 AM, jose <twblr@yahoo.com> wrote:
-> hi,
-> 
-> i want to install bluez on a pda with arm linux kernel
-> 2.4.18-rmk7. can i directly install bluez or do i have
-> to first install a kernel patch?
-> 
-> rgds,
-> jose
-> 
-> __________________________________
-> Do you Yahoo!?
-> Make Yahoo! your home page
-> http://www.yahoo.com/r/hs
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
+Best Regards
+Martin Rolsted Jensen
 
 
--- 
-Anderson Clayton B. Rodrigues
-Eng. de Software
-Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
