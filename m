@@ -1,62 +1,54 @@
-Return-Path: <gnome-bluetooth-bounces@usefulinc.com>
-From: Fredrik Noring <noring@nocrew.org>
-To: Edd Dumbill <edd@usefulinc.com>
-In-Reply-To: <1067906859.15607.48.camel@saag>
-References: <1064593223.12843.127.camel@saag>
-	<1067882864.15593.326.camel@dhcp-116.surrey.redhat.com>
-	<1067906859.15607.48.camel@saag>
-Message-Id: <1075331039.553.80.camel@akka.yeti.nocrew.org>
-Mime-Version: 1.0
-Date: Thu, 29 Jan 2004 00:04:00 +0100
-Subject: Re: [gnome-bluetooth] What stuff in gnome-bluetooth does, and
-	ideas for its future
-Content-Type: text/plain
-Cc: GNOME Bluetooth Mailing List <gnome-bluetooth@usefulinc.com>,
+Return-Path: <acr@acroberts.com>
+Message-ID: <401813C8.508@acroberts.com>
+Date: Wed, 28 Jan 2004 20:55:52 +0100
+From: "Antony C. Roberts" <acr@acroberts.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Peter Kjellerstedt <peter.kjellerstedt@axis.com>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-List-Unsubscribe: <http://lists.usefulinc.com/mailman/listinfo/gnome-bluetooth>,
-	<mailto:gnome-bluetooth-request@usefulinc.com?subject=unsubscribe>
-List-Archive: <http://lists.usefulinc.com/pipermail/gnome-bluetooth>
-List-Post: <mailto:gnome-bluetooth@usefulinc.com>
-List-Help: <mailto:gnome-bluetooth-request@usefulinc.com?subject=help>
-List-Subscribe: <http://lists.usefulinc.com/mailman/listinfo/gnome-bluetooth>,
-	<mailto:gnome-bluetooth-request@usefulinc.com?subject=subscribe>
-Sender: gnome-bluetooth-bounces@usefulinc.com
-Errors-To: gnome-bluetooth-bounces@usefulinc.com
+Subject: Re: [Bluez-devel] Windows Port
+References: <50BF37ECE4954A4BA18C08D0C2CF88CB04B83F@exmail1.se.axis.com>	 <1075276388.12766.49.camel@pegasus>  <40176BC2.9020307@acroberts.com>	 <1075277296.12766.63.camel@pegasus>  <4017704C.2070505@acroberts.com> <1075306926.26729.8.camel@pegasus>
+In-Reply-To: <1075306926.26729.8.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Edd,
+Marcel Holtmann wrote:
 
-tis 2003-11-04 klockan 01.47 skrev Edd Dumbill:
-> We need a way of finding out for which bdaddrs it has a key.  Currently 
-> this information is stored in /etc/bluetooth/link_key and readable only 
-> by root, so we've some progress to make there.
+>Hi Antony,
+>
+>  
+>
+>>Thanks for the warning. The stuff I want to port will be isolated in the 
+>>services provided and all the code in this application will, as 
+>>required, still be GPL. However, the parts which interface to these 
+>>services (the hardware driver and the API) would be a modified GPL that 
+>>does not require the entire program to be made public but only the 
+>>original source code and any modifications made to it.
+>>    
+>>
+>
+>if a program contains one line GPL code, the complete source code must
+>be available. If you link a library under GPL, the final program will
+>also be GPL.
+>  
+>
+True. In this respect the program would be the l2cap and rfcomm 
+services. The UI stuff and the driver are separate programs, which don't 
+contain any GLP'ed code. If the interfaces to RFCOMM and L2CAP are 
+socket based (or pipe based or whatever), then you don't need to link 
+with any GPL'ed libs.
 
-I believe it would be helpful to change the link_key binary file format
-to ascii.
+That's my thinking. My intention is not to "misuse" GPL'ed code. My 
+intention is to give people something that they can innovate with 
+commercially. I believe this is good for Bluetooth. It's important for 
+Bluetooth that it gets a truely intuitive presence on Windows. Let's not 
+turn this discussion into a GPL/non-GPL argument, though.
 
-This would make the file more accessible and also simplify debugging,
-manual recovery, endianess compatibility, future data type compatibility
-and compiler issues such as the size of "time_t". Current format is:
+Besides, I don't even yet know whether or not I am going to heed your 
+warnings and implement without using the BlueZ sources. The first step 
+is to get the USB driver working and being able to initiate basic HCI 
+stuff - that will be a completely new implementation and nothing to do 
+with BlueZ. Once I've gotten there, I'll make a definite decision.
 
-	struct link_key {
-		bdaddr_t sba;
-		bdaddr_t dba;
-		uint8_t	 key[16];
-		uint8_t	 type;
-		time_t	 time;
-	};
-
-An ascii version could be row based. What about like this?
-
-00:11:22:33:44:55   66:77:88:99:00:11   6d450822cf944dcedd7a5b2e347e606f   key_type   1075330902
-
-Works with grep, awk, perl, emacs and so on too. :)
-
-Fredrik
-
-
-
-_______________________________________________
-gnome-bluetooth mailing list
-gnome-bluetooth@usefulinc.com
-http://lists.usefulinc.com/mailman/listinfo/gnome-bluetooth
+Regards,
+Antony C. Roberts.
