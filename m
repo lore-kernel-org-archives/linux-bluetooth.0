@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
+Subject: Re: [Bluez-users] controller code!!!!
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200412292101.17166.cijoml@volny.cz>
-Subject: [Bluez-users] bluecore02 and BT2.0 19.x fw
+In-Reply-To: <20041229194012.95D5621B32F@ws5-6.us4.outblaze.com>
+References: <20041229194012.95D5621B32F@ws5-6.us4.outblaze.com>
+Content-Type: text/plain
+Message-Id: <1104349921.6325.9.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,14 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Dec 2004 21:01:17 +0100
+Date: Wed, 29 Dec 2004 20:52:01 +0100
 
-Hi,
+Hi Simi,
 
-will be possible to use BT 2.0 19.x fw with BlueCore02? It would be nice if 
-apple would release 2.0 fw for us :)
+> sorry to say ...but since i am immature in this topic can i plz give the documentation of HCI alone....so how the connection is established without LMP
 
-Michal
+download the Bluetooth Core specification.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
