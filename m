@@ -1,15 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: # =?ISO-8859-1?Q?Bj=F6rn?= Specht # <bspecht@gmx.net>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] omtu, imtu
-Message-ID: <20050209160702.56b74881@CleverSophie>
-In-Reply-To: <1107957430.13863.34.camel@pegasus>
-References: <20050209140701.2cf50710@CleverSophie>
-	<1107955171.13863.26.camel@pegasus>
-	<20050209143858.1e0350c3@CleverSophie>
-	<1107957430.13863.34.camel@pegasus>
+Subject: Re: [Bluez-devel] L2CAP retransmission, flow control
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1107955473.9489.37.camel@mammoth.research.nokia.com>
+References: <1107934854.9489.4.camel@mammoth.research.nokia.com>
+	 <1107938887.13863.4.camel@pegasus>
+	 <1107940961.9489.32.camel@mammoth.research.nokia.com>
+	 <1107944306.13863.15.camel@pegasus>
+	 <1107955473.9489.37.camel@mammoth.research.nokia.com>
+Content-Type: text/plain
+Message-Id: <1107957983.13863.37.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,19 +22,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 9 Feb 2005 16:07:02 +0100
+Date: Wed, 09 Feb 2005 15:06:23 +0100
 
-Hi Marcel,
+Hi Imre,
 
-can you also tell me what omtu and imtu are for? I know the Maximum Transfe=
-r Unit, but what exactly do these 2? I have set them to 672 and 0 like in t=
-he rctest.c file.
+> > If SOCK_STREAM is requested and RFC negotiation fails, then also the
+> > connection must fail. For SOCK_STREAM you need flow control.
+> >
+> > For SOCK_DGRAM and SOCK_RAW we don't do anything. The SOCK_DGRAM is for
+> > connection-less channels and SOCK_RAW gives access to the signal channel
+> > itself.
+> > 
+> > If you use SOCK_SEQPACKET (current type) and mode > 0 then negotiate RFC
+> > and if success then use it, otherwise fail.
+> > 
+> 
+> Shouldn't we support the flow control only mode, so without
+> retransmission? For SOCK_SEQPACKET and a specific mode value for
+> example.
 
-Is 672 the maximum? It would just be nice to know the maximum data per fram=
-e, for a good header to data proportion.
+if you select SOCK_SEQPACKET and set the mode to flow control and
+retransmission then this must be negotiated and on success this can be
+used.
 
-Thanks again=20
-Bj=F6rn
+For SOCK_STREAM only the flow control is really needed, but also having
+retransmission whould be great.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
