@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <HV4JYI$A76840F1DFBE95344225AA2AE2138988@laposte.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-From: "Antoine Maisonneuve" <antoine02@laposte.net>
-To: "bluez-users" <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Ipaq problem with kernel 2.4.19-rmk6-pxa1-hh36
+Subject: Re: [Bluez-users] hcitool returns error 0x11 with RSSI command
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alvin Lam <alvinlam@shaw.ca>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <45a3bf460bd7.460bd745a3bf@shaw.ca>
+References: <45a3bf460bd7.460bd745a3bf@shaw.ca>
+Content-Type: text/plain
+Message-Id: <1080154185.2309.63.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,83 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Mar 2004 10:06:18 +0100
+Date: Wed, 24 Mar 2004 19:49:45 +0100
 
-Hi all,
-I install the last revision 0.72 of familiar on my Ipaq 3970,=0D
-=
-with no problem (kernel 2.4.19-rmk6-pxa1-hh30). And Bluetooth
-works well=
-, but I would like activate some networking options.
-So I get the last k=
-ernel on familiar CVS server
-2.4.19-rmk6-pxa1-hh36 I use the file
-arch/=
-arm/def-configs/ipaqpxa to configure my kernel and add
-networking option=
-s.
-But when use my new kernel Bluetooth don't works anymore,(the
-rest o=
-f the system works well) I look at Bluetooth part in
-kernel options, all=
- seem right.... (Bluetooth subsystem
-support and HCI UART driver correct=
-ly checked as modules).
-I also try to create a kernel with the ipaqpxa c=
-onfiguration
-(without adding or remove any options) and it's the same pr=
-oblem.
+Hi Alvin,
 
-When I use lsmod, hci_uart seems unused, if someone could help=0D
-=
-me ?
-Does an Ipaq needs any special options to activate Bluetooth
-in th=
-e kernel ?
+> Thanks for the replies.  I seem to recall seeing the RSSI feature being available before I re-installed the dtl1_cs driver.  Could it be possible that I have somehow disabled this feature?
 
-Thanks for your help
+the Nokia card didn't had these features and it is not possible to
+disable or enable them.
 
-Antoine Maisonneuve
+Regards
 
-lsmod report=
- :
+Marcel
 
-hci_uart               11860   0 (unused)
-pxa-i2s                 =
-1136   0
-i2c-core               13752   0
-pxa-audio               9136 =
-  0
-ds                      7476   2
-h3600_generic_sleeve    6504   0 (=
-unused)
-pxa_cs                 12584   2 [h3600_generic_sleeve]
-pcmcia_=
-core            35416   0 [ds pxa_cs]
-usbcore                57256   0 (=
-unused)
-usb-eth                 5988   0 (unused)
-pxausb_core          =
-   8904   0 [usb-eth]
-sa1100-rtc              5688   1
-ipaq-sleeve     =
-        7876   0 [h3600_generic_sleeve pxa_cs]
-ircomm-tty             35=
-128   0 (unused)
-ircomm                 15964   0 [ircomm-tty]
-irda    =
-              162632   0 [ircomm-tty ircomm]
-h3600_ts                978=
-8   1
-apm                     4412   1
-bnep                    9288   0=
- (unused)
-l2cap                  17276   0 [bnep]
-bluez                =
-  32088   1 [hci_uart bnep l2cap] 
-=0A=0AAcc=E9dez au courrier =E9lectro=
-nique de La Poste : www.laposte.net ; =0A3615 LAPOSTENET (0,34=80/mn) ; t=
-=E9l : 08 92 68 13 50 (0,34=80/mn)=0A=0A
 
 
 
