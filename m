@@ -1,48 +1,58 @@
-Return-Path: <Olivier.Bornet@smartdata.ch>
-Date: Wed, 10 Dec 2003 09:02:59 +0100
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-users@lists.sourceforge.net, bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-users] bthid cvs question
-Message-ID: <20031210080259.GF26896@smartdata.ch>
-References: <Pine.LNX.4.44.0312091023470.6471-100000@speare5-1-11.nmt.edu> <1071020597.10655.4.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Logitech MX900 mouse with Dell Inspiron 8600
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Charles Bueche <charles@bueche.ch>
+Cc: Olivier Bornet <Olivier.Bornet@smartdata.ch>,
+   Edd Dumbill <edd@usefulinc.com>, Peter Klausler <peter@klausler.com>,
+   BlueZ Developers List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1071001915.13464.33.camel@bluez.bueche.ch>
+References: <1070201531.8187.20.camel@bluez.bueche.ch>
+	 <1070218289.8534.30.camel@bluez.bueche.ch>
+	 <20031201093804.A1281@schnell.us.cray.com> <1070380522.19169.52.camel@saag>
+	 <1070380907.19169.55.camel@saag> <1070482683.18058.6.camel@bluez.bueche.ch>
+	 <1070483755.24159.114.camel@pegasus>  <20031204085314.GA1780@smartdata.ch>
+	 <1071001915.13464.33.camel@bluez.bueche.ch>
+Content-Type: text/plain
+Message-Id: <1071020516.10655.2.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="rwbb4r/vLufKlfJs"
-In-Reply-To: <1071020597.10655.4.camel@pegasus>
-From: Olivier Bornet <Olivier.Bornet@smartdata.ch>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 10 Dec 2003 02:41:57 +0100
+
+Hi Charles,
+
+> - modified out.c to use /dev/misc/uinput (Marcel says devfs produce
+> this, I don't see exactly what I do wrong or what I should do to get
+> /dev/input/uinput).
+
+I don't use devfs and this is what I have in /dev
+
+crw-rw-rw-    1 root     root      10, 223 Aug 31 22:05 /dev/input/uinput
+
+You can use mknod for creating it. Maybe your devfs problem is a
+permission problem.
+
+Regards
+
+Marcel
 
 
---rwbb4r/vLufKlfJs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Hello,
 
-> the code is in CVS under utils2/hid/ now.
-
-And do you have some tips on how to use it. I have try without success.
-I will be happy to switch from bthid to the hid from BlueZ.
-
-Thanks, and good day.
-
-		Olivier
---=20
-Olivier Bornet                      http://www.smartdata.ch/
-Olivier.Bornet@smartdata.ch         SMARTDATA SA
-GPG key ID: C53D9218                CH Martigny/Lausanne
-
---rwbb4r/vLufKlfJs
-Content-Type: application/pgp-signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.2 (GNU/Linux)
-
-iD8DBQE/1tMzdj3R/MU9khgRAprMAKC0uIEscPwu/CYb0XneXoFzBux0GQCgi8s3
-Z1+5d4TK+Fo31QFU5rYervA=
-=ZGqJ
------END PGP SIGNATURE-----
-
---rwbb4r/vLufKlfJs--
+-------------------------------------------------------
+This SF.net email is sponsored by: SF.net Giveback Program.
+Does SourceForge.net help you be more productive?  Does it
+help you create better code?  SHARE THE LOVE, and help us help
+YOU!  Click Here: http://sourceforge.net/donate/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
