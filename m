@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Anssi Saari <as@sci.fi>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Message-ID: <20040401102919.GA6987@sci.fi>
-References: <20040328220800.36896.qmail@web60302.mail.yahoo.com> <200403290028.48289.cijoml@volny.cz> <1080514616.2281.178.camel@pegasus>
+Subject: Re: [Bluez-users] still the old problem...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Geert Geurts <geert@ebm.nl>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1080813335.3081.38.camel@geert.ebm.nl>
+References: <1080813335.3081.38.camel@geert.ebm.nl>
+Content-Type: text/plain
+Message-Id: <1080813841.3059.12.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1080514616.2281.178.camel@pegasus>
-Subject: [Bluez-users] Re: Bluetooth security in bluez ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,16 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 1 Apr 2004 13:29:19 +0300
+Date: Thu, 01 Apr 2004 12:04:02 +0200
 
-On Mon, Mar 29, 2004 at 12:56:57AM +0200, Marcel Holtmann wrote:
- 
-> setting auth and encrypt in hcid.conf enables security mode 3, which is
-> not what most people want. Leave it off and use security mode 1/2 and
-> let the remote device trigger the security mechanism.
+Hi Geert,
 
-How can you tell whether a connection is encrypted or not in Bluez if
-security mode is 2?
+> got rid of affix but still got the same old problem...
+> after 1/2 min of connectivity It breaks again...  and pinging over the
+> ppp gives 
+> sendmsg: No buffer space available
+> again...
+> I've made some files wich probably says more then me whining... 
+> 62.131.96.192/geert/*
+> containing: hcidump,lsmod,messages,ppp-peers-dun,steps,uname-r
+
+try to exchange the dongle or update your PalmOS. Please try it with a
+2.6 kernel. However send us a binary dump made with "hcidump -w <file>".
+
+Regards
+
+Marcel
+
 
 
 
