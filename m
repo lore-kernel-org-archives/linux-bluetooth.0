@@ -1,67 +1,48 @@
-Return-Path: <crosser@average.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Device specific pins
-From: Eugene Crosser <crosser@average.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Dave Henriksen <dhenriksen@optibrand.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1075151423.25442.135.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dave Henriksen <dhenriksen@optibrand.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1075157711.3751.1.camel@linux.local>
 References: <1075153448.2906.2.camel@linux.local>
-	 <1075151423.25442.135.camel@pegasus>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-D024Sp+niSuJ3/GUoVZE"
-Message-Id: <1075187139.9727.29.camel@pccross.average.org>
-Mime-Version: 1.0
-Date: Tue, 27 Jan 2004 10:05:39 +0300
-List-ID: <bluez-devel.lists.sourceforge.net>
-
-
---=-D024Sp+niSuJ3/GUoVZE
+	 <1075151423.25442.135.camel@pegasus>  <1075157711.3751.1.camel@linux.local>
 Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Message-Id: <1075159575.5234.1.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Tue, 27 Jan 2004 00:26:15 +0100
 
-On Tue, 2004-01-27 at 00:10, Marcel Holtmann wrote:
+Hi Dave,
 
-> > Just wondering if there is any way to have pins that vary depending upo=
-n
-> > what device you are connecting to.   Currently, I just use
-> > /etb/bluetooth/givepin to supply a pin, but this pin must be the same
-> > for every device that my Linux laptop connects to.
->=20
-> this is a planned future for the new security manager which also
-> includes one-time PIN codes.
->=20
-> For the current version you must do it by yourself in a pin-helper
-> script. The BD_ADDR of the remote device is one of the parameters.
+> Thanks for the reply.   Are you saying that the BD_ADDR gets passed into
+> the pin helper script as a parameter ?  Or is it an environment variable
+> that I can reference within my pin_helper script ?
 
-Do you think it might be right to leave "low level" PIN management as it
-is now, via an executable helper?  It is very much the same way as
-kernel "hotplug" works.  So it can stay the same even if hcid eventually
-becomes a kernel thread.
+it is a parameter. For more details look at utils/hcid/security.c at
+line 254ff.
 
-The "real" PIN management, with the database, GUI prompt boxes etc.
-could be isolated from the BT stack, helper executable being the only
-interface.
+Regards
 
-E.g., a Gnome or KDE applet could listen on a unix domain socket.  The
-helper, when invoked, would try to talk over this socket, and if the
-latter is not present or nobody listens on it, default to preexisting
-database.  This way, both fancy GUI dialogues and unattended operation
-could be implemented rather easily.
+Marcel
 
-Sorry if I say stupid or trivial things, I did not really try to learn
-how these things are currently done in Blues..
 
-Eugene
 
---=-D024Sp+niSuJ3/GUoVZE
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.1 (GNU/Linux)
-
-iD8DBQBAFg3Cfrw/cIw6UWkRAlM3AJ4rxJx7rUObHFPaWuZaZTz8ERF7IgCglkFn
-pw2Ixz9KZldMGv4GITbrC8M=
-=yB62
------END PGP SIGNATURE-----
-
---=-D024Sp+niSuJ3/GUoVZE--
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
