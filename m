@@ -1,107 +1,61 @@
-Return-Path: <krose@nausicaa.valley-of-wind.krose.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: O Plameras <oscarp@acay.com.au>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] AMD64 HID pairing
-References: <khnacuya23u.fsf@hunter-killer.kendall.corp.akamai.com>
-	<1097185188.7325.75.camel@pegasus>
-	<khnr7oa8ah1.fsf@hunter-killer.kendall.corp.akamai.com>
-	<1097186322.7325.79.camel@pegasus>
-	<khnk6u289o5.fsf@hunter-killer.kendall.corp.akamai.com>
-From: Kyle Rose <krose+bluez@krose.org>
-Date: Sat, 09 Oct 2004 11:04:47 -0400
-In-Reply-To: <khnk6u289o5.fsf@hunter-killer.kendall.corp.akamai.com> (Kyle
-	Rose's message of "Thu, 07 Oct 2004 18:07:06 -0400")
-Message-ID: <87ekk82ar4.fsf@nausicaa.krose.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: Kyle Rose <krose@nausicaa.valley-of-wind.krose.org>
-List-ID: <bluez-users.lists.sourceforge.net>
+In-Reply-To: <4167DB4C.6000504@acay.com.au>
+References: <41629C2B.4040201@3wt.com.br>
+	 <1096991861.20349.73.camel@pegasus>  <4162D886.8010406@3wt.com.br>
+	 <1097055892.4937.3.camel@pegasus>  <4167DB4C.6000504@acay.com.au>
+Content-Type: text/plain
+Message-Id: <1097329902.12972.1.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-users] Re: rfcommX and ppp
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Sat, 09 Oct 2004 15:51:43 +0200
 
->> Then use "-x". I think the "-X" option was introduced with 1.11 or so
->> and the Debian packages are a little bit behind.
->
-> I'll have to do this when I get home, so I can move the mouse around
-> and see what I get.
+Hi,
 
-OK, so I'm now using 2.6.9-rc3-bk8, and I get the following when
-moving the mouse around after the connection times out:
+> > try to use 10.0.0.1: or other way around. Or you can define multiple
+> > options.rfcommX files in /etc/ppp/ and use a bridge. There are some ways
+> > to get this working.
+> 
+> I learned from PPP lists that ppp0 interface bridging is not supported
+> nor is their a patch under 2.6.x or pppd.
+> 
+> When I do this,
+> brctl addif br0 ppp0
+> 
+> it returns,
+> br_add_interface: Invalid argument
+> 
+> Nobody is doing work on these at the moment is my understanding.
 
-> HCI Event: Connect Request (0x04) plen 10
-  19 C4 14 61 07 00 80 25 00 01 
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  19 C4 14 61 07 00 00 
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04 
-> HCI Event: Link Key Request (0x17) plen 6
-  19 C4 14 61 07 00 
-< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
-  19 C4 14 61 07 00 
-> HCI Event: Role Change (0x12) plen 8
-  00 19 C4 14 61 07 00 00 
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0C 04 00 19 C4 14 61 07 00 
-> HCI Event: PIN Code Request (0x16) plen 6
-  19 C4 14 61 07 00 
-< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
-  19 C4 14 61 07 00 04 36 30 35 38 00 00 00 00 00 00 00 00 00 
-  00 00 00 
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0D 04 00 19 C4 14 61 07 00 
-> HCI Event: Connect Complete (0x03) plen 11
-  18 2A 00 19 C4 14 61 07 00 01 00 
-> HCI Event: Connect Request (0x04) plen 10
-  19 C4 14 61 07 00 80 25 00 01 
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  19 C4 14 61 07 00 00 
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04 
-> HCI Event: Role Change (0x12) plen 8
-  00 19 C4 14 61 07 00 00 
-> HCI Event: Connect Complete (0x03) plen 11
-  17 2B 00 19 C4 14 61 07 00 01 00 
-> HCI Event: Connect Request (0x04) plen 10
-  19 C4 14 61 07 00 80 25 00 01 
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  19 C4 14 61 07 00 00 
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04 
-> HCI Event: Link Key Request (0x17) plen 6
-  19 C4 14 61 07 00 
-< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
-  19 C4 14 61 07 00 
-> HCI Event: Role Change (0x12) plen 8
-  00 19 C4 14 61 07 00 00 
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0C 04 00 19 C4 14 61 07 00 
-> HCI Event: PIN Code Request (0x16) plen 6
-  19 C4 14 61 07 00 
-< HCI Command: PIN Code Request Reply (0x01|0x000d) plen 23
-  19 C4 14 61 07 00 04 36 30 35 38 00 00 00 00 00 00 00 00 00 
-  00 00 00 
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0D 04 00 19 C4 14 61 07 00 
-> HCI Event: Connect Complete (0x03) plen 11
-  18 2C 00 19 C4 14 61 07 00 01 00 
-> HCI Event: Connect Request (0x04) plen 10
-  19 C4 14 61 07 00 80 25 00 01 
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  19 C4 14 61 07 00 00 
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04 
-> HCI Event: Role Change (0x12) plen 8
-  00 19 C4 14 61 07 00 00 
-> HCI Event: Connect Complete (0x03) plen 11
-  17 2D 00 19 C4 14 61 07 00 01 00 
-> HCI Event: Connect Request (0x04) plen 10
-  19 C4 14 61 07 00 80 25 00 01 
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  19 C4 14 61 07 00 00 
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04 
-> HCI Event: Role Change (0x12) plen 8
-  00 19 C4 14 61 07 00 00 
-> HCI Event: Connect Complete (0x03) plen 11
-  17 2E 00 19 C4 14 61 07 00 01 00 
+this is a question for the bridge people. Using PPP over RFCOMM is
+deprecated by the Bluetooth SIG and using PAN is much more straight
+forward how things should be.
 
-Cheers,
-Kyle
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
