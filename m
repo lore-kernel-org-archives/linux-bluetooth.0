@@ -1,109 +1,66 @@
-Return-Path: <Steven.Singer@csr.com>
-Message-ID: <3F84295E.9020303@csr.com>
-Date: Wed, 08 Oct 2003 16:12:30 +0100
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Peter Bergmann <bergmann.peter@gmx.net>,
-   BlueZ Mailing List
-    <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Reducing power consumption (Was: bluetooth and wireless
-    lan horror)
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] bluetooth and wireless lan horror
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Steven Singer <steven.singer@csr.com>
+Cc: Peter Bergmann <bergmann.peter@gmx.net>,
+   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3F83F423.7020406@csr.com>
 References: <1065171540.1734.97.camel@pegasus>
-    <28385.1065174121@www39.gmx.net> <1065174943.1734.101.camel@pegasus>
-    <3F7D5B72.1050900@csr.com> <1065443556.21958.39.camel@pegasus>
-    <3F83F423.7020406@csr.com> <1065613768.5327.138.camel@pegasus>
-In-Reply-To: <1065613768.5327.138.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+	<28385.1065174121@www39.gmx.net> <1065174943.1734.101.camel@pegasus>
+	<3F7D5B72.1050900@csr.com> <1065443556.21958.39.camel@pegasus>
+	<3F83F423.7020406@csr.com>
+Content-Type: text/plain
+Message-Id: <1065613768.5327.138.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: 08 Oct 2003 13:49:22 +0200
 
-Marcel Holtmann wrote:
-> It can be useful for all kind of devices where power consumption is
-> essential. Even an iPAQ with a PAN connection can profit from it. The
-> Microsoft HID devices make heavy use of sniff mode, before they
-> disconnect the ACL link after 12 minutes of idle time. And everyone
-> talks about the long battery life time of Bluetooth HID devices, so this
-> looks like the right way to reduce power consumption.
+Hi Steven,
 
-I think, in the HID profile, it's the HID client device (the mouse or
-whatever) that controls the sniff settings and chooses when to disconnect.
-It's the client that has to keep power consumption extremely low to make
-its battery last for months. It's the client that has the input from the
-sensor (for example) to determine when would be a good time to bring the
-link latency down. All the server has to do is enable sniff and let the
-client sort it out.
+> > this idea is nice and it sounds like a useful feature. But it can't
+> > depend on the RFCOMM traffic. It must depend on the ACL traffic and the
+> > BlueZ core must handle it.
+> 
+> Yes, sorry. Of course it must depend on ACL traffic not RFCOMM. I
+> suspect the easiest way to do it is to advertise an ioctl for this
+> feature. I'm not quite sure what the interface should be, but I'm sure
+> you can think of something.
 
-If you're looking at BlueZ HID clients (say BlueZ on a palmtop which
-can behave as a HID device for a desktop machine) then you will need
-to look at controlling sniff.
+I think more of an on/off flag with some additional parameters. And it
+maybe described the best with "Automatic Sniff Mode".
 
-However, as you say, for battery powered devices, sniff is generally
-a good thing. In Bluetooth, active slaves are required to listen in
-every slot. This burns power. Just switching into sniff with a short
-interval (say 25 ms - same as the poll period) can have a significant
-effect on power consumption. Of course, if you're on a mains powered
-machine, or if the power consumption of your Bluetooth device is a
-small fraction of your total power consumption, then this is not worth
-bothering with. In fact, in these cases, you probably shouldn't do it
-and you should let the device at the other end of the link decide what
-settings are most profitable for it.
+> We're getting ahead of ourselves though. We need confirmation from Peter
+> that sniff helps the problem. If it doesn't we're wasting our time
+> (unless you think the feature is useful for other applications).
 
-How much power you save depends on the host transport and the host
-transport settings. Some scenarios allow us to save more power than
-others. I've tried to simplify the description to try and keep it
-general rather than too CSR specific but, because I know only the CSR
-solution in detail, some of this might not apply to other chipsets.
+It can be useful for all kind of devices where power consumption is
+essential. Even an iPAQ with a PAN connection can profit from it. The
+Microsoft HID devices make heavy use of sniff mode, before they
+disconnect the ACL link after 12 minutes of idle time. And everyone
+talks about the long battery life time of Bluetooth HID devices, so this
+looks like the right way to reduce power consumption.
 
-For all scenarios, even short sniffs can be a significant improvement
-over being an active slave. Just allowing the dongle to keep its radio
-turned off most of the time could save maybe a factor of two in power
-(depending on sniff settings).
+Regards
 
-For some scenarios, such as bus powered USB dongles and H4 UART dongles
-with very high baud rates, this might be the best you can do.
-
-Other scenarios may improve things dramatically, particularly at long
-sniff intervals. If the Bluetooth dongle is a self powered USB device
-and if you support remote wakeup then suspending it may help.
-
-For UARTs, both with H4 and BCSP, using a lower baud rate might help the
-power consumption even on short sniff intervals (of course it will hurt
-the data rate)
-
-Using a host transport that supports devices going to sleep - BCSP
-is an example - really helps at long sniff intervals (say one second
-or more).
-
-The question is how much of a saving do you need? Even flat out,
-any Bluetooth radio will be pushed to draw more than 60 mA. An
-active, but idle, link will draw less than that. What's the total
-power consupmtion of an iPAQ? Is 60 mA a significant fraction? At
-what point do we stop caring?
-
-Sometimes the critical factor is not the current consumption of the
-Bluetooth dongle, but of the whole system. If you have a situation
-where both ends of the link are free to go to sleep, such as with BCSP
-or suspended self-powered USB devices, then being able to shut the host
-down and wake it up when Bluetooth activity occurs could be a
-significant long-term power saving.
-
-Sometimes, what eats most current, on average, is time spent without a
-link but being discoverable and/or connectable. Using BCSP will help
-compared to H4. Suspending self-powered USB devices may help.
-
-	- Steven
--- 
+Marcel
 
 
 
-**********************************************************************
-The information transmitted is intended only for the person or
-entity to which it is addressed and may contain confidential 
-and/or privileged material. 
-Any review, retransmission, dissemination or other use of, or
-taking of any action in reliance upon, this information by 
-persons or entities other than the intended recipient is 
-prohibited.  
-If you received this in error, please contact the sender and 
-delete the material from any computer.
-**********************************************************************
+
+-------------------------------------------------------
+This sf.net email is sponsored by:ThinkGeek
+Welcome to geek heaven.
+http://thinkgeek.com/sf
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
