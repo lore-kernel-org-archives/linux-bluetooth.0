@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "john smith" <roofass@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Alignment issue
+Subject: Re: [Bluez-devel] Re: CSR firmware question...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: rtaylor@hcvwireless.com
+Cc: Jean Tourrilhes <jt@hpl.hp.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   Steven Singer <steven.singer@csr.com>
+In-Reply-To: <1092657677.1982.14.camel@localhost>
+References: <20040813002514.GA21388@bougret.hpl.hp.com>
+	 <1092385877.28711.185.camel@pegasus>  <1092657677.1982.14.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1092644692.4375.75.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY22-F42hUaRTpCkEW000285a5@hotmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,34 +21,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 16 Aug 2004 09:48:58 +0000
+Date: Mon, 16 Aug 2004 10:24:52 +0200
 
-> > > Why are these macros even here? ISTR Max having some reason not to use
-> > > <asm/unaligned.h> but surely that's what it's there for...
-> >
-> > No, asm/unaligned.h is there for kernel code only.
->
->the rule is to not include headers from the kernel source code in any
->user space program or library. Even if some people try to bend this rule
->I will follow as much as I can.
+Hi Rod,
 
-Hi, I'm new to Linux prog. and I'm a bit confused. Does this mean there's a 
-problem with bluez/utils/tools/l2ping.c which contains:
+> Is btdfu app USB only?
 
-   #include <asm/types.h>
-   #include <asm/byteorder.h>
+yes, it is USB only.
 
+> A quick skim through the source leads me to believe it is. Will their be
+> a UART one?
 
-Or are the above includes System kernel headers ( which as far as I 
-understand are OK for user-space apps. to link to) rather than Kernel source 
-headers.
+I have no plans to do this and even if I find the time for it, I won't
+do it, because I don't need it. Actually the upgrade support of version
+0.3 is only there, because a company paid me for writing it.
 
-Bye for now,
+Regards
 
-John
+Marcel
 
-_________________________________________________________________
-Express yourself with cool new emoticons http://www.msn.co.uk/specials/myemo
 
 
 
