@@ -1,10 +1,9 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: rtaylor@hcvwireless.com
-Cc: Jonathan Paisley <jp-www@dcs.gla.ac.uk>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092214694.12197.14.camel@localhost>
+From: Roderick Taylor <rtaylor@hcvwireless.com>
+Reply-To: rtaylor@hcvwireless.com
+To: Jonathan Paisley <jp-www@dcs.gla.ac.uk>, bluez-devel@lists.sourceforge.net
+In-Reply-To: <Pine.LNX.4.59.9999.0408101615190.22497@brava.dcs.gla.ac.uk>
 References: <4117AB9A.9010909@dark-reality.de>
 	 <1092071356.4564.12.camel@pegasus> <4117B098.5020805@dark-reality.de>
 	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>
@@ -13,9 +12,8 @@ References: <4117AB9A.9010909@dark-reality.de>
 	 <Pine.LNX.4.59.9999.0408101435250.22497@brava.dcs.gla.ac.uk>
 	 <4118DAF9.2080204@csr.com>
 	 <Pine.LNX.4.59.9999.0408101615190.22497@brava.dcs.gla.ac.uk>
-	 <1092214694.12197.14.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1092206422.4564.222.camel@pegasus>
+Message-Id: <1092214694.12197.14.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -27,32 +25,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 Aug 2004 08:40:22 +0200
+Date: Wed, 11 Aug 2004 09:58:15 +0100
 
-Hi Roderick,
+On Tue, 2004-08-10 at 16:31, Jonathan Paisley wrote:
 
-> > > I can't find anything in this thread that reveals whether you're
-> > > trying to send SCO traffic over USB or UART.  The data handling
-> > > for the two cases have subtle differences.
-> > 
-> > As far as I'm aware, we're dealing with USB only.
-> > 
 > 
-> I am researching BlueZ application in Embedded applcations.
+> > I can't find anything in this thread that reveals whether you're
+> > trying to send SCO traffic over USB or UART.  The data handling
+> > for the two cases have subtle differences.
 > 
-> Having UART support would be useful for embedded processors that don't
-> have USB host support.  Please don't disregard it completely
+> As far as I'm aware, we're dealing with USB only.
+> 
 
-don't worry about it, because my plan is to use the standard HCI of the
-BlueZ core for SCO data. This means it will work with every driver we
-have written so far. I don't think that playing special driver tricks
-will help us in any way and unless somebody proves me otherwise I don't
-wanna do it.
+I am researching BlueZ application in Embedded applcations.
 
-Regards
-
-Marcel
-
+Having UART support would be useful for embedded processors that don't
+have USB host support.  Please don't disregard it completely
 
 
 
