@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] trusted
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY12-F184548D865F7C7ED1F9A4F8AB40@phx.gbl>
-References: <BAY12-F184548D865F7C7ED1F9A4F8AB40@phx.gbl>
-Content-Type: text/plain
-Message-Id: <1102347788.9644.37.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41B47D96.2060304@csr.com>
+From: Steven Singer <steven.singer@csr.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Test Mode
+References: <2de4657604113010234e4e3a3f@mail.gmail.com>
+    <1101882666.18840.23.camel@pegasus>
+    <200412011028.iB1ASZIk030820@news01.csr.com> <manjunath.mp@gmail.com>
+    <2de4657604120606361751793a@mail.gmail.com> <25262.1102344714@csr.com>
+    <2de4657604120607051de3580b@mail.gmail.com>
+In-Reply-To: <2de4657604120607051de3580b@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +22,61 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 06 Dec 2004 16:43:08 +0100
+Date: Mon, 06 Dec 2004 15:41:10 +0000
 
-Hi Salvatore,
+Manjunath Prabhu wrote:
+> Status shows 11 which is "HCI unsupported feature". I am using  a
+> version 1.1 anycom-120 usb dongle.
 
-> Does BlueZ impost trusted and Untrusted device?
+Maybe the device doesn't support loopback.
 
-actually this is application specific.
+It's not mandatory (in fact, nothing at HCI is mandatory - it's not a
+qualifiable stack layer). There's no features bit to tell you if it's
+supported as it's a test command.
 
-> Does BlueZ support Authorisation and authentication, authentication only, no 
-> authentication no authorisation for access service?
+The Anycom-120 dongle is a Silicon Wave dongle. I don't know if they put
+loopback support in all (any?) of their dongles. It's not really that
+useful for anything other than host code testing (which most people
+don't want to do).
 
-It supports authentication on the stack level and you must take care of
-the authorisation inside your application.
+CSR devices support loopback (but we don't test it that thoroughly since
+hardly anybody ever uses it, and even when they do it's as a test so
+they don't care if it's not that robust).
 
-Regards
+Use hciconfig -a to see if it's a 1.2 device. If it is, it might
+support the HCI_Read_Local_Supported_Commands command, which will give
+you a list of all the commands the dongle supports. Use the BT 1.2 spec
+to find out the OCF and OGF and to decode the result.
 
-Marcel
+Having said that, even it it's a 1.2 device it might not support the
+HCI_Read_Local_Supported_Commands command (in which case it should
+return error code 0x01).
 
+Even then, it might claim to support the loopback command as it may
+understand the command but be unable to enter loopback mode for some
+other reason (like, for example, the loopback command must be the first
+command after a reset for some manufacturer specific reasons, or the
+device must not be scanning).
+
+If you really need the feature then contact the manufacturer directly.
+However, most people have no use for the command, so don't be too
+surprised if it's not supported.
+
+	- Steven
+
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
