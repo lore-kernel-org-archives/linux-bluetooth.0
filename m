@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41EB74EA.7030907@gmx.ch>
+Message-ID: <41EB6ACB.5050305@gmx.ch>
 From: Marco Trudel <mtrudel@gmx.ch>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] dongle firmware
+Subject: [Bluez-users] bluez library questions
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,15 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 17 Jan 2005 09:18:50 +0100
+Date: Mon, 17 Jan 2005 08:35:39 +0100
 
 Hello everybody
 
-how to get the dongle firmware version?
-is it the "HCI Ver: XXX" on "hciconfig -a"?
+The bluez library (to create bluetooth programs), is it in only in c?
+Or does a c++ library exist?
 
-Does someone know dongles with a firmware version >= 16.4?
+What about documentation?
+I searched the archive and my conclusion is that there is no 
+documentation. The only starting help is:
+- bluez-utils-2.14/test
+- the slides from "Bluetooth programming for Linux"
 
+Is something planned, like, for example, the jsr82 documentation for the 
+java bluetooth library 
+(http://www.avetana-gmbh.de/avetana-gmbh/produkte/doc/javax/bluetooth/package-frame.html)
 
 regards
 Marco Trudel
