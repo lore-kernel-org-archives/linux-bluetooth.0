@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4233BF6B.5050007@gmail.com>
-From: pratyush <pratyush.kotturu@gmail.com>
+From: Michal Semler <cijoml@volny.cz>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] can't initialize bluetooth dongle with CBT100U chipset!
+References: <1110643712.7592.7.camel@tux> <1110658999.30047.0.camel@pegasus> <1110664806.10050.0.camel@tux>
+In-Reply-To: <1110664806.10050.0.camel@tux>
 MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] regarding configuring in Sarge
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200503122337.44208.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,13 +19,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 13 Mar 2005 09:49:55 +0530
+Date: Sat, 12 Mar 2005 23:37:43 +0100
 
-hello all
-i am newbie to configure in Sarge.i have a bluetooth with winddcomm 
-driver in windows and i want to configure in gnu/linux.plz help me
-thankyou in advance
-neverstable
+Try install hotplug package and it will load all modules for you:)
+
+Michal
+
+Dne so 12. b=F8ezna 2005 23:00 Tamer Higazi napsal(a):
+> I love you! You are beautifull.... It's working!!!!!!!!!!
+>
+> Tamer
+>
+> Am Samstag, den 12.03.2005, 21:23 +0100 schrieb Marcel Holtmann:
+> > uhci_hcd
+>
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+=2D-=20
+S pozdravem
+
+Michal Semler
 
 
 -------------------------------------------------------
