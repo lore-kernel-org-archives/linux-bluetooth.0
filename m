@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Qualification Testing
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-To: Daryl Van Vorst <daryl@wideray.com>
-Cc: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000801c31684$627d9f80$1a01010a@baked>
-References: <000801c31684$627d9f80$1a01010a@baked>
-Content-Type: text/plain
-Message-Id: <1052526375.1214.130.camel@pegasus.local>
-Mime-Version: 1.0
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+Message-ID: <000a01c31687$c06757a0$1a01010a@baked>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Subject: [Bluez-devel] Qualification - L2CA_DisconnectCfm
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -20,45 +17,34 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 10 May 2003 02:26:08 +0200
+Date: Fri, 9 May 2003 17:04:39 -0700
 
-Hi Daryl,
+Max, Marcel,
 
-> > I was going to just drop the frame and log an error. The 
-> > thing is, if the packet header is corrupted (i.e. wrong 
-> > length, etc) we can't really trust its content. I mean if 
-> > length is wrong how do we know that CID is right. It means 
-> > that we don't really know which channel should be closed 
-> > (i.e. which app should be notified).
-> 
-> Here's Cetecom's response to your comment:
-> 
-> "Good point ! I agree, in a messed up remote L2CAP stack, CID could be wrong
-> as well if length is wrong. But I think it is a good approach to check
-> first, if that CID exists and if yes, notify the app about that channel."
-> 
-> So how about we do this:  As above, if it exists then we close it. If not,
-> we log an error.
+In order to pass TP/COS/CED/BV-08 we're supposed to be able to indicate tha=
+t
+there was a timeout waiting for an L2CAP disconnect confirm from the remote
+device. I'm waiting for clarification that this is indeed necessary.
 
-the proposal from Cetecom makes no sense.
+The test works like this:
 
-If you have one channel with correct data and you get a wrong packet
-which was for another channel, but the CID is corrupt and show now the
-value of the correct channel. You will infect a correct working channel
-with a false packet.
+1. We send a disconnect request
+2. The tester ignores it.
+3. optionally - we resend the disconnect request following a timeout patter=
+n
+where each retransmission happens after a delay equal to twice the previous
+delay.
+4. After 60 seconds the channel must be closed - we indicated to the app
+that the channel is indeed closed (even though we didn't get a confirmation
+from the remote side) and indicate that a timeout ocurred.
 
-The main problem is that wrong packets should not arrive at the L2CAP
-layer. If they do and we decect them (like a length mismatch), we have
-to close down all channels and remove the infected ACL link.
+I think there's a standard way of doing that sort of thing by setting a
+socket option which causes close() to block until things are closed. Not
+sure though.
 
-Max, what do you think? This way is a little bit radical, but I think it
-is an acceptable way of handling these errors. And with this method we
-will pass this test.
+Can we do this with BlueZ?
 
-Regards
-
-Marcel
-
+-Daryl.
 
 
 
