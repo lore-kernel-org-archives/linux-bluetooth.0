@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <000e01c3fbe9$ef726830$b54db850@ULLA>
-From: "Zbigniew Diaczyszyn (gmx)" <z.dia@gmx.de>
-To: <bluez-users@lists.sourceforge.net>
-References: <000d01c3f343$d89f1ad0$e04db850@ULLA> <1076855680.14758.55.camel@pegasus>  <000b01c3f599$04aaf520$de4bb850@ULLA> <1077058491.2665.131.camel@pegasus>  <003b01c3f65e$371ef400$dc4db850@ULLA> <1077147114.2685.11.camel@pegasus>  <000601c3f8c9$98e2c820$3d4bb850@ULLA> <1077415764.2716.21.camel@pegasus>  <000b01c3f98e$697f79a0$494db850@ULLA> <1077486947.2832.20.camel@pegasus>  <000b01c3fa66$4dccee30$4c4bb850@ULLA> <1077580779.2880.4.camel@pegasus>  <006c01c3fb29$c2b4b700$184cb850@ULLA> <1077663786.2919.64.camel@pegasus>
-Subject: Re: [Bluez-users] rfcomm socket message: function not implemented
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+Subject: Re: [Bluez-users] Bluetooth Access Point elmeg D@VOS-44.dsl
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Florian <Kimpenhaus@gmx.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <opr3xydd1hqdj9uv@mail.gmx.de>
+References: <opr3xmdugiqdj9uv@mail.gmx.de>
+	 <1077725935.2919.116.camel@pegasus>  <opr3xs5louqdj9uv@mail.gmx.de>
+	 <1077734547.2919.147.camel@pegasus>  <opr3xydd1hqdj9uv@mail.gmx.de>
+Content-Type: text/plain
+Message-Id: <1077740936.2884.2.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,19 +20,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Feb 2004 22:53:24 +0100
+Date: Wed, 25 Feb 2004 21:28:56 +0100
 
-Hi Marcel,
+Hi Florian,
 
-> is the hcid running?
+> bash-2.05b# dund --nodetach --connect 00:0B:CE:00:01:8E  --msdun
+> dund[3470]: DUN daemon ver 1.1
+> dund[3470]: Searching for LAP on 00:0B:CE:00:01:8E
+> dund[3470]: Failed to connect to the SDP server. Connection timed out(110)
+> 
+> bash-2.05b# hcidump
+> HCIDump - HCI packet analyzer ver 1.5
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> < HCI Command: Create Connection(0x01|0x0005) plen 13
+> > HCI Event: Command Status(0x0f) plen 4
+> > HCI Event: Connect Complete(0x03) plen 11
+> 
+> how do i start/configure the sdp server?
 
-Yes. (according to ps -ax).
+this is the SDP server on the AP, you don't have to start one. Run
+hcidump with the -x option, so I can see the status codes.
 
 Regards
 
-Zbigniew
-
-
+Marcel
 
 
 
