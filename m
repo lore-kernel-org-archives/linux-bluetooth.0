@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] diNovo kbd / mice / mediapad
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1078857187.2354.3.camel@amd-01.home>
-References: <1078857187.2354.3.camel@amd-01.home>
-Content-Type: text/plain
-Message-Id: <1078873003.10671.100.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <012d01c40629$3b103440$6e01030a@xxx>
+Reply-To: "Nayib Kiuhan" <nayib@onlinetec.net>
+From: "Nayib Kiuhan" <nayib@onlinetec.net>
+To: "Stuart Anderson" <subs@iduniken.com>
+Cc: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
+References: <1078848325.9713.5.camel@donivin.nx14.com>
+Subject: Re: [Bluez-users] Missing libopenobex-1.0.so.1
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,28 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 09 Mar 2004 23:56:43 +0100
+Date: Tue, 9 Mar 2004 17:52:42 -0500
 
-Hi Alexandre,
+Hi Stuart,
 
-> Charles Bueche has updated his website (MX900 mouse) to add this nano
-> HOWTO for the use of Logitech's diNovo keyboard, mouse and MediaPad.
-> 
-> Please, don't hesitate to make comments.
-> 
-> http://www.bueche.ch/comp/mx900/feedback/ghisoli_alexandre_mx900_with_hub.txt
+>    Im following the tutorial at
+> http://www.frasunek.com/HOWTO-Nokia7650-Bluetooth.txt and ive got down
+> to the stage of running runing ObexSERVER at the bottom of step five =
+but
+> when i do i get the error:
 
-nice ;)
+Have you tried the OBEX Push Daemon (opd v0.2) from =
+http://oss.bdit.de/opd.html ? I works very smoothly.
 
-However the name of the USB host controller module is uhci-hcd and I
-don't find the multi-byte patch for hid-core.c in 2.6.3 or in the latest
-snapshot. It seems that Vojtech Pavlik haven't sent it to Linus.
+Best Regards,
 
-Regards
-
-Marcel
-
-
+Nayib
 
 
 -------------------------------------------------------
