@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] IP address
-References: <20050208134358.17173.qmail@web53202.mail.yahoo.com> <1107880993.7327.190.camel@pegasus> <008901c50f7e$eccd4a60$7aac623e@pc>
-In-Reply-To: <008901c50f7e$eccd4a60$7aac623e@pc>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200502101916.14086.pavouk@pavouk.org>
+Subject: Re: [Bluez-users] position of multiple bluetooth dongles
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200502101825.15870.cijoml@volny.cz>
+References: <420B9635.6020701@gmx.ch>  <200502101825.15870.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1108057316.15974.93.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,49 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Feb 2005 19:16:13 +0100
+Date: Thu, 10 Feb 2005 18:41:56 +0100
 
-Hi,
+Hi Michal,
 
-> Is it possible to assign the ip-address to each laptop/dongle before
-> creating connections?
+> BT 1.1 dongles may interference...
+> BT 1.2 only when comunication with 1.1 devices - 1.2 devices can never 
+> interference
 
-I depends on distribution.
-In Mandrake, Redhat and maybe others you can preconfigure parameters for first 
-bnep interface in file:
-/etc/sysconfig/network-scripts/ifcfg-bnep0
-File looks like this:
------
-DEVICE=bnep0
-BOOTPROTO=static
-IPADDR=192.168.100.1
-NETMASK=255.255.255.252
-ONBOOT=no
------
+let me correct this. AFH is not for detecting used frequencies of other
+Bluetooth piconets. It only detects other wireless technologies, because
+for itself it is already protected by the hopping sequence itself. If it
+is the same hopping sequence it is the same piconet and thus it really
+wants to listen to its traffic.
 
-bnep1 can look like this:
------
-DEVICE=bnep1
-BOOTPROTO=static
-IPADDR=192.168.100.5
-NETMASK=255.255.255.252
-ONBOOT=no
------
+Regards
 
-This is example for configuring many Point-to-Point BNEP connections.
-IP 1 with 2, 5 with 6 etc...
-You must have enabled routing in kernel.
-For automatic enabling/disabling you must have functional hotplug.
+Marcel
 
-If you want LAN with one big address space like 192.168.1.0
-with mask 255.255.255.0, you must run bridge on your machine.
 
-Some documentation is here:
-http://bluez.sourceforge.net/contrib/HOWTO-PAN
-
-Best regards,
-
-Pavel Ruzicka
 
 
 -------------------------------------------------------
