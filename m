@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bug link_key: no connection after AP was once
-	accessed with Win XP AVM tools
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Achim Bohnet <ach@mpe.mpg.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200403312212.08249.ach@mpe.mpg.de>
-References: <200403310134.14280.ach@mpe.mpg.de>
-	 <1080725493.2773.49.camel@pegasus>  <200403312212.08249.ach@mpe.mpg.de>
-Content-Type: text/plain
-Message-Id: <1080773082.2536.30.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20040331144144.786.qmail@web21004.mail.yahoo.com>
+From: =?iso-8859-1?q?Gary=20Martin?= <gary_martin_au@yahoo.com.au>
+Subject: Re: [Bluez-users] Desperate newbie
+To: Thomas Chiverton <thomas.chiverton@bluefinger.com>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <200403311512.32864.thomas.chiverton@bluefinger.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,39 +17,92 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 01 Apr 2004 00:48:49 +0200
+Date: Thu, 1 Apr 2004 00:41:44 +1000 (EST)
 
-Hi Achim,
+Thanks Tom. But this whole exercise was to find the numerical
+class codes for "computer" and "mobile phone"
 
-> > don't enable auth and encrypt, because this means security mode 3. Leave
-> > it off and let the AP trigger the security mechanism.
+ --- Thomas Chiverton <thomas.chiverton@bluefinger.com> wrote: >
+On Wednesday 31 Mar 2004 11:01 am, Gary Martin wrote:
+> > 2 - I use GNOME, so I imagine there would be a lot of new
+> packages
+> > to incorporate (KDE?)
 > 
-> Right, after commenting out auth and encrypt, stop hcid, reinstalling old
-> 'borked' link_key file and starting hcid, ciptool asked for a pin.
+> Your Linux distribution should include a package manager to help
+> you with 
+> this. You mention debian, so apt-get install kde-bluetooth or
+> similar should 
+> work.
+I use Synaptic, which is a GUI for apt-get, but kde-bluetooth is
+not in the powerpc repository. So I would have to build from
+source.
+
+> GNOME and KDE are two desktop enviroments ('Windows'). I know
+> you can run 
+> GNOME apps in KDE, which is what I do, but I don't know it it
+> works vica 
+> versa.
+Yes, I run Kile under GNOME and it works fine.
 > 
-> Now I have two ways to workaround a bug, it is a bug isn't it?  At
-> least with auth and encrypt enabled and no link_key entry or a valid
-> link_key entry, ciptool works. Only with an invalid link_key entry it
-> fails.  So for me, who never read any bluetooth spec (sorry), it looks
-> like hcid fails to ask for a PIN is the case the link_key is no longer
-> valid.
+> > 3 - When it comes to Linux, what is "simple enough" on an x86
+> > desktop might not be simple on a PowerPC laptop
+> 
+> Download.
+> unzip
+> ./configure
+> make 
+> make install
+I have looked into compiling packages in the past, and I
+understand the basic configure make install instructions. But I
+got lost (or lost interest) when they mention "flags" Until now, I
+have never needed or wanted a package that wasn't in the Debian
+PowerPC binary repository
+> 
+> The kde-bluetooth mailing list is very helpfull too - though you
+> are right, 
+> you might be the first person to try on PowerPC with GNOME :-)
+> If so, great, 
+> try it and report back - open source relies a lot on people
+> trying things and 
+> saying how it broke.
 
-I already talked with the guys from AVM about the problem and this is
-part of the link manager of the local Bluetooth dongle. At the moment I
-am not quite sure what should be the right behaviour of a link manager
-in security mode 3 and a wrong link key. I will test other dongles if I
-have more time.
+Alright! I will give it a go --- will have to wait until Saturday
+though
+> 
+> -- 
+> Tom Chiverton 
+> Advanced ColdFusion Programmer
+> 
+> Tel: +44(0)1749 834997
+> email: tom.chiverton@bluefinger.com
+> BlueFinger Limited
+> Underwood Business Park
+> Wookey Hole Road, WELLS. BA5 1AF
+> Tel: +44 (0)1749 834900
+> Fax: +44 (0)1749 834901
+> web: www.bluefinger.com
+> Company Reg No: 4209395 Registered Office: 2 Temple Back East,
+> Temple
+> Quay, BRISTOL. BS1 6EG.
+> *** This E-mail contains confidential information for the
+> addressee
+> only. If you are not the intended recipient, please notify us
+> immediately. You should not use, disclose, distribute or copy
+> this
+> communication if received in error. No binding contract will
+> result from
+> this e-mail until such time as a written document is signed on
+> behalf of
+> the company. BlueFinger Limited cannot accept responsibility for
+> the
+> completeness or accuracy of this message as it has been
+> transmitted over
+> public networks.*** 
 
-> Thx, for ciptool and your bluetooth work Marcel, beside this trouble it
-> served my needs always perfectly.
+Gary
 
-You are welcome.
-
-Regards
-
-Marcel
-
-
+Find local movie times and trailers on Yahoo! Movies.
+http://au.movies.yahoo.com
 
 
 -------------------------------------------------------
