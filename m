@@ -1,15 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] ISSC USB Dongle does not work with current bluez?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andreas Krause <Andreas.Krause@web.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200407230649.28305.Andreas.Krause@web.de>
-References: <200407222124.44032.Andreas.Krause@web.de>
-	 <1090529272.21828.41.camel@pegasus>
-	 <200407230649.28305.Andreas.Krause@web.de>
-Content-Type: text/plain
-Message-Id: <1090570478.21828.47.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: Chris Searle <usenet@chrissearle.org>
+Message-ID: <lgk6wvgqax.fsf@montgomery.empolis.no>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] hcid config
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,36 +15,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jul 2004 10:14:39 +0200
-
-Hi Andreas,
-
-> > > I've got a Bluetooth USB Dongle, Vendor ID 0x1131 (ISSC, Integrated
-> > > System Solution Corp.), Product ID 0x1001, Revision 3.115. 
-> > where do you got these dongle?
-> 
-> http://cgi.ebay.de/ws/eBayISAPI.dll?ViewItem&item=5709740304
-
-is there anyone who will donate one of these?
-
-> hciconfig -a says the same as in my original posting.
-> 
-> > Run "hcidump -x" and show it to us while executing these commands.
-> 
-> The following dump is the output of 'hcidump -x' while running 'hciconfig -a'. 
-> Running 'hcitool inq' or 'hcitool scan' does not trigger any output from 
-> 'hcidump -x'!
-
-That is the problem here, because the kernel thinks that the dongle is
-already in inquiry mode and won't start another one. Please stop hcid
-and sdpd. Unplug your dongle and replug it. Run "hcidump -x" and then
-call "hciconfig hci0 up".
-
-Regards
-
-Marcel
+Date: Fri, 23 Jul 2004 09:01:42 +0200
 
 
+Been having some problems with a comOne dongle both before and after
+upgrading to kernel 2.6.7 (debian unstable).
+
+So - I've just plugged in a belken dongle from another machine too
+(with ideas of using one to test what services the other is showing).
+
+Both appear in /var/log/messages and also in /proc/bus/usb/devices
+
+So - some simple tests:
+
+chris@chris:~$ hcitool dev
+Devices:
+        hci0    00:30:C2:08:0A:A1
+        hci1    00:0A:3A:54:5B:49
+chris@chris:~$ hcitool -i hci0 scan
+Scanning ...
+        00:0A:D9:94:BF:68       Chris Mobile
+        00:0A:3A:54:5B:49       WINDOWS-2000
+chris@chris:~$ hcitool -i hci1 scan
+Scanning ...
+        00:30:C2:08:0A:A1       Chris
+        00:0A:D9:94:BF:68       Chris Mobile
+
+
+Now - this is odd - in hcid.conf I have 
+
+device {
+        # Local device name
+        #   %d - device id
+        #   %h - host name
+        name "%h-%d";
+
+I was expecting two names - chris-0 (where now it's Chris) and chris-1
+(where now of all things its WINDOWS-2000).
+
+Any ideas?
+
+-- 
+Chris
 
 
 
