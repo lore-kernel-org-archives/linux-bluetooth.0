@@ -1,12 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Ben Wilson <bwilson@yooser.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bthid on ppc
-Message-ID: <20040308054000.GB1930@stag.mark-and-erika.com>
-References: <20040307221349.GA1930@stag.mark-and-erika.com> <1078704798.15279.3.camel@pegasus>
+Subject: Re: [Bluez-users] Socket G card newbie Q
+From: Marcel Holtmann <marcel@holtmann.org>
+To: John McCorquodale <mcq@cacr.caltech.edu>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040308004811.GA19145@viz.cacr.caltech.edu>
+References: <20040307214224.GB18481@viz.cacr.caltech.edu>
+	 <1078704901.15279.6.camel@pegasus>
+	 <20040308002100.GA19049@viz.cacr.caltech.edu>
+	 <1078705579.15279.18.camel@pegasus>
+	 <20040308004811.GA19145@viz.cacr.caltech.edu>
+Content-Type: text/plain
+Message-Id: <1078707603.15279.27.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1078704798.15279.3.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,24 +22,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 8 Mar 2004 00:40:01 -0500
+Date: Mon, 08 Mar 2004 02:00:03 +0100
 
-Hi Marcel,
- 
-> actually I think the new SDP code and the HID program has some endian
-> bugs which causes your problem.
+Hi John,
 
-Does this mean this is a known issue? The HID program from
-http://www.visi.com/~pmk/msbtkb-linux.html wouldn't even compile
-for me, I figured it may be the same type of issue.
+> Progress.  2.4.25 produces different behavior:
+> 
+> First time loading it says:
+> bcsp_recv: Out-of-order packet arrived, expected 1 got 0
 
-Are there any plans for making this work? I'm not a programmer,
-but may be able to find someone to do it :)
+this is ok. You can ignore this message.
 
-Thanks! 
+> Second time loading it says:
+> Unknown device type or id
 
--- 
-Ben
+This looks like that your command parameters are wrong.
+
+> In 2.4.20, it always says "Unknown device type or id".
+
+You need to have BCSP enabled for the hci_uart module.
+
+>   1) Is there maybe a new G card device id out there, or should I be using
+>      some other bluez than that which ships with 2.4.25?
+
+The 2.4.25 should be fine.
+
+>   2) Is there a patch for the 2.6 serial problem?
+
+Not that I know of. Some cards are working and some are not.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
