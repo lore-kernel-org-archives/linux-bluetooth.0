@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluez-utils Makefile fault
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200408142331.27222.cijoml@volny.cz>
-References: <200408142331.27222.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1092530108.4375.13.camel@pegasus>
-Mime-Version: 1.0
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200408142332.10700.cijoml@volny.cz>
+Subject: [Bluez-users] hidd not reports it's version
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +17,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 15 Aug 2004 02:35:08 +0200
+Date: Sat, 14 Aug 2004 23:32:10 +0200
 
-Hi Michal,
+Hi Marcel,
 
-> when make uninstall and then make a new ones in bluez-utils, all my 
-> configurated files were replaced with default conf files :(
-> PLS add some kind of check (md5sum??)
+hidd doesn't report it's version when called hidd --help
 
-if you tell me how to do this with default autoconf/automake methods I
-will add this. I learned very much about the auto* stuff, but actually I
-don't know how to do this.
-
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
