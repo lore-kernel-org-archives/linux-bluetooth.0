@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Catalin Drula <Catalin.Drula@imag.fr>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <Pine.GSO.4.33.0502151510240.1694-100000@horus.imag.fr>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] hci_cmd_task: hci0 command tx timeout
+To: bluez-devel@lists.sourceforge.net
+From: Sebastian Roth <sebastian.roth@esk.fhg.de>
+Message-ID: <cuso8n$4g1$2@sea.gmane.org>
+References: <cusgdr$4g1$1@sea.gmane.org> <4211C910.1020204@dark-reality.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <4211C910.1020204@dark-reality.de>
+Subject: [Bluez-devel] Re: snd-bt-sco built-in
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,61 +18,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 15 Feb 2005 15:19:21 +0100 (CET)
+Date: Tue, 15 Feb 2005 13:02:52 +0100
 
-Hi,
+Hi Lars,
 
-While using a COM One Bluetooth USB dongle, after a random
-amount of time, the device becomes unresponsive (no HCI
-commands are accepted). The only solution is to physically
-remove the dongle and re-insert it.
+thanks for your fast reply!
 
-The system is Fedora Core 3, kernel version 2.6.10-1.741_FC3.
+ > | I'm trying to build snd-bt-sco directly into the kernel.
+ >
+ > why?
+I'm working on a project in which a "communication-server" should use
+bluetooth headsets...
+So I want to have the kernel with all functions built-in. If this is
+not possible I'll have to load it on startup. ;-(
 
-These are the relevant messages from /var/log/messages:
 
-Feb 15 14:20:22 corse kernel: usb 2-2: new full speed USB device using
-uhci_hcd and address 7
-Feb 15 14:22:02 corse kernel: hci_cmd_task: hci0 command tx timeout
+ > I can't tell for sure why this function is failing this way. Did you
+ > build snd-hw-dep and put it in the kernel, too? If it's missing than
+ > that could be the problem.
+That was my first guess too! But it's built-in
 
-Also, here is the output of hcidump -i hci0 -x before the crash occurs:
+grep SND /boot/config-2.6.10-mh4-sr1 | grep -v "^#"
+CONFIG_SND=y
+CONFIG_SND_TIMER=y
+CONFIG_SND_PCM=y
+CONFIG_SND_HWDEP=y
+CONFIG_SND_RAWMIDI=y
+CONFIG_SND_SEQUENCER=y
+CONFIG_SND_OSSEMUL=y
+CONFIG_SND_MIXER_OSS=y
+CONFIG_SND_PCM_OSS=y
+CONFIG_SND_SEQUENCER_OSS=y
+CONFIG_SND_RTCTIMER=m
+CONFIG_SND_AC97_CODEC=y
+CONFIG_SND_EMU10K1=y
+CONFIG_SND_USB_AUDIO=y
+CONFIG_SND_BT_SCO=y
 
-> HCI Event: Connect Complete (0x03) plen 11
-  00 28 00 3E 17 39 EE 02 00 01 00
-< ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 4097 scid 0x0041
-< ACL data: handle 0x0028 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 4097 scid 0x0040
-< HCI Command: Inquiry Cancel (0x01|0x0002) plen 0
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-  28 00 13
-< HCI Command: Write Scan Enable (0x03|0x001a) plen 1
-  00
 
-As you can see the last three commands get no answers.
-
-Here's (the relevant parts of) the output of lsmod:
-
-Module                  Size  Used by
-dtl1_cs                11845  3
-l2cap                  26053  3
-pcmcia                 20805  5 dtl1_cs
-dm_mod                 55509  0
-ac                      4805  0
-joydev                  9217  0
-hci_usb                15041  3
-bluetooth              48069  7 dtl1_cs,l2cap,hci_usb
-yenta_socket           19137  1
-pcmcia_core            50817  3 dtl1_cs,pcmcia,yenta_socket
-uhci_hcd               31321  0
-hw_random               5717  0
-
-I have read that this behavior might be caused by the loss of
-syncronization between the host and the device. Is there any way to fix this?
-
-Thanks,
-Catalin
-
+Best regards,
+Sebastian
 
 
 
