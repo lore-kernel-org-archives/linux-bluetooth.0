@@ -1,71 +1,73 @@
-Return-Path: <SRS0+cd78f81f0a36eea3fb57+355+infradead.org+dwmw2@baythorne.srs.infradead.org>
-Subject: RE: [Bluez-devel] Alignment issue
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092317787.28711.150.camel@pegasus>
-References: <001201c47fc2$7093e4a0$1301010a@baked>
-	 <1092252699.4564.238.camel@pegasus>
-	 <1092299689.4622.8.camel@imladris.demon.co.uk>
-	 <1092302834.28711.72.camel@pegasus>
-	 <1092304890.15466.44.camel@hades.cambridge.redhat.com>
-	 <1092306154.28711.85.camel@pegasus>
-	 <1092306935.15466.74.camel@hades.cambridge.redhat.com>
-	 <1092308407.28711.99.camel@pegasus>
-	 <1092310391.15466.178.camel@hades.cambridge.redhat.com>
-	 <1092311388.28711.117.camel@pegasus>
-	 <1092312127.15466.211.camel@hades.cambridge.redhat.com>
-	 <1092317787.28711.150.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1092384465.4186.37.camel@imladris.demon.co.uk>
-Mime-Version: 1.0
-Date: Fri, 13 Aug 2004 09:07:45 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Billy Pucyutan <bluebee@gmail.com>
+Reply-To: bluebee@gmail.com
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re: Presentation Slides
+References: <200408121654.44052.bluebee@gmail.com> <1092301914.28711.54.camel@pegasus>
+In-Reply-To: <1092301914.28711.54.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200408131456.15445.bluebee@gmail.com>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 13 Aug 2004 14:56:15 +0800
 
-On Thu, 2004-08-12 at 15:36 +0200, Marcel Holtmann wrote:
-> I looked at the patches from the bluez-utils source RPM and actually I
-> can include optional PIE support for you. A simple patch for that is
-> easy and actually I already did that. From what I saw, this is a GCC 3.4
-> only feature and you give -pie at linking time and not at compile time
-> of the sources itself. Is this correct? 
+Hi Marcel,
+	This is the link of the schedule... http://www.philosc.com/agenda-2ndday.php
+But the abstract is not yet available(I don't know if it will be available) 
+since the schedule was given on a short notice. I will try to make my 
+presentation available online(maybe on another site). Thank you and good day.
 
-You also need -fpic in CFLAGS, I believe.
+Billy
+On Thursday 12 August 2004 17:11, Marcel Holtmann wrote:
+> Hi Billy,
+>
+> > 	I'm going to have a talk on bluetooth at the Philippine Open Source
+> > Conference 2004 regarding bluetooth and linux. The title of my talk is
+> > "Bluetooth and Linux: A Developer's Perspective". The focus of the talk
+> > is on our experiences in BlueZ. I am asking permission if I can use some
+> > of your slides in your previous presentations.
+>
+> do you have a website for the conference page and your abstract? I like
+> to put a link on our talks page.
+>
+> You can use my slides if you want, but you must show me as the original
+> author. In return I hope that you will make your slides online available
+> after you talk, so I can link these, too.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+> 100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+> Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+> http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-> What is the best way to detect PIE support in the compiler?
 
-I hate myself for saying it, but possibly just test whether you can
-actually build an executable that way?
-
-> And please don't do this
-> 
->         # Authentication and Encryption
-> -       #auth enable;
-> -       #encrypt enable;
-> +       auth enable;
-> +       encrypt enable;
-> 
-> in the bluez-utils-2.3-conf.patch. If you do that then you are going to
-> set your local device in security mode 3 and this is not what you want.
-
-Hmmm, OK.... /me refers to Google and then
-http://www.niksula.cs.hut.fi/~jiitv/bluesec.html
-
-Don't I want that? If I were to leave it out, would that leave it in
-mode 1, and mean I wouldn't be required to exchange a PIN with _every_
-device before I can communicate with it at all?
-
-The gnome-bluetooth program has been known to register its OBEX file
-receive service and then just dump stuff into the user's home directory
--- even files with names like .rhosts :) If I make the requested change,
-would that mean that _anyone_ can exploit this, rather than only devices
-with which we're already paired?
-
-Or am I getting confused? Can we do security mode 2?
-
-I have a _vague_ recollection that there were devices I couldn't
-communicate with unless I enabled those -- but it was a long time ago
-and perhaps it was just that I thought authentication and encryption
-sounded like good things so I should probably enable them :)
-
--- 
-dwmw2
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
