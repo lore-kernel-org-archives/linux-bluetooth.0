@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41E48785.2010100@avantwave.com>
-From: mike <mikelee@avantwave.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] out of range
+Subject: Re: [Bluez-devel] Crosscompiling HCIEMU
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <IA5UYB$8CDBA1E15CF3997E0FCABCA3192E8041@uol.com.br>
+References: <IA5UYB$8CDBA1E15CF3997E0FCABCA3192E8041@uol.com.br>
+Content-Type: text/plain
+Message-Id: <1105465925.7961.1.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,14 +18,32 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 12 Jan 2005 10:12:21 +0800
+Date: Tue, 11 Jan 2005 18:52:05 +0100
 
-Dear all
-    Could anyone tell me , how to detect out of range from user 
-application when i am using rfcomm SPP profile?
+Hi,
 
-best regard
-Mike,Lee
+> Well, I have to deploy bluetooth into
+> this platform and we dont have any
+> bluetooth device to test it. So, I
+> thought i coult use hciemu to make tests.
+
+the hciemu is still limited in its functionality. Getting a real device
+is maybe a better idea.
+
+> I am using a crosscompiling evironment
+> called SCRATCHBOX. The problem is that
+> the compiler can not find the glib.h.
+> I verified and the file is there but
+> for some reason it can not be found.
+
+You need a cross-compiled version of Glib and this is not an easy job. I
+actually never did this.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
