@@ -1,15 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: "Collin R. Mulliner" <collin@betaversion.net>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] browsing non-public services?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Collin R. Mulliner" <collin@betaversion.net>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040224134200.45dab5be@coredump>
+Message-Id: <20040224134200.45dab5be@coredump>
+In-Reply-To: <1077626176.2880.54.camel@pegasus>
 References: <403B1072.1020102@soft.uni-linz.ac.at>
-	 <1077624474.2880.37.camel@pegasus> <20040224132517.0434ab6d@coredump>
-	 <1077626176.2880.54.camel@pegasus>  <20040224134200.45dab5be@coredump>
-Content-Type: text/plain
-Message-Id: <1077627172.2880.70.camel@pegasus>
+	<1077624474.2880.37.camel@pegasus>
+	<20040224132517.0434ab6d@coredump>
+	<1077626176.2880.54.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,21 +20,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 24 Feb 2004 13:52:52 +0100
+Date: Tue, 24 Feb 2004 13:42:00 +0100
 
-Hi Collin,
+Hi Marcel,
 
-> the Nokia 6310 has a serial port running on RFCOMM 17 and/or 18 which
-> allows you to connect and fire AT commands, without having a pairing.
+the Nokia 6310 has a serial port running on RFCOMM 17 and/or 18 which
+allows you to connect and fire AT commands, without having a pairing.
 
-are you sure? Using attest with my Nokia 6310 on channel 17 or 18, I get
-a connection refused message.
-
-Regards
-
-Marcel
+See:
+http://www.betaversion.net/btdsd/db/Nokia6310i.txt
+http://www.saftware.de/bluetooth/btxml.c
 
 
+... Collin
+
+-- 
+Collin R. Mulliner <collin@betaversion.net>
+BATAVERSiON Systems [www.betaversion.net]
+info/pgp: finger collin@betaversion.net
+Code written before 10:00 pm will be replaced by code written after
+2:00am
 
 
 -------------------------------------------------------
