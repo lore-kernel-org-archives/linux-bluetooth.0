@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Sean Godsell" <sgodsell@hotmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: RE: [Bluez-users] Can you spoof/forge Bluetooth Devices/Address?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: EXT-Somil.Asthana@nokia.com
+Cc: d.mackie@ru.ac.za, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E320A8529CF07E4C967ECC2F380B0CF90140382B@bsebe001.americas.nokia.com>
+References: 
+	 <E320A8529CF07E4C967ECC2F380B0CF90140382B@bsebe001.americas.nokia.com>
+Content-Type: text/plain
+Message-Id: <1086642107.28514.21.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY12-F46k3Y8pEBtKa0004b06c@hotmail.com>
-Subject: [Bluez-users] Problem with more than 2 users
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,52 +19,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 08 Jun 2004 09:14:15 -0400
+Date: Mon, 07 Jun 2004 23:01:48 +0200
 
-Hello,
+Hi Somil,
 
-Okay there seems to be a problem with bluez, when more than 2 users try to 
-connect at the same time.  I have 4 bluetooth PDA's (2 palms and 2 windows 
-pdas).   I tried connecting any combination of three PDA's and only the 
-first 2 will connect and work.   I tried a few different kernels as well.   
->From 2.4.25 - 26  --  2.6.3 - 5 and all of which produce the same results 
-only 2 PDA's can connect at one time.   I have configured 8 /dev/rfcomm#  
-devices starting from 0 to 7.     I have hcid and sdpd running.   Then I run 
-dund with --listen.     All the PDA's can see the PC lan server, and can 
-connect and work.   The only problem is only 2 will work and no more.   The 
-following are the configuration files:
+>   Looks like I am in minority here :(. Actually you are very correct there aren't any phone with PAN or UPnP (its in one of our TODO list). Further, Symbian 8.0 release will have a PAN stack anyway (it will be interesting to interface with Bluez PAN  stack, as there are some issues). So for the time being you can look for solutions like Distributed SDP database, tunneling for the RFCOMM channels. They look every exciting but requires lot of debugging/testing  based on my experience on developing/debugging l2cap broadcast utility (using Bluez util code) and I didn't do anything novel there. As far as I see maintaining /updating Distributed SDP database is no different from cache coherence problem (but I am nt expert so I shouldn't really say that but I thought about it :)).
 
-hcid.conf:
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        pin_helper /etc/bluetooth/givepin;
-}
+if you think that there are BlueZ PAN vs. Symbian PAN problems, feel
+free to send me a PAN enabled phone and I will check what happens on our
+side. Maybe the BlueZ code is buggy. I hope not, but it may be possible.
 
-device {
-        name "BlueZ";
-        class 0x100;
-        iscan enable; pscan enable;
-        lm accept;
-        lp hold,sniff,park;
-        auth enable;
-        encrypt enable;
-}
+The idea with distributed SDP and a L2CAP/RFCOMM tunnel is very old. I
+know that this works, because I already used it to reverse engineer the
+FBus over Bluetooth part of the Nokia Data Suite that way. I didn't used
+IP as tunnel between the two piconet, because BlueZ is able to work with
+more than one dongle (or expensive PCMCIA cards in my case) attached to
+the same host. Some easy tricks if you can't buy yourself a protocol
+analyzer ;)
 
+Regards
 
-pin:
-bluez
+Marcel
 
-
-Any help would really be appreciated.
-Thank you
-
-Sean  ;)
-
-_________________________________________________________________
-STOP MORE SPAM with the MSN Premium and get 2 months FREE*    
-http://join.msn.com/?pgmarket=en-ca&page=byoa/prem&xAPID=1994&DI=1034&SU=http://hotmail.com/enca&HL=Market_MSNIS_Taglines
 
 
 
