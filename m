@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Sebastian Roth <sebastian.roth@esk.fhg.de>
-Message-ID: <ctdn6n$sqs$1@sea.gmane.org>
-References: <41FA06A5.3010904@tootai.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-In-Reply-To: <41FA06A5.3010904@tootai.net>
-Subject: [Bluez-users] Re: Connection issue with headset
+Message-ID: <20050128172646.695.qmail@web53205.mail.yahoo.com>
+From: Filipa Duarte <filipa_duarte@yahoo.com>
+To: BlueZ Users <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Can't connect RFCOMM socket: resource temporarily unavailable
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +16,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Jan 2005 16:53:59 +0100
+Date: Fri, 28 Jan 2005 09:26:46 -0800 (PST)
 
-Hi Daniel,
+Hi everyone,
 
-> nomade:/home/dh# btsco 00:0b:2e:06:01:2e
-> Device is 1:0
-> Voice setting: 0x0060
-> RFCOMM channel 6 connected
-You have to press the headset button now!
+I am have Linux 2.6.9 in my laptop and an Conceptronic
+CBT 100U USB adapter. I installed bluez-utils-2.14 and
+bluez-libs-2.14.
 
-If this does not help please post the outputs of
-hciconfig hci0 revision (as root)
-and
-cat /proc/bus/usb/devices
+'hciconfig -a' shows me my device and 'hcitool scan'
+show me the computer of a friend (a windows pc). I can
+do an 'l2ping' and an 'rfcomm bind' to this computer
+without any problem. 
+
+The problems arrive when I try to do 'rfcomm connect'.
+The answer is: "Can't connect RFCOMM socket: resource
+temporarily unavailable". 
+
+I saw on the web and on the mailling lists that there
+is a problem with the 'bluepin'. I checked mine and it
+didn't work. So, I created a new file (called pin in 
+/usr/bin/) with:
+
+#!bin/sh
+# file: /usr/bin/pin
+echo -n "PIN: "
+cat /etc/bluetooth/pin
+
+and created a file in /etc/bluetooth/ also called pin
+with a numerical the PIN code.
+
+Still I could not make the 'rfcomm connect' work! It
+appears a window asking for the PIN in my friend's
+computer, but in my computer I still have the same
+answer.
+
+I could not find a solution to this problem on the
+web. Any help would be appreciated.
 
 Regards,
-Sebastian
 
 
+Filipa Duarte
 
+
+		
+__________________________________ 
+Do you Yahoo!? 
+The all-new My Yahoo! - What will yours do?
+http://my.yahoo.com 
 
 
 -------------------------------------------------------
