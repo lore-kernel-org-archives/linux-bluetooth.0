@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <003301c4a6a1$f513af70$6f04a8c0@ZBOX>
-From: "Suriyan" <suriyan@netgadgets.co.th>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] testing Bleuz/SCO with hsplay
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset=windows-874
+Subject: Re: [Bluez-devel] testing Bleuz/SCO with hsplay
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stefan de Konink <skinkie@xs4all.nl>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4159974B.4000602@xs4all.nl>
+References: <41597F43.9060208@xs4all.nl> <1096390088.4726.6.camel@notepaq>
+	 <4159974B.4000602@xs4all.nl>
+Content-Type: text/plain
+Message-Id: <1096496461.6380.6.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,27 +19,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 30 Sep 2004 10:59:59 +0700
+Date: Thu, 30 Sep 2004 00:21:02 +0200
 
 Hi Stefan,
 
 > > I think this is a thinko. Pair your headset with your PC and then use
 > > hstest or hsplay to get music on the headset.
->
-> Probably I told it the wrong way, I want my pc to act as a headset for
+> 
+> Probably I told it the wrong way, I want my pc to act as a headset for 
 > my phone. I know I'm odd.
->
-> Does this Harry Potter stuff require some magic to the code or is this
+> 
+> Does this Harry Potter stuff require some magic to the code or is this 
 > not possible?
 
-Try to visit
-http://www.soft.uni-linz.ac.at/_wiki/tiki-index.php?page=ProjectBluezHandsfree
+you can't do that with hstest.
 
-This maybe work for you.
+Regards
 
-Regards,
-
-Suriyan.
+Marcel
 
 
 
