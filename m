@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <403B7FA5.4050607@gmx.de>
-From: Kasimir.Mueller@t-online.de (=?ISO-8859-15?Q?Kasimir_M=FCller?=)
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Content-Type: multipart/mixed;
- boundary="------------060906020308040502030500"
-Subject: [Bluez-users] RFCOMM Question
+Subject: Re: [Bluez-users] License of BlueZ libraries
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Christoph Bartelmus <bluez-users@bartelmus.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <93S9$6GSqpB@bartelmus.de>
+References: <93S9$6GSqpB@bartelmus.de>
+Content-Type: text/plain
+Message-Id: <1077639268.2919.4.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,43 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 24 Feb 2004 17:45:25 +0100
+Date: Tue, 24 Feb 2004 17:14:29 +0100
 
-This is a multi-part message in MIME format.
---------------060906020308040502030500
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Christoph,
 
-Hi Marcel,
-I two simple Questions :
-1.) How many RFCOMM-Connections can be made to a single usb-Stick on Linux
-2.) Is there a timeout which closes the connection, if there ist no 
-traffic for a certain time.
+> this question has been already asked a while ago with no definite answer
+> (http://sourceforge.net/mailarchive/message.php?msg_id=2435632).
+> 
+> Are there any plans to release the Bluez user-space libraries under LGPL?
 
-We plan to connect 10 devices via serial connections to a single server
-to transmit periodically data.
+for the current version of the libraries I have no plan to release them
+under LGPL, but the new libs2 should be LGPL from the start. There are
+some critical parts where the copyright still belongs to Qualcomm. For
+me there is no problem to make libs2 LGPL, but I need confirmation from
+Max and from Qualcomm for a final LGPL version.
 
-Thanks in advance,
+Regards
 
-Kasimir
-
---------------060906020308040502030500
-Content-Type: text/x-vcard; charset=utf8;
- name="Kasimir.Mueller.vcf"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="Kasimir.Mueller.vcf"
-
-begin:vcard
-fn;quoted-printable:Kasimir M=C3=BCller
-n;quoted-printable:M=C3=BCller;Kasimir
-email;internet:Kasimir.Mueller@gmx.de
-x-mozilla-html:FALSE
-version:2.1
-end:vcard
+Marcel
 
 
---------------060906020308040502030500--
 
 
 -------------------------------------------------------
