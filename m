@@ -1,75 +1,69 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Logitech MX900 Hub + i-mate smartphone2
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Neil Fenemor <Neil@OnDrugs.co.nz>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1088029361.3703.17.camel@localhost.localdomain>
-References: <1088029361.3703.17.camel@localhost.localdomain>
-Content-Type: text/plain
-Message-Id: <1088030296.4296.14.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Jun 2004 00:38:16 +0200
+Return-Path: <n1c0l4s.l3@wanadoo.fr>
+From: nicolas <n1c0l4s.l3@wanadoo.fr>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re: inactivity of my Bt
+Date: Thu, 24 Jun 2004 00:50:30 +0200
+References: <200406232055.06709.n1c0l4s.l3@wanadoo.fr> <200406240028.07415.n1c0l4s.l3@wanadoo.fr> <1088029418.4296.9.camel@pegasus>
+In-Reply-To: <1088029418.4296.9.camel@pegasus>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Message-Id: <200406240050.30749.n1c0l4s.l3@wanadoo.fr>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Neil,
+Le jeudi 24 Juin 2004 00:23, Marcel Holtmann a =E9crit=A0:
+> Hi Nicolas,
+>
+> > > > i have with your advices installed my bluetooth  but i have a big
+> > > > problem, if i let my bluetooth alone a time too long 10-15 min   i
+> > > > lost my bluetooth and i have to use a ps/2 or usb keyboard/ mouse to
+> > > > reinstall ( hcitool inq  scan and hidd -c )
+> > > >
+> > > > there is a way to keep it alive ?
+> > >
+> > > mostly every HID will disconnect after some time. Start "hidd --serve=
+r"
+> > > at boot time and your mouse or keyboard will reconnect after a
+> > > keypress.
+> >
+> > and how can i start "hidd --server" at boot time?
+>
+> the bluez-utils-2.7 (and also the Debian package) contains an init
+> script that will do this for you.
 
-choose one mailing list, because I hate cross-postings.
+i have all installed this rpm from my distrib
 
-> I'm trying to get my MX900 Hub and my i-mate smartphone2 to place
-> nicely together, but so far, I haven't had much luck on that front.
-> The smartphone2 FYI runs Windows Mobile 2003, or CE4, which ever you
-> prefer to call it. The phone is also called a Orange SPV E200 for
-> those on that network.
+bluez-bluefw-1.0-1mdk
+bluez-utils-2.7-4mdk
+bluez-hciemu-1.0-2mdk
+libbluez1-2.7-1mdk
+bluez-hcidump-1.8-1mdk
+libbluez1-devel-2.7-1mdk
 
-Send us the information about your phone from "hcitool info <bdaddr>".
+and there is no bluetooth service in my mcc but service bluetooth start   w=
+ork
 
-> I can get rfcomm stuff to work fine with other phones, so I believe it
-> is the phone itself at fault. The end result that I'm after, is to be
-> able to sync with my phone, and also surf from my laptop via GPRS. The
-> time frame I'm trying t work within is of course tight, as I'm needed
-> this next week for while I'm away. 
-> 
-> When all connected, peered, etc, and it looks successful, I get odd
-> things like the following.
-> 
-> [root@localhost neil]# cat /dev/rfcomm0
-> cat: /dev/rfcomm0: Connection reset by peer
-> [root@localhost neil]# 
-> 
-> I've put the hcidump information at the bottom of the e-mail.
-
-Do it again, but this time with -x or send us the binary dump.
-
-> I'm also having problems with the ActiveSync facilities on the phone,
-> as when I try the "BT ActiveSync" it comes up with "Please bond with
-> other Bluetooth device which supports serial port or ActiveSync
-> profile as your ActiveSync partner!"
-
->>From the dump I saw that you use security mode 3. Do you enabled auth
-and encrypt in hcid.conf? Don't do so. Show us "hciconfig -a".
-
-Regards
-
-Marcel
+so  what have i to do?
+there is a packaging bug?  ( in this case i will mail the packager rapidly)
 
 
 
-
--------------------------------------------------------
-This SF.Net email sponsored by Black Hat Briefings & Training.
-Attend Black Hat Briefings & Training, Las Vegas July 24-29 - 
-digital self defense, top technical experts, no vendor pitches, 
-unmatched networking opportunities. Visit www.blackhat.com
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+thanks
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> This SF.Net email sponsored by Black Hat Briefings & Training.
+> Attend Black Hat Briefings & Training, Las Vegas July 24-29 -
+> digital self defense, top technical experts, no vendor pitches,
+> unmatched networking opportunities. Visit www.blackhat.com
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
