@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] MX900 sometimes catalepsic
-From: Charles Bueche <bueche@netnea.com>
-To: bluez-users@lists.sourceforge.net
-Cc: puggy@gentoo.org, bryan@reigndropsfall.net, puggy@bobspants.com
-In-Reply-To: <1106761340.28444.46.camel@pegasus>
-References: <1106681895.20288.0.camel@bluez.bueche.ch>
-	 <1106761340.28444.46.camel@pegasus>
+Subject: Re: [Bluez-users] rfcomm question 3
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <420504B8.1090903@gmx.ch>
+References: <20050205124828.1758.qmail@web60903.mail.yahoo.com>
+	 <4204C77D.1040207@gmx.ch> <1107611491.6921.133.camel@pegasus>
+	 <4204D19B.1090108@gmx.ch> <1107612892.6921.152.camel@pegasus>
+	 <420504B8.1090903@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1107771690.23897.23.camel@bluez.bueche.ch>
+Message-Id: <1107626911.6921.179.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,98 +21,59 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 07 Feb 2005 11:21:29 +0100
+Date: Sat, 05 Feb 2005 19:08:31 +0100
 
-Hi all,
+Hi Marco,
 
-sorry for the long time before answering, I wanted to be sure the
-problem is really fixed.
+> thanks a lot for your comments and hints on my code.
 
-Apart from the good remarks about the MX900 design error (lack of a
-power-switch), the best suggestion came from Marcel :
+you are welcome.
 
-Doing this :
+> unfortunately we only had 1 module about c/c++ programming in the 
+> university and I'm programming java for over 3 years.
+> Luckily, in comunication-technology, we've a subtopic about c 
+> socket-programming in two weeks, this will be very helpfull.
+> 
+> Actually my project is in c++. Because of that I started already with the 
+> c++ usage of comments and variable declarations. For c I usually use the 
+> --ansii flag to ensure gcc backward compatibility.
 
-	/usr/sbin/hciconfig hci0 noscan
-	/usr/bin/hidd --killall
+Actually all my suggestions are based on my work inside the Linux
+kernel. If you are at that point you see code a little bit different,
+because you must deal with different things. People underestimate the
+coding style and I think it is one of the important things to keep this
+clean and to help and allow newbies to understand the code. And this is
+another important thing, because if you don't understand the code you
+end up copying stuff from one project to another. This does not increase
+code quality and I have seen enough projects where something works, but
+nobody knows why.
 
-at shutdown time avoids the problem, not a single mouse deadlock anymore
-since one week.
+> I'll definitely check out the rctest.c example
 
-Thanks for you suggestions. I shall update my MX900 web page rsn.
+The test programs still need some cleanups, because there are too many
+global variables in that code.
 
-Charles
+> Regarding your price/hour: Do you know how many money you would earn if you 
+> got paid for your email support in this list? Amazing! :-)
 
-On mer, 2005-01-26 at 18:42 +0100, Marcel Holtmann wrote:
-> Hi Charles,
-> 
-> > I'm running 2.6.10-gentoo-r4 with patch-2.6.10-mh1.gz. My hardware is a
-> > Logitech MX900 mouse and a Dell Inspiron 8600 with a CSR chip :
-> > 
-> > hci0:   Type: USB
-> >         BD Address: 00:10:C6:22:54:AF ACL MTU: 192:8  SCO MTU: 64:8
-> >         UP RUNNING PSCAN ISCAN 
-> >         RX bytes:113629 acl:7992 sco:0 events:88 errors:0
-> >         TX bytes:1043 acl:24 sco:0 commands:42 errors:0
-> >         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-> >         Link policy: RSWITCH HOLD SNIFF PARK 
-> >         Link mode: SLAVE ACCEPT 
-> >         Name: 'laptopcb (0)'
-> >         Class: 0x100100
-> >         Service Classes: Object Transfer
-> >         Device Class: Computer, Uncategorized
-> >         HCI Ver: 1.1 (0x1) HCI Rev: 0x235 LMP Ver: 1.1 (0x1) LMP Subver: 0x235
-> >         Manufacturer: Cambridge Silicon Radio (10)
-> > 
-> > I'm not using the mouse bluetooth dock for any connection (only battery
-> > loading).
-> > 
-> > Often, after unpacking my laptop and MX900 mouse from its bag, the mouse
-> > appear to "hang". The laptop doesn't see it, and I have to open the
-> > mouse battery location and quickly unplug one battery to reset the
-> > mouse. After this treatment, the mouse announce itself and the laptop
-> > sees it and create the devices with udev.
-> > 
-> > The problem happen about 1/4 of the time when unpacking the laptop, but
-> > in a systematic way after a reboot (eg after upgrading my kernel). I
-> > never boot my laptop under Windows, and I never use the mouse with other
-> > machines. The "connect" button has no effect.
-> > 
-> > The problem has be present since a long time and several kernels and
-> > bluez patches, maybe since always.
-> > 
-> > It would only be annoying, but the battery door of my mouse is starting
-> > to present a bad shape after openning it with just about all the tools
-> > that fits it, including cisors.
-> 
-> I have no idea what the problem is, but I assume that it is because of
-> the reconnect feature of the mouse. I will always try to reconnect when
-> you move your bag and after some failed retries it may deadlock itself.
-> 
-> On the other hand there is maybe a small race when you shutdown the
-> machine and disconnect every device. May a "hciconfig hci0 noscan"
-> before calling "hidd -K" will help.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
-> Tool for open source databases. Create drag-&-drop reports. Save time
-> by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
-> Download a FREE copy at http://www.intelliview.com/go/osdn_nl
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
--- 
-Charles Bueche <bueche@netnea.com>
-www.netnea.com : your best source for ultra-geeks !
+I don't know, but actually that is not so important. A project will only
+make progress if the mailing list is activly maintained. If people don't
+care about the problems of others, the project is already dead.
+
+However feel free to make a donation if you like ;)
+
+	http://www.bluez.org/sponsors.html
+
+> It's always a pleasure if someone answers emails in mailinglists that fast 
+> and precise as you do (The last one i've "met" spending so much time for a 
+> mailinglist was Mattia Barbon in the wxPerl list.).
+
+Thanks
+
+Regards
+
+Marcel
+
 
 
 
