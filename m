@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] support for CSR Bluecore4 chip
-From: "durai" <durai@isofttech.com>
-In-Reply-To: <1112554855.8263.17.camel@pegasus>
-References: <20050402141512.1882699599.durai@isofttech.com>
-	<1112554855.8263.17.camel@pegasus>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0
-Message-Id: <20050407125744.588722761.durai@isofttech.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Subject: RE: [Bluez-devel] rejecting or accepting connection request
+Message-ID: <11D888B5FA88D9409851B71E8D3206D101662C@doar.commil.com>
+From: "Tzahi Efrati" <tzah@commil.com>
+To: <bluez-devel@lists.sourceforge.net>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,41 +17,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 7 Apr 2005 12:57:44 +0530
-
+Date: Wed, 6 Apr 2005 20:00:12 +0200
 
 Hi Marcel,
-thanks for your response. I have some more queries.
-In our product we are using linux kernel 2.4.18.We cannot upgrade
-our kernel immediately. I want to know whether CSR Bluecore4 support
-is available for 2.4.18 kernel. Is there any patch available for that?
-I found a kernel patch "patch-2.4.18-mh15.gz" in your website. Does it have=
- the
-Bluecore4 support? Also we would like to use our bluetooth device as Access=
-point.
-Does it support PAN and LAN profiles? =
 
-I am a newbie to bluetooth technology. Please apologize me if I am asking s=
-ome technically wrong
-questions.
-regards
-durai
+Thanks for the answer. I changed hci_conn_request_evt() to simply return
+without doing anything, and hci_conn_complete_evt() to allocate (using
+hci_add_conn()) the hci_conn struct. So far it seems to work with no
+side-effects.
 
- ------------Original Message------------
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-Date: Mon, Apr-4-2005 6:25 AM
-Subject: Re: [Bluez-devel] support for CSR Bluecore4 chip
+Regards,
+Tzahi
 
-Hi Durai,
+-----Original Message-----
+From: bluez-devel-admin@lists.sourceforge.net
+[mailto:bluez-devel-admin@lists.sourceforge.net] On Behalf Of Marcel
+Holtmann
+Sent: Tuesday, April 05, 2005 7:49 PM
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] rejecting or accepting connection request
 
-> We are going to use Bluecore4 chip for our product. I wanted to know
-> whether the current bluez implementation
-> will support Bluecore4 chipset. =
+Hi Tzahi,
 
+> I'm trying to build an application which accepts or rejects incoming=20
+> connections according to the requesting device's bd_Addr. My=20
+> application compares the requesting device's bd_Addr to a list and if=20
+> the address is in the list, the application accepts the request.
+> Otherwise, it rejects it.
+> I have set the event filter to EVT_CONN_REQEUST (and =20
+> EVT_CONN_COMPLETE and EVT_DISCONN_COMPLETE) and I'm using select()=20
+> followed by read() to get the events. My problem is that for every=20
+> EVT_CONN_REQ I receive, the hci interface automatically accepts it.
+> I've tried to set the link_mode with different values using the=20
+> hciconfigure but it didn't help.
+> =20
+> It seems that the only way I can make this bd_addr filtering is by=20
+> disconnecting the connections with un-listed bd_addreses. Am I right?
+> any ideas?
 
-besides eSCO we fully support the BlueCore4 chips. So feel free to play
-with the EDR feature.
+what you are talking about will be handled by an in-kernel policy
+manager, but actually this code is far away from being finished at the
+moment. And you must do this inside the kernel, because it is not the
+job of the userspace to handle HCI connections.
 
 Regards
 
@@ -63,15 +68,14 @@ Marcel
 
 
 -------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
+SF email is sponsored by - The IT Product Guide Read honest & candid
+reviews on hundreds of IT Products from real users.
 Discover which products truly live up to the hype. Start reading now.
 http://ads.osdn.com/?ad_id=3D6595&alloc_id=3D14396&op=3Dclick
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
 
 
 -------------------------------------------------------
