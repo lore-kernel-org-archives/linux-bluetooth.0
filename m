@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4114CE58.5070302@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] Logiteh MX900 / USB Bluetooth "dongle" support?
+Subject: Re: [Bluez-devel] sdp_proto_desc_t problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: wang@cs.byu.edu
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <33044.128.187.171.223.1091836937.squirrel@mail.cs.byu.edu>
+References: <33044.128.187.171.223.1091836937.squirrel@mail.cs.byu.edu>
+Content-Type: text/plain
+Message-Id: <1091877701.20839.148.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,38 +18,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 07 Aug 2004 14:43:04 +0200
+Date: Sat, 07 Aug 2004 13:21:41 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi,
 
-Hi there,
+> I am a newbie to linux bluetooth programming.
+> My system is fedora2, kernel 2.6.5-1.358.
+> I was trying to compile a project developed by our lab, and got the
+> following error message:
+> 
+> error: type specifier omitted for parameter `sdp_proto_desc_t'
+> 
+> It seems that some header file was not included so the compiler could not
+> recognize sdp_proto_desc_t. However, bluetooth.h has been included. I
+> tried to find the definition of sdp_proto_desc_t in bluetooth.h, sdp.h and
+> sdp_lib.h, but all failed.
+> 
+> Can you tell me in which file sdp_proto_desc_t is defined? Or the possible
+> reason for this error.
 
-I just bought a Logitech MX900 - works fine with the dongle, as it
-registers as a native USB HID.
+I can't remember that we used sdp_proto_desc_t. Show us the source code
+of your project.
 
-But as the USB "dongle" that comes with the mouse also works as a
-bluetooth device, it would be nice to have support for this.
+Regards
 
-I'm not sure if there already is support, if not, I'd like to have a
-look at it myself. The thingy reports as two USB devices,
-"Logitech Inc." and "Texas Instruments, Inc. TUSB2036 HUB". I think the
-second one might be the Bluetooth device.
+Marcel
 
-Any experiences with ti chipsets?
 
-or maybe I just overlooked something and everything is already "there"...
-
-cu,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFBFM5XQWC6DTWkDAoRAmIeAJ9YaWpwmzTFDEt8PYs+MftzGPCkNACgq+tK
-qCdipP6C4GeGkXS5RK8sRe4=
-=4Pzn
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
