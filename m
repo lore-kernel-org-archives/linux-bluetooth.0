@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <1ffb4b0705022008331572db81@mail.gmail.com>
+From: Mike Lee <eemike@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-From: Sebastian Roth <sebastian.roth@esk.fhg.de>
-Message-ID: <cvc5d5$lij$1@sea.gmane.org>
-References: <cv4qgt$8h4$1@sea.gmane.org> <4215FC4A.20504@dark-reality.de> <cv50e9$tm3$1@sea.gmane.org> <42161CC7.1090800@dark-reality.de> <cv7vnn$b2i$1@sea.gmane.org> <4217E058.2000805@xmission.com>
+Subject: Re: [Bluez-devel] About new hardware testing
+In-Reply-To: <Pine.LNX.4.33.0502201659100.26897-100000@redbean.intranet.gw-instruments.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <4217E058.2000805@xmission.com>
-Subject: [Bluez-devel] Re: mystic AT-Command
+Content-Type: text/plain; charset=US-ASCII
+References: <1ffb4b070502200751191953c@mail.gmail.com>
+	 <Pine.LNX.4.33.0502201659100.26897-100000@redbean.intranet.gw-instruments.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,42 +19,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 21 Feb 2005 09:20:01 +0100
+Date: Mon, 21 Feb 2005 00:33:46 +0800
 
-Hi Brad,
+Dear Peter
 
-> ok, I made this change in cvs.
-Thank you!
+> I remember we initialy had a problem to get the right default pass for
+> hcid.conf when cross compiling.
+    I will try this
+> Does "hciconfig hci0 up" work ??
+    Because i do not get any info from hciconfig. I can not "up" the device.
+> 
+> I use
+> hciattach /dev/ttyS1 -s 115200 csr 921600 flow
+> to attach the bluetooth device (CSR with HCI connected to an ARM).
 
-Can you please merge this in btsco2 too.
+   My script is like that hciattach /dev/ttyS1 -s 921600 csr 921600
+flow. But it works on my development board, so i don't think it is the
+problem.
+> 
+   Thanks for helping
 
-diff -u -r1.1 btsco2.c
---- btsco2.c    1 Dec 2004 12:02:58 -0000       1.1
-+++ btsco2.c    21 Feb 2005 08:15:25 -0000
-@@ -387,10 +387,9 @@
-                 return 0;
-         buf [rlen] = 0;
-         fprintf(stderr, "recieved %s\n", buf);
--       if (strstr(buf, "AT+BVRA="   )) opdone = headset_button(headset);
--       else if (strstr(buf, "AT+CKPD=200")) opdone = 
-headset_button(headset);
--       else if (strstr(buf, "AT+CHUP"    )) opdone = 
-headset_button(headset);
--       else if (strstr(buf, "AT+CIND=?"  )) opdone = 
-headset_button(headset);
-+       if (strstr(buf, "AT+CKPD=200"   )) opdone = headset_button(headset);
-+       else if (strstr(buf, "AT+CHUP"  )) opdone = headset_button(headset);
-+       else if (strstr(buf, "AT+CIND=?")) opdone = headset_button(headset);
-         else if (sscanf (buf, "AT+VGS=%d", &headset->volumes[0]) == 1) 
-opdone = headset_speaker (headset);
-         else if (sscanf (buf, "AT+VGM=%d", &headset->volumes[1]) == 1) 
-opdone = headset_micro   (headset);
-         if (opdone == 1)
-
-
-Best regards,
-Sebastian
-
+best regard
+Mike,Lee
 
 
 -------------------------------------------------------
