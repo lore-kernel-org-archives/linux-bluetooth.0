@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] usb dongle problem
+Subject: Re: [Bluez-users] (no subject)
 From: Marcel Holtmann <marcel@holtmann.org>
-To: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
+To: Geert Geurts <geert@ebm.nl>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <7234973362.7336272349@estudiants.urv.es>
-References: <7234973362.7336272349@estudiants.urv.es>
+In-Reply-To: <1080225769.3064.6.camel@geert.ebm.nl>
+References: <1080225769.3064.6.camel@geert.ebm.nl>
 Content-Type: text/plain
-Message-Id: <1080258192.2283.46.camel@pegasus>
+Message-Id: <1080258046.2283.43.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,18 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Mar 2004 00:43:12 +0100
+Date: Fri, 26 Mar 2004 00:40:46 +0100
 
-Hi Albert,
+Hi Geert,
 
-> I'm still working on the problem I have with my usb
-> dongle.
-> In a red hat 7.3 with kernel 2.4.18 (i know it's
-> deprecated) I install bluez-kernel 2.3, bluez-libs,
-> bluez-utils, bluez-sdp and bluez-pan, but when I do
-> hciconfig, there is no output.
+> Man your fanatic with your bluez driver! good work!
+> I've got some more for you :-)
+> I've done the stuff you told me to, rebuild kernel with patch applied
+> and it works better! but after half a minute or something the connection
+> breaks again... and after pinging over the ppp I get the same message...
+> uuuugh...
+> What to do next??
 
-show me /proc/bus/usb/devices and tell me what dongle did you bought.
+I don't own a Palm so I don't know. Check the connection if it is a PPP
+error or a RFCOMM error. Question is why this stalls.
 
 Regards
 
