@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Problems with anycom usb dongle
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <cp4df4$i6l$1@sea.gmane.org>
-References: <20041206225609.GA1177@zeus.galaxy.org.uk>
-	 <cp3mkk$m7t$1@sea.gmane.org> <1102407664.8447.20.camel@pegasus>
-	 <cp3rr7$1vv$1@sea.gmane.org> <1102411047.8447.28.camel@pegasus>
-	 <cp4a8v$959$1@sea.gmane.org> <1102425729.8447.41.camel@pegasus>
-	 <cp4df4$i6l$1@sea.gmane.org>
-Content-Type: text/plain
-Message-Id: <1102439143.8447.47.camel@pegasus>
+To: bluez-devel@lists.sourceforge.net
+From: Sebastian Roth <sebastian.roth@esk.fhg.de>
+Message-ID: <cp4df4$i6l$1@sea.gmane.org>
+References: <20041206225609.GA1177@zeus.galaxy.org.uk>	 <cp3mkk$m7t$1@sea.gmane.org> <1102407664.8447.20.camel@pegasus>	 <cp3rr7$1vv$1@sea.gmane.org> <1102411047.8447.28.camel@pegasus>	 <cp4a8v$959$1@sea.gmane.org> <1102425729.8447.41.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1102425729.8447.41.camel@pegasus>
+Subject: [Bluez-devel] Re: Problems with anycom usb dongle
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,28 +18,59 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 07 Dec 2004 18:05:43 +0100
+Date: Tue, 07 Dec 2004 15:07:32 +0100
 
-Hi Sebastian,
+Hi Marcel,
 
->  > Should I mark it as broken in hci_usb driver?
-> The dongle seems broken but IMO it's better to have an acknowledgment
-> of someone else who have tested it.
+as I mentioned in my first post I'm new to blueooth. So I think I'm not
+the one who can really answer your questions but let's give it a try.
 
-I have no problem to mark buggy hardware as broken.
+ > Should I mark it as broken in hci_usb driver?
+The dongle seems broken but IMO it's better to have an acknowledgment
+of someone else who have tested it.
 
->  > Or should I simply drop SCO packets with no data on handle 0 in the
->  > HCI core? Is handle 0 a valid handle?
->  From my bluetooth spec, page 226 (bluetooth_1_1_vol1)
-> "The SCO handle zero is never used."
+ > Or should I simply drop SCO packets with no data on handle 0 in the
+ > HCI core? Is handle 0 a valid handle?
+ From my bluetooth spec, page 226 (bluetooth_1_1_vol1)
+"The SCO handle zero is never used."
 
-As far as I know this speaks about the LMP handle and this is different
-from the HCI handle.
 
-Regards
 
-Marcel
+ > There must be "SCO add" in between.
+Yes you are right!
 
+(this should be the first button press AT+CKPD=200)
+ > ACL data: handle 0x0001 flags 0x02 dlen 17
+ > ACL data: handle 0x0001 flags 0x01 dlen 3
+     L2CAP(d): cid 0x0041 len 16 [psm 3]
+       RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 12 fcs 0x40
+       0000: 41 54 2b 43 4b 50 44 3d  32 30 30 0d              AT+CKPD=200.
+< ACL data: handle 0x0001 flags 0x02 dlen 14
+     L2CAP(d): cid 0x01c3 len 10 [psm 3]
+       RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 6 fcs 0x9a
+       0000: 0d 0a 4f 4b 0d 0a                                 ..OK..
+< HCI Command: Add SCO Connection (0x01|0x0007) plen 4
+   0000: 01 00 e0 00                                       ....
+ > HCI Event: Command Status (0x0f) plen 4
+   0000: 00 01 07 04                                       ....
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+   0000: 01 01 00 01 00                                    .....
+ > HCI Event: Connect Complete (0x03) plen 11
+   0000: 00 01 04 33 ff 00 1b 08  00 00 01                 ...3.......
+ > SCO data: handle 0x0000 dlen 0
+... (a lot of those packets)
+ > SCO data: handle 0x0000 dlen 0
+ > SCO data: handle 0x0401 dlen 48
+     0000: 58 00 60 ff f0 ff a0 ff  7c ff 98 ff d8 00 38 00
+     0010: 68 00 48 ff d0 ff 6c ff  5c ff a8 ff f0 00 50 00
+     0020: 70 00 38 ff c8 ff 7c ff  88 ff c0 00 20 00 70 00
+
+I was wrong.
+The first button press was _before_ the SCO data with handle 0!
+
+
+Best regards,
+Sebastian
 
 
 
