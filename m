@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Triona Ryan <triona.ryan@nuigalway.ie>
-Subject: Re: [Bluez-users] local device class...
-To: bluez-user@schaettgen.de
-Cc: bluez-users@lists.sourceforge.net
-Message-id: <01LKY0ISS1MC0002UB@beacon.nuigalway.ie>
-MIME-version: 1.0
-Content-type: text/plain
+Message-ID: <4215A788.9070205@yahoo-inc.com>
+From: "Vegard B. Havdal" <vegardh@yahoo-inc.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] Am stuck; HP laptop, Fedora
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,127 +16,62 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 18 Feb 2005 09:09:54 +0000
-
-Sorry if I seemed rude but my problem is, I think, ridiculous.
-
->> Ok, I seem to
- be very much ignored.
->
->> Thanks very much
-
->You're welcome :P
->Maybe you're w
-aiting so long (about 9 hours already!) for an answer because 
->those misplaced 
-wh itespace and linebreaks scared the readers? 
-
-Not my fault, but I accept, tot
-ally annoying.
-
->Or it's just 
->because no one tried hard enough to figure out w
-hat you tried to achieve by 
->doing what.
->So in short: you want to send files t
-o another PC and it's not working, right? 
-
-Correct
-
->Do you have an obex server
- running?Which one?
-
-Yes, I've tried obexserver, and then the gnome-obex-server,
- the same problem
-
-> Did it register with the SDP server (hint: sdptool --help)?
- 
-
-Did the obexserver register with the SDP server. I'm not sure. I've done sdpt
-ool --help and still am not sure what you  mean. I've added OBEX with sdptool is
- that's what you mean?
-
->The device class has very little to do with that. 
-
->> 
-However, IF there's any
->> one out there using this list EXCEPT for one on-going
- thread, could someone
->> plea se check their hciconfig -a and see if their devi
-ce class matches
-> >their services . I'm using college lab computers, and I inst
-alled BT on one
-
->The device class is not meant to match all your services. 
->Th
-at's what the sdp server is for.
+Date: Fri, 18 Feb 2005 09:30:00 +0100
 
 
-As I said, I've added the services, and from 
-the other PC(s) I've browsed the services, and see OBEX push etc, but when I "hc
-iconfig -a", In Service Class Object transfer is set on the master (the one I'm 
-sending from, and have no problem trnafering files to and from my phone with) bu
-t not set on the slave (the one that's trying to receive a file, where the serve
-r is running.)
+Hello, I've spent some time getting BT to work on my HP NC6000 laptop, 
+now looking for any clues. To put it shortly, I think I have everything 
+installed right, but when I for instance fire up gnome-obex-send, it 
+will hang when I scan for devices.
 
-Aka. on the master: 
+More detail:
 
-Class: 0x100100...........................
-....................(note the MSB is "1", hence, Object Transfer is "set")
-     
-   Service Classes: Object Transfer
-        Device Class: Computer, Uncategorize
-d
+I have FC2 with the 2.6.9-1.11_FC2 kernel. I got the latest bluez-libs 
+and bluez-utils compiled fine:
 
-Whereas on the other PCs
-Class: 0x3e0100.....................................
-............(note the MSB is "3", hence Object Trnasfer is "set")
-       Service
- Classes: Networking, Capturing, Rendering..........(and yet "Object Transfer" i
-s NOT here!)
-       Device Class: Computer, Uncategorized
+-rw-r--r--  1 root root 55116 Feb 17 22:17 /usr/lib/libbluetooth.a
+-rwxr-xr-x  1 root root   835 Feb 17 22:17 /usr/lib/libbluetooth.la
+lrwxrwxrwx  1 root root    22 Feb 17 22:17 /usr/lib/libbluetooth.so -> 
+libbluetooth.so.1.0.15
+lrwxrwxrwx  1 root root    22 Feb 17 22:17 /usr/lib/libbluetooth.so.1 -> 
+libbluetooth.so.1.0.15
+-rwxr-xr-x  1 root root 59773 Feb 17 22:17 /usr/lib/libbluetooth.so.1.0.15
+[vegardh@dhcp-244 vegardh]$
 
+The kernel module is the one that was in the kernel in the first place, 
+I haven't compiled that:
 
-This is the only thi
-ng I can see that's differenf between a working PC and a non-working PC. I've se
-en another computer that has Networking and Object Transfer Activated and the co
-rresponding local device class: 12010c, and it works fine. 
+author:         Maxim Krasnyansky <maxk@qualcomm.com>, Marcel Holtmann 
+<marcel@holtmann.org>
+description:    Bluetooth Core ver 2.6
+version:        2.6 21CCA1EA2920D6252535138
+license:        GPL
+alias:          net-pf-31
+vermagic:       2.6.9-1.11_FC2 686 REGPARM 4KSTACKS gcc-3.3
+depends:
 
-My question is, cou
-ld this be the problem, and if so, how do I fix it?
-Apologies again for my ruden
-ess, and what will be no doubt, another whitespace filled and distorted email.
+And the device itself is on the USB:
 
-Thanks for your help,
-Triona
-.
-> >computer a few week s ago, and it gave me 0x10
-0 as device class, but last
-> >week I installed all on an other computer, and I 
-got 0x3e0100. They're ALL
-> >inked to the SAME lan, and SAME computers etc. I ch
-anged the first
-> >computer to ox100100, to set Object Transfer , which immediat
-ely worked,
->> but the other one is set already and isn't registeri ng the servi
-ce. Why
+T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=049f ProdID=0086 Rev= 8.02
+S:  Manufacturer=ACTIONTEC
+S:  Product=Bluetooth by hp
 
->"Is set already"? Set the device class to 0x100100? What makes you thi
-nk it 
->isn't registering the service? Did you actually check the sdp server or 
-are 
->you talking about the device class?
+The BT works from Windows.
 
-Fred
+With obex_test I get this, can't get more debug or something from it:
 
--- 
-Fred Schaettgen
-bluez-devel
-@schaettgen.de
-===========End of original message text===========
+[vegardh@dhcp-244 vegardh]$ obex_test -b
+Using Bluetooth RFCOMM transport
+OBEX Interactive test client/server.
+ > s
+Server register error! (Bluetooth)
 
+I'd appreciate any clues, either from someone with experience with this 
+laptop and linux, or if I've overlooked something.
 
-
+Vegard
 
 
 -------------------------------------------------------
