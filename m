@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] installing bluez-hciemu-1.0 on Debian--GLib not
-	found
+Subject: Re: [Bluez-users] SCO link
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Tehyih D Wan <tdwan@MIT.EDU>
+To: Julius Loman <lomo@mailbox.sk>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1081889721.407c53b90c5d4@webmail.mit.edu>
-References: <1081889721.407c53b90c5d4@webmail.mit.edu>
+In-Reply-To: <20040414090858.GL10652@kyberia.net>
+References: <20040414090858.GL10652@kyberia.net>
 Content-Type: text/plain
-Message-Id: <1082161011.4489.30.camel@pegasus>
+Message-Id: <1082160929.4489.27.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,22 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 17 Apr 2004 02:16:51 +0200
+Date: Sat, 17 Apr 2004 02:15:29 +0200
 
-Hi Debbie,
+Hi Julius,
 
-> I'm trying to install bluez-hciemu on Debian, and getting the error "checking
-> for glib-config...not found" when I run the ./configure script.
-> 
-> I've installed libglib2.0, libglib2.0-dev, libglib2.0-data, and libglib2.0-dbg,
-> but I still get the same error when running the ./configure script.
-> 
-> There was a thread about this same problem back in 2003 but the only suggestion
-> seemed to be to try installing the -dev packages for Glib.  Any ideas on what
-> else I might try?
+> is there a solution how to establish a SCO link (voice) between mobile phone and 
+> PC in the way, that PC with soundcard will act as bluetooth handset ? 
+> I've found an alsa driver, but this works in opposite direction (BT handset
+> acts as soundcart to PC). 
 
-change the source of hciemu to use Glib 2.x (and send us a patch) or
-install the development packages of Glib 1.4.
+not that I know of. Start writing it ;)
 
 Regards
 
