@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <cone.1089163591.829830.5657.500@commodore.email-scan.com>
-From: Sam Varshavchik <mrsam@courier-mta.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] rfcomm0: connection refused
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Virat Gohil <virat4lug@hotpop.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <001b01c46355$7a0c4150$c1010f0a@matrix>
+References: <007c01c46334$7d8f5090$17010f0a@matrix>
+	 <1089110652.4504.138.camel@pegasus> <001b01c46355$7a0c4150$c1010f0a@matrix>
+Content-Type: text/plain
+Message-Id: <1089124649.4504.208.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="US-ASCII"
-Subject: [Bluez-users] Trouble connecting to a Sony Ericsson T610 phone.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,24 +19,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 06 Jul 2004 21:26:31 -0400
+Date: Tue, 06 Jul 2004 16:37:29 +0200
 
-I'm using a Belkin USB dongle to try to connect to my T610 phone.  I'm 
-running bluez 2.5 on Fedora Core 2 x86_64.
+Hi Virat,
 
-"hcitool scan" does list the phone.  And the "Add New Device" option on the 
-phone does show the PC, after a brief delay.  But if I tell the phone to go 
-ahead and connect to the PC, enter a PIN, the phone spins for a while, then 
-reports "Bluetooth connection failed" .  On the PC side nothing happens.
+> > about what patch are you talking? What kernel do you use?
+> 
+> I am using 2.4.20-8 which comes with RedHat Linux 9.0
 
-Trying it the other way around also fails.  "sdptool browse" reports an 
-error: "Failed to connect to SDP server on 00:0A:D9:79:1B:B3: Connection 
-timed out".  Nautilus does show an icon for the T610 (but only if I'm 
-logged in as root) for "bluetooth:///", but either double-clicking on the 
-icon, or dragging a file into it, reports an error saying that the device is 
-read-only.  Meanwhile, the phone is not doing anything.
+not really good. Better you use 2.4.26-mh1.
 
-So the phone and PC can see each other, but are not talking.
+> > This can be a PIN problem or you use the wrong RFCOMM channel number.
+> > Check the channel number of DUN with sdptool first.
+> 
+> I dont think so, as I was able to connect once, and then it failed after
+> restart and without me making any changes.
+
+Check it with "sdptool browse <bdaddr>". What does "hciconfig -a" say?
+
+> > Fix up your mailer. This messed up hcidump was hard to read.
+> 
+> I am attaching a text file with the hcidump with this mail, hope you wont
+> mind that.
+
+Use the suffix *.txt so I can view it inline in my mailer.
+
+Regards
+
+Marcel
 
 
 
