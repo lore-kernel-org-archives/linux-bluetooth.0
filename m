@@ -1,54 +1,24 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Jorge =?ISO-8859-1?Q?Gonz=E1lez?= <jorge@naxus.biz>
-To: bluez-devel@lists.sourceforge.net
+Return-Path: <noring@nocrew.org>
+Subject: Status of hcid patches
+From: Fredrik Noring <noring@nocrew.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>
 Content-Type: text/plain
-Message-Id: <1083853467.28356.18.camel@pancho>
+Message-Id: <1083843090.21904.27.camel@kalkyl.roxen.com>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Sdp
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 06 May 2004 16:24:54 +0200
+Date: Thu, 06 May 2004 13:31:31 +0200
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hello
+Hi Marcel
 
-I am trying to get working the sdp tools in order to make the PDA know
-what services are provided by a linux machine.
+My hcid patches with support for Dbus, extended configuration files
+etc. are available here: http://noring.nocrew.org/bluetooth/
 
-But I get this when I try to compile:
------------------------------------------
-/bin/sh ../libtool --mode=link gcc  -Wall -g -O2   -o sdptool  sdptool.o
-listattr.o setattr.o -L../libs -lsdp /usr/lib/libbluetooth.la
-libtool: link: cannot find the library `'
------------------------------------------
+The patches are made for Bluez utils 2.4. I guess some work is needed 
+to match the most recent release of Bluez utils.
 
-I think the problem is -lsdp which is not found. How could I get this
-library??
+The Dbus interface could be improved. Perhaps it's a good idea to think
+about how to include interfaces for SDP and other services as well in
+some kind of general "bluetooth" interface?
 
-
-I dont know if this type questions are supposed to be in bluez-users or
-bluez-devel. If this is no the appropiate list for this questions I
-would be appreciate to know :D
-
-Thanks,
-
-Jorge
-
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by Sleepycat Software
-Learn developer strategies Cisco, Motorola, Ericsson & Lucent use to deliver
-higher performing products faster, at low TCO.
-http://www.sleepycat.com/telcomwpreg.php?From=osdnemail3
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Fredrik
