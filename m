@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <42393EF0.3090301@prim-time.fr>
-From: Xavier Garreau <x.garreau@prim-time.fr>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] A PAN newbie
-References: <a0580c510503160953311ea8e2@mail.gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <a0580c510503160953311ea8e2@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+References: <a0580c510503160953311ea8e2@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1111012139.11792.46.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,8 +18,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Mar 2005 09:25:20 +0100
+Date: Wed, 16 Mar 2005 23:28:59 +0100
 
+Hi Eduardo,
+
+>    I'm starting to use Bluez to create a PAN. I'm using the 2.6.x linux kernel.
+> I did the following:
+> 
 > ####
 > GN:
 > ####
@@ -32,14 +37,72 @@ Date: Thu, 17 Mar 2005 09:25:20 +0100
 > # sdptool add GN 
 > # modprobe bnep
 > # pand --listen --role GN -n
+> 
+> 
+> ####
+> PANU:
+> ####
+> 
+> # hcid -f /etc/bluetooth/hci.conf
+> # sdpd
+> # modprobe bnep
+> # pand --connect BT_ADDRESS
+> 
+> 
+>   After the connection establishment I configured a LAN with the 10.0.0.0/24 IP
+> configuration. So:
+> 
+> ####
+> GN:
+> ####
+> 
+> # ifconfig bnep0 10.0.0.1 netmask 255.255.255.0
+> 
+> ####
+> PANU:
+> ####
+> 
+> # ifconfig bnep0 10.0.0.2 netmask 255.255.255.0
+> 
+> 
+>   At this point I could ping the two host:
+> 
+> ####
+> GN:
+> ####
+> 
+> # ping 10.0.0.2 # that's ok
+> 
+> ####
+> PANU:
+> ####
+> 
+> # ping 10.0.0.1 # that's ok
+> 
+> 	So, I tried to add a second PANU with:
+> 
+> # hcid -f /etc/bluetooth/hci.conf
+> # sdpd
+> # modprobe bnep
+> # pand --connect BT_ADDRESS
+> 
+> 	It connected with the GN, but when I tried:
+> # ifconfig bnep0 10.0.0.3 netmask 255.255.255.0
+> # ping 10.0.0.1
+> 
+> 	The ping could not reach the GN host even the other
+> PANU (ping 10.0.0.2). I tried to do a ping from the GN to
+> the new PANU and from the old PANU to the new PANU
+> and the problem kept. 
 
-Sorry if I'm wrong but i think the newest version of pand do the sdp 
-stuff (you don't need sdptool add GN)
+you will get a second (bnep1) interface on the master machine and thus a
+bridge is needed to connect these.
 
-Please correct me if I'm wrong ...
+Regards
 
-Regards,
-Xavier Garreau
+Marcel
+
+
 
 
 -------------------------------------------------------
