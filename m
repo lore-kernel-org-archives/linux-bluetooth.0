@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <a0580c510503160953311ea8e2@mail.gmail.com>
-From: Eduardo Bezerra <edubezval@gmail.com>
+Message-ID: <423850C6.9080109@sinister.cz>
+From: Trekie <trekie@sinister.cz>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] A PAN newbie
+Subject: Re: [Bluez-users] MS-6871 isn't working
+References: <42381514.3070701@sinister.cz>	 <1110971745.9818.131.camel@pegasus>  <423818DE.1060909@sinister.cz>	 <1110973336.9818.141.camel@pegasus>  <42381DAA.20703@sinister.cz> <1110974114.9818.147.camel@pegasus>
+In-Reply-To: <1110974114.9818.147.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,94 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Mar 2005 13:53:36 -0400
+Date: Wed, 16 Mar 2005 16:29:10 +0100
 
-Hi folks,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
+Hi Marcel,
 
-   I'm starting to use Bluez to create a PAN. I'm using the 2.6.x linux kernel.
-I did the following:
+|
+| simply give the 2.6.11 or 2.6.12-bkX kernel a try.
+|
 
-####
-GN:
-####
+I tried 2.6.11.4 and it works! Thank you for your quick responses.
 
-Edited the file /etc/bluetooth/hci.conf and enabled the "lm accept,
-master" option.
+David
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
 
-# hcid -f /etc/bluetooth/hci.conf
-# sdpd
-# sdptool add GN 
-# modprobe bnep
-# pand --listen --role GN -n
-
-
-####
-PANU:
-####
-
-# hcid -f /etc/bluetooth/hci.conf
-# sdpd
-# modprobe bnep
-# pand --connect BT_ADDRESS
-
-
-  After the connection establishment I configured a LAN with the 10.0.0.0/24 IP
-configuration. So:
-
-####
-GN:
-####
-
-# ifconfig bnep0 10.0.0.1 netmask 255.255.255.0
-
-####
-PANU:
-####
-
-# ifconfig bnep0 10.0.0.2 netmask 255.255.255.0
-
-
-  At this point I could ping the two host:
-
-####
-GN:
-####
-
-# ping 10.0.0.2 # that's ok
-
-####
-PANU:
-####
-
-# ping 10.0.0.1 # that's ok
-
-	So, I tried to add a second PANU with:
-
-# hcid -f /etc/bluetooth/hci.conf
-# sdpd
-# modprobe bnep
-# pand --connect BT_ADDRESS
-
-	It connected with the GN, but when I tried:
-# ifconfig bnep0 10.0.0.3 netmask 255.255.255.0
-# ping 10.0.0.1
-
-	The ping could not reach the GN host even the other
-PANU (ping 10.0.0.2). I tried to do a ping from the GN to
-the new PANU and from the old PANU to the new PANU
-and the problem kept. 
-
-
-	What am I doing wrong? 
-
- 	Any help is very welcome.
- 
- cheers,
-
-
-
-Eduardo Bezerra Valentin
+iD8DBQFCOFDGMcA3II2AlaIRAm4LAKCGMWdQhp3UalZb7D/uOZQd45qDCgCggCIq
+gmQsaXS2X/JBISiE9XZeFZo=
+=ic+s
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
