@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4200EC42.9020004@prim-time.fr>
-From: Xavier Garreau <x.garreau@prim-time.fr>
-MIME-Version: 1.0
+Message-ID: <c93f2a2905020206543686ed38@mail.gmail.com>
+From: Embedded System <embed.sys@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] how can I understand hcidump output
-References: <c93f2a2905020206543686ed38@mail.gmail.com>
-In-Reply-To: <c93f2a2905020206543686ed38@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] how can I understand hcidump output
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,18 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 02 Feb 2005 16:05:38 +0100
+Date: Wed, 2 Feb 2005 22:54:01 +0800
 
-> Some of the hcidump is easy to understand, such as aid, but what is
-> scid, dcid, flags and etc. Is there any document helpful?
-> 
-> Thanks a lot for your time.
+hi,
 
-Well ... These are the same terms used in the Bluetooth Specification 
-... Download and read it ...
+Some of the hcidump is easy to understand, such as aid, but what is
+scid, dcid, flags and etc. Is there any document helpful?
 
-Regards,
-Xavier
+Thanks a lot for your time.
+
+Andy
 
 
 -------------------------------------------------------
