@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4225DEAC.7050203@gmx.de>
-From: Zbigniew Diaczyszyn <z.dia@gmx.de>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-users] Typhoon BluetoothModem working with Suse Linux 9.0
+From: Sebastian Roth <sebiroth@web.de>
+Message-ID: <d09q50$7r9$1@sea.gmane.org>
+References: <004401c5207b$c13a3210$4100a8c0@benjamin> <7aa80ced05030321482f162db2@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <7aa80ced05030321482f162db2@mail.gmail.com>
+Subject: [Bluez-users] Re: Fw: Re: Can't able to send data in both direction
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 02 Mar 2005 16:41:32 +0100
+Date: Fri, 04 Mar 2005 15:14:03 +0100
 
+Hi Mohan,
 
-I got the error message "Permission denied", although hcid was working
-correctly, /bin/bluepin got the "echo PIN:xxxx"  command and
-/dev/rfcomm0 was installed.
+why do you connect for each keypress?
+Just connect on programm startup then `do' `send' `while' `getch'
+and close the connection on programm shutdown.
+This should avoid the delay!
 
-The solution: A Windows-connection with the Modem deranged the pairing
-with the Linux-connection. After I had deleted the content of the file
-/etc/bluetooth/link_key, or when I had renamed it to link_key.org, then 
-everything
-was working fine.
-
------
-Zbigniew Diaczyszyn	z.dia@gmx.de
-
+Best regards,
+Sebastian
 
 
 
