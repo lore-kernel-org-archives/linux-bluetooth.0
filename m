@@ -1,71 +1,42 @@
-Return-Path: <theo.beisch@gmx.de>
-From: Theo Beisch <theo.beisch@gmx.de>
-Reply-To: theo.beisch@gmx.de
-To: Marcel Holtmann <marcel@holtmann.org>,
-   Paulo Marques <pmarques@grupopie.com>
-Subject: Re: [Bluez-users] help for bluez and bridge configuration needed
-Date: Wed, 8 Oct 2003 21:10:12 +0200
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-References: <200310062337.37090.root <> <3F82A016.2050901@grupopie.com> <1065526456.5327.45.camel@pegasus>
-In-Reply-To: <1065526456.5327.45.camel@pegasus>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Manolis Stamatogiannakis <mstamat@csd.uoc.gr>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <Pine.GSO.4.53.0310091345550.20391@thetis.csd.uch.gr>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-15"
-Message-Id: <200310082110.19194.theo.beisch@gmx.de>
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] flow control question
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 9 Oct 2003 13:54:11 +0300 (EEST)
 
-Marcel,
+Hi,
+As I remember from a previous thread if you use BlueZ to exchange data
+between two apps and receiving device receives too slow, eventually data
+will be lost due to kernel buffers for receiving device being filled up.
 
-thanks, I tried this but couldnt get it to work at least with SuSEfirewall2, 
-activating NAT between the internal:pan0 (bridge) and external:eth0. ANy 
-other ways?
+Does the mechanisms (eg some HCI call?) exist to allow you propagate the
+knowledge that buffers are full (so data will be lost) to the Bluetooth
+chip and make it use the FLOW field on baseband packets to notify sender
+to stop sending?
 
-What I am trying to get to: as I use my linux-laptop online (DHCP on eth0 in 
-different networks) and offline (with th PDA/BT connection with apache etc. 
-running on the laptop) my plan was to have a default configuration which at 
-boot is overridden after DHCP on eth0 (or the bridge) has provided the laptop 
-with its network IP, gateway and so on.
+Thanks,
+Manolis
 
-As I said, new to all this stuff....
 
-Tx again
-Theo
-
-Am Dienstag, 7. Oktober 2003 13:34 schrieb Marcel Holtmann:
-> Hi,
->
-> > The problem is that when the bnep0 interface enters the bridge, the
-> > bridge's "mac address" changes. You can see that happening doing a
-> > "ifconfig pan0" before the bnep0 joining the bridge and after, to see the
-> > hardware address of the pan0 interface.
-> >
-> > I tried to solve this by issuing "arping's" so that other machines on the
-> > network would be warned about the new hardware address, but unfortunately
-> > never got this to work properly... :(
->
-> I never put the eth0 into the bridge ;) You can use IP forwarding and
-> NAT between eth0 und pan0.
->
-> Regards
->
-> Marcel
->
->
->
->
-> -------------------------------------------------------
-> This sf.net email is sponsored by:ThinkGeek
-> Welcome to geek heaven.
-> http://thinkgeek.com/sf
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-
--- 
-Theo Beisch
-106 Ronheider Weg
-Aachen, Germany 52066
-Tel +49 (241) 13935 & +49 (9401) 6000283
-Mobil +49 (172) 2102211
-theo.beisch@gmx.de
+-------------------------------------------------------
+This SF.net email is sponsored by: SF.net Giveback Program.
+SourceForge.net hosts over 70,000 Open Source Projects.
+See the people who have HELPED US provide better services:
+Click here: http://sourceforge.net/supporters.php
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
