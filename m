@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <ef9938ec041216204573da2fb5@mail.gmail.com>
-From: Albert Huang <ashuang@gmail.com>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Cc: calvinon@mit.edu, rudolph@csail.mit.edu
+Subject: Re: [Bluez-devel] Interwork of RFCOMM and L2CAP layers
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <20041216134138.6218.qmail@web53205.mail.yahoo.com>
+References: <20041216134138.6218.qmail@web53205.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1103227236.6325.12.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] announce: pybluez 0.1
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,26 +18,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 16 Dec 2004 23:45:43 -0500
+Date: Thu, 16 Dec 2004 21:00:35 +0100
 
-Hi all,
+Hi Filipa,
 
-We've been working on some python wrappers around bluez.
+> I am not a kernel developer but I would like to do
+> profiling in BlueZ code as part of my PhD research,
+> specifically on RFCOMM/L2CAP layers. I took the source
+> code from my 2.4.22 kernel. 
+> 
+> I was expecting to see some functions on the RFCOMM
+> files calling functions on the L2CAP files, as RFCOMM
+> is a layer on top of the L2CAP layer. However I could
+> not find any (actually there is one: rfcomm_init calls
+> l2cap_load; but this last function is a dummy
+> function). 
+> 
+> Could you please tell me where I could find
+> information on how the RFCOMM and L2CAP layers
+> interwork in the BlueZ implementation (I, of course,
+> tryed Google and BlueZ web sites but I could not find
+> information)?
 
-http://org.csail.mit.edu/pybluez/
+the RFCOMM uses in-kernel socket programming to send or retrieve data
+from the L2CAP layer.
 
-Much of this is just pyaffix ported over to bluez (we started from the
-pyaffix code).  We've currently implemented and tested wrappers for
-HCI, L2CAP, and RFCOMM sockets.  We haven't yet dealt with SDP, OBEX,
-or anything else.
+> I would be particularly grateful if someone could give
+> directions on how to use the BlueZ stack in a simple
+> user space mode.
 
-Comments, assistance, and constructive criticism are all welcome. 
-We're also interested in hearing about similar projects, as a google
-search hasn't turned up anything other than Fred Strauss's seemingly
-inactive PyBluetooth.
+Check out l2test or rctest. This is all about socket programming.
 
-Regards,
-Albert Huang
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
