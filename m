@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-users] Problems connecting to multiple rfcomm sockets
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Steve Drew <steve.drew@empics.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <0DD4EA5DCF754A409C4E182C758C37F38231@tigris.i.empics.co.uk>
-References: <0DD4EA5DCF754A409C4E182C758C37F38231@tigris.i.empics.co.uk>
+From: Anders =?ISO-8859-1?Q?=D6stling?= <anders.ostling@neurope.ikea.com>
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1099591273.7022.70.camel@pegasus>
+Message-Id: <1099589151.4872.1.camel@anders2003.neurope.ikea.com>
 Mime-Version: 1.0
+Subject: [Bluez-users] Forgot some info ...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,26 +16,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 04 Nov 2004 19:01:13 +0100
+Date: Thu, 04 Nov 2004 17:25:50 +0000
 
-Hi Steve,
+Hi again
+Sorry, forgot a few important info-pieces regarding the non-functional
+CSR BT adapter that I reported a few minutes ago ...
 
-> 	I've tried increasing the page timeout and the error still
-> remains. 
+Fedora Core 3 Test 3
 
-two more options left to try.
+[root@anders2003 tmp]# rpm -qa|grep luez
+bluez-libs-2.10-2
+bluez-utils-2.10-2
+bluez-pin-0.23-3
+bluez-hcidump-1.11-1
+bluez-bluefw-1.0-6
 
-> 	I have found that the problem is due to the mobile handsets we
-> were      using (3x Nokia 6310i). Using a different handsets (Nokia
-> 6230's) we were able to get bluetooth connections to 3 6230s (on top of
-> this we could also have 2 6310s connected).
-
-Yeah, the old Nokia Bluetooth chips are not quite the best for such
-scenarios. The 6230 contains a CSR chip, right?
-
-Regards
-
-Marcel
+Anders
 
 
 
