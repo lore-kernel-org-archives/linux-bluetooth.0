@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4240E6DB.5010901@ono.com>
-From: kwyjibo <kwyjibo@ono.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Adding services with sdptool
+Subject: Re: [Bluez-users] which dongle?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <424034A3.9070207@db.db>
+References: <424034A3.9070207@db.db>
+Content-Type: text/plain
+Message-Id: <1111530207.22872.128.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,20 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Mar 2005 04:47:39 +0100
+Date: Tue, 22 Mar 2005 23:23:27 +0100
 
 Hi,
 
-I have a pair of bluetooth dongles, and I want one to provide access to 
-services. I load de sdpd daemon, and then I ouse the sdtool, like this 
-"#sdptool add --channel 5 SP".
+> I need a dongle that allows inquiry_with_RSSI .
+> 
+> Could you tell me a list of models with this feature?
 
-Then, with the other dongle I try to discover the services, using 
-"#sdptool browse", but I get an error message: "Can't acces to remote 
-host: File not found" or "Can't acces to remote host: Host refuse 
-connection"
+actually all Bluetooth 1.2 dongles, besides the Broadcom based ones.
+Some of the Silicon Wave based dongles may return a wrong event.
 
-Any suggestions?
+Regards
+
+Marcel
+
 
 
 
