@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] closing a connection: timing
+Subject: Re: [Bluez-users] problems establishing connection to Cellular
+	phone
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <42347901.9010202@gmx.ch>
-References: <42347901.9010202@gmx.ch>
+In-Reply-To: <1110766661.9456.4.camel@tux>
+References: <1110766661.9456.4.camel@tux>
 Content-Type: text/plain
-Message-Id: <1110795844.8158.50.camel@pegasus>
+Message-Id: <1110795678.8158.46.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,37 +19,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Mar 2005 11:24:04 +0100
+Date: Mon, 14 Mar 2005 11:21:18 +0100
 
-Hi Marco,
+Hi Tamer,
 
-> this is my "server-code":
-> 
-> int client = accept(sock, (struct sockaddr *)&addr, &alen))
-> char out[] = "200 100";
-> send(client, out, strlen(out), 0);
-> // sleep(2);
-> close(client);
+> How do I make a stable connection to my cellular phone via bluetooth
+> without that the connection is dying. 
 > 
 > 
-> I wrote a little client with the avetana library on my laptop and i'm able 
-> to receive the message "200 100".
+> I make: 
+> hcitool cc MAC-ADDRESS 
+> hcitool auth MAC-ADDRESS 
 > 
-> I tested it with my mobile phone (with exactly the same code as with the 
-> avetana library). Here I'm unable to receive the data. as soon as i try to 
-> open the inputstream, an exception ("connection already closed") is thrown.
-> If I uncommend the sleep, it works an i get "200 100".
-> I now don't know where the source of the problem could be. Do I miss 
-> something important? Mobile Phone bug?
+> then I enter the pin on the mobile phone and I receive the answer: 
+> 
+> HCI authentication request failed: Input/output error
 > 
 > 
-> btw, I tested it with the bluetooth-terminal from kde and only receive "200 
-> 10". -> where is the last "0"?
+> Can somebody help me? 
+> 
+> However I get this bluez-pin installed. In which relation does it belong
+> to my problem? And if yes, how do I use it? 
 
-I have no idea with the Java problem, but if you send only strlen()
-bytes then you miss the null byte at the the end. So even for a char
-array you should use sizeof(). If this is a text based protocol you
-start to run over RFCOMM send add "\r\n" may also be a good idea.
+you will never get a stable connection with "hcitool cc". In the case of
+a mobile phone establish a RFCOMM connection. If you see problems then
+check with "hcidump -X -V" as root what really happens on the device.
 
 Regards
 
