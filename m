@@ -1,16 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] L2Ping / Rfcomm connect : Function not
-	implemented
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] L2Ping / Rfcomm connect : Function not implemented
+References: <200412122356.09617.wim.delvaux@adaptiveplanet.com> <1102939476.8750.148.camel@pegasus> <200412131309.12167.wim.delvaux@adaptiveplanet.com>
 In-Reply-To: <200412131309.12167.wim.delvaux@adaptiveplanet.com>
-References: <200412122356.09617.wim.delvaux@adaptiveplanet.com>
-	 <200412131259.20788.wim.delvaux@adaptiveplanet.com>
-	 <1102939476.8750.148.camel@pegasus>
-	 <200412131309.12167.wim.delvaux@adaptiveplanet.com>
-Content-Type: text/plain
-Message-Id: <1102940092.8750.151.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200412131312.21010.wim.delvaux@adaptiveplanet.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,49 +19,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Dec 2004 13:14:51 +0100
+Date: Mon, 13 Dec 2004 13:12:20 +0100
 
-Hi Wim,
+I just disconnected my Ipaq-> Desktop BNEP connection.
 
-> > > After a reboot (again a kernel freeze that I mailed about before) and a
-> > > change in hcid.conf ... no result.
-> >
-> > We can't get any further without a protocol analyzer. However you might
-> > wanna ask a Nokia Service Shop to update your mobile phone.
-> 
->  The strange thing is 
-> 
->  1. it has worked before
->  2. it works from my desktop
-> 
->  with this hciconfig -a output
->  hci0:   Type: USB
->         BD Address: 00:60:57:02:71:A2 ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN AUTH
->         RX bytes:3133810 acl:37666 sco:0 events:87504 errors:0
->         TX bytes:19406578 acl:115742 sco:0 commands:737 errors:0
->         Features: 0xff 0xff 0x09 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: ACCEPT MASTER
->         Name: 'buro-0'
->         Class: 0x100000
->         Service Classes: Object Transfer
->         Device Class: Miscellaneous,
->         HCI Ver: 1.1 (0x1) HCI Rev: 0xbc LMP Ver: 1.1 (0x1) LMP Subver: 0xbc
->         Manufacturer: Cambridge Silicon Radio (10)
-> 
->  I can connect with BNEP from the Ipaq to the desktop and actually
->  AM connected to it
+And even now hcitool scan on my desktop can only find the phone and NOT the 
+Ipaq.
 
-it looks like a link manager problem in some way. However this can't be
-debugged without a protocol analyzer.
+hcitool scan on the Ipaq does not reveal ANY device (not even the desktop)
+????!?
 
-Regards
+Why has it all of a sudden broke down ? Could the BT hardware be in an 'odd' 
+state ? Might Depleting the battery help ?
 
-Marcel
-
-
+W
 
 
 -------------------------------------------------------
