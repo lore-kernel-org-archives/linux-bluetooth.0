@@ -1,12 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] i mail you for a friend : n1c0l4s.l3@wanadoo.fr
+Subject: Re: [Bluez-users] Slaves in Sniff mode
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Nicolas RICHARD <nicolasrichard@macif.fr>
+To: tOpSy TuRvY <topsyturvy@nemo.student.utwente.nl>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <OF55F0932D.E33A9720-ONC1256EBC.003DECCD@fr>
-References: <OF55F0932D.E33A9720-ONC1256EBC.003DECCD@fr>
+In-Reply-To: <Pine.BSO.4.58.0406231319140.20827@nemo.student.utwente.nl>
+References: <E1BcqIi-0002cT-53@sc8-sf-list2.sourceforge.net>
+	 <Pine.BSO.4.58.0406222046050.9882@nemo.student.utwente.nl>
+	 <1087939830.4209.12.camel@pegasus>
+	 <Pine.BSO.4.58.0406222346200.5451@nemo.student.utwente.nl>
+	 <1087942444.4209.45.camel@pegasus>
+	 <Pine.BSO.4.58.0406231319140.20827@nemo.student.utwente.nl>
 Content-Type: text/plain
-Message-Id: <1087993597.4209.90.camel@pegasus>
+Message-Id: <1087992990.4209.79.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,34 +23,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Jun 2004 14:26:37 +0200
+Date: Wed, 23 Jun 2004 14:16:30 +0200
 
-Hi Nicolas,
+Hi Assed,
 
-> i am on a 2.6.7 kernel patch with mh1
-> bluez is installed
-> 
-> hci0 is on
-> 
-> # hciconfig
-> hci0:   Type: USB
->         BD Address: 00:50:F2:7E:3B:3F ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:152 acl:0 sco:0 events:20 errors:0
->         TX bytes:320 acl:0 sco:0 commands:18 errors:0
-> 
-> 
-> but i cannot connect my Wireless IntelliMouse and optical desktop
-> i obtain
-> 
-> # hcitool inq
-> Inquiring ...
-> # hcitool scan
-> Scanning ...
-> #
+> Does anyone know if the master delays ACL transmittions to slaves in sniff 
+> mode (i.e. till they become active again), or will it just keep on 
+> transmitting the baseband frame till the slave eventually wakes up and can 
+> send an ACK.
 
-you must press the connect button on your mouse before you are able to
-see it via an inquiry.
+the master should request an unsiff before it sends the next ACL packet.
 
 Regards
 
