@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] A new Microsoft's transceiver!
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <200409101056.29447.cijoml@volny.cz>
-References: <200409101056.29447.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1094822572.5311.3.camel@notepaq>
-Mime-Version: 1.0
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200409101204.38465.cijoml@volny.cz>
+Subject: [Bluez-users] BT stack from Microsoft
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,28 +17,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Sep 2004 15:22:52 +0200
+Date: Fri, 10 Sep 2004 12:04:38 +0200
 
-Hi Michal,
+Hi,
 
-> In Microsofts very good demo:
-> http://www.microsoft.com/hardware/mouseandkeyboard/features/docs/bluetooth.html
-> 
-> is shown a new transceiver! It should be 1.2 compatible and we should try 
-> upgrade an old one!
-> 
-> Marcel maybe it's chance for you to get back working your destroyed 
-> transceiver
+I tried MS BT stack included in SP2 and it looks like that we can successfully 
+communicate with it.
 
-the good news are that it is Bluetooth 1.2 compatible, but the bad one
-is that it uses a Broadcom chip and so there is no chance to update the
-old one.
+BT phone works
+BT HID devices works (after boot into linux it STILL CONNECTS!!!)
+BT PAN works against our stack
 
-Regards
+And as Marcel thought - firmware in dongle is not upgraded after instalation 
+of SP2 :(((
 
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
