@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <403FD968.6010004@superbug.demon.co.uk>
+Message-ID: <403F8EAC.40701@superbug.demon.co.uk>
 From: James Courtier-Dutton <James@superbug.demon.co.uk>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/mixed;
- boundary="------------000908050406020005050508"
-Subject: [Bluez-devel] [PATCH] Fix to enable bluez SCO USB urbs.
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] Questions about correctness of hci_usb sco support.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,54 +15,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 27 Feb 2004 23:57:28 +0000
+Date: Fri, 27 Feb 2004 18:38:36 +0000
 
-This is a multi-part message in MIME format.
---------------000908050406020005050508
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+In hci_usb.c file, line 604 ish
+static inline int __recv_frame(struct hci_usb *husb, int type, void 
+*data, int count)
 
-Here is a patch for /usr/src/linux-2.6.3/drivers/bluetooth/hci_usb.c
+Contains: -
+case HCI_SCODATA_PKT:
+        if (count >= HCI_SCO_HDR_SIZE) {
+                  struct hci_sco_hdr *h = data;
+                  len = HCI_SCO_HDR_SIZE + h->dlen;
+        } else
+                  return -EILSEQ;
+        break;
 
-Without the interval set, the latest kernel 2.6.3 usb code will reject 
-the usb_submit_urb().
+With a SCO HCI packet, it lasts 3 air frames for a bluetooth headset.
+How do we know that the first frame we receive from the usb bluetooth 
+device is the SCO HCI header?
+What happens if the first SCO HCI frame we receive is actually the 
+second or third frame in the SCO HCI packet ?
+Surely some validation checks need to be done.
+For example, depending on the sample format we are using, we should 
+already know what the SCO HCI length should be, so we could check this 
+against the length in the SCO HCI header, and only accept the frame if 
+they match, if they don't match, drop the frame, and wait for the next 
+frame.
+I would expect similar problems with HCI int/bulk frames, but I don't 
+actually see any corrupt int/bulk frames, so I was wondering whether the 
+usb bluetooth dongle somehow ensures that the first air frame we receive 
+is actually the start of an HCI frame. Maybe it is just luck, as 
+int/bulk frames normally have a lot of blank invalid frames in between, 
+so maybe as soon as it sees a valid frame, it is always the start of the 
+int/bulk frame. I don't think we can make this assumtion all the time, 
+in case we start filling the air entirely with bulk frames, and some air 
+frames get lost. We will have to drop the hci frame, and then resync 
+when the next hci frame arrives.
 
-Without this patch no ISOC urbs are submitted, and thus no SCO data is 
-passed.
+With SCO HCI frames, there are never gaps between frames, so if we loose 
+a single air frame, we would have to somehow resync to get back to the 
+SCO HCI header frame.
 
-The proper fix would really be to only enable these when a SCO 
-connection is actually open.
+Can anyone help me understand this?
 
 Cheers
 James
-
---------------000908050406020005050508
-Content-Type: text/x-patch;
- name="sco-patch.diff"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="sco-patch.diff"
-
---- hci_usb.c.org	2004-02-26 20:36:06.000000000 +0000
-+++ hci_usb.c	2004-02-27 23:49:08.273537136 +0000
-@@ -263,6 +263,7 @@
- 
- 	urb->context  = husb;
- 	urb->dev      = husb->udev;
-+	urb->interval = husb->isoc_in_ep->desc.bInterval;
- 	urb->pipe     = usb_rcvisocpipe(husb->udev, husb->isoc_in_ep->desc.bEndpointAddress);
- 	urb->complete = hci_usb_rx_complete;
- 
-@@ -490,6 +491,7 @@
- 	
- 	urb->context  = husb;
- 	urb->dev      = husb->udev;
-+	urb->interval = husb->isoc_out_ep->desc.bInterval;
- 	urb->pipe     = usb_sndisocpipe(husb->udev, husb->isoc_out_ep->desc.bEndpointAddress);
- 	urb->complete = hci_usb_tx_complete;
- 	urb->transfer_flags = URB_ISO_ASAP;
-
---------------000908050406020005050508--
 
 
 -------------------------------------------------------
