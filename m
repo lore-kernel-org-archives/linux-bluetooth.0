@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f16b04cf050327221766330331@mail.gmail.com>
-From: hariharan veerappan <hariharanneevee@gmail.com>
+Message-ID: <424780AA.4020705@coloradocollege.edu>
+From: Jonathan Bredin <jbredin@coloradocollege.edu>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] HCI Config returns Can't Init device
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] creating the bnep0 device
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,33 +16,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 28 Mar 2005 11:47:59 +0530
+Date: Sun, 27 Mar 2005 20:57:30 -0700
 
-Hi,
-    i am using 2.4.18 kernel with the RFMD serial port bluetooth
-module. i have ported the Bluez Stack and HCI_H4 protocol modules. The
-RFMD device is get attached by
+hello all,
 
-hciattach /dev/ttyS0 swave 115200 flow
+I have a pretty remedial question involving setting up bluettoth in 
+Linux, but I don't think that I've seen any answers in the documentation 
+or mailing list. 
 
-the patch added in the hciattach.c is soft reset functionality
-included before sending param acess command in SWAVE function and
-after that reset again. This attaches my UART dongle with the HCI
-layer.
+I'm using kernel 2.6.11 with a LinkSys USBBT100 adaptor.  The adaptor 
+can scan and ping other bluetooth devices with l2ping, but I'm having 
+problems getting bnep0 recognized as a network interface.
 
-When i try to hciconfig uration i am getting the following errors.
+ifconfig bnep0 returns
+bnep0: error fetching interface information: Device not found
 
-hciconfig hci0 up
+The fedora utility sees bnep0, but cannot activate it and returns
+SIOCGIFFLAGS: No such device
+when I try to deactivate it.
 
-Can't init device hci0. Connection timed out(110) ERROR.
+I get the same results when I use bluez/benp compiled into the kernel or 
+loading them as modules.  /var/log/messages has the bluetooth messages:
+Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: L2CAP ver 2.7
+Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: L2CAP socket layer initialized
+Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM ver 1.5
+Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM socket layer 
+initialized
+Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: RFCOMM TTY layer initialized
+Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: BNEP (Ethernet Emulation) 
+ver 1.2
+Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: BNEP filters: protocol 
+multicast
+Mar 27 12:30:11 ma-jbredin kernel: Bluetooth: HIDP (Human Interface 
+Emulation) ver 1.1
 
-But i could have functionality with Kernel 2.6. The HCI config works fine. 
+Does anyone have suggestions to get bnep0 off the ground?
 
-Is there any patch to imply for the 2..4 kernel.
+Thanks,
 
-Please advise
-Thanks and regards
-Hariharan.v.
+jonathan
 
 
 -------------------------------------------------------
