@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] bluetooth socket + rfcomm tty
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <A4D3CD3715C9DD4089BFE00A7279399406EB@posthoorn.intra.local>
-References: <A4D3CD3715C9DD4089BFE00A7279399406EB@posthoorn.intra.local>
-Content-Type: text/plain
-Message-Id: <1106760899.28444.42.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41F7CEF6.1050508@webstuhl.net>
+From: Ben Pezzei <ben@webstuhl.net>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-devel] partly OT: pipe sound from Headset to soundcard
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +16,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 26 Jan 2005 18:34:59 +0100
+Date: Wed, 26 Jan 2005 18:10:14 +0100
 
-Hi Victor,
+Hi again,
 
-> Now I close the socket after converting to TTY. After this I open
-> "/dev/rfcomm0" with O_RDWR | O_NOCTTY and write ATD12345\n\r command to
-> it, then read the response (receive echo), and sleep, meanwhile phone
-> starts to dial the number, but then stops for no reason. If I do the
-> same with original (non-converted) socket (skipping converting to TTY),
-> everything is OK.
+Apologies if my question is a bit OT, but no one on the alsa
+list had an answer for this one:
 
-if the socket way works, why don't you use it?
+I try to pipe the sound from the headset to line in of the
+soundcard. something like:
+/dev/snd/pcmC1D0c -> /dev/snd/pcmC0D0p
+and vice versa:
+/dev/snd/pcmC0D0c -> /dev/snd/pcmC1D0p
 
-> I've taken a look at hcidump output and it looks rather strange if I
-> compare it for both cases. In the case of file handle to converted TTY
-> all the data looks fragmented between ACL packets (like ATD1234 is not
-> sent in one packet, like in the case of non-converted socket, but piece
-> by piece in a number of packets) + there is a lot of activity from the
-> phone during the sleep phase when I do not do anything with the file
-> handle.
+So everything which comes through the soundcard mic should
+be "forwarded" to the headset earphone, and everything
+which comes from the headset mic should land at the
+soundcards line in.
 
-What kind of phone is this?
+is there a way to accomplish this?
 
-Regards
+any hint would be great
 
-Marcel
-
+greetings
+ben
 
 
 
