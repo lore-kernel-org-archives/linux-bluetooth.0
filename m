@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hidp used 4x, but 2 devices connected?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405150047.43407.cijoml@volny.cz>
-References: <200405150047.43407.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1084611502.24119.20.camel@pegasus>
-Mime-Version: 1.0
+From: Mr Jie Liu <s4048156@student.uq.edu.au>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <1afc401b1d89.1b1d891afc40@uq.edu.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] hstest.c could not work
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,25 +15,11 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 15 May 2004 10:58:23 +0200
+Date: Sat, 15 May 2004 14:00:07 +1000
 
-Hi Michal,
-
-> trying to simulate reboot I wanted rmmod hidp, so I killed all devices, but 2 
-> references still exist. What all should I kill?
-> 
-> Module                  Size  Used by
-> hidp                   26368  4
-> 
-> only keyboard and mouse are connected, so I think there should be 2 references
-
-these two must come from the hidd. Kill it and see if the refcount goes
-down to zero.
-
-Regards
-
-Marcel
-
+I am trying to use hstest of bluez to test the sco connection. But I can't hear anything when I use "hstest play xx x:x:x:x:x x"
+I can establish rfcom and sco connection and send AT command through the ACL link. but I can't hear anything in the headset. I try to record a file from the headset by "hstest record xx x:x:x:x:x x",and then try to play it by "hstest play xx x:x:x:x:x x",i still can't hear anything. Has anyone used this test program to test the headset profile? 
+The voice setting in hstest is 0x0060,but in Jonathan Paisley's ALSA Bluetooth Headset Driver it says the voice setting should be set to 0x0040. I don't know if it is because of this.
 
 
 
