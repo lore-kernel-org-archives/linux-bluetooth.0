@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Nicholas A. Preyss" <nalp@gmx.net>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] MTU and MRU for Bluetooth
-Message-ID: <20040505211012.GA11210@gmx.net>
-References: <opr7hpnaqeqdj9uv@mail.gmx.de> <1083692600.4666.57.camel@pegasus>
+Subject: Re: [Bluez-users] Oops in hci_usb
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Riku Voipio <riku.voipio@iki.fi>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040505190725.GB1339@kos.to>
+References: <20040501173626.GA3866@kos.to> <1083587205.4666.0.camel@pegasus>
+	 <20040503193747.GA21331@kos.to> <1083686495.4666.39.camel@pegasus>
+	 <20040505190725.GB1339@kos.to>
+Content-Type: text/plain
+Message-Id: <1083785352.4420.33.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1083692600.4666.57.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,20 +20,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 5 May 2004 23:10:12 +0200
+Date: Wed, 05 May 2004 21:29:12 +0200
 
-On  0, Marcel Holtmann <marcel@holtmann.org> wrote:
->> some suggestions for suitable values for MTU / MRU when using pppd and PAP?
-> 
-> are these values not related to the upper protocols like TCP/IP? The
-> underlaying RFCOMM protocol is a stream, so you don't have a MTU.
+Hi Riku,
 
-I think, he wants a MTU size that doesn't lead to fragmentation on the
-carrying transport medium. I think this doesn't make much sense due to
-the "short" packets of bluetooth, and the fact that L2CAP packets can be
-up to 2^16 bytes large.
+> Here's an oops with SCO options enabled and without preempt. I wonder if
+> symbols are resolved from some wrong place, thou. Anyway, these oops
+> don't look like they are preempt-related.
 
-nicholas
+this is a wild guess, but maybe the linking of the USB device into the
+/sys structure causes this problem. So please comment out this line
+
+	SET_HCIDEV_DEV(hdev, &intf->dev);
+
+in the hci_usb driver and try again.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
