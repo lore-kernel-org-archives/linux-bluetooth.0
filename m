@@ -1,48 +1,54 @@
-Return-Path: <daryl@wideray.com>
-Errors-To: <daryl@wideray.com>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Return-Path: <maxk@qualcomm.com>
+Message-Id: <5.1.0.14.2.20030513104509.051ef688@unixmail.qualcomm.com>
+Date: Tue, 13 May 2003 10:49:41 -0700
+To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>, Daryl Van Vorst <daryl@wideray.com>
+From: Max Krasnyansky <maxk@qualcomm.com>
 Subject: RE: [Bluez-devel] Qualification Testing
-Date: Tue, 13 May 2003 10:55:31 -0700
-Message-ID: <000401c31978$d903f130$1a01010a@baked>
-MIME-Version: 1.0
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1052784278.1132.170.camel@pegasus.local>
+References: <000901c318df$6b11ad00$1a01010a@baked>
+	<000901c318df$6b11ad00$1a01010a@baked>
+Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <5.1.0.14.2.20030513095851.0d257510@unixmail.qualcomm.com>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Max,
+At 05:04 PM 5/12/2003, Marcel Holtmann wrote:
+>Hi Max,
+>
+>> > Daryl, so it is now up to you to do your tests with Cetecom 
+>> > again and see what we pass and what we fail. The RFCOMM layer 
+>> > should now perform perfect, but the L2CAP config stuff will 
+>> > still fail. You can use 2.4.18-mh4 and apply these 5 patches 
+>> > from the bt-2.4 repository to it:
+>> 
+>> Great work guys! Thanks!
+>
+>maybe we have another RFCOMM misbehaviour, which doesn't matter in the
+>real world, but can confuse the tester.
+>
+>        < ACL data: handle 0x0029 flags 0x02 dlen 8
+>            L2CAP(d): cid 0x45 len 4 [psm 3]
+>              RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8 
+>        > ACL data: handle 0x0029 flags 0x02 dlen 8
+>            L2CAP(d): cid 0x40 len 4 [psm 3]
+>              RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92 
+>        < ACL data: handle 0x0029 flags 0x02 dlen 8
+>            L2CAP(d): cid 0x45 len 4 [psm 3]
+>              RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd 
+>        < ACL data: handle 0x0029 flags 0x02 dlen 12
+>            L2CAP(s): Disconn req: dcid 0x0045 scid 0x0040
+>        > ACL data: handle 0x0029 flags 0x02 dlen 8
+>            L2CAP(d): cid 0x40 len 4 [psm 3]
+>              RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
+>        > ACL data: handle 0x0029 flags 0x02 dlen 12
+>            L2CAP(s): Disconn rsp: dcid 0x0045 scid 0x0040
+>
+>The dump above is from a disconnect sequence of RFCOMM. We don't wait
+>for the UA of the DISC on the dlci 0. We send the L2CAP disconnect
+>request right after the disconnect of the dlci 0. The L2CAP channel
+>should be closed after receiving the UA or after a timeout.
+Yeah, this one probably needs to be fixed. Although I think I've heard that 
+simply closing L2CAP channel is enough, I mean even sending DISC is optional. 
+But we need to verify that in the spec.
 
-> >Having the messages appear on the console is enough to pass=20
-> testing. We=20
-> >shouldn't need a special app that monitors syslog. We could submit a=20
-> >copy of the syslog if necessary.
-> Hmm, ok :). But after thinking more about this I think that=20
-> we probably still need=20
-> some way to tell the apps that link became unreliable. I mean=20
-> parsing syslogs is=20
-> not very elegant solution :). Also even though Cetecom=20
-> accepted it as a solution=20
-> other BQBs might not.
-
-Technically Cetecom hasn't accepted it yet. That's just preliminary. The BQ=
-B
-hasn't reviewed the data.
-
-> Here is what I had in mind. We could add L2CAP socket option=20
-> L2CAP_RELIABILITY, which will be used by the apps that are=20
-> "paranoid" :) about link reliability. Then whenever we=20
-> receive corrupted L2CAP frame we'd check connected sockets,=20
-> attached to this connection, that have this option enabled=20
-> and signal error condition on them.=20
-> i.e. read/recvmsg will return error. Application can then=20
-> either clear that error with=20
-> getsockopt(SO_ERROR) and continue or close the socket.
->=20
-> Comments ?
-
-That sounds great to me! That's the sort of thing I was hoping for in the
-beginning, but I knew too little about sockets to suggest a workable
-solution. :)
-
--Daryl.
+Max
