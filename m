@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] PAN and kernel 2.4.26
-From: Bastian Ballmann <Crazydj@chaostal.de>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1088364052.3774.67.camel@pegasus>
-References: <1088271695.29447.5.camel@espy.crazydj.de>
-	 <1088364052.3774.67.camel@pegasus>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-DYhVwFhhm5oR4SL2bmng"
-Message-Id: <1088372482.2430.4.camel@espy.crazydj.de>
+From: "Nicholas A. Preyss" <nalp@gmx.net>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Questions about BlueZ in  commercial use
+Message-ID: <20040627214233.GA26576@gmx.net>
+References: <003401c45c2b$b6eab240$0364a8c0@haruo> <1088359746.3774.20.camel@pegasus> <20040627191016.GA26191@gmx.net> <1088363397.3774.64.camel@pegasus> <20040627203414.GB26191@gmx.net> <1088369388.3774.88.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1088369388.3774.88.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,45 +17,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Jun 2004 23:41:23 +0200
+Date: Sun, 27 Jun 2004 23:42:33 +0200
 
+On  0, Marcel Holtmann <marcel@holtmann.org> wrote:
+> the current USB subsystem (as of 2.6.7) is not as bad as you think.
+> Actually it is working very nice and even the hci_usb driver didn't
+> crash anymore. Anyhow the problem is not USB. We made all of them by
+> ourself :(
 
---=-DYhVwFhhm5oR4SL2bmng
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+I think the problem is USB. It is too complicated for the least cost
+market. So many manufacturers built chips or firmware for USB devices
+which are not spec compliant. Additionaly there are so many bad 
+programmed driver.
+I think this is a design failure, even if it only appears as bad driver
+implementations.
 
-Hi Marcel,
+> > The debian project shows that if you really want such high quality
+> > standards for use in embedded devices e.g. it is possible to keep your
+> > own stable branch. I think it is very easy with a good Changelog.
+> 
+> I really like the Debian way of forking a stable version and only doing
+> security or bugfixes. The problem is that this needs a lot of man power
+> and costs a lot of time. I know what I am talking about, because I did
+> all the 2.4 kernel backports of the Bluetooth subsystem.
 
-On Sun, 2004-06-27 at 21:20, Marcel Holtmann wrote:
+A company would need to do this for the version they use in production
+systems only. So it should be possible.
 
-> this should actually not fail.=20
+> If we got a number of companies that help sponsoring the BlueZ itself
+> and its official qualification I can think of such a fork. At that point
+> it makes sense to me and is worth the extra work.
 
-I've got a 2.4.26 on my laptop and PAN is working without any=20
-problems, therefore it cannot be a problem with this kernel version, but
-I wonder, that it's working togehter with 2.6.7.
-I've absolutly no idea why this could fail on my 2.4.26er kernel...
+I didn't thought of you maintaining such a stable fork. But like in the
+debian project, the developers who need this high quality standard, care
+for the branch themselves. Then you need to assure only, that all fixes you
+apply are documented and published, even if you fix them with a new feature
+that doesn't go into the stable tree.
 
-> What bluez-utils version is installed?
-
-It's bluez-utils-2.7. Same result using version 2.3.
-Greets
-
-Basti
-
---=-DYhVwFhhm5oR4SL2bmng
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQBA3z8C3rCd3KdGxg4RAqHIAKChXG8vUiYkVJNJ0+EsQdUr8H2a/QCffs8n
-b6wZ+GJWO760X/NhdBn5gEs=
-=tm49
------END PGP SIGNATURE-----
-
---=-DYhVwFhhm5oR4SL2bmng--
-
+nicholas
 
 
 -------------------------------------------------------
