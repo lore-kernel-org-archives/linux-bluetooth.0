@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Unresolved Symbols
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Florian Beyer <florian.beyer@aei.mpg.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040520090502.GA4352@mcmabrruq.sirius.net>
-References: <20040520090502.GA4352@mcmabrruq.sirius.net>
-Content-Type: text/plain
-Message-Id: <1085044940.4327.135.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <40AC714E.9040306@telus.net>
+From: Ken <a5a33956@telus.net>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] rfcomm confusion
+References: <40AB4D9F.7010307@telus.net> <1084969555.4327.60.camel@pegasus>
+In-Reply-To: <1084969555.4327.60.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,58 +17,101 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 20 May 2004 11:22:20 +0200
+Date: Thu, 20 May 2004 01:50:22 -0700
 
-Hi Florian,
+Hi Marcel,
+Thanks for the response.  It is Windows on the iPAQ.
+I've tried again using /dev/rfcomm0 for <dev> but the results are the 
+same. (I think it was defaulting to rfcomm0 before even though I put 
+hci0 in the <dev> field)
 
-> I have problems compiling the bluez-kernel-2.3-package with kernel  
-> 2.4.22 and the mh6-patch (with activated bluetooth support of course).  
-> The same happens for kernel 2.4.26 and mh1-patch.
-> 
-> After a
-> 
-> ./configure --with-kernel=/usr/src/linux-2.4 --prefix=/usr
-> make
-> make install
-> 
-> I get
-> 
-> /sbin/depmod -a
-> depmod: *** Unresolved symbols in /lib/modules/2.4.22-mh6/kernel/net/ 
-> bluetooth/bnep/bnep.o
-> depmod: *** Unresolved symbols in /lib/modules/2.4.22-mh6/kernel/net/ 
-> bluetooth/rfcomm/rfcomm.o
-> 
-> Furthermore I have
-> 
-> /sbin/modprobe bnep
-> /lib/modules/2.4.22-mh6/kernel/net/bluetooth/bnep/bnep.o: unresolved  
-> symbol l2cap_load_Rfc31fe88
-> /lib/modules/2.4.22-mh6/kernel/net/bluetooth/bnep/bnep.o: insmod /lib/ 
-> modules/2.4.22-mh6/kernel/net/bluetooth/bnep/bnep.o failed
-> 
-> and
-> 
-> /sbin/modprobe rfcomm
-> /lib/modules/2.4.22-mh6/kernel/net/bluetooth/rfcomm/rfcomm.o:  
-> unresolved symbol
-> l2cap_load_Rfc31fe88
-> /lib/modules/2.4.22-mh6/kernel/net/bluetooth/rfcomm/rfcomm.o:  
-> unresolved symbol
-> bluez_sock_wait_state_R12a89245
-> /lib/modules/2.4.22-mh6/kernel/net/bluetooth/rfcomm/rfcomm.o: insmod / 
-> lib/modules/2.4.22-mh6/kernel/net/bluetooth/rfcomm/rfcomm.o failed
-> 
-> 
-> What can I do?
+So, in linux I do:
+ > rfcomm connect /dev/rfcomm0 08:00:28:90:25:D6 1
+Connected /dev/rfcomm0 to 08:00:28:90:25:D6 on channel 1
+Press CTRL-C for hangup
 
-don't use bluez-kernel-2.3 !!! This package is deprecated and no longer
-needed. The only way to update the kernel drivers is via my -mh patch.
+When I do this the iPAQ shows a connection icon, and when click into the 
+status screen for that connection it shows me the details including 
+connection time, activity, and signal strength.
 
-Regards
+Everything looks good but the activity always shows 0 bytes transfered 
+and 0 bytes received.
 
-Marcel
+So, I guess my question is, how do I send data through this connection?
+Should I just be able to echo data into /dev/rfcomm0? (ie: echo "some 
+data" > /dev/rfcomm0)
 
+Or is it the case that I need an application on the iPAQ side to be 
+listening for data before it will show any bytes received or transfered?
+
+I hope this makes sense.
+Thanks!
+Ken
+
+Marcel Holtmann wrote:
+
+>Hi Ken,
+>
+>  
+>
+>>I am trying to create a bluetooth serial connection between my linux 
+>>laptop and iPAQ pda.
+>>    
+>>
+>
+>is this a Windows or a Linux based iPAQ?
+>
+>  
+>
+>>I'm using the command "rfcomm connect hci0 00:11:22:33 1" and it appears 
+>>to work.
+>>    
+>>
+>
+>The <dev> is not the HCI device. It is the RFCOMM device you wanna
+>create. So use "rfcomm0" or "0" for short.
+>
+>  
+>
+>>the connection shows up on the iPAQ and when I go to the status it 
+>>displays 0 bytes transfered - 0 bytes received.
+>>    
+>>
+>
+>Where do you see this?
+>
+>  
+>
+>>so, now i'm trying to send some data over this connection. my 
+>>expectation was that i could do something like:
+>>echo "test" > /dev/rfcomm0
+>>and then see 4 bytes received on the iPAQ interface, however the byte 
+>>counts on the ipaq remain 0.
+>>    
+>>
+>
+>Actually this depends on the program on the other side. If it is a
+>Windows iPAQ I don't know how they count the bytes.
+>
+>Regards
+>
+>Marcel
+>
+>
+>
+>
+>-------------------------------------------------------
+>This SF.Net email is sponsored by: SourceForge.net Broadband
+>Sign-up now for SourceForge Broadband and get the fastest
+>6.0/768 connection for only $19.95/mo for the first 3 months!
+>http://ads.osdn.com/?ad_id=2562&alloc_id=6184&op=click
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>  
+>
 
 
 
