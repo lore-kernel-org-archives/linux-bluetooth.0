@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <41E3FE69.5030903@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Multiple Headsets
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41E3FE69.5030903@xmission.com>
-References: <41E25ECD.2000505@fcse.co.uk> <41E267C4.5030906@dark-reality.de>
-	 <1105362147.8652.10.camel@pegasus> <41E2A9FC.2010405@dark-reality.de>
-	 <41E39BC8.2020105@xmission.com> <1105438532.8056.12.camel@pegasus>
-	 <41E3AAD8.9090303@dark-reality.de>  <41E3FE69.5030903@xmission.com>
-Content-Type: text/plain
-Message-Id: <1105461428.8056.46.camel@pegasus>
-Mime-Version: 1.0
+References: <41E25ECD.2000505@fcse.co.uk> <41E267C4.5030906@dark-reality.de>	 <1105362147.8652.10.camel@pegasus> <41E2A9FC.2010405@dark-reality.de>	 <41E39BC8.2020105@xmission.com> <1105438532.8056.12.camel@pegasus> <41E3AAD8.9090303@dark-reality.de>
+In-Reply-To: <41E3AAD8.9090303@dark-reality.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,34 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Jan 2005 17:37:08 +0100
+Date: Tue, 11 Jan 2005 09:27:21 -0700
 
-Hi Brad,
+Lars,
 
-> > What has to be documented is:
-> > 
-> > how to calculate the bitrate for the proper "alternate setting" of usb_hci?
-> > 
-> > We could put the table from the BT docs online
+> What has to be documented is:
 > 
-> Where do I look to find this table? (The phrase "alternate setting" does 
-> not seem to be the way to find it)
+> how to calculate the bitrate for the proper "alternate setting" of usb_hci?
+> 
+> We could put the table from the BT docs online
 
-it is part of the HCI USB transport specification or look at the old
-Bluetooth 1.1 specification under H:2.
+Where do I look to find this table? (The phrase "alternate setting" does 
+not seem to be the way to find it)
 
-> What if it's set too high? Will it fail to work or will it waste space 
-> in the transmission?
+What if it's set too high? Will it fail to work or will it waste space 
+in the transmission?
 
-Setting it to 0 makes the driver not to select the ISOC endpoint. When
-you choose a too high value this should fail. However I haven't tested
-this so far.
-
-Regards
-
-Marcel
-
-
+Brad
 
 
 -------------------------------------------------------
