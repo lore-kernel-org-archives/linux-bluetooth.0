@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Bluez+2.6+Logitech bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405161825.27002.cijoml@volny.cz>
-References: <20040515163903.CB06543F94@rekin8.go2.pl>
-	 <1084708456.4184.0.camel@pegasus> <20040516174923.5a5f58af@bluez.bueche.ch>
-	 <200405161825.27002.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1084726694.4184.33.camel@pegasus>
-Mime-Version: 1.0
+References: <20040515163903.CB06543F94@rekin8.go2.pl> <1084708456.4184.0.camel@pegasus> <20040516174923.5a5f58af@bluez.bueche.ch>
+In-Reply-To: <20040516174923.5a5f58af@bluez.bueche.ch>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200405161825.27002.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,27 +19,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 May 2004 18:58:14 +0200
+Date: Sun, 16 May 2004 18:25:27 +0200
 
-Hi Michal,
+On Sunday 16 of May 2004 17:49, Charles Bueche wrote:
+> Hi Marcel,
+>
+> yes, I know I'm a bit off the bleeding edge since some weeks, but I'm
+> not alone at fault : gentoo-dev-sources is still at 2.6.5, and I don't
+> want to switch to another kernel for now.
+>
+> When 2.6.6 is out, I will try your patch and the new user-space daemons.
+> Meanwhile, thank for your support to us all bluez users.
+>
+> Charles
 
-> I can write it, coz I use it :)
+I can write it, coz I use it :)
 
-actually I like to have a full BlueZ user howto so it can be added to
-the Linux Documentation Project (www.tldp.org). My time for writing this
-is very limited, but I already wrote some articles and papers in german.
-If anyone is willing to translate them into english, I think we have a
-good starting point. Maybe you wanna start a new thread with this topic
-and coordinate this effort. I know that there are many people out there
-that have enough experience with BlueZ to wrote a chapter or a paragraph
-about it. So the first goal should be to make a content table and then
-get people to write something.
-
-Regards
-
-Marcel
-
-
+Michal
 
 
 -------------------------------------------------------
