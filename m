@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Message-ID: <0DD4EA5DCF754A409C4E182C758C37F38204@tigris.i.empics.co.uk>
-From: "Steve Drew" <steve.drew@empics.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Problems connecting to multiple rfcomm sockets
+Subject: Re: [Bluez-users] Linux 2.6.10-rc1 HID problems
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Edd Dumbill <edd@usefulinc.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1098722840.6927.4.camel@saag>
+References: <1098722840.6927.4.camel@saag>
+Content-Type: text/plain
+Message-Id: <1098827078.14036.125.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,53 +18,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 27 Oct 2004 16:42:48 +0100
+Date: Tue, 26 Oct 2004 23:44:38 +0200
 
-Hi all,
+Hi Edd,
 
-I've been experiencing some problems when trying to open multiple rfcomm
-ports, with pppd using the rfcomm ports.
+> Running Linux 2.6.10-rc1 I've got the following HID related problems:
+> 
+> * the multimedia keys on my Apple Bluetooth keyboard no longer work
+> (showkey shows nothing)
+> 
+> * the microsoft bluetooth mouse no longer generates scroll wheel events
+> (xev shows nothing)
+> 
+> hidd is running with --master (the apple keyboard won't successfully
+> reconnect otherwise).
 
-I have three bluetooth serial ports setup in rfcomm.conf, but it appears
-that I can open connections to two of them at once.=20
+this sounds like boot mode and actually 2.6.10-rc1 only supports the
+boot mode. For using the report mode, you have to apply my -mh1 patch.
 
-While the first two serial ports are connected, and the third is trying
-to connect, running rfcomm gives;
+Regards
 
-rfcomm0: 00:0E:6D:1A:9A:3F channel 1 connected [tty-attached]
-rfcomm1: 00:02:EE:82:D9:29 channel 2 connected [tty-attached]
-rfcomm2: 00:60:57:70:CD:E1 channel 3 config [tty-attached]
+Marcel
 
-Then the terminal with the third connection reports;
-
-"Failed to open /dev/rfcomm2: Host is down"
-
-At which point running #rfcomm gives;
-
-rfcomm0: 00:0E:6D:1A:9A:3F channel 1 connected [tty-attached]
-rfcomm1: 00:02:EE:82:D9:29 channel 2 connected [tty-attached]
-rfcomm2: 00:60:57:70:CD:E1 channel 3 closed.
-
-If I now close the connection to rfcomm1 or rfcomm0, I can connect to
-rfcomm2 (so I can always have a max of 2 active connections).
-
-However, If before I start the pppd connections to the serial ports, I
-start 3 copies of l2ping (one to each of the MAC addresses listed
-above), and keep these running, I can establish pppd connections on
-rfcomm0+1+2 at the same time.
-
-With this scenario, if one of the pppd sessions terminates, the l2ping
-to the corresponding rfcomm device's MAC will stop giving:
- "Send failed: Connection reset by peer", and once again I can only use
-two of the rfcomm ports.=20
-
-Using bluez-utils-2.10-2 and bluez-libs-2.10-2 under a 2.4.22-1 kernel
-
-Any idea/subjections/requests for more information greatly appreciated!
-
-Many Thanks
-
-Steve Drew
 
 
 
