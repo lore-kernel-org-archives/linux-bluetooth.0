@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050405114604.26990.qmail@webmail18.rediffmail.com>
+Message-ID: <42526502.80503@arnes.si>
+From: Matija Grabnar <matija.grabnar@arnes.si>
 MIME-Version: 1.0
-From: "vaishali  paisal" <vaishalipaisal@rediffmail.com>
 To: bluez-users@lists.sourceforge.net
-Content-type: multipart/alternative;
-	boundary="Next_1112701564---0-203.199.83.28-26984"
-Subject: [Bluez-users] Can anybody help plz?
+Subject: Re: [Bluez-users] Bluetooth after suspend?
+References: <42513AA3.1050309@arnes.si> <17461.1112620837@csr.com>  <20050404203625.GA18079@rzenik.arnes.si> <10838.1112692850@csr.com>
+In-Reply-To: <10838.1112692850@csr.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,45 +18,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 5 Apr 2005 11:46:04 -0000
+Date: Tue, 05 Apr 2005 12:14:26 +0200
 
- This is a multipart mime message
+Peter Stephenson wrote:
 
+>Matija Grabnar wrote:
+>  
+>
+>>lsubs -v says:
+>>Bus 004 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongl
+>>e (HCI mode)
+>>  bcdDevice            8.28
+>>    
+>>
+>
+>I think that's version 828, i.e.
+>
+>bc02x_4hci_bt1.1_16.14_encr56 2003-04-02
+>
+>This could be our bug B-729 which is known to affect 16.14.  According to
+>the report the chip could reset if the suspend was sufficiently long,
+>typically between 1.5 and 3 minutes.  This was due to a timing error
+>when we entered the very low power state required by suspend.  It's
+>fixed in 16.15 and in the BT 1.2 firmware (version 18.x; version 17 wasn't
+>released for bc02x).
+>
+>Most things which go wrong should result in the device falling off the
+>bus and reappearing, having rebooted.  If that's not your problem, there
+>may be something else going on.
+>  
+>
 
---Next_1112701564---0-203.199.83.28-26984
-Content-type: text/plain;
-	charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
- =A0=0AHello all,=0A=0AI have a small problem in understanding the blueZ so=
-urce code for kernel 2.6.11.I am unable to find out exactly how the kernel =
-implementations of the l2cap layer,hcilayer and rfcomm layer are interactin=
-g amongst themselves ?As well as how they interact with the user space libr=
-aries?=0A=0AI have seen some functions in l2cap.c calling functions from hc=
-i_core.c which have been put as EXPORT_SYMBOL() in hci_core.c.=0AIs it the =
-way they are communicating or am i missing something?=0A=0AI am new to Blue=
-Z and kernel programming stuff.=0A=0AThanks in advance.=0A=0A=0A
---Next_1112701564---0-203.199.83.28-26984
-Content-type: text/html;
-	charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-<P>=0A&nbsp; <BR>=0AHello all,<BR>=0A<BR>=0AI have a small problem in under=
-standing the blueZ source code for kernel 2.6.11.I am unable to find out ex=
-actly how the kernel implementations of the l2cap layer,hcilayer and rfcomm=
- layer are interacting amongst themselves ?As well as how they interact wit=
-h the user space libraries?<BR>=0A<BR>=0AI have seen some functions in l2ca=
-p.c calling functions from hci_core.c which have been put as EXPORT_SYMBOL(=
-) in hci_core.c.<BR>=0AIs it the way they are communicating or am i missing=
- something?<BR>=0A<BR>=0AI am new to BlueZ and kernel programming stuff.<BR=
->=0A<BR>=0AThanks in advance.<BR>=0A<BR>=0A<BR>=0A=0A</P>=0A<br><br>=0A<A t=
-arget=3D"_blank" HREF=3D"http://clients.rediff.com/signature/track_sig.asp"=
-><IMG SRC=3D"http://ads.rediff.com/RealMedia/ads/adstream_nx.cgi/www.rediff=
-mail.com/inbox.htm@Bottom" BORDER=3D0 VSPACE=3D0 HSPACE=3D0></a>=0A
---Next_1112701564---0-203.199.83.28-26984--
-
+No, the problem I'm seeing is after much longer suspends (12-16 hours, 
+typicaly,
+I haven't tried suspends measured in minutes), and the problem I'm 
+seeing is that
+all the operations that attempt to access bluetooth time out.
 
 
 -------------------------------------------------------
