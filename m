@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de465760412060523287f7d5c@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Help Needed - Ritesh
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <45A1F95BB9D7D84FAB0A1EB4D67EEF9601665B5F@is01ex01.ittiam.com>
+References: <45A1F95BB9D7D84FAB0A1EB4D67EEF9601665B5F@is01ex01.ittiam.com>
+Content-Type: text/plain
+Message-Id: <1102332520.9644.15.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Link Quality
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 6 Dec 2004 18:53:42 +0530
+Date: Mon, 06 Dec 2004 12:28:40 +0100
 
-Hi Marcel,
-The LM decides which packets to use to send data based on link quality. 
-How can I read or trace the  packet type I am using currently? Or
-rather if the packet type changes...will an event be generated? Do the
-packet types change dynamically......as the link quality varies???
+Hi Ritesh,
 
-Can I somehow avoid FEC checks???May be by using DH packets......but I
-know you say I shouldn't change packet types??? Is there someother
-method to do so.
+> I am implementing a Bluetooth application for portable players. My application uses ARM926EJ host processor interfaced to Bluetooth baseband processor. I am looking for linux profiles RFCOMM, L2CAP, SDP, HCI driver, file transfer profile and TCP/IP application on ARM9 processor. Can anyone throw some light and help me in this regard.
 
-thanks ,
-regards,
-Manjunath
+if Linux works on your processor then also BlueZ will work.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
