@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Victor Shcherbatyuk <victor@win.tue.nl>
-To: bluez-devel@lists.sourceforge.net
-Cc: victor@win.tue.nl
-Message-ID: <Pine.LNX.4.44.0502271406520.18458-100000@antilope>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Message-ID: <001401c51b9d$4c81af30$1a01010a@baked>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] Connection with a phone stays open after closing RFCOMM channel
+Content-Type: text/plain;
+	charset="US-ASCII"
+Subject: [Bluez-devel] Cleaning up after sdp_get_access_protos()
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,33 +17,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Feb 2005 14:25:16 +0100 (MET)
+Date: Fri, 25 Feb 2005 16:51:22 -0800
 
-Hi Marcel!
+Hi,
 
-I have the following prob.:
+This stuff hurts my brain, so I was hoping someone (Marcel? ;) could =
+verify
+my logic.
 
-My prog. listens on a RFCOMM chan. (adv. as HF channel via SDP) of  a 
-laptop, when I 
-connect from my phone to the laptop the chan. is opened, I send some 
-commands to configure the phone and when finished, close the chan. The 
-problem is that L2CAP connection stays open, from the output of hcidump I 
-see that laptop sends DISC request on dlci 6 and receives UA, but then 
-according to protocol it should also then send DISC for dlci 0, and then 
-terminate L2CAP -- it does not happen...
-If I do the same, but initiating connection from laptop - it works fine...
-I'm sure there is no other RFCOMM chan. opened.
+I'm mentioning this mostly because the utils code gets used as example =
+code.
 
-I have latest lib. and utils, 2.6.10 kernel not pached. The phone is 
-SE630.
+In this snippet from sdptool.c, proto is cleaned up with
+sdp_list_free(proto, (sdp_free_func_t)sdp_data_free);
 
-Thanks in advance.
+        if (sdp_get_access_protos(rec, &proto) =3D=3D 0) {
+                printf("Protocol Descriptor List:\n");
+                sdp_list_foreach(proto, print_access_protos, 0);
+                sdp_list_free(proto, (sdp_free_func_t)sdp_data_free);
+        }
 
-Kind regards,
-          Victor Shcherbatyuk.
- -- 
-P.S. btw, phone detects that RFCOMM chan. is closed and changes HF icon to 
-general connected icon...
+I think the cleanup should be:
+
+    sdp_list_foreach(proto,(sdp_list_func_t)sdp_list_free,0);
+    sdp_list_free(proto,0);
+
+Looking at sdp.c source (in libs), sdp_get_access_protos() returns a =
+list of
+lists of data sequences. The data sequences themselves shouldn't be =
+freed at
+this point because they weren't allocated by sdp_get_access_protos() =
+(thus
+the ,0 in the sdp_list_foreach call). But the list of lists is allocated
+inside sdp_get_access_protos().
+
+-Daryl.
 
 
 
