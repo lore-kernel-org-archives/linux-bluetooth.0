@@ -1,52 +1,36 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040305094657.98433.qmail@web40713.mail.yahoo.com>
-From: Lalith Chakravarthi <lalithvc@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Return-Path: <Bernd.Jucknischke@web.de>
+From: Bernd Jucknischke <Bernd.Jucknischke@web.de>
+Reply-To: Bernd.Jucknischke@web.de
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-users] AVM AP-X and DUN profile
+Date: Fri, 5 Mar 2004 08:34:00 +0100
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <200403030832.19665.Bernd.Jucknischke@web.de> <200403040924.58522.Bernd.Jucknischke@web.de> <1078398559.5347.1.camel@pegasus>
+In-Reply-To: <1078398559.5347.1.camel@pegasus>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] USB Dongle to Dongle -- Connection
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 5 Mar 2004 01:46:57 -0800 (PST)
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200403050834.01008.Bernd.Jucknischke@web.de>
+Sender: Bernd.Jucknischke@web.de
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi
+On Donnerstag, 4. M=E4rz 2004 12:09, Marcel Holtmann wrote:
+> Hi Bernd,
+>
+> > Thanks for the fast reply. I know that page already. I'm running the 2.6
+> > kernel series and haven't been able to find a working capi, yet. I guess
+> > I'll have to wait until it's (capi) supported for 2.6...
+>
+> you can search for a patch named i4l-t9bk22 or use 2.6.4-rc1 which
+> already includes every ISDN update that is needed. However you must make
+> sure that the module capi.ko is loaded and that /dev/capi is mounted,
+> because capiinit sometimes forget about it.
 
-I have two USB dongles... One on a laptop and other on my PC... I have
-linux running on both the machines. I have installed all the necessary
-packages. 
+Thanks again! That's info I didn't have and I'll try it immediately...
 
-I can even ping between the two. But I dont understand how I can
-transfer files between the two computers. I checked using the sdptool
-but the only service that can be found on the other computer is the sdp
-server running. 
+> Regards
+>
+> Marcel
 
-Could someone please advise me as to how to make a file transfer
-between these two computers. I am not using a GUI for this. So, I would
-appreciate it if the procedure can be told as command line arguments.
-
-Regards
-Lalith
-
-__________________________________
-Do you Yahoo!?
-Yahoo! Finance: Get your refund fast by filing online.
-http://taxes.yahoo.com/filing.html
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Later,
+Bernd
