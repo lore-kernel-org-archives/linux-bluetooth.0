@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <421B9948.7000505@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: strange btsco error
-References: <Pine.LNX.4.61.0502191116450.10610@block.bubble> <cv89g9$399$1@sea.gmane.org> <Pine.LNX.4.61.0502200852440.15784@block.bubble> <cvad1d$8tb$1@sea.gmane.org> <Pine.LNX.4.61.0502221045530.11660@block.bubble> <Pine.LNX.4.61.0502221238490.11660@block.bubble>
-In-Reply-To: <Pine.LNX.4.61.0502221238490.11660@block.bubble>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: Sebastian Roth <sebiroth@web.de>
+Message-ID: <cvg3ls$t62$1@sea.gmane.org>
+References: <20050222164005.71253.qmail@web26409.mail.ukl.yahoo.com> <20050222172313.48745.qmail@web26410.mail.ukl.yahoo.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <20050222172313.48745.qmail@web26410.mail.ukl.yahoo.com>
+Subject: [Bluez-users] Re: Driver version problems..hci_usb & bluetooth parser
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,53 +18,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Feb 2005 13:42:48 -0700
+Date: Tue, 22 Feb 2005 21:15:39 +0100
 
-Florian,
+Hi!
 
-I added a note about kernel alsa to the docs at bluetooth-alsa.sf.net
+> hci_usb: no version for "struct_module" found: kernel
+> tainted.
+> hci_usb: no version magic, tainting kernel.
+Try google or some other great magic tool ;-)
+Seems to me that the kernel image was not compiled from
+exactly the same sources.
+IMHO it's better to compile a complete new kernel and not
+only some modules and try to load them into the
+distribution kernel (this is just my guess about what might
+be the problem so please complain if I'm wrong)
 
-Brad
+Best regards,
+Sebastian
 
-Florian Echtler wrote:
-> -----BEGIN PGP SIGNED MESSAGE-----
-> Hash: SHA1
-> 
-> 
->>Any experiences with that? Better kernel ALSA or standalone ALSA?
-> 
-> 
-> Well, I solved that one by myself (see also 
-> http://thread.gmane.org/gmane.linux.bluez.devel/3790). Obviously,
-> kernel ALSA is necessary (I'm using 2.6.10-mh2).
-> 
-> Two things therefore:
-> 1. the B-Speech Elect Headset works fine (now ;)
-> 2. on the bluetooth-alsa site, you should really mention that external
->    ALSA drivers (at least 1.0.8) won't work! (as already asked for in 
->    the above thread)
-> 
-> Yours, Florian
-> - -- 
-> Preserve wildlife - pickle a squirrel today!
-> -----BEGIN PGP SIGNATURE-----
-> Version: GnuPG v1.2.6 (GNU/Linux)
-> 
-> iD8DBQFCGxp+7CzyshGvatgRAsMOAKDlUbCE1vJw3zB2W/w4bYa2/6dg+ACcDdvW
-> HO16/AOvfxJu+Bw5x/flhPg=
-> =5mjw
-> -----END PGP SIGNATURE-----
-> 
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 -------------------------------------------------------
