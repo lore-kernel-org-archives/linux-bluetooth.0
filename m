@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] RE: Logitech multimedia keys off by one
+Subject: Re: [Bluez-users] new bthid and switching off sensor in mouse???
 From: Marcel Holtmann <marcel@holtmann.org>
 To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200404021856.17235.cijoml@volny.cz>
-References: <406C1E19.7090003@ntlworld.com>
-	 <1080911347.2836.62.camel@pegasus>  <200404021856.17235.cijoml@volny.cz>
+In-Reply-To: <200404021906.54779.cijoml@volny.cz>
+References: <200404021906.54779.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1080927108.2836.92.camel@pegasus>
+Message-Id: <1080926895.2836.87.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,27 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 02 Apr 2004 19:31:48 +0200
+Date: Fri, 02 Apr 2004 19:28:15 +0200
 
 Hi Michal,
 
-> > the libs2 and utils2 are the next generation and they are completely
-> > independent from the current version. Actually with bluez-libs-2.6 it
-> > should be possible to port the bthid to use the old library. I fixed
-> > some internal stuff and this should make it possible to get the HID
-> > descriptor from a device.
+> I upgraded bthid from CVS and from that time optical sensor in my mouse is 
+> switching off??  It absolutelly not lights. Switch on makes it only pressing 
+> right mouse button???
 > 
-> GREAT! Marcel pls do it as soon as possible! :)*****
+> Is it new feature or bug?
+> Can I switch this feature off? It makes me crazy
 
-no time for it right now, sorry.
-
-> > At the moment I am also thinking of moving pand and dund into the utils
-> > package to lower my maintenance overhead.
-> 
-> It is a good choice.
-
-In the past there were objections against it and at the moment I haven't
-made any decision. Please comment it with pro and cons.
+I don't know what you are talking about, but maybe the battery of your
+mouse is almost empty.
 
 Regards
 
