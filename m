@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] encoding delay, librarifying a2play
+Subject: Re: [Bluez-devel] SBC code cleanup
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41A936C6.70209@xmission.com>
-References: <41A936C6.70209@xmission.com>
+In-Reply-To: <20041128053245.4608f749.henryk@ploetzli.ch>
+References: <1101592165.27074.31.camel@pegasus>
+	 <20041128053245.4608f749.henryk@ploetzli.ch>
 Content-Type: text/plain
-Message-Id: <1101624988.18467.32.camel@pegasus>
+Message-Id: <1101620847.18467.19.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,47 +19,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 28 Nov 2004 07:56:28 +0100
+Date: Sun, 28 Nov 2004 06:47:27 +0100
 
-Hi Brad,
+Hi Henryk,
 
-> I was able to encode audio in real time with:
+> > I started with some cleaning up of the SBC code to better fit into
+> > current coding conventions. My focus was on the sbc_synthesize_audio()
+> > and sbc_analyze_audio() functions. 
 > 
-> arecord -c 2 -r 44100 -f S16_BE -t au /dev/stdout | ./sbc/sbcenc - | 
-> ./a2play 00:08:F4:30:05:BB
+> I saw that and you're doing a good job there.
+
+I hope that we get no performance problems with this cleanups. This all
+now depends on how good the compiler optimizes and predict stuff. I
+think that we need some regression tests.
+
+>  I also saw that you
+> registered sf.net/projects/sbc.
+
+Yes, it is true. I registered the SBC library as a standalone project at
+Sourceforge. Right now this is still in the setup phase, but I hope that
+we can move the code over very soon. Actually this was the reason why I
+tried to cleanup some things.
+
+> > -       for (i = 0; i < 7; i++)
+> > +       for (i = 0; i < 8; i++)
 > 
-> But I estimate the delay is about 300ms. The bluetake encoder dongle was 
-> bothering me with its delay which is probably under 200ms... I really 
-> want to get our encoder under 100ms. I read somewhere that 60ms is 
-> achievable.
+> > Am I right, or do I miss something?
 > 
-> I think the place to start to get shorter latency is to write something 
-> that reads audio itself, uses the encoder library and writes out to the 
-> headset. Context switches between the 3 userland apps could be wiped 
-> out. I imagine the app will have command-line args for rate and mode, 
-> will open/ioctl the audio device appropriately, and then write to the 
-> headset.
+> No, you're absolutely right. Actually the decoder is broken currently
+> (I swear it worked when I checked in rev 1.8 of sbclib.c). I'm
+> investigating...
 
-the pipes and too small buffers can be really a problem here.
-
-> What's the ultimate destination for a2play? A library somewhere? I need 
-> to break a2play into at least 3 files: headers, library, and a fairly 
-> simple main(). Is this a good time?
-
-I propose a generic AVDTP library that will handle all AVDTP related
-things. I checked in some basic code into the avdtp directory. My idea
-is to make the library look like a socket interface so we can later move
-things very easy to a kernel AVDTP implementation.
-
-The a2play is then only a frontend for the AVDTP library, SBC library
-and some audio input library (libmad for exmaple). And I think we should
-also include the rcplay stuff into it and provide an alternate RFCOMM
-streaming with an extra parameter.
-
-However the final goal should be an ALSA library extension like their
-JACK plugin. But from my first tests I realized that it is impossible to
-create such an extension outside the ALSA PCM directory. I must talk
-with the ALSA developers about that issue.
+The decoder is working for me. I tried it before I checked in my
+changes.
 
 Regards
 
