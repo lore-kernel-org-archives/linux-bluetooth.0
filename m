@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: bluez-utils-2.14 compile error: make returns
-	"cannot find -lbluetooth"
+Subject: Re: [Bluez-users] Can't connect RFCOMM socket
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <8272108050119101561d8eb9b@mail.gmail.com>
-References: <82721080501190249144cfac0@mail.gmail.com>
-	 <csllc3$c6d$1@sea.gmane.org>  <8272108050119101561d8eb9b@mail.gmail.com>
+In-Reply-To: <csm972$gnu$1@sea.gmane.org>
+References: <csm972$gnu$1@sea.gmane.org>
 Content-Type: text/plain
-Message-Id: <1106167174.8190.135.camel@pegasus>
+Message-Id: <1106167097.8190.133.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,21 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 Jan 2005 21:39:34 +0100
+Date: Wed, 19 Jan 2005 21:38:17 +0100
 
 Hi,
 
-> Added /usr/local/bluez/lib (even tried /usr/local/bluez), ran ldconfig as root.
-> ldconfig -p | grep bluetooth
->         libbluetooth.so.1 (libc6) => /usr/local/bluez/lib/libbluetooth.so.1
->         libbluetooth.so (libc6) => /usr/local/bluez/lib/libbluetooth.so
-> Same thing gets spat out during make. :((
-> bluez-libs...I had that installed first...at least that's what I
-> presume I did. :)
-> I've even turned religous - started praying, that is. :P
+> First of all thanks again for your time, maybe this is another proof of 
+> my lack of basic knowledge, but I've trying a lot and can't get ride of 
+> this error (I know this error is in many mails arround the list, but I 
+> have not find the particular remedy for mine)
+> 
+> When I try:
+> 
+>   rfcomm connect rfcomm0 00:10:60:A5:8F:8A 5
+> 
+> I get:
+> 
+> Can't connect RFCOMM socket: Connection refused
 
-if you use a different prefix than /usr you might to tell the utils
-about it. Look at --with-bluez=... for example.
+the dump shows that there is no service running on RFCOMM channel on the
+other side.
 
 Regards
 
