@@ -1,28 +1,59 @@
-Return-Path: <pb@nexus.co.uk>
-Subject: Re: [Bluez-devel] D-Bus interfaces
-From: Philip Blundell <pb@nexus.co.uk>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Fred Sch??ttgen <bluez-devel@schaettgen.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1077058771.2665.134.camel@pegasus>
-References: <1076265358.2670.36.camel@pegasus>
-	 <1076278554.14742.112.camel@akka.yeti.nocrew.org>
-	 <1076279508.6869.54.camel@pegasus>
-	 <200402090015.24318.bluez-devel@schaettgen.de>
-	 <20040216144615.GA318@nexus.co.uk> <1076945776.17824.6.camel@merlin>
-	 <20040216154155.GB32285@nexus.co.uk>  <1077058771.2665.134.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] RFCOMM bug?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andy Ross <andy@plausible.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <40329CA6.7080302@mdolabs.com>
+References: <40329CA6.7080302@mdolabs.com>
 Content-Type: text/plain
-Message-Id: <1077061102.685.0.camel@dixie.nexus.co.uk>
+Message-Id: <1077060827.2665.137.camel@pegasus>
 Mime-Version: 1.0
-Date: Tue, 17 Feb 2004 23:38:22 +0000
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 18 Feb 2004 00:33:47 +0100
 
-On Tue, 2004-02-17 at 22:59, Marcel Holtmann wrote:
-> I included your patch with a massive coding style change. Any other
-> outstanding stuff before I prepare a new release?
+Hi Andy,
 
-Hi Marcel
+> I'm having some trouble with the bluez implementation as distributed
+> with fedora.  I thought for a long time that this was a bug on the
+> device (Ericsson P900 / Symbian 7.0) side of the connection, but it's
+> now looking like a kernel issue on the linux box.
+> 
+> The app on the other side is a simple RFCOMM echoer.  It reads a byte
+> at a time and writes it back out to the socket.  I'm connecting to it
+> with a "cat /dev/rfcomm1", while I do a "echo a > /dev/rfcomm1" from
+> another shell.  What comes back is an unending spew of bytes, mostly
+> (but oddly not entirely) derived from the "a\r\n" that went out the
+> terminal initially.
+> 
+> FWIW, I see almost identical behavior when connecting to the "modem"
+> device on the phone.  The AT command work (in the sense that I can see
+> the desired output appear on the socket), but come back as part of an
+> infinite garbage stream.
 
-Ah, cool.  Nothing else from me.
+set the RFCOMM terminal device into raw mode and everything works fine.
 
-p.
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+Build and deploy apps & Web services for Linux with
+a free DVD software kit from IBM. Click Now!
+http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
