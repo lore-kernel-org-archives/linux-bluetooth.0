@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] problem on make install
+Subject: Re: [Bluez-users] D-Link DBT-120
 From: Marcel Holtmann <marcel@holtmann.org>
-To: ALBERT RIBAS GUASCH <albert.ribas@estudiants.urv.es>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <13c0fd76e.d76e13c0f@estudiants.urv.es>
-References: <13c0fd76e.d76e13c0f@estudiants.urv.es>
+To: Gene Imes <ebi7@ozob.net>
+Cc: list-bluez <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1078339075.8547.2.camel@go2>
+References: <1078322158.11523.83.camel@go2>
+	 <1078322721.2787.86.camel@pegasus>  <1078339075.8547.2.camel@go2>
 Content-Type: text/plain
-Message-Id: <1078487739.2762.60.camel@pegasus>
+Message-Id: <1078487569.2762.56.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,66 +19,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 05 Mar 2004 12:55:39 +0100
+Date: Fri, 05 Mar 2004 12:52:49 +0100
 
-Hi Albert,
+Hi Gene,
 
-> I'm working in a Red Hat with kernel 2.4.18, so I've
-> downloaded bluez-kernel-2.3 , untared it, and
-> ./configure. Until there there is no problem, but
-> when I do make, I need to comment line 461 on core.c
-> to skip the error:
+> Disregard my previous post. 2.6.4-rc1-mm2 has fixed this problem.
 
-the bluez-kernel-2.3 package is deprecated and no longer supported. Use
-a vanilla kernel and apply my patch.
-
-> core.c: In function `bnep_session':
-> core.c:461: structure has no member named `nice'
-> make[2]: *** [core.o] Error 1
-> make[1]: *** [bnep.o] Error 2
-> 
-> when I comment that line there is no problem on
-> doing the 'make', but on make install I get the next
-> messages:
-> 
-> make[1]: Leaving directory
-> `/root/testings/bluez-kernel-2.3/doc'
-> /sbin/depmod -a
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/bluecard_cs.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/bt3c_cs.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/btuart_cs.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/dtl1_cs.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/hci_uart.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/hci_usb.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/drivers/bluetooth/hci_vhci.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/misc/ksock_multi.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/misc/ksock_single.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/net/bluetooth/bluez.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/net/bluetooth/bnep.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/net/bluetooth/l2cap.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/net/bluetooth/rfcomm.o
-> depmod: *** Unresolved symbols in
-> /lib/modules/2.4.18-4custom/kernel/net/bluetooth/sco.o
-> make: *** [install] Error 1
-> 
-> can anybody help me on this? I'm new on BlueZ so
-> please be gentle!! ;)
-
-I can't give you any assistance here, because you use a custom kernel
-and a deprecated package.
+I had now the same problem with 2.6.4-rc2. Please try to find the patch
+from 2.6.4-rc1-mm2 that fixes your problem, because this needs to be
+send to Linus before he releases 2.6.4 (final).
 
 Regards
 
