@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050227082859.31822.qmail@web50706.mail.yahoo.com>
-From: "John H." <mistamaila@yahoo.com>
+Message-ID: <d1f423d3050226200521a6d7a@mail.gmail.com>
+From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <50BF37ECE4954A4BA18C08D0C2CF88CB0104037E@exmail1.se.axis.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] how to get bluetooth to emulate comport?
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] RFCOMM Device
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,37 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Feb 2005 00:28:59 -0800 (PST)
+Date: Sat, 26 Feb 2005 23:05:12 -0500
 
-I have zonet usb dongle, pm-325 sprint phone.
+Hi Folks,
 
-hciconfig hci0 up
+I am new with Bluez  and I trying to set up a rfcomm device but the
+/dev/rfcomm0 is not being created or does not exist.
 
-Can't open HCI socket.: Address family not
-supported by protocol
+# rfcomm bind 0 aa:aa:aa:aa:aa 1 (works)
+#rfcomm
+rfcomm0: aa:aa:aa:aa:aa clean (is it right?)
 
-I thought i installed the necessary modules?
+but when i try to use pppd it does not work, it does not recognize the
+/dev/rfcomm0
 
-Also, pin link is broken.
+i will appreciate any help
 
+cheers,
 
-> > 
-> > --- "D.W." <sword@gmx.de> wrote:
-> > 
-> > > Try this:
-> > > 
-> > > hciconfig hci0 up
-> > > rfcomm connect 0 <bt-address from your handy>
-> > > 
-> > > Then you shoulfdhave a com port /dev/rfcomm0
-> > > Daniel
-
-
-		
-__________________________________ 
-Do you Yahoo!? 
-Read only the mail you want - Yahoo! Mail SpamGuard. 
-http://promotions.yahoo.com/new_mail 
+-- 
+Anderson Clayton B. Rodrigues
+Eng. de Software
+Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
