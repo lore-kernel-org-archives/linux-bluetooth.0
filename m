@@ -1,77 +1,53 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] re: UART-based bluetooth stuff / serial_cs
-	problems solved?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Kevin Page <bluez-devel@krp.org.uk>
-Cc: bluez-devel@lists.sourceforge.net, rmk@arm.linux.org.uk
-In-Reply-To: <Pine.LNX.4.58.0411031120260.18518@moog.ecs.soton.ac.uk>
-References: <Pine.LNX.4.58.0411031120260.18518@moog.ecs.soton.ac.uk>
+Return-Path: <steve.crane@rococosoft.com>
+Subject: Re: [Bluez-devel] RFCOMM service level security testing
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1099496238.6330.2.camel@notepaq>
+References: <1099151759.16247.18.camel@pegasus>
+	 <1099433039.7125.13.camel@pegasus>
+	 <1099495689.3265.44.camel@baroque.rococosoft.com>
+	 <1099496238.6330.2.camel@notepaq>
 Content-Type: text/plain
-Message-Id: <1099496495.6330.7.camel@notepaq>
+Message-Id: <1099497364.3261.64.camel@baroque.rococosoft.com>
 Mime-Version: 1.0
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 03 Nov 2004 16:41:35 +0100
+Date: Wed, 03 Nov 2004 15:56:04 +0000
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Kevin,
+Hi Marcel,
 
-> I have a IBM Thinkpad X31 with a CF Socket bluetooth card (rev. G),
-> which has been one of the serial PCMCIA/CF bluetooth cards which
-> mysteriously haven't worked since 2.6. Just done a periodic scan of 
-> the list archives, and thought I'd give the latest kernel at try, 
-> as changes to serial/UART have been mentioned (I'm normally running
-> Fedora Core 2 with 2.6.8).
-> 
-> Anyway, basically, it seems to fix things.
+On Wed, 2004-11-03 at 15:37, Marcel Holtmann wrote:
+> thanks for testing and what do you think, should I put this feature into
+> the next stable kernel?
 
-this will be perfect and I am going to test my cards that stopped
-working. I don't have the Socket one, but some others.
+Yes: definitely!
 
-> With linux-2.6.10-rc1-mm2:
-> 
-> hciattach /dev/ttyS3 socket
-> 
-> seems to complete ok (none of the "BCSP initialization timed out" 
-> messages I was seeing before). I do get a lone:
-> 
-> hcid[2543]: HCI dev 0 registered
-> kernel: bcsp_recv: Out-of-order packet arrived, got 1 expected 0
-> hcid[2543]: HCI dev 0 up
-> 
-> but then I can successfully hcitool scan etc.
+> Another question is what should we do when the encryption on a link with
+> RFCOMM_ENCRYPT is switched off? At the moment L2CAP keeps works, but in
+> the RFCOMM layer I drop the connection by sending DM.
 
-The ouf-of-order packet is ok, because BCSP can deal with these things
-by itself. Maybe I have to change that message into a debug message.
- 
-> I don't know what's changed, but thanks! This seems to be good news.
-> Unfortunately I haven't had the chance to do more rigorous testing as
-> the new kernel either doesn't like something else in the thinkpad, or
-> I screwed up the config :-/
+Yeah I thought I saw something like this happen. I don't think it is 
+correct behaviour. My reasoning would go something like this:
 
-Can you retest it with 2.6.10-rc1-bk13 and see if these patches are
-already merged back mainline.
+* If encryption on a link is switched off at the HCI level, _all_ of the
+connections (L2CAP and RFComm) which required it should be closed
+shouldn't they? 
 
-Regards
+* Conversely, encryption should be automatically turned off on a link
+when the last connection which required encryption is closed.
 
-Marcel
+* Owners of a connection should be able to indicate that they're no
+longer interested in encryption by an ioctl on the L2CAP or RFComm
+socket.
 
+* Connections which were created without the encryption requirement
+should be able to ask for it by a similar ioctl.
 
+I imagine this behaviour would be required only very rarely but it seems
+the most intuitive to me. What do you think?
 
-
--------------------------------------------------------
-This SF.Net email is sponsored by:
-Sybase ASE Linux Express Edition - download now for FREE
-LinuxWorld Reader's Choice Award Winner for best database on Linux.
-http://ads.osdn.com/?ad_id=5588&alloc_id=12065&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Regards,
+Steve
+-- 
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
