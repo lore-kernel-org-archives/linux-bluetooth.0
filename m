@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Automatically accepting pairing from a mouse?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4227A238.5030003@emenaker.com>
-References: <4227A238.5030003@emenaker.com>
-Content-Type: text/plain
-Message-Id: <1109933159.8058.19.camel@pegasus>
+Message-ID: <7aa80ced05030404572b157616@mail.gmail.com>
+From: Mohan K <kmohangda@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: Fw: [Bluez-users] Re: Can't able to send data in both direction
+In-Reply-To: <1109933262.8058.21.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <004401c5207b$c13a3210$4100a8c0@benjamin>
+	 <7aa80ced05030321482f162db2@mail.gmail.com>
+	 <1109933262.8058.21.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,52 +20,53 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Mar 2005 11:45:58 +0100
+Date: Fri, 4 Mar 2005 18:27:31 +0530
 
-Hi Joe,
+Hi Marcel,
+              Thanks for your suggestion. I tried by keeping the
+connection open. On the receiving side I am using recv() function.
+Immediately after recv() function I want to print the data. The
+problem I am facing is, it prints the received data only after
+disconnecting the connection on the sending side with close(). For
+that time the data is available in the buffer. Whether I want to
+multithread the recveive portion, sothat I can dispay the data
+immediately after receiving? Is there any other bluez command to
+receive the data?
 
-> Please forgive the newbie question... I'm still a little new to how 
-> bluetooth devices interact.
+Thanks & Regards
+Mohan
+
+
+On Fri, 04 Mar 2005 11:47:42 +0100, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Mohan,
 > 
-> I've got bluez-utils running on my debian laptop and I can use it to 
-> find my bluetooth mouse.
-> I can run "hcitool scan" and, provided that I've clicked the little 
-> "pairing" button on my mouse, the scan finds it.
-> Then, I can run "hidd --connect aa:bb:cc:dd:ee:ff" (not the actual hw 
-> address I use) and it connects!
+> >                   I bought a new dongle, and now the send program is
+> > working on two sides.
+> >                   I am facing one more problem. The send program is
+> > reading a character for PC keyboard using getch()
+> > function,immediately, it establishes a connection using connect() and
+> > then it sends the data. This is in a do-while loop to read and send
+> > the continous key press. The problem is, I am not getting all the data
+> > on the recv side, what i have typed on the send side. As for I know
+> > the problem is due to delay in l2cap connection establishment. Is
+> > there any way to avoid the delay? Kindly suggest me.
 > 
-> However, I'd like to avoid having to open a konsole window and do this 
-> pairing every time I boot my laptop. Furthermore, the mouse I have likes 
-> to go to sleep after about 5-10 minutes of inactivity... at which point 
-> it requires pairing again.
+> you must keep the connection open.
 > 
-> It would be nice if I could just click the pairing button on my mouse 
-> and have the rest happen automatically.
+> Regards
 > 
-> In an attempt to do this, I've changed my "HIDD_OPTIONS=--master 
-> --server" to "HIDD_OPTIONS=-i aa:bb:cc:dd:ee:ff --server", but this 
-> doesn't seem to have done anything.
-
-it is enought to edit /etc/default/bluez-utils to contain
-
-	HIDD_ENABLED=1
-	HIDD_OPTIONS="--server"
-
-and then restart the Bluetooth subsystem. The next time your mouse will
-reconnect and this will be handled by the running hidd.
-
-> Lastly, does anyone have any suggestions for a better mouse? My current 
-> one is pretty nifty, though. It has an on/off switch so that I can save 
-> batteries when the laptop is packed away. And it's a mini-style. But the 
-> timeout-sleep thing is just killing me....
-
-Run the hidd and the timeout thing is no longer a problem.
-
-Regards
-
-Marcel
-
-
+> Marcel
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 
 -------------------------------------------------------
