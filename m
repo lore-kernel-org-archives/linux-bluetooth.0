@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Detecting RSSI without connecting
+Subject: Re: [Bluez-users] RE[2]: inquiry scan problems
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <qszzn10q72i.fsf@timepilot.gpcc.itd.umich.edu>
-References: <qszactrj3c5.fsf@timepilot.gpcc.itd.umich.edu>
-	 <1099960170.29330.43.camel@pegasus>
-	 <qszu0rfnfil.fsf@mspacman.gpcc.itd.umich.edu>
-	 <1101413321.6465.6.camel@pegasus>
-	 <qszzn10q72i.fsf@timepilot.gpcc.itd.umich.edu>
+In-Reply-To: <41AB9BB2.1070603@gmx.ch>
+References: <41AB96DF.4080405@zhwin.ch> <1101765045.7562.48.camel@pegasus>
+	 <41AB9BB2.1070603@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1101792690.7562.54.camel@pegasus>
+Message-Id: <1101792487.7562.50.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -22,32 +19,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 30 Nov 2004 06:31:30 +0100
+Date: Tue, 30 Nov 2004 06:28:07 +0100
 
-Hi Scott,
+Hi Marco,
 
-> > If you buy a CSR based Bluetooth 1.2 device it will support inquiry with
-> > RSSI. Also the 1.2 Silicon Wave based and the AVM BlueFRITZ! USB v2.0
-> > have this support. However both have a bug, but you can work around it.
-> > Maybe the easiest way is a D-Link DBT-120 Rev. B3 and then put the Apple
-> > firmware update on it.
-> 
-> Thanks for the advice, I got a DBT-120 and put the Apple firmware on
-> it (yet another reason I'm glad we bought a Mac for my wife), and I
-> can now get the RSSI from an inquiry!
-> 
-> That is to say, I can see it in hcidump.  I don't see the results in
-> "hcitool inq", and from a quick look at the source code it looks like
-> that information isn't returned from the kernel.  Are there plans to
-> provide this information via the kernel and libraries, or should I
-> plan on hacking something up with hcidump?
+> what do you mean by "job periodic inquiry"?
+> what is this? i don't know what this means...
 
-I maybe gonna change the complete interface to the inquiry stuff in the
-future and so I haven't added support for inquiry with RSSI so far. You
-don't need to hack something on hcidump, simply use the HCI raw socket
-interface. Send the inquiry command and wait for the events. You will
-find example code for this and listening on the 1.1 inquiry event in the
-mailing list archive. It should be easy to adapt.
+look at the HCI part of the Bluetooth specification for the commands and
+events for periodic inquiry.
 
 Regards
 
