@@ -1,61 +1,60 @@
-Return-Path: <SRS0+7abe75bf9b19a3b2e46b+354+infradead.org+dwmw2@pentafluge.srs.infradead.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Alignment issue
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Daryl Van Vorst <daryl@wideray.com>,
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: David Woodhouse <dwmw2@infradead.org>, Daryl Van Vorst <daryl@wideray.com>,
    "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1092306154.28711.85.camel@pegasus>
+In-Reply-To: <1092305447.24961.1169.camel@baroque.rococosoft.com>
 References: <001201c47fc2$7093e4a0$1301010a@baked>
 	 <1092252699.4564.238.camel@pegasus>
 	 <1092299689.4622.8.camel@imladris.demon.co.uk>
 	 <1092302834.28711.72.camel@pegasus>
-	 <1092304890.15466.44.camel@hades.cambridge.redhat.com>
-	 <1092306154.28711.85.camel@pegasus>
+	 <1092305447.24961.1169.camel@baroque.rococosoft.com>
 Content-Type: text/plain
-Message-Id: <1092306935.15466.74.camel@hades.cambridge.redhat.com>
+Message-Id: <1092306354.28711.88.camel@pegasus>
 Mime-Version: 1.0
-Date: Thu, 12 Aug 2004 11:35:36 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 12 Aug 2004 12:25:54 +0200
 
-On Thu, 2004-08-12 at 12:22 +0200, Marcel Holtmann wrote:
-> btw what is the status of BlueZ for Fedora Core. Currently I know the
-> status of them for Debian and SuSE. Are there any extra patches that I
-> must know of? 
+Hi Steve,
 
-We have a patch to make various daemons build PIE and we mangle the
-defaults in some config files -- other than that nothing interesting. I
-went through it all quite recently and made sure you had the one or two
-other patches that made sense.
-
-> How do you split the bluez-utils into different packages?
-
-We have these packages:
-	bluez-bluefw-1.0-5.ppc.rpm
-	bluez-hcidump-1.10-1.ppc.rpm
-	bluez-libs-2.9-1.ppc.rpm
-	bluez-libs-devel-2.9-1.ppc.rpm
-	bluez-pin-0.23-2.ppc.rpm
-	bluez-utils-2.9-1.ppc.rpm
-	bluez-utils-cups-2.9-1.ppc.rpm
-
-We do split the bluez-utils init scripts up, as discussed a few weeks
-ago. I have patches outstanding for initscripts which make 'ifup bnep0'
-responsible for starting pand, to make it just like a normal interface
--- even pppd is started that way, not by an initscript.
-
-> > Autocrap considered harmful; I'd rather let the compiler do it.
+> > I am not an expert when it comes to specific compiler stuff and I can't
+> > make the best decision with my limited information. What I realized is
+> > that we need our own unaligned access implementation, because we can't
+> > rely on the asm/unaligned.h. So I started to put our own in bluetooth.h
+> > for general access. If this was wrong, please correct me.
 > 
-> Actually I meant to let autoconf compile some test code, then run it and
-> analyse that result.
+> I don't think this is wrong, in the absence of a system-supplied one.
+> This is the basic problem if you ask me: <asm/unaligned.h> _should_ be a
+> user-space header file (provided by glibc or something) because
+> unaligned access _is_ something that people who write network programs
+> need.
 
-/me shudders. Autocrap considered harmful. You break cross-compilation
-if you try to do that. I'd much prefer just to write portable code.
+I must agree, but it seems that nobody provides a generic include for
+unaligned access. So we don't have a choise at the moment :(
 
-> For now I will use memmove, but we need clarification on this. I lost my
-> Sun Ultra system, so I can't do any tests.
+Regards
 
-We keep our compiler-dudes in the US mostly so they're sleeping. I'll
-poke one when they wake up.
+Marcel
 
--- 
-dwmw2
+
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink & Toner - Free Shipping and Free Gift.
+http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
