@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Florian Echtler <echtler@fs.tum.de>
+Subject: Re: [Bluez-users] Zoom 4312 PCMCIA Bluetooth freezes laptop
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Some general HID questions..
-In-Reply-To: <1105014500.4299.25.camel@pegasus>
-Message-ID: <Pine.LNX.4.61.0501061406380.17785@block.bubble>
-References: <Pine.LNX.4.61.0501061130420.17785@block.bubble>
- <1105014500.4299.25.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <opsj5r1azldfsa41@dfavro-3>
+References: <opsj5ahvnzdfsa41@dfavro-3>  <opsj5r1azldfsa41@dfavro-3>
+Content-Type: text/plain
+Message-Id: <1105014703.4299.31.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,28 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 6 Jan 2005 14:07:51 +0100 (CET)
+Date: Thu, 06 Jan 2005 13:31:43 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi David,
 
-> you read the email where I explained that I will keep the revision
-> history by any costs? The input subsystem is no merged back and once I
-> get my x-mas and new years backlog done, I will start with it.
-Hm, I must have missed that one. 
-So an universal HID parser is indeed planned?
-And the sources are presumably in the bluez-CVS?
+> I still hope to find a fix for the newer kernel, but at least I have a
+> way to start experimenting with my new card.  Thanks to anyone who can
+> help me to understand what is happening.
 
-Yours, Florian
-- -- 
-Homo homini lupus.
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
+maybe you should simple test a vanilla 2.6.10 or later. The reports
+about the RedHat kernel are not the bests lately and I am not going to
+debug any of their kernels.
 
-iD8DBQFB3Tgr7CzyshGvatgRAkvGAKD8rjNONFf61W/wvtFNh9pLqToR0gCgtD/1
-DWqJXtLGo30J0NwNbVSAjTQ=
-=UtWR
------END PGP SIGNATURE-----
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
