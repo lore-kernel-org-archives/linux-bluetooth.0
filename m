@@ -1,89 +1,71 @@
-Return-Path: <noring@nocrew.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] D-Bus support
-From: Fredrik Noring <noring@nocrew.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Fredrik Noring <noring@nocrew.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076267396.2670.58.camel@pegasus>
+In-Reply-To: <1076266267.14742.38.camel@akka.yeti.nocrew.org>
 References: <1076265358.2670.36.camel@pegasus>
 	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
-	 <1076267396.2670.58.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1076274445.14742.73.camel@akka.yeti.nocrew.org>
+Message-Id: <1076267396.2670.58.camel@pegasus>
 Mime-Version: 1.0
-Date: Sun, 08 Feb 2004 22:07:25 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Sun, 08 Feb 2004 20:09:56 +0100
 
-Hi Marcel
+Hi Fredrik,
 
-On Sun, 2004-02-08 at 20:09, Marcel Holtmann wrote:
-> I already looked at your stuff. Nice work btw.
+> > My problem is now that I don't wanna link the Bluetooth library itself 
+> > with the D-Bus library. So what I was thinking of that we extend the 
+> > hcid to be a multiplexer with a D-Bus interface. So we have the HCI raw 
+> > socket and ioctl's for configuration and we can use the D-Bus interface 
+> > for this and also advanced things like PIN management etc. My idea behind
+> > this is, that graphical interfaces like Gnome or KDE only have to use the 
+> > D-Bus for their stuff.
+> 
+> I have implemented this in hcid, DBus sockets, Gnome configuration
+> interface and so on. Please look at: http://noring.nocrew.org/bluetooth/
 
-Thanks!
+I already looked at your stuff. Nice work btw. At the moment I am more
+concerned on how the D-Bus interface should look like than a real
+implementation. You now that an important part for me is the security.
+For example a user can see what devices a paired and it can delete a
+pairing, but it don't have to see the link key itself. This is the job
+of the daemon that provides this interface. The same applies for
+changing device settings and storing them on the harddisk.
 
-> At the moment I am more concerned on how the D-Bus interface should
-> look like than a real implementation. 
+Another point is that I want to use the system message bus for it.
 
-I will send you the interface proposal in another e-mail. It's largely
-implemented and used by the Gnome Bluetooth Configuration tool already,
-but it's possible to modify of course.
+> > Proposals and comments?
+> 
+> Later tonight, I'll write you a detailed description on what's already
+> implemented on the hcid DBus interfaces, new configuration options, the
+> nametab and keytab files etc. I'd like to discuss these things so that
+> we can agree on the API:s etc.
 
-> You now that an important part for me is the security. For example a 
-> user can see what devices a paired and it can delete a pairing, but 
-> it don't have to see the link key itself. This is the job of the 
-> daemon that provides this interface. The same applies for changing 
-> device settings and storing them on the harddisk.
+My favourite storage is Berkeley DB.
 
-I agree. This is the way the new proposed hcid is implemented.
+Regards
 
-> My favourite storage is Berkeley DB.
+Marcel
 
-That's an interesting idea, you mentioned that before. Can you
-elaborate, please? 
 
-Here are some advantages of using textfiles (as default) for hcid
-storage:
 
-   1. Textfiles are intuitive to use and debug because they work
-      with any tool (emacs, grep, awk, perl etc.)
 
-   2. Small to medium size storage files have always been text
-      files in Unix/Linux (/etc/passwd, /etc/hosts etc.)
-
-   3. Textfile routines are very lightweight and efficient.
-
-Please understand that although it does work, applications should
-use the DBus interface instead of manipulating these files directly.
-
-Here's how it's implemented in the proposed hcid. The default location
-of these files is something to discuss. File layout:
-
-   $ ls -l /etc/bluetooth/keytab*
-   -rw-r--r-- 1 root root  98 Feb  8 18:29 /etc/bluetooth/keytab
-   -rw-r--r-- 1 root root 147 Feb  8 16:56 /etc/bluetooth/keytab-
-   -rw------- 1 root root 138 Feb  8 18:29 /etc/bluetooth/keytab.shadow
-   -rw------- 1 root root 207 Feb  8 16:56 /etc/bluetooth/keytab.shadow-
-
-   $ ls -l /etc/bluetooth/nametab*
-   -rw-r--r-- 1 root root 115 Feb  8 16:00 /etc/bluetooth/nametab
-   -rw-r--r-- 1 root root  86 Feb  8 15:02 /etc/bluetooth/nametab-
-
-The dash files ("keytab-" etc.) are backup files. The "keytab" file is 
-readable by all. The "keytab.shadow" is only r/w-able by root. Contents:
-
-   $ cat /etc/bluetooth/keytab
-   # sba              dba                type    create time
-   00:03:C9:2A:C4:A8  00:07:E0:0C:1B:3F  0       1076252948
-   00:10:DC:E9:EF:20  00:80:37:AA:7A:DA  0       1076253156
-
-   $ cat /etc/bluetooth/keytab.shadow
-   # sba              dba                key
-   00:03:C9:2A:C4:A8  00:07:E0:0C:1B:3F  2f66d0364a1eea2fae680af948bb3299
-   00:10:DC:E9:EF:20  00:80:37:AA:7A:DA  2855bdc30b49254902d5deebe24c24ce
-
-   $ cat /etc/bluetooth/nametab
-   # bdaddr                name
-   00:00:08:04:DE:C8       Fuzz Buzz
-   00:80:37:AA:7A:DA       Fredrik T39
-   00:07:E0:0C:1B:3F       Fredrik TT
-
-Fredrik
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
