@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41DE6DC3.7070903@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
+From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] btsco under FC3
-References: <5256d0b05010520461ad68ff3@mail.gmail.com>	 <1105014278.4299.19.camel@pegasus>	 <5256d0b05010622152c32d3f4@mail.gmail.com>	 <41DE36E2.5030404@xmission.com> <5256d0b0501062319209a3d3a@mail.gmail.com>
-In-Reply-To: <5256d0b0501062319209a3d3a@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Message-Id: <20050107120154.424e0927.henryk@ploetzli.ch>
+In-Reply-To: <5256d0b05010622152c32d3f4@mail.gmail.com>
+References: <5256d0b05010520461ad68ff3@mail.gmail.com>
+	<1105014278.4299.19.camel@pegasus>
+	<5256d0b05010622152c32d3f4@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="pgp-sha1";
+ boundary="Signature=_Fri__7_Jan_2005_12_01_54_+0100_nBrZn//oOBoQpK8Z"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,59 +22,56 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 07 Jan 2005 12:08:51 +0100
+Date: Fri, 7 Jan 2005 12:01:54 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+--Signature=_Fri__7_Jan_2005_12_01_54_+0100_nBrZn//oOBoQpK8Z
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I also think it's not needed to run btsco when you try to use a2play!
+Moin,
 
-btsco is for using the headset with alsa in normal (mono) audio
-applications, while a2play connects directly to the headset to play
-stereo music.
+Am Fri, 7 Jan 2005 14:15:44 +0800 schrieb Peter Robinson:
 
-So it should be either btsco *or* a2play!
+> As seen below it detects the device, the voice settings and connects
+> with a RFCOMM channel but then it just sits there. I end up just
+> putting it into the background and try running the varoius examples.
+> Output of all included below. I get no sound at all. any ideas or
+> suggestions?
 
-best regards,
-~  Lars
+You did press the connect button on the headset, did you?
 
-Peter Robinson wrote:
-|>It's not a real daemon. You run it in the foreground and click the
-|>connect button on the headset. Then you can send and receive audio from
-|>another app.
-|
-|
-| OK so its not suppose to exit then...
-|
-| P
-|
-|
-| -------------------------------------------------------
-| The SF.Net email is sponsored by: Beat the post-holiday blues
-| Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
-| It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
-| _______________________________________________
-| Bluez-devel mailing list
-| Bluez-devel@lists.sourceforge.net
-| https://lists.sourceforge.net/lists/listinfo/bluez-devel
-|
+> [root@trinity btsco]# btsco 00:07:A4:0E:69:3D
+...
+> [1]+ btsco 00:07:A4:0E:69:3D &
+> [root@trinity btsco]# mpg123 --au -
+> /home/audio/mp3/green_day/american_idiot/green_day-boulevard_of_broke
+> n_dreams.mp3
+> | sbc/sbcenc - | ./a2play 00:07:A4:0E:69:3D
 
+That is not supposed to work. btsco (the program) and a2play are two
+different things. You should only be able to use one of them at any
+one time, if a2play works for you at all (which it doesn't, as the
+HS-810 can't do A2DP).
 
-- --
-Lars Grunewaldt
-* software development
-* multimedia design
-skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
-web: http://www.dark-reality.de
-mail: lgw@dark-reality.de
+--=20
+Henryk Pl=F6tz
+Gr=FC=DFe aus Berlin
+~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
+~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
+
+--Signature=_Fri__7_Jan_2005_12_01_54_+0100_nBrZn//oOBoQpK8Z
+Content-Type: application/pgp-signature
+
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+Version: GnuPG v1.2.6 (GNU/Linux)
 
-iD8DBQFB3m3DQWC6DTWkDAoRApxyAJoDSkDi4wWBVjrLF0JNZ6pyEyaPwwCfY7q+
-jqtiPDRSg21KGNME6M/f1kU=
-=YqzK
+iD8DBQFB3mwnIjWgKE0OA2gRAnQ/AJ9RxuLPiiyLP12KxS8z5/GhQtTGWgCg5e4q
+0T/+yWiSJVrCvKCRy/1fpzw=
+=467X
 -----END PGP SIGNATURE-----
+
+--Signature=_Fri__7_Jan_2005_12_01_54_+0100_nBrZn//oOBoQpK8Z--
 
 
 -------------------------------------------------------
