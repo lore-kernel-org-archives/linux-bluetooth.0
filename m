@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41ED32F0.8010502@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <002f01c4fd75$e647c280$19cb13ac@stu.nus.edu.sg>
+From: "Khoo Teck Ping" <eng10166@nus.edu.sg>
+To: <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluetooth headset
-References: <200501181145.11573.da209@cam.ac.uk>
-In-Reply-To: <200501181145.11573.da209@cam.ac.uk>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_002A_01C4FDB8.F058FCB0"
+Subject: [Bluez-devel] Project about Bluetooth Security: Request for assistance
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,108 +17,146 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 Jan 2005 09:01:52 -0700
+Date: Tue, 18 Jan 2005 23:53:42 +0800
 
-daniel,
+This is a multi-part message in MIME format.
 
-btsco.c (userspace) has a function detect_channel that tries to figure
-out the channel using sdp. i believe it's equivalent to running:
+------=_NextPart_000_002A_01C4FDB8.F058FCB0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-sdptool search --bdaddr 00:0A:D9:74:B4:EA 0x1108
+Dear All
 
-what kind of output do you get when you search your headset?
+I am a newbie, please assist me if possible.=20
 
-can anyone confirm that 0x1108 is the right way to find the headset
-profile over sdp?
+I have some questions about bluetooth security.=20
 
-paul ionescu had a similar problem with the jabra bt 110...
+I am currently doing a project on bluetooth security and am required to =
+develop some software (with bluetooth hardware) which can demonstrate =
+bluetooth security weaknesses.=20
 
-brad
+Following are my ideas, please comment
 
-Daniel Andor wrote:
-> Hi,
-> 
-> Had success with connecting to my laptop's headset profile, but not before 
-> figuring out that it doesn't work with the default channel 7, but needs to be 
-> made to use channel 8:
-> 
-> Does't work:
-> $ ./btsco 00:0B:6B:58:92:E9
-> Device is 3:0
-> Voice setting: 0x0060
-> RFCOMM channel 7 connected
-> 
-> Does work:
-> $ ./btsco 00:0B:6B:58:92:E9 8
-> Device is 3:0
-> Voice setting: 0x0060
-> RFCOMM channel 8 connected
-> recieved AT+BRSF=22
-> recieved AT+CIND=?
-> opened hwdep
-> connected SCO channel
-> Setting sco fd
-> Done setting sco fd
-> recieved AT+CIND?
-> AT+CMER=3,0,0,1=15
-> Sending up speaker change 15
-> recieved AT+CHLD=?
-> recieved AT+CCWA=1
-> recieved AT+CLIP=1
-> 
-> Details:
-> $ uname -a
-> Linux pooh 2.6.9-2-k7 #1 Sat Jan 8 15:38:24 EST 2005 i686 GNU/Linux
-> 
-> $ sudo hciconfig -a
-> hci0:   Type: USB
->         BD Address: 00:02:72:40:AD:56 ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:9550635 acl:181 sco:187095 events:359 errors:0
->         TX bytes:9545657 acl:188 sco:187095 commands:98 errors:0
->         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: ACCEPT MASTER
->         Name: 'pooh'
->         Class: 0x100100
->         Service Classes: Object Transfer
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
->         Manufacturer: Cambridge Silicon Radio (10)
-> 
-> $ sudo hciconfig hci0 revision
-> hci0:   Type: USB
->         BD Address: 00:02:72:40:AD:56 ACL MTU: 192:8  SCO MTU: 64:8
->         HCI 16.4
->         Chip version: BlueCore02
->         Max key size: 56 bit
->         SCO mapping:  HCI
-> 
-> $ sudo hcitool info 00:0B:6B:58:92:E9
-> Requesting information ...
->         BD Address:  00:0B:6B:58:92:E9
->         Device Name: HANNAH
->         LMP Version: 1.2 (0x2) LMP Subversion: 0x694a
->         Manufacturer: Broadcom Corporation (15)
->         Features: 0xff 0xff 0x0d 0x38 0x08 0x08 0x00 0x00
->                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
->                 <timing accuracy> <role switch> <hold mode> <sniff mode>
->                 <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
->                 <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
->                 <transparent SCO> <enhanced iscan> <interlaced iscan>
->                 <interlaced pscan> <AFH cap. slave> <AFH cap. master>
-> 
-> 
-> 
-> -------------------------------------------------------
-> The SF.Net email is sponsored by: Beat the post-holiday blues
-> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
-> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+1. I have a silicon wave Bluetooth USB dongle and a V3 headset, and a =
+Nokia 6600 smartphone. I desire to capture packets sent between the =
+phone and the headset, without a bluetooth protocol analyser (eg from =
+mobiwave), so that I can demostrate that a hacker can listen in to =
+unencrypted voice traffic. Is this possible at all?
+
+hcidump is similar to a protocol analyser, but it can capture only high =
+level traffic. My guess is that I can use hcitool scan to get the =
+bluetooth address of the phone and the headset first, and then based on =
+the addresses attempt to calculate the pseudo random frequency hopping =
+sequence, so that I can stay in the same frequency as the phone and the =
+headset. Problem is i don't understand the output of hcidump. Can =
+hcidump capture traffic which does not belong to the host device?=20
+
+2. May I know the steps required to reproduce the work done by Adam =
+Laurie (bluesnarfing) or the Flexilis team(bluesniper)? Will the test =
+programs provided by the install of BlueZ be good as starting points? If =
+so, which test program should I focus on? Please provide details if =
+possible. This is purely for academic purposes.=20
+
+3. For the program l2ping.c, what is the end result of the victim phone =
+of running the program? Does it cause the phone to malfunction?=20
+
+I ran it and pinged my Sony Ericsson T630. Later my phone could not =
+initiate a bluetooth connection with my headset. Otherwise everything =
+else is fine.=20
+
+I shall be grateful for any assistance.=20
+
+BlueZ is great software. Keep up the good work.=20
+
+Teck Ping
+------=_NextPart_000_002A_01C4FDB8.F058FCB0
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.2523" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>Dear All</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I am a newbie, please assist me if =
+possible.=20
+</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I have some questions about bluetooth =
+security.=20
+</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I am currently doing a project on =
+bluetooth=20
+security and am required to develop some software (with bluetooth =
+hardware)=20
+which can demonstrate bluetooth security weaknesses. </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Following are my ideas, please =
+comment</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>1. I have a silicon wave Bluetooth USB =
+dongle and a=20
+V3 headset, and a Nokia 6600 smartphone. I desire to capture packets =
+sent=20
+between the phone and the headset, without a bluetooth protocol analyser =
+(eg=20
+from mobiwave), so that I can demostrate that a hacker can listen in to=20
+unencrypted voice traffic. Is this possible at all?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>hcidump is similar to a protocol =
+analyser, but it=20
+can capture only high level traffic. My guess is that I can use hcitool =
+scan to=20
+get the bluetooth address of the phone and the headset first, and then =
+based on=20
+the addresses attempt to calculate the pseudo random frequency hopping =
+sequence,=20
+so that I can stay in the same frequency as the phone and the headset. =
+Problem=20
+is i don't understand the output of hcidump. Can hcidump capture traffic =
+which=20
+does not belong to the host device? </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>2. May I know the steps required to =
+reproduce the=20
+work done by Adam Laurie (bluesnarfing) or the Flexilis =
+team(bluesniper)? Will=20
+the test programs provided by the install of BlueZ be good as starting =
+points?=20
+If so, which test program should I focus on? Please provide details if =
+possible.=20
+This is purely for academic purposes. </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>3. For the program l2ping.c, what is =
+the end result=20
+of the victim phone of running the program? Does it cause the phone to=20
+malfunction?&nbsp;</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I ran it and pinged my Sony Ericsson =
+T630. Later my=20
+phone could not initiate a bluetooth connection with my headset. =
+Otherwise=20
+everything else is fine. </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I shall be grateful for any assistance. =
+
+</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>BlueZ is great software. Keep up the =
+good work.=20
+</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Teck Ping</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_002A_01C4FDB8.F058FCB0--
 
 
 
