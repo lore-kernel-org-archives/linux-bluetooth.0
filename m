@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] About serial interface bluetooth module
+Subject: Re: [Bluez-users] PICO Bluetooth Modem and PCMCIA Card
 From: Marcel Holtmann <marcel@holtmann.org>
-To: mike <mikelee@avantwave.com>
+To: Monika Hubrich <monikahubrich@aol.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <416F8FE1.7060509@avantwave.com>
-References: <416F8FE1.7060509@avantwave.com>
+In-Reply-To: <001c01c4b223$9875c130$752cb8ac@monika>
+References: <E1CHrun-0004K5-67@sc8-sf-list2.sourceforge.net>
+	 <001c01c4b223$9875c130$752cb8ac@monika>
 Content-Type: text/plain
-Message-Id: <1097927452.4911.4.camel@pegasus>
+Message-Id: <1097927391.4911.2.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,25 +19,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 16 Oct 2004 13:50:53 +0200
+Date: Sat, 16 Oct 2004 13:49:51 +0200
 
-Hi Mike,
+Hi Monika,
 
->     I am new to bluez, Here are some questions on serial driver 
-> hci_uart.And i am using Fedora2 with bluez-lib-2.10 bluez-util-2.10
-> 
->     I am now using a serial bluetooth module, after i install bluez-lib 
-> and bluez-util. I can see the rfcomm,l2cap,bluetooth module is loaded. 
-> but no hci_uart module.
->     and when i use hciattach /dev/ttyS0......... to attach the serial 
-> module, it fail and reply "Initialization timed out". After i insmod 
-> hci_uart.ko from /lib/module . It is just the same.
-> 
->     The module is work well in MS window and the cable is checked. am i 
-> use wrong version or any steps i missed?
+> I've only created bluepin in ./bin/
+> Can this be a problem, or have I to install bluez-pin.0.24 (how can I do
+> that?)
 
-you must find the correct parameters for the hciattach call. About what
-kind of module are we talking?
+this is a PIN helper problem. Check the mailing list archives for more
+details and send in the lines matching "hcid" from your syslog.
+
+BTW please fix up you mail client, because these extra empty lines and
+the removing of trailing whitespaces are annoying.
 
 Regards
 
