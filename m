@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SDP service example
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Stefan Mischke <survivor@uni-paderborn.de>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <40F70E09.7010300@uni-paderborn.de>
-References: <40F70E09.7010300@uni-paderborn.de>
-Content-Type: text/plain
-Message-Id: <1089959906.4517.55.camel@pegasus>
+From: John McCorquodale <mcq@cacr.caltech.edu>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20040716051048.GA31365@viz.cacr.caltech.edu>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] BCSP initialization timed out
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,27 +15,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 16 Jul 2004 08:38:26 +0200
+Date: Thu, 15 Jul 2004 22:10:48 -0700
 
-Hi Stefan,
+I know this is a FAQ, but I'm a heartless, uncaring Microsoft-loving newbie
+treehugging republican commie meat-eating gun-toting american imperialist
+frustrated by the crappy broken list search operation which doesn't even
+find the last time I asked the question, so I'm asking it again.  I'm just 
+trying to get the facts and status straight before harassing Other People
+to try to figure this thing out.
 
-> I'm looking for a small example to show me how to write my own SDP 
-> service? Particularly, I'd like to know where exactly the service 
-> functions of my new service are bound to SDP. I looked into the souce 
-> code, but I couldn't find it. I almost suppose SDP just provides the 
-> L2CAP channel id where the new service is listening or how does it work? 
-> Sorry, I'm not so much into this Linux developer thing and I have not 
-> yet found any good documentation. I'm also looking for docs how this 
-> Linux/Unix socket interface stuff works (preferably in German ;-). Yes, 
-> I checked the manpages, but they are not quite explanatory.
+FAQ: "BCSP initialization timed out" with 2.6 serial_cs
 
-look at the source code of pand, dund or sdptool.
+As I understand it, the bluez opinion on this problem is "something changed
+with the serial driver from 2.4 to 2.6, and it's broken now and the problem
+isn't our fault so we're not going to think about it"
 
-Regards
+I anticipate, if I try to go to kernel types and say this, that their response
+will be something to the effet of "every other serial device works fine in
+2.6, bluez is broken and the problem isn't our fault so we're not going to
+think about it"
 
-Marcel
+In an attempt to avoid this impasse, could those of y'all who know this
+hardware pause for a moment and try to imagine what might be weird about 
+the Uarts in question, and maybe offer some constructive shots in the dark
+about what might make a Socket Communications bluetooth CF card different
+than a normal 16550?
 
+A quick run of od -x shows that the device really does deliver different
+data in 2.4 and 2.6 -- the 2.6 version never sends the 0xc0 that hciattach
+seems to be waiting for, so there really is something different going on
+but I'm trying to avoid a complete shot in the dark and wholesale reading
+of the whole serial implementations in both kernel verions, which is
+tantamount in time and complexity to just rewriting the thing anyway.
 
+Alternatively, if somebody could just recommend a CF card that works in
+2.6, I'll pitch this one in the trash and get on with life.
+
+-mcq
 
 
 -------------------------------------------------------
