@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200412031515.02372.wim.delvaux@adaptiveplanet.com>
-Subject: [Bluez-users] how to interpret  'link quality' value
+Subject: Re: [Bluez-users] Thinkpad 560x with pnpbios and bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <34315.194.59.120.11.1102057863.squirrel@194.59.120.11>
+References: <36763.194.59.120.11.1101982344.squirrel@thalreit.dyndns.org>
+	 <1101987478.15615.112.camel@pegasus>
+	 <48456.194.59.120.11.1102056209.squirrel@194.59.120.11>
+	 <1102057135.7350.66.camel@pegasus>
+	 <34315.194.59.120.11.1102057863.squirrel@194.59.120.11>
+Content-Type: text/plain
+Message-Id: <1102060352.7350.68.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,12 +22,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 3 Dec 2004 15:15:02 +0100
+Date: Fri, 03 Dec 2004 08:52:32 +0100
 
-can anybody tell me the range for a 'link' quality
-Is there a range ?
+Hi Volker,
 
-Thanx
+> >> > is a vanilla 2.4.22-ac working for you?
+> >> Yup. That's OK for the PNP Bios (but will not incorporate the mh
+> >> patches,
+> >> of course )
+> >
+> > is patching the problem or do the kernel not work?
+> The ac and mh patches are conflicting.
+
+where?
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
