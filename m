@@ -1,12 +1,24 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PAN and security mode 3
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mark RISON <mrison@hotmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY8-F97aHyJBu3pQBo0002a6ce@hotmail.com>
-References: <BAY8-F97aHyJBu3pQBo0002a6ce@hotmail.com>
+Subject: Re: T3 Was Re: [Bluez-users] Logitech Bluetooth  Mx900+keyboard
+	support.
+From: Terence Rudkin <trexx@pobox.com>
+To: Gareth Reakes <gareth@apache.org>
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <20040129050235.K80797@minotaur.apache.org>
+References: <1074457244.3254.17.camel@localhost.localdomain>
+	 <1074458664.6070.73.camel@pegasus>
+	 <1074480891.2817.10.camel@localhost.localdomain>
+	 <1074514935.6070.80.camel@pegasus>
+	 <1074568150.7831.5.camel@localhost.localdomain>
+	 <20040120081245.GA1871@smartdata.ch>  <1074597908.7088.5.camel@pegasus>
+	 <1075234547.3064.13.camel@localhost.localdomain>
+	 <1075276833.12766.56.camel@pegasus>
+	 <1075306699.1793.38.camel@localhost.localdomain>
+	 <1075307541.26729.18.camel@pegasus>
+	 <1075346991.1793.65.camel@localhost.localdomain>
+	 <20040129050235.K80797@minotaur.apache.org>
 Content-Type: text/plain
-Message-Id: <1075584286.2720.88.camel@pegasus>
+Message-Id: <1075577697.2658.15.camel@localhost.localdomain>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,55 +30,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 31 Jan 2004 22:24:46 +0100
+Date: Sat, 31 Jan 2004 12:34:57 -0700
 
-Hi Mark,
+Gareth,
 
-> - If in the "device" part of hcid.conf I put "auth enable" and
-> "encrypt enable", does this enforce security mode 3 for all (incoming
-> and outgoing) connections, or do I need to make sure appropriate
-> settings are specified in other files/utilities (and if so, which?)?
+Thanks for the offer, got it up. Cleaned up the hcid.conf file to make
+it work.   
 
-yes.
-
-> - If I only start the PAN daemon, does this guarantee that no other
-> profiles will be running (i.e. only PAN will allow access to the
-> laptop)?
-
-Of course you will need hcid and sdpd, too. But if you only have pand
-running you have only support for the PAN profile. To be sure check what
-listen sockets /proc/bluetooth/l2cap and /proc/bluetooth/rfcomm say.
-
-> - Can "auth enable" and "encrypt enable" in hcid.conf be overwritten
-> by command-line utility/daemon arguments, or is this a bullet-proof
-> way to enfore security mode 3 irrespective of "user error"?
-
-Yes. The difference between security mode 3 and not is device dependent
-and has nothing to with any local daemon. See
-
-	hciconfig hci0 noencrypt
-	hciconfig hci0 noauth
-
-> - How does authorisation work in BlueZ?  Ideally I'd like to be able
-> to specify a list of BD_ADDRs to (exclusively) authorise for PAN, but
-> if it's necessary for all connection requests to be manually
-> authorised, that's better than nothing.
-
-This is currently not implemented and the best way to do this is in pand
-directly. Otherwise the kernel have to control a black- or whitelist of
-device addresses and I don't think that is a good idea.
-
-> - /etc/bluetooth/link_keys appears to be where link keys resulting
-> from pairing are stored.  Is this correct, and if so, what is the
-> format, and will deleting this file remove all pairing information (or
-> do I need to delete something else somewhere else?)?
-
-Yes, it will remove all pairings. For the format look at the source.
-
-Regards
-
-Marcel
-
+As to not getting out of you own sunbet.  the script found here 
+http://www.ibiblio.org/mdw/HOWTO/IP-Masquerade-HOWTO/firewall-examples.html#RC.FIREWALL-2.4.X
+may be of assist.  
+ 
+On Thu, 2004-01-29 at 06:12, Gareth Reakes wrote:
+> > Now to get the Tungsten T3 talking (passcode not exchanging) , but that
+> > a different thread.
+> 
+> I have just done so if you have a problem give me a shout. The only thing
+> I cant do now is look up computers on my internal subnet. I have no idea
+> how to fix this yet. I wanted to be able to control my slimp3 web
+> interface so if you get this working then give me a shout.
+> 
+> I have a three line script at home that works, so if you have any problems
+> then I will mail it to you.
+> 
+> Gareth
+-- 
 
 
 
