@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] EPOX BT-PM01B (new) and linux 2.4 ?
+Subject: Re: [Bluez-users] Re: Re:[Bluez-devel] BlueZ on CSR ?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4225D4B4.7050306@rcs.ei.tum.de>
-References: <4225D4B4.7050306@rcs.ei.tum.de>
+In-Reply-To: <d1f423d305030110576d2a66df@mail.gmail.com>
+References: <ICGZCE$7DF6A31DCAD3E31E3169B51A8859A4C6@bol.com.br>
+	 <1109520020.27107.30.camel@localhost.localdomain>
+	 <d1f423d305030110576d2a66df@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1109779958.8284.30.camel@pegasus>
+Message-Id: <1109779818.8284.26.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,29 +20,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 02 Mar 2005 17:12:38 +0100
+Date: Wed, 02 Mar 2005 17:10:18 +0100
 
-Hi Reinald,
+Hi Anderson,
 
-> Are there different Versions of Epox Presenter BT-PM01B and can
-> the latest one be used with kernel 2.4  ?
-> 
-> The device I bought recently
-> 	- is hdi-based
-> 	- has to be brought to "pairing mode" by pressing 3 buttons
-> 	  after poweron in order to react to hcitool scan.
-> 
-> (Both facts are not mentioned in
-> http://www.holtmann.org/linux/bluetooth/epox.html)
-> 
-> epox-presenter:			"no devices in range"
-> epox-presenter <hw_addr>:	"socket:connection refused"
-> 
-> 
-> The BT-PM01B works great on linux 2.6.10 using hidd --server.
-> I have one 2.4.29 - System however I can not upgrade yet.
+> I have a doubt about PAN. If i would like to enable PAN services
+> should i dowload pan package from Bluez Site?
+> Forgive me if it is a stupid question but i can not find PAN package
+> at the Bluez.org download area.
 
-apply one of my -mh patches for that kernel.
+the pand is part of the bluez-utils packages.
 
 Regards
 
