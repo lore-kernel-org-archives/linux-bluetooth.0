@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Profiles and Service publicing
+Subject: Re: [Bluez-users] Am stuck; HP laptop, Fedora
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <cuvg8v$6qs$1@sea.gmane.org>
-References: <cuvg8v$6qs$1@sea.gmane.org>
+In-Reply-To: <4215A788.9070205@yahoo-inc.com>
+References: <4215A788.9070205@yahoo-inc.com>
 Content-Type: text/plain
-Message-Id: <1109027993.7626.41.camel@pegasus>
+Message-Id: <1109027434.7626.28.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,36 +18,65 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Feb 2005 00:19:53 +0100
+Date: Tue, 22 Feb 2005 00:10:34 +0100
 
-Hi,
+Hi Vegard,
 
-> The following SDP transaction is repeating again and again until the 
-> headset gets tired:
+> Hello, I've spent some time getting BT to work on my HP NC6000 laptop, 
+> now looking for any clues. To put it shortly, I think I have everything 
+> installed right, but when I for instance fire up gnome-obex-send, it 
+> will hang when I scan for devices.
 > 
->  > ACL data: handle 0x0029 flags 0x02 dlen 19
->      L2CAP(d): cid 0x0040 len 15 [psm 1]
->          SDP SS Req: tid 0x49 len 0xa
->            pat uuid-32 0x1112 (AG)
->            max 0x28
->            cont 00
-> < ACL data: handle 0x0029 flags 0x02 dlen 14
->      L2CAP(d): cid 0x0040 len 10 [psm 1]
->          SDP SS Rsp: tid 0x49 len 0x5
->            tot 0x0 cur 0x0
->            cont 00
+> More detail:
 > 
-> The first is a SDP_ServiceSearch Request from the headset looking for a 
-> service with UUID  of value 0x1112 (corresponds to AudioGateway).
-> The second is a SDP_ServiceSearch Response from BlueZ saying that the 
-> requested service is not found in the SDP database nor nothing even 
-> similar, which is really true because I have not add this service 
-> ("sdptool add AG" is not supported)
+> I have FC2 with the 2.6.9-1.11_FC2 kernel. I got the latest bluez-libs 
+> and bluez-utils compiled fine:
+> 
+> -rw-r--r--  1 root root 55116 Feb 17 22:17 /usr/lib/libbluetooth.a
+> -rwxr-xr-x  1 root root   835 Feb 17 22:17 /usr/lib/libbluetooth.la
+> lrwxrwxrwx  1 root root    22 Feb 17 22:17 /usr/lib/libbluetooth.so -> 
+> libbluetooth.so.1.0.15
+> lrwxrwxrwx  1 root root    22 Feb 17 22:17 /usr/lib/libbluetooth.so.1 -> 
+> libbluetooth.so.1.0.15
+> -rwxr-xr-x  1 root root 59773 Feb 17 22:17 /usr/lib/libbluetooth.so.1.0.15
+> [vegardh@dhcp-244 vegardh]$
+> 
+> The kernel module is the one that was in the kernel in the first place, 
+> I haven't compiled that:
+> 
+> author:         Maxim Krasnyansky <maxk@qualcomm.com>, Marcel Holtmann 
+> <marcel@holtmann.org>
+> description:    Bluetooth Core ver 2.6
+> version:        2.6 21CCA1EA2920D6252535138
+> license:        GPL
+> alias:          net-pf-31
+> vermagic:       2.6.9-1.11_FC2 686 REGPARM 4KSTACKS gcc-3.3
+> depends:
+> 
+> And the device itself is on the USB:
+> 
+> T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=049f ProdID=0086 Rev= 8.02
+> S:  Manufacturer=ACTIONTEC
+> S:  Product=Bluetooth by hp
+> 
+> The BT works from Windows.
+> 
+> With obex_test I get this, can't get more debug or something from it:
+> 
+> [vegardh@dhcp-244 vegardh]$ obex_test -b
+> Using Bluetooth RFCOMM transport
+> OBEX Interactive test client/server.
+>  > s
+> Server register error! (Bluetooth)
+> 
+> I'd appreciate any clues, either from someone with experience with this 
+> laptop and linux, or if I've overlooked something.
 
-if the headset ends up in a loop like this, then the implementation of
-the headset profile inside the headset has a bug. It is that simple,
-because they should be able to handle a non existing audio gateway
-record nicely.
+from this report I can't tell you anything, but the Bluetooth device
+inside my NC4000 is working prefect and actually it is the same as in
+your laptop. What does "hciconfig -a" tells you?
 
 Regards
 
