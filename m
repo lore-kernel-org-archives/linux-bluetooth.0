@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] btohs,btohl, ...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050209140701.2cf50710@CleverSophie>
-References: <20050209140701.2cf50710@CleverSophie>
-Content-Type: text/plain
-Message-Id: <1107955171.13863.26.camel@pegasus>
+From: # =?ISO-8859-1?Q?Bj=F6rn?= Specht # <bspecht@gmx.net>
+To: "bluez-devel@lists.sourceforge.net" <bluez-devel@lists.sourceforge.net>
+Message-ID: <20050209140701.2cf50710@CleverSophie>
 Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary="Signature_Wed__9_Feb_2005_14_07_01_+0100_W6PeIE=0HKB+__cu";
+ protocol="application/pgp-signature"; micalg=pgp-sha1
+Subject: [Bluez-devel] btohs,btohl, ...
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,29 +18,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 09 Feb 2005 14:19:31 +0100
+Date: Wed, 9 Feb 2005 14:07:01 +0100
 
-Hi Bjoern,
+--Signature_Wed__9_Feb_2005_14_07_01_+0100_W6PeIE=0HKB+__cu
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-if you sign emails that go to a mailing list. Make sure that your key is
-available on a public keyserver. Yours is not.
+Hi all,
 
-> I implemented a client server over bluetooth and I was wondering if I need the Little Endian, Big Endien conversion functions btohs,btohl,htobs,htobl?
+I implemented a client server over bluetooth and I was wondering if I need =
+the Little Endian, Big Endien conversion functions btohs,btohl,htobs,htobl?
 
-if both sides are of the same endianess then not, but it is a good
-programming style to always use them.
+Do I need to convert every single byte? which is received or sent over my s=
+ock_stream socket?
+If yes, should it look like this for the receiving case: btohs(buf[0]).... =
+an so on for every byte?
 
-> Do I need to convert every single byte? which is received or sent over my sock_stream socket?
-> If yes, should it look like this for the receiving case: btohs(buf[0]).... an so on for every byte?
+Thanks in advance=20
+Bj=F6rn
 
-For what do you wanna swap a byte and with what? There is nothing to
-swap. Think about it ;)
+--Signature_Wed__9_Feb_2005_14_07_01_+0100_W6PeIE=0HKB+__cu
+Content-Type: application/pgp-signature
 
-Regards
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
 
-Marcel
+iD8DBQFCCgr2rdSygrmIeLARAl4yAJ98AHNb8tDJnpD32n60KzZZ2ku2pQCeJPoC
+wsCVKR04jeUj7Ig7AQgJnqY=
+=J+uM
+-----END PGP SIGNATURE-----
 
-
+--Signature_Wed__9_Feb_2005_14_07_01_+0100_W6PeIE=0HKB+__cu--
 
 
 -------------------------------------------------------
