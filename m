@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Some questions
+Subject: Re: [Bluez-users] rfcomm device disappears
 From: Marcel Holtmann <marcel@holtmann.org>
-To: DVornheder@t-online.de
+To: Stephan Cremer <cremer.stephan@web.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1BYJR5-1Xq5q40@cmpmail07.bbul.t-online.de>
-References: <1BYJR5-1Xq5q40@cmpmail07.bbul.t-online.de>
+In-Reply-To: <540644453@web.de>
+References: <540644453@web.de>
 Content-Type: text/plain
-Message-Id: <1086863592.1607.47.camel@pegasus>
+Message-Id: <1086863282.1607.41.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,75 +18,63 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Jun 2004 12:33:13 +0200
+Date: Thu, 10 Jun 2004 12:28:02 +0200
 
-Hi Dirk,
+Hi Stephan,
 
-> Yesterday i bought a Belkin Bluetooth USB Adapter.
+> I have been observing a strange and reproduceable problem trying
+> to setup a PPP server for my Nokia 3650. Briefly, the scenario is
+> as follows:
+>  
+> First, a serial Port is registered: "sdptool add --channel=2 SP"
+> After that, dund is started and waits for incoming PPP requests:
+> "dund -n --listen --channel=2 call dun"
+> When an application - e.g. a web browswer is started on the phone,
+> using a bluetooth access point configured via gnubox, the PPP link
+> is fired up and the app works perfectly.
 > 
-> After plugin the adapter i get this messages:
+> Unfortunately, this works excactly once, because for some reason,
+> the rfcomm device that was used for the PPP link disappears, which
+> on the connection request makes dund complain 
+> "RFCOMM TTY creation failed. No such file or directory(2)" - I
+> tried to (re-)create the device in /etc/ppp/ip-down but no avail...
 > 
-> Jun  9 21:36:05 pclap kernel: usb 1-1: new full speed USB device using
-> address 
-> 2
-> Jun  9 21:36:05 pclap /etc/hotplug/usb.agent[11903]: need a device for
-> this 
-> command
-> Jun  9 21:36:05 pclap hcid[4002]: HCI dev 0 registered
-> Jun  9 21:36:05 pclap hcid[4002]: HCI dev 0 up
-> Jun  9 21:36:05 pclap hcid[4002]: Starting security manager 0
-> Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM ver 1.3
-> Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM socket layer initialized
-> Jun  9 21:36:09 pclap kernel: Bluetooth: RFCOMM TTY layer initialized
+> Here is the output of "hcidump -x" starting right before the 
+> application is closed on the phone:
 > 
-> lsusb shows:
+> ---------- snip -----------
+> HCIDump - HCI packet analyzer ver 1.5 device: hci0 snap_len: 1028
+> filter: 0xffffffff > ACL data: handle 0x0029 flags 0x02 dlen 20
+>     L2CAP(d): cid 0x41 len 16 [psm 0]
+>       13 EF 19 7E FF 03 C0 21 05 03 00 04 85 72 7E 65 < ACL data:
+> handle 0x0029 flags 0x02 dlen 25
+>     L2CAP(d): cid 0x59 len 21 [psm 0]
+>       11 EF 23 7E FF 7D 23 C0 21 7D 26 7D 23 7D 20 7D 24 48 57 7E
+>       BF > HCI Event: Number of Completed Packets(0x13) plen 5
+>   01 29 00 01 00 < ACL data: handle 0x0029 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x59 len 4 [psm 0]
+>       11 53 01 16 > HCI Event: Number of Completed  Packets(0x13)
+> plen 5
+>   01 29 00 01 00 > ACL data: handle 0x0029 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x41 len 4 [psm 0]
+>       11 73 01 3C > ACL data: handle 0x0029 flags 0x02 dlen 12
+>     L2CAP(s):  Disconn  req:  dcid 0x0041 scid 0x0059 < ACL data:
+> handle 0x0029 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0059 >  HCI  Event:
+> Number of Completed Packets(0x13) plen 5
+>   01 29 00 01 00
+> ---------- snip -----------
 > 
-> Bus 002 Device 002: ID 050d:0081 Belkin Components
 > 
-> With ciptool search the adapter is connecting to my AVM Fritz ISDN AP-X:
+> And here are some notes on my configuration:
 > 
-> Jun  9 21:40:00 pclap hcid[4002]: pin_code_request
-> (sba=00:0A:3A:51:81:4E, 
-> dba=00:04:0E:85:35:15)
-> Jun  9 21:40:00 pclap hcid[4002]: link_key_notify
-> (sba=00:0A:3A:51:81:4E)
-> Jun  9 21:40:00 pclap hcid[4002]: Saving link key 00:0A:3A:51:81:4E 
-> 00:04:0E:85:35:15
-> 
-> hcitool scan shows:
-> 
-> Scanning ...
-> 	00:04:0E:85:35:15	Bluetooth ISDN Access Point
-> 	00:04:0E:83:3C:40	BlueZ (0)
->                            00:02:72:44:CF:9F                  
-> BELKIN_PRT_44CF9F
-> 
-> My questions:
-> 
-> - No driver is loaded after plugin the adapter.
-> 
->    Is this ok ?
+> - Gentoo Linux, Kernel 2.6.6 / patch-2.6.6-mh3.gz
+> - Epox bt-dg02a USB BT dongle
+> - bluez: kernel 2.3, libs 2.5, pan 1.1, sdp 1.5, utils 2.3-r1, hcidump 1.5
 
-I think the hci_usb is loaded, otherwise your device won't work.
-
-> - How can i open a internet connection ?
-
-Use pppd and the CAPI plugin for it. Check with capiinfo for your ISDN
-access point.
-
-http://www.holtmann.org/linux/bluetooth/isdn.html
-
-> - How can i print on my usb printer which is connected to the
-> BELKIN_PRT_44CF9F
-> 
->    bluetooth adapter ?
-
-First send me some info about this printer adapter for my list. The
-output "hcitool info ..." will be nice.
-
-The CUPS printing backend for Bluetooth will help you out here.
-
-http://www.holtmann.org/linux/bluetooth/cups.html
+first don't use kernel-2.3, because you use 2.6.6-mh3. Second uninstall
+the other tools and install the latest versions of it. Make use of udev
+and everything should be fine.
 
 Regards
 
