@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] using select()?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000a01c4d733$8609ce30$6401000a@zool>
-References: <000a01c4d733$8609ce30$6401000a@zool>
-Content-Type: text/plain
-Message-Id: <1101882219.18840.12.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41AD2B86.6010002@avantwave.com>
+From: mike <mikelee@avantwave.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net, bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] About rfcomm socket
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,21 +16,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 07:23:39 +0100
+Date: Wed, 01 Dec 2004 10:25:10 +0800
 
-Hi Steffen,
+Dear all
 
-> Is there anyware some examples or any source code in the BlueZ utils.
-> where they use the standard network select() function?
+    I am new to this place. Thanks for any help first.
 
-there is no difference between using select() with BlueZ. You use poll()
-or select() as you used to. Check the manual pages for more help.
+    I have tried to fork two process, One use socket system call - 
+accept at rfcomm channel 2, and another try to connect to a bluetooth 
+device thought channel 3. But i found that i can not use a 3rd device to 
+connect to the listen channel 2 at the same time.
+    I am using bluez-lib-2.6, utils-2.6. ,hci-uart and linux-2.4.18 
+patched with patch-2.4.18-mh15.
 
-Regards
+    My question is simple, Could bluez be multi-tasking?
 
-Marcel
-
-
+best regard
+Mike,Lee
 
 
 -------------------------------------------------------
