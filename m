@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Content-Type: text/html; charset="iso-8859-1"
+Message-ID: <4054022B.8090100@itelefonica.com.br>
+From: Daniel Moraes <ra002890@itelefonica.com.br>
 MIME-Version: 1.0
-From: "bart claeys" <bart.claeys@mail.com>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20040314130046.3C4F1232AE@ws1-10.us4.outblaze.com>
-Subject: [Bluez-users] broadcast/multicast and bluez?
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] How can I use Bluez with 460800 kbps
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,17 +15,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 14 Mar 2004 08:00:46 -0500
+Date: Sun, 14 Mar 2004 03:56:43 -0300
 
-<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB">Hi,<?xml:namespace prefix = o ns = "urn:schemas-microsoft-com:office:office" /><o:p></o:p></SPAN></P>
-<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB"><o:p>&nbsp;</o:p></SPAN></P>
-<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB">I would like to send a broadcast or multicast audio stream over Bluetooth using Bluez. Does Bluez support broadcast /multicast? It has to be a “real” broadcast… So I want to send only ONE audiostream (from a master) to multiple devices. Am I right when I think a broadcast/multicast with the PAN profile is not a real broadcast on the lower layers?<o:p></o:p></SPAN></P>
-<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB">Is this possible with Bluez? Is it in general possible with Bluetooth? What’s the best method to implement broadcast/multicast?<o:p></o:p></SPAN></P>
-<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB"><o:p>&nbsp;</o:p></SPAN></P>
-<P class=MsoNormal style="MARGIN: 0cm 0cm 0pt"><SPAN lang=EN-GB style="mso-ansi-language: EN-GB">Thanks in advance<o:p></o:p></SPAN></P><BR>
--- 
-<p>___________________________________________________________<br>Sign-up for Ads Free at Mail.com<br>
-<a href="http://mail01.mail.com/scripts/payment/adtracking.cgi?bannercode=adsfreejump01" target="_blank">http://www.mail.com/?sr=signup</a></p>
+Hello everybody,
+
+I would like to know if anybody here could use bluetooth casira with the 
+serial with speeds like 460800.
+I have to configure linux serial?!? What program I can use to do that?!?
+
+And How can I transmit bits via rfcomm?!? I get a tutorial, but it 
+didn't worked well!!  Does anybody have a good tutorial, or a rapid 
+solution for me?!?
+
+Thanks in advance, Daniel Moraes.
 
 
 
