@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hciemu pb: can't set scan mode
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gigie Lertriniva <gigie_lertriniva@yahoo.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040301214508.47928.qmail@web20722.mail.yahoo.com>
-References: <20040301214508.47928.qmail@web20722.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1078181359.1942.164.camel@pegasus>
-Mime-Version: 1.0
+From: "Thor Egil Skaug" <paxtonrd@hotmail.com>
+To: "'Steven Singer'" <steven.singer@csr.com>
+Cc: <bluez-users@lists.sourceforge.net>
+Subject: RE: [Bluez-users] AUX1 packets
+Message-ID: <000601c3ffc0$b0e35cc0$46a57e40@thores>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <40437D65.9050004@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,43 +18,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 01 Mar 2004 23:49:20 +0100
+Date: Mon, 1 Mar 2004 11:09:16 -0800
 
-Hi Gigie,
+>It's not clear to me how knowing the QoS settings for link will alter
+what settings are best for the link, so it's not clear to me what your
+middleware brings to the situation.
 
-> I'm learning how to write (in Java) applications which
-> use Bluetooth to communicate. The simulator by
-> Rococosoft is nice but is not free and it does not
-> allow a simulated device to communicate with a real
-> one. That's why I came to hciemu.
-> I'm a newbie, I use Linux but I don't know what's
-> going on inside exactly, and I can write Java programs
-> but I don't know C too much. Yet I'm willing to learn
-> and if possible to contribute.
-> Since you seem to be an expert, I would appreciate
-> your advices. My first question is: does "expanding"
-> hciemu sounds like a reasonnable thing to do for my
-> purpose or is there a nice Bluetooth emulator I
-> haven't heard of? And my second question is: where do
-> I start do add commands to hciemu? My friend suggested
-> I read the book "Linux device drivers" by Rubini and
-> Corbet. According to you, will that help me to
-> understand the code of hciemu.c? One last question:
-> what is the "scan_enable" method for (in the hciemu.c
-> file)?
-> I hope you'll be able to find some time to help me
-> again. I realize I'm asking a lot but I think I just
-> need to be put on tracks.
+My research intends to enumerate mechanisms for QoS in wireless CORBA
+transports - figuring out the switches in each standard that can be
+toggeled to change the behavior of the wireless network. Then the
+application designer (using CORBA) will decide on a type of wireless
+network, and network requirements (these are generecized and not tied to
+BT/IEEE8011.b etc). The middleware then takes these requirements and
+uses the hooks specific to the wirless network to achieve what was
+asked.
 
-I don't really support hciemu in any way. If you want to extend it and
-if you send me a patch I am going to apply it gladly, but that's the
-only support I can offer to you.
+>You're trying to reinvent the wheel badly.
 
-Regards
+Thanks for the info on the received signal strenght versus the
+transmission packet type. I didn't think of that. I could of course be
+stubborn and say that if I wanted to let the application decide packet
+types, I'd attach a byte of link quality to every message for the
+receiver to use. But as you say, it is really reinventing the wheel
+somewhat.
 
-Marcel
+But if there are multiple CORBA server replicas, it could be interesting
+to send each CORBA request to both servers, one link having packet
+requirements, and the other letting CQDDR decide, then the client uses
+the first reply and discards the other (in a CORBA client/server
+application using BT).
 
+More interesting: Is CQDDR implemented on all devices? I have a couple
+that don't support reading RSSI/Link Quality?
 
+Anyway, it makes some sence to me to try and force certain packet types,
+since the system may have strict latency requirements, combining this
+with flush timeouts for the connection.
+
+Thor
 
 
 -------------------------------------------------------
