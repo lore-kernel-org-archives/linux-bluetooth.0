@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Logitech MX900 mouse not working.
-From: Kim Pedersen <jungle@saphire.dk>
-Reply-To: jungle@saphire.dk
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200407251632.32162.cijoml@volny.cz>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: jungle@saphire.dk
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1090765201.983.13.camel@aquarius>
 References: <1090765201.983.13.camel@aquarius>
-	 <200407251632.32162.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1090769444.983.19.camel@aquarius>
+Message-Id: <1090767190.4791.95.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,74 +18,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 25 Jul 2004 17:30:44 +0200
+Date: Sun, 25 Jul 2004 16:53:11 +0200
 
-Hi Michal,
+Hi Kim,
 
-On Sun, 2004-07-25 at 16:32, Bc. Michal Semler wrote:
-> And you should better run hotplug
-> apt-get install hotplug
+> I just bought a Logitech MX900 set (Mouse, Keyboard and Bluetooth HUB),
+> and I am trying very hard to get it working. 
+> 
+> At the moment I am able to use the keyboard, due to the PS2 compability
+> feature, but I am unable to even use hciscan to obtain a bluetooth
+> address on the mouse. The only response I get from the mouse in X is up
+> and down movement, laggy and unusable.
+> 
+> I have read the mailing list archive and the Logitech MX900 Bluetooth
+> Optical mouse page (http://www.bueche.ch/comp/mx900/mx900.html) and
+> followed the instructions, but with no luck. I also tried all the tips
+> in the feedback section on that page. Google provided me with some
+> resources which I have tried, again with no luck.
+> 
+> 
+> At the moment I am running a 2.6.7 kernel with the 2.6.8-rc2 patch,
+> which was recommended on the Bluez website. I am using Debian Unstable
+> and have installed the userland utilies.
+> 
+> I have tried to load all sorts of bluetooth modules and compiling them
+> directly into the kernel (shouldnt matter, but you know, you get
+> paranoid). 
+> 
+> No matter what I do, I cannot get hcitool scan to give me anything but:
+> 
+> Device is not available: Success
+> 
+> hid2hci tells me:
+> Switching device 046d:c703 to HCI mode failed (No such file or
+> directory)
 
-I did this, and installed hotplug.
+I assume that you don't have the hiddev devices nodes that are needed
+for this utility. You must create them by hand, because udev is not
+capable of that at the moment.
 
-I also installed the usbutils package. lsusb gives me:
+Regards
 
-Bus 005 Device 001: ID 0000:0000  
-Bus 004 Device 001: ID 0000:0000  
-Bus 003 Device 003: ID 046d:c703 Logitech, Inc. 
-Bus 003 Device 002: ID 0451:2036 Texas Instruments, Inc. TUSB2036 Hub
-Bus 003 Device 001: ID 0000:0000  
-Bus 002 Device 002: ID 046d:c00c Logitech, Inc. Optical Wheel Mouse
-Bus 002 Device 001: ID 0000:0000  
-Bus 001 Device 001: ID 0000:0000 
-
-
-The Optical wheel mouse is my standard USB mouse, not the new Bluetooth
-one.
-
-
-After reading Marcel Holtmann's post I also manually created some device
-nodes with this shell script:
-
-#!/bin/sh
-mkdir -p /dev/usb/hid
-mknod /dev/usb/hid/hiddev0 c 180 96
-mknod /dev/usb/hid/hiddev1 c 180 97
-mknod /dev/usb/hid/hiddev2 c 180 98
-mknod /dev/usb/hid/hiddev3 c 180 99
-mknod /dev/usb/hid/hiddev4 c 180 100
-mknod /dev/usb/hid/hiddev5 c 180 101
-mknod /dev/usb/hid/hiddev6 c 180 102
-mknod /dev/usb/hid/hiddev7 c 180 103
-mknod /dev/usb/hid/hiddev8 c 180 104
-mknod /dev/usb/hid/hiddev9 c 180 105
-mknod /dev/usb/hid/hiddev10 c 180 106
-mknod /dev/usb/hid/hiddev11 c 180 107
-mknod /dev/usb/hid/hiddev12 c 180 108
-mknod /dev/usb/hid/hiddev13 c 180 109
-mknod /dev/usb/hid/hiddev14 c 180 110
-mknod /dev/usb/hid/hiddev15 c 180 111
-
-I found the above by Googling around. Please correct me if I am doing
-something wrong with this.
-
-Still after this, it doesnt quite seem to work.
-
-hcitool scan still reports:
-Device is not available: Success
-
-and hid2hci also still reports:
-Switching device 046d:c703 to HCI mode failed (No such device)
-
-I must be missing a step somewhere since you guys are able to get it
-working properly.
-
-Thanks,
-
-Sincerely,
-
-// Kim Pedersen
-  -- Freedom Matters!
+Marcel
 
 
 
