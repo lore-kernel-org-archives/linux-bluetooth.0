@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] irattach and pseudo tty
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050314223925.04FDC2DE@arbetsmyra.dyndns.org>
-References: <20050314223925.04FDC2DE@arbetsmyra.dyndns.org>
-Content-Type: text/plain
-Message-Id: <1110872420.8820.0.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+From: Ronny L Nilsson <bb@arbetsmyra.dyndns.org>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Message-Id: <20050314223925.04FDC2DE@arbetsmyra.dyndns.org>
+Subject: [Bluez-users] irattach and pseudo tty
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +17,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 15 Mar 2005 08:40:20 +0100
+Date: Mon, 14 Mar 2005 23:39:06 +0100
 
-Hi Ronny,
 
-> I have a question about interfaceing a BT device via UART.
-> 
-> Is it possible to use irattach with a pseudo TTY? (This may sound a bit 
-> strange perhaps but my device is avilible through a tunneld remote 
-> serial port). Or is currently only "real" TTYs supported?
+Hi
+I have a question about interfaceing a BT device via UART.
 
-use the hci_vhci driver for these kind of devices.
+Is it possible to use irattach with a pseudo TTY? (This may sound a bit 
+strange perhaps but my device is avilible through a tunneld remote 
+serial port). Or is currently only "real" TTYs supported?
 
 Regards
+/Ronny Nilsson
 
-Marcel
+
+
+
 
 
 
