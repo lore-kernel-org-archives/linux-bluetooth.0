@@ -1,17 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: cross-compilation howto  (was "Re: [Bluez-users] Trying to
-	compile for axis but Bluetooth library not found")
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4203B1BB.1070006@gmx.ch>
-References: <41FE85A0.2040709@ieee.org>
-	 <1107204712.15769.70.camel@justakiss>  <41FF54DA.40801@ul.ie>
-	 <1107254209.9652.0.camel@pegasus>  <41FF8FE0.8010204@gmx.ch>
-	 <1107268938.9652.34.camel@pegasus> <41FF9C42.1090604@gmx.ch>
-	 <41FF9EA2.8090605@gmx.ch> <1107273565.8819.38.camel@justakiss>
-	 <4203B1BB.1070006@gmx.ch>
+Subject: Re: [Bluez-users] Re: where can I find patch for 2.6.9?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4203B336.6080804@gmx.ch>
+References: <c93f2a29050203210522694d38@mail.gmail.com>
+	 <ctv818$aa1$1@sea.gmane.org> <1107517953.6921.3.camel@pegasus>
+	 <4203A9C4.7040509@gmx.ch> <1107538283.6921.51.camel@pegasus>
+	 <4203B336.6080804@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1107541143.22567.29.camel@justakiss>
+Message-Id: <1107540379.6921.78.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -24,53 +21,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Feb 2005 19:19:03 +0100
+Date: Fri, 04 Feb 2005 19:06:19 +0100
 
-Am Fre, den 04.02.2005 schrieb Marco Trudel um 18:32:
-> Hello Marcel
-> 
-> I learned a lot of configure and make flags I didn't knew before.
-> So, that's the state:
-> 
-> For crosscompiling, it's enought to:
-> ./configure --build=[buildArchitecture] --host=[targetArchitecture]
-> 
-> The cross-compiler has to be in path.
-> That's it. Everything else is like usual compiling.
-> 
-Hi,
-you are almost right. In practice, almost every configure script has
-some problems with cross-compiling. For example, configure scripts that
-do runtime tests for the target system will obviously fail. You can work
-around that by supplying a hand-crafted config.guess that substitutes
-missing values. In other cases, you have to play with configure options
-and environment variables.
+Hi Marco,
 
-> I don't think this is worth a howto, do you?
-> Actually a bluetooth compilation howto with a little crosscompiling 
-> subsection that hints to the --build and --host switches should be more 
-> than enough.
-It's definitely worth to have a howto, because if you search the web or
-mailinglists, there are a lot of misleading or wrong hints regarding
-this topic. I don't have time right now to write a howto, but I think
-that the recent postings are already some help to get started for
-somebody who is in trouble with cross-compiling.
-
+> > We are developing for 2.6 and I don't have time to do the backporting to
+> > 2.4 and actually I see no reason to do this.
 > 
-> Erwin: Is only using --host proper?
-> It works but I get a warning (I don't like warnings. So I always try to do 
-> things right.)
+> Well, there are reasons. But that would be a huge lot of work and would 
+> only slow down the progress and development of bluez.
+
+there is always work, but I think it is better to investigate into
+switching to 2.6 instead of backporting BlueZ. The advantage of using
+2.6 is that some stuff comes free house, like the BlueZ ;)
+
+>  > People should start using
+> > the new stable kernel series or pay someone to backport the stuff if
+> > they wanna stick with an old kernel.
 > 
-I have cross-compiled a lot of packages, and --host was always
-sufficient (I tried to use the possible minimum of options) . The
-warning says:
+> Right. That's the only way that makes sense (in my mind).
+> 
+> I'm curious:
+> what would a backport to a specific 2.4 kernel cost?
+> What time would it need?
+> 
+> Oh, I just see that you wrote "someone". So you wouldn't be available for 
+> such a action?
+> 
+> Is there a list of features that are not in the 2.4 series?
 
-  "WARNING: If you wanted to set the --build type, don't use --host."
+I never made a list for that, but actually there are some serious dead
+lock fixes for some corner cases, some protocol corrections and of
+course the RFCOMM service level security that was merged mainline and
+will be part of the final 2.6.11 kernel.
 
-that applies to something that you don't want to do anyway in our case.
+Since I keep track all of my changes, a simple "ls patch-2.6.* | wc -l"
+revealed 138 patches. There are maybe some duplicates and some 2.6 only
+patches, but there must be at least 50-60 patches of difference between
+the latest 2.4 and the current 2.6 kernel.
 
-Regards,
-Erwin
+So how much time would this take? I can't tell you right now, because
+for that I have to look to all 138 patches and decide if they should be
+backported or not. This also depends on the specific 2.4 kernel version
+you want this backport for. And then add the testing part.
+
+I would maybe be available for such a job, but this depends on when you
+need this. And the cost question is easy, because you only have to
+multiply the time with my normal price per hour ;)
+
+Regards
+
+Marcel
 
 
 
