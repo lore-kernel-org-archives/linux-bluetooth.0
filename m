@@ -1,20 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] AMD64 HID pairing
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Kyle Rose <krose+bluez@krose.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <87brfb1fio.fsf@nausicaa.krose.org>
-References: <khnacuya23u.fsf@hunter-killer.kendall.corp.akamai.com>
-	 <1097185188.7325.75.camel@pegasus>
-	 <khnr7oa8ah1.fsf@hunter-killer.kendall.corp.akamai.com>
-	 <1097186322.7325.79.camel@pegasus>
-	 <khnk6u289o5.fsf@hunter-killer.kendall.corp.akamai.com>
-	 <87ekk82ar4.fsf@nausicaa.krose.org> <1097342518.12972.3.camel@pegasus>
-	 <87zn2v1xry.fsf@nausicaa.krose.org> <1097359976.12972.5.camel@pegasus>
-	 <87brfb1fio.fsf@nausicaa.krose.org>
-Content-Type: text/plain
-Message-Id: <1097395058.12972.17.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <4168D4E3.6060901@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: Chris Frost <chris@frostnet.net>, bluez-users@lists.sourceforge.net
+References: <20041010013028.GC3191@frostnet.net>
+In-Reply-To: <20041010013028.GC3191@frostnet.net>
+Subject: Re: [Bluez-users] advertising a linux computer as a headset?
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,25 +17,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 10 Oct 2004 09:57:38 +0200
+Date: Sun, 10 Oct 2004 00:21:23 -0600
 
-Hi Kyle,
+Chris,
 
-> > why do you enabled auth and encrypt? This is security mode 3. Disable it
-> > and try again.
+FYI, the asterisk project just put a bounty out for someone to implement 
+this sort of thing with their pbx software. So you're not the only one 
+thinking along these lines (but asterisk would provide a lot more than 
+just a speakerphone)
+
+http://www.voip-info.org/wiki-Asterisk+bounty+bluetooth+cell-phone+support
+
+unfortunately there is a bit of work required before asterisk devels can 
+jump in. Marcel has suggested that we move the btsco stuff entirely into 
+userspace as the next move.
+
+Brad
+
+Chris Frost wrote:
+> I am interested in turning my laptop into a speakerphone for my
+> bluetooth cell phone. Not knowing much about bluetooth, I assume the
+> route to take would be to advertise the laptop as a headset. Has there
+> previously been any work on this?
+> (A search through the bluez-users archive didn't turn anything up, but
+> I certainly could have missed threads. If I did, a pointer to prior
+> discussions would be great!)
 > 
-> I guess my rebuttal is, "Why shouldn't it work with auth and encrypt
-> in 64 bit mode only?" :)
-
-the security mode 3 can have some weird effects. You shouldn't use it
-unless you really know what you are doing. I repeated this so often, but
-actually it seems no one is really believing me.
-
-Regards
-
-Marcel
-
-
+> thanks!
 
 
 -------------------------------------------------------
