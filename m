@@ -1,11 +1,20 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] setup pairing?
+Subject: Re: [Bluez-users] Bluez BNEP connection close
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41F5C90D.90401@coriand.com>
-References: <41F5C90D.90401@coriand.com>
+In-Reply-To: <6.1.2.0.2.20050125092855.057821a0@pop.gmx.net>
+References: <6.1.2.0.2.20050124165802.04168330@luna.tlmat.unican.es>
+	 <1106581771.8058.49.camel@pegasus>
+	 <6.1.2.0.2.20050124172931.041a03a0@pop.gmx.net>
+	 <1106583831.8058.52.camel@pegasus>
+	 <6.1.2.0.2.20050124180402.041c1eb0@pop.gmx.net>
+	 <1106585260.8058.56.camel@pegasus>
+	 <6.1.2.0.2.20050124182813.04216860@pop.gmx.net>
+	 <6.1.2.0.2.20050124192058.04bee240@pop.gmx.net>
+	 <1106589847.8058.90.camel@pegasus>
+	 <6.1.2.0.2.20050125092855.057821a0@pop.gmx.net>
 Content-Type: text/plain
-Message-Id: <1106660253.8242.7.camel@pegasus>
+Message-Id: <1106656339.8058.143.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,28 +27,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 25 Jan 2005 14:37:33 +0100
+Date: Tue, 25 Jan 2005 13:32:19 +0100
 
-Hi Franz,
+Hi George,
 
-> I'm new in this area and I've a problem with setting up a simple key
-> pairing mechanism for bluetooth with BlueZ.
-> 
-> I'd like to setup a bluetooth connection with tcp/ip between a
-> Linux-Watch (kernel 2.4.18) and a Windows XP SP2.
-> My problem is, I can access the Windows host only with the help of a key
-> pairing, because with  my current windows bluetooth driver it's not
-> possible to establish a "unsecure connection" without a keypairs.
-> 
-> With the Linux-Watch and the Windows computer I can search for devices
-> and they find earch other, but the key pairing doesn't work.
+> In my code I have a reconnection capability once the bnep connection 
+> disappears.
+> However doing some more tests I found that sometimes the interface bnep0 is 
+> still there (in the laptop) although there is no connectivity.
+> I mean, the interface exists but the channel or path is not more up. 
+> Therefore my reconnection capability doesn't work on this case.
 
-show us the output of "hcidump -x" as root while you are trying to
-connect.
+this is maybe a bug or a little race in the code. Include more details
+and actually are way to reproduce it.
 
-What kind of Windows driver is this. The Windows XP SP2 Bluetooth stack
-allows unpaired connection as long as both devices are not in security
-mode 3. What does "hciconfig -a" show you?
+> So... don't know what could happen. I have recompiled the kernel serveral 
+> times changing the UCHI, OHCI and EHCI supports but still happens the same..
+
+Recompiling the kernel doesn't help here. You need to exchange the USB
+host controller hardware for checking UHCI, OHCI or EHCI. I always have
+a second PCI USB controller in my system for these tests.
+
+> I'm thinking on buying a PCMCIA Bluetooth card to have a try as Marcel 
+> thinks the problem is with the usb.
+
+It is worth testing, but don't ask for the best PCMCIA card. This is
+always another story. In general every card is working, but you must now
+the exact hciattach parameter to make them work.
 
 Regards
 
