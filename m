@@ -1,41 +1,48 @@
-Return-Path: <maxk@qualcomm.com>
-Subject: Re: BCM2033 firmware loader
-From: Max Krasnyansky <maxk@qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1074197813.2629.52.camel@pegasus>
-References: <1074193649.2629.23.camel@pegasus>
-	 <1074196213.2559.255.camel@localhost>  <1074197813.2629.52.camel@pegasus>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] New maintainer for Bluetooth subsystem
+From: Edd Dumbill <edd@usefulinc.com>
+To: BlueZ Developers List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1074191225.2559.226.camel@localhost>
+References: <1074191225.2559.226.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1074287664.2559.422.camel@localhost>
+Message-Id: <1074200961.27104.79.camel@saag>
 Mime-Version: 1.0
-Date: Fri, 16 Jan 2004 13:14:24 -0800
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 15 Jan 2004 21:09:21 +0000
 
-On Thu, 2004-01-15 at 12:16, Marcel Holtmann wrote:
-> Hi Max,
+On Thu, 2004-01-15 at 18:27, Max Krasnyansky wrote:
+> Hi Folks,
 > 
-> > What's wrong with BlueFW ? Why did you implement BCM FW loader in the
-> > kernel ?
-> > I looked in the archive and the only thing I could find was that you
-> > don't want to keep it without an explanation why.
-> 
-> actually I never got bluefw working stable with 2.6. The usbfs interface
-> causes troubles which I can't explain. Maybe the problems are caused by
-> my hardware, but I don't know. I also want to avoid using bulk transfer
-> over ISOC endpoint to make OHCI happy and it seems that inside the
-> kernel there exists no more problems for the OHCI chips. 
-You mean Bulk over Interrupt. BlueFW doesn't send Bulk over Isoc.
+> I'd like to announce new maintainer for Linux kernel Bluetooth subsystem
+> and Linux Bluetooth user-space utilities (aka BlueZ project).
+> Marcel Holtmann <marcel@holtmann.org> is going to assume primary
+> maintainer role.
 
-> So after I made
-> my experiences with the request_firmware() interface and the bfusb
-> driver I decided to give it a try and the bcm203x driver was born.
+Hi Max,
 
-I see. I have no problem with implementation in fact it's very clean and
-nice. My only concern is that if it can be done from user space it
-should be done in user-space thing :). I mean nobody is going to unload
-this bcm203x module after fw download is complete. Yeah it's small but
-it's still a waste. I'd rather fix usbfs if it's broken. Greg and
-Johannes will happily accept patches ;-). 
+I just wanted to say a big thank you to both you and Marcel for your
+hard work on BlueZ!  You've both done some excellent work.
 
-Max
+-- Edd
+
+
+
+
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
