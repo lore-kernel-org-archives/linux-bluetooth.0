@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Which is needed to have usb bluetooth? (kernels
-	modules)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gregoire Favre <Gregoire.Favre@freesurf.ch>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040410155935.GA26618@magma.epfl.ch>
-References: <20040410155935.GA26618@magma.epfl.ch>
-Content-Type: text/plain
-Message-Id: <1081613259.5398.5.camel@pegasus>
-Mime-Version: 1.0
+From: Richard Cox <rcox27@triad.rr.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Hotplug
+References: <200404101126.25631.conardcox@earthlink.net> <200404101747.11107.aben@webcom.sk>
+In-Reply-To: <200404101747.11107.aben@webcom.sk>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200404101206.09125.rcox27@triad.rr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,58 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 10 Apr 2004 18:07:39 +0200
+Date: Sat, 10 Apr 2004 12:06:09 -0400
 
-Hi Gregoire,
+On Saturday 10 April 2004 11:47 am, Aben Siatris wrote:
 
-> I am getting deseperate regarding bluetooth under linux :-(
-> 
-> I got a kernel with which I could access my onboard usb bluetooth, but I
-> cannot anymore since at least 10 kernels rebuild...
-> 
-> I am using 2.6.5-mm3.
-> I don't find aynwhere exactly what is needed for Bluez, could someone
-> point me to the right config?
-> 
-> Right now I have:
-> 
-> CONFIG_BT=y
-> CONFIG_BT_L2CAP=y
-> CONFIG_BT_SCO=y
-> CONFIG_BT_RFCOMM=y
-> CONFIG_BT_RFCOMM_TTY=y
-> CONFIG_BT_BNEP=y
-> CONFIG_BT_BNEP_MC_FILTER=y
-> CONFIG_BT_BNEP_PROTO_FILTER=y
-> CONFIG_BT_HCIUSB=y
-> CONFIG_BT_HCIUART=y
-> CONFIG_BT_HCIUART_H4=y
-> CONFIG_BT_HCIUART_BCSP=y
-> CONFIG_BT_HCIVHCI=y
-> CONFIG_USB=y
-> CONFIG_USB_DEVICEFS=y
-> CONFIG_USB_BANDWIDTH=y
-> CONFIG_USB_DYNAMIC_MINORS=y
-> CONFIG_USB_EHCI_HCD=y
-> CONFIG_USB_EHCI_ROOT_HUB_TT=y
-> CONFIG_USB_UHCI_HCD=y
-> CONFIG_USB_STORAGE=y
-> CONFIG_USB_SERIAL=y
-> CONFIG_USB_SERIAL_VISOR=y
-> 
-> And cat /proc/bus/usb/devices just show my hub and cards readers...
+> not bluetooth.agent, but net.agent.
+> you need action after creating NET (bnep0)
+>
+> i have iPAQ4155 connected.
+> read thread  "No more bluez.o in 2.6?"
 
-I personally prefer having the USB and Bluetooth subsystem as modules,
-but it should work in both ways. May you wanna try a modular system.
+Aben,
+	Thank you so much!  I had been reading some old documentation it would 
+appear.  net.agent  is the script beeing called by hotplug for when pand 
+establishes a connection.  Hopfully, I'll have my iPAQ connected soon, like 
+you.
 
-Show us the content of /proc/bus/usb/devices and what do lspci and lsusb
-say? What kind of Bluetooth dongle do you have?
+Cheers,
 
-Regards
-
-Marcel
-
-
+Richard
 
 
 -------------------------------------------------------
