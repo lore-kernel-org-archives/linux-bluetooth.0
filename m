@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Jesse Guardiani <jesse@wingnet.net>
-Message-ID: <cteadv$tbe$1@sea.gmane.org>
+Subject: Re: [Bluez-users] Can't connect RFCOMM socket: resource
+	temporarily unavailable
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050128172646.695.qmail@web53205.mail.yahoo.com>
+References: <20050128172646.695.qmail@web53205.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1106939965.10580.0.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Anycom USB-240 & firmware
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,65 +19,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Jan 2005 16:22:06 -0500
+Date: Fri, 28 Jan 2005 20:19:25 +0100
 
-Hello,
+Hi Filipa,
 
-I recently bought an Anycom USB-240. It ships
-with BT 1.1 firmware, as depicted below, but
-it *should* be BT 1.2 capable hardware.
+> I am have Linux 2.6.9 in my laptop and an Conceptronic
+> CBT 100U USB adapter. I installed bluez-utils-2.14 and
+> bluez-libs-2.14.
+> 
+> 'hciconfig -a' shows me my device and 'hcitool scan'
+> show me the computer of a friend (a windows pc). I can
+> do an 'l2ping' and an 'rfcomm bind' to this computer
+> without any problem. 
+> 
+> The problems arrive when I try to do 'rfcomm connect'.
+> The answer is: "Can't connect RFCOMM socket: resource
+> temporarily unavailable". 
 
-% hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:0B:0D:34:1F:E0 ACL MTU: 120:20  SCO MTU: 64:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:254 acl:0 sco:0 events:43 errors:0
-        TX bytes:416 acl:0 sco:0 commands:30 errors:0
-        Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ (0)'
-        Class: 0x100100
-        Service Classes: Object Transfer
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x0 LMP Ver: 1.1 (0x1) LMP Subver: 0x757
-        Manufacturer: Silicon Wave (11)
+you can't use bind and connect together. Choose one.
 
-My interest in Bluetooth is primarily tied to
-audio right now. I've been doing a lot of work
-with SIP phones lately so I've ordered a BT 1.2
-Logitech Mobile Freedom Headset to play with.
-It should arrive in a week or two.
+> I saw on the web and on the mailling lists that there
+> is a problem with the 'bluepin'. I checked mine and it
+> didn't work. So, I created a new file (called pin in 
+> /usr/bin/) with:
+> 
+> #!bin/sh
+> # file: /usr/bin/pin
+> echo -n "PIN: "
+> cat /etc/bluetooth/pin
+> 
+> and created a file in /etc/bluetooth/ also called pin
+> with a numerical the PIN code.
+> 
+> Still I could not make the 'rfcomm connect' work! It
+> appears a window asking for the PIN in my friend's
+> computer, but in my computer I still have the same
+> answer.
 
-Anyway, the Logitech headset is BT 1.2 capable
-so I'd like to upgrade my USB-240 firmware to
-1.2 also (freq hopping to avoid my 802.11b nets,
-etc...), but this post on the Anycom website
-claims that the USB-240's headset and handsfree
-profiles don't work well under Linux with BT
-1.2 firmware:
-    http://tinyurl.com/5pqnm
+Check with "hcidump -x" as root if it is really a PIN helper problem.
 
-So in the interest of NOT frying my shiny new
-USB-240, does anyone on this list currently use
-a USB-240 with a headset or handsfree profile
-device? Which firmware do you use?
+Regards
 
-Also, if I *do* decide to upgrade the adapter's
-firmware, am I likely to have better luck with
-Anycom's firmware via a Win32 install? Or with
-Bluez supplied firmware? Does the Bluez firmware
-even work with my Silicon Wave chipset?
-
-TIA!
-
--- 
-Jesse Guardiani, Systems Administrator
-WingNET Internet Services,
-P.O. Box 2605 // Cleveland, TN 37320-2605
-423-559-LINK (v)  423-559-5145 (f)
-http://www.wingnet.net
+Marcel
 
 
 
