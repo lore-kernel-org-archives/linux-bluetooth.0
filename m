@@ -1,86 +1,110 @@
-Return-Path: <oscarp@acay.com.au>
-Message-ID: <415C8B5B.3060400@acay.com.au>
-Date: Fri, 01 Oct 2004 08:40:27 +1000
-From: O Plameras <oscarp@acay.com.au>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <000e01c4cd7d$f2c02020$2c00a8c0@DISCO17G>
+From: "Carlos Azevedo" <carlosarazevedo@netcabo.pt>
+To: <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: pand freezes upon disconnect
-References: <E1CA5Ze-0006Iu-R6@paris.servershost.net>	 <cjad82$qji$1@sea.gmane.org> <1096371695.4950.2.camel@notepaq>	 <cje512$kj5$1@sea.gmane.org> <1096494023.6380.0.camel@pegasus>
-In-Reply-To: <1096494023.6380.0.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_000B_01C4CD7D.F2B26480"
+Subject: [Bluez-devel] Re: Re: Lifetech BlueConnect DOES NOT work with bluez
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 18 Nov 2004 14:50:29 -0000
 
-Marcel Holtmann wrote:
+This is a multi-part message in MIME format.
 
-> 
-> go ahead and test it, because everything is working prefect on mine
-> machines.
-> 
+------=_NextPart_000_000B_01C4CD7D.F2B26480
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-I made more tests. I put the results here hoping it
-might assist point to the problem.
+Hi Marcel,
 
-I found the ff:
+No, this dongle has a SiliconWave chipset. This chipset implements the =
+1.2 spec, but Bluez implements 1.1 only. Specifically, on the 1.2 spec =
+the Add SCO Connection is deprecated and indicated as 'not to be used'. =
+The Bluez code (net/bluetooth/hci_conn.c) uses that command to start a =
+SCO voice connection to a headset. I'm suspecting that the dongle =
+doesn't implement the Add SCO command properly and causes my problems. =
+But nevertheless a 1.2 spec device is not required (and is even =
+discoraged) to implement it.
+The hcidump indicates that the connection is established but on shut =
+down (when the SCO socket is closed) a first disconnect exchange is =
+concluded but SCO data keeps coming in. The Bluez code complains about =
+those packets (in hci_scodata_packet) and only after a second disconnect =
+exchange does the SCO data stop.
+I'm now trying to use the Create Synchronous Connection (as per 1.2 =
+spec) instead to see if this works.
+By the way hcidump 1.16 reports the Create command as an Accept one =
+(0x01|0x0028).
 
-1. Installed bluez NAP server on another Linux-2.6.8.1-mm4-mh2
-with nobridge-router-nofirewall-bluez. Result: When client
-disconnects the server does NOT FREEZE.
+Carlos A. R. Azevedo
+------=_NextPart_000_000B_01C4CD7D.F2B26480
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-2. Installed bluez NAP server on various versions of
-Linux-2.6.8.1-mm4-mh1 && mh2; Linux-2.6.8.1-mh1 && mh2 on
-bridge-router-firewall-bluez.
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2800.1400" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#d9e9f9>
+<DIV><FONT face=3DArial size=3D2>Hi Marcel,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>No, this dongle has a SiliconWave =
+chipset. This=20
+chipset implements the 1.2 spec, but Bluez implements 1.1 only. =
+Specifically, on=20
+the 1.2 spec the Add SCO Connection is deprecated and indicated as 'not =
+to be=20
+used'. The Bluez code (net/bluetooth/hci_conn.c) uses that command to =
+start a=20
+SCO voice connection to a headset. I'm suspecting that the dongle =
+doesn't=20
+implement the Add SCO command properly and causes my problems. But =
+nevertheless=20
+a 1.2 spec device is not required (and is even discoraged) to implement=20
+it.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>The hcidump indicates that the =
+connection is=20
+established but on shut down (when the SCO socket is closed) a first =
+disconnect=20
+exchange is concluded but SCO data keeps coming in. The Bluez code =
+complains=20
+about those packets (in hci_scodata_packet) and only after a second =
+disconnect=20
+exchange does the SCO data stop.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>I'm now trying to&nbsp;use the Create =
+Synchronous=20
+Connection (as per 1.2 spec) instead to see if this works.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>By the way hcidump 1.16 reports the =
+Create command=20
+as an Accept one (0x01|0x0028).</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Carlos A. R. =
+Azevedo</FONT></DIV></BODY></HTML>
 
-When client disconnects the server FREEZES in any combination.
+------=_NextPart_000_000B_01C4CD7D.F2B26480--
 
-3. Using any setup in item 2, I can disconnect a client without
-freezing the server if I disable bluetooth by "rmmod" up till
-uhci_hcd at the server first. Then, I reloaded the modules
-to restart pand server so I get the client reconnected
-successfully.
 
-With these processes, I got the following logs on the server:
 
-br0: port 3(bnep0) entering disabled state
-Debug: sleeping function called from invalid context at 
-include/asm/semaphore.h:119
-in_atomic():1, irqs_disabled():0
-  [<c011a45f>] __might_sleep+0x9f/0xb0
-  [<c01841cb>] sysfs_hash_and_remove+0x2b/0x108
-  [<ccaff5b8>] br_sysfs_removeif+0x18/0x20 [bridge]
-  [<ccafc671>] br_del_if+0x31/0x56 [bridge]
-  [<ccafd51a>] br_device_event+0xba/0xe0 [bridge]
-  [<c01273a8>] notifier_call_chain+0x18/0x40
-  [<c02c723e>] unregister_netdevice+0x13e/0x236
-  [<c025a82f>] unregister_netdev+0xf/0x20
-  [<cc974c00>] bnep_session+0x6f0/0x790 [bnep]
-  [<c0105d32>] ret_from_fork+0x6/0x14
-  [<c01197c0>] default_wake_function+0x0/0x10
-  [<cc974510>] bnep_session+0x0/0x790 [bnep]
-  [<c010429d>] kernel_thread_helper+0x5/0x18
-
-device bnep0 left promiscuous mode
-br0: port 3(bnep0) entering disabled state
-uhci_hcd 0000:00:14.2: remove, state 1
-usb usb1: USB disconnect, address 1
-usb 1-2: USB disconnect, address 2
-uhci_hcd 0000:00:14.2: USB bus 1 deregistered
-usbcore: deregistering driver hci_usb
-NET: Unregistered protocol family 31
-Bluetooth: Core ver 2.6
-NET: Registered protocol family 31
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: HCI USB driver ver 2.7
-usbcore: registered new driver hci_usb
-Bluetooth: L2CAP ver 2.4
-Bluetooth: L2CAP socket layer initialized
-Bluetooth: BNEP (Ethernet Emulation) ver 1.2
-Bluetooth: BNEP filters: protocol multicast
-USB Universal Host Controller Interface driver v2.2
-PCI: Found IRQ 11 for device 0000:00:14.2
-PCI: Sharing IRQ 11 with 0000:00:0a.0
-uhci_hcd 0000:00:14.2: UHCI Host Controller
-uhci_hcd 0000:00:14.2: irq 11, io base 00002020
-uhci_hcd 0000:00:14.2: new USB bus registered, assigned bus number 1
- 
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now. 
+http://productguide.itmanagersjournal.com/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
