@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <200501302046.ALU31339@ms12.netsolmail.com>
-From: Chris Taylor <cht@imipolex-g.com>
-Subject: Re: [Bluez-users] D-Link DWB-120M and BlueZ 2.14
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
+From: Mathis <mathis_w@gmx.net>
+Message-ID: <loom.20050130T212956-606@post.gmane.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] F8T001 version 1 and SuSE 9.2
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,60 +16,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 Jan 2005 12:46:41 -0800
+Date: Sun, 30 Jan 2005 20:35:52 +0000 (UTC)
+
+Hello,
+I have SuSE Linux 9.2 installed with all updates, installed all bluez packages,
+rebooted, plugged in my Belkin F8T001 USB Bluetooth dongle, KDE told me that it
+found a new device, set it up -- enabling bluetooth daemon, configuring things
+(left everything on default), pressed OK -- the daemon started, but nothing else
+happened, I am unable to do anything...
+
+"hcitool dev" shows:
+Devices:
+nothing else...
+
+"lsusb" shows the device as being recognized by the USB subsystem, but seems
+that the bluetooth subsystem is not interested in that device.
+
+dmesg shows following (only bluetooth part):
+Bluetooth: Core ver 2.6
+NET: Registered protocol family 31
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: L2CAP ver 2.4
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: HIDP (Human Interface Emulation) ver 1.0
+Bluetooth: RFCOMM ver 1.3
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
+usb 2-1: new full speed USB device using address 2
+Bluetooth: HCI USB driver ver 2.7
+usbcore: registered new driver hci_usb
+
+Any hints?
 
 
->do a "make install DESTDIR=$PWD/x" and then check what it is in the
->directory "x". Show us the result of a "find x".
-
-Okay so I did this:
-./configure --enable-bcm203x
- make install DESTDIR=$PWD/x
-
-here's what's in x:
-
-x
-x/usr
-x/usr/sbin
-x/usr/sbin/hcid
-x/usr/sbin/hciattach
-x/usr/sbin/hciconfig
-x/usr/sbin/sdpd
-x/usr/share
-x/usr/share/man
-x/usr/share/man/man5
-x/usr/share/man/man5/hcid.conf.5
-x/usr/share/man/man8
-x/usr/share/man/man8/hcid.8
-x/usr/share/man/man8/hciattach.8
-x/usr/share/man/man8/hciconfig.8
-x/usr/share/man/man8/sdpd.8
-x/usr/share/man/man1
-x/usr/share/man/man1/hcitool.1
-x/usr/share/man/man1/l2ping.1
-x/usr/share/man/man1/sdptool.1
-x/usr/share/man/man1/ciptool.1
-x/usr/share/man/man1/rfcomm.1
-x/usr/share/man/man1/dund.1
-x/usr/share/man/man1/pand.1
-x/usr/share/man/man1/hidd.1
-x/usr/bin
-x/usr/bin/hcitool
-x/usr/bin/l2ping
-x/usr/bin/sdptool
-x/usr/bin/ciptool
-x/usr/bin/rfcomm
-x/usr/bin/dund
-x/usr/bin/pand
-x/usr/bin/hidd
-x/usr/bin/bluepin
-x/etc
-x/etc/bluetooth
-x/etc/bluetooth/hcid.conf
-x/etc/bluetooth/pin
-x/etc/bluetooth/rfcomm.conf
-
-That's it...? Thanks for your help.
 
 
 -------------------------------------------------------
