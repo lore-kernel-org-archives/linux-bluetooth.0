@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bthid and battery condition and syslog
-References: <200403171259.22015.cijoml@volny.cz> <1079525750.3301.14.camel@pegasus>
-In-Reply-To: <1079525750.3301.14.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200403171320.24816.cijoml@volny.cz>
+Subject: Re: [Bluez-users] latest modules.conf settings for bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200403171309.13660.cijoml@volny.cz>
+References: <200403171309.13660.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1079525913.3301.18.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,33 +18,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Mar 2004 13:20:24 +0100
+Date: Wed, 17 Mar 2004 13:18:33 +0100
 
-Dne st 17. b=F8ezna 2004 13:15 jste napsal(a):
-> Hi Michal,
->
-> > is there possible to switch off sysloging battery condition?
-> >
-> > bthid generates 2KB/10minutes into syslog
-> >
-> > Maybe there should be in bthid some kind of condition as in nut - UPS
-> > battery monitor and not to sysloging?
->
-> look at the source code and comment it out.
+Hi Michal,
 
-I better prefer to be bthid abble receive tcp connections a reports via it =
-and=20
-not into syslog.
-It would be used then with some kind of graphical output like mrtg or rrdto=
-ol
-as soon as I monitor UPS battery
+> I am sending my latest modules.conf. Can you look at it and tell me if it's 
+> complete modules.conf for BlueZ?
+> 
+> #BlueZ settings
+> alias net-pf-31 bluez
+> alias bt-proto-0 l2cap
+> alias bt-proto-2 sco
+> alias bt-proto-4 bnep
+> alias tty-ldisc-15 hci_uart
+> alias char-major-10-250 hci_vhci
+> alias bt-proto-3 rfcomm
+> alias char-major-10-223 uinput
+> above uinput mousedev keybdev
+> above bluez hci_usb
 
->
-> Regards
->
-> Marcel
+I don't know what "above" do. The bluez and hci_usb should be loaded if
+the dongle is plugged in by hotplug.
 
-Michal
+> post-install hci_usb /sbin/hciconfig hci0 lm master
+
+This is not a good idea and does not really work. Put it into hcid.conf,
+but I prefer leaving it "slave,accept". The bthid will itself set to
+master mode.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
