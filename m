@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41D4394B.7000509@Qindel.ES>
-From: Nito Martinez <Nito@Qindel.ES>
+Message-ID: <41D3600B.8000702@avantwave.com>
+From: mike <mikelee@avantwave.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] rfcomm socket and rfcomm tty
+References: <41D12158.6020206@avantwave.com> <1104315958.6319.13.camel@notepaq>
+In-Reply-To: <1104315958.6319.13.camel@notepaq>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] compilation of kernel module snd-bt-sco with kernel-2.6.10
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,126 +18,102 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 30 Dec 2004 18:22:19 +0100
+Date: Thu, 30 Dec 2004 09:55:23 +0800
 
-Hi,
+Dear Marcel
+    Thanks for your clarification.
+    Here come to a question , i am wrting a socket rfcomm program and 
+try to use it connect to a bluetooth rfcomm channel by bluez-util rfcomm 
+listen from two different computer. My program gives out "Resource 
+temporarily unavailable" after connect system call . Here is the hcidump 
+from listening side, there is a pause from listening side when connect 
+system call fail.
 
-I have been trying to compile the snd-bt-sco with kernel-2.6.10, and I'm 
-getting this error/warning:
-----------------------------------------------------------------------------
-18:00:02 nito@cardalda:/usr/src/btsco/kernel $ make clean
-make[1]: Entering directory `/usr/src/linux-2.6.10'
-  CLEAN   /usr/src/btsco/kernel/.tmp_versions
-make[1]: Leaving directory `/usr/src/linux-2.6.10'
-18:15:55 nito@cardalda:/usr/src/btsco/kernel $ make
-make[1]: Entering directory `/usr/src/linux-2.6.10'
-  CC [M]  /usr/src/btsco/kernel/btsco.o
-  LD [M]  /usr/src/btsco/kernel/snd-bt-sco.o
-  Building modules, stage 2.
-  MODPOST
-*** Warning: "snd_hwdep_new" [/usr/src/btsco/kernel/snd-bt-sco.ko] 
-undefined!
-  CC      /usr/src/btsco/kernel/snd-bt-sco.mod.o
-  LD [M]  /usr/src/btsco/kernel/snd-bt-sco.ko
-make[1]: Leaving directory `/usr/src/linux-2.6.10'
-18:16:06 nito@cardalda:/usr/src/btsco/kernel $
+ > HCI Event: Connect Request (0x04) plen 10
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+ > HCI Event: Command Status (0x0f) plen 4
+ > HCI Event: Connect Complete (0x03) plen 11
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+ > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+ > HCI Event: Command Status (0x0f) plen 4
+ > HCI Event: Connection Packet Type Changed (0x1d) plen 5
+ > HCI Event: Max Slots Change (0x1b) plen 3
+ > ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
+    MTU 1024
+< ACL data: handle 0x0028 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
+< ACL data: handle 0x0028 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x0000 clen 4
+    MTU 1024
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 0x0028 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x0000 result 0 clen 0
+ > ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+------------------------------------------------------------------------------- 
+Pause here
+ > ACL data: handle 0x0028 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 6 pf 1 ilen 0 fcs 0x32
+ > ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+< ACL data: handle 0x0028 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Disconn Complete (0x05) plen 4
 
-When I try to load the module in the kernel I get the following error:
--------------------------------------------------------------------------------------------------------------------
-snd_bt_sco: Unknown symbol snd_hwdep_new
+    Thanks for helping
+best regard
+Mike,Lee
 
-which relates to the warning above.
 
-I've been tracing the function and it is available in the 
-"sound/core/hwdep.c" file, but I'm unable (or my knowledge of the kernel 
-build structure is too short) to establish the dependency into the module.
+Marcel Holtmann wrote:
 
-I have a couple of questions:
-
-1) Do I need to add in some way the hwdep.o into the kernel/Makefile ?
-2) Is it necessary that another module is loaded so that the dependency 
-is met?
-
-My current configuration is:
-- Debian unstable (with updated packages as of 30/12)
-- kernel 4.6.10
-- Laptop with a Bluetooth/usb connector (works fine with other bluetooth 
-devices like phones...)
-- Alsa working with a trident module.
-
-Output of lsmod:
-
-cardalda:/usr/src/linux# lsmod
-Module                  Size  Used by
-ppp_deflate             4832  0
-zlib_deflate           21720  1 ppp_deflate
-zlib_inflate           17120  1 ppp_deflate
-bsd_comp                5344  0
-ppp_async               9184  0
-ircomm_tty             35240  0
-ircomm                 19332  1 ircomm_tty
-ppp_generic            20820  3 ppp_deflate,bsd_comp,ppp_async
-slhc                    6336  1 ppp_generic
-snd_pcm_oss            58692  0
-hci_usb                12256  2
-nls_iso8859_1           3680  1
-nls_cp437               5312  1
-vfat                   11456  1
-fat                    36512  1 vfat
-nls_base                6240  4 nls_iso8859_1,nls_cp437,vfat,fat
-snd_mixer_oss          19616  2 snd_pcm_oss
-snd_seq_midi            7520  0
-snd_seq_midi_event      6048  1 snd_seq_midi
-snd_trident_synth      11552  1
-snd_ainstr_simple       2592  1 snd_trident_synth
-snd_seq_instr           8000  1 snd_trident_synth
-snd_seq_midi_emul       7040  1 snd_trident_synth
-snd_seq                55856  6 
-snd_seq_midi,snd_seq_midi_event,snd_trident_synth,snd_seq_instr,snd_seq_midi_emul
-8250_pci               16768  0
-snd_trident            40548  2 snd_trident_synth
-snd_ac97_codec         75392  1 snd_trident
-snd_pcm                97384  3 snd_pcm_oss,snd_trident,snd_ac97_codec
-snd_timer              23044  2 snd_seq,snd_pcm
-snd_page_alloc          8004  3 snd_trident_synth,snd_trident,snd_pcm
-snd_util_mem            3648  1 snd_trident
-snd_mpu401_uart         6592  1 snd_trident
-snd_rawmidi            21408  2 snd_seq_midi,snd_mpu401_uart
-snd_seq_device          7212  5 
-snd_seq_midi,snd_trident_synth,snd_seq,snd_trident,snd_rawmidi
-snd                    55748  15 
-snd_pcm_oss,snd_mixer_oss,snd_seq_midi,snd_seq_midi_event,snd_seq_instr,snd_seq_midi_emul,snd_seq,snd_trident,snd_ac97_codec,snd_pcm,snd_timer,snd_util_mem,snd_mpu401_uart,snd_rawmidi,snd_seq_device
-soundcore               7328  2 snd
-ohci_hcd               33064  0
-sis                    71648  2
-sis_agp                 5892  1
-floppy                 54608  0
-8250_pnp                7872  0
-psmouse                20040  0
-rfcomm                 33948  1
-l2cap                  22340  5 rfcomm
-bluetooth              43748  7 hci_usb,rfcomm,l2cap
-af_packet              13192  2
-orinoco_cs              6984  1
-orinoco                41516  1 orinoco_cs
-hermes                  7616  2 orinoco_cs,orinoco
-pcmcia                 17412  5 orinoco_cs
-yenta_socket           19136  1
-pcmcia_core            45292  3 orinoco_cs,pcmcia,yenta_socket
-irtty_sir               7488  2
-sir_dev                15404  1 irtty_sir
-irda                  189216  6 ircomm_tty,ircomm,irtty_sir,sir_dev
-crc_ccitt               1632  2 ppp_async,irda
-usbcore               118104  3 hci_usb,ohci_hcd
-parport_pc             22436  1
-lp                      8136  0
-parport                20736  2 parport_pc,lp
-8250                   20452  4 8250_pci,8250_pnp
-serial_core            19200  1 8250
-
-Thanks in advance,
-
-Nito
+>Hi Mike,
+>
+>  
+>
+>>    I have little knowledge on tty structure, so i want to clarify 
+>>something is that, if i want to connect to a rfcomm enabled phone. Are 
+>>there any difference when i sending raw data to the phone with tty 
+>>rfcomm and socket rfcomm? I ask this question because i see that from 
+>>bluez-util rfcomm source code, tty connection is built up from socket 
+>>first and then set the tty attr. So if i do not need tty functions, only 
+>>read/write from/to external device is needed, socket rfcomm will be more 
+>>simple. Am i right?
+>>    
+>>
+>
+>this is right. The RFCOMM socket is the native interface and the TTY is
+>only there for legacy reasons.
+>
+>Regards
+>
+>Marcel
+>
+>
+>
+>
+>-------------------------------------------------------
+>SF email is sponsored by - The IT Product Guide
+>Read honest & candid reviews on hundreds of IT Products from real users.
+>Discover which products truly live up to the hype. Start reading now. 
+>http://productguide.itmanagersjournal.com/
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>  
+>
 
 
 
