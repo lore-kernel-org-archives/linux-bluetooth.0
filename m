@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050406111405.18543.qmail@web52407.mail.yahoo.com>
-From: jose <twblr@yahoo.com>
+From: Major A <andras.major@univie.ac.at>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
+Message-ID: <20050406103841.GA27120@janus>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] ARM linux kernel 2.4.18-rmk7
+Subject: [Bluez-devel] Logitech Mobile Freedom headset problems
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,23 +16,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 6 Apr 2005 04:14:05 -0700 (PDT)
-
-hi,
-
-i want to install bluez on a pda with arm linux kernel
-2.4.18-rmk7. can i directly install bluez or do i have
-to first install a kernel patch?
-
-rgds,
-jose 
+Date: Wed, 6 Apr 2005 12:38:42 +0200
 
 
-		
-__________________________________ 
-Do you Yahoo!? 
-Make Yahoo! your home page 
-http://www.yahoo.com/r/hs
+Hi,
+
+I'm trying to get the Logitech Mobile Freedom headset working. I use
+"hcitool scan" to find its address, and it identifies itself as
+"Logitech HS02-V05". Now when I do btsco -v <bdaddr>, I get this:
+
+> btsco v0.4
+> Device is 1:0
+> Error: Failed to connect to SDP server: Invalid exchange
+> Assuming channel 2
+> 
+> Voice setting: 0x0060
+> Can't connect RFCOMM channel: Invalid exchange
+
+What's the reason for this? I'm supposed to be able to enter the PIN
+at this point. The headset is in pairing mode, and bluez works because
+I can use minicom to issue AT commands to my phone at the same time.
+
+I'm using the current CVS version of btsco, kernel is 2.6.11.6 and the
+snd_bt_sco module loads just fine.
+
+Any help would be greatly appreciated.
+
+  Andras
 
 
 -------------------------------------------------------
