@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Deresch <aderesch@fs.tum.de>
-Reply-To: Andreas Deresch <aderesch@fs.tum.de>
-To: =?iso-8859-1?q?Gary=20Martin?= <gary_martin_au@yahoo.com.au>
-Cc: bluez-users@lists.sourceforge.net
+From: Thomas Chiverton <thomas.chiverton@bluefinger.com>
+To: Gary Martin <gary_martin_au@yahoo.com.au>
 Subject: Re: [Bluez-users] Desperate newbie
-In-Reply-To: <20040331134502.35044.qmail@web21006.mail.yahoo.com>
-Message-ID: <Pine.LNX.4.56L0.0403311642280.9869@localhost>
-References: <20040331134502.35044.qmail@web21006.mail.yahoo.com>
+Cc: bluez-users@lists.sourceforge.net
+References: <20040331144144.786.qmail@web21004.mail.yahoo.com>
+In-Reply-To: <20040331144144.786.qmail@web21004.mail.yahoo.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200403311553.37118.thomas.chiverton@bluefinger.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,44 +19,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 31 Mar 2004 17:06:11 +0200 (CEST)
+Date: Wed, 31 Mar 2004 15:53:36 +0100
 
-On Wed, 31 Mar 2004, [iso-8859-1] Gary Martin wrote:
+On Wednesday 31 Mar 2004 15:41 pm, Gary Martin wrote:
+> numerical
+> class codes for "computer" and "mobile phone"
 
-> Thank you for your support Andreas. Problems like this make me
-> want to go back to Mac OS X, but there is something about Linux
-> that draws me back. It has been a struggle --- I think a lot of
-> the problems I have encountered with Linux have been the result of
-> trying to run it on a PowerPC chip!!
-As Marcel explained, this certainly does result in additional difficulties,
-yes.
+:hunts
+No, it's not clear is it...
 
-> Service Name: IrMC Synchronization
-> Service RecHandle: 0x10006
-> Service Class ID List:
->   "IrMCSync" (0x1104)
-> Protocol Descriptor List:
->   "L2CAP" (0x0100)
->   "RFCOMM" (0x0003)
->     Channel: 11
->   "OBEX" (0x0008)
-> Profile Descriptor List:
->   "IrMCSync" (0x1104)
->     Version: 0x0100
->
-> [...]
->
-> Yes --- there is an option in Multisync (IRMC-Bluetooth) to
-> "search for units", and if found, "test connection" It just hangs
-> during the search
+:looks
+0x000100 and 0x000200 according to khciconfig.
 
-Fine, so the only difference (apart from multisync itself) between our
-phones is that "hcitool info <BDA>" does not work for you. The problem there
-seems to arise at HCIGETCONNINFO and then hci_create_connection. Anybody
-with BE hardware care to take a closer look at it? I unfortunately do not
-own any (bluetooth capable).
+-- 
+Tom Chiverton 
+Advanced ColdFusion Programmer
 
-ad
+Tel: +44(0)1749 834997
+email: tom.chiverton@bluefinger.com
+BlueFinger Limited
+Underwood Business Park
+Wookey Hole Road, WELLS. BA5 1AF
+Tel: +44 (0)1749 834900
+Fax: +44 (0)1749 834901
+web: www.bluefinger.com
+Company Reg No: 4209395 Registered Office: 2 Temple Back East, Temple
+Quay, BRISTOL. BS1 6EG.
+*** This E-mail contains confidential information for the addressee
+only. If you are not the intended recipient, please notify us
+immediately. You should not use, disclose, distribute or copy this
+communication if received in error. No binding contract will result from
+this e-mail until such time as a written document is signed on behalf of
+the company. BlueFinger Limited cannot accept responsibility for the
+completeness or accuracy of this message as it has been transmitted over
+public networks.***
 
 
 -------------------------------------------------------
