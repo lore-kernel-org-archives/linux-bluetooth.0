@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <403A4FEE.50909@superbug.demon.co.uk>
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed;
- boundary="------------090601070907060506020702"
-Subject: [Bluez-devel] Problems decoding SDP in hcidump.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Aaron Klish <aklish1@urbana.css.mot.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.GSO.4.20.0402231031470.11242-100000@wombat.urbana.css.mot.com>
+References: 
+	 <Pine.GSO.4.20.0402231031470.11242-100000@wombat.urbana.css.mot.com>
+Content-Type: text/plain
+Message-Id: <1077556750.2791.48.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: libs2 and utils2
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,78 +19,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 23 Feb 2004 19:09:34 +0000
+Date: Mon, 23 Feb 2004 18:19:10 +0100
 
-This is a multi-part message in MIME format.
---------------090601070907060506020702
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Aaron,
 
-I attach a captured file using "hcidump -whcidump.cap".
+>   What are your plans for officially releasing the code in libs2 and utils2 
+> currently in CVS?  Do you have a target date sometime in the future?
 
-Can anyone decode this.
-hcidump -rhcidump.cap does not seem to like it.
+the libs2 should already been released, but it wasn't. The new code must
+be tested on a big endian platform and I lost my Sun Ultra60.
 
-The capture was done while running the following command: -
+The core part is finished and the HCI layer needs only a small number of
+corrections. But the SDP client part is a full rewrite and need much
+more testing.
 
-sdptool search --bdaddr 00:02:EE:C3:43:61 0x0100
+> At what point will you stop supporting the current libraries and utilities?
 
-That bdaddr is a Nokia 6310i mobile phone, so I assume that what it is 
-sending is valid.
+As long as people send me patches for the current version I will apply
+them. Actually I only want to put bugfixes into libs, but for utils I'll
+accept new features.
 
-Cheers
-James
+Regards
 
---------------090601070907060506020702
-Content-Type: application/octet-stream;
- name="hcidump.cap"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="hcidump.cap"
+Marcel
 
-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
---------------090601070907060506020702--
+
 
 
 -------------------------------------------------------
