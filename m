@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH] Fix abuse of kernel headers.
 From: David Woodhouse <dwmw2@infradead.org>
-To: bluez-devel@lists.sourceforge.net
+To: Max Krasnyansky <maxk@qualcomm.com>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <5.1.0.14.2.20030425153625.081db0f0@unixmail.qualcomm.com>
+References: <5.1.0.14.2.20030425104103.1040bb30@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030425104103.1040bb30@unixmail.qualcomm.com>
+	<5.1.0.14.2.20030425153625.081db0f0@unixmail.qualcomm.com>
 Content-Type: text/plain
-Message-Id: <1051440611.2850.138.camel@imladris.demon.co.uk>
+Message-Id: <1051313297.2850.14.camel@imladris.demon.co.uk>
 Mime-Version: 1.0
-Subject: [Bluez-devel] [PATCH] Check return code of pin helper.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -17,74 +22,39 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 27 Apr 2003 11:50:11 +0100
+Date: Sat, 26 Apr 2003 00:28:17 +0100
 
-On Red Hat 9, the python interpreter segfaults when running bluepin if
-hcid is started from the init script, but it all works fine if hcid was
-started from a command prompt. This confuses me, but it confused me even
-more before I make hcid report what was happening...
+On Fri, 2003-04-25 at 23:49, Max Krasnyansky wrote:
+> >Take a look at the PPC version.
 
-Apr 27 11:42:35 imladris hcid[31158]: PIN helper exited abnormally with code 11
+> Looks ok to me ;-). But I do remember some problem on some arch.
+> Which was the reason why I implemented sdp_get_unaligned() instead
+> of using <asm/unaligned.h>
 
---- bluez-utils-2.3/hcid/security.c~	2003-03-20 05:58:12.000000000 +0000
-+++ bluez-utils-2.3/hcid/security.c	2003-04-27 11:34:41.000000000 +0100
-@@ -224,10 +224,11 @@
- static void call_pin_helper(int dev, struct hci_conn_info *ci)
- {
- 	pin_code_reply_cp pr;
-+	struct sigaction sa;
- 	char str[255], *pin, name[20];
- 	bdaddr_t ba;
- 	FILE *pipe;
--	int len;
-+	int len, ret;
- 	
- 	/* Run PIN helper in the separate process */
- 	switch (fork()) {
-@@ -256,6 +257,11 @@
- 
- 	setenv("PATH", "/bin:/usr/bin:/usr/local/bin", 1);
- 
-+	memset(&sa, 0, sizeof(sa));
-+	sa.sa_flags = SA_NOCLDSTOP;
-+	sa.sa_handler = SIG_DFL;
-+	sigaction(SIGCHLD, &sa, NULL);
-+
- 	pipe = popen(str, "r");
- 	if (!pipe) {
- 		syslog(LOG_ERR, "Can't exec PIN helper. %s(%d)", strerror(errno), errno);
-@@ -263,15 +269,15 @@
- 	}	
- 
- 	pin = fgets(str, sizeof(str), pipe);
--	pclose(pipe);
-+	ret = pclose(pipe);
- 
- 	if (!pin || strlen(pin) < 5)
--		goto reject;
-+		goto nopin;
- 
- 	strtok(pin, "\n\r");
- 
- 	if (strncmp("PIN:", pin, 4))
--		goto reject;
-+		goto nopin;
- 
- 	pin += 4;
- 	len  = strlen(pin);
-@@ -284,6 +290,10 @@
- 			PIN_CODE_REPLY_CP_SIZE, &pr);
- 	exit(0);
- 
-+ nopin:
-+	if (!pin || strncmp("ERR", pin, 3))
-+		syslog(LOG_ERR, "PIN helper exited abnormally with code %d\n", ret);
-+
- reject:
- 	hci_send_cmd(dev, OGF_LINK_CTL, OCF_PIN_CODE_NEG_REPLY, 6, &ci->bdaddr);
- 	exit(0);
+It's wrapped in '#ifdef __KERNEL__' on the build box I used. 
 
+> >I looked at that but AFAIK the C standard doesn't actually guarantee the
+> > packed structure method will work 
 
+> I don't think packet structures are in the standard. But compiler has to 
+> guarantee that. Otherwise we'd have big problems (all hci structures
+> are packed).
+
+The people I consulted weren't convinced that the compiler must generate
+code which handles the _structure_ being misaligned. Expecting it to
+emitting code to correctly read an int which is three bytes from the
+beginning of the struct is OK; expecting it to emit code which can
+handle misalignment when the member being accessed is at a normal offset
+from the start of the structure isn't necessarily safe.
+ 
+> >and since we were always byteswapping
+> No we don't. ntohs does nothing on big endian machines.
+
+Sorry, I should have said 'since we were always byteswapping on i386
+anyway'. 
+
+Do it that way on ARM and you end up individually loading bytes and
+shifting, then you swap them all round afterwards... :)
 
 -- 
 dwmw2
