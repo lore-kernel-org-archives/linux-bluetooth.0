@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41570BC9.6090109@pallit.lhi.is>
-From: Pall Thayer <palli@pallit.lhi.is>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] accessing info on paired devices
+From: Michael Klose <mk@pottklose.de>
+Message-ID: <loom.20040926T103741-961@post.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Connect printer via bluetooth printer adaper
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,26 +15,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 26 Sep 2004 18:34:49 +0000
+Date: Sun, 26 Sep 2004 08:40:16 +0000 (UTC)
 
-Hi,
-I'm working on a little project that would have to automatically scan 
-for bluetooth devices (using a little perl script) and then attempt to 
-connect to them. However, I would prefer if it would only attempt to 
-connect to devices that have already been paired with the computer (via 
-bluetooth usb-dongle) and ignore discovered devices that have not been 
-paired. So, how can I find out which of the discovered devices have been 
-paired?
+Hi all
 
-Pall Thayer
+I use Debian 3.1. The connection between usb bt dongle and bt printer adapter
+works. (hcitool scan delivers correct address of bt printer adapter, l2ping
+works alls well).
 
--- 
-_______________________________
-Pall Thayer
-artist/teacher
-http://www.this.is/pallit
-http://pallit.lhi.is/panse
-_______________________________
+How do I set up the printer (cups), so that bt connection will be used.
+
+
+Many thanks in advance for your help.
+
+Best Regards
+
+Michael
+
+
+
+
 
 
 -------------------------------------------------------
