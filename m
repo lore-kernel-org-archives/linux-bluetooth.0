@@ -1,74 +1,55 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-In-Reply-To: <3F9F8062.90209@superbug.demon.co.uk>
-References: <1067379074.2419.24.camel@paul> <3F9F8062.90209@superbug.demon.co.uk>
+Return-Path: <guy@alum.mit.edu>
+In-Reply-To: <1067425631.24043.224.camel@pegasus>
+References: <1067379074.2419.24.camel@paul> <1067425631.24043.224.camel@pegasus>
 Mime-Version: 1.0 (Apple Message framework v606)
 Content-Type: text/plain; charset=US-ASCII; format=flowed
-Message-Id: <D78AFB12-0A4C-11D8-B1BA-000A958097E4@alum.mit.edu>
+Message-Id: <D4C83C06-0A45-11D8-B1BA-000A958097E4@alum.mit.edu>
 Cc: Paul Ionescu <paul@acorp.ro>,
    BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
    ethereal-dev@ethereal.com
 From: Guy Harris <guy@alum.mit.edu>
 Subject: Re: [Ethereal-dev] Re: [Bluez-devel] bluetooth ethereal dissector
-To: James Courtier-Dutton <James@superbug.demon.co.uk>
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 29 Oct 2003 12:16:55 -0800
+Date: Wed, 29 Oct 2003 11:26:44 -0800
+To: Marcel Holtmann <marcel@holtmann.org>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
 
-On Oct 29, 2003, at 12:54 AM, James Courtier-Dutton wrote:
+On Oct 29, 2003, at 3:07 AM, Marcel Holtmann wrote:
+> from my point of view this is not a good idea, because libpcap is for
+> Ethernet traffic. But ask the libpcap guys what they think about it.
 
-> The affix,"http://affix.sourceforge.net/", bluetooth stack for linux
+Well, as one of the libpcap people, I'd first like to note that libpcap 
+is also for UNIX loopback (when the UNIX system in question lets you 
+capture on it), Token Ring, ARCNET, SLIP, PPP, FDDI, ATM, Cisco HDLC, 
+802.11, Frame Relay, LocalTalk, IP-over-Fibre-Channel, etc. traffic - 
+there's nothing magical about Ethernet (other than the fact that it's 
+displacing more and more network types over time).
 
-(Did they know what they were doing when they added the PF_AFFIX 
-protocol type for HCI SCO sockets, or was it a pure accident that 
-BTPROTO_HCISCO ends with "CISCO"? :-))
+If a given type of link-layer interface can act as a network interface 
+(in the sense of something that "ifconfig" on UNIX can tell you about, 
+or that plugs into NDIS on Windows), you can probably capture on it.  
+Depending on the OS on which you're running, you might even be able to 
+see all the link-layer traffic, not just the stuff that gets handed to 
+network protocol handlers such as IP.
 
->  already has an interface to ethereal,
+The current CVS version of libpcap lets you plug in (at compile time) 
+modules to let you open for capturing devices *other* than network 
+interfaces, such as the DAG cards from Endace (it was put in for them, 
+but it should be usable for other devices as well).
 
-Their support is a bit, err, umm, odd.
+>> 2. Make ethereal read capture files made with hcidump -w.
+>
+> This should be the way to go, because live capturing is not always what
+> you want.
 
-The Ethereal patch contains:
+Yes, but that doesn't *exclude* support for libpcap-based live 
+capturing; a Wiretap module to read "hcidump -w" files would be useful, 
+but if that's added you might still want support for libpcap-based 
+capturing.
 
-	1) a bunch of dissectors, which don't actually do any *capturing* - it 
-appears that the HCI dissector registers itself with Ethertype 0xb123, 
-so it appears to assume that the packets in the capture look like 
-Ethernet packets, with the Bluetooth stuff inside Ethereal payload;
+>  However ethereal can read from stdin
 
-	2) a "capture-affix-pcap.c", which appears to be the "load WinPcap at 
-run time" code, modified to load a UNIX-style "libpcap.so" at run time.
-
-2) seems not to be particularly useful - if you've dynamically-linked 
-Ethereal, it should *already* load "libpcap.so" at start-up time (at 
-least if ".so" is your OS's dynamically-linked library suffix).  It 
-also doesn't appear to include any code to *call* the routine to load 
-"libpcap.so" at run time.
-
-I assume that the affix people have a modified version of libpcap that 
-uses some mechanism (Bluetooth sockets?) to capture Bluetooth packets; 
-however, it doesn't appear to be in the Ethereal patch for affix, nor 
-can I find it in either the affix-kernel-2.0.2 or the affix-2.0.2 
-stable or testing tarballs.
-
-So I don't see any evidence of any support for Bluetooth capture with 
-Ethereal, unless they've cleverly hidden their modified libpcap 
-somewhere.
-
-
-
--------------------------------------------------------
-This SF.net email is sponsored by: SF.net Giveback Program.
-Does SourceForge.net help you be more productive?  Does it
-help you create better code?   SHARE THE LOVE, and help us help
-YOU!  Click Here: http://sourceforge.net/donate/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Within limits - if you're loading a saved capture, you have to read 
+from a file (Ethereal needs to be able to go back and read packet data 
+again), but you can "capture from a pipe", at least on UNIX - but that 
+requires that the capture be written in libpcap format.
