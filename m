@@ -1,17 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluez-sdp depreciated? Was Which fedora core?
+Subject: Re: [Bluez-users] rfcomm problems
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1101329008.3773.10.camel@localhost.localdomain>
-References: <cnhnd6$toe$1@sea.gmane.org>  <1100769119.7164.17.camel@pegasus>
-	 <1100798738.3439.4.camel@localhost.localdomain>
-	 <1100803683.7164.74.camel@pegasus>
-	 <1100808919.3433.12.camel@localhost.localdomain>
-	 <1100813353.7164.87.camel@pegasus>
-	 <1100861560.7136.49.camel@baroque.rococosoft.com>
-	 <1101329008.3773.10.camel@localhost.localdomain>
+To: Andrew de Quincey <adq_dvb@lidskialf.net>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200411250131.50765.adq_dvb@lidskialf.net>
+References: <200411241854.13007.adq_dvb@lidskialf.net>
+	 <1101325813.7538.6.camel@pegasus>
+	 <200411250131.50765.adq_dvb@lidskialf.net>
 Content-Type: text/plain
-Message-Id: <1101350779.7538.19.camel@pegasus>
+Message-Id: <1101350516.7538.15.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -24,33 +21,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 25 Nov 2004 03:46:19 +0100
+Date: Thu, 25 Nov 2004 03:41:56 +0100
 
-Hi Phil,
+Hi Andrew,
 
-> > You can fool your installation into thinking libsdp is there by
-> > softlinking it to libbluetooth. Hacky but it works.
-> > 
-> > # ln -s /usr/lib/libbluetooth.so /usr/lib/libsdp.so
-> > 
-> Thanks for that idea Steve, I've not managed to get it working with the
-> core 3 files as I have other problems with dynamic devices and I am
-> trying to solve one problem at a time. 
-
-the Fedora Core 3 should at least use bluez-{libs|utils}-2.10 and these
-packages are working fine. Even in conjunction with udev.
-
-> At present I have un-installed the bluez files from core 3 and installed
-> core 2. I have created rfcomm0 and rfcomm1 in /etc/udev/devices, they
-> are then created in /dev at start-up. At this point I can connect my T2
-> to the PC. 
+> OK: my next question is about the "Bluetooth serial port" on the phone. When I 
+> connect to it with:
 > 
-> The problem is now when I disconnect the T2 /dev/rfcomm0 is destroyed so
-> I cannot reconnect without recreating it.
+> rfcomm connect 0 00:60:57:7C:31:49 2
+> 
+> It connects, but then the phone immediately disconnects. A short time later,  
+> the phone connects back to my computer on seemingly the service with the 
+> highest channel id - in my case kbemusedsrv (from kdebluetooth - an XMMS 
+> control service for the phone).
+> 
+> kbemused handily has a raw data dump option, and I can see the phone sending 
+> what are obviously PPP LCP packets at it.
+> 
+> How do I get the phone to connect to something sensible - e.g. to dund. I 
+> found various sets of instructions on the web, but the damn thing keeps 
+> connecting to kbedmused. 
+> 
+> Is this connect-disconnect-reconnect behaviour normal?
 
-This is udev. We remove device nodes that are not needed. Disable udev
-or maybe install a SuSE 9.2, Debian Sid etc. where the udev is known to
-work if Fedore Core 2/3 can't handle it.
+welcome to the world of this mRouter crap. You can try the latest dund
+from bluez-utils-2.11 package. I added some support for mRouter, but I
+am not sure if it is really working.
 
 Regards
 
