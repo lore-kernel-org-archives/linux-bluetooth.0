@@ -1,20 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jean Tourrilhes <jt@hpl.hp.com>
-Cc: Michal Semler <cijoml@volny.cz>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040810163203.GA1963@bougret.hpl.hp.com>
-References: <20040805013335.GA13608@bougret.hpl.hp.com>
-	 <1091976547.2773.29.camel@pegasus>
-	 <20040809185159.GA21899@bougret.hpl.hp.com>
-	 <1092078516.4564.40.camel@pegasus>
-	 <20040809195448.GA24140@bougret.hpl.hp.com>
-	 <1092125599.4564.76.camel@pegasus>
-	 <20040810163203.GA1963@bougret.hpl.hp.com>
-Content-Type: text/plain
-Message-Id: <1092178402.4564.204.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Re: [PATCH 2.6] link trigger for AODV and +
+In-Reply-To: <20040806195016.5b379fc9.Andreas.Gaufer@blue-cell-networks.com>
+References: <34A116F6-E7C6-11D8-B421-000A959E26AE@ermy.net> <20040806195016.5b379fc9.Andreas.Gaufer@blue-cell-networks.com>
+Mime-Version: 1.0 (Apple Message framework v618)
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-Id: <501B4DE6-EB16-11D8-8E8C-000A959E26AE@ermy.net>
+Cc: Bluez Devel <bluez-devel@lists.sourceforge.net>
+From: Mark Thompson <lists@ermy.net>
+Subject: Re: [Bluez-devel] L2CAP_CONN_TIMEOUT without recompiling kernel?
+To: Andreas Gaufer <Andreas.Gaufer@blue-cell-networks.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,59 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 11 Aug 2004 00:53:23 +0200
+Date: Tue, 10 Aug 2004 22:43:27 +0100
 
-Hi Jean,
 
-> > If the HCI connections themself are fully integrated into the driver and
-> > device model an event through hotplug would be the best. Comments?
-> 
-> 	I personally don't like hotplug for this application. Hotplug
-> force the event to go through a bunch of scripts, which is good for
-> simple config and daemon-less stuff, but bad for daemons.
-> 	Let say you have a big daemon monitoring a bunch of stuff and
-> keeping track of state. Examples are pand, waproamd, MobileIP... With
-> hotplug you have to write a script that somehow forward the event to
-> the daemon. As events are usually passed via Unix sockets, shared
-> memory or something similar, the scripts need to call a little program
-> generating the event.
-> 	Therefore you have :
-> 		hotplug event ->
-> 			-> my shell script
-> 				-> my tiny program
-> 					-> Unix socket or shared memory
-> 						-> My daemon
-> 	For each event, you need to create two processes (shell script
-> and tiny program) than need to be paged from disk. Yuck...
-> 	If you look at waproamd, it uses exclusively the RtNetlink
-> events, even though the equivalent events exist in Hotplug.
+On Aug 06, 2004, at 18:50, Andreas Gaufer wrote:
+>
+> I guess the timeout you are searching for is the page-time out. This
+> timer is managed on the chip an can be changed with "hciconfig hciX
+> pageto n" (if what your using is a usb device). man hciconfig also has 
+> a
+> lot of info.
 
-you are right, but there are pros and cons on both sides and I like to
-find the best solution. However I never looked at RtNetlink before. I
-think that I should educate myself a little bit more.
+You're absolutely right.
 
-> > > > I sent the full patch for inclusion, but it came out that one part
-> > > > causes troubles and so I removed this part. I didn't found the time for
-> > > > a further investigation.
-> > > 
-> > > 	That's what I said : I'm going to test it properly. If you
-> > > could remember the issue, that would help.
-> > 
-> > I searched the email exchange between Michal and me from the mailing
-> > list archives for you. Check out this thread:
-> > 
-> > 	http://thread.gmane.org/gmane.linux.bluez.user/2672
-> 
-> 	The bug is obvious, you forgot that in 2.4.X the list doesn't
-> point to struct sock but to struct bluez_pinfo. Compare your patch to
-> the version below.
+Thanks for the pointer - client code fixed :)
 
-What a stupid mistake. I must been blind at that time :(
-
-Regards
-
-Marcel
-
+Mark/
 
 
 
