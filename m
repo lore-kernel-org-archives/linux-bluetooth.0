@@ -2,64 +2,78 @@ Return-Path: <daryl@wideray.com>
 Errors-To: <daryl@wideray.com>
 From: "Daryl Van Vorst" <daryl@wideray.com>
 To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
-Cc: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Qualification Testing
-Date: Mon, 12 May 2003 17:43:29 -0700
-Message-ID: <000e01c318e8$ac4db940$1a01010a@baked>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>, "'MaxKrasnyansky'" <maxk@qualcomm.com>
+Subject: RE: [Bluez-devel] Qualification - L2CA_DisconnectCfm
+Date: Mon, 12 May 2003 17:11:27 -0700
+Message-ID: <000d01c318e4$32a57460$1a01010a@baked>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <1052784278.1132.170.camel@pegasus.local>
+In-Reply-To: <1052783343.1132.159.camel@pegasus.local>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 Marcel,
 
-> maybe we have another RFCOMM misbehaviour, which doesn't=20
-> matter in the real world, but can confuse the tester.
->=20
-> 	< ACL data: handle 0x0029 flags 0x02 dlen 8
-> 	    L2CAP(d): cid 0x45 len 4 [psm 3]
-> 	      RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8=20
-> 	> ACL data: handle 0x0029 flags 0x02 dlen 8
-> 	    L2CAP(d): cid 0x40 len 4 [psm 3]
-> 	      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92=20
-> 	< ACL data: handle 0x0029 flags 0x02 dlen 8
-> 	    L2CAP(d): cid 0x45 len 4 [psm 3]
-> 	      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd=20
-> 	< ACL data: handle 0x0029 flags 0x02 dlen 12
-> 	    L2CAP(s): Disconn req: dcid 0x0045 scid 0x0040
-> 	> ACL data: handle 0x0029 flags 0x02 dlen 8
-> 	    L2CAP(d): cid 0x40 len 4 [psm 3]
-> 	      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7=20
-> 	> ACL data: handle 0x0029 flags 0x02 dlen 12
-> 	    L2CAP(s): Disconn rsp: dcid 0x0045 scid 0x0040
->=20
-> The dump above is from a disconnect sequence of RFCOMM. We=20
-> don't wait for the UA of the DISC on the dlci 0. We send the=20
-> L2CAP disconnect request right after the disconnect of the=20
-> dlci 0. The L2CAP channel should be closed after receiving=20
-> the UA or after a timeout.
-
-I'd have to learn more about the spec to be able to talk with you
-intelligently about this. There were quite a few RFCOMM tests we had to ski=
-p
-due to the other problems, so if you think you've found something that
-doesn't quite follow the spec then we might get caught on it when we do the
-rest of the tests. I'll query Cetecom about it.
-
-> > I'll hold off on more testing until we've figured out a=20
-> solution for=20
-> > the L2CAP config stuff. More than likely something else=20
-> will come out=20
-> > the woodwork too, but probably not much. A number of tests=20
-> had to be=20
-> > postponed due to the previous failures.
->=20
-> Daryl, this is your decision (and of course your money), but=20
-> I think it will be good to see if our patches fixes the=20
-> problems. New code can introduce new bugs :)
-
-It'll definitely get tested! I just want to do the testing in batches. We'r=
+The behaviour you list below makes sense to me. I think there's supposed to
+be a 60 second timeout instead of 5 seconds, but that seems a bit excessive
+to me. Does it matter? If we close L2CAP and then the remote side sends an
+L2CAP_DISCONN_RSP, does the fact that we've already closed the channel caus=
 e
-only one failed test away from having a complete set.
+any different packets to be exchanged?
+
+The only advantage that I see in the capability of a blocking close is
+completeness. I can't think of a scenario where it really matters, but you
+never know what someone will cook up.
+
+I don't believe the application actually needs to know that the
+disconnection was normal, just that it has definitely been disconnected. I'=
+m
+a little fuzzy on the definition of "disconnected". Telling the app that
+there was a timeout is optional.
+
+If the stack closing the L2CAP connection and then receiving an
+L2CAP_DISCONN_RSP afterwards does not cause any different traffic to occurr
+(ie: the remote side can't tell the difference), then we're probably ok. Is
+this true?  Then the only difference between what we do and what the spec
+says is _when_ the "L2CA_DisconnectCfm" gets sent to the app. In our case,
+it would be immediately (i.e.: close() returned success). In the test case,
+it is 60 seconds after sending the disconnect request.
 
 -Daryl.
+
+> -----Original Message-----
+> From: Marcel Holtmann [mailto:marcel@rvs.uni-bielefeld.de]=20
+> Sent: May 12, 2003 4:49 PM
+> To: Daryl Van Vorst
+> Cc: 'BlueZ Mailing List'; 'MaxKrasnyansky'
+> Subject: RE: [Bluez-devel] Qualification - L2CA_DisconnectCfm
+>=20
+>=20
+> Hi Daryl,
+>=20
+> > What happens when you close an L2CAP connection?
+>=20
+> if you close() the L2CAP connection, we send a=20
+> L2CAP_DISCONN_REQ and set a timeout of 5 seconds. In the case=20
+> of L2CAP_DISCONN_RSP or the timeout, we close the L2CAP channel.
+>=20
+> Max, please correct me if this is wrong, because I am not 100% sure.
+>=20
+> > There is a test (see below) where the IUT sends an L2CAP disconnect=20
+> > request but the tester ignores it (doesn't send a disconnect=20
+> > response). To pass the test we must at least show an=20
+> > "L2CAP_DisconnectCfm" to the application. Indicating that a timeout=20
+> > ocurred is optional.
+>=20
+> I don't understand why the application needs to now if the=20
+> L2CAP channel is correctly disconnected? We close the L2CAP=20
+> socket and the rest has to be done by the kernel. If the link=20
+> is dead and the other side didn't response, waiting 60=20
+> seconds won't help. Or did you see any advantage of a=20
+> blocking close()?
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+>=20
+>=20
