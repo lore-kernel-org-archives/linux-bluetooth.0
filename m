@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <001601c50210$feedd960$2bc212ac@stu.nus.edu.sg>
-From: "Khoo Teck Ping" <eng10166@nus.edu.sg>
-To: <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0013_01C50254.09CBB260"
-Subject: [Bluez-devel] Question about dev/bluetooth/rfcomm/0
+Subject: Re: [Bluez-devel] scooped by pocketpc (a2dp)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41EA1B6E.3070303@xmission.com>
+References: <41E93682.9040907@xmission.com>
+	 <41E93B4F.1010600@dark-reality.de>  <41EA1B6E.3070303@xmission.com>
+Content-Type: text/plain
+Message-Id: <1106569928.9269.78.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,59 +19,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 24 Jan 2005 20:34:01 +0800
+Date: Mon, 24 Jan 2005 13:32:08 +0100
 
-This is a multi-part message in MIME format.
+Hi Brad,
 
-------=_NextPart_000_0013_01C50254.09CBB260
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+> > writing the a2dp alsa driver should be similar to the btsco alsa part,
+> > maybe we can build one thing for both purposes, or at least keep
+> > structures similar so that both projects can support each other best!
+> 
+> well i want to try putting a2dp in a userspace driver since that might 
+> be the best way to go. (that's an issue that may not be totally worked 
+> out but i think we decided that it looks attractive enough to at least 
+> try writing alsa-lib drivers)
+> 
+> if it works well, we might rewrite the sco driver to be in userspace.
 
-Dear All
+I like to see both drivers in userspace as an ALSA library plugin. The
+SCO driver is somewhat more interesting at the moment, because of the
+ongoing VoIP hype.
 
-I do not currently have this folder on my file system.=20
-dev/bluetooth/rfcomm/0
+There is also an SDK for ALSA library plugins planned that should make
+this development easier and possible to develop them outside the ALSA
+source code.
 
-I understand that it should have been created by the kernel drivers.=20
+Regards
 
-May I know how I can install this folder? This is required for rfcomm.=20
+Marcel
 
-Thank You
-
-Teck Ping
-------=_NextPart_000_0013_01C50254.09CBB260
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2900.2523" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial>Dear All</FONT></DIV>
-<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial>I do not currently have this folder on my file =
-system.=20
-</FONT></DIV>
-<DIV><FONT face=3DArial>
-<P>dev/bluetooth/rfcomm/0</P>I understand that it should have been =
-created by=20
-the kernel drivers. </FONT></DIV>
-<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial>May I know how I can install this folder? This =
-is required=20
-for rfcomm. </FONT></DIV>
-<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial>Thank You</FONT></DIV>
-<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial>Teck Ping</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0013_01C50254.09CBB260--
 
 
 
