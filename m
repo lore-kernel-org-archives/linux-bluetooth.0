@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hid2usb error
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1077206432.17056.7.camel@pc-04.ycom.ch>
-References: <1077206432.17056.7.camel@pc-04.ycom.ch>
-Content-Type: text/plain
-Message-Id: <1077215608.2767.2.camel@pegasus>
-Mime-Version: 1.0
+From: "Radoslav Reznicek" <radecek@email.cz>
+To: "'Pavel Ruzicka'" <pavouk@pavouk.org>
+Cc: <bluez-users@lists.sourceforge.net>
+Subject: RE: [Bluez-users] pairing i-Tech BT USB dongle and Nokia 6310i
+Message-ID: <001c01c3f707$0aa1e640$2974daa0@radecek>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-2"
+In-Reply-To: <200402162247.13628.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,34 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 19 Feb 2004 19:33:29 +0100
+Date: Thu, 19 Feb 2004 17:32:13 +0100
 
-Hi Alexandre,
+SOLVED
 
-> I've the Logitech diNovo Bluetooth kit, and try to use it as BT device.
-> So, i've bluez-libs2 & bluez-utils2 to use the hid2hci tool to pass my
-> Logitech USB HUB to an Bluetooth HUB.
-> 
-> Kernel 2.6.2-mh
-> hid module loaded.
-> 
-> Running the hid2usb give :
-> Invalid argument ...
-> 
-> After some investigations, it appear that the following line return the
-> error (around line 240) :
-> 
-> err = send_report(fd, rep1, sizeof(rep1))
-> 
-> at the 2nd byte send (0xff 0x80)
+(see HOWTO http://www.holtmann.org/linux/bluetooth/)
 
-you need a patch for the USB HID driver to send multiple bytes. I think
-it is not included so far. Must be pending in Greg's list.
+File
+/etc/bluetooth/hcid.conf
+contains bad pin_helper (/bin/bluepin)
 
-Regards
+To make this work with the hcid.conf file above you need the
+/etc/bluetooth/givepin script. Here is mine:
 
-Marcel
+##############givepin##########
+#!/bin/sh
+echo "PIN:123456"
+################
 
+Just open an editor and copy this into a file and save it as
+/etc/bluetooth/givepin Then do
+
+chmod 710 /etc/bluetooth/givepin
+
+Thank to Pavel Ruzicka
+
+
+Radoslav Reznicek
 
 
 
