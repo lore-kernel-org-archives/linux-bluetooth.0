@@ -5,8 +5,8 @@ To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200403171304.37863.cijoml@volny.cz>
-Subject: [Bluez-users] bthid and 2.4.25-mh2
+Message-Id: <200403171259.22015.cijoml@volny.cz>
+Subject: [Bluez-users] bthid and battery condition and syslog
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,13 +17,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 17 Mar 2004 13:04:37 +0100
+Date: Wed, 17 Mar 2004 12:59:22 +0100
 
-Marcel,
+Hi Marcel,
 
-there is 100% problem in mh2 patch. I tried downgrade to simple 2.4.25 and 
-keyboard started working imeditially. Then tried upgrade to 2.4.25-mh2 and 
-keyboard stopped working.
+is there possible to switch off sysloging battery condition?
+
+bthid generates 2KB/10minutes into syslog
+
+Maybe there should be in bthid some kind of condition as in nut - UPS battery 
+monitor and not to sysloging?
 
 Michal
 
