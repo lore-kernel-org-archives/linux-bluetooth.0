@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sdp_proto_desc_t problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: wang@cs.byu.edu
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <33044.128.187.171.223.1091836937.squirrel@mail.cs.byu.edu>
-References: <33044.128.187.171.223.1091836937.squirrel@mail.cs.byu.edu>
-Content-Type: text/plain
-Message-Id: <1091877701.20839.148.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <33044.128.187.171.223.1091836937.squirrel@mail.cs.byu.edu>
+From: wang@cs.byu.edu
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;charset=iso-8859-1
+Subject: [Bluez-devel] sdp_proto_desc_t problem
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,33 +15,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 07 Aug 2004 13:21:41 +0200
+Date: Fri, 6 Aug 2004 18:02:17 -0600 (MDT)
 
-Hi,
+I am a newbie to linux bluetooth programming.
+My system is fedora2, kernel 2.6.5-1.358.
+I was trying to compile a project developed by our lab, and got the
+following error message:
 
-> I am a newbie to linux bluetooth programming.
-> My system is fedora2, kernel 2.6.5-1.358.
-> I was trying to compile a project developed by our lab, and got the
-> following error message:
-> 
-> error: type specifier omitted for parameter `sdp_proto_desc_t'
-> 
-> It seems that some header file was not included so the compiler could not
-> recognize sdp_proto_desc_t. However, bluetooth.h has been included. I
-> tried to find the definition of sdp_proto_desc_t in bluetooth.h, sdp.h and
-> sdp_lib.h, but all failed.
-> 
-> Can you tell me in which file sdp_proto_desc_t is defined? Or the possible
-> reason for this error.
+error: type specifier omitted for parameter `sdp_proto_desc_t'
 
-I can't remember that we used sdp_proto_desc_t. Show us the source code
-of your project.
+It seems that some header file was not included so the compiler could not
+recognize sdp_proto_desc_t. However, bluetooth.h has been included. I
+tried to find the definition of sdp_proto_desc_t in bluetooth.h, sdp.h and
+sdp_lib.h, but all failed.
 
-Regards
+Can you tell me in which file sdp_proto_desc_t is defined? Or the possible
+reason for this error.
 
-Marcel
-
-
+Thanks
 
 
 -------------------------------------------------------
