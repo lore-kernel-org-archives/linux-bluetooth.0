@@ -1,82 +1,72 @@
-Return-Path: <pomac@vapor.com>
-Subject: Re: [Bluez-devel] [2.6.8 ->] Problems, hci_usb dosn't work.
-From: Ian Kumlien <pomac@vapor.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1095879167.6223.104.camel@pegasus>
-References: <1095807044.3211.9.camel@big> <1095842833.5762.27.camel@pegasus>
-	 <1095877600.3211.15.camel@big>  <1095877744.6223.88.camel@pegasus>
-	 <1095877955.3211.18.camel@big>  <1095878303.6223.93.camel@pegasus>
-	 <1095878969.3211.23.camel@big>  <1095879167.6223.104.camel@pegasus>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-g1clS8S/nBwxFaCYsSBD"
-Message-Id: <1095880805.3277.4.camel@big>
-Mime-Version: 1.0
-Date: Wed, 22 Sep 2004 21:20:05 +0200
+Return-Path: <daryl@wideray.com>
+Errors-To: <daryl@wideray.com>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "'Marcel Holtmann'" <marcel@holtmann.org>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Rfcomm Use Count
+Date: Wed, 22 Sep 2004 12:05:17 -0700
+Message-ID: <003301c4a0d7$1982c5b0$1a01010a@baked>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+In-Reply-To: <1095876765.6223.85.camel@pegasus>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
+Hi Marcel,
 
---=-g1clS8S/nBwxFaCYsSBD
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+> try to test your normal stuff to make sure that it doesn't break
+> anything else.
 
-On Wed, 2004-09-22 at 20:52, Marcel Holtmann wrote:
-> > 2 joysticks, one 6in1 card reader and one muvodrive, it all works.
-> > And, it registers the device correctly it just can't read from it.
+So far so good. I'm setting up some automated testers to pound on it for =
+a
+while.
+
+> > Does this change make the "if (sk->state =3D=3D BT_CLOSED)" =
+statement in
+> > bluez_accept_dequeue() redundant?
 >=20
-> are these devices all USB 2.0 capable? If yes, then they are handled by
-> the ehci_hcd host controller driver.
+> I think so. Haven't thought about it so far.
+>=20
+> > This is important because if somehow a socket is in=20
+> BT_CLOSED state and is
+> > in the accept queue during shutdown, then=20
+> rfcomm_cleanup_listen() can't
+> > clean it up (because bluez_accept_dequeue() won't return=20
+> it). I think your
+> > changes make it impossible for there to ever be an rfcomm=20
+> socket (or l2cap
+> > socket) in the BT_CLOSED state in the accept queue. If=20
+> that's true, then
+> > this isn't an issue. Thoughts?
+>=20
+> Sorry, but I can't follow your point here. Please explain it again.
 
-All except the monitor that also registers it self via usb, =3D)
-(I am really surprised about that actually)
+Bluez_accept_dequeue() won't return a socket if it is in the closed =
+state.
+So rfcomm_cleanup_listen() will never call close and kill on the socket
+because ...accept_dequeue() never returns it (it just unlinks it). And =
+then
+we would have the use count problem. But if there is no possibility of a
+socket being in the closed state on the accept queue (for rfcomm at =
+least),
+then this isn't an issue.
 
-Sam Sung Electronics
-Manufacturer: Samsung Electronics
-Serial Number: HVAWA04398
-Speed: 1.5Mb/s (low)
-USB Version:  1.10
-Device Class: 00(>ifc )
-Device Subclass: 00
-Device Protocol: 00
-Maximum Default Endpoint Size: 8
-Number of Configurations: 1
-Vendor Id: 0419
-Product Id: 8002
-Revision Number:  2.00
+I think this is fixed - so if I'm still talking nonsense, just ignore =
+it. ;)
 
-And here is the usb dongle output
-hci_usb
-Speed: 12Mb/s (full)
-USB Version:  1.10
-Device Class: e0(unk. ) <=3D=3D Looks like something missing
-Device Subclass: 01
-Device Protocol: 01
-Maximum Default Endpoint Size: 64
-Number of Configurations: 1
-Vendor Id: 0db0
-Product Id: 1967
-Revision Number:  5.25
+> > Do you think we've covered the case where there are=20
+> incomming connections
+> > while things are at various stages of being shut down? I=20
+> think we're ok, but
+> > I wanted to bring it up.
+>=20
+> Actually I don't know. In general we should be protected against that
+> with our locking.
 
-Should i change some identifier and test some?
+As far as I could see the locking protects against it. But I did not =
+spend
+enough time on it to fully understand how it works. If there is a =
+problem,
+my testing should eventually uncover it.
 
-> Check that first and then report it to the Linux USB mailing list. It is
-> more an USB issue then LKML related.
-
-yep... Assumed, i just assumed that some small thing might be broken and
-that you usb ppl would be quicker to spot it =3D)
-
---=20
-Ian Kumlien <pomac () vapor ! com> -- http://pomac.netswarm.net
-
---=-g1clS8S/nBwxFaCYsSBD
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.5 (GNU/Linux)
-
-iD8DBQBBUdBk7F3Euyc51N8RAgFQAJ90CqfjhJJapXl4VIKj5ObGzJ/08QCeKG5s
-LJ+1oxKFTIpCgpaxd+ORgGM=
-=gfO2
------END PGP SIGNATURE-----
-
---=-g1clS8S/nBwxFaCYsSBD--
+-Daryl.
