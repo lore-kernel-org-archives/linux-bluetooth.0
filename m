@@ -1,28 +1,75 @@
-Return-Path: <jamesp@hisser.org>
-Message-ID: <404E3793.3010204@hisser.org>
-Date: Tue, 09 Mar 2004 21:30:59 +0000
-From: James Pattinson <jamesp@hisser.org>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Obex / Palm TT
-References: <Pine.LNX.4.44.0303121553230.9558-100000@greebo.hisser.org>	<1047488348.28415.117.camel@pegasus.local>	<Pine.LNX.4.58.0403092101240.24697@greebo> <1078867356.10671.70.camel@pegasus>
-In-Reply-To: <1078867356.10671.70.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: John McCorquodale <mcq@cacr.caltech.edu>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20040309212125.GA27173@viz.cacr.caltech.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Bluez HID story?
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 9 Mar 2004 13:21:25 -0800
 
-Marcel Holtmann wrote:
+So I'm trying to get my spiffy new Logitech BT keyboard working with my CF
+BT card.
 
-> why to you think you can use a Siemens custom transport to connect to a
-> Palm Tungsten? Actually using the RFCOMM TTY emulation should not be
-> necessary. Try to make a direct connection over the RFCOMM socket. I
-> think obexftp supports it.
+I found Peter Klausler's 'bthid' which seems to sortof work with the uinput
+driver in 2.4.25.  However, when typing very fast, it repeats substrings of
+my input more than once (e.g. 'ls -lsa' -> 'ls -ls-lsa') which is a problem
+that typing more slowly eliminates.  I've also had my kernel panic once or
+twice when trying this stuff out.
 
-I didn't suggest that I thought the siemens transport was the right one, 
-in fact this is why I was asking for advice - as is usual for this sort 
-of thing, user documentation is sparse :)
+I also found Marcel's page:
 
-I do not know how to do obex over rfcomm with obexftp - but perhaps I'll 
-try ussp-push next...
+  http://www.holtmann.org/linux/bluetooth/hid.html
 
-James
+Which starts off great talking about how "this reimplementation" reuses the HID
+parser from USB and is morally superior to Peter's work.  However, the page
+then goes on to talk about all sorts of USB dongles, which is irrelevant (the
+whole point of a BT keyboard is to throw the dongle in the trash and use my
+laptop's builtin BT), and further doesn't seem to talk about any exiting code
+at all past the mention of "this reiplementation" in the first paragraph.
+
+My question is:
+
+  What is the best currently working way to handle bluetooth HI devices?  The
+  device itself, not the dongle.  How does one configure host-initiated
+  disconnection on idle detection (since I'm a Logitech KB, I guess I need to
+  do that)?  Am I just totally missing the important message on Marcel's
+  HID page?  By the way: what's doing the layout on hortmann.org? -- I really
+  respect and admire the minimalism and good design sense of those pages.
+
+If there is such a thing, can you give me a quick breakdown of the steps one
+would take to get it working?  For example, for bthid, the steps I use go:
+
+  1. Get HCI working (cardmgr loads serial_cs, hciattach ttyS0 bcsp 2300400)
+  2. Compile bthid from http://www.visi.com/~pmk/bthid-0.10.tar.gz
+  3. hcitool scan, hit connect button, to deduce BT address of keyboard
+  4. bthid -n -v -v <address>
+  5. hit connect on KB
+
+If there is no existing HID implementation other than Peter's, please let me
+know this so I know it's worth the time to debug the substring repeat problem
+and figure out why it panics me.
+
+Thanks,
+
+-mcq
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
