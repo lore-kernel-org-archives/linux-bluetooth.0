@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <412D99CA.5050209@nue.et-inf.uni-siegen.de>
-From: Michael Schmidt <schmidt@nue.et-inf.uni-siegen.de>
+From: Simone Gotti <simone.gotti@email.it>
+To: Detlef Grittner <detlef.grittner@t-online.de>
+Subject: Re: [Bluez-users] Pocket PC 2003 and Linux
+References: <412C5482.3010909@t-online.de> <200408251846.26673.simone.gotti@email.it> <412CC793.1000208@t-online.de>
+In-Reply-To: <412CC793.1000208@t-online.de>
 MIME-Version: 1.0
-To: philip@lawatsch.at
-CC: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Limit communication to serveral devices
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Cc: bluez-users@lists.sourceforge.net
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200408252002.51563.simone.gotti@email.it>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,48 +19,96 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 26 Aug 2004 10:05:30 +0200
+Date: Wed, 25 Aug 2004 20:02:51 +0000
 
-Hi Philip,
+On Wednesday 25 August 2004 17:08, Detlef Grittner wrote:
+>  > ACL data: handle 0x0029 flags 0x02 dlen 23
+>
+>     L2CAP(d): cid 0x40 len 19 [psm 1]
+>         SDP SA Req: tid 0x3 len 0xe
+>           hndl 0x8051328
+>           max 0x1f0
+>           aid(s) 0x0000 - 0xffff
+>           cont 00
+Here the pocket PC sent a SDP_ServiceAttributeRequest for every attribute in 
+the PC sdp record. 
 
-> Call me paranoid but I would like to know if there is any way to limit 
-> all types of communication to just several devices by checking with the 
-> hardware addresses.
-> 
-> I understand that in principle not being discoverable and the pin 
-> challenge should help you with being secure but to me this is not enough.
-> 
-> I'm currently running 2 class 1 devices to serve my flat with rfcomm for 
-> dial in and I for sure do not want anyone besides me to get access to 
-> these com ports.
-> 
-> Is there anything I can do to tighten security and limit all 
-> communication to just some devices?
-> 
-> I do understand that even this is no guarantee for anything, but I'd for 
-> sure feel better  :) 
+> < ACL data: handle 0x0029 flags 0x02 dlen 113
+>     L2CAP(d): cid 0x40 len 109 [psm 1]
+>         SDP SA Rsp: tid 0x3 len 0x68
+>           cnt 0x65
+>           aid 0x0000 (SrvRecHndl)
+>              uint 0x8051328
+>           aid 0x0001 (SrvClassIDList)
+>              < uuid-16 0x1105 (OBEXObjPush) >
+>           aid 0x0004 (ProtocolDescList)
+>              < < uuid-16 0x0100 (L2CAP) > <
+>              uuid-16 0x0003 (RFCOMM) uint 0xa > <
+>              uuid-16 0x0008 (OBEX) > >
+>           aid 0x0005 (BrwGrpList)
+>              < uuid-16 0x1002 (PubBrwsGrp) >
+>           aid 0x0009 (BTProfileDescList)
+>              < < uuid-16 0x1105 (OBEXObjPush) uint 0x100 > >
+>           aid 0x0100 (SrvName)
+>              str "OBEX Object Push"
+>           aid 0x0303 (SuppFormatsList)
+>              < uint 0x1 uint 0x2 uint 0x3 uint 0x4 uint 0x5 uint 0x6
+> uint 0xff >
+>
+>           cont 00
+>
+>  > HCI Event: Number of Completed Packets(0x13) plen 5
+>
+>   01 29 00 01 00
+This is the answer. The service can be located on the rfcomm chennale n.10 
+(0xa), it looks right for me.
 
-When assessing your level of security (and evaluating address 
-filtering), keep in mind that it's not too difficult to masquerade BT 
-device addresses. You only neeed to look up the Axis OpenBT stack source 
-code to figure out how to adjust the device address of certain Ericsson 
-and CSR-based modules.
+>  > ACL data: handle 0x0029 flags 0x02 dlen 23
+>
+>     L2CAP(d): cid 0x40 len 19 [psm 1]
+>         SDP SA Req: tid 0x4 len 0xe
+>           hndl 0x80516b0
+>           max 0x1f0
+>           aid(s) 0x0000 - 0xffff
+>           cont 00
+> < ACL data: handle 0x0029 flags 0x02 dlen 113
+>     L2CAP(d): cid 0x40 len 109 [psm 1]
+>         SDP SA Rsp: tid 0x4 len 0x68
+>           cnt 0x65
+>           aid 0x0000 (SrvRecHndl)
+>              uint 0x80516b0
+>           aid 0x0001 (SrvClassIDList)
+>              < uuid-16 0x1105 (OBEXObjPush) >
+>           aid 0x0004 (ProtocolDescList)
+>              < < uuid-16 0x0100 (L2CAP) > <
+>              uuid-16 0x0003 (RFCOMM) uint 0xa > <
+>              uuid-16 0x0008 (OBEX) > >
+>           aid 0x0005 (BrwGrpList)
+>              < uuid-16 0x1002 (PubBrwsGrp) >
+>           aid 0x0009 (BTProfileDescList)
+>              < < uuid-16 0x1105 (OBEXObjPush) uint 0x100 > >
+>           aid 0x0100 (SrvName)
+>              str "OBEX Object Push"
+>           aid 0x0303 (SuppFormatsList)
+>              < uint 0x1 uint 0x2 uint 0x3 uint 0x4 uint 0x5 uint 0x6
+> uint 0xff >
+>
+this is the same but for a different handle.
+this is caused because the request for SDP_ServiceSearchRequest reported 4 
+handlers and 2 of this are reffered to object push. So it looks like there 
+are 2 records for the same object push service. I Don't know if this is right 
+and/or will be the cause of the problem. 
 
-Clearly, your main line of defense should be a strong BT PIN.
+did you have a similare behavior using kbluetoothd instead of opd ?
 
+I hope that someone more expert than me (like Marcel) can find the source of 
+the problem.
 
-Cheers,
-
-Michael
-
-
+Bye!
 -- 
-===========================================
-Michael Schmidt
--------------------------------------------
-Institute for Data Communications Systems
-University of Siegen, Germany
-===========================================
+Simone Gotti
+<simone.gotti@email.it>
+http://kde-bluetooth.sf.net
 
 
 -------------------------------------------------------
