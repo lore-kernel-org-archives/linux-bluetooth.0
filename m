@@ -1,39 +1,32 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4216DFAC.40103@gmx.net>
-From: Marcel Partap <mpartap@gmx.net>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-References: <20050219040442.C001189107@sc8-sf-spam1.sourceforge.net>
-In-Reply-To: <20050219040442.C001189107@sc8-sf-spam1.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] Re: possible to use phone itself as headset?
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 19 Feb 2005 07:41:48 +0100
+Return-Path: <domen@coderock.org>
+Date: Sat, 19 Feb 2005 00:43:53 +0100
+From: Domen Puncer <domen@coderock.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Nishanth Aravamudan <nacc@us.ibm.com>, kernel-janitors@lists.osdl.org,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   Max Krasnyansky <maxk@qualcomm.com>
+Subject: Re: bluetooth/bluecard_cs: remove interruptible_sleep_on_timeout() usage
+Message-ID: <20050218234353.GA3840@masina.coderock.org>
+References: <20050202225855.GY2546@us.ibm.com> <1107386189.11944.21.camel@pegasus> <20050203002502.GB2546@us.ibm.com> <1107562301.6921.115.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1107562301.6921.115.camel@pegasus>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-> As I said in previous thread, I think NONE actual mobile phone would let 
-> us hook the audio streaming from/to the microphone/speaker to/into a SCO 
-> channel. Telephone Companies have some power at phones market.
-so everybody and his brother believes this to be impossible then? Well, 
-in that I'll get myself another headset. Thx everybody for answers.
-regards.
+On 05/02/05 01:11 +0100, Marcel Holtmann wrote:
+> Hi Nish,
+...
+> Unable to handle kernel NULL pointer dereference at virtual address 00000004
+>  printing eip:
+...
+> EIP is at prepare_to_wait+0x32/0xa0
+...
 
 
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+I think this is because wait_queue_head_t variable is uninitialized.
+(task_list is at offset 4, __add_wait_queue from prepare_to_wait uses it)
+
+DECLARE_WAIT_QUEUE_HEAD should take care of it.
+
+
+	Domen
