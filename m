@@ -1,16 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jean Tourrilhes <jt@hpl.hp.com>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Steven Singer <steven.singer@csr.com>
-In-Reply-To: <20040813163736.GC22763@bougret.hpl.hp.com>
-References: <20040813002514.GA21388@bougret.hpl.hp.com>
-	 <1092385877.28711.185.camel@pegasus>
-	 <20040813163736.GC22763@bougret.hpl.hp.com>
-Content-Type: text/plain
-Message-Id: <1092416234.28711.256.camel@pegasus>
+Message-ID: <ef9938ec04081309406c2abae3@mail.gmail.com>
+From: Albert Huang <ashuang@gmail.com>
+Reply-To: Albert Huang <ashuang@gmail.com>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: CSR firmware question...
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-devel] want duplicate inquiry results during a single device inquiry
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,28 +16,25 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 13 Aug 2004 18:57:14 +0200
+Date: Fri, 13 Aug 2004 12:40:52 -0400
 
-Hi Jean,
+Hello,
 
-> > The D-Link dongle DBT-120 (Rev B3) can be updated using the Apple
-> > firmware update file. After that it will be HCI 18.1 with default boot
-> > mode set to HID.
-> 
-> 	This is exactly what I did. I have a rev B3, and I used Apple
-> file.
-> 	What do you mean default boot set to HID ? I look similar to
-> what I'm seeing.
+While experimenting with a hp ipaq running a 2.4.19 kernel, I noticed
+that during a since device inquiry, multiple EVT_INQUIRY_RESULT events
+could be generated from the same remote device.  The inquiry was done
+using a raw hci socket.  On x86 PCs running the same userland code but
+with more recent versions of bluez and the linux kernel, the duplicate
+events are no longer generated.  Instead, during a single inquiry, a
+response will be received from a remote device at most once.
 
-try running hid2hci :)
+I'm assuming that sometime in the recent past, kernel level caching
+was implemented to prevent these duplicate inquiry results from
+propagating up to user land.  Is there a way to turn this off, so that
+all inquiry results are passed through?
 
-If this does not work, show us /proc/bus/usb/devices.
-
-Regards
-
-Marcel
-
-
+Thanks!
+-albert
 
 
 -------------------------------------------------------
