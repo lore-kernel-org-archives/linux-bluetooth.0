@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] audio problems with a2play
+Subject: Re: [Bluez-devel] SBC packer done, kind of
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20041123070621.50569968.henryk@ploetzli.ch>
-References: <41A22C0B.4050008@xmission.com> <41A234FA.7020303@xmission.com>
-	 <20041123033429.132bf84b.henryk@ploetzli.ch>
-	 <41A2B331.4010001@xmission.com>
-	 <20041123070621.50569968.henryk@ploetzli.ch>
+In-Reply-To: <20041123074829.7f978ce7.henryk@ploetzli.ch>
+References: <20041123014732.3a03b10e.henryk@ploetzli.ch>
+	 <1101191260.26578.43.camel@pegasus>
+	 <20041123074829.7f978ce7.henryk@ploetzli.ch>
 Content-Type: text/plain
-Message-Id: <1101202495.26578.58.camel@pegasus>
+Message-Id: <1101201897.26578.54.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -21,28 +20,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 23 Nov 2004 10:34:55 +0100
+Date: Tue, 23 Nov 2004 10:24:57 +0100
 
 Hi Henryk,
 
-> > I don't know the "real" mapping between the indexed settings in the
-> > sbc file format and the bitmapped settings/capabilities we use with
-> > the a2dp protocol.
+> > these are good news. So I really must code the sbcenc tool now. In
+> > what fields do I have to put the PCM stream and what other things must
+> > I set?
 > 
-> It's on page 20 of the A2DP spec where it says, for example, that the
-> first byte of the codec specific information elements for SBC encodes
-> the sampling frequency in the upper half of the byte and the channel
-> mode in the lower half. The first byte that a2play sends for
-> sbc_test_01.sbc (which is 48 kHz mono) is 0x81, so bits 7 (0x80) and 0
-> (0x01) are set. Bit 7 set means 16 kHz (section 4.3.2.1), bit 0 set
-> means joint stereo (section 4.3.2.2). The correct value for this byte
-> would be 0x18 (bits 4 and 3 set). 
-> 
-> Similarly the second byte (currently 0x86) should be 0x1a (bits 4, 3 and
-> 1 set).
+> You'll have to get yourself a shiny new struct sbc_frame, fill in the
+> metadata and then put the pcm samples in the pcm_sample member. Then do
+> the regular init (only once), analyze, pack (which do the reverse of
+> their decoding counterparts).
 
-may you check the hcidump from CVS again if it is now correct? If yes,
-then I will release another version.
+the sbcenc program can now read Sun/NeXT audio S16_BE AU files and it
+runs the encoder and writes the SBC frames to standard output. The tools
+sbcinfo and rcplay are modified to accept the filename "-" as reading
+from standard input. The sbcdec can't use standard input at the moment.
+
+However it does not work as expected, but if you accept some noise you
+will get some results. I used these commands for testing:
+
+	sbcenc file.au > file.sbc
+	sbcdec file.sbc
+
+> > Actually that is the main point behind using tabs with the size of 8
+> > spaces. Code that uses too much nested structures become unreadable
+> > and you start thinking of how you can make this easier and make it
+> > looking a little bit nicer. In most cases the answer is inline
+> > functions.
+> 
+> Well yes. For most programs that's entirely true but in this special
+> case of only a few ever recurring tight loops (some of them even copied
+> literally from the spec) I don't see how littering the otherwise linear
+> functionality all over the file would make it easier to read. I'd rather
+> say the opposite was true.
+
+Don't worry too much about it, because once we have a working decoder
+and encoder we can look over your code and optimize it. Maybe some loops
+will simply disappear then.
 
 Regards
 
