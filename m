@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] multi rfcomm/sco connection
-From: Marcel Holtmann <marcel@holtmann.org>
-To: ubaldo <ubaldo@eja.it>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040618175410.28510.qmail@webmail.aruba.it>
-References: <20040618175410.28510.qmail@webmail.aruba.it>
-Content-Type: text/plain
-Message-Id: <1087582530.4309.121.camel@pegasus>
+Message-ID: <20040618175410.28510.qmail@webmail.aruba.it>
+From: "ubaldo" <ubaldo@eja.it>
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; format=flowed; charset="iso-8859-1"
+Subject: [Bluez-devel] multi rfcomm/sco connection
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,19 +15,12 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 18 Jun 2004 20:15:30 +0200
+Date: Fri, 18 Jun 2004 19:54:10 +0200
 
-Hi,
+Buondi', 
 
-> I would like to understand why it is not possible to establish more than one 
-> sco connection and more than an rfcomm connection with and usb-dongle. 
-
-it is possible to establish up to 30 RFCOMM connections into each
-direction. The number of SCO connections is limited to one per ACL link.
-
-Regards
-
-Marcel
+I would like to understand why it is not possible to establish more than one 
+sco connection and more than an rfcomm connection with and usb-dongle. 
 
 
 
