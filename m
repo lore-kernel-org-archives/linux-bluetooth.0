@@ -1,76 +1,118 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Return-Path: <daryl@wideray.com>
+Errors-To: <daryl@wideray.com>
+From: "Daryl Van Vorst" <daryl@wideray.com>
+To: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+Subject: RE: [Bluez-devel] Qualification Testing
+Date: Thu, 29 May 2003 15:51:22 -0700
+Message-ID: <001b01c32634$d3cd5530$1a01010a@baked>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Subject: RE: [Bluez-users] DB aliases (wishlist)
-Message-ID: <E320A8529CF07E4C967ECC2F380B0CF9013E84C7@bsebe001.americas.nokia.com>
-From: <EXT-Somil.Asthana@nokia.com>
-To: <maxk@qualcomm.com>, <tomi@virago.in-chemnitz.de>, <bluez-users@lists.sourceforge.net>
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: 
-	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: 
-	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 10 Apr 2003 09:26:57 -0400
+In-Reply-To: <5.1.0.14.2.20030519141834.0951b330@unixmail.qualcomm.com>
+Content-Type: text/plain; CHARSET=us-ascii
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Max
-  Just a thought !! Do you really think this is necessary feature because I=
- added a simple cmd in hcitool -i hciX lname <local_name> which calls issue=
-s HCI_CMD to write local name. It was nothing more than cut & paste from hc=
-id/main.c file which writes local name...
+Max,
 
-regards
-Somil
+Here's where we're at with this one:  We either need to pass this test, or
+issue an erratum. Issuing an erratum is going to be a very time-consuming
+task and we can't be certain of the outcome.
 
+About the only scenario we could come up with where this makes any sense at
+all is if the remote device wants to send data larger than the default MTU
+of 672, and the local application doesn't specifically tell the stack that
+it can handle a larger MTU before calling connect().  Is it in our interest
+to handle this?
 
------Original Message-----
-From: ext Max Krasnyansky [mailto:maxk@qualcomm.com]
-Sent: Monday, April 07, 2003 4:02 PM
-To: Dr. Thomas Bengs; bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] DB aliases (wishlist)
+Is it possible to give the app control during the CONFIG state so that it
+can do the negotiation with the remote side? Am I correct in assuming that
+as it is now the app only gets control once we enter the OPEN state?
 
+The original test MSC (Message Sequence Chart) showed the application
+sending L2CA_ConfigReq to the top end of the stack and the stack sending
+L2CAP_ConfigReq to the remote device. The L2CAP_ConfigReq was also sent up
+to the application as L2CA_ConfigCfm (with status=3Dreject and the values t=
+hat
+the remote device wants to see). It was then up to the app to send another
+L2CA_ConfigReq to the stack to be forwarded to the remote device. The MSC
+was later updated to remove the involvement of the application, but the sam=
+e
+reject-then-re-request sequence is there.
 
-At 02:20 PM 4/4/2003, Dr. Thomas Bengs wrote:
+Perhaps we could put in a "hack" (if we're going to call it that) which
+allows us to pass the test. We could, at the same time, write up an errata
+requesting that this test be optional or changed so that we would pass the
+test without the "hack". Once the erratum is accepted, we could remove the
+hack.
 
->Hello Paul Hedderly,
->
->You wrote on 04/04/03:
->> I would love to be able to populate a file like /etc/bluetooth/aliases
->> which would be like /etc/hosts, ie:
->> 00:E0:03:25:08:72     pauls-laptop
->> Any chance?
->
->me too :)
-Next major version of bluez utils might have something like that.=20
+Is there any chance that you could make this change?  Or, if not, could you
+help me determine where in the code to do it? The behaviour that would make
+it pass is as follows:
 
-Max
+1. We send a config request.
+2. We get a config response rejecting our request which contains the
+tester's desired values.
+3. We re-send the config request with those values (the tester will accept
+this request).
+4. At this point if the config request is not accepted we can close the lin=
+k
+like we would normally.
 
+Maybe we could add a setsockopt() l2cap option like LM_FLEXIBLEINMTU to tur=
+n
+on this behaviour (not sure if making it optional will pass - I'll check).
 
+Apparently, in step 3 above, if we send a config request with no options it
+will also pass the test. How silly is that? (specially considering that's
+what we send by default in the first place!)
 
--------------------------------------------------------
-This SF.net email is sponsored by: ValueWeb:=20
-Dedicated Hosting for just $79/mo with 500 GB of bandwidth!=20
-No other company gives more support or power for your dedicated server
-http://click.atdmt.com/AFF/go/sdnxxaff00300020aff/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+-Daryl.
 
 
--------------------------------------------------------
-This SF.net email is sponsored by: Etnus, makers of TotalView, The debugger=
-=20
-for complex code. Debugging C/C++ programs can leave you feeling lost and=20
-disoriented. TotalView can help you find your way. Available on major UNIX=20
-and Linux platforms. Try it free. www.etnus.com
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+> -----Original Message-----
+> From: Max Krasnyansky [mailto:maxk@qualcomm.com]=20
+> Sent: May 19, 2003 2:19 PM
+> To: Daryl Van Vorst; 'Marcel Holtmann'
+> Cc: 'BlueZ Mailing List'
+> Subject: RE: [Bluez-devel] Qualification Testing
+>=20
+>=20
+> At 11:01 AM 5/16/2003, Daryl Van Vorst wrote:
+> >Max,
+> >
+> >> >> I sent the above quote to Cetecom last week. They=20
+> responded saying=20
+> >> >> that MTU isn't the only negotiated parameter.
+> >>=20
+> >> FlushTO _must_ be 0xffff for reliable ACL link. So far none
+> >> of the profiles specified use of unreliable links.=20
+> >>=20
+> >> Support for QOS is totally optional. We're only required to
+> >> support 'best effort'. Which means that even if they want=20
+> >> something other than 'best effort' (i.e. they reject=20
+> >> default settings) we won't be able to accept it simply=20
+> >> because we don't support it.
+> >>=20
+> >> So I'm not sure what can be negotiated there.
+> >
+> >Ok. I'll see what they say about that too.
+> >
+> >> btw Can this fancy Merlin viewer export trace in plain text ?
+> >> I'm too lazy to install that stuff. And it looks like I=20
+> need to see=20
+> >> what is it exactly that they request/reject.
+> >
+> >
+> >Before we start the test, we must specify to the tester the=20
+> parameters=20
+> >that we'll accept. The tester will reject the first set of=20
+> values, no=20
+> >matter what they are. In its response it will send new=20
+> values (which we=20
+> >specify) that it expects to see in the next request from the IUT.
+>=20
+> Any updates on this one ?
+>=20
+> Max
+>=20
+>=20
+>=20
