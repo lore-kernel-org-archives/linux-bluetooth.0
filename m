@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Command to modify l2cap flush timeout
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: Sean Loh <blaze_wk@yahoo.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20041028171416.67124.qmail@web41112.mail.yahoo.com>
+References: <20041028171416.67124.qmail@web41112.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1099024935.10164.11.camel@pegasus>
+Message-Id: <1098984748.6636.34.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Service level security for RFCOMM
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,24 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 29 Oct 2004 06:42:15 +0200
+Date: Thu, 28 Oct 2004 19:32:28 +0200
 
-Hi Folks,
+Hi Sean,
 
-actually it seems that nobody really cares about service level security
-on the RFCOMM layer. Or people are too lazy to send in a patch. However,
-I spent some hours with thinking about it and the core stuff of a small
-framework for providing authentication and encrypt feedback from HCI to
-higher level protocols is finished.
+> I was wondering if there is an implementation to
+> modify the l2cap flush timeout? I'm using the pan
+> profile and would like to make the l2cap layer
+> unreliable to stream real time data. Through the
+> mailing list, I can't seem to find the implementation
+> of the flush timeout command, only some comments on
+> it. 
 
-The problem now is to change the RFCOMM state machine to deal with it
-and reject connections in the failure case. After looking at the state
-machine of RFCOMM, I realized that there are two posibilities when to
-trigger the authentication. One is after we receive the PN CMD and the
-other after the SABM for the specific channel. The specification says
-nothing about that. What are the pros and cons?
-
-And btw, who is really interested in this feature or needs it?
+I never worked on it and I think Max neither. However any patch that
+improves BlueZ is welcome.
 
 Regards
 
