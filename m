@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <423811DA.10403@carmedialab.de>
-From: Marcus Mikolaiczyk <marcus.mikolaiczyk@carmedialab.de>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BLueZ Questions
-References: <4237F516.2040804@carmedialab.de>	 <1110965751.9818.87.camel@pegasus>  <42380154.3080005@carmedialab.de> <1110967438.9818.110.camel@pegasus>
-In-Reply-To: <1110967438.9818.110.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Subject: Re: [Bluez-users] Multiple Bluetooth connections 
+In-Reply-To: Message from Marcel Holtmann <marcel@holtmann.org>
+   of "Wed, 16 Mar 2005 10:42:10 +0100." <1110966130.9818.95.camel@pegasus>
+References: <42372E0A.80002@futurlink.com>  <1110966130.9818.95.camel@pegasus> 
+Message-ID: <22721.1110969653@csr.com>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,44 +17,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Mar 2005 12:00:42 +0100
+Date: Wed, 16 Mar 2005 10:40:53 +0000
 
-Hi Marcel,
+Marcel Holtmann wrote:
+> this is a hardware limit and I don't know of any chip that is capable of
+> establishing two connections at the same time. From what I know this
+> will never be possible, but you should better ask a radio/baseband
+> expert for a correct answer.
+
+Below HCI, it won't work in a typical set up.  The usual scan mode is "R1
+page scan repetition mode" where the device scans at least (and usually
+only) every 1.28 seconds, usually for 18 slots.  If you try to page
+two devices at once, you run the risk of switching to paging the other
+device at exactly the short window you need to pick up one device,
+and hence miss it altogether.  You can do it when the devices are in
+"R0" (continuous scan) but then connection time should be more or
+less instantaneous anyway and there's no gain.  So it's not supported
+by HCI_Create_Connection.
+
+Once you have an ACL connection, it should be entirely possible to
+negotiate multiple channels over the top of it, depending on the
+software.
+
+pws
 
 
-> make sure that you adding my latest -mh patch for that kernel.
-for Kernel 2.4.19 I do (patch-2.4.19-mh18).
-> 
->>Profiles looking for:
->>Serial Profile (through rfcomm ?)
-> 
-> 
-> To what should this be connected? The GPS or the GSM/GPRS unit?
-What ever is possible.
--GPS for using a PDA(bt) to get positioning informations to spare a 
-separate GPS Module.
--A terminal to connect to from a PC
--Maybe using GSM/GPRS as Dial up connection.
-> 
->>Handsfree (for using a external mobile phone)
-> 
-> 
-> Are the SCO audio data sent over the PCM interface of the chip?
-In the first Hardware release there's no Audio codec but ther will be 
-one in the second. I'm not sure how it will be implemented. In the 
-moment the PCM interface is connected to a synchronus serial interface 
-on the tc1130. I'll think we got to diskuss this internally more deeply 
-to clarify the needs and usage.
-> 
->>Fileexchange (through openobex)
-> 
-> 
-> Depending on what you wanna do you may need do write some extra code,
-> but there are a lot of examples. 
-I thought it's done through the openobex package. I suppose I can find 
-example on the openobex project site.
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
 
-Bye Marcus
+**********************************************************************
+
 
 
 -------------------------------------------------------
