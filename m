@@ -1,29 +1,55 @@
-Return-Path: <steve.crane@rococosoft.com>
-Subject: New Zaurus packages available
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: bluez-announce@lists.sourceforge.net, bluez-users@lists.sourceforge.net,
-   bluez-users@lists.sourceforge.net
-Cc: marcel@holtmann.org
+Return-Path: <jon@valvatne.com>
+Subject: Re: [Bluez-users] CF cards
+From: Jon Valvatne <jon@valvatne.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1086300734.4424.6.camel@pegasus>
+References: <1086292123.4353.27.camel@m117a.studby.ntnu.no>
+	 <1086300734.4424.6.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1086340599.10892.807.camel@baroque.rococosoft.com>
+Message-Id: <1086339872.4342.7.camel@m117a.studby.ntnu.no>
 Mime-Version: 1.0
-Date: Fri, 04 Jun 2004 10:16:39 +0100
+Date: Fri, 04 Jun 2004 11:04:32 +0200
 List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi,
-I have uploaded the following packages to the Sourceforge download site,
-http://bluez.sourceforge.net/download/zaurus:
+Ok, thanks for the prompt response.
 
-bluez-libs-2.7
-bluez-hcidump-1.8
-bluez-utils-2.7
-bluez-kernel-2.4.18-mh14 --- BlueZ kernel modules for the 3.10 Sharp ROM
+I think what I'll do is get the Socket card and just stick with the 2.4
+kernel for now. Maybe I can even help track down the problem with 2.6;
+I'm quite comfortable recompiling kernels/modules and digging into
+source code. I have no experience with kernel hacking though, and no
+experience with BlueZ internals, so any pointers or further thoughts on
+where the problem might lie would be helpful.
 
-Let me know how you get on with them: they haven't been extensively
-tested. Also if your favourite util is missing, ask and I might
-include it.
+Jon
 
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+On Fri, 2004-06-04 at 00:12, Marcel Holtmann wrote:
+> Hi Jon,
+> 
+> > I'm in the market for a CF card for my laptop (Thinkpad X30, built-in CF
+> > slot), and after checking the hardware support list on bluez.org I had
+> > decided on the Socket card, since that was one of the few I could find
+> > in my country.
+> > 
+> > But in the archives of this list I stumbled across a few mentions of
+> > that card not working with the 2.6 kernel. Is this still true? Has there
+> > been any progress on solving that problem?
+> > 
+> > Alternately, is there any chance the Billionton (CFBT02) or Dell
+> > (Truemobile 300) cards are supported or will be supported in the near
+> > future?
+> 
+> actually the Socket card 2.5 is an excellent choise, because of their
+> size and its CSR based Bluetooth chip. But as you already read in the
+> archives there are some problems. With 2.6 some serial cards work and
+> some don't. I guess that this is a problem in the new serial layer of
+> 2.6. So choosing the right card will be a non-trivial problem, because
+> most of them are serial based and you can't be sure that they work until
+> you tested them. If you don't care what Bluetooth chip is used I suppose
+> that you go with the Anycom CF card (bluecard_cs driver).
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
