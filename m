@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4235C92D.80107@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: [Patch] Some btsco modifications
-References: <1110683934.5056.43.camel@pc7.dolda2000.com>	 <4233C663.80109@xmission.com> <1110762698.5056.73.camel@pc7.dolda2000.com>	 <423589B1.6000403@xmission.com> <1110809103.5056.102.camel@pc7.dolda2000.com>
-In-Reply-To: <1110809103.5056.102.camel@pc7.dolda2000.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] Re: Initial support for the BPA 100/105 sniffers
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <loom.20050314T161343-122@post.gmane.org>
+References: <1107294719.9652.81.camel@pegasus>
+	 <loom.20050314T161343-122@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1110817752.629.23.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +19,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 14 Mar 2005 10:26:05 -0700
+Date: Mon, 14 Mar 2005 17:29:12 +0100
 
-Fredrik
+Hi Andreas,
 
->>Can you comment on what the implications are for supporting multiple 
->>headsets simultaneously with a single btsco daemon? Would the kernel 
->>interaction need to be changed again or could it be limited to the daemon?
-> 
-> 
-> Well, if you ask me, that's just unnecessary.  It would add a lot of
-> complexity to the btsco daemon, for no obvious purpose. I believe that
-> if one wants multiple headsets, one should simply run multiple instances
-> of the btsco daemon.
+> I have one for testing (more sniffing) the telematic devices coming from our 
+> suppliers.
+> Up to now we are using it with windows. But now we will have a deeper look to 
+> your support for the BPA105 :-) 
 
-Maybe what we're looking for is something to start/stop/restart 
-one-per-headset btsco deamons appropriately. Maybe a daemon itself.
+I never thought that these sniffers are still in use. I would be great
+to increase the Linux support for them. However be aware of that the
+current code is not able to sniff encrypted traffic. I also still don't
+have any idea how to differ between traffic from the master and the
+slaves.
 
-I will tag and merge the latest changes tonight. We will need to update 
-the README (I can do this myself at some point) and Thomas or someone 
-who uses it should fix btsco2.
+> We plan to switch to kernel 2.6.10 with your patches within the next two weeks.
 
-I believe everything (with the possible glaring exception of userspace 
-btsco.c) was indented to "kernel style" using some magical args to 
-indent. If things work ok, I will do an indent pass again to make the 
-look consistent.
+It seems that people are really beginning to love the 2.6.10 kernel, but
+personally I would see them to use 2.6.11.x.
 
-Brad
+> By the way, it's nice to have bluez for testing ...
+
+me, too :)
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
