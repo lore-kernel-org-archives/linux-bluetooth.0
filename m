@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Paul Ionescu <i_p_a_u_l@yahoo.com>
-Message-ID: <pan.2005.01.18.21.13.28.823011@yahoo.com>
-References: <200501181145.11573.da209@cam.ac.uk> <41ED32F0.8010502@xmission.com>
+Subject: Re: [Bluez-devel] [btsco] automake error
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41ED434B.9060207@xmission.com>
+References: <41ED224E.9030702@pca.it>  <41ED434B.9060207@xmission.com>
+Content-Type: text/plain
+Message-Id: <1106078211.8190.79.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-devel] Re: bluetooth headset
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,24 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 Jan 2005 23:13:31 +0200
+Date: Tue, 18 Jan 2005 20:56:51 +0100
 
 Hi Brad,
 
-The problem was not the detection itself.
-Indeed sco was connecting to Jabra BT 110 to the headset channel.
-But it worked better on handsfree channel.
-The headset profile is pretty dumb, comparing to handsfree profile.
-So I forced to connect to handsfree instead of headset.
-Maybe we should check if the headset implements both profiles, and if so,
-choose the handsfree profile which is better.
+> thanks Luca. keep those patches coming :)
 
-Best regards,
-Paul
+the Debian users should consider to use update-alternatives to choose
+their prefered automake. The CVS is for developers and they should know
+what they are doing. In a released tarball this doesn't matter anymore.
+On the other hand you can simply remove --ignore-deps from the bootstrap
+file. I personally don't like this depend stuff and so I don't use it.
 
-On Tue, 18 Jan 2005 09:01:52 -0700, Brad Midgley wrote:
-> paul ionescu had a similar problem with the jabra bt 110...
-> 
+Regards
+
+Marcel
 
 
 
