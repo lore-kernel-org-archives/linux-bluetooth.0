@@ -1,5 +1,5 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <423818DE.1060909@sinister.cz>
+Message-ID: <42381799.4020404@sinister.cz>
 From: Trekie <trekie@sinister.cz>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
@@ -18,13 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Mar 2005 12:30:38 +0100
+Date: Wed, 16 Mar 2005 12:25:13 +0100
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-Maybe bluetooth is connected to that USB hub, but I can't do anything
-with it. I can do almost whatever you say to make it working.
+Hi Marcel,
+
+Marcel Holtmann wrote:
+| Hi David,
+|
+|
+|>I can't get MS-6871 BT device (USB hub with bluetooth) working.
+|>hciconfig shows:
+|>
+|>hci0:   Type: USB
+|>~        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO MTU: 0:0
+|>~        DOWN
+|>~        RX bytes:0 acl:0 sco:0 events:0 errors:0
+|>~        TX bytes:0 acl:0 sco:0 commands:0 errors:0
+|>
+|>and hciconfig hci0 up:
+|>
+|>Can't init device hci0. Input/output error(5)
+|>
+|>with this in syslog:
+|>
+|>hci_usb_intr_rx_submit: hci0 intr rx submit failed urb c17e1514 err -28
+|>
+|>Do anyone know what should I do?
+|
+|
+| is it directly connected to the USB root hub? We saw problems if another
+| USB hub is involved.
+
+Yes, it is connected directly to my notebook. I tried to plug it in
+another port, but the result is same.
+
 
 Regards
 
@@ -33,9 +63,9 @@ David
 Version: GnuPG v1.2.6 (GNU/Linux)
 Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
 
-iD8DBQFCOBjeMcA3II2AlaIRAnJOAKDGtq+Iz3QHmc9gUptt+KBdJsiM/gCgtsc3
-AaP4gEx6MaQd4Y221GnzoYw=
-=kwnM
+iD8DBQFCOBeZMcA3II2AlaIRAt6EAKCj34AdQG2LG7ju2b/pTqiL5qbDWACeI/gk
+brC9/eSakijCEkMk5yPcw3Y=
+=k+bj
 -----END PGP SIGNATURE-----
 
 
