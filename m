@@ -1,9 +1,9 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: cross-compilation howto  (was "Re: [Bluez-users] Trying to
 	compile for axis but Bluetooth library not found")
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1107542589.6921.84.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1107542281.22569.42.camel@justakiss>
 References: <41FE85A0.2040709@ieee.org>
 	 <1107204712.15769.70.camel@justakiss>  <41FF54DA.40801@ul.ie>
 	 <1107254209.9652.0.camel@pegasus>  <41FF8FE0.8010204@gmx.ch>
@@ -11,9 +11,8 @@ References: <41FE85A0.2040709@ieee.org>
 	 <41FF9EA2.8090605@gmx.ch> <1107273565.8819.38.camel@justakiss>
 	 <4203B1BB.1070006@gmx.ch>  <1107541143.22567.29.camel@justakiss>
 	 <1107541330.6921.81.camel@pegasus>  <1107542281.22569.42.camel@justakiss>
-	 <1107542589.6921.84.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1107543332.22573.52.camel@justakiss>
+Message-Id: <1107542589.6921.84.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -26,48 +25,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Feb 2005 19:55:32 +0100
+Date: Fri, 04 Feb 2005 19:43:09 +0100
 
-Am Fre, den 04.02.2005 schrieb Marcel Holtmann um 19:43:
-> Hi Erwin,
-> 
-> > finding a quick workaround usually consumes much less time than fixing
-> > the configure scripts. Once it's working, most times I'm not in the mood
-> > to look how the autoconf stuff can be fixed. The bluez configure scripts
-> > are quite nice compared to other packages, but there are still some
-> > small problems where I didn't find a nice solution. For example, is it
-> > possible to specify only a subset of the applications to be installed
-> > for the target system, by specifying that in enviroment variables?
-> 
-> what do you wanna select or better de-select. Lets discuss this what is
-> needed by default and what not and we can add such an option very easy.
-> 
-> Regards
-> 
-> Marcel
-Hi Marcel,
+Hi Erwin,
 
-in my uClinux Midori distribution, I have a web based configuration
-where I have a checkbox for every binary from bluez-utils that should be
-installed on the target. Right now, I'm not using the install: target,
-instead I just copy the selected applications to the target. 
-(See http://cvs.home.at/midori/sources/bluez-utils-2.10)
+> finding a quick workaround usually consumes much less time than fixing
+> the configure scripts. Once it's working, most times I'm not in the mood
+> to look how the autoconf stuff can be fixed. The bluez configure scripts
+> are quite nice compared to other packages, but there are still some
+> small problems where I didn't find a nice solution. For example, is it
+> possible to specify only a subset of the applications to be installed
+> for the target system, by specifying that in enviroment variables?
 
-Regards,
-Erwin
--------------------------
-# Name: BLUEZ_UTILS_PROGS
-# Description: BlueZ programs to install in /bin
-# Type: LIST CHECKBOX (dund/dund,pand/pand,hidd/hidd,tools/ciptool,tools/hcitool,tools/l2ping,rfcomm/rfcomm,tools/sdptool)
-# Default: ""
-BLUEZ_UTILS_PROGS=""
+what do you wanna select or better de-select. Lets discuss this what is
+needed by default and what not and we can add such an option very easy.
 
-# Name: BLUEZ_UTILS_SPROGS
-# Description: BlueZ programs to install in /sbin
-# Type: LIST CHECKBOX (tools/hciattach,tools/hciconfig,hcid/hcid,sdpd/sdpd)
-# Default: ""
-BLUEZ_UTILS_SPROGS=""
--------------------------
+Regards
+
+Marcel
 
 
 
