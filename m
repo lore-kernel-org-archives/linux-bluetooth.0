@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluez tools
+Subject: Re: [Bluez-users] Encrypted and unencrypted connections at the
+	same time
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <E73D9A5BC4A2D711BBC600065BF3595F1C66CF94@il06exm10>
-References: <E73D9A5BC4A2D711BBC600065BF3595F1C66CF94@il06exm10>
+In-Reply-To: <200502141659.45030.sc2@inf.tu-dresden.de>
+References: <200502141659.45030.sc2@inf.tu-dresden.de>
 Content-Type: text/plain
-Message-Id: <1108408399.7780.6.camel@notepaq>
+Message-Id: <1108408313.7780.3.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,14 +19,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Feb 2005 20:13:19 +0100
+Date: Mon, 14 Feb 2005 20:11:52 +0100
 
-Hi Hiren,
+Hi Sebastian,
 
-> I would like to know where can I get Bluez tools/libraries for profiles like Obj push (OPD) and others ... my OS is FC3
+> I have a MS optical desktop elite (mouse and keyboard).
+> The keyboard supports an encrypted connection, but the mouse doesn't.
+> So, I want to enable encryption and authentication by default,
+> but want to disable it for the mouse.
+> When I enable authentication/encryption, the laptop wants to make a secure 
+> connection also to the mouse, but obviously this does not work. So, I have to 
+> switch authentication/encryption off temporarily to connect to the mouse, and 
+> then enable it again.
 
-look at the BlueZ CVS repositories and check out the link list of BlueZ
-related websites at my page.
+you switch into security mode 3 and don't know what it is.
+
+> Is there a way configure hcid or hidd in a way, e.g. by hcid.conf,
+> so that this setting is recognized automatically (i.e. a special configuration 
+> for the mouse)?
+
+Try to start the hidd --server with the --encrypt switch. It should then
+request encryption for the keyboards.
 
 Regards
 
