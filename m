@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Lars Steinke <sf@lsweb.de>
+Message-ID: <BAY2-F40D2F3CE195E490C120BF1A63B0@phx.gbl>
+In-Reply-To: <425179EE.2080602@xmission.com>
+From: "Mack Stevenson" <mackstevenson@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20050404194542.GA7640@lsweb.de>
+Subject: Re: [Bluez-users] well-supported cardbus bluetooth card
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] btsco - headset profile activated but no sco packets transmitted ???
+Content-Type: text/plain; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,72 +17,89 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 4 Apr 2005 21:45:42 +0200
+Date: Mon, 04 Apr 2005 21:32:26 +0200
 
-Hi there,
+Hi Brad
 
-while running btsco I can successfully change my mixersettings via 
-the headset, so I assume the connection has been established just fine:
+Thanks for the input. I'm indeed "stuck" using 2.6 (802.11g drivers...) and 
+I'm having trouble finding the model you mentioned. Actually, I've 
+repeatedly searched amazon and I can only find one pcmcia/cardbus card:
 
-root@sigma:~/src/btsco# ./btsco -v 00:07:A4:95:41:76 2
-btsco v0.4
-Device is 1:0
-Voice setting: 0x0060
-RFCOMM channel 2 connected
-recieved AT+BRSF=24
-recieved AT+VGS=03
-Sending up speaker change 3
-recieved AT+VGS=07
-Sending up speaker change 7
-recieved AT+VGS=11
-Sending up speaker change 11
-recieved AT+VGS=15
-Sending up speaker change 15
-speaker volume: 15 mic volume: 1
-driver is in use
-connected SCO channel
-Done setting sco fd
+3Com 3CRWB6096B
 
-But I can neither hear sound nor record anything via the Jabra BT110
-headset using BlueZ 20050328 with kernel 2.6.11:
+Will this work? Alternatively please just let me know a brand/product name I 
+can by expecting that it will work under 2.6.
 
-aplay -D plughw:Headset test.wav
-Playing Sparc Audio 'test.wav' : Mu-Law, Rate 8000 Hz, Mono
+Thank you for your input,
 
-I just hear a raise in static when playback commences (even though mixer
-levels are maxed in alsamixer!)...
+Mack
 
-snd-bt-sco revision 1.6 $
-snd-bt-sco: snd-bt-scod thread starting
-snd-bt-sco: playback_open
-snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 2000
-snd-bt-sco: playback_trigger 1
-snd-bt-sco: setting playback to bspcm
+>From: Brad Midgley <bmidgley@xmission.com>
+>Reply-To: bluez-users@lists.sourceforge.net
+>To: bluez-users@lists.sourceforge.net
+>Subject: Re: [Bluez-users] well-supported cardbus bluetooth card
+>Date: Mon, 04 Apr 2005 11:31:26 -0600
+>
+>Mack
+>
+>I had a lot of luck with the socket f and g models.
+>
+>If you are using a 2.4 kernel, these will work great.
+>
+>If you need 2.6, you may have to apply a patch or wait until it makes it 
+>into the mainline kernel. (Mathias Adam posted the patch on bluez-devel 
+>around 3/5/05)
+>
+>Brad
+>
+>Mack Stevenson wrote:
+>>Hi all
+>>
+>>I want to buy a cardbus bluetooth card for my old laptop (for use with a 
+>>keyboard).
+>>
+>>Since the list of supported devices is no longer available at
+>>
+>>http://www.holtmann.org/linux/bluetooth/devices.html
+>>
+>>could anyone please tell me what would be a wise choice to avoid headaches 
+>>later on?
+>>
+>>Thank you in advance,
+>>
+>>Mack
+>>
+>>_________________________________________________________________
+>>Don't just search. Find. Check out the new MSN Search! 
+>>http://search.msn.click-url.com/go/onm00200636ave/direct/01/
+>>
+>>
+>>
+>>-------------------------------------------------------
+>>SF email is sponsored by - The IT Product Guide
+>>Read honest & candid reviews on hundreds of IT Products from real users.
+>>Discover which products truly live up to the hype. Start reading now.
+>>http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+>>_______________________________________________
+>>Bluez-users mailing list
+>>Bluez-users@lists.sourceforge.net
+>>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
+>-------------------------------------------------------
+>SF email is sponsored by - The IT Product Guide
+>Read honest & candid reviews on hundreds of IT Products from real users.
+>Discover which products truly live up to the hype. Start reading now.
+>http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-root@sigma:~# hcitool con
-Connections:
-        < SCO 00:07:A4:95:41:76 handle 44 state 1 lm SLAVE
-        < ACL 00:07:A4:95:41:76 handle 41 state 1 lm MASTER
-root@sigma:~# hciconfig hci0
-hci0:   Type: USB
-        BD Address: 00:02:72:80:A5:D3 ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:9966 acl:207 sco:0 events:535 errors:0
-        TX bytes:6279 acl:191 sco:0 commands:195 errors:0
+_________________________________________________________________
+Express yourself instantly with MSN Messenger! Download today it's FREE! 
+http://messenger.msn.click-url.com/go/onm00200471ave/direct/01/
 
-root@sigma:~# hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:02:72:80:A5:D3 ACL MTU: 192:8 SCO MTU: 64:8
-        HCI 16.14
-        Chip version: BlueCore02-External
-        Max key size: 56 bit
-        SCO mapping:  HCI
-
-Audio works fine with that headset and dongle using the Widcomm stack
-1.4 under Windoze ;(...
-
-Regards,
-Lars
 
 
 -------------------------------------------------------
