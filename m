@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] BlueZ and headset
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200402022242.43547.cijoml@volny.cz>
-References: <200402022018.05536.cijoml@volny.cz>
-	 <1075756519.29899.193.camel@pegasus>  <200402022242.43547.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1075762637.29899.257.camel@pegasus>
-Mime-Version: 1.0
+References: <200402022018.05536.cijoml@volny.cz> <1075756519.29899.193.camel@pegasus>
+In-Reply-To: <1075756519.29899.193.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200402022242.43547.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,31 +19,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 02 Feb 2004 23:57:18 +0100
+Date: Mon, 2 Feb 2004 22:42:43 +0100
 
-Hi Michal,
+Dne po 2. =FAnora 2004 22:15 Marcel Holtmann napsal(a):
+> Hi Michal,
+>
+> > there is a some driver for SCO using ALSA. Does anything exists for good
+> > old OSS too?
+>
+> the complete SCO/eSCO stuff needs to be reworked, but I don't see any
+> future for an OSS driver. ALSA is the choosen architecture for 2.6 and
+> onwords.
 
-> > the complete SCO/eSCO stuff needs to be reworked, but I don't see any
-> > future for an OSS driver. ALSA is the choosen architecture for 2.6 and
-> > onwords.
-> 
-> Well, so implementation from:
-> http://www.dcs.gla.ac.uk/~jp/snd-bluez-sco/
-> 
-> will never be included and you want write your own implementation?
+Well, so implementation from:
+http://www.dcs.gla.ac.uk/~jp/snd-bluez-sco/
 
-I don't want to do this, but we have to, because of Bluetooth 1.2 and
-eSCO etc. The other point is, that the snd-bluez-sco driver should be
-integrated directly into the SCO module and not running as a kernel
-thread, because there is no need for it. However I actually don't know
-how this all should look like and work together with the Headset and
-Cordless Telephony profiles. And what about A2DP which carries audio
-streams over an ACL link?
+will never be included and you want write your own implementation?
 
-Regards
-
-Marcel
-
+Michal
 
 
 
