@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41C71F9D.7000902@cc.gatech.edu>
-From: Jay Summet <summetj@cc.gatech.edu>
-MIME-Version: 1.0
+Message-ID: <20041220180425.9191.qmail@web11601.mail.yahoo.com>
+From: "Bhaskar S. Manda" <bhaskar_manda@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] File Transfer via Bluetooth
-References: <loom.20041220T180020-785@post.gmane.org>
-In-Reply-To: <loom.20041220T180020-785@post.gmane.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] Socket version F not recognized on SL-6000
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,50 +16,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 20 Dec 2004 10:53:17 -0800
+Date: Mon, 20 Dec 2004 10:04:25 -0800 (PST)
 
-If you have the network already working, the hard part is done.
+cardctl ident shows product info matching that in
+/etc/pcmcia/bluetooth.conf, but doesn't load dtl1_cs.
 
-You just have to set up a server daemon on the computer you want to 
-"serve" files, and use the correct client on the "client" computer to 
-retrieve (or push) files. Each of your computers should have a static IP 
-(on the private PAN network). If you don't want to use IP addresses, you 
-can edit your /etc/hosts file to give them "real" names.
+# cardctl ident
+Socket 0:
+  product info: "Socket", "CF+ Personal Network Card"
+  manfid: 0x0104, 0x009f
+  function: 254 ((null))
 
-If you just want to be able to transfer a file here or there, I would 
-suggest using scp (secure copy, part of the SSH suite of tools). Make 
-sure that at least one of your computers (the server) is running sshd. 
-On the other computer (client) use scp to cpy files. (e.g. scp 
-"username@server.hostname:~/file_in_users_home_dir.txt ." will copy a 
-file from the server into the current directory (the trailing dot 
-specifies the current directory).
+And apparently because of this hciconfig has no output. The only other
+postings I've seen related to this had at least the card's function
+identified as "serial", but mine isn't getting even to that point, as
+the driver dtl1_cs for this card isn't being associated with the
+physical card being inserted.
 
-If you want to mount a filesystem, NSF (or Samba/SMB) would work as 
-well, but is a lot harder to setup/configure than scp.
-
-Jay
-
-Hannes Reiff wrote:
-
->Hi All,
->
->I'm using two pcs to create a pan connection so that both have access to the
->web. No problems. But when it comes to exchange files between the the two pcs -
->what has to be done? Is it possible to establish NFS over bluetooth? (I know
->there are some threads - but no solutions).
->
->Hope you can help me!
->
->Thanks,
->
->Hannes
->
->
->
->  
->
-
-
+All suggestions appreciated, thanks.
 
 
 -------------------------------------------------------
