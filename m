@@ -2,16 +2,17 @@ Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] AVDTP socket?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <cbf0aec904111913205a053965@mail.gmail.com>
-References: <418DB442.2050801@uen.org> <419B7292.9080706@xmission.com>
+In-Reply-To: <cbf0aec904111913065c4f8e25@mail.gmail.com>
+References: <418DB442.2050801@uen.org> <41957BC1.507@xmission.com>
+	 <1100351199.7349.50.camel@pegasus> <41970F25.4020902@xmission.com>
+	 <1100446172.21403.16.camel@pegasus> <419B7292.9080706@xmission.com>
 	 <cbf0aec9041118052714481128@mail.gmail.com>
-	 <1100822368.7164.98.camel@pegasus> <419DB6E1.8000203@xmission.com>
-	 <1100864484.7213.19.camel@pegasus> <419E20C3.7@xmission.com>
-	 <1100883199.7213.27.camel@pegasus> <1100885959.7213.31.camel@pegasus>
-	 <1100897144.7213.63.camel@pegasus>
-	 <cbf0aec904111913205a053965@mail.gmail.com>
+	 <1100822368.7164.98.camel@pegasus>
+	 <cbf0aec904111910383520ec7f@mail.gmail.com>
+	 <1100890600.7213.36.camel@pegasus>
+	 <cbf0aec904111913065c4f8e25@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1100900024.7213.79.camel@pegasus>
+Message-Id: <1100899434.7213.72.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -24,36 +25,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 19 Nov 2004 22:33:44 +0100
+Date: Fri, 19 Nov 2004 22:23:54 +0100
 
 Hi Henryk,
 
-> > and I figured out what the extra RFCOMM channel 1 on my Aiptek headphone
-> > does. You can simply stream the SBC files over it. The attached program
-> > will do this for you, but actually it only works on streams with two
-> > channels. I don't know what to change to support all test SBC files.
+> > number of subbands etc. The SBC defines a lot, but not all of them can
+> > be supported when we want to integrate it into ALSA. For the sink all
+> > are mandatory, but for the source only some of them.
 > 
-> Excellent!
-> 
-> I know I did try this as the first thing when I discovered that
-> channel (using rfcomm bind ..., rfcomm connect ... and cat foo.sbc >
-> /dev/rfcomm0) but obviously didn't try hard enough. Your rcplay does
-> work with mono files for me just fine.
+> Hmm, since we're dealing with a software and have quite some
+> computational power the encoder will probably support any possible
+> configuration. I'd just take the values from Table 4.7 on page 22 of
+> the A2DP spec as a set of reasonable default values where the only
+> choice left is middle vs. high quality.
 
-I think the problem with the other approach (I also tried it) was that
-the underlaying frame size is different if you connect through a TTY. I
-stuck it at 330 bytes which is a DH5 minus protocol overhead.
+from my current knowledge of ALSA we can set the frequency and the
+number of channels. So supporting all 4 frequencies and mono (1 channel)
+and joint stereo (2 channels) from the interface point of view is a
+reasonable way? Should we really do joint stereo instead of stereo?
 
-The test files 01, 03, 05 don't work for me.
-
-> From a rough test (I didn't compare the sound output to the reference
-> decoder, just listened at it) I'd say my headphones play back the
-> first 10 SBC test streams well, with the notable exception of number
-> 7. So it seems that being a mono file doesn't prevent playback this
-> way generically.
-
-Do you also use the Aiptek or the BlueTake one. The Aiptek is very old
-and maybe the decoder in my headphone has a bug.
+Any thoughts about this are welcome.
 
 Regards
 
