@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <411649EB.9020407@patbert.com>
+From: Patrick <patbert@patbert.com>
+Reply-To: patbert@patbert.com
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Apple bluetooth keyboard fun...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: patbert@patbert.com
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <411649EB.9020407@patbert.com>
 References: <4115A5E3.8000107@patbert.com> <1091959881.2773.6.camel@pegasus>
-	 <411649EB.9020407@patbert.com>
-Content-Type: text/plain
-Message-Id: <1091980492.2773.33.camel@pegasus>
-Mime-Version: 1.0
+In-Reply-To: <1091959881.2773.6.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,37 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 08 Aug 2004 17:54:52 +0200
+Date: Sun, 08 Aug 2004 11:42:35 -0400
 
-Hi Patrick,
+Alright I got libz, utils, and pin 2.9. I had to install dbus to get 
+bluez-pin to compile.
 
-> Alright I got libz, utils, and pin 2.9. I had to install dbus to get 
-> bluez-pin to compile.
+Now I have to do hciconfig hci0 up to get the adaptor to wake up...
+
+Now whenever I try to connect with hidd it always times out.
+
+Ah yes and I am using a 2.6.8-rc3 colonel now.
+
+2.7 was a package from my distro, I had to do 2.9 by hand. I guess there 
+is a chance I missed something but it all seemed to go over without a 
+hitch installation wise.
+
+Thanks for everyones replies!
+
+Patrick
+
+
+Marcel Holtmann wrote:
+> Hi Patrick,
 > 
-> Now I have to do hciconfig hci0 up to get the adaptor to wake up...
-
-start the hcid and sdpd from a boot script. Make sure that only one hcid
-is running.
-
-> Now whenever I try to connect with hidd it always times out.
 > 
-> Ah yes and I am using a 2.6.8-rc3 colonel now.
-
-On first connect to your keyboard you must input the PIN on it and press
-enter. Run "hcidump -x" as root to check what is going on.
-
-> 2.7 was a package from my distro, I had to do 2.9 by hand. I guess there 
-> is a chance I missed something but it all seemed to go over without a 
-> hitch installation wise.
-
-I hope you removed the distro packages first, before installing the new
-ones. Ask the package maintainer to adapt the upstream version.
-
-Regards
-
-Marcel
-
-
+>>I have had my apple bt keyboard working in linux for some time on my old
+>>pc. I now have a new pc and I can't get the damn thing going...
+>>
+>>I am using the same bluetooth adaptor from the old pc and as far as I
+>>can tell the same kernel config (as relates to bluetooth) as the old pc. 
+>>This is with bluez-libs and utils 2.7.
+> 
+> 
+> use bluez-libs-2.9 and bluez-utils-2.9 and kernel 2.6.8-rc3.
+> 
+> Regards
+> 
+> Marcel
 
 
 -------------------------------------------------------
