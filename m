@@ -1,107 +1,109 @@
-Return-Path: <t.schorpp@gmx.de>
-Message-ID: <3FFADA5E.8050202@gmx.de>
-Date: Tue, 06 Jan 2004 16:55:10 +0100
-From: "thomas.schorpp" <t.schorpp@gmx.de>
-Reply-To: "t.[NO_SPAM]schorpp"@gmx.de
-MIME-Version: 1.0
-CC: Marcel Holtmann <marcel@holtmann.org>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hci_acl_tx_to: hci0 ACL tx timeout, sco not the
- problem
-References: <3FF9E3F2.4040506@gmx.de> <1073393043.2508.50.camel@pegasus>	 <3FFAB0C5.4050407@gmx.de> <1073396288.2508.72.camel@pegasus>	 <3FFABD90.1020903@gmx.de> <1073397402.2508.81.camel@pegasus> <3FFACF71.70607@gmx.de>
-In-Reply-To: <3FFACF71.70607@gmx.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] non-blocking device discovery
+From: Stephen Crane <steve.crane@rococosoft.com>
+To: Fred =?ISO-8859-1?Q?Sch=E4ttgen?= <bluez-devel@schaettgen.de>
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1073403253.26243.1099.camel@baroque.rococosoft.com>
+References: <1073308932.26243.1058.camel@baroque.rococosoft.com>
+	 <200401052012.34307.bluez-devel@schaettgen.de>
+	 <1073403253.26243.1099.camel@baroque.rococosoft.com>
+Content-Type: text/plain; charset=ISO-8859-15
+Message-Id: <1073404409.26094.1101.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 06 Jan 2004 15:53:30 +0000
 
-thomas.schorpp wrote:
-> Marcel Holtmann wrote:
-> 
->> Hi Thomas,
->>
->>
->>>> This is HCI 16.4 firmware and it should work fine. Do you use the SCO
->>>> audio support for the HCI USB driver? If yes, disable it, because I
->>>> heard of problems with ISOC transfers on VIA chips if I remember
->>>> correctly.
->>>
->>>
->>> NO sco module loaded(?)
->>
->>
->>
->> I am not talking about the sco module. I am talking about the SCO audio
->> option of the HCI USB driver. Disable it to avoid ISOC transfers.
-> 
-> 
-> yes, ill check, i think it is disabled, wanted only pan from the 
-> beginning, thx a lot.
+Sorry, it was my fsck-up. (Funny how quickly these things are discovered
+after going public :-)
 
-was enabled, now disabled, no change, stalled after 2 minutes transfer:
+On Tue, 2004-01-06 at 15:34, Stephen Crane wrote:
+> Hi Fred and list,
+> Yeah that was the code I was referring to. (It is also very similar to
+> the code I'd cobbled together from Marcel's libs2 and the old
+> hci_inquiry() from libs1.)
+>=20
+> Now onto my new question, what are the semantics of OCF_INQUIRY? I seem
+> to be getting one unique device per inquiry call. That is I get one
+> EVT_INQUIRY_RESULT event with a bdaddr I haven't seen before and then i=
+t
+> terminates with an EVT_INQUIRY_COMPLETE. For example:
+>=20
+> inquiry
+> found 00:aa:bb:cc:dd:ee
+> inquiry complete
+> ...
+> inquiry
+> found 00:aa:bb:cc:dd:ee
+> found 00:aa:bb:cc:dd:ef
+> inquiry complete
+>=20
+> ...and so on. It seems that when it finds a new device, it passes that
+> back up and exits inquiry mode. Can this be right (or have I fscked
+> up)?  It only stays in inquiry mode for the specified length of time
+> when there are no new devices to be found.
+>=20
+> I have set the inquiry time parameter to 0x30 and the number of devices
+> to 0xff (both the max as per the spec).
+>=20
+> TIA,
+> Steve
+>=20
+> On Mon, 2004-01-05 at 19:12, Fred Sch=E4ttgen wrote:
+> > On Monday 05 January 2004 14:22, Stephen Crane wrote:
+> > > Hi,
+> > > I seem to remember a posting to this list in which someone mentione=
+d
+> > > that they'd implemented non-blocking device-discovery by writing
+> > > commands directly to the hci socket. The code was C++ which leads m=
+e to
+> > > think that it was part of KDE but I can't find it on the net.
+> > >
+> > > Can someone refresh my memory?
+> >=20
+> > Maybe you were looking for this: http://cvs.sourceforge.net/viewcvs.p=
+y/
+> > kde-bluetooth/kdebluetooth/libkbluetooth/? It's not part of the offic=
+ial KDE=20
+> > distribution (yet), but it's in fact KDE/Qt code..
+> >=20
+> > greetings
+> > Fred
+> >=20
+> >=20
+> >=20
+> > -------------------------------------------------------
+> > This SF.net email is sponsored by: IBM Linux Tutorials.
+> > Become an expert in LINUX or just sharpen your skills.  Sign up for I=
+BM's
+> > Free Linux Tutorials.  Learn everything from the bash shell to sys ad=
+min.
+> > Click now! http://ads.osdn.com/?ad_id=3D1278&alloc_id=3D3371&op=3Dcli=
+ck
+> > _______________________________________________
+> > Bluez-devel mailing list
+> > Bluez-devel@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--=20
+Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
+steve.crane@rococosoft.com +353-1-6601315 (ext 209)
 
-Jan  6 16:38:46 TOM1 pand[4118]: New connection from 00:10:60:A5:0F:DC bnep0
-
-Jan  6 16:42:37 TOM1 kernel: hci_acl_tx_to: hci0 ACL tx timeout
-Jan  6 16:42:37 TOM1 kernel: hci_acl_tx_to: hci0 killing stalled ACL 
-connection DC:0F:A5:60:10:00
-
-trying alternate usb driver...
 
 
-> 
->>
->>
->>>> Use 2.4.23-mh1 or 2.4.24-mh1.
->>>
->>>
->>> roger that. what change do you think in the changelogs should target 
->>> the problem?
->>
->>
->>
->> In general nothing will help here, but I must be sure that we talk about
->> the same version of the Bluetooth subsystem.
-> 
-> 
-> yes, ill try the patches IF theyre considered stable.
-> will also try another usb driver -WARNING- do not use via vt6202 ehci 
-> chipsets, they crashed my gatewaysystem reproducable on boot. :(
-> 
-> but i wonder why the window$ stacks do not trigger the fault... maybe 
-> usb... have problems with sane scanner too :)
-> 
->>
->> Regards
->>
->> Marcel
->>
->>
->>
->>
->> -------------------------------------------------------
->> This SF.net email is sponsored by: IBM Linux Tutorials.
->> Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
->> Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
->> Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
->> _______________________________________________
->> Bluez-devel mailing list
->> Bluez-devel@lists.sourceforge.net
->> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->>
->>
-> 
-> y
-> tom
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.net email is sponsored by: IBM Linux Tutorials.
-> Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
-> Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
-> Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-> 
+-------------------------------------------------------
+This SF.net email is sponsored by: IBM Linux Tutorials.
+Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
+Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
+Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
