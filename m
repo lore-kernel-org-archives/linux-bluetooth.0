@@ -1,18 +1,19 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Re: Version 3 libs/utils
-From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+Message-ID: <3F1C8EED.2050903@superbug.demon.co.uk>
+From: James Courtier-Dutton <James@superbug.demon.co.uk>
+MIME-Version: 1.0
 To: Max Krasnyansky <maxk@qualcomm.com>
-Cc: Stephen Crane <steve.crane@rococosoft.com>, Philip Blundell <pb@nexus.co.uk>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5.1.0.14.2.20030721172830.094837d0@unixmail.qualcomm.com>
-References: <5.1.0.14.2.20030717170310.0703eec8@unixmail.qualcomm.com>
-	<1057107686.15797.101.camel@pegasus>
-	<5.1.0.14.2.20030630170200.0e4c3e28@unixmail.qualcomm.com>
-	<1057107686.15797.101.camel@pegasus>
-	<5.1.0.14.2.20030717170310.0703eec8@unixmail.qualcomm.com>
-	<5.1.0.14.2.20030721172830.094837d0@unixmail.qualcomm.com>
-Content-Type: text/plain
-Message-Id: <1058868378.24408.31.camel@pegasus>
-Mime-Version: 1.0
+CC: Jonathan Paisley <jp-www@dcs.gla.ac.uk>, bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Re: Re: Bluetooth headset with Bluetooth usb
+	dongle status.
+References: <E19a5DI-0002jL-00@sc8-sf-list2.sourceforge.net>
+	<3F1752C5.5020701@dsto.defence.gov.au>
+	<3F17E4EF.5060401@superbug.demon.co.uk>
+	<1058533496.25379.237.camel@pegasus>
+	<3F17FD1A.9050003@superbug.demon.co.uk>
+	<5.1.0.14.2.20030721172151.094589f0@unixmail.qualcomm.com>
+In-Reply-To: <5.1.0.14.2.20030721172151.094589f0@unixmail.qualcomm.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -25,35 +26,26 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 22 Jul 2003 12:06:11 +0200
+Date: Tue, 22 Jul 2003 02:10:05 +0100
 
-Hi Max,
-
-> >> >I quite like this idea, except the SDP server functionality won't be
-> >> >needed for some devices (e.g., handhelds).
-> >> Agreed.
-> >
-> >not agreed.
-> >
-> >Try to connect with a Windows machine to a Linux based handheld to
-> >transfer files over OBEX. You need a SDP server on your Linux handheld.
-> >Only the real client only devices need no SDP server and these are
-> >special cases or applications.
+Max Krasnyansky wrote:
+> At 07:33 AM 7/20/2003, Jonathan Paisley wrote:
 > 
-> I don't use OBEX and my laptop doesn't provide any other Bluetooth service.
+>>I have managed to get playback and recording (with the PC acting as a
+>>headset for my phone) to work well. I've made the following changes which
+>>are included in the patch at the end:
+>>
+>>       (1) submit two rx urbs (same as your proposed patch, but done at caller)
+>>       (2) allow two pending isoc urbs instead of one
+>>       (3) only use the 9 byte (single voice channel) isoc endpoint
+> 
+> I buy #1 and #2, although I'm surprised that it's supported by HCD.
+> But 9 bytes packets ?
+Read the bluetooth headset specification. For 8000hz 8 bit mono sound.
 
-but some laptops will provide Bluetooth services to others ;)
-
-Anyway, if I remember correctly, the status channel of HCRP will
-connected from the server to client. And the server ask the client for
-the PSM of status channel by SDP.
-
-And don't forget the stupid mRouter callback mechanism of the Symbian
-Bluetooth phones.
-
-Regards
-
-Marcel
+> 
+> Max
+> 
 
 
 
