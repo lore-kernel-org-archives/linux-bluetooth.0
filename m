@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: Bluetooth security in bluez ?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Anssi Saari <as@sci.fi>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040401102919.GA6987@sci.fi>
-References: <20040328220800.36896.qmail@web60302.mail.yahoo.com>
-	 <200403290028.48289.cijoml@volny.cz> <1080514616.2281.178.camel@pegasus>
-	 <20040401102919.GA6987@sci.fi>
-Content-Type: text/plain
-Message-Id: <1080816007.3059.18.camel@pegasus>
+From: Anssi Saari <as@sci.fi>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Message-ID: <20040401102919.GA6987@sci.fi>
+References: <20040328220800.36896.qmail@web60302.mail.yahoo.com> <200403290028.48289.cijoml@volny.cz> <1080514616.2281.178.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1080514616.2281.178.camel@pegasus>
+Subject: [Bluez-users] Re: Bluetooth security in bluez ?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,26 +17,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 01 Apr 2004 12:40:08 +0200
+Date: Thu, 1 Apr 2004 13:29:19 +0300
 
-Hi Anssi,
+On Mon, Mar 29, 2004 at 12:56:57AM +0200, Marcel Holtmann wrote:
+ 
+> setting auth and encrypt in hcid.conf enables security mode 3, which is
+> not what most people want. Leave it off and use security mode 1/2 and
+> let the remote device trigger the security mechanism.
 
-> > setting auth and encrypt in hcid.conf enables security mode 3, which is
-> > not what most people want. Leave it off and use security mode 1/2 and
-> > let the remote device trigger the security mechanism.
-> 
-> How can you tell whether a connection is encrypted or not in Bluez if
-> security mode is 2?
-
-check with "hcitool con"
-
-Connections:
-        < ACL 00:0A:xx:xx:xx:xx handle 43 state 1 lm MASTER ENCRYPT 
-
-Regards
-
-Marcel
-
+How can you tell whether a connection is encrypted or not in Bluez if
+security mode is 2?
 
 
 
