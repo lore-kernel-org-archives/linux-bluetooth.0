@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-Id: <I9YCME$DFE1F4BA6EFCB5068110B7257B436297@uol.com.br>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-From: "omap" <omap@uol.com.br>
-To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] HCIemu
+Subject: Re: [Bluez-devel] SDP & RFCOMM SYNC
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <5000105b05010705172040f6c3@mail.gmail.com>
+References: <5000105b0501070138cd4b4a8@mail.gmail.com>
+	 <1105102531.4299.97.camel@pegasus>
+	 <5000105b05010705172040f6c3@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1105108041.4299.100.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,44 +20,37 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri,  7 Jan 2005 13:06:14 -0200
+Date: Fri, 07 Jan 2005 15:27:21 +0100
 
+Hi Amit,
 
+> can u explain how it is possible? 
+> 
+> Because only one  l2cap connection is possible over a ACL connection
+> (between 2 devices).
 
-Hi folks,
+who said so? There can only be one ACL connection between two devices,
+but there is no limit for L2CAP connections. You can even have multiple
+connections on the same PSM.
 
+> According to SDP specification, SDP seesion first issue a SDP connect,
+> send SDP query, wait for response and then send SDP disconnect.
+>  
+>  if we start a SDP session, What will happen with the l2cap
+> connection, over which 1( or more ) rfcomm session is running?
+> 
+> Should l2cap implementation provide a support for this or SDP should
+> check for that?
+> 
+> if so how to implement this at the l2cap level? 
 
-I am trying to compile the HCIemu but
-i am having the following error messages:
+Read the specification and look at the source code. As I said, this
+simply works.
 
-hciemu.c:956: error: invalid use of
-undefined type `struct vhci_device'
-hciemu.c:958: error: invalid use of
-undefined type `struct vhci_device'
-hciemu.c:959: error: invalid use of
-undefined type `struct vhci_device'
-hciemu.c:960: error: invalid use of
-undefined type `struct vhci_device'
-hciemu.c:963: warning: implicit
-declaration of function `g_main_new'
-hciemu.c:963: error: `FALSE'
-undeclared (first use in this function)
-hciemu.c:963: warning: assignment
-makes pointer from integer without a cast
-hciemu.c:973: error: invalid use of
-undefined type `struct vhci_device'
-hciemu.c:976: error: `G_IO_IN'
-undeclared (first use in this function)
-hciemu.c:981: warning: implicit
-declaration of function `g_main_run'
+Regards
 
-should i enter anything else in the
-make command line?
+Marcel
 
-
-Thanks=0A =0A____________________________________________________________=
-______________=0AAcabe com aquelas janelinhas que pulam na sua tela.=0AAn=
-tiPop-up UOL - =C9 gr=E1tis!=0Ahttp://antipopup.uol.com.br/=0A
 
 
 
