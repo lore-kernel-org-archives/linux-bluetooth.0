@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41EF869D.8020705@fastwebnet.it>
-From: WiseLYNX <wiselynx.naima@fastwebnet.it>
-MIME-Version: 1.0
+From: Stephen Crane <steve.crane@rococosoft.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluetooth headset - connects but no audio
-References: <41EE3974.1010604@fastwebnet.it> <41EE5112.1040502@dark-reality.de> <41EE4ACD.9070105@fastwebnet.it> <41EE66A2.1040106@dark-reality.de> <41EE69F3.1030401@fastwebnet.it> <41EE989A.7030206@dark-reality.de> <41EED6AE.1080205@fastwebnet.it> <41EF0C15.3040705@dark-reality.de>
-In-Reply-To: <41EF0C15.3040705@dark-reality.de>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-rbqanG/rnraesUL5oiK6"
+Message-Id: <1106218017.6052.22.camel@baroque.rococosoft.com>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Bluetrek G2
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,53 +16,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 11:23:25 +0100
+Date: Thu, 20 Jan 2005 10:46:57 +0000
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
 
-| well it *should* work with this setup, as it works on my system with
-| stock 2.6.10 plus mh1 patches. Anything else special, like, are you
-| using an SMP kernel?
+--=-rbqanG/rnraesUL5oiK6
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-no, ? just checked and SMP is disabled. it may be some issue with other
-settings, maybe in the bluetooth section?
+Hello world,
+Just to let you know that the above headset works fine with btsco and
+2.6.10-mh1 on Mandrake 10.1.  (I tried it with 2.6.10 and while it was
+detected and connected, I couldn't get any sound out of it --- could
+have been my fault though.)
 
-| Maybe it's a problem with your dongle, do you have access to another on=
-e
-| to test this? (local setup: epox bt-dg03 + sony/eri. hbh-35 headset)
+About the web-page: it would be useful to have a TO-DO list so people
+could dive in and fix/implement things.
 
-it could be of course. I'll have a try with the one (other productor,
-but same chipset I fear) of a friend of mine, but it won't be before
-next week. anyway, isn't it strange that the dongle works fine with
-other applications (I'm able to connect via gprs with my phone)?
+Nice work!
+Steve
 
-I'll do some more experiments on my own, and I'll let you know if I
-understand something.
-
-- --
-
-=B0=B0=B0 Wise
-~ O  LYNX
-
-GPG key: http://wiselynx.interfree.it/wiselynx.naima.asc
-MD5 checksum: http://wiselynx.interfree.it/wiselynx.naima.asc.md5
-
-- -----BEGIN GEEK CODE BLOCK-----
-Version: 3.1
-GE>$/IT/S d+ s: !a>? C++(+++)>$ U P>+ L++>++++ E--- W++ N ?o ?K w-- ?O ?M
-?V>+ PS+ !PE Y+ PGP+ t- ?5 X- R+(*) tv- b+(++)>+++ DI(++) !D G e++ h!*@
-r%>++ y-->+
-- ------END GEEK CODE BLOCK------
+--=-rbqanG/rnraesUL5oiK6
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+Version: GnuPG v1.2.6 (GNU/Linux)
 
-iD8DBQFB74abkYE9G6fXLlgRAs9TAJ47Tx0yZ6YAwFeqpqLTfrG/boodBACfWeO8
-N75/q3lcD973LmTFA3wzec8=3D
-=3DdV8P
+iD8DBQBB74whlgMqgVzLyWcRAm+qAJ49EDNkXchl3XPoEbTBnCvnIHYIXACfdm0f
+HuSJEAoekUzLOuvTMaveunM=
+=J+Ma
 -----END PGP SIGNATURE-----
+
+--=-rbqanG/rnraesUL5oiK6--
+
 
 
 -------------------------------------------------------
