@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] BlueZ on Linux iPAQ
+Subject: Re: [Bluez-devel] libtool and autoconf versions
 From: Max Krasnyansky <maxk@qualcomm.com>
-To: Sean Barry <sfelkes@hotmail.com>
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <BAY7-F19GQq9RFSdXuF000530ae@hotmail.com>
-References: <BAY7-F19GQq9RFSdXuF000530ae@hotmail.com>
+To: Edd Dumbill <edd@usefulinc.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1074424282.16573.52.camel@saag>
+References: <1074424282.16573.52.camel@saag>
 Content-Type: text/plain
-Message-Id: <1074632857.1707.187.camel@localhost>
+Message-Id: <1074632525.1707.181.camel@localhost>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,41 +18,45 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Jan 2004 13:07:37 -0800
+Date: Tue, 20 Jan 2004 13:02:05 -0800
 
-On Mon, 2004-01-19 at 18:51, Sean Barry wrote:
-> Hi,
-> 
-> Could anyone help me get BlueZ installed and configured on any of Familiar 
-> v0.7, 0.7.1 or 0.7.2.  Ideally the latter I have a 3970 iPAQ which is not 
-> able to access the Internet.  Thus far I have installed the following: -
-> 
-> bluez-modules-2.4.18-rmk3_2.1-1_arm.ipk
-> task-bluez_1.3-hh1_arm.ipk
-> 
-> Task-bluez required some other ipkgs which I installed until task-bluez 
-> install completed successfully.  However, when I install the Rococo 
-> reference implementation of Java APIs in Bluetooth I get the following 
-> error.
-> 
-> /mnt/hda # ipkg install impronto_1.1_arm.ipk
-> ERROR: Cannot satisfy the following dependencies for impronto:
->          libbluetooth libsdp
-> 
-> bluez-libs-2.0_0.9-hh1_arm.ipk is installed as is bluez-sdp_0.7-hh7_arm.ipk.
-> 
-> Are these the right files? Where can I get the right files? I can switch the 
-> BT radio on from GPE and perform hciconfig hci0, hcitool scan and hcitool 
-> inquiry.  Do I need to install any BlueZ packages in Familiar v0.7.2.
-> 
-> Please help me this problem is really bothering me.
-
-Actually it should just work if you install bootgpe from Familiar 0.7.2.
-I've upgraded a couple of 39xx IPAQs here to 0.7.2. PAN connection
-worked right away. I didn't have install any extra packages.
+I'd say lets update. 
+btw What exactly depends on the old autoconf ? I mean if you just run
+./bootstrap on the machine that has new version it just works right.
+At least it does on Fedora with the latest autoconf.
 
 Max
 
+
+On Sun, 2004-01-18 at 03:11, Edd Dumbill wrote:
+> The BlueZ packages still use libtool1.4 and autoconf2.13, which are
+> outdated.
+> 
+> Debian wants to remove support for libtool1.4.  The reasons for the
+> dropping of libtool1.4 are here:
+> http://lists.debian.org/debian-devel/2004/debian-devel-200401/msg00968.html
+> 
+> What do you think to the idea of updating to libtool1.5 and autoconf2.5
+> (and a newer automake too)?
+> 
+> It's not actually critical right now, as I am not likely to need to
+> re-run autoconf or libtool to package BlueZ, but it seems likely that
+> it's a good idea to move to more updated versions of these tools.
+> 
+> -- Edd
+> 
+> 
+> 
+> 
+> -------------------------------------------------------
+> The SF.Net email is sponsored by EclipseCon 2004
+> Premiere Conference on Open Tools Development and Integration
+> See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+> http://www.eclipsecon.org/osdn
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 
