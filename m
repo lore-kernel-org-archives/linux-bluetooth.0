@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4117A907.7010006@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] "comlicated" setup - known issues for hid and SCO?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jean Tourrilhes <jt@hpl.hp.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20040805013335.GA13608@bougret.hpl.hp.com>
+References: <20040805013335.GA13608@bougret.hpl.hp.com>
+Content-Type: text/plain
+Message-Id: <1091976547.2773.29.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: [PATCH 2.6] link trigger for AODV and +
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,57 +18,54 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 09 Aug 2004 18:40:39 +0200
+Date: Sun, 08 Aug 2004 16:49:08 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Jean,
 
-Hi there,
+> 	This is a patch I wrote a couple of months back, and I would
+> like to submit it for inclusion in the BlueZ stack. The reason I think
+> we should include that is that the patch has minimal footprint and
+> offer a feature unavailable by other means...
+> 
+> 	The idea is that this patch add an event that is trigger when
+> a connection is likely to fail, but before the connection get
+> disconnected. This is similar to the TxDrop iwevent implemented for
+> 802.11 (in Wireless Extensions).
+> 	In many cases, you don't want to use LinkSupervisionTimeout,
+> because it disconnect the connection before you have time to take
+> corrective action (i.e. game over).
+> 	The main use is for Ad-Hoc routing protocol (mesh) such as
+> AODV. In the litterature, this is called a "link trigger". I can give
+> you real world example of people using the TxDrop iwevent in AODV
+> implementations.
+> 	Another example would be to use this event to generate a
+> warning to the user that his connection is about to drop. Because
+> LinkSupervisionTimeout is so large, most users would be able to use
+> this warning to get back into range or away from the interferer
+> without loosing the connection.
+> 	I could go at lenght on why this is useful and why this is the
+> way to implement it, but I don't want to waste your time.
 
-right now I'm using two BT devices with my Epox dongle, an MX900 mice
-and a Sony Ericcson HBH-35 Headset with snd-bt-sco (voice mode 0x0060,
-before you ask ;)
+no problem, I got the point. However I am not sure about applying your
+patch. I don't like the way the event is propagated. It is a connection
+related event and so I like to send it to the sockets that are using
+that ACL connection. Or at least I should introduce the per device stack
+internal events.
 
-both devices work fluently when used without the other, but when I use
-headset and mouse at the same time there are various problems during
-connect, scan and usage.
+Another question is, do we need a compile option for it? Is there any
+disadvantage to compile it always and disable by default?
 
-The main usage problem was that the sco layer got scrambled audio
-(sounded much like random data) on about every third sco connection.
-After a while, mouse and headset began to block each other, and the
-stack seemed to get more and more, well, muddy. After some more
-connection retries even the mouse, before only "hanging" when the
-headset tried to connect, stopped working fully.
+> 	Patch has been tested in kernel from 2.6.1 to 2.6.8. I also
+> have a patch for 2.4.X. Please apply...
 
-dmesg only noticed this:
+I would include it into my next -mh patch for testing, but the 2.4
+series should be closed for new features.
 
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 76
+Regards
 
-When even connection was impossible, I plugged the BT dongle out and put
-it back in. After reloading the hid module and programs the mouse and
-headset worked again.
-
-Are you interested in more specific reports? I could enable debugging
-for some modules and try to collect some more data than this, if you
-want to have something to debug on. I myself don't have the time right
-now to drop too deeply into the subject :(
-
-at least, mostly it works :)
+Marcel
 
 
-I hope I can deliver some actual patches for snd-bt-sco against
-alsa-1.0.5a soon, but right now I'm totally busy :/
-
-thanks,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFBF6kHQWC6DTWkDAoRAur6AKCqRgv5pB5rL9PE1V+rtuLmfNklRwCglOrb
-NEzF/QeL2Q0z0vlF5H7Bn7s=
-=cR7L
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
