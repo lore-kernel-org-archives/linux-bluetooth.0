@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] SuSE 9.1 Pro and Epox Barton wireless desktop
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ulrich Wisser <u.wisser@publisher.de>
+To: Ramon A Reveron <ramon@us.ibm.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1091648489.4237.2.camel@dorette.Entenhausen>
-References: <1091568946.3759.18.camel@dorette.Entenhausen>
-	 <1091569567.16182.36.camel@pegasus>
-	 <1091648489.4237.2.camel@dorette.Entenhausen>
+In-Reply-To: <OF0E2A126C.4B39339D-ON85256EE7.00754A22-85256EE7.0076A7D2@us.ibm.com>
+References: 
+	 <OF0E2A126C.4B39339D-ON85256EE7.00754A22-85256EE7.0076A7D2@us.ibm.com>
 Content-Type: text/plain
-Message-Id: <1091661690.16182.74.camel@pegasus>
+Message-Id: <1091661380.16182.68.camel@pegasus>
 Mime-Version: 1.0
+Subject: [Bluez-users] Re: Can't Connect RFCOMM Socket. Too many links.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,31 +19,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Aug 2004 01:21:30 +0200
+Date: Thu, 05 Aug 2004 01:16:21 +0200
 
-Hi Ulrich,
+Hi Ramon,
 
-> > > has anybody got that combination running?
-> > > When I plug in my BT-DG03BF USB bluetooth dongle "hcitool dev" does not
-> > > show any device. Please find the /var/log/messages below.
-> > > 
-> > > Any idea how to get the dongle working? The keyboard and mouse?
-> > 
-> > the dongle of the Barton desktop is a HID proxy dongle. You must run
-> > hid2hci first before you will see it with hciconfig.
+> I'm having some problems while connecting to a serial profile device.
+> If I connect to a device using:
 > 
-> which I would love to do, but it seems the SuSE 9.1 Pro does not include
-> the hid2hci tool.
+> rfcomm connect 0 "device address" 1
+> 
+> the connection works perfectly. If by some reason the device
+> disconnects  (i.e. out of range), I need to wait around 50 seconds to
+> reconnect to it providing that it is back in range. 
+> If i try before the 50 seconds have pass, I get this error: "Can't
+> Connect RFCOMM Socket. Too many links."
+> 
+> Is this a normal behavior?
 
-that's maybe true. However the upcoming SuSE 9.2 will include it ;)
+maybe this is a link manager problem. Run "hcidump -x" to show us the
+disconnect and the reconnect. What is the output of "hciconfig -a"?
 
-> Can I download and compile from SF or do I need to upgrade all bluez
-> packages in that case?
+> Is there a way of connecting to the device as soon as it comes back in
+> range?  
 
-It should be possible to compile only hid2hci. Download bluez-utils-2.9
-and run configure. Make sure that the USB library is installed. Then
-change to the tools directory and type "make hid2hci". Then you should
-get the hid2hci binary that you can copy everywhere you like.
+Only if you start running an inquiry.
+
+> How can you specify a "Link Timeout" with BlueZ? 
+
+Check the Bluetooth specification for the appropriate HCI command.
+
+> Kernel: 2.4.19
+> BlueZ utils 2.3
+
+You should update to 2.4.19-mh18 and bluez-utils-2.9 ;)
 
 Regards
 
