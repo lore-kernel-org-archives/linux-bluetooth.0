@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Robert Foster <rfoster@mountainvisions.com.au>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] hidd :)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200405092109.56194.cijoml@volny.cz>
+References: <200405092044.51226.cijoml@volny.cz>
+	 <1084129392.9269.106.camel@pegasus>  <200405092109.56194.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1084160685.3287.2.camel@rover.mountainvisions.com.au>
+Message-Id: <1084130745.9269.112.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] bluez-utils 2.7 and bthid
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,19 +19,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 May 2004 13:44:45 +1000
+Date: Sun, 09 May 2004 21:25:46 +0200
 
-A word of caution:
+Hi Michal,
 
-bthid does not seem to play nicely with the recently released
-bluez-utils 2.7.  Every time I tried to connect to my MS mouse, it would
-ask for a pin code.  I had to uninstall bluez-{utils|libs} 2.7 and
-revert back to the 2.6 release before this problem would go away again.
+> But I think Linus will be glad to have it in 2.6.6 to have much more real 
+> loosers as testers :-)
 
-I'm really hoping there was another solution?!?
+sorry, no chance. This is one of these things that will stay outside the
+kernel for a long time. The overall goal is to give Linux a generic HID
+layer so USB and Bluetooth can use it. Until that is done, the hidp
+module won't be merged mainline.
 
-Rob.
+Regards
 
+Marcel
 
 
 
