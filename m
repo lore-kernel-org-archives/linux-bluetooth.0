@@ -1,84 +1,68 @@
-Return-Path: <rene@soft.uni-linz.ac.at>
-Message-ID: <3F954348.7090700@soft.uni-linz.ac.at>
-Date: Tue, 21 Oct 2003 16:31:36 +0200
-From: Rene Mayrhofer <rene@soft.uni-linz.ac.at>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Stress testing (Was: Re: command tx timeout and
- continuous inquiry.)
-References: <3F86784F.9050608@soft.uni-linz.ac.at>	<1065778372.14923.336.camel@baroque.r				ococosoft.com>		<3F86A88E.4090106@soft.uni-linz.ac.at>	<1065790691.14513.	1	73.camel@pegasus>			<3F86AF96.7000904@soft.uni-linz.ac.at>	<1065791594.14514.179.camel@pegasus>		 <3F8FB6D9.8030000@soft.uni-linz.ac.at> <1066636708.902.5.camel@pegasus>		<3F950E33.3070303@soft.uni-linz.ac.at> <1066735933.1005.114.camel@pegasus>	 <3F9521E4.8010900@soft.uni-linz.ac.at> <1066738444.13788.124.camel@pegasus>
-In-Reply-To: <1066738444.13788.124.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Re: command tx timeout and continuous inquiry.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rene Mayrhofer <rene@soft.uni-linz.ac.at>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <3F9521E4.8010900@soft.uni-linz.ac.at>
+References: 
+	<3F86784F.9050608@soft.uni-linz.ac.at>	<1065778372.14923.336.camel@baroque.r
+				ococosoft.com>		<3F86A88E.4090106@soft.uni-linz.ac.at>	<1065790691.14513.
+	1	73.camel@pegasus>	
+		<3F86AF96.7000904@soft.uni-linz.ac.at>	<1065791594.14514.179.camel@pegasus>
+		 <3F8FB6D9.8030000@soft.uni-linz.ac.at> <1066636708.902.5.camel@pegasus>
+		<3F950E33.3070303@soft.uni-linz.ac.at> <1066735933.1005.114.camel@pegasus>
+	 <3F9521E4.8010900@soft.uni-linz.ac.at>
+Content-Type: text/plain
+Message-Id: <1066738444.13788.124.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 21 Oct 2003 14:13:59 +0200
 
-Hi Marcel
+Hi Rene,
 
-I've now done a bit of stress-testing and these are the results:
+> On my system, I can not confirm this. When I start two l2ping runs, 
+> "hcitool scan" will never return a result (I have tried a number of 
+> times). The interesting thing is the following: One l2ping runs in the 
+> background and I start "hcitool scan". It will take 10 - 24 seconds and 
+> will only return those devices which are currently _not_ pinged. When I 
+> start the second l2ping when "hcitool scan" is still running, either:
+> a) hcitool scan will immediately return (in less than 10 seconds) and 
+> the l2ping will work
+> b) hcitool scan will return with "Can't connect.: Device or ressource busy"
+> I've not found a way to reliably reproduce on of the two, it seems to be 
+> random which one will happen.
 
-With the Epox adapter (HCI 16.4), I was able to go up to the theoretical 
-maximum of 7 concurrent l2ping instances to different devices. All 7 
-instances run and get their reply packets back. However, only 3 of them 
-report "20 bytes from ...." while the other 4 report "0 bytes from 
-....". I am not sure what causes this, but it might be the devices 
-themselves. The Bluetooth stacks on the devices I used in this test are 
-vastly different, ranging from Compaq Ipaq, FSC Pocket Loox, Sony Vaio 
-with WinXP to other bluez boxes under x86 or Compaq Ipaq. There were 
-even a few mobile phones in the pool....
-And the background inquiry even returned some devices under this load, 
-I'm now nearly where I want to go :)
+it is ok that devices with active connections don't answer inquiry scans
+and you need to use --flush with hcitool to disable the kernel side
+inquiry cache.
 
-Although this sounds very good, there are a few catches:
-- Starting the l2ping instances was very tricky. The more were already 
-running, the more difficult it got to start an additional one. For the 
-last 2 instances, I had to try for about 25 times until it started 
-correctly. Before that, it always returned "Can't connect.: Device or 
-resource busy". Are there any internal kernel timeouts for freeing 
-resources ? I have no idea why in the beginning it doesn't work but then 
-suddenly it does. As soon as the l2ping starts, it seems reliable most 
-of the time (some connection break but can be re-established, maybe it's 
-just the radio link that's bad in these cases).
-- Sometimes the same happens for the inquiry. In my "while true; hcitool 
-scan --flush; done" loop, it sometimes also goes crazy with "Inquiry 
-failed.: Device or resource busy" for about 30 seconds and then starts 
-to work again.
+> PS: Is libbluetooth thread-safe ? Maybe that could be part of my problem 
+> with two l2ping sessions from two different threads in the same process ?
 
-How is an application supposed to deal with these phenomena ? Is there a 
-maximum period during which a call is allowed to fail or is it random ? 
-Although my application still can't create two L2 connections, this test 
-shows that (with a current HCI firmware) it is in principle possible. I 
-still have to find out why my code (which is mostly copied from l2ping) 
-does not perform the same - I still think that it has to do with 
-multi-threading somehow. But I am getting closer now.....
+I don't see any problems here, because you only use socket programming.
 
-As a sidenote, bluez is rather unstable on my Sony Vaio PCG-SRX51P/A, 
-which has a CSR chip with build ID 0x77 (which is reported as HCI 12.1). 
-After a while of moderate load, the kernel log starts to get entries such as
-kernel: hci_cmd_task: hci0 command tx timeout
-kernel: Warning: null TTY for (d8:00) in tty_fasync
-(I use rfcomm connections to a Siemens S55).
-Reloading the bluez stack seems to reset everything so that it works 
-again (until it breaks again....) - at least I don't have to reboot to 
-get it back to work and can still claim that bluez is more mature than 
-the Sony Bluespace stack :)
-On my Debian system, this typically means
-/etc/init.d/bluez-sdp stop
-/etc/init.d/bluez-utils stop
-/etc/init.d/hotplug restart
-/etc/init.d/bluez-utils start
-/etc/init.d/bluez-sdp start
-Another sequence won't work, especially restarting the whole USB 
-subsystem is necessary so that hci_usb gets reloaded.
+Regards
 
-PS: I can now confirm that Acer indeed has no updated firmware for their 
-Bluetooth adapters BT-500 and does not plan to create one - our 
-technician has talked to our Acer contact. Thus, I can not recommend 
-this adapter for any more serious use under Linux.
+Marcel
 
-best regards,
-Rene
 
--- 
-------------------------------------------------
-Pervasive 2004:            www.pervasive2004.org
-------------------------------------------------
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by OSDN developer relations
+Here's your chance to show off your extensive product knowledge
+We want to know what you know. Tell us and you have a chance to win $100
+http://www.zoomerang.com/survey.zgi?HRPT1X3RYQNC5V4MLNSV3E54
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
