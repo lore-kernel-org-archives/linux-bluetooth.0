@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41CAECC5.8000006@cc.gatech.edu>
-From: Jay Summet <summetj@cc.gatech.edu>
-MIME-Version: 1.0
+From: Andreas Millinger <andreas.millinger@web.de>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] get remote bt address
-References: <2de4657604122303546f813ecf@mail.gmail.com>	 <1103803109.20258.79.camel@pegasus> <2de465760412230418552a4af6@mail.gmail.com>
-In-Reply-To: <2de465760412230418552a4af6@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain
+Message-Id: <1103817277.4597.2.camel@tuxlaptop.site>
+Mime-Version: 1.0
+Subject: [Bluez-users] Re: Re: Re: 3com bluetooth card
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,24 +16,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Dec 2004 11:05:25 -0500
+Date: Thu, 23 Dec 2004 16:54:37 +0100
 
-Manjunath Prabhu wrote:
+Hello,
 
-> Also, which would be the best Bluetooth PCMCIA card , the ones with
-> linux drivers , for 2.6 kernels?
-I'm using a Zoom bluetooth adapter (Class 1, w/ 100m claimed range and pop-out 
-antenna) with 2.6.8 and am very happy with it. (It's also inexpensive to buy 
-online...)
+I used hciattach ttyS16 any (csr works also). The outpup of dump_cis is:
 
-Keep in mind that I only need it to do 6kbps to talk with my phone, so I've 
-never tested it under a high-throughput situation, but I know of no reason it 
-wouldn't work as well as any other bluetooth card...
+Socket 0:
+  dev_info
+    NULL 0ns, 512b
+  manfid 0x0101, 0x0041
+  funcid serial_port [post]
+  serial_interface
+    uart 16550 [space/mark/odd/even] [5/6/7/8] [1/1.5/2]
+  vers_1 7.1, "3Com", "3CRWB6096B Bluetooth PC Card", "", ""
+  config base 0x00f8 mask 0x000f last_index 0x02
+  cftable_entry 0x01 [default]
+    [rdybsy]
+    Vcc Vnom 3300mV Iavg 70mA
+    io 0x0000-0x000f [lines=4] [8bit] [range]
+    irq mask 0xffff [level] [shared]
+  cftable_entry 0x02 [default]
+    [rdybsy]
+    Vcc Vnom 5V Iavg 70mA
+    io 0x0000-0x000f [lines=4] [8bit] [range]
+    irq mask 0xffff [level] [shared]
 
-more comments:
-http://www.summet.com/x31/zoom.html
+Socket 1:
+  no CIS present
 
-Jay
+Best regards
+Andreas
+
 
 
 -------------------------------------------------------
