@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41A6EA08.7050904@xmission.com>
+Message-ID: <41A6E434.3030107@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] a2play and Toshiba SR-1 Bluetooth Headset
-References: <20041125091124.GA19805@snoopy.src.ricoh.co.jp> <20041125112509.75347786.henryk@ploetzli.ch> <20041125105615.GA19821@snoopy.src.ricoh.co.jp> <1101440449.6465.64.camel@pegasus> <20041126041158.GF27879@snoopy.src.ricoh.co.jp>
-In-Reply-To: <20041126041158.GF27879@snoopy.src.ricoh.co.jp>
+References: <20041125091124.GA19805@snoopy.src.ricoh.co.jp>	 <20041125112509.75347786.henryk@ploetzli.ch>	 <20041125105615.GA19821@snoopy.src.ricoh.co.jp> <1101440449.6465.64.camel@pegasus>
+In-Reply-To: <1101440449.6465.64.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,17 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 26 Nov 2004 01:32:08 -0700
+Date: Fri, 26 Nov 2004 01:07:16 -0700
 
-Alain
+hey
 
->>You can try to hack the a2play.c to use SEID 3 instead of 1 and see what
->>the audio sink on SEID 3 offers you. Run the hcidump 1.15.
+>       AVDTP(s): Discover rsp: transaction 0
+>         ACP SEID 1 - Audio Sink
+>         ACP SEID 3 - Audio Sink
+>         ACP SEID 4 - Audio Source
 
-a2play.c from cvs should detect the additional seid values and skip 
-those that aren't audio media type and sbc codec type. i'm not sure if i 
-should be checking to make sure the seid is an audio sink but it is past 
-my bedtime... :)
+i made a whack at receiving multiple seid records but it's wrong... the 
+seid part got put in the part of the packet that doesn't get repeated.
+
+i will give this the once-over tomorrow and hopefully have something 
+that will discover seid 3 on the toshiba.
 
 brad
 
