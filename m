@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: tmp@nitwit.de
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200503271708.10663.tmp@nitwit.de>
-Subject: [Bluez-users] No working Bluetooth adapter found
+Subject: Re: [Bluez-users] bluetooth serial vs. audio connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.62.0503271357080.3134@ybpnyubfg.ybpnyqbznva>
+References: <Pine.LNX.4.62.0503271303450.3134@ybpnyubfg.ybpnyqbznva>
+	 <1111923433.9195.216.camel@pegasus>
+	 <Pine.LNX.4.62.0503271357080.3134@ybpnyubfg.ybpnyqbznva>
+Content-Type: text/plain
+Message-Id: <1111926923.9195.218.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,50 +20,39 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 27 Mar 2005 17:08:10 +0200
+Date: Sun, 27 Mar 2005 14:35:23 +0200
 
-Hi!
+Hi Andreas,
 
-I currently run SuSE 9.2 and have a MSI PC2PC USB bluetooth dongle and it 
-doesn't work: No working bluetooth adapter found. This is the log when I plug 
+> >MH: > I have a problem connecting to my phone with my computer. With 
+> >MH: > Linux, I only get an 'audio' connection, on the same computer 
+> >MH: > (using VMware) I get a 'serial' connection. With this audio 
+> >MH: > connection, I'm not able to read data from my mobile phone. How 
+> >MH: > is it possible to get a serial connection? Is there some 'howto' 
+> >MH: > on this?
+> >MH: 
+> >MH: in general you only do:
+> >MH: 
+> >MH: 	rfcomm connect 0 <bdaddr> <channel>
+> >MH: 
+> >MH: and then /dev/rfcomm0 is your serial port of the phone. However you 
+> >MH: may have to check with "sdptool browse <bdaddr>" what's the channel 
+> >MH: for the serial port or dialup networking profile.
+> 
+> Hmm, in theory... yes. But as soon as rfcomm comes up, my phone asks me, 
+> if I want an 'audio' connection. If I connect with the windows software, 
+> the mobile asks me, if I want a 'serial' connection.
+> 
+> sdptool browse 00:xx gives no information. Just the line "Browsing 00:xx 
+> ..." Any idea on that?
 
-Mar 27 16:47:09 tcn kernel: usb 1-4: new full speed USB device using address 7
-Mar 27 16:47:10 tcn hcid[24373]: HCI dev 0 registered
-Mar 27 16:47:13 tcn kernel: hci_cmd_task: hci0 command tx timeout
-Mar 27 16:47:18 tcn sdpd[24748]: init_server: binding L2CAP socket: Address 
-already in use
-Mar 27 16:47:18 tcn sdpd[24748]: main: Server initialization failed
-Mar 27 16:47:18 tcn opd[24752]: OBEX Push Daemon - version 0.2 started
-Mar 27 16:47:18 tcn opd[24752]: OBEX Object Push service registered with sdpd
-Mar 27 16:47:18 tcn opd[24752]: Failed to register BtOBEX server on RFCOMM 
-channel 10. (-1 / 98)
+then do "sdptool search --bdaddr <bdaddr> {sp|dun}".
 
-Hmm. So I switched to channel 9. 
+Regards
 
-Mar 27 17:05:43 tcn kernel: hci_cmd_task: hci0 command tx timeout
-Mar 27 17:05:49 tcn kernel: usb 1-4: USB disconnect, address 7
-Mar 27 17:05:49 tcn hcid[28768]: HCI dev 0 unregistered
-Mar 27 17:05:49 tcn /sbin/hotplug[28997]: unknown command
-Mar 27 17:05:49 tcn /sbin/hotplug[28999]: unknown command
-Mar 27 17:05:49 tcn /sbin/hotplug[28996]: unknown command
-Mar 27 17:05:49 tcn /sbin/hotplug[28998]: unknown command
-Mar 27 17:05:57 tcn kernel: ohci_hcd 0000:00:02.1: wakeup
-Mar 27 17:05:58 tcn kernel: usb 2-4: new full speed USB device using address 3
-Mar 27 17:05:58 tcn hcid[28768]: HCI dev 0 registered
-Mar 27 17:06:01 tcn kernel: hci_cmd_task: hci0 command tx timeout
-Mar 27 17:06:06 tcn sdpd[29323]: init_server: binding L2CAP socket: Address 
-already in use
-Mar 27 17:06:06 tcn sdpd[29323]: main: Server initialization failed
-Mar 27 17:06:06 tcn opd[29327]: OBEX Push Daemon - version 0.2 started
-Mar 27 17:06:06 tcn opd[29327]: OBEX Object Push service registered with sdpd
-Mar 27 17:06:06 tcn opd[29327]: Failed to register BtOBEX server on RFCOMM 
-channel 9. (-1 / 98)
-Mar 27 17:06:35 tcn kernel: hci_cmd_task: hci0 command tx timeout
+Marcel
 
-Does somebody have a clue on this?
 
-Thanks a lot
-Timo
 
 
 -------------------------------------------------------
