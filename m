@@ -1,13 +1,17 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: martin f krafft <madduck@madduck.net>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Bluetooth on a MIPS-System
-Message-ID: <20041007154102.GA24256@cirrus.madduck.net>
-References: <41651D72.7040806@corscience.de> <1097147273.7325.26.camel@pegasus> <41652A40.4080209@corscience.de> <1097152912.7325.30.camel@pegasus> <41654062.5050009@corscience.de> <1097154841.7325.36.camel@pegasus> <41654D83.1090306@corscience.de> <1097158664.7325.38.camel@pegasus> <41655C4D.1070206@corscience.de>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ew6BAiZeqk4r7MaW"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: leidenfrost@corscience.de
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <41655C4D.1070206@corscience.de>
+References: <41651D72.7040806@corscience.de>
+	 <1097147273.7325.26.camel@pegasus>  <41652A40.4080209@corscience.de>
+	 <1097152912.7325.30.camel@pegasus>  <41654062.5050009@corscience.de>
+	 <1097154841.7325.36.camel@pegasus>  <41654D83.1090306@corscience.de>
+	 <1097158664.7325.38.camel@pegasus>  <41655C4D.1070206@corscience.de>
+Content-Type: text/plain
+Message-Id: <1097161856.7325.43.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,55 +22,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 7 Oct 2004 17:41:02 +0200
+Date: Thu, 07 Oct 2004 17:10:56 +0200
 
+Hi Thomas,
 
---ew6BAiZeqk4r7MaW
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-also sprach Thomas Leidenfrost <leidenfrost@corscience.de> [2004.10.07.1710=
- +0200]:
-> Now I have depmod installed and I know that my Linux is
-> Debian-based.
-
-Good.
-
-> depmod: /lib/modules/2.4.21/sdptool.o: Unhandled relocation of type 12=20
+> Now I have depmod installed and I know that my Linux is Debian-based.
+> And my System is non-PCI-based, but USB is already working 
+> (Input-devides). Running depmod -a results:
+> 
+> ...
+> depmod: /lib/modules/2.4.21/sdptool.o: Unhandled relocation of type 12 
 > for .text
-> depmod: /lib/modules/2.4.21/sdptool.o: Unhandled relocation of type 12=20
+> depmod: /lib/modules/2.4.21/sdptool.o: Unhandled relocation of type 12 
 > for .text
 > depmod: depmod obj_relocate failed
+> ...
+> depmod: *** Unresolved symbols in /lib/modules/2.4.21/l2ping.o
+> depmod: *** Unresolved symbols in /lib/modules/2.4.21/ppporc.o
+> depmod: *** Unresolved symbols in /lib/modules/2.4.21/rfcomm.o
+> depmod: *** Unresolved symbols in /lib/modules/2.4.21/sdptool.o
+> 
+> I guess that there is someting totally wrong, but how to solve this?
+> 
+> > this rfcomm.o is not a kernel module. It is a compiled object file from
+> > the bluez-hcidump package.
+> 
+> What does this mean?
 
-What kernel are you using? Is this the Debian kernel, or a vanilla
-version?
+yes, there is something wrong. You don't understand the difference
+between a kernel module and a user space program and an object file that
+is produced when building the previous two.
 
---=20
-martin;              (greetings from the heart of the sun.)
-  \____ echo mailto: !#^."<*>"|tr "<*> mailto:" net@madduck
-=20
-invalid/expired pgp subkeys? use subkeys.pgp.net as keyserver!
-spamtraps: madduck.bogus@madduck.net
-=20
-"aus der kriegsschule des lebens -
- was mich nicht umbringt, macht mich h=E4rter."
-                                                 - friedrich nietzsche
+You need the BlueZ kernel modules and you need a cross-compiled version
+of bluez-libs and bluez-utils. Try to achieve these two goals first and
+don't try to mix them.
 
---ew6BAiZeqk4r7MaW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
+Regards
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.5 (GNU/Linux)
+Marcel
 
-iD8DBQFBZWOOIgvIgzMMSnURAhIgAKCTLQbvdgWDiSIu//y0zvH84/SXywCg2ARe
-uylJrtHiaYr03ZY+eDrq/uM=
-=bjTT
------END PGP SIGNATURE-----
 
---ew6BAiZeqk4r7MaW--
 
 
 -------------------------------------------------------
