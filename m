@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41EE22F8.8080901@cc.hut.fi>
-From: Heikki Vuolteenaho <hvuoltee@cc.hut.fi>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Receiving multiple (>2) incoming rfcomm connections?
-References: <41EB8C5C.2090708@cc.hut.fi> <1105960994.8080.32.camel@pegasus> <41ECD643.6060101@cc.hut.fi>
-In-Reply-To: <41ECD643.6060101@cc.hut.fi>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] Permissions on Sockets
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <8EEDF252-6988-11D9-A39A-000D9348D4BE@magnifeye.com>
+References: <41B8A67C.3060608@paytec.com> <1102627652.7962.4.camel@pegasus>
+	 <8EEDF252-6988-11D9-A39A-000D9348D4BE@magnifeye.com>
+Content-Type: text/plain
+Message-Id: <1106092579.8190.81.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,26 +19,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 19 Jan 2005 11:06:00 +0200
+Date: Wed, 19 Jan 2005 00:56:18 +0100
 
-Heikki Vuolteenaho wrote:
-> Marcel Holtmann wrote:
-> 
->>
->> your device must become master of the piconet and the phones should
->> support the role switch.
->>
-> 
-> You mean the USB BT device should take master role? Any pointers on how 
-> this is done? Or some good documents, I guess I'll have to study a bit 
-> more on this...
-> 
+Hi Jonathan,
 
-Searching the web (http://www.phptr.com/articles/article.asp?p=21324) 
-and mailing list archive helped, I just changed the link mode to 
-master,accept and now it's working. Thanks!
+> My application connects to a custom device.  The app works when I run 
+> as su but I get an error from hci_send_cmd from the writev(dd, iv, ivn) 
+> when I run as a regular user.
+> 
+> Are there some permissions that I need to set to allow my regular user 
+> to write to the socket?
 
--Hege-
+for some HCI commands you need root rights. About what commands are we
+talking?
+
+Regards
+
+Marcel
+
 
 
 
