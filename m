@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Subject: RE: [Bluez-devel] Apple mouse and disconnect problem
-Message-ID: <7D3093619D15A841A322413C3F138E0855C2F9@exchange02.csr.com>
-From: "Chris Hubball" <Chris.Hubball@csr.com>
-To: <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Deepesh S Gujarathi <d_gujarathi@hotmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <LAW11-OE33GHeqXipAS00015cf1@hotmail.com>
+References: <LAW11-OE33GHeqXipAS00015cf1@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1073314449.2508.1.camel@pegasus>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Re: blueZ-bthid testing
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,85 +18,76 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 5 Jan 2004 16:07:16 -0000
+Date: Mon, 05 Jan 2004 15:54:09 +0100
 
 Hi,
 
-There is no defined "owner" of an ACL connection mainly because the
-L2CAP connections on top of it can be established by either end.
+> I'm implementing the firmware for a bluetooth HID mouse using an
+> Ericsson module and using the bluez stack to test my implementation. 
+> For a start I was trying to make the MS Intelliexplorer mouse work
+> with Marcels bthid program, but somehow havent been able to see the
+> cursor move, heres what all I did
+>  
+> - downloaded a crisp new linux2.4.22 kernel from kernel.org
+>  
+> - patched the kenel with patch-2.4.22-mh2.gz 
+>  
+> - recompiled the kenel with Input Core support (uinput.o) + BlueZ
+> modules + usb support (usb_ohci) modules etc. 
+>  
+> - reboot with linux2.4.22-mh2 kernel
+>  
+> - downloaded the latest rpms and did a rpm update to bluez.
+>  
+> - downloaded and compiled the libs2 and utils2 as per Marcel's
+> instructions (using --prefix /opt/bluetooth etc.) from cvs
+>  
+> - added the following to the XFree86config-4 file
+>  
+> Section "InputDevice"
+>         Identifier "MSmouse"
+>         driver "mouse"
+>         option "Protocol" "IMPS/2"
+>         option "Device" "/dev/input/mice"
+>         option "ZAxisMapping" "4 5"
+>         option "Buttons" "5"
+>         option "Emulate3Buttons" "false"
+> EndSection
+>     
+> and added 
+> InputDevice  "MSmouse" "SendCoreEvents" to the ServerLayout section
+>  
+> - the following modules are present (lsmod)
+>  
+> l2cap.o
+> bluez.o
+> input.o
+> uinput.o
+> usb_uhci.o
+> hci_usb.o
+> usb_core.o
+>  
+> - run hcid daemon
+>  
+> - run bthid daemon 
+>  
+> -run /opt/bluetooth/sbin/bthid -c 00:50:F2:E5:89:15 (here the
+> /var/log/messages shows the following )
+>  
+> bthid[2040]: cant open input device: no such file or directory (2)
+> bthid[2040]: connected: Microsoft Five Button Mouse 
+>  
+> when I do a hcitool scan, the local device detects the MS
+> IntelliExplorer mouse. but nothing happens further.
+>  
+> am I missing something relevant ?
 
->From general interop experience, if you close the last L2CAP connection
-on the ACL, you should also disconnect the ACL.  Not sure if you've got
-this feature, but it's also a nice idea to add a timeout before closing
-an ACL as it's common to open another L2CAP connection immediately after
-e.g. SDP search followed by HID.  This saves the paging time to re-open
-the ACL.
-
-Chris.
-
--------- Original Message --------
-Subject: [Bluez-devel] Apple mouse and disconnect problem
-Date: Sun, 21 Dec 2003 02:52:32 +0100
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-
-Hi Folks,
-
-I played with the Apple Bluetooth mouse and I had a problem with the
-termination of the ACL link after the two L2CAP channels are closed. The
-ACL link still stays there, but not always. After a long time of testing
-and tracking possible errors I found that the Apple mouse itself never
-terminates the ACL link (like it does not role switch itself or go to
-sniff mode after idle time). So the host stack has to terminate the ACL
-link if no other L2CAP connection is open. In the case of BlueZ we do
-this only for outgoing and not for incoming ones. And this means that if
-the mouse reconnects the ACL link will never closed if we terminate the
-connection because of idle time or because the bthid daemon was shut
-down. I looked through the revisions of the HCI core code, but we never
-close the ACL link if the connection was not created by us and so I must
-assume that no one else had this problem before. However the relevant
-code is in include/net/bluetooth/hci_core.h
-
-	static inline void hci_conn_put(struct hci_conn *conn)
-	{
-	        if (atomic_dec_and_test(&conn->refcnt)) {
-	                if (conn->type =3D=3D SCO_LINK)
-	                        hci_conn_set_timer(conn, HZ / 100);
-	                else if (conn->out)
-	                        hci_conn_set_timer(conn,
-HCI_DISCONN_TIMEOUT);
-	        }
-	}
-
-My question is now, why we only initiate the disconnect timer for
-outgoing connections? Is the device that creates the ACL link also
-responsible for its termination? If yes, why the hell is the Bluetooth
-stack on the Apple mouse not doing this and how did this device then got
-qualified?
-
-I used the attached patch and everything seems to be ok. Any comments?
+what about creating the /dev/input/uinput device node?
 
 Regards
 
 Marcel
 
-
-
-
---=20
-
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
 
 
 
