@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41FEDD73.7090109@cloutier-vilhuber.net>
-From: Lars Vilhuber <lists.all@cloutier-vilhuber.net>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] experience with TDK PCMCIA Bluetooth Card, (goBlue)?
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-users] Trying to compile for axis but Bluetooth library
+	not found
+From: Erwin Authried <eauth@softsys.co.at>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41FE85A0.2040709@ieee.org>
+References: <41FE85A0.2040709@ieee.org>
+Content-Type: text/plain
+Message-Id: <1107204712.15769.70.camel@justakiss>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,56 +19,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 31 Jan 2005 20:37:55 -0500
+Date: Mon, 31 Jan 2005 21:51:52 +0100
 
->>> config.opts AND bluetooth.conf (one may be redundant):
->>> card "TDK goBlue PCMCIA Bluetooth Adapter"
->>> ~  manfid 0x0105,0x4254
->>> ~  version "TDK","Bluetooth PC Card II","",""
->>> ~  bind "serial_cs" class "bluetooth"
->>> 
->>> and adding an elif condition in /etc/pcmcia/bluetooth conditional on MANFID.
+Am Mon, den 31.01.2005 schrieb joe sloan um 20:23:
+> Hi,
 > 
-> this looks like a new generation of the card. 
+> I have compiled bluez-libs-2.14 but having problems with bluez-utils-2.14.
+> 
+> I'm working on a PC with SUSE 9.1, and the target is devboard_82 with 
+> linux-2.4.26.
+> 
+> I've tried almost every option at this stage and I keep getting the 
+> error related to /lib/libc.so.6 I cannot figure out where it is getting 
+> this from - my guess is that it should be pointing to 
+> ../../target/cris-axis-linux-gnu/lib/libc.so.6  but cannot.
+> 
+> I'd appreciate some help or pointers with this (having searched the web 
+> and this newgroup - and tried loads of combinations of commands).
+> 
+> thanks
+> 
+> Joe
+...
+> 
+> cd bluez-libs-2.14/
+> linux:/axis/devboard_82/apps/bluez-libs-2.14 # ./configure CC="gcc-cris 
+> -mlinux"  LD="cris-ld"   --target=cris-axis-linux --host=i686-pc-linux 
+> --prefix=/usr
 
-I believe the right link is
+Hi,
+it seems that your options for configure are wrong for cross
+compilation. --host specifies the system where the package will run.
+This should be cris-axis-linux in your case, I guess.
 
-http://www.tdksystems.com/products/intro.asp?id=3
+As a general hint for cross compiling:
+* Set CC,CFLAGS and LDFLAGS that you need for cross compiling in the
+environment.
+* use "./configure --host=<your target architecture>" (and special
+options that are required, but don't use --target or --build !!)
 
-I bought it here:
+For bluez-utils-2.10, I had to specify --with-bluez=.. and --with-usb=..
+with the path were the bluez-libs includes were installed.
 
-http://www.expansys-usa.com/product.asp?code=106260
+Hope that helps
+Erwin
 
- > Please post the output of
- > dump_cis.
- >
 
-Socket 0:
-   dev_info
-     NULL 0ns, 512b
-   manfid 0x0105, 0x4254
-   funcid unknown [post]
-   vers_1 7.1, "TDK", "Bluetooth PC Card II", "", ""
-   config base 0x00f8 mask 0x000f last_index 0x04
-   cftable_entry 0x03 [default]
-     [rdybsy]
-     Vcc Vnom 5V
-     io 0x01e0-0x01ef [lines=8] [8bit] [range]
-     irq mask 0xffff [level] [shared]
-   cftable_entry 0x04
-     io 0x0000-0x7fff [lines=15] [8bit]
 
-Looks like it is new...
 
-Let me know - if it is new, I will just give it to a Windows-only 
-colleague - I need it on a machine where I do not want to run 
-non-distribution kernels (I would on another machine, but that's not a 
-laptop...), but let me know either way. I'll be happy to run a couple of 
-tests until then.
-
-lars
--- 
-Lars Vilhuber                    lists.all@cloutier-vilhuber.net
 
 
 -------------------------------------------------------
