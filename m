@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <3F82A1AE.9020607@grupopie.com>
+From: Paulo Marques <pmarques@grupopie.com>
+MIME-Version: 1.0
+To: theo.beisch@gmx.de
+Cc: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] help for bluez and bridge configuration needed
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Paulo Marques <pmarques@grupopie.com>
-Cc: theo.beisch@gmx.de, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3F82A016.2050901@grupopie.com>
-References: <200310062337.37090.root <>>  <3F82A016.2050901@grupopie.com>
-Content-Type: text/plain
-Message-Id: <1065526456.5327.45.camel@pegasus>
-Mime-Version: 1.0
+References: <200310062337.37090.root <>>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -18,26 +17,26 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 07 Oct 2003 13:34:10 +0200
+Date: Tue, 07 Oct 2003 12:21:18 +0100
 
-Hi,
 
-> The problem is that when the bnep0 interface enters the bridge, the bridge's 
-> "mac address" changes. You can see that happening doing a "ifconfig pan0" before 
-> the bnep0 joining the bridge and after, to see the hardware address of the pan0 
-> interface.
-> 
-> I tried to solve this by issuing "arping's" so that other machines on the 
-> network would be warned about the new hardware address, but unfortunately never 
-> got this to work properly... :(
+Just one more thing i forgot to mention: you can try and send a similar report 
+to the bridging mailing list to see if there is some solution on the bridge side.
 
-I never put the eth0 into the bridge ;) You can use IP forwarding and
-NAT between eth0 und pan0.
+The mailing list for bridging is at:
 
-Regards
+http://www.math.leidenuniv.nl/mailman/listinfo/bridge
 
-Marcel
+I hope this helps,
 
+
+-- 
+Paulo Marques
+Software Development Department - Restinfor, Lda.
+Phone: +351 252 290600, Fax: +351 252 290601
+Web: www.grupopie.com
+
+"In a world without walls and fences who needs windows and gates?"
 
 
 
