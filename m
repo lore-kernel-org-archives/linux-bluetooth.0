@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] regarding configuring in Sarge
+Subject: Re: [Bluez-users] problems getting connection to cell phone
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4233BF6B.5050007@gmail.com>
-References: <4233BF6B.5050007@gmail.com>
+In-Reply-To: <1110730150.15038.9.camel@tux>
+References: <1110730150.15038.9.camel@tux>
 Content-Type: text/plain
-Message-Id: <1110795994.8158.54.camel@pegasus>
+Message-Id: <1110795898.8158.52.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,17 +18,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Mar 2005 11:26:34 +0100
+Date: Mon, 14 Mar 2005 11:24:58 +0100
 
-Hi,
+Hi Tamer,
 
-> i am newbie to configure in Sarge.i have a bluetooth with winddcomm 
-> driver in windows and i want to configure in gnu/linux.plz help me
-> thankyou in advance
-> neverstable
+> I have problems getting a stable connection between my Computer and my
+> cellular phone through bluetooth. Could be the problem because the
+> package bluez-pin was not installed? 
+> 
+> I unpacked the package and tried to compile it, and I receive a long
+> list of errors. Here the output: 
+> 
+> 
+> make
+> cc -O2 -g `pkg-config --cflags gtk+-2.0 libglade-2.0 dbus-glib-1
+> gconf-2.0` -DGTK_DISABLE_DEPRECATED -DDBUS_API_SUBJECT_TO_CHANGE -Wall
+> -Os -fomit-frame-pointer -DPACKAGE=\"bluez-pin\" -DPREFIX=\"/usr\"
+> -DPACKAGE_LOCALE_DIR=\"/usr/share/locale\"   -c main.c -o main.o
+> Package dbus-glib-1 was not found in the pkg-config search path.
+> Perhaps you should add the directory containing `dbus-glib-1.pc'
+> to the PKG_CONFIG_PATH environment variable
+> No package 'dbus-glib-1' found
+> main.c:20:21: gtk/gtk.h: No such file or directory
+> main.c:22:23: dbus/dbus.h: No such file or directory
+> main.c:23:28: dbus/dbus-glib.h: No such file or directory
+> main.c:24:37: dbus/dbus-glib-lowlevel.h: No such file or directory
 
-there is nothing really to configure. Install the bluez-utils package
-and make sure that you have a recent 2.6 kernel running.
+I think this makes it quite clear. You need GTK and DBus development
+libraries to be installed.
 
 Regards
 
