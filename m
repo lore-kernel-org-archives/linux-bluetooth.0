@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41DE6E20.8080503@dark-reality.de>
+Message-ID: <41DE6DC3.7070903@dark-reality.de>
 From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] btsco under FC3
-References: <5256d0b05010520461ad68ff3@mail.gmail.com>	<1105014278.4299.19.camel@pegasus>	<5256d0b05010622152c32d3f4@mail.gmail.com> <20050107120154.424e0927.henryk@ploetzli.ch>
-In-Reply-To: <20050107120154.424e0927.henryk@ploetzli.ch>
+References: <5256d0b05010520461ad68ff3@mail.gmail.com>	 <1105014278.4299.19.camel@pegasus>	 <5256d0b05010622152c32d3f4@mail.gmail.com>	 <41DE36E2.5030404@xmission.com> <5256d0b0501062319209a3d3a@mail.gmail.com>
+In-Reply-To: <5256d0b0501062319209a3d3a@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,50 +18,41 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 07 Jan 2005 12:10:24 +0100
+Date: Fri, 07 Jan 2005 12:08:51 +0100
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-Maybe we have to improve the documentation what btsco.ko, btsco, btsco2
-and a2play are and what they do - and what they do not :)
+I also think it's not needed to run btsco when you try to use a2play!
 
-to bad I have so much work to do :(
+btsco is for using the headset with alsa in normal (mono) audio
+applications, while a2play connects directly to the headset to play
+stereo music.
 
-regards,
+So it should be either btsco *or* a2play!
+
+best regards,
 ~  Lars
 
-Henryk Pl=F6tz wrote:
-| Moin,
-|
-| Am Fri, 7 Jan 2005 14:15:44 +0800 schrieb Peter Robinson:
-|
-|
-|>As seen below it detects the device, the voice settings and connects
-|>with a RFCOMM channel but then it just sits there. I end up just
-|>putting it into the background and try running the varoius examples.
-|>Output of all included below. I get no sound at all. any ideas or
-|>suggestions?
+Peter Robinson wrote:
+|>It's not a real daemon. You run it in the foreground and click the
+|>connect button on the headset. Then you can send and receive audio from
+|>another app.
 |
 |
-| You did press the connect button on the headset, did you?
+| OK so its not suppose to exit then...
+|
+| P
 |
 |
-|>[root@trinity btsco]# btsco 00:07:A4:0E:69:3D
-|
-| ...
-|
-|>[1]+ btsco 00:07:A4:0E:69:3D &
-|>[root@trinity btsco]# mpg123 --au -
-|>/home/audio/mp3/green_day/american_idiot/green_day-boulevard_of_broke
-|>n_dreams.mp3
-|>| sbc/sbcenc - | ./a2play 00:07:A4:0E:69:3D
-|
-|
-| That is not supposed to work. btsco (the program) and a2play are two
-| different things. You should only be able to use one of them at any
-| one time, if a2play works for you at all (which it doesn't, as the
-| HS-810 can't do A2DP).
+| -------------------------------------------------------
+| The SF.Net email is sponsored by: Beat the post-holiday blues
+| Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+| It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+| _______________________________________________
+| Bluez-devel mailing list
+| Bluez-devel@lists.sourceforge.net
+| https://lists.sourceforge.net/lists/listinfo/bluez-devel
 |
 
 
@@ -76,9 +67,9 @@ mail: lgw@dark-reality.de
 Version: GnuPG v1.2.3 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFB3m4gQWC6DTWkDAoRAt0+AJwI2FmEti8TF7BPlix5Iy3MBHcFSwCfeh+M
-+0BM6oKH8T/vu+WmM+KCu20=3D
-=3DbvFY
+iD8DBQFB3m3DQWC6DTWkDAoRApxyAJoDSkDi4wWBVjrLF0JNZ6pyEyaPwwCfY7q+
+jqtiPDRSg21KGNME6M/f1kU=
+=YqzK
 -----END PGP SIGNATURE-----
 
 
