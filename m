@@ -1,45 +1,156 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040225093953.42411.qmail@web41309.mail.yahoo.com>
-From: comp sci <compsci10hyd@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Return-Path: <wim.delvaux@adaptiveplanet.com>
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [Bluez-users] link_key_request problems
+Date: Wed, 25 Feb 2004 03:51:06 +0100
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <200402250154.18963.wim.delvaux@adaptiveplanet.com> <1077672429.2919.67.camel@pegasus>
+In-Reply-To: <1077672429.2919.67.camel@pegasus>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] obex file transfer..!
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Feb 2004 01:39:53 -0800 (PST)
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200402250351.06911.wim.delvaux@adaptiveplanet.com>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Sir,
-     I was able to do Obex file transfer to other PC
-from my PC using ussp-push as specified in
-http://www.klings.org/nowires/main.php/How-To/OBEX/
-     Now if I want to recieve the file from other
-device what should I.Is there any Obex server included
-in the bluez stack or apps,which can waiting for files
-etc.
-     Hope to hear from you in this regard.
-Thank you.
+>
+> what are your hcid.conf settings? Set the pairing mode to "multi".
 
-__________________________________
-Do you Yahoo!?
-Yahoo! Mail SpamGuard - Read only the mail you want.
-http://antispam.yahoo.com/tools
+	Pairing is in both MULTI
+
+HCID.conf of IPAQ
+
+# HCId options
+options {
+        # Automatically initialize new devices
+        autoinit yes;
+
+        # Security Manager mode
+        #   none - Security manager disabled
+        #   auto - Use local PIN for incoming connections
+        #   user - Always ask user for a PIN
+        #
+        security user;
+
+        # Pairing mode
+        #   none  - Pairing disabled
+        #   multi - Allow pairing with already paired devices
+        #   once  - Pair once and deny successive attempts
+        pairing multi;
+
+        # PIN helper
+        pin_helper /bin/bluepin;
+        #dbus_pin_helper;
+}device {
+        # Local device name
+        #   %d - device id
+        #   %h - host name
+        name "%h (%d)";
+
+        # Local device class
+        class 0x120112;
+
+        # Default packet type
+        #pkt_type DH1,DM1,HV1;
+
+        # Inquiry and Page scan
+        iscan enable; pscan enable;
+
+        # Default link mode
+        #   none   - no specific policy
+        #   accept - always accept incoming connections
+        #   master - become master on incoming connections,
+        #            deny role switch on outgoing connections
+        #
+        #lm accept,master;
+        #
+        lm accept;
+
+        # Default link policy
+        #   none    - no specific policy
+        #   rswitch - allow role switch
+        #   hold    - allow hold mode
+        #   sniff   - allow sniff mode
+        #   park    - allow park mode
+        #
+        #lp hold,sniff;
+        #
+        lp hold,sniff,park;
+
+        # Authentication and Encryption
+        auth enable;
+        #encrypt enable;
+}
+
+Hcid for the SERVER :
+
+options {
+        # Automatically initialize new devices
+        autoinit yes;
+
+        # Security Manager mode
+        #   none - Security manager disabled
+        #   auto - Use local PIN for incoming connections
+        #   user - Always ask user for a PIN
+        #
+        # security auto;
+        security user;
+
+        # Pairing mode
+        #   none  - Pairing disabled
+        #   multi - Allow pairing with already paired devices
+        #   once  - Pair once and deny successive attempts
+        pairing multi;
+
+        # PIN helper
+        pin_helper /usr/bin/bluez-pin;
+}
+
+# Default settings for HCI devices
+device {
+        # Local device name
+        #   %d - device id
+        #   %h - host name
+        name "%h-%d";
+
+        # Local device class
+        class 0x100;
+
+        # Default packet type
+        #pkt_type DH1,DM1,HV1;
+
+        # Inquiry and Page scan
+        iscan enable; pscan enable;
+
+        # Default link mode
+        #   none   - no specific policy
+        #   accept - always accept incoming connections
+        #   master - become master on incoming connections,
+        #            deny role switch on outgoing connections
+        #
+        lm accept,master;
+        #
+        #lm accept;
+
+        # Default link policy
+        #   none    - no specific policy
+        #   rswitch - allow role switch
+        #   hold    - allow hold mode
+        #   sniff   - allow sniff mode
+        #   park    - allow park mode
+        #
+        #lp hold,sniff;
+        #
+        lp hold,sniff,park;
+
+        # Authentication and Encryption
+        auth enable;
+        # encrypt enable;
+}
 
 
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+
+>
+> Regards
+>
+> Marcel
