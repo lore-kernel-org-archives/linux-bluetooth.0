@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Andreas Deresch <aderesch@fs.tum.de>
-Reply-To: Andreas Deresch <aderesch@fs.tum.de>
-To: =?iso-8859-1?q?Gary=20Martin?= <gary_martin_au@yahoo.com.au>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Desperate newbie
-In-Reply-To: <20040328020755.5494.qmail@web21003.mail.yahoo.com>
-Message-ID: <Pine.LNX.4.56L0.0403291037080.10064@localhost>
-References: <20040328020755.5494.qmail@web21003.mail.yahoo.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+To: bluez-users@lists.sourceforge.net
+From: Mick Wever <hair@netbeans.org>
+Message-ID: <pan.2004.03.29.08.17.54.697624@netbeans.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Subject: [Bluez-users] Bluetooth device missing after kernel recompile
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,17 +15,67 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Mar 2004 10:40:57 +0200 (CEST)
+Date: Mon, 29 Mar 2004 10:17:55 +0200
 
-On Sun, 28 Mar 2004, [iso-8859-1] Gary Martin wrote:
+After recompiling my kernel (2.6) bluetooth has stopped working for me.
+lsmod gives me the required modules.
+When I type 'hcitool scan' I get:
+"Device is not available.: Success".
+And 'hcitool inq' gives me:
+"Inquiring ...
+Inquiry failed.: No such device".
+'hcitool dev' does not output any devices.
 
-> Thanks for the suggestion Michal. I changed the class from 0x100; to 0x10c; in the file
-> hcid.conf, but nothing has changed. I'm glad it is not only me that is mystified.
-Try 0x120104 ("Laptop"). This has worked with my T28 and T68i.
-(Other possible settings are "Computer" and "Mobile Phone", the numerical
-values of which I don't have at hand.)
+What am I missing? What is the /dev device file that is used? How do I
+create the local device again if that is what's needed?
 
-ad
+Mick.
+
+lsmod output:
+Module                  Size  Used by 
+hci_usb                11904  0
+hci_vhci                5248  0
+hci_uart               15056  0
+bnep                   10880  0
+rfcomm                 25624  0
+l2cap                  20868  4 bnep,rfcomm 
+sco                     11012 0
+bluetooth              42852  7 hci_usb,hci_vhci,hci_uart,bnep,rfcomm,l2cap,sco 
+sg                     28960  0
+i830                   66860  2
+ohci_hcd               14852  0
+intel_agp              15516  1
+agpgart                25384  3 intel_agp 
+uhci_hcd               28304  0
+i810_audio             27540  0
+ac97_codec             16524  1 i810_audio 
+snd_intel8x0           28584  0
+snd_ac97_codec         57092  1 snd_intel8x0 
+snd_pcm                 81928 1 snd_intel8x0 
+snd_timer              21380  1 
+snd_pcm gameport        3712  1 snd_intel8x0 
+snd_page_alloc          9220  2 snd_intel8x0,snd_pcm 
+snd_mpu401_uart         6144  1 snd_intel8x0
+snd_rawmidi            20000  1 snd_mpu401_uart 
+snd_seq_device          6536  1 snd_rawmidi 
+snd                    44260  7 snd_intel8x0,snd_ac97_codec,snd_pcm,snd_timer,snd_mpu401_uart,snd_rawmidi,snd_seq_device
+sbp2                   20488  0
+scsi_mod               64172  2 sg,sbp2 
+eth1394                17416  0
+ohci1394               30340  0
+ieee1394               90680  3 sbp2,eth1394,ohci1394 
+hid                    29760  0
+ehci_hcd               22916  0
+usbcore                87644  7 hci_usb,ohci_hcd,uhci_hcd,hid,ehci_hcd
+
+Mick.
+
+-- 
+-- <BR/>
+"This above all: to thine own self be true. It must follow that you cannot then be false to any man." Shakespeare
+<BR/> --- <a href=http://www.harryspractice.com.au>Harry's Practice</a> --- 
+
+
 
 
 -------------------------------------------------------
