@@ -1,54 +1,50 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Zia Syed <zs@comp.rgu.ac.uk>
-Reply-To: zs@comp.rgu.ac.uk
-To: bluez-users@lists.sourceforge.net
+Return-Path: <dv_mlist@verizon.net>
+Subject: bluetooth pcmcia/cf serial errors with 2.6 kernel
+From: digger vermont <dv_mlist@verizon.net>
+To: Russell King <rmk+serial@arm.linux.org.uk>,
+   Linux Serial <linux-serial@vger.kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Max Krasnyansky <maxk@qualcomm.com>,
+   bluez-users <bluez-users@lists.sourceforge.net>,
+   Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Content-Type: text/plain
-Message-Id: <1074894810.6320.16.camel@zs>
+Message-Id: <1074885137.3532.9.camel@myrna>
 Mime-Version: 1.0
-Subject: [Bluez-users] PAN and Device Lookup Problem- Still no luck :(
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jan 2004 21:53:30 +0000
+Date: Fri, 23 Jan 2004 14:16:42 -0500
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Well guys!, after whole day effort, i still couldn't manage to get PAND
-and device discovery to work together. I'm using Zaurus SL5500 with
-kernel 2.4.18-rmk7-pxa3-embedix. As i said before, stack works fine
-until when I connect to NAP, after that I can't do device lookup. Only
-after killing the PANU session, i can do the "hcitool scan". Otherwise
-it gives me error saying "Inquiry failed: Device or resource busy".
+Hello Russell King and Linux Serial Mailing List,
 
-I'm really stuck now as my application which was working till last night
-but now with this problem I can't go any further. My application need
-both PAN (for fetching web-contents) and device lookup for discovering
-nearby devices. 
+	Changes to the serial driver in 2.6.xx kernels have caused problems
+with some bluetooth pcmcia/cf cards that do work properly with 2.4.xx
+kernels. 
 
-What do you guys suggest I should do? I've tried installing different
-versions of bluez packages (from sf.net and from community.zaurus.com). 
+When the cards are plugged the uarts are correctly identified and the
+ports created.  However, hciattach returns errors when trying to attach
+the port to the BlueZ stack. Different settings have been tried such as
+baud rates and irq's through setserial with no difference.
+	
+The problem is not platform specific.  It occurs on my powerbook.  I'm
+not sure of the platforms of the other reported errors, but they are not
+powerpc's.
 
-I'm using Socket CF (G Series) Bluetooth card. Is there anyone out there
-using the same device settings with Bluez?
+Here are more specifics:
 
-Please advice!
+kernel 2.4.24 works fine
 
-Thanks
-Zia
+kernel 2.6.2-rc1 and 2.6.2-rc1-ben1
+	Com One Platinum:Reported to work fine.
+	Xircom PC cards:Reported to time out.
+	Socket CF:	Error is "BCSP initialization timed out".
+			Card is reported as "Socket", "CF+ Personal
+			Network Card Rev 2.5"
+
+Here is the top of the thread on the bluez-users mailing list:
+	http://thread.gmane.org/gmane.linux.bluez.user/1864
+	
+If there is any other information I can help with please let me know.
 
 
+Thanks,
 
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+digger	
+	
