@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] help on project!!!!
+Subject: Re: [Bluez-users] Conflict bluetooth and soundcard
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Simi Manuel <roses_3@operamail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041222133512.69B1323CF7@ws5-3.us4.outblaze.com>
-References: <20041222133512.69B1323CF7@ws5-3.us4.outblaze.com>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAejKkYMP2t0iWvwvgIRffgQEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAejKkYMP2t0iWvwvgIRffgQEAAAAA@t-online.de>
 Content-Type: text/plain
-Message-Id: <1103729756.20258.50.camel@pegasus>
+Message-Id: <1103720272.20258.26.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,21 +19,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 22 Dec 2004 16:35:56 +0100
+Date: Wed, 22 Dec 2004 13:57:52 +0100
 
-Hi,
+Hi Peter,
 
-first if you ask on the mailing list, you reply to the mailing list.
+> I'm using SuSE 9.2 with kernel 2.6.8-24.5 and recompiled dmabt but no
+> positiv result. Again the message Can't access Toshiba device /dev/toshiba
+> occured. Then soundcard is also uncorrectly installed but this is to be
+> solved by YaST at Sound --> options --> reset all.
+> But the target is to have both available dmabt (bluetooth-function on of
+> Toshiba-notebook) and a usable soundcard (in windows it is using PCI-bus 0
+> and irq 11). So, do you have an idea to solve this problem?
 
-> but i am not understanding its documentation and i didnt get its source code....rather than the code,i need to know how simply it can be done since mine is a 2 months project.
+if I remember correctly then the SuSE 9.2 kernel is a 2.6.9-rc2 + extra
+patches. The problem you are running in is not Bluetooth related. This
+is a system one and most times it is ACPI and the IRQ routing. Since
+dmabt and /dev/toshiba is not the right way to go you may a little bit
+lost here. Everything must be done through ACPI, but you need to know
+where's the on/off switch for Bluetooth in your ACPI tables.
 
-You don't get the source code, then you might try something else. The
-code is available for free. You can download it from the BlueZ webpage
-and you will find it inside the Linux kernel source. So use it, Luke ;)
+> Why? Marcel Holtmann helped me very well to get the whole BT-function with
+> AP started. I tried to get help from SuSE, but this is not really good.
+> Sometimes they have heard something about bluetooth and BT on
+> Toshiba-notebook is a story itself. So, I'm happy about help from
+> bluez-users, especially as Bluez is part of the kernel of SuSE 9.2
 
-And once again. If you have a problem describe it in detail and describe
-what you wanna do. Otherwise no one is able to help you. If you don't
-know what you wanna do, then try something else.
+As mentioned above this is not a BlueZ problem. Once your Bluetooth USB
+adapter is activated everything is working. And as Michal mentioned it
+is worth trying the latest vanilla kernel (2.6.10-rc3-bk15) available.
+You must look out for ACPI and ALSA updates and try to find a way not
+using dmabt to activate your Bluetooth module (toshiba_acpi maybe).
 
 Regards
 
