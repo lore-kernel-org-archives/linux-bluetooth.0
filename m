@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4251F6CB.8080209@xmission.com>
+Message-ID: <425175E9.8040509@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] a2dp timing
+References: <42439ADA.5000006@xmission.com>	 <1111756476.9195.105.camel@pegasus>  <42443FDB.3070205@xmission.com> <1111771895.9195.133.camel@pegasus>
+In-Reply-To: <1111771895.9195.133.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] arm boards for embedding bluez
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,24 +18,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 04 Apr 2005 20:24:11 -0600
+Date: Mon, 04 Apr 2005 11:14:17 -0600
 
-Hey
+Marcel
 
-Does anyone have a feel for what is available now for doing embedded 
-bluez stuff with arm? I would like to put together something with a 
-class 1 adapter... it seems like there was talk of a board for embedding 
-that had class 1 built in but I can't find it in the archives and 
-googling reveals a bunch of designs that have probably been abandoned.
+FYI, I found alsa-lib post-1.0.8 has fixed up the plugin api so plugins 
+really can be built standalone. The plugins were moved to a different 
+cvs project "alsa-plugins" and the api changed in the process.
 
-I am hoping that by doing linux on arm, it would be 
-cheaper/smaller/cooler than the $200+ each that a small x86 barebones 
-board costs, eg: 
-http://www.kontron.com/products/pdproductdetail.cfm?keyProduct=32658&kps=1689&kpc=237&keySiteRegion=1
+I changed our reference plugin to be based on the new oss plugin. I will 
+work on the a2dp source side of things here. It looks much more 
+straightforward now.
 
-but 300Mhz/IDE/VGA is overkill for this... I just want something that 
-could stream a2dp & do voip to a headset and act as an access point for 
-a bluetooth pda.
+I suppose we could implement a2dp sink as well, but I don't think 
+connections can be initiated by a sink--it has to listen for the source 
+to make the connection.
+
+I'm keeping the cvs code up to date in case anyone wants to look (in 
+btsco/bt)
+
+On a more pragmatic note, I sold my bluetake to a friend so it won't be 
+as easy to try things on it. I bought one of the iTech sets so hopefully 
+development can go well with the new headset.
 
 Brad
 
