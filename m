@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Stefan Behlert <behlert@suse.de>
+From: Pete Stevens <pete@ex-parrot.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] hcitool bug
-Message-ID: <20050223154857.GE5777@suse.de>
-References: <Pine.LNX.4.58.0502231536460.9757@sphinx.mythic-beasts.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <Pine.LNX.4.58.0502231536460.9757@sphinx.mythic-beasts.com>
+Message-ID: <Pine.LNX.4.58.0502231536460.9757@sphinx.mythic-beasts.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] hcitool bug
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,41 +16,59 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Feb 2005 16:48:58 +0100
+Date: Wed, 23 Feb 2005 15:41:45 +0000 (GMT)
 
-On Feb 23, 05 15:41:45 +0000, Pete Stevens wrote:
-> Hi,
-> 
-> This confuses me, can anyone explain why I get this?
-> 
-> [root@pstevens bluetooth-pc-tag]# hcitool dev
-> Devices:
->         hci0    00:0C:76:47:6A:94
-> 
-> [root@pstevens bluetooth-pc-tag]# hcitool -i 00:0C:76:47:6A:94 info
-> 00:0E:6D:13:D8:74
-> Requesting information ...
-> Get connection info failed: No such file or directory
+Hi,
 
-> 
-> [root@pstevens bluetooth-pc-tag]# hcitool info 00:0E:6D:13:D8:74
-> Requesting information ...
->         BD Address:  00:0E:6D:13:D8:74
+This confuses me, can anyone explain why I get this?
 
-Nice. With version 2.15 this fails with me. Do you have more than one
-Bluetooth dongle in your computer?
-[...]
+[root@pstevens bluetooth-pc-tag]# hcitool dev
+Devices:
+        hci0    00:0C:76:47:6A:94
 
-I think it has to fail, because '-i <dev>' explicitly says "send it out
-using this interface" and only affects remote devices. I don't think you
-should be able to ask local devices for information in this way. But I may
-be wrong.
+[root@pstevens bluetooth-pc-tag]# hcitool -i 00:0C:76:47:6A:94 info
+00:0E:6D:13:D8:74
+Requesting information ...
+Get connection info failed: No such file or directory
 
-        ciao,
-          Stefan
+[root@pstevens bluetooth-pc-tag]# hcitool info 00:0E:6D:13:D8:74
+Requesting information ...
+        BD Address:  00:0E:6D:13:D8:74
+        Device Name: Nokia 7600
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x24d
+        Manufacturer: Nokia Mobile Phones (1)
+        Features: 0xbf 0x28 0x21 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <sniff mode> <SCO link>
+                <HV3 packets> <CVSD>
 
--- 
-Stefan Behlert
+
+If I specify the dongle by mac address it fails to get the info of the device.
+
+For extra info
+
+[root@pstevens bluetooth-pc-tag]# uname -a
+Linux pstevens.hypertag.local 2.6.10-1.9_FC2 #1 Thu Jan 13 17:54:57 EST 2005
+i686 athlon i386 GNU/Linux
+
+[root@pstevens bluetooth-pc-tag]# hcitool --help
+hcitool - HCI Tool ver 2.4
+
+
+Any got any ideas why this doesn't work?
+
+Thanks,
+
+Pete Stevens
+
+--
+Pete Stevens
+pete@ex-parrot.com
+http://www.ex-parrot.com/~pete/
+
+    People always ask me, "Where were you when Kennedy was shot?" Well, I don't
+                                                                 have an alibi.
+                                                                 -- Emo Philips
 
 
 -------------------------------------------------------
