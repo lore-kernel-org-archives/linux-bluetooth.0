@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Ben Wilson <bwilson@yooser.org>
-To: Thea <thea@m-net.arbornet.org>
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Can ping, nothing else
-Message-ID: <20040613022458.GC32460@stag.mark-and-erika.com>
-References: <20040612150207.T12604-100000@m-net.arbornet.org>
+From: Gene Imes <ebi7@ozob.net>
+To: list bluez <bluez-users@lists.sf.net>
+Content-Type: text/plain
+Message-Id: <1087081230.21739.7.camel@tr1a.ozob.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20040612150207.T12604-100000@m-net.arbornet.org>
+Subject: [Bluez-users] more bluepin
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,32 +15,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 12 Jun 2004 22:24:58 -0400
+Date: Sat, 12 Jun 2004 18:00:30 -0500
 
-* On Sat, Jun 12, 2004 at 03:10:12PM -0400, I received from Thea:
-> 
-> Forgive me if this question has been asked before. I've gotten pppd to
-> establish a connection to my t610 mobile phone through bluez. I get pair
+When I try to send a file from a windows box to my linux a dialog box
+appears on the windows box and the pairing is rejected by the linux box.
 
-This most likely isn't a bluez problem then.
+In the log:
 
-> of addresses and can properly ping and resolve hosts. Nice, but I can't
-> actually connect to hosts. This is something I don't know how to deal
-> with. If I telnet to <nameserver> 53, it times-out; if I telnet to
-> www.google.com 80, it times-out; if I ping www.altavista.com, it works
-> fine. What's happening here?
+Jun 12 15:25:29 [hcid] pin_code_request (sba=08:00:46:CC:91:76,
+dba=00:0D:88:C0:3E:DB)_
+Jun 12 15:25:29 [hcid] PIN helper exited abnormally with code 256
 
-Probably a proxy server. Depending on the service, you may have
-to authenticate first. Who are you using?
+This may be related to my previous post.
 
-> I'm running linux 2.6, stock-generic on an ibook.
-> Just ask if you want to see any configuration files
-> 
-> -Thea DeSilva
-> 
+Thanks,
 
--- 
-Ben
+Gene
+
 
 
 -------------------------------------------------------
