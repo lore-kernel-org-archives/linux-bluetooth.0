@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: "Daryl Van Vorst" <daryl@wideray.com>
 To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
-Message-ID: <001d01c324ae$8e0d6da0$1a01010a@baked>
+Message-ID: <001001c3248f$838dfdf0$1a01010a@baked>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Subject: [Bluez-devel] Qualification testing - rfcomm
+Subject: [Bluez-devel] SO_ERROR, LM_RELIABLE
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
@@ -17,32 +17,31 @@ List-Unsubscribe:
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: 
 	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 27 May 2003 17:17:41 -0700
+Date: Tue, 27 May 2003 13:35:29 -0700
 
-Marcel,
+Max,
 
-Looks like there were two problems related to xon/xoff (and maybe other
-parameters) in the rfcomm_recv_rpn() function.
+I'm working on LM_RELIABLE support in l2test. I'm using aclsession to send
+both valid and invalid l2cap packets.
 
-Here's what's happening: (Please excuse me if I'm slightly off on the
-terminology)
- 1.  The tester sends a parameter negotiation packet with valid settings an=
+I'm sending an invalid (wrong length) packet followed by a valid packet. I
+get the ECOMM error and clear it with getsockopt(SO_ERROR), and then I can
+receive the next packet. That works fine for both long and short packets.
+But when I disconnect, I get the following in syslog (for either the too
+long or the too short case):
+
+l2test[583]: Disconnect. Communication error on send
+
+Normally that would say "Disconnect. Success".
+
+But I'm not sending. (At least not that I know of) Any ideas about what
+would cause that?
+
+The same code will print "Disconnect. Success" if aclsession is used to sen=
 d
-all bits in the mask set.
- 2.  We send back a response with the XON bit in the mask still set
-(indicating that we liked it), but the XON_CHAR field is set to 0. We're
-supposed to reply with the valid XON character.
-
-I just took a quick look at the code and it appears that if we like the
-value then xon_char is left as the default value of 0, and then sent as suc=
-h
-at the bottom of the function.
-
-And, yes, we have hcidump -w logs (just not yet at my fingertips to send
-you). I'll forward them as soon as I get them.
+two valid packets.
 
 -Daryl.
-
 
 
 
