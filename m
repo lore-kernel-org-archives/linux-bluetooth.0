@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bluez sdp and kernel
+Subject: Re: [Bluez-users] HCI Stops responding
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jurgens du Toit <dutoitjj@yahoo.co.uk>
+To: axs203dd@excite.com
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <416A35E4.209@yahoo.co.uk>
-References: <416A35E4.209@yahoo.co.uk>
+In-Reply-To: <20041010175639.E7B58B6D5@xprdmailfe17.nwk.excite.com>
+References: <20041010175639.E7B58B6D5@xprdmailfe17.nwk.excite.com>
 Content-Type: text/plain
-Message-Id: <1097488644.9474.5.camel@notepaq>
+Message-Id: <1097488745.9474.8.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,19 +18,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 11 Oct 2004 11:57:25 +0200
+Date: Mon, 11 Oct 2004 11:59:05 +0200
 
-Hi Jurgens,
+Hi,
 
-> I'm trying to compile a multisync plugin, but it complains that it can't 
-> find the bluez-kernel and bluez-sdp packages. I looked on bluez's site, 
-> but can't find any references to these packages there. I googled, but 
-> only found some debian packages.
+> I am using Slackware 10 with bluetooth support compiled as modules and bluez-libs-2.10 & bluez-utils-2.10. My box is an Athlon AMD K7 600MHz and the motherboard is Gigabyte 7IXE.
+> 
+> 
+> 
+> I can;t get bluez to work properly. After some packets transmission the link breaks down and I have to unplug the dongle and plug it back again. It happened once to load the uhci (or usb-uhci) module and the PAN worked fine. However it is impossible to load these modules in the new distribution of Slackware, so I have to use usb-ohci instead.
 
-the bluez-sdp is merged into the bluez-libs and bluez-utils packages and
-you simply have to use the latest vanilla kernel. Check the mailing list
-archives for more details, because this problem was already dicussed
-some times.
+send in more information. What does "hciconfig -a" say?
 
 Regards
 
