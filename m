@@ -1,17 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] apple wireless mouse on apple ibook (g4, builtin
-	usb)
+Subject: Re: [Bluez-users] Apple keyboard
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Sunnan <sunnan@handgranat.org>
+To: Radu Maurer <a400@gmx.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <402D5592.3060907@handgranat.org>
-References: <402D07B8.8030504@handgranat.org>
-	 <1076694675.2671.191.camel@pegasus>  <402D1E8C.6020301@handgranat.org>
-	 <1076702197.18588.11.camel@pegasus>  <402D381D.1000306@handgranat.org>
-	 <1076709007.18588.39.camel@pegasus>  <402D4959.10704@handgranat.org>
-	 <1076711341.18588.57.camel@pegasus>  <402D5592.3060907@handgranat.org>
+In-Reply-To: <20040213225030.GA10502@mail.gmx.de>
+References: <20040210175802.GA17705@mail.gmx.de>
+	 <1076451979.2777.21.camel@pegasus> <20040211151146.GA19818@mail.gmx.de>
+	 <1076515215.2696.36.camel@pegasus> <20040213105035.GA10464@mail.gmx.de>
+	 <1076669640.2671.27.camel@pegasus> <20040213113749.GA13481@mail.gmx.de>
+	 <1076673365.2671.30.camel@pegasus>  <20040213225030.GA10502@mail.gmx.de>
 Content-Type: text/plain
-Message-Id: <1076714464.18588.95.camel@pegasus>
+Message-Id: <1076714070.18588.87.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -23,19 +22,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 14 Feb 2004 00:21:04 +0100
+Date: Sat, 14 Feb 2004 00:14:31 +0100
 
-Hi Sunnan,
+Hi Radu,
+ 
+> Feb 13 23:20:49 localhost bthid[8705]: Connected: Apple Computer, Inc. Apple Wireless Keyboard (05ac:0209)
+> 
+> hcidump prints this every time a press a key:
+> > ACL data: handle 0x0029 flags 0x02 dlen 15
+>     L2CAP(d): cid 0x41 len 11 [psm 19]
+> 
+> now I wonder: how do I use the keyboard with X11 (and possibly at the
+> console), i.e. which device do I have to enter in the "InputDevice"
+> section of XFree86Config?
 
-> No, not at all. bthid keeps turning itself off (silently disappearing 
-> from "ps aux|grep bthid" after a while) and I'm not sure how to see if 
-> or how the mouse connects to the computer. is the dev from hcitool dev 
-> my bluetooth chip or the mouse? where will the mouse show up, under 
-> /dev/input/mice or what? I don't really get this basic stuff yet.
-
-the "hcitool dev" shows your local device. The syslog will show your
-mouse if it is connected. Take a look at the latest posts on the mailing
-list about an Apple keyboard. I think it is the same PIN problem.
+you only have to load the keybdev kernel module.
 
 Regards
 
