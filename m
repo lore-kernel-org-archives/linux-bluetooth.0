@@ -1,66 +1,56 @@
-Return-Path: <strikewing16th@hotmail.com>
-From: "Anthony Yulo" <strikewing16th@hotmail.com>
-To: marcel@holtmann.org
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] rfcomm error message?
-Date: Wed, 21 Jan 2004 08:32:20 +0000
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] libtool and autoconf versions
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Edd Dumbill <edd@usefulinc.com>
+Cc: Max Krasnyansky <maxk@qualcomm.com>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1074650832.23181.93.camel@saag>
+References: <1074424282.16573.52.camel@saag>
+	 <1074632525.1707.181.camel@localhost>  <1074632708.23181.56.camel@saag>
+	 <1074633031.1707.190.camel@localhost>  <1074650005.7088.56.camel@pegasus>
+	 <1074650832.23181.93.camel@saag>
+Content-Type: text/plain
+Message-Id: <1074651001.7088.64.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <Law11-F41C9IHzQL9P30004988b@hotmail.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 21 Jan 2004 03:10:01 +0100
+
+Hi Edd,
+
+> > what version of libtool and autoconf is used for Debian Woody?
+> 
+> libtool1.4, autoconf2.53
+> 
+> >  Do Debian
+> > Sarge already uses the new versions?
+> 
+> sarge (and unstable) have autoconf2.59, libtool1.5
+
+ok, I see. Sarge is on its way becoming stable so it is indeed a good
+idea to ship new autoconf and libtool versions with the next tarballs.
+
+Regards
+
+Marcel
 
 
-Hey Marcel,
 
-sorry, i didn't know i'm sending html, because i'm sending the previous 
-emails using Outlook express, maybe i have to set it to send text only...
-sorry..:)
 
-well, im just testing with the rfcomm program to see if i can connect to the 
-linux box with a smartphone.. i didn't read the source of rfcomm that much, 
-so im asking if i can still make a bluetooth program thru RFCOMM, without 
-the TTY support?..
-
-how do i set the kernel options CONFIG_BLUEZ_RFCOMM_TTY? The only way i know 
-how to set it is thru recompiling the kernel.. i.e. "make xconfig"... other 
-ways to do it?
-
-sorry :) hehe im just starting bluetooth programming, and i know very little 
-on the kernel...
-
-regards,
-
-Anton
-
->
->Hi Anthony,
->
->first, can you please send text only emails. There is no reason to send
->HTML emails to a mailing list and I tend to delete emails with a blue
->background without reading them. Thanks.
->
-> > i tried using the rfcomm program to test for connections between
-> > cellphone and linux pc...
-> >
-> > anton@maverick home]rfcomm -i hci0 listen 2
-> > Waiting for connection on channel 1
-> >
-> > ...when i try to connect the smartphone the program returns and
-> > outputs the error message:
-> >
-> > "can't create RFCOMM TTY: Operation not supported"
-> >
-> > whats wrong with this? do i have to set some configuration files?
->
->your kernel is compiled without RFCOMM TTY support. Set the kernel
->option CONFIG_BLUEZ_RFCOMM_TTY.
->
->Regards
->
->Marcel
->
->
-
-_________________________________________________________________
-MSN 8 helps eliminate e-mail viruses. Get 2 months FREE*. 
-http://join.msn.com/?page=features/virus
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
