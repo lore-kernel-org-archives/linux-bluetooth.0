@@ -1,17 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] pand/main.c, restore signals for dev-up
-	script
+Subject: Re: [Bluez-devel] PAN and kernel 2.4.26
 From: Marcel Holtmann <marcel@holtmann.org>
-To: James Cameron <james.cameron@hp.com>
+To: Bastian Ballmann <Crazydj@chaostal.de>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040628101927.GC8871@hp.com>
-References: <20040627133325.GA23996@hp.com>
-	 <1088366793.3774.70.camel@pegasus> <20040627233437.GD28828@hp.com>
-	 <1088408656.3774.136.camel@pegasus> <20040628085356.GA8871@hp.com>
-	 <1088413518.3774.167.camel@pegasus> <20040628095541.GB8871@hp.com>
-	 <1088417629.3774.177.camel@pegasus>  <20040628101927.GC8871@hp.com>
+In-Reply-To: <1088418472.2513.6.camel@espy.crazydj.de>
+References: <1088271695.29447.5.camel@espy.crazydj.de>
+	 <1088364052.3774.67.camel@pegasus>
+	 <1088372482.2430.4.camel@espy.crazydj.de>
+	 <1088406110.3774.91.camel@pegasus>
+	 <1088413956.2508.3.camel@espy.crazydj.de>
+	 <1088414347.3774.170.camel@pegasus>
+	 <1088418472.2513.6.camel@espy.crazydj.de>
 Content-Type: text/plain
-Message-Id: <1088419197.3774.183.camel@pegasus>
+Message-Id: <1088419003.3774.179.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -23,24 +24,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Jun 2004 12:39:57 +0200
+Date: Mon, 28 Jun 2004 12:36:43 +0200
 
-Hi James,
+Hi Bastian,
 
-> > > But dev-up is given the peer's Bluetooth device address.  net.agent is not
-> > > given this.  Can it be determined from just the interface name?  I could
-> > > do a "hcitool con" if I knew what the right hci device number was, but
-> > > it seems sensible to have the dev-up script provide the knowledge.
-> > 
-> > it is the same as the ethernet address of the bnep0 interfaces.
+> > Is this a vanilla 2.4.26 from kernel.org?
 > 
-> No, it isn't.  You're thinking of the local device address.  I'm talking
-> about the peer's address, which is passed to dev-up by pand.
-> 
-> While the bnep0 interface on the peer has the address, that doesn't
-> help the local host get it.
+> Yes it is. Including the security patch from openwall.com.
 
-sorry. I mixed them up. The remote address is available via "pand -l".
+remove the security patch and try again.
 
 Regards
 
