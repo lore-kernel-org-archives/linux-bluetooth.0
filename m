@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] How to initiate a Pin-Exchange?
+Subject: Re: [Bluez-users] l2ping acts like ping
 From: Marcel Holtmann <marcel@holtmann.org>
 To: "Nicholas A. Preyss" <nalp@gmx.net>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040417140311.GA2532@gmx.net>
-References: <200404142203.21126.panizzon@woody.ch>
-	 <200404142211.55534.cijoml@volny.cz> <200404151149.35989.panizzon@woody.ch>
-	 <200404151729.32798.cijoml@volny.cz> <20040415202106.GA17934@gmx.net>
-	 <1082160503.4489.25.camel@pegasus>  <20040417140311.GA2532@gmx.net>
+In-Reply-To: <20040417131246.GA2461@gmx.net>
+References: <20040417131246.GA2461@gmx.net>
 Content-Type: text/plain
-Message-Id: <1082280336.4403.12.camel@pegasus>
+Message-Id: <1082280132.4403.7.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,23 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 18 Apr 2004 11:25:36 +0200
+Date: Sun, 18 Apr 2004 11:22:12 +0200
 
 Hi Nicholas,
 
-> What is security mode 3? AUTH and ENCRYPT ?
-> What is wrong about it?
-
-look at the Bluetooth specification or read my Bluetooth security paper.
-What you really wan't is security mode 1/2 and setting auth and encrypt
-is security mode 3.
-
-> > You can use the D-Bus enabled hcid and bluez-pin package.
+> > I don't know why it is from 200, so I applied your patch. Thanks.
 > 
-> Anyone written some doc about this combination? I dont get it running..
+> snip l2cap.c 
+> ...
+> 	/* Get next available identificator.
+> 	*    1 - 199 are used by kernel.
+> 	*  200 - 254 are used by utilities like l2ping,
+> 	*  etc
+> 	*/
+> ...
 
-Set "dbus_pin_helper" option in hcid.conf and run "bluez-pin --dbus" as
-normal user.
+thanks for this information. I reverted the patch.
 
 Regards
 
