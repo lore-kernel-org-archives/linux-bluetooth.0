@@ -2,10 +2,10 @@ Return-Path: <bluez-users-admin@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="iso-8859-1"
-Message-ID: <4487C040D663894C961C8297CB8F62B81E6354@apl03.poli.usp.br>
+Message-ID: <4487C040D663894C961C8297CB8F62B81E6353@apl03.poli.usp.br>
 From: "Oswaldo Seiji Morelli Sakai" <oswaldo.sakai@poli.usp.br>
 To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] easier way to program ?
+Subject: [Bluez-users] using matlab to program bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,15 +16,9 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 13 Feb 2004 11:48:12 -0200
+Date: Fri, 13 Feb 2004 11:42:47 -0200
 
-wich is the easier way to program hci commands?
-i have to student kits(ericson) and i want to program somethig simple(i =
-think):
-a automatic conection between them(inquire-create conection-accept =
-conection)=20
-does someone works with something similar in C or VB?=20
-=20
+does someone kows if its possible to program hci commands using matlab?
 
 
 -------------------------------------------------------
