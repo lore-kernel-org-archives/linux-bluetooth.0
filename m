@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [btsco] configure/make errors
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41EE6C49.7090908@pca.it>
-References: <41ED7E8D.8030709@pca.it> <1106136920.8190.96.camel@pegasus>
-	 <41EE6C49.7090908@pca.it>
-Content-Type: text/plain
-Message-Id: <1106151718.8190.121.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <41EE989A.7030206@dark-reality.de>
+From: Lars Grunewaldt <lgw@dark-reality.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] bluetooth headset - connects but no audio
+References: <41EE3974.1010604@fastwebnet.it> <41EE5112.1040502@dark-reality.de> <41EE4ACD.9070105@fastwebnet.it> <41EE66A2.1040106@dark-reality.de> <41EE69F3.1030401@fastwebnet.it>
+In-Reply-To: <41EE69F3.1030401@fastwebnet.it>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,42 +18,49 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 19 Jan 2005 17:21:58 +0100
+Date: Wed, 19 Jan 2005 18:27:54 +0100
 
-Hi Luca,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> > And again. The bootstrap thing is for making the developer happy,
-> > because he must call only one program/script for getting the repository
-> > ready. It is not for others ;)
-> I know this, but the problem here is that if someone like me (not a
-> developer, not really a newbie) wants to try his Bluetake BT420EX with
-> the bluetooth-alsa project, he should go with the CVS (no other released
-> versions). And so he has some problem, because there're no info about
-> the requirements (automake-1.7, the Audio Output libraries and the
-> Bluetooth libraries, even if the last one was my fault, it's quite
-> obvious that for a Bluetooth project you need the Bluetooth libraries).
-> 
-> So, IMHO also for developers, at least a 'required packages' section
-> should be added to the README.
+WiseLYNX wrote:
+| | no, it's not patched with mh1. Best thing would be to use the vanilla
+| | kernel (i.e. get it directly from kernel.org) and patch it with -mh1
+| | patchset from bluez. I'm using gentoo, too, btw, so it should work this
+| | way.
+|
+| I patched manually the kernel. now I get this strange thing:
+|
+| # btsco 00:0E:07:4E:4B:3E
+| Device is 1:0
+| Failed to connect to SDP server: Permission denied
+| Assuming channel 2
+| Voice setting: 0x0060
+| Can't connect RFCOMM channel: Too many levels of symbolic links
+|
 
-I don't lead this project and so these are only my two cents. Brad is
-responsible and it is actually his decision.
+use a vanilla kernel.
 
-Maybe doing a release once in a while is a good idea, but the problem is
-the kernel module is not in that shape that I would accept it. However I
-like the idea of doing everything in userspace as an ALSA plugin and
-that should be the way to go.
+no really, no idea :)
 
-> Ok, I'll add this ASAP, but ATM Debian unstable still has 2.11 and I
-> should prepare my own Debian bluez-2.13 packages.
+maybe someone else?
+- - Lars
 
-Yeah, we really need new packages (btw 2.14) for Debian Sid.
+- --
+Lars Grunewaldt
+* software development
+* multimedia design
+skills: C/C++/Java/PHP/(X)HTML/Flash/audio/video
+web: http://www.dark-reality.de
+mail: lgw@dark-reality.de
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-Regards
-
-Marcel
-
-
+iD8DBQFB7piaQWC6DTWkDAoRArAIAKCXQJaIx7F72UeEIST/PC9RrmvWvACfav+R
+C32YXYTZk0oaZknb86BW89Y=
+=55+S
+-----END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
