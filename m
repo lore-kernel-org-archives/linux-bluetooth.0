@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Desperate newbie
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gary Martin <gary_martin_au@yahoo.com.au>
-Cc: Andreas Deresch <aderesch@fs.tum.de>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040331134502.35044.qmail@web21006.mail.yahoo.com>
-References: <20040331134502.35044.qmail@web21006.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1080742767.2536.3.camel@pegasus>
-Mime-Version: 1.0
+From: =?ISO-8859-2?Q?Lendvai_P=E9ter?= <lendvai.peter@freemail.hu>
+To: Bluez-users@lists.sourceforge.net
+Message-ID: <freemail.20040231161557.52454@fm4.freemail.hu>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; CHARSET=ISO-8859-2
+Subject: [Bluez-users] connection-less communication
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,32 +15,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 31 Mar 2004 16:19:27 +0200
+Date: Wed, 31 Mar 2004 16:15:57 +0200 (CEST)
 
-Hi Gary,
 
-> Thank you for your support Andreas. Problems like this make me
-> want to go back to Mac OS X, but there is something about Linux
-> that draws me back. It has been a struggle --- I think a lot of
-> the problems I have encountered with Linux have been the result of
-> trying to run it on a PowerPC chip!!
-> 
-> I started using Linux because my Masters thesis will be on the use
-> of OSS in the public health care system --- I thought I should
-> practice what I will preach!
+Dear  Members,
 
-most problems on PowerPC are because this is a big endian platform and
-i386 is little endian. The kernel side should be clean of any endian
-bugs, but there are maybe some code parts that are never got really
-intensiv testing on big endian platforms. So I am of course not 100%
-sure. On the other side I think that the userspace part still have some
-missing byteswap operations, so try to isolate them and I will try to
-fix them as soon as possible.
+I am a final year student in University of Miskolc.I study
+telecommunications and my final project is to implement a connection-
+less
+communication method between linux boxes via usb bluetooth dongles.
+I am almost beginner in programming -- even in socket programming. 
+Could
+anybody send me some sample code or any idea what to begin with?
+I would like to use broadcast frames or datagram packets. Any help is
+welcome.
 
-Regards
-
-Marcel
-
+Thanks,
+Peter Lendvai
 
 
 
