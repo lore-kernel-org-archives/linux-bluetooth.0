@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] creation of Bnep0
+Subject: Re: [Bluez-users] Can 2 services work parallely between a PC and a
+	BT device
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050308132455.92993.qmail@web26604.mail.ukl.yahoo.com>
-References: <20050308132455.92993.qmail@web26604.mail.ukl.yahoo.com>
+In-Reply-To: <f54d86405030903455bf71640@mail.gmail.com>
+References: <d1f423d30503071045794c487e@mail.gmail.com>
+	 <f54d86405030903455bf71640@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1110391117.5462.32.camel@notepaq>
+Message-Id: <1110391057.5462.30.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,29 +20,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 09 Mar 2005 18:58:36 +0100
+Date: Wed, 09 Mar 2005 18:57:37 +0100
 
 Hi Benny,
 
-> I was reading the archive about the story of BNEP.
-> and I see that Max was more interested in an
-> implementation with TUN/TAP device.
-> a breif description of fabricio was a VTun support of
-> BNEP packet:
+> Whether 2 profile services work parallely between a PC and a single BT device.
 > 
+> - On the PC we use a Standard USB BT Dongle with the required profile settings.
+> - BT device has to have the Headset profile and the Serial port
+> profile implementaion.
 > 
-> >>extending VTun so it implements BNEP
-> 
-> >One way would be to implement BNEP support in vtund.
-> >Packets would be sent to a TAP (virtual Ethernet) and
-> >vtund would format the Ethernet packet to BNEP. Only,
-> >all packets would have to go to user space before
-> >being sent to the Bluetooth socket.
->  
-> My quetsion is : was there a Bluez release which use
-> TUN/TAP device? 
+> Is there any Bluetooth SoC which supports 2 profiles simultaneously
+> with the same Host?
 
-not that I know of.
+I don't know that for SoC systems, but the BlueZ supports multiple
+profiles at the same time.
 
 Regards
 
