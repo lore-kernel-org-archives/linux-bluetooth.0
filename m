@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hibernate and BlueZ??
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200503070104.18956.cijoml@volny.cz>
-References: <200503070104.18956.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1110390819.5462.23.camel@notepaq>
-Mime-Version: 1.0
+Message-ID: <20050309162812.75343.qmail@web26603.mail.ukl.yahoo.com>
+From: BZ Benny <bennybbz@yahoo.fr>
+To: bluez maillinglist <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-users] Adresse resolution in BlueZ
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,20 +16,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 09 Mar 2005 18:53:39 +0100
+Date: Wed, 9 Mar 2005 17:28:12 +0100 (CET)
 
-Hi Michal,
+Hi,
 
-> where in your list is support for hibernate in BlueZ? 
+The Adresse resolution in bluez is done in the BNEP
+isn"t it?
 
-right now, I won't have time to look into this, but patches are always
-welcome.
+But I see in the specification of BNEP that the
+adresse resolution may be handled by PAN layer. Is
+BlueZ like that because it was the best solution for
+implementing PAN on linux.
 
-Regards
+regards,
+benny
 
-Marcel
 
 
+	
+
+	
+		
+Découvrez le nouveau Yahoo! Mail : 250 Mo d'espace de stockage pour vos mails ! 
+Créez votre Yahoo! Mail sur http://fr.mail.yahoo.com/
 
 
 -------------------------------------------------------
