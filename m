@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+To: "beatriz.hargrave" <beatriz.hargrave@uol.com.br>,
+   bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Bluetooth - USB adapters
+References: <HVI9GX$IDS3gDUdf06VCb6ODUPlAa2l6e7HJtg5g8qTWg3_jM6V@uol.com.br>
+From: "Christoph Torens" <c.torens@web.de>
+Content-Type: text/plain; format=flowed; delsp=yes; charset=iso-8859-15
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Message-ID: <5CD2BD8F1F23A943BAEBE96AB20C24980549DD5C@VS1.hdi.tvcabo>
-From: "filipe_abrantes" <filipe_abrantes@netcabo.pt>
-To: "bluez-users" <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Can't read local name on hci0. Connection timed out(110)
+Message-ID: <opr5snzxgceocfdv@debian>
+In-Reply-To: <HVI9GX$IDS3gDUdf06VCb6ODUPlAa2l6e7HJtg5g8qTWg3_jM6V@uol.com.br>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,56 +18,58 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 1 Apr 2004 22:03:12 +0100
+Date: Thu, 01 Apr 2004 22:17:47 +0200
 
-hello:
+Hi Beatriz,
 
-i'm sorry to be posting this again, ive posting this around but havent =
-got any feedback yet, and as im kind of desperate with this, i would =
-really appreciate your help even if it is to say that it isn't =
-possible...
+> I would like to know if there is a bluetooth-USB adapter for
+> Linux Red Hat 7.1, and where can I buy it (Internet or in
+> Brazil) . The adapters I have found so far are only for
+> Windows (Leadership and Apple).
 
-so:
+Thats quite exactly what I asked a few days ago. I'll post the answer I  
+got from the list.
+Hope this helps you...
 
-#modprobe hci_uart
-#hciattach /dev/tts/1 any 921600
-
-# hciconfig -a
-hci0:   Type: UART
-        BD Address: 08:00:17:1F:C5:E4 ACL MTU: 339:4  SCO MTU: 60:9
-        UP RUNNING PSCAN ISCAN AUTH
-        RX bytes:98 acl:0 sco:0 events:10 errors:0
-        TX bytes:315 acl:0 sco:0 commands:14 errors:0
-        Features: 0xff 0x3b 0x05 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-Can't read local name on hci0. Connection timed out(110)
+My question was exactly:
+>> I'd like to buy an additional Bluetooth Dongle,
+>> because my Zeevo Chip Dongles don't work properly and I stressed my  
+>> friend to long now by borrowing his CSR Dongle.
+>> So which chipsets exist at all, and is CSR the "all-time-best-solution"  
+>> for linux?
+>> And last but not least, how can I buy a Dongle with the desired  
+>> chipset? You normaly just see the manufacturers as Acer for example,  
+>> not the chipset, don't you? Is it absolutely unimportant at all, if its  
+>> Acer, Belkin, D-Link or what ever?
 
 
-also hcitool scan gives timeout as well as pand connections so i cant =
-bring up the bnep interface...
+And here the answer from Marcel Holtmann, who does the developing on the  
+bluez stack:
 
-im using an ipaq h5500, using kernel 2.4.19-rmk6-pxa1-hh30=20
+> the problem is the community support with chips from Zeevo and Broadcom
+> for example. We already know that their chips not behave very well under
+> some circumstances. On the other side we have CSR and if you ask me I
+> would always decide to use one of their chips, because their chips are
+> known to work very well and their community support is very good. They
+> really support Linux and try to help people that have problems. But
+> there are more companies than Zeevo, Broadcom and CSR. For example I
+> also use devices from AVM and ST Microelectronics and some others.
+>Actually my current policy is to tell everyone to try a CSR dongle first
+> if you see hardware problems like TX timeouts. Some companies should do
+> their homework or pay people to do it for them.
+>For finding out what kind of chip is inside the dongles you can use this
+> webpage					
+>http://www.holtmann.org/linux/bluetooth/features.html
 
-anyone has a clue of what could be wrong ??
+There is no special RedHat USB-Dongle. Well, bluez should work on your  
+Linux, of course. If it does not run already, I suggest you should read  
+some of the howto's on www.holtmann.org/linux/bluetooth/
 
-also alternative(if any) ideas for establishing an IP connection over bt =
-(other then bnep) are welcome.
+By the way, I bought the "Epox DG02A" (CSR Chipset)
+and I think it works better with Linux than my "Acer BT510" (Zeevo Chipset)
 
-
-thanks a lot=20
-
-filipe
-
-
-
-
-
-
-
-
-
+--
+Christoph
 
 
 -------------------------------------------------------
