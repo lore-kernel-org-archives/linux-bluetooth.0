@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] GPRS /  pppd problem
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1103323155.28046.127.camel@pegasus>
-References: <1103312469.4788.15.camel@justakiss>
-	 <1103323155.28046.127.camel@pegasus>
-Content-Type: multipart/mixed; boundary="=-mIODeDPJWpGJ1oIKwd4c"
-Message-Id: <1103555401.28429.78.camel@justakiss>
+Subject: Re: [Bluez-users] Setting up an hotplug connection with USB dongles
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200412192323.20579.rdorsch@web.de>
+References: <200411282132.37941.rdorsch@web.de>
+	 <1101740700.19573.48.camel@justakiss>  <200412192323.20579.rdorsch@web.de>
+Content-Type: text/plain
+Message-Id: <1103495289.29892.85.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,62 +19,85 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 20 Dec 2004 16:10:01 +0100
+Date: Sun, 19 Dec 2004 23:28:09 +0100
 
+Hi Rainer,
 
---=-mIODeDPJWpGJ1oIKwd4c
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-Am Fre, den 17.12.2004 schrieb Marcel Holtmann um 23:39:
-> Hi Erwin,
+> thanks for that very useful link.
 > 
-> > I'm using GPRS on a Ericsson T630 over bluetooth successfully. When I
-> > press a key on the phone to terminate the GPRS connection, pppd doesn't
-> > recognize that, however. I did a hcidump to see what happens after the
-> > key has been pressed on the phone (see below). Any ideas if there's a
-> > way to signal pppd that the GPRS connection has been terminated? The
-> > pppd debug log doesn't show any activity in that case.
+> If have everything up an running, only two minor issues left on the PANU side:
 > 
-> get the full dump or run it with --psm=3 to enable RFCOMM decoding.
+> 1. It seems that I need to do an "hcitool scan" to make pand --search working, 
+> e.g.
 > 
-> Regards
+>               hcitool scan
+>               pand --nodetach --role PANU --search --encrypt 
+> --pidfile /var/run/pand.pid
 > 
-> Marcel
+> It does work without hcitool scan, when I use the BT device address
 > 
-Hi Marcel,
-the dump with "hcidump --psm=3 -X" after canceling the GPRS connection
-on the phone:
+>               pand --connect <BT device address>
+> 
+> 2. On the client side, I do not get dhcp to work. When I run 
+> 
+>                dhclient bnep0
+> 
+> I see on the PANU (from syslog):
+> 
+> Dec 19 23:07:42 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255 port 
+> 67 interval 5
+> Dec 19 23:07:42 topsi dhclient: send_packet: Network is down
+> Dec 19 23:07:47 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255 port 
+> 67 interval 10
+> Dec 19 23:07:47 topsi dhclient: send_packet: Network is down
+> Dec 19 23:07:49 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255 port 
+> 67 interval 10
+> Dec 19 23:07:49 topsi dhclient: send_packet: Network is down
+> Dec 19 23:07:57 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255 port 
+> 67 interval 14
+> Dec 19 23:07:57 topsi dhclient: send_packet: Network is down
+> Dec 19 23:07:59 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255 port 
+> 67 interval 1
+> Dec 19 23:07:59 topsi dhclient: send_packet: Network is down
+> Dec 19 23:08:00 topsi dhclient: No DHCPOFFERS received.
+> Dec 19 23:08:00 topsi dhclient: No working leases in persistent database.
+> Dec 19 23:08:00 topsi dhclient: Sleeping.
+> Dec 19 23:08:11 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255 port 
+> 67 interval 14
+> Dec 19 23:08:11 topsi dhclient: send_packet: Network is down
+> Dec 19 23:08:25 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255 port 
+> 67 interval 15
+> Dec 19 23:08:25 topsi dhclient: send_packet: Network is down
+> Dec 19 23:08:40 topsi dhclient: DHCPDISCOVER on bnep0 to 255.255.255.255 port 
+> 67 interval 3
+> Dec 19 23:08:40 topsi dhclient: send_packet: Network is down
+> Dec 19 23:08:43 topsi dhclient: No DHCPOFFERS received.
+> Dec 19 23:08:43 topsi dhclient: No working leases in persistent database.
+> Dec 19 23:08:44 topsi dhclient: Sleeping.
+> 
+> There is no entry in the syslog file in the DHCP server (which is NAP). Its 
+> dhcpd.conf looks like this:
+> 
+> # Bluetooth
+> subnet 192.168.2.0 netmask 255.255.255.0 {
+>   range 192.168.2.100 192.168.2.150;
+> #  option broadcast-address 204.254.239.31;
+>   option domain-name "vix.com";
+>   option domain-name-servers 192.168.2.1;
+>   option broadcast-address 192.168.2.255;
+>   option routers 192.168.2.1;
+> }
+> 
+> Any ideas are welcome.
 
-Regards,
-Erwin
+as I said, use the standard Debian stuff for configuring the network
+interfaces. If you got problems setup a bridge that covers all the PAN
+connections.
 
+Regards
 
---=-mIODeDPJWpGJ1oIKwd4c
-Content-Disposition: attachment; filename=dump
-Content-Type: text/plain; name=dump; charset=iso-8859-1
-Content-Transfer-Encoding: 7bit
+Marcel
 
-
-> ACL data: handle 0x0029 flags 0x02 dlen 13
-    L2CAP(d): cid 0x0040 len 9 [psm 3]
-      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 0 len 4
-< ACL data: handle 0x0029 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0094 len 8 [psm 3]
-      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
-      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 1 len 2
-> ACL data: handle 0x0029 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0040 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-  0000: 01 29 00 01 00                                    .)...
-> ACL data: handle 0x0029 flags 0x02 dlen 16
-    L2CAP(d): cid 0x0040 len 12 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 6 fcs 0x5c credits 0
-      0000: 0d 0a 4f 4b 0d 0a  
-
---=-mIODeDPJWpGJ1oIKwd4c--
 
 
 
