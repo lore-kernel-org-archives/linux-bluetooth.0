@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Fred Schaettgen <bluez-devel@schaettgen.de>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+From: "Anderson Clayton" <omap@uol.com.br>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: RES: [Bluez-devel] Bluz APi
+Message-ID: <FHELLALOGPIKNIIPNJLPKEIHCAAA.omap@uol.com.br>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200501030040.48387.bluez-devel@schaettgen.de>
-Subject: [Bluez-devel] Problem with service level security (2.6.10-mh1)
+	charset="iso-8859-1"
+In-Reply-To: <1104663487.8286.4.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,37 +18,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 3 Jan 2005 00:40:46 +0100
+Date: Sun, 2 Jan 2005 19:04:48 -0200
 
-Hi,
 
-I've got some problems with enabling service level security for rfcomm.
-First I was hoping that this is in 2.6.10, but obvisously it isn't.
-Btw. rctest doesn't work with a vanilla kernel, because setsockopt() is called 
-(and fails), no matter if it's necessary or not. 
+Hi Marcel,
 
-So after applying the mh1-patch for 2.6.10, the result looks like this:
+I tryed to compile "hstest.c" using "make hstest" but it did not work.
 
-$ ./rctest -d -P 27 -A
-rctest[12830]: Waiting for connection on channel 27 ...
-rctest[12831]: Connect from 00:E0:03:32:28:37
-rctest[12831]: Receiving ...
-rctest[12831]: Recevied 4 bytes
-(nothing more to expect at this point..)
-rctest[12831]: Disconnect
-$
+am i doing something wrong?
 
-No authentication is triggered, even though the two devices are not paired.
-rctest seems to recognize the A-switch nicely. setsockopt is called and 
-doesn't fail.
-Is service level security supposed to work at the moment with 2.6.10-mh1?
+reagards
 
-regards
-Fred
+-----Mensagem original-----
+De: bluez-devel-admin@lists.sourceforge.net
+[mailto:bluez-devel-admin@lists.sourceforge.net]Em nome de Marcel
+Holtmann
+Enviada em: domingo, 2 de janeiro de 2005 08:58
+Para: BlueZ Mailing List
+Assunto: Re: [Bluez-devel] Bluz APi
 
--- 
-Fred Schaettgen
-bluez-devel@schaettgen.de
+
+Hi Anderson,
+
+> I am a freshman in the bluez world and I would apreciate if someone could
+> help me on finding a guide of the bluez api.
+
+the source packages contain many example and test programs. Use the
+source, Luke ;)
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+The SF.Net email is sponsored by: Beat the post-holiday blues
+Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
 
 
 -------------------------------------------------------
