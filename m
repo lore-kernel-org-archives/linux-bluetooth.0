@@ -1,24 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] racing condition in accepting incoming RFCOMM
+	connection
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jean Tourrilhes <jt@hpl.hp.com>
-Cc: Max Krasnyansky <maxk@qualcomm.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040205022635.GA24757@bougret.hpl.hp.com>
-References: <20040204015825.GA2217@bougret.hpl.hp.com>
-	 <1075879044.13285.151.camel@pegasus>
-	 <20040204175832.GB16590@bougret.hpl.hp.com>
-	 <1075924727.2783.47.camel@pegasus>
-	 <20040204214541.GA20129@bougret.hpl.hp.com>
-	 <1075942818.2783.70.camel@pegasus>
-	 <20040205011102.GA23352@bougret.hpl.hp.com>
-	 <1075944624.2783.87.camel@pegasus>
-	 <20040205014030.GA23802@bougret.hpl.hp.com>
-	 <1075947705.2783.117.camel@pegasus>
-	 <20040205022635.GA24757@bougret.hpl.hp.com>
+To: Dmitri Khokhlov <dkhokhlov@hotmail.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY8-DAV8lzzOjPtlBB000035dd@hotmail.com>
+References: <BAY8-DAV8lzzOjPtlBB000035dd@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1075948602.2783.129.camel@pegasus>
+Message-Id: <1075947988.2783.119.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Re: L2CAP non-blocking socket nasty race conditions
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -29,23 +19,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 05 Feb 2004 03:36:43 +0100
+Date: Thu, 05 Feb 2004 03:26:28 +0100
 
-Hi Jean,
+Hi Dmitri,
 
-> > What I am thinking is that
-> > if our socket is BT_LISTEN, we check for an not empty accept_q and than
-> > iterate through all sockets for BT_CONNECTED. If we found one, we return
-> > POLLIN else nothing.
-> 
-> 	This is a bit yucky, especially that poll is performance
-> critical (for scalability). That's why I was suggesting the socket
-> counter in the parent. Check what's sk_ack_backlog does, it's very
-> close to what we want.
+> It looks like there is a racing condition in accepting incoming RFCOMM
+> connection. It happens to me in 90% cases when a headset originates
+> connection to a voice gateway. If RFCOMM SAMB command frame comes in L2CAP
+> data packet right after L2CAP Configuration Request packet and there is no
+> active RFCOMM sessions yet then the kernel RFCOMM thread wakes up only one
+> time and creates new session but does not process SAMB frame from second
+> L2CAP data packet waiting in queue. Connection setup hangs. Headset is
+> waiting for UA frame response but the kernel RFCOMM thread keeps sleeping.
+> The kernel log for bad case is attached. I use the following environment:
+> Kernel: Linux 2.4.21 + patch-2.4.21-mh6, PowerPC.
+> Headsets: Motorola Model 98405H, BlueTrek-G2.
+> Voice gateway: Murata BlueModule, CSR BlueCore: BC02 (Hardware ID 8a)
+> firmware version 526
+> A possible solution could be to force additional thread wakeup right after
+> successful creation of new session in rfcomm_accept_connection(). The patch
+> is attached.
 
-yes I know, but worse performance only kicks in if it is a listen socket
-and if it has at minimum one child in its queue. A second counter sounds
-not really better to me and I think it will be very hackish.
+sounds reasonable to me. Anyone else noticed this behaviour?
 
 Regards
 
