@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <AFE91B59A185A5439840B43AB7919047093816@mchp997a.mch.sbs.de>
-From: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
-To: "'bluez-devel@lists.sourceforge.net'" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Patch for kernel oops while
+	disconnecting	devices (hci_usb.c)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alexander Holler <holler@ahsoftware.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <3FDFAC8D.7080500@ahsoftware.de>
+References: <10800000.1071618502@[192.168.207.2]>
+	 <1071622226.27570.35.camel@pegasus>  <3FDFAC8D.7080500@ahsoftware.de>
 Content-Type: text/plain
-Subject: [Bluez-devel] bandwidth when using serial cable
+Message-Id: <1071623889.27570.42.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,22 +20,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 17 Dec 2003 11:05:55 +0100
+Date: Wed, 17 Dec 2003 02:18:09 +0100
 
-Hi all, 
+Hi Alexander,
 
-I work with several Bluetooth Chips, but they have
-one commonality: they all have to be connected via serial
-cable. Am I right, that attaching with
-	hciattach /dev/ttyS0 any 115200 
-limits the data rate to 115,2 Kbit/s, which is the
-speed of serial cable? I am not talking about any 'baseband'
-datarate or l2ping, I am talking about the user data rate, 
-lets say for transfering a 10 MBit file.
-Did anyone get higher throughput than this 115, 
-when using serial cables? 
+> > what happens if you compile the HCI USB driver without SCO support?
+> 
+> The same as with this patch and SCO support, it works. Because that 
+> pointer on the lkml I've found the fix/workaround relativly fast.
 
-Regards, Matthias
+I never have worked on USB with ISOC transfers, so I don't know what is
+the correct way to fix it. I propose that you send a full detailed bug
+report (with ksymoops etc.) to the USB developer mailing list and let us
+see what they say.
+
+BTW the BT_DBG is not non-functional ;)
+
+Regards
+
+Marcel
+
 
 
 
