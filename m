@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050108092154.27208.qmail@webmail2.aruba.it>
-References: <I9YM8N$7FAD017A09BC73827FE250A0E50B0128@uol.com.br>
-In-Reply-To: <I9YM8N$7FAD017A09BC73827FE250A0E50B0128@uol.com.br>
-From: "ubaldo" <ubaldo@eja.it>
+Message-ID: <5256d0b05010717425be7834d@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] btsco under FC3
+In-Reply-To: <20050107120154.424e0927.henryk@ploetzli.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="iso-8859-1"
-Subject: [Bluez-devel] Re: miax
+Content-Type: text/plain; charset=US-ASCII
+References: <5256d0b05010520461ad68ff3@mail.gmail.com>
+	 <1105014278.4299.19.camel@pegasus>
+	 <5256d0b05010622152c32d3f4@mail.gmail.com>
+	 <20050107120154.424e0927.henryk@ploetzli.ch>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,94 +21,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 08 Jan 2005 10:21:53 +0100
+Date: Sat, 8 Jan 2005 09:42:42 +0800
 
-Ciao Omap, 
+> > As seen below it detects the device, the voice settings and connects
+> > with a RFCOMM channel but then it just sits there. I end up just
+> > putting it into the background and try running the varoius examples.
+> > Output of all included below. I get no sound at all. any ideas or
+> > suggestions?
+> 
+> You did press the connect button on the headset, did you?
 
-download it from http://sourceforge.net/projects/miax/ or go to 
-http://www.eja.it/gpl and download it from my web site, there is not any 
-documentation yet, but once compiled give a "miax --help" and it should be 
-easy to understand how it works... 
-
-Anyway it works as a iax client connected to an asterisk server as usual, 
-taking audio in/out from console and input/output from keyboard/video. 
-
-If you have a bluetooth mobile phone, you should pair it with your computer 
-and once paired you add "-b source/destination" (where "source" is the 
-computer and "destination" the mobile phone) and it will take input/output 
-and audio in/out from the mobile phone. 
-
-If you haven't a bt phone you can use a normal gsm modem (tc35/gm47/etc) but 
-this way you have to connect the audio in/out to a soundcard and the 
-serial/usb port... 
-
-With bt it is better because there are not cables and above all any 
-digital/analog conversion. The best will be when the bt-sco will support the 
-famouse 3 connection per bt-dongle at the same time, 'cause this way it will 
-be easy to make a mini gsm gateway with just few bt-phones and a 
-linux/asterisk server... 
-
-> 
-> Hi ubaldo. 
-> 
-> I have special interest on telephony
-> over the internet. Where can i find
-> more information about your
-> application? I visited the project
-> homepage but i could not find a
-> description about it.
-> And I want to congrat you for your project 
-> 
-> Regards 
-> 
-> 
->> Hi, I developed a mobile iax client
-> for asterisk server with bluetooth
->> support that can be found on
-> http://sourceforge.net/projects/miax/ . 
->> 
->> Thanx to everyone who helped here! :)  
->> 
->>   
->> 
->> ubaldo porcheddu - eja.it software
-> development
->>  
->> 
->>
-> -------------------------------------------------------
->> The SF.Net email is sponsored by:
-> Beat the post-holiday blues
->> Get a FREE limited edition
-> SourceForge.net t-shirt from ThinkGeek.
->> It's fun and FREE -- well,
-> almost....http://www.thinkgeek.com/sfshirt
->>
-> _______________________________________________
->> Bluez-devel mailing list
->> Bluez-devel@lists.sourceforge.net 
->>
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->> 
->  
-> __________________________________________________________________________
-> Acabe com aquelas janelinhas que pulam na sua tela.
-> AntiPop-up UOL - É grátis!
-> http://antipopup.uol.com.br/ 
-> 
->  
-> 
-> 
-> -------------------------------------------------------
-> The SF.Net email is sponsored by: Beat the post-holiday blues
-> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
-> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Yes. You put this headset into a Pairing mode, run btsco, it asks for
+a pin for the headset and away you go.
  
+> > [root@trinity btsco]# btsco 00:07:A4:0E:69:3D
+> ...
+> > [1]+ btsco 00:07:A4:0E:69:3D &
+> > [root@trinity btsco]# mpg123 --au -
+> > /home/audio/mp3/green_day/american_idiot/green_day-boulevard_of_broke
+> > n_dreams.mp3
+> > | sbc/sbcenc - | ./a2play 00:07:A4:0E:69:3D
+> 
+> That is not supposed to work. btsco (the program) and a2play are two
+> different things. You should only be able to use one of them at any
+> one time, if a2play works for you at all (which it doesn't, as the
+> HS-810 can't do A2DP).
 
+That may be my interpretation of the web page. Something for me to try
+when I get some more time.
+
+So does a2play etc ask for a pin to pair with the headset as well?
+
+P
 
 
 -------------------------------------------------------
