@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Development IDE sugguestion?
+Subject: Re: [Bluez-devel] Unknown answer
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Keith Pemberton <kbpember@cox.net>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1080460219.3641.4.camel@linuxcomp.gatep5.net>
-References: <1080460219.3641.4.camel@linuxcomp.gatep5.net>
+To: zubiwat <zubiwat@poczta.onet.pl>
+Cc: devel Bluetooth <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000e01c4145d$904fa7f0$fcca010a@lysydziadek>
+References: <000e01c4145d$904fa7f0$fcca010a@lysydziadek>
 Content-Type: text/plain
-Message-Id: <1080462811.2281.94.camel@pegasus>
+Message-Id: <1080462748.2281.92.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,22 +18,38 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 28 Mar 2004 10:33:31 +0200
+Date: Sun, 28 Mar 2004 10:32:28 +0200
 
-Hi Keith,
+Hi Maciej,
 
-> I am trying to get started with developing kernel drivers, but I need
-> some initial assistance.  I was looking for a good IDE that I can use
-> with good code completion capabilities.  Anyone got any suggestions?
-> What are you guys using for developing the Bluez stack?  I have tried
-> Kdevelop and Anjuta but I can seem to get started with new projects
-> under these.  The initial configure scripts always fail and when ever I
-> add a new include directive I get a bunch of error/warning messages.  I
-> know that I have so much to learn about this new world, but I would
-> appreciate your help and advice in getting started.  Thanks in advance!
+your questions are annoying me and this will be the last one I answer.
+Please stop posting non BlueZ related things to our mailing lists,
+because otherwise I have to ban you.
 
-I am using anjuta as editor, but I am writing the autoconf/automake
-files by myself.
+> I'm sending these commands :
+> 0x01 0x05  0x10  0x00
+> 0x01 0x09  0x10  0x00
+>  
+> and I don't understand why I get answer like this:
+>  
+> 04 FF 13 C2 01 00 09 00 02 00 02 68 00 00 BF 0E 00 00 00 00 00 00 04
+> 0E 0B 01 05 10 00 C0 00 40 08 00 08 00 04 0E 0A 01 09 10 00 04 00 20
+> DD 09 00 
+
+You should have taken my advise and sit down and decode your results,
+because then you had seen the answers.
+
+04 FF 13 C2 01 00 09 00 02 00 02 68 00 00 BF 0E 00 00 00 00 00 00
+
+This is a vendor specific event. Ask your module manufacturer.
+
+04 0E 0B 01 05 10 00 C0 00 40 08 00 08 00
+
+And this is the result of the reading the buffer size.
+
+04 0E 0A 01 09 10 00 04 00 20 DD 09 00
+
+And here we have your local BD_ADDR, which is 00:09:dd:20:00:04
 
 Regards
 
