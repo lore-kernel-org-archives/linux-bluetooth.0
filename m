@@ -1,61 +1,48 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Peter Wippich <pewi@gw-instruments.de>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: RE: [Bluez-devel] Maintain Bluetooth Connections
-In-Reply-To: <6EF58BF68042DF4AA46A54994117D64F0253E93B@mercury.mtctech.com>
-Message-ID: <Pine.LNX.4.33.0502111321280.24534-100000@redbean.intranet.gw-instruments.de>
+Return-Path: <catalin@cs.toronto.edu>
+Date: Fri, 11 Feb 2005 04:00:37 -0500 (EST)
+From: Catalin Drula <catalin@cs.toronto.edu>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: Re: Re: Lower granularity for INQUIRY interval
+In-Reply-To: <1108109727.18099.7.camel@pegasus>
+Message-ID: <Pine.GSO.4.58.0502110351380.28007@qew.cs>
+References: <Pine.GSO.4.58.0502110245280.20071@qew.cs> <1108109727.18099.7.camel@pegasus>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-Reply-To: bluez-devel@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 11 Feb 2005 13:24:45 +0100 (CET)
+List-ID: <bluez-devel.lists.sourceforge.net>
 
+Hi Marcel,
 
-Hi Richard,
+On Fri, 11 Feb 2005, Marcel Holtmann wrote:
 
-On Thu, 10 Feb 2005, Williams, Richard wrote:
+> > > I still don"t get why switching inquiry scan on and off should help in
+> > > any case. Since inquiry scan defines the discoverable mode and so you
+> > > switch devices to unvisible when they inquiry and back to visible when
+> > > they don"t.
+> >
+> > I never switch inquiry scan off (the scan mode always stays PSCAN and
+> > ISCAN). But when an inquiry is initiated, the device switches into INQUIRY
+> > mode (or substate) from stops scanning (moves out of the INQUIRY SCAN
+> > substate for the duration of the inquiry). That is to say, during an
+> > inquiry a device is not discoverable (or visible). That is what I meant by
+> > switching between the two states.
+>
+> in the code you sent me, you did exactly this. So what are we talking
+> about?
 
-> - suppose the master has suspended and its BT radio is still awake
-> maintaining
-> the network integrity. If another new device does something as simple as
-> hci scan,
-> how will the BT device of the suspended processor behave? I suspect that
-> the BT
-> device will be unable to handle this and will probably do something
-> ugly.
+You're right, I did do that, but then I realized it was unnecessary (as
+you yourself pointed out). However, the first issue I raised (that of
+being able to inquire with a finer granularity) remains, but as you said
+the solution is to go to the HCI level and stop the ongoing inquiry with
+INQUIRY CANCEL.
 
-It may also be a good idea to disable page / inquiry scan on the local
-radio.
+One behaviour that I noticed (just empirically) and that is worth
+mentioning is that sometimes it appears that a few shorter inquiries (1-2
+seconds long) separated by pauses (of the same length) yield up more
+discovered devices than one long inquiry (of say 10.28 seconds). I do not
+know enough about the baseband layer to explain this and please notice I
+said "sometimes" and "empirically". So this is definitely not always the
+case, and it might not be the case at all since it's just based on my
+empirical observations (no data, statistics to support this).
 
-Ciao,
-
-Peter
-
-
-
-|	Peter Wippich 			Voice: +49 30 46776411		|
-|	G&W Instruments GmbH		fax:   +49 30 46776419		|
-|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
-|	D-13355 Berlin  / Germany					|
-
-
-
-
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Catalin
