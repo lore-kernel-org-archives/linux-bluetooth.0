@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41629C2B.4040201@3wt.com.br>
-From: Rafael Vidal Aroca <rafael@3wt.com.br>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] rfcommX and ppp
+Subject: Re: [Bluez-users] New bluetooth device.  Now what?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: tsw@johana.com
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041003100129.15441.qmail@web60805.mail.yahoo.com>
+References: <20041003100129.15441.qmail@web60805.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1096883295.20349.35.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,21 +18,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 05 Oct 2004 10:05:47 -0300
+Date: Mon, 04 Oct 2004 11:48:15 +0200
+
+Hi Tom,
+
+> OK, I've got the kernel stuff working to my USB dongle.  It is a D-Link
+> DBT-120, and up to that point it all is OK.
+> 
+> Now I want to connect to a device.  It is an Earthmate Blue Logger GPS (quite a
+> nice little yellow box!).  My assumption is that eventually I want the
+> equivalent of a "serial" type connection that a program similar to "minicom"
+> can talk to.
+> 
+> I've entered a few commands, and I'm a little frustrated.  How do I get
+> something like this to work?
+> 
+> Some commands that DO work are:
+> [bluetooth]$ hcitool inq
+> Inquiring ...
+>         00:90:4B:2A:9D:9D       clock offset: 0x219e    class: 0x001f00
+> [bluetooth]$ hcitool scan
+> Scanning ...
+>         00:90:4B:2A:9D:9D       Earthmate Blue Logger GPS
+> 
+> Some that DON'T are:
+> [bluetooth]$ rfcomm show rfcomm0
+> Get info failed: No such device
+> [bluetooth]$ rfcomm bind rfcomm0
+> Can't create device: Operation not permitted
+> 
+> I think I have the configuration file OK, but I'm not exactly sure.
+> 
+> Do I need to have some configuration file setup?  The documentation isn't very
+> clear here (as I can see).  Do I access this with RFCOMM??  How do I connect to
+> the device with 'minicom'??  Do I need to setup some device files??
+
+I think the documentation is clear enough. Do you looked at the manual
+pages? You must do binding of RFCOMM devices as root, because normal
+users don't have the right permissions and the command lookes like this:
+
+	rfcomm bind 0 00:90:4B:2A:9D:9D 1
+
+And after that, you bound the /dev/rfcomm0 device node to device
+00:90:4B:2A:9D:9D on RFCOMM channel 1. Now use /dev/rfcomm0 like any
+other terminal device.
+
+Regards
+
+Marcel
 
 
-    Hi,
-
-    i set up a Linux box as a gateway for pdas to access internet. The 
-first device that connects to the LAN service gets rfcomm0 and have 
-internet access!
-
-    The other devices get rfcomm1, rfcomm2, rfcomm3.....all ok up to now.
-
-    The problem is that none of then estabilishes a ppp connection. What 
-could it be?
-
-[]s Rafael.
 
 
 -------------------------------------------------------
