@@ -1,49 +1,59 @@
 Return-Path: <maxk@qualcomm.com>
-Message-Id: <5.1.0.14.2.20030722103927.09737068@unixmail.qualcomm.com>
-Date: Tue, 22 Jul 2003 10:40:57 -0700
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+Message-Id: <5.1.0.14.2.20030722092654.096aad60@unixmail.qualcomm.com>
+Date: Tue, 22 Jul 2003 10:09:10 -0700
+To: "Daryl Van Vorst" <daryl@wideray.com>, "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
 From: Max Krasnyansky <maxk@qualcomm.com>
-Subject: Re: [Bluez-devel] Re: Qualification testing - rfcomm
-Cc: Daryl Van Vorst <daryl@wideray.com>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1058892413.2854.22.camel@pegasus>
-References: <1058838934.3470.5.camel@localhost.localdomain>
-	<001501c3457d$18b63a10$1a01010a@baked> <1057911516.1026.7.camel@pegasus>
-	<1058838934.3470.5.camel@localhost.localdomain>
+Subject: RE: [Bluez-devel] RE: Qualification testing - rfcomm
+Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>, David Woodhouse <dwmw2@infradead.org>
+In-Reply-To: <002501c34d61$84afdc30$5796fea9@baked>
+References: <1058555551.31052.261.camel@pegasus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-At 09:46 AM 7/22/2003, Marcel Holtmann wrote:
->> > @@ -1533,6 +1591,9 @@
->> >     struct list_head *p, *n;
->> > 
->> >     BT_DBG("session %p state %ld", s, s->state);
->> > +
->> > +   if (test_bit(RFCOMM_TX_THROTTLED, &s->flags))
->> > +           return;
->> > 
->> >     list_for_each_safe(p, n, &s->dlcs) {
->> >             d = list_entry(p, struct rfcomm_dlc, list);
->> This part is not ok. We still have to check for timeout. Rest of patch is fine.
+At 12:19 PM 7/18/2003, Daryl Van Vorst wrote:
+>Marcel,
 >
->good point.
+>> > Do you mean you tried the aclsession script and didn't see the same 
+>> > send 5 frames, wait 20 sec, send 5 more etc problem?
+>> 
+>> the aclsession scripts produces this effect, but it also left 
+>> the ACL link in some kind of buggy state. It must be some 
+>> really stupid that I always overlook. The code looks correct 
+>> to me and my Bluetooth 1.0b devices are working fine.
 >
->diff -urN linux-2.4.22-pre7/net/bluetooth/rfcomm/core.c linux-2.4.22-pre7-mh/net/bluetooth/rfcomm/core.c
->--- linux-2.4.22-pre7/net/bluetooth/rfcomm/core.c       Tue Jul 22 18:33:43 2003
->+++ linux-2.4.22-pre7-mh/net/bluetooth/rfcomm/core.c    Tue Jul 22 18:37:59 2003
->@@ -1540,6 +1598,9 @@
->                        __rfcomm_dlc_close(d, ETIMEDOUT);
->                        continue;
->                }
->+
->+               if (test_bit(RFCOMM_TX_THROTTLED, &s->flags))
->+                       continue;
-> 
->                if ((d->state == BT_CONNECTED || d->state == BT_DISCONN) &&
->                                d->mscex == RFCOMM_MSCEX_OK)
->
->I think that should do the job. If you agree I will push this change.
+>Ok...  I guess we can leave it for now then. If it becomes a more serious
+>issue I'll let you know.
+Ok. I know what's the problem is. Basically what happens is that we fill up socket 
+tx buffer before MSC exchange completes (aclsession script does wait 10) and app goes to 
+sleep in sendmsg(). Then we receive MSC and send 5 frames from tx buffer (we only 
+send 5 frames at a time when credit flow ctl is not enabled). App is still sleeping 
+at this point because sock_def_write_space() will not wakeup the process unless there
+is a lot of room in the tx buffer. Eventually (after 30 secs) sendmsg() times out but
+it doesn't return an error because it did manage to send a little bit. So the app will 
+call sendmsg() again and send some more data, which will trigger tx queue processing 
+and we will send 5 more frames, app goes to sleep again because buffer is still full 
+and the cycle repeats. 
+So it's should be obvious where the bug is :), it is in rfcomm_process_tx(). It's supposed
+to reschedule DLC after it sends 5 packets. The reason it works for real world apps is 
+because there is always some activity on the link which kicks tx processing.
 
-Yep. This one is ok.
+Also the problem was somewhat hard to trigger before this patch from David went in
+> >+++ core.c      Thu Apr  3 14:05:20 2003
+> >@@ -1430,7 +1430,7 @@
+> >        } else {
+> >                /* CFC disabled.
+> >                 * Give ourselves some credits */
+> >-               d->tx_credits = RFCOMM_MAX_CREDITS;
+> >+               d->tx_credits = 5;
+> >        }
+> >  
+> >        if (test_bit(RFCOMM_TX_THROTTLED, &d->flags))
+
+ie We used to send more frames and therefor managed free more tx buffer space and wake up application.
+
+The fix is simple we just need to reschedule DLC when credit based flow control is not enabled. But I'm
+not sure how often we need to do that. If we do it too often we'll essentially restore old behavior, too
+seldom and performance will suffer. David, any suggestion ?
 
 Max
