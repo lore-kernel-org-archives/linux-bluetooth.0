@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4210419A.6030400@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+From: Triona Ryan <triona.ryan@nuigalway.ie>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] position of multiple bluetooth dongles
-References: <420B9635.6020701@gmx.ch> <200502101825.15870.cijoml@volny.cz>
-In-Reply-To: <200502101825.15870.cijoml@volny.cz>
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Message-id: <01LKRITSDX9I0036OM@beacon.nuigalway.ie>
+MIME-version: 1.0
+Content-type: text/plain
+Subject: [Bluez-users] Can't connect.: Function not implemented
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,65 +16,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Feb 2005 07:13:46 +0100
+Date: Sun, 13 Feb 2005 17:38:31 +0000
 
-Hello Michael
+Hi all,
 
-thank you a lot for this information.
-Another question regarding this topic:
+I'm new to this mailing list, but have been experimenting with bluetoot
+h over linux for a few months now. I've had a look at the archive, and saw an en
+try very similar to mine, which was unresolved. I'm hoping there are more recent
+ insights to help me!!
 
-Does it help/make any difference if the two dongles have a distance of 
-~11cm? Does this lead to equivalent/less interferences?
-I have no idea about how radios send out their signals. I could imagine 
-that if they spread their signal and there's another dongle just above the 
-sending one that sends out a signal too, the interference is much worse 
-than if they have a little distance, because the point of the problem is 
-not right at the source.
+I've bluez installed on Fedora Core 2, and until a few w
+eeks ago, when I started to try and get rfcomm to work, I could l2ping, pair to 
+several devices and connect using hcitool with no problem. Recently however, I c
+an no longer l2ping certain modules. I now get 
 
-Will rfcomm ensure the correctness of received data? something like a 
-checksum and automatic retransmission of data if a brocken packet is 
-recognized?
+Can't connect.: Function not im
+plemented
 
-regards
-Marco Trudel
+As an error. I can still l2ping select devices.
+
+I saw that encrypt a
+nd authentication must be commented out in /etc/bluetooth/hcid.conf which I have
+ always had. 
+
+Can anyone recognise any problem there?
+
+Thanks very much,
+Triona
 
 
-Michal Semler wrote:
-> BT 1.1 dongles may interference...
-> BT 1.2 only when comunication with 1.1 devices - 1.2 devices can never 
-> interference
-> 
-> Michal
-> 
-> Dne èt 10. února 2005 18:13 Marco Trudel napsal(a):
-> 
->>Hello everybody
->>
->>Maybe someone knows this:
->>If two bluetooth dongles are used (a class1 and a class2), could it lead to
->>signal interfereces/problems if they're just above each other and both have
->>to send a lot of data at the same time?
->>
->>With "right above each other", I mean this:
->>http://www1.ch2.conrad.com/m/7000_7999/7100/7160/7162/716282_LB_00_FB.EPS.j
->>pg (dongle cases are removed).
->>
->>
->>kind regards
->>Marco
->>
->>
->>-------------------------------------------------------
->>SF email is sponsored by - The IT Product Guide
->>Read honest & candid reviews on hundreds of IT Products from real users.
->>Discover which products truly live up to the hype. Start reading now.
->>http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
->>_______________________________________________
->>Bluez-users mailing list
->>Bluez-users@lists.sourceforge.net
->>https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
-> 
+
 
 
 -------------------------------------------------------
