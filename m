@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <411A542B.2090707@clifford.net>
-From: Raphael Clifford <raphael@clifford.net>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] File size limit and nokia 6230
+Subject: Re: [Bluez-users] Multisync Bluetooth No devices
+From: Andy Beuth <andy@beuth.info>
+Reply-To: andy@beuth.info
+To: Olivier Bornet <Olivier.Bornet@puck.ch>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040811083602.GA12856@puck.ch>
+References: <1092127580.9886.56.camel@goya>
+	 <1092127904.4564.79.camel@pegasus>  <20040811083602.GA12856@puck.ch>
+Content-Type: text/plain
+Message-Id: <1092214835.13600.1.camel@goya>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,19 +20,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 11 Aug 2004 18:15:23 +0100
+Date: Wed, 11 Aug 2004 11:00:35 +0200
 
-Hi,
+Hello,
 
-I am trying to send a file to my Nokia 6230 phone using gnome-bluetooth. 
-Everything works well except that it seems to only send it to the 
-phone's main memory. The problem is that I have a 256MB flash mmc card 
-in the phone and the phone's memory is only 8.8MB.  Is there any way to 
-send a file directly to the memory card or do I have to split up 
-everything so that it can fit in 8.8MB before then saving it to flash 
-memory.
+Thanx. Its working.
 
-Raphael
+Andy
+
+Am Mi, den 11.08.2004 schrieb Olivier Bornet um 10:36:
+> Hello,
+> 
+> > > I run debian unstable with kernel 2.6.7 and mh4 from Marcel Holtmann
+> > > (thanx). My problem is the following. By booting my pc i got the message
+> > > No devices in HCI mode found.
+> > > The Bluetooth Button in the "Connect with" selection is only grey.
+> > > Any Idea??
+> > 
+> > the Multisync package maintainer linked the Bluetooth plugin against the
+> > libsdp which is no longer present. File a Debian bug report, because
+> > this is not a BlueZ problem.
+> 
+> Now, the new libmultisync-plugin-irmc-bluetooth version 0.82-3 is
+> working as expected with libbluetooth1 2.9-1.
+> 
+> So, try to update/upgrade your system now, and it must works.
+> 
+> Good day.
+> 
+> 		Olivier
+-- 
+        Andy Beuth
+      andy@beuth.info
+      D1: 0175/3217530   
+    
+            \|||/
+            (o o)
+---------ooO-(_)-Ooo-----
+* Don't drink as root!! *
+-------------------------
+http://www.beuth.info
+
 
 
 -------------------------------------------------------
