@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de46576041124081140dc74b7@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] BT test mode operation
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200411241701.07891.cijoml@volny.cz>
+Subject: [Bluez-users] Keyboarch encryption howto?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,19 +17,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 24 Nov 2004 21:41:50 +0530
+Date: Wed, 24 Nov 2004 17:01:07 +0100
 
-hi marcel,
-can i configure my bt dongles to operate in test mode....and then
-conduct the loopback or transmitter tests. This is indicated in the
-HCI part of the specification....so is it possible to run these tests
-just with BT devices connected to host PC's,  and not using a BT
-protocol analyser.
-If i buy a BT tester, then wouldn't my BT dongle be the DUT....
-Also, if i buy a CATC-tracer/trainer, should I again buy a BT tester????
+Hi Marcel,
 
-thanks and regards,
-manjunath
+is there any howto where described how to start encryption on BT keyboard?
+Is my MS keyboard (CSR based) supported?
+
+Thanks
+
+Michal
 
 
 -------------------------------------------------------
