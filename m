@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Help needed (Fedora Core 2)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ricky Soh <rickysoh@gmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <db972f43040909223675a4a082@mail.gmail.com>
-References: <db972f43040909203314e6825d@mail.gmail.com>
-	 <20040910034429.37672.qmail@web11605.mail.yahoo.com>
-	 <db972f43040909223675a4a082@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1094997279.5695.2.camel@pegasus>
-Mime-Version: 1.0
+From: "Bc. Michal Semler" <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] A new Microsoft's transceiver!
+References: <200409101056.29447.cijoml@volny.cz> <1094822572.5311.3.camel@notepaq>
+In-Reply-To: <1094822572.5311.3.camel@notepaq>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200409101415.44114.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,25 +19,34 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 12 Sep 2004 15:54:39 +0200
+Date: Fri, 10 Sep 2004 14:15:44 +0200
 
-Hi Ricky,
+Only answer is F**K :(
 
-> when i couldn't get bluez on lsmod and l2test and scotest command,
-> does it mean my bluez is not installed properly? If so, how do i get
-> it done?
-> 
-> I understand that fedora core 2 is preinstalled with bluez, how do i
-> get it loaded then instead of the bluetooth?
+Michal :)
 
-I don't understand what you mean. If you have the command hciconfig and
-if it shows an adapter then BlueZ is installed and working.
-
-Regards
-
-Marcel
-
-
+Dne p=E1 10. z=E1=F8=ED 2004 15:22 jste napsal(a):
+> Hi Michal,
+>
+> > In Microsofts very good demo:
+> > http://www.microsoft.com/hardware/mouseandkeyboard/features/docs/blueto=
+ot
+> >h.html
+> >
+> > is shown a new transceiver! It should be 1.2 compatible and we should t=
+ry
+> > upgrade an old one!
+> >
+> > Marcel maybe it's chance for you to get back working your destroyed
+> > transceiver
+>
+> the good news are that it is Bluetooth 1.2 compatible, but the bad one
+> is that it uses a Broadcom chip and so there is no chance to update the
+> old one.
+>
+> Regards
+>
+> Marcel
 
 
 -------------------------------------------------------
