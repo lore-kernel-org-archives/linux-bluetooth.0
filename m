@@ -1,16 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41AB1AF5.3030901@csr.com>
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] DBT-120 firmware upgrade
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <41AB14DD.3010807@csr.com>
 References: <200411261152.29925.pavouk@pavouk.org>
-    <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus>
-    <200411272130.44783.pavouk@pavouk.org>
-    <1101588637.27074.22.camel@pegasus> <41AB14DD.3010807@csr.com>
-    <1101731638.10115.0.camel@pegasus>
-In-Reply-To: <1101731638.10115.0.camel@pegasus>
-Content-Type: text/plain; charset="us-ascii"
+	 <200411271655.27322.pavouk@pavouk.org> <1101579731.27074.8.camel@pegasus>
+	 <200411272130.44783.pavouk@pavouk.org> <1101588637.27074.22.camel@pegasus>
+	  <41AB14DD.3010807@csr.com>
+Content-Type: text/plain
+Message-Id: <1101731638.10115.0.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -22,30 +21,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 29 Nov 2004 12:49:57 +0000
+Date: Mon, 29 Nov 2004 13:33:58 +0100
 
-Marcel Holtmann wrote:
-> do you have the full build information for my web page?
+Hi Steven,
 
-Oops, I should have enclosed that:
+> >>         Build 1586
+> >>         Chip version: BlueCore02
+> > 
+> > I assume this is HCI 18.2 firmware, but I am not quite sure. It is not
+> > in my list.
+> 
+> Yep. It's 18.2.
 
-  0x632 1586 bc02x_8unified_fl_bt1.2_18_0408131143_encr128 2004-08-13
+do you have the full build information for my web page?
 
-	- Steven
--- 
+Regards
 
+Marcel
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-This footnote also confirms that this email message has been swept by
-MIMEsweeper for the presence of computer viruses.
-
-www.mimesweeper.com
-**********************************************************************
 
 
 
