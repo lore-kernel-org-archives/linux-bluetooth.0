@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <000e01c4145d$904fa7f0$fcca010a@lysydziadek>
-From: "zubiwat" <zubiwat@poczta.onet.pl>
-To: "devel Bluetooth" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_000B_01C41465.F1E33BF0"
-Subject: [Bluez-devel] Unknown answer
+Subject: Re: [Bluez-devel] BT Initialization
+From: Marcel Holtmann <marcel@holtmann.org>
+To: zubiwat <zubiwat@poczta.onet.pl>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <00a401c41436$58423520$fcca010a@lysydziadek>
+References: <009401c4142a$b06be720$fcca010a@lysydziadek>
+	 <1080413063.2281.59.camel@pegasus>
+	 <00a401c41436$58423520$fcca010a@lysydziadek>
+Content-Type: text/plain
+Message-Id: <1080418812.2281.78.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,84 +20,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 28 Mar 2004 01:42:35 +0100
+Date: Sat, 27 Mar 2004 21:20:12 +0100
 
-This is a multi-part message in MIME format.
+Hi Maciej,
 
-------=_NextPart_000_000B_01C41465.F1E33BF0
-Content-Type: text/plain;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+> I wanna code which isn't useing system specific commands like ioctl() or
+> other but simple sending bytes.
 
-Hi=20
-I'm sending these commands :
-0x01 0x05  0x10  0x00
-0x01 0x09  0x10  0x00
+if you don't like the BlueZ code, don't use it. There are many Bluetooth
+stacks on the market and you also have the freedom to write your own
+one. But how do you expect help from us?
 
-and I don't understand why I get answer like this:
+> The code from blueZ is fine and the answers are the same (almost) like those
+> commented out examples. But after this i get only this vendor specific event
+> and can't get answers to my commands like reading BT ADDR and other.
+> If you know what is wrong please help. I have to use bits as a commands
+> because I'm using only UART between my microchip and BT CSR chip. I red
+> Bluetooth specification v1.1 , v1.2 and UART specification as you told me
+> earlier but I alweys get the same answer and can't get through. When I read
+> those bytes and then try to send wrong command like 0x00 0x00 0x09 it
+> answers with a error event 04 10 01 fe and this is the only right answer I
+> can get.
 
-04 FF 13 C2 01 00 09 00 02 00 02 68 00 00 BF 0E 00 00 00 00 00 00 04 0E =
-0B 01 05 10 00 C0 00 40 08 00 08 00 04 0E 0A 01 09 10 00 04 00 20 DD 09 =
-00=20
+This is the general init code from BlueZ:
 
-Why when I'm trying to read buffer size (0x01 0x05  0x10  0x00) and read =
-BT ADDR (0x01 0x09  0x10  0x00) I get so many events? It's strange =
-because when I'm trying to read, device answers that it can't for =
-example connect because of connection rejected due to security reasons =
-(04 0E 0B 01 05 10 00 C0 00 40 08 00 08 00 ) or am I wrong?
-=20
-Regards=20
+	< 01 03 10 00 
+	> 04 0E 0C 01 03 10 00 2F BE 05 00 00 00 00 00 
+	< 01 05 10 00 
+	> 04 0E 0B 01 05 10 00 A0 02 00 06 00 00 00 
 
-Maciej Zubilewicz
+I got it by running BlueZ and using hcidump in raw mode. Decode it and
+learn from it.
 
-------=_NextPart_000_000B_01C41465.F1E33BF0
-Content-Type: text/html;
-	charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+> I looked for other forums but I couldn't find any. If you can't answer to my
+> questions and know proper forum please tell me because this is my work for
+> master's degree and it's important for me.
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-2">
-<META content=3D"MSHTML 5.50.4134.600" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I'm sending these commands =
-:</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>
-<DIV><FONT face=3DArial size=3D2>0x01 0x05&nbsp; 0x10&nbsp; =
-0x00</FONT></DIV>0x01=20
-0x09&nbsp; 0x10&nbsp; 0x00</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>and I don't understand why I get answer =
-like=20
-this:</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>04 FF 13 C2 01 00 09 00 02 00 02 68 00 =
-00 BF 0E 00=20
-00 00 00 00 00 04 0E 0B 01 05 10 00 C0 00 40 08 00 08 00 04 0E 0A 01 09 =
-10 00 04=20
-00 20 DD 09 00 </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Why when I'm trying to read buffer size =
-(0x01=20
-0x05&nbsp; 0x10&nbsp; 0x00) and read BT ADDR (0x01 0x09&nbsp; 0x10&nbsp; =
-0x00) I=20
-get so many events? It's strange because when I'm trying to&nbsp;read, =
-device=20
-answers that it can't for example connect because of connection rejected =
-due to=20
-security reasons (04 0E 0B 01 05 10 00 C0 00 40 08 00 08 00 ) or am I=20
-wrong?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>&nbsp;</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Regards </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Maciej =
-Zubilewicz</FONT></DIV></BODY></HTML>
+Actually I can't do your research for your master degree.
 
-------=_NextPart_000_000B_01C41465.F1E33BF0--
+Regards
+
+Marcel
+
 
 
 
