@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY104-F28B10D34C6CA29EC4D37E9C1A70@phx.gbl>
-In-Reply-To: <4dfd570904122402134ec2fd32@mail.gmail.com>
-From: "blookk -" <blookk@hotmail.com>
+From: =?euc-kr?B?vsjI8cHY?= <heejune@snut.ac.kr>
 To: bluez-users@lists.sourceforge.net
-Subject: RE: [Bluez-users] Error when compiling bluez-utils
-Mime-Version: 1.0
-Content-Type: text/html; charset=iso-8859-1; format=flowed
+Cc: heejune@snut.ac.kr
+MIME-Version: 1.0
+Message-ID: <1106071c70101.heejune@snut.ac.kr>
+Content-Type: multipart/alternative;
+	boundary="DC83348481.1103936713239.MailEdge"
+Subject: [Bluez-users] Help, Xscale-based Linux machin cannot use Bluetooth USB  dongle ^^;;;
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,106 +18,77 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 25 Dec 2004 11:19:32 +0000
+Date: Sat, 25 Dec 2004 10:05:13 +0900
 
-<html><div style='background-color:'><DIV class=RTE>
-<P>Hello!</P>
-<P>Have you compiled Bluez-Libs first?</P>
-<P>Have you modified the source code?</P>
-<P>Regards!<BR><BR></P></DIV>
-<DIV></DIV>&gt;From: CoCozZ geek &lt;cocozz@gmail.com&gt;
-<DIV></DIV>&gt;Reply-To: bluez-users@lists.sourceforge.net
-<DIV></DIV>&gt;To: bluez-users@lists.sourceforge.net
-<DIV></DIV>&gt;Subject: [Bluez-users] Error when compiling bluez-utils
-<DIV></DIV>&gt;Date: Fri, 24 Dec 2004 11:13:47 +0100
-<DIV></DIV>&gt;
-<DIV></DIV>&gt;I get those errors when I compile bluez-utils ... using
-<DIV></DIV>&gt;2.6.8-gentoo-r10 and gcc (GCC) 3.3.4 20040623.
-<DIV></DIV>&gt;
-<DIV></DIV>&gt;Thanks :)
-<DIV></DIV>&gt;
-<DIV></DIV>&gt;gcc -DHAVE_CONFIG_H -I. -I. -I..&nbsp;&nbsp;&nbsp;&nbsp;-I/usr/include&nbsp;&nbsp;-I/usr/include
-<DIV></DIV>&gt;-march=pentium4 -O3 -pipe -fomit-frame-pointer -c `test -f
-<DIV></DIV>&gt;'hcisecfilter.c' || echo './'`hcisecfilter.c
-<DIV></DIV>&gt;sdptool.c: In function `add_handsfree':
-<DIV></DIV>&gt;sdptool.c:1130: error: `HANDSFREE_SVCLASS_ID' undeclared (first use in
-<DIV></DIV>&gt;this function)
-<DIV></DIV>&gt;sdptool.c:1130: error: (Each undeclared identifier is reported only once
-<DIV></DIV>&gt;sdptool.c:1130: error: for each function it appears in.)
-<DIV></DIV>&gt;sdptool.c:1136: error: `HANDSFREE_PROFILE_ID' undeclared (first use in
-<DIV></DIV>&gt;this function)
-<DIV></DIV>&gt;sdptool.c:1152: error: `SDP_SUPPORTED_FEATURES' undeclared (first use
-<DIV></DIV>&gt;in this function)
-<DIV></DIV>&gt;sdptool.c: In function `add_audio_source':
-<DIV></DIV>&gt;sdptool.c:1583: error: `AUDIO_SOURCE_SVCLASS_ID' undeclared (first use
-<DIV></DIV>&gt;in this function)
-<DIV></DIV>&gt;sdptool.c:1587: error: `ADVANCED_AUDIO_PROFILE_ID' undeclared (first
-<DIV></DIV>&gt;use in this function)sdptool.c:1598: error: `AVDTP_UUID' undeclared
-<DIV></DIV>&gt;(first use in this function)
-<DIV></DIV>&gt;sdptool.c: In function `add_audio_sink':
-<DIV></DIV>&gt;sdptool.c:1642: error: `AUDIO_SINK_SVCLASS_ID' undeclared (first use
-<DIV></DIV>&gt;in this function)
-<DIV></DIV>&gt;sdptool.c:1646: error: `ADVANCED_AUDIO_PROFILE_ID' undeclared (first
-<DIV></DIV>&gt;use in this function)sdptool.c:1657: error: `AVDTP_UUID' undeclared
-<DIV></DIV>&gt;(first use in this function)
-<DIV></DIV>&gt;sdptool.c: At top level:
-<DIV></DIV>&gt;sdptool.c:1697: error: `HANDSFREE_SVCLASS_ID' undeclared here (not in
-<DIV></DIV>&gt;a function)
-<DIV></DIV>&gt;sdptool.c:1697: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1697: error: (near initialization for `service[7].class')
-<DIV></DIV>&gt;sdptool.c:1697: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1697: error: (near initialization for `service[7]')
-<DIV></DIV>&gt;sdptool.c:1699: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1699: error: (near initialization for `service[8]')
-<DIV></DIV>&gt;sdptool.c:1700: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1700: error: (near initialization for `service[9]')
-<DIV></DIV>&gt;sdptool.c:1702: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1702: error: (near initialization for `service[10]')
-<DIV></DIV>&gt;sdptool.c:1703: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1703: error: (near initialization for `service[11]')
-<DIV></DIV>&gt;sdptool.c:1704: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1704: error: (near initialization for `service[12]')
-<DIV></DIV>&gt;sdptool.c:1706: error: `AUDIO_SOURCE_SVCLASS_ID' undeclared here (not
-<DIV></DIV>&gt;in a function)gcc -DHAVE_CONFIG_H -I. -I. -I..&nbsp;&nbsp;&nbsp;&nbsp;-I/usr/include
-<DIV></DIV>&gt;-I/usr/include -march=pentium4 -O3 -pipe -fomit-frame-pointer -c `test
-<DIV></DIV>&gt;-f 'hciattach.c' || echo './'`hciattach.c
-<DIV></DIV>&gt;sdptool.c:1706: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1706: error: (near initialization for `service[13].class')
-<DIV></DIV>&gt;sdptool.c:1706: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1706: error: (near initialization for `service[13]')
-<DIV></DIV>&gt;sdptool.c:1707: error: `AUDIO_SINK_SVCLASS_ID' undeclared here (not in
-<DIV></DIV>&gt;a function)
-<DIV></DIV>&gt;sdptool.c:1707: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1707: error: (near initialization for `service[14].class')
-<DIV></DIV>&gt;sdptool.c:1707: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1707: error: (near initialization for `service[14]')
-<DIV></DIV>&gt;sdptool.c:1709: error: initializer element is not constant
-<DIV></DIV>&gt;sdptool.c:1709: error: (near initialization for `service[15]')
-<DIV></DIV>&gt;make[2]: *** [sdptool.o] Error 1
-<DIV></DIV>&gt;make[2]: *** Waiting for unfinished jobs....
-<DIV></DIV>&gt;make[2]: Leaving directory
-<DIV></DIV>&gt;`/var/tmp/portage/bluez-utils-2.10-r1/work/bluez-utils-2.10/tools'make[1]:
-<DIV></DIV>&gt;*** [all-recursive] Error 1
-<DIV></DIV>&gt;make[1]: Leaving directory
-<DIV></DIV>&gt;`/var/tmp/portage/bluez-utils-2.10-r1/work/bluez-utils-2.10'
-<DIV></DIV>&gt;make: *** [all] Error 2
-<DIV></DIV>&gt;
-<DIV></DIV>&gt;!!! ERROR: net-wireless/bluez-utils-2.10-r1 failed.
-<DIV></DIV>&gt;!!! Function src_compile, Line 53, Exitcode 2
-<DIV></DIV>&gt;!!! (no error message)
-<DIV></DIV>&gt;!!! If you need support, post the topmost build error, NOT this status message.
-<DIV></DIV>&gt;
-<DIV></DIV>&gt;
-<DIV></DIV>&gt;-------------------------------------------------------
-<DIV></DIV>&gt;SF email is sponsored by - The IT Product Guide
-<DIV></DIV>&gt;Read honest &amp; candid reviews on hundreds of IT Products from real users.
-<DIV></DIV>&gt;Discover which products truly live up to the hype. Start reading now.
-<DIV></DIV>&gt;http://productguide.itmanagersjournal.com/
-<DIV></DIV>&gt;_______________________________________________
-<DIV></DIV>&gt;Bluez-users mailing list
-<DIV></DIV>&gt;Bluez-users@lists.sourceforge.net
-<DIV></DIV>&gt;https://lists.sourceforge.net/lists/listinfo/bluez-users
-<DIV></DIV></div></html>
+--DC83348481.1103936713239.MailEdge
+Content-Type: text/plain;charset=euc-kr
+Content-Transfer-Encoding: base64
+
+SGksIEFsbA0KSSBoYXZlIHByb2JsZW0gdXNpbmcgQmx1ZXRvb3RoIFVTQiBEb25nbGUgaW4gYSBY
+c2NhbGUtYmFzZWQgTGludXggbWFjaGluZS4NClRoZSBibHVleiBvZmZpY2lhbCBzaXRlIGFubm91
+bmNlcyB0aGF0IGl0IHN1dXBvcnQgYXJtLWJhc2VkIG1hY2hpbmUgKGluY2x1ZGluZyB4c2NhbGUp
+Lg0KSSBhbSB3b25kZXJpbmcgd2hhdCBJIGhhdmUgdG8gZG8gc29sdmUgdGhpcyBwcm9ibGVtLi4g
+cGxlYXNlIGhlbHAgbWUuDQoNCkZpcnN0IG9mIGFsbCwgSSB0ZXN0ZWQgYW5kIHN1Y2NlZWRlZCBp
+biB1c2luZyB0aGUgZG9uZ2xlIHdpdGggUmVkaGF0IDkueCAoMi40LjIwLTgpIHdpdGggYmx1ZXog
+MS4xMiBhcHBsaWNhdGlvbnMuDQpsMnBpbmcsIGhjaWNvbmZpZywgLi4uIGFuZCBmaW5hbGx5IHBh
+bmQsIHdoZXJlIEkgZ2V0IGEgZnRwIGZpbGUgdHJhc2ZlciBzcGVlZCBvZiA1MDAga2JwIQ0KTm93
+IEkgdHJpZWQgdG8gdGhlIHNhbWUgdGhpbmcgb24gdGhlIHhzYWxlLW1hY2hpbmUuIEkgZ290IGEg
+cGF0Y2ggZm9yIDIuNC4xOSBmcm9tIHRoZSBibHVleiBzaXRlIGFuZCBhcHBsaWVkIGl0IHRvIG15
+IG1hY2hpbmUga2VybmVsLg0KYW5kIGNyb3NzLWNvbXBpbGVkIHRoZSBibHVleiBsaWIgYW5kIHV0
+aWxpdHkuDQpUaGVuLCBJIHBsdWcgaW4gdGhlIGRvbmdsZSwgSSB0eXBlZCAiaGNpY29uZmlnIiBh
+bmQgZ290IGEgbmljZSByZXN1bHRzDQo+aGNpY29uZmlnDQogaGNpMCANCiBETiBicmFicmEuLi4u
+Lg0KSXQgaXMgdGltZSB0byBkbyB0aGUgaGNpMCB1cDoNCj5oY2ljb25maWcgaGNpMCB1cA0KSVJR
+IG9jY3VycmVkIHdoaWxlIHNlcnZpY2UgU09GOiBpcnEgPSAweDENCklSUSBvY2N1cnJlZCB3aGls
+ZSBzZXJ2aWNlIFNPRjogaXJxID0gMHgxDQpDYW5ub3QgaW5pdCBkZXZpY2U6IHRpbWUtb3V0ICgx
+MDEpDQpJIGNoZWNrZWQgdGhlIC9wcm9jL2J1cy91c2IvZHJpdmVycyBhbmQgZGV2aWNlcy4gSXQg
+bG9va3Mgb2ssIGl0IGhhcyB0aGUgaGNpX3VzYiBkZXZpY2VzIGFuZCBkcml2ZXJzIGFsc28uDQpT
+bywgSSBjaGVrZWQgdGhlIHNvdXJjZSBhbmQgaW50ZXJuZXQ6IGl0IHNlZW1zIHRoYXQgdGhlIFNM
+ODExIFVTQiBIT1NUIGNvbnRyb2xsZXIgZHJpdmVyIG9mIEFybS1iYXNlZCBsaW51eCBrZXJuZWwN
+CmhhcyBzb21lIHByb2JsZW0uIEkgZXZlbiB0cmllZCB0byBwYXRjaCB0aGUgdXNiIGxvdyBsZXZl
+IGRyaXZlciwgYnV0IHN0aWxsIG5vdCBvayBeXjs7Ozs7DQpJcyB0aGVyZSBhbnkgc29sdXRpb24g
+YW5kIGhpbnQgb3Igc29tZSBzdWdnZXN0aW9uIGZvciB0aGlzPz8/Pz8/DQogDQoNCiAgCg==
+
+
+--DC83348481.1103936713239.MailEdge
+Content-Type: text/html;charset=euc-kr
+Content-Transfer-Encoding: base64
+
+PGltZyBib3JkZXI9MCB3aWR0aD0xIGhlaWdodD0xIHNyYz0naHR0cDovL21haWwuc251dC5hYy5r
+ci9tZS9qc3AvaW5ib3gvZGlzcFJlY3ZDb25maXJtRm9yU2VudC5qc3A/YWN0aW9uS2luZD1pbnNl
+cnQmc1VzZXJJRD1oZWVqdW5lJnNNc2dJRD0xMTA2MDcxYzcwMTAxJnNFTWFpbD1ibHVlei11c2Vy
+c0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQmc05hbWU9JyA+CjxodG1sPjxib2R5IGJhY2tncm91bmQ9
+Jyc+CjxzdHlsZT48IS0tDQpQIHttYXJnaW4tdG9wOiAwOyBtYXJnaW4tYm90dG9tOiAwOyBmb250
+LUZhbWlseTogZ3VsaW07IGZvbnQtU2l6ZTogOXB0O30NCi0tPjwvc3R5bGU+DQo8UD5IaSwgQWxs
+PC9QPg0KPFA+SSBoYXZlIHByb2JsZW0gdXNpbmcgQmx1ZXRvb3RoIFVTQiBEb25nbGUgaW4gYSBY
+c2NhbGUtYmFzZWQgTGludXggbWFjaGluZS48QlI+VGhlIGJsdWV6IG9mZmljaWFsIHNpdGUgYW5u
+b3VuY2VzIHRoYXQgaXQgc3V1cG9ydCBhcm0tYmFzZWQgbWFjaGluZSAoaW5jbHVkaW5nIHhzY2Fs
+ZSkuPEJSPkkgYW0gd29uZGVyaW5nIHdoYXQgSSBoYXZlIHRvIGRvIHNvbHZlIHRoaXMgcHJvYmxl
+bS4uIHBsZWFzZSBoZWxwIG1lLjwvUD4NCjxQPjxCUj5GaXJzdCBvZiBhbGwsIEkgdGVzdGVkIGFu
+ZCBzdWNjZWVkZWQgaW4gdXNpbmcgdGhlIGRvbmdsZSB3aXRoIFJlZGhhdCA5LnggKDIuNC4yMC04
+KSB3aXRoIGJsdWV6IDEuMTIgYXBwbGljYXRpb25zLjxCUj5sMnBpbmcsIGhjaWNvbmZpZywgLi4u
+IGFuZCBmaW5hbGx5IHBhbmQsIHdoZXJlIEkgZ2V0IGEgZnRwIGZpbGUgdHJhc2ZlciBzcGVlZCBv
+ZiA1MDAga2JwITwvUD4NCjxQPk5vdyBJIHRyaWVkIHRvIHRoZSBzYW1lIHRoaW5nIG9uIHRoZSB4
+c2FsZS1tYWNoaW5lLiBJIGdvdCBhIHBhdGNoIGZvciAyLjQuMTkgZnJvbSB0aGUgYmx1ZXogc2l0
+ZSBhbmQgYXBwbGllZCBpdCB0byBteSBtYWNoaW5lIGtlcm5lbC48QlI+YW5kIGNyb3NzLWNvbXBp
+bGVkIHRoZSBibHVleiBsaWIgYW5kIHV0aWxpdHkuPEJSPlRoZW4sIEkgcGx1ZyBpbiB0aGUgZG9u
+Z2xlLCBJIHR5cGVkICJoY2ljb25maWciIGFuZCBnb3QgYSBuaWNlIHJlc3VsdHM8L1A+DQo8UD4m
+Z3Q7aGNpY29uZmlnPEJSPiZuYnNwO2hjaTAgPEJSPiZuYnNwO0ROIGJyYWJyYS4uLi4uPC9QPg0K
+PFA+SXQgaXMgdGltZSB0byBkbyB0aGUgaGNpMCB1cDo8L1A+DQo8UD4mZ3Q7aGNpY29uZmlnIGhj
+aTAgdXA8QlI+SVJRIG9jY3VycmVkIHdoaWxlIHNlcnZpY2UgU09GOiBpcnEgPSAweDE8QlI+SVJR
+IG9jY3VycmVkIHdoaWxlIHNlcnZpY2UgU09GOiBpcnEgPSAweDE8QlI+Q2Fubm90IGluaXQgZGV2
+aWNlOiB0aW1lLW91dCAoMTAxKTwvUD4NCjxQPkkgY2hlY2tlZCB0aGUgL3Byb2MvYnVzL3VzYi9k
+cml2ZXJzIGFuZCBkZXZpY2VzLiBJdCBsb29rcyBvaywgaXQgaGFzIHRoZSBoY2lfdXNiIGRldmlj
+ZXMgYW5kIGRyaXZlcnMgYWxzby48QlI+U28sIEkgY2hla2VkIHRoZSBzb3VyY2UgYW5kIGludGVy
+bmV0OiBpdCBzZWVtcyB0aGF0IHRoZSBTTDgxMSBVU0IgSE9TVCBjb250cm9sbGVyIGRyaXZlciBv
+ZiBBcm0tYmFzZWQgbGludXgga2VybmVsPEJSPmhhcyBzb21lIHByb2JsZW0uIEkgZXZlbiB0cmll
+ZCB0byBwYXRjaCB0aGUgdXNiIGxvdyBsZXZlIGRyaXZlciwgYnV0IHN0aWxsIG5vdCBvayBeXjs7
+Ozs7PC9QPg0KPFA+SXMgdGhlcmUgYW55IHNvbHV0aW9uIGFuZCBoaW50IG9yIHNvbWUgc3VnZ2Vz
+dGlvbiBmb3IgdGhpcz8/Pz8/PzxCUj4mbmJzcDs8L1A+DQo8UD4mbmJzcDs8L1A+DQo8UD4mbmJz
+cDsgPC9QPg0KPFA+PEJSPiZuYnNwOzwvUD48L2JvZHk+PC9odG1sPgo=
+
+
+
+--DC83348481.1103936713239.MailEdge--
 
 
 
