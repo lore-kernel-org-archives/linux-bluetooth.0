@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Connect to mysql server thorugh SDP
+Subject: Re: [Bluez-devel] Connection with a phone stays open after closing
+	RFCOMM channel
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050225194018.4684.qmail@web60401.mail.yahoo.com>
-References: <20050225194018.4684.qmail@web60401.mail.yahoo.com>
+Cc: victor@win.tue.nl
+In-Reply-To: <Pine.LNX.4.44.0502271406520.18458-100000@antilope>
+References: <Pine.LNX.4.44.0502271406520.18458-100000@antilope>
 Content-Type: text/plain
-Message-Id: <1109578606.17256.11.camel@pegasus>
+Message-Id: <1109578068.17256.0.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,25 +20,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Feb 2005 09:16:46 +0100
+Date: Mon, 28 Feb 2005 09:07:48 +0100
 
-Hi Tanveer,
+Hi Victor,
 
-> Me and my frined are doing a project here just to
-> learn where we have a db server(mysql) in Linux PC and
-> installed all necessary IDE & SDK in win2000 PC. Now
-> We want to design a program that can access that
-> database through LAN as we dont have a NOKIA 60 series
-> phone or USB dongles. Now asked baout SDP because how
-> to offer the mysqld service to my win2000 PC?
-> I can connect my emulator to internet and also to
-> another PC on LAN. But how to access the mysql server?
-> So that when I manage a compatible phone then I can
-> interact to database via BT on that phone.
-> Hope I made myself clear.
+> My prog. listens on a RFCOMM chan. (adv. as HF channel via SDP) of  a 
+> laptop, when I 
+> connect from my phone to the laptop the chan. is opened, I send some 
+> commands to configure the phone and when finished, close the chan. The 
+> problem is that L2CAP connection stays open, from the output of hcidump I 
+> see that laptop sends DISC request on dlci 6 and receives UA, but then 
+> according to protocol it should also then send DISC for dlci 0, and then 
+> terminate L2CAP -- it does not happen...
+> If I do the same, but initiating connection from laptop - it works fine...
+> I'm sure there is no other RFCOMM chan. opened.
 
-this has nothing to do with BlueZ. Use the DUN or PAN profile to get a
-TCP/IP connection and then use this.
+sounds like a bug in the phone. Send in the "hcidump -X -V" for it.
 
 Regards
 
