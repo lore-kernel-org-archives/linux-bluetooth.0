@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Ruben Jenster <rjenster@web.de>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200503301323.56682.rjenster@web.de>
-Subject: [Bluez-devel] Connect button does not work anymore?
+Subject: Re: [Bluez-devel] does flush_to in l2cap setsockopt currently do
+	anything?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <ef9938ec05032915072ee95a9@mail.gmail.com>
+References: <ef9938ec05032915072ee95a9@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1112137866.9016.164.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,40 +19,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 30 Mar 2005 13:23:56 +0000
+Date: Wed, 30 Mar 2005 01:11:06 +0200
 
-Hi,
+Hi Albert,
 
-connecting to my headset works with btsco v0.4 but the connect/disconnect 
-button does not work anymore. When starting btsco in verbose mode I get 
-displayed when the button was pressed but nothing happens.
-Is this a wanted behaviour?
+> I was poking through the sources while trying to find an easy way to
+> set the ACL automatic flush timeout with an l2cap socket.
+> 
+> Does setsockopt(s, SOL_L2CAP, L2CAP_OPTIONS, ...) cause the underlying
+> ACL automatic flush timeout to change?  It doesn't look like flush_to
+> is being used in net/bluetooth/l2cap.c:setsockopt
 
-tsco v0.4
-Device is 0:0
-Voice setting: 0x0060
-RFCOMM channel 1 connected
-speaker volume: 1 mic volume: 1
-driver is in use
-connected SCO channel
-Done setting sco fd
-recieved AT+VGS=01
-Sending up speaker change 1
-speaker volume: 1 mic volume: 1
-driver is not in use
-disconnected SCO channel
-speaker volume: 1 mic volume: 1
-driver is in use
-connected SCO channel
-Done setting sco fd
-recieved AT+VGS=01
-Sending up speaker change 1
-recieved AT+CKPD=200		-> connect button pressed
+it is doing nothing at the moment.
+
+> Is there an easier way of doing it short of extracting the underlying
+> ACL connection handle and then sending an HCI
+> Write_Automatic_Flush_Timeout command packet to a separate HCI socket?
+
+May you wanna look at the cmd_info() part of hcitool.c.
+
+Regards
+
+Marcel
 
 
-Regards 
-
-Ruben
 
 
 -------------------------------------------------------
