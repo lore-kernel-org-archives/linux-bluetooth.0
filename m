@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4034CA08.50500@soft.uni-linz.ac.at>
-From: Simon Vogl <vogl@soft.uni-linz.ac.at>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Subject: [Bluez-devel] sco link help needed
+Subject: Re: [Bluez-devel] Ability to change the PIN or Device Name through
+	Bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dave Henriksen <dhenriksen@optibrand.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1077143382.4135.5.camel@linux.local>
+References: <1077143382.4135.5.camel@linux.local>
+Content-Type: text/plain
+Message-Id: <1077147233.2685.14.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,47 +19,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 19 Feb 2004 15:36:56 +0100
+Date: Thu, 19 Feb 2004 00:33:53 +0100
 
-Hi,
-I desparately need some help with audio links:
-I have written two small programs that use my pc to emulate a headset
-and a handsfree device. Both work quite nicely, the rfcomm-based initiali=
-zation
-takes place, and I get an SCO connection, but mysteriously, I don't get a=
- single
-byte of audio data (I don't see it with hcidump neither).
+Hi Dave,
 
-my setup:
-* Acer usb bluetooth dongle
-* test phones used: p800 (headset), p6600/ngage/3650 (handsfree) with no =
-luck...
-* kernel 2.4.23
-* bluez utils&lib from cvs
-* and yes, i did register hset profile via sdptool....
+> I was wondering if there is any way in which you can change the pin of a
+> device using the bluez stack.   Specifically, I am using BlueZ to
+> communicate with a Brain boxes BL-521.   I have a custom application in
+> which I would like to allow the user to manipluate the PIN on the BL-521
+> (through bluetooth).   The only way that I believe that this can be done
+> is by connecting the BL-521 to my computer via the serial port.
 
-I had the program running perfectly already with a T68i....
-Any help appreciated heavily (for example a traace of a successful connec=
-tion...),
-Simon
+this is a question you should ask Brainboxes.
 
-P.S. Is there a location for such tips anywhere? If not, I am willing to =
-donate
-space & a wiki on one of our institute servers....
+Regards
 
---=20
-_______________________________________________________________________
-Dr. Simon Vogl
-Institut f=C3=BCr Pervasive Computing, Johannes Kepler Universit=C3=A4t L=
-inz
-Altenberger Stra=C3=9Fe 69, A-4040 Linz, Austria
-
-Tel: +43 732 2468-8517, Fax: +43 732 2468-8426
-mailto: vogl@soft.uni-linz.ac.at,  http://www.soft.uni-linz.ac.at/
-
-
-
-
+Marcel
 
 
 
