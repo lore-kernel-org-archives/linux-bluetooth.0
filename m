@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Question about baseband configuration.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Wang Haiguang <wanghg@i2r.a-star.edu.sg>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <LMEOKMJFKNFFHEAEDGDEKEKNCGAA.wanghg@i2r.a-star.edu.sg>
-References: <LMEOKMJFKNFFHEAEDGDEKEKNCGAA.wanghg@i2r.a-star.edu.sg>
-Content-Type: text/plain
-Message-Id: <1083750309.4666.60.camel@pegasus>
-Mime-Version: 1.0
+From: Wang Haiguang <wanghg@i2r.a-star.edu.sg>
+To: bluez-devel@lists.sourceforge.net
+Message-id: <LMEOKMJFKNFFHEAEDGDEKEKNCGAA.wanghg@i2r.a-star.edu.sg>
+MIME-version: 1.0
+Content-type: text/plain; charset=gb2312
+Subject: [Bluez-devel] Question about baseband configuration.
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,20 +15,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 05 May 2004 11:45:09 +0200
+Date: Wed, 05 May 2004 10:46:09 +0800
 
-Hi Wang,
+Hi, all.
 
-> I have some questions about the baseband configuration. 
+I have some questions about the baseband configuration. 
 
-this is the wrong mailing list, because BlueZ is a Bluetooth host stack
-and the baseband is part of the hardware.
+In our development, we want the baseband to delivery packet with
+bit errors to the L2CAP. 
 
-Regards
+After reading the Baseband specification, we found there are 7 packet
+types for ACL connection in Baseband level -- DM1, DM3, DM5, DH1, 
+DH3, DH5 and AUX1. The first 6 has 16 bit CRC for payload. 
 
-Marcel
+My question is: 
 
+Is it possible to disable the CRC check for payload at the receiver side 
+through the some configuration command so that the IP packet with bit 
+errors could be passed to L2CAP? 
 
+Thanks a lot.
+
+BR
+
+Haiguang 
 
 
 -------------------------------------------------------
