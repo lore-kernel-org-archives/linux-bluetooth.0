@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "Michal Semler (volny.cz)" <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] bthid and 2.4.25-mh2
-References: <200403171304.37863.cijoml@volny.cz> <1079525716.3301.12.camel@pegasus>
-In-Reply-To: <1079525716.3301.12.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200403182116.24096.cijoml@volny.cz>
+Subject: Re: [Bluez-users] Connection not completing????? DT120 and T3 palm
+From: Marcel Holtmann <marcel@holtmann.org>
+To: J C <jjcar1526@hotmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY14-F18fNwpISMFja000785fd@hotmail.com>
+References: <BAY14-F18fNwpISMFja000785fd@hotmail.com>
+Content-Type: text/plain
+Message-Id: <1079634305.3301.58.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,28 +18,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 18 Mar 2004 21:16:24 +0100
+Date: Thu, 18 Mar 2004 19:25:05 +0100
 
-Dne st 17. b=F8ezna 2004 13:15 jste napsal(a):
-> Hi Michal,
->
-> > there is 100% problem in mh2 patch. I tried downgrade to simple 2.4.25
-> > and keyboard started working imeditially. Then tried upgrade to
-> > 2.4.25-mh2 and keyboard stopped working.
->
-> please check 2.4.25-mh1.
+Hi John,
 
-Works without problem :) Maybe "Patch day" was not so patch :D
-Marcel send me in privat your mh2 patch differenced into parts and I'll fin=
-d=20
-which "patch" in it si bad.
+>   I am using 2.4.22 on both the workstation and embedded cpu.  I
+> downloaded the latest tools, bluez-libs-2.5, bluez-pan-1.1,
+> bluez-spd-1.5, bluez-utils-2.4, rfcommd-1.2.  I load modules
+> crc32,bluez,hci_usb,l2cap,bnep, and rfcomm.  I have a script with
+> these commands: ip_script"starts ip-tables", hciconfig hci0 up, sdpd,
+> sdptool add LAN, sdptool add SP, hcid, rfcommd -s, dund -s call
+> btpalm.  All of these things work on my workstation.  dund will see
+> the connection and the pppd daemon will run providing me with a ppp
+> connection.  I am able to the get to the internet with my T3.  
 
-Michal
+don't use the "sdptool add ...", because they are not needed. The dund
+will register the SDP record itself and in that case the RFCOMM channel
+is correct and not the wrong one. Your T3 tries to connect to channel 2
+while dund by default uses channel 1. And don't use rfcommd, because it
+is deprecated and not needed anyway.
 
->
-> Regards
->
-> Marcel
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
