@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Deleted acl-handles on failed
-	hci_create_connection
+Subject: Re: [Bluez-devel] hci_create_connection assuming timeout too soon
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Andreas Gaufer <andreas.gaufer@blue-cell-networks.com>
 Cc: Bluez Devel <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040610203555.273c77bd.Andreas.Gaufer@blue-cell-networks.com>
-References: <20040610203555.273c77bd.Andreas.Gaufer@blue-cell-networks.com>
-Content-Type: multipart/mixed; boundary="=-bTYfbb0CI/IaQv5TeAXy"
-Message-Id: <1086893582.7930.55.camel@pegasus>
+In-Reply-To: <20040609154824.531c71b8.Andreas.Gaufer@blue-cell-networks.com>
+References: <20040609154824.531c71b8.Andreas.Gaufer@blue-cell-networks.com>
+Content-Type: text/plain
+Message-Id: <1087033515.4306.0.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,53 +18,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 10 Jun 2004 20:53:02 +0200
-
-
---=-bTYfbb0CI/IaQv5TeAXy
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Date: Sat, 12 Jun 2004 11:45:16 +0200
 
 Hi Andreas,
 
-> Heres a patch for hci_event.c to fix the problem that acl-handles are removed 
-> from the kernels connection hash when a hci_create_connection returnes a
-> command status thats not 0x00.
+> I noticed that many tools that use hci_create_connection use a hard coded 
+> timeout-value that varries between 1000 and 25000. 1000 is much to short for 
+> most mobile phones. 
 > 
-> One of the problems that was caused by this bug was that cc could be issued 
-> even if the peer was already connected. This case leads to the error message 
-> "Too many links" with sdptool and rfcomm for example. This connection could 
-> only be removed if the acl handle was known otherwise or by removing power 
-> from the usb-dongle (unplugg).
+> This leads to error messages even if the chip didnt report a "connection 
+> complete" yet. Very often a conection complete with 00 is reported 
+> later but the tool did exit already.
+> 
+> IMHO we could rely on the chips page timeout and wait for its "connection
+> complete" event. This timeout can also be changed with hciconfig pageto 
+> by the user.
+> 
+> To catch a condition where the chip is stalled in some way i think the best 
+> approach would be to time out on host side after the chips 
+> page time out * 1,5 or so.
+> 
+> I changed hcitool to make it possible to specifiy the host side
+> timeout via command line but i dont belive that this is a good aproach because
+> it only fixes the symthoms not the root of the problem. Anyways I attach the 
+> patch against the latest CVS-HEAD to show what im talking about.
+> 
+> In the moment my time is extremly short, i will try to bring up some code 
+> that realy helps here later. Since im not that familiar with C please let me 
+> know if somethings not right with my changes.
 
-I think your patch is wrong, because in case of the first try through
-L2CAP etc. a negative return value must result in a drop of the hci_conn
-structure. Check if the attached patch is also working (againt 2.6).
+your change is me too much at the moment. I simply changed the timeout
+to 25000 for the hcitool cc command.
 
 Regards
 
 Marcel
 
-
---=-bTYfbb0CI/IaQv5TeAXy
-Content-Disposition: attachment; filename=patch
-Content-Type: text/plain; name=patch; charset=iso-8859-1
-Content-Transfer-Encoding: 7bit
-
-===== net/bluetooth/hci_event.c 1.13 vs edited =====
---- 1.13/net/bluetooth/hci_event.c	2004-05-31 22:15:12 +02:00
-+++ edited/net/bluetooth/hci_event.c	2004-06-10 20:48:55 +02:00
-@@ -358,7 +358,7 @@
- 			status, batostr(&cp->bdaddr), conn);
- 
- 	if (status) {
--		if (conn) {
-+		if (conn && conn->state == BT_CONNECT) {
- 			conn->state = BT_CLOSED;
- 			hci_proto_connect_cfm(conn, status);
- 			hci_conn_del(conn);
-
---=-bTYfbb0CI/IaQv5TeAXy--
 
 
 
