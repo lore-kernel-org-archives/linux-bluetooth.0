@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Content-Type: text/plain
-Message-Id: <1086429803.16316.44.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-users] Bluetooth 1.2 and HID Proxy
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Linux audio gateway and headset feature
+Reply-To: axs203dd@excite.com
+From: "mr" <axs203dd@excite.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Message-Id: <20040604230847.673C13DD8@xprdmailfe12.nwk.excite.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,54 +16,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 05 Jun 2004 12:03:23 +0200
-
-Hi Folks,
-
-for everyone of you who is searching for a Bluetooth 1.2 capable USB
-dongle or a dongle with HID Proxy support, there is now a way to getting
-one with a minimum of costs. It is possible through the update efforts
-of Apple. Before they equiped their machines with internal Bluetooth
-adapters they sold (and I think still sell) a USB dongle from D-Link.
-According to Apple every D-Link with hardware revision B2 and higher can
-be updated through their firmware updater
-
-http://www.apple.com/downloads/macosx/apple/bluetoothfirmwareupdater.html
-
-So I bought myself a D-Link (Rev B3) and tried it. I used the DFU wizard
-from CSR and after some time I got the new firmware on the dongle
-
-hci0:   Type: USB
-        BD Address: 00:0D:88:xx:xx:xx ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN 
-        RX bytes:966 acl:0 sco:0 events:25 errors:0
-        TX bytes:333 acl:0 sco:0 commands:24 errors:0
-        Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: RSWITCH HOLD SNIFF PARK 
-        Link mode: SLAVE ACCEPT 
-        Name: 'D-Link DBT-120 (Rev B3)'
-        Class: 0x1c010c
-        Service Classes: Rendering, Capturing, Object Transfer
-        Device Class: Computer, Laptop
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x4d9 LMP Ver: 1.2 (0x2) LMP Subver: 0x4d9
-        Manufacturer: Cambridge Silicon Radio (10)
-
-And now this dongle is not only capable of Bluetooth 1.2 it also uses
-the HID Proxy feature. The HID mode is the default boot mode and you
-need to use hid2hci to switch between the modes.
-
-The bad news are that you must extract the file GenericCSR.dfu from the
-Apple firmware update. Actually that is impossible without using Mac OS.
-And the other problem is that you need a DFU Upgrade utility. The CSR
-one is not for free and I never really finished the download code for
-btdfu. Right now I don't know how to get these two thinks worked out.
-
-Regards
-
-Marcel
+Date: Fri,  4 Jun 2004 19:08:47 -0400 (EDT)
 
 
+>./hsmicro  00:02:EE:0D:47:5F 12
+
+>Voice setting: 0x0060
+
+>RFCOMM channel connected
+
+>Can't connect SCO audio channel: Connection refused
+
+---
+
+
+
+>any idea on that ?
+
+
+
+Do you have the SCO module loaded?
+
+'modprobe sco'
+
+_______________________________________________
+Join Excite! - http://www.excite.com
+The most personalized portal on the Web!
 
 
 -------------------------------------------------------
