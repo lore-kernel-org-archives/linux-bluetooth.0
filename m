@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Catalin Drula <catalin.drula@imag.fr>
-Message-ID: <loom.20050324T123636-904@post.gmane.org>
-References: <Pine.LNX.4.33.0503171141200.22782-100000@redbean.intranet.gw-instruments.de> <1111057586.11792.58.camel@pegasus>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1111660850.1916.49.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] Re: Handling a Hardware Error event on iPAQ h5550
+Subject: [Bluez-devel] Feature mask retrieval for L2CAP RFC
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,34 +16,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 24 Mar 2005 11:39:37 +0000 (UTC)
+Date: Thu, 24 Mar 2005 11:40:50 +0100
 
-Hi Marcel,
+Hi,
 
-Marcel Holtmann <marcel <at> holtmann.org> writes:
- 
-> Hi Peter,
-> 
-> > I'm not that familiar with the architecture of BlueZ but with the
-> > experiences for our own stack I can tell you this is not trivial. The main
-> > problem here is that the Bluetooth Stack is not stateless. One possible
-> > solution is to feed the reset done event to the higher layers (l2cap). But
-> > than L2cap must be modified to correctly shut down all connections. It
-> > would be easier if the HCI layer tracks the state of all ACL and SCO
-> > connections (Marcel ??). Than a reset done event can be handled like a
-> > unexpected link loss on all active connections and the higher layers do
-> > not need any modifications (hopefully).
-> 
-> we can do this and actually calling "hcitool cc" does this already, but
-> it waits indeed for a timeout of the HCI_Disconnect.
+to fully support the L2CAP 1.2 retransmission and flow control (RFC) you
+need to send an info request first to request the extended feature mask.
+The part of the the specification when to request this information is
+quite lame. It actually says only you have to do so before configuring
+for any RFC settings (volume 3, part A, chapter 8.1).
 
-Could you give a few more details on this one, please? What I want to do is what
-Pieter suggested: have the Hardware Error event trigger an unexpected link loss
-on all active connections. 
+The extended feature mask is a global value and thus it should be enough
+to request it once for the underlaying ACL link. This means that we may
+should request this value before creating any L2CAP channel. The problem
+is that older BlueZ L2CAP implementations send wrong responses for an
+info request. This may result into problems with L2CAP 1.1 (SEQPACKET)
+only connections and so I don't wanna do that until we really need to
+configure RFC.
 
-Thanks,
+My idea is to send the request for the extended feature mask only once
+before we try to open the first L2CAP 1.2 channel. This means before we
+send the connection request for that channel. The mask should be stored
+in the l2cap_conn structure and then used for further channel requests.
+Using such a scheme means that no info requests will be sent if only
+L2CAP 1.1 channels are used and using a L2CAP 1.2 channel will result in
+only one info request/response transaction from our side. This looks to
+me like the most sane approach.
 
-Catalin
+Comments?
+
+Regards
+
+Marcel
+
 
 
 
