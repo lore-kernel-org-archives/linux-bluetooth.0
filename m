@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?iso-8859-1?q?J=FCrgen_Schindele?= <jschindele@arcor.de>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200501261244.47898.jschindele@arcor.de>
-Subject: [Bluez-users] Problem Connecting to Logitech HS01-V14
+Subject: Re: [Bluez-users] F8T001 version 1 and SuSE 9.2
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <loom.20050130T212956-606@post.gmane.org>
+References: <loom.20050130T212956-606@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1107118147.8384.12.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,84 +18,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 26 Jan 2005 12:44:47 +0100
+Date: Sun, 30 Jan 2005 21:49:07 +0100
 
-Hello guys
+Hi,
 
-I try in vain to connect btsco to this new nice headset.
-It work only once and till the first try it don't work any more
+> I have SuSE Linux 9.2 installed with all updates, installed all bluez packages,
+> rebooted, plugged in my Belkin F8T001 USB Bluetooth dongle, KDE told me that it
+> found a new device, set it up -- enabling bluetooth daemon, configuring things
+> (left everything on default), pressed OK -- the daemon started, but nothing else
+> happened, I am unable to do anything...
+> 
+> "hcitool dev" shows:
+> Devices:
+> nothing else...
+> 
+> "lsusb" shows the device as being recognized by the USB subsystem, but seems
+> that the bluetooth subsystem is not interested in that device.
+> 
+> dmesg shows following (only bluetooth part):
+> Bluetooth: Core ver 2.6
+> NET: Registered protocol family 31
+> Bluetooth: HCI device and connection manager initialized
+> Bluetooth: HCI socket layer initialized
+> Bluetooth: L2CAP ver 2.4
+> Bluetooth: L2CAP socket layer initialized
+> Bluetooth: HIDP (Human Interface Emulation) ver 1.0
+> Bluetooth: RFCOMM ver 1.3
+> Bluetooth: RFCOMM socket layer initialized
+> Bluetooth: RFCOMM TTY layer initialized
+> usb 2-1: new full speed USB device using address 2
+> Bluetooth: HCI USB driver ver 2.7
+> usbcore: registered new driver hci_usb
 
-Here the details :
+what is the content of /proc/bus/usb/devices? Does "hciconfig -a" shows
+you anything?
 
-hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:0C:76:48:06:D8 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-        RX bytes:7762 acl:0 sco:0 events:325 errors:0
-        TX bytes:2930 acl:0 sco:0 commands:188 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ (0)'
-        Class: 0x7e0100
-        Service Classes: Networking, Rendering, Capturing
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x=
-20d
-        Manufacturer: Cambridge Silicon Radio (10)
+Regards
 
-After discovering i tried manually to do :
-=2D-------------------
-hcitool name 00:0D:44:02:E5:B7
-Logitech HS01-V14
+Marcel
 
-hcitool cc 00:0D:44:02:E5:B7
-Can't create connection: Input/output error
 
-And here the coresponding hcidump -x is :
-=2D----------------
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-  B7 E5 02 44 0D 00 02 00 00 00
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 19 04
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-  00 B7 E5 02 44 0D 00 4C 6F 67 69 74 65 63 68 20 48 53 30 31
-  2D 56 31 34 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-  B7 E5 02 44 0D 00 18 CC 02 00 00 00 01
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 05 04
-> HCI Event: Link Key Request (0x17) plen 6
-  B7 E5 02 44 0D 00
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-  B7 E5 02 44 0D 00 E4 AC 30 9D 93 2A D5 64 09 2E 0E 2B 4A B1
-  85 9A
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0B 04 00 B7 E5 02 44 0D 00
-> HCI Event: Connect Complete (0x03) plen 11
-  05 29 00 B7 E5 02 44 0D 00 01 00
-
-Why i'am not even asked for the pin ??
-(using "/bin/bluepincat")
-What is goning wrong ??
-
-By the way under "windoof" it works ok with pairing and so on.=20
-
-Any help is very welcome
-=2D-=20
-Gru=DF J=FCrgen
 
 
 -------------------------------------------------------
