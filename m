@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jack Jia <jjia@cs.ubc.ca>
+Message-ID: <16dd70ff050211012063a9c6f5@mail.gmail.com>
+From: Cristian Tapus <cristian.tapus@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050211111140.64497886BC@sc8-sf-spam1.sourceforge.net>
-Message-ID: <Pine.GSO.4.60.0502110314380.12691@columbia.cs.ubc.ca>
-References: <20050211111140.64497886BC@sc8-sf-spam1.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Subject: [Bluez-users] hcitool scan question
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] Bluetooth problem under FC3 on a D600
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,68 +16,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 11 Feb 2005 03:35:34 -0800 (PST)
+Date: Fri, 11 Feb 2005 01:20:32 -0800
 
-Hi there,
+I have tried to get the bluetooth running under FC3 for the last 2
+days without any luck. The laptop can not detect any bluetooth device,
+nor is detected by any other device (phone, mac)
 
-I am running hciemu. hciconfig shows VHCI devices up and running and I can 
-l2ping the devices, but when I do hcitool scan I get the following:
+Here is my setup:
 
-# hcitool scan
+[crt@dhcp-44-206 ~]$ lsmod
+Module                  Size  Used by
+rfcomm                 37853  0
+hci_usb                15945  3
+hidp                   26817  2
+l2cap                  26053  10 rfcomm,hidp
+bluetooth              48453  10 rfcomm,hci_usb,hidp,l2cap
+
+[crt@dhcp-44-206 ~]$ hciconfig -a
+hci0:   Type: USB
+      BD Address: <addr> ACL MTU: 192:8  SCO MTU: 64:8
+      UP RUNNING PSCAN ISCAN
+      RX bytes:10530 acl:0 sco:0 events:469 errors:0
+      TX bytes:1162 acl:0 sco:0 commands:133 errors:0
+      Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
+      Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+      Link policy: RSWITCH HOLD SNIFF PARK
+      Link mode: SLAVE ACCEPT
+      Name: <name>
+      Class: 0x120104
+      Service Classes: Networking, Object Transfer
+      Device Class: Computer, Desktop workstation
+      HCI Ver: 1.2 (0x2) HCI Rev: 0x4f2 LMP Ver: 1.2 (0x2) LMP Subver: 0x4f2
+      Manufacturer: Cambridge Silicon Radio (10)
+
+When I do hcitool scan here is what I get:
+[crt@dhcp-44-206 ~]$ hcitool scan
 Scanning ...
-Inquiry failed: Connection timed out
+[crt@dhcp-44-206 ~]$
 
-hcidump shows the following:
-
-# hcidump -i hci0 -V
-HCI sniffer - Bluetooth packet analyzer ver 1.17
+The hcidump associated with this is:
+[crt@dhcp-44-206 ~]$ hcidump
+HCIDump - HCI packet analyzer ver 1.11
 device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-> HCI Event: Command Complete (0x0e) plen 4
-     Inquiry (0x01|0x0001) ncmd 1
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Inquiry Complete (0x01) plen 1
 
-Could you give me some ideas about what I should do to make the scan 
-working? Can I achieve that with VHCI devices? hcidump shows hci0 is doing 
-the job, but the scan doesn't show it.
+Any ideas what I am doing wrong? If you need extra information please
+let me know.
 
-Regards,
-Jack
+Cheers,
 
-By the way, my hciconfigure shows the following:
-
-# hciconfig -a
-hci0:   Type: VHCI
-         BD Address: 7F:00:00:01:00:0A ACL MTU: 192:8 SCO MTU: 64:0
-         UP RUNNING PSCAN ISCAN
-         RX bytes:0 acl:11 sco:0 events:36 errors:0
-         TX bytes:870 acl:13 sco:0 commands:26 errors:0
-         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-         Name: 'BlueZ (0)'
-         Class: 0x3e0100
-         Service Classes: Networking, Rendering, Capturing
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x0 LMP Ver: 1.1 (0x1) LMP Subver: 0x0
-         Manufacturer: Qualcomm (29)
-
-hci1:   Type: VHCI
-         BD Address: 7F:00:00:01:00:0B ACL MTU: 192:8 SCO MTU: 64:0
-         UP RUNNING PSCAN ISCAN
-         RX bytes:0 acl:11 sco:0 events:25 errors:0
-         TX bytes:735 acl:11 sco:0 commands:19 errors:0
-         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-         Name: 'BlueZ (1)'
-         Class: 0x3e0100
-         Service Classes: Networking, Rendering, Capturing
-         Device Class: Computer, Uncategorized
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x0 LMP Ver: 1.1 (0x1) LMP Subver: 0x0
-         Manufacturer: Qualcomm (29)
-
+Cristian
 
 
 -------------------------------------------------------
