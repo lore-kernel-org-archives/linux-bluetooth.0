@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Getting installed usb bluetooth adaptor into
-	linux system
+Subject: Re: [Bluez-users] Porting bluz
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Mezkiriz <dmezkiriz@yahoo.com>
+To: kidd <affix_kidd@hotmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20040721T155547-62@post.gmane.org>
-References: <loom.20040721T155547-62@post.gmane.org>
+In-Reply-To: <BAY22-DAV13I2rV4Zne0000e0d5@hotmail.com>
+References: <BAY22-DAV13I2rV4Zne0000e0d5@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1090478946.21828.12.camel@pegasus>
+Message-Id: <1090478858.21828.9.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,27 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 22 Jul 2004 08:49:06 +0200
+Date: Thu, 22 Jul 2004 08:47:38 +0200
 
-Hi David,
+Hi Kidd,
 
-> I've got a usb bluetooth adapter 100Mb from Conceptronic,
-> a no well-known hardware company, I've been struggling 
-> trying to get installed bluetooth in my PC and laptop
-> but I didn't succeed in it. So my last hope is to ask 
-> for some help:
-> 
-> I installed rpm packages you updated in my redhat 9.0
-> pc. When I plug my bluetooth adaptor I don't know how
-> to proceed in order to get a device (like /dev/sda1 or
-> so) to mount the system, at least that's what I
-> expected. 
-> I may be mistaken, so could you please tell me how to
-> proceed, or Could you tell me a good how-to?. 
+>    Did anyone know whether there used to be a really bluetooth_enabled
+> product that use affix?
+>    Now if I want to develop a mobile phone that developping on ARM9
+> CPU with linux OS ,And want to use open source bluetooth stack,which
+> one is the best ,bluz,affix,openbt?
 
-network adapters don't use any device nodes and so Bluetooth also don't
-uses them. Look at the output of "dmesg" and check "hciconfig -a". What
-is the content of /proc/bus/usb/devices?
+you are asking on the BlueZ mailing list about the Affix stack? Very
+funny. However BlueZ is the official Bluetooth stack for Linux and
+actually the most powerful and most supported stack. At the time the
+Affix was released Max has done a comparision between BlueZ and Affix
+based on the source code and most of his design critics are still
+present. Check the mailing list archives for more details.
+
+I know that BlueZ is used in many research and development labs around
+the world and assume that there are more products based on BlueZ, but
+for sure we only know of one (http://www.bluez.org/qualification.html).
 
 Regards
 
