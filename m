@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BlueZ licensing inquiry
-References: <OF200FCC20.5703443A-ON48256FD3.001D7002-48256FD3.001DBAF3@lexmark.com>
-In-Reply-To: <OF200FCC20.5703443A-ON48256FD3.001D7002-48256FD3.001DBAF3@lexmark.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200503290736.20676.cijoml@volny.cz>
+Message-ID: <OF200FCC20.5703443A-ON48256FD3.001D7002-48256FD3.001DBAF3@lexmark.com>
+From: gcagasan@lexmark.com
+Content-Type: multipart/alternative; boundary="=_alternative 001DBAF048256FD3_="
+Subject: [Bluez-users] BlueZ licensing inquiry
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,22 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 29 Mar 2005 07:36:20 +0200
+Date: Tue, 29 Mar 2005 13:23:12 +0800
 
-It is GPL project :)
+This is a multipart message in MIME format.
+--=_alternative 001DBAF048256FD3_=
+Content-Type: text/plain; charset="us-ascii"
 
-Dne =FAt 29. b=F8ezna 2005 7:23 gcagasan@lexmark.com napsal(a):
-> I would like to know, what is the licensing for BlueZ?  Are there any
-> issues from a legal or licensing stand-point if we port it to another OS?
->
-> thanks,
-> Gail Cagasan
-> Lexmark Research and Development Corp.
+I would like to know, what is the licensing for BlueZ?  Are there any 
+issues from a legal or licensing stand-point if we port it to another OS? 
 
-=2D-=20
-S pozdravem
+thanks,
+Gail Cagasan
+Lexmark Research and Development Corp.
+--=_alternative 001DBAF048256FD3_=
+Content-Type: text/html; charset="us-ascii"
 
-Michal Semler
+
+<br><font size=2 face="Courier New">I would like to know, what is the licensing for BlueZ? &nbsp;Are there any issues from a legal or licensing stand-point if we port it to another OS? </font>
+<br>
+<br><font size=2 face="Courier New">thanks,</font>
+<br><font size=2 face="Courier New">Gail Cagasan</font>
+<br><font size=2 face="Courier New">Lexmark Research and Development Corp.</font>
+--=_alternative 001DBAF048256FD3_=--
 
 
 -------------------------------------------------------
