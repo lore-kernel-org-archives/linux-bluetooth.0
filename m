@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Toby Fisher <toby@tjfisher.co.uk>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.58.0405302214280.8012@sebagqbbe.gwsvfure.pb.hx>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] Problems connecting to Nokia 6310I phone.
+Subject: Re: [Bluez-users] CSR firmware
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200405301317.45481.cijoml@volny.cz>
+References: <200405290256.06151.cijoml@volny.cz>
+	 <200405301229.25546.cijoml@volny.cz> <1085914997.5925.1.camel@pegasus>
+	 <200405301317.45481.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1085918845.5925.5.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,44 +20,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 30 May 2004 22:25:33 +0100 (BST)
+Date: Sun, 30 May 2004 14:07:25 +0200
 
-Hi.
+Hi Michal,
 
-The subject gives the outline, and a brief scan of the archives didn't 
-yield anything useful.
+> Do you plan to add this tool to bluez-utils?
 
-I'm using kernel 2.6.6RC1, and I almost have the connecting working with 
-Gnokii to the phone.  However, there are some weird things going on which 
-lead me to belioeve that something is wrong.
+no, I don't. Actually the tool is not really useful at the moment.
 
-I can, using rfcomm, get a connection to the phone, however tearing it 
-down has strange results:
-1.  Once the connection is down, I can no longer ping the phone using 
-l2ping, though hcitool scan and info still work.
-2.  The command rfcomm release rfcomm0 yields a device not found error, 
-whereas the binding works without error.
+Regards
 
-In addition to this, if I use the gnokii --monitor command I can get a 
-response from the phone, however it sends one lot of data and then seems 
-to hang - the only way to end the Gnokii process is to move to another 
-console and use the kill command, as ctrl-c doesn't work.
+Marcel
 
 
-I'm puzzled, as I seem almost to be there but somehow seem to be missing 
-one step.
-Oh yes, and one final thing, rfcomm -a gives no output, despite the fact 
-that I created rfcomm0 and it seems to work,
-rfcomm connect rfcomm0 00:60:57:69:CB:18
-will get me an rfcomm connection to the phone.
-
-Thanks in advance for any pointers you can offer.
-
-
--- 
-Toby Fisher	Email: toby@tjfisher.co.uk
-Tel.: +44(0)1480 417272	Mobile: +44(0)7974 363239
-ICQ: #61744808
 
 
 -------------------------------------------------------
