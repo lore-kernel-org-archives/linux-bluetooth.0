@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41F7BFFE.20808@xmission.com>
+Message-ID: <41F7D274.4030208@xmission.com>
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] btsco/headset problems
-References: <20050125015049.GA1520@viz.cacr.caltech.edu>
-In-Reply-To: <20050125015049.GA1520@viz.cacr.caltech.edu>
+Subject: Re: [Bluez-devel] partly OT: pipe sound from Headset to soundcard
+References: <41F7CEF6.1050508@webstuhl.net>
+In-Reply-To: <41F7CEF6.1050508@webstuhl.net>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,43 +18,44 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 26 Jan 2005 09:06:22 -0700
+Date: Wed, 26 Jan 2005 10:25:08 -0700
 
-John,
+Ben
 
-I wanted to let you know that I've looked at this message and tried to 
-imagine what is wrong and I don't have a lot of ideas.
+I had the same thought.
 
-It might be that the pairing is trying to get established and require a 
-pin number. A few days ago someone reported that they had to change the 
-pin script to hardcode "0000" in order for it to work. Check the recent 
-archives.
+We have a way to send line in to a stereo headset but there is a delay. 
+(see bluetooth-alsa.sf.net)
+
+You could write something similar that runs in userspace and copies 
+audio streams around using sco.
 
 Brad
 
-John McCorquodale wrote:
-> Hi, y'all,
+Ben Pezzei wrote:
+> Hi again,
 > 
-> I just pulled the current btsco CVS, compiled against vanilla 2.6.10-rc3,
-> trying to talk to a HBH-35.  I run btsco <addr> and it gets thru the
-> "AT+" lines, but never says "opened hwdep" no matter what I do (yes, I
-> push the button on the headset).  I can set the volume just fine with
-> alsamixer.  aplay does nothing (hangs forever) and arecord prints the
-> header and then hangs forever, which are consistent with btsco never
-> having opened the SCO.
+> Apologies if my question is a bit OT, but no one on the alsa
+> list had an answer for this one:
 > 
-> stracing btsco shows that no data ever comes in on the BT file descriptor;
-> the poll just sits in its little one-second loop never rx'ing anything from
-> anybody, even when I bang on the headset button like an undersexed chihuahua
-> on speed.
+> I try to pipe the sound from the headset to line in of the
+> soundcard. something like:
+> /dev/snd/pcmC1D0c -> /dev/snd/pcmC0D0p
+> and vice versa:
+> /dev/snd/pcmC0D0c -> /dev/snd/pcmC1D0p
 > 
-> Tried two HCIs, the socket CF G card (which, yes, works in 2.6 with suitable
-> patch for the serial driver) and the tiny little dlink USB dongle.  Exact
-> same behavior both cases.
+> So everything which comes through the soundcard mic should
+> be "forwarded" to the headset earphone, and everything
+> which comes from the headset mic should land at the
+> soundcards line in.
 > 
-> I hope this is obvious to somebody?
+> is there a way to accomplish this?
 > 
-> -mcq
+> any hint would be great
+> 
+> greetings
+> ben
+> 
 > 
 > 
 > -------------------------------------------------------
