@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: RE: [Bluez-users] bluetooth sniff mode
-Message-ID: <A1F0D47583A2D711919F00600819B3A46B78C1@goofy.vitronics.com>
-From: "Cruz, Maria" <maria.cruz@VITRONICS.com>
-To: <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] bluetooth sniff mode
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <A1F0D47583A2D711919F00600819B3A48BA128@goofy.vitronics.com>
+References: <A1F0D47583A2D711919F00600819B3A48BA128@goofy.vitronics.com>
+Content-Type: text/plain; charset=windows-1251
+Message-Id: <1101929819.15615.28.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,23 +18,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 1 Dec 2004 16:42:45 -0500
-
-Thanks Marcel.  I found out that after a "sniff mode" command the HCI
-Event : Mode Change occurs.  I found reference to this in both specs.
-This event shows a "current_mode" field.  If it is set to "0x02" then in
-sniff mode.
-
-Running hcidump -x captures this event.
-
-Thanks
-maria
-
------Original Message-----
-From: Marcel Holtmann [mailto:marcel@holtmann.org]=20
-Sent: Wednesday, December 01, 2004 2:37 PM
-To: BlueZ Mailing List
-Subject: Re: [Bluez-users] bluetooth sniff mode
+Date: Wed, 01 Dec 2004 20:36:59 +0100
 
 Hi Maria,
 
@@ -54,18 +39,18 @@ run "hcidump -X" as root at the same time and see what it produces.
 
 > Not sure if this indicates a success (or just pending not sure yet of
 > success).  Additionally, I am using bluez-libs&bluez-utils2.10.
-> Should I reference the "BLUETOOTH SPECIFICATION Version 2.0 + EDR"
-> instead?  I found version 2.0 at "Bluetooth.org" web site.  AND the
+> Should I reference the =93BLUETOOTH SPECIFICATION Version 2.0 + EDR=94
+> instead?  I found version 2.0 at =93Bluetooth.org=94 web site.  AND the
 > version 2.0 spec is slightly different.  For example the error codes
 > listed in 2.0 are different. =20
 
 The BlueZ versions have nothing to do with the version of the Bluetooth
 specification.
 
-> Maybe it is only semantics... either way I do not understand what
-either
+> Maybe it is only semantics=85 either way I do not understand what eithe=
+r
 > really mean.  For the sniff mode I have setup a bnep connection.  I
-> can ping "host", I have static IPs setup.  And=20
+> can ping =93host=94, I have static IPs setup.  And=20
 >=20
 > hcitool con
 >=20
@@ -75,7 +60,8 @@ either
 >=20
 > =20
 >=20
-> Should this indicate "SLAVE"?  Somes times hcitool con will show SLAVE
+> Should this indicate =93SLAVE=94?  Somes times hcitool con will show SL=
+AVE
 > instead.  Your advice on what spec to use and how to decipher hictool
 > output is appreciated.
 
@@ -85,19 +71,6 @@ its role.
 Regards
 
 Marcel
-
-
-
-
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.=20
-http://productguide.itmanagersjournal.com/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
 
