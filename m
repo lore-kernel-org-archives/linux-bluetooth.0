@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <4.3.2-J.20040613230727.0638bee8@emi.s-direct.com>
-To: bluez-users@lists.sourceforge.net
-From: Tetsuo Shiraishi <tetsu@s-direct.com>
+From: Simon Huggins <huggie@earth.li>
+To: list bluez <bluez-users@lists.sf.net>
+Subject: Re: [Bluez-users] bluepin
+Message-ID: <20040613091328.GB27985@paranoidfreak.co.uk>
+References: <1087080981.21738.3.camel@tr1a.ozob.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-2022-JP"
-Subject: [Bluez-users] hcid pin problem
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1087080981.21738.3.camel@tr1a.ozob.net>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,42 +17,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 14 Jun 2004 00:08:14 +0900
+Date: Sun, 13 Jun 2004 10:13:28 +0100
 
-Hello,
+'ello list
 
-I could not get pin_helper to work, 
-since I upgraded to bluez-utils-2.7 from bluez-utils-2.3.
+On Sat, Jun 12, 2004 at 05:56:21PM -0500, Gene Imes wrote:
+> Sorry about that. I inadvertantly tacked this to another thread. My
+> apologies.
 
-Using system
-- sh4-linux
-- patch-2.4.24-mh5.gz 
-- bluez-libs-2.7.tar.gz 
-- bluez-utils-2.7.tar.gz 
-- pin_helper in hcid.conf
+> Anyone know how to fix this:
 
-I modified bluez-utils-2.7 as follows, so it work fine.
+> gene@tr1a:~> bluepin
+> Xlib: connection to ":0.0" refused by server
+> Xlib: No protocol specified
 
---- bluez-utils-2.7/hcid/security.c	Sun May  9 19:39:43 2004
-+++ bluez-utils-2.7_mod/hcid/security.c	Sun Jun 13 22:53:29 2004
-@@ -236,7 +236,7 @@
- {
- 	pin_code_reply_cp pr;
- 	struct sigaction sa;
--	char addr[12], str[255], *pin, name[20];
-+	char addr[18], str[255], *pin, name[20];
- 	FILE *pipe;
- 	int ret, len;
- 
-Thanks,
+> Traceback (most recent call last):
+>   File "/usr/bin/bluepin", line 39, in ?
+>     import gtk
+>   File "/usr/lib/python2.3/site-packages/gtk-2.0/gtk/__init__.py", line
+> 43, in ?    from _gtk import *
+> RuntimeError: could not open display
 
-Tetsuo 
+You're trying to run the python-gtk bluez pin helper.  Are you actually
+in X?
 
-//
-//　　　白石哲夫　tetsu@s-direct.com
-//　　　　　　　　tshiro@arion.ocn.ne.jp
-//
+You could change your pin helper to just be:
+#!/bin/sh
+echo "PIN:1234"
 
+or whatever yours is and the corresponding pin_helper line in hcid.conf
+
+I guess ultimately you might want the python-gtk helper to work though.
+
+Simon.
+
+-- 
+        Black Cat Networks        -( "I'm gonna eat you, little fishy!"  )-
+UK domain, email and web hosting  -(              - The Cat              )-
+http://www.blackcatnetworks.co.uk -(                                     )-
 
 
 -------------------------------------------------------
