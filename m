@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] inquiry_info device class to string
-From: Stephen Crane <steve.crane@rococosoft.com>
-To: bluez@spamzed.com
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <275070-2200410219819354@M2W046.mail2web.com>
-References: <275070-2200410219819354@M2W046.mail2web.com>
-Content-Type: text/plain
-Message-Id: <1098177829.4538.121.camel@baroque.rococosoft.com>
-Mime-Version: 1.0
+Message-ID: <4174DA39.5090206@c-s.fr>
+From: "GUILLON Gabriel" <gabriel.guillon@c-s.fr>
+MIME-Version: 1.0
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Piconet Routing
+References: <4173F86A.3050801@uni-paderborn.de>
+In-Reply-To: <4173F86A.3050801@uni-paderborn.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,32 +17,52 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 19 Oct 2004 10:23:49 +0100
+Date: Tue, 19 Oct 2004 11:11:21 +0200
 
-Hi,
+Take a look at btchat: it does routing through bluetooth
 
-On Tue, 2004-10-19 at 09:19, postmaster@spamzed.com wrote:
-> Im sort of new to bluetooth and bt development but its going ok so far. Im
-> writing a little tool which displays all current devices in range. Since my
-> code uses ripped parts from hcitool scan i can succesfully enumerate the
-> device address and name, my question is , how do I parse  the device_class
-> item from the inquiry_info structure ? Say device ID is 001, i want to
-> convert it to an human readable string like 001 == Phone, 002 == Audio
-> etc... where can i find an translation list for this ? after a heavy google
-> battle i found a PalmOS site which mentions the bluetooth specs, but the
-> prop is , i can find only parts of it and my 'bluetooth unreveiled' book is
-> currently beeing shipped to me (i hope its mentioned there). I hope im not
-> forced to use a sdptool query since some 'light' devices dont have it
-> onboard, like headsets etc
+Stefan Mischke a =E9crit :
+> Hello!
+>=20
+> Since Bluetooth uses Time Division Duplex, a slave is not allowed to=20
+> talk to another slave in the same Piconet. The logical consequence must=
+=20
+> be that the data is routed over the master. I've used l2test to check i=
+f=20
+> l2cap does this kind of routing automatically. It doesn't but rather=20
+> creates a new, direct acl link to the remote slave device (scatternet).=
+=20
+> I don't know how it is with rfcomm, but I suppose it's the same. My=20
+> question: Is there any automatic Piconet Routing inside BlueZ or does=20
+> one have to implement it by oneself?
+>=20
+> Regards
+> Stefan
+>=20
+>=20
+>=20
+> -------------------------------------------------------
+> This SF.net email is sponsored by: IT Product Guide on ITManagersJourna=
+l
+> Use IT products in your business? Tell us what you think of them. Give =
+us
+> Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out =
+more
+> http://productguide.itmanagersjournal.com/guidepromo.tmpl
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>=20
 
-See hciconfig.c in bluez-utils.
+--=20
+"Everything is funny, if you wait long enough"
 
-Cheers,
-Steve
--- 
-Stephen Crane, Rococo Software Ltd. http://www.rococosoft.com
-steve.crane@rococosoft.com +353-1-6601315 (ext 209)
+Gab
 
+Dieu, dans sa grande cl=E9mence, a invent=E9 l'alcool pour que les moches
+aussi puissent baiser.
+- Woody Allen -
 
 
 -------------------------------------------------------
