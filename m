@@ -1,33 +1,66 @@
-Return-Path: <dwmw2@redhat.com>
-From: David Woodhouse <dwmw2@infradead.org>
-In-Reply-To: <1038466070.772.42.camel@pegasus.local> 
-References: <1038466070.772.42.camel@pegasus.local>
-	<5.1.0.14.2.20021126092054.0798bff0@mail1.qualcomm.com>
-	<5.1.0.14.2.20021126092054.0798bff0@mail1.qualcomm.com>
-	<5.1.0.14.2.20021127095652.07b78738@mail1.qualcomm.com>
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-Cc: Max Krasnyansky <maxk@qualcomm.com>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Reuse of H4 and BCSP code 
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Date: Wed, 15 Jan 2003 23:45:21 +0000
-Message-ID: <11011.1042674321@passion.cambridge.redhat.com>
-Sender: David Woodhouse <dwmw2@redhat.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Message-Id: <200301101640.13586.wim.delvaux@adaptiveplanet.com>
+Subject: [Bluez-users] better return code handling in rfcomm command
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 10 Jan 2003 16:40:13 +0100
+Content-Type: multipart/mixed; boundary="=-LfVyLD+vC1iAsXm+1qNz"
 
 
-On Thu, 28 Nov 2002, marcel@rvs.uni-bielefeld.de said:
->  The serial.o have a register_serial function and I want to start
-> playing with it. And yes we have one card that works with btuart_cs,
-> but not with serial_cs. I was told that the "magic initialization" of
-> serial_cs (or serial.o) causes the hciattach to fail, but the minimal
-> things in btuart_cs keep it happy and the device will work. 
+--=-LfVyLD+vC1iAsXm+1qNz
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; CHARSET=us-ascii
 
-Having fixed the 8250 driver so it doesn't screw up the extended
-functionality of the Oxford Semi OXCF950 on startup, it transpires that all
-we were actually losing was the extra magic baud rate divisor. Using the old
-serial driver from 2.4 and setting baud_base to 1152000 to compensate allows
-you to use the line discipline code with the standard serial driver.
+Hi all,
 
---
-dwmw2
+just found out that some errors do not cause rfcomm to retrun with exit != 0
+It seems that the 'func' field in the command jump table should return int and 
+not void.
+
+All commands can then return an error code (probably one that was generate by 
+an deeper function) and cause exit to return proper return values.
+
+Patch attached
+
+--=-LfVyLD+vC1iAsXm+1qNz
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="patch.gz"
+Content-Type: application/x-gzip; NAME=patch.gz
+
+H4sICCvpHj4AA3BhdGNoAK1WbU/jRhD+nPyKEVKpjW2wHV5CUnTkSLirCuTEpVVPVxQZew2rc2xu
+veF6vfLfO7O7zgsESCGRol17vTPPPM/M7HqeByKNi9FoaxTxfDOuhb4fekHg+QGEfivcb4W7m371
+A8cPfL/uOI7Z5eXs28zOBm7zAh+C3VZjv+U3H+w8PAQvbOy5e+Do4fCwDjXB5Fjk4LfrcFeHulfK
+SPIYbgueQDxKhnGR5yyWFs8lxDJzgSYJu3XhMomSRAwlbOiZXorEVexCfB0J2NjAh1u77hibysRq
+TMIPhF5KMY4llEX8RW0TMWR6l6ChPf1EEzZEH0PBvgL+25qOnYaiQw2KDp6CRf7gFwht5UW9MgYE
+ixT8lF9Vr/TTMOUZs3GTbzbVbpgQhbDWjqL8ZwnFDcvh/Piof3oKegfQjjW7XffwYy1Cu+5M5uAF
+hL9GmuCgAtoU8TCNRjz7DgfQOR6+Pfm9N+j3B+9NMLuhCkYNFEwF/jKKRzfWOka9mZTShbfdTrd7
+PuycfbLh4GAKOb0RSHdqlTJB8C4Y7CnPE4gq2CyX4jukhTCk/pT8la+5JN8ysdRq+L8DlpUMnSrU
+e3tuuIuw9WhwE2yr/IJxkrpMWrPhuvCxf/Tb8OPgvNc5xXAGH877g/5Q02vPqjAvQozySVbJoA0b
+BWZAz2G+m6C5RBYQkQvWvbSDDXvdpF3J/2FFaqmnJ3CQqYco8LM4K0qGTpbFVBXSY7DEHCzxDCxj
+7dXIogxz/WCejLZBfMUk2c2jEXuOzHWy8zhatDSPFMjoArhw7zcBv3hhLpQRG5WYfFQ6LvhTJtlX
+29ZF1wh8Kjo9TDqIheWAFPAC25uKUyM9woQd9Lq9PzA6ZWPJVB0MPr1AhzI39YxgiBsXTjt/fugM
+3p/0zsCDAAt8C5e2qjqeVLGOq6njalZxLW3vMhszWRTy2ljemjFtOpKVJkgPNcWpMSzgbv/s5BP8
+i9Oz/hEGbS/ZUdEGj5drpoobFeBO4IY7GCGNoQ7RxLfW5aUpBkbdjXDjquY+TWwy/eyxqQRc6an5
+aovIo6fox6KjE4HefvYvULcoy9bMWUAUaldDfGuhK0UrdeyZJXRsKRQKgV+BcI1b5W+Gpic9wpvZ
+WrznG1rwv1wuVkOwjEXlSuVYgcml9TC+FgpSrd2j54Xs3/eE9D/uYDHX5XXxbZVEv9ae6h7Pskwd
+mKpf3REzXkodq1+1Q7ydBNQP97bdoFk1xAeXS56nBSQce9sP4EkLIlnwyqENd5P+pw8G5UG3sHe9
+AR4Lv54d9/FoSPjCvvcOzzjlII3w6phU7Y79zaUV2E9cHqeB0XaL7OtT4kEbAxMSOdYkogLtyUOU
+SfKppLY20nEe269QhhDTyiosVQiLGzl9SIqY4gKSJ8qTzxeki5Jzu7nvBg1wtpso67aRUxFE59JU
+teDC9H6671qkq9+emOMXm8QOcMchqR7cJwiruJ1ojtTmlH/z23XjUvm4bcP6Oiz4DGmf+0xlaw1P
+KMnzMVMOiBPPq6a3jqNyY8YGUTwpXwwT0+yRll0TdHV5wdbJ9aRqUTo1dSvScwsJ0an9BgLsLb49
+va6My+iKWfjiP/UdpFYYDwAA
+
+--=-LfVyLD+vC1iAsXm+1qNz--
