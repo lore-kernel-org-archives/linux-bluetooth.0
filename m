@@ -1,8 +1,8 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4152F657.7090603@daimi.au.dk>
+Message-ID: <4152F5C6.8@daimi.au.dk>
 From: "Rolf E. Thorup" <rolft@daimi.au.dk>
 MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] which compile option need cross compile bluez-libs
  and bluez-utis?
 References: <f64f4e8a04092306503e292111@mail.gmail.com>
@@ -18,7 +18,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Sep 2004 18:14:15 +0200
+Date: Thu, 23 Sep 2004 18:11:50 +0200
 
 zhu yong wrote:
 
@@ -29,9 +29,11 @@ zhu yong wrote:
 > maybe these option is same, maybe have some howto artical?
 > any advice will help me !
 
-Ups, forget the link:
+I have actually written a howto for cross compiling to an Intrinsyc 
+Cerfcube (www.intrinsyc.com). It's an Arm based device so you should 
+have no problems following the guidelines.
 
-http://www.daimi.au.dk/~rolft/liwas/docs/CrossCompilingBluez.html
+Regards
 
 Rolf
 
