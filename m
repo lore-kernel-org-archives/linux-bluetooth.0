@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
+Message-ID: <002301c439b0$0da83010$0189e00a@yourygynwf3o8h>
+From: "frasnet" <frasnet78@vodafone.it>
+To: <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] rfcomm: Wrong number of parameters
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200405141524.04481.cijoml@volny.cz>
-Subject: [Bluez-users] hidp and connecting
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0020_01C439C0.C960B9C0"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,21 +16,48 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 14 May 2004 15:24:04 +0200
+Date: Fri, 14 May 2004 14:36:04 +0200
 
-Hi Marcel,
+This is a multi-part message in MIME format.
 
-when hidd is not started and device wants connect, system prints errors about 
-unknown connections.
+------=_NextPart_000_0020_01C439C0.C960B9C0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-1) Maybe we should have somewhere in /etc/bluetooth list of allowed devices 
-which will be accepted without hidd runnnig?
+thanx marcel, problem solved :-)=20
+My bluetooth usb adapter is a sitcom and in their web site it was =
+written to install rfcomm 0.8. I failled because of that. Now I use =
+linux + bt + vodafone gprs.=20
 
-2) When hidp and other modules compiled directly into kernel, we should under 
-single mode allow all hid devices to connect without hidd running to allow 
-users maintain their system without any daemons running
+thanx and Have a lot of fun :-)
 
-Michal
+------=_NextPart_000_0020_01C439C0.C960B9C0
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2800.1276" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>thanx marcel, problem solved :-) =
+</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>My bluetooth usb adapter is a sitcom =
+and in their=20
+web site it was written to install rfcomm 0.8. I failled because of=20
+that.&nbsp;Now I use linux + bt + vodafone gprs. </FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>thanx and Have a lot of fun =
+:-)</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV></BODY></HTML>
+
+------=_NextPart_000_0020_01C439C0.C960B9C0--
+
 
 
 -------------------------------------------------------
