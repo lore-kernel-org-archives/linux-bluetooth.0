@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BT-PM01B-HID
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <419F4399.20405@thomae-privat.de>
-References: <419F4399.20405@thomae-privat.de>
-Content-Type: text/plain
-Message-Id: <1100958241.7213.121.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <419F4399.20405@thomae-privat.de>
+From: Matthias Thomae <bluez@thomae-privat.de>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] BT-PM01B-HID
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +16,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 20 Nov 2004 14:44:01 +0100
+Date: Sat, 20 Nov 2004 14:16:09 +0100
 
-Hi Matthias,
+Hi,
 
-> has anyone noticed there is a second version of the Epox Presenter that 
-> supports the HID Profile?
-> 
-> SPP: http://www.epox.de/produkte/produkt.asp?ProduktID=268
-> HID: http://www.epox.de/produkte/produkt.asp?ProduktID=309
-> 
-> Has anyone tried the HID version with BlueZ?
+has anyone noticed there is a second version of the Epox Presenter that 
+supports the HID Profile?
 
-I used the HID version for my last 5 presentation I gave. Actually it
-has the same stupid endian bug as the EPoX keyboard, but the hidd is
-able to workaround it. The device works perfect.
+SPP: http://www.epox.de/produkte/produkt.asp?ProduktID=268
+HID: http://www.epox.de/produkte/produkt.asp?ProduktID=309
 
-Regards
+Has anyone tried the HID version with BlueZ?
 
-Marcel
+Marcel has got the SPP version on his web pages:
+http://www.holtmann.org/linux/bluetooth/epox.html
 
-
+Greets
+Matthias
 
 
 -------------------------------------------------------
