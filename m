@@ -1,103 +1,49 @@
-Return-Path: <jjjessen@control.auc.dk>
-Date: Mon, 29 Sep 2003 12:58:45 +0200 (MEST)
-From: "Jan J. Jessen" <jjjessen@control.auc.dk>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Digianswer USB driver
-In-Reply-To: <1064307381.26572.162.camel@pegasus>
-Message-ID: <Pine.GSO.4.40.0309291248010.923-100000@prosit.control.auc.dk>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Sjoerd Simons <sjoerd@air.luon.net>
+To: Jonathan Paisley <jp-www@dcs.gla.ac.uk>
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [ANNOUNCE] ALSA Bluetooth Headset Driver
+Message-ID: <20030926095900.GB1280@air.luon.net>
+References: <Pine.LNX.4.54.999.0309150112530.29667@sibu.dcs.gla.ac.uk> <20030926085100.GA1280@air.luon.net> <Pine.LNX.4.54.999.0309260958140.1399@brava.dcs.gla.ac.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <Pine.LNX.4.54.999.0309260958140.1399@brava.dcs.gla.ac.uk>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Fri, 26 Sep 2003 11:59:00 +0200
 
-Hi Marcel,
+On Fri, Sep 26, 2003 at 09:59:43AM +0100, Jonathan Paisley wrote:
+> Thanks for the info. I'm surprised that the latency is so bad. I didn't
+> experience similar problems during my testing (although I haven't tested
+> it with gnomemeeting yet). Can you try any other software to see what the
+> latency is like?
+> 
+> If you turn on the loopback mode in an ALSA mixer, do you experience
+> similar latencies (loopback means the audio received is sent straight back
+> to the headset).
 
-On 23 Sep 2003, Marcel Holtmann wrote:
+Sorry my measuring was flawed.. Apperently the h323 latency was caused
+by something else and cat /dev/dspX > /dev/dspY always causes a
+latency (pulling brown paper bag over head :( )
 
-> Hi Jan,
->
-> these are good news. Your initial problem setting scan mode can only be
-> solved with a USB sniffer, I think.
-
-Well I've tried it a few times now, and it is a rare event.
-
->
-> Do you have any H:2 USB Bluetooth devices? If yes, please attach them
-> along with a Digianswer one to the same host and use them both. I want
-> to make sure that a Digianswer device works in conjunction with a H:2
-> device.
-
-I've just tried it with a 3com device, and it works:-)
-
->
-> Have you ever updated the firmware of the Digianswer device? I though
-> that Digianswer already had a USB device at the time they are not a
-> subsidiary of Motorola. So the manufacturer should be 12.
-
-I have no idea. I've never updated the firmware on their devices.
-Digianswer has - at least in the past - been very restrictive about
-getting access to the firmware and related issues. A few years ago, former
-students at Aalborg University wrote a linux driver for their first pcmcia
-cards, but a lot of NDA stuff has prevented the publishing of this driver.
-But that's a whole different story.
-
-> Please do my test above and send me "hciconfig -a" of a machine with two
-> different dongles. If this works I apply this patch to mainline and your
-> students can start working with BlueZ very easy ;)
-
-# lsmod
-Module                  Size  Used by    Not tainted
-hci_usb                 9212   0  (unused)
-bluez                  36452   0  [hci_usb]
-usb-uhci               24460   0  (unused)
-usbcore                66272   0  [hci_usb usb-uhci]
-
-# hciconfig hci0 up
-# hciconfig hci1 up
-# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:0B:AC:E8:21:B1 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:69 acl:0 sco:0 events:8 errors:0
-        TX bytes:27 acl:0 sco:0 commands:7 errors:0
-        Features: 0xff 0xff 0x0f 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'VIP'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20e LMP Ver: 1.1 (0x1) LMP Subver: 0x20e
-        Manufacturer: Cambridge Silicon Radio (10)
-
-hci1:   Type: USB
-        BD Address: 00:50:CD:00:42:2B ACL MTU: 384:6  SCO MTU: 32:7
-        UP RUNNING PSCAN ISCAN
-        RX bytes:42673 acl:0 sco:0 events:7 errors:0
-        TX bytes:27 acl:0 sco:0 commands:7 errors:0
-        Features: 0xff 0xfa 0x21 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: ''
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x0 LMP Ver: 1.1 (0x1) LMP Subver: 0x37
-        Manufacturer: Motorola (8)
+  Sjoerd
+-- 
+Don't have good ideas if you aren't willing to be responsible for them.
 
 
-It seems to work perfectly now. Apply Your patch, and everyone is happy...
-regards,
-Jan Jakob
-
-
-Best regards, Jan Jakob
-------------------------------------
-Jan Jakob Jessen
-Ph.D. Student, M.Sc.E.E.
-Center for Embedded Software Systems
-Aalborg University
-Fredrik Bajers Vej 7C, B2-212
-DK-9220 Aalborg East
+-------------------------------------------------------
+This sf.net email is sponsored by:ThinkGeek
+Welcome to geek heaven.
+http://thinkgeek.com/sf
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
