@@ -3,12 +3,11 @@ Subject: Re: [Bluez-users] can't establish a connection
 From: Marcel Holtmann <marcel@holtmann.org>
 To: ben4fun <ben_4_fun@freenet.de>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1091748784.6143.28.camel@localhost>
+In-Reply-To: <1091747064.6143.25.camel@localhost>
 References: <1091742606.6143.17.camel@localhost>
 	 <1091746301.20839.60.camel@pegasus>  <1091747064.6143.25.camel@localhost>
-	 <1091748133.20839.63.camel@pegasus>  <1091748784.6143.28.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1091749859.20839.65.camel@pegasus>
+Message-Id: <1091748133.20839.63.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,16 +19,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 06 Aug 2004 01:50:59 +0200
+Date: Fri, 06 Aug 2004 01:22:13 +0200
 
 Hi Ben,
 
-> > show us the content of the /proc/bus/usb/devices file.
-> 
-> The file is absolutely empty, there is not a line.
+> Unfortunately it gives me "Can't init device hci0. Connection timed out(110)"
+> Too bad.
 
-activate the USB device filesystem in your kernel and mount it. Look at
-the USB howto for more details.
+show us the content of the /proc/bus/usb/devices file.
 
 Regards
 
