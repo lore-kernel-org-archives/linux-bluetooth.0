@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <5256d0b05011019273d81fdef@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-From: soraberri <421246@posta.unizar.es>
-Message-ID: <cs044v$o6q$1@sea.gmane.org>
-References: <cruhvs$fj5$1@sea.gmane.org> <1105388822.8652.53.camel@pegasus>
+Subject: Re: [Bluez-devel] hciconfig question
+In-Reply-To: <5f30e261050110123968721dc4@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-In-Reply-To: <1105388822.8652.53.camel@pegasus>
-Subject: [Bluez-devel] Re: baswap neccesity
+Content-Type: text/plain; charset=US-ASCII
+References: <5f30e261041224131026cfa70a@mail.gmail.com>
+	 <1103931501.20258.94.camel@pegasus>
+	 <5f30e261050110123968721dc4@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,36 +20,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Jan 2005 09:52:07 +0100
+Date: Tue, 11 Jan 2005 11:27:42 +0800
 
-Hello Marcel,
+> The only 1.2 devices listed at
+> http://www.holtmann.org/linux/bluetooth/devices.html are the Apple G4
+> and the Lifetech BlueConnect (but then I saw Carlos say that isn't
+> so).
+> 
+> I'm in the market for a couple of 1.2 USB dongles I can use with the
+> latest BlueZ kernel.  Any suggestions?  I found "ANYCOM USB-120 USB
+> Adapter" on Froogle.  Any comments about Anycom?
 
-Marcel Holtmann wrote:
-> Hi,
-> 
-> 
->>I'm reading rctest.c:
->>In do_connect function, a call to bswap is used just before the connect 
->>call:
->>	baswap(&rem_addr.rc_bdaddr, strtoba(svr));
->>
->>In the server, baswap is again called just after the accept call
->>
->>Why is it neccesary? Why does the server listening at the other side 
->>expect addresses in such byte ordering?
-> 
-> 
-> this is part of the specification. The textual representation and the
-> over-air BD_ADDR is swapped.
-> 
-> However the code above has a memory leak. Where do you found it?
-this piece of code is from the 'bluez-utils-2.13.tar.gz' package which 
-is downloadable now at the web site. Precisely in function 'int 
-do_connect(char *svr)' of rctest.c.
-It's curious, I'm sure you'd see memory leaks where I only see flowers!
+>From the thread that appeared the other day on the users list can't
+you just buy one of the upgradable BT 1.1 devices like a later
+revision of the DLink BT-120 and upgrade it to the 1.2 standard.
 
-thanks Marcel
+Thread here
+http://sourceforge.net/mailarchive/forum.php?thread_id=6278463&forum_id=1883
 
+Regards
+Peter
 
 
 -------------------------------------------------------
