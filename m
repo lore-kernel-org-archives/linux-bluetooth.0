@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41E3FE69.5030903@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
+Message-Id: <IA5TVV$8DF5EF8088642004CA3645D354A512F9@uol.com.br>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Multiple Headsets
-References: <41E25ECD.2000505@fcse.co.uk> <41E267C4.5030906@dark-reality.de>	 <1105362147.8652.10.camel@pegasus> <41E2A9FC.2010405@dark-reality.de>	 <41E39BC8.2020105@xmission.com> <1105438532.8056.12.camel@pegasus> <41E3AAD8.9090303@dark-reality.de>
-In-Reply-To: <41E3AAD8.9090303@dark-reality.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+From: "omap" <omap@uol.com.br>
+To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Crosscompiling HCIEMU
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,23 +16,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 11 Jan 2005 09:27:21 -0700
+Date: Tue, 11 Jan 2005 14:02:19 -0200
 
-Lars,
 
-> What has to be documented is:
-> 
-> how to calculate the bitrate for the proper "alternate setting" of usb_hci?
-> 
-> We could put the table from the BT docs online
+Dear folks,
 
-Where do I look to find this table? (The phrase "alternate setting" does 
-not seem to be the way to find it)
 
-What if it's set too high? Will it fail to work or will it waste space 
-in the transmission?
+I am trying to compile HCIemu for ARM
+platform, but i am having problems.
+has Any one tryed it before?
 
-Brad
+Regards =0A =0A__________________________________________________________=
+________________=0AAcabe com aquelas janelinhas que pulam na sua tela.=0A=
+AntiPop-up UOL - =C9 gr=E1tis!=0Ahttp://antipopup.uol.com.br/=0A
+
 
 
 -------------------------------------------------------
