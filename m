@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] "comlicated" setup - known issues for hid and
-	SCO?
+Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Lars Grunewaldt <lgw@dark-reality.de>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4117A907.7010006@dark-reality.de>
-References: <4117A907.7010006@dark-reality.de>
+In-Reply-To: <4117AB9A.9010909@dark-reality.de>
+References: <4117AB9A.9010909@dark-reality.de>
 Content-Type: text/plain
-Message-Id: <1092071597.4564.17.camel@pegasus>
+Message-Id: <1092071356.4564.12.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,38 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 09 Aug 2004 19:13:17 +0200
+Date: Mon, 09 Aug 2004 19:09:16 +0200
 
 Hi Lars,
 
-> right now I'm using two BT devices with my Epox dongle, an MX900 mice
-> and a Sony Ericcson HBH-35 Headset with snd-bt-sco (voice mode 0x0060,
-> before you ask ;)
+> A while ago I decided that I might want to take over the snd-bt-sco
+> project.
+> 
+> I had very little time in the last month due to personal reasons, but
+> I'm eager to give this project at least structure and manpower.
+> 
+> I have the feeling that there are some different people picking at the
+> code right now, but there is no teamwork here.
+> 
+> If there are people out there who are using snd-bt-sco or might want to
+> improve the program, please notice me.
+> 
+> I think this might be a good idea, maybe it's possible to set up a
+> sourceforge project together or something.
+> 
+> I alone can't do much right now, and there are some problems to address
+> (i.e. how to handle call pickup stuff). I'm pretty busy so I don't have
+> the time to get into the subject enough :(
 
-what does "hcitool info ..." say about your headset? What is the
-firmware version of your EPoX dongle?
+you can use this mailing list and you can also post patches here. 
 
-> both devices work fluently when used without the other, but when I use
-> headset and mouse at the same time there are various problems during
-> connect, scan and usage.
-> 
-> The main usage problem was that the sco layer got scrambled audio
-> (sounded much like random data) on about every third sco connection.
-> After a while, mouse and headset began to block each other, and the
-> stack seemed to get more and more, well, muddy. After some more
-> connection retries even the mouse, before only "hanging" when the
-> headset tried to connect, stopped working fully.
-> 
-> dmesg only noticed this:
-> 
-> hci_scodata_packet: hci0 SCO packet for unknown connection handle 76
-> 
-> When even connection was impossible, I plugged the BT dongle out and put
-> it back in. After reloading the hid module and programs the mouse and
-> headset worked again.
-
-I think that is a hardware problem. A protocol analyser would help to
-track this down ;)
+And as I said before, the best way is to extend the current SCO kernel
+module with an ALSA interface, because the basic idea of snd-bt-sco is
+wrong.
 
 Regards
 
