@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Content-Type: text/plain; charset="ISO-8859-1"
 MIME-Version: 1.0
-From: Stefan Bellon <sbellon@sbellon.de>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <4d348a05e8sbellon@sbellon.de>
-In-Reply-To: <4d33b69105sbellon@sbellon.de>
-References: <4d3382eb6csbellon@sbellon.de> <41F81D6F.3000908@xmission.com> <4d33b69105sbellon@sbellon.de>
-Content-Type: text/plain
-Subject: [Bluez-users] Re: bluetooth-alsa and Jabra BT800
+From: russellturner@fastmail.com.au
+Message-Id: <1106956484.11673.213836256@webmail.messagingengine.com>
+Subject: [Bluez-users] General Debian bluez question
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,35 +16,28 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 28 Jan 2005 23:17:05 +0100
+Date: Sat, 29 Jan 2005 10:54:44 +1100
 
-Stefan Bellon wrote:
-> Brad Midgley wrote:
-> > did you put it in pairing mode (usually by holding down the power
-> > button until it beeps) just before running btsco?
+Hi Everyone,
+I am hoping someone can answer a general Debian-bluez question.
 
-> I tried that as well. Doesn't make any difference. But the headset and
-> the PC are already paired. Do you have to put the headset into pairing
-> mode every time you start btsco?
+I have installed Debian sarge and upgraded to the sid kernel so I can
+apply the patch patch-2.6.10-mh2.gz.
 
-> Anyway, even that would be acceptable if it worked. ;-}
+When installing sarge I also choose the bluez-utils package, but there
+is another package called kernel-patch-2.6-bluez. Should I also be
+patching the 2.6.10 kernel with this patch, as well as the "mh2" one?
 
-> On http://www.dcs.gla.ac.uk/~jp/snd-bt-sco/README there's the hint to
-> find out about the channel to use with btsco. But I get:
+My Microsoft bluetooth mouse works fine without the debian patch - or at
+least it seems to! I'm just curious about whether I need both patches. I
+will continue to use the "mh2" patch do I can enjoy scroll-wheel
+support.
 
-> root@roma# sdptool search --bdaddr 00:07:A4:21:1D:86 0x1108
-> Class 0x1108
-> Failed to connect to SDP server on 00:07:A4:21:1D:86: Connection
-> timed out
-
-> Is this a problem? What else can I do to track down the problem? TIA.
-
-Tomorrow I have some time I could spend on tracking that problem down.
-But I could need a bit of help here. What else could I try to debug? I
-really want to get my Jabra BT800 going with bluetooth-alsa.
-
+Thanks. 
 -- 
-Stefan Bellon
+  
+  russellturner@fastmail.com.au
+
 
 
 -------------------------------------------------------
