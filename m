@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
+Message-ID: <e1effdeb050406070077389f4c@mail.gmail.com>
+From: Claudio Takahasi <cktakahasi@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: Re: Re: CSR USB dongle w/BT 1.2 =?iso-8859-1?q?and=09headset/handsfree?= profiles?
-References: <ctriti$j66$1@sea.gmane.org> <1107819680.7327.155.camel@pegasus> <pan.2005.04.05.19.53.17.138671@wingnet.net>
-In-Reply-To: <pan.2005.04.05.19.53.17.138671@wingnet.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200504061711.36270.pavouk@pavouk.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Subject: [Bluez-users] NAP service records attributes
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,21 +16,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 6 Apr 2005 17:11:36 +0200
+Date: Wed, 6 Apr 2005 11:00:20 -0300
 
-Hello,
+Hi,
 
-I use this dongle DBT-120 B3 BT1.2 with Bluetooth headset Jabra BT-250
-without problems.
+According with Bluetooth PAN Profile specification IP4vSubnet and
+IPv6Subnet NAP service record attributeID is a displayable string
+containing subnet definition of the network, e.g.  10.0.0.0/8  for
+IPv4 and  fe80::/48  for IPv6. Based on this informartion I would like
+to know if is possible add an extra attribute(IPv4Gateway).
 
-Best regards,
+I am working with Bluetooth linux statck(BlueZ). Considering a NAP
+scenario, where a PANU connects to the NAP. After establish a PAN, it
+is necessary add a route to the default gateway(NAP Bluetooth
+interface). However, only the IPv4Subnet is provided and this
+information is not enough for IP setup. Attach a DHCP server on NAP
+interface or use a standard addressing based on subnet
+information(e.g. for 10.0.0.0 the gw  should be 10.0.0.1) can solve my
+problem, but I want avoid these approachs.
 
-Pavel Ruzicka
+What is the process to submit a profile change to Bluetooth SIG? Is it
+feasible add an IPv4Gateway attribute?
 
-> It's been a while since this post. I'm finally about to buy a DBT 120 B3.
-> Is it still the ideal USB Bluetooth dongle if I want to play with BT audio
-> features?
-
+Regards,
+Claudio
 
 
 -------------------------------------------------------
