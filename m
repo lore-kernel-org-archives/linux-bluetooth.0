@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42093340.4@fastwebnet.it>
-From: WiseLYNX <wiselynx.naima@fastwebnet.it>
+Message-ID: <000701c50dd0$f0c41c70$9e2910ac@ccnuc772f52584>
+From: "Chen Bin" <binch@mobilesoft.com.cn>
+To: <bluez-devel@lists.sourceforge.net>
+References: <42065FAA.8030309@web.de> <1107714956.12834.72.camel@pegasus> <Pine.GSO.4.60.0502070037090.27664@columbia.cs.ubc.ca> <1107775357.7327.99.camel@pegasus> <Pine.GSO.4.60.0502080053300.29306@columbia.cs.ubc.ca> <1107856868.7327.168.camel@pegasus>
+Subject: Re: [Bluez-devel] documentation question
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: bluetooth headset - connects but no audio
-References: <99803f32050207174495135a8@mail.gmail.com>
-In-Reply-To: <99803f32050207174495135a8@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain;
+	charset="gb2312"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,100 +18,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 08 Feb 2005 22:46:40 +0100
+Date: Tue, 8 Feb 2005 19:25:48 +0800
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+eWVzLCBpdCBpcyBqdXN0IHRoZSBwb2ludC4NCg0KQ2hlbg0KLS0tLS0gT3JpZ2luYWwgTWVzc2Fn
+ZSAtLS0tLSANCkZyb206ICJNYXJjZWwgSG9sdG1hbm4iIDxtYXJjZWxAaG9sdG1hbm4ub3JnPg0K
+VG86ICJCbHVlWiBNYWlsaW5nIExpc3QiIDxibHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5u
+ZXQ+DQpTZW50OiBUdWVzZGF5LCBGZWJydWFyeSAwOCwgMjAwNSA2OjAxIFBNDQpTdWJqZWN0OiBS
+ZTogW0JsdWV6LWRldmVsXSBkb2N1bWVudGF0aW9uIHF1ZXN0aW9uDQoNCg0KPiBIaSBKYWNrLA0K
+PiANCj4gPiBTb3JyeSBpZiB0aGUgcXVlc3Rpb24gZG9lc24ndCBtYWtlIGFueSBzZW5zZS4gV2hh
+dCBJIGFtIHRoaW5raW5nIGlzIGEgDQo+ID4gZHVtbXkgaGVsbG8gd29ybGQgdHV0b3JpYWwgdG8g
+Y29udmluY2UgbmV3Y29tZXJzLCBhbmQgYWZ0ZXIgdGhhdCB0aGV5IG1heSANCj4gPiBnZXQgbW9y
+ZSBleGNpdGVkIGFuZCBnbyBmdXJ0aGVyIHJlYWRpbmcgYm9va3MgYW5kIHNvdXJjZSBjb2RlLCBi
+dXlpbmcgDQo+ID4gaGFyZHdhcmVzIGFuZCBnZXR0aW5nIGludm9sdmVkLiBJdCBjb3VsZCBiZSBh
+IHNpbXBsZSBsaXN0IHdpdGhvdXQgc2hvd2luZyANCj4gPiBhbnkgd2h5J3MuIEkgd291bGQgc2F5
+IGl0IGlzIG1vcmUgcHN5Y2hvbG9naWNhbCB0aGFuIHRlY2huaWNhbC4NCj4gDQo+IHRoZSBxdWVz
+dGlvbiB3YXMgdW5wb2xpdGUgYW5kIGlmIHlvdSByZWFkIHRoZSBwYXBlciBmcm9tIEVTUiB5b3Ug
+bWlnaHQNCj4gdW5kZXJzdGFuZCB3aHkuDQo+IA0KPiBPbmUgcG9pbnQgb2Ygb3BlbiBzb3VyY2Ug
+aXMgdGhhdCB5b3UgZ2V0IGludm9sdmVkIGFuZCBpZiB5b3UgZG9uJ3QgbGlrZQ0KPiB0aGUgY3Vy
+cmVudCBzaXR1YXRpb24gd2l0aCB0aGUgZG9jdW1lbnRhdGlvbiwgdGhlbiBkbyBzb21ldGhpbmcg
+YW5kDQo+IHdyaXRlIG9uZSwgdGhhdCB3aWxsIGV4YWN0bHkgZG8gd2hhdCB5b3UgYXNrZWQgbWUg
+dG8gZG8uIEkgYW0gaGFwcHkgdG8NCj4gbGluayBpdCBvciB0byBwdXQgaXQgc29tZXdoZXJlIGZv
+ciBlYXN5IGFjY2Vzcy4NCj4gDQo+ID4gQWN0dWFsbHkgSSBtYXkgbm90IG5lZWQgdGhhdCBhbnlt
+b3JlIGFmdGVyIHNwZW5kaW5nIHRpbWUgZGlnZ2luZyB0aHJvdWdoIA0KPiA+IHRoZSBtYWlsaW5n
+IGFyY2hpdmUsIGJ1dCBJIHRoaW5rIGl0IHdvdWxkIGJlIHZlcnkgaGVscGZ1bC4NCj4gDQo+IFRo
+ZSBtYWlsaW5nIGxpc3QgYXJjaGl2ZSBpcyBleGFjdGx5IHRoZXJlIGZvciB0aGlzLiBPdGhlcndp
+c2UgSSBjYW4gc3RvcA0KPiBhbnN3ZXJpbmcgZW1haWxzLiBBbmQgYWdhaW4sIGl0IHlvdSB0aGlu
+ayBzb21ldGhpbmcgbW9yZSBpcyBuZWVkZWQsIHRoZW4NCj4gc3RhcnQgd2l0aCBpdCBhbmQgZG8g
+aXQuDQo+IA0KPiBSZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQo+IA0KPiANCj4gDQo+IC0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gU0Yg
+ZW1haWwgaXMgc3BvbnNvcmVkIGJ5IC0gVGhlIElUIFByb2R1Y3QgR3VpZGUNCj4gUmVhZCBob25l
+c3QgJiBjYW5kaWQgcmV2aWV3cyBvbiBodW5kcmVkcyBvZiBJVCBQcm9kdWN0cyBmcm9tIHJlYWwg
+dXNlcnMuDQo+IERpc2NvdmVyIHdoaWNoIHByb2R1Y3RzIHRydWx5IGxpdmUgdXAgdG8gdGhlIGh5
+cGUuIFN0YXJ0IHJlYWRpbmcgbm93Lg0KPiBodHRwOi8vYWRzLm9zZG4uY29tLz9hZF9pZD02NTk1
+JmFsbG9jX2lkPTE0Mzk2Jm9wPWNsaWNrDQo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fDQo+IEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdA0KPiBCbHVlei1k
+ZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQNCj4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5u
+ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWw=
 
-| I had the same permission errors with my logitech f-0179a, but in the
-| end it was the /etc/bluetooth/link_key file. Delete this file and try
-| to run btsco again. It worked for me.
-
-thanks, this worked for me also (at least to resolve the permissions issu=
-e)
-
-now, I lost a bit the discussion thread, because it was some time ago I
-last wrote, and I'm also having a lot of work for university. let me
-summary things up now:
-
-- - hardware is Ericsscon HBH-35 and a SiW based usb dongle
-- - software is gentoo-dev 2.6.10-r5, with mh4 patch (also tried a
-vanilla, with same results)
-- - the problem is, btsco connects and I can set the volume and hear
-hissing sound, but I can't hear anything using aplay or others (they
-just hang there), nor set the loopback option
-- - I tried my friend's dongle, with other chipset, and everything just
-works fine; anyway I'd of course rather to be able to use _my_ dongle :)
-
-Lars pointed out some times ago that there was an issue with handles.
-here I report what he told:
-
-| I asked Marcel on this list, but I did not understand his answer...:
-
-|> the Silicon Wave chips are not the best ones. They have problems and i=
-t
-|> seems that they are not going to fix them. Mostly because they sell RO=
-M
-|> chips are these ones can't be updated by a newer firmware. However if
-|> this is the problem with SCO packets and handle 0 then the hci_usb
-|> driver should simply drop these frames, because they are not valid SCO
-|> payload.
-
-after applying the mh4 patch, and doing some more try (with no better
-results), I noticed a lot of kernel debugging stuff in the logs, thing
-that I didn't notice in th past. here is a sample of it:
-
-Feb  8 22:29:27 [hcid] link_key_request (sba=3D00:0B:0D:40:6F:B9,
-dba=3D00:0E:07:4E:4B:3E)
-Feb  8 22:29:41 [hcid] link_key_request (sba=3D00:0B:0D:40:6F:B9,
-dba=3D00:0E:07:4E:4B:3E)
-Feb  8 22:29:54 [kernel] hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 1280
-Feb  8 22:29:54 [kernel] hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 14
-Feb  8 22:29:54 [kernel] hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 65535
-Feb  8 22:29:54 [kernel] hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 65535
-Feb  8 22:29:56 [kernel] hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 3072
-Feb  8 22:29:56 [kernel] hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 64512
-Feb  8 22:29:56 [kernel] hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 18
-Feb  8 22:29:56 [kernel] hci_scodata_packet: hci0 SCO packet for unknown
-connection handle 0
-
-is this useful in some way? is there anything that can be done in the
-drivers to make SiW and other broken chipset usable?
-
-I'd like to help finding a solution, but I'm not experienced at all in
-kernel/driver programming, and I have too few spare time left right now :=
-(
-
-- --
-
-=B0=B0=B0 Wise
-~ O  LYNX
-
-GPG key: http://wiselynx.interfree.it/wiselynx.naima.asc
-MD5 checksum: http://wiselynx.interfree.it/wiselynx.naima.asc.md5
-
-- -----BEGIN GEEK CODE BLOCK-----
-Version: 3.1
-GE>$/IT/S d+ s: !a>? C++(+++)>$ U P>+ L++>++++ E--- W++ N ?o ?K w-- ?O ?M
-?V>+ PS+ !PE Y+ PGP+ t- ?5 X- R+(*) tv- b+(++)>+++ DI(++) !D G e++ h!*@
-r%>++ y-->+
-- ------END GEEK CODE BLOCK------
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iD8DBQFCCTM+kYE9G6fXLlgRAoekAJ925cgIgHOjo6h8xuK5ts3AXAP+agCfWOce
-+zKpM7z9FE2F1sa8EwDdmms=3D
-=3Djnzx
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
