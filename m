@@ -3,7 +3,7 @@ From: James Cameron <james.cameron@hp.com>
 To: h0016530@hkusua.hku.hk
 Cc: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Questions about Role Changing during PAN setup
-Message-ID: <20040708052744.GG18689@hp.com>
+Message-ID: <20040708051343.GF18689@hp.com>
 References: <1089262620.40ecd41c49ef3@imp.webmail.hku.hk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -18,24 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 8 Jul 2004 15:27:44 +1000
+Date: Thu, 8 Jul 2004 15:13:43 +1000
 
 On Thu, Jul 08, 2004 at 12:57:00PM +0800, h0016530@hkusua.hku.hk wrote:
-> I'm using PAN daemon version 1.1rc2. 
+> #sftp 10.0.0.2
+> Connecting to 10.0.0.2...
+> root@10.0.0.2's password:
+> Request for subsystem 'sftp' failed on channel 0
+> Connection closed
 
-I'm using version 2.7.
+This is what happens if the connection is closed due to tcpd filtering.
 
-> The role of server is always "PANU" after I have tried to declare and
-> change it to NAP by "pand --listen --role NAP --service --sdp
-> --master" and "pand --listen --role NAP". This is what I got: 
-> # pand --show
-> bnep0 00:02:C7:18:25:A0 PANU
-
-When I use "pand --listen --role NAP", and then establish a connection,
-I get;
-
-# pand --show
-bnep0 00:02:72:01:E5:F5 NAP
+Check /etc/hosts.allow has an entry for the IP address of the client.
+For example, mine has "ALL: 10.0.0.0/255.255.255.0"
 
 -- 
 James Cameron
