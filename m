@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bizzare result when getting the bluetooth address
-From: jan d tux <janice@asti.dost.gov.ph>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1075807802.13285.0.camel@pegasus>
-References: <1075714467.1546.49.camel@Asgard>
-	 <1075722905.29899.10.camel@pegasus>  <1075777047.1362.42.camel@Asgard>
-	 <1075807802.13285.0.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1075858415.994.59.camel@Asgard>
-Mime-Version: 1.0
+Message-Id: <HSJB2Z$B9BA7BECBCE0A10656B7DE841903709B@libero.it>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+From: "baruffa\@libero\.it" <baruffa@libero.it>
+To: "bluez-users" <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Why does not pppd directly work?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,114 +15,137 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 04 Feb 2004 09:33:35 +0800
+Date: Wed,  4 Feb 2004 01:37:47 +0100
 
-Hi to all :)
+Hello,
 
-Here is the complete code of the server I am working on. The server code
-is from http://www.frasunek.com/sources/unix/obexserver.c.
+thanks to the valuable information provided in this list by Cam=
+eron B. Prince,
+I've been able to  set up a GPRS connection via bluetoot=
+h to a T39m mobile phone.
+What I'm wondering is why the usual way of usi=
+ng pppd directly from the command
+line does not work. I know this is not=
+ the right place to ask, but if you have
+time and will, please satisfy m=
+y curiosity. This is the log of a classic pppd call:
 
+[root@ringo me]#p=
+ppd call gprs-eric
++++ATmodem init: press <ctrl>-C to disconnect
+OK
+AT=
+E1
+OK
+AT&FE0V1&D2
+OK
 
+OK
 
-/* Simple OpenOBEX server for Bluez+OpenOBEX */
-/* link with libmisc.a from OPENObex-apps and libopenobex from OpenOBEX
-*/
-/* venglin@freebsd.lublin.pl */
+OK
 
+OK
+ + requesting data connection=0D
+=
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+CONNECT
+Serial connection established.
+using channel 10
+Using interf=
+ace ppp0
+Connect: ppp0 <--> /dev/rfcomm0
+Looking for secret in /etc/ppp=
+/pap-secrets for client test server (null)
+Got client test
+Got server *=
 
-#include <openobex/obex.h>
-#include "obex_io.c"
-#include "obex_put_common.c"
-#include <bluetooth/rfcomm.h>
-
-#define OBEX_PUSH_HANDLE	10
-
-volatile int finished = 0;
-obex_t *handle = NULL;
-
-int Get_handle_bdaddr(obex_t *handle, char *str);
-void obex_event(obex_t *handle, obex_object_t *object, int mode, int
-event, int obex_cmd, int obex_rsp);
-
-int main(int argc, char **argv)
-{
-
-	char str[256];
-	int get;
-
-	obex_object_t *object;
-
-	handle = OBEX_Init(OBEX_TRANS_BLUETOOTH, obex_event, 0);
-
-	if (argc == 1)
-	{
-		BtOBEX_ServerRegister(handle, NULL, OBEX_PUSH_HANDLE);
-		printf("Waiting for connection...\n");
-		btobex_accept(handle);
-
-		while (!finished)
-		{
-			OBEX_HandleInput(handle, 1);
-		}
-
-		get=get_bdaddr(handle,str);
-	}
-}
-
-/*
-*	int get_bdaddr(obex_t *handle, char *str)
-*   	I've added this function
-*
-*/
-int get_bdaddr(obex_t *handle, char *str)
-{
-	int			fd;
-	struct	sockaddr_rc	sa;
-	socklen_t		len = sizeof(sa);
-
-
-	if( (fd = OBEX_GetFD(handle)) < 0 )
-		return 0;
-
-	if( getpeername(fd,(struct sockaddr *)&sa,&len) < 0 )
-		return 0;
-
-	ba2str(&sa.rc_bdaddr,str);
-	printf("\n\tADDRESS: %s\n", str);
-	printf("\tchannel: %d\n", sa.rc_channel);
-	printf("\tfamily: %d\n", sa.rc_family);
-
-	return 1;
-}
-
-
-------------
-
-I saved it inside the openobex-apps/src folder and compiled it using 
-	gcc -o obexserver_temp obexserver_temp.c -lopenobex -lbluetooth
-
-
-
-Thanks :)
-
-
-On Tue, 2004-02-03 at 19:30, Marcel Holtmann wrote:
-> Hi Jan,
-> 
-> > I have already inserted a len=sizeof(sa) before calling getpeername but
-> > the result is still the same.
-> 
-> show us the complete code.
-> 
-> Regards
-> 
-> Marcel
-> 
-
+Got secret *
+Got auth_addr *
+Got client *
+Looking for secret in /etc=
+/ppp/chap-secrets for client test server (null)
+Got client test
+Got ser=
+ver *
+Got secret *
+Got auth_addr *
+Got client *
+sent [LCP ConfReq id=3D=
+0x1 <asyncmap 0x0> <magic 0xe78c9680> <pcomp> <accomp>]
+rcvd [LCP ConfRe=
+q id=3D0x1 <asyncmap 0x0> <pcomp> <accomp> <auth pap>]
+sent [LCP ConfAck=
+ id=3D0x1 <asyncmap 0x0> <pcomp> <accomp> <auth pap>]
+rcvd [LCP ConfRej =
+id=3D0x1 <magic 0xe78c9680>]
+sent [LCP ConfReq id=3D0x2 <asyncmap 0x0> <=
+pcomp> <accomp>]
+rcvd [LCP ConfAck id=3D0x2 <asyncmap 0x0> <pcomp> <acco=
+mp>]
+Looking for secret in /etc/ppp/pap-secrets for client test server (=
+null)
+Got client test
+Got server *
+Got secret *
+Got auth_addr *
+Got =
+client *
+sent [PAP AuthReq id=3D0x1 user=3D"test" password=3D"test"]
+se=
+nt [PAP AuthReq id=3D0x2 user=3D"test" password=3D"test"]
+rcvd [PAP Auth=
+Ack id=3D0x2 ""]
+sent [IPCP ConfReq id=3D0x1 <addr 0.0.0.0> <ms-dns1 0.0=
+.0.0> <ms-dns3 0.0.0.0>]
+sent [CCP ConfReq id=3D0x1 <deflate 15> <deflat=
+e(old#) 15> <bsd v1 15>]
+rcvd [LCP ProtRej id=3D0x3 80 fd 01 01 00 0f 1a=
+ 04 78 00 18 04 78 00 15 03 2f]
+sent [IPCP ConfReq id=3D0x1 <addr 0.0.0.=
+0> <ms-dns1 0.0.0.0> <ms-dns3 0.0.0.0>]
+rcvd [IPCP ConfReq id=3D0x1]
+se=
+nt [IPCP ConfNak id=3D0x1 <addr 0.0.0.0>]
+rcvd [IPCP ConfNak id=3D0x1 <a=
+ddr 10.216.254.254> <ms-dns1 194.185.97.134>
+<ms-dns3 194.185.97.134>]=0D
+=
+sent [IPCP ConfReq id=3D0x2 <addr 10.216.254.254> <ms-dns1 194.185.97.134=
+>
+<ms-dns3 194.185.97.134>]
+rcvd [IPCP ConfAck id=3D0x2 <addr 10.216.25=
+4.254> <ms-dns1 194.185.97.134>
+<ms-dns3 194.185.97.134>]
+sent [IPCP Co=
+nfReq id=3D0x2 <addr 10.216.254.254> <ms-dns1 194.185.97.134>
+<ms-dns3 1=
+94.185.97.134>]
+rcvd [IPCP ConfAck id=3D0x2 <addr 10.216.254.254> <ms-dn=
+s1 194.185.97.134>
+<ms-dns3 194.185.97.134>]
+sent [IPCP ConfReq id=3D0x=
+2 <addr 10.216.254.254> <ms-dns1 194.185.97.134>
+<ms-dns3 194.185.97.134=
+>]
+rcvd [IPCP ConfAck id=3D0x2 <addr 10.216.254.254> <ms-dns1 194.185.97=
+.134>
+<ms-dns3 194.185.97.134>]
+sent [IPCP ConfReq id=3D0x2 <addr 10.21=
+6.254.254> <ms-dns1 194.185.97.134>
+<ms-dns3 194.185.97.134>]
+rcvd [IPC=
+P ConfAck id=3D0x2 <addr 10.216.254.254> <ms-dns1 194.185.97.134>
+<ms-dn=
+s3 194.185.97.134>]
+.................
+This continues and never ends.=0D
+=
+Why doesn't pppd see that DNS and IP are passed to me and does not call t=
+he
+proper script to ip-up the connection?
+Sorry for the partial off top=
+ic. Hope you do not blame me ;-)
+Thanks a lot.
 
 
 
