@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <416D745B.7020208@users.sourceforge.net>
-From: Pander <pander@users.sourceforge.net>
+Message-ID: <20041013143813.89912.qmail@web40626.mail.yahoo.com>
+From: Paolino paperino <vonzoltan@yahoo.it>
+To: bluez-users@lists.sourceforge.net
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1097675179.1075.40.camel@igno>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] modprobe: FATAL: Error inserting hci_usb
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-devel] Re: [Bluez-users] problems with bytestream + rfcomm socket problems
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,41 +17,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 13 Oct 2004 20:30:51 +0200
+Date: Wed, 13 Oct 2004 16:38:13 +0200 (CEST)
 
-Hi all,
+Thanks Diego,
+Now i've tested the rctest (without the usleep that
+i've inserted) on a machine with kernel 2.4.18 and
+bluez libs/utils 2.2(USB dongle digicom), and the
+receive function doesn't give any prblems, work well,
+doesn't loose any byte...is this a bug in the kernel i
+use?!
 
-I'm have build linux kernel 2.6.8.1 with Debian testing distro on a 
-PowerPC (PowerBook G4). All went well and booted oke except for 
-bleutooth support:
+PS The USB dongle i use with the kernel 2.6 is a Trust
+BT180
 
-Bluetooth: HCI device and connection manager initialized
-hci_usb: Unknown symbol hci_free_dev
-hci_usb: Unknown symbol hci_alloc_dev
-hci_usb: Unknown symbol hci_unregister_dev
-hci_usb: Unknown symbol hci_register_dev
-hci_usb: Unknown symbol hci_free_dev
-hci_usb: Unknown symbol hci_alloc_dev
-hci_usb: Unknown symbol hci_unregister_dev
-hci_usb: Unknown symbol hci_register_dev
-Bluetooth: HCI socket layer initialized
-Bluetooth: HCI USB driver ver 2.7
-usbcore: registered new driver hci_usb
-modprobe: FATAL: Error inserting hci_usb 
-(/lib/modules/2.6.8.1-pbg4/kernel/drivers/bluetooth/hci_usb.ko): Unknown 
-symbol in module, or unknown parameter (see dmesg)
+Thanks 
+Andrea S.
 
-modprobe: FATAL: Error inserting hci_usb 
-(/lib/modules/2.6.8.1-pbg4/kernel/drivers/bluetooth/hci_usb.ko): Unknown 
-symbol in module, or unknown parameter (see dmesg)
 
-I also patched the 2.6.8.1 kernel source with patch-2.6.8-mh2 but that 
-resulted in the same error. dmesg says the same as above. Does anyone 
-know how to fix this?
 
-Regards,
-
-Pander
+		
+___________________________________ 
+Nuovo Yahoo! Messenger: E' molto più divertente: Audibles, Avatar, Webcam, Giochi, Rubrica… Scaricalo ora! 
+http://it.messenger.yahoo.it
 
 
 -------------------------------------------------------
