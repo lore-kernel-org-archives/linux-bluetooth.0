@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-users] controller code!!!!
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-From: soraberri <421246@posta.unizar.es>
-Message-ID: <cqunik$ule$1@sea.gmane.org>
+In-Reply-To: <20041229142921.D8AD73982EF@ws5-1.us4.outblaze.com>
+References: <20041229142921.D8AD73982EF@ws5-1.us4.outblaze.com>
+Content-Type: text/plain
+Message-Id: <1104335546.6389.0.camel@notepaq>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] rctest[3790]: Can't set L2CAP link mode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,32 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Dec 2004 17:55:13 +0100
+Date: Wed, 29 Dec 2004 16:52:26 +0100
 
-This is part of my lsmod output:
+Hi Simi,
 
-[soraberri@castejon temp]$ lsmod
-Module                  Size  Used by
-hci_usb                15041  3
-rfcomm                 36701  2
-l2cap                  25285  7 rfcomm
-bluetooth              46917  11 hci_usb,rfcomm,l2cap
+> can u tell me how bluez has implemented the code????i mean i am not seeing the code for LMP,baseband..... 
 
-sdpd and hcid are running
+we don't have to, because there is the Host Controller Interface (HCI).
 
-I think all the important stuff is there, and then why am I getting the 
-following error?
+Regards
 
-[soraberri@castejon temp]$rctest -r
-rctest[3790]: Can't set L2CAP link mode. Protocol not available(92)
+Marcel
 
-Well it seems that the error is born within the call to
-setsockopt(s, SOL_RFCOMM, RFCOMM_LM, &opt, sizeof(opt))
-in rctest.c
-
-If you could give me a clue, pleease..
-
-thanks for your time.
 
 
 
