@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40D6D9DD.5070300@pobox.com>
-From: Daniel Jimenez <djimenez@pobox.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] PCMCIA Bluetooth card that works with 2.6.X
+Subject: Re: [Bluez-users] kbluetoothd falls over....
+From: Marcel Holtmann <marcel@holtmann.org>
+To: frank@snapafun.co.nz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40D6D491.2080307@snapafun.co.nz>
+References: <40D6D491.2080307@snapafun.co.nz>
+Content-Type: text/plain
+Message-Id: <1087821334.4328.13.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,19 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 21 Jun 2004 07:51:41 -0500
+Date: Mon, 21 Jun 2004 14:35:34 +0200
 
-Hi all,
+Hi Frank,
 
-I'm looking for a nice PCMCIA bluetooth card that works with 2.6.x. I 
-currently have an Ambicom BT2000E but the only driver I can find for it 
-I can't figure out how to compile.
+> As a newbie I tried to get bluetooth up and running. Any suggestions?
 
-Anyone know of a good PCMCIA bluetooth card? I'd rather not have a usb 
-dongle sticking out of my laptop all the time.
+and this is the wrong mailing list. Ask your question on the KDE
+Bluetooth mailing list or in one of the Mandrake forums.
 
-Thanks!,
-Daniel
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
