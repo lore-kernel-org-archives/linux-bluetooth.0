@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050217111414.40743.qmail@web53202.mail.yahoo.com>
-From: Filipa Duarte <filipa_duarte@yahoo.com>
 Subject: Re: [Bluez-devel] L2CAP & HCI trace
+From: zze-COLBUS Emmanuel RD-MAPS-GRE <emmanuel.colbus@rd.francetelecom.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1108570362.11909.35.camel@g-necml5-146.rd.francetelecom.fr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20050216155732.29721.qmail@web53201.mail.yahoo.com>
+References: <20050216155732.29721.qmail@web53201.mail.yahoo.com>
+Content-Type: text/plain; charset=iso-8859-15
+Message-Id: <1108570362.11909.35.camel@g-necml5-146.rd.francetelecom.fr>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,75 +18,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Feb 2005 03:14:14 -0800 (PST)
+Date: Wed, 16 Feb 2005 17:12:42 +0100
 
-Hi
-
-Many thanks for your help. 
-
---- zze-COLBUS Emmanuel RD-MAPS-GRE
-<emmanuel.colbus@rd.francetelecom.com> wrote:
-
-> Le mercredi 16 février 2005 à 07:57 -0800, Filipa
-> Duarte a écrit :
-> > Hi,
-> > 
-> > I suppose that this is a quite stupid question but
-> I
-> > would like to know how can I have the same kind of
-> > trace as Victor had (in the end of the e-mail)? 
-> > 
-> > The reason why is that I would like to identify
-> which
-> > are the functions (like l2cap_sock_sendmsg,
-> > l2cap_chan_send, hci_send_acl, etc) used to send
-> data
-> > on the l2cap/hci layers. Could anyone give me any
-> > direction to find this?
-> > 
-> > Many thanks,
-> > 
-> > Filipa
-> > 
+Le mercredi 16 février 2005 à 07:57 -0800, Filipa Duarte a écrit :
+> Hi,
 > 
-> Hello, 
+> I suppose that this is a quite stupid question but I
+> would like to know how can I have the same kind of
+> trace as Victor had (in the end of the e-mail)? 
 > 
-> Try recompilating your kernel with the
-> CONFIG_BT_HCI_SOCK_DEBUG, CONFIG_BT_L2CAP_DEBUG,
-> etc... (All the options
-> mentionned at the beginning of the files, in a block
-> like : 
+> The reason why is that I would like to identify which
+> are the functions (like l2cap_sock_sendmsg,
+> l2cap_chan_send, hci_send_acl, etc) used to send data
+> on the l2cap/hci layers. Could anyone give me any
+> direction to find this?
 > 
-> #ifndef CONFIG_BT_L2CAP_DEBUG
-> #undef  BT_DBG
-> #define BT_DBG(D...)
-> #endif
+> Many thanks,
 > 
-> ) enabled.
-I am a newbie in Linux/BlueZ matters and I am not sure
-how to do this. Could you please explain?
-
+> Filipa
 > 
-> I've not tried it myself, but, reading to the code,
-> I think it will
-> work.
-> 
-> Emmanuel Colbus
 
-By the way, does anybody has the l2cap and hci layers
-implemented im User Space? I need to have those layers
-running without OS... 
+Hello, 
 
-Cheers,
+Try recompilating your kernel with the
+CONFIG_BT_HCI_SOCK_DEBUG, CONFIG_BT_L2CAP_DEBUG, etc... (All the options
+mentionned at the beginning of the files, in a block like : 
 
-Filipa
+#ifndef CONFIG_BT_L2CAP_DEBUG
+#undef  BT_DBG
+#define BT_DBG(D...)
+#endif
 
+) enabled.
 
-		
-__________________________________ 
-Do you Yahoo!? 
-Yahoo! Mail - Find what you need with new enhanced search.
-http://info.mail.yahoo.com/mail_250
+I've not tried it myself, but, reading to the code, I think it will
+work.
+
+Emmanuel Colbus
+
+-- 
+Please don't care about this useless mail signature:
+
+M. Emmanuel Colbus de l'ENSIMAG intervenant à FTRD/MAPS/AMS du 01/02/05 
+au 30/06/05 sous la responsabilité de M. Tahar Jarboui dans le cadre 
+d'un stage de fin d'études.
+
 
 
 -------------------------------------------------------
