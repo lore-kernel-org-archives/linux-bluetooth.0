@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Dirk Husemann <hud@zurich.ibm.com>
-To: bluez-devel@lists.sourceforge.net
-Cc: Brad Midgley <bmidgley@xmission.com>, Russell Neches <russell@ccs.neu.edu>,
-   bluez-users <bluez-users@lists.sourceforge.net>
-References: <20040310182158.GA9279@naginata.ccs.neu.edu> <404F84BC.4020406@xmission.com>
-In-Reply-To: <404F84BC.4020406@xmission.com>
-Message-Id: <200403151421.58685.hud@zurich.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg="pgp-sha1"; boundary="Boundary-02=_23aVAa7dvEzWN53"; charset="iso-8859-1"
-Subject: [Bluez-devel] Re: [Bluez-users] crash on remove
+Subject: Re: [Bluez-devel] Writing a bluetooth mouse driver...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Keith Pemberton <kbpember@cox.net>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1079350703.4317.7.camel@linuxcomp.gatep5.net>
+References: <1079350703.4317.7.camel@linuxcomp.gatep5.net>
+Content-Type: text/plain
+Message-Id: <1079352208.3405.26.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,48 +18,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 15 Mar 2004 14:21:54 +0100
+Date: Mon, 15 Mar 2004 13:03:28 +0100
+
+Hi Keith,
+
+> I'm going to write a bluetooth mouse driver for my MS bluetooth mouse
+> just to see if I can do it. (yes, I do know that there is one out there
+> already, but I don't like the way that that driver is doing things).  My
+> hang up in understanding is in the communication between the mouse and
+> the wireless transceiver.  I am guessing that the functions providing
+> communication to the transceiver are defined in hci.c (or hci.h).  Does
+> anyone have a good document that describes how the Bluez stack
+> communicates with different hardware?  Any other documents that you can
+> suggest would be much appreciated!  Thanks in advance.  
+
+actually you must understand how the Bluetooth stack is designed and how
+the HID profile makes use of it. You will notice that HID uses two L2CAP
+connections, one for control message and the other one for interrupt
+messages. The transport protocol is HIDP and than you need of course a
+HID parser, which is the biggest part.
+
+Regards
+
+Marcel
 
 
---Boundary-02=_23aVAa7dvEzWN53
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-On Wednesday 10 March 2004 22.12, Brad Midgley (BM) wrote:
-> Russell
->
-> > Every time I remove a bluetooth USB key from my desktop machine, I get
-> > a hard lock.
-
-same thing here. haven't tried the forced usb_hci removal...
-
-=2D-=20
-Dr Dirk Husemann, Mobile Computing, IBM Research, Zurich Research Lab
-	hud@zurich.ibm.com --- http://www.zurich.ibm.com/~hud/
-       PGP key: http://www.zurich.ibm.com/~hud/contact/PGP
-  PGP Fingerprint: 983C 48E7 0A78 A313 401C  C4AD 3C0A 278E 6431 A149
-	     Email only authentic if signed with PGP key.
-
-Attached to this email is an electronic signature attachment. You can
-ignore it if your email program does not know how to verify such a
-signature. If you'd like to learn more about this topic, www.gnupg.org
-is a good starting point.
-
---Boundary-02=_23aVAa7dvEzWN53
-Content-Type: application/pgp-signature
-Content-Description: signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.4 (GNU/Linux)
-
-iD8DBQBAVa32PAonjmQxoUkRAunBAJ9N1GFv5QnYcf1rCbfkI50iP6fsoACfTRRx
-xE4JmOX1OvgkZDid2mRYWn8=
-=7pGw
------END PGP SIGNATURE-----
-
---Boundary-02=_23aVAa7dvEzWN53--
 
 
 -------------------------------------------------------
