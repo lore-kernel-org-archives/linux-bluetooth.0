@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <40E02D93.8090305@conectiva.com.br>
+From: "Ademar de Souza Reis Jr." <ademar@conectiva.com.br>
+MIME-Version: 1.0
+To: "Nicholas A. Preyss" <nalp@gmx.net>
+Cc: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] Questions about BlueZ in  commercial use
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Ademar de Souza Reis Jr." <ademar@conectiva.com.br>
-Cc: "Nicholas A. Preyss" <nalp@gmx.net>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <40E02D93.8090305@conectiva.com.br>
-References: <003401c45c2b$b6eab240$0364a8c0@haruo>
-	 <20040627125235.GA15938@gmx.net>  <40E02D93.8090305@conectiva.com.br>
-Content-Type: text/plain
-Message-Id: <1088434128.4614.27.camel@pegasus>
-Mime-Version: 1.0
+References: <003401c45c2b$b6eab240$0364a8c0@haruo> <20040627125235.GA15938@gmx.net>
+In-Reply-To: <20040627125235.GA15938@gmx.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,31 +18,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Jun 2004 16:48:48 +0200
+Date: Mon, 28 Jun 2004 10:39:15 -0400
 
-Hi Ademar,
+Nicholas A. Preyss wrote:
+> On  0, KeiHachi <keihachi@swissinfo.org> wrote:
+> 
+>>I have some questions about BlueZ.
+>>
+>>Our company is investigating now about BlueZ,
+>>to determine whether it is useful to use in our commercial product, or not.
+> 
+> 
+> If this is the first GPL software you are using, please read and 
+> understand the implications of this license. This is no offense, but i
+> think some DVD and Router manufacturer didn't do this before integrating
+> linux code in their products.
+> 
 
-> While we're at this topic: Is there a way to get a license to use the bluez 
-> code in a comercial, closed-source, product? (I was thinking about something 
-> like what QT/Trolltech does).
+Hello.
 
-the kernel part of BlueZ is GPL and will stay as GPL forever. Another
-license makes no sense here.
+While we're at this topic: Is there a way to get a license to use the bluez 
+code in a comercial, closed-source, product? (I was thinking about something 
+like what QT/Trolltech does).
 
-For the BlueZ library and the utilities we can talk about it. Some time
-ago people asked for a LGPL version of the library and actually I tend
-to agree with that. However this can't be decided by me alone, because
-part of the code is copyright by Qualcomm and also by Maxim Krasnyansky
-himself. For the utilities I don't see any need for a different license.
+I'm sorry if this has been asked before, but I haven't found it in the 
+archives and it's not in the FAQ.
 
-I believe in the GPL and from my view releasing the Linux Bluetooth
-library under LGPL is the only step I wanna make forward to allow closed
-source products based on BlueZ.
+Thanks.
 
-Regards
+-- 
+Ademar de Souza Reis Jr. <ademar@conectiva.com.br>
+Conectiva S.A. - http://www.conectiva.com.br
 
-Marcel
-
+^[:wq!
 
 
 
