@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <412CBEB3.6090606@t-online.de>
-From: detlef.grittner@t-online.de (Detlef Grittner)
+Message-ID: <412CBADD.3080204@mWare.ca>
+From: Mykel <Mykel@mWare.ca>
 MIME-Version: 1.0
-To: Simone Gotti <simone.gotti@email.it>
+To: Polina Tataeva <polina.t@web.de>
 CC: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Pocket PC 2003 and Linux
-References: <412C5482.3010909@t-online.de> <200408251202.48482.simone.gotti@email.it> <412C9332.7010002@t-online.de> <200408251612.44110.simone.gotti@email.it>
-In-Reply-To: <200408251612.44110.simone.gotti@email.it>
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Subject: Re: [Bluez-users] TAP/TUN with blueZ
+References: <1039977544@web.de>
+In-Reply-To: <1039977544@web.de>
+Content-Type: multipart/alternative;
+ boundary="------------000104010400030304030007"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,93 +19,125 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 25 Aug 2004 18:30:43 +0200
+Date: Wed, 25 Aug 2004 12:14:21 -0400
 
-Simone Gotti wrote:
+This is a multi-part message in MIME format.
+--------------000104010400030304030007
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 
->So the Obex Push service is right registered but the Pocket PC can't find it?
->you said that it can find only the kbtserialchat, can you confirm this?
->I can only think that probably there are registered more than one obexservice. 
->Can you post the full output of "sdptool browse local"?
+I have no idea. I don't know very much about this, but I believe the tap 
+devices have been deprecated by tun.
+(I use vtun for my Internet VPNs)
+
+Myke
+
+
+Polina Tataeva wrote:
+
+> Hi,
 >
->P.S. I don't know if this is the right place to talk about kdebluetooth. 
->Probably we should move our thread to the kdebluetooth mailing list (avoiding 
->any crossposting).
+> do anybody know how can i run a tap device over bnep or ppp?
 >
->Bye!
+> I can establish bnep connection or ppp/rfcomm connection and want to 
+> send the pakets to my own TCP/IP Stack.  The TCP/IP Stack run in User 
+> space and blueZ in Kernel. I thout I could run a tap device over it 
+> and read the messages from tap divice, but i don't know how to do it? 
+>
+> Maybe somebody knows the other way to recieve and send messages from 
+> kernel space into the User space?
+>
 >  
 >
-
-It's not only kdebluetooth that isn't working, but opd as well.
-And yes,  kserialchat is detected by the Pocket PC.
-
-Here is the output, which looks alright:
-Browsing FF:FF:FF:00:00:00 ...
-Service Name: SDP Server
-Service Description: Bluetooth service discovery server
-Service Provider: BlueZ
-Service RecHandle: 0x0
-Service Class ID List:
-  "SDP Server" (0x1000)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 1
-    Version: 0x0001
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-
-Service Name: Public Browse Group Root
-Service Description: Root of public browse hierarchy
-Service Provider: BlueZ
-Service RecHandle: 0x804d008
-Service Class ID List:
-  "Browse Group Descriptor" (0x1001)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-
-Service Name: Obex Push Server
-Service Description: KDE OBEX Object Push Service
-Service RecHandle: 0x8050770
-Service Class ID List:
-  "OBEX Object Push" (0x1105)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 3
-  "OBEX" (0x0008)
-Profile Descriptor List:
-  "OBEX Object Push" (0x1105)
-    Version: 0x0100
-
-Service Name: KBtHandsfree
-Service Description: KDE Bluetooth Phone Client
-Service RecHandle: 0x8050b58
-Service Class ID List:
-  "" (0x111e)
-  "Generic Audio" (0x1203)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 4
-Profile Descriptor List:
-  "" (0x111e)
-    Version: 0x0101
-
-Service Name: KBtSerialChat
-Service Description: KDE Bluetooth Serial Chat Service
-Service RecHandle: 0x8050eb0
-Service Class ID List:
-  "Serial Port" (0x1101)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 5
+> Regards
+>
+>  
+>
+> Polina
+>
+>   
+>
+>
+>
+> Aufnehmen! , abschicken, nah sein - So einfach ist   
+> WEB.DE Video-Mail: *http://freemail.web.de/?mc=021200*  
+>
+> ------------------------------------------------------- SF.Net email 
+> is sponsored by Shop4tech.com-Lowest price on Blank Media 100pk Sonic 
+> DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33 Save 50% off 
+> Retail on Ink & Toner - Free Shipping and Free Gift. 
+> http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285 
+> _______________________________________________ Bluez-users mailing 
+> list Bluez-users@lists.sourceforge.net 
+> https://lists.sourceforge.net/lists/listinfo/bluez-users 
 
 
+--------------000104010400030304030007
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+I have no idea. I don't know very much about this, but I believe the
+tap devices have been deprecated by tun.<br>
+(I use vtun for my Internet VPNs)<br>
+<br>
+Myke<br>
+<br>
+<br>
+Polina Tataeva wrote:
+<blockquote cite="mid1039977544@web.de" type="cite">
+  <style>p {margin: 0px}</style>
+  <style>p {margin: 0px}</style>
+  <p>Hi,</p>
+  <p>do anybody know how can i run a tap device over bnep or ppp? </p>
+  <p>I&nbsp;can establish&nbsp;bnep connection or ppp/rfcomm connection and want
+to send the&nbsp;pakets to my own TCP/IP Stack.&nbsp; The TCP/IP Stack run in
+User space and blueZ in&nbsp;Kernel. I thout&nbsp;I could run a tap device over
+it and&nbsp;read the messages from tap divice, but i don't know how to do
+it?&nbsp;</p>
+  <p>Maybe somebody knows the other way to recieve and send messages
+from kernel space into the User space?</p>
+  <p>&nbsp;</p>
+  <p>Regards</p>
+  <p>&nbsp;</p>
+  <p>Polina</p>
+  <p>&nbsp;&nbsp;</p>
+  <br>
+  <br>
+  <table border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td bgcolor="#000000"><img moz-do-not-send="true"
+ src="http://img.web.de/p.gif" alt="" border="0" height="1" width="1"></td>
+      </tr>
+      <tr>
+        <td
+ style="font-family: verdana; font-size: 12px; line-height: 17px;">Aufnehmen!
+, abschicken, nah sein - So einfach ist &nbsp;&nbsp;<br>
+WEB.DE Video-Mail: <a href="http://freemail.web.de/?mc=021200"><b>http://freemail.web.de/?mc=021200</b></a>&nbsp;&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+-------------------------------------------------------
+SF.Net email is sponsored by Shop4tech.com-Lowest price on Blank Media
+100pk Sonic DVD-R 4x for only $29 -100pk Sonic DVD+R for only $33
+Save 50% off Retail on Ink &amp; Toner - Free Shipping and Free Gift.
+<a class="moz-txt-link-freetext" href="http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285">http://www.shop4tech.com/z/Inkjet_Cartridges/9_108_r285</a>
+_______________________________________________
+Bluez-users mailing list
+<a class="moz-txt-link-abbreviated" href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a>
+<a class="moz-txt-link-freetext" href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a>
+</blockquote>
+</body>
+</html>
+
+--------------000104010400030304030007--
 
 
 -------------------------------------------------------
