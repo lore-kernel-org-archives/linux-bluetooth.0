@@ -1,61 +1,27 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bthid updated
-From: Marcel Holtmann <marcel@holtmann.org>
-To: cijoml@volny.cz
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200311101225.09925.cijoml@volny.cz>
-References: <20031106014519.GA31868@schnell>
-	 <1068109845.1288.153.camel@pegasus>  <200311101225.09925.cijoml@volny.cz>
-Content-Type: text/plain
-Message-Id: <1068465144.31420.18.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 Nov 2003 12:52:24 +0100
+Return-Path: <gareth@apache.org>
+Date: Mon, 10 Nov 2003 03:36:43 -0800 (PST)
+From: Gareth Reakes <gareth@apache.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Problems with MS mouse and keyboard
+In-Reply-To: <1068072643.1284.106.camel@pegasus>
+Message-ID: <20031110033339.L63252@minotaur.apache.org>
+References: <20031105093947.J63252@minotaur.apache.org> <1068072643.1284.106.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Michal,
+Hi,
 
-> > Let's talk a little bit about the freezing of the Microsoft devices,
-> > because I already solved this for my own HID implementation, but I
-> > forgot to share my knowledge. The mouse and the keyboard drop both L2CAP
-> > connections after 12 minutes of idle time and try to disconnect the ACL
-> > link after that, but on the Linux side we don't handle this correctly.
-> 
-> Maybe M$ handle it incorrectly on theit side :)
+> it looks like you lost the ACL link, but the mouse didn't know about
+> that and keeps sending you reports on that channel.
+>
+> Do you get this working under Windows XP. If not, they are broken.
 
-I don't think that this is a Microsoft problem, because it works fine
-with the XP Bluetooth stack and the keyboard and mouse are running the
-HID implementation from CSR.
+Arrrrggh. They do not work properly under XP! Finally found someone with
+XP. They connect and then a few minutes later they start to lock up. Off
+to talk with MS to try and change them.
 
-> > Keeping the HID device alive with some kind of pinging is not a good
-> > idea, because it consumes to much power ;)
-> 
-> For now I prefer working solution if non other and better is known...
+Thanks for all your help,
 
-Try to include my approach into the code from Peter and see if it works
-for you.
-
-Regards
-
-Marcel
-
-
-
-
--------------------------------------------------------
-This SF.Net email sponsored by: ApacheCon 2003,
-16-19 November in Las Vegas. Learn firsthand the latest
-developments in Apache, PHP, Perl, XML, Java, MySQL,
-WebDAV, and more! http://www.apachecon.com/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Gareth
