@@ -11,67 +11,18 @@ References: <1098654320.4635.16.camel@localhost>
 	 <1099776680.6919.104.camel@pegasus>  <1099788984.4543.5.camel@localhost>
 	 <1099795084.6896.3.camel@pegasus>  <1099942733.5806.7.camel@localhost>
 	 <1099943605.29330.21.camel@pegasus>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-AzK2nB+r6T+AQ16ec5tZ"
-Message-Id: <1100326156.6216.29.camel@localhost>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-CXlxjt+8xpBf/bW/zzie"
+Message-Id: <1100317165.6212.12.camel@localhost>
 Mime-Version: 1.0
-Date: Sat, 13 Nov 2004 19:09:17 +1300
+Date: Sat, 13 Nov 2004 16:39:25 +1300
 List-ID: <bluez-users.lists.sourceforge.net>
 
 
---=-AzK2nB+r6T+AQ16ec5tZ
+--=-CXlxjt+8xpBf/bW/zzie
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
 Hi Marcel,
-
-My first ideas about the kernel realigning things are wrong, its actually t=
-he=20
-struct hidp_connlist_req definitions not matching.
-
-Real reason for it is this, user-space thinks cnum field is 16 bit, kernel=20
-thinks it is 32 bit.  Bug only shows up in big-endian architectures as resu=
-lt
-count is returned in top byte of what is received from the kernel, whereas =
-on
-i386 it is in the lowest where by fluke it works...
-
-Mismatch in the kernel and user-space  header files:
-
-in the kernel, net/bluetooth/hid/hdip.h:=20
-
-struct hidp_connlist_req {
-        __u32  cnum;
-        struct hidp_conninfo __user *ci;
-};
-
-in libbluetoth, include/bluetooth/hidp.h:
-
-struct hidp_connlist_req {
-        uint16_t cnum;
-        struct hidp_conninfo *ci;
-};
-
-Which way should we go here?  We need to fix kernel or user-space, and I ne=
-ed your=20
-'official' touch before I post a patch in the Debian bug report I am going =
-to submit.
-The fix I prefer affects the user-space bluetooth include files.
-
-My inclination is to convert user space from uint16_t=20
-to uint32_t for the cnum field as this will properly byte-align the followi=
-ng pointer
-on a 4-byte boundary.  Some architectures throw exceptions on non-aligned p=
-ointer
-dereferences and accesses, and this is why I suspect the kernel may have be=
-en changed.
-
-
-Cheers,
-
-Matthew Grant
-
-PS: Following is here for reference.
-
 
 Found what is wrong with hidd --show on powerpc. =20
 
@@ -169,16 +120,16 @@ A Linux Network Guy /~~\^/~~\_/~~~~~\_______/~~~~~~~~~~\____/******\
 2EE20270=3D=3D
 
 
---=-AzK2nB+r6T+AQ16ec5tZ
+--=-CXlxjt+8xpBf/bW/zzie
 Content-Type: application/pgp-signature; name=signature.asc
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.4 (GNU/Linux)
 
-iD8DBQBBlaUMuk55Di7iAnARAsaDAJ9K0JM3pYItug3bFewsD5YIb5tUiACcC5I2
-GcFFV02v6mDqug5BFIMxBrA=
-=rri9
+iD8DBQBBlYHsuk55Di7iAnARApICAJ9dseWdCdLYU3AUBxZD0GyvX3PfnACgiqwG
+KSHFjX5Z3hz3FatwHRtpiJo=
+=LkZG
 -----END PGP SIGNATURE-----
 
---=-AzK2nB+r6T+AQ16ec5tZ--
+--=-CXlxjt+8xpBf/bW/zzie--
