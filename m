@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Achim Bohnet <ach@mpe.mpg.de>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Debian packages updated
-References: <1085586569.18009.7.camel@saag>
-In-Reply-To: <1085586569.18009.7.camel@saag>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200405270007.32190.ach@mpe.mpg.de>
+Subject: Re: [Bluez-users] Talks at GUADEC, OSCON
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Edd Dumbill <edd@usefulinc.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1085586900.18009.14.camel@saag>
+References: <1085586900.18009.14.camel@saag>
+Content-Type: text/plain
+Message-Id: <1085594047.8896.32.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,56 +18,37 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 27 May 2004 00:07:31 +0200
-
-On Wednesday 26 May 2004 17:49, Edd Dumbill wrote:
-> I uploaded new experimental packages for BlueZ 2.7 to Debian
-> experimental (expect them there in a week or so, as bluez-cups is NEW),
-> and to the http://bluez.sf.net/download/debian/ repository.  This build
-> has DBUS and CUPS enabled.  More details are available in the
-> README.Debian file in the bluez-utils package.
-> 
-> Fuller details available on my blog at
-> http://usefulinc.com/edd/blog/contents/2004/05/26-bluez/read
-> 
-> I'd welcome feedback from users of the older packages, particularly in
-> how the 2.4 -> 2.7 upgrade goes, as the bluez-pan and bluez-sdp packages
-> have all been subsumed into bluez-utils.
+Date: Wed, 26 May 2004 19:54:07 +0200
 
 Hi Edd,
 
-first thx for the new pkgs.  Update from 2.6 went smooth
-(beside the artefacts of updating testing with bluez.sf.net
-pkgs ;)
-
-First impressions:
-
-I'm not sure if I'm a fan of the /etc/init.d/bluez-pan merge into
-/etc/init.d/bluez-utils.  Before I could remove the rcX.d links
-and let hotplug and/or script call bluez-pan as needed.
-I only switch on the bluetooth adapter when needed.  Ditto with pand.
-Now I did get lots of useless entries in syslog of pan trying to find
-the (nonexisting) NAP ;)
-
-Output of restart of the init.d script is a bit strange:
-	Restarting bluez-utils: hidd hcid sdpd hidd rfcomm
-hidd entry appears twice (same for pund and dund when enabled)
-
-My M$ bt mouse didn't arrive yet, but I would expect that hidd
-adds an SDP record (kdebluetooth didn't show it; running debian
-kernel-source 2.6.6 + mh2).  Maybe the mouse will work without
-an SDP record.  Nevertheless IMHO a SDP record tells more
-to Joe User than a ps | grep ;)
-
-thx again for the pkgs!
-Achim
+> I'll be giving two talks related to BlueZ in the near future;:
 > 
-> -- Edd
--- 
-  To me vi is Zen.  To use vi is to practice zen. Every command is
-  a koan. Profound to the user, unintelligible to the uninitiated.
-  You discover truth everytime you use it.
-                                      -- reddy@lion.austin.ibm.com
+> GNOME Bluetooth support
+>   GUADEC 2004: http://2004.guadec.org/
+>   (Kristiansand, Norway, 28-30 June 2004)
+> 
+> Linux and Bluetooth
+>   O'Reilly Open Source Convention 
+>   http://conferences.oreillynet.com/os2004/
+>   (July 26 - 30, 2004,  Portland, OR, USA)
+
+this is great. I like to see more talks about Bluetooth and Linux. If
+you make your papers and talks public after your talk, I am happy to
+link them from the BlueZ website.
+
+Btw you forgot to mention your book "Linux Unwired", which contains a
+great chapter about BlueZ. Oh and I am the responsible person that
+should be blamed that some of the stuff is already outdated. Sorry for
+that ;)
+
+I should ask O'Reilly for a free copy for my next lecture.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
