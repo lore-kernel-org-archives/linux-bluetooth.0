@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] hid2hci: No devices in HCI mode found
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Sven Ehret <sven.ehret@gmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3eef79ed04100803094fd88c74@mail.gmail.com>
-References: <3eef79ed04100803094fd88c74@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1097234566.4407.1.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <1302.213.112.80.112.1097230559.squirrel@webmail.nada.kth.se>
+From: alexj@nada.kth.se
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;charset=iso-8859-1
+Subject: [Bluez-users] Scan Time for hcitool
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +15,27 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 08 Oct 2004 13:22:46 +0200
+Date: Fri, 8 Oct 2004 12:15:59 +0200 (MEST)
 
-Hi Sven,
+Dear list,
 
-> running Gentoo Linux. I searched the web like crazy but did not get
-> much or even helpful information.
+I'm using hcitool to search for a number of known HW-addresses, to see of
+someones in the (coffee)room. Corny, but fun.
+Example:
+hcitool name DE:39:EF:98:01:34
 
-don't care about that message, because not so much people have a HID
-Proxy Bluetooth dongle. Talk to the Gentoo package maintainer and tell
-him/her to use the -q switch to suppress this message.
+However, If all phones/devices are present, the script runs quickliy,
+traversin through the list. But, if one is missing it takes a very long
+time before it terminates. Setting a timeoutflag, doesn't seem to do the
+trick. And I can't spawn more cild processes, because the first one locks
+up the HCi device, of course.
 
-Regards
+What can be done to shorten the seek->timeout time for non-present devices
+that have known HW-addresses?
 
-Marcel
+sincerely
+
+Alex
 
 
 
