@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] can't get bthid
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mykel <Mykel@mWare.ca>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <408C72DA.4070205@mWare.ca>
-References: <408C4D8D.7090104@yahoo.com.au>  <408C5F5C.1040501@mWare.ca>
-	 <1082941746.28880.111.camel@pegasus>  <408C72DA.4070205@mWare.ca>
+From: Devraj Mukherjee <lugs@eternitytechnologies.com>
+Reply-To: lugs@eternitytechnologies.com
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1082973170.28880.114.camel@pegasus>
+Message-Id: <1082948029.4574.14.camel@localhost>
 Mime-Version: 1.0
+Subject: [Bluez-users] Bluetooth utils to route mobile phone audio?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,27 +16,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 26 Apr 2004 11:52:50 +0200
+Date: Mon, 26 Apr 2004 12:53:49 +1000
 
-Hi Mykel,
+Hi everyone,
 
-> Hey hey! I got somewhere! (Thanks! I'm so happy about this!) But after
-> reboot, I'm not sure what I was doing wrong... It seems I need to hit
-> connect every time I restart... Maybe I have the sequence of commands
-> wrong?
-> 
-> bthid -d
-> hcid
-> bthid -c xx:xx:xx:...
+I have only recently started using BlueZ. I have a Nokia bluetooth
+enabled phone. I am interested to know if there is software out there
+that could potentially route the audio of the Mobile phone to a sound
+card on the PC much like a Bluetooth based car kit.
 
-you should start hcid before you start any other Bluetooth daemon and
-the "bthid -c" is only needed once. The HID device will reconnect by
-itself after you pressed a key.
+Thanks in advance for any pointers.
 
-Regards
-
-Marcel
-
+Devraj
 
 
 
