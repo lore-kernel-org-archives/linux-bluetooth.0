@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] question: what does this patch from snd-bt-sco
+	do?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lars Grunewaldt <lgw@dark-reality.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
+   linux-usb-users@lists.sourceforge.net
 In-Reply-To: <40A9E6CB.4010505@dark-reality.de>
 References: <40A9E6CB.4010505@dark-reality.de>
-Mime-Version: 1.0 (Apple Message framework v613)
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Message-Id: <88307002-A8B9-11D8-A107-000A95A4D990@dcs.gla.ac.uk>
-Cc: linux-usb-users@lists.sourceforge.net, bluez-devel@lists.sourceforge.net
-From: Jonathan Paisley <jp-www@dcs.gla.ac.uk>
-Subject: Re: [Bluez-devel] question: what does this patch from snd-bt-sco do?
-To: Lars Grunewaldt <lgw@dark-reality.de>
+Content-Type: text/plain
+Message-Id: <1084877081.5833.102.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,20 +20,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 18 May 2004 11:53:01 +0100
+Date: Tue, 18 May 2004 12:44:41 +0200
 
-On 18 May 2004, at 11:34, Lars Grunewaldt wrote:
+Hi Lars,
 
 > there's a kernel patch in snd-bt-sco, and it would  be great if someone
 > could explain what it does:
->
+> 
 > *****
 > - --- linux-2.6.4-orig/drivers/bluetooth/hci_usb.c	2004-03-11
 > 02:55:44.000000000 +0000
 > +++ linux-2.6.4/drivers/bluetooth/hci_usb.c	2004-03-13
 > 23:52:27.000000000 +0000
 > @@ -851,7 +851,12 @@
->
+> 
 > ~ #ifdef CONFIG_BT_HCIUSB_SCO
 > ~ 				case USB_ENDPOINT_XFER_ISOC:
 > - -					if (ep->desc.wMaxPacketSize < size || a > 2)
@@ -45,29 +47,25 @@ On 18 May 2004, at 11:34, Lars Grunewaldt wrote:
 > ~ 					size = ep->desc.wMaxPacketSize;
 > ****
 
+according to the current voice setting (0x0060 by default) and the
+number of SCO link the Bluetooth USB driver has to adjust the alternate
+setting for the ISOC interface. Currently we don't support this dynamic
+adjustment in hci_usb and so I have choosen to use alternate setting 2
+as default value in the latest versions of 2.4 and 2.6 kernels. This
+means that the voice setting must be 0x0060 and there can be only one
+SCO link at the same time. For more information look at the Bluetooth
+core specification.
 
-There are different voice encodings over the isochronous USB channel 
-that is used for the SCO connection. Which encoding is used is selected 
-by running 'hciconfig hci0 voice <somenumber>', where <somenumber> is, 
-for example, 0x0040 for one 8 bit 8000Hz stream and 0x0060 for one 16 
-bit 8000Hz stream.
+> Also, it would be interesting to know if this patch for kernel 2.6.4 is
+> still nessesary for newer kernels (2.6.6 to be specific), because I want
+> to "port" snd-bt-sco to alsa 1.0.4 and kernel 2.6.6.
 
-Depending on how many SCO channels are open and what format is used, 
-different isoc USB frames are used by the bluetooth device. The 
-possibilities are enumerated in the documentation that is referenced in 
-that comment.
+Don't use this patch and accept the default voice setting of 0x0060.
 
-What it boils down to is that for one 8000Hz 8 bit channel, the USB 
-packets are 9 bytes each. That check ensures that the appropriate 
-endpoint is selected. Otherwise, the wrong endpoint probably gets 
-chosen and the audio doesn't work at all or it sounds very bad.
+Regards
 
-The isoc streams ideally would be dynamically selected as required, 
-depending on the type and number of SCO connections. Since there wasn't 
-infrastructure in place when I wrote that patch, I hard-coded that 
-choice to coincide with that required by the alsa driver.
+Marcel
 
-Hope that sheds some light on the matter!
 
 
 
