@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Michael Wever <mick@machina.no>
-Message-ID: <pan.2004.03.30.07.32.53.106568@machina.no>
-References: <pan.2004.03.29.08.17.54.697624@netbeans.org> <1080556737.2281.217.camel@pegasus> <pan.2004.03.29.10.58.33.731525@machina.no> <1080559561.2281.227.camel@pegasus>
+Subject: Re: [Bluez-users] PAND and RFCOMM simultaneously
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Harald Meier <meh1@rts.at>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <003201c4161f$d37a2050$4000fe0a@rtsviec64>
+References: <003201c4161f$d37a2050$4000fe0a@rtsviec64>
+Content-Type: text/plain
+Message-Id: <1080630888.4094.5.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Subject: [Bluez-users] Re: Re: Bluetooth device missing after kernel	recompile
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,39 +18,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 30 Mar 2004 09:32:53 +0200
+Date: Tue, 30 Mar 2004 09:14:48 +0200
 
-On Mon, 29 Mar 2004 13:26:02 +0200, Marcel Holtmann wrote:
-> I meant lsusb.
+Hi Harald,
 
-Bus 003 Device 001: ID 0000:0000
-Bus 002 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd
-Bus 002 Device 001: ID 0000:0000
-Bus 001 Device 001: ID 0000:0000
+> All PCs in the PAN are equipped with G+W Instruments PICO Bluetooth PCI
+> Adapter (class 1).
+> The Serial Devices are equipped with G+W Instruments Blue Serial Bluetooth
+> Adapter.
+> (www.gw-instruments.de)
+> 
+> The init script does the following:
+> 
+>         insmod bt-pci.o            # the driver for the BT-PCI card
+>         insmod bluez.o
+>         insmod hci_usb.o
+>         insmod l2cap.o
+>         insmod bnep.o
+>        insmod rfcomm.o
+> 
+>         hcid
+> 
+>         sdpd
+> 
+>         pand --listen --role NAP                                         #
+> on the NAP
+>         pand --connect <BT-address-of-NAP> --persist    # in the PANU
+> 
+> The hcid.conf is attached (same for NAP and PANU).
+> 
+> When this is running, I get a "Function not implemented" if I try to connect
+> to
+> a different NAP (using pand) or if I try to establish a RFCOMM connection.
 
-> Check the dmesg output to see if any of the USB host controller drivers
-> complain about anything.
+maybe your Bluetooth device don't support multiple connections. Show us
+the output of "hciconfig -a".
 
-Nothing interesting that I can find in /var/log/messages (I have no
-dmesg). But during startup on the console I read: 
+Regards
 
-No modules for INPUT product 0011/0002/0005/0000 
-No modules for INPUT product 0011/0001/0001/ab41
-
-But.... I had to reboot to catch these and... it works now!?
-(I have rebooted since the kernel recompile a number of times so I very
-buffled but happy nonetheless). 
-Sorry for wasting your time and thanks for
-your help.
-
-Mick.
-
-
-
--- 
--- <BR/>
-"The reward of patience is patience." St. Augustine
-<BR/> --- <a href=http://www.harryspractice.com.au>Harry's Practice</a> --- 
+Marcel
 
 
 
