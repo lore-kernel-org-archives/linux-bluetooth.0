@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4118BEBE.2010505@dark-reality.de>
-From: Lars Grunewaldt <lgw@dark-reality.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] "comlicated" setup - known issues for	hid	and	SCO?
-References: <4117A907.7010006@dark-reality.de>	 <1092071597.4564.17.camel@pegasus>  <4117B376.3030507@dark-reality.de>	 <1092073484.4564.32.camel@pegasus>  <4117BA71.5000800@dark-reality.de> <1092090585.4564.51.camel@pegasus>
-In-Reply-To: <1092090585.4564.51.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lars Grunewaldt <lgw@dark-reality.de>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <41180E64.1010007@dark-reality.de>
+References: <4117AB9A.9010909@dark-reality.de>
+	 <1092071356.4564.12.camel@pegasus>  <4117B098.5020805@dark-reality.de>
+	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>
+	 <1092090364.4564.46.camel@pegasus> <41180E64.1010007@dark-reality.de>
+Content-Type: text/plain
+Message-Id: <1092140041.4564.96.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,45 +21,48 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 14:25:34 +0200
+Date: Tue, 10 Aug 2004 14:14:01 +0200
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Lars,
 
-Marcel Holtmann wrote:
-| Hi Lars,
+> | Actually you think that we need it, but I am still not sure that this is
+> | really needed in case of the concept of the SCO packet from the HCI and
+> | the SCO handling that is done on link manager/chip level. However you
+> | can still convince me with real code.
+> 
+> I have to agree with Marcel here. I've been using snd-bt-sco for a while
+> now with my HBH-35 Sony Ericsson Headset, and it works pretty well. Of
+> course I don't know much about how audio is processed here, but the
+> snd-bt-sco layer simply connects the sco socket to the alsa audio
+> socket. There's not much stuff about full duplex or low latency done,
+> I'm pretty sure I'd have noticed.
 
-| so both devices are in the same piconet. There should be no problem, but
-| from my position I can't tell you anything more.
+and the snd-bt-sco driver uses socket programming from within a kernel
+thread. If we remove that and include it directly into the SCO driver I
+think we have all what we need ;)
 
-I think this message might have something to do with the problem:
+> Marcel, what exactly do you mean by "implementing an alsa interface"?
+> Should there be an interface [like SCO] that is than accessed by an
+> additional alsa driver?
+> 
+> Maybe it would be possible to use some of the snd-bt-sco code here,
+> because only the userspace daemon that "wraps" the sound sockets
+> together must be "integrated" (well, it's functionality) into BlueZ,
+> while the snd-bt-sco alsa driver could remain nearly the same, just
+> accessing the BlueZ/alsa interface instead of BlueZ/SCO?
 
-hci_scodata_packet: hci0 SCO packet for unknown connection handle 44
+Lets connect the SCO channel throught the socket interface and then tell
+the kernel via an IOCTL to change this into an ALSA device. We do the
+same for RFCOMM where we convert a socket into a TTY.
 
-My main problem does not even seem to be connected to the mouse, because
-it also happens when the mouse is far far away and not connected.
+Most of the snd-bt-sco source will be useless, because it handles the in
+kernel socket programming and you don't need that inside the SCO module.
 
-In about 50% of SCO connections the sound coming from the headset is
-totally garbage (not the sound send TO the headset!); I think this might
-be connected to another report here on the list when someone mentioned
-he had to cut the first byte when recording audio from an SCO channel
-(because I'm using 16bit right now, too). This never happend with 8bit
-transmissions over SCO.
+Regards
 
-Any ideas?
+Marcel
 
-Kernel is 2.6.7 with mh4 patch.
 
-cu,
-~  Lars
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.3 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
-
-iD8DBQFBGL6+QWC6DTWkDAoRAl2lAJ4ktMZ3xgDH5euwJmISKE/bM6l4XwCfci3X
-kXpVLb9uy8Nwu8qXP5rzBVg=
-=qY1P
------END PGP SIGNATURE-----
 
 
 -------------------------------------------------------
