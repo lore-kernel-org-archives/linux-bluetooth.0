@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] LAN access devices
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.BSO.4.53.0411261207460.9290@vakttornet.mynet>
-References: <Pine.BSO.4.53.0411261207460.9290@vakttornet.mynet>
-Content-Type: text/plain
-Message-Id: <1101489877.6514.30.camel@pegasus>
+Subject: Re: [Bluez-users] Creating programs with Bluez Libraries..
+From: Bastian Ballmann <Crazydj@chaostal.de>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <BAY21-F1269792B015AEB1770DB46DBB90@phx.gbl>
+References: <BAY21-F1269792B015AEB1770DB46DBB90@phx.gbl>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-e1rHLEZ7bivDWZQsSrfF"
+Message-Id: <1101492046.1308.13.camel@espy.crazydj.de>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,52 +18,43 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 26 Nov 2004 18:24:37 +0100
+Date: Fri, 26 Nov 2004 19:00:47 +0100
 
-Hi Claes,
 
-> This is not strictly a Bluez question, but anyways... I was thinking if it
-> would be possible to use WAP over Bluetooth on a Bluetooth-enabled phone
-> to connect to a web server running Bluez. I have a SonyEricsson K700i, and
-> as far as I can tell, it does not support the LAN access profile. I don't
-> know whether that is required or if there are other ways to accomplish
-> this. Are there devices that support this? Not even SonyEricsson P910
-> seems to do so.
+--=-e1rHLEZ7bivDWZQsSrfF
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-the K700i contains a SDP record for a WAP client:
+Hello,
 
-Sequence
-        Attribute 0x0000 - Service record handle
-                UINT32 0x00010007
-        Attribute 0x0001 - Service class ID list
-                Sequence
-                        UUID16 0x1114 - WAP Client
-        Attribute 0x0004 - Protocol descriptor list
-                Sequence
-                        Sequence
-                                UUID16 0x0100 - L2CAP
-                        Sequence
-                                UUID16 0x0003 - RFCOMM
-                                UINT8 0x0c
-        Attribute 0x0005 - Browse group list
-                Sequence
-                        UUID16 0x1002 - Public Browse Group
-        Attribute 0x0009 - Bluetooth profile descriptor list
-                Sequence
-                        Sequence
-                                UUID16 0x1102 - LAN Access Using PPP
-                                UINT16 0x0100
-        Attribute 0x0100
-                String WAP Client
+On Thu, 2004-11-25 at 23:40, LuXs Amaral wrote:
 
-I actually don't know how this may work, but you can try to use dund on
-the RFCOMM channel 12. Check the Bluetooth WAP specification for more
-details.
+> I am startting a project using some Bluetooth USB Dongles (concemptronic)=
+=20
+> and i need to creat programs to communicate between them.
 
-Regards
+Maybe this will help you:=20
+https://ds.ccc.de/083/bluetoothfunandprofit
+The article is in German, but you can use the example code.
+Have fun && Greets
 
-Marcel
+Basti
+--=20
+Time is a bitch.
 
+--=-e1rHLEZ7bivDWZQsSrfF
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQBBp29O3rCd3KdGxg4RAg3TAKCfrJaQLN5+qvqp4yA/oO+x/VirRgCdGkNv
+YOhokODP9P2dDDmwJR4+J5c=
+=VaIT
+-----END PGP SIGNATURE-----
+
+--=-e1rHLEZ7bivDWZQsSrfF--
 
 
 
