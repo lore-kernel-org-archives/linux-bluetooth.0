@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Richard Cox <conardcox@earthlink.net>
-Reply-To: rcox27@triad.rr.com
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200404101126.25631.conardcox@earthlink.net>
-Subject: [Bluez-users] Hotplug
+From: Elimar Riesebieter <riesebie@lxtec.de>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] hid2hci
+Message-ID: <20040410130853.GA4934@aragorn.home.lxtec.de>
+References: <20040409153508.GA2123@aragorn.home.lxtec.de> <1081531882.21596.23.camel@pegasus> <20040409193454.GA2187@aragorn.home.lxtec.de> <1081593331.3028.10.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="0F1p//8PRICkK4MW"
+In-Reply-To: <1081593331.3028.10.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,24 +18,53 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 10 Apr 2004 11:26:25 -0400
+Date: Sat, 10 Apr 2004 15:08:53 +0200
 
-Gentlemen,
-	I'm trying to get bluez running on my gentoo linux server so I can connect to 
-my IPaq 2215.  I've got a connection successfully established, but I'm trying 
-to automate it with hotplug in hopes of setting up a NAP bridge.  The docs 
-I've found so far are rather unclear on this subject, but I've created an 
-'/etc/hotplug/bluetooth.agent' script.  Right now, I'm just trying to get 
-hotplug to call that script when a connection is established to automatically 
-configure bnep0, but it only seems to get called on startup when I reboot my 
-kernel.  I had the impression that 'pand' would emit a hotplug event for 
-bnep0 when a connection is established, but I'm not so sure now.  Any 
-guidance about how I might proceed.  Thank you in advance for any information 
-you may provide.
 
-Regards,
+--0F1p//8PRICkK4MW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Richard
+On Sat, 10 Apr 2004 the mental interface of
+Marcel Holtmann told:
+
+> Hi Elimar,
+>=20
+> > [...]
+> > > looks like another USB problem. Maybe the USB guys already have a fix
+> > > for it. Ask them.
+> >=20
+> > hci_usb was loaded while running hid2hci. Unloading that module
+> > solves the prob. hci_usb is loaded from hotplug after changing to
+> > hci by hid2hci.
+>=20
+> so this is really an USB race.
+
+Maybe you're right ;-)
+
+Ciao
+
+Elimar
+
+--=20
+  On the keyboard of life you have always
+  to keep a finger at the escape key;-)
+
+--0F1p//8PRICkK4MW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFAd/Hl3Ig8bsVPf7ARAmt8AKCP1H9OgF9l14AF7fmsz7mJ0CB7YwCeNTIj
+YIWAChvr7UW+SOyndoiF7uY=
+=LsE5
+-----END PGP SIGNATURE-----
+
+--0F1p//8PRICkK4MW--
 
 
 -------------------------------------------------------
