@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] PAN profile of bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
-To: GUILLON Gabriel <gabriel.guillon@c-s.fr>
-Cc: bluez devel <bluez-devel@lists.sourceforge.net>,
-   bluez users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <41334BA2.3030603@c-s.fr>
-References: <BAY1-F25PMxBZMBDC9p000456a6@hotmail.com>
-	 <41334BA2.3030603@c-s.fr>
+To: Till Harbaum <harbaum@beecon.de>
+Cc: "Williams, Richard" <Richard.Williams@VITRONICS.com>,
+   blookk - <blookk@hotmail.com>, bluez-devel@lists.sf.net
+In-Reply-To: <200408301756.14723.harbaum@beecon.de>
+References: <A1F0D47583A2D711919F00600819B3A45BDCF7@goofy.vitronics.com>
+	 <200408301756.14723.harbaum@beecon.de>
 Content-Type: text/plain
-Message-Id: <1093884567.5620.92.camel@pegasus>
+Message-Id: <1093882109.5620.89.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -20,26 +20,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 30 Aug 2004 18:49:27 +0200
+Date: Mon, 30 Aug 2004 18:08:30 +0200
 
-Hi,
+Hi Till,
 
-> Hi! I newly subscribed to these ML.
+> > Did you make sure the /etc/bluetooth/pan/dev-up file is correct and present
+> > on both your devices, master and slave ? If this file isn't there, you
+> > won't get the bnep process started.
+> Are you sure? I never heard of that file, but have successfully been using 
+> bnep without even having a /etc/bluetooth/pan directory on my pc.
 
-don't attach to a thread with different topic. Create your own.
-
-> I'm a lot interested by BT since I made my last year's projetc on that 
-> ("BT and the ad hod networks", actually. I'm french, so it's in french. 
-> If someone want to read it ;) )
-> I have a lot of ideas about using BT, but for now I would like to know 
-> more about how to use Bluez stack. I'm ready for testing anything you 
-> want me to test: I have 2 usb BT dongles (CSR chipset), and Logitech BT 
-> mouse and keyboard (yep, on windows)
-> My only exploit with BT was to make a pda connect to the net throught a 
-> BT dongle connect to an Linux box.
-
-Go ahead with your mouse and keyboard. You will find many links for that
-on the internet and trying out kernel 2.6.8-mh1 and hidd would be great.
+this depends on your system. Actually on every new system that uses
+hotplug, there is no need for using dev-up. The bnep0 is like every
+other network card in your machine and hotplug takes care of it.
 
 Regards
 
