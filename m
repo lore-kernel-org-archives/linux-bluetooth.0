@@ -1,64 +1,43 @@
-Return-Path: <jamesp@hisser.org>
-Date: Tue, 9 Mar 2004 21:02:52 +0000 (GMT)
-From: James Pattinson <jamesp@hisser.org>
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Obex / Palm TT
-In-Reply-To: <1047488348.28415.117.camel@pegasus.local>
-Message-ID: <Pine.LNX.4.58.0403092101240.24697@greebo>
-References: <Pine.LNX.4.44.0303121553230.9558-100000@greebo.hisser.org>
- <1047488348.28415.117.camel@pegasus.local>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: Alexandre Ghisoli <alexandre.ghisoli@ycom.ch>
+To: bluez-users <bluez-users@lists.sourceforge.net>
+Content-Type: text/plain
+Message-Id: <1078857187.2354.3.camel@amd-01.home>
+Mime-Version: 1.0
+Subject: [Bluez-users] diNovo kbd / mice / mediapad
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 09 Mar 2004 19:33:07 +0100
 
-Hi Marcel
+Hi there, 
 
-Do you have any more info about this application? I have just revisted bluetooth 
-now I have a bt enabled handheld again. (This time it's Tungsten T3).
+Charles Bueche has updated his website (MX900 mouse) to add this nano
+HOWTO for the use of Logitech's diNovo keyboard, mouse and MediaPad.
 
-Everything works great - would just like a way of using obex push.
+Please, don't hesitate to make comments.
 
-I tried opexftp over rfcomm, the connection got established however the file 
-didn't transfer:
+http://www.bueche.ch/comp/mx900/feedback/ghisoli_alexandre_mx900_with_hub.txt
 
-greebo root # obexftp -d /dev/bluetooth/rfcomm/0 -p /tmp/trace.out 
-Custom transport set to 'Siemens'
-Connecting...failed: connect
-Still trying to connect
+Regards
 
-Thanks!
+	--Alexandre
 
-James
 
-On Wed, 12 Mar 2003, Marcel Holtmann wrote:
 
-> Hi James,
-> 
-> > 2. OBEX - I'm going to try this tonight, but don't believe it's going to 
-> > work, as the only suitable application seems to be obexftp which doesn't 
-> > yet support Bluetooth. Anyone got obex working over BT to a palm?
-> 
-> I have a program called btftp which implements the File Transfer
-> Profile, but it is not complete ready at the moment. The other one
-> called btobex is an implementation of the OBEX Push Profile and will
-> allow you to push/pull vcards etc. and download your phonebook and
-> calendar from an IrMC compatible phone. I asked Max to put it into CVS.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
-> -------------------------------------------------------
-> This SF.net email is sponsored by:Crypto Challenge is now open! 
-> Get cracking and register here for some mind boggling fun and 
-> the chance of winning an Apple iPod:
-> http://ads.sourceforge.net/cgi-bin/redirect.pl?thaw0031en
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+-------------------------------------------------------
+This SF.Net email is sponsored by: IBM Linux Tutorials
+Free Linux tutorial presented by Daniel Robbins, President and CEO of
+GenToo technologies. Learn everything from fundamentals to system
+administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
