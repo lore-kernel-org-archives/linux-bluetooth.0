@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "P. Elias" <p_ilias@hotmail.com>
+From: Michal Semler <cijoml@volny.cz>
+Reply-To: cijoml@volny.cz
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <BAY17-F24SjJVBFdAhT0002d945@hotmail.com>
-Subject: [Bluez-users] USB - Stable connection
+References: <200405271934.52883.cijoml@volny.cz>
+In-Reply-To: <200405271934.52883.cijoml@volny.cz>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Message-Id: <200405271948.15023.cijoml@volny.cz>
+Subject: [Bluez-users] Re: 2.6.6-mh2 freeze
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,37 +19,35 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 27 May 2004 19:27:57 +0100
+Date: Thu, 27 May 2004 19:48:14 +0200
 
-Hi,
+Hmm when I try exit 0 pcmcia start scripts, kernel freezes on configuriing NET
 
-I'm not sure if this is a bluez related issue but it might help some people 
-who have l2cap connection problems.
+Michal
 
-I'm running kernel 2.4.22 on both machines (1 desktop, 1 laptop) without any 
-patch installed. USB and Bluetooth support compiled as modules.
-
-I had troubles getting a stable l2cap link between them. The connection was 
-breaking after some packet transmission, even by surfing the web. The cause 
-of the problem was the UHCI module (laptop side) which was crashing 
-unexpectedly after removing it with the bluetooth dongle plugged. I tried to 
-load the USB-UHCI instead and the link works fine now. I tested it overnight 
-downloading 1.5 GB at 75Kbps stable speed without any interrupt.
-
-Have a look at my loaded modules:
-
-usb-uhci             23500   0  (unused)
-hci_usb              8088     1
-usbcore              62624   1  [usb-uhci hci_usb]
-bnep                  10324   1
-crc32                  2880    0  [bnep]
-l2cap                 16876   2  [bnep]
-bluez                 32196   1  [hci_usb bnep l2cap]
-
-I hope this will help you guys..
-Greetings
-
-
+On Thursday 27 of May 2004 19:34, Michal Semler wrote:
+> Hi Marcel,
+>
+> I tried to use latest -mh patch, but my computer freezes when pcmcia
+> services wants to start.
+> No oops, clear freeze
+>
+> Here is output from 2.4.26:
+> Yenta ISA IRQ mask 0x0030, PCI irq 10
+> Socket status: 30000010
+> Yenta ISA IRQ mask 0x0030, PCI irq 10
+> Socket status: 30000006
+>
+>
+> 0000:02:04.0 CardBus bridge: Texas Instruments PCI1520 PC card Cardbus
+> Controller (rev 01)
+> 0000:02:04.1 CardBus bridge: Texas Instruments PCI1520 PC card Cardbus
+> Controller (rev 01)
+>
+>
+>
+>
+> Michal
 
 
 -------------------------------------------------------
