@@ -1,16 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] can't establish a connection
-From: Marcel Holtmann <marcel@holtmann.org>
-To: ben4fun <ben_4_fun@freenet.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1092779397.3475.31.camel@localhost>
-References: <1091742606.6143.17.camel@localhost>
-	 <1092727197.12606.1.camel@localhost> <1092728177.31651.6.camel@pegasus>
-	 <200408170949.50588.cijoml@volny.cz>  <1092776029.3475.27.camel@localhost>
-	 <1092778940.31651.39.camel@pegasus>  <1092779397.3475.31.camel@localhost>
-Content-Type: text/plain
-Message-Id: <1092814652.31651.43.camel@pegasus>
+From: Charles Bueche <charles@bueche.ch>
+To: bluez-users@lists.sourceforge.net
+Message-Id: <20040817123228.2d896a07@bluez.bueche.ch>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] OT: SonyEricsson K700i addressbook and OBEX over Bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,41 +15,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Aug 2004 09:37:32 +0200
+Date: Tue, 17 Aug 2004 12:32:28 +0200
 
-Hi Ben,
+Hi,
 
-> > so adding the broken ISOC quirk would be enough to make this dongle work
-> > again. Maybe the last time I tested it, I had the SCO support disabled.
-> Is this something to add in the kernel settings?
+sorry if this a bit off-topic, but I didn't find help elsewhere and I
+thought someone here might have seen the same problems.
 
-===== drivers/bluetooth/hci_usb.c 1.54 vs edited =====
---- 1.54/drivers/bluetooth/hci_usb.c    2004-07-31 12:57:14 +02:00
-+++ edited/drivers/bluetooth/hci_usb.c  2004-08-17 23:32:42 +02:00
-@@ -96,7 +96,7 @@
-        { USB_DEVICE(0x0a5c, 0x2033), .driver_info = HCI_IGNORE },
- 
-        /* Broadcom BCM2035 */
--       { USB_DEVICE(0x0a5c, 0x200a), .driver_info = HCI_RESET },
-+       { USB_DEVICE(0x0a5c, 0x200a), .driver_info = HCI_RESET | HCI_BROKEN_ISOC },
- 
-        /* ISSC Bluetooth Adapter v3.1 */
-        { USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET },
+I just got my SonyEricsson K700i from Swisscom, and I'm experimenting
+with bluez and user-space tools (kde-bluetooth).
 
-> > What does "hciconfig hci0 revision" say? These versions look a little
-> > bit wrong.
-> hciconfig hci0 revision
-> hci0:   Type: USB
->         BD Address: 00:02:72:B3:43:18 ACL MTU: 377:10  SCO MTU: 16:0
->         Unsupported manufacturer
+It works quite well, I can send VCARD's using the OBEX Object Push, and
+the phone gets them well. The only glitch is that the file must me named
+*.vcf for the phone to consider it as address records.
 
-Update your libs and utils. The current version is 2.10.
+I have two problems left : 
 
-Regards
+1. OBEX File Transfer (eg to get pictures from the pone) : in Konqueror,
+using kde-buetooth, the selection of "obex://[btaddr]:7/" brings up
+"Authentication Required". From my analysis of the source code, it might
+be caused by the transport layer (bluez), but not sure.
 
-Marcel
+2. UID field in VCARD's : if I send a single VCARD in a file for a
+record already present in the phone, it asks "overwrite y/n ?". If I
+send a file containing two or more VCARD's for records already present
+in the phone, it duplicate them. I added a UID fields as recommended by
+the Vcard spec, the phone seem to ignore it.
+
+Hints welcome, regards,
+Charles
 
 
+-- 
+Charles Bueche <charles@bueche.ch>
+sand, snow, wave, wind and net -surfer
 
 
 -------------------------------------------------------
