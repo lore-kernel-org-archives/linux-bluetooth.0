@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] sdptool setattr
-From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?Jo=E3o?= Santos <jsantos_pt@hotmail.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Sea2-F42DCZx4FR0rmT00041536@hotmail.com>
-References: <Sea2-F42DCZx4FR0rmT00041536@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1075313854.26729.31.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <4017F953.1090108@virgin.net>
+From: Rob Davis <rob.davis@virgin.net>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] epox-presenter
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,22 +15,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jan 2004 19:17:34 +0100
+Date: Wed, 28 Jan 2004 18:02:59 +0000
 
-Hi Joao,
+Is  this still being developed/supported?
 
-> Anyone can tell me how i add a attribute in my sdp record with a boolean 
-> value.
-> i'm trying to add the 0x0302 attr_id(Remote audio volume control) with the 
-> attr_value set as boolean True.
+I've just picked up one of these devices, and was quite happy to see it 
+supported under linux, and even working with remote X windows..
 
-it is not possible, because setattr only supports UUID16, UINT32 and
-STR8. You must fix the add_headset() function of sdptool or extend the
-set_attrib() routine to recognize boolean input.
+However, I was wondering if there was a way of slowing or speeding up 
+the speed of the mouse point, and getting the extra buttons working like 
+a wheel mouse, like in windoze?
 
-Regards
-
-Marcel
 
 
 
