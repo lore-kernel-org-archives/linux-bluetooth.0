@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Kyler Laird <Kyler@Lairds.com>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20040428135604.GD1862@snout>
+Subject: Re: [Bluez-devel] PROBLEM: device node rfcomm0 is removed, but not
+	created.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Christoph Burger-Scheidlin <andersin@gmx.net>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200404281515.02262.andersin@gmx.net>
+References: <200404281515.02262.andersin@gmx.net>
+Content-Type: text/plain
+Message-Id: <1083158876.4000.26.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] What Bluetooth CF cards do developers use?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,24 +19,51 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 28 Apr 2004 08:56:04 -0500
+Date: Wed, 28 Apr 2004 15:27:56 +0200
 
-So far I've bought three CF cards to use with BlueZ.  The first wasn't
-supported well at all.  The second set (Socket, without a protruding
-antenna) was slick but doesn't work with BlueZ under Linux 2.6.
+Hi Christoph,
 
-I want to get something that will work under 2.6 and is likely to
-continue working for awhile (so that I don't have to convince my boss
-to keep buying new ones).  I suspect that the best way to do that is to
-get whatever the developers use.
+> [1] device node rfcomm0 is removed by sysfs upon ppp disconnect, but not 
+> created on connect
+> 
+> [2] I am connecting a palm Tungsten T to my linux box using bluetooth (bluez 
+> stack). I am using dund to listen for incoming connections. My problem is, 
+> that the device node rfcomm0 is not created automatically. However, if I 
+> create it manually, it is removed upon termination of the connection, by 
+> sysfs presumably. Creating the node manually, the connection works fine.
+> 
+> In my rfcommd.conf settings, I have set:
+> rfcomm0 {
+>                 bind no;
+>                 device <btaddr of palm>;
+>                 channel 1;
+>                 comment "Tungsten";
+> }
+> 
+> which appears to be the problem. Setting "bind yes;" will cause the device 
+> node to be created, but the connection fails, presumably because the Tungsten 
+> does not allow binding.
+> 
+> I also tested bluetooth connectivity with my cellphone. issuing the command
+> rfcomm bind 3 <btaddr of cellphone> works and also creates the device 
+> node /dev/rfcomm3.
+> 
+> [3] bluetooth rfcomm sysfs
+> 
+> [4] 2.6.5
+> 
+> I will be happy to provide the rest upon request, but deem it too long to post 
+> it initially
 
-So...what's a good choice?  I'd especially like to find something that
-will readily work with the Zaurus.  A product that is readily available
-at Best Buy/Circuit City/... is preferred.
+the problem will be that the dund creates the RFCOMM TTY devices by
+itself and actually when you use udev it takes some time until the
+device node appears. The "rfcomm connect" function had the same problem
+and we need a similar fix for dund.
 
-Thank you.
+Regards
 
---kyler
+Marcel
+
 
 
 
