@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <2de46576041206085827162a8f@mail.gmail.com>
-From: Manjunath Prabhu <manjunath.mp@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] trusted
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY12-F184548D865F7C7ED1F9A4F8AB40@phx.gbl>
+References: <BAY12-F184548D865F7C7ED1F9A4F8AB40@phx.gbl>
+Content-Type: text/plain
+Message-Id: <1102347788.9644.37.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] HCI data packets
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 6 Dec 2004 22:28:46 +0530
+Date: Mon, 06 Dec 2004 16:43:08 +0100
 
-Hi Marcel,
+Hi Salvatore,
 
-Does, opening a socket and then connect() at the
-L2CAP......automatically establish an HCI connection first and then an
-L2CAP connection on top of it??  This is what HCI dump shows..
+> Does BlueZ impost trusted and Untrusted device?
 
-Can I in someway just create an HCI connection first and then pump HCI data
-packet with some known payload???How can i generate the test data
-packets........... In a way, i just want  pump raw bits.....
+actually this is application specific.
 
-Thanks,
-Regards,
-Manjunath
+> Does BlueZ support Authorisation and authentication, authentication only, no 
+> authentication no authorisation for access service?
+
+It supports authentication on the stack level and you must take care of
+the authorisation inside your application.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
