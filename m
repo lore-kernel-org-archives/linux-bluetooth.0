@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Logitech diNovo/Desktop MX Bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Stian Jordet <liste@jordet.nu>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1071170463.763.10.camel@chevrolet.hybel>
-References: <1071170463.763.10.camel@chevrolet.hybel>
+From: Stian Jordet <liste@jordet.nu>
+To: bluez-users@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1071171612.27255.65.camel@pegasus>
+Message-Id: <1071170463.763.10.camel@chevrolet.hybel>
 Mime-Version: 1.0
+Subject: [Bluez-users] Logitech diNovo/Desktop MX Bluetooth
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,55 +15,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 11 Dec 2003 20:40:12 +0100
+Date: Thu, 11 Dec 2003 20:21:03 +0100
 
-Hi Stian,
+Hi,
 
-> I've been searching the archives a bit. I found some references and talk
-> about the diNovo, but no real answer, though I understand that work are
-> progressing in this area.
-> 
-> Since Greg KH is claiming that my keyboard/mouse are faulty (keeps
-> reconnecting when using usb-serial adapter), I'm going to buy a new set
-> during Christmas, and I'd like to have one of Logitechs BT sets. Thus I
-> have some questions.
-> 
-> Will it work with Linux? I'm running 2.6 kernels. If not, what will I
-> need, and is this already developed? I saw something about a user-space
-> daemon called bthid. Does that mean that the keyboard can't be used
-> untill a user-space daemon has loaded? Can it be used with Grub, for
-> instance?
-> 
-> And one last question, will I be able to sync my phone using the
-> Logitech BT dongle, while both the keyboard and mouse is connected?
+I've been searching the archives a bit. I found some references and talk
+about the diNovo, but no real answer, though I understand that work are
+progressing in this area.
 
-the diNovo Desktop is working fine with Linux, but the code is in an
-early phase of development. We have two implementations at the moment,
-the one from Peter Klausler and the other one from me which is based on
-the new Bluetooth library I am working on. Peter's code need some
-patches to make the keyboard and mouse working and for 2.6 it also needs
-a patch to support the uinput kernel driver. My code includes already
-all the needed stuff, but there is no official release available and the
-code only exists in the BlueZ CVS repositories.
+Since Greg KH is claiming that my keyboard/mouse are faulty (keeps
+reconnecting when using usb-serial adapter), I'm going to buy a new set
+during Christmas, and I'd like to have one of Logitechs BT sets. Thus I
+have some questions.
 
-The Logitech Bluetooth HUB is a little bit problematic, because it is a
-HID proxy capable device. This means it has a HID mode and a HCI mode.
-In HID mode it presents you a USB HID mouse and keyboard and you don't
-need a Bluetooth stack on your PC to have it working. And in this mode
-you can also use your keyboard in the BIOS and for Grub. The HCI mode
-converts this HUB into a simple USB Bluetooth dongle and your OS needs
-to support Bluetooth HID devices. Actually at the moment nobody knows
-how to switch this HUB from HID to HCI mode and back.
+Will it work with Linux? I'm running 2.6 kernels. If not, what will I
+need, and is this already developed? I saw something about a user-space
+daemon called bthid. Does that mean that the keyboard can't be used
+untill a user-space daemon has loaded? Can it be used with Grub, for
+instance?
 
-This all means that you can use the diNovo desktop always with the
-Logitech Bluetooth HUB in HID mode under Linux, but you can't use the
-HUB for phone connections at the same time. You need an extra Bluetooth
-dongle for this until someone figured out how to switch the modes.
+And one last question, will I be able to sync my phone using the
+Logitech BT dongle, while both the keyboard and mouse is connected?
 
-Regards
+Sorry for all these question, but it's a rather expensive toy if I can't
+use it :P Hope someone has any experience to share.
 
-Marcel
+Please cc me if anyone has anything clever to say, as I'm not
+subscribed.
 
+Best regards,
+Stian
 
 
 
