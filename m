@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BCSP problem
-From: Erwin Authried <eauth@softsys.co.at>
+Message-ID: <41E6ED75.2060800@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <BAY104-F40DFDF64BCF0100D83487BC18A0@phx.gbl>
-References: <BAY104-F40DFDF64BCF0100D83487BC18A0@phx.gbl>
-Content-Type: text/plain
-Message-Id: <1105654294.3361.25.camel@kabel>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users] multiple BT dongles
+References: <18514.1105613960@www29.gmx.net> <1105614296.7961.162.camel@pegasus>
+In-Reply-To: <1105614296.7961.162.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,48 +18,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 13 Jan 2005 23:11:35 +0100
+Date: Thu, 13 Jan 2005 22:51:49 +0100
 
-On Thu, 2005-01-13 at 18:01, blookk - wrote:
-> Hello:
-> 
-> I am working with CompactFlash Bluetooth BT0100M, and when I make some data 
-> tranference or operations  as hciattach or other operations  I obtain these 
-> warnings:
-> 
-> 
-> bcsp_recv: Short BCSP packet
-> bcsp_recv: Error in BCSP hdr checksum
-> bcsp_recv: Error in BCSP hdr checksum
-> bcsp_timed_event: Timeout, retransmitting 1 pkts
-> bcsp_recv: Short BCSP packet
-> bcsp_recv: Error in BCSP hdr checksum
-> bcsp_recv: Error in BCSP hdr checksum
-> bcsp_recv: Out-of-order packet arrived, got 0 expected 5
-> bcsp_timed_event: Timeout, retransmitting 1 pkts
-> bcsp_unslip_one_byte: Invalid byte a8 after esc byte
-> bcsp_recv: Out-of-order packet arrived, got 3 expected 2
-> bcsp_recv: Out-of-order packet arrived, got 4 expected 2
-> bcsp_recv: Out-of-order packet arrived, got 5 expected 2
-> bcsp_timed_event: Timeout, retransmitting 1 pkts
-> 
-> 
-> Is there any form to modify the timeout?
-> How can manage this?
-> 
-> Thanks and regards.
-> 
-That looks like you get overrun errors in the serial driver. You can
-check /proc/tty/driver/ if there are overrun errors. I don't know your
-particular card, but generally PCMCIA/CF cards do no have a real uart
-and can send data far beyond the specified baudrate. I had to modify the
-serial driver as well as hci_bcsp.c to get rid of the errors for an
-embedded system (ARM7,40MHz).
+Hello Marcel
 
-Regards,
-Erwin
+Marcel Holtmann wrote:
+> Hi Marco,
+> 
+> 
+>>If i've connected multiple bluetooth dongles to my computer, is it possible
+>>to seperate those two within bluez?
+>>I mean controlling wich services run on wich dongle...
+> 
+> 
+> you can assign the services (application like pand) for each dongle, but
+> right now you can't make the sdpd differ between them.
+
+I think we talk about the same thing, but just to get shure:
+If i program two different rfcomm services, that would mean that i can 
+control which service runs on which dongle?
+
+>>Another little question:
+>>Does anybody know a bluetooth dongle that supports inquiry scan during
+>>active connections?
+> 
+> 
+> Every CSR dongle with at least HCI 16.4 firmware.
+
+Is the firmware updateable?
+Do i have to contact the manufacturer?
 
 
+Thanks a lot for your help Marcel! As always, you're a big help!
+
+
+kind regards
+Marco Trudel
 
 
 -------------------------------------------------------
