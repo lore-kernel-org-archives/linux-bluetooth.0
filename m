@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4118CB27.6000402@dark-reality.de>
+Message-ID: <4118C95E.40904@dark-reality.de>
 From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] snd-bt-sco development teamup...
-References: <4117AB9A.9010909@dark-reality.de>	 <1092071356.4564.12.camel@pegasus> <4117B098.5020805@dark-reality.de>	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>	 <1092090364.4564.46.camel@pegasus> <41180E64.1010007@dark-reality.de>	 <1092140041.4564.96.camel@pegasus>	 <Pine.LNX.4.59.9999.0408101355310.22497@brava.dcs.gla.ac.uk> <1092143505.4564.117.camel@pegasus>
-In-Reply-To: <1092143505.4564.117.camel@pegasus>
+References: <4117AB9A.9010909@dark-reality.de>	 <1092071356.4564.12.camel@pegasus>  <4117B098.5020805@dark-reality.de>	 <1092073167.4564.26.camel@pegasus> <4117C0AB.2010609@superbug.demon.co.uk>	 <1092090364.4564.46.camel@pegasus> <4118B5FF.5070008@dark-reality.de>	 <1092139719.4564.89.camel@pegasus>  <4118C229.3080606@dark-reality.de> <1092142988.4564.109.camel@pegasus>
+In-Reply-To: <1092142988.4564.109.camel@pegasus>
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -17,44 +17,55 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 10 Aug 2004 15:18:31 +0200
+Date: Tue, 10 Aug 2004 15:10:54 +0200
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
 Marcel Holtmann wrote:
-
-|>As far as the existing snd-bt-sco source goes, I think there's a
-|>significant amount of code that can be saved. Most of the code is dealing
-|>with the ALSA integration, management of the mixer and pcm interfaces
-etc.
-|>The kernel thread that does the socket programming can be ripped out
-|>(along with the ioctl handlers that set it up) and replaced with
-|>timer-driven code which talks directly to the SCO module.
+| Hi Lars,
 |
 |
-| I prefer the ALSA integration would be written from scratch, because the
-| original driver was written for a 2.4 kernel and we must concentrate on
-| the 2.6 series. The ALSA subsytem will be cleaned up in the next kernel
-| releases and the magic casting stuff they do is still wrong.
+|>| I actually prefer that you discuss this on the bluez-devel mailing list,
+|>| because you may need to change BlueZ core parts and most of this will be
+|>| kernel related stuff and this should belong here.
+|>
+|>I know, and I voted for that too. But I also feel that we need to
+|>discuss some lineup questions first that might me just fuzz for the
+|>BlueZ list, so I think it's good to start seperatly.
+|>
+|>We'll post and discuss BlueZ-specific stuff on the bluez-devel list, and
+|>propably the other one will die sooner or later. But for now I think
+|>it's a good way to make up our minds first.
+|
+|
+| do it as you like, but remember that I hate cross-postings accross
+| mailing lists.
 
-Hm, OK if someone has the time to do this. I might have, if I do some
-work on this as my final work for my study. Maybe I'll have to talk
-about this with some professors. But I think it's not crazy enough to
-make me happy with it ;)
+me too. Much. It's useless. I'm pretty sure that the more you are
+involved, the more development issues will be discussed on bluez-devel.
 
-Anyway, we'll get this. It's not like an alsa module is that hard to
-write, even from scratch.
+I just feel the need to drag some people into this because for one thing
+development is not really going forward, but I think there are many
+people picking an the problems. That's not good, because I think only
+cooperation brings good results.
 
-cu,
+I hope we can find a proper and nice solution soon, because I'm using
+the headset already in day-to-day phone calling, and the faster it gets
+stable, the less annoyed will be the people I'm talking to.
+
+regards,
 ~  Lars
+
+YAY, CANT HEAR ME AGAIN? SORRY, MY HEADSET IS MESSED UP AGAIN BECAUSE IT
+DROPPED ONE BYTE... ;)
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.3 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFBGMsmQWC6DTWkDAoRArdpAKDG9djRipQay4i1/PRWBBiqFVZnZwCfeFGi
-CoKHPJLgWaZRP62jgqFlu3g=
-=wXN3
+iD8DBQFBGMleQWC6DTWkDAoRAq0iAKC7cClewBhf1tyOaGngcbjXoMvC1QCfUXNY
+AfUFeOse8WDNSsZvVjblnio=
+=1RlX
 -----END PGP SIGNATURE-----
 
 
