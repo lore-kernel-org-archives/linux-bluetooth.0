@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
-To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] err corridge in sdp.c
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Paolino paperino <vonzoltan@yahoo.it>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20041027124534.8266.qmail@web40622.mail.yahoo.com>
+References: <20041027124534.8266.qmail@web40622.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1098890650.9121.53.camel@localhost>
+Message-Id: <1098882103.6611.33.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Any news on DiNovo LCD?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,25 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 27 Oct 2004 17:24:10 +0200
+Date: Wed, 27 Oct 2004 15:01:42 +0200
 
-Hi!
-After some googl'ing I came to the conclusion that Logitech quite
-obviously refuses to give out specs on how to control the LC display of
-the DiNovo media pad.
-Is this still true?
-Or are there other possibilities to, say, hack that protocol?
+Hi Andrea,
 
-The media pad would make a really cool gadget ;)
+>  there is an inconsosistence in the doc comments of
+> the function sdp_service_search_req between sdp.c and
+> sdp.h (bluez_libs_2.8 and 2.9). With more precison, in
+> sdp.c are documented a parameter (lenght of response
+> list) that the function prototipe doesn't define...i
+> think
 
-CU
-  nils faerber
+if you think there is something wrong, please send in a patch.
 
--- 
-kernel concepts          Tel: +49-271-771091-12
-Dreisbachstr. 24         Fax: +49-271-771091-19
-D-57250 Netphen          Mob: +49-176-21024535
---
+Regards
+
+Marcel
+
 
 
 
