@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f54d8640503240350250aae5e@mail.gmail.com>
-From: Benny <bennyvasanth@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: adding sdp service record attributes
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050323134226.4082.qmail@web60901.mail.yahoo.com>
+References: <20050323134226.4082.qmail@web60901.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1111656426.1916.26.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Subject: [Bluez-users] Serial(HCI-UART) Bluetooth Module - Initialization timeout error
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,32 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Mar 2005 17:20:33 +0530
+Date: Thu, 24 Mar 2005 10:27:06 +0100
 
-Dear all,
-            
-We are now working with a RFMD Silicon wave based serial(hci-uart)
-bluetooth module.  We are trying to test for its working under linux
-2.6.  We have installed the Bluetooth stack (bluetooth.o) module and
-the HCI Uart (hci_uart.ko ) module.
-We have tested for the working under windows.
+Hi Michael,
 
-When we try to do hciattach the device with Serial port using the
-following command.
+> P.S. bic_michael.c and bic_rfcomm.c are main programs without and with
+> the part from rfcomm/main.c respectively, and bic_sdp.c and bic_sdp.h
+> are files to be included in /usr/include
 
-             hciattach  /dev/ttyS0 swave 115200 flow
+actually I miss the GPL statement and a comment about the origin for
+parts of your code at the top of these files.
 
-we are getting the INITIALIAZATION TIME OUT error. And it is the same
-result with the following commands also:
+Regards
 
-             hciattach ttyS0 swave 115200 flow
-             hciattach  -s 115200 ttyS0  swave 115200 flow
-             hciattach /dev/ttyS0 swave 115200
-                      
-Has anyone faced this problem before. Any pointers? Please advice.
+Marcel
 
-Thanks and regards
-Benny
+
 
 
 -------------------------------------------------------
