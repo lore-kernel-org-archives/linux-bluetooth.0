@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20040825085103.14132.qmail@webmail29.rediffmail.com>
-MIME-Version: 1.0
-From: "abhay b" <abhay7182@rediffmail.com>
-Reply-To: "abhay b" <abhay7182@rediffmail.com>
-To: bluez-devel@lists.sourceforge.net
-Content-type: multipart/alternative;
-	boundary="Next_1093423863---0-203.199.83.39-14055"
-Subject: [Bluez-devel] driver code of bluez for PCMCIA?
+Subject: Re: [Bluez-devel] Extra keyboard events are back with 2.6.8.1 and
+	bluez-libs/utils 2.10
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vesa Halttunen <vesuri@jormas.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1093385241.495.3.camel@pc.vesuri.net>
+References: <1093375338.560.11.camel@pc.vesuri.net>
+	 <1093376692.17083.1.camel@pegasus>  <1093385241.495.3.camel@pc.vesuri.net>
+Content-Type: text/plain
+Message-Id: <1093423799.17083.3.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,32 +20,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 25 Aug 2004 08:51:03 -0000
+Date: Wed, 25 Aug 2004 10:49:59 +0200
 
- This is a multipart mime message
+Hi Vesa,
 
+> > maybe this is a problem of the boot protocol mode. Try using the patch
+> > 2.6.8-mh1 with kernel 2.6.8.1.
+> 
+> ...and it works fine! Thanks. I should have tried it out earlier but I
+> thought it isn't necessary "since all bugfixes and new features for the
+> Bluetooth subsystem got merged into the 2.6.8 release"... :)
 
---Next_1093423863---0-203.199.83.39-14055
-Content-type: text/html;
-	charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+the news item also states that this patch contains the HID report
+protocol mode support ;)
 
-<P>=0A&nbsp; <BR>=0Ahi <BR>=0Adoes anyone have bluez/BT sample driver code =
-for PCMCIA or CF or any notes available <BR>=0Athanks<BR>=0AAbhay<BR>=0A=0A=
-</P>=0A<br><br>=0A<A target=3D"_blank" HREF=3D"http://clients.rediff.com/si=
-gnature/track_sig.asp"><IMG SRC=3D"http://ads.rediff.com/RealMedia/ads/adst=
-ream_nx.cgi/www.rediffmail.com/inbox.htm@Bottom" BORDER=3D0 VSPACE=3D0 HSPA=
-CE=3D0></a>=0A
---Next_1093423863---0-203.199.83.39-14055
-Content-type: text/plain;
-	charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Regards
 
- =A0=0Ahi =0Adoes anyone have bluez/BT sample driver code for PCMCIA or CF =
-or any notes available =0Athanks=0AAbhay=0A
---Next_1093423863---0-203.199.83.39-14055--
+Marcel
+
 
 
 
