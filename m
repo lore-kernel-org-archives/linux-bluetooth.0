@@ -1,19 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Bluetooth address specific device
-	configuration
+Subject: Re: [Bluez-devel] [PATCH] New keytab storage
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Fredrik Noring <noring@nocrew.org>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Edd Dumbill <edd@usefulinc.com>
-In-Reply-To: <1075564164.14644.167.camel@akka.yeti.nocrew.org>
-References: <1075316178.553.18.camel@akka.yeti.nocrew.org>
-	 <1075355567.26729.65.camel@pegasus>
-	 <1075405154.22564.64.camel@akka.yeti.nocrew.org>
-	 <1075406315.22564.67.camel@akka.yeti.nocrew.org>
-	 <1075563018.2720.19.camel@pegasus>
-	 <1075564164.14644.167.camel@akka.yeti.nocrew.org>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1075563628.14644.161.camel@akka.yeti.nocrew.org>
+References: <1075506991.14644.114.camel@akka.yeti.nocrew.org>
+	 <1075509170.3594.36.camel@pegasus>
+	 <1075510549.14644.135.camel@akka.yeti.nocrew.org>
+	 <1075511922.3594.49.camel@pegasus>
+	 <1075541234.14644.149.camel@akka.yeti.nocrew.org>
+	 <1075562590.2720.13.camel@pegasus>
+	 <1075563628.14644.161.camel@akka.yeti.nocrew.org>
 Content-Type: text/plain
-Message-Id: <1075564788.2720.49.camel@pegasus>
+Message-Id: <1075564322.2720.42.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -25,38 +24,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 31 Jan 2004 16:59:49 +0100
+Date: Sat, 31 Jan 2004 16:52:02 +0100
 
 Hi Fredrik,
 
-> As far as I can see there is only one misplaced space and two 
-> misplaced '{' characters in the entire patch, on lines 93, 312
-> and 331 in main.c. :)
+> > the compat directories contains the old code until all parts are
+> > replaced. This is why it is called compat. Don't focus on it.
+> 
+> Since the "new" hcid was lost and there is no replacement, I'll work 
+> on the old code. I think it's very useful. I'm currently cleaning up 
+> the mess in "glib-ectomy" and preparing it for a DBus connection.
 
-I have seen more. Also misplaced comments ;)
+it is not very hard to replace this code, but I am a little bit busy and
+the CVS is dead at the moment. But I think we should discuss some design
+goals of the new device manager.
 
-One other thing.
-
-static void init_device_defaults(struct device_opts *device_opts)
-{
-       device_opts->name        = 0;
-       device_opts->class       = 0;
-       device_opts->pkt_type    = 0;
-       device_opts->scan        = SCAN_PAGE | SCAN_INQUIRY;
-       device_opts->link_mode   = 0;
-       device_opts->link_policy = 0;
-       device_opts->auth        = 0;
-       device_opts->encrypt     = 0;
-}
-
-This is too much and not needed, because we can use memset().
-
-	memset(device_opts, 0, sizeof(*device_opts));
-	device_opts->scan = SCAN_PAGE | SCAN_INQUIRY;
-
-I know one function later it is used in the same style, but I don't like
-it either. And of course in this case inlining the function is a good
-idea.
+I don't see what kind of mess in "glib-ectomy" you mean, but go ahead
+and send a patch for it. The D-Bus support is one of the things I
+definitively want to have in the next release, so every patch would help
+here. Please keep both separate, because small patches are easier to
+review.
 
 Regards
 
