@@ -1,61 +1,56 @@
-Return-Path: <James@superbug.demon.co.uk>
-Message-ID: <4039275F.5020802@superbug.demon.co.uk>
-Date: Sun, 22 Feb 2004 22:04:15 +0000
-From: James Courtier-Dutton <James@superbug.demon.co.uk>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: =?ISO-8859-1?Q?Fred_Sch=E4ttgen?= <bluez-devel@schaettgen.de>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>,
-   Simon Vogl <vogl@soft.uni-linz.ac.at>
+Return-Path: <bluez-devel@schaettgen.de>
+From: Fred =?iso-8859-1?q?Sch=E4ttgen?= <bluez-devel@schaettgen.de>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] sco link help needed
-References: <4034CA08.50500@soft.uni-linz.ac.at>	 <200402191629.38846.bluez-devel@schaettgen.de>	 <40376D2B.1060904@superbug.demon.co.uk> <1077452836.2716.42.camel@pegasus>	 <403916CB.3060205@superbug.demon.co.uk> <1077485446.2832.14.camel@pegasus>
-In-Reply-To: <1077485446.2832.14.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Date: Sun, 22 Feb 2004 22:54:53 +0100
+Cc: James Courtier-Dutton <James@superbug.demon.co.uk>,
+   Marcel Holtmann <marcel@holtmann.org>,
+   Simon Vogl <vogl@soft.uni-linz.ac.at>
+References: <4034CA08.50500@soft.uni-linz.ac.at> <1077452836.2716.42.camel@pegasus> <403916CB.3060205@superbug.demon.co.uk>
+In-Reply-To: <403916CB.3060205@superbug.demon.co.uk>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200402222254.53781.bluez-devel@schaettgen.de>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Marcel Holtmann wrote:
-> Hi James,
-> 
-> 
->>A agree that we need a clearly defined interface for the bluetooth SCO.
->>For SCO connections the interface will HAVE to be a callback based 
->>interface. SCO is all about realtime data, and we must ensure minimal 
->>latency, so that requires a callback interface.
->>I.E. We set up the SCO connection, and get it to callback after every X 
->>frames received. The same for sending, callback saying I need X samples now!
-> 
-> 
-> we already had this discussion and there is no need for such a callback
-> stuff. If there is too much data, we simply have to drop some samples.
+On Sunday 22 February 2004 21:53, James Courtier-Dutton wrote:
+> Marcel Holtmann wrote:
+> > we don't need a kernel module that implements the headset profile as an
+> > audio device. What we need is a generic SCO kernel module with a well
+> > defined interface that is between the Bluetooth HCI SCO traffic and the
+> > ALSA sound layer. This means that if a SCO connection is created the
+> > driver must set up a new sound device, but the mixer stuff is profile
+> > stuff and must be done by a userspace application.
+...
+> Summary: -
+> 1) The alsa driver for bluetooth will be a kernel mode implementation of
+> the bluetooth headset profile.
 
-So you only want a basic read/write interface? No possibility for 
-specifying low latency and setting accurate playback timing?
-What would happen if the user wanted to use bluetooth headphones, and 
-wanted sound to come out of the headphones, and the video from a DVD to 
-be displayed on the computer screen. We need some way to ensure the two 
-are in sync. A simple read/write interface cannot do that.
-For playing a DVD, latency does not matter, what matters in accurate 
-playback timing.
-For Voice over IP, low latency is what matters.
-I cannot see how your simple read/write interface can handle these 
-options. The SCO interface should be able to handle all these.
+I don't understand why the whole headset profile has to be implemented as a 
+part of an alsa driver. Everything can be done completely in user space 
+already, completely independent from alsa. The only reason one might wish to 
+have a special alsa driver is better responsiveness only, or what else did I 
+miss? 
+The rfcomm stuff isn't performance critical at all, so there is need for it to 
+go into an alsa driver.
 
-> 
-> 
->>For alsa to work well with bluetooth, we will need some special handling 
->>. The main use of alsa with bluetooth will be for headset communications 
->>and therefore use the bluetooth headset profile.
-> 
-> 
-> That is wrong. Also Handsfree, Cordless Telephony and Intercom needs a
-> SCO to audio device mapping. With eSCO we will also have a data link and
-> maybe more profiles in the future.
+> 2) A userspace tool will be used to configure the bluetooth pairing and
+> configure the alsa-bluez link.
+>
+> 3) We will need to be able to implement bluetooth profiles in kernel
+> modules as well as user space applications.
 
-Ok, so you only want alsa to interface PCM (alsa's term for an audio 
-channel, where the audio samples go.) directly to a SCO channel.
-So, what about an application that supports alsa now. How will it set 
-volume and mic levels on a bluetooth headset? Will the user have to add 
-special bluetooth support to their application?
+I really don't like the idea that an alsa driver would decide if a sco 
+connection is going to be accepted or not. This should all be up to the a 
+regular userspace application. The alsa driver should not accept incoming 
+connections itself. 
+Instead their should be a way for the application to create or accept (or not 
+accept) a SCO connection the usual way and - only if it wishes to - tell alsa 
+to take care of that connection by creating a new alsa device for it.
+The only job the driver should do is to connect an existing sco socket to an 
+alsa device and make sure that there are no cracks in the audio stream, 
+nothing more.
 
-Cheers
-James
+greetings
+Fred
