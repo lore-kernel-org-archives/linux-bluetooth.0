@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20040922104057.17401.qmail@webmail27.rediffmail.com>
-MIME-Version: 1.0
-From: "abhay b" <abhay7182@rediffmail.com>
-Reply-To: "abhay b" <abhay7182@rediffmail.com>
-To: bluez-devel@lists.sourceforge.net
-Content-type: multipart/alternative;
-	boundary="Next_1095849657---0-203.199.83.37-17383"
-Subject: [Bluez-devel] "iobase" pcmcia?
+Subject: Re: [Bluez-devel] [2.6.8 ->] Problems, hci_usb dosn't work.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ian Kumlien <pomac@vapor.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>,
+   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1095807044.3211.9.camel@big>
+References: <1095807044.3211.9.camel@big>
+Content-Type: text/plain
+Message-Id: <1095842833.5762.27.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,44 +19,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: 22 Sep 2004 10:40:57 -0000
+Date: Wed, 22 Sep 2004 10:47:13 +0200
 
- This is a multipart mime message
+Hi Ian,
 
+> Since some kernel version i can't exactly remember which, i have been
+> unable to use usb, i have tested with with 2.6.8 -> 2.6.9-rc2-bk7 and i
+> also applied your patches for 2.6.8.
+> 
+> I have 2 usb dongles, one old that did work once, and one new that seems
+> to be working like the older but it doesn't work with linux.
+> 
+> Both are based on the CSR chipset, here is the new ones entry from the
+> hw support list:
+> MSI MS-6967 CSR 1.1 hci_usb working Dave Beckett
+> 
+> Som logs from insertions:
+> usb 1-3.4: new full speed USB device using address 12
+> ehci_hcd 0000:00:02.2: qh f7e54780 (#0) state 1
+> hci_usb_intr_rx_submit: hci0 intr rx submit failed urb d968cd74 err -28
+> 
+> usb 1-4.4: new full speed USB device using address 13
+> ehci_hcd 0000:00:02.2: qh f7e54900 (#0) state 1
+> hci_usb_intr_rx_submit: hci1 intr rx submit failed urb d315eef4 err -28
+> 
+> both of these are connected to usb 2.0 hubs (this machine does usb 2.0)
 
---Next_1095849657---0-203.199.83.37-17383
-Content-type: text/html;
-	charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+this looks like an USB problem to me. Try to connect it to USB 1.1 ports
+and see if this works.
 
-<P>=0A&nbsp; <BR>=0Ahi i got the code of Bluetooth driver for the Anycom Bl=
-ueCard (LSE039/LSE041)in this code and some other codes i have seen there i=
-s a parameter called &quot;iobase &quot;<BR>=0Aits being used in many palce=
-s like<BR>=0A outb(0x08 | 0x20, iobase + 0x30);<BR>=0Asoem functions take i=
-t as argument but i dont know how we r getting a partcular address as nowhe=
-re its intialized to some address.<BR>=0Ai want to know what this address i=
-s? is it base address of io window? is the pcmcia memory is part of io memo=
-ry? how we get a value for tha parameter &quot;iobase&quot;<BR>=0Athanks<BR=
->=0Aabhay=0A</P>=0A<br><br>=0A<A target=3D"_blank" HREF=3D"http://clients.r=
-ediff.com/signature/track_sig.asp"><IMG SRC=3D"http://ads.rediff.com/RealMe=
-dia/ads/adstream_nx.cgi/www.rediffmail.com/inbox.htm@Bottom" BORDER=3D0 VSP=
-ACE=3D0 HSPACE=3D0></a>=0A
---Next_1095849657---0-203.199.83.37-17383
-Content-type: text/plain;
-	charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Regards
 
- =A0=0Ahi i got the code of Bluetooth driver for the Anycom BlueCard (LSE03=
-9/LSE041)in this code and some other codes i have seen there is a parameter=
- called "iobase "=0Aits being used in many palces like=0A outb(0x08 | 0x20,=
- iobase + 0x30);=0Asoem functions take it as argument but i dont know how w=
-e r getting a partcular address as nowhere its intialized to some address.=
-=0Ai want to know what this address is? is it base address of io window? is=
- the pcmcia memory is part of io memory? how we get a value for tha paramet=
-er "iobase"=0Athanks=0Aabhay
---Next_1095849657---0-203.199.83.37-17383--
+Marcel
+
 
 
 
