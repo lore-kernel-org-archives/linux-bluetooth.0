@@ -1,37 +1,61 @@
-Return-Path: <pavouk@pavouk.org>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] MSI MS-6970 (BToes) firmware upgrade
-Date: Fri, 16 Jul 2004 10:45:10 +0200
-Cc: Marcel Holtmann <marcel@holtmann.org>, cijoml@volny.cz
-References: <200407131225.15448.pavouk@pavouk.org> <200407152241.30155.cijoml@volny.cz> <1089959822.4517.52.camel@pegasus>
-In-Reply-To: <1089959822.4517.52.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200407161045.10846.pavouk@pavouk.org>
-List-ID: <bluez-users.lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: cijoml@volny.cz
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200407152241.30155.cijoml@volny.cz>
+References: <200407131225.15448.pavouk@pavouk.org>
+	 <1089826413.4517.4.camel@pegasus> <200407152159.47024.pavouk@pavouk.org>
+	 <200407152241.30155.cijoml@volny.cz>
+Content-Type: text/plain
+Message-Id: <1089959822.4517.52.camel@pegasus>
+Mime-Version: 1.0
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Fri, 16 Jul 2004 08:37:02 +0200
 
-Hi,
+Hi Michal,
 
-> > Does anybody has a newer .dfu file for Microsoft Wireless Transceiver
-> > dongle? :(
-> > It would be nice to has it 1.2 ready :((
->
-> I don't know of any and flashing another one breaks your Microsoft
-> dongle completly.
+> Does anybody has a newer .dfu file for Microsoft Wireless Transceiver 
+> dongle? :(
+> It would be nice to has it 1.2 ready :((
 
-Michal probably means "Microstar" not "Microsoft" dongle, because he has
-maybe same dongle MS-6970 like me.
+I don't know of any and flashing another one breaks your Microsoft
+dongle completly.
 
-> The only dongle that can be easily updated using the Apple firmware is
-> from D-Link. And I only had success with the B3 revision. The B4 is not
-> working and I broke another dongle of mine.
+> Marcel could you pls enhance your site with supported dongles about info that 
+> this dongle was successfully upgraded using newer firmware and contact to 
+> person who reported it? It will help many people and will save our time to 
+> this feature questions.
 
-Can you tell me, if firmware for D-link use different key than firmware
-for MSI?
-It's possible to get this information from DFU file?
+The only dongle that can be easily updated using the Apple firmware is
+from D-Link. And I only had success with the B3 revision. The B4 is not
+working and I broke another dongle of mine.
 
-Best regards,
+So I won't go any further with firmware upgrades until the manufactures
+come to me and say that they wanna have a Linux firmware upgrade tool.
 
-Pavel Ruzicka
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by BEA Weblogic Workshop
+FREE Java Enterprise J2EE developer tools!
+Get your free copy of BEA WebLogic Workshop 8.1 today.
+http://ads.osdn.com/?ad_id=4721&alloc_id=10040&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
