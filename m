@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41E28999.9070005@cc.gatech.edu>
-From: Jay Summet <summetj@cc.gatech.edu>
+In-Reply-To: <27251cb805011005263325ddce@mail.gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Re: rfcomm -> /dev/dsp? (phone as headset)
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net, panizzon@woody.ch
-References: <20050110040324.3E5548852B@sc8-sf-spam1.sourceforge.net>
-In-Reply-To: <20050110040324.3E5548852B@sc8-sf-spam1.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] Re: Accept incomming serial connection (palm hotsync)
+Message-ID: <OFFD66E982.58D7AFC3-ONC1256F85.004A0E9B-C1256F85.004BE1D7@isbac.com>
+From: Marius Schaefer/Camberg/ISBAC <Marius.Schaefer@ISBAC.COM>
+Content-Type: text/plain; charset="US-ASCII"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,64 +17,112 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 10 Jan 2005 08:56:41 -0500
+Date: Mon, 10 Jan 2005 14:48:46 +0100
+
+I would be very interested in doing this.
+
+Imagine when you are at home, your bluetooth phone acts just like a normal 
+wireless phone. You can make phone calls without having to pay the high 
+mobile rates and it rings when there is an incoming call on your normal 
+phone line.
+
+When your phone is out of bluetooth range, you could switch on the mailbox 
+on your phone line or set a call forwarding to your mobile.
+
+I think there are a lot more things one could imagine...
+
+Marius
 
 
->    3. Accept incomming serial connection (palm hotsync) (Benoit Panizzon)
+bluez-users-admin@lists.sourceforge.net wrote on 10.01.2005 14:26:05:
 
+> I can't see many people interested in exactly this, but it would be
+> useful to make a wireless phone call without buying a wireless phone
+> or buying expensive VoIP hardware.
 > 
-> --__--__--
+> Doing the same using a Bluetooth headset is more useful but less
+> people have these. More people have bluetooth phones than headsets I
+> believe - because Bluetooth headsets have only been marketed for use
+> with mobiles and not PCs, landlines, as walkie talkies or anything
+> else for some strange reason (the world is useless).
 > 
-> Message: 3
-> From: Benoit Panizzon <panizzon@woody.ch>
-> To: bluez-users@lists.sourceforge.net
-> Date: Sun, 9 Jan 2005 18:45:26 +0100
-> Subject: [Bluez-users] Accept incomming serial connection (palm hotsync)
-> Reply-To: bluez-users@lists.sourceforge.net
+> You shouldn't have to buy a headset for say, gaming communication with
+> say, a program like Teamspeak if you already have a bluetooth headset.
 > 
-> Hi all
+> And seeing as I need a mic headset I'd like to be able to use the
+> bluetooth dongle I've already bought and kill 3 birds with one stone.
 > 
-> I'm trying to be able to sync my palm zire via bluetooth.
+> p.s. using the PC for audio interface is interesting though.
 > 
-> As I understood from the ircomm or USBtty Connection the palm just wants to 
-> build a simple serial connection to the hotsync host.
 > 
-> Everything else via bluetooth works fine: obexpush, dund... (strange it does 
-> not recognize pand, but I assume palm only supports dund...)
+> On Mon, 10 Jan 2005 11:30:13 +0100, soraberri <421246@posta.unizar.es> 
+wrote:
+> > Michal Semler wrote:
+> > > Dne ne 9. ledna 2005 23:06 jago25_98 / ajpearce napsal(a):
+> > >
+> > >>How do I use my phone as a microphone input? It has the "Voice
+> > >>gateway" bluetooth profile on channel 1, which is bound to
+> > >>/dev/rfcomm1
+> > >>
+> > >>Maybe there's something in the kbluetoothd (KDE) that can help?
+> > >>
+> > >>hmm... I see there is the alsa-bluetooth project but I'm not sure 
+how
+> > >>to use it, and not sure if it will work with my phone.
+> > >
+> > >
+> > > Project you are looking for is:
+> > >
+> > > http://www.crazygreek.co.uk/content/chan_bluetooth
+> > >
+> > > Michal
+> > >
+> > >
+> > 
+> > The project you mention is about 'Bluetooth HandsFreeProfile support 
+for
+> > Asterisk'. Then, you can use the computer as a handsfree device: you
+> > carry the phone in your briefcase and the laptop in the desk, so you 
+can
+> >  make/receive calls without speaking to the phone -you speak to the
+> > laptop.
+> > A different thing is to use the phone as audio input: in this case you
+> > want to speak to your phone, but you want the streaming audio to reach
+> > the computer via bluetooth in order to use VoIP there (for example). 
+So
+> > you use the phone just like a headset, the difference is that you have
+> > to hold it by hand instead of hook it in the ear. This way, all you 
+need
+> > in the Linux point is Bluez and btsco (bluetooth-alsa) in order to 
+have
+> > AudioGateway support. The problem is what you need in the phone end: I
+> > think at least Symbian, and the possibility to "read/write" from/to 
+the
+> > phone audio device and implement the headset profile.
+> > 
+> > Do you think is it possible? Has it been managed anywhere?
+> > I guess many people wouldn't like the idea at all...
+> > 
+> > -------------------------------------------------------
+> > The SF.Net email is sponsored by: Beat the post-holiday blues
+> > Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+> > It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
 > 
-> But I don't manage to build a serial connection.
 > 
-> When I add bind yes into frcomm.conf then the computer initiates the 
-> connection and the palm of course rejects it...
-> 
-> So the solutions seamed to be to have an entry in rfcomm.conf with bind no and 
-> then use:
-> 
-> rfcomm list /dev/rfcomm1 8
-> 
-> To announce channel 8 as serial service and then have the palm connect to 
-> rfcomm1.
-> 
-> Unfortunately before the palm connects the rfcomm1 device is not availabe and 
-> without it being available the palm does not seam to want to connect...
-> 
-> Are there any 'undocummented' options to rfcomm to make the device show being 
-> present and waiting for the palm to connect? Like dund does?
-> 
-> Regards
-> -Benoit-
-> 
+> -------------------------------------------------------
+> The SF.Net email is sponsored by: Beat the post-holiday blues
+> Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
+> It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-I am able to sync my Palm T via bluetooth, but the way I do it is not by setting 
-up a serial connection. Instead, I set up a PAN connection (giving my palm pilot 
-a local ip address and my computer another) and then do a NETWORK hotsync (vs 
-serial over bluetooth) using the IP address of my computer. I tell Jpilot 
-(pilot-link) to listen to "net:all" (or is it "net:any"....)...
-
-I did this because I read (somewhere) that a plain serial over bluetooth 
-wouldn't work for some odd reason...
-
-Jay
 
 
 -------------------------------------------------------
