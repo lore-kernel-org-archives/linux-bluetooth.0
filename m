@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Kyler Laird <Kyler@Lairds.com>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] What Bluetooth CF cards do developers use?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: kyler-dated-1083420652.dfd739@lairds.com
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040428141637.GE1862@snout>
+Message-ID: <20040428141637.GE1862@snout>
+Reply-To: kyler-dated-1083420652.dfd739@lairds.com
 References: <20040428135604.GD1862@snout> <1083161388.4000.40.camel@pegasus>
-	 <20040428141637.GE1862@snout>
-Content-Type: text/plain
-Message-Id: <1083162180.4000.45.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1083161388.4000.40.camel@pegasus>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,45 +18,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 28 Apr 2004 16:23:00 +0200
+Date: Wed, 28 Apr 2004 09:16:37 -0500
 
-Hi Kyler,
+On Wed, Apr 28, 2004 at 04:09:48PM +0200, Marcel Holtmann wrote:
 
-> > someone just asked me the same question. Actually I don't know what's
-> > the best CF card so far. The non working Socket 2.5 is very bad, but it
-> > is not the fault of the Bluetooth developers, because I think the
-> > problem is in the serial subsystem.
-> 
-> Has that been noted anywhere useful?
+> someone just asked me the same question. Actually I don't know what's
+> the best CF card so far. The non working Socket 2.5 is very bad, but it
+> is not the fault of the Bluetooth developers, because I think the
+> problem is in the serial subsystem.
 
-it has been raised on the serial mailing list, but the problem is that
-nobody really knows where the problem is, because some cards are still
-working.
+Has that been noted anywhere useful?
 
-> > Starting with 2.6.6-rc2 the Anycom
-> > CF-300 is finally supported. Actually the card works in my development
-> > machine.
-> 
-> Sounds like a winner.  I'll look for it.
+> Starting with 2.6.6-rc2 the Anycom
+> CF-300 is finally supported. Actually the card works in my development
+> machine.
 
-Don't blame me if it don't works in a Zaurus ;)
+Sounds like a winner.  I'll look for it.
 
-> > And actually I don't use any CF card for development. I do everything
-> > with Bluetooth development boards with USB and serial connectors.
-> 
-> I thought USB might be the answer so last week I bought two USB Bluetooth
-> adapters (Belkin and Kensington).  Only one (barely) fits in the USB slot
-> of my Toughbook.  The other fits enough to make contact but if I happen
-> to bump either one out of the socket the kernel crashes.  That's not
-> what I need when I'm on the road.
+> And actually I don't use any CF card for development. I do everything
+> with Bluetooth development boards with USB and serial connectors.
 
-The USB related kernel oopses should all be fixed with the upcoming
-2.6.6, I hope.
+I thought USB might be the answer so last week I bought two USB Bluetooth
+adapters (Belkin and Kensington).  Only one (barely) fits in the USB slot
+of my Toughbook.  The other fits enough to make contact but if I happen
+to bump either one out of the socket the kernel crashes.  That's not
+what I need when I'm on the road.
 
-Regards
+Thank you for the info.
 
-Marcel
-
+--kyler
 
 
 
