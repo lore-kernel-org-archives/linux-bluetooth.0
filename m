@@ -1,8 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 From: Gene Imes <ebi7@ozob.net>
 To: list bluez <bluez-users@lists.sf.net>
+In-Reply-To: <Pine.OSF.4.10.10406121321460.6753-100000@speed.seas.smu.edu>
+References: <Pine.OSF.4.10.10406121321460.6753-100000@speed.seas.smu.edu>
 Content-Type: text/plain
-Message-Id: <1087080981.21738.3.camel@tr1a.ozob.net>
+Message-Id: <1087078183.9717.22.camel@tr1a.ozob.net>
 Mime-Version: 1.0
 Subject: [Bluez-users] bluepin
 Sender: bluez-users-admin@lists.sourceforge.net
@@ -15,10 +17,7 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 12 Jun 2004 17:56:21 -0500
-
-Sorry about that. I inadvertantly tacked this to another thread. My
-apologies.
+Date: Sat, 12 Jun 2004 17:09:43 -0500
 
 Anyone know how to fix this:
 
@@ -36,8 +35,6 @@ RuntimeError: could not open display
 Thanks,
 
 Gene
-
-
 
 
 
