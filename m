@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Epox Barton keyboard: HID create error 53
+Subject: Re: [Bluez-users] Bluetooth keyboards / Frogpad
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Matthias Thomae <bluez@thomae-privat.de>
+To: Thomas Chiverton <thomas.chiverton@bluefinger.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <40CEC020.6050107@thomae-privat.de>
-References: <40CDE18C.70703@thomae-privat.de>
-	 <1087255678.13792.51.camel@pegasus>  <40CE96A8.3020407@thomae-privat.de>
-	 <1087284859.13792.67.camel@pegasus>  <40CEC020.6050107@thomae-privat.de>
+In-Reply-To: <200406151006.07385@moveAlongNothingToSeeHere>
+References: <40CB0CB1.3040003@web.de> <1087228739.13792.10.camel@pegasus>
+	 <200406151006.07385@moveAlongNothingToSeeHere>
 Content-Type: text/plain
-Message-Id: <1087292887.13792.81.camel@pegasus>
+Message-Id: <1087292436.13792.75.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,41 +19,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 15 Jun 2004 11:48:07 +0200
+Date: Tue, 15 Jun 2004 11:40:36 +0200
 
-Hi Matthias,
+Hi Thomas,
 
-> > it is a problem of the HID parser. If you enable debugging with "#define
-> > DEBUG" in net/bluetooth/hidp/hid.h then you should see those lines with
-> > dmesg:
-> > 
-> > net/bluetooth/hidp/hid.c: usage index exceeded
-> > net/bluetooth/hidp/hid.c: hid_add_usage failed
-> > net/bluetooth/hidp/hid.c: item 0 2 2 2 parsing failed
-> > 
-> > Do you see it, too?
+> > in general it should work, but I can't promise anything. Hopefully I get
+> > one of these next month.
 > 
-> Yes, I see exactly the same.
+> Ohh, rar, which one ?
 
-someone has to fix the HID parser to get it working with the keyboard
-and the presenter from EPoX. I am a little bit busy in getting the boot
-protocol support ready, so that we can at least include HID boot support
-into the mainline kernel. The full report protocol support has to wait
-until the kernel gets its device independent HID support.
-
-> > Please send me the output of your mouse too and use
-> 
-> I`ll send it tonight, 'cause I haven't got it with me now.
-> 
-> > 	sdptest records 00:04:61:xx:xx:xx > file
-> > 
-> > from the utils2 CVS to get the full SDP record information.
-> 
-> It's attached. Do you need the same from the mouse, too?
-> Anything else I can do?
-
-Please do so. I want to compare it with my devices. The keyboard looks
-the same as mine. It seems they only choosed a newer CSR firmware.
+are there any differences? I am only interested in the Bluetooth version
+and as I know, they only differ between right- or left-handed.
 
 Regards
 
