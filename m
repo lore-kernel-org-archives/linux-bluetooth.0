@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] HCI Stops responding
-Reply-To: axs203dd@excite.com
-From: "mr" <axs203dd@excite.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Message-Id: <20041011125233.B209D3DD1@xprdmailfe11.nwk.excite.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: axs203dd@excite.com
+Cc: bluez-users@lists.sourceforge.net
+In-Reply-To: <20041011112240.AEDA5B6D8@xprdmailfe14.nwk.excite.com>
+References: <20041011112240.AEDA5B6D8@xprdmailfe14.nwk.excite.com>
+Content-Type: text/plain
+Message-Id: <1097497926.9474.18.camel@notepaq>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,52 +18,59 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 11 Oct 2004 08:52:33 -0400 (EDT)
+Date: Mon, 11 Oct 2004 14:32:06 +0200
 
+Hi,
 
-> What kernel do you use? Is the hci_usb driver compiled with SCO support?
+> >send in more information. What does "hciconfig -a" say?
+> 
+> 
+> 
+> hci0:   Type: USB
+> 
+>         BD Address: 00:02:72:80:4A:F9 ACL MTU: 192:8  SCO MTU: 64:8
+> 
+>         UP RUNNING PSCAN ISCAN AUTH ENCRYPT
+> 
+>         RX bytes:41034 acl:378 sco:0 events:777 errors:0
+> 
+>         TX bytes:126303 acl:766 sco:0 commands:15 errors:0
+> 
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+> 
+>         Packet type: DM1 DH1 HV1
+> 
+>         Link policy: RSWITCH HOLD SNIFF PARK
+> 
+>         Link mode: ACCEPT MASTER
+> 
+>         Name: 'BlueZ (0)'
+> 
+>         Class: 0x000100
+> 
+>         Service Classes: Unspecified
+> 
+>         Device Class: Computer, Uncategorized
+> 
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+> 
+>         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> 
+> 
+> 
+> 
+> I have tried different packets also but no result... Any idea?
 
-
-
-I'm using 2.4.27 with bluetooth support compiled as modules. The hci_usb is compiled with SCO support.
-
-
-
-The lsmod gives:
-
-
-
-bnep                    8500   1
-
-l2cap                  15952   2  [bnep]
-
-hci_usb                 8504   1
-
-bluez                  29092   3  [sco bnep l2cap hci_usb]
-
-usbcore                61452   1  [usb-ohci hci_usb]
-
-fealnx                 10288   2
-
-mii                     2368   0  [fealnx]
-
-crc32                   2848   0  [bnep fealnx]
-
-
-
-I have tried bluez-libs & utils 2.7 and 2.10 (currently) as well.
-
-
+don't try other packet types. Leave them all on. The link manager will
+use the right one. What kernel do you use? Is the hci_usb driver
+compiled with SCO support?
 
 Regards
 
-Elias
+Marcel
 
 
-
-_______________________________________________
-Join Excite! - http://www.excite.com
-The most personalized portal on the Web!
 
 
 -------------------------------------------------------
