@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <db972f43040818004773fa590a@mail.gmail.com>
-From: Ricky Soh <rickysoh@gmail.com>
-Reply-To: Ricky Soh <rickysoh@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] can't establish a connection
+From: Marcel Holtmann <marcel@holtmann.org>
+To: ben4fun <ben_4_fun@freenet.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1092779397.3475.31.camel@localhost>
+References: <1091742606.6143.17.camel@localhost>
+	 <1092727197.12606.1.camel@localhost> <1092728177.31651.6.camel@pegasus>
+	 <200408170949.50588.cijoml@volny.cz>  <1092776029.3475.27.camel@localhost>
+	 <1092778940.31651.39.camel@pegasus>  <1092779397.3475.31.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1092814652.31651.43.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Newbie
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,21 +21,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Aug 2004 15:47:10 +0800
+Date: Wed, 18 Aug 2004 09:37:32 +0200
 
-Sorry, I am a newbie in this area and is doing a sch project in Linux
-using Bluez. Thus i would like to find out where can i find the
-complete listing of the bluez api.
+Hi Ben,
 
-Secondly, I compile the following code btxml.c from a web and tried
-running. However, it produces this line:
+> > so adding the broken ISOC quirk would be enough to make this dongle work
+> > again. Maybe the last time I tested it, I had the SCO support disabled.
+> Is this something to add in the kernel settings?
 
-/dev/bluetooth/rfcomm/0: No such file or directory
+===== drivers/bluetooth/hci_usb.c 1.54 vs edited =====
+--- 1.54/drivers/bluetooth/hci_usb.c    2004-07-31 12:57:14 +02:00
++++ edited/drivers/bluetooth/hci_usb.c  2004-08-17 23:32:42 +02:00
+@@ -96,7 +96,7 @@
+        { USB_DEVICE(0x0a5c, 0x2033), .driver_info = HCI_IGNORE },
+ 
+        /* Broadcom BCM2035 */
+-       { USB_DEVICE(0x0a5c, 0x200a), .driver_info = HCI_RESET },
++       { USB_DEVICE(0x0a5c, 0x200a), .driver_info = HCI_RESET | HCI_BROKEN_ISOC },
+ 
+        /* ISSC Bluetooth Adapter v3.1 */
+        { USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET },
 
-Anyone of you can assist in this?
+> > What does "hciconfig hci0 revision" say? These versions look a little
+> > bit wrong.
+> hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:02:72:B3:43:18 ACL MTU: 377:10  SCO MTU: 16:0
+>         Unsupported manufacturer
 
-Sincerely
-Ric
+Update your libs and utils. The current version is 2.10.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
