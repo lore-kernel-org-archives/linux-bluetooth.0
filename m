@@ -4,12 +4,12 @@ Subject: Re: [Bluez-users] Some BT problems connecting between Ipaq and USB
 From: Marcel Holtmann <marcel@holtmann.org>
 To: wim delvaux <wim.delvaux@adaptiveplanet.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200408050840.40598.wim.delvaux@adaptiveplanet.com>
+In-Reply-To: <200408050850.43082.wim.delvaux@adaptiveplanet.com>
 References: <200408050214.25654.wim.delvaux@adaptiveplanet.com>
 	 <1091669135.16182.93.camel@pegasus>
-	 <200408050840.40598.wim.delvaux@adaptiveplanet.com>
+	 <200408050850.43082.wim.delvaux@adaptiveplanet.com>
 Content-Type: text/plain
-Message-Id: <1091699597.16182.104.camel@pegasus>
+Message-Id: <1091699503.16182.101.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,17 +21,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 05 Aug 2004 11:53:17 +0200
+Date: Thu, 05 Aug 2004 11:51:43 +0200
 
 Hi Wim,
 
-> > looks like one of your devices is in security mode 3. It is not a good
-> > idea to use this security mode.
+> I have this acer bt500 that from time to time does not 'accept addresses'.
 > 
-> Donno ... where could I have set this up ?
+> Is there any way to fix this problem (running 2.6.7-rc3 of kernel)
+> is there a better USB dongle that does not have this problem
 
-look at the line with "auth enable". This is security mode 3. Leave it
-disabled and let the PAN server trigger auth if you need it.
+we know, but you are asking the wrong guys. This is a USB related
+problem and the USB guys must workaround it.
 
 Regards
 
