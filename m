@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Nelson Murilo <nelson@pangeia.com.br>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] TCP/IP Connection
-Message-ID: <20050107140350.GB19076@pangeia.com.br>
-References: <I9Y93C$55FC8919B06AC8E8E02A8F46B27F7329@uol.com.br>
+Message-ID: <20050107135431.GA19076@pangeia.com.br>
+References: <5000105b05010705172040f6c3@mail.gmail.com> <Pine.LNX.4.33.0501071420510.21727-100000@redbean.intranet.gw-instruments.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <I9Y93C$55FC8919B06AC8E8E02A8F46B27F7329@uol.com.br>
+In-Reply-To: <Pine.LNX.4.33.0501071420510.21727-100000@redbean.intranet.gw-instruments.de>
+Subject: [Bluez-devel] headset emulator apps
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,38 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 7 Jan 2005 12:03:51 -0200
-
-On Fri, Jan 07, 2005 at 11:50:00AM -0200, omap wrote:
-> 
-> 
-> Hi folks,
-> 
-> 
-> Here I am with another dummy question
-> for those with more experience in Bluez.
-> I am intending to build an application
-> to connect a Bluetooth device to PC
-> using TCP/IP. Well, can anyone help me
-> on finding any howto or samples where
-> i can find the necessary steps to
-> acomplish my task?
-> 
-
-[Server Side] 
-# pand --master --listen role GN
-# ifconfig bnep0 192.168.0.1
-
-[Client Side]
-# pand --connect 00:11:22:33:44:55 # SERVER ADDR 
-# ifconfig bnep0 192.168.0.2
-# route add default gw 192.168.0.1
+Date: Fri, 7 Jan 2005 11:54:31 -0200
 
 
-I hope this help,
+Hi guys,
+
+sorry for off-topic, but anybody know any headset emulator for
+linux?  
+My idea is send mp3 from my phone via bluetooth connection to my linux box, 
+and may redirect sound for real sound sistem. 
+
+Thanks in advance,
 
 ./nelson -murilo
-
 
 
 -------------------------------------------------------
