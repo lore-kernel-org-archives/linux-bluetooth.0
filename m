@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <d1f423d305032808558a318ea@mail.gmail.com>
-From: Anderson Rodrigues <rodrigues.anderson@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] linux kernel patch on pda
-In-Reply-To: <20050328105548.70974.qmail@web52406.mail.yahoo.com>
+Subject: Re: [Bluez-devel] Re: [Bluez-users] PANU service search
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <e1effdeb0503280607600d1863@mail.gmail.com>
+References: <e1effdeb05032805225cf1b8dd@mail.gmail.com>
+	 <1112016560.9016.32.camel@pegasus>
+	 <e1effdeb0503280607600d1863@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1112019482.9016.37.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <20050328105548.70974.qmail@web52406.mail.yahoo.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,52 +20,36 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 28 Mar 2005 08:55:15 -0800
+Date: Mon, 28 Mar 2005 16:18:02 +0200
 
-Hi Jose,
+Hi Claudio,
 
+> Suppose an UPnP application where a control point(role GN controller)
+> needs search for
+> services in several servers. The control point is the active member
+> and it will search for other devices. It must be the GN controller
+> because sometimes foward packet is required.
+> 
+> The UPnP search takes few seconds therefore connect and search for UPnP service
+> on each server is unacceptable.
+> 
+> Someone can suggest use a search for UPnP service at bluetooth SDP level,
+> searching only devices that provide UPnP service. It solve the problem
+> for ad hoc
+> networks, but can't solve in network access point scenario. This is the reason 
+> for establish the PAN and after use the UPnP search.
 
-Well, I don't know exactally your case but I am trying to use Bluez on
-ARM based devices. Well, I posted a little tutorial to this list
-showing how to use bluez on Innovator 1510, maybe it can help you to
-find your start.
+I have no idea what you are talking about. You need to create a low
+level ACL link to do SDP searching, or create the BNEP connection or
+whatever. This is the time consuming (and blocking) action. So if you
+want to establish a PAN first and then do UPnP over TCP/IP that is fine.
+I don't see your problem.
 
-regards,
+Regards
 
-On Mon, 28 Mar 2005 02:55:48 -0800 (PST), jose <twblr@yahoo.com> wrote:
-> hi,
-> 
-> i use a pda which has linux kernel 2.4.18-rmk7,
-> 
-> it has Intel StrongArm 206MHz SA-1110 processor:
-> 
-> i want to enable bluetooth on this device.Anyone
-> worked on similar lines?..pls hlp
-> 
-> rgds,
-> jose
-> 
-> __________________________________
-> Do you Yahoo!?
-> Yahoo! Small Business - Try our new resources site!
-> http://smallbusiness.yahoo.com/resources/
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
+Marcel
 
 
--- 
-Anderson Clayton B. Rodrigues
-Eng. de Software
-Instituto Nokia de Tecnologia - INdT
 
 
 -------------------------------------------------------
