@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Edd Dumbill <edd@usefulinc.com>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <1099916465.3186.21.camel@saag>
-Mime-Version: 1.0
+Subject: Re: [Bluez-users]  Again dund
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAO5qWLdOLE0SlT9H59+95+AEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAO5qWLdOLE0SlT9H59+95+AEAAAAA@t-online.de>
 Content-Type: text/plain
-Subject: [Bluez-users] Key bouncing
+Message-Id: <1099913396.6896.88.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,40 +19,66 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 08 Nov 2004 12:21:05 +0000
+Date: Mon, 08 Nov 2004 12:29:56 +0100
 
-Hi,
+Hi Peter,
 
-I've noticed that if typing quickly on my Apple Bluetooth keyboard I
-often get additional keypresses. For instance, 'mode' comes out as
-'moddeo' sometimes.  This only affects me when my DLink dongle is in HCI
-mode -- I get no issues when in HID mode.  I've seen this in kernels
-2.6.9 and 2.6.10-rc1.
+> now I give you the responses of hcidump -x and I hope that you can give me a
+> hint for my next steps to the bluetooth connection.
+> 
+> Than I run dund --connect 00:0B:CE:00:01:8F # address of BT-Modul
+> and
+> HCIDUMP -X response
+> < HCI Command: Create Connection(0x01|0x0005) plen 13
+>   8F 01 00 CE 0B 00 18 CC 02 00 00 00 01
+> > HCI Event: Command Status(0x0f) plen 4
+>   00 01 05 04
+> > HCI Event: Role Change(0x12) plen 8
+>   00 8F 01 00 CE 0B 00 01
+> > HCI Event: Connect Complete(0x03) plen 11
+>   00 29 00 8F 01 00 CE 0B 00 01 00
+> < ACL data: handle 0x0029 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 1 scid 0x0040
+> < HCI Command: Write Link Policy Settings(0x02|0x000d) plen 4
+>   29 00 0F 00
+> > HCI Event: Page Scan Repetition Mode Change(0x20) plen 7
+>   8F 01 00 CE 0B 00 01
+> > HCI Event: Command Complete(0x0e) plen 6
+>   01 0D 08 00 29 00
+> > HCI Event: Max Slots Change(0x1b) plen 3
+>   29 00 05
+> > HCI Event: Number of Completed Packets(0x13) plen 5
+>   01 29 00 01 00
+> > HCI Event: Link Key Request(0x17) plen 6
+>   8F 01 00 CE 0B 00
+> < HCI Command: Link Key Request Reply(0x01|0x000b) plen 22
+>   8F 01 00 CE 0B 00 57 D3 4C A0 11 16 5C 3F 27 59 01 71 9C D2
+>   AC 1B
+> > HCI Event: Command Complete(0x0e) plen 10
+>   01 0B 04 00 8F 01 00 CE 0B 00
+> > ACL data: handle 0x0029 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 3 status 0
+> < HCI Command: Disconnect(0x01|0x0006) plen 3
+>   29 00 13
+> > HCI Event: Command Status(0x0f) plen 4
+>   00 01 06 04
+> > HCI Event: Disconn Complete(0x05) plen 4
+>   00 29 00 16
+> 
+> there is no bt-connection established and I don't know why.
 
-% hidd --show
-00:50:F2:E2:A4:B1 HID Boot Device [045e:007c] connected [boot-protocol]
-00:0A:95:39:0F:9E HID Boot Device [05ac:0209] connected [boot-protocol]
+the L2CAP response failed with result code 3 and this means "Connection
+refused - security block". The link key request is there and you reply
+with a link key, but the connection fails. This means that your link key
+that is stored on your system is wrong.
 
-% hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:0F:3D:38:D3:A8 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:118698 acl:7768 sco:0 events:201 errors:0
-        TX bytes:1309 acl:42 sco:0 commands:20 errors:0
-        Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'saag-0'
-        Class: 0x100100
-        Service Classes: Object Transfer
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x4d9 LMP Ver: 1.2 (0x2) LMP Subver:
-0x4d9
-        Manufacturer: Cambridge Silicon Radio (10)
+There is no easy way to delete a link key at the moment and so I think
+the best way is to delete the file /etc/bluetooth/link_key and restart
+your running hcid.
 
+Regards
 
--- Edd
+Marcel
 
 
 
