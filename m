@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <db972f43040909175946b8d17a@mail.gmail.com>
-From: Ricky Soh <rickysoh@gmail.com>
-Reply-To: Ricky Soh <rickysoh@gmail.com>
+Message-ID: <4140924F.6080504@3wt.com.br>
+From: Rafael Vidal Aroca <rafael@3wt.com.br>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] Help needed (Fedora Core 2)
+Subject: Re: [Bluez-users] Power level & Scan Timing
+References: <413F701F.5020905@3wt.com.br> <1094715184.5237.3.camel@notepaq>
+In-Reply-To: <1094715184.5237.3.camel@notepaq>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,24 +17,74 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Sep 2004 08:59:34 +0800
+Date: Thu, 09 Sep 2004 14:26:39 -0300
 
-Dear all,
-Sorry, i have a noob's question. I am using fedora core2.
 
-1. When i plug in my usb BT dongle, /dev/bluetooth/ directory is not
-created. Under lsmod, there is no bluez but only bluetooth. The
-command l2ping but not l2test is working only. For l2test, command not
-found. Scotest is not found too.
+    With Rolf suggestion, i decreased the discovery time to about 5 
+seconds using lenght 2.
 
-Based on the above symptons, i suspect fedora core 2 does not have the
-full version of bluez installed. Am i right to say that or bluez is
-not even installed? I tot bluez is the official linux bt protocol,
-thus bluetooth in fedora core 2 should be bluez right? Please
-enlighten me and advise me how do i get bluez working... thanks.
+    Now about the transmit/receive power, i know we can see what is 
+set....but the windows software allows us to controle low high or 
+medium...and as i understood from this mail this kind of configuration 
+can not be set with bluez.
+    Is it correct or is there a way to change the power level?
 
-Sincerely
-Ricky
+again, thanks.
+Rafael.
+
+
+Marcel Holtmann wrote:
+
+>Hi Rafael,
+>
+>  
+>
+>>    i'm playing with my dbt-120 d-link usb dongle, and i'm not managing 
+>>to do some things i wanted...
+>>
+>>    1) I want to decrease the power or my dongle, cause de devices work 
+>>over 20m....i want they to be detected just near the computer. I know 
+>>it's possible, but could not find documentaion...so the question is: how 
+>>can i decreate the power of my bluetooth adapter?
+>>    
+>>
+>
+>don't worry about it, because your Bluetooth chip does this automaticly
+>and it is the job of the link manager.
+>
+>  
+>
+>>    2) I'm using hcitool scan to constantly detect if my ipaq is near my 
+>>desktop. It seems to be really slow (from 10 to 15 seconds to 
+>>scan)...can this time be reduced? Does bluez do some kind of cache? (i 
+>>ask that because i can turn my ipaq of, and hcitool scan will not only 
+>>detect my ipaq anymore in about 12 seconds...)
+>>    
+>>
+>
+>Check the specification for periodic inquiry or use the HCI directly.
+>You can also use the HCI socket directly and look for inquiry result
+>events.
+>
+>Regards
+>
+>Marcel
+>
+>
+>
+>
+>-------------------------------------------------------
+>This SF.Net email is sponsored by BEA Weblogic Workshop
+>FREE Java Enterprise J2EE developer tools!
+>Get your free copy of BEA WebLogic Workshop 8.1 today.
+>http://ads.osdn.com/?ad_id=5047&alloc_id=10808&op=click
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+>  
+>
+
 
 
 -------------------------------------------------------
