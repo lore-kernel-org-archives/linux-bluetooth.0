@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Daniel Vollmer <maven@maven.de>
-Reply-To: Daniel Vollmer <maven@maven.de>
-Message-ID: <475977561.20040824110859@maven.de>
-To: Marcel Holtmann <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth Intellimouse Explorer not working after reboot
-In-Reply-To: <1093293640.26717.48.camel@pegasus>
-References: <167432047.20040823200031@maven.de>
- <1093285155.26717.25.camel@pegasus>  <489665030.20040823205505@maven.de>
- <1093293640.26717.48.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Bluez-users] Bluez USB Driver
+From: Marcel Holtmann <marcel@holtmann.org>
+To: taylor <taylor@ms.usi.com.tw>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <00cb01c488ba$82fc6490$df0618ac@USI08844>
+References: <00cb01c488ba$82fc6490$df0618ac@USI08844>
+Content-Type: text/plain
+Message-Id: <1093334466.26717.55.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,39 +18,44 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 24 Aug 2004 11:08:59 +0200
+Date: Tue, 24 Aug 2004 10:01:06 +0200
 
-Hello Marcel,
+Hi Taylor,
 
-Monday, August 23, 2004, 22:40:41, you wrote:
+>   Recently, I spend a little time to study the Bluez Driver. Attached
+> file is my notes. Hope this is useful for others.
 
-> Hi Daniel,
+I can't do anything useful with a file from a Microsoft Office
+application ;)
+ 
+>   But I have one question about the Bluez USB driver for Kernle 2.4.26
+> and 2.6.5.
+>  
+> Kernel 2.4.26:
+> /linux/src/driver/usb/bluetooth.c
+> /linux/src/driver/bluetooth/hci_usb.c
+>  
+> Kernel 2.6.5:
+> /linux/src/driver/bluetooth/hci_usb.c
+>  Why are there two USB drivers for 2.4.26?
+> Because, the /linux/src/driver/bluetooth/hci_usb.c have registered
+> with USB core and get the hci dev. I couldn't know the purpose
+> of /linux/src/driver/usb/blueotooth.c ? Do someone know the reason?
 
->> > it looks like such a problem. Try to put a "hidd -K" in the init script
->> > and see if that helps.
->> 
->> Putting "$HIDD_DAEMON -K" into stop_hid() in /etc/init.d/bluez-utils
->> before the start-stop-daemon line has fixed this. I'm CCing this to
->> Edd, maybe he can add that to the bluez init-script.
->> 
->> > Maybe you also need to set the device to non
->> > pageable with "hciconfig hci0 noscan" on shutdown.
->> 
->> Didn't try this as the above worked.
+the bluetooth.o from 2.4 and the bluetty.ko driver from 2.6 are for
+transforming the H:2 transport protocol into a H:4 transport protocol.
+Both of them are part of the kernel for allowing the use of a Bluetooth
+stack that support only H:4. An example for such a stack is the OpenBT
+from Axis. It is impossible to select both drivers at the same time and
+if you activate the Bluetooth subsystem you will use hci_usb.ko which is
+the default configuration that is shipped by every distribtuion at the
+moment. For more information take a look at the mailing list archives of
+the BlueZ and USB mailing lists.
 
-> the point in called "hciconfig hci0 noscan" before you call "hidd -K" is
-> that in this case the mouse can't reconnect if you touch it again while
-> your machine is shutting down.
+Regards
 
-But as I kill the hidd-daemon directly after issuing "hidd -K", this
-shouldn't be a problem as it wouldn't try to reconnect. Or am I
-missing something?
+Marcel
 
-
--- 
-Best regards,
-    Daniel.                         http://www.maven.de
-[Open mouth. Insert foot. Echo internationally!]
 
 
 
