@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <001301c4b071$c7b509a0$c6b6b3ac@monika>
-Reply-To: "Monika Hubrich" <monikahubrich@aol.com>
-From: "Monika Hubrich" <monikahubrich@aol.com>
-To: <bluez-users@lists.sourceforge.net>
-References: <E1CHDBt-0002Ku-0s@sc8-sf-list2.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: [Bluez-users] bluez-hcidump package
+Message-ID: <db972f4304101203089c825b1@mail.gmail.com>
+From: Ricky Soh <rickysoh@gmail.com>
+Reply-To: Ricky Soh <rickysoh@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] Bluetooth Passive Mode
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,41 +16,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 12 Oct 2004 17:40:10 +0200
+Date: Tue, 12 Oct 2004 18:08:57 +0800
 
+I understand that when a device is in discoverable mode, it is
+actually in a passive (receiving) mode while waiting for ppl to probe
+him. To disable this mode while keep bluetooth on, one need to
+deactivate the scan mode by doing a hciconfig noscan.
 
------ Original Message ----- 
-From: "Marcel Holtmann" <marcel@holtmann.org>
-To: "Monika Hubrich" <monikahubrich@aol.com>
-Cc: <bluez-users@lists.sourceforge.net>
-Sent: Tuesday, October 12, 2004 8:50 AM
-Subject: Re: [Bluez-users] PICO Bluetooth Card / Modem hcidump -x
-
-
-> Hi Monika,
-> 
-> > -run "hcidump -x" as root and show us the output.
-> > 
-> > When I type in the command hcicump -x, 
-> > the output is: Command not found.
-> 
-> you have to install the bluez-hcidump package.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-
-Okay.
-
-Please show me the link.
-
-Greetings
-
-Moni
-
+However, is there a way to enable my bluetooth device in only passive
+receiving mode? In other words, is it possible to make my device
+non-discoverable yet, it can still grab all Bluetooth signals off the
+air?
 
 
 -------------------------------------------------------
