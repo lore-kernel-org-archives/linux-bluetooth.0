@@ -1,17 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <01b901c41015$1aefb050$b67ba8c0@zaz1>
+From: "Xavier Garreau" <x.garreau@prim-time.fr>
+To: <mohalik@india.hp.com>
+Cc: "BlueZ Mailing List" <bluez-users@lists.sourceforge.net>
+References: <405E6C9E.1030600@india.hp.com> <1079937432.2663.78.camel@pegasus>  <405EBCDD.3090402@india.hp.com> <1079951177.2663.90.camel@pegasus> <016701c40ffc$8a07f8d0$b67ba8c0@zaz1> <405EECA6.2080407@india.hp.com>
 Subject: Re: [Bluez-users] l2test problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: mohalik@india.hp.com
-Cc: Xavier Garreau <x.garreau@prim-time.fr>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <405EECA6.2080407@india.hp.com>
-References: <405E6C9E.1030600@india.hp.com>
-	 <1079937432.2663.78.camel@pegasus>  <405EBCDD.3090402@india.hp.com>
-	 <1079951177.2663.90.camel@pegasus> <016701c40ffc$8a07f8d0$b67ba8c0@zaz1>
-	 <405EECA6.2080407@india.hp.com>
-Content-Type: text/plain
-Message-Id: <1079965396.2663.276.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,35 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 22 Mar 2004 15:23:16 +0100
-
-Hi Swarup,
+Date: Mon, 22 Mar 2004 14:53:50 +0100
 
 > Actually I started with a client on the linux PC and a symbian server
-> on the nokia 3650. I used the API's for l2cap sockets and had set the 
-> psm to 5 (arbitrary choice). Then i got the 
->     connection refused(111) 
+> on the nokia 3650. I used the API's for l2cap sockets and had set the
+> psm to 5 (arbitrary choice). Then i got the
+>     connection refused(111)
 > message from the PC.
-> 
+
 > It was now that I wanted to use l2test as a client (just for the
-> connection part).
+connection part).
 > So I changed the psm in l2test.c to 5 and tested. But connection still
-> gets refused.
+gets refused.
 > The reason for connect response is always - "psm not supported".
-> 
-> Does this mean that the nokia device may not have l2cap socket
-> support?
-> I did not find any such information though on the web.
 
-you must use a PSM > 0x1000, so PSM 4097 is the first usable choise and
-of course your application on the Symbian must listen on that PSM for
-incoming connection. From what your hcidump shows is that the problem is
-on the phone side and so a problem of your symbian server code.
+PSM 5 is reserved for Telephony Control Protocol so it can be tricky to
+access it.
+Use a PSM > 0x1000, odd, and with the least significant bit of the most
+significant octet equal to 0.
 
-Regards
+Also look at the -P param for l2test ;-)
 
-Marcel
-
+BR,
+-- 
+Xavier Garreau <x.garreau@prim-time.fr>
+Prim'Time Technology
+http://www.prim-time.fr/
 
 
 
