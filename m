@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Matthias Albert <matthias@ma-c.de>
+Message-ID: <416F8FE1.7060509@avantwave.com>
+From: mike <mikelee@avantwave.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1097845922.12708.16.camel@ringo.aicas.burg>
-Mime-Version: 1.0
-Subject: [Bluez-users] rfcomm pppd
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] About serial interface bluetooth module
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,33 +15,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 15 Oct 2004 15:12:02 +0200
+Date: Fri, 15 Oct 2004 16:52:49 +0800
 
-Hello,
+Dear All
 
-now I'm able to establish a connection from my ipaq (running familiar)
-to my notebook (linux, debian host).
+    I am new to bluez, Here are some questions on serial driver 
+hci_uart.And i am using Fedora2 with bluez-lib-2.10 bluez-util-2.10
 
-hcitool scan -> list of all available bluetooth devices
- -> select the one I need
-sdptool browse <bluetoothadress> -> gives me list of all availble
-profiles
+    I am now using a serial bluetooth module, after i install bluez-lib 
+and bluez-util. I can see the rfcomm,l2cap,bluetooth module is loaded. 
+but no hci_uart module.
+    and when i use hciattach /dev/ttyS0......... to attach the serial 
+module, it fail and reply "Initialization timed out". After i insmod 
+hci_uart.ko from /lib/module . It is just the same.
 
-rfcomm connect 0 <bluetoothadress> 1 -> do a serial connection to my bt
-device
-
-rfcomm show -> give me a list of established connections
-
-So everytime I do this, the pppd is starting. If nothing happens the
-connection will be closed. Where can I define which program should be
-started? I don't want that pppd is starting. I want to see with minicom
-what happen on the device. Do you know what I mean?. So where can I
-define this?
-
-Kind regards,
-
-Matthias
-
+    The module is work well in MS window and the cable is checked. am i 
+use wrong version or any steps i missed?
 
 
 -------------------------------------------------------
