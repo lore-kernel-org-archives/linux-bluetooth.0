@@ -1,16 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm correction
-From: Marcel Holtmann <marcel@holtmann.org>
-To: mohalik@india.hp.com
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4100FD64.4080904@india.hp.com>
-References: <loom.20040523T164826-243@post.gmane.org>
-	 <1085324502.8309.19.camel@pegasus>
-	 <loom.20040523T170840-699@post.gmane.org>
-	 <1085326200.8309.22.camel@pegasus>  <4100FD64.4080904@india.hp.com>
-Content-Type: text/plain
-Message-Id: <1090585128.4791.45.camel@pegasus>
-Mime-Version: 1.0
+Message-Id: <200407231216.i6NCGiSw095359@www1.pochta.ru>
+From: Роман <papa@rbcmail.ru>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset="koi8-r"
+Subject: [Bluez-users] TECOM BT3035
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,22 +15,53 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 23 Jul 2004 14:18:49 +0200
+Date: Fri, 23 Jul 2004 16:16:44 +0400 (MSD)
 
-Hi Swarup,
+Is anybody solved it under kernel 2.4?
 
-> When I start rctest -s on lx1 without starting rctest -r on lx2, lx2 hangs
-> and I have to switch it off and on to restart. This happens EVERY TIME
-> I try this.  (In the previous mail, I had messed up the -r and -s)
+I Have Tecom BT3035.
+It works easy and find under SuSE 9.1 with kernel 2.6..
+But I need to use it under kernel 2.4
 
-as I said before, we need to know what kernel you are using and if
-possible, what's the output of "hcidump -x" as root.
+thats what I see from dmesg
 
-Regards
+hub.c: new USB device 00:1f.2-2, assigned address 3
+hub.c: USB hub found
+hub.c: 3 ports detected
+hub.c: new USB device 00:1f.2-2.1, assigned address 4
+usb.c: USB device 4 (vend/prod 0xa5c/0x200a) is not
+claimed by any active driver.
+hub.c: new USB device 00:1f.2-2.2, assigned address 5
+usb.c: USB device 5 (vend/prod 0xa5c/0x3502) is not
+claimed by any active driver.
+hub.c: new USB device 00:1f.2-2.3, assigned address 6
+usb.c: USB device 6 (vend/prod 0xa5c/0x3503) is not
+claimed by any active driver.
 
-Marcel
+when I type lsusb i see
+Bus 001 Device 003: ID 0a5c:3535 Broadcom Corp.
+Bus 001 Device 004: ID 0a5c:200a Broadcom Corp.
+Bus 001 Device 005: ID 0a5c:3502 Broadcom Corp.
+Bus 001 Device 006: ID 0a5c:3503 Broadcom Corp.
 
 
+hciconfig displays 
+
+hci0:   Type: USB
+        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0  SCO
+MTU: 0:0
+        DOWN
+        RX bytes:0 acl:0 sco:0 events:0 errors:0
+        TX bytes:0 acl:0 sco:0 commands:0 errors:0
+        Features: 0x00 0x00 0x00 0x00
+        Packet type: DM1 DH1 HV1
+        Link policy:
+        Link mode: SLAVE ACCEPT
+
+
+Is there something that I can do to make it work?
+
+Thanks
 
 
 -------------------------------------------------------
