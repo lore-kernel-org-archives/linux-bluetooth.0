@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alex Holland <ah160@york.ac.uk>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Release of new BlueZ libs and utils
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Charles Bueche <charles@bueche.ch>
+Cc: cijoml@volny.cz, BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1071904498.5961.41.camel@bluez.bueche.ch>
+References: <1071791711.6635.18.camel@pegasus>
+	 <200312190128.44892.cijoml@volny.cz> <1071825547.6635.28.camel@pegasus>
+	 <200312191122.09289.cijoml@volny.cz>
+	 <1071904498.5961.41.camel@bluez.bueche.ch>
 Content-Type: text/plain
-Message-Id: <1071931390.2102.34.camel@localhost>
+Message-Id: <1071931148.2477.65.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Problem with stability - Belkin F8T001 with bluez+bluefw in Gentoo
- Linux
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,45 +21,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 20 Dec 2003 14:43:10 +0000
+Date: Sat, 20 Dec 2003 15:39:08 +0100
 
-Hi,
+Hi Charles,
 
-I've been battling to set up my Belkin USB dongle in Gentoo so I can
-sync my Sony Ericsson t610 with Evolution using multisync.
+> I will happily write a script that create daily or weekly snapshots 
+> and provide them on my page if it would help to get it into your company. 
 
-However, I'm having problems with the stability of the dongle. My init
-scripts load the firmware using hotplug/bluefw, then load the required
-kernel modules, then bring hci0 up using hciconfig, then start hcid and
-sdpd.
+if you want to do Michal a favour, tar the current CVS and send it to
+him via email.
 
-In this state I can see my phone on a hcitool scan, connect to it using
-rfcomm, pair with it, etc. I've had little joy with multisync, but
-that's a matter for another mailing list.
+> Or would it be easier if I call them "beta-something" ? :-)
 
-After some fiddling with hcitool, sdptool and multisync, any sdp related
-function ceases to work. Running "sdptool browse" returns "Failed to
-connect to SDP server on 00:0A:D9:3F:21:27: Connection timed out", and
-l2ping loses 100% of packets.
+No, we are not in beta testing stage.
 
-I've tried to recover from this state by using "hciconfig down" then
-"hciconfig up" or even "hciconfig reset". However, if I bring hciconfig
-down (either with down or reset), I subsequently can't bring it up,
-getting the following message: "Can't init device hci0. Connection timed
-out(110)".
+Regards
 
-I've tried bringing hci0 down, killing all BT related processes,
-unloading all relevant modules and then starting over, but it still
-times out. Nothing but a reboot seems to fix it.
+Marcel
 
-Any suggestions? All other USB devices on my system (keyboard, mouse,
-Zip drive) work fine, so I don't think the USB subsystem is suspect. The
-same dongle worked wonderfully in Windows 2000, so I'm not sure what the
-problem is.
-
-I can post copious configuration details if required.
-
-Alex Holland
 
 
 
