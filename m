@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20041112211827.71472.qmail@web54509.mail.yahoo.com>
-From: Luis p <luisito555es@yahoo.es>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Help Me ! Pstool of csr bt chip
+Subject: Re: [Bluez-users] Debian testing required: bcm203x firmware
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1100285554.8785.60.camel@saag>
+References: <1100260673.8785.20.camel@saag>
+	 <1100261630.12168.71.camel@pegasus>  <1100267525.8785.39.camel@saag>
+	 <1100268649.8785.43.camel@saag>  <1100282119.7349.3.camel@pegasus>
+	 <1100285554.8785.60.camel@saag>
+Content-Type: text/plain
+Message-Id: <1100286100.7349.5.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,21 +21,31 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 12 Nov 2004 22:18:27 +0100 (CET)
+Date: Fri, 12 Nov 2004 20:01:40 +0100
 
-Please help me! I need Pstool win32 for configure csr
-bluetooth chip.
+Hi Edd,
 
-Many Thanks
+> > > > > the firmware files are in the wrong place. You are using the old
+> > > > > directory. They must be under /lib/firmware/.
+> > > 
+> > > OK, I renamed it to bluez-firmware and changed the location back
+> > > to /lib/firmware.  bluez-utils-2.10-4 also updated to reference the
+> > > right firmware package name.
+> > 
+> > the bluez-bcm203x package cannot depend on the non-free bluez-firmware
+> > package, right?
+> 
+> Right, or all of bluez-utils would have to go in contrib. 
+
+I thought so :(
+
+What is stronger from the Debian package view. Suggested or Recommended?
+
+Regards
+
+Marcel
 
 
-
-
-		
-______________________________________________
-Renovamos el Correo Yahoo!: ¡100 MB GRATIS!
-Nuevos servicios, más seguridad
-http://correo.yahoo.es
 
 
 -------------------------------------------------------
