@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: RE : RE : [Bluez-users] SuSE and Audio
-From: Marcel Holtmann <marcel@holtmann.org>
-To: =?ISO-8859-1?Q?J=E9r=F4me?= Stadelmann <jerome.stadelmann@hta-bi.bfh.ch>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <008901c3e9a0$4b488970$2d105793@N64101>
-References: <008901c3e9a0$4b488970$2d105793@N64101>
-Content-Type: text/plain
-Message-Id: <1075739193.29899.61.camel@pegasus>
-Mime-Version: 1.0
+From: "V" <scorpio1970@inbox.ru>
+To: <bluez-users@lists.sourceforge.net>
+Message-ID: <000601c3e9a8$f6b9b8d0$6764a8c0@Scorpio>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0007_01C3E9A8.F6B9B8D0"
+Subject: [Bluez-users] I'm looking for AmbiCom BT2000D drivers
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,28 +16,167 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 02 Feb 2004 17:26:34 +0100
+Date: Mon, 2 Feb 2004 16:23:54 -0000
 
-Hi Jerome,
+This is a multi-part message in MIME format.
 
-> > what kernel are you talking about 2.4.21 or 2.6.1? For the 2.4.21 you need
-> at least -mh4.
-> 
-> Sorry :) It's the 2.6.1-mh3
+------=_NextPart_000_0007_01C3E9A8.F6B9B8D0
+Content-Type: text/plain;
+	charset="koi8-r"
+Content-Transfer-Encoding: 7bit
 
-you have to enable CONFIG_BT_HCIUSB_SCO, but this can cause crashes at
-unplug on UHCI host adapters.
+Dear all,
 
-> > What does "hciconfig hci0 revision" say? You need a SCO over HCI mapping
-> and I never tested this stuff on a 2.6 kernel.
-> 
-> It gives me SCO mapping : HCI
+ 
 
-This is correct, but I never checked that it also works with 2.6.
+I have new AmbiCom BT2000D Bluetooth compact flash card. I tried to 
 
-Regards
+use it with my Sharp Zaurus, but it seems the current bt950_cs driver  
 
-Marcel
+does not support it. Also I was not able to find any information in 
+
+the internet about Linux drivers for this card.
+
+ 
+
+Can anybody help me this card?
+
+ 
+
+Best wishes,
+
+ 
+
+Vadim
+
+ 
+
+
+------=_NextPart_000_0007_01C3E9A8.F6B9B8D0
+Content-Type: text/html;
+	charset="koi8-r"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+
+<head>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dkoi8-r">
+
+
+<meta name=3DGenerator content=3D"Microsoft Word 10 (filtered)">
+
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:"Courier New CYR";
+	panose-1:2 7 3 9 2 2 5 2 4 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:2.0cm 42.5pt 2.0cm 3.0cm;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=3DRU link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>Dear all,</span></font></p>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>I have new AmbiCom BT2000D Bluetooth compact flash =
+card. I
+tried to </span></font></p>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>use it with my Sharp Zaurus, but it seems the current
+bt950_cs driver =9A</span></font></p>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>does not support it. Also I was not able to find any
+information in </span></font></p>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>the internet about Linux drivers for this =
+card.</span></font></p>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>Can anybody help me this card?</span></font></p>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>Best wishes,</span></font></p>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal style=3D'text-autospace:none'><font size=3D2
+face=3D"Courier New CYR"><span lang=3DEN-GB =
+style=3D'font-size:10.0pt;font-family:
+"Courier New CYR"'>Vadim</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span lang=3DEN-GB =
+style=3D'font-size:
+10.0pt;font-family:Arial'>&nbsp;</span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------=_NextPart_000_0007_01C3E9A8.F6B9B8D0--
 
 
 
