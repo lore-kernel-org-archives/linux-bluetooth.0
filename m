@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <407195F7.4020907@pobox.com>
-From: Daniel Jimenez <djimenez@pobox.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] BT950_CS
+Subject: Re: [Bluez-users] Kernel crash USB dongle removing 2.6.5
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pavel Ruzicka <pavouk@pavouk.org>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200404050101.17882.pavouk@pavouk.org>
+References: <200404050101.17882.pavouk@pavouk.org>
+Content-Type: text/plain
+Message-Id: <1081120090.4635.5.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,48 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 05 Apr 2004 12:23:03 -0500
+Date: Mon, 05 Apr 2004 01:08:10 +0200
 
-Hi all. I apologize in advanced for the noobish question. I tried 
-RTFMing but couldn't find what I needed.
+Hi Pavel,
 
-I have an Ambicom BT2000-CF. According to cardctl ident its:
+> On kernel 2.6.5 (and 2.6.4) when I remove my Bluetooth USB dongle MSI 6970, 
+> that kernel crash with Lost Interrupt messages.
+> 
+> I have SCO support disabled in kernel.
+> 
+> I use uhci_hcd with VIA chipset.
+> 
+> With kernel 2.6.3 this works.
+> 
+> Where can be a problem?
+> In bluetooth or USB driver?
 
-Socket 0:
-   product info: "AmbiCom,Inc", "BT2000E", "Bluetooth PC/CF Card"
-   manfid: 0x022d, 0x2000
-   function: 2 (serial)
+this is an USB problem. Post your report to the Linux USB mailing list.
 
---
+Regards
 
-The driver I need is either BT950_CS 
-(http://www.holtmann.org/linux/bluetooth/bt950.html) or BT2000E 
-(http://www.iral.com/~albertr/linux/bt2000e/).
-
-I'm running a vanilla Kernel 2.6.5 with all the bluetooth options 
-compiled in (except no drivers).
-
-...
-
-I've downloaded the source for both of these packages but cannot figure 
-out how to compile the modules.
-
-  BT950 came with a make file, but a TON of errors were returned when I 
-attempted to make it. I assume it was built for another kernel series 
-(maybe 2.4?).
-
-  BT2000E just came with a changelog and a .c file. I did gcc bt2000e.c 
-and it returned a whole hell of allot more errors.
+Marcel
 
 
-...
-
-Is there something I'm missing/not doing? I have bluez-libs installed as 
-well. I can post the output of the compiles to a web server if needed.
-
-Thanks!,
--- 
-Daniel Jimenez <djimenez[at]pobox[dot]com>
 
 
 -------------------------------------------------------
