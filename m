@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Erik Tews <erik@debian.franken.de>
-To: bluez-devel@lists.sourceforge.net
+Subject: RE: [Bluez-devel] BNEP kernel oops
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Williams, Richard" <Richard.Williams@VITRONICS.com>
+Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <A1F0D47583A2D711919F00600819B3A45BDCD4@goofy.vitronics.com>
+References: <A1F0D47583A2D711919F00600819B3A45BDCD4@goofy.vitronics.com>
 Content-Type: text/plain
-Message-Id: <1092427728.5708.1.camel@localhost.localdomain>
+Message-Id: <1092426641.4501.39.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-devel] JSR-82 Implementation
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,15 +18,59 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 13 Aug 2004 22:08:48 +0200
+Date: Fri, 13 Aug 2004 21:50:41 +0200
 
-Hi
+Hi Richard,
 
-Is there currently any implementation of the jsr-82 standard for linux,
-so that I can use bluetooth from my java-application? Or for any other
-(free) desktop-operating system? I have seen one for serial bluetooth
-dongels on linux (but I got only usb ones) and for Windows XP. Are there
-any other ones.
+> The single board computer I'm using comes from Applied Data Systems (ADS)- its called a 
+> BitsyX. I get my kernel from kernel.org and patches from ADS, and use their 
+> patches. From the instructions on  ADS web site: (http://www.applieddata.net/support/)
+> 
+> 
+> <<<<<<<<<<<<<<<<<<<<<<<<
+> Kernel source and patches
+> 
+> linux-2.4.26.tar.bz2 (~30MB)
+> Download from the link above or from kernel.org and make a base directory.
+> 
+> bzcat < linux-2.4.26.tar.bz2 | tar -xf -
+> 
+> 
+> patch-2.4.26-vrs1.gz (~595kB)
+> Download from the link above or from arm.linux.org.uk.
+> Change to the linux directory and apply the patch using patch level "-p1".
+> 
+> cd linux-2.4.26
+> zcat patch-2.4.26-vrs1.gz | patch -p1
+> 
+> 
+> linux-2.4.26-vrs1-pxa1.patch.gz (~250kB)
+> Download from the link above or (uncompressed) from Robert Schwebel.
+> Remain in the linux directory and apply the patch using patch level "-p1".
+> 
+> zcat linux-2.4.26-vrs1-pxa1.patch.gz | patch -p1
+> 
+> 
+> diff-2.4.26-vrs1-pxa1-adsx2.gz (~220kB)
+> Download from the link above and apply the patch using patch level "-p1".
+> 
+> zcat diff-2.4.26-vrs1-pxa1-adsx2.gz | patch -p1
+> 
+> >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+> 
+> 
+> The two patch files and the diff file will show the differences between
+> plain vanilla 2.4.26 and my embedded ARM kernel.
+
+they are touching to many files as I can tell you where the problem can
+be. Please make sure that a 2.4.26 is working fine for you on a desktop
+machine and ask ADS for help. If a plain vanilla is working, then they
+broke something with their patches.
+
+Regards
+
+Marcel
+
 
 
 
