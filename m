@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bthid cvs question
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Jeffrey Arbuckle <jbarbuc@nmt.edu>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.44.0312091023470.6471-100000@speare5-1-11.nmt.edu>
-References: <Pine.LNX.4.44.0312091023470.6471-100000@speare5-1-11.nmt.edu>
-Content-Type: text/plain
-Message-Id: <1071020597.10655.4.camel@pegasus>
-Mime-Version: 1.0
+From: Jeffrey Arbuckle <jbarbuc@nmt.edu>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <Pine.LNX.4.44.0312091023470.6471-100000@speare5-1-11.nmt.edu>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-users] bthid cvs question
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +15,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 10 Dec 2003 02:43:17 +0100
+Date: Tue, 9 Dec 2003 10:28:46 -0700 (MST)
 
-Hi Jeffrey,
 
-> I was wondering if anyone could direct me to the cleaned up bthid cvs code referenced
-> by Marcel Holtmann in this posting:
-> 
-> 3 Dec 21:12     Marcel Holtmann     The future of Bluetooth HID
+Hi,
 
-the code is in CVS under utils2/hid/ now.
+I was wondering if anyone could direct me to the cleaned up bthid cvs code referenced
+by Marcel Holtmann in this posting:
 
-Regards
+3 Dec 21:12     Marcel Holtmann     The future of Bluetooth HID
 
-Marcel
+-Jeffrey Arbuckle
 
 
 
