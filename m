@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: [Bluez-devel] rfcomm patch
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Alan Huang <alanh@tuks.co.za>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1068150549.3faaaf153cd2c@student.up.ac.za>
-References: <200311050945.34166.sybren@thirdtower.com>
-	 <004101c3a3b4$81f42dd0$dc01a8c0@alan> <1068107961.1284.123.camel@pegasus>
-	 <1068150549.3faaaf153cd2c@student.up.ac.za>
-Content-Type: text/plain
-Message-Id: <1068162278.25167.85.camel@pegasus>
-Mime-Version: 1.0
+To: BlueZ-Users <bluez-users@lists.sourceforge.net>
+Message-ID: <1068150549.3faaaf153cd2c@student.up.ac.za>
+From: Alan Huang <alanh@tuks.co.za>
+References: <200311050945.34166.sybren@thirdtower.com>  <004101c3a3b4$81f42dd0$dc01a8c0@alan> <1068107961.1284.123.camel@pegasus>
+In-Reply-To: <1068107961.1284.123.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=Big5
+Subject: [Bluez-users] Re: [Bluez-devel] rfcomm patch
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
@@ -20,28 +17,50 @@ List-Id: <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 07 Nov 2003 00:44:39 +0100
+Date: Thu, 06 Nov 2003 22:29:09 +0200 (SAST)
 
-Hi Alan,
+Hi,
+  Thanks again Marcel, for your reply! Can you tell me a bit more how to 
+switch to raw terminal mode? Does it mean that I'll have to skip the bind 
+action and directly connect after I created the socket?
 
->   Thanks again Marcel, for your reply! Can you tell me a bit more how to 
-> switch to raw terminal mode? Does it mean that I'll have to skip the bind 
-> action and directly connect after I created the socket?
+Hmm... it really seems like I should enhance my socket programming 
+knowledge...Any good online guides/tuts or books anyone can recommend ;-)
 
-look at the code ;) And the raw stuff is only for TTY terminals and the
-RFCOMM emulation of it. If you connect through a socket you won't have
-problems with it.
+Thanks~
 
-> Hmm... it really seems like I should enhance my socket programming 
-> knowledge...Any good online guides/tuts or books anyone can recommend ;-)
+Alan
 
-The source code of any socket based program ;)
+ Marcel Holtmann <marcel@holtmann.org>:
 
-Regards
-
-Marcel
-
-
+> Hi Alan,
+> 
+> >   Regarding this topic that rfcomm doesn't flush. I just want to ask
+> that,
+> > I'm using an USB Bluetooth dongle that's connected to another
+> Bluetooth
+> > device using the rfcomm program. This other Bluetooth device is
+> connected to
+> > a Windows PC's COM1 port (RS-232) and connected/displayed by
+> > hyperterminal... For some unknown reason, what ever the hyperterminal
+> sends
+> > on the Windows side can be shown
+> > "cat /dev/rfcomm0". But what ever the USB Bluetooth dongle sends
+> (using
+> > "echo hello > /dev/rfcomm0") it can't be shown on the Windows
+> > hyperterminal...
+> 
+> try to use the --raw switch to set the terminal into RAW mode after
+> connect (this works not for "bind").
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> 
+> 
 
 
 -------------------------------------------------------
