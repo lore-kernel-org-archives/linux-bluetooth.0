@@ -1,42 +1,42 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Return-Path: <paxtonrd@hotmail.com>
 From: "Thor Egil Skaug" <paxtonrd@hotmail.com>
-To: "'BlueZ Mailing List'" <bluez-users@lists.sourceforge.net>
-Message-ID: <000101c3ffa4$a060e550$46a57e40@thores>
+To: "'Marcel Holtmann'" <marcel@holtmann.org>
+Cc: "'BlueZ Mailing List'" <bluez-users@lists.sourceforge.net>
+Subject: RE: [Bluez-users] AUX1 packets
+Date: Mon, 1 Mar 2004 07:44:34 -0800
+Message-ID: <000001c3ffa4$181dee40$46a57e40@thores>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="us-ascii"
-Subject: [Bluez-users] Socket permissions
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 1 Mar 2004 07:48:22 -0800
+In-Reply-To: <1078152924.1942.126.camel@pegasus>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-When I use the hciconfig, hcitool, etc. applications that depend on
-raw-data hci-sockets,
-I have to be logged in as root for it to work. If not I get a permission
-denied error.
+>Hi Thor,
+>
+> Is there any way of having an ACL connection use AUX1 packets?
+> 
+> The packet type is not defined in the Bluetooth specification for the 
+> HCI_create_connection command.
+>
+>you can't control this from the host stack side, because as you already
+have seen it is not defined for the HCI_create_connection command. It is
+the job of the link manager to choose the right packet types.
+>
+>Regards
+>
+>Marcel
 
-Which files do I have to alter permissions on in order for a normal user
-to do this?
+Regarding DM and DH packets:
+Am I correct in assuming the following?
 
-I am using Linux 2.4.25, hci_usb + usb-uhci, Belkin USB dongle (CSR).
+If I use the HCI_change_connection_packet_type command, I can change the
+packet type for the connection
+as long as it is supported by both devices? It is then mostly my
+decision what packet type is used for the
+connection, although the link controller may use DM1 packets if
+necessary.
+
+I am trying to have my application select different packet types based
+on the current BER.
 
 Thor
-
-
--------------------------------------------------------
-SF.Net is sponsored by: Speed Start Your Linux Apps Now.
-Build and deploy apps & Web services for Linux with
-a free DVD software kit from IBM. Click Now!
-http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
