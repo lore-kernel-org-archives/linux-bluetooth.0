@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41F290CB.9010504@webstuhl.net>
-From: Ben Pezzei <ben@webstuhl.net>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: Again: Problems with Dongle, Headset or btsco
-References: <41F0EB0A.1020302@webstuhl.net> <41F0FE84.8030401@dark-reality.de> <41F128F4.2020006@webstuhl.net> <41F13638.1080207@dark-reality.de> <41F25C4B.6040709@webstuhl.net> <pan.2005.01.22.15.35.18.929419@yahoo.com>
-In-Reply-To: <pan.2005.01.22.15.35.18.929419@yahoo.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: Re: [Bluez-devel] version
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <loom.20050122T171729-917@post.gmane.org>
+References: <loom.20050122T171729-917@post.gmane.org>
+Content-Type: text/plain
+Message-Id: <1106411503.7902.0.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 22 Jan 2005 18:43:39 +0100
+Date: Sat, 22 Jan 2005 17:31:43 +0100
 
-Hi ,
+Hi Radoa,
 
-Paul Ionescu schrieb:
+> I have one question: What version of bluez-libs and bluez-utils was released 
+> with linux kernel 2.4.25? 
 
-> How do you know the dongle can't be re-initialized ?
-> What does it say when you launch again btsco ?
+there is no special version of the libs or utils for the 2.4.25 kernel.
+Using the latest is almost fine.
 
-After disconnecting via Headset (press Button) and connecting again
-the btsco looks like:
-   disconnected SCO channel
-   recieved AT+CKPD=200
-   opened hwdep
-   Can't connect SCO audio channel
-   : Connection timed out
+Regards
 
-Same when exiting ctrl+c btsco and start it again
+Marcel
 
-> I was able to use gnomemeeting, mplayer and other programs that use alsa
-> or oss.
-> For mplayer I used -ao alsa:device=hw=Headset -srate 8000 -channels 1
-
-no X installed ;(
-
-greetings
-ben
 
 
 
