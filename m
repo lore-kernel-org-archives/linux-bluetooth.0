@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] PICO Bluetooth Card / Modem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Monika Hubrich <monikahubrich@aol.com>
-Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <005001c4aeef$5d9d8e80$8601b6ac@monika>
-References: <005001c4aeef$5d9d8e80$8601b6ac@monika>
-Content-Type: text/plain
-Message-Id: <1097485834.9474.0.camel@notepaq>
-Mime-Version: 1.0
+Message-ID: <416A35E4.209@yahoo.co.uk>
+From: Jurgens du Toit <dutoitjj@yahoo.co.uk>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Bluez-users] bluez sdp and kernel
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,58 +15,24 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 11 Oct 2004 11:11:28 +0200
+Date: Mon, 11 Oct 2004 09:27:32 +0200
 
-Hi Monika,
+Hi.
 
-> I tried to install my bluetooth modem (PICO/Sphinx Bluetooth Modem) on
-> SuSE Linux 8.2.
-> But I get always the message "Connection refused".
-> What do I wrong?
->  
-> linux:~ # hciconfig
-> hci0:   Type: PCCARD
->         BD Address: 00:80:37:14:C3:51 ACL MTU: 672:10  SCO MTU: 64:0
->         UP RUNNING PSCAN ISCAN
->         RX bytes:1407 acl:29 sco:0 events:69 errors:0
->         TX bytes:1157 acl:34 sco:0 commands:35 errors:0
->  
-> linux:~ # hciconfig hci0 up
-> linux:~ # hciconfig -a
-> hci0:   Type: PCCARD
->         BD Address: 00:80:37:14:C3:51 ACL MTU: 672:10  SCO MTU: 64:0
->         UP RUNNING PSCAN ISCAN
->         RX bytes:1407 acl:29 sco:0 events:69 errors:0
->         TX bytes:1157 acl:34 sco:0 commands:35 errors:0
->         Features: 0x07 0xea 0x31 0x00 0x00 0x00 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'BlueZ (0)'
->         Class: 0x000100
->         Service Classes: Unspecified
->         Device Class: Computer, Uncategorized
->         HCI Ver: 1.1 (0x1) HCI Rev: 0xb LMP Ver: 1.1 (0x1) LMP Subver:
-> 0x300
->         Manufacturer: Ericsson Technology Licensing (0)
->  
-> linux:~ # hcitool scan
-> Scanning ...
->         00:02:C7:09:9B:FA       n/a
-> linux:~ # sdptool browse 00:02:C7:09:9B:FA
-> Browsing 00:02:C7:09:9B:FA ...
-> linux:~ # rfcomm connect 0 00:02:C7:09:9B:FA 1
-> Can't connect RFCOMM socket: Connection refused
-> linux:~ # rfcomm connect 0 00:02:C7:09:9B:FA 2
-> Can't connect RFCOMM socket: Connection refused
+I'm trying to compile a multisync plugin, but it complains that it can't 
+find the bluez-kernel and bluez-sdp packages. I looked on bluez's site, 
+but can't find any references to these packages there. I googled, but 
+only found some debian packages.
 
-run "hcidump -x" as root and show us the output.
-
-Regards
-
-Marcel
-
-
+What gives?
+Jrgns
+-- 
+We are not enemies, but friends. We must not be enemies. Though passion 
+may have strained, it must not break, our bonds of affection. The mystic 
+chords of memory, stretching from every battle-field and patriot grave 
+to every living heart and hearthstone all over this broad land, will yet 
+swell the chorus of the Union when again touched, as surely they will 
+be, by the better angels of our nature.
 
 
 -------------------------------------------------------
