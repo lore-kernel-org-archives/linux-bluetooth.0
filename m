@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050316102129.28080.qmail@web26610.mail.ukl.yahoo.com>
-From: BZ Benny <bennybbz@yahoo.fr>
-Subject: Re: [Bluez-users] Adresse resolution in BlueZ
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: 6667
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Subject: Re: [Bluez-users] BLueZ Questions
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <42380154.3080005@carmedialab.de>
+References: <4237F516.2040804@carmedialab.de>
+	 <1110965751.9818.87.camel@pegasus>  <42380154.3080005@carmedialab.de>
+Content-Type: text/plain
+Message-Id: <1110967438.9818.110.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,106 +19,51 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 16 Mar 2005 11:21:29 +0100 (CET)
+Date: Wed, 16 Mar 2005 11:03:58 +0100
 
-Hi Marcel,
+Hi Marcus,
 
-Excuse me if I wasn't precise.
-
-I know that the BD_ADDR is the MAC address it is
-explained in the BNEP spec. and when I do ifconfig
-bnep0 i see in the MAC address feild the BD_ADDR.
-
-When we conect tow bluetooth devices with a PAN
-connection, we use ifconfig to affect an IP address
-for both our PC.
-
-The IP address is in the IP layer.When the tcp stack
-send an IP frame in the IP headers we find the IP
-address of the sender and the IP address of the dst.
-
-when BNEP receive this IP frame it needs to build its
-BNEP headers. The BNEP header cantains (not in
-ETHERNET_COMPRESSED) the BD_ADDR of the dst and the
-src. BNEP needs to convert the IP address into
-BD_ADDR.
-
-So BNEP ask IP for such a thing. This BD_ADDR is
-stored in an ARP table. the ARP table is in the IP
-layer. The ARP table contains for any known IP address
-its related BD_ADDR (or MAC address as you want).
-
-If this IP isn't known like when we begin a conection
-the IP layer send an ARP resolution request asking
-which device owns this IP address. The device it have
-this IP address reply with " this Ip address is owne
-by this BD_ADDR"
-so the IP layer store this BD_ADRR in this ARP table.
-
-you can see that with #tcpdump -i bnep0.
-
-The ARP protocol is explained here. 
-http://www.ietf.org/rfc/rfc826.txt.
-
-Actually this is the protocol between the IP layer and
-the Ethernet layer. Since the BNEP have to replace the
-Ethernet layer, I wanted to know how is implemented
-address resolution in BNEP. Exactly how BNEP ask IP
-for getting the BD_ADDR stored in the ARP table. 
-
-regards
-Benny
-
-
-
---- Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Benny,
+> > if the protocol is implemented you can easily have an application
+> > running that provides the profile function.
+> > 
+> > This is not general, but if you ask what profiles you have in mind, I
+> > can give you a more detailed answer.
 > 
-> > But, How could bnep build its bnep frame. BNEP
-> receive
-> > frome TCP/IP the IP address of the peer device.
-> And
-> > she needs to convert this IP adresse into a MAC
-> > address so it needs to ask for the MAC adresse in
-> the
-> > ARP tables in the IP layer.
-> > isn't it?
-> 
-> the MAC address of the virtual network card is the
-> BD_ADDR. Both are
-> part of the IEEE address range and they will never
-> overlap.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
-> 
->
--------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT
-> Products from real users.
-> Discover which products truly live up to the hype.
-> Start reading now.
->
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+> Just shortly descibing our hardware: Embedded Box using an AC45 GSM/GPRS 
+> Modem (serial  connection) , GPS Samsung modul (serial connection), 
+> BT-Infioneon singlestone Bluemoon (serial connection).
+
+make sure that you adding my latest -mh patch for that kernel.
+
+> Profiles looking for:
+> Serial Profile (through rfcomm ?)
+
+To what should this be connected? The GPS or the GSM/GPRS unit?
+
+> Handsfree (for using a external mobile phone)
+
+Are the SCO audio data sent over the PCM interface of the chip?
+
+> SAP (would be nice, cause AC45 supports SAP)
+
+Nobody has written anything like this, because the hardware for testing
+is missing. However this works like PDUs over a RFCOMM socket and should
+be quite simple.
+
+> Network(through PAN?)
+
+You can use pand for it.
+
+> Fileexchange (through openobex)
+
+Depending on what you wanna do you may need do write some extra code,
+but there are a lot of examples.
+
+Regards
+
+Marcel
 
 
-	
-
-	
-		
-Découvrez nos promotions exclusives "destination de la Tunisie, du Maroc, des Baléares et la Rép. Dominicaine sur Yahoo! Voyages :
-http://fr.travel.yahoo.com/promotions/mar14.html
 
 
 -------------------------------------------------------
