@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] OT: SonyEricsson K700i addressbook and OBEX over
-	Bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Charles Bueche <charles@bueche.ch>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040817123228.2d896a07@bluez.bueche.ch>
-References: <20040817123228.2d896a07@bluez.bueche.ch>
+Message-ID: <1092817959.2125167424.21489.sendItem@bloglines.com>
+From: banzaay.2949407@bloglines.com
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <1092818433.31651.60.camel@pegasus>
-Mime-Version: 1.0
+Subject: [Bluez-users] Rpm problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,40 +15,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 18 Aug 2004 10:40:33 +0200
+Date: 18 Aug 2004 08:32:39 -0000
 
-Hi Charles,
 
-> sorry if this a bit off-topic, but I didn't find help elsewhere and I
-> thought someone here might have seen the same problems.
-> 
-> I just got my SonyEricsson K700i from Swisscom, and I'm experimenting
-> with bluez and user-space tools (kde-bluetooth).
-> 
-> It works quite well, I can send VCARD's using the OBEX Object Push, and
-> the phone gets them well. The only glitch is that the file must me named
-> *.vcf for the phone to consider it as address records.
 
-this is some kind of stupid, but normal for most phones.
+Hi, i'm new bluez user.
 
-> 1. OBEX File Transfer (eg to get pictures from the pone) : in Konqueror,
-> using kde-buetooth, the selection of "obex://[btaddr]:7/" brings up
-> "Authentication Required". From my analysis of the source code, it might
-> be caused by the transport layer (bluez), but not sure.
 
-Check the hcidump and ask the KDE-Bluetooth developers.
 
-> 2. UID field in VCARD's : if I send a single VCARD in a file for a
-> record already present in the phone, it asks "overwrite y/n ?". If I
-> send a file containing two or more VCARD's for records already present
-> in the phone, it duplicate them. I added a UID fields as recommended by
-> the Vcard spec, the phone seem to ignore it.
+I have downloaded the rpm for RH distro, i'm
+using 
 
-Sounds like a bug in the phone. Tell SE about it ;)
+QiLinux, a Red Hat like distro. 
 
-Regards
+This are the files i try to install:
 
-Marcel
+bluez-bluefw-1.0-1.i386.rpm
+
+bluez-sdp-1.5-1.i386.rpm
+
+bluez-hcidump-1.10-1.i386.rpm
+ 
+
+bluez-utils-2.8-1.i386.rpm
+
+bluez-libs-2.8-1.i386.rpm      
+
+bluez-pan-1.1-1.i386.rpm
+
+
+
+First i install the bluez-libs, then, when i try to install bluez-sdp rpm
+i get this error:
+
+file /usr/include/bluetooth/sdp.h from install of bluez-sdp-1.5-1
+conflicts with file from package bluez-libs-2.8-1
+
+file /usr/include/bluetooth/sdp_lib.h
+from install of bluez-sdp-1.5-1 conflicts with file from package bluez-libs-2.8-1
+
+
+
+Have anyone find the same problem? May be a problem of my distro?
+
+
+
+
+
+Thanks Mirko
+
+
 
 
 
