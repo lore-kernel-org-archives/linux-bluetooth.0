@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Problem with slow Speed of Socket CF Card
+Subject: Re: [Bluez-users] CSR firmware
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Wolfgang =?ISO-8859-1?Q?M=FCes?= <wolfgang@iksw-muees.de>
+To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405291047.20701.wolfgang@iksw-muees.de>
-References: <200405291047.20701.wolfgang@iksw-muees.de>
+In-Reply-To: <200405290256.06151.cijoml@volny.cz>
+References: <200405290256.06151.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1085821206.3932.11.camel@pegasus>
+Message-Id: <1085820898.3932.6.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,34 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 May 2004 11:00:06 +0200
+Date: Sat, 29 May 2004 10:54:58 +0200
 
-Hi Wolfgang,
+Hi Michal,
 
-> I am using the Socket Communications CF Card Rev. G with the CSR chipset 
-> and the bcsp protocol in my Zaurus C750 with Kernel 2.4.18.
-> It is working fine (thank you, guys).
+> have anybody downloaded firmware from csr dongle? I would like to make 
+> research if is possible to change vendor ID in it and then flash it back. I 
+> think it is possibly way to upgrade firmware in old dongles.
 > 
-> hicattach opens the card with a speed of 230 KBit/s. This is the speed 
-> the CSR chipset is initialized after reset. I am using PAN, and I get a 
-> file transfer rate of about 150 KBit/s. With other bluetooth devices 
-> (USB dongle) I get about 550-600 KBit/s.
-> 
-> I have asked Socket Communications if the card is limited to slow 
-> baudrates, and they have answered me that this card is able to perform 
-> about 730 KBit/s under ideal conditions.
-> 
-> Obviously, this is not possible with a serial UART and 230 KBit/s.
-> So there must be a speed change command, and I want to use it.
-> 
-> Can anybody give me some usefull advice how to proceed? 
-> I am able to write/change kernel drivers, but I have no hint where to 
-> start and how to get the speed change information in the bcsp protocol.
+> Can somebody give me help how download it? I have now access to 14 different 
+> csr based dongles from different wendors, which have same firmware version. 
+> So I'll try find differences in firmware.
 
-this is simple. Try "hciattach <dev> socket 460800".
+the software you search for is my btdfu tool.
 
-Look at the manpage and the source code of hcitattch, because the kernel
-hasn't really to do anything with it.
+	http://www.holtmann.org/linux/bluetooth/btdfu-0.2.tar.gz
+
+And you upload a firmware from the dongle (archive mode) and you
+download a new one to a dongle (upgrade mode).
+
+The problem is not the vendor ID. It is the digital signature of the
+firmware file. You can download everything you want onto your dongle,
+but it can happen that the boot loader don't boot the other firmware. In
+that case it will stay in DFU mode. The boot loader can only be changed
+over a SPI connection.
 
 Regards
 
