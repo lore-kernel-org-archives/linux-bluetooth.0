@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Catalin Drula <Catalin.Drula@imag.fr>
-To: <bluez-devel@lists.sourceforge.net>
-Message-ID: <Pine.GSO.4.33.0503171103450.12042-100000@horus.imag.fr>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-devel] Handling a Hardware Error event on iPAQ h5550
+Subject: Re: [Bluez-devel] bluez installation query
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: bluez-devel@lists.sf.net
+In-Reply-To: <20050317060516.82046.qmail@web41129.mail.yahoo.com>
+References: <20050317060516.82046.qmail@web41129.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1111055149.11792.51.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,65 +19,42 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Mar 2005 11:23:19 +0100 (CET)
+Date: Thu, 17 Mar 2005 11:25:49 +0100
 
-Hi,
+Hi Jose,
 
-I was trying to debug the Bluetooth subsystem on an HP iPAQ h5550 running
-Linux:
+> On suse linux 9.1, iam not able to make and make
+> install the bluez install files 'utils, libs etc'.
+> when i say ./configure, this is what is listed:
+> 
+> ose:/home/jose/bluetooth/bluez-hcidump-1.18 #
+> ./configure --with-gcc --prefix=/usr
+> --mandir=/usr/share/man
+> checking for a BSD-compatible install...
+> /usr/bin/install -c
+> checking whether build environment is sane... yes
+> checking for gawk... gawk
+> checking whether make sets $(MAKE)... no
+> checking whether to enable maintainer-specific
+> portions of Makefiles... no
+> checking for gcc... no
+> checking for cc... no
+> checking for cc... no
+> checking for cl... no
+> configure: error: no acceptable C compiler found in
+> $PATH
+> See `config.log' for more details.
+> 
+> 
+> how do i set the path to the gcc?
 
-root@h3900:~# hciconfig -a
-hci0:   Type: UART
-        BD Address: 08:00:17:1A:EB:76 ACL MTU: 339:4 SCO MTU: 60:9
-        UP RUNNING PSCAN ISCAN
-        RX bytes:-2117082264 acl:19904935 sco:0 events:4940395 errors:0
-        TX bytes:386017560 acl:9879838 sco:0 commands:430 errors:0
-        Features: 0xff 0x3b 0x05 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'POCKET_PC'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x180 LMP Ver: 1.1 (0x1) LMP Subver: 0x180
-        Manufacturer: RTX Telecom A/S (21)
+is this the SuSE 9.1 Personal edition? If yes, then you don't have a GCC
+on it. Otherwise simply install it.
 
-The problem I am facing on this machine is that it seems that the UART
-communication is sometimes unreliable. What happens is that while sending
-data, there sometimes seems to be corruption between the host and the
-controller. For example, doing an l2test where the iPAQ is sending to a
-PC, every once in a while on the receiving side there are data or sequence
-or size mismatches. After a while, the corrupted bytes happen to be in the
-H4 header, and the controller assumes it has lost synchronization with the
-host, thus sending a "Hardware Error" event. It then expects a "Reset"
-command to resynchronize.
+Regards
 
-Since a lot of digging has not found the root cause of these errors in the
-UART communication, I wanted to hack the Bluez stack to better handle when
-these loss of synchronization events occur (I am not refering to patching
-the main Bluez stack, but rather make a hack for our own purposes here,
-and perhaps share it with other iPAQ h5550 users).
+Marcel
 
-It is easy enough to add the sending of a "Reset" command after a
-"Hardware Error" event is received, but I get the impression that there's
-more needed, such as tearing down the established connections somehow. The
-point is to get a "clean" stack to start with after such an event (and of
-course, propagate the error up the stack so that the application gets a
-"broken connection"). Any advice on how hard it is to do that, and what
-needs to be done?
-
-Currently, what happens is that after sending "Reset", we resynchronize
-with the controller, but the previous connections still show:
-
-root@h3900:~# hcitool con
-Connections:
-        < ACL 00:10:DC:57:C9:79 handle 1 state 8 lm MASTER
-        > ACL 08:00:17:1A:E6:02 handle 2 state 8 lm SLAVE
-
-Thanks in advance for your help,
-
-Catalin
 
 
 
