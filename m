@@ -1,13 +1,19 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: James Cameron <james.cameron@hp.com>
-To: Albert Huang <ashuang@gmail.com>
+Subject: Re: [Bluez-devel] [PATCH] pand/main.c, restore signals for dev-up
+	script
+From: Marcel Holtmann <marcel@holtmann.org>
+To: James Cameron <james.cameron@hp.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] how to do asynchronous device inquiry?
-Message-ID: <20040629043356.GK20139@hp.com>
-References: <ef9938ec040628194321db5d9c@mail.gmail.com>
+In-Reply-To: <20040628224803.GA20139@hp.com>
+References: <20040627233437.GD28828@hp.com>
+	 <1088408656.3774.136.camel@pegasus> <20040628085356.GA8871@hp.com>
+	 <1088413518.3774.167.camel@pegasus> <20040628095541.GB8871@hp.com>
+	 <1088417629.3774.177.camel@pegasus> <20040628101927.GC8871@hp.com>
+	 <1088419197.3774.183.camel@pegasus> <20040628120612.GF8871@hp.com>
+	 <1088427271.3774.198.camel@pegasus>  <20040628224803.GA20139@hp.com>
+Content-Type: text/plain
+Message-Id: <1088465177.6030.221.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <ef9938ec040628194321db5d9c@mail.gmail.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,47 +24,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 29 Jun 2004 14:33:56 +1000
+Date: Tue, 29 Jun 2004 01:26:17 +0200
 
-G'day Albert,
+Hi James,
 
-You could certainly fork() a process to exec() hcitool, and when it
-finishes it could send the information to your program, through a pipe
-that your program is select()ing on, or something similar.
+> > what do you wanna do with that information? Actually I never needed it.
+> 
+> Select access policies.  Probably not a terribly reliable access
+> control, but at least ringing alarms if I sight a connection from an
+> unexpected address would be useful.
 
-If you knew your application environment well, you could configure the
-inquiry to take far less time.  e.g. "hcitool inq --length=1" is
-supposed to work for 1.28 seconds only, assuming no cache.  If you can
-change the inquiry parameters of the other device, you can help this to
-go even faster.
+from my view it is better to use "net.agent" and "pand -l" for this job.
+If it gets to complex then you should integrate it directly into pand.
 
-I've tried running "hcitool inq --length=1" repeatedly until another
-device is found.  It doesn't seem as reliable as doing a full inquiry.
+Regards
 
-You could use threads.  Erk.
+Marcel
 
-But how to implement it asynchronously all in one process using an event
-model ... doesn't seem to be a way to do it.  Maybe I just can't find
-it.  Here's how I looked ...
 
-Looking at tools/hcitool.c, an inquiry uses hci_inquiry() function, part
-of libbluetooth1 on my system.  I'm looking at 2.7.
-
-In libbluetooth1, hci_inquiry() calls ioctl() to do the work.  It passes
-an hci_inquiry_req struct.  I'm not sure what possible flag bits are
-valid.  IREQ_CACHE_FLUSH is the only one I can see defined.
-
-The ioctl() is handled by kernel function hci_sock_ioctl() in
-net/bluetooth/hci_sock.c which dispatches it to hci_inquiry() in
-net/bluetooth/hci_core.c and there doesn't seem to be any clear support
-for doing the inquiry asynchronously.  I'm looking at 2.6.6.
-
-Warning though; in hci_request() in the hci_core.c file, all requests to
-the device are serialised.  Multiple attempts to do hci_inquiry() will
-be queued.
-
--- 
-James Cameron
 
 
 -------------------------------------------------------
