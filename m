@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BlueZ with 2.6.4 kernel
+Subject: Re: [Bluez-users] About Ipaq and Nokia phone
 From: Marcel Holtmann <marcel@holtmann.org>
-To: patilabh@cse.msu.edu
+To: Lan Zhang <Lan.Zhang@Zoran.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040330201859.75357.qmail@web10911.mail.yahoo.com>
-References: <20040330201859.75357.qmail@web10911.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1080687412.2773.39.camel@pegasus>
+In-Reply-To: <E65CD2CAB74C80498703D6EF7624BB4C4ACABC@zmaex.zma.zoran.com>
+References: <E65CD2CAB74C80498703D6EF7624BB4C4ACABC@zmaex.zma.zoran.com>
+Content-Type: text/plain; charset=iso-8859-13
+Message-Id: <1080687489.2773.41.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,56 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 31 Mar 2004 00:56:52 +0200
+Date: Wed, 31 Mar 2004 00:58:09 +0200
 
-Hi Abhishek,
+Hi Lan,
 
-> I'm having trouble getting BlueZ to work with the new kernel (2.6.4). I am
-> using a 3COM Bluetooth USB device. 
-> 
-> I checked Marcel's website and didnt find any patch for the 2.6.x kernel.
-> so, I assume that I dont need to patch the 2.6 kernel... please correct me
-> if I am wrong.
+> I have an ipaq and Nokia 3650 phone; I try to use both of them with my
+> linux box. I download bluez packet and obex packet, before I make any
+> connect or pair, both of them can find my linux, and each of them can
+> setup a connection with the linux Bluetooth. But they cannot work
+> together. The problem is the Nokia phone cannot find the Bluetooth
+> device after the ipaq connected to LAN access point. Before the ipaq
+> connect to LAN access over ppp, the phone can find my linux Bluetooth
+> device, and it can use the sdp service which provided. But after the
+> ipaq connected to the linux; the phone will not able to look this
+> Bluetooth device anymore. I didn=FFt try to pair these two; I just try
+> to search the Bluetooth around the phone. And if I disconnect the
+> ipaq, then the phone can find it again. So dose it support multiple
+> connections?=20
 
-	http://www.bluez.org/patches.html
-
-> My kernel compilation went smoothly and after the first reboot, I installed
-> the latest bluez-libs and bluez-utils with no errors. After another reboot,
-> I tried starting bluez:
-> 
-> [root@abhishek-pc BlueZ]# modprobe bluez
-> FATAL: Module bluez not found.
-> [root@abhishek-pc BlueZ]# modprobe hci_usb
-> [root@abhishek-pc BlueZ]# modprobe hci0 up
-> FATAL: Module hci0 not found.
-
-It is "modprobe bluetooth" in 2.6 and it is "hciconfig hci0 up". However
-nothing of that is needed if you have hotplug installed and hcid is
-running.
-
-> lsmod shows the following:
-> 
-> [root@abhishek-pc BlueZ]# lsmod
-> Module                  Size  Used by
-> snd_seq_oss            32576  0
-> snd_seq_midi_event      6272  1 snd_seq_oss
-> snd_seq                52400  4 snd_seq_oss,snd_seq_midi_event
-> snd_pcm_oss            49220  1
-> snd_mixer_oss          17536  1 snd_pcm_oss
-> snd_via82xx            21792  1
-> snd_pcm                88128  2 snd_pcm_oss,snd_via82xx
-> snd_timer              22080  2 snd_seq,snd_pcm
-> snd_ac97_codec         60548  1 snd_via82xx
-> snd_page_alloc          9348  2 snd_via82xx,snd_pcm
-> snd_mpu401_uart         6208  1 snd_via82xx
-> snd_rawmidi            20800  1 snd_mpu401_uart
-> snd_seq_device          6468  3 snd_seq_oss,snd_seq,snd_rawmidi
-> hci_usb                12224  0
-> bluetooth              44452  1 hci_usb
-> usbcore                63904  1 hci_usb
-> autofs                 14464  0
-
-Actually I miss "uhci_hcd" or "ohci_hcd".
+what does "hciconfig -a" say?
 
 Regards
 
