@@ -1,11 +1,18 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Peter Wippich <pewi@gw-instruments.de>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluetooth hardware that is discoverable by default?
-In-Reply-To: <20050121020742.55149.qmail@web25003.mail.ukl.yahoo.com>
-Message-ID: <Pine.LNX.4.33.0501211032070.8362-100000@redbean.intranet.gw-instruments.de>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Bluez-devel] Alignment issue
+From: David Woodhouse <dwmw2@infradead.org>
+To: bluez-devel@lists.sourceforge.net
+Cc: Daryl Van Vorst <daryl@wideray.com>
+In-Reply-To: <1106244883.13562.3.camel@pegasus>
+References: <001301c47f09$3900e650$1301010a@baked>
+	 <1092208405.4564.227.camel@pegasus>
+	 <1106231454.26551.582.camel@hades.cambridge.redhat.com>
+	 <1106232343.8190.187.camel@pegasus>
+	 <1106233175.26551.597.camel@hades.cambridge.redhat.com>
+	 <1106244883.13562.3.camel@pegasus>
+Content-Type: text/plain
+Message-Id: <1106295971.783.57.camel@baythorne.infradead.org>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,83 +24,58 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 21 Jan 2005 10:36:55 +0100 (CET)
+Date: Fri, 21 Jan 2005 08:26:11 +0000
 
+On Thu, 2005-01-20 at 19:14 +0100, Marcel Holtmann wrote:
+> Your patch is now in (after I reworked the tab vs. space problem). And
+> everyone should start testing these on various platforms.
 
-Hi Dave,
+OK. Do you want to apply this one too so we can release bluez-libs-2.15
+without changing the soname?
 
-all "standard" USB dongles behave this way. To get an idea why  read the
-standard documents ...
+--- bluez-libs-2.14/src/hci.c.compat	2005-01-20 12:21:11.000000000 +0000
++++ bluez-libs-2.14/src/hci.c	2005-01-20 12:21:17.000000000 +0000
+@@ -850,6 +850,11 @@ int hci_disconnect(int dd, uint16_t hand
+ 	return 0;
+ }
+ 
++int hci_local_name(int dd, int len, char *name, int to)
++{
++	return hci_read_local_name(dd, len, name, to);
++}
++
+ int hci_read_local_name(int dd, int len, char *name, int to)
+ {
+ 	read_local_name_rp rp;
+@@ -891,6 +896,11 @@ int hci_write_local_name(int dd, const c
+ 	return 0;
+ }
+ 
++int hci_remote_name(int dd, const bdaddr_t *bdaddr, int len, char *name, int to)
++{
++	return hci_read_remote_name(dd, bdaddr, len, name, to);
++}
++
+ int hci_read_remote_name(int dd, const bdaddr_t *bdaddr, int len, char *name, int to)
+ {
+ 	evt_remote_name_req_complete rn;
+--- bluez-libs-2.14/include/hci_lib.h.compat	2005-01-20 12:21:11.000000000 +0000
++++ bluez-libs-2.14/include/hci_lib.h	2005-01-20 12:21:17.000000000 +0000
+@@ -66,8 +66,11 @@ int hci_devinfo(int dev_id, struct hci_d
+ int hci_devba(int dev_id, bdaddr_t *bdaddr);
+ int hci_devid(const char *str);
+ 
++/* deprecated: preserve compatibility */
++int hci_local_name(int dd, int len, char *name, int to);
+ int hci_read_local_name(int dd, int len, char *name, int to);
+ int hci_write_local_name(int dd, const char *name, int to);
++int hci_remote_name(int dd, const bdaddr_t *bdaddr, int len, char *name, int to);
+ int hci_read_remote_name(int dd, const bdaddr_t *bdaddr, int len, char *name, int to);
+ int hci_read_remote_features(int dd, uint16_t handle, uint8_t *features, int to);
+ int hci_read_remote_version(int dd, uint16_t handle, struct hci_version *ver, int to);
 
-However, you can get a BT serial port adapter (more expensive than USB) or
-you can modify the firmware of a standard dongle (you need a
-development kit from the BT chip manufacturer for $$$$).
-
-Ciao,
-	Peter
-
-On Fri, 21 Jan 2005, Dave West wrote:
-
-> Hi there,
->
-> I have very simple requirements for a bluetooth
-> 'beacon' that is discoverable, but nothing else (ie.
-> it responds to discovery requests, but you don't need
-> to connect to it or anything).  At the moment I am
-> using a D-Link USB dongle where the USB powerlines are
-> soldered to an external power supply.  This supplies
-> power to the beacon, but it still needs to connect to
-> a linux/bluez equipped laptop (with USB power
-> disconnected as it draws its power externally) to
-> bring up the device and make it discoverable.
-> Immediately disconnecting the bluez laptop you then
-> have a cheap standalone beacon as long as the power
-> remains.
->
-> I'm wondering is there any way to have a beacon like
-> this where you don't have to connect it to a laptop
-> after its been powered up to make it discoverable?  My
-> searches on google and looking at the bluez code make
-> me think that normally a HCISETSCAN ioctl is sent to
-> the device with SCAN_INQUIRY|SCAN_PAGE option to make
-> it discoverable.  My question is are there any dongles
-> out there that become discoverable immediately when
-> they are powered without having to send them a HCI
-> command?  One of you who have written drivers for
-> these things might know....
->
-> Or if there aren't, can anyone suggest another way I
-> might go about making or designing a cheap self
-> powered bluetooth beacon that is discoverable on
-> powerup?  I may want to manufacture these beacons in
-> some quantity later.
->
-> Thanks,
-> David
->
->
->
->
->
-> ___________________________________________________________
-> ALL-NEW Yahoo! Messenger - all new features - even more fun! http://uk.messenger.yahoo.com
->
->
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
-> Tool for open source databases. Create drag-&-drop reports. Save time
-> by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
-> Download a FREE copy at http://www.intelliview.com/go/osdn_nl
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-
-|	Peter Wippich 			Voice: +49 30 46776411		|
-|	G&W Instruments GmbH		fax:   +49 30 46776419		|
-|	Gustav-Meyer-Allee 25, Geb. 12	Email: pewi@gw-instruments.de	|
-|	D-13355 Berlin  / Germany					|
+-- 
+dwmw2
 
 
 
