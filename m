@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] RCOMM_SendData
+Subject: Re: [Bluez-users] kernel configuration
 From: Marcel Holtmann <marcel@holtmann.org>
-To: karthik bala guru <bluekarthik@yahoo.com>
-Cc: Philip MacIver <philipmaciver@yahoo.co.uk>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040721114733.48802.qmail@web90102.mail.scd.yahoo.com>
-References: <20040721114733.48802.qmail@web90102.mail.scd.yahoo.com>
+To: Philip MacIver <philipmaciver@yahoo.co.uk>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040721111635.26295.qmail@web25407.mail.ukl.yahoo.com>
+References: <20040721111635.26295.qmail@web25407.mail.ukl.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1090412513.21683.91.camel@pegasus>
+Message-Id: <1090412369.21683.89.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,25 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 21 Jul 2004 14:21:53 +0200
+Date: Wed, 21 Jul 2004 14:19:30 +0200
 
-Hi Karthik,
+Hi Philip,
 
->         I am using Bluez .
->         
->         I am into sending some document and hence analysing the RFCOMM
->         
->         segment .
->         
->         And I find that RFCOMM.H has RFCOMM_SendData function.
->         
->         But, i would like to know the function definition and not just
->         the declaration.
->         
->         Could anyone tell me the file which has the RFCOMM_SendData
->         Definition.
+> Hopefully this is a simple question with a simple
+> answer.
+> 
+> I have just installed kernel-2.6.8rc2
+> 
+> I would just like to know what bluetooth options
+> should be set in the kernel, I've read that there are
+> a couple that shouldn't be selected when selecting the
+> blueZ stuff. At the moment I have got all the
+> bluetooth options compiled into my kernel, but if this
+> is not neccessary I would rather have a smaller more
+> stable kernel.
 
-there is no RFCOMM_SendData in BlueZ.
+it should now be safe to select every option, but you should use them as
+modules.
 
 Regards
 
