@@ -1,40 +1,35 @@
-Return-Path: <i_p_a_u_l@yahoo.com>
-Message-ID: <20040816180651.48235.qmail@web50202.mail.yahoo.com>
-Date: Mon, 16 Aug 2004 11:06:51 -0700 (PDT)
-From: Paul Ionescu <i_p_a_u_l@yahoo.com>
-Subject: Re: [Bluez-users] Need help with PAND between 2  linux boxes
+Return-Path: <skronenberger@web.de>
+Date: Mon, 16 Aug 2004 19:21:06 +0200
+From: Sigrid Kronenberger <skronenberger@web.de>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1092666785.4375.150.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Bluez-users] Kernel 2.6.8 final and AVM BlueFritz
+Message-Id: <20040816192106.727fcf03@localhost>
+In-Reply-To: <1092645125.4375.83.camel@pegasus>
+References: <20040815222056.2160d599@localhost>
+	<1092645125.4375.83.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: skronenberger@web.de
 List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Marcel,
+On Mon, 16 Aug 2004 10:32:05 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
---- Marcel Holtmann <marcel@holtmann.org> wrote:
-> > ifconfig bnep0
-> > down, and I wanted to "rmmod bnep".
-> > But rmmod bnep gives:
-> > ERROR: Module bnep is in use
-> > And indeed is in use by "ps xa|grep bnep" :
-> > 2660 ?        SW<    0:00 [kbnepd bnep0]
-> > 
-> > Is this normal ?
+Hi Marcel, 
+
+> Hi Sigrid,
 > 
-> Yes, because "ifconfig bnep0 down" doesn't kill the
-> BNEP connection
-> between these two devices. Try to run "pand -K".
 
-It worked flawlessly with "pand -K".
-And thanks again, your answers were like instant.
+> 
+> Take a look at my Bluetooth ISDN howto:
+> 
+> 	http://www.holtmann.org/linux/bluetooth/isdn.html
+> 
+> And of course make sure that hcid is running.
+> 
+Thanks a lot, Marcel. Now it works. I have to start hcid manually...
 
-Paul,
-A happy now pan with bluez user.
+Regards
 
-
-		
-__________________________________
-Do you Yahoo!?
-Yahoo! Mail - Helps protect you from nasty viruses.
-http://promotions.yahoo.com/new_mail
+Sigrid
