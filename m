@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] how to interpret  'link quality' value
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200412031515.02372.wim.delvaux@adaptiveplanet.com>
-References: <200412031515.02372.wim.delvaux@adaptiveplanet.com>
-Content-Type: text/plain
-Message-Id: <1102084671.8479.18.camel@pegasus>
-Mime-Version: 1.0
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200412031515.02372.wim.delvaux@adaptiveplanet.com>
+Subject: [Bluez-users] how to interpret  'link quality' value
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,21 +17,12 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 03 Dec 2004 15:37:51 +0100
+Date: Fri, 3 Dec 2004 15:15:02 +0100
 
-Hi Wim,
+can anybody tell me the range for a 'link' quality
+Is there a range ?
 
-> can anybody tell me the range for a 'link' quality
-> Is there a range ?
-
-this value is vendor specific. For a CSR chip I have this information on
-my webpage.
-
-Regards
-
-Marcel
-
-
+Thanx
 
 
 -------------------------------------------------------
