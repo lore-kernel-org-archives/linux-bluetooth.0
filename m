@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Chris Boyle <bluez-devel@cmb.is-a-geek.org>
+Message-ID: <41B6D872.6050308@suche.org>
+From: "suche.org" <admin@suche.org>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: snd-bt-sco problem
-Message-ID: <20041208103449.GC2258@zeus.galaxy.org.uk>
-References: <20041206225609.GA1177@zeus.galaxy.org.uk> <cp3mkk$m7t$1@sea.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <cp3mkk$m7t$1@sea.gmane.org>
+Subject: Re: [Bluez-devel] CVS doubles
+References: <20041206225609.GA1177@zeus.galaxy.org.uk>	 <cp3mkk$m7t$1@sea.gmane.org> <1102407664.8447.20.camel@pegasus>	 <cp3rr7$1vv$1@sea.gmane.org> <1102411047.8447.28.camel@pegasus>	 <cp4a8v$959$1@sea.gmane.org> <1102425729.8447.41.camel@pegasus>	 <cp4df4$i6l$1@sea.gmane.org> <1102439143.8447.47.camel@pegasus>	 <cp6fpq$167$1@sea.gmane.org> <1102496771.9988.35.camel@pegasus>	 <41B6CBDC.4010802@suche.org> <1102499338.9988.44.camel@pegasus>
+In-Reply-To: <1102499338.9988.44.camel@pegasus>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,33 +18,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 8 Dec 2004 10:34:49 +0000
+Date: Wed, 08 Dec 2004 11:33:22 +0100
 
-On Tue, Dec 07, 2004 at 08:37:56AM +0100, Sebastian Roth wrote:
-> Please post the ouput of `hciconfig hci0 revision'
 
-zeus:~# hciconfig hci0 revision
-hci0:	Type: USB
-	BD Address: 00:0B:0D:40:6C:63 ACL MTU: 120:20  SCO MTU: 64:0
-	Unsupported manufacturer
+>the bluez-pan and bluez-sdp packages were deprecated a long time ago and
+>I will delete the CVS repositories once I checked that we don't any code
+>from them anymore. Use bluez-libs and bluez-utils. Everything you need
+>is in there.
+>  
+>
+Hi,
+ok i done an error with libdsp installed i run configure and before 
+running make i delete the old.
+And so he seek for it. Maybe bluez-utils should remove the check for 
+libsdp ? Becasue as you say
+it in compleate in libbluez now.
 
-> The second issue was that all "sound-apps" were blocking (hanging) 
-> without playing any sound. My headsets (both from Anycom) must be 
-> activated with the switch to recieve the sound. Just like answer the 
-> telephone.
-
-As mentioned in reply to Brad Midgley, this established a successful
-connection (pressing the volume buttons affected alsamixer), but I
-still couldn't actually get any audio to flow in either direction,
-despite continuous SCO data packets seen with hcidump, although only in
-one direction.
-
-"> SCO data: handle 0x0100 dlen 24"
-
--- 
-Chris Boyle - http://cmb.is-a-geek.org/
-GPG: B7D86E0F, MSN: shortcipher@hotmail.com, ICQ: 24151961,
-AIM: kerneloops, Yahoo: kerneloops, IRC: cmb on irc.uwcs.co.uk
+Cu Thomas
 
 
 -------------------------------------------------------
