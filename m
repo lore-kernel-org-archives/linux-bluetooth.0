@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <E73D9A5BC4A2D711BBC600065BF3595F1C66CFB9@il06exm10>
-From: Mandalia Hiren-AHM047 <hirenm@motorola.com>
-To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
+From: "g.starre" <info@microllix.nl>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Bluez-users] using sdptool
+Message-ID: <421F0517.17219.330641@localhost>
+Content-type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] connecting 2 linux pc's
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,28 +16,86 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 24 Feb 2005 17:14:34 -0600
+Date: Fri, 25 Feb 2005 10:59:35 +0100
 
-Hello all
+Hi all,
+  
+After a long time trying, I still cannot connect
+2 linux PC's together using usb-bluetooth sticks
+with rfcomm.
 
-I don't know how to frame my question but I will tell you what problem I'm facing. I have 2 linux machines and a Bluetooth USB dongle on each. 
+I'm using among others :
+knoppix 3.7 CD boot (bootoption knoppix26)
+debian PC (2.6.11-rc4-bk10 kernel, unstable dist)
+debian laptop (2.6.11-rc4 kernel, unstable dist)
 
-When I do "sdptool get"(on 1 machine) I get
-% sdptool get record_handle
-Service Name: SDP server
-Service Description: Bluetooth service discovery server
-So on....
+All the modules like
+- hci_usb
+- rfcomm
+- bluetooth
+- l2cap
+are loaded either by the kernel (/etc/modules) or
+by hand using modprobe.
+
+These command's are used to try to setup
+a connection :
+
+hciconfig hci0 up
+sdptool add sp
+rfcomm bind 0 <bdaddr> 1
+rfcomm connect 0
+
+While on the "receiving" debian laptop these command's
+were issued :
+
+hciconfig hci0 up
+sdptool add sp
+rfcomm listen /dev/rfcomm0 1
+
+To check connection I use cat/echo (or minicom)
+-> echo "hello world" > /dev/rfcomm0
+
+This way I can connect to a pc with some proprietary OS,
+but I cannot build a connection between 2 linux pc's.
+
+Yesterday I was able to start a connection between
+a debian PC and debian laptop but immedeatily after
+pressing the return button on the debian PC the
+laptop responded with (rfcomm listen /dev/rfcomm0) :
+
+ Press control-c to disconnect
+ Disconnected
 
 
-When I do (on another machine) I get 
-% sdptool get record_handle
-Failed to connect to SDP server on FF:FF:FF:00:00:00: no such file or directory.
+It's probably one bit I have to toggle ;-)
+
+Some settings in hcid.conf :
+pairing multi;
+lm accept;
+lp rswitch,hold,sniff,park;
+
+My rfcomm.conf on the debian PC is
+modified like this :
+rfcomm0 {
+  bind yes;
+  device <bd-address of debian laptop connected BT dongle>;
+  channel 1;
+}
+
+The service was restarted each time the config
+was altered with /etc/init.d/bluez-utils stop
+and then ..... start
+
+In all the howto's/archives there is a lot of
+info how to connect to a phone or some device,
+but there's no info how to connect 2 pc's.
+Can anyone help ?
+
+Thanks in advance.
 
 
-I guess my question should be "how to start a SDP server on a machine?" 
+grt, geert
 
-Thanks,
-Hiren Mandalia
 
 
 
