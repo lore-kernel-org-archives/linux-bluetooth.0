@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] running 2 rfcomm modules simultaneously
+Subject: Re: [Bluez-users] newbe: rfcomm_recv_frame: bad checksum in packet
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Mackie <D.Mackie@ru.ac.za>
+To: pat <pat@xvalheru.org>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040901130123.GB31321@rucus.ru.ac.za>
-References: <20040901130123.GB31321@rucus.ru.ac.za>
+In-Reply-To: <20040910155027.M37511@xvalheru.org>
+References: <20040910155027.M37511@xvalheru.org>
 Content-Type: text/plain
-Message-Id: <1094998092.5695.19.camel@pegasus>
+Message-Id: <1094997603.5695.9.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,31 +18,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 12 Sep 2004 16:08:12 +0200
+Date: Sun, 12 Sep 2004 16:00:03 +0200
 
-Hi David,
+Hi Pat,
 
-> Is it possiable to have two rfcomm modules loaded at the same time, each one
-> with a different PSM values? What I was attempting to do was to modify
-> rfcomm/core.c and recompile it into a new module, but it seems it is not as
-> simple as that as can be seen by this kernel Oops while unloading the
-> module.
-> 
-> Sep  1 01:16:12 warped l2cap_sock_kill: sk deec6380 state 9
-> Sep  1 01:16:12 warped l2cap_sock_destruct: sk deec6380
-> Sep  1 01:16:12 warped Unable to handle kernel NULL pointer dereference at
-> virtual address 00000004
-> Sep  1 01:16:12 warped printing eip:
-> Sep  1 01:16:12 warped c020496e
-> Sep  1 01:16:12 warped *pde = 00000000
-> Sep  1 01:16:12 warped Oops: 0002 [#1]
-> Sep  1 01:16:12 warped PREEMPT 
-> 
-> Has anyone done something like this before?
+> I have installed the BlueZ to my laptop because I want to use GPRT through the
+> Bluetooth. I have scripts and the rest configured and I'm able to connect and
+> upload some data, but within 30 seconds the connection go down. The system log
+> contains only this line "rfcomm_recv_frame: bad checksum in packet". Could
+> someone help me ???
 
-this is not possible this way. It needs more changes to provide such a
-functionality and you must keep it inside the RFCOMM module. Why do you
-need it?
+actually this should never happen, because the underlaying L2CAP layer
+is reliable. Try to use the latest 2.6 kernel and run "hcidump -X" as
+root and show the output to us.
 
 Regards
 
