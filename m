@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040310124449.40181.qmail@web40704.mail.yahoo.com>
-From: Lalith Chakravarthi <lalithvc@yahoo.com>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Shell script during bluetooth connection
+Subject: Re: [Bluez-users] Logitech MX900 oddities and solutions
+From: Marcel Holtmann <marcel@holtmann.org>
+To: fd@cisco.com
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1078917509.32636.453.camel@metal.cisco.com>
+References: <1078912919.32148.356.camel@metal.cisco.com>
+	 <1078915401.2537.14.camel@pegasus>
+	 <1078917509.32636.453.camel@metal.cisco.com>
+Content-Type: text/plain
+Message-Id: <1078918790.2537.29.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,27 +20,36 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 10 Mar 2004 04:44:49 -0800 (PST)
+Date: Wed, 10 Mar 2004 12:39:50 +0100
 
-Hi...
+Hi Frederic,
 
-I want to execute a shell script whenever a bluetooth connection is
-established. I am connecting between two computers using USB Dongles. I
-have RedHat Linux 9 with 2.4.20-8 kernel. I am using the bnep
-interface. I have already set up the ifcfg-bnepX files for that... but
-I can't put the script there as it wont be an executable file there...
+> I forgot to say that. The problem is that it did not compile anything
+> (Make says there is "nothing to make for all"). I may have done dirty
+> things while fiddling around. I will try downloading again from CVS and
+> do it cleanly.
 
-So cud you help me out with the files that will be called when a
-connection using bnepX interface is created so that I can put my shell
-script there..
+I checked it again and if you give --enable-compat to libs2 and utils2
+configure everything will be compiled.
 
-thanks
-Lalith
+> Don't you thing hcitool should be made current and not just "compat" ?
+> It is a precious tool...
 
-__________________________________
-Do you Yahoo!?
-Yahoo! Search - Find what you’re looking for faster
-http://search.yahoo.com
+Actually my replacement for hcitool which uses the new Bluetooth library
+is not ready and every code in compat uses the old library.
+
+> You mean the multibyte stuff, right ? What about the -mh4 patch, util2
+> and lib2 ? Will they be made grand public soon ?
+
+Sending in the multi-byte patch is job of the input guys. Everything
+from -mh4 is already present in 2.6.4-rcX. The libs2 and utils2 will
+take some time before they go real public.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
