@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41FC4BAF.4090201@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
+From: Stefan Bellon <sbellon@sbellon.de>
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: bluetooth-alsa and Jabra BT800
-References: <4d3382eb6csbellon@sbellon.de> <41F81D6F.3000908@xmission.com> <4d33b69105sbellon@sbellon.de> <4d348a05e8sbellon@sbellon.de>
-In-Reply-To: <4d348a05e8sbellon@sbellon.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Message-ID: <4d34f3925fsbellon@sbellon.de>
+In-Reply-To: <ctdn6n$sqs$1@sea.gmane.org>
+References: <41FA06A5.3010904@tootai.net> <ctdn6n$sqs$1@sea.gmane.org>
+Content-Type: text/plain
+Subject: [Bluez-users] Re: Connection issue with headset
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,54 +18,60 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 29 Jan 2005 19:51:27 -0700
+Date: Sat, 29 Jan 2005 18:29:57 +0100
 
-Stefan,
+Sebastian Roth wrote:
 
-How do you know you're using the right address? No sdp available doesn't 
-look good.
+> > nomade:/home/dh# btsco 00:0b:2e:06:01:2e
+> > Device is 1:0
+> > Voice setting: 0x0060
+> > RFCOMM channel 6 connected
+> You have to press the headset button now!
 
-Is the headset paired with a cellphone that is in range? Some embedded 
-bluetooth radios will only talk to one device... if it discovers the 
-paired phone at power on then your laptop typically won't be able to 
-talk to it.
+Sorry to hi-jack this thread, but I just noticed something regarding my
+problem when I read this.
 
-Brad
+When I issue the above, the line "RFCOMM channel x connected" doesn't
+appear at all. You wrote that afterwards I have to press the headset
+button. That means, if that line doesn't appear, the problem isn't with
+the headset, but still with my Bluetooth/rfcomm configuration of the
+computer?
 
-Stefan Bellon wrote:
-> Stefan Bellon wrote:
-> 
->>Brad Midgley wrote:
->>
->>>did you put it in pairing mode (usually by holding down the power
->>>button until it beeps) just before running btsco?
-> 
-> 
->>I tried that as well. Doesn't make any difference. But the headset and
->>the PC are already paired. Do you have to put the headset into pairing
->>mode every time you start btsco?
-> 
-> 
->>Anyway, even that would be acceptable if it worked. ;-}
-> 
-> 
->>On http://www.dcs.gla.ac.uk/~jp/snd-bt-sco/README there's the hint to
->>find out about the channel to use with btsco. But I get:
-> 
-> 
->>root@roma# sdptool search --bdaddr 00:07:A4:21:1D:86 0x1108
->>Class 0x1108
->>Failed to connect to SDP server on 00:07:A4:21:1D:86: Connection
->>timed out
-> 
-> 
->>Is this a problem? What else can I do to track down the problem? TIA.
-> 
-> 
-> Tomorrow I have some time I could spend on tracking that problem down.
-> But I could need a bit of help here. What else could I try to debug? I
-> really want to get my Jabra BT800 going with bluetooth-alsa.
-> 
+In that case I got an idea. As I use Bluetooth in order to connect my
+SonyEricsson P900 to the computer as well, I have got set up a
+/etc/bluetooth/rfcomm.conf which looks like this:
+
+rfcomm1 {
+        bind yes;
+        device 00:0A:D9:E9:BB:0A;
+        channel	1;
+        comment "P900 Serial Protocol connection";
+}
+
+rfcomm11 {
+        bind yes;
+        device 00:0A:D9:E9:BB:0A;
+        channel 11;
+        comment "P900 p3nfsd connection";
+}
+
+Do I have to add something like ...
+
+rfcomm2 {
+        bind yes;
+        device 00:07:A4:21:1D:86;
+        channel 2;
+        comment "Jabra BT800";
+}
+
+... in order to make it work with btsco? In any case, adding the above
+channel 2 configuration doesn't work. Or don't I have to touch the
+rfcomm.conf at all?
+
+Perhaps this gives some clues what I'm doing wrong?
+
+-- 
+Stefan Bellon
 
 
 -------------------------------------------------------
