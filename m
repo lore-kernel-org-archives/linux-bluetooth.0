@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42498E15.9000409@csr.com>
-From: Steven Singer <steven.singer@csr.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Hardware Error event patch
-References: <Pine.GSO.4.33.0503251434430.12451-100000@horus.imag.fr>
-In-Reply-To: <Pine.GSO.4.33.0503251434430.12451-100000@horus.imag.fr>
-Content-Type: text/plain; charset="us-ascii"
+Subject: Re: [Bluez-devel] RFCOMM related oops
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+Cc: victor.shcherbatyuk@tomtom.com
+In-Reply-To: <Pine.LNX.4.44.0503282103070.7184-201000@antilope>
+References: <Pine.LNX.4.44.0503282103070.7184-201000@antilope>
+Content-Type: text/plain
+Message-Id: <1112045836.9016.56.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,48 +19,46 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 29 Mar 2005 18:19:17 +0100
+Date: Mon, 28 Mar 2005 23:37:16 +0200
 
-Catalin Drula wrote:
-> I've finished the patch for handling the Hardware Error event and you have
-> it attached below.
+Hi Victor,
+
+> Some more problems...
 > 
-> To briefly remind the context: when H4 (HCI over UART) is used
-> as the transport layer between the host and the Bluetooth controller
-> and the controller detects a loss of synchronization, it sends a
-> "Hardware Error" event to the host, which should then send a "Reset"
-> command for resynchronization. The procedure is described under "Error
-> Recovery" in the H:4 appendix of Bluetooth v1.1 specification.
+> The following holds for Motorola V3 (RAZR) and Nokia 6310i (i hope i'm not 
+> mistaking), and prob. some more phones I've never seen ;)
+> 
+> The sequence leading to the oops (oops.txt):
+> Open RFCOMM channel exposed as HF channel. Try to open RFCOMM channel 
+> exposed as DUN channel for 3 times (first 2 fail, and finally attempt 3 
+> gives success). Close RFCOMM channel for DUN. Close RFCOMM channel for HF -> 
+> oops.
+> 
+> Looks like those phones allow only 1 RFCOMM channel to be opened. But 
+> strange things happen if you try to connect, when there is 
+> already a RFCOMM connection open on another channel (all this story with 
+> 3 attempts). 
+> 
+> What I see from the log (motov3.bin):
+> On attempt 2 bluez stack DISC on dlci 0 (for the reason I don't know) 
+> where there are still active RFCOMM connections (HF channel, dlci 14 in 
+> the log).  So when I try to close HF it oops'es... 
+> 
+> Have it reproducible on 2 platforms (arm and i386):
+> 2.6.11.4 + 2.6.11-mh2 (i386)
 
-Are you resetting for all hardware error events, or just when you think
-that H4 synchronisation has been lost?
+I hope this is not because of my fix for the reference counting problem
+you found. Check if this still happens with a vanilla 2.6.11 kernel.
 
-It is true that the spec says that a device will issue a hardware error
-when synchronisation is lost but it doesn't say that that's the only
-reason for a device to issue a hardware error.
+If it still happens try to reproduce it without the ndiswrapper. This
+taints your kernel and I am not willing to fix buggy Windows drivers.
 
-CSR devices, for example, use hardware error code 0xFE to mean that H4
-synchronisation has been lost. Other hardware error events mean other
-things and HCI_Reset is not the appropriate action in all cases. In some
-cases no action is required. In other cases user intervention will be
-needed to clear the error and we'll emit a hardware error on every boot
-until the problem is resolved. A few cases will require a harder reset
-than an HCI_Reset.
+Next thing is to try it without PREEMPT enabled.
 
-You probably don't want to reset if you receive a hardware error and
-you were not using the H4 host transport.
+Regards
 
-	- Steven
--- 
+Marcel
 
-
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
-
-**********************************************************************
 
 
 
