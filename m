@@ -1,46 +1,68 @@
-Return-Path: <jt@bougret.hpl.hp.com>
-Date: Fri, 12 Sep 2003 14:34:15 -0700
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Max Krasnyansky <maxk@qualcomm.com>,
-   BlueZ mailing list <bluez-devel@lists.sourceforge.net>,
-   Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [Bluez-devel] Re: [BUG] BlueTooth socket busted in 2.6.0-test5
-Message-ID: <20030912213415.GA24895@bougret.hpl.hp.com>
-Reply-To: jt@hpl.hp.com
-References: <20030910225810.GA7712@bougret.hpl.hp.com> <1063237174.28890.6.camel@pegasus> <20030911203249.GA15575@bougret.hpl.hp.com> <1063344094.7869.396.camel@imladris.demon.co.uk> <1063354754.23778.380.camel@hades.cambridge.redhat.com>
+Return-Path: <maxk@qualcomm.com>
+Message-Id: <5.1.0.14.2.20030912095921.030764b0@unixmail.qualcomm.com>
+Date: Fri, 12 Sep 2003 10:44:29 -0700
+To: Marcel Holtmann <marcel@holtmann.org>
+From: Max Krasnyansky <maxk@qualcomm.com>
+Subject: Re: Bluetooth update for 2.4.23-pre2
+Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <1062432872.13729.185.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1063354754.23778.380.camel@hades.cambridge.redhat.com>
-From: Jean Tourrilhes <jt@bougret.hpl.hp.com>
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Fri, Sep 12, 2003 at 09:19:15AM +0100, David Woodhouse wrote:
-> On Fri, 2003-09-12 at 06:21 +0100, David Woodhouse wrote:
-> > Er, if we're actually _running_ code from the bnep module, how can it
-> > have a zero refcount? This bug is elsewhere, surely?
-> 
-> Please confirm this fixes it...
-> 
-> ===== net/bluetooth/bnep/sock.c 1.11 vs edited =====
-> --- 1.11/net/bluetooth/bnep/sock.c	Thu Jun  5 01:57:08 2003
-> +++ edited/net/bluetooth/bnep/sock.c	Fri Sep 12 09:16:17 2003
-> @@ -186,7 +189,8 @@
->  
->  static struct net_proto_family bnep_sock_family_ops = {
->  	.family = PF_BLUETOOTH,
-> -	.create = bnep_sock_create
-> +	.create = bnep_sock_create,
-> +	.owner = THIS_MODULE
->  };
->  
->  int __init bnep_sock_init(void)
-> 
-> 
-> -- 
-> dwmw2
+At 09:14 AM 9/1/2003, Marcel Holtmann wrote:
+>here are the outstanding Bluetooth updates for 2.4.23-pre. All of them
+>are well tested in my -mh patches and I don't expect any other big
+>changes for the 2.4 series.
 
-	Sorry for the slow answer, but yes, this fixes the problem
-(and yes, I've removed my temporary hack).
-	Thanks a lot !
+Ok. I got problem with the following Changesets.
 
-	Jean
+><marcel@holtmann.org> (03/08/21 1.1067)
+>   [Bluetooth] Add notify() callback for host drivers
+>   
+>   This patch adds a notification callback to the hci_dev structure which
+>   is used by the HCI core to tell the driver about connection creation
+>   and clearing. It also notifies about changed voice setting. To assure
+>   that the core always knows the correct voice setting, it is read at
+>   device initialization and stored in the hci_dev structure.
+
+--- 1.5/net/bluetooth/hci_conn.c        Fri Mar 21 04:26:29 2003
++++ 1.6/net/bluetooth/hci_conn.c        Thu Aug 21 06:11:42 2003
+@@ -168,6 +168,9 @@
+ 
+        hci_dev_hold(hdev);
+ 
++       if (hdev->notify)
++               hdev->notify(hdev, HCI_NOTIFY_CONN_ADD, (unsigned long) conn);
++
+
+I believe I mentioned that before. Above patch basically means that driver has to keep 
+its own counter of ACL and SCO connection (ie check conn->type and stuff). That does 
+not make sense to me. Core already has that information. It's part of hci_conn_hash. 
+Currently we single counter. So we probably need to split it. And if we do it that way 
+there is no need for the third argument to hdev->notify().
+
+><marcel@holtmann.org> (03/07/31 1.1019.1.7)
+>   [Bluetooth] Set initial value of RFCOMM credits to zero
+>   
+>   The initial credits value must be zero, because this is default
+>   for Bluetooth 1.0b without credit based flow control. Once the
+>   other side signals us that it supports credit based flow control
+>   we set the session wide credits value.
+
+@@ -746,7 +746,7 @@
+        pn->ack_timer   = 0;
+        pn->max_retrans = 0;
+ 
+-       if (d->credits) {
++       if (cr || d->credits) {
+                pn->flow_ctrl = cr ? 0xf0 : 0xe0;
+                pn->credits = RFCOMM_DEFAULT_CREDITS;
+        } else {
+
+We talked about this one too. With that change we're going to ask
+for credits every time we send PN request even if other side already told 
+us that they don't support CFC. This is not right. We need to negotiate CFC 
+only once.
+
+Max
