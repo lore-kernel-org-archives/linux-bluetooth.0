@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
-Message-ID: <001401c51b9d$4c81af30$1a01010a@baked>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
-Subject: [Bluez-devel] Cleaning up after sdp_get_access_protos()
+From: Michael B Allen <mba2000@ioplex.com>
+To: bluez-devel@lists.sourceforge.net
+Message-Id: <20050225163841.4e1a96ce.mba2000@ioplex.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-devel] Waking up a machine with bluetooth signal?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,42 +16,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 25 Feb 2005 16:51:22 -0800
+Date: Fri, 25 Feb 2005 16:38:41 -0500
 
-Hi,
+I just bought a mac mini w/ a bluetooth keyboard. I'd like to be able to ssh
+into it from my laptop but when it's in sleep mode it doesn't respond over
+the network. I can't use wake on lan because it's a wireless connection not
+ethernet. I'm all the way across the other side of the room and I'm very
+very lazy so I would like to use the bluetooth capability builtin to my
+Thinkpad T30 to try to wake up the mac mini from across the room. Is this
+possible?
 
-This stuff hurts my brain, so I was hoping someone (Marcel? ;) could =
-verify
-my logic.
+Thanks,
+Mike
 
-I'm mentioning this mostly because the utils code gets used as example =
-code.
-
-In this snippet from sdptool.c, proto is cleaned up with
-sdp_list_free(proto, (sdp_free_func_t)sdp_data_free);
-
-        if (sdp_get_access_protos(rec, &proto) =3D=3D 0) {
-                printf("Protocol Descriptor List:\n");
-                sdp_list_foreach(proto, print_access_protos, 0);
-                sdp_list_free(proto, (sdp_free_func_t)sdp_data_free);
-        }
-
-I think the cleanup should be:
-
-    sdp_list_foreach(proto,(sdp_list_func_t)sdp_list_free,0);
-    sdp_list_free(proto,0);
-
-Looking at sdp.c source (in libs), sdp_get_access_protos() returns a =
-list of
-lists of data sequences. The data sequences themselves shouldn't be =
-freed at
-this point because they weren't allocated by sdp_get_access_protos() =
-(thus
-the ,0 in the sdp_list_foreach call). But the list of lists is allocated
-inside sdp_get_access_protos().
-
--Daryl.
-
+-- 
+IRC - where men are men, women are men, and the boys are FBI agents.
 
 
 -------------------------------------------------------
