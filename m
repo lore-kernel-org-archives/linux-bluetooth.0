@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Michal Semler <cijoml@volny.cz>
-Reply-To: cijoml@volny.cz
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] hidp and connecting
-References: <200405141524.04481.cijoml@volny.cz> <1084556671.25099.201.camel@pegasus>
-In-Reply-To: <1084556671.25099.201.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-2"
-Message-Id: <200405142343.04831.cijoml@volny.cz>
+Subject: Re: [Bluez-users] rfcomm: Wrong number of parameters
+From: Marcel Holtmann <marcel@holtmann.org>
+To: frasnet <frasnet78@vodafone.it>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <002301c439b0$0da83010$0189e00a@yourygynwf3o8h>
+References: <002301c439b0$0da83010$0189e00a@yourygynwf3o8h>
+Content-Type: text/plain
+Message-Id: <1084556738.25099.203.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,51 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 14 May 2004 23:43:04 +0200
+Date: Fri, 14 May 2004 19:45:38 +0200
 
-On Friday 14 of May 2004 19:44, Marcel Holtmann wrote:
-> Hi Michal,
->
-> > when hidd is not started and device wants connect, system prints errors
-> > about unknown connections.
->
-> what kind of errors are you talking about? You must be more specific.
+Hi,
 
-hci_acldata_packet: hci0 ACL packet for unknown connection handle 41
-hci_acldata_packet: hci0 ACL packet for unknown connection handle 42
-etc...
+> My bluetooth usb adapter is a sitcom and in their web site it was
+> written to install rfcomm 0.8. I failled because of that. Now I use
+> linux + bt + vodafone gprs. 
 
->
-> > 1) Maybe we should have somewhere in /etc/bluetooth list of allowed
-> > devices which will be accepted without hidd runnnig?
->
-> Why should we accept a device when hidd is not running?
+about what site are you talking? Contact the author or the company so
+that this wrong statement will be removed.
 
-Why not? If kernel knows them via list specified in some config by root, hidd 
-should be used only for connecting a new one and killling them.
+Regards
 
-It reminds me, that --kill option kills connection, but device can reconnect. 
-Maybe should be implemented option, which will kill device and it will not be 
-allowed to reconnect.
+Marcel
 
->
-> > 2) When hidp and other modules compiled directly into kernel, we should
-> > under single mode allow all hid devices to connect without hidd running
-> > to allow users maintain their system without any daemons running
->
-> This is impossible. If you need this, you have to go with Bluetooth
-> dongles that implement HID proxy.
 
-Why? After connecting I can kill hidd and devices works. So if under single 
-mode will not be control for bdaddr and unknown connections, it should be 
-possible to work too.
-
->
-> Regards
->
-> Marcel
-
-Michal
 
 
 -------------------------------------------------------
