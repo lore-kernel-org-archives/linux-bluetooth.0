@@ -1,48 +1,65 @@
 Return-Path: <daryl@wideray.com>
 Errors-To: <daryl@wideray.com>
 From: "Daryl Van Vorst" <daryl@wideray.com>
-To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>, "'Max Krasnyansky'" <maxk@qualcomm.com>
-Cc: "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
+To: "'Marcel Holtmann'" <marcel@rvs.uni-bielefeld.de>
+Cc: "'Max Krasnyansky'" <maxk@qualcomm.com>, "'BlueZ Mailing List'" <bluez-devel@lists.sourceforge.net>
 Subject: RE: [Bluez-devel] Qualification Testing
-Date: Tue, 13 May 2003 06:30:58 -0700
-Message-ID: <000b01c31953$e3a50a90$1a01010a@baked>
+Date: Mon, 12 May 2003 17:43:29 -0700
+Message-ID: <000e01c318e8$ac4db940$1a01010a@baked>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <1052584255.1133.13.camel@pegasus.local>
+In-Reply-To: <1052784278.1132.170.camel@pegasus.local>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 Marcel,
 
-How do I get those 5 patches from the bt-2.4 repository? Or better yet:
-Where is the bt-2.4 repository?
+> maybe we have another RFCOMM misbehaviour, which doesn't=20
+> matter in the real world, but can confuse the tester.
+>=20
+> 	< ACL data: handle 0x0029 flags 0x02 dlen 8
+> 	    L2CAP(d): cid 0x45 len 4 [psm 3]
+> 	      RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8=20
+> 	> ACL data: handle 0x0029 flags 0x02 dlen 8
+> 	    L2CAP(d): cid 0x40 len 4 [psm 3]
+> 	      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92=20
+> 	< ACL data: handle 0x0029 flags 0x02 dlen 8
+> 	    L2CAP(d): cid 0x45 len 4 [psm 3]
+> 	      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd=20
+> 	< ACL data: handle 0x0029 flags 0x02 dlen 12
+> 	    L2CAP(s): Disconn req: dcid 0x0045 scid 0x0040
+> 	> ACL data: handle 0x0029 flags 0x02 dlen 8
+> 	    L2CAP(d): cid 0x40 len 4 [psm 3]
+> 	      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7=20
+> 	> ACL data: handle 0x0029 flags 0x02 dlen 12
+> 	    L2CAP(s): Disconn rsp: dcid 0x0045 scid 0x0040
+>=20
+> The dump above is from a disconnect sequence of RFCOMM. We=20
+> don't wait for the UA of the DISC on the dlci 0. We send the=20
+> L2CAP disconnect request right after the disconnect of the=20
+> dlci 0. The L2CAP channel should be closed after receiving=20
+> the UA or after a timeout.
 
-> Daryl, so it is now up to you to do your tests with Cetecom 
-> again and see what we pass and what we fail. The RFCOMM layer 
-> should now perform perfect, but the L2CAP config stuff will 
-> still fail. You can use 2.4.18-mh4 and apply these 5 patches 
-> from the bt-2.4 repository to it:
-> 
-> ChangeSet@1.1162, 2003-05-09 21:11:49-07:00
->   [Bluetooth] RFCOMM must wait for MSC exchange to complete 
-> before sending the data.
-> 
-> ChangeSet@1.1161, 2003-05-09 16:41:45-07:00
->   [Bluetooth] Detect and log error condition when first L2CAP 
-> fragment is too long.
-> 
-> ChangeSet@1.1160, 2003-05-09 11:55:22-07:00
->   [Bluetooth] L2CAP config req/rsp handling fixes. 
-> 
-> ChangeSet@1.1126.3.2, 2003-05-09 03:22:06+02:00
->   [Bluetooth] Handle priority bits in parameter negotiation
-> 
-> ChangeSet@1.1126.3.1, 2003-05-09 02:07:07+02:00
->   [Bluetooth] Send the correct values in RPN response
-> 
-> Max, please go ahead and forward them to Marcelo and Linus. 
-> If you have some extra time, please update my repositories 
-> with the new stuff.
-> 
-> I will make some new -mh patches on monday or tuesday.
+I'd have to learn more about the spec to be able to talk with you
+intelligently about this. There were quite a few RFCOMM tests we had to ski=
+p
+due to the other problems, so if you think you've found something that
+doesn't quite follow the spec then we might get caught on it when we do the
+rest of the tests. I'll query Cetecom about it.
+
+> > I'll hold off on more testing until we've figured out a=20
+> solution for=20
+> > the L2CAP config stuff. More than likely something else=20
+> will come out=20
+> > the woodwork too, but probably not much. A number of tests=20
+> had to be=20
+> > postponed due to the previous failures.
+>=20
+> Daryl, this is your decision (and of course your money), but=20
+> I think it will be good to see if our patches fixes the=20
+> problems. New code can introduce new bugs :)
+
+It'll definitely get tested! I just want to do the testing in batches. We'r=
+e
+only one failed test away from having a complete set.
 
 -Daryl.
