@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [btsco] configure/make errors
+Subject: Re: [Bluez-devel] Sending own L2CAP packets to HCI
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41ED7E8D.8030709@pca.it>
-References: <41ED7E8D.8030709@pca.it>
+In-Reply-To: <loom.20050119T121309-507@post.gmane.org>
+References: <loom.20050119T121309-507@post.gmane.org>
 Content-Type: text/plain
-Message-Id: <1106136920.8190.96.camel@pegasus>
+Message-Id: <1106136563.8190.89.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,33 +18,19 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 19 Jan 2005 13:15:20 +0100
+Date: Wed, 19 Jan 2005 13:09:23 +0100
 
-Hi Luca,
+Hi Matthias,
 
-> after having solved the automake error, configure gave me another one
-> and googling solved it [1]. But, again, no dependencies from libao-dev
-> is present in the README (and, strangely, automake doesn't complain).
-> 
-> This wasn't enough: make gave me other errors, because it could not find
-> the Bluetooth dev libraries.
-> 
-> Attached a patch against the current CVS:
-> 
-> * bootstrap:
-> checking for the existence of /usr/share/aclocal/ao.m4 and exiting with
-> an error if not present (we cannot use the pkg-config because ao.m4 is
-> used to generate the configure script)
+> I wrote a program that builds its own L2CAP packets together.
+> And now I want to inject these L2CAP packets to a mobile phone.
+> I begin the transmission with a simple "connection request", but the command is 
+> rejected with reason 0 (command not understood).
+> Can you tell me how to inject L2CAP packets to HCI without using the BlueZ 
+> L2CAP layer?
 
-And again. The bootstrap thing is for making the developer happy,
-because he must call only one program/script for getting the repository
-ready. It is not for others ;)
-
-> * configure.in:
-> used pkg-config to check the presence of the Bluetooth dev libraries
-
-You can also use AM_PATH_BLUEZ. Since bluez-libs-2.13 it is also
-available now, because not all systems use pkg-config.
+look at the l2ping program, because it does exactly this for the echo
+command and responses.
 
 Regards
 
