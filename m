@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Sebastian Eichner <mail@sebastian-eichner.de>
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] A2DP working :-) , voice not :-(
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200412011224.29191.mail@sebastian-eichner.de>
-References: <200412010839.06669.mailsp@sebastian-eichner.de>
-	 <200412010943.33419.mail@sebastian-eichner.de>
-	 <1101894192.18840.44.camel@pegasus>
-	 <200412011224.29191.mail@sebastian-eichner.de>
-Content-Type: text/plain
-Message-Id: <1101900716.18840.69.camel@pegasus>
-Mime-Version: 1.0
+References: <200412010839.06669.mailsp@sebastian-eichner.de> <200412010943.33419.mail@sebastian-eichner.de> <1101894192.18840.44.camel@pegasus>
+In-Reply-To: <1101894192.18840.44.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200412011224.29191.mail@sebastian-eichner.de>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,25 +19,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 12:31:56 +0100
+Date: Wed, 1 Dec 2004 12:24:28 +0100
 
-Hi Sebastian,
+Hi Marcel,
 
-> On Wednesday, 1. December 2004 10:43, Marcel Holtmann wrote:
-> > > Generally it should work with kernel 2.6.9, right?
-> >
-> > yes, and last time I tested this, it worked for me.
-> 
-> Hmm, is there anything i can do to get more information about the 
-> problem? Any debug switch?
+On Wednesday, 1. December 2004 10:43, Marcel Holtmann wrote:
+> > Generally it should work with kernel 2.6.9, right?
+>
+> yes, and last time I tested this, it worked for me.
 
-actually I have no idea, because I haven't written any line of code for
-this. However take a look at what hcidump reports.
+Hmm, is there anything i can do to get more information about the 
+problem? Any debug switch?
 
-Regards
-
-Marcel
-
+Thanks!
+ Sebastian
 
 
 
