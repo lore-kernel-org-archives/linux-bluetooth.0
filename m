@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <b895079705010722156869ddd7@mail.gmail.com>
-From: Weston Weems <wweems@gmail.com>
+Message-ID: <BAY104-F21F148B2D4DCA90524B510C1930@phx.gbl>
+In-Reply-To: <1105050548.4299.95.camel@pegasus>
+From: "blookk -" <blookk@hotmail.com>
 To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-users] detecting BT devices
+Content-Type: text/html; charset=iso-8859-1; format=flowed
+Subject: [Bluez-users] [Bluez-users]OBEX application
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,17 +17,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 7 Jan 2005 22:15:52 -0800
+Date: Thu, 06 Jan 2005 22:45:57 +0000
 
-I am aware of scanning for bluetooth devices, but is there anyway I
-can have my linux box notify me when bt devices come in range? Or
-something along those lines?
+<html><div style='background-color:'><DIV class=RTE>
+<P><BR>Hello.</P>
+<P>I have used obextool application to send a file from PC to phone, but if I want to send a file from phone to PC I can't, because I need some application that acts as a server.</P>
+<P>I use Red Hat 9&nbsp; without graphical Bluetooth Interfaz.</P>
+<P>I found in the web a daemon called "opd", but with this daemon I can't send files to PC. It seem that doesn't work correctly.</P>
+<P>Is there a application for solve this? </P>
+<P>Thanks and regards.</P></DIV></div></html>
 
-Also, anyone got reading material for using RFCONN to interact with bt
-devices using rs232 stuff.
-
-Thanks so much in advance!
-Weston
 
 
 -------------------------------------------------------
