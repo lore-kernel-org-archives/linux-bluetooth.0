@@ -1,124 +1,226 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: wim delvaux <wim.delvaux@adaptiveplanet.com>
-To: bluez-users@lists.sourceforge.net
+Return-Path: <Peter.K.Martin@t-online.de>
+From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
+To: <bluez-users@lists.sourceforge.net>,
+   "'Marcel Holtmann'" <marcel@holtmann.org>
+Subject: Toshiba and BT (SuSE 9.2)
+Date: Mon, 13 Dec 2004 20:00:28 +0100
+Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAmw8F2L2GLkSuK/qWO0/qzgEAAAAA@t-online.de>
 MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0023_01C4E14E.68658980"
+List-ID: <bluez-users.lists.sourceforge.net>
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0023_01C4E14E.68658980
 Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200412132025.29208.wim.delvaux@adaptiveplanet.com>
-Subject: [Bluez-users] role change not allowed when connecting with PAND
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 13 Dec 2004 20:25:29 +0100
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Marcel,
+here I'm again, the story is still runing. Now I'm able to connect to =
+the
+BT-accesspoint with pand only a short time till timeout.
+I tried hcitool cc <baddr>
+At first I have to start dmabt
+Linux-Notebook:~ # dmabt
 
-When I run
+then
 
-pand --connect XXXX --persist
+Linux-Notebook:~ # hcitool scan
 
-and my server runs 
+Scanning ...
 
-pand --listen --role NAP
+        00:0B:CE:00:01:8F       Bluetooth-Modul
 
-and hciconfig -a on the client shows (Had to type this over)
+the next step was
 
-link policy : RSWITCH, HOLD PARK SNIFF
-link mode : SLAVE ACCEPT
-Features : 0xff 0xff 0x05 0x00
+Linux-Notebook:~ # hcitool cc 00:0B:CE:00:01:8F
 
-and on the server it shows
+Linux-Notebook:~ # hcitool con
 
-hci0:   Type: USB
-        BD Address: 00:60:57:02:71:A2 ACL MTU: 192:8  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:4704 acl:33 sco:0 events:445 errors:0
-        TX bytes:12193 acl:111 sco:0 commands:128 errors:0
-        Features: 0xff 0xff 0x09 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: ACCEPT MASTER
-        Name: 'buro-0'
-        Class: 0x100000
-        Service Classes: Object Transfer
-        Device Class: Miscellaneous,
-        HCI Ver: 1.1 (0x1) HCI Rev: 0xbc LMP Ver: 1.1 (0x1) LMP Subver: 0xbc
-        Manufacturer: Cambridge Silicon Radio (10)
+Connections:
 
-I get the following HCIDUMP -x output
+        < ACL 00:0B:CE:00:01:8F handle 41 state 1 lm SLAVE
 
-HCIDump - HCI packet analyzer ver 1.12
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request (0x04) plen 10
-  96 85 0D C7 02 00 12 01 12 01
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  96 85 0D C7 02 00 00
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04
-> HCI Event: Role Change (0x12) plen 8
-  21 96 85 0D C7 02 00 01
-> HCI Event: Link Key Request (0x17) plen 6
-  96 85 0D C7 02 00
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-  96 85 0D C7 02 00 72 97 A4 D0 A0 3A D3 4E E8 50 A4 46 46 F0
-  8A A1
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0B 04 0C 96 85 0D C7 02 00
-> HCI Event: Connect Complete (0x03) plen 11
-  21 28 00 96 85 0D C7 02 00 01 00
-> HCI Event: Connect Request (0x04) plen 10
-  96 85 0D C7 02 00 12 01 12 01
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  96 85 0D C7 02 00 00
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04
-> HCI Event: Role Change (0x12) plen 8
-  21 96 85 0D C7 02 00 01
-> HCI Event: Link Key Request (0x17) plen 6
-  96 85 0D C7 02 00
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-  96 85 0D C7 02 00 72 97 A4 D0 A0 3A D3 4E E8 50 A4 46 46 F0
-  8A A1
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0B 04 0C 96 85 0D C7 02 00
-> HCI Event: Connect Complete (0x03) plen 11
-  21 29 00 96 85 0D C7 02 00 01 00
-> HCI Event: Connect Request (0x04) plen 10
-  96 85 0D C7 02 00 12 01 12 01
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-  96 85 0D C7 02 00 00
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 09 04
-> HCI Event: Role Change (0x12) plen 8
-  21 96 85 0D C7 02 00 01
-> HCI Event: Link Key Request (0x17) plen 6
-  96 85 0D C7 02 00
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-  96 85 0D C7 02 00 72 97 A4 D0 A0 3A D3 4E E8 50 A4 46 46 F0
-  8A A1
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0B 04 0C 96 85 0D C7 02 00
-> HCI Event: Connect Complete (0x03) plen 11
-  21 28 00 96 85 0D C7 02 00 01 00
+Linux-Notebook:~ # ip link show
 
+1: lo: <LOOPBACK,UP> mtu 16436 qdisc noqueue
 
-Why don't I get a connection ?
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 
+2: eth0: <BROADCAST,MULTICAST,NOTRAILERS,UP> mtu 1500 qdisc pfifo_fast =
+qlen
+1000
 
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now. 
-http://productguide.itmanagersjournal.com/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+    link/ether 00:08:0d:a9:18:53 brd ff:ff:ff:ff:ff:ff
+
+3: sit0: <NOARP> mtu 1480 qdisc noqueue
+
+    link/sit 0.0.0.0 brd 0.0.0.0
+
+Linux-Notebook:~ #                =20
+
+=20
+With YaST pand was set as pand --search --master
+and as networkdevice bnep0 was initialized, so I don't understand why it
+doesn't apear within the listing of ip link show.
+The setup of network accesses by YaST for DSL also doesn't give me the
+opportunity to use bnep0 as connection for DSL. There is only as =
+PPP-Modus
+PPP via Ethernet, etc. available, but not PPP via Bluetooth as I =
+expected.=20
+=20
+Please, what is to do in order to get this foolish bnep0 device availabe =
+for
+DSL? bnep0 only appears in the initialization-area for network devices.
+=20
+The everlasting reboot with Windows in order to get internet-access is =
+very
+boring and makes me not really happy!!!
+=20
+Regards
+Peter
+=20
+
+------=_NextPart_000_0023_01C4E14E.68658980
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<TITLE>Nachricht</TITLE>
+
+<META content=3D"MSHTML 6.00.2800.1479" name=3DGENERATOR></HEAD>
+<BODY>
+<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>Hi=20
+Marcel,</FONT></SPAN></DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>here I'm again, =
+the story=20
+is still runing. Now I'm able to connect to the BT-accesspoint with pand =
+only a=20
+short time till timeout.</FONT></SPAN></DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>I tried hcitool =
+cc=20
+&lt;baddr&gt;</FONT></SPAN></DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>At first I have =
+to start=20
+dmabt</FONT></SPAN></DIV>
+<DIV><SPAN class=3D436333918-13122004>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US>Linux-Notebook:~=20
+# dmabt</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US><SPAN=20
+class=3D436333918-13122004><FONT =
+face=3DArial>then</FONT></SPAN></SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US>Linux-Notebook:~=20
+# hcitool scan</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US>Scanning=20
+...</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US><SPAN=20
+style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
+</SPAN>00:0B:CE:00:01:8F<SPAN=20
+style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
+</SPAN>Bluetooth-Modul</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US></SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US><SPAN=20
+class=3D436333918-13122004><FONT face=3DArial>the next step=20
+was</FONT></SPAN></SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US>Linux-Notebook:~=20
+# hcitool cc 00:0B:CE:00:01:8F</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US>Linux-Notebook:~=20
+# hcitool con</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN=20
+lang=3DEN-US>Connections:</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US><SPAN=20
+style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+</SPAN>&lt;=20
+ACL 00:0B:CE:00:01:8F handle 41 state 1 lm SLAVE</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US>Linux-Notebook:~=20
+# ip link show</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN lang=3DEN-US>1: =
+lo:=20
+&lt;LOOPBACK,UP&gt; mtu 16436 qdisc noqueue</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US><SPAN=20
+style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </SPAN>link/loopback=20
+00:00:00:00:00:00 brd 00:00:00:00:00:00</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN lang=3DEN-US>2: =
+eth0:=20
+&lt;BROADCAST,MULTICAST,NOTRAILERS,UP&gt; mtu 1500 qdisc pfifo_fast qlen =
+
+1000</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US><SPAN=20
+style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </SPAN>link/ether =
+00:08:0d:a9:18:53=20
+brd ff:ff:ff:ff:ff:ff</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN lang=3DEN-US>3: =
+sit0:=20
+&lt;NOARP&gt; mtu 1480 qdisc noqueue</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US><SPAN=20
+style=3D"mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </SPAN>link/sit 0.0.0.0 =
+brd=20
+0.0.0.0</SPAN></P>
+<P class=3DMsoNormal style=3D"MARGIN: 0cm 0cm 0pt"><SPAN =
+lang=3DEN-US>Linux-Notebook:~=20
+#<SPAN=20
+style=3D"mso-spacerun: =
+yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
+</SPAN></SPAN></P></SPAN></DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT =
+face=3DArial></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>With YaST pand =
+was set as=20
+pand --search --master</FONT></SPAN></DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>and as =
+networkdevice bnep0=20
+was initialized, so I don't understand why it doesn't apear within the =
+listing=20
+of ip link show.</FONT></SPAN></DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>The setup of=20
+network&nbsp;accesses by YaST for DSL also doesn't give me the =
+opportunity to=20
+use bnep0 as connection for DSL. There is only as PPP-Modus PPP via =
+Ethernet,=20
+etc. available, but not PPP via Bluetooth as I expected. =
+</FONT></SPAN></DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT =
+face=3DArial></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>Please, what is =
+to do in=20
+order to get this foolish bnep0 device availabe for DSL? bnep0 only =
+appears in=20
+the initialization-area for network devices.</FONT></SPAN></DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT =
+face=3DArial></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT face=3DArial>The everlasting =
+reboot with=20
+Windows in order to get internet-access is very boring and makes me not =
+really=20
+happy!!!</FONT></SPAN></DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT =
+face=3DArial></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT =
+face=3DArial>Regards</FONT></SPAN></DIV>
+<DIV><SPAN class=3D436333918-13122004><FONT =
+face=3DArial>Peter</FONT></SPAN></DIV>
+<DIV><FONT face=3DArial color=3D#173c66=20
+size=3D2><STRONG><EM></EM></STRONG></FONT>&nbsp;</DIV></BODY></HTML>
+
+------=_NextPart_000_0023_01C4E14E.68658980--
