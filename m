@@ -1,58 +1,67 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Peter K. Martin" <Peter.K.Martin@t-online.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAuD34QxxG80OHXRWPDw9h+QEAAAAA@t-online.de>
-References: 
-	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAuD34QxxG80OHXRWPDw9h+QEAAAAA@t-online.de>
-Content-Type: text/plain
-Message-Id: <1102515083.9988.76.camel@pegasus>
-Mime-Version: 1.0
-Subject: [Bluez-users] Re: BT unter SuSE 9.2
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 08 Dec 2004 15:11:23 +0100
+Return-Path: <Peter.K.Martin@t-online.de>
+From: "Peter K. Martin" <Peter.K.Martin@t-online.de>
+To: "'Marcel Holtmann'" <marcel@holtmann.org>,
+   <bluez-users@lists.sourceforge.net>
+Subject: AW: BT unter SuSE 9.2
+Date: Wed, 8 Dec 2004 15:10:02 +0100
+Message-ID: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAuD34QxxG80OHXRWPDw9h+QEAAAAA@t-online.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+In-Reply-To: <1102514327.9988.73.camel@pegasus>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Peter,
+Hello Marcel,
+the BT-device is always activate by the switch. I was really astonished =
+that
+it doesn't work under 9.2
+At the moment I'm working with Windows, also connected by the BT-device =
+to
+my network.
 
-> the BT-device is always activate by the switch. I was really astonished that
-> it doesn't work under 9.2
-
-maybe you simply have to run YaST once and activate Bluetooth.
-
-> At the moment I'm working with Windows, also connected by the BT-device to
-> my network.
-
-That is a problem of course ;)
-
-> What have I to do, when it is not shown up in /proc/bus/usb/devices ???
-> In order to find out, I have to reboot with Linux.
-
-If it is not recognized by USB subsystem, then you have to activate it
-and in general this is somekind of ACPI magic.
+What have I to do, when it is not shown up in /proc/bus/usb/devices ???
+In order to find out, I have to reboot with Linux.
 
 Regards
+Peter
 
-Marcel
-
-
-
-
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now. 
-http://productguide.itmanagersjournal.com/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+##>-----Urspr=FCngliche Nachricht-----
+##>Von: Marcel Holtmann [mailto:marcel@holtmann.org]=20
+##>Gesendet: Mittwoch, 8. Dezember 2004 14:59
+##>An: Peter K. Martin
+##>Cc: BlueZ Mailing List
+##>Betreff: Re: BT unter SuSE 9.2
+##>
+##>
+##>Hi Peter,
+##>
+##>> now the trouble begins. I install SuSE 9.2 and wnted to start the=20
+##>> bluetooth-function of my toshiba satellite pro m10, which already=20
+##>> worked under 9.1 ---> but now nothing happens. When I try to start=20
+##>> with dmabt the response is: unable to access /dev/toshiba,=20
+##>although=20
+##>> the file (?) is existing. The lines in modules.conf are also o.k.
+##>> =20
+##>> I tried to patch the toshiba_acpi, but without any result.=20
+##>Only a long=20
+##>> time of compilation, etc.
+##>> =20
+##>> Please give me an idea what to do to solve the problem. I=20
+##>have always=20
+##>> to switch from Linux to Windows in order to get an=20
+##>internet-connection=20
+##>> and this is very boring.
+##>
+##>the SuSE 9.2 and Bluetooth is working perfect. Your problems=20
+##>seems to be in activating the dongle on the hardware side .=20
+##>Actually this is not really a BlueZ related problem.
+##>
+##>Do it show up in /proc/bus/usb/devices? Can you use a=20
+##>hardware switch near your keyboard to activate it?
+##>
+##>Regards
+##>
+##>Marcel
+##>
+##>
+##>
