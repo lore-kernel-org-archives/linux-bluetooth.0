@@ -1,28 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Jonathan Sass <jsass@magnifeye.com>
-Subject: Re: [Bluez-users] Source sample custom Bluetooth
-In-reply-to: <1104839435.8894.86.camel@pegasus>
+From: Michal Semler <cijoml@volny.cz>
 To: bluez-users@lists.sourceforge.net
-Message-id: <6653F70C-5ECD-11D9-8017-000D9348D4BE@magnifeye.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=US-ASCII; format=flowed
-References: <4dfd570904122402134ec2fd32@mail.gmail.com>
- <4dfd570904122509237f2a2f48@mail.gmail.com> <1103995727.8758.31.camel@pegasus>
- <4dfd570904122509451e811d7a@mail.gmail.com> <1103996976.8758.34.camel@pegasus>
- <4dfd5709041225095410f71a46@mail.gmail.com> <1103997529.8758.36.camel@pegasus>
- <4dfd570904122510081a9bfa7@mail.gmail.com>
- <4dfd570904122510085371c17b@mail.gmail.com>
- <4dfd57090412251011705f52be@mail.gmail.com>
- <4dfd5709041225103246f6934c@mail.gmail.com> <1104000494.8758.46.camel@pegasus>
- <002601c4ebb8$4de24200$020ba8c0@heejune> <1104125195.9393.12.camel@pegasus>
- <BEB39C04-5B6A-11D9-8017-000D9348D4BE@magnifeye.com>
- <1104604846.4253.1.camel@pegasus>
- <FA69107A-5DAA-11D9-8017-000D9348D4BE@magnifeye.com>
- <1104776407.8894.53.camel@pegasus>
- <AFDBF1EE-5DB6-11D9-8017-000D9348D4BE@magnifeye.com>
- <1104778613.8894.62.camel@pegasus>
- <C17DB8CE-5E1A-11D9-8017-000D9348D4BE@magnifeye.com>
- <1104839435.8894.86.camel@pegasus>
+Subject: Re: [Bluez-users] Dongle firmware
+References: <20050104110418.M39860@bandos.homelinux.com> <1104841297.8894.92.camel@pegasus> <20050104210042.M19007@bandos.homelinux.com>
+In-Reply-To: <20050104210042.M19007@bandos.homelinux.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200501042245.58663.cijoml@volny.cz>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -34,35 +19,56 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 04 Jan 2005 19:53:46 -0800
+Date: Tue, 4 Jan 2005 22:45:58 +0100
+
+Dne =FAt 4. ledna 2005 22:16 Jose Bernardo Silva napsal(a):
+> On Tue, 04 Jan 2005 13:21:37 +0100, Marcel Holtmann wrote
+>
+> > Hi Jose,
+> >
+> > > I've seen recently a few messages about new firmwares, is there a list
+> > > of dongles and firmwares available?
+> > > I have a Acer BT-500 and a MSI MS-6967, and I'd like to update these
+> > > two.
+> >
+> > you should actually ask the vendor of these dongles for updates. However
+> > the ACER is a BlueCore01b and can't be updated with the
+> > GenericCSR.dfu firmware file and for the MSI I don't know. The
+> > general rule at the moment is if "hciconfig hci0 revision" don't
+> > show BlueCore02 and lsusb don't show it as a "Cambridge Silicion
+> > Radio". You shouldn't even try to update it.
+>
+> Marcel,
+>
+> My BT-500 shows in lsusb as " ID 0a12:0001 Cambridge Silicon Radio Ltd.",
+> and "hciconfig hci0 revision shows it as a BlueCore02 as follows:
+> hci0:   Type: USB
+>         BD Address: 00:60:57:32:96:0E ACL MTU: 192:8  SCO MTU: 64:8
+>         HCI 14.7
+>         Chip version: BlueCore02 (ES2)
+>         Max key size: 56 bit
+>         SCO mapping:  PCM
+>
+> Does this mean I can update it? If so, where can I get that GenericCSR.dfu
+> firmware, and what can I use to update?
+
+This dongle looks prepared for apple firmware :)
 
 >
-> the HCI raw socket doesn't support connect(). It is not meant for doing
-> actual data transmission. You must do this all by yourself. Look at the
-> source code of the hci*.c tools.
->
-> Regards
->
-> Marcel
->
+> As for the MSI, the lsusb output isn't very promising ("ID 0db0:1967"),
+> even thoguh the output of hciconfig is similar:
+> hci0:   Type: USB
+>         BD Address: 00:10:DC:AF:E1:13 ACL MTU: 192:8  SCO MTU: 64:8
+>         HCI 16.4
+>         Chip version: BlueCore02
+>         Max key size: 56 bit
+>         SCO mapping:  HCI
 
-I have looked at the hcitool.c program and I am stuck by my lack of 
-understanding. The cmd_cmd seems like what I want to do to read data 
-from my custom device. What I want to do is given a device address, I 
-want to read bytes from it and occasionally write to it.  Is there a 
-code fragment that you can point me to?
+Don't think about flashing MSI, there isn't firmware for it...I own one too=
+  :
+((
 
- From the person who wrote the stack on our device.
-
-This is a connect device with a ACL DH5 packet type. The transfers are 
-standard ACL L2CAP packets from the remote. The remote appears to the 
-host as a master device, pushing down ACL packets when a button is 
-pressed.
-
-Thank you,
-
-Jonathan
-
+Michal
 
 
 -------------------------------------------------------
