@@ -1,47 +1,76 @@
-Return-Path: <leidenfrost@corscience.de>
-Message-ID: <41654D83.1090306@corscience.de>
-Date: Thu, 07 Oct 2004 16:06:59 +0200
-From: Thomas Leidenfrost <leidenfrost@corscience.de>
-Reply-To: leidenfrost@corscience.de
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: martin f krafft <madduck@madduck.net>
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Bluetooth on a MIPS-System
-References: <41651D72.7040806@corscience.de>	 <1097147273.7325.26.camel@pegasus>  <41652A40.4080209@corscience.de>	 <1097152912.7325.30.camel@pegasus>  <41654062.5050009@corscience.de> <1097154841.7325.36.camel@pegasus>
-In-Reply-To: <1097154841.7325.36.camel@pegasus>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-users.lists.sourceforge.net>
-
-Hi Marcel, hi Martin,
-
-
->>>So what does "find /lib/modules/ | grep bluetooth" say?
->>This results nothing, just the # again.
-> This is wrong unless you copied the BlueZ modules somewhere else by
-> hand.
-
-Yes, I did. All modules are located in /lib/modules/2.4.21, but there 
-are no other subdirectories like bluetooth or something else.
-
-Now after doing hciconfig hci0 up I am able to ping other devices,
-but I guess I'll need rfcomm, too. But there is something missing... but 
-what?
-
-# modprobe rfcomm
-Using /lib/modules/2.4.21/rfcomm.o
-insmod: unresolved symbol putchar
-insmod: unresolved symbol obex_dump
-insmod: unresolved symbol parser
-insmod: unresolved symbol get_proto
-insmod: unresolved symbol raw_dump
-insmod: unresolved symbol _gp_disp
-insmod: unresolved symbol printf
-modprobe: failed to load module rfcomm
-
-Trying to figure out whats missing with depmod -a won't help because:
-
-# depmod -a
--sh: depmod: not found
+Message-ID: <20041007132054.GA18310@cirrus.madduck.net>
+References: <41651D72.7040806@corscience.de> <1097147273.7325.26.camel@pegasus> <20041007114224.GA9849@cirrus.madduck.net> <416536BA.3080901@corscience.de>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="5mCyUwZo2JvN/JJP"
+In-Reply-To: <416536BA.3080901@corscience.de>
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Thu, 7 Oct 2004 15:20:54 +0200
 
 
-Thx again, Tom
+--5mCyUwZo2JvN/JJP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+also sprach Thomas Leidenfrost <leidenfrost@corscience.de> [2004.10.07.1429=
+ +0200]:
+> the linux-distribution I am using is a specific from mycable.
+
+looks like they screwed up. :)
+
+run
+
+  depmod -a
+
+then try modprobe again.
+
+--=20
+martin;              (greetings from the heart of the sun.)
+  \____ echo mailto: !#^."<*>"|tr "<*> mailto:" net@madduck
+=20
+invalid/expired pgp subkeys? use subkeys.pgp.net as keyserver!
+spamtraps: madduck.bogus@madduck.net
+=20
+"information superhighway"
+ is just an anagram for
+"i'm on a huge wispy rhino fart".
+
+--5mCyUwZo2JvN/JJP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+
+iD8DBQFBZUK2IgvIgzMMSnURArbFAKDRLlDlVcM7tsuC0soHJAVkmeKZfQCfVynr
+P/ewocJo8Tq0qRaoa9+iPmY=
+=6lLf
+-----END PGP SIGNATURE-----
+
+--5mCyUwZo2JvN/JJP--
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
