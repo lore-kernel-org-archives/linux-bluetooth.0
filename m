@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: pand freezes upon disconnect
-From: Marcel Holtmann <marcel@holtmann.org>
-To: O Plameras <oscarp@acay.com.au>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <cje512$kj5$1@sea.gmane.org>
-References: <E1CA5Ze-0006Iu-R6@paris.servershost.net>
-	 <cjad82$qji$1@sea.gmane.org> <1096371695.4950.2.camel@notepaq>
-	 <cje512$kj5$1@sea.gmane.org>
-Content-Type: text/plain
-Message-Id: <1096494023.6380.0.camel@pegasus>
+From: "Jouni.Lohikoski@iki.fi" <jlohikos@cc.hut.fi>
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] bluez-hciemu-1.0 install error- Glib Not found
+Message-ID: <20040929155222.GA131327@kosh.hut.fi>
+Reply-To: Jouni.Lohikoski@iki.fi
+References: <296459384.12087@bjut.edu.cn>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <296459384.12087@bjut.edu.cn>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,27 +18,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Sep 2004 23:40:23 +0200
+Date: Wed, 29 Sep 2004 18:52:22 +0300
 
-Hi,
+On Wed, Sep 29, 2004 at 08:15:46PM +0800, Jin Pu wrote:
+>  checking for glib-config... not found
+>  configure: error: GLib not found
+>  ---then ./configure exit back to the shell---
+>  
+>  I know from the README, I need GLib package before
+>  install the hciemu. But I suppose that the package is
+>  already installed with RedHat 9.
 
-> I have re-installed bluez. The setup works well as
-> before until a client bluetooth is downed or is temporarily
-> out of range. The server, then freezes with the console
-> going blank.
-> 
-> I tried using Bluetooth on Windows/XP Professional with the
-> same results.
-> 
-> Is there an older version of bluez that does not do this ?
+You need glib-devel package in RH9 or in Fedora. When developing
+something, you need many devel-packages.
 
-go ahead and test it, because everything is working prefect on mine
-machines.
+After error like this, you could try if you find yourself the missing
+file/program. One method here:
 
-Regards
+# locate glib-config
+.....probably won't find it.
 
-Marcel
+Then to < http://rpm.pbone.net/ >
+and "Search for rpms which contain given file name": "glib-config"
 
+...you can guess from the results, you'll need glib-devel package.
+
+// jouni
 
 
 
