@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <421CC068.3050202@futurlink.com>
-From: Pedro Monjo Florit <pedro.monjo@futurlink.com>
-MIME-Version: 1.0
+From: Stefan Behlert <behlert@suse.de>
 To: bluez-users@lists.sourceforge.net
-Content-Type: multipart/alternative;
- boundary="------------050400050100090203010409"
-Subject: [Bluez-users] Detect the type of remote device
+Subject: Re: [Bluez-users] hcitool bug
+Message-ID: <20050223161415.GF5777@suse.de>
+References: <Pine.LNX.4.58.0502231536460.9757@sphinx.mythic-beasts.com> <20050223154857.GE5777@suse.de> <Pine.LNX.4.58.0502231602530.9757@sphinx.mythic-beasts.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <Pine.LNX.4.58.0502231602530.9757@sphinx.mythic-beasts.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,72 +18,57 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Feb 2005 18:42:00 +0100
+Date: Wed, 23 Feb 2005 17:14:15 +0100
 
-This is a multi-part message in MIME format.
---------------050400050100090203010409
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Moin,
 
-Hi everybody:
+On Feb 23, 05 16:04:14 +0000, Pete Stevens wrote:
+> On Wed, 23 Feb 2005, Stefan Behlert wrote:
+> 
+> > On Feb 23, 05 15:41:45 +0000, Pete Stevens wrote:
+> > > Hi,
+> > >
+> > > This confuses me, can anyone explain why I get this?
+> > >
+> > > [root@pstevens bluetooth-pc-tag]# hcitool dev
+> > > Devices:
+> > >         hci0    00:0C:76:47:6A:94
+> > >
+> > > [root@pstevens bluetooth-pc-tag]# hcitool -i 00:0C:76:47:6A:94 info
+> > > 00:0E:6D:13:D8:74
+> > > Requesting information ...
+> > > Get connection info failed: No such file or directory
+> >
+> > >
+> > > [root@pstevens bluetooth-pc-tag]# hcitool info 00:0E:6D:13:D8:74
+> > > Requesting information ...
+> > >         BD Address:  00:0E:6D:13:D8:74
+> >
+> > Nice. With version 2.15 this fails with me. Do you have more than one
+> > Bluetooth dongle in your computer?
+> > [...]
+> 
+> At present I only have one, sometimes I have more than that.
+> 
+> > I think it has to fail, because '-i <dev>' explicitly says "send it out
+> > using this interface" and only affects remote devices. I don't think you
+> > should be able to ask local devices for information in this way. But I may
+> > be wrong.
+> 
+> I was under the impression I was using local device 00:0C:76:47:6A:94 to query
+> the remote device 00:0E:6D:13:D8:74, when I believe should succeed.
 
-While using the BlueZ API's we have discovered that it's difficult to 
-find which kind of device (brand and model) we are talking to. We are 
-writing an application that delivers an image to any device passing by, 
-taking into account its screen width, height and color depth, but 
-without any prior knowledge of the device.
+The explanation from me is not quite right, must be the long day :) 
+I've read "00:0E:6D:13:D8:74" twice :( Sorry for the confusion.
+The situation you reported works fine with me here, using version 2.15. It
+doesn't matter here for me if I use hci0 or the bdaddress.
+I think you should update your hcitool to a newer version.
 
-Using WAP we have access to the HTTP headers from where you can parse 
-the User Agent Profile (UAProf), but we have not found any similar 
-function in Bluetooth. In fact, there is the PnPInformation Profile, but 
-nowadays is supported in very few devices.
+        ciao,
+          Stefan
 
-Is there any function or mechanism to retrieve the UAProf data (or 
-anything similar) using the BlueZ library?
-
-Thanks & regards,
-
-Pedro Monjo
-
-
---------------050400050100090203010409
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
-  <title></title>
-</head>
-<body bgcolor="#ffffff" text="#000000">
-Hi everybody:<br>
-<br>
-<meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
-<title></title>
-While using the BlueZ API's we have discovered that it's difficult to
-find which kind of device (brand and model) we are talking to. We are
-writing an application that delivers an image to any device passing by,
-taking
-into account its screen width, height and color depth, but without any
-prior knowledge of the device.<br>
-<br>
-Using WAP we have access to the HTTP headers from where you can parse
-the User Agent Profile (UAProf), but we have not found any similar
-function in Bluetooth. In fact, there is the PnPInformation Profile,
-but nowadays is supported in very few devices.<br>
-<br>
-Is there any function or mechanism to retrieve the UAProf data
-(or anything similar) using the BlueZ library?<br>
-<br>
-Thanks &amp; regards,<br>
-<br>
-Pedro Monjo<br>
-<br>
-</body>
-</html>
-
---------------050400050100090203010409--
+-- 
+Stefan Behlert
 
 
 -------------------------------------------------------
