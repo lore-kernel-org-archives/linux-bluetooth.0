@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hciconfig question
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5f30e261041224131026cfa70a@mail.gmail.com>
-References: <5f30e261041224131026cfa70a@mail.gmail.com>
-Content-Type: text/plain
-Message-Id: <1103931501.20258.94.camel@pegasus>
+Message-ID: <5f30e261041224131026cfa70a@mail.gmail.com>
+From: Jeff Wilson <jazzbotley@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-devel] hciconfig question
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,27 +16,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 25 Dec 2004 00:38:21 +0100
+Date: Fri, 24 Dec 2004 15:10:46 -0600
 
-Hi Jeff,
+Hi,
 
-> I'm studying hciconfig.c to learn how to set inquiry mode and
-> parameters.  As I play with the binary to understand the source, I get
-> the following error on "hciconfig hci0 inqmode":
-> 
-> Can't read inquiry mode on hci0. Input/output error(5)
-> 
-> The "inqparms" command reads from hci0 just fine, with no errors.  I
-> have "iscan enable" set in /etc/bluetooth/hcid.conf ... what else
-> should I check?
+I'm studying hciconfig.c to learn how to set inquiry mode and
+parameters.  As I play with the binary to understand the source, I get
+the following error on "hciconfig hci0 inqmode":
 
-you need a Bluetooth 1.2 device with inquiry with RSSI support.
+Can't read inquiry mode on hci0. Input/output error(5)
 
-Regards
+The "inqparms" command reads from hci0 just fine, with no errors.  I
+have "iscan enable" set in /etc/bluetooth/hcid.conf ... what else
+should I check?
 
-Marcel
-
-
+       Thanks for your time,
+         jw
 
 
 -------------------------------------------------------
