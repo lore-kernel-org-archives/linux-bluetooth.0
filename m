@@ -1,55 +1,55 @@
 Return-Path: <noring@nocrew.org>
-Subject: Re: [Bluez-devel] hcid hotplug initialisation?
+Subject: Re: [Bluez-devel] D-Bus interfaces
 From: Fredrik Noring <noring@nocrew.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076325635.6869.128.camel@pegasus>
-References: <1076323204.5263.34.camel@kalkyl.roxen.com>
-	 <1076323641.6869.98.camel@pegasus>
-	 <1076324203.5263.47.camel@kalkyl.roxen.com>
-	 <1076325635.6869.128.camel@pegasus>
+In-Reply-To: <1076324584.6869.109.camel@pegasus>
+References: <1076265358.2670.36.camel@pegasus>
+	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
+	 <1076267396.2670.58.camel@pegasus>
+	 <1076275689.14742.93.camel@akka.yeti.nocrew.org>
+	 <1076277250.6869.24.camel@pegasus>
+	 <1076278554.14742.112.camel@akka.yeti.nocrew.org>
+	 <1076279508.6869.54.camel@pegasus>
+	 <1076280612.14742.147.camel@akka.yeti.nocrew.org>
+	 <1076282343.6869.65.camel@pegasus>
+	 <1076284317.14742.179.camel@akka.yeti.nocrew.org>
+	 <1076287085.6869.70.camel@pegasus>
+	 <1076311376.14742.202.camel@akka.yeti.nocrew.org>
+	 <1076321200.6869.75.camel@pegasus>
+	 <1076322129.5263.28.camel@kalkyl.roxen.com>
+	 <1076323138.6869.93.camel@pegasus>
+	 <1076323602.5263.41.camel@kalkyl.roxen.com>
+	 <1076324584.6869.109.camel@pegasus>
 Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1076330114.5263.85.camel@kalkyl.roxen.com>
+Message-Id: <1076327592.5263.64.camel@kalkyl.roxen.com>
 Mime-Version: 1.0
-Date: Mon, 09 Feb 2004 13:35:14 +0100
+Date: Mon, 09 Feb 2004 12:53:12 +0100
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 Marcel,
 
-mån 2004-02-09 klockan 12.20 skrev Marcel Holtmann:
-> but you expect that the user has installed the Bluetooth specific
-> software? 
+mån 2004-02-09 klockan 12.03 skrev Marcel Holtmann:
+> I don't wanna support a config file which is intend to be editable by a
+> user and changable by a program. This is always a mess.
 
-Yes, it could be installed by default. A few megs of harddisk space 
-is hardly an issue compared with having a handful of strange daemons
-(hcid, stpd etc.) always running no matter if any Bluetooth devices
-are actually available or not, is it?
+That's actually the way many other configuration tools in Linux works...
+Like it or not, it's the simplest and most robust way to have it working
+because you will have to trust the administrator of the system for
+certain things anyway. 
 
-> If the software is installed we start all needed parts of the
-> Bluetooth subsystem. If they don't want them they shouldn't install
-> their software.
+If the administrator decides to edit a system file, it's very likely
+because something really needs to be done. Hiding the real configuration
+files behind special binary databases is a true nightmare when stuff
+simply isn't working.
 
-Starting these services on demand is more efficient and simpler for
-the user. Perhaps 1 % of all users will try to use the Bluetooth stuff.
+> We need to write a command line utility with full support anyway, because
+> the interface must be tested.
 
-> To make everything work perfect on the first use of a Bluetooth dongle
-> is not the job of the Bluetooth subsystem. If the USB or PCMCIA subsytem
-> detects a Bluetooth device it has to install, start or run whatever
-> other action is needed to make it work.
-
-This would require that hcid is compatible with that approach. That's
-the issue here. :)
-
-> If hcid is not running, because no device is attached. How would you
-> manage you pairings through D-Bus for example? For some stuff an
-> attached device is not needed.
-
-The hotplug may not be the only way to start hcid. Other services
-may require it to start too, of course.
-
-> If you think the long way then after hcid comes sdpd. This daemon must
-> be started first, before any PAN service can be started.
-
-This kind of dependency needs to be tracked too.
+Emacs/grep/awk/perl et. al. are much more powerful than most special 
+tools. The user interfaces, DBus interfaces and tools only need to 
+support the common cases when plain text files are used. This shouldn't 
+stop anyone from actually implementing _all_ configuration features in some 
+tool, but the advanced stuff can be also be left to the administrator.
 
 Fredrik
