@@ -1,20 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-Id: <6.1.2.0.2.20050125092855.057821a0@pop.gmx.net>
+Message-ID: <41F5C90D.90401@coriand.com>
+From: Franz Coriand <franz@coriand.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: George <george.news@gmx.net>
-Subject: Re: [Bluez-users] Bluez BNEP connection close
-In-Reply-To: <1106589847.8058.90.camel@pegasus>
-References: <6.1.2.0.2.20050124165802.04168330@luna.tlmat.unican.es>
- <1106581771.8058.49.camel@pegasus>
- <6.1.2.0.2.20050124172931.041a03a0@pop.gmx.net>
- <1106583831.8058.52.camel@pegasus>
- <6.1.2.0.2.20050124180402.041c1eb0@pop.gmx.net>
- <1106585260.8058.56.camel@pegasus>
- <6.1.2.0.2.20050124182813.04216860@pop.gmx.net>
- <6.1.2.0.2.20050124192058.04bee240@pop.gmx.net>
- <1106589847.8058.90.camel@pegasus>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigE10FD2946035BDFDE0BE434A"
+Subject: [Bluez-users] setup pairing?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -26,59 +18,75 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 25 Jan 2005 09:33:24 +0100
+Date: Mon, 24 Jan 2005 23:20:29 -0500
 
-Hi again.
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigE10FD2946035BDFDE0BE434A
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
 
-In my code I have a reconnection capability once the bnep connection 
-disappears.
-However doing some more tests I found that sometimes the interface bnep0 is 
-still there (in the laptop) although there is no connectivity.
-I mean, the interface exists but the channel or path is not more up. 
-Therefore my reconnection capability doesn't work on this case.
+Hi!
 
-So... don't know what could happen. I have recompiled the kernel serveral 
-times changing the UCHI, OHCI and EHCI supports but still happens the same..
+I'm new in this area and I've a problem with setting up a simple key
+pairing mechanism for bluetooth with BlueZ.
 
-I'm thinking on buying a PCMCIA Bluetooth card to have a try as Marcel 
-thinks the problem is with the usb.
+I'd like to setup a bluetooth connection with tcp/ip between a
+Linux-Watch (kernel 2.4.18) and a Windows XP SP2.
+My problem is, I can access the Windows host only with the help of a key
+pairing, because with  my current windows bluetooth driver it's not
+possible to establish a "unsecure connection" without a keypairs.
 
-Any new Idea?
+With the Linux-Watch and the Windows computer I can search for devices
+and they find earch other, but the key pairing doesn't work.
 
-Sorry for being so insistant but it's a matter of dead or life ;)
+I wrote a /etc/bluetooth/hcid.conf-file:
 
-Regards
+##########begin
+# HCI daemon configuration file.
+#
+#
+options {
+        autoinit yes;
+        security auto;
+        pairing multi;
+        pin_helper /etc/bluetooth/givepin;
+}
+###########end
 
-At 19:04 24/01/2005, Marcel Holtmann wrote:
- >Hi George,
- >
- >> OOpssss ... It wasn't the solution
- >>
- >> I have remove the SCO totally removed and still facing the same problem.
- >> Thanks for your help and sorry for bothering all of you, but I have to 
-show
- >> my application in a short while and I want it to be as stable as possible.
- >
- >try to swap your UHCI host controller with an OHCI one or move to a 2.6
- >kernel. If the USB subsystem is the problem I can't help you.
- >
- >Regards
- >
- >Marcel
- >
- >
- >
- >
- >-------------------------------------------------------
- >This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
- >Tool for open source databases. Create drag-&-drop reports. Save time
- >by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
- >Download a FREE copy at http://www.intelliview.com/go/osdn_nl
- >_______________________________________________
- >Bluez-users mailing list
- >Bluez-users@lists.sourceforge.net
- >https://lists.sourceforge.net/lists/listinfo/bluez-users
+and loaded this file with "/usr/local/bin/hcid -f /etc/bluetooth/hcid.conf"!
+"/etc/bluetooth/givepin" rights are 710 and looks like:
 
+#####givepin######
+#!/bin/sh
+echo "PIN:0000"
+################
+
+But it still doesn't work - any idea?
+
+Software:
+bluez-libs-2.4.
+bluez-pan-1.1
+bluez-sdp-1.2
+bluez-utils-2.3
+
+Bye,
+Franz
+
+--------------enigE10FD2946035BDFDE0BE434A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (MingW32)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFB9ckQRct14D3a7wsRAqbPAJ4xvFc7Jc6Suqini59IQDlwRqQJ1gCguJIJ
+h/L4iX48srPyew578ZQGBDk=
+=aoyE
+-----END PGP SIGNATURE-----
+
+--------------enigE10FD2946035BDFDE0BE434A--
 
 
 -------------------------------------------------------
