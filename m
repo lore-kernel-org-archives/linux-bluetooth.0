@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problem with Billionton PCMCIA card
+Subject: Re: [Bluez-devel] RFCOMM service level security testing
 From: Marcel Holtmann <marcel@holtmann.org>
-To: marcin@telscom.ch
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41879A9F.17242.6433A23@localhost>
-References: <4187903F.16859.61AB28E@localhost>
-	 <41879A9F.17242.6433A23@localhost>
+To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1099151759.16247.18.camel@pegasus>
+References: <1099151759.16247.18.camel@pegasus>
 Content-Type: text/plain
-Message-Id: <1099445373.7125.47.camel@pegasus>
+Message-Id: <1099433039.7125.13.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,20 +17,26 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 03 Nov 2004 02:29:33 +0100
+Date: Tue, 02 Nov 2004 23:03:59 +0100
 
-Hi Marcin,
+Hi Folks,
 
-> > Do you wanna donate one of these cards so that I can take a look at it?
-> > 
-> Not really, I only have one myself and need it. I can provide some 
-> information if You want, just tell me what/how to get it.
->  I tried hciattach /dev/ttyS17 bcsp
-> and it works. I can still use it with 2.4 kernel, since the idea is 
-> to use it on some device using arm processor.
+> I released patch-2.6.9-mh3 some minutes ago and it contains the first
+> experimental version of the service level security implementation for
+> the RFCOMM layer.
+> 
+> The libs CVS is also updated to add the specific defines for using it
+> and rctest got some extra paramters for it, but it seems that the CVS
+> service for anonymous access from Sourceforge is broken and so most of
+> you won't get these modification. However this is not a big problem,
+> because you can use L2CAP_LM, L2CAP_LM_AUTH etc. for it. The values
+> behind these defines are identical and so this should work at least for
+> testing this new feature.
+> 
+> Please test this and send reports back to the mailing list.
 
-I like to sort this problem out, but without a card for testing or an
-oops from you I can't do anything useful.
+what's up? Has nobody tested this new feature so far? The Sourceforge
+CVS is now back in sync and rctest has all needed options.
 
 Regards
 
