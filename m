@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] libtool and autoconf versions
-From: Max Krasnyansky <maxk@qualcomm.com>
-To: Edd Dumbill <edd@usefulinc.com>
+From: Edd Dumbill <edd@usefulinc.com>
+To: Max Krasnyansky <maxk@qualcomm.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1074632708.23181.56.camel@saag>
+In-Reply-To: <1074632525.1707.181.camel@localhost>
 References: <1074424282.16573.52.camel@saag>
-	 <1074632525.1707.181.camel@localhost>  <1074632708.23181.56.camel@saag>
+	 <1074632525.1707.181.camel@localhost>
 Content-Type: text/plain
-Message-Id: <1074633031.1707.190.camel@localhost>
+Message-Id: <1074632708.23181.56.camel@saag>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,24 +19,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 20 Jan 2004 13:10:31 -0800
+Date: Tue, 20 Jan 2004 21:05:09 +0000
 
-On Tue, 2004-01-20 at 13:05, Edd Dumbill wrote:
-> On Tue, 2004-01-20 at 21:02, Max Krasnyansky wrote:
-> > I'd say lets update. 
-> > btw What exactly depends on the old autoconf ? I mean if you just run
-> > ./bootstrap on the machine that has new version it just works right.
-> > At least it does on Fedora with the latest au
-> 
-> I'm talking about what's shipped in the tarballs, which uses
-> libtool1.4.  Packagers for distros rely on the tarball releases.  In the
-> (admittedly) unlikely event that changes need to be made and autoconf
-> re-run for the purposes of packaging, the old ac and libtool would be
-> needed.
-I see. Yeah, I think we should release our tarballs with new autoconf. 
-Marcel, it's time for you to upgrade ;-).
+On Tue, 2004-01-20 at 21:02, Max Krasnyansky wrote:
+> I'd say lets update. 
+> btw What exactly depends on the old autoconf ? I mean if you just run
+> ./bootstrap on the machine that has new version it just works right.
+> At least it does on Fedora with the latest au
 
-Max
+I'm talking about what's shipped in the tarballs, which uses
+libtool1.4.  Packagers for distros rely on the tarball releases.  In the
+(admittedly) unlikely event that changes need to be made and autoconf
+re-run for the purposes of packaging, the old ac and libtool would be
+needed.
+
+-- Edd
+
 
 
 
