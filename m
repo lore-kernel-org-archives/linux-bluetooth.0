@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Anders =?ISO-8859-1?Q?=D6stling?= <anders.ostling@neurope.ikea.com>
-To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Network Access Point - pairing problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20041104134346.GA207615@kosh.hut.fi>
+References: <7166.1099563749@www18.gmx.net>
+	 <1099566332.7022.12.camel@pegasus>  <20041104134346.GA207615@kosh.hut.fi>
 Content-Type: text/plain
-Message-Id: <1099589151.4872.1.camel@anders2003.neurope.ikea.com>
+Message-Id: <1099578162.7022.21.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Forgot some info ...
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,22 +19,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 04 Nov 2004 17:25:50 +0000
+Date: Thu, 04 Nov 2004 15:22:42 +0100
 
-Hi again
-Sorry, forgot a few important info-pieces regarding the non-functional
-CSR BT adapter that I reported a few minutes ago ...
+Hi Jouni,
 
-Fedora Core 3 Test 3
+> > > > HCI Event: PIN Code Request(0x16) plen 6
+> > >   B0 3A 4C 3D 0F 00 
+> > > < HCI Command: PIN Code Request Reply(0x01|0x000d) plen 23
+> > >   B0 3A 4C 3D 0F 00 05 42 6C 75 65 5A 00 00 00 00 00 00 00 00 
+> > >   00 00 00 
+> > 
+> > The PIN code you entered is simply wrong. Try "BlueZ".
+> 
+> btw, what and where is the tried PIN code in that hex dump? B0 3A 4C 3D 0F 00
+> is obviously Bluetooth address of the remote host, so somewhere here
+> is the PIN code "05 42 6C 75 65 5A 00 00 00 00 00 00 00 00 00 00 00",
+> but how it is encoded?
 
-[root@anders2003 tmp]# rpm -qa|grep luez
-bluez-libs-2.10-2
-bluez-utils-2.10-2
-bluez-pin-0.23-3
-bluez-hcidump-1.11-1
-bluez-bluefw-1.0-6
+you can use "hcidump -X" and you will see it. You can also read the
+specification or think about what "05 42 6C 75 65 5A" maybe means ;)
 
-Anders
+Regards
+
+Marcel
 
 
 
