@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: David Mackie <D.Mackie@ru.ac.za>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] running 2 rfcomm modules simultaneously
-Message-ID: <20040914124718.GA76088@rucus.ru.ac.za>
-References: <20040901130123.GB31321@rucus.ru.ac.za> <1094998092.5695.19.camel@pegasus>
+Subject: Re: [Bluez-users] bluetooth ipaq familiar
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Matthias Albert <matthias@ma-c.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1095082582.2191.35.camel@ringo.aicas.burg>
+References: <1095082582.2191.35.camel@ringo.aicas.burg>
+Content-Type: text/plain
+Message-Id: <1095154677.5695.134.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1094998092.5695.19.camel@pegasus>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,29 +18,33 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Sep 2004 14:47:18 +0200
+Date: Tue, 14 Sep 2004 11:37:57 +0200
 
-On Sun 2004-09-12 (16:08), Marcel Holtmann wrote:
-> > Has anyone done something like this before?
+Hi Matthias,
+
+> I have a iPAQ 5550 running with Familiar unstable 0.7.2 and Opie 1.1.4.
+> I can establish a connection over pand between a pc and the ipaq.
 > 
-> this is not possible this way. It needs more changes to provide such a
-> functionality and you must keep it inside the RFCOMM module. Why do you
-> need it?
+> After that I have a device called bnep0 which I can configure with
+> ifconfig bnep0 and so on.
+> 
+> Now I would like to have a serial bluetooth connection between the pc
+> and the ipaq.
+> How can I do this?
 
-I had hoped to be able to "pick-up" data sent to the 2nd RFCOMM Module
-(using a new PCM value to differentiate it from the "Original") and pass it to
-another program to transport it across the network to another PC where it
-would be "injected" into a modified module there. At the moment, I am only
-loading the modified module, and it not absolutely necessary that both be
-loaded at a time, but would be interesting to do.
+use dund, play with the rfcomm utility or write your own client/server
+application.
 
--dave
+> Is it possible with a serial bluetooth connection, that I can go outside
+> the frequency with my ipaq and go back and the connection is there?
 
--- 
- David Mackie
- MSc Student - Computer Science -  Rhodes University
- email: D.Mackie@ru.ac.za
-   web: http://www.cs.ru.ac.za/research/students/g99m0302/
+You have to write this stuff by yourself.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
