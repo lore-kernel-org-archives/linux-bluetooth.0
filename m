@@ -1,16 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <411687AF.1070605@patbert.com>
+From: Patrick <patbert@patbert.com>
+Reply-To: patbert@patbert.com
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Apple bluetooth keyboard fun...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: patbert@patbert.com
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4116692D.1060003@patbert.com>
-References: <4115A5E3.8000107@patbert.com> <1091959881.2773.6.camel@pegasus>
-	 <411649EB.9020407@patbert.com> <1091980492.2773.33.camel@pegasus>
-	 <41165ACF.10802@patbert.com> <1091985064.2773.36.camel@pegasus>
-	 <4116692D.1060003@patbert.com>
-Content-Type: text/plain
-Message-Id: <1092005589.2773.53.camel@pegasus>
-Mime-Version: 1.0
+References: <4115A5E3.8000107@patbert.com> <1091959881.2773.6.camel@pegasus>	 <411649EB.9020407@patbert.com> <1091980492.2773.33.camel@pegasus>	 <41165ACF.10802@patbert.com> <1091985064.2773.36.camel@pegasus>
+In-Reply-To: <1091985064.2773.36.camel@pegasus>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,31 +18,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 09 Aug 2004 00:53:09 +0200
+Date: Sun, 08 Aug 2004 16:06:07 -0400
 
-Hi Patrick,
+Ah ha! I changed /etc/bluetooth/pin so it only contained 0000 and now 
+it's all working wonderfully!
 
-> In my log there were such obvious errors as....
-> 
-> Aug  8 13:38:53 Kawaii64 hcid[7695]: Bluetooth HCI daemon
-> Aug  8 13:38:53 Kawaii64 hcid[7695]: Can not open /etc/bluetooth/hcid.conf
-> Aug  8 13:38:53 Kawaii64 hcid[7695]: Config load failed
-> Aug  8 13:38:53 Kawaii64 hcid[7695]: Can't open PIN file 
-> /etc/bluetooth/pin. No such file or directory(2)
-> 
-> When bluez installed it made all those files in /usr/etc/bluetooth/ but 
-> I guess it wasn't looking there so I copied it all over to 
-> /etc/bluetooth and things are looking up...
+Thank you so much for all your help!
 
-if you overwrite the prefix you should also overwrite the sysconfdir
-unless you really want it that way. Look at the configure example from
-the README file.
-
-Regards
-
-Marcel
-
-
+Patrick
 
 
 -------------------------------------------------------
