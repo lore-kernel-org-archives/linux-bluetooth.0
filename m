@@ -3,11 +3,10 @@ Subject: Re: [Bluez-users] info about encryption in proc?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: cijoml@volny.cz
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200411011442.37852.cijoml@volny.cz>
+In-Reply-To: <200411011341.30769.cijoml@volny.cz>
 References: <200411011341.30769.cijoml@volny.cz>
-	 <1099315632.16247.96.camel@pegasus>  <200411011442.37852.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1099317714.16247.100.camel@pegasus>
+Message-Id: <1099315632.16247.96.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,25 +18,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 01 Nov 2004 15:01:54 +0100
+Date: Mon, 01 Nov 2004 14:27:12 +0100
 
 Hi Michal,
 
-> > > is it possible to show in proc info about encryption which is used to
-> > > intercommunicate between linux box and other devices?
-> >
-> > what do you expect to see? This is a boolean value and "hcitool con"
-> > shows you the current state.
-> 
-> for example in /proc/bluetooth/encryption
-> 
-> MS Keyboard 128bit
-> MS Mouse none
-> ...
+> is it possible to show in proc info about encryption which is used to 
+> intercommunicate between linux box and other devices?
 
-as I said, this is only a boolean value and "hcitool con" already shows
-the current state of the encryption. How many bits are used for it, is
-not retrievable with standard HCI commands.
+what do you expect to see? This is a boolean value and "hcitool con"
+shows you the current state.
 
 Regards
 
