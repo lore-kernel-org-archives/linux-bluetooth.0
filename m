@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Anybody using Socket CF Bluetooth version F on
-	Zaurus
+Subject: Re: [Bluez-users] Bluetooth-alsa Success
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20041222161314.65249.qmail@web11610.mail.yahoo.com>
-References: <20041222161314.65249.qmail@web11610.mail.yahoo.com>
+In-Reply-To: <200412230144.24223.cijoml@volny.cz>
+References: <200412230144.24223.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1103802134.20258.69.camel@pegasus>
+Message-Id: <1103802002.20258.67.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,18 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 23 Dec 2004 12:42:14 +0100
+Date: Thu, 23 Dec 2004 12:40:02 +0100
 
-Hi Bashkar,
+Hi Michal,
 
-> Has anyone gotten this card (Socket CF Bluetooth, version F) to work on
-> a Zaurus. If so, please post what ROM, kernel version, and Bluez or
-> Affix  packages you are using. My card is detected by PCMCIA, but the
-> dtl1_cs modules doesn't see it. So I can see it in "cardctl ident", but
-> no driver is loaded, and hciconfig doesn't see it.
+> after fixing code to compile snd-hwdep I can use my headset CANYON CN-BTH1.
+> Problem is, than when I send something to /dev/dsp1 I hear nothing in headset 
+> until press volume/- button. Then I hear sound. Could this be fixed too?
 
-check /etc/pcmcia/bluetooth.conf for the correct entry. Post the output
-of dump_cis of your card.
+I am not sure if this is possible, because the ALSA library need to do
+some conversion into 8K PCM. Do using aplay works?
 
 Regards
 
