@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040311045957.47445.qmail@web40703.mail.yahoo.com>
-From: Lalith Chakravarthi <lalithvc@yahoo.com>
-Subject: Re: [Bluez-users] Shell script during bluetooth connection
-To: bluez-users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1078923303.2537.33.camel@pegasus>
-MIME-Version: 1.0
+From: Russell Neches <russell@ccs.neu.edu>
+To: Brad Midgley <bmidgley@xmission.com>, bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] crash on remove
+Message-ID: <20040311024720.GA3297@omocha.vort.org>
+References: <20040310182158.GA9279@naginata.ccs.neu.edu> <404F84BC.4020406@xmission.com> <20040310223504.GA3398@omocha.vort.org> <404FB5D1.5030104@xmission.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <404FB5D1.5030104@xmission.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,29 +17,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 10 Mar 2004 20:59:57 -0800 (PST)
+Date: Wed, 10 Mar 2004 21:47:20 -0500
 
-HI Marcel..
-> 
-> I don't use RedHat, but in general there is not a big difference
-> between
-> an executable file and an executable shell script. It is important
-> that
-> the script is mode 755. However you can also put your script directly
-> into /etc/hotplug/net.agent.
+> yes, i enabled force remove because the module shows up as in use. i 
+> think it's unsafe, but how much worse can it be than crashing the kernel?
 
-When is the script /etc/hotplug/net.agent called? Is it when the USB
-Dongle is plugged in??? Or is it when another USB device comes within
-the range (I cant think of a way that this can happen without a
-connexion)... or is it when a bluetooth connection is established??
+Indeed. 
 
-Regards
-Lalith
+> i am compiling the modules without SCO support right now to see if that 
+> helps.
 
-__________________________________
-Do you Yahoo!?
-Yahoo! Search - Find what you’re looking for faster
-http://search.yahoo.com
+Now, by SCO support, do we mean the module (CONFIG_BT_SCO) or
+CONFIG_BT_HCIUSB_SCO? I'm actually getting the crash without the sco
+module loaded, and I have my kernel built with CONFIG_BT_HCIUSB_SCO not
+set. I don't think SCO shows up anywhere else in the kernel. Sorry if
+I'm beginning to sound pedantic. 
+
+Maybe I should figure out how to use SysReq after all...
+
+Russell
 
 
 -------------------------------------------------------
