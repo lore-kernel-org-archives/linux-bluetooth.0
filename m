@@ -1,38 +1,75 @@
-Return-Path: <SRS0+2f2b06aae31afc370aaa+299+infradead.org+dwmw2@pentafluge-142022.srs.infradead.org>
-Subject: Re: [Bluez-devel] Extremely slow printing?
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Jon Valvatne <jon@valvatne.com>,
-   BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1087473569.23809.7.camel@localhost>
-References: <1087431069.6361.26.camel@localhost.localdomain>
-	 <1087432013.4309.43.camel@pegasus>
-	 <1087438456.2624.64.camel@localhost.localdomain>
-	 <1087440365.2624.75.camel@localhost.localdomain>
-	 <1087473569.23809.7.camel@localhost>
-Content-Type: text/plain
-Message-Id: <1087564820.19489.3167.camel@hades.cambridge.redhat.com>
-Mime-Version: 1.0
-Date: Fri, 18 Jun 2004 14:20:20 +0100
+Return-Path: <ach@mpe.mpg.de>
+From: Achim Bohnet <ach@mpe.mpg.de>
+To: sjoerd@spring.luon.net (Sjoerd Simons)
+Subject: Re: [Bluez-devel] D-BUS fixes for hcid
+Date: Fri, 18 Jun 2004 09:30:32 +0200
+Cc: bluez-devel@lists.sourceforge.net, Marcel Holtmann <marcel@holtmann.org>
+References: <20040616112702.GA898@kone> <20040616141845.GA8921@kone> <20040617072748.GA3775@spring.luon.net>
+In-Reply-To: <20040617072748.GA3775@spring.luon.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200406180930.32342.ach@mpe.mpg.de>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Thu, 2004-06-17 at 13:59 +0200, Marcel Holtmann wrote:
-> actually this depends on the hardware in your printer. The max transfer
-> rate should be something about 700kbps, but this is not a must. Mostly
-> the reasons for this are differnt link manager implementations or an
-> UART that isn't running with full speed.
+On Thursday 17 June 2004 09:27, Sjoerd Simons wrote:
+> On Wed, Jun 16, 2004 at 05:18:45PM +0300, Johan Hedberg wrote:
+> > On Wed, Jun 16, 2004, Achim Bohnet wrote:
+> > > On debian, dbus-1-utils installs a xsession startup script
+> > > that checks for use-session-dbus in /etc/X11/Xsession.options
+> > > Therefore dbus daemon knows the $DISPLAY.
+> 
+> $DISPLAY is indeed in the enviroment when started by the debian x-session. But
+> dbus doesn't (and shouldn't) care about it. There is nothing that says
+> that a dbus session bus is connected to an X session (could be console
+> only session just as well)..
 
-The UART speed could be a problem on the client side too. Many CF cards
-I've seen are pointlessly crippled and run at 115200 baud, instead of
-about ten times faster as they should do.
+As long is dbus does not delete DISPLAY it's okay ;)  Child processes
+inherit DISPLAY (if available) and that's the important point.  In
+hotplug scripts you have to hardcode :0 (almost always wrong when
+someone works in a second session on :1) or implement hack to find
+out the right display.
+> 
+> > However, hcid uses the system D-BUS which knows nothing about the
+> > session (system D-BUS and session D-BUS are run as two separate
+> > processes). This is an interesting problem, because from a lowlevel
+> > (BT-stack) standpoint we want to use the system bus, but from a higher
+> > level (pin-code dialog) standpoint the session bus would be apropriate.
+> 
+>  From both standpoints you'll want to use the system bus. A bluetooth pin query
+>  is not linked to a specific users session, but to complete system.
+> 
+>  The current sollution is correct imho, when a users wants to answer pin
+>  queries he/she should have something running that monitors the system bus for
+>  them.  That something could be a gnome applet/notification icon, a kde
+>  thingie or a simple command line program that doesn't really matter.
 
-The sensible ones which run faster will often do so just by tweaking the
-input clock to the 16550 UART, so that it runs faster while it _thinks_
-it's running at 115200 baud. Use 'pskey' to check what speed the
-Bluetooth chip actually thinks it's running at.
+That does not scale well.  Why does inetd exist? Just to not waste
+resources.  Something similar for the desktop should exist!  We
+have hotplug, on the one side and the desktop session on the other
+side.  Maybe the design of dbus is too limited (or simply not designed
+for it).  But AFAIK dbus can start apps on demand.   So
 
-Marcel -- it'd be useful if your hardware list would include the maximum
-speed, btw.
+   hotplug -> system dbus -> session dbus -> desktop tool/applet
 
+was (one of) my expectation of dbus.  Makes no sense that every
+app needs to know about dbus protocol, when all that's needed is
+just a 'desktop inetd' that start or notifies, e.g. via DCOP, an
+application off a certain hotplug event.
+
+But this get's off really topic, I'll check the dbus mailing
+lists ...
+
+Achim
+> 
+>  The activation stuff could be nice for non-interactive pin handlers, but you
+>  can already use the ``old'' pin_helper option of hcid for that.
+> 
+>   Sjoerd
+> -- 
+> Men love to wonder, and that is the seed of science.
 -- 
-dwmw2
+  To me vi is Zen.  To use vi is to practice zen. Every command is
+  a koan. Profound to the user, unintelligible to the uninitiated.
+  You discover truth everytime you use it.
+                                      -- reddy@lion.austin.ibm.com
