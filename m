@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problems switching usb dongles...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Anthony Yulo <strikewing16th@hotmail.com>
-Cc: bluez devel <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Law11-OE54SB2qgrZCT0000dbb9@hotmail.com>
-References: <Law11-OE54SB2qgrZCT0000dbb9@hotmail.com>
-Content-Type: text/plain
-Message-Id: <1074452313.6070.7.camel@pegasus>
-Mime-Version: 1.0
+From: "Anthony Yulo" <strikewing16th@hotmail.com>
+To: "bluez devel" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0045_01C3DE2D.F67408C0"
+Message-ID: <Law11-OE54SB2qgrZCT0000dbb9@hotmail.com>
+Subject: [Bluez-devel] Problems switching usb dongles...
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,29 +16,61 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 18 Jan 2004 19:58:33 +0100
+Date: Mon, 19 Jan 2004 01:45:48 +0800
 
-Hi Anthony,
+This is a multi-part message in MIME format.
 
-> Hi! I have a problems switching usb dongles...
-> When i installed bluez the bluetooth dongle i used is the one made by
-> TDK... now when i tried using a different dongle, a Billionton class
-> B, it seems linux cannot startup the bluetooth system...
->  
-> i.e.
-> "hciconfig hci0 up"
->  
-> linux outputs a messaging saying the device is not present or not
-> connected.... when i switch back to the TDK dongle, then it was ok... 
+------=_NextPart_000_0045_01C3DE2D.F67408C0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-maybe this is the same problems others saw already with some dongles on
-an UHCI USB host controller. Unload and reload the [usb-]uhci.o driver.
+Hi! I have a problems switching usb dongles...
 
-Regards
+When i installed bluez the bluetooth dongle i used is the one made by =
+TDK... now when i tried using a different dongle, a Billionton class B, =
+it seems linux cannot startup the bluetooth system...
 
-Marcel
+i.e.
+"hciconfig hci0 up"
+
+linux outputs a messaging saying the device is not present or not =
+connected.... when i switch back to the TDK dongle, then it was ok...=20
 
 
+
+------=_NextPart_000_0045_01C3DE2D.F67408C0
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2726.2500" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#d2ebfa>
+<DIV><FONT face=3DArial size=3D2>Hi! I have&nbsp;a problems switching =
+usb=20
+dongles...</FONT></DIV><FONT face=3DArial size=3D2>
+<DIV><BR>When i installed bluez the bluetooth dongle i used is the one =
+made by=20
+TDK... now when i tried using a different dongle, a Billionton class B, =
+it seems=20
+linux cannot startup the bluetooth system...</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>i.e.</DIV>
+<DIV>"hciconfig hci0 up"</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>linux outputs a messaging saying the device is not present or not=20
+connected.... when i switch back to the TDK dongle, then it was ok... =
+</DIV>
+<DIV>&nbsp;</DIV>
+<DIV></FONT>&nbsp;</DIV></BODY></HTML>
+
+------=_NextPart_000_0045_01C3DE2D.F67408C0--
 
 
 -------------------------------------------------------
