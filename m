@@ -1,59 +1,105 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] rfcomm shouldn't fail silently
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Edd Dumbill <edd@usefulinc.com>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1075135629.12874.339.camel@saag>
-References: <1075133668.12874.328.camel@saag>
-	 <1075135361.25442.57.camel@pegasus>  <1075135629.12874.339.camel@saag>
-Content-Type: text/plain
-Message-Id: <1075136125.25442.77.camel@pegasus>
+Return-Path: <jsantos_pt@hotmail.com>
+From: "João Santos" <jsantos_pt@hotmail.com>
+To: marcel@holtmann.org
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] phone+heaset
+Date: Mon, 26 Jan 2004 16:55:35 +0000
 Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 26 Jan 2004 17:55:25 +0100
+Content-Type: text/plain; format=flowed
+Message-ID: <Sea2-F67d4kbAoqKLn1000424f3@hotmail.com>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Edd,
+Hi Marcel,
 
-> > > rfcomm shouldn't fail silently if an invalid command is given to ie.
-> > 
-> > it does not fail silently. It show the the list of bonded devices.
-> 
-> If none are bonded, it is silent :)
-> 
-> The point was there should be a usage error output.
+> > >ACL data: handle 0x0028 flags 0x02 dlen 21
+> >     L2CAP(d): cid 0x41 len 17 [psm 1]
+> >         SDP SA Req: tid 0x53 len 0xc
+> >           hndl 0x804f738
+> >           max 0xff
+> >           aid(s) 0x0302 ((null))
+> >           cont 00
+> > < ACL data: handle 0x0028 flags 0x02 dlen 14
+> >     L2CAP(d): cid 0x41 len 10 [psm 1]
+> >         SDP SA Rsp: tid 0x53 len 0x5
+> >           cnt 0x2
+> >
+> >           cont 00
+>
+>it seems that your problem is here. The SDP record must be correct
+>otherwise it won't work.
 
-actually the problem is an unknown command with no extra parameters. Try
-these two and see what happens:
+Thanks for answer my last question.
+could you explain me better what's the problem, i think i 'm doing it right:
 
-	rfcomm test
-	rfcomm test abc
+[root@olivia jsantos]# sdptool browse local
+Browsing FF:FF:FF:00:00:00 ...
+Service Name: SDP Server
+Service Description: Bluetooth service discovery server
+Service Provider: BlueZ
+Service RecHandle: 0x0
+Service Class ID List:
+  "SDP Server" (0x1000)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+    PSM: 1
+    Version: 0x0001
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
 
-I don't care so much about it, but I will accept patches for this
-problem. Should not be so hard to fix, but at the moment I have to deal
-with some other stuff.
+Service Name: Public Browse Group Root
+Service Description: Root of public browse hierarchy
+Service Provider: BlueZ
+Service RecHandle: 0x804cd30
+Service Class ID List:
+  "Browse Group Descriptor" (0x1001)
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
 
-Regards
+Service Name: Headset
+Service RecHandle: 0x804f728
+Service Class ID List:
+  "Headset" (0x1108)
+  "Generic Audio" (0x1203)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 12
+Profile Descriptor List:
+  "Headset" (0x1108)
+    Version: 0x0100
 
-Marcel
 
 
+[root@olivia jsantos]# sdptool search HSET
+Inquiring ...
+Searching for HSET on 00:60:57:15:8A:A9 ...
+Service Name: Audio Gateway
+Service RecHandle: 0x10002
+Service Class ID List:
+  "Headset Audio Gateway" (0x1112)
+  "Generic Audio" (0x1203)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 12
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Headset" (0x1108)
+    Version: 0x0100
 
 
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Thanks in advance,
+Regards,
+
+João Santos
+
+_________________________________________________________________
+Find high-speed ‘net deals — comparison-shop your local providers here. 
+https://broadband.msn.com
