@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <003701c4f3d9$fa562960$0300a8c0@supercomputer>
-From: "D.W." <sword@gmx.de>
-To: <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0034_01C4F3E2.589C8E30"
-Subject: [Bluez-users] Who is master?
+Subject: Re: [Bluez-users] Zoom 4312 PCMCIA Bluetooth freezes laptop
+From: Erwin Authried <eauth@softsys.co.at>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <opsj5r1azldfsa41@dfavro-3>
+References: <opsj5ahvnzdfsa41@dfavro-3>  <opsj5r1azldfsa41@dfavro-3>
+Content-Type: text/plain
+Message-Id: <1105005023.32055.19.camel@kabel>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,42 +18,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 6 Jan 2005 11:24:54 +0100
+Date: Thu, 06 Jan 2005 10:50:23 +0100
 
-This is a multi-part message in MIME format.
+On Thu, 2005-01-06 at 03:04, David Favro wrote:
+> > I'm no expert on PCMCIA nor Bluetooth, so I am clueless as to how to
+> > address this.  I don't know if this is the BT protocol driver or the
+> > PCMCIA config that is causing the problem, but it is hard to deal with
+> > due to the machine being so totally disabled.  I've retried many times
+> > and it is repeatable very consistently.  Should I try a PCMCIA mailing
+> > list?  Am I correct to do the hciattach command?  If I don't, the card
+> > seems not to be noticed by hciconfig (see attached logs).
 
-------=_NextPart_000_0034_01C4F3E2.589C8E30
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+It seems to me that you have a problem with pcmcia and serial+serial_cs.
+You should first figure out if the same problem appears with serial_cs
+only (without any bluetooth module, and without using hciattach). Try to
+send some data (like "echo XX > /dev/ttySxx") to see if the lockup
+occurs already here (IRQ problem?).
 
-My apoligies if this is not an appropriate question.
-Can I check who is master and who is slave during a connection?
-Regards Daniel
+Regards,
+Erwin
 
-------=_NextPart_000_0034_01C4F3E2.589C8E30
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2600.0" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>My apoligies if this is not an =
-appropriate=20
-question.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Can I check who is master and who is =
-slave during a=20
-connection?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Regards =
-Daniel</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0034_01C4F3E2.589C8E30--
 
 
 
