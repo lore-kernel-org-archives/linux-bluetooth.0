@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Fernando Usero <fusero@wanadoo.es>
+Message-ID: <db972f43040929233863680ff2@mail.gmail.com>
+From: Ricky Soh <rickysoh@gmail.com>
+Reply-To: Ricky Soh <rickysoh@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain
-Message-Id: <1096554833.8011.52.camel@parisina.ladies>
 Mime-Version: 1.0
-Subject: [Bluez-users] rfcomm gateway for iPAQ
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] Bluetooth headset enquiries
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,23 +16,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 30 Sep 2004 16:33:53 +0200
+Date: Thu, 30 Sep 2004 14:38:02 +0800
 
-Hi all,
+Dear all,
 
-I want my computer (with a USB dongle) to receive connections from an
-iPAQ. I know ho to publish the service (sdptool) and know how to connect
-with rfcomm between two computers, but have no idea on how to make a
-computer wait for rfcomm connections.
+I would like to clear some doubts about the Bluetooth headset profile.
+Please assist in anyway possible.
 
-A long time ago I used rfcommd (and worked) but don't want to use it
-cause it seems to be deprecated.
+1. After both the headset and AG (Audio Gateway) are paired, if there
+are no need for active communication, the headset will go into PARK
+mode but stay in sync with the AG. At this point, is there any
+transmission between the devices, or is the headset just purely
+listening to the master (AG) for the clock sequence? What is the
+rate/frequency that the master sent a signal to the headset to
+indicate its clock and frequency sequence at this time?
 
-So my question is: how can I make my computer wait for incoming rfcomm
-connections?
+2. What is the encryption key for SCO packets? Is it the same Kc
+derived from the E0 cipher scheme used in encrypting the data files in
+data transmission? I heard that different security modes will result
+in different Kc length, do you have any details on this and what is
+the length of the key?
 
-Thanks!
+3. For FHSS in bluetooth, there are 13 different packet types. Which
+part of the packet is frequency hopping sequence information attached
+to? Is it the access codes, the header or the payload? What is the bit
+of this information? Do the slave derive that sequence based on the
+data (Master's BD_ADDR and clock) exchanged or the slave gets the
+sequence directly from the Master?
 
+Sorry for the lengthy email. Please help if possible. Thanks
+
+Sincerely
+Ricky
 
 
 -------------------------------------------------------
