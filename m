@@ -1,32 +1,45 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Error compiling bluez-utils for buildroot/ARM
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4238804C.4070607@indt.org>
-References: <4238804C.4070607@indt.org>
+In-Reply-To: <4239536C.5030202@amplex.dk>
+References: <4239536C.5030202@amplex.dk>
 Content-Type: text/plain
-Message-Id: <1111058131.11792.65.camel@pegasus>
+Message-Id: <1111058060.11792.63.camel@pegasus>
 Mime-Version: 1.0
-Subject: [Bluez-users] Re: [Bluez-devel] PAN Attributes
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 17 Mar 2005 12:15:31 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+Reply-To: bluez-devel@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Thu, 17 Mar 2005 12:14:20 +0100
 
-Hi Claudio,
+Hi Stephan,
 
-> Which modification should be done in order to get
-> NAP/GN attribute values?
+> If I add  --libdir=${TARGET_DIR}/usr/lib  (which expands to 
+> --libdir=/home/sth/au/buildroot/build_arm/root/usr/lib) to the 
+> configure command, the configuring succeeds, but compilation fails:
+> 
+> ...
+> 
+> /home/sth/au/buildroot/build_arm/staging_dir/bin/arm-linux-uclibc-gcc 
+> -I/usr/include -DDBUS_API_SUBJECT_TO_CHANGE  -Os -pipe    -o hcid 
+> main.o security.o storage.o lib.o parser.o lexer.o kword.o 
+> glib-ectomy.o     -L/home/sth/au/buildroot/build_arm/root/usr/lib 
+> -lbluetooth
+> lexer.o(.text+0x7e0): In function `yy_get_next_buffer':
+> : undefined reference to `_IO_getc'
+> collect2: ld returned 1 exit status
 
-to retrieve them from a remote side or to add them to your PAN server?
+this looks like we have a problem with the generated code for the
+parser. Try to remove parser.[ch] and lexer.c. Maybe you need to add
+another library for the target platform to provide _IO_getc().
 
 Regards
 
@@ -41,6 +54,6 @@ Read honest & candid reviews on hundreds of IT Products from real users.
 Discover which products truly live up to the hype. Start reading now.
 http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
