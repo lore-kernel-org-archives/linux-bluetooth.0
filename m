@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] download on bluez site 'not functioning'
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050321053935.80089.qmail@web52405.mail.yahoo.com>
-References: <20050321053935.80089.qmail@web52405.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1111404466.22872.43.camel@pegasus>
-Mime-Version: 1.0
+Message-ID: <20050321053935.80089.qmail@web52405.mail.yahoo.com>
+From: jose <twblr@yahoo.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] download on bluez site 'not functioning'
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,24 +16,23 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 21 Mar 2005 12:27:46 +0100
+Date: Sun, 20 Mar 2005 21:39:35 -0800 (PST)
 
-Hi Jose,
+Hi,
 
-> On the bluez download page,
-> 
-> http://www.bluez.org/download.html
-> 
-> Iam unable to download, bluez-pin-0.24.tar.gz file.
+On the bluez download page,
 
-this one is on the gpe.handhelds.org server and I don't have control
-over it.
+http://www.bluez.org/download.html
 
-Regards
+Iam unable to download, bluez-pin-0.24.tar.gz file.
 
-Marcel
+Rgds,
+Jose
 
-
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
