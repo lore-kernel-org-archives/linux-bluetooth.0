@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <40327430.2090807@grupopie.com>
-From: Paulo Marques <pmarques@grupopie.com>
+From: "Radoslav Reznicek" <radecek@email.cz>
+To: "'Pavel Ruzicka'" <pavouk@pavouk.org>
+Cc: <bluez-users@lists.sourceforge.net>
+Subject: RE: [Bluez-users] pairing i-Tech BT USB dongle and Nokia 6310i
+Message-ID: <000901c3f590$79ca1b50$388edaa0@radecek>
 MIME-Version: 1.0
-To: grpmind+bluez.users@boromir.vpop.net
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] How to configure a 723kbps connection?
-References: <200402160913.i1G9DCP02222@webserver.restinfor.pt>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain;
+	charset="iso-8859-2"
+In-Reply-To: <200402162247.13628.pavouk@pavouk.org>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,41 +18,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 17 Feb 2004 20:06:08 +0000
+Date: Tue, 17 Feb 2004 20:47:46 +0100
 
-grpmind+bluez.users@boromir.vpop.net wrote:
+> I was similar problem with Mandrake. You can try edit file 
+> /etc/bluetooth/pin
+> and change "BlueZ" to some numbers "1234". But I don't know, 
+> if I make some
 
-> 
-> For a poor man's throughput test I'm downloading a 7M mpeg file, both
-> through Pocket IE and by having Pocket TV stream it from my 100Mbps LAN.
-> I'm running "nload -o 800 -t 250 xl0" and watching the outgoing avg in
-> kbit/s.
-> 
-> No matter what I do, the average caps out at about 265kbps. I've tried all
-> the following in various combinations:
+File /etc/bluetooth/pin contains only digits (my PIN).
 
-
-What profile are you using? LAN or PAN?
-
-If you're using LAN you should really try using PAN. I don't trust the micro$oft 
-stack at all. The simpler the profile, the most likely it is to work ok.
-
-> Does all this mean that my ipaq has a slow UART
-
-It's strange... a slow UART should be 230400 or 460800 baud. If it were 230400 
-you shouldn't get a bandwidth as high as you're getting. If it were 460800 you'd 
-probably be a little higher.
-
-Of course, this is no proof that the UART is in fact the culprit.
-
--- 
-Paulo Marques
-Software Development Department - Restinfor, Lda.
-Phone: +351 252 290600, Fax: +351 252 290601
-Web: www.grupopie.com
-
-"In a world without walls and fences who needs windows and gates?"
-
+Radoslav Reznicek
 
 
 -------------------------------------------------------
