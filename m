@@ -1,15 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Error message
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Alex <welpan@gmx.de>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200405212051.07773.welpan@gmx.de>
-References: <200405211611.38038.welpan@gmx.de>
-	 <200405211940.07538.welpan@gmx.de> <1085161340.22191.32.camel@pegasus>
-	 <200405212051.07773.welpan@gmx.de>
-Content-Type: text/plain
-Message-Id: <1085167255.22191.37.camel@pegasus>
+To: bluez-users@lists.sourceforge.net
+From: Vitaliy <pub@mifki.ru>
+Message-ID: <loom.20040521T204715-334@post.gmane.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-users] can't connect
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +15,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 21 May 2004 21:20:55 +0200
+Date: Fri, 21 May 2004 18:52:18 +0000 (UTC)
 
-Hi Alex,
+I have strange problem with BT connection.
 
-> > However disable CONFIG_BT_HCIUSB_SCO and try again.
-> 
-> That was it, the dongle is running.
+On desktop machine I use Slackware with 2.6 kernel and CSR-based USB-BT adapter
+and everything works fine. Now I installed Gentoo with 2.4 kernel to my notebook
+and use the same adapter. I can initiate any connection from notebook to any of
+my BT devices. But I can't initiate any connection from device to notebook -
+they can see it, but can't even get list of available services. I use the same
+config on desktop and notebook. What can be the reason for such a strange
+behaviour?
 
-send us the full /proc/bus/usb/devices from your system. I think we have
-to blacklist the SCO support for this device.
-
-Regards
-
-Marcel
-
+Thanks,
+Vitaliy
 
 
 
