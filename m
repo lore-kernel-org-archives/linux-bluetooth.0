@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Alex Holland <ah160@student.cs.york.ac.uk>
-To: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Compile bluez-bluefw-1.0 fails
-References: <200404182321.55431.dvornheder@t-online.de> <200404191639.48612.ah160@student.cs.york.ac.uk> <1082391148.4403.57.camel@pegasus>
-In-Reply-To: <1082391148.4403.57.camel@pegasus>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200404191822.46586.ah160@student.cs.york.ac.uk>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Alex Holland <ah160@student.cs.york.ac.uk>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200404191639.48612.ah160@student.cs.york.ac.uk>
+References: <200404182321.55431.dvornheder@t-online.de>
+	 <200404191441.53945.ah160@student.cs.york.ac.uk>
+	 <1082382899.4403.46.camel@pegasus>
+	 <200404191639.48612.ah160@student.cs.york.ac.uk>
+Content-Type: text/plain
+Message-Id: <1082391148.4403.57.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,27 +21,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 19 Apr 2004 18:22:46 +0100
+Date: Mon, 19 Apr 2004 18:12:29 +0200
 
-On Monday 19 Apr 2004 17:12, Marcel Holtmann wrote:
+Hi Alex,
 
-> so far so good. Everything seems to look fine, but actually the
-> bcm203x driver can't load the BCM2033-MD.hex firmware file from the
-> userspace. Add some debugging lines to firmware.agent to see if it
-> got really called by the hotplug system.
+> > check the path for the firmware files in the firmware.agent script.
+> > Is the script is executable? Is /sys mounted? What are the
+> > permissions of your firmware files?
+> 
+> firmware.agent is executable. The firmware permissions are as follows:
+> 
+> -rw-r--r--    1 root     root       114688 Apr 19 12:29 BCM2033-FW.bin
+> -rw-r--r--    1 root     root         3245 Apr 19 12:29 BCM2033-MD.hex
+> 
+> This should be okay, I'd imagine - no need to execute or write to them. 
+> For the other questions, I've attached firmware.agent, but everything 
+> looks correct to me.
+> 
+> > You need CONFIG_FW_LOADER, but this should be done automaticly by the
+> > bcm203x driver and lsmod must show you a firmware_class module.
+> 
+> Yup, this seems to be working; lsmod has the following:
+> 
+> firmware_class          7616  1 bcm203x
 
-I wasn't quite sure how to do this, but I tried adding this to the start 
-of the firmware.agent file (after the header, before the code):
+so far so good. Everything seems to look fine, but actually the bcm203x
+driver can't load the BCM2033-MD.hex firmware file from the userspace.
+Add some debugging lines to firmware.agent to see if it got really
+called by the hotplug system.
 
-echo "Now in firmware.agent"
+Regards
 
-This didn't appear during the boot sequence, and doesn't appear in 
-dmesg, so I assume the firmware.agent isn't being called.
+Marcel
 
-Any suggestions, or is this now a Hotplug problem? If it is, could you 
-tell me how to phrase it as a question for the Hotplug mailing list?
 
-Alex Holland
 
 
 -------------------------------------------------------
