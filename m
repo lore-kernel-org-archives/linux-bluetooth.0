@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Park & sniff modes
+Subject: Re: [Bluez-devel] Where does the L2CAP FCS was checked?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: zubiwat <zubiwat@poczta.onet.pl>
+To: Wang Haiguang <wanghg@i2r.a-star.edu.sg>
 Cc: bluez devel <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001a01c4334b$00d661b0$fcca010a@firedrake>
-References: <001a01c4334b$00d661b0$fcca010a@firedrake>
+In-Reply-To: <LMEOKMJFKNFFHEAEDGDEGELLCGAA.wanghg@i2r.a-star.edu.sg>
+References: <LMEOKMJFKNFFHEAEDGDEGELLCGAA.wanghg@i2r.a-star.edu.sg>
 Content-Type: text/plain
-Message-Id: <1083878211.4420.90.camel@pegasus>
+Message-Id: <1083878149.4420.88.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,14 +18,21 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 06 May 2004 23:16:51 +0200
+Date: Thu, 06 May 2004 23:15:49 +0200
 
-Hi Maciej,
+Hi Haiguang,
 
-> How can I put BT into park mode or sniff mode?
-> Is there any command to do this?
+please stop sending emails in blue. Keep it plain 7 bit ASCII.
 
-what about reading the HCI part of the Bluetooth specification?
+> I read the bluetooth specification of L2CAP. There is a FCS at the end
+> of a L2CAP frame.
+>  
+> Could you please tell me in which fucntion this FCS is checked. 
+
+the FCS is for L2CAP with retransmission and flow control which is part
+of Bluetooth 1.2 and currently this feature is not supported by BlueZ.
+And actually not by any other Bluetooth stack that I know of. So it is
+checked nowhere.
 
 Regards
 
