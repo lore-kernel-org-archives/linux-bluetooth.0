@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Vitaliy <pub@mifki.ru>
-Message-ID: <loom.20040523T164826-243@post.gmane.org>
+Subject: Re: [Bluez-users] BT3030
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?koi8-r?Q?=E8=C5=C4=C9=CE?= <hedin@hiervard.ru>
+Cc: bluez-users@lists.sf.net
+In-Reply-To: <200405232027.52861.hedin@hiervard.ru>
+References: <200405232027.52861.hedin@hiervard.ru>
+Content-Type: text/plain
+Message-Id: <1085321952.8309.17.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] help me
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,10 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 23 May 2004 14:51:53 +0000 (UTC)
+Date: Sun, 23 May 2004 16:19:12 +0200
 
-Really nobody knows how to solve this problem ("can't connect" topic)?
-I can post any required info here..
+Hi,
+
+> I'm still stuck with my BT3030 dongle. Nobody can help me on my quest :(
+> What does this error mean: 
+> 
+> Bluetooth: Broadcom Blutonium firmware driver ver 1.0
+> usbcore: registered new driver bcm203x
+> usb 1-1: new full speed USB device using address 2
+> bcm203x_probe: Mini driver request failed
+> bcm203x: probe of 1-1:1.0 failed with error -5.
+> 
+> I have everything installed, what I need.
+
+I actually don't think so, because this error only occurs when the
+request_firmware() call for BCM2033-MD.hex fails. This is not a kernel
+error. It is is a problem of your hotplug setup. You must have a working
+firmware.agent for loading firmware from userspace into the kernel.
+
+Regards
+
+Marcel
+
 
 
 
