@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <408FDFFD.2090904@whoi.edu>
-From: Nelson Hogg <nhogg@whoi.edu>
-MIME-Version: 1.0
+Message-Id: <D971A27FCD3DE04689089E8A98D8AF710361C2DB@G9JJ1.mgb01.telekom.de>
+From: "Mateo, Jose-Luis" <Jose-Luis.Mateo@t-systems.com>
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-users] cups (non)printing
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Subject: [Bluez-users] Bluetooth CF card for Zaurus SL-5500
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,20 +16,9 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Apr 2004 12:46:53 -0400
+Date: Wed, 28 Apr 2004 17:20:09 +0200
 
-I have a canon i80 printer equipped with a bluetooth receiver which 
-prints properly under cups and a usb connection. I've compiled the 
-cups-bluetooth package and transfered the 2 files manually to their 
-appropriate locations. I edited the printer.conf file to put in the 
-device address that I had determined from looking at the winxp 
-configuration (where bluetooth does work). However, I can't get any 
-response from trying to set the printer up in cups using the second 
-method described in the install instructions. I am not sure where to 
-look for it in the device list. I have a "zoom pccard" bluetooth device 
-that flashes and is listed as running in the services. It seems to 
-attach itself to ttyS4. I am running Mandrake 10.0 with the 2.6.3 
-kernel. Thanks for any help, Nelson Hogg
+I'm looking for a Bluetooth CF card for PAN Profile in a Zaurus SL-5500 with OZ 3.2, and also for the correspondent drivers. Suggestions?
 
 
 
