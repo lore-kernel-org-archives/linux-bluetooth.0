@@ -1,14 +1,22 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Florian Echtler <echtler@fs.tum.de>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Re: strange btsco error
-In-Reply-To: <Pine.LNX.4.61.0502221045530.11660@block.bubble>
-Message-ID: <Pine.LNX.4.61.0502221238490.11660@block.bubble>
-References: <Pine.LNX.4.61.0502191116450.10610@block.bubble> <cv89g9$399$1@sea.gmane.org>
- <Pine.LNX.4.61.0502200852440.15784@block.bubble> <cvad1d$8tb$1@sea.gmane.org>
- <Pine.LNX.4.61.0502221045530.11660@block.bubble>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: Fwd: [Bluez-users] trying to send data at HCI level
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mohan K <kmohangda@gmail.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <7aa80ced050222024634dce552@mail.gmail.com>
+References: <7aa80ced0502212224cce2126@mail.gmail.com>
+	 <1109055931.8506.0.camel@pegasus>
+	 <7aa80ced0502212319181c8835@mail.gmail.com>
+	 <1109059399.8506.3.camel@pegasus>
+	 <7aa80ced050222002338e57eaf@mail.gmail.com>
+	 <7aa80ced0502220057379ef414@mail.gmail.com>
+	 <1109066181.8506.6.camel@pegasus>
+	 <7aa80ced0502220231161c0a3@mail.gmail.com>
+	 <1109068760.8506.13.camel@pegasus>
+	 <7aa80ced050222024634dce552@mail.gmail.com>
+Content-Type: text/plain
+Message-Id: <1109069504.8506.16.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -20,33 +28,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 22 Feb 2005 12:41:45 +0100 (CET)
+Date: Tue, 22 Feb 2005 11:51:44 +0100
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi Mohan,
 
-> Any experiences with that? Better kernel ALSA or standalone ALSA?
+>               Whether I want to establish the connection between two
+> PC's, like L2CAP?. Can I directly read or write using the raw socket?
+>               I saw a function "hci_create_connection" in hci.c! 
 
-Well, I solved that one by myself (see also 
-http://thread.gmane.org/gmane.linux.bluez.devel/3790). Obviously,
-kernel ALSA is necessary (I'm using 2.6.10-mh2).
+HCI is the host controller interface and you should not use it for
+direct communication between two devices. It is the hardware abstraction
+of Bluetooth. Use L2CAP instead.
 
-Two things therefore:
-1. the B-Speech Elect Headset works fine (now ;)
-2. on the bluetooth-alsa site, you should really mention that external
-   ALSA drivers (at least 1.0.8) won't work! (as already asked for in 
-   the above thread)
+Regards
 
-Yours, Florian
-- -- 
-Preserve wildlife - pickle a squirrel today!
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
+Marcel
 
-iD8DBQFCGxp+7CzyshGvatgRAsMOAKDlUbCE1vJw3zB2W/w4bYa2/6dg+ACcDdvW
-HO16/AOvfxJu+Bw5x/flhPg=
-=5mjw
------END PGP SIGNATURE-----
+
 
 
 -------------------------------------------------------
