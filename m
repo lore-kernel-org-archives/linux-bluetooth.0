@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <4117AB9A.9010909@dark-reality.de>
+Message-ID: <4117A907.7010006@dark-reality.de>
 From: Lars Grunewaldt <lgw@dark-reality.de>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] snd-bt-sco development teamup...
+Subject: [Bluez-devel] "comlicated" setup - known issues for hid and SCO?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,41 +15,56 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 09 Aug 2004 18:51:38 +0200
+Date: Mon, 09 Aug 2004 18:40:39 +0200
 
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-Hello there
+Hi there,
 
-A while ago I decided that I might want to take over the snd-bt-sco
-project.
+right now I'm using two BT devices with my Epox dongle, an MX900 mice
+and a Sony Ericcson HBH-35 Headset with snd-bt-sco (voice mode 0x0060,
+before you ask ;)
 
-I had very little time in the last month due to personal reasons, but
-I'm eager to give this project at least structure and manpower.
+both devices work fluently when used without the other, but when I use
+headset and mouse at the same time there are various problems during
+connect, scan and usage.
 
-I have the feeling that there are some different people picking at the
-code right now, but there is no teamwork here.
+The main usage problem was that the sco layer got scrambled audio
+(sounded much like random data) on about every third sco connection.
+After a while, mouse and headset began to block each other, and the
+stack seemed to get more and more, well, muddy. After some more
+connection retries even the mouse, before only "hanging" when the
+headset tried to connect, stopped working fully.
 
-If there are people out there who are using snd-bt-sco or might want to
-improve the program, please notice me.
+dmesg only noticed this:
 
-I think this might be a good idea, maybe it's possible to set up a
-sourceforge project together or something.
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 76
 
-I alone can't do much right now, and there are some problems to address
-(i.e. how to handle call pickup stuff). I'm pretty busy so I don't have
-the time to get into the subject enough :(
+When even connection was impossible, I plugged the BT dongle out and put
+it back in. After reloading the hid module and programs the mouse and
+headset worked again.
 
-thanks in advance,
+Are you interested in more specific reports? I could enable debugging
+for some modules and try to collect some more data than this, if you
+want to have something to debug on. I myself don't have the time right
+now to drop too deeply into the subject :(
+
+at least, mostly it works :)
+
+
+I hope I can deliver some actual patches for snd-bt-sco against
+alsa-1.0.5a soon, but right now I'm totally busy :/
+
+thanks,
 ~  Lars
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.3 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
 
-iD8DBQFBF6uZQWC6DTWkDAoRAnhcAKC6fQi746tDO8jD751GOpfhhCuiegCeMOIm
-NjpCCxbpeAsMrHyhoNcWUjI=
-=AxaF
+iD8DBQFBF6kHQWC6DTWkDAoRAur6AKCqRgv5pB5rL9PE1V+rtuLmfNklRwCglOrb
+NEzF/QeL2Q0z0vlF5H7Bn7s=
+=cR7L
 -----END PGP SIGNATURE-----
 
 
