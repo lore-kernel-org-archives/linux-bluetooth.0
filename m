@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Michael Klose <mk@pottklose.de>
-Message-ID: <loom.20040929T233953-766@post.gmane.org>
-References: <loom.20040926T103741-961@post.gmane.org> <1096359475.4684.31.camel@notepaq>
+Subject: Re: [Bluez-users] Re: pand freezes upon disconnect
+From: Marcel Holtmann <marcel@holtmann.org>
+To: O Plameras <oscarp@acay.com.au>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <cje512$kj5$1@sea.gmane.org>
+References: <E1CA5Ze-0006Iu-R6@paris.servershost.net>
+	 <cjad82$qji$1@sea.gmane.org> <1096371695.4950.2.camel@notepaq>
+	 <cje512$kj5$1@sea.gmane.org>
+Content-Type: text/plain
+Message-Id: <1096494023.6380.0.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] Re: Connect printer via bluetooth printer adaper
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,66 +20,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Sep 2004 21:47:32 +0000 (UTC)
+Date: Wed, 29 Sep 2004 23:40:23 +0200
 
-Marcel Holtmann <marcel <at> holtmann.org> writes:
+Hi,
 
+> I have re-installed bluez. The setup works well as
+> before until a client bluetooth is downed or is temporarily
+> out of range. The server, then freezes with the console
+> going blank.
 > 
-> Hi Michael,
+> I tried using Bluetooth on Windows/XP Professional with the
+> same results.
 > 
-> > I use Debian 3.1. The connection between usb bt dongle and bt printer adapter
-> > works. (hcitool scan delivers correct address of bt printer adapter, l2ping
-> > works alls well).
-> > 
-> > How do I set up the printer (cups), so that bt connection will be used.
-> 
-> install the bluez-cups package and then setup a printer with your CUPS
-> manager or whatever you use and type in the URI for that. For example to
-> use a printer with BD_ADDR aa:bb:cc:dd:ee:ff the URI will be
-> bluetooth://aabbccddeeff/
+> Is there an older version of bluez that does not do this ?
 
-Thank you marcel,
+go ahead and test it, because everything is working prefect on mine
+machines.
 
-but that I tried. I installed bluez-cup 2.9-4 from testing, and tried to add a
-printer using a browser via http://localhost:631.
-No Bluetooh protocol is offered. So I choosed "ldp/lpr host or printer" and
-enter the URI according to your example.
+Regards
 
-Client error and protocol not know error followed. When I use the KDE Setup, the
-same
-
-/usr/lib/cups/backend/bluetooth exists. printers.conf does not exist but is not
-really necessary - as far as I understood the documentation - as long as I type
-in the URI directly.
-But even if I use your examples of printers.conf (found a newsgroup posting of
-you) - the same
-
-So...
-
-Any further idea?
-
-Again Many thanks in advance
-
-Best regards
-
-Michael
-
-
-
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> -------------------------------------------------------
-> This SF.Net email is sponsored by: YOU BE THE JUDGE. Be one of 170
-> Project Admins to receive an Apple iPod Mini FREE for your judgement on
-> who ports your project to Linux PPC the best. Sponsored by IBM.
-> Deadline: Sept. 24. Go here: http://sf.net/ppc_contest.php
-> 
-
-
+Marcel
 
 
 
