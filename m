@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] 2.6.10 multimedia keys
+Subject: Re: [Bluez-users] BT-1.2 spec device
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200501032144.53762.cijoml@volny.cz>
-References: <41D85BB7.5020506@comcast.net>
-	 <1104698820.8894.34.camel@pegasus>  <200501032144.53762.cijoml@volny.cz>
+In-Reply-To: <200501032137.22606.cijoml@volny.cz>
+References: <2de46576050103071248159461@mail.gmail.com>
+	 <1104776590.8894.57.camel@pegasus>  <200501032137.22606.cijoml@volny.cz>
 Content-Type: text/plain
-Message-Id: <1104785779.8894.72.camel@pegasus>
+Message-Id: <1104785612.8894.68.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,18 +19,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 03 Jan 2005 21:56:19 +0100
+Date: Mon, 03 Jan 2005 21:53:32 +0100
 
 Hi Michal,
 
-> Marcel pls write support for user space configuring hotkey keycodes too, 
-> coz I have multimedia keys on my laptop and those keys returns other key press 
-> keycodes than keys on MS desktop........than I can't configure it well, coz 
-> 254 returns IE key on notebook and email key on MS desktop and so on...
+> > you can update the D-Link DBT-120 Rev. B3.
+> 
+> is B2 firmware supported too? Apple garantee it, but tried it anybody? My 
+> friend want me to flash it for him, but I worry about destroying dongle.
 
-some parts of this are not my job. The input guys must work on it. The
-Bluetooth HIDP is only a transport layer between L2CAP and the generic
-HID parser and/or the input subsystem.
+in general yes, but I don't tested these ones. After I flashed a B4 it
+seems that I destroyed some of the radio/baseband settings. The Linux
+may still have some bugs and will not work with the timings of all flash
+chips.
 
 Regards
 
