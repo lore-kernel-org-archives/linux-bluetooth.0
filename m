@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Nelson Murilo <nelson@pangeia.com.br>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20050107135431.GA19076@pangeia.com.br>
-References: <5000105b05010705172040f6c3@mail.gmail.com> <Pine.LNX.4.33.0501071420510.21727-100000@redbean.intranet.gw-instruments.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <Pine.LNX.4.33.0501071420510.21727-100000@redbean.intranet.gw-instruments.de>
-Subject: [Bluez-devel] headset emulator apps
+Message-Id: <I9Y93C$55FC8919B06AC8E8E02A8F46B27F7329@uol.com.br>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+From: "omap" <omap@uol.com.br>
+To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] TCP/IP Connection
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,19 +16,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 7 Jan 2005 11:54:31 -0200
+Date: Fri,  7 Jan 2005 11:50:00 -0200
 
 
-Hi guys,
 
-sorry for off-topic, but anybody know any headset emulator for
-linux?  
-My idea is send mp3 from my phone via bluetooth connection to my linux box, 
-and may redirect sound for real sound sistem. 
+Hi folks,
 
-Thanks in advance,
 
-./nelson -murilo
+Here I am with another dummy question
+for those with more experience in Bluez.
+I am intending to build an application
+to connect a Bluetooth device to PC
+using TCP/IP. Well, can anyone help me
+on finding any howto or samples where
+i can find the necessary steps to
+acomplish my task?
+
+I'll appreciate any help=0A =0A__________________________________________=
+________________________________=0AAcabe com aquelas janelinhas que pulam=
+ na sua tela.=0AAntiPop-up UOL - =C9 gr=E1tis!=0Ahttp://antipopup.uol.com=
+.br/=0A
+
 
 
 -------------------------------------------------------
