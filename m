@@ -1,41 +1,59 @@
 Return-Path: <wim.delvaux@adaptiveplanet.com>
 From: wim delvaux <wim.delvaux@adaptiveplanet.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Subject: bnep module use count ...
-Date: Sun, 7 Mar 2004 03:34:32 +0100
+Subject: Re: [Bluez-users] killing a persisted pand session
+Date: Sun, 7 Mar 2004 03:10:27 +0100
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+References: <200403070058.50508.wim.delvaux@adaptiveplanet.com> <200403070245.59604.wim.delvaux@adaptiveplanet.com> <1078624633.2807.20.camel@pegasus>
+In-Reply-To: <1078624633.2807.20.camel@pegasus>
 MIME-Version: 1.0
 Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200403070334.32315.wim.delvaux@adaptiveplanet.com>
+  charset="iso-8859-1"
+Message-Id: <200403070310.27377.wim.delvaux@adaptiveplanet.com>
 List-ID: <bluez-users.lists.sourceforge.net>
 
-I have a theory about this module use count.
+On Sunday 07 March 2004 02:57, Marcel Holtmann wrote:
+> Hi Wim,
+>
+> > I also have a lot of 'dead' pand --listens haning around in the process
+> > table (perhaps a pointer error caused the module to become dangling ???)
+>
+> when do you start your "pand --listen"? Don't start it from
+> bluetooth.agent script.
 
-What is my setup.
+	Ah that might be the problem. Indeed it is started from there.
 
-When I insert the usb dongle, hci/sdp and pand --listen is started wating for 
-a connection.
+	Why ? As said I have a dongle that gets inserted and removed frequently.
+	Therefore I wanted the hcid/sdpd/pand thing to start when the dongle
+	is inserted. so I added the start / stop of these apps to the bluetooth.agent	
+	script.  
 
-Then I activate the connection on my Ipaq and notice in syslog that the 
-connection is request.
 
-Pand will then create a bnep module in the kernel.  This will trigger a 
-hotplug event causing ifup to be executed on bnep0.
+case $ACTION in
+    add|register)
+        # start bluetooth daemons
+        sh -x /etc/init.d/bluez-utils start
+        sleep 1
+        sh -x /etc/init.d/bluez-sdp start
+        sleep 1
+        sh -x /etc/init.d/bluez-pan start
 
-So far so good.
+        # install remover
+        #echo "set -x" > $REMOVER
+        #echo 'exec 2> /tmp/HCI_REMOVE' >> $REMOVER
+        #echo "/etc/init.d/bluez-pan stop" >> $REMOVER
+        #echo "/etc/init.d/bluez-sdp stop" >> $REMOVER
+        #echo "/etc/init.d/bluez-utils stop" >> $REMOVER
+        #chmod 700 $REMOVER
+     ;;
+     unregister)
+        /etc/init.d/bluez-pan stop
+        /etc/init.d/bluez-sdp stop
+        /etc/init.d/bluez-utils stop
+     ;;
+esac
 
-Now I disconnect my Ipaq. (either by pand -k and kill or whatever).  
-This event does not get detected by anybody.
-
-The Ipaq when it comes back will request a new session and a new handle to 
-bnep0 is created in the kernel (causing refcount to increase beyond the real 
-use count).
-
-Once this occurs the module is no longer unloadable and actually causes the 
-system to hang when the usb dongle is removed !!!! A reboot is then 
-needed ;-((((((
-
-WHat you think of this scenario ?
-
-W
+>
+> Regards
+>
+> Marcel
