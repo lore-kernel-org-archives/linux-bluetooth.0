@@ -1,59 +1,103 @@
-Return-Path: <maxk@qualcomm.com>
-Message-Id: <5.1.0.14.2.20030306131747.070a7bc0@mail1.qualcomm.com>
-Date: Thu, 06 Mar 2003 13:33:12 -0800
-To: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
-From: Max Krasnyansky <maxk@qualcomm.com>
-Subject: Re: [Bluez-devel] BlueZ Qualification
-Cc: david.libault@inventel.fr, Daryl Van Vorst <dvpub@telus.net>, bluez-devel@lists.sourceforge.net, Halam.Rose@7layers-UK.com
-In-Reply-To: <1046706518.14907.133.camel@linux>
-References: <5.1.0.14.2.20030228122906.023b3ca8@mail1.qualcomm.com>
-	<5.1.0.14.2.20030227125343.023513a0@mail1.qualcomm.com>
-	<5.1.0.14.2.20030227125343.023513a0@mail1.qualcomm.com>
-	<5.1.0.14.2.20030228122906.023b3ca8@mail1.qualcomm.com>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@rvs.uni-bielefeld.de>
+To: Stephen Crane <steve.crane@rococosoft.com>
+Cc: Max Krasnyansky <maxk@qualcomm.com>, BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1046871982.2860.1155.camel@baroque.rococosoft.com>
+References: <1046871982.2860.1155.camel@baroque.rococosoft.com>
+Message-Id: <1046879580.1823.136.camel@pegasus.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Subject: [Bluez-devel] Re: New BlueZ Security Manager
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: 
+	<https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: 
+	<http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: 05 Mar 2003 16:52:53 +0100
+Content-Type: text/plain
 
-At 07:48 AM 3/3/2003, Marcel Holtmann wrote:
->The BlueZ kernel modules are working perfect in conjunction with other
->devices and other stacks, but we have already seen that we need to add
->some quirks for passing the qualification and I agree completly with Max
->that is a bad idea to have things that don't makes sense, but are needed
->for a qualification. 
-That the biggest thing that concerns me about qualification. And that's where
-separate package helps.
+Hi Stephen,
 
->We should start colleting these quirks and see how we handle them. At the moment 
->I see two ways out of this problem:
->
->1. Include them into the kernel code and make them a compile option
-That can be pretty ugly. 
+> On Marcel's German slides (for which I've lost the link) I noticed a
+> revamped security manager on the TODO list. However I don't ever
+> remember seeing a discussion about it here on the list. I'd like to
+> kick-start this discussion if possible.
 
->2. Have own patches against the stable kernel for qualification
-I guess by "separate package" I didn't necessarily mean tar.gz with
-make install or whatever. It could be a patch.
+here is the link to me slides
 
->The same rules apply to the userspace utils and also to the userspace
->protocol implementations like SDP and OBEX.
-For some reason I'm less concerned about ugliness in the user-space code ;-)
-(must be because I'm a kernel guy). I'm just kidding of course.
+	http://www.holtmann.org/papers/bluetooth/
 
->In general I think a qualified version of the BlueZ stack is a good
->idea, but this is also hard work and at this points comes the money
->problem in. The end user don't get any advantages of a qualified Linux
->Bluetooth (it only sounds great), 
-True. %99.9 percent of the Linux users couldn't care less whether Bluetooth 
-stack is qualified or not as long as it works correctly.
+There was no real discussion about this topic, but some problems have
+raised from time to time. And it is clear that the device up/down
+functionaltiy of hcid will be removed and placed as bluetooth.agent in
+the hotplug scripts. If you remove this from hcid the only thing which
+is left is the security manager and it should be named like this ;)
 
->but companies who plan to use BlueZ in their Bluetooth products will save a lot of time, 
->money and knowledge if they don't have to qualify the complete stack again. If we really 
->got BlueZ qualified and companies can take advantage of it I think that they should payback 
->something to the OpenSource community. 
-Yeah, like buy a new Volvo SUV for me for example ;-)
+> The main thing wrong with hcid (in my opinion) is what the security
+> white-paper (http://www.bluetooth.com/upload/24Security_Paper.PDF)
+> defines as support for security mode 2. This is where the
+> owning-application enforces the security requirements for a service.
+> 
+> The difference between this and the current setup (security modes 1 and
+> 3 in the whitepaper's terminology) is (I think) that hcid enforces
+> permissions at the ACL level whereas service-level security takes place
+> /after/ the ACL link is already up. It should be possible to allow SDP
+> searches for example, but deny access to services discovered through
+> SDP.
 
->And at this point the idea of a non-profit organization which takes care of a qualified
->version of the BlueZ stack and represent the Linux fraction in the Bluetooth SIG comes to 
->my mind.
-I'm not sure about that. Might be a good idea.
+I never used it, but if I remember correclty this can be done through
+the L2CAP_LM option with setsockopt(), but it can't be done for RFCOMM
+at the moment. Max told me that he have this on his todo list.
 
-Max
+> I don't think that the current kernel API is rich enough to permit this.
+> It ought to be possible for a server listening on a socket to discover
+> the BDADDR of the connecting peer and either accept() or reject access
+> --- probably through an ioctl(). On the client-side, a special error
+> return from (or argument to) connect() could indicate that a PIN was
+> required to connect.
+
+It would be great to know the IP before doing a accept(), but as I know
+the socket API didn't provide this. If you don't like the BDADDR you can
+close the connection right after connect. Maybe it is possible to extend
+shutdown() to return a request denied option to the other end.
+
+I also have this idea with the connect() return with an error to request
+a PIN. This can be set through a setsockopt() or can be a paramter of
+sockaddr. But the problem is that you don't have a PIN or pairing for
+one L2CAP or RFCOMM connection. You only have it at HCI layer and what
+if two applications on the same host request some services on the same
+device. Which PIN has to be entered? Should one connect() be delayed
+until the first finished his authentication?
+
+>From my point I think the application which establish the connection has
+to handle the PIN code. If a device is already paired, the link key
+exchange and request should be handled global. I also have played a
+little bit with in-kernel (HCI core) handling of the link notification
+and response to link requests. But the keys have to stored on shutdown
+and restored on the boot.
+
+And a question for the brave ;) How do we handle authentication with a
+Bluetooth keyboard?
+
+Regards
+
+Marcel
+
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Etnus, makers of TotalView, The debugger 
+for complex code. Debugging C/C++ programs can leave you feeling lost and 
+disoriented. TotalView can help you find your way. Available on major UNIX 
+and Linux platforms. Try it free. www.etnus.com
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
