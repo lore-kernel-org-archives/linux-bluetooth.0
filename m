@@ -1,11 +1,19 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Steffen Schwientek <schwientek@web.de>
-Message-ID: <1r2er1-pr7.ln1@ID-90813.users.dfncis.de>
-References: <amsbr1-glo.ln1@ID-90813.users.dfncis.de> <20040701094518.GB4505@gmx.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Zhikui Chen <zhikui.chen@po.uni-stuttgart.de>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40E42714.9000304@po.uni-stuttgart.de>
+References: <40E40440.8070109@po.uni-stuttgart.de>
+	 <1088685238.4540.190.camel@pegasus>  <40E40A44.60008@po.uni-stuttgart.de>
+	 <1088687188.4540.202.camel@pegasus> <40E412AA.4070908@po.uni-stuttgart.de>
+	 <1088689181.4540.216.camel@pegasus> <40E416AB.2040904@po.uni-stuttgart.de>
+	 <1088690093.4540.218.camel@pegasus> <40E41A18.8050201@po.uni-stuttgart.de>
+	 <1088691084.4540.232.camel@pegasus> <40E4206F.6060101@po.uni-stuttgart.de>
+	 <1088692837.4540.235.camel@pegasus>  <40E42714.9000304@po.uni-stuttgart.de>
+Content-Type: text/plain
+Message-Id: <1088694124.4540.237.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] Re: headset$
+Subject: [Bluez-users] Re: Help for bluez-bluefw-1.0.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,40 +24,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 01 Jul 2004 20:47:27 +0200
+Date: Thu, 01 Jul 2004 17:02:04 +0200
 
-Nicholas A. Preyss schrieb:
+Hi Zhikui,
 
-> On  0, Steffen Schwientek <schwientek@web.de> wrote:
->> I want to use my plantronics M9000 headset. Since it?s my only bluetooth
->> part, I can?t figure out, if bluetooth works. Connecting the USB dongle,
->> the kernel (2.6.6) reports:
+> Thanks for your help.
 > 
-> Better use 2.6.7 or apply the latest -mh patch to 2.6.6.
-
-OK, I have upgraded to 2.6.7 now. Now I´m ask for a pin. Here is the output
-of /car/log/syslog:
-
-Jul  1 20:07:29 schwientek hcid[8586]: pin_code_request
-(sba=85:0F:41:72:02:00, dba=0F:E2:46:89:03:00)
-Jul  1 20:07:36 schwientek hcid[8586]: link_key_notify
-(sba=85:0F:41:72:02:00)
-Jul  1 20:07:36 schwientek hcid[8586]: Saving link key 00:02:72:41:0F:85
-00:03:89:46:E2:0F
-
-Fine. But how can I use the headset? kbluetoothd also shows the the
-headset-profile and an unknown profile. 
+> Now it's ok after I change a new USB driver.
 > 
-> Did you pair Headset and Computer? Normally you have to switch the
-> headset in pairing mode (-> Manual) and then insert the pin on the
-> computer. (you can also specifiy pin in a file?) This should happen
-> transparently, when  a program tries to connect to a remote device 
+> Could you tell me how to enable BNEP/BNEP0? I want to transfer IP 
+> packets over bluetooth.
 
-Hmm, how can I tell kphone  to connect and use the remote device? I think,
-kphone needs an an sounddriver for this task.But there is no sound-driver
-in the 
+as I said before, look at the howtos. Look for the kernel module bnep.ko
+and the userspace tool pand.
 
-Steffen
+Regards
+
+Marcel
 
 
 
