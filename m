@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Zbyszek <dzidoz@poczta.fm>
-To: mailing list <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: TEXT/plain; CHARSET=ISO-8859-2
-Message-Id: <20040225141752.2E2977CDE@front.interia.pl>
-Subject: [Bluez-users] Where I can find description ??
+Subject: Re: [Bluez-users] dund never activates pppd
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Klaus Holst <klaus@encephalon.dk>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20040225113847.GB1339@encephalon.dk>
+References: <20040223213658.GA1453@encephalon.dk>
+	 <1077573810.2791.161.camel@pegasus> <20040224085351.GA3782@encephalon.dk>
+	 <1077624875.2880.44.camel@pegasus>  <20040225113847.GB1339@encephalon.dk>
+Content-Type: text/plain
+Message-Id: <1077716089.2919.86.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,22 +20,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: 25 Feb 2004 15:17:52 +0100
+Date: Wed, 25 Feb 2004 14:34:49 +0100
 
-hi all
+Hi Klaus,
 
-My name is Zbyszek. My final year project includes communication between ce=
-ll phone and pc via Bluetooth.I have problem with BlueZ. My problem is that=
-, I never programmed in Bluetooth and when I look at source code in directo=
-ry "test" I see many function f.e. "getsockopt(s, SOL\_L2CAP, L2CAP\_OPTION=
-S, \&opts, \&opts\_len)" but there is no describtion for them. So I'm askin=
-g you, could you tell me, where I can find any documentations describing th=
-ese functions.
-It is very important for me, and I have little time left.=20
-I will be very grateful for any help.
+> Here is the info from the PDA:
+> 
+> # hcitool info 00:04:3E:A2:2D:C9
+> Requesting information ...
+>         BD Address:  00:04:3E:A2:2D:C9
+>         Device Name: Pocket_PC
+>         LMP Version: 1.1 (0x1) LMP Subversion: 0x8d
+>         Manufacturer: Telencomm Inc. (18)
+>         Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
+>                 <3-slot packets> <5-slot packets> <encryption> <slot offset> 
+>                 <timing accuracy> <role switch> <hold mode> <sniff mode> 
+>                 <park state> <RSSI> <channel quality> <SCO link> 
+>                 <HV2 packets> <HV3 packets> <u-law log> <A-law log> 
+>                 <CVSD> <power control> 
 
-regards
-Zbyszek
+what iPAQ is this?
+
+> Actually the dongle (Belkin F8T001) is listed as supported in
+> http://www.holtmann.org/linux/bluetooth/devices.html.
+
+It is fully supported, but there can be problems with the firmware you
+are using or with the interop to some other chips. We can't test this,
+because we have no access to the link manager. From the HCI layer
+onwards the Broadcom BCM2033 is fully supported.
+
+> However in case I should try to find another dongle, can anyone recommend one 
+> which is properly supported by linux/bluez and has a reasonable range?
+
+I had the best results with a Bluetooth chip from CSR.
+
+Regards
+
+Marcel
+
+
 
 
 -------------------------------------------------------
