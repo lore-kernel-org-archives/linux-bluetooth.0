@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Pavel Ruzicka <pavouk@pavouk.org>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200407131225.15448.pavouk@pavouk.org>
-Subject: [Bluez-users] MSI MS-6970 (BToes) firmware upgrade
+Subject: Re: [Bluez-users] BlueZ w/ XP SP2-RC2
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Pering, Trevor" <trevor.pering@intel.com>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <EFCD68F7BFDB06468769D4D9EAAA938703C14132@scsmsx401.amr.corp.intel.com>
+References: 
+	 <EFCD68F7BFDB06468769D4D9EAAA938703C14132@scsmsx401.amr.corp.intel.com>
+Content-Type: text/plain
+Message-Id: <1089662401.4644.73.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,31 +19,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 13 Jul 2004 12:25:15 +0200
+Date: Mon, 12 Jul 2004 22:00:02 +0200
 
-Hello,
+Hi Trevor,
 
-Where can I get firmware upgrade for MSI MS-6970 (BToes) USB dongle?
-I looked at manufacturer pages and google, but nothing.
+> we are trying to get a Linux Bluez device to work with Windows XP
+> Service Pack 2 Release Candidate 2, which includes Bluetooth support.
+> Windows can't "see" the device when I try to "Join a Personal Area
+> Network".  My device presents as Major Class 1 (Computer) and Minor
+> Class 1 (Desktop workstation), and I have tried with and without
+> advertising the Networking Service class (bit 17).  It advertises PAND
+> as GN in SDP and works fine with other software.  With other CoD values
+> the device has been seen as a Bluetooth device, but not as a valid PAN
+> partner.
 
-Some informations:
--------------------------------
-hciconfig hci0 version
-hci0:   Type: USB
-        BD Address: 00:10:DC:EA:XX:XX ACL MTU: 192:8  SCO MTU: 64:8
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
-        Manufacturer: Cambridge Silicon Radio (10)
-hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:10:DC:EA:XX:XX ACL MTU: 192:8  SCO MTU: 64:8
-        HCI 16.4
-        Chip version: BlueCore02
-        Max key size: 56 bit
-        SCO mapping:  HCI
+run "hcidump -x" as root on the Linux box and see if Windows XP tries to
+connect to the BlueZ SDP service and for what service it is searching.
+If you don't see anything then the only problem is the CoD and I can't
+really tell you what it expects.
 
-Best regards,
+Regards
 
-Pavel Ruzicka
+Marcel
+
+
 
 
 -------------------------------------------------------
