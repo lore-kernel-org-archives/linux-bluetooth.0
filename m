@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41DBA21D.7010707@avantwave.com>
-From: mike <mikelee@avantwave.com>
+Message-ID: <41DA94BF.8000401@csr.com>
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] rfcomm socket and rfcomm tty
-References: <41D12158.6020206@avantwave.com>	 <1104315958.6319.13.camel@notepaq>  <41D3600B.8000702@avantwave.com>	 <1104604967.4253.4.camel@pegasus>  <41D8F10B.5050207@avantwave.com>	 <1104745873.8894.44.camel@pegasus>  <41DA46A2.9060801@avantwave.com> <1104839485.8894.88.camel@pegasus>
-In-Reply-To: <1104839485.8894.88.camel@pegasus>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] Continuous Inquiry
+References: <BAY12-F35563885BF49C62DF2513EAB9E0@phx.gbl>
+In-Reply-To: <BAY12-F35563885BF49C62DF2513EAB9E0@phx.gbl>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,73 +18,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 05 Jan 2005 16:15:25 +0800
+Date: Tue, 04 Jan 2005 13:06:07 +0000
 
-Dear Marcel
-    It is 2.6.5, which is default kernel of Fedora 2.
-    Does it the problem on kernel?Actually, i really no idea for that.
+Pegasus ... wrote:
+> If I do Inquiry in batches of  1.28 seconds, will that affect Inquiry 
+> response from other devices? ...due to the Inquiry Scan Window traversing 
+> the same frequencies again !
+> 
+> I tested the batch approach with the two Socket CF+PCMCIA cards I have and 
+> seem to work fine... but maybe it wont work when there are more devices from 
+> different vendors ?
 
-best regard
-Mike,Lee
+In general, this can't be guaranteed to work for the reason you stated.
 
-Marcel Holtmann wrote:
+The minimum time an inquiry can be performed for and have a good chance
+of picking up all devices is 10.24 seconds.
 
->Hi Mike,
->
->  
->
->>    Actually, i have tried to connect to Window base computer and test 
->>with hyperterminal . my program does success in connection and send out 
->>data. But when i try to connect to rfcomm listen in another computer, it 
->>comes out a oops. and then my usb dongle halt and need a OS reboot.
->>    Do you have any idea on below oops? Thanks for helping
->>
->>------------[ cut here ]------------
->>kernel BUG at include/linux/module.h:325!
->>invalid operand: 0000 [#1]
->>CPU:    0
->>EIP:    0060:[<129d25e1>]    Not tainted
->>EFLAGS: 00010246   (2.6.5-1.358)
->>EIP is at rfcomm_session_add+0x73/0x88 [rfcomm]
->>eax: 00000000   ebx: 0e63a984   ecx: 00000000   edx: 11ee5400
->>esi: 00000002   edi: 0e63a9b0   ebp: 0bda8080   esp: 0e283fa4
->>ds: 007b   es: 007b   ss: 0068
->>Process krfcommd (pid: 1835, threadinfo=0e283000 task=10ee39b0)
->>Stack: 128daba0 0bda8080 0a7e1800 0397c91c 129d3b29 029d91a8 129d84f0 
->>00000000
->>       0e283000 00000000 0e283fde 00000000 129d3f49 00000000 00000000 
->>0000007b
->>       0000007b 129d3ef1 00000000 021041d9 00000000 00000000 00000000
->>Call Trace:
->> [<129d3b29>] rfcomm_worker+0x10b/0x3a6 [rfcomm]
->> [<129d3f49>] rfcomm_run+0x58/0x6b [rfcomm]
->> [<129d3ef1>] rfcomm_run+0x0/0x6b [rfcomm]
->> [<021041d9>] kernel_thread_helper+0x5/0xb
->> 
->>Code: 0f 0b 45 01 ff 5f 9d 12 ff 05 00 89 9d 12 89 d8 5b 5e 5f 5d
->>    
->>
->
->what kernel is this? Try the latest one.
->
->Regards
->
->Marcel
->
->
->
->
->-------------------------------------------------------
->The SF.Net email is sponsored by: Beat the post-holiday blues
->Get a FREE limited edition SourceForge.net t-shirt from ThinkGeek.
->It's fun and FREE -- well, almost....http://www.thinkgeek.com/sfshirt
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->  
->
+I think the raw socket approach is best. Do the inquiry as normal but
+snoop on the inquiry response events by using a raw HCI socket.
+
+	- Steven
+
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
