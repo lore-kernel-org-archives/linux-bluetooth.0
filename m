@@ -1,67 +1,56 @@
-Return-Path: <noring@nocrew.org>
-Subject: Re: [Bluez-devel] D-Bus interfaces
-From: Fredrik Noring <noring@nocrew.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] usb to serial verification
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Torez Smith <torez@us.ibm.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1076323138.6869.93.camel@pegasus>
-References: <1076265358.2670.36.camel@pegasus>
-	 <1076266267.14742.38.camel@akka.yeti.nocrew.org>
-	 <1076267396.2670.58.camel@pegasus>
-	 <1076275689.14742.93.camel@akka.yeti.nocrew.org>
-	 <1076277250.6869.24.camel@pegasus>
-	 <1076278554.14742.112.camel@akka.yeti.nocrew.org>
-	 <1076279508.6869.54.camel@pegasus>
-	 <1076280612.14742.147.camel@akka.yeti.nocrew.org>
-	 <1076282343.6869.65.camel@pegasus>
-	 <1076284317.14742.179.camel@akka.yeti.nocrew.org>
-	 <1076287085.6869.70.camel@pegasus>
-	 <1076311376.14742.202.camel@akka.yeti.nocrew.org>
-	 <1076321200.6869.75.camel@pegasus>
-	 <1076322129.5263.28.camel@kalkyl.roxen.com>
-	 <1076323138.6869.93.camel@pegasus>
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1076493798.6281.19.camel@kalkyl.roxen.com>
+In-Reply-To: <OF5A385DC1.2BE48959-ON87256E36.007C6942-86256E36.007CBA73@us.ibm.com>
+References: 
+	 <OF5A385DC1.2BE48959-ON87256E36.007C6942-86256E36.007CBA73@us.ibm.com>
+Content-Type: text/plain
+Message-Id: <1076456996.2777.55.camel@pegasus>
 Mime-Version: 1.0
-Date: Wed, 11 Feb 2004 11:03:18 +0100
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-admin@lists.sourceforge.net
+Errors-To: bluez-devel-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-devel.lists.sourceforge.net>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+Date: Wed, 11 Feb 2004 00:49:56 +0100
 
-Marcel,
+Hi Torez,
 
-mån 2004-02-09 klockan 11.38 skrev Marcel Holtmann:
-> The HCI is well defined in the Bluetooth specification and you can of
-> course look at libs2. The source contains all defined HCI commands and
-> events for Bluetoth 1.2.
+> The serial dongle is a BT125S dongle. It's connected to a com port on
+> a
+> linux box. Theoretically, I should be able to cat /dev/ttyS0 on that
+> linux box
+> to read the data coming across from the usb dongle. 
 
-This looks good but many HCI functions are perhaps a bit low level? These
-are probably OK:
+this was not my question. Maybe I should be more specific. Is this
+serial dongle a simply host adapter or a full "cable replacement"
+product?
 
-   org.bluetooth.hci.devup
-   org.bluetooth.hci.devdown
-   org.bluetooth.hci.devreset
-   org.bluetooth.hci.devinfo
-   org.bluetooth.hci.set_pkt_type
-   org.bluetooth.hci.set_link_policy
-   org.bluetooth.hci.set_link_mode
-   org.bluetooth.hci.write_local_name
-   org.bluetooth.hci.read_local_name
-   etc.
+> Do I still need to hciattach the serial dongle on the linux box? 
 
-But these do not appear to be suited for a DBus interface because they deal
-with low level things like sockets:
+If it is a host adapter then you have to attach to your Bluetooth stack
+and you must use RFCOMM on both sides.
 
-   hci_open
-   hci_close
-   hci_recv
-   hci_send_command
-   hci_send_request
-   hci_errno
-   etc.
+Regards
 
-> We will provide a general and extend interface to the HCI functions, 
-> so we call it "hci".
+Marcel
 
-Do you mean an extended subset of HCI? I'm not sure I understand, please
-explain. What will be omitted and what will be extended?
 
-Thanks,
-Fredrik
+
+
+-------------------------------------------------------
+The SF.Net email is sponsored by EclipseCon 2004
+Premiere Conference on Open Tools Development and Integration
+See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
+http://www.eclipsecon.org/osdn
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
