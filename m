@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Connection failed error (110)
+Subject: Re: [Bluez-users] PROBLEM: Apple powerbook, Apple BT keyboard,
+	keyboard does not reconnect on reboot
 From: Marcel Holtmann <marcel@holtmann.org>
-To: KEYUR DESAI <keyurde@nortelnetworks.com>
+To: Matthew Grant <grantma@anathoth.gen.nz>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E337F6C8A5154F4C8E95349BA276D63008FBB4@zrtphxm0.corp.nortel.com>
-References: 
-	 <E337F6C8A5154F4C8E95349BA276D63008FBB4@zrtphxm0.corp.nortel.com>
-Content-Type: text/plain; charset=iso-8859-7
-Message-Id: <1098676659.6465.72.camel@pegasus>
+In-Reply-To: <1098655672.4636.21.camel@localhost>
+References: <1098654320.4635.16.camel@localhost>
+	 <1098655672.4636.21.camel@localhost>
+Content-Type: text/plain
+Message-Id: <1098676588.6465.70.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,41 +20,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 25 Oct 2004 05:57:39 +0200
+Date: Mon, 25 Oct 2004 05:56:28 +0200
 
-Hi Keyur,
+Hi Matthew,
 
-> Here is my current scenario
->=20
-> =20
->=20
-> Hardware: Belkin Dongle
->=20
-> O.S.: Fedora Core 2 Kernel 2.6.5-1.358
->=20
-> =20
->=20
-> =20
->=20
-> Here is the problem:
->=20
-> =20
->=20
-> When I do=20
->=20
-> #hciconfig hci0 up The device works fine.
->=20
-> =20
->=20
-> However on doing a hciconfig hci0 down followed by a hciconfig hci0
-> up . The dongle does not work.
->=20
-> It gives an error=20
->=20
-> Can=A2t init device hci0. Connection timed out (110).
+> If it would be useful, I  can get a dump of Apple OSX doing its BT stuff
+> on boot.
 
-what kind of dongle is this (hciconfig -a) and why don't you update to
-the latest Linux kernel and BlueZ utils first?
+and how would you do that?
+
+> I have a Logitech MX 900 BT base station which I can connect to another
+> Linux box.  Will hcidump on this be able to dump the conversation if I
+> switch off encryption?
+
+The hcidump tool is not an air sniffer.
 
 Regards
 
