@@ -1,69 +1,57 @@
-Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <AFE91B59A185A5439840B43AB7919047093912@mchp997a.mch.sbs.de>
-From: Kutschenreuter Matthias <Matthias.Kutschenreuter@siemens.com>
-To: "'Bluez-devel@lists.sourceforge.net'"
-	 <Bluez-devel@lists.sourceforge.net>
+Return-Path: <bluez-devel@schaettgen.de>
+From: Fred =?utf-8?q?Sch=C3=A4ttgen?= <bluez-devel@schaettgen.de>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Force pairing on single connection?
+Date: Wed, 17 Mar 2004 15:23:44 +0100
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+   Nils Faerber <nils.faerber@kernelconcepts.de>
+References: <1076339030.2892.64.camel@localhost> <1076407517.32750.36.camel@pegasus>
+In-Reply-To: <1076407517.32750.36.camel@pegasus>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Bluez-devel] pan on zaurus
-Sender: bluez-devel-admin@lists.sourceforge.net
-Errors-To: bluez-devel-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-devel.lists.sourceforge.net>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 17 Mar 2004 20:28:50 +0100
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200403171523.44542.bluez-devel@schaettgen.de>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
+On Tuesday 10 February 2004 11:05, Marcel Holtmann wrote:
+> Hi Nils,
+>
+> > Is it possible to force a pairing process for a single device pair?
+> > The situation is that I have a device that seems to accept non-paired
+> > and paired connections. I would now like to pair with this device and
+> > thus force the pairing, but only for this device - I am quite happy with
+> > not being forced to pair for mostly all other devices ;)
+>
+> you must issue a HCI_Authenticate command on the HCI socket. There is no
+> other method at the moment. I was thinking about adding an ioctl to the
+> L2CAP socket so this can also be triggered by normal users.
 
-I installed "bluez-zaurus_2.3b_arm.ipk" on zaurus and
-can perfetly pan between zaurus and non-arm laptops: pand -s, pand -c <MAC>.
+This would in fact be very useful. With it we could make our obex push server 
+accept connections from everyone, while other services require authentication 
+(the services don't have root privileges). Did you add that ioctl already? 
+If not, do you think it's save for us to use a little suid program to let 
+normal users issue HCI_AUTHENTICATION_REQUESTED in the meantime?
 
-Now I wrote a software, that  does the same as in the
-source file <pand.c>  (connect / accept, bnep_create_connectio ...).
-this software works perfectly among non-arm devices, but
-the zaurus can only be a slave with it (the "pand -s" part).
+> Other proposals are welcome.
 
-if the zaurus tries to create the connection (would
-be equivalent to pand -c MAC), it fails on l2cap before 
-bnep commands are involved.
+I don't understand why there should be an l2cap ioctl for it. Isn't it enough 
+to let everybody use HCI_AUTHENTICATION_REQUESTED, just like it's the case 
+for HCI_INQUIRY and add a helper function to hci_lib.h?
 
-sk=socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)
-getsockopt(sk, ...)
-...
-connect(sk, (struct sockaddr *) &l2a, sizeof(l2a))  
-<---- this connect fails
+Btw. there is a related issue where I don't have an answer for..
+how can we deal with pairing in a multi-user environment? At the moment, 
+whoever is logged in can enter a pin when a device requests authentication. 
+What if I don't trust the other users? Someone else may have paired with a 
+device with a faked address, so the fact that a connection could be 
+authenticated doesn't mean that *I* verified the identity of the other party. 
+I don't have an idea how this could be handled with the standard HCI 
+functions though - can I pair two devices again while the current link is 
+already authenticated? If this is possible, then BlueZ could remember the old 
+link key and provide an interface for applications to find out if the 
+currently used link key is the "successor" of a key where we checked the 
+identity of the other device ourself. 
+The other solution - letting only an administrator pair devices - doesn't seem 
+to be a nice solution too.  Any ideas?
 
-gives back: "No route to host."
-
-using hcidump, I see that no "CreateConnection" is sent.
-I found out that sizeof(l2a) equals 12, although it should only
-be 10. this is due to padding:  on zaurus struct-sizes are padded
-to a multiple of 4 bytes, i.e. 12 instead of 10. But I think
-this cant be the problem, as it also will pad when executing "pand -c"
-(which works). 
-
-
-Now I cannot understand, why my software fails on Zaurus, 
-using the same commands as the official PAN, that doesnt fail.
-Which are the sources of  bluez-zaurus_2.3b_arm.ipk? 
-	(I only found those of bluez-zaurus_2.3_arm.ipk)
-Are they different to the one for non-arm devices?
-Is there a trick, when cross compiling bluez for zaurus ?
-
-Kind regards, Matthias
-
-
--------------------------------------------------------
-This SF.Net email is sponsored by: IBM Linux Tutorials
-Free Linux tutorial presented by Daniel Robbins, President and CEO of
-GenToo technologies. Learn everything from fundamentals to system
-administration.http://ads.osdn.com/?ad_id=1470&alloc_id=3638&op=click
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+greetings
+Fred
