@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] hci_dev_open function
-From: Marcel Holtmann <marcel@holtmann.org>
-To: radoa <cat@pobox.sk>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <loom.20041025T141305-8@post.gmane.org>
-References: <loom.20041025T141305-8@post.gmane.org>
-Content-Type: text/plain
-Message-Id: <1098826382.14036.110.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="US-ASCII"
+Message-ID: <7FB17951357F434FA9C14522522BA59B447E65@dcl-ex.dcml.docomolabs-usa.com>
+From: "Jun Sun" <jsun@docomolabs-usa.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] bluetooth services and profiles
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,33 +16,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 26 Oct 2004 23:33:02 +0200
+Date: Mon, 25 Oct 2004 10:12:25 -0700
 
-Hi Radoa,
 
-> I want to ask how linux kernel initializes HCI sockets.
-> When bluetooth dongle is inserted to USB, is registered by USB driver in bluez 
-> stack as new device. But has not set flag HCI_UP, this flag is set only in call 
-> of ioctl command HCIDEVUP - which calls hci_dev_open(). Function hci_dev_open() 
-> resets BT dongle and receives its BT address. But where and when is ioctl with 
-> HCIDEVUP cmd called? It seems that ioctl call is only place where is BT dongle 
-> initialized.
+I am relatively new to Bluetooth and bluez stack.  Sorry if these
+questions sound dumb. :)
 
-there is no call like hci_dev_open() in the source code and the final
-device initialization is done inside the kernel.
+I saw a lot of web pages about setting up a linux box talking with a
+Bluetooth phone.  Typically you would discover a lot of services offered
+by the phone.
 
-Regards
+I am wondering what happens if you hook linux box with a second linux
+box.  In other words what kind of services will you find on the Linux
+box?  What has to be done to support those similar services on bluez?=20
 
-Marcel
+Are they related to the Bluetooth profiles?  I have not seen much about
+Bluetooth profile support in bluez.  Do they exist?
 
+The reason I am asking this is because there are now phones powered by
+Linux.  I think they support Bluetooth but I don't know if they are
+using bluez.  I like to get an understanding on how to provide those
+Bluetooth phone services on Linux with bluez.
+
+Thanks in advance.
+
+Jun
 
 
 
 -------------------------------------------------------
-This SF.Net email is sponsored by:
-Sybase ASE Linux Express Edition - download now for FREE
-LinuxWorld Reader's Choice Award Winner for best database on Linux.
-http://ads.osdn.com/?ad_id=5588&alloc_id=12065&op=click
+This SF.net email is sponsored by: IT Product Guide on ITManagersJournal
+Use IT products in your business? Tell us what you think of them. Give us
+Your Opinions, Get Free ThinkGeek Gift Certificates! Click to find out more
+http://productguide.itmanagersjournal.com/guidepromo.tmpl
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
