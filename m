@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] more on rfcomm : function not implemented.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200412132014.18120.wim.delvaux@adaptiveplanet.com>
-References: <200412132014.18120.wim.delvaux@adaptiveplanet.com>
-Content-Type: text/plain
-Message-Id: <1102980691.2143.57.camel@pegasus>
-Mime-Version: 1.0
+From: wim delvaux <wim.delvaux@adaptiveplanet.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200412132014.18120.wim.delvaux@adaptiveplanet.com>
+Subject: [Bluez-users] more on rfcomm : function not implemented.
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,27 +17,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 14 Dec 2004 00:31:31 +0100
+Date: Mon, 13 Dec 2004 20:14:18 +0100
 
-Hi Wim,
 
-> I think it might have something to do with PAND --search --persist --cache
-> 
-> If pand is NOT running i can perform hcitool scan and get
-> response from my phone.
-> 
-> When I start pand with above options, after it 'detects' my desktop's PAND
-> hcitool scan fails and l2ping too 
+I think it might have something to do with PAND --search --persist --cache
 
-is this still the iPAQ with build id 0x72? If yes, then this is the
-reason, because you can't connect while you run an inquiry or start an
-inquiry while you have a connection open. The second restriction is gone
-with HCI 16.x firmwares.
+If pand is NOT running i can perform hcitool scan and get
+response from my phone.
 
-Regards
+When I start pand with above options, after it 'detects' my desktop's PAND
+hcitool scan fails and l2ping too 
 
-Marcel
+Ideas ?
 
+W
 
 
 
