@@ -1,50 +1,132 @@
-Return-Path: <edd@usefulinc.com>
-Subject: Re: [Bluez-users] Release of new BlueZ libs and utils
-From: Edd Dumbill <edd@usefulinc.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1073212685.25261.138.camel@pegasus>
-References: <1071791711.6635.18.camel@pegasus>
-	 <1073147533.8729.53.camel@saag>  <1073148476.8729.56.camel@saag>
-	 <1073149849.25261.97.camel@pegasus>  <1073154814.8729.66.camel@saag>
-	 <1073212685.25261.138.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1073388369.8729.164.camel@saag>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+From: "Sean Barry" <sfelkes@hotmail.com>
+To: Bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
-Date: Tue, 06 Jan 2004 11:26:09 +0000
-List-ID: <bluez-users.lists.sourceforge.net>
+Content-Type: text/plain; format=flowed
+Message-ID: <BAY7-F1074lDPHpNwqe00003086@hotmail.com>
+Subject: [Bluez-users] BlueZ on Linux iPAQ
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 06 Jan 2004 00:27:04 +0000
 
-On Sun, 2004-01-04 at 10:38, Marcel Holtmann wrote:
-> Hi Edd,
-> 
-> > No, I've not tried BlueZ<->BlueZ, it happened with my SE P800 connecting
-> > back to BlueZ.  
-> > 
-> > Occasionally it gets a bit further, then hangs:
-> > 
-> > > ACL data: handle 0x002a flags 0x02 dlen 8
-> >     L2CAP(d): cid 0x41 len 4 [psm 3]
-> >       RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-> > < ACL data: handle 0x002a flags 0x02 dlen 8
-> >     L2CAP(d): cid 0x169 len 4 [psm 3]
-> >       RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> > > HCI Event: Number of Completed Packets(0x13) plen 5
-> > > ACL data: handle 0x002a flags 0x02 dlen 18
-> >     L2CAP(d): cid 0x41 len 14 [psm 3]
-> >       RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
-> >       dlci 2 frame_type 0 credit_flow 15 pri 0 ack_timer 0 frame_size
-> > 667 max_retrans 0 credits 3
-> > < ACL data: handle 0x002a flags 0x02 dlen 8
-> >     L2CAP(d): cid 0x169 len 4 [psm 3]
-> >       RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73
-> 
-> how long is the time between these two packets?
+Hi,
 
-no perceptible delay between these two.
+I have the following instructions for installing BlueZ on a Sharp Zaurus, 
+however, I have attempted to follow them for Familiar but with no luck.  
+Could someone translate the Sharp Zaurus instructions into instructions for 
+Familiar on an iPAQ with integrated Bluetooth, but Bluetooth on a CF or 
+PCMCIA card.
 
->  Is there really a
-> listening socket for this channel?
+---------------------------------------------------------------------
+Installation instructions for BlueZ binaries on Sharp Zaurus with ROM v3.10
+===========================================================================
 
-strace shows dund running accept() on the socket, so I guess so.
+Upload all of the files to /home/root on the Zaurus, either using scp or 
+ftp.
+Log into the Zaurus as root.
 
--- Edd
+* Kernel modules
+----------------
+
+# mv bluez-kernel-2.4.18-rmk7-pxa3-embedix-arm.tar.gz 
+/home/root/modules/2.4.18-rmk7-pxa3-embedix
+# cd /home/root/modules/2.4.18-rmk7-pxa3-embedix
+# tar zxf bluez-kernel-2.4.18-rmk7-pxa3-embedix-arm.tar.gz
+# depmod -a
+# mv bluetooth /etc/pcmcia
+# mv bluetooth.conf /etc/pcmcia
+# /etc/rc.d/init.d/pcmcia restart
+
+* User-libraries
+----------------
+
+# cd
+# mv libbluetooth.so.1.0.1 libsdp.so.2.0.1 /usr/lib
+# cd /usr/lib
+# ln -s libbluetooth.so.1.0.1 libbluetooth.so.1
+# ln -s libbluetooth.so.1.0.1 libbluetooth.so
+# ln -s libsdp.so.2.0.1 libsdp.so.2
+# ln -s libsdp.so.2.0.1 libsdp.so
+
+* User-programs
+---------------
+
+# cd
+# mv hciconfig /usr/sbin
+# mv hcid /usr/sbin
+# mv sdpd /usr/sbin
+# mv sdptool /usr/bin
+
+* Verifying the install
+-----------------------
+(Insert the Bluetooth card!)
+
+# modprobe l2cap
+# lsmod
+bluecard_cs             6944   1
+l2cap                  16368   2
+bluez                  33984   3  [bluecard_cs l2cap]
+
+# hciconfig hci0 up
+hci0:   Type: PCCARD
+        BD Address: 00:90:02:03:89:0C ACL MTU: 672:10  SCO MTU: 64:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:1659564 acl:10626 sco:0 events:5147 errors:0
+        TX bytes:1255739 acl:11550 sco:0 commands:1214 errors:0
+# sdpd
+# sdptool browse ff:ff:ff
+Browsing FF:FF:FF:00:00:00 ...
+Service Name: SDP Server
+Service Description: Bluetooth service discovery server
+Service Provider: BlueZ
+Service RecHandle: 0x0
+Service Class ID List:
+  "SDP Server" (0x1000)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+    PSM: 1
+    Version: 0x0001
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+
+Service Name: Public Browse Group Root
+Service Description: Root of public group hierarchy
+Service Provider: BlueZ
+Service RecHandle: 0x15000
+Service Class ID List:
+  "Browse Group Descriptor" (0x1001)
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+
+---------------------------------------------------------------------
+
+Regards,
+
+Sean
+
+_________________________________________________________________
+Express yourself with cool new emoticons http://www.msn.co.uk/specials/myemo
+
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: IBM Linux Tutorials.
+Become an expert in LINUX or just sharpen your skills.  Sign up for IBM's
+Free Linux Tutorials.  Learn everything from the bash shell to sys admin.
+Click now! http://ads.osdn.com/?ad_id=1278&alloc_id=3371&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
