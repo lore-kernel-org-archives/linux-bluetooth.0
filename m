@@ -1,11 +1,22 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050126203356.90975.qmail@web54510.mail.yahoo.com>
-From: m r <captain512@yahoo.com>
-Subject: Re: [Bluez-users] Help sending a file
+Message-Id: <6.1.2.0.2.20050126191747.04a84710@pop.gmx.net>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200501252003.59228.cijoml@volny.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: George <george.news@gmx.net>
+Subject: Re: [Bluez-users] Bluez BNEP connection close
+In-Reply-To: <1106656339.8058.143.camel@pegasus>
+References: <6.1.2.0.2.20050124165802.04168330@luna.tlmat.unican.es>
+ <1106581771.8058.49.camel@pegasus>
+ <6.1.2.0.2.20050124172931.041a03a0@pop.gmx.net>
+ <1106583831.8058.52.camel@pegasus>
+ <6.1.2.0.2.20050124180402.041c1eb0@pop.gmx.net>
+ <1106585260.8058.56.camel@pegasus>
+ <6.1.2.0.2.20050124182813.04216860@pop.gmx.net>
+ <6.1.2.0.2.20050124192058.04bee240@pop.gmx.net>
+ <1106589847.8058.90.camel@pegasus>
+ <6.1.2.0.2.20050125092855.057821a0@pop.gmx.net>
+ <1106656339.8058.143.camel@pegasus>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,104 +28,63 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 26 Jan 2005 12:33:56 -0800 (PST)
+Date: Wed, 26 Jan 2005 19:18:51 +0100
 
-Hello, Thank you for all your suggestions!  Please
-excuse my ignorance on this topic.  I am new to
-bluetooth and linux. Does anyone know where I could
-find info on the net about sending files via bnep and
-TCP, or using DUN.  I have found a little but cannot
-seem to piece the proper instructions together, or I
-am missing something. Specifically how to set up the
-TCP, or DUN on both machines and commands for sending
-files, I believe I know how to get bnep running.  So
-far all I can do is send a file to XP using ussp-push,
-so I know things are working.  Your help is greatly
-appreciated! Thank you in advance. 
-Matt
+Hi again...
 
---- Michal Semler <cijoml@volny.cz> wrote:
+With the PCMCIA card is much more stable. For the moment it only has 
+crashed one or twice when stressing the channel throughput.
 
-> Easyest way is to start bnep and send files via TCP
-> :)
-> 
-> Michal
-> 
-> Dne út 25. ledna 2005 04:42 m r napsal(a):
-> > Can anyone tell me the steps to send a file via
-> > bluetooth.  I have two desktops one with Fedora
-> C2,
-> > and all bluez packages installed, the other
-> windows
-> > and D-Link bluetooth software installed. I have
-> two
-> > usb dongles D-Link 120's. Each device can see the
-> > other, and pair, but I can't seem to figure out
-> how to
-> > do file transfers. I have looked everywhere on the
-> web
-> > and can't seem to find any answers.  Any help
-> would be
-> > greatly appreciated. Thanks in advance!
-> >
-> > Matt
-> >
-> >
-> >
-> > __________________________________
-> > Do you Yahoo!?
-> > Meet the all-new My Yahoo! - Try it today!
-> > http://my.yahoo.com
-> >
-> >
-> >
-> >
-> >
->
--------------------------------------------------------
-> > This SF.Net email is sponsored by: IntelliVIEW --
-> Interactive Reporting
-> > Tool for open source databases. Create drag-&-drop
-> reports. Save time
-> > by over 75%! Publish reports on the web. Export to
-> DOC, XLS, RTF, etc.
-> > Download a FREE copy at
-> http://www.intelliview.com/go/osdn_nl
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> >
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
-> -- 
-> S pozdravem
-> 
-> Michal Semler
-> 
-> 
->
--------------------------------------------------------
-> This SF.Net email is sponsored by: IntelliVIEW --
-> Interactive Reporting
-> Tool for open source databases. Create drag-&-drop
-> reports. Save time
-> by over 75%! Publish reports on the web. Export to
-> DOC, XLS, RTF, etc.
-> Download a FREE copy at
-> http://www.intelliview.com/go/osdn_nl
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+Thanks for all the help.
 
+Regards
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+At 13:32 25/01/2005, Marcel Holtmann wrote:
+ >Hi George,
+ >
+ >> In my code I have a reconnection capability once the bnep connection
+ >> disappears.
+ >> However doing some more tests I found that sometimes the interface 
+bnep0 is
+ >> still there (in the laptop) although there is no connectivity.
+ >> I mean, the interface exists but the channel or path is not more up.
+ >> Therefore my reconnection capability doesn't work on this case.
+ >
+ >this is maybe a bug or a little race in the code. Include more details
+ >and actually are way to reproduce it.
+ >
+ >> So... don't know what could happen. I have recompiled the kernel serveral
+ >> times changing the UCHI, OHCI and EHCI supports but still happens the 
+same..
+ >
+ >Recompiling the kernel doesn't help here. You need to exchange the USB
+ >host controller hardware for checking UHCI, OHCI or EHCI. I always have
+ >a second PCI USB controller in my system for these tests.
+ >
+ >> I'm thinking on buying a PCMCIA Bluetooth card to have a try as Marcel
+ >> thinks the problem is with the usb.
+ >
+ >It is worth testing, but don't ask for the best PCMCIA card. This is
+ >always another story. In general every card is working, but you must now
+ >the exact hciattach parameter to make them work.
+ >
+ >Regards
+ >
+ >Marcel
+ >
+ >
+ >
+ >
+ >-------------------------------------------------------
+ >This SF.Net email is sponsored by: IntelliVIEW -- Interactive Reporting
+ >Tool for open source databases. Create drag-&-drop reports. Save time
+ >by over 75%! Publish reports on the web. Export to DOC, XLS, RTF, etc.
+ >Download a FREE copy at http://www.intelliview.com/go/osdn_nl
+ >_______________________________________________
+ >Bluez-users mailing list
+ >Bluez-users@lists.sourceforge.net
+ >https://lists.sourceforge.net/lists/listinfo/bluez-users
+
 
 
 -------------------------------------------------------
