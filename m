@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] IDS noncommercial?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Nelson Murilo <nelson@pangeia.com.br>
-Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040412193816.GA2635@pangeia.com.br>
-References: <20040412193816.GA2635@pangeia.com.br>
-Content-Type: text/plain; charset=iso-8859-1
-Message-Id: <1081799442.8634.14.camel@pegasus>
+From: Nelson Murilo <nelson@pangeia.com.br>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20040412193816.GA2635@pangeia.com.br>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Subject: [Bluez-devel] IDS noncommercial?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,22 +15,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 12 Apr 2004 21:50:42 +0200
+Date: Mon, 12 Apr 2004 16:38:16 -0300
 
-Hi Nelson,
 
-> anybody know any IDS with bluetooth detection?=20
+Hi,
 
-are talking about an intrusion detection system?
+anybody know any IDS with bluetooth detection?=20
+If not what=B4s features are important to have?=20
 
-> If not what=B4s features are important to have?=20
+Thanks for any hints,
 
-I don't know, what do you expect?
-
-Regards
-
-Marcel
-
+./nelson -murilo
 
 
 
