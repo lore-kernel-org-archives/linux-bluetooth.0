@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Fix too-many-keys-pressed error in
-	hidp/core.c
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20050120003408.GA8619@salvia.homeip.net>
-References: <20050119224400.GA7881@salvia.homeip.net>
-	 <1106180379.8190.146.camel@pegasus>
-	 <20050120003408.GA8619@salvia.homeip.net>
-Content-Type: text/plain
-Message-Id: <1106182874.8190.166.camel@pegasus>
+From: Juha =?iso-8859-1?B?WXJq9mzk?= <juha.yrjola@iki.fi>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20050120003408.GA8619@salvia.homeip.net>
+References: <20050119224400.GA7881@salvia.homeip.net> <1106180379.8190.146.camel@pegasus>
 Mime-Version: 1.0
+In-Reply-To: <1106180379.8190.146.camel@pegasus>
+Subject: Re: [Bluez-devel] [PATCH] Fix too-many-keys-pressed error in hidp/core.c
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -21,47 +18,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 20 Jan 2005 02:01:13 +0100
+Date: Thu, 20 Jan 2005 02:34:08 +0200
 
-Hi Juha,
+Hi Marcel,
 
-> > can you point me to the part of the HID specification that defines this
-> > behaviour? And show me an extract from hcidump when this happens.
-> 
-> I don't know if this is in the spec, or if it is just a quirk of some
-> Logitech keyboards.  However, it shouldn't cause any trouble to check
-> for it as a special case, since that kind of data packet is clearly
-> invalid, no?
-> 
-> Here's the dump of me pressing 'qwert', and then releasing 't':
-> 
-> 1106180982.868085 > ACL data: handle 0x0029 flags 0x02 dlen 14
->     L2CAP(d): cid 0x0041 len 10 [psm 0]
->       A1 01 00 00 14 00 00 00 00 00 
-> 1106180982.927077 > ACL data: handle 0x0029 flags 0x02 dlen 14
->     L2CAP(d): cid 0x0041 len 10 [psm 0]
->       A1 01 00 00 14 1A 00 00 00 00 
-> 1106180982.967071 > ACL data: handle 0x0029 flags 0x02 dlen 14
->     L2CAP(d): cid 0x0041 len 10 [psm 0]
->       A1 01 00 00 14 1A 08 00 00 00 
-> 1106180983.027061 > ACL data: handle 0x0029 flags 0x02 dlen 14
->     L2CAP(d): cid 0x0041 len 10 [psm 0]
->       A1 01 00 00 14 1A 08 15 00 00 
-> 1106180983.047059 > ACL data: handle 0x0029 flags 0x02 dlen 14
->     L2CAP(d): cid 0x0041 len 10 [psm 0]
->       A1 01 00 00 01 01 01 01 01 01 
-> 1106180983.267020 > ACL data: handle 0x0029 flags 0x02 dlen 14
->     L2CAP(d): cid 0x0041 len 10 [psm 0]
->       A1 01 00 00 14 1A 08 15 00 00 
+On Thu, Jan 20, 2005 at 01:19:38AM +0100, Marcel Holtmann wrote:
 
-this looks weird and even the 't' is still missing in that dump. Is this
-a general behaviour? Do we see the same on other keyboard?
+> can you point me to the part of the HID specification that defines this
+> behaviour? And show me an extract from hcidump when this happens.
 
-Regards
+I don't know if this is in the spec, or if it is just a quirk of some
+Logitech keyboards.  However, it shouldn't cause any trouble to check
+for it as a special case, since that kind of data packet is clearly
+invalid, no?
 
-Marcel
+Here's the dump of me pressing 'qwert', and then releasing 't':
 
+1106180982.868085 > ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      A1 01 00 00 14 00 00 00 00 00 
+1106180982.927077 > ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      A1 01 00 00 14 1A 00 00 00 00 
+1106180982.967071 > ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      A1 01 00 00 14 1A 08 00 00 00 
+1106180983.027061 > ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      A1 01 00 00 14 1A 08 15 00 00 
+1106180983.047059 > ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      A1 01 00 00 01 01 01 01 01 01 
+1106180983.267020 > ACL data: handle 0x0029 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0041 len 10 [psm 0]
+      A1 01 00 00 14 1A 08 15 00 00 
 
+Cheers,
+Juha
 
 
 -------------------------------------------------------
