@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <41EA44F4.50606@egabriel.de>
-From: ligi <ligi@egabriel.de>
+Message-ID: <41EA1B6E.3070303@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] btsco crash without daemon
-References: <41E91B7A.1070303@egabriel.de> <41E925F4.3060907@dark-reality.de> <41E92C83.8010406@egabriel.de> <41E9349C.8060001@dark-reality.de> <41E96812.7030903@egabriel.de> <41E9B60E.2010509@dark-reality.de>
-In-Reply-To: <41E9B60E.2010509@dark-reality.de>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [Bluez-devel] scooped by pocketpc (a2dp)
+References: <41E93682.9040907@xmission.com> <41E93B4F.1010600@dark-reality.de>
+In-Reply-To: <41E93B4F.1010600@dark-reality.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,55 +18,40 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sun, 16 Jan 2005 11:41:56 +0100
+Date: Sun, 16 Jan 2005 00:44:46 -0700
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Lars,
 
-Lars Grunewaldt wrote:
+> all programs that use openh323/pwlib (latter for hardware abstraction)
+> use alsalib, because pwlib can be compiled against alsalib or oss or both.
 
-| ligi wrote: | | I am using Gentoo and here alsa is an ebuild that
-| wants alsa not to be | compiled in the kernel it has to be
-| external( build from | alsa-driver-1.0.8rc2.tar.bz2 by that ebuild
-| of portage ). | But snd_hwdep is loaded and there is no complaining
-| of missing things | - this method just fails... | Has anyone some
-| Hint ?
-|
-| Just wanted to note that you don't need the external alsa driver
-| package, only alsalib (I'm using gentoo, too). Of course this only
-| applies if your other soundcards are supported well by the kernel.
-|
-| Maybe you should try using the kernel alsa stuff and drop the
-| external alsa stuff, it's not supposed to work this way. Especially
-| because snd-bt-sco is linked against the KERNEL alsa stuff, not
-| your external driver stuff, so I think this might very well be the
-| source of the problem.
-|
-Yes it was. Big up  - you made my Day a brighter Day ;-)
+hmm. i see a menu for alsa devices but our userspace a2dp device 
+(currently stubbed out, but not implemented) doesn't show up. i set it 
+up as documented in btsco/bt/BUILD
 
-| Why do you want to use the external alsa-driver anyway?
-|
-It recommended to use the external Driver in the Gentoo docs - and i
-found nothing in the btsco docs that says something diffrent - so i
-used the external Driver ( Well -  I like the external Driver Concept
-(in a world with so much devices ) more too .... )
+> That leads to - at least - gnomemeeting and openphone supporting alsa
+> directly :)
 
-| best regards, ~  Lars
-|
-PS: You can mark the SouthWing NeoVoice Headset ( on a Sitecom USB ->
-BT Dongle ) as working for btsco - there is no wiki so I cant do this
-now !-)
-btw. anyone interested in a btscoWiki ?
+that looks like a good option, esp when gm supports sip
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.6 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+> I'm not that interested because my headset only supports the mono
+> headset profile... ;)
 
-iD8DBQFB6kTz3NorRo/jFWIRAk8EAJ92zMrOsojDhiIR582UC5eNsSr+rQCgrwRB
-VuOS+rI7y+e+Gn5+jnimQG4=
-=8HE2
------END PGP SIGNATURE-----
+a2dp does not address using a microphone, so if you use a2dp, you have 
+to choose a different device for audio in.
 
+> writing the a2dp alsa driver should be similar to the btsco alsa part,
+> maybe we can build one thing for both purposes, or at least keep
+> structures similar so that both projects can support each other best!
+
+well i want to try putting a2dp in a userspace driver since that might 
+be the best way to go. (that's an issue that may not be totally worked 
+out but i think we decided that it looks attractive enough to at least 
+try writing alsa-lib drivers)
+
+if it works well, we might rewrite the sco driver to be in userspace.
+
+brad
 
 
 -------------------------------------------------------
