@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <20050223143915.52335.qmail@web60908.mail.yahoo.com>
+From: Ka Kin Cheung <michaelhku2002@yahoo.com.hk>
+Subject: Re: [Bluez-users] sdp problem
 To: bluez-users@lists.sourceforge.net
-From: soraberri <421246@posta.unizar.es>
-Message-ID: <cvi5l2$q7m$1@sea.gmane.org>
-References: <421C892E.3090200@gmx.ch> <20050223142950.53110.qmail@web60907.mail.yahoo.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=Big5
 In-Reply-To: <20050223142950.53110.qmail@web60907.mail.yahoo.com>
-Subject: [Bluez-users] Re: sdp problem
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="0-719825890-1109169555=:51030"
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,35 +17,80 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 23 Feb 2005 16:01:18 +0100
+Date: Wed, 23 Feb 2005 22:39:15 +0800 (CST)
 
-Hi,
+--0-719825890-1109169555=:51030
+Content-Type: text/plain; charset=big5
+Content-Transfer-Encoding: 8bit
+
+Sorry for that. I haven't told one thing here. In Linux, I cannot connect the phone to PC. But in Window, I can connect the phone to PC by sending files for it.
+
+Ka Kin Cheung <michaelhku2002@yahoo.com.hk> wrote:Hi!
+    The strange thing is here:
+    For Linux, when my phone searched for my PC, the PC can be found and then added in the "My device" list, but when I looked at "Service list", none service can be found. Then I opened Windows XP and the bluetooth dongle driver was installed in my PC. Then I press "update" key to update services, and I found headset, synchronisation, object push and file transfer in the "Service list" for my Windows PC. So, how can I do for sdp in my Linux PC as my project is done on Linux? Thank you very much for your kindness.
+Michael
+
+Marco Trudel <mtrudel@gmx.ch> wrote:
+have you already found out how the phone will connect to the pc?
+
+regards
+Marco
+
 
 Ka Kin Cheung wrote:
-> Hi!
->     The strange thing is here:
->     For Linux, when my phone searched for my PC, the PC can be found and 
-> then added in the "My device" list, but when I looked at "Service list", 
-> none service can be found. Then I opened Windows XP and the bluetooth 
-> dongle driver was installed in my PC. Then I press "update" key to 
-> update services, and I found headset, synchronisation, object push and 
-> file transfer in the "Service list" for my Windows PC. So, how can I do 
-> for sdp in my Linux PC as my project is done on Linux? Thank you very 
-> much for your kindness.
+> Hi all!
+> Now I'm still thinking about how to implement sdp in my program so 
+> that the PC can let the bluetooth mobile devices connect to PC and then 
+> involve in the program. I searched about sdptool.c, but it doesn't help 
+> so much because I find no part that can really implement in my program. 
+> Then I borrowed books about Bluetooth sdp, but I can't find any method 
+> to write sdp C API. So, I wish to know that is there any reference for 
+> me to write sdp C API? Or instead of sdptool.c, is there any file that I 
+> can refer for SDP? Thank you very much.
 > Michael
+> 
+> 
+> ------------------------------------------------------------------------
+> Yahoo! 工具列 - 內置防止彈出視窗工能 ！
 
-You can advertise standard services in Linux using 'sdptool add ...' but
-advertising is not the same as offering... To offer a real service, an
-application has to be implemented and listening for clients at the
-appropiate network protocols and ports. Maybe what it is happening in
-windows is that most basic profiles are already implemented and
-correctly advertised. With BlueZ you  can also advertise them in order
-to be seen by a remote device, but they won't work until you don't
-implement them. I hope this helps.
 
-regards,
-Luis
+-------------------------------------------------------
+SF email is sponsored by - The IT Product Guide
+Read honest & candid reviews on hundreds of IT Products from real users.
+Discover which products truly live up to the hype. Start reading now.
+http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
+
+
+---------------------------------
+Yahoo! 工具列 - 內置防止彈出視窗工能！
+
+
+
+
+---------------------------------
+Yahoo! 工具列 - 內置防止彈出視窗工能！
+
+--0-719825890-1109169555=:51030
+Content-Type: text/html; charset=big5
+Content-Transfer-Encoding: 8bit
+
+<DIV>Sorry for that. I haven't told one thing here. In Linux, I cannot connect the phone to PC. But in Window, I can connect the phone to PC by sending files for it.<BR><BR><B><I>Ka Kin Cheung &lt;michaelhku2002@yahoo.com.hk&gt;</I></B> wrote:
+<BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">
+<DIV>Hi!</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; The strange thing is here:</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; For Linux, when my phone searched for my PC, the PC can be found and then added in the "My device" list, but when I looked at "Service list", none service can be found. Then I opened Windows XP and the bluetooth dongle driver was installed in my PC. Then I press "update" key to update services, and I found headset, synchronisation, object push and file transfer in the "Service list" for my Windows PC. So, how can I do for sdp in my Linux PC as my project is done on Linux? Thank you very much for your kindness.</DIV>
+<DIV>Michael<BR><BR><B><I>Marco Trudel &lt;mtrudel@gmx.ch&gt;</I></B> wrote:</DIV>
+<BLOCKQUOTE class=replbq style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: #1010ff 2px solid">have you already found out how the phone will connect to the pc?<BR><BR>regards<BR>Marco<BR><BR><BR>Ka Kin Cheung wrote:<BR>&gt; Hi all!<BR>&gt; Now I'm still thinking about how to implement sdp in my program so <BR>&gt; that the PC can let the bluetooth mobile devices connect to PC and then <BR>&gt; involve in the program. I searched about sdptool.c, but it doesn't help <BR>&gt; so much because I find no part that can really implement in my program. <BR>&gt; Then I borrowed books about Bluetooth sdp, but I can't find any method <BR>&gt; to write sdp C API. So, I wish to know that is there any reference for <BR>&gt; me to write sdp C API? Or instead of sdptool.c, is there any file that I <BR>&gt; can refer for SDP? Thank you very much.<BR>&gt; Michael<BR>&gt; <BR>&gt; <BR>&gt; ------------------------------------------------------------------------<BR>&gt; Yahoo! 工具列 -
+ 內置防止彈出視窗工能 <HTTP: hk.toolbar.yahoo.com>！<BR><BR><BR>-------------------------------------------------------<BR>SF email is sponsored by - The IT Product Guide<BR>Read honest &amp; candid reviews on hundreds of IT Products from real users.<BR>Discover which products truly live up to the hype. Start reading now.<BR>http://ads.osdn.com/?ad_id=6595&amp;alloc_id=14396&amp;op=click<BR>_______________________________________________<BR>Bluez-users mailing list<BR>Bluez-users@lists.sourceforge.net<BR>https://lists.sourceforge.net/lists/listinfo/bluez-users<BR></BLOCKQUOTE>
+<P><BR>
+<HR SIZE=1>
+Yahoo! 工具列 - <A href="http://hk.toolbar.yahoo.com/">內置防止彈出視窗工能</A>！<BR></BLOCKQUOTE></DIV><p><br><hr size=1>Yahoo! 工具列 - <a href=http://hk.toolbar.yahoo.com>內置防止彈出視窗工能</a>！<br>
+--0-719825890-1109169555=:51030--
 
 
 -------------------------------------------------------
