@@ -1,23 +1,24 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SBC packer done, kind of
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20041125060213.4c8c34d5.henryk@ploetzli.ch>
-References: <20041123014732.3a03b10e.henryk@ploetzli.ch>
-	 <1101191260.26578.43.camel@pegasus>
-	 <20041123074829.7f978ce7.henryk@ploetzli.ch>
-	 <1101201897.26578.54.camel@pegasus>
-	 <20041123204901.776fe240.henryk@ploetzli.ch>
-	 <1101243809.27351.18.camel@pegasus>
-	 <20041124042114.5e1fee94.henryk@ploetzli.ch>
-	 <1101272477.27351.67.camel@pegasus> <41A43E8A.8030602@xmission.com>
-	 <1101307146.27351.104.camel@pegasus>
-	 <20041124213730.46aefcb7.henryk@ploetzli.ch>
-	 <1101350953.7538.22.camel@pegasus>
-	 <20041125060213.4c8c34d5.henryk@ploetzli.ch>
-Content-Type: text/plain
-Message-Id: <1101360632.7538.36.camel@pegasus>
+From: Henryk =?ISO-8859-15?Q?Pl=F6tz?= <henryk@ploetzli.ch>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] audio problems with a2play
+Message-Id: <20041125060857.22178e80.henryk@ploetzli.ch>
+In-Reply-To: <1101272951.27351.76.camel@pegasus>
+References: <41A22C0B.4050008@xmission.com>
+	<41A234FA.7020303@xmission.com>
+	<20041123033429.132bf84b.henryk@ploetzli.ch>
+	<41A2B331.4010001@xmission.com>
+	<20041123070621.50569968.henryk@ploetzli.ch>
+	<41A3471C.4000602@xmission.com>
+	<20041123203836.046fb4f4.henryk@ploetzli.ch>
+	<41A3ACE2.4030501@xmission.com>
+	<1101246735.27351.45.camel@pegasus>
+	<41A3FD27.6060400@xmission.com>
+	<1101272951.27351.76.camel@pegasus>
 Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="pgp-sha1";
+ boundary="Signature=_Thu__25_Nov_2004_06_08_57_+0100_4QVtRO/=merfDXIw"
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -29,30 +30,43 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 25 Nov 2004 06:30:32 +0100
+Date: Thu, 25 Nov 2004 06:08:57 +0100
 
-Hi Henryk,
+--Signature=_Thu__25_Nov_2004_06_08_57_+0100_4QVtRO/=merfDXIw
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > maybe you wanna try:
-> > 
-> > 	mpg321 --au /dev/stdout foo.mp3 | sbcenc - | a2play <bdaddr> -
-> 
-> That works fine, too, and is a lot less to type, thanks. But now the 100
-> Million Dollar question: When a2play is streaming my Microsoft Wireless
-> IntelliMouse Explorer for Bluetooth can't connect to the hidd. And vice
-> versa: If the mouse is connected a2play won't stream.
-> 
-> Is this expected? Can it be fixed?
+Moin,
 
-this depends on your version of hidd I think. If it has the --master
-option and it uses it, then start without. This sounds like a role
-switch problem and the headphone want's to be the master of the piconet.
+Am Wed, 24 Nov 2004 06:09:11 +0100 schrieb Marcel Holtmann:
 
-Regards
+> I also don't see any reason why we need to store a SBC configuration
+> and then submit the same values with every frame. However without the
+> header it is impossible to get the SBC frame size.
 
-Marcel
+Because we're allowed to change the bitpool value, I guess. The current
+value can then always be read from the header. And of course to ease
+resynchronization.
 
+--=20
+Henryk Pl=F6tz
+Gr=FC=DFe aus Berlin
+~~~~~~~ Un-CDs, nein danke! http://www.heise.de/ct/cd-register/ ~~~~~~~
+~ Help Microsoft fight software piracy: Give Linux to a friend today! ~
 
+--Signature=_Thu__25_Nov_2004_06_08_57_+0100_4QVtRO/=merfDXIw
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (GNU/Linux)
+
+iD8DBQFBpWjtIjWgKE0OA2gRAs6wAJ4x3fUGwt0ts8Yq7aNQ70zKo9E1xgCg5fWm
+VnSC7ymtokJFpniGl4it9vg=
+=Yffn
+-----END PGP SIGNATURE-----
+
+--Signature=_Thu__25_Nov_2004_06_08_57_+0100_4QVtRO/=merfDXIw--
 
 
 -------------------------------------------------------
