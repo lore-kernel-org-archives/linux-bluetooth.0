@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <422860FF.9080202@gmail.com>
-From: Fabio Ruini <fabio.ruini@gmail.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Subject: [Bluez-users] Problems with a Broadcom USB Bluetooth Adapter
+Message-ID: <7aa80ced05030321482f162db2@mail.gmail.com>
+From: Mohan K <kmohangda@gmail.com>
+To: bluez-users@lists.sourceforge.net, sebastian.roth@esk.fhg.de
+Subject: Re: Fw: [Bluez-users] Re: Can't able to send data in both direction
+In-Reply-To: <004401c5207b$c13a3210$4100a8c0@benjamin>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+References: <004401c5207b$c13a3210$4100a8c0@benjamin>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,98 +18,82 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 04 Mar 2005 14:22:07 +0100
+Date: Fri, 4 Mar 2005 11:18:23 +0530
 
-Hi at all.
+Hi Sebastian,
+                  I bought a new dongle, and now the send program is
+working on two sides.
+                  I am facing one more problem. The send program is
+reading a character for PC keyboard using getch()
+function,immediately, it establishes a connection using connect() and
+then it sends the data. This is in a do-while loop to read and send
+the continous key press. The problem is, I am not getting all the data
+on the recv side, what i have typed on the send side. As for I know
+the problem is due to delay in l2cap connection establishment. Is
+there any way to avoid the delay? Kindly suggest me.
 
-I'm trying to use my bluetooth adapter with a Linux box (Debian Sarge, 
-with kernel 2.6.10), but I found some problems.
+Thanks and regards,
+Mohan
 
-When I plug the adapter into the usb slot, the KDE Information Center 
-can see the new hardware as BCM2033 Bluetooth (class 224, usb version 
-1.01, vendor id 0xa5c Broadcom, product id 0x2033 BCM2033 Bluetooth, 
-revision 0.a0, speed 12 Mbit/s). Anyway, I also installed (through 
-apt-get) KBluetoothD, but when I run it I get an error message saying: 
-"No working Bluetooth adapter found. Only local services will be 
-displayed". I also tried the hciconfig utility from root console, but 
-the output is nothing.
 
-My kernel is the 2.6.10 version, recompiled by me (I needed to do this 
-because I experienced many problems with the ACPI support). I think all 
-necessary modules are presents; the command "modprobe -l | grep 
-bluetooth" give me:
 
-/lib/modules/2.6.10/kernel/drivers/bluetooth/hci_uart.ko
-/lib/modules/2.6.10/kernel/drivers/bluetooth/bfusb.ko
-/lib/modules/2.6.10/kernel/drivers/bluetooth/bcm203x.ko
-/lib/modules/2.6.10/kernel/drivers/bluetooth/hci_vhci.ko
-/lib/modules/2.6.10/kernel/drivers/bluetooth/hci_usb.ko
-/lib/modules/2.6.10/kernel/net/bluetooth/bluetooth.ko
-/lib/modules/2.6.10/kernel/net/bluetooth/l2cap.ko
-/lib/modules/2.6.10/kernel/net/bluetooth/sco.ko
-/lib/modules/2.6.10/kernel/net/bluetooth/rfcomm/rfcomm.ko
-/lib/modules/2.6.10/kernel/net/bluetooth/bnep/bnep.ko
-
-The command "lsmod" give me (mixed with other things):
-
-bluetooth              43780  5 hci_usb,rfcomm,l2cap
-bcm203x                 4736  0
-firmware_class          7936  1 bcm203x
-usbcore               117624  6 bcm203x,hci_usb,ndiswrapper,usbhid,ohci_hcd
-usbhid                 40512  0
-ohci_hcd               32776  0
-
-I also paste here the dmesg output, starting from the time when I plug 
-the adapter:
-
-hub 1-0:1.0: state 5 ports 4 chg fff0 evt 0002
-ohci_hcd 0000:00:02.0: GetStatus roothub.portstatus [0] = 0x00010101 CSC 
-PPS CCS
-hub 1-0:1.0: port 1, status 0101, change 0001, 12 Mb/s
-hub 1-0:1.0: debounce: port 1: total 100ms stable 100ms status 0x101
-ohci_hcd 0000:00:02.0: GetStatus roothub.portstatus [0] = 0x00100103 
-PRSC PPS PES CCS
-usb 1-1: new full speed USB device using ohci_hcd and address 3
-ohci_hcd 0000:00:02.0: GetStatus roothub.portstatus [0] = 0x00100103 
-PRSC PPS PES CCS
-usb 1-1: new device strings: Mfr=0, Product=0, SerialNumber=0
-usb 1-1: hotplug
-usb 1-1: adding 1-1:1.0 (config #1, interface 0)
-usb 1-1:1.0: hotplug
-usb 1-1: adding 1-1:1.1 (config #1, interface 1)
-usb 1-1:1.1: hotplug
-usb 1-1: adding 1-1:1.2 (config #1, interface 2)
-usb 1-1:1.2: hotplug
-Bluetooth: HCI USB driver ver 2.7
-hci_usb 1-1:1.0: usb_probe_interface
-hci_usb 1-1:1.0: usb_probe_interface - got id
-hci_usb 1-1:1.1: usb_probe_interface
-hci_usb 1-1:1.1: usb_probe_interface - got id
-hci_usb 1-1:1.2: usb_probe_interface
-hci_usb 1-1:1.2: usb_probe_interface - got id
-usbcore: registered new driver hci_usb
-bcm203x: Unknown symbol release_firmware
-bcm203x: Unknown symbol request_firmware
-Bluetooth: Broadcom Blutonium firmware driver ver 1.0
-bcm203x 1-1:1.0: usb_probe_interface
-bcm203x 1-1:1.0: usb_probe_interface - got id
-bcm203x_probe: Mini driver request failed
-bcm203x: probe of 1-1:1.0 failed with error -5
-bcm203x 1-1:1.1: usb_probe_interface
-bcm203x 1-1:1.1: usb_probe_interface - got id
-bcm203x 1-1:1.2: usb_probe_interface
-bcm203x 1-1:1.2: usb_probe_interface - got id
-usbcore: registered new driver bcm203x
-
-Can someone help me? :-(
-
-TIA,
-
---
-Fabio Ruini
-e-mail: fabio.ruini@gmail.com
-icq: 2887596
-www: http://web.rossoalice.it/fabio.ruini
+> > From: Sebastian Roth <sebastian.roth@esk.fhg.de>
+> > Date: Thu, 24 Feb 2005 08:23:30 +0100
+> > Subject: [Bluez-users] Re: Can't able to send data in both direction
+> > To: bluez-users@lists.sourceforge.net
+> >
+> >
+> > Hi Mohan,
+> >
+> > I'm sorry. I have not made this point clear!
+> >
+> >>                   Can you tell me whether the send program is working
+> >> after making the device up using "hciconfig hci0 up" on the SiW dongle
+> >> side?
+> > Yes, after starting `hcid' (or using `hciconfig hci0 up') I was able to
+> > connect and send data in both directions.
+> >
+> > Wugh? What's this? hciconfig shows a "Transilica, Inc." chip to me.
+> > Don't know why but I thought that this dongle has a SiW chip in it.
+> >
+> > Are you able to send data using another programm? Please try l2ping to
+> > see if both directions work.
+> >
+> > Best regards,
+> > Sebastian
+> >
+> > -------------------------------------------------------
+> > SF email is sponsored by - The IT Product Guide
+> > Read honest & candid reviews on hundreds of IT Products from real users.
+> > Discover which products truly live up to the hype. Start reading now.
+> > http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
+> >
+> > --
+> > This message contains information from GDA Technologies LTD  and
+> > affiliates, and is intended for the sole use of the individual and entity
+> > to whom it is addressed. It may contain information, including any
+> > attachments, that is privileged, confidential and exempt from disclosure
+> > under applicable law. If you are not the intended addressee, nor
+> > authorized to receive for the intended addressee, you are hereby notified
+> > that you may not use, copy, disclose or distribute to anyone the message
+> > or any information contained in the message. If you have received this
+> > electronic transmission in error, please notify the sender immediately by
+> > a "reply to sender only" message and destroy all electronic and hard
+> > copies of the communication, including attachments.
+> > This message was scanned for spam and viruses by BitDefender.
+> >
+> >
+> 
+> --
+> This message contains information from GDA Technologies LTD  and affiliates, and is intended for the sole use of the individual and entity to whom it is addressed. It may contain information, including any attachments, that is privileged, confidential and exempt from disclosure under applicable law. If you are not the intended addressee, nor authorized to receive for the intended addressee, you are hereby notified that you may not use, copy, disclose or distribute to anyone the message or any information contained in the message. If you have received this electronic transmission in error, please notify the sender immediately by a "reply to sender only" message and destroy all electronic and hard copies of the communication, including attachments.
+> This message was scanned for spam and viruses by BitDefender.
+> 
+>
 
 
 -------------------------------------------------------
