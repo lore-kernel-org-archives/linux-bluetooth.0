@@ -1,40 +1,47 @@
-Return-Path: <skrzypek-piotr@o2.pl>
-From: skrzypek-piotr@o2.pl
-To: =?iso-8859-2?Q?Marcel_Holtmann?= <marcel@holtmann.org>
-Cc: bluez-users@lists.sourceforge.net
-Subject: =?iso-8859-2?Q?Re:_[Bluez-users]_NAT_connection_established_but_n?=
-	=?iso-8859-2?Q?o_data_transport?=
-Date: Tue,  2 Nov 2004 08:41:27 +0100
-Content-Type: text/plain; charset="iso-8859-2";
-In-Reply-To: <1099362451.10948.22.camel@pegasus>
-References: <20041101214200.C1E5BD0B0C@rekin6.o2.pl>  <1099347952.10948.19.camel@pegasus>  <20041101235513.2017B3816E@rekin11.go2.pl>
-	<1099362451.10948.22.camel@pegasus>
-Message-Id: <20041102074127.9B9CAD0B0F@rekin6.o2.pl>
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-admin@lists.sourceforge.net>
+Message-ID: <2de46576041101220615adedb4@mail.gmail.com>
+From: Manjunath Prabhu <manjunath.mp@gmail.com>
+Reply-To: Manjunath Prabhu <manjunath.mp@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: [Bluez-users] Bluetooth capture and client manager
+Sender: bluez-users-admin@lists.sourceforge.net
+Errors-To: bluez-users-admin@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: <bluez-users.lists.sourceforge.net>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+Date: Tue, 2 Nov 2004 11:36:20 +0530
 
->Hi Pete,
->
->there is a "Reply to All" button in your mail client ;)
->
->> >try to activate bnep0 and set an IP address.
->> i set: ifconfig bnep0 192.168.0.1
->> and when i type ifconfig there is nothing about bnep0, but when i
-type
->> ifconfig bnep0
->> i can see everything just like it should be: the same mac adress
->> (read from cover of usb device), ip 192.168.0.1, appropriate mask
->> etc. but still it doesn`t send/recieve data. 
->> 
->> Maybe it can help somehow:
->> I checked the transmission status on the notebook and it says that
->> the device is transmitting (especially while pinging) but not
-reciving.
->
->are you sure that you are using the latest -mh patch for your kernel?
+Hi bluez userz,
+I am working on a BT project and am trying to capture bluetooth packets. 
 
-There is only one patch for kernel 2.4.27 and i`m using it.
+I have done a simple test, where in using hcidump i have captured the
+packets and saved it to a file. I have then fed the file to
+ethereal.........which gives limited and insufficient information like
+data bytes, frame number etc. I am not able to retrieve any header
+contents
 
->Regards
->
->Marcel
->
+Is it possible to capture and analyse BT packets from the air
+interface, calculate the data transfer rate, etc...something similar
+to a 802.11 client manager???? Please do send the links ..if some work
+has already taken place on this front.
+
+Thanx and regards,
+manjunath
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by:
+Sybase ASE Linux Express Edition - download now for FREE
+LinuxWorld Reader's Choice Award Winner for best database on Linux.
+http://ads.osdn.com/?ad_id=5588&alloc_id=12065&op=click
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
