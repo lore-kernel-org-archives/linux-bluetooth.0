@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <415C4A11.8070903@biarritx.dyndns.org>
-From: jbarre <jbarre@biarritx.dyndns.org>
-MIME-Version: 1.0
+Message-ID: <20040930111009.21569.qmail@web53208.mail.yahoo.com>
+From: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-devel] [Fwd: Re: [Asterisk-Dev] New Bounty: Bluetooth Phone Support]
+In-Reply-To: <1096496461.6380.6.camel@pegasus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] Compiling Bluez into suse 9.1 pro
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,132 +16,119 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 30 Sep 2004 20:01:53 +0200
+Date: Thu, 30 Sep 2004 04:10:09 -0700 (PDT)
 
-Hi,
-
-The Asterisk-Dev list is talking about bt... ounce again...
-
-Since I'm (really) not an expert in this kind of stuff, I would like to 
-have your opinion.
-
-Here is a copy of my last reply to this list.
-
-Note: I'm not in the bluez-devel list. Too much mail... :-(
-
-Please don't forget to add my email address to your reply.
-
-Thanks a lot, Jérôme.
-
--------- Original Message --------
-Subject: Re: [Asterisk-Dev] New Bounty: Bluetooth Phone Support
-Date: Thu, 30 Sep 2004 19:27:03 +0200
-From: jbarre <asterisk@biarritx.dyndns.org>
-Reply-To: asterisk@biarritx.dyndns.org,	Asterisk Developers Mailing List 
-<asterisk-dev@lists.digium.com>
-Organization: home
-To: Asterisk Developers Mailing List <asterisk-dev@lists.digium.com>
-References: 
-<Pine.LNX.4.61.0409291639540.364@tungsten.technicality.org> 
-<1096533948.415bc7bca2583@webmail.telecomlabs.net> 
-<415C35ED.5050908@xmission.com>
-
-First... I guess we should all focus on SCO support for bluez:
-http://www.bluez.org/todo.html
-
-Then... this is another step :
-* -> headset
-* -> cellphone
-
-2 kind of chan_
-
-Then... SMS (easy), least cost routing (obvious), directory synchro, and
-other features.
-
-Why don't you send the bounties to bluez???
-
-Jérôme
-
-(I may be wrong... but that's the way I see the bt integration stuff).
-
-Brad Midgley wrote:
-> Ozed,
-> 
-> In our sourceforge project, we're targeting host->headset but it 
-> wouldn't be hard to make the leap to host->cellphone.
-> 
-> FYI, after some input here and over at the alsa project, I think the 
-> bluetooth-alsa stuff needs tighter kernel integration and needs to work 
-> with either hotplug or dbus.
-> 
-> check out the btp on digium cvs server that trclark mentioned for a 
-> start from the asterisk side.
-> 
-> Brad
-> 
-> ooseghale@telecomlabs.net wrote:
-> 
->> Hi Nate,
->>   I will be intereseted in working on an asterisk bluetooth channel.  
->> I worked on a bluetooth projector back in college and I think I can 
->> transfer some of that knowledge to this project.  Cheers
->> Ozed
->> Quoting Nate Carlson <natecars@natecarlson.com>:
->>
->>
->>> Hey all,
->>>
->>> Jay Milk and I have sponsored a new bounty to get Bluetooth phone 
->>> support added to Asterisk - that is, the Asterisk host has a 
->>> bluetooth dongle, and can send/receive calls via a Bluetooth cell phone.
->>>
->>> See:
->>>
->>> http://www.voip-info.org/wiki-Asterisk+bounty+bluetooth+cell-phone+support 
->>>
->>>
->>> The pot's at $150 right now.
->>>
->>> ------------------------------------------------------------------------
->>> | nate carlson | natecars@natecarlson.com | http://www.natecarlson.com |
->>> |       depriving some poor village of its idiot since 1981            |
->>> ------------------------------------------------------------------------
->>> _______________________________________________
->>> Asterisk-Dev mailing list
->>> Asterisk-Dev@lists.digium.com
->>> http://lists.digium.com/mailman/listinfo/asterisk-dev
->>> To UNSUBSCRIBE or update options visit:
->>>   http://lists.digium.com/mailman/listinfo/asterisk-dev
->>>
->>
->>
->>
->>
->>
->> -------------------------------------------------
->> This mail sent through IMP: http://horde.org/imp/
->> _______________________________________________
->> Asterisk-Dev mailing list
->> Asterisk-Dev@lists.digium.com
->> http://lists.digium.com/mailman/listinfo/asterisk-dev
->> To UNSUBSCRIBE or update options visit:
->>    http://lists.digium.com/mailman/listinfo/asterisk-dev
-> 
-> _______________________________________________
-> Asterisk-Dev mailing list
-> Asterisk-Dev@lists.digium.com
-> http://lists.digium.com/mailman/listinfo/asterisk-dev
-> To UNSUBSCRIBE or update options visit:
->   http://lists.digium.com/mailman/listinfo/asterisk-dev
+I downloaded from cvs the source of bluez
+I can compile only libs, sdp and hcidump
+the others (pan, utils, obex, bluefw and hciemu) are
+giving errors
 
 
-_______________________________________________
-Asterisk-Dev mailing list
-Asterisk-Dev@lists.digium.com
-http://lists.digium.com/mailman/listinfo/asterisk-dev
-To UNSUBSCRIBE or update options visit:
-   http://lists.digium.com/mailman/listinfo/asterisk-dev
+1 --------------------- running bootstrap give an
+error
+"bad interpreter: no such file or directory"
+So I proceded running the contents of the file itself
+(copy-paste in the command line, excluding
+"#!/bin/sh") for every bootstrap file.
 
+doing so I obtain a configure file, so I can proceeds
+running configure, than make and after make install.
+
+These are the problems encountered during configure or
+make phase of compilation.
+
+2 --------------------- for pan and for hciemu, 
+running configure I obtains "configure: error: cannot
+run /bin/sh ./config.sub"
+3 --------------------- for utils, 
+make fails, this is the output:
+make  all-recursive
+make[1]: Entering directory `/home/maxc/prj/4/utils'
+Making all in hcid
+make[2]: Entering directory
+`/home/maxc/prj/4/utils/hcid'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory
+`/home/maxc/prj/4/utils/hcid'
+Making all in tools
+make[2]: Entering directory
+`/home/maxc/prj/4/utils/tools'
+gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/include 
+-I/usr/include -Wall -O2 -c sdptool.c
+sdptool.c: In function `add_audio_source':
+sdptool.c:1583: error: `AUDIO_SOURCE_SVCLASS_ID'
+undeclared (first use in this function)
+sdptool.c:1583: error: (Each undeclared identifier is
+reported only once
+sdptool.c:1583: error: for each function it appears
+in.)
+sdptool.c:1587: error: `ADVANCED_AUDIO_PROFILE_ID'
+undeclared (first use in this function)
+sdptool.c:1598: error: `AVDTP_UUID' undeclared (first
+use in this function)
+sdptool.c: In function `add_audio_sink':
+sdptool.c:1642: error: `AUDIO_SINK_SVCLASS_ID'
+undeclared (first use in this function)
+sdptool.c:1646: error: `ADVANCED_AUDIO_PROFILE_ID'
+undeclared (first use in this function)
+sdptool.c:1657: error: `AVDTP_UUID' undeclared (first
+use in this function)
+sdptool.c: At top level:
+sdptool.c:1706: error: `AUDIO_SOURCE_SVCLASS_ID'
+undeclared here (not in a function)
+sdptool.c:1706: error: initializer element is not
+constant
+sdptool.c:1706: error: (near initialization for
+`service[13].class')
+sdptool.c:1706: error: initializer element is not
+constant
+sdptool.c:1706: error: (near initialization for
+`service[13]')
+sdptool.c:1707: error: `AUDIO_SINK_SVCLASS_ID'
+undeclared here (not in a function)
+sdptool.c:1707: error: initializer element is not
+constant
+sdptool.c:1707: error: (near initialization for
+`service[14].class')
+sdptool.c:1707: error: initializer element is not
+constant
+sdptool.c:1707: error: (near initialization for
+`service[14]')
+sdptool.c:1709: error: initializer element is not
+constant
+sdptool.c:1709: error: (near initialization for
+`service[15]')
+make[2]: *** [sdptool.o] Error 1
+make[2]: Leaving directory
+`/home/maxc/prj/4/utils/tools'
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory `/home/maxc/prj/4/utils'
+make: *** [all] Error 2
+
+4 --------------------- for bluefw, 
+doing make I obtain this output:
+"/usr/src/linux/include/linux/usbdevice_fs.h:49
+variable or field '__user' declared void"
+5 --------------------- for obex,
+during make, the "gcc ... -o btobex ..."
+say: "./obex.c: undefined reference to
+'OBEX_SetTransportMTU'"
+
+How to solve these problems?
+Can you help me?
+
+thanks for your time
+
+(sorry for cross posting, similar mails was sent to
+bluez-users list, maybe this is a better place for
+these problems)
+
+
+		
+__________________________________
+Do you Yahoo!?
+Yahoo! Mail - 50x more storage than other providers!
+http://promotions.yahoo.com/new_mail
 
 
 -------------------------------------------------------
