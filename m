@@ -4,8 +4,8 @@ To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-2"
-Message-Id: <200412280908.35348.cijoml@volny.cz>
-Subject: [Bluez-users] problem switching via hid2hci
+Message-Id: <200412271400.24208.cijoml@volny.cz>
+Subject: [Bluez-users] compatible firmwares?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,143 +17,55 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Dec 2004 09:08:35 +0100
+Date: Mon, 27 Dec 2004 14:00:24 +0100
 
 Hi Marcel,
 
-when I call hid2hci I get:
-# hid2hci
-Switching device 0a12:1000 to HCI mode failed (Protocol error)
-notas:/home/cijoml# hciconfig
-hci0:   Type: USB
-        BD Address: 00:0D:88:8E:AB:2F ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:107 acl:0 sco:0 events:14 errors:0
-        TX bytes:300 acl:0 sco:0 commands:13 errors:0
+are these two firmwares compatible? One I found here:
+http://www.dasgenie.com/scrap/archives/000057.html
 
-notas:/home/cijoml# hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:0D:88:8E:AB:2F ACL MTU: 192:8 SCO MTU: 64:8
-        HCI 18.2
-        Chip version: BlueCore02-External
-        Max key size: 128 bit
-        SCO mapping:  HCI
+second I downloaded via btdfu from my dlink dongle (15.3)
 
-And in dmesg is:
-usb 3-1: usbfs: USBDEVFS_CONTROL failed cmd hid2hci rqt 64 rq 0 len 0 ret -71
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: input irq status -84 received
-usb 3-1: USB disconnect, address 3
-drivers/usb/input/hid-core.c: input irq status -84 received
-drivers/usb/input/hid-core.c: can't resubmit intr, 0000:00:1d.2-1/input1, 
-status -19
-usb 3-1: new full speed USB device using uhci_hcd and address 4
-Bluetooth: HCI USB driver ver 2.7
-usbcore: registered new driver hci_usb
+notas:/usr/src/btdfu-0.3# src/btdfu verify /usr/src/BTfirmware/dlink.dfu
+Filename        dlink.dfu
+Filesize        347078
+Checksum        be0ea993
 
-Thanks for fixing these stupid messages :)
+DFU suffix      43 04 01 00 12 0a 00 01 55 46 44 10 93 a9 0e be
 
-kernel 2.6.10 without -mh patch
+idVendor        0a12
+idProduct       0001
+bcdDevice       443
+
+bcdDFU          1.0
+ucDfuSignature  DFU
+bLength         16
+dwCRC           be0ea993
+
+Firmware type   CSR-dfu2
+Firmware check  valid checksum
+
+notas:/usr/src/btdfu-0.3# src/btdfu verify /usr/src/BTfirmware/cc_16_4.dfu
+Filename        cc_16_4.dfu
+Filesize        355054
+Checksum        b8efbfbb
+
+DFU suffix      25 05 01 00 12 0a 00 01 55 46 44 10 bb bf ef b8
+
+idVendor        0a12
+idProduct       0001
+bcdDevice       525
+
+bcdDFU          1.0
+ucDfuSignature  DFU
+bLength         16
+dwCRC           b8efbfbb
+
+Firmware type   CSR-dfu1
+Firmware check  valid checksum
+
+
+Thanks
 
 Michal
 
