@@ -1,49 +1,65 @@
-Return-Path: <kdesai@mail.smu.edu>
+Return-Path: <mplanque@laas.fr>
+From: Michel Planques <mplanque@laas.fr>
+Message-ID: <2338.82.255.26.193.1076970003.squirrel@www.laas.fr>
+Date: Mon, 16 Feb 2004 23:20:03 +0100 (CET)
+Subject: Re: [Bluez-users] How to configure a 723kbps connection?
+To: <marcel@holtmann.org>
+In-Reply-To: <1076855596.14758.52.camel@pegasus>
+References: <20040215000300.0C48932D37@mail.rvs.uni-bielefeld.de>
+        <1076855596.14758.52.camel@pegasus>
+Cc: <grpmind+bluez.users@boromir.vpop.net>,
+   <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Subject: RE: [Bluez-users] L2CAP connectionless
-Date: Mon, 16 Feb 2004 16:20:25 -0600
-Message-ID: <38F76B90B82C0A4A822651EACE4FF8E9C23327@s31xs2>
-From: "Desai, Keyur Rajnikant" <kdesai@mail.smu.edu>
-To: "Michel Planques" <mplanque@laas.fr>, <marcel@holtmann.org>
-Cc: <bluez-users@lists.sourceforge.net>
+Content-Type: text/plain; charset=iso-8859-1
 List-ID: <bluez-users.lists.sourceforge.net>
 
-SGkgLA0KIA0KWWVhaCBpdCB3b3VsZCBiZSBncmVhdCBpZiBzb21lIGJvZHkgY291bGQgdGhyb3cg
-c29tZSBsaWdodCBvbiB3aGF0IHRoaXMgaGFuZGxlciBmdW5jdGlvbiBkb2VzIGluIHRoZSBjb25u
-ZWN0aW9sZXNzIG1vZGUNCiANCnRoZSBjb2RlIGdvZXMgbGlrZSB0aGlzDQogDQppZiAoc29ja3R5
-cGU9U09DS19ER1JBTSkNCnsgDQogICBoYW5kbGVyKHMpOw0KICAgcmV0dXJuOw0KfQ0KIA0KSSBz
-b21lIGhvdyBjYW5ub3QgZ2V0IGluc2lkZSBvZiB0aGlzIGZ1bmN0aW9uIHRocnUgeHhnZGIgLi4u
-Y2FuIG55Ym9keSBoZWxwIG1lIGluIHRoaXMuLi4uDQogDQpjaGVlcnMuLg0KRGVzYWkNCg0KCS0t
-LS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tIA0KCUZyb206IE1pY2hlbCBQbGFucXVlcyBbbWFpbHRv
-Om1wbGFucXVlQGxhYXMuZnJdIA0KCVNlbnQ6IE1vbiAyLzE2LzIwMDQgMzo0MyBQTSANCglUbzog
-bWFyY2VsQGhvbHRtYW5uLm9yZyANCglDYzogRGVzYWksIEtleXVyIFJham5pa2FudDsgYmx1ZXot
-dXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0IA0KCVN1YmplY3Q6IFJlOiBbQmx1ZXotdXNlcnNd
-IEwyQ0FQIGNvbm5lY3Rpb25sZXNzDQoJDQoJDQoNCglIaSBNYXJjZWwsDQoJDQoJQXMgSSBrbm93
-LCBhIEwyQ0FQIGxpbmsgaXMgY29ubmVjdGlvbiBvcmllbnRlZCwgc28gSSBkb24ndCB1bmRlcnN0
-YW5kIGhvdw0KCXRoZSBjb25uZWN0aW9ubGVzcyBtb2RlIGlzIHdvcmtpbmcuDQoJSSBhbHJlYWR5
-IHNlYXJjaGVkIGluZm9ybWF0aW9ucyBhYm91dCBTT0NLX0RHUkFNIGltcGxlbWVudGF0aW9uIGlu
-IEJsdWV6DQoJYW5kIG5ldmVyIGZvdW5kIGFueXRoaW5nIDogZXZlbiBpbiB0aGlzIG1haWxpbmcg
-bGlzdCAobWF5YmUgSSdtIGJsaW5kICEpDQoJSWYgYW55Ym9keSBjb3VsZCBwb2ludCBtZSBvbiBz
-b21lIGluZm9ybWF0aW9ucyAuLi4NCgkNCglUaGFuayB5b3UuDQoJDQoJTWljaGVsLg0KCQ0KCT4g
-SGkgRGVzYWksDQoJPg0KCT4+IEkgYW0gIGp1c3Qgd29uZGVyaW5nIGhvdyBMMkNBUCBjb25uZWN0
-aW9ubGVzcyBtb2RlIHdvcmtzDQoJPj4NCgk+PiB3aGVuIGkgZG8gYSAuL2wydGVzdCAtcyAtRCBC
-RF9BRERSIGl0IGhhcyB0byB1c2UgdGhlIGNvbm5lY3QgbWV0aG9kLg0KCT4+DQoJPj4gQWxzbyB3
-aGVuIHRoZSAtRCBvcHRpb24gY2F1c2VzIHRoZSBzb2NrZXQgdG8gYmUgc2V0IHRvIFNPQ0tfREdS
-QU0gIEkNCgk+PiBjYW5ub3QgdW5kZXJzdGFuZCB3aGF0IHRoZSAgaGFuZGxlciAocykgZnVuY3Rp
-b24gZG9lcw0KCT4+DQoJPj4gSSB0cmllZCB0byBzaW5nbGUgc3RlcCB1c2luZyB4eGdkYiBidXQg
-aXQgd291bGQgYWx3YXlzIHNraXAgdGhlDQoJPj4gaGFuZGxlcihzKSBmdW5jdGlvbi4NCgk+DQoJ
-PiBubyBjb21tZW50cyBmcm9tIG1lLCBiZWNhdXNlIEkgbmV2ZXIgd29ya2VkIHdpdGggTDJDQVAg
-Y29ubmVjdGlvbmxlc3MNCgk+IHNvY2tldHMuIFRoZXJlIHdhcyBzb21lIGRpc2N1c3Npb24gYWJv
-dXQgaXQgb24gdGhlIG1haWxpbmcgbGlzdCwgc28gSQ0KCT4gdGhpbmsgeW91IHNob3VsZCBnbyB0
-aHJvdWdoIHRoZSBhcmNoaXZlLg0KCT4NCgk+IFJlZ2FyZHMNCgk+DQoJPiBNYXJjZWwNCgk+DQoJ
-Pg0KCT4NCgk+DQoJPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tDQoJPiBTRi5OZXQgaXMgc3BvbnNvcmVkIGJ5OiBTcGVlZCBTdGFydCBZb3Vy
-IExpbnV4IEFwcHMgTm93Lg0KCT4gQnVpbGQgYW5kIGRlcGxveSBhcHBzICYgV2ViIHNlcnZpY2Vz
-IGZvciBMaW51eCB3aXRoDQoJPiBhIGZyZWUgRFZEIHNvZnR3YXJlIGtpdCBmcm9tIElCTS4gQ2xp
-Y2sgTm93IQ0KCT4gaHR0cDovL2Fkcy5vc2RuLmNvbS8/YWRfaWQ9MTM1NiZhbGxvY19pZD0zNDM4
-Jm9wPWNsaWNrDQoJPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXw0KCT4gQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0DQoJPiBCbHVlei11c2Vyc0BsaXN0cy5z
-b3VyY2Vmb3JnZS5uZXQNCgk+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xp
-c3RpbmZvL2JsdWV6LXVzZXJzDQoJDQoJDQoJDQoJDQoNCg==
+Hi Marcel,
+
+l2test is a good tool to generate Bluetooth traffic between 2 linux
+stations. You can also use the PAN profile with bnep protocol and a
+TCP/UDP traffic generator : I suggest iperf (it works on Linux and
+Windows). I followed these two methods and the results were similar.
+
+I had some bad experiences with the packet type choosen by my dongle's
+link manager. I had to force the packet type to DH5 reach the maximum bit
+rate.
+
+
+
+Michel.
+
+> Hi,
+>
+>> I'd like to configure a linux box using a USB bt dongle to talk to an
+>> ipaq     at 723kbps for streaming video. So two questions:
+>
+> what iPAQ is this?
+>
+>> 1. How can I tell at what rate the two bluetooth devices are talking?
+>> I could    use l2test if I could run linux on the ipaq, but I can't
+>> (yet).
+>
+> Buy a protocol analyser ;)
+>
+>> 2. How can I configure the two to talk at the assymetric 723kbps rate?
+>>
+>
+> In general this is not needed, because the link manager should choose
+> the best package types for you.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------
+> SF.Net is sponsored by: Speed Start Your Linux Apps Now.
+> Build and deploy apps & Web services for Linux with
+> a free DVD software kit from IBM. Click Now!
+> http://ads.osdn.com/?ad_id=1356&alloc_id=3438&op=click
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
