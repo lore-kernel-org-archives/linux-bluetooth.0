@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <41EB6ACB.5050305@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
+Message-ID: <41EB422B.3040603@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] bluez library questions
+Subject: Re: [Bluez-users] btsco compile fail
+References: <41EA83D3.9060204@tootai.net>
+In-Reply-To: <41EA83D3.9060204@tootai.net>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,25 +18,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 17 Jan 2005 08:35:39 +0100
+Date: Sun, 16 Jan 2005 21:42:19 -0700
 
-Hello everybody
+hi
 
-The bluez library (to create bluetooth programs), is it in only in c?
-Or does a c++ library exist?
+i don't know if this is the best answer, but you could try updating 
+automake, autoconf, etc from debian testing. it does look alsa specific 
+though, so check that you have -dev packages (try libasound2-dev and 
+maybe libalsaplayer-devm, libmikmod2-dev, liby-dev to flush out whatever 
+package you need)
 
-What about documentation?
-I searched the archive and my conclusion is that there is no 
-documentation. The only starting help is:
-- bluez-utils-2.14/test
-- the slides from "Bluetooth programming for Linux"
+brad
 
-Is something planned, like, for example, the jsr82 documentation for the 
-java bluetooth library 
-(http://www.avetana-gmbh.de/avetana-gmbh/produkte/doc/javax/bluetooth/package-frame.html)
-
-regards
-Marco Trudel
+administrator tootai wrote:
+> Hi,
+> 
+> I want co compile btsco from CVS and get following error:
+> 
+> aclocal: configure.in: 21: macro `AM_PATH_ALSA' not found in library
+> nomade:/usr/src/btsco#
+> I'm running a Debian 2.6.8 kernel.
+> 
+> Thanks for hint.
+> 
 
 
 -------------------------------------------------------
