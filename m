@@ -1,46 +1,29 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bizzare result when getting the bluetooth address
-From: Marcel Holtmann <marcel@holtmann.org>
-To: jan d tux <janice@asti.dost.gov.ph>
-Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1075777047.1362.42.camel@Asgard>
-References: <1075714467.1546.49.camel@Asgard>
-	 <1075722905.29899.10.camel@pegasus>  <1075777047.1362.42.camel@Asgard>
-Content-Type: text/plain
-Message-Id: <1075807802.13285.0.camel@pegasus>
-Mime-Version: 1.0
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 03 Feb 2004 12:30:02 +0100
+Return-Path: <jerome.stadelmann@hta-bi.bfh.ch>
+From: =?iso-8859-1?Q?J=E9r=F4me_Stadelmann?= <jerome.stadelmann@hta-bi.bfh.ch>
+To: "'Marcel Holtmann'" <marcel@holtmann.org>
+Cc: <bluez-users@lists.sourceforge.net>
+Subject: RE : RE : RE : [Bluez-users] SuSE and Audio
+Date: Tue, 3 Feb 2004 10:47:31 +0100
+Message-ID: <004901c3ea3a$be48f140$2d105793@N64101>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+In-Reply-To: <1075739193.29899.61.camel@pegasus>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Jan,
+Hi Marcel,
 
-> I have already inserted a len=sizeof(sa) before calling getpeername but
-> the result is still the same.
+> you have to enable CONFIG_BT_HCIUSB_SCO, but this can cause crashes at
+> unplug on UHCI host adapters.
 
-show us the complete code.
+It's already done...
+
+
+> This is correct, but I never checked that it also works with 2.6.
+
+So you think it's better for me to use an older kernel ?
+
 
 Regards
 
-Marcel
-
-
-
-
--------------------------------------------------------
-The SF.Net email is sponsored by EclipseCon 2004
-Premiere Conference on Open Tools Development and Integration
-See the breadth of Eclipse activity. February 3-5 in Anaheim, CA.
-http://www.eclipsecon.org/osdn
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Jerome
