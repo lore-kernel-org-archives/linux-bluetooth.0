@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4190E7AB.6070803@phaldor.co.uk>
-From: Dave Givens <dave.givens@phaldor.co.uk>
-MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] Bluetooth Printing
+To: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Audio & Bluetooth 
+In-reply-to: <200411091411.33911.tim@birdsnest.maths.tcd.ie> 
+References: <418FC205.7070102@tootai.net> <1099954588.6339.144.camel@loke> <1099956503.29330.35.camel@pegasus> <200411091411.33911.tim@birdsnest.maths.tcd.ie>
+Message-ID: <17005.1100011637@csr.com>
+From: Peter Stephenson <pws@csr.com>
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,23 +16,42 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 09 Nov 2004 15:52:11 +0000
+Date: Tue, 09 Nov 2004 14:47:17 +0000
 
-Marcel ,
-    I contacted you a couple of weeks ago about this problem. I have 
-since started from scratch and re-installed Fedora Core 2. I have 
-installed as a server and have made sure that I have the latest updates 
-available. I still cannot connect to the printer, but when running 
-gnome-bluetooth-admin, I can see the bluetooth print adapter listed but 
-no services for it.
+Timothy Murphy wrote:
+> A bit OT, but I tried that on my Sony Picturebook (C1VFK) and got
+> =====================================
+> tim@william ~]$ sudo hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 08:00:46:21:58:29 ACL MTU: 128:8  SCO MTU: 64:8
+>         Build 66
+>         Chip version: BlueCore01b (ES)
+> =====================================
+> 
+> I guess that means the chip in the in-built Bluetooth is pre-pre-historic.
 
-I have kernel 2.6.8-1.521
+66              beta-9.8 2001-01-17
 
-    I have tried to install via the print manager and the web front end, 
-but no bluetooth device is listed in the drop down menu. What have I not 
-done?
+Congratulations, this is the oldest chip I've ever heard of in the wild.
+The "ES" chip is an engineering sample, even before the full production
+run of BC01b.  I'm not 100% sure these are properly supported by the
+later BC01 firmware, so I wouldn't recommend upgrading the firmware,
+even if you find away, unless you're pretty sure you can get back.
 
-Dave Givens
+pws
+
+
+**********************************************************************
+This email and any files transmitted with it are confidential and
+intended solely for the use of the individual or entity to whom they
+are addressed. If you have received this email in error please notify
+the system manager.
+
+This footnote also confirms that this email message has been swept by
+MIMEsweeper for the presence of computer viruses.
+
+www.mimesweeper.com
+**********************************************************************
 
 
 
