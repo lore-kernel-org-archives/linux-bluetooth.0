@@ -1,12 +1,22 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SCO audio sync
+Subject: Re: [Bluez-devel] HIDP backport for 2.4
 From: Marcel Holtmann <marcel@holtmann.org>
-To: ubaldo <ubaldo@eja.it>
+To: Michael Frey <mfrey@pepper.com>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20040727145602.30665.qmail@webmail.aruba.it>
-References: <20040727145602.30665.qmail@webmail.aruba.it>
+In-Reply-To: <ABD9E52C-DFDC-11D8-BE76-00039390D626@pepper.com>
+References: <1090054739.4558.2.camel@pegasus>
+	 <1090759952.4791.91.camel@pegasus>
+	 <9A44A69C-DF28-11D8-B83A-00039390D626@pepper.com>
+	 <1090864026.29589.1.camel@pegasus>
+	 <5F07F140-DF2E-11D8-B83A-00039390D626@pepper.com>
+	 <1090865790.29589.5.camel@pegasus>
+	 <76F28965-DF34-11D8-B83A-00039390D626@pepper.com>
+	 <1090875679.10807.1.camel@pegasus>
+	 <4B8C0D08-DF64-11D8-95A4-003065B218E0@pepper.com>
+	 <1090916301.4650.9.camel@pegasus>
+	 <ABD9E52C-DFDC-11D8-BE76-00039390D626@pepper.com>
 Content-Type: text/plain
-Message-Id: <1090940808.4845.21.camel@pegasus>
+Message-Id: <1090940516.4845.19.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,21 +28,29 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 27 Jul 2004 17:06:48 +0200
+Date: Tue, 27 Jul 2004 17:01:56 +0200
 
-Hi,
+Hi Michael,
 
-> I am having another strange problem, sometime when I record from a SCO 
-> channel in 16bit (0x0060) to a file the first byte is missing and when I 
-> play it back I listen just caos. 
+> > at the end of hidp_input_report() and see if this helps out for your
+> > keyboard and mouse problems. What do "hidd -l" say after you have
+> > connected the devices? What devices do you use?
 > 
-> But if I cut the first byte, or I add a byte in front of the file, then I 
-> can listen it fine. 
+> root@(none):~# hidd -l
+> 00:02:72:40:8A:97 HID Boot Device [0000:0000] connected
 > 
-> Is there a way to be sure that I am reading the packet in the right way? 
+> I am using a Keyboard with integrated mouse.  So I guess it is 
+> technically one device.  The mouse is a track ball embedded in the 
+> keyboard.  The keyboard is made by BlueLogic.
 
-check the mailing list archive, because I remember that there was a
-thread about this problem.
+you should have said this earlier. Do you have a website for me? I need
+more information about this device. Please use sdptest from libs2 CVS
+repository to get the SDP record.
+
+	./sdptest records 00:xx:xx:xx:xx:xx > sdp_record.txt
+
+Send me that file. I also need the information from "hcitool inq" and
+from "hcitool info" for that device.
 
 Regards
 
