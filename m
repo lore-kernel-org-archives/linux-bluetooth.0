@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] accessing info on paired devices
+Subject: Re: [Bluez-users] SCO route way!!
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Pall Thayer <palli@pallit.lhi.is>
+To: Chen Bin <binch@mobilesoft.com.cn>
 Cc: bluez-users@lists.sourceforge.net
-In-Reply-To: <415921D4.9000605@pallit.lhi.is>
-References: <41570BC9.6090109@pallit.lhi.is>
-	 <1096359364.4684.28.camel@notepaq>  <415921D4.9000605@pallit.lhi.is>
+In-Reply-To: <1096360479.2115.9.camel@debian>
+References: <1096249564.1725.0.camel@debian>
+	 <1096359291.4684.26.camel@notepaq>  <1096360479.2115.9.camel@debian>
 Content-Type: text/plain
-Message-Id: <1096361009.4684.36.camel@notepaq>
+Message-Id: <1096360690.4684.33.camel@notepaq>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -19,23 +19,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 28 Sep 2004 10:43:29 +0200
+Date: Tue, 28 Sep 2004 10:38:10 +0200
 
-Hi Pall,
+Hi Chen,
 
-> But the link key is in binary form so I can't read it. What I've been 
-> doing is just sending a single l2ping to each of the discovered devices, 
-> the ones that are paired and authorized respond, the others time-out and 
-> are eventually ignored. The only problem is that I end up with a stack 
-> of PIN request pop-ups for the ones that aren't paired and authorized. 
-> Not a big deal but somewhat annoying. I tried playing around with the 
-> security settings in hcid.conf but nothing I did managed to avoid the 
-> PIN request pop-up.
+> If the SCO is over PCM, what should I do before I write data from the
+> codec to the chip, just establish the connection is enough?
 
-we will change the link key file to be ASCII, but you should understand
-the three security modes of Bluetooth. I think you put your device into
-security mode 3 and this is bad unless you really know what you are
-doing.
+in general, yes.
+
+> I mean, I use HCI ACL to add a SCO link with the chip, then I write the
+> voice data from the codec to the chip. I wonder if there are several SCO
+> connections over the chip, how can the chip determine which connection
+> will be used to send the voice? Should I do more steps to specify which
+> connection to use?
+
+This depends on your chip manufacturer. Ask them.
 
 Regards
 
