@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: "João Santos" <jsantos_pt@hotmail.com>
+From: "Raul Jimeno Mouzo" <pichas23@hotmail.com>
 To: bluez-users@lists.sourceforge.net
 Mime-Version: 1.0
-Content-Type: text/plain; format=flowed
-Message-ID: <Sea2-F5425UE9chbN2t0002c71b@hotmail.com>
-Subject: [Bluez-users] pppd problems
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Message-ID: <Law11-F82jPkQTGpaoG00010ed1@hotmail.com>
+Subject: [Bluez-users] Dongles not working
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,48 +15,17 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 08 Jan 2004 15:49:52 +0000
+Date: Thu, 08 Jan 2004 16:35:46 +0100
 
-Hi all,
-Sorry about my bad english.
-I don't know what is happening whit the pppd.
-I have the mandrake 9.1  whit kernel 2.4.21-0.13mdk.
-I have install the ppp-2.3.3 distribution.
-PPP modules:
+Hi Marcel,
 
-#ppp stuf
-alias ppp0 ppp_generic
-alias char-major-108    ppp_generic
-alias /dev/ppp          ppp_generic
-alias tty-ldisc-3       ppp_async
-alias tty-ldisc-14      ppp_synctty
-alias ppp0              ppp_generic
-alias ppp-compress-21   bsd_comp
-alias ppp-compress-24   ppp_deflate
-alias ppp-compress-26   ppp_deflate
-
-but after folloing the readme instrutions, it didn't work:
-
-[root@olivia /]# pppd
-pppd: This system lacks kernel support for PPP.  This could be because
-the PPP kernel module is not loaded, or because the kernel is
-not configured for PPP.  See the README.linux file in the
-ppp-2.3.3 distribution.
-
-
-i think the problem is because this distribution is very old.
-I want to remove this distribution and install a more recent.
-where can i download it, and get a good howto?
-
-if you have another suggestion please tell me?
-
-Regards
-
-João Santos
+I have devices BT that do not work well. Is a Microtune 
+http://www.microtune.com/products/MT0760.html) modelo MT0760
+Can I to rewrite the flash of the devices and to obtain that they work well?
 
 _________________________________________________________________
-Add photos to your e-mail with MSN 8. Get 2 months FREE*. 
-http://join.msn.com/?page=features/featuredemail
+¿Estás dispuesto a una cita? Conoce gente en MSN Amor & Amistad. 
+http://match.msn.es/match/mt.cfm?pg=channel
 
 
 
