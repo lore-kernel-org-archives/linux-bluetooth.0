@@ -1,19 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Logitech Bluetooth  Mx900+keyboard support.
+Subject: Re: [Bluez-users] hci0 problem after timeout
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Terence Rudkin <trexx@pobox.com>
-Cc: Olivier Bornet <Olivier.Bornet@puck.ch>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1075234547.3064.13.camel@localhost.localdomain>
-References: <1074457244.3254.17.camel@localhost.localdomain>
-	 <1074458664.6070.73.camel@pegasus>
-	 <1074480891.2817.10.camel@localhost.localdomain>
-	 <1074514935.6070.80.camel@pegasus>
-	 <1074568150.7831.5.camel@localhost.localdomain>
-	 <20040120081245.GA1871@smartdata.ch>  <1074597908.7088.5.camel@pegasus>
-	 <1075234547.3064.13.camel@localhost.localdomain>
+To: Rafael Vidal Aroca <rafael@3WT.com.br>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <40170986.70105@3WT.com.br>
+References: <40170986.70105@3WT.com.br>
 Content-Type: text/plain
-Message-Id: <1075276833.12766.56.camel@pegasus>
+Message-Id: <1075276651.12766.52.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -25,32 +18,54 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 28 Jan 2004 09:00:33 +0100
+Date: Wed, 28 Jan 2004 08:57:31 +0100
 
-Hi Terence,
+Hi Rafael,
 
-> I finally had a chance to patch kernel and try hid2hci  with this patch
-> kernel.   I still got success. but hcitool dev never reported any
-> devices.   I looked at the code in hid2hci, my diff is below. 
+> 	Hi guys, i made a bluetooth network from my linux box to my ipaq  box, 
+> but i'm having some problems. Both systems runs linux and bluez.
 > 
-> I first made the change at 204.  And found that the /dev/usb/hid was not
-> opening.  Finding me /dev to be /dev/usb I changed line 79 to match my
-> file structure.   
-
-be more specific and make a unified diff.
-
-> Now I get
-> hciconfig
-> hci0:   Type: USB
->         BD Address: 00:07:61:07:ED:A9 ACL MTU: 192:8  SCO MTU: 64:8
->         UP RUNNING PSCAN ISCAN
->         RX bytes:131 acl:0 sco:0 events:14 errors:0
->         TX bytes:32 acl:0 sco:0 commands:13 errors:0
+> 	In PC side i use the folowing commands:
 > 
-> But not input from mouse and keyboard.
+> 	pand --listen --role GN
+> 	hciconfig hci0 -lm master,accept
+> 
+> 	Then on iPaq:
+> 
+> 	hcitool inq
+>     	pand --connect 00:80....
+>    	ifconfig bnep0 192.168.2.2 netmask 255.255.255.0
+> 
+> 	Back to PC:
+> 
+>     	ifconfig bnep0 192.168.2.1 netmask 255.255.255.0
+> 
+> 	
+> 	Doing that i can ping and ssh to my ipaq pocket pc and can also use 
+> internet through pc. But just for 30 seconds!!!!
+> 
+> 	After about 30 seconds the conection fails and pc's dmesg shows 
+> nothing. I just get and error when trying to restart hci0:
+> 
+> 
+> 	root@gemini:~# hciconfig hci0 down	
+> 	root@gemini:~# hciconfig hci0 up
+> 	Can't init device hci0. Connection timed out(110)
+> 
+> 
+> 	I really think the problem is in the pc side, and i'm having trouble 
+> putting this D-Link DBT-120 usb bluetooth dongle to work since last 
+> year. Can anyone help or point solutions?
+> 
+> 	Distro: Debian Woody
+> 	Kernel: 2.4.22 (no from distro, i compiled)
+> 	hotplug: 2004_01_05 (latest)
+> 	bluefw: 1.0
+> 	
+> 	Hope i gave enough info. Thanks in advance.
 
-The dongle is now in HCI mode and this means that you have to handle the
-HID protocol by yourself. Run the bthid daemon.
+give us the output of "hciconfig -a" for your devices. What kind of USB
+host controller do you have (lspci)? What USB host driver do you use?
 
 Regards
 
