@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluez+2.6+Logitech bluetooth
+Subject: Re: [Bluez-users] GhostSong
 From: Marcel Holtmann <marcel@holtmann.org>
-To: fd@cisco.com
-Cc: de Laurent <de_laurent@o2.pl>,
-   BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1084692905.12711.75.camel@metal.cisco.com>
-References: <20040515163903.CB06543F94@rekin8.go2.pl>
-	 <1084692905.12711.75.camel@metal.cisco.com>
+To: the White Rabbit in Wonderland <ghostsong@aliceposta.it>
+Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1084655065.19124.3.camel@alice.wonderland>
+References: <1084655065.19124.3.camel@alice.wonderland>
 Content-Type: text/plain
-Message-Id: <1084708620.4184.4.camel@pegasus>
+Message-Id: <1084708779.4184.7.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -20,31 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sun, 16 May 2004 13:57:00 +0200
+Date: Sun, 16 May 2004 13:59:39 +0200
 
-Hi Fred,
+Hi,
 
-> I think this is normal. When you boot, the USB/BT hub (the mouse base
-> station) acts as a dumb RF<->HID in plain USB mode. I.e. Linux
-> recognizes the base station as a USB hub with plain USB keyboard and
-> mouse attached to it.
+> Cardctl ident 3Com "3CRWB6096B Bluetooth PC CARD","",""
+> mandfid 0x0101,0x0041
+> function : 2 (serial)
+> ttyS16|I/O ox100 irq3 FUNCID=2 / 8 8250 16c960 
 > 
-> When you switch over to HCI mode with hid2hci, the USB hub, mouse and
-> keyboards disappear and a USB/BT dongle appears instead (i.e. a HCI
-> "hub"). The USB/BT piece is not connected to any device yet. You
-> normally have to pair the keyboard and mouse and start bthid to do the
-> HCI<->HID conversion in order to make Linux see your BT devices... You
-> can't type these commands since the kernel can't see your keyboard
-> during that phase :-) It's a catch chicken and egg problem.
+> 3.3V 16bit PCCARD Function 0 [ready]
 > 
-> Try connecting a secondary keyboard for the initial pairing and make
-> sure you start bthid automatically after hid2hci next time (you don't
-> have to pair each time).
+> All i have to do is to test now
 
-actually this isn't a chicken and egg problem. You only must ensure that
-the hidd is correctly started. When you then run hid2hci the mouse and
-keyboard will be disconnected and they will reconnect, but now the BlueZ
-is running the HID profile.
+so this is a serial port based Bluetooth card. You must run hciattach to
+attach that serial port through the hci_uart driver to the BlueZ stack.
+I don't own that card, so you must try by yourself which is the correct
+command line.
 
 Regards
 
