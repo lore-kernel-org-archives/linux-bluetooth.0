@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Fwd: alsa bluetooth module
-From: Fredrik Tolf <fredrik@dolda2000.com>
-To: bluez-devel@lists.sourceforge.net
+Mime-Version: 1.0 (Apple Message framework v619.2)
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Message-Id: <e36f1e61ac13a554d52d2f7b8d7a5df4@freezone.co.uk>
 Cc: Antonio-Blasco Bonito <blasco.bonito@email.it>
-In-Reply-To: <e36f1e61ac13a554d52d2f7b8d7a5df4@freezone.co.uk>
-References: <e36f1e61ac13a554d52d2f7b8d7a5df4@freezone.co.uk>
-Content-Type: text/plain
-Message-Id: <1111098892.19889.88.camel@pc7.dolda2000.com>
-Mime-Version: 1.0
+From: ms419@freezone.co.uk
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] Fwd: alsa bluetooth module
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,42 +17,57 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 17 Mar 2005 23:34:52 +0100
+Date: Thu, 17 Mar 2005 14:05:17 -0800
 
-On Thu, 2005-03-17 at 14:05 -0800, ms419@freezone.co.uk wrote:
-> Begin forwarded message:
-> 
-> > From: Antonio-Blasco Bonito <blasco.bonito@email.it>
-> > Date: March 17, 2005 4:02:35 AM PST
-> > To: ms419@freezone.co.uk
-> > Subject: Re: alsa bluetooth module
+I maintain a Debian package of bluetooth-alsa - for my convenience -=20
+but bluetooth-alsa is so popular, some others use this package also -=20
+http://cgi.sfu.ca/~jdbates/moin/moin.cgi/Bluetooth&ALSA
+
+Blasco contacted me with this problem, but truth is - I haven't got=20
+bluetooth-alsa working myself. Perhaps someone else can be more helpful=20=
+
+to him?
+
+Many thanks!
+
+Jack
+
+Begin forwarded message:
+
+> From: Antonio-Blasco Bonito <blasco.bonito@email.it>
+> Date: March 17, 2005 4:02:35 AM PST
+> To: ms419@freezone.co.uk
+> Subject: Re: alsa bluetooth module
+
 [...]
-> > I get:
-> > # modprobe snd-bt-sco
-> > FATAL: Error inserting snd_bt_sco 
-> > (/lib/modules/2.6.8-2-686/extra/snd-bt-sco.ko): Unknown symbol in 
-> > module, or unknown parameter (see dmesg)
-> >
-> > # dmesg|tail
-> > ...
-> > snd_bt_sco: no version for "struct_module" found: kernel tainted.
-> > snd_bt_sco: Unknown symbol kcalloc
 
-Well, I'm not sure (especially since I don't use Debian and thus have no
-idea how they compile their kernels), but I would guess that this is a
-matter of symbol versioning. Is this module compiled against the same
-kernel (and with the same compilation options) that Blasco is using?
+> I get:
+> # modprobe snd-bt-sco
+> FATAL: Error inserting snd_bt_sco=20
+> (/lib/modules/2.6.8-2-686/extra/snd-bt-sco.ko): Unknown symbol in=20
+> module, or unknown parameter (see dmesg)
+>
+> # dmesg|tail
+> ...
+> snd_bt_sco: no version for "struct_module" found: kernel tainted.
+> snd_bt_sco: Unknown symbol kcalloc
+>
+> I looked in alsa sources in the kernel and I only found=20
+> "snd_magic_kcalloc"
+> Maybe kcalloc calls should be renamed as such?
+>
+> Cheers,
+>             Blasco
+> --
+> Email.it, the professional e-mail, gratis per te: =
+http://www.email.it/f
+> Sponsor:
+> Bisogno di liquidit=E0? Non devi spiegare per cosa. Fino a 4.000 =80 a=20=
 
-Try to check the output of `grep kcalloc /proc/kallsyms' and compare
-that to the output of `nm /path/to/snd-bt-sco.ko | grep kcalloc'.
-
-> > I looked in alsa sources in the kernel and I only found 
-> > "snd_magic_kcalloc"
-> > Maybe kcalloc calls should be renamed as such?
-
-By no means. kcalloc() is a core kernel function, defined in mm/slab.c.
-It's not an ALSA-specific routine.
-
+> casa tua
+> Clicca qui: http://adv.email.it/cgi-bin/foclick.cgi?mid=3D2291&d=3D17-3
+>
+>
 
 
 
