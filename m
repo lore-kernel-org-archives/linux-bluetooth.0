@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Nokia 7610 phone & logitech DiNovo keyboard /
-	MX900 mouse
-From: Laurence Orchard <Laurence.Orchard@tesco.net>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <1102315314.8510.57.camel@pegasus>
-References: <1102035154.4258.14.camel@localhost>
-	 <1102042749.7350.33.camel@pegasus>  <1102291223.4219.3.camel@localhost>
-	 <1102315314.8510.57.camel@pegasus>
-Content-Type: text/plain
-Message-Id: <1102639908.4112.7.camel@localhost>
+Subject: Re: [Bluez-users] BT unter SuSE 9.2
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAkRplsTjGckiCzJYjVEyeLQEAAAAA@t-online.de>
+References: 
+	 <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAABgAAAAAAAAAosiAEZOtxUiHqgChZUVmh8KAAAAQAAAAkRplsTjGckiCzJYjVEyeLQEAAAAA@t-online.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <1102627923.7962.8.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,41 +19,32 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 10 Dec 2004 00:51:48 +0000
+Date: Thu, 09 Dec 2004 22:32:02 +0100
 
-On Mon, 2004-12-06 at 07:41 +0100, Marcel Holtmann wrote:
-> Hi Laurence,
-> 
-> > I have now upgraded to Fedora Core 3
-> > kernel-2.6.9-1.667
-> > bluez-bluefw-1.0-6
-> > bluez-hcidump-1.11-1
-> > bluez-utils-2.10-2
-> > bluez-libs-2.10-2
-> > bluez-libs-devel-2.10-2
-> > 
-> > the problem more or less is the same, start Bluetooth, keyboard & mouse
-> > stop working.
-> > 
-> > Same question as before, how do I set it up so the system will recognise
-> > my phone, keyboard & mouse.
-> 
-> make sure that "hidd --server" is started somewhere in the boot script.
-> 
-> Regards
-> 
-> Marcel
-> 
+Hi Peter,
 
-Yes hidd --server --search
+> when I'm starting kbluetoothd I get for the BT-accesspoint the
+> characteristics:
+> Typ: LAN/Networking Bluetooth Device
+> Ge=E4ndert:  01.01.1970  01:00
+> Eigent=FCmer: -
+> Rechte: drwxrwxrwx
+>=20
+> then I try to reach or show the services of the BT-accesspoint but with=
+out
+> any sucess.
+> I'm not able to interpret the hcidump -x as you see it here. Please be =
+so
+> kind to help me. I have to send the PIN to the bt-accesspoint, the PIN =
+is
+> set in /etc/bluetooth/pin and in hcid.conf security is set to auto.
 
-run at boot S26hidd in rc5.d
-after S25bluetooth
+what does "hciconfig -a" show you?
 
-still the same problem, debugging is very difficult without a mouse or
-keyboard. Can't query system, all I can do is press the reset button!
+Regards
 
-laurence
+Marcel
+
 
 
 
