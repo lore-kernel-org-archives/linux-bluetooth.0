@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] btsco
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1107212460.6703.9.camel@linux.site>
-References: <1107212460.6703.9.camel@linux.site>
+From: Dave Henriksen <dhenriksen@optibrand.com>
+To: bluez-devel@lists.sourceforge.net
 Content-Type: text/plain
-Message-Id: <1107209370.8848.4.camel@pegasus>
+Message-Id: <1107212460.6703.9.camel@linux.site>
 Mime-Version: 1.0
+Subject: [Bluez-devel] btsco
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,22 +16,16 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 31 Jan 2005 23:09:30 +0100
+Date: Mon, 31 Jan 2005 15:01:00 -0800
 
-Hi Dave,
+I am attempting to build btsco.   I apologize if this is a dumb
+question, but where in the heck can I download the libao-dev and
+libbluetooth-dev packages ?   The only ones I have found are ".deb"
+packages for Debian.  I am running under SUSE9.2
 
-> I am attempting to build btsco.   I apologize if this is a dumb
-> question, but where in the heck can I download the libao-dev and
-> libbluetooth-dev packages ?   The only ones I have found are ".deb"
-> packages for Debian.  I am running under SUSE9.2
+Thanks,
 
-you only have to install them. They are named a little bit different.
-The development part for the Bluetooth library is already included in
-the bluez-libs package and for the AO library you need libao-devel.
-
-Regards
-
-Marcel
+Dave Henriksen
 
 
 
