@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Questions about correctness of hci_usb sco
-	support.
+Subject: Re: [Bluez-devel] [PATCH] Fix to enable bluez SCO USB urbs.
 From: Marcel Holtmann <marcel@holtmann.org>
 To: James Courtier-Dutton <James@superbug.demon.co.uk>
 Cc: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <403F8EAC.40701@superbug.demon.co.uk>
-References: <403F8EAC.40701@superbug.demon.co.uk>
+In-Reply-To: <403FD968.6010004@superbug.demon.co.uk>
+References: <403FD968.6010004@superbug.demon.co.uk>
 Content-Type: text/plain
-Message-Id: <1077973622.2843.75.camel@pegasus>
+Message-Id: <1077972736.2843.60.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -19,52 +18,24 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 28 Feb 2004 14:07:02 +0100
+Date: Sat, 28 Feb 2004 13:52:16 +0100
 
 Hi James,
 
-> In hci_usb.c file, line 604 ish
-> static inline int __recv_frame(struct hci_usb *husb, int type, void 
-> *data, int count)
+> Here is a patch for /usr/src/linux-2.6.3/drivers/bluetooth/hci_usb.c
 > 
-> Contains: -
-> case HCI_SCODATA_PKT:
->         if (count >= HCI_SCO_HDR_SIZE) {
->                   struct hci_sco_hdr *h = data;
->                   len = HCI_SCO_HDR_SIZE + h->dlen;
->         } else
->                   return -EILSEQ;
->         break;
+> Without the interval set, the latest kernel 2.6.3 usb code will reject 
+> the usb_submit_urb().
 > 
-> With a SCO HCI packet, it lasts 3 air frames for a bluetooth headset.
-> How do we know that the first frame we receive from the usb bluetooth 
-> device is the SCO HCI header?
+> Without this patch no ISOC urbs are submitted, and thus no SCO data is 
+> passed.
 
-	if (!skb) {
-		/* Start of the frame */
+the same patch is already in 2.6.4-rc1.
 
-> What happens if the first SCO HCI frame we receive is actually the 
-> second or third frame in the SCO HCI packet ?
-> Surely some validation checks need to be done.
-> For example, depending on the sample format we are using, we should 
-> already know what the SCO HCI length should be, so we could check this 
-> against the length in the SCO HCI header, and only accept the frame if 
-> they match, if they don't match, drop the frame, and wait for the next 
-> frame.
-> I would expect similar problems with HCI int/bulk frames, but I don't 
-> actually see any corrupt int/bulk frames, so I was wondering whether the 
-> usb bluetooth dongle somehow ensures that the first air frame we receive 
-> is actually the start of an HCI frame. Maybe it is just luck, as 
-> int/bulk frames normally have a lot of blank invalid frames in between, 
-> so maybe as soon as it sees a valid frame, it is always the start of the 
-> int/bulk frame. I don't think we can make this assumtion all the time, 
-> in case we start filling the air entirely with bulk frames, and some air 
-> frames get lost. We will have to drop the hci frame, and then resync 
-> when the next hci frame arrives.
+> The proper fix would really be to only enable these when a SCO 
+> connection is actually open.
 
-I actually don't get your point, because the USB INT, BULK and ISOC
-URB's has nothing to do with the frames on the air. It is the HCI of the
-Bluetooth chip.
+Of course. Send me patches for it.
 
 Regards
 
