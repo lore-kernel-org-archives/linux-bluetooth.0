@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
+Message-ID: <41ADB1C2.8070805@suche.org>
+From: "suche.org" <admin@suche.org>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] BTsco
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <41ADB1C2.8070805@suche.org>
-References: <200412010839.06669.mailsp@sebastian-eichner.de>
-	 <200412010943.33419.mail@sebastian-eichner.de>
-	 <1101894192.18840.44.camel@pegasus>
-	 <200412011224.29191.mail@sebastian-eichner.de>  <41ADAC67.10706@suche.org>
-	 <1101901302.18840.72.camel@pegasus>  <41ADB1C2.8070805@suche.org>
-Content-Type: text/plain
-Message-Id: <1101902920.18840.79.camel@pegasus>
-Mime-Version: 1.0
+References: <200412010839.06669.mailsp@sebastian-eichner.de>	 <200412010943.33419.mail@sebastian-eichner.de>	 <1101894192.18840.44.camel@pegasus>	 <200412011224.29191.mail@sebastian-eichner.de>  <41ADAC67.10706@suche.org> <1101901302.18840.72.camel@pegasus>
+In-Reply-To: <1101901302.18840.72.camel@pegasus>
+Content-Type: text/html; charset=ISO-8859-15
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -22,25 +18,34 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Wed, 01 Dec 2004 13:08:40 +0100
+Date: Wed, 01 Dec 2004 12:57:54 +0100
 
-Hi Thomas,
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-15"
+ http-equiv="Content-Type">
+  <title></title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Marcel Holtmann wrote:
+<blockquote cite="mid1101901302.18840.72.camel@pegasus" type="cite">
+  <pre wrap="">Hi Thomas,
 
-> > this looks a way better. I am going to check it in as btsco2.c
-> >   
-> Uhps the S must be came in when is saved the source :-(
-
-your version is now in the CVS as btsco2.c and I already fixed a bunch
-of coding style mistakes that were still present (especially the missing
-static declarations). There are still some more things that are not nice
-and you should read the kernel coding style paper from Greg.
-
-Regards
-
-Marcel
-
-
-
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">i hope this time it is better c style.
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+this looks a way better. I am going to check it in as btsco2.c
+  </pre>
+</blockquote>
+Uhps the S must be came in when is saved the source :-(<br>
+<br>
+Cu Thomas<br>
+</body>
+</html>
 
 
 -------------------------------------------------------
