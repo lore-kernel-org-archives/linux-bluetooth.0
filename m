@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] bthid,ppc,sdp
+Subject: Re: [Bluez-users] What's the best way to go about device detection?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ben Wilson <bwilson@yooser.org>
+To: Rob Raper <djrobx@hotmail.com>
 Cc: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20040519214238.GK15386@stag.mark-and-erika.com>
-References: <878yfp4bmz.fsf@handgranat.org>
-	 <20040519212124.GI15386@stag.mark-and-erika.com>
-	 <1085002651.4327.82.camel@pegasus>
-	 <20040519214238.GK15386@stag.mark-and-erika.com>
+In-Reply-To: <BAY14-F2518CB70kFir00064ba8@hotmail.com>
+References: <BAY14-F2518CB70kFir00064ba8@hotmail.com>
 Content-Type: text/plain
-Message-Id: <1085007918.4327.127.camel@pegasus>
+Message-Id: <1085006674.4327.118.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -21,17 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 20 May 2004 01:05:18 +0200
+Date: Thu, 20 May 2004 00:44:35 +0200
 
-Hi Ben,
+Hi Rob,
 
-> > build the hidp support as module, because it looks like that some
-> > function will collide with the usbhid driver.
-> 
-> Bingo! Thanks.
+> Do you know of any manufacturers out there that make CSR BlueCore02 based 
+> dongles that have the 1.2 update available?  Or is there currently no 
+> solution that I can go out and buy that will give me 1.2 support?
 
-I fixed this problem and with the next patch it should be possible to
-compile hidp and usbhid built-in.
+I don't know of any, but my AVM BlueFRITZ! USB v2.0 prototype supports
+Inquiry with RSSI and the Anycom USB-120 should be available in a 1.2
+version very soon. However you can of course buy a CSR Casira to check
+out their Bluetooth 1.2 support.
 
 Regards
 
