@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <296459384.12087@bjut.edu.cn>
-From: "Jin Pu" <jpu@emails.bjpu.edu.cn>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-Mime-Version: 1.0
-Content-Type: text/plain;
-      charset="GB2312"
-Subject: [Bluez-users] bluez-hciemu-1.0 install error- Glib Not found
+Message-ID: <20040929112930.56699.qmail@web53207.mail.yahoo.com>
+From: Massimiliano Cuccia <massimiliano_cuccia@yahoo.com>
+Subject: Re: [Bluez-users] obexFTP ... does it works?
+To: Bluez-users@lists.sourceforge.net
+In-Reply-To: <41591760.90208@c-s.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,28 +16,47 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 29 Sep 2004 20:15:46 +0800
+Date: Wed, 29 Sep 2004 04:29:30 -0700 (PDT)
 
-Good day:
- 
- When I want to install bluez-hciemu-1.0 into my Red
- Hat 9, I got an error when I start ./configure to
- generate Makefile. 
- 
- ---here is the error when execute ./configure ---
- checking for GLib ...
- checking for glib-config... not found
- configure: error: GLib not found
- ---then ./configure exit back to the shell---
- 
- I know from the README, I need GLib package before
- install the hciemu. But I suppose that the package is
- already installed with RedHat 9.
- 
- What' wrong with it and what shoud I do?
+--- GUILLON Gabriel <gabriel.guillon@c-s.fr> wrote:
+> I just tried obexftp on friday. I use channel 4.
+
+I want to send the file named pippo.txt
+this is what i'm doing
+---- first i search for my phone
+
+maxc@linux:~/prj/4/utils> hcitool scan
+Scanning ...
+        00:60:57:FB:3F:CE       MaxCube6600
+
+---- next try to send the file
+maxc@linux:~/prj/4/utils> obexftp -b 00:60:57:FB:3F:CE
+-B 10 -p pippo.txt
+No custom transport
+Connecting...bt: 1
+failed: S45 UUID
+done
+Sending pippo.txt...\failed: pippo.txt
+Disconnecting...done
+maxc@linux:~/prj/4/utils> 
+
+If I try channel 4 it doesn't write the send line like
+above. It writes connecting/failed pair three times.
+(sorry I don't have the transcription of my shell)
+
+are these the same steps you do to achieve transfer of
+file?
+thanks
 
 
 
+
+	
+		
+__________________________________
+Do you Yahoo!?
+New and Improved Yahoo! Mail - 100MB free storage!
+http://promotions.yahoo.com/new_mail 
 
 
 -------------------------------------------------------
