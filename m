@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <5000105b0501070138cd4b4a8@mail.gmail.com>
-From: Amit Kumar Goel <amitgoel25aug@gmail.com>
-To: Bluez-devel@lists.sourceforge.net
+Message-ID: <5256d0b0501062319209a3d3a@mail.gmail.com>
+From: Peter Robinson <pbrobinson@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] btsco under FC3
+In-Reply-To: <41DE36E2.5030404@xmission.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Subject: [Bluez-devel] SDP & RFCOMM SYNC
+References: <5256d0b05010520461ad68ff3@mail.gmail.com>
+	 <1105014278.4299.19.camel@pegasus>
+	 <5256d0b05010622152c32d3f4@mail.gmail.com>
+	 <41DE36E2.5030404@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,22 +21,15 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 7 Jan 2005 15:08:41 +0530
+Date: Fri, 7 Jan 2005 15:19:15 +0800
 
-Hi frds,
+> It's not a real daemon. You run it in the foreground and click the
+> connect button on the headset. Then you can send and receive audio from
+> another app.
 
-I am working over SDP layer & i want to suport multiple profile over rfcomm.
+OK so its not suppose to exit then...
 
-I want to know how I can implement the following situation.
-
-Already there is one rfcomm (ACL) connection with the remote device by
-a profile .Other profile wants to make sdp session with the same
-device.How can we send query request over the l2cap chanel?
-
-If so, wat will happen after if sdp sends a disconnect request after query?
-
-Regards 
-Amit
+P
 
 
 -------------------------------------------------------
