@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Error when compiling bluez-utils
+Subject: Re: [Bluez-users] IOGear GBU311 support
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4dfd570904122402134ec2fd32@mail.gmail.com>
-References: <4dfd570904122402134ec2fd32@mail.gmail.com>
+In-Reply-To: <m2ekhg51v9.fsf@tnuctip.rychter.com>
+References: <m2ekhg51v9.fsf@tnuctip.rychter.com>
 Content-Type: text/plain
-Message-Id: <1103892116.20258.89.camel@pegasus>
+Message-Id: <1103891971.20258.85.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,14 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 24 Dec 2004 13:41:56 +0100
+Date: Fri, 24 Dec 2004 13:39:31 +0100
 
-Hi,
+Hi Jan,
 
-> I get those errors when I compile bluez-utils ... using
-> 2.6.8-gentoo-r10 and gcc (GCC) 3.3.4 20040623.
+> I've just bought a rather nice USB bluetooth adapter, IOgear
+> GBU311. It's a class 1 device.
+> 
+> lsusb shows it as four devices:
+> 
+> Bus 001 Device 014: ID 0a5c:2009 Broadcom Corp. 
 
-take a look at the ChangeLog file of this package.
+this is the problematic one. The 0a5c:200a works fine. As long as nobody
+donates one of these to me I can't take a deeper look why this one makes
+so much problems.
 
 Regards
 
