@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20040408114640.19624.qmail@web60309.mail.yahoo.com>
+Message-ID: <20040408114459.19348.qmail@web60309.mail.yahoo.com>
 From: =?iso-8859-1?q?Thomas=20PEYRIN?= <titom51@yahoo.fr>
 Reply-To: tpeyrin@cpe.fr
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-Subject: [Bluez-users] kbluetoothd problem - noob
+Subject: [Bluez-users] sniffing others devices - noob
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,13 +16,15 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 8 Apr 2004 13:46:40 +0200 (CEST)
+Date: Thu, 8 Apr 2004 13:44:59 +0200 (CEST)
 
 hi !
 
-when i lanch kbluetoothd, the process immediately
-stops and i don't understand why ... if someone could
-help me ...
+i'm would like to get the random values (in_rand) and
+all the other data (Ca - Cb) sent while the
+authentification of two devices. Can hcidump get these
+values if he runs on a different machine than the two
+ones authentificating ?? how so ??
 
 thanks in advance !
 
