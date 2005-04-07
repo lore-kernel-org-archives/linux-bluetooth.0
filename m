@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] pm-325 help, anyone aside from marcel?
+Subject: Re: [Bluez-users] Configure PCMCIA Zoom Bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050407160939.51153.qmail@web50705.mail.yahoo.com>
-References: <20050407160939.51153.qmail@web50705.mail.yahoo.com>
+In-Reply-To: <BAY23-F26E455C08371E7C6201733B13E0@phx.gbl>
+References: <BAY23-F26E455C08371E7C6201733B13E0@phx.gbl>
 Content-Type: text/plain
-Message-Id: <1112891952.9047.90.camel@pegasus>
+Message-Id: <1112891841.9047.87.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,30 +18,23 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 07 Apr 2005 18:39:12 +0200
+Date: Thu, 07 Apr 2005 18:37:21 +0200
 
-Hi John,
+Hi Cesar,
 
-> I was wondering if anyon else could help me with
-> getting the bluetooth for DUN/com port emulation
-> working in linux, as I have it in XP, with LG PM-325
-> phone?  An rfcomm device cannot be created with it,
-> saying connection refused(presumably due to wrong
-> channel?).  I have repeatedly responded to marcel's
-> questioning on the issue, but he seems to have decided
-> to start ignoring me all of the sudden, after asking
-> me several questions about my issue.  I have emailed
-> him personally and asked if there's any other
-> information I could provide him that would help
-> resolve my issue, but all in vain.
+> First sorry by my english is very poor i've a question about to configure a 
+> pcmcia card Zoom 4312 Bluetooth i see in your web a description about card 
+> information structure of the zoom bluetooth card. i installed ubuntu hoary 
+> rc in my laptop (Toshiba 1700-200) and i can not use the multysinc to pairy 
+> my SE Phone with the laptop with cardctrl  ident i obtaint the next 
+> information:
+> 
+> product info :  "PCMCIA", "Bluetoothcard","",""
+> manfid: 0x0279, 0x950b
+> function : 2 (serial)
 
-as I already told you, you need to choose the right RFCOMM channel for
-the dialup networking or serial port profile. After that call
-
-	rfcomm bind 0 <bdaddr> <channel>
-
-and /dev/rfcomm0 is working like any other serial port. The hcidump
-always showed that you used the wrong channel number.
+check with "dmesg" for a new ttyS device after you put in that card and
+then call "hciattach <dev> zoom".
 
 Regards
 
