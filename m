@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42556E87.7090206@csr.com>
-From: Steven Singer <steven.singer@csr.com>
+From: Catalin Drula <Catalin.Drula@imag.fr>
+To: <bluez-devel@lists.sourceforge.net>
+Message-ID: <Pine.GSO.4.33.0504071324180.4769-100000@horus.imag.fr>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Re: [PATCH] H4 loss of synchronization recovery
-References: <Pine.GSO.4.33.0504071324180.4769-100000@horus.imag.fr>
-In-Reply-To: <Pine.GSO.4.33.0504071324180.4769-100000@horus.imag.fr>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Bluez-devel] Re: [PATCH] H4 loss of synchronization recovery
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,56 +16,211 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 07 Apr 2005 18:31:51 +0100
+Date: Thu, 7 Apr 2005 18:46:36 +0200 (CEST)
 
-Catalin Drula wrote:
-> But, I would safely say that if such devices exist, they are the
-> exception, rather than the norm. Maybe someone with more knowledge about
-> Bluetooth firmware could confirm/infirm that (Steven?). From the spec it
-> does not sound like those hardware error should be occuring very often
-> (they should signal critical conditions; they cannot be "benign").
+Hi Marcel,
 
-As an example, I can think of one for CSR devices that might cause a
-problem. It indicates a real, serious error but does not require a
-reboot. It's FAULT_SYNTH (0x12). This is emitted at boot if we're unable
-to calibrate the radio. The usual reason for this is that our PS keys
-have not been set correctly. The host will then want to set the correct
-PS keys and reboot.
+Marcel Holtmann <marcel <at> holtmann.org> writes:
 
-This might be common on ROM devices without an external EEPROM as the
-PS keys are wiped on every cold reboot. The ROM parts have to assume
-values for critical parts of the system, such as the crystal frequency.
-Clearly, this can be right only for some modules. Attempting to
-calibrate the radio from a 16 MHz crystal when you think it's 26 MHz
-is likely to fail (you'll be trying to tune to 1.4 GHz, not 2.4 GHz).
-The chip will still boot, albeit a bit slower, and will then use baud
-rate detection to establish communcation with the host. The host should
-then download the right parameters and issue a BCCMD SETREQ warm_reset.
+> please change some things for me to clean this patch.
+>
+> 1. The "{" after the function name must be at the next line.
+>
+> 2. Name the reset function hci_reset_dev().
+>
+> It is not H:4 specific, even if you only call it in that case. And since
+> the parameter is hci_dev it should not start with hci_dev_*. In this
+> case you would expect a device id.
+>
+> 3. There is no need to preset "auth" and "encrypt".
+>
+> 4. For "auth" and "encrypt" use constructs like this:
+>
+> 	auth = test_bit(HCI_AUTH, &hdev->flags) ? AUTH_ENABLED : AUTH_DISABLED
+>
+> To decrease the stack size, you can also use the same variable for
+> "auth", "encrypt" and "scan".
 
-Fortunately, in this case, an HCI_Reset is not a sufficiently hard reset
-to force us to try and recalibrate, so we shouldn't get stuck in an
-infinite loop.
+I did all of the above and attached you have the cleaned up patch.
 
-We did once toy with hardware error codes to indicate battery voltage
-problems. We don't use them now, but they would be another example of
-something serious enough for a hardware error but where rebooting is the
-wrong thing to do.
+> And what do we do if the transport if BCSP? In this case the type is
+> also HCI_UART.
 
-Having said that, on the H4 transport, 99.9% of all hardware errors are
-loss of link synchronisation, so resetting HCI is usually the right
-thing.
+I thought about this. We could check that the actual UART transport used
+is H4, using something like this:
 
-	- Steven
--- 
+((struct hci_uart *)hdev->driver_data)->proto.id == HCI_UART_H4
 
+but that does not seem right, because you have to include the header file
+drivers/bluetooth/hci_uart.h (in net/bluetooth/hci_event.c). It does not
+seem like a good thing from a design point of view.
 
-**********************************************************************
-This email and any files transmitted with it are confidential and
-intended solely for the use of the individual or entity to whom they
-are addressed. If you have received this email in error please notify
-the system manager.
+As it stands now, it would only hurt if you have some device that uses
+BCSP as transport protocol, raises a hardware error, and you don't want a
+reset of the device as a result of this hardware error. The Bluetooth 1.2
+spec says "The Hardware Error event is used to indicate some type of
+hardware failure for the Bluetooth device". Could this be a transient
+failure, even a periodical one, that could be safely ignored? If the
+answer is yes, then our patch would hurt those devices (one can imagine
+that if such a device generates a hw error event every second or so,
+and this event is benign, you would not want to tear up all your
+connections when it happens).
 
-**********************************************************************
+But, I would safely say that if such devices exist, they are the
+exception, rather than the norm. Maybe someone with more knowledge about
+Bluetooth firmware could confirm/infirm that (Steven?). From the spec it
+does not sound like those hardware error should be occuring very often
+(they should signal critical conditions; they cannot be "benign").
+
+We could add a boolean parameter to the bluetooth module, something like
+"ignore_hardware_errors", to take care of those odd cases of BCSP and H4
+devices, if they exist, which I doubt.
+
+Regards,
+
+Catalin
+
+diff -ur linux-2.6.11-mh2/include/net/bluetooth/hci_core.h linux-2.6.11-mh2-hwerr/include/net/bluetooth/hci_core.h
+--- linux-2.6.11-mh2/include/net/bluetooth/hci_core.h	2005-03-24 13:08:31.000000000 +0100
++++ linux-2.6.11-mh2-hwerr/include/net/bluetooth/hci_core.h	2005-04-07 12:35:26.433165382 +0200
+@@ -381,6 +381,7 @@
+ int hci_dev_close(__u16 dev);
+ int hci_dev_reset(__u16 dev);
+ int hci_dev_reset_stat(__u16 dev);
++int hci_reset_dev(struct hci_dev *hdev);
+ int hci_dev_cmd(unsigned int cmd, void __user *arg);
+ int hci_get_dev_list(void __user *arg);
+ int hci_get_dev_info(void __user *arg);
+diff -ur linux-2.6.11-mh2/include/net/bluetooth/hci.h linux-2.6.11-mh2-hwerr/include/net/bluetooth/hci.h
+--- linux-2.6.11-mh2/include/net/bluetooth/hci.h	2005-03-24 13:02:39.000000000 +0100
++++ linux-2.6.11-mh2-hwerr/include/net/bluetooth/hci.h	2005-04-05 14:10:55.000000000 +0200
+@@ -584,6 +584,11 @@
+ 	__u16    clock_offset;
+ } __attribute__ ((packed));
+
++#define HCI_EV_HARDWARE_ERROR	0x10
++struct hci_ev_hardware_error {
++	 __u8     hwcode;
++} __attribute__ ((packed));
++
+ /* Internal events generated by Bluetooth stack */
+ #define HCI_EV_STACK_INTERNAL	0xFD
+ struct hci_ev_stack_internal {
+diff -ur linux-2.6.11-mh2/net/bluetooth/hci_core.c linux-2.6.11-mh2-hwerr/net/bluetooth/hci_core.c
+--- linux-2.6.11-mh2/net/bluetooth/hci_core.c	2005-03-24 13:02:43.000000000 +0100
++++ linux-2.6.11-mh2-hwerr/net/bluetooth/hci_core.c	2005-04-07 12:51:15.415026673 +0200
+@@ -646,6 +646,76 @@
+ 	return ret;
+ }
+
++int hci_reset_dev(struct hci_dev *hdev)
++{
++	int ret = 0;
++	__u8 mode = 0;
++
++	hci_req_cancel(hdev, ENODEV);
++	hci_req_lock(hdev);
++
++	/* Disable RX and TX tasks */
++	tasklet_disable(&hdev->rx_task);
++	tasklet_disable(&hdev->tx_task);
++
++	/* Flush connection hash */
++	hci_dev_lock_bh(hdev);
++	hci_conn_hash_flush(hdev);
++	hci_dev_unlock_bh(hdev);
++
++	/* Flush driver */
++	if (hdev->flush)
++		hdev->flush(hdev);
++
++	/* Disable cmd task */
++	tasklet_disable(&hdev->cmd_task);
++
++	/* Drop queues */
++	skb_queue_purge(&hdev->rx_q);
++	skb_queue_purge(&hdev->cmd_q);
++	skb_queue_purge(&hdev->raw_q);
++
++	/* Reset command counter */
++	atomic_set(&hdev->cmd_cnt, 1);
++
++	/* Drop last sent command */
++	if (hdev->sent_cmd) {
++		kfree_skb(hdev->sent_cmd);
++		hdev->sent_cmd = NULL;
++	}
++
++	/* Send reset command */
++	hci_send_cmd(hdev, OGF_HOST_CTL, OCF_RESET, 0, NULL);
++
++	/* Reset ACL and SCO counters */
++	hdev->acl_cnt = hdev->acl_pkts;
++	hdev->sco_cnt = hdev->sco_pkts;
++
++	/* Restore device flags and state */
++	if (test_bit(HCI_ISCAN, &hdev->flags))
++		mode |= SCAN_INQUIRY;
++	if (test_bit(HCI_PSCAN, &hdev->flags))
++		mode |= SCAN_PAGE;
++	hci_send_cmd(hdev, OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE, 1, &mode);
++
++	mode = test_bit(HCI_AUTH, &hdev->flags) ? AUTH_ENABLED : AUTH_DISABLED;
++	hci_send_cmd(hdev, OGF_HOST_CTL, OCF_WRITE_AUTH_ENABLE, 1, &mode);
++
++	mode = test_bit(HCI_ENCRYPT, &hdev->flags) ? ENCRYPT_P2P : ENCRYPT_DISABLED;
++	hci_send_cmd(hdev, OGF_HOST_CTL, OCF_WRITE_ENCRYPT_MODE, 1, &mode);
++
++	clear_bit(HCI_INQUIRY, &hdev->flags);
++
++	/* Enable tasks */
++	tasklet_enable(&hdev->rx_task);
++	tasklet_enable(&hdev->tx_task);
++	tasklet_enable(&hdev->cmd_task);
++
++	hci_req_unlock(hdev);
++
++	return ret;
++}
++
+ int hci_dev_cmd(unsigned int cmd, void __user *arg)
+ {
+ 	struct hci_dev *hdev;
+diff -ur linux-2.6.11-mh2/net/bluetooth/hci_event.c linux-2.6.11-mh2-hwerr/net/bluetooth/hci_event.c
+--- linux-2.6.11-mh2/net/bluetooth/hci_event.c	2005-03-24 13:08:31.000000000 +0100
++++ linux-2.6.11-mh2-hwerr/net/bluetooth/hci_event.c	2005-04-07 12:33:42.035821861 +0200
+@@ -866,6 +866,20 @@
+ 	hci_dev_unlock(hdev);
+ }
+
++/* Hardware Error */
++static inline void hci_hardware_error_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_ev_hardware_error *ev = (struct hci_ev_hardware_error *) skb->data;
++
++	BT_ERR("%s hardware error event with code 0x%.2x", hdev->name, ev->hwcode);
++
++	/* Perform recovery procedure if the transport is UART */
++	if (hdev->type == HCI_UART) {
++		BT_ERR("%s performing H4 synchronization recovery procedure", hdev->name);
++		hci_reset_dev(hdev);
++	}
++}
++
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_event_hdr *hdr = (struct hci_event_hdr *) skb->data;
+@@ -938,6 +952,10 @@
+ 		hci_clock_offset_evt(hdev, skb);
+ 		break;
+
++	case HCI_EV_HARDWARE_ERROR:
++		hci_hardware_error_evt(hdev, skb);
++		break;
++
+ 	case HCI_EV_CMD_STATUS:
+ 		cs = (struct hci_ev_cmd_status *) skb->data;
+ 		skb_pull(skb, sizeof(cs));
 
 
 
