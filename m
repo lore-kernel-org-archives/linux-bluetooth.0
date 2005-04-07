@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <BAY23-F1784450F5B656E2A2DF08B13E0@phx.gbl>
-In-Reply-To: <1112894787.9047.95.camel@pegasus>
-From: "Cesar Diaz" <skagerrad@hotmail.com>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Configure PCMCIA Zoom Bluetooth
+Subject: Re: [Bluez-users] pm-325 help, anyone aside from marcel?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20050407165647.9470.qmail@web50706.mail.yahoo.com>
+References: <20050407165647.9470.qmail@web50706.mail.yahoo.com>
+Content-Type: text/plain
+Message-Id: <1112895220.9047.102.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,47 +18,25 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 07 Apr 2005 19:38:00 +0200
+Date: Thu, 07 Apr 2005 19:33:40 +0200
 
-Sorry but i write it correctly in my computer and the bluez-utils are the 
-last from ubuntu repositories
-and continue with the same error "unkwon type or id"
+Hi John,
 
+> As I replied, though, I tried other channels to no
+> avail, and I followed your exact instructions to try
+> to find the correct channel, and pasted you the
+> results of that, but never got a response.
 
-Thanks
+when you reply you always break the thread and this is not useful. Fix
+your mail client.
 
->From: Marcel Holtmann <marcel@holtmann.org>
->Reply-To: bluez-users@lists.sourceforge.net
->To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
->Subject: Re: [Bluez-users] Configure PCMCIA Zoom Bluetooth
->Date: Thu, 07 Apr 2005 19:26:27 +0200
->
->Hi Cesar,
->
-> > with dmesg i see a new ttyS14 but when i write "hciattach ttys14 zoom"  
->i
-> > received the next message :
-> >
-> > unkwon device type or id
->
->then update your bluez-utils and it is ttyS14 and not ttys14.
->
->Regards
->
->Marcel
->
->
->
->
->-------------------------------------------------------
->SF email is sponsored by - The IT Product Guide
->Read honest & candid reviews on hundreds of IT Products from real users.
->Discover which products truly live up to the hype. Start reading now.
->http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
->_______________________________________________
->Bluez-users mailing list
->Bluez-users@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-users
+And if all 30 RFCOMM channel behave the same then your phone has some
+weird setting. If the PN command is not answered with a response then
+there is no channel, so try the next one.
+
+Regards
+
+Marcel
 
 
 
