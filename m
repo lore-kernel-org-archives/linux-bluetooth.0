@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Configure PCMCIA Zoom Bluetooth
-From: Erwin Authried <eauth@softsys.co.at>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
 In-Reply-To: <BAY23-F1784450F5B656E2A2DF08B13E0@phx.gbl>
 References: <BAY23-F1784450F5B656E2A2DF08B13E0@phx.gbl>
 Content-Type: text/plain
-Message-Id: <1112896238.7898.52.camel@justakiss>
+Message-Id: <1112895960.9047.104.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,20 +18,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 07 Apr 2005 19:50:38 +0200
+Date: Thu, 07 Apr 2005 19:46:00 +0200
 
-Am Don, den 07.04.2005 schrieb Cesar Diaz um 19:38:
+Hi Cesar,
+
 > Sorry but i write it correctly in my computer and the bluez-utils are the 
 > last from ubuntu repositories
 > and continue with the same error "unkwon type or id"
-> 
-you should try 
-  hciattach <dev> bcsp
 
-if "zoom" isn't available.
+then try "hciattach ttyS14 bcsp 115200" or check the manual page for
+other possible options. Or compile bluez-utils from the source.
 
-Regards,
-Erwin
+Regards
+
+Marcel
 
 
 
