@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] nokia 7610 and LAN access
+Subject: Re: [Bluez-users] about sniff
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1112858437.5629e71cS9702510@student.rmit.edu.au>
-References: <1112858437.5629e71cS9702510@student.rmit.edu.au>
+In-Reply-To: <312862694.02755@bjut.edu.cn>
+References: <312862694.02755@bjut.edu.cn>
 Content-Type: text/plain
-Message-Id: <1112870068.9047.71.camel@pegasus>
+Message-Id: <1112869979.9047.68.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,13 +18,13 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 07 Apr 2005 12:34:28 +0200
+Date: Thu, 07 Apr 2005 12:32:59 +0200
 
-Hi Sean,
+Hi,
 
-> I used to use a nokia 3650 and was able to connect my uni LAN through the phone using serial profile and mrouter (ppp). Since the 7610 doesn't have that, and only the DUN profile, does anyone have an idea if it can be done?
+>   I want to set Sniff_Timeout and Sniff_Attempt command parameters in HCI_Sniff_Mode as bluetooth specification says. But I can't find the associated API about setting sniff mode.Is there any one cloud give me some clues ? Thanks in advance.
 
-check with sdptool what services the 7610 offers.
+you need to use the HCI raw socket for this.
 
 Regards
 
