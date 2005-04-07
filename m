@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] pm-325 help, anyone aside from marcel?
+Subject: Re: [Bluez-users] Configure PCMCIA Zoom Bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ Mailing List <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20050407165647.9470.qmail@web50706.mail.yahoo.com>
-References: <20050407165647.9470.qmail@web50706.mail.yahoo.com>
+In-Reply-To: <b5c638dc050407101411cc85d3@mail.gmail.com>
+References: <BAY23-F26E455C08371E7C6201733B13E0@phx.gbl>
+	 <1112891841.9047.87.camel@pegasus>
+	 <b5c638dc050407101411cc85d3@mail.gmail.com>
 Content-Type: text/plain
-Message-Id: <1112895220.9047.102.camel@pegasus>
+Message-Id: <1112894824.9047.97.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,21 +20,40 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 07 Apr 2005 19:33:40 +0200
+Date: Thu, 07 Apr 2005 19:27:04 +0200
 
-Hi John,
+Hi David,
 
-> As I replied, though, I tried other channels to no
-> avail, and I followed your exact instructions to try
-> to find the correct channel, and pasted you the
-> results of that, but never got a response.
+> this is how i connected my billionton card (same way with the zoom i
+> bought and returned after i figurd out how to get my card working)
+> 
+> well that's my script at startup that doesn' twork actually :)  but
+> the commands in line work.. the attach is for your ttys device once u
+> figure it out from dmesg.. then run the hcid, an hciconfig to see if
+> it's running.. then you can run hidd --connect and the mac of the
+> device..
+> 
+> hey marcel i have a question..   it seems everytime i run my connect
+> thing.. ineed to have my mouse in the pairing mode (solid light.. like
+> when i pair it with windows) is there a way to just have the mouse
+> connect without paring it everytime i reboot hte machine. ?
+> 
+> 
+> anyway i hope this helps anybody else that has a billionton card..
+> good work with the drivers..
+> 
+> #!/bin/sh
+> 
+> hciattach ttyS14 bcsp 921600
+> hcid
+> hciconfig
+> 
+> hidd --server
+> 
+> hidd --connect 00:0E:A1:03:09:AC
 
-when you reply you always break the thread and this is not useful. Fix
-your mail client.
-
-And if all 30 RFCOMM channel behave the same then your phone has some
-weird setting. If the PN command is not answered with a response then
-there is no channel, so try the next one.
+the connect is needed only once. After that the mouse will reconnect by
+itself if needed.
 
 Regards
 
