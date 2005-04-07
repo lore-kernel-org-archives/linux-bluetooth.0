@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <BAY20-F20A55F402EB690A199F6BD853E0@phx.gbl>
-From: "Martin Rolsted Jensen" <mrj_ing@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
+To: "BlueZ Mailing List" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] support for CSR Bluecore4 chip
+From: "durai" <durai@isofttech.com>
+In-Reply-To: <20050407125744.588722761.durai@isofttech.com>
+References: <20050402141512.1882699599.durai@isofttech.com>
+	<1112554855.8263.17.camel@pegasus>
+	<20050407125744.588722761.durai@isofttech.com>
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Subject: [Bluez-devel] Build BlueZ Libs and BluzZ Utils for ARM
+Message-Id: <20050407130933.1578873113.durai@isofttech.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,31 +20,17 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Thu, 07 Apr 2005 10:06:03 +0000
+Date: Thu, 7 Apr 2005 13:09:33 +0530
 
-Hello everybody!
 
-First of all thanks to Peter Wippich for his help - it gave me a clue, 
-but¡K!
 
-I am currently working on a triton1 board with a pxa255 module. I want to 
-connect a UART Bluetooth module to the board (WML-C20AH).
-The first thing I did was to configure the kernel (2.6.10) to support 
-Bluetooth. As far as I can see in the boot sequence of Linux, the ttyBT 
-interface is controlled by the standard ttyS1.
+Hi,
+I forgot to tell you that We are running 2.4.18 linux kernel in a
+big endian mips platform. Has it been already tested in some of the big end=
+ian platforms?
 
-Peter told me to build BlueZ Libs and then BluzZ Utils for my platform ¡V I 
-got that, marvellous.
-My new question is how to build those on a host-PC for my arm-board (no gcc 
-on that board).
-Am I going to get them precompiled - if so were to get them, and how to 
-install (step by step).
-I am newbie to Linux ƒº
-
-Best Regards
-
-Martin Rolsted Jensen
-
+regards
+durai
 
 
 
