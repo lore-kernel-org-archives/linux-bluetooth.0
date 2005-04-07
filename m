@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <20050408071216.92567.qmail@web52408.mail.yahoo.com>
-From: jose <twblr@yahoo.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <4255B49C.3090406@xmission.com>
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-devel] bluez-utils-2.15 install
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] a2dp on iTech works
+References: <4255A15E.3010007@xmission.com>
+In-Reply-To: <4255A15E.3010007@xmission.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,39 +18,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 8 Apr 2005 00:12:16 -0700 (PDT)
+Date: Thu, 07 Apr 2005 16:30:52 -0600
 
-hi,
+hey
 
-in the 'README' of bluez-utils-2.15, it says:
+useful trivia--the pin is "8888" for this set even though the manual 
+states it's "0000"
 
-In order to compile Bluetooth utilities you need
-following software packages:
-	- Linux Bluetooth protocol stack (BlueZ)
-	- GCC compiler
-	- USB library
-	- Lexical Analyzer (flex, lex)
-	- YACC (yacc, bison, byacc)
-
-how do i find if item 1, i.e., the Linux Bluetooth
-protocol stack (BlueZ) is installed on my PC?what
-should i check for?
-
-and how do i install or find if: USB library is
-installed?what do i check for?
-
-iam working on suse 9.1, kernel 2.6.4-52-smp
-
-
-thanks & rgds,
-Jose
-
-
-		
-__________________________________ 
-Yahoo! Messenger 
-Show us what our next emoticon should look like. Join the fun. 
-http://www.advision.webevents.yahoo.com/emoticontest
+Brad Midgley wrote:
+> Hey
+> 
+> My iTech a2dp headset order has been delayed, but my coworker has his 
+> and it actually works with our a2dp driver! I am really looking forward 
+> to having the set for development as well as just using the thing.
+> 
+> Maybe this isn't so good for our support of the HP set since the 
+> headsets Marcel and I will be using seem to work ok.
+> 
+> Brad
+> 
+> 
+> -------------------------------------------------------
+> SF email is sponsored by - The IT Product Guide
+> Read honest & candid reviews on hundreds of IT Products from real users.
+> Discover which products truly live up to the hype. Start reading now.
+> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------
