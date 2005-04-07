@@ -1,51 +1,136 @@
-Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050407160939.51153.qmail@web50705.mail.yahoo.com>
-From: "John H." <mistamaila@yahoo.com>
+Return-Path: <S9702510@student.rmit.edu.au>
+Subject: Re: Re: [Bluez-users] nokia 7610 and LAN access
+Reply-To: s9702510@student.rmit.edu.au
+From: "Sean Turnbull" <S9702510@student.rmit.edu.au>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: 6667
+CC: marcel@holtmann.org
+Date: Thu, 07 Apr 2005 21:40:47 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: [Bluez-users] pm-325 help, anyone aside from marcel?
-Sender: bluez-users-admin@lists.sourceforge.net
-Errors-To: bluez-users-admin@lists.sourceforge.net
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 7 Apr 2005 09:09:39 -0700 (PDT)
+Message-ID: <1112874047.6722a81cS9702510@student.rmit.edu.au>
+Content-Type: text/plain; charset="ISO-8859-1"
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi, I was wondering if anyon else could help me with
-getting the bluetooth for DUN/com port emulation
-working in linux, as I have it in XP, with LG PM-325
-phone?  An rfcomm device cannot be created with it,
-saying connection refused(presumably due to wrong
-channel?).  I have repeatedly responded to marcel's
-questioning on the issue, but he seems to have decided
-to start ignoring me all of the sudden, after asking
-me several questions about my issue.  I have emailed
-him personally and asked if there's any other
-information I could provide him that would help
-resolve my issue, but all in vain.
+-----Original Message-----
+From: Sean Turnbull <sean@sean-turnbull.ph.rmit.edu.au>
+To: Sean Turnbull <s9702510@student.rmit.edu.au>
+Date: Thu, 7 Apr 2005 21:38:06 +1000 (EST)
+Subject: Re: [Bluez-users] nokia 7610 and LAN access (fwd)
 
-Thanks, any help would be appreciated.
+Hi Sean,
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+> I used to use a nokia 3650 and was able to connect my uni LAN through the=
+ phone using serial profile and mrouter (ppp). Since the 7610 doesn't hav=
+e that, and only the DUN profile, does anyone have an idea if it can be d=
+one?
+
+check with sdptool what services the 7610 offers.
+
+Regards
+
+Marcel
 
 
--------------------------------------------------------
-SF email is sponsored by - The IT Product Guide
-Read honest & candid reviews on hundreds of IT Products from real users.
-Discover which products truly live up to the hype. Start reading now.
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Services included are:
+Service Name: Hands-Free Audio Gateway
+Service RecHandle: 0x1002a
+Service Class ID List:
+  "Handfree Audio Gateway" (0x111f)
+  "Generic Audio" (0x1203)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 1
+Language Base Attr List:
+  code_ISO639: 0x454e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Handfree Audio Gateway" (0x111f)
+    Version: 0x0101
+
+Service Name: OBEX File Transfer
+Service RecHandle: 0x1002b
+Service Class ID List:
+  "OBEX File Transfer" (0x1106)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 10
+  "OBEX" (0x0008)
+Language Base Attr List:
+  code_ISO639: 0x454e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "OBEX File Transfer" (0x1106)
+    Version: 0x0100
+
+Service Name: SyncMLClient
+Service RecHandle: 0x1002c
+Service Class ID List:
+  "Error: This is UUID-128" (0x00000002-0000-1000-8000-0002ee000002)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 11
+  "OBEX" (0x0008)
+Language Base Attr List:
+  code_ISO639: 0x454e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Error: This is UUID-128" (0x00000002-0000-1000-8000-0002ee000002)
+    Version: 0x0100
+
+Service Name: Nokia OBEX PC Suite Services
+Service RecHandle: 0x1002d
+Service Class ID List:
+  "Error: This is UUID-128" (0x00005005-0000-1000-8000-0002ee000001)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 12
+  "OBEX" (0x0008)
+Language Base Attr List:
+  code_ISO639: 0x454e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Error: This is UUID-128" (0x00005005-0000-1000-8000-0002ee000001)
+    Version: 0x0100
+
+Service Name: OBEX Object Push
+Service RecHandle: 0x1002e
+Service Class ID List:
+  "OBEX Object Push" (0x1105)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 9
+  "OBEX" (0x0008)
+Language Base Attr List:
+  code_ISO639: 0x454e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "OBEX Object Push" (0x1105)
+    Version: 0x0100
+
+Service Name: Dial-Up Networking
+Service RecHandle: 0x1002f
+Service Class ID List:
+  "Dialup Networking" (0x1103)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 13
+Language Base Attr List:
+  code_ISO639: 0x454e
+  encoding:    0x6a
+  base_offset: 0x100
+Profile Descriptor List:
+  "Dialup Networking" (0x1103)
+    Version: 0x0100
+
+
+sean
