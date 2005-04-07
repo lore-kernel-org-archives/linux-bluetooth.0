@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <312862694.02755@bjut.edu.cn>
-From: "Jin Pu" <jpu@emails.bjpu.edu.cn>
-To: "bluez-users@lists.sourceforge.ne" <bluez-users@lists.sourceforge.net>
-Mime-Version: 1.0
-Content-Type: text/plain;
-      charset="GB2312"
-Subject: [Bluez-users] about sniff
+From: "Sean Turnbull" <S9702510@student.rmit.edu.au>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Message-ID: <1112858437.5629e71cS9702510@student.rmit.edu.au>
+Content-Type: text/plain; charset="ISO-8859-1"
+Subject: [Bluez-users] nokia 7610 and LAN access
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,19 +16,16 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Thu, 7 Apr 2005 16:49:10 +0800
+Date: Thu, 07 Apr 2005 17:20:37 +1000
 
- Good day,
-    
-  I want to set Sniff_Timeout and Sniff_Attempt command=
- parameters in HCI_Sniff_Mode as bluetooth specification says.=
- But I can't find the associated API about setting sniff mode.Is=
- there any one cloud give me some clues ? Thanks in advance.
- =09=09=09=09
+Hello all!
+I used to use a nokia 3650 and was able to connect my uni LAN through the p=
+hone using serial profile and mrouter (ppp). Since the 7610 doesn't have =
+that, and only the DUN profile, does anyone have an idea if it can be don=
+e?
 
-=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1Jin Pu
-=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1
-
+Thanks,
+Sean
 
 
 
