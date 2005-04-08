@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluez-utils-2.15 install
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20050408071216.92567.qmail@web52408.mail.yahoo.com>
+From: jose <twblr@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <20050408071216.92567.qmail@web52408.mail.yahoo.com>
-References: <20050408071216.92567.qmail@web52408.mail.yahoo.com>
-Content-Type: text/plain
-Message-Id: <1112958900.26175.9.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: [Bluez-devel] bluez-utils-2.15 install
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,37 +16,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 08 Apr 2005 13:15:00 +0200
+Date: Fri, 8 Apr 2005 00:12:16 -0700 (PDT)
 
-Hi Jose,
+hi,
 
-> in the 'README' of bluez-utils-2.15, it says:
-> 
-> In order to compile Bluetooth utilities you need
-> following software packages:
-> 	- Linux Bluetooth protocol stack (BlueZ)
-> 	- GCC compiler
-> 	- USB library
-> 	- Lexical Analyzer (flex, lex)
-> 	- YACC (yacc, bison, byacc)
-> 
-> how do i find if item 1, i.e., the Linux Bluetooth
-> protocol stack (BlueZ) is installed on my PC?what
-> should i check for?
-> 
-> and how do i install or find if: USB library is
-> installed?what do i check for?
-> 
-> iam working on suse 9.1, kernel 2.6.4-52-smp
+in the 'README' of bluez-utils-2.15, it says:
 
-the SuSE 9.1 kernel contains the needed BlueZ modules, but they are not
-up-to-date. The USB library is available as package over YaST.
+In order to compile Bluetooth utilities you need
+following software packages:
+	- Linux Bluetooth protocol stack (BlueZ)
+	- GCC compiler
+	- USB library
+	- Lexical Analyzer (flex, lex)
+	- YACC (yacc, bison, byacc)
 
-Regards
+how do i find if item 1, i.e., the Linux Bluetooth
+protocol stack (BlueZ) is installed on my PC?what
+should i check for?
 
-Marcel
+and how do i install or find if: USB library is
+installed?what do i check for?
+
+iam working on suse 9.1, kernel 2.6.4-52-smp
 
 
+thanks & rgds,
+Jose
+
+
+		
+__________________________________ 
+Yahoo! Messenger 
+Show us what our next emoticon should look like. Join the fun. 
+http://www.advision.webevents.yahoo.com/emoticontest
 
 
 -------------------------------------------------------
