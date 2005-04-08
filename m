@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] sco transfer not possible if hci_usb uses
-	ehci_hcd?
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Ruben Jenster <rjenster@web.de>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <200504082054.21259.rjenster@web.de>
-References: <200504082054.21259.rjenster@web.de>
-Content-Type: text/plain
-Message-Id: <1113049174.9783.52.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200504082054.21259.rjenster@web.de>
+Subject: [Bluez-devel] sco transfer not possible if hci_usb uses ehci_hcd?
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,33 +17,28 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 09 Apr 2005 14:19:34 +0200
+Date: Fri, 8 Apr 2005 20:54:21 +0000
 
-Hi Ruben,
+Hi,
 
-> I've the problem that when ehci_hcd is loaded  and I plug my bluetooth dongle 
-> to my usb hub,  hci_hcd uses the ehci host and playing or recording sound 
-> through snd-bt-sco is not possible then. (USB_EHCI_SPLIT_ISO is enabled)
-> I have to unload ehci_hcd and replug the dongle in order to make audio 
-> transfer possible.
-> Can I tell hci_usb to use ohci_hcd even when ehci_hcd is loaded? 
-> 
-> Curiously when I plug the dongle to the usb jacks that are direcly attached to 
-> the mainboard hci_usb uses the ohci host, even when ehci_hcd is loaded.
-> 
-> I've added a bug report to thet kernel bugtracker
-> http://bugme.osdl.org/show_bug.cgi?id=4358
-> 
-> I would be glad if someone could help me.
+I've the problem that when ehci_hcd is loaded  and I plug my bluetooth dongle 
+to my usb hub,  hci_hcd uses the ehci host and playing or recording sound 
+through snd-bt-sco is not possible then. (USB_EHCI_SPLIT_ISO is enabled)
+I have to unload ehci_hcd and replug the dongle in order to make audio 
+transfer possible.
+Can I tell hci_usb to use ohci_hcd even when ehci_hcd is loaded? 
 
-with David's and Greg's attention you got the right guys for this job,
-because I am not into USB HCD stuff.
+Curiously when I plug the dongle to the usb jacks that are direcly attached to 
+the mainboard hci_usb uses the ohci host, even when ehci_hcd is loaded.
 
-Regards
+I've added a bug report to thet kernel bugtracker
+http://bugme.osdl.org/show_bug.cgi?id=4358
 
-Marcel
+I would be glad if someone could help me.
 
+Regards 
 
+Ruben 
 
 
 -------------------------------------------------------
