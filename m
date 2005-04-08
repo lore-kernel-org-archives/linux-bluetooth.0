@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Ruben Jenster <rjenster@web.de>
+Subject: Re: [Bluez-devel] Problem to really close RFComm socket
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200504082054.21259.rjenster@web.de>
-Subject: [Bluez-devel] sco transfer not possible if hci_usb uses ehci_hcd?
+In-Reply-To: <4256B7BB.3090800@palmsource.com>
+References: <4256B7BB.3090800@palmsource.com>
+Content-Type: text/plain
+Message-Id: <1112981304.9783.15.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -17,28 +18,27 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 8 Apr 2005 20:54:21 +0000
+Date: Fri, 08 Apr 2005 19:28:24 +0200
 
-Hi,
+Hi Frederic,
 
-I've the problem that when ehci_hcd is loaded  and I plug my bluetooth dongle 
-to my usb hub,  hci_hcd uses the ehci host and playing or recording sound 
-through snd-bt-sco is not possible then. (USB_EHCI_SPLIT_ISO is enabled)
-I have to unload ehci_hcd and replug the dongle in order to make audio 
-transfer possible.
-Can I tell hci_usb to use ohci_hcd even when ehci_hcd is loaded? 
+> I am trying to use RFComm sockets, but I have a problem when I close the 
+> socket, it does not close RFComm or ACL connection.
+> So, if I try to reconnect I got an error 0x10. I used hcidump and 
+> nothing happens when close is called.
+> The only way to really close is to stop the app.
 
-Curiously when I plug the dongle to the usb jacks that are direcly attached to 
-the mainboard hci_usb uses the ohci host, even when ehci_hcd is loaded.
+are you using fork() in between?
 
-I've added a bug report to thet kernel bugtracker
-http://bugme.osdl.org/show_bug.cgi?id=4358
+The close() will close the DLC and if all DLCs are closed it will close
+the session. If no other session is active the underlaying ACL link will
+be terminated.
 
-I would be glad if someone could help me.
+Regards
 
-Regards 
+Marcel
 
-Ruben 
+
 
 
 -------------------------------------------------------
