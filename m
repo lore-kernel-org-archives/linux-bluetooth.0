@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] RFCOMM problem
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <312926723.29767@bjut.edu.cn>
-References: <312926723.29767@bjut.edu.cn>
-Content-Type: text/plain
-Message-Id: <1112933715.26175.5.camel@pegasus>
+Message-ID: <312926723.29767@bjut.edu.cn>
+From: "Jin Pu" <jpu@emails.bjpu.edu.cn>
+To: "bluez-users@lists.sourceforge.ne" <bluez-users@lists.sourceforge.net>
 Mime-Version: 1.0
+Content-Type: text/plain;
+      charset="GB2312"
+Subject: [Bluez-users] RFCOMM problem
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,18 +17,19 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 08 Apr 2005 06:15:15 +0200
+Date: Fri, 8 Apr 2005 10:36:20 +0800
 
-Hi,
+    Hello :
+    Now,I'm programming with RFCOMM socket. I can use  RFCOMM=
+ socket to connect with my PDA,but I don't know how to catch the
+disconnection event when PDA disconnect the RFCOMM connection=
+ between them first. What shall I do ?
+    Thanks.
+    
 
->     Now,I'm programming with RFCOMM socket. I can use  RFCOMM socket to connect with my PDA,but I don't know how to catch the
-> disconnection event when PDA disconnect the RFCOMM connection between them first. What shall I do ?
 
-use select() or poll() and check for a HUP signal.
-
-Regards
-
-Marcel
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1Jin Pu
+=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1
 
 
 
