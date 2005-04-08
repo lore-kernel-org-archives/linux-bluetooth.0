@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <6D4DC8B4AD16D6118E8200D0B76FE2621033CFE6@ont06exm01.comm.mot.com>
-From: Belokour Victor-Y18342C <Y18342C@motorola.com>
+Message-ID: <E73D9A5BC4A2D711BBC600065BF3595F1C66D01B@il06exm10>
+From: Mandalia Hiren-AHM047 <hirenm@motorola.com>
 To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Bluez-users] Re: PIN for Microsoft Mouse (Marcel Holtmann)
+Subject: [Bluez-users] Bluetooth audio support
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,27 +16,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 8 Apr 2005 12:32:22 -0400
+Date: Fri, 8 Apr 2005 11:06:50 -0500
 
-Hi Marcel
+Hi there,
 
-How do I enable security mode 1/2 ??
-In hcid.conf, there are only options 'none', 'auto' and 'user'.
+Just a quick question. Does any1 know if audio over Bluetooth is supported on Familiar Linux (v0.8.1)? If yes any website that I look it up?
 
-Thanks
-
-
------Original Message-----
-
-so you are using security mode 3 and in this case this is how it will be, because the mouse can't store a link key. And actually if you follow the HID profile then it don't have to.
-
-Use security mode 1/2 and if needed add --encrypt when you start the hidd server daemon.
-
-Regards
-
-Marcel
-
-
+Thanks,
+Hiren
 
 
 
