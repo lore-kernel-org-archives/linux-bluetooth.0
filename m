@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <312934322.09773@bjut.edu.cn>
-From: "Jin Pu" <jpu@emails.bjpu.edu.cn>
-To: "bluez-users@lists.sourceforge.ne" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] RFCOMM problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <312926723.29767@bjut.edu.cn>
+References: <312926723.29767@bjut.edu.cn>
+Content-Type: text/plain
+Message-Id: <1112933715.26175.5.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain;
-      charset="GB2312"
-Subject: [Bluez-users] Re: about sniff
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,20 +18,18 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 8 Apr 2005 12:42:59 +0800
+Date: Fri, 08 Apr 2005 06:15:15 +0200
 
-  =09Hi, Marcel.
-    One more question.I am a beginner of Bluz programming, please=
- tell me that where could I find some sample codes or docs which=
- explain how to use with the HCI raw socket to send a HCI command=
- to the Host Controller as well as get the HCI event from the=
- Host Controller. 
-   Thank you very much..
-    
+Hi,
 
+>     Now,I'm programming with RFCOMM socket. I can use  RFCOMM socket to connect with my PDA,but I don't know how to catch the
+> disconnection event when PDA disconnect the RFCOMM connection between them first. What shall I do ?
 
-=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1Jin Pu
-=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1=A1
+use select() or poll() and check for a HUP signal.
+
+Regards
+
+Marcel
 
 
 
