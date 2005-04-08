@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problem to really close RFComm socket
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4256B7BB.3090800@palmsource.com>
+From: Frederic Danis <frederic.danis@palmsource.com>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <4256B7BB.3090800@palmsource.com>
-References: <4256B7BB.3090800@palmsource.com>
-Content-Type: text/plain
-Message-Id: <1112981304.9783.15.camel@pegasus>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-devel] Problem to really close RFComm socket
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,27 +16,39 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Fri, 08 Apr 2005 19:28:24 +0200
+Date: Fri, 08 Apr 2005 18:56:27 +0200
 
-Hi Frederic,
+Hello,
 
-> I am trying to use RFComm sockets, but I have a problem when I close the 
-> socket, it does not close RFComm or ACL connection.
-> So, if I try to reconnect I got an error 0x10. I used hcidump and 
-> nothing happens when close is called.
-> The only way to really close is to stop the app.
+I am trying to use RFComm sockets, but I have a problem when I close the 
+socket, it does not close RFComm or ACL connection.
+So, if I try to reconnect I got an error 0x10. I used hcidump and 
+nothing happens when close is called.
+The only way to really close is to stop the app.
 
-are you using fork() in between?
+what I use is :
+        laddr.rc_family = AF_BLUETOOTH;
+        laddr.rc_bdaddr = *BDADDR_ANY;
+        laddr.rc_channel = 0;
+       
+        if (bind(rfcSocket, (struct sockaddr *)&laddr, sizeof(laddr)) < 0)
+            return -1;
+      
+        raddr.rc_family = AF_BLUETOOTH;
+        raddr.rc_bdaddr = SESSION(btAddr);
+        raddr.rc_channel = channel;
+        if (connect(rfcSocket, (struct sockaddr *)&raddr, sizeof(raddr)) 
+< 0)
+            return -1;
 
-The close() will close the DLC and if all DLCs are closed it will close
-the session. If no other session is active the underlaying ACL link will
-be terminated.
+       ........
+
+       close(rfcSocket);
+
+I think I have forgot something, but what ?
 
 Regards
-
-Marcel
-
-
+Fred
 
 
 -------------------------------------------------------
