@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Re: PIN for Microsoft Mouse (Marcel Holtmann)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <6D4DC8B4AD16D6118E8200D0B76FE2621033CFE6@ont06exm01.comm.mot.com>
-References: 
-	 <6D4DC8B4AD16D6118E8200D0B76FE2621033CFE6@ont06exm01.comm.mot.com>
+Message-ID: <6D4DC8B4AD16D6118E8200D0B76FE2621033CFE6@ont06exm01.comm.mot.com>
+From: Belokour Victor-Y18342C <Y18342C@motorola.com>
+To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <1112981167.9783.12.camel@pegasus>
-Mime-Version: 1.0
+Subject: [Bluez-users] Re: PIN for Microsoft Mouse (Marcel Holtmann)
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,19 +16,26 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 08 Apr 2005 19:26:07 +0200
+Date: Fri, 8 Apr 2005 12:32:22 -0400
 
-Hi Victor,
+Hi Marcel
 
-> How do I enable security mode 1/2 ??
-> In hcid.conf, there are only options 'none', 'auto' and 'user'.
+How do I enable security mode 1/2 ??
+In hcid.conf, there are only options 'none', 'auto' and 'user'.
 
-these options are not the security mode. Disable "auth" and you are in
-security mode 1 or 2 (depend on the running services).
+Thanks
+
+
+-----Original Message-----
+
+so you are using security mode 3 and in this case this is how it will be, because the mouse can't store a link key. And actually if you follow the HID profile then it don't have to.
+
+Use security mode 1/2 and if needed add --encrypt when you start the hidd server daemon.
 
 Regards
 
 Marcel
+
 
 
 
