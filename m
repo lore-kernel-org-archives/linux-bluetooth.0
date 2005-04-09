@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <4257BCCF.9060703@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
-MIME-Version: 1.0
+Message-ID: <20050409053510.5507.qmail@web50706.mail.yahoo.com>
+From: "John H." <mistamaila@yahoo.com>
+Subject: Re: [Bluez-users] pm-325 help, anyone aside from marcel?
 To: bluez-users@lists.sourceforge.net
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Subject: [Bluez-users] new 1.2 dongles
+In-Reply-To: 6667
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -16,27 +17,46 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 09 Apr 2005 13:30:23 +0200
+Date: Fri, 8 Apr 2005 22:35:10 -0700 (PDT)
 
-Hello
 
-I just bought these dongles:
-- ednet btVer 1.2 (class2, 40 meters) Firmware 20.3.009
-- acer btVer 1.2 (class1, 100 meters) Firmware 10.3.009
+--- Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi John,
+> 
+> > As I replied, though, I tried other channels to no
+> > avail, and I followed your exact instructions to
+> try
+> > to find the correct channel, and pasted you the
+> > results of that, but never got a response.
+> 
+> when you reply you always break the thread and this
+> is not useful. Fix
+> your mail client.
+> 
+> And if all 30 RFCOMM channel behave the same then
+> your phone has some
+> weird setting. If the PN command is not answered
+> with a response then
+> there is no channel, so try the next one.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+>
 
-Both work just fine with bluez and are from Broadcom Corporation.
 
-Marcel, as much as i've seen, you no longer have a list of supported 
-devices... so i think you don't need any data, right?
+ 
+Well, since I have it working in XP, can I find out
+the channel in XP somehow?
 
-I actually do have a question: I read much more about csr dongles than 
-broadcom's in the list. Are broadcom's known to be bader or are there other 
-disadvantages?
-Is the firmware updateable too? I'm a little bit worried that there's such 
-a big version-difference of the firmware...
 
-regards
-Marco
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
