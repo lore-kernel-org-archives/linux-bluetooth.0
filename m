@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] pm-325 help, anyone aside from marcel?
+Subject: Re: [Bluez-users] new 1.2 dongles
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <20050409053510.5507.qmail@web50706.mail.yahoo.com>
-References: <20050409053510.5507.qmail@web50706.mail.yahoo.com>
+In-Reply-To: <4257BCCF.9060703@gmx.ch>
+References: <4257BCCF.9060703@gmx.ch>
 Content-Type: text/plain
-Message-Id: <1113048258.9783.46.camel@pegasus>
+Message-Id: <1113048226.9783.44.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,14 +18,38 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 09 Apr 2005 14:04:18 +0200
+Date: Sat, 09 Apr 2005 14:03:46 +0200
 
-Hi John,
+Hi Marco,
 
-> Well, since I have it working in XP, can I find out
-> the channel in XP somehow?
+> I just bought these dongles:
+> - ednet btVer 1.2 (class2, 40 meters) Firmware 20.3.009
+> - acer btVer 1.2 (class1, 100 meters) Firmware 10.3.009
+> 
+> Both work just fine with bluez and are from Broadcom Corporation.
+> 
+> Marcel, as much as i've seen, you no longer have a list of supported 
+> devices... so i think you don't need any data, right?
 
-it is maybe possible, but I don't know how.
+I still maintain the features document and I think about moving
+everything into a database. So please send in "hciconfig -a" and the
+content of /proc/bus/usb/devices.
+
+> I actually do have a question: I read much more about csr dongles than 
+> broadcom's in the list. Are broadcom's known to be bader or are there other 
+> disadvantages?
+
+I think that Broadcom/Zeevo is catching up, but actually at the moment
+the CSR chips are way ahead of everything else.
+
+> Is the firmware updateable too? I'm a little bit worried that there's such 
+> a big version-difference of the firmware...
+
+It maybe is upgradeable, but I don't know how. Don't worry so much about
+the version thing. I still don't know what these values actually mean,
+because the decoding is derived from the Widcomm stack version display.
+Broadcom was never helpful when it comes to Linux support while CSR
+always helped out.
 
 Regards
 
