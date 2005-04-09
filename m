@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050409053510.5507.qmail@web50706.mail.yahoo.com>
-From: "John H." <mistamaila@yahoo.com>
-Subject: Re: [Bluez-users] pm-325 help, anyone aside from marcel?
+From: Paul LeoNerd Evans <leonerd@leonerd.org.uk>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: 6667
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Message-ID: <20050409015826.746a3add@nim.leo>
+Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary=Signature_Sat__9_Apr_2005_01_58_26_+0100_l3VZnT7fJBgmjmL2;
+ protocol="application/pgp-signature"; micalg=pgp-sha1
+Subject: [Bluez-users] Extra keys on a Logitech Cordless Desktop Elite keyboard
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,46 +18,52 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Fri, 8 Apr 2005 22:35:10 -0700 (PDT)
+Date: Sat, 9 Apr 2005 01:58:26 +0100
 
+--Signature_Sat__9_Apr_2005_01_58_26_+0100_l3VZnT7fJBgmjmL2
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
---- Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi John,
-> 
-> > As I replied, though, I tried other channels to no
-> > avail, and I followed your exact instructions to
-> try
-> > to find the correct channel, and pasted you the
-> > results of that, but never got a response.
-> 
-> when you reply you always break the thread and this
-> is not useful. Fix
-> your mail client.
-> 
-> And if all 30 RFCOMM channel behave the same then
-> your phone has some
-> weird setting. If the PN command is not answered
-> with a response then
-> there is no channel, so try the next one.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
->
+I have recently bought a Logitech Bluetooth keyboard/mouse combo, as
+named above.. After much struggling, I've found that the -MH2 kernel
+patch properly handles most of the behaviour.=20
 
+The mouse connects fine, all buttons work except the weird 8th button on
+the top, but that doesn't work on a wired equivalent of the mouse that I
+have elsewhere, so I suspect that's not BlueZ's fault. It even reconnects
+after I remove it from the charger base too; most of the other
+implementations would lose connectivity due to the mouse shutting down
+for charging.
 
- 
-Well, since I have it working in XP, can I find out
-the channel in XP somehow?
+The keyboard doesn't seem too bad either. The basic 105key layout works
+as expected, but the extra keys around the top do not. There's the
+standard complement of play/stop, volume, application launch, etc.. keys
+there. If I press any of those, the "showkey" program on the console will
+not show anything. Similarly, Xfree shows a complete lack of activity on
+the "xev" output.
 
+Any thoughts..? Has anyone else had any luck with this or a similar
+keyboard in this regard..? Is it likely to be easy to fix..?
 
+--=20
+Paul "LeoNerd" Evans
 
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+leonerd@leonerd.org.uk
+ICQ# 4135350       |  Registered Linux# 179460
+http://www.leonerd.org.uk/
+
+--Signature_Sat__9_Apr_2005_01_58_26_+0100_l3VZnT7fJBgmjmL2
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+
+iD8DBQFCVyi1vcPg11V/1hgRAoFBAJsHJ5udbY9QYefX732maHwc/y+79QCeK9Nd
+5nYsA0N4zZxwHb8nIcZOu84=
+=hKZQ
+-----END PGP SIGNATURE-----
+
+--Signature_Sat__9_Apr_2005_01_58_26_+0100_l3VZnT7fJBgmjmL2--
 
 
 -------------------------------------------------------
