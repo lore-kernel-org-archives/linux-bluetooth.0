@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: =?iso-8859-1?q?R=FCdiger_H=E4rtel?= <r_haertel@gmx.de>
+Subject: RE: [Bluez-users] Bluetooth audio support
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200504091713.36367.r_haertel@gmx.de>
-Subject: [Bluez-users] Bluetooth modem
+In-Reply-To: <E73D9A5BC4A2D711BBC600065BF3595F1C66D01F@il06exm10>
+References: <E73D9A5BC4A2D711BBC600065BF3595F1C66D01F@il06exm10>
+Content-Type: text/plain
+Message-Id: <1113048396.9783.49.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,47 +18,21 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 9 Apr 2005 17:13:36 +0200
+Date: Sat, 09 Apr 2005 14:06:36 +0200
 
-Hello,
+Hi Hiren,
 
-I am interested in using bluetooth to connect to a modem. I found 
-two products:
-- Acer Bluetooth (ww.Acer.de -> Products->Kommunikation)
-- Typhoon Bluetooth modem 
-(http://www.anubisline.com/german/articlec.asp?id=20008&catid=200).
+> Is there a way I can find the mapping from my Handheld itself?
 
-Has anyone experience with these modems ? Was it difficult to get 
-them working ?
-What about the distance? Originally defined for 10 m now devices 
-supporting 100 m; How far does it reach within a house ? How many 
-walls is it able to get through ?
+I think there exists a pskey program that can be used for this job, but
+it involves a deep knowledge of the CSR internals and you can render
+your chip useless with this tool.
+
+Regards
+
+Marcel
 
 
-
----
-
-Marcel reminded me to ask here instead of asking him directly. So 
-here is my question that was answered by him:
-
-> I am considering to use a bluetooth modem from acer. I think it 
-> should work but I know to little about the software components to 
-> be used. Can you say a little bit about it.
-> 
-> For example:
-> When the bluetooth stick is plugged in and everything is ok, ie. 
-> linux detects it. How do I proceed to tell wvdial/smpppd where to 
-> connect to ?
-> 
-> Haven't found any pointers to this topic. Only AVM fritz. But I 
-> think that is different because it uses ISDN. But I'll have a 
-read.
-
-You know that such a question should be posted to the BlueZ users
-mailing list. However these modem are no different from the dialup
-procedures over mobile phones. You need to create the /dev/rfcomm0
-device node with the rfcomm program and then use whatever dialer you
-normally use for /dev/ttyS0.
 
 
 -------------------------------------------------------
