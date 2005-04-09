@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: RE: [Bluez-users] Bluetooth audio support
+Subject: Re: [Bluez-users] pm-325 help, anyone aside from marcel?
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <E73D9A5BC4A2D711BBC600065BF3595F1C66D01F@il06exm10>
-References: <E73D9A5BC4A2D711BBC600065BF3595F1C66D01F@il06exm10>
+In-Reply-To: <20050409053510.5507.qmail@web50706.mail.yahoo.com>
+References: <20050409053510.5507.qmail@web50706.mail.yahoo.com>
 Content-Type: text/plain
-Message-Id: <1113048396.9783.49.camel@pegasus>
+Message-Id: <1113048258.9783.46.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
@@ -18,15 +18,14 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 09 Apr 2005 14:06:36 +0200
+Date: Sat, 09 Apr 2005 14:04:18 +0200
 
-Hi Hiren,
+Hi John,
 
-> Is there a way I can find the mapping from my Handheld itself?
+> Well, since I have it working in XP, can I find out
+> the channel in XP somehow?
 
-I think there exists a pskey program that can be used for this job, but
-it involves a deep knowledge of the CSR internals and you can render
-your chip useless with this tool.
+it is maybe possible, but I don't know how.
 
 Regards
 
