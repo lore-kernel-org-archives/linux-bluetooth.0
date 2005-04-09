@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <42582BE5.2050407@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] gumstix & bluez (infineon)
+Subject: Re: [Bluez-devel] sco transfer not possible if hci_usb uses
+	ehci_hcd?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <200504082054.21259.rjenster@web.de>
+References: <200504082054.21259.rjenster@web.de>
+Content-Type: text/plain
+Message-Id: <1113049174.9783.52.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,23 +19,33 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Sat, 09 Apr 2005 13:24:21 -0600
+Date: Sat, 09 Apr 2005 14:19:34 +0200
 
-Hey
+Hi Ruben,
 
-I like the specs of the x-scale gumstix 400f-bt for building something 
-like a homebrew bluetooth access point etc.
+> I've the problem that when ehci_hcd is loaded  and I plug my bluetooth dongle 
+> to my usb hub,  hci_hcd uses the ehci host and playing or recording sound 
+> through snd-bt-sco is not possible then. (USB_EHCI_SPLIT_ISO is enabled)
+> I have to unload ehci_hcd and replug the dongle in order to make audio 
+> transfer possible.
+> Can I tell hci_usb to use ohci_hcd even when ehci_hcd is loaded? 
+> 
+> Curiously when I plug the dongle to the usb jacks that are direcly attached to 
+> the mainboard hci_usb uses the ohci host, even when ehci_hcd is loaded.
+> 
+> I've added a bug report to thet kernel bugtracker
+> http://bugme.osdl.org/show_bug.cgi?id=4358
+> 
+> I would be glad if someone could help me.
 
-I don't like the fact that it's using a class 2 infineon bluetooth 
-radio. Has anyone had success with infineon and btsco for example?
+with David's and Greg's attention you got the right guys for this job,
+because I am not into USB HCD stuff.
 
-The other alternative is to get a csr class 1 (bluecore4/bt2.0?) chip 
-and tie it into one of the gumstix uarts. I don't have the first clue 
-about getting csr hardware directly...
+Regards
 
-Has anyone else caught the embedded "bug" or is it just me :)
+Marcel
 
-Brad
+
 
 
 -------------------------------------------------------
