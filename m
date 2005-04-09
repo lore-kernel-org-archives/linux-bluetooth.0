@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050409203226.80921.qmail@web50906.mail.yahoo.com>
-From: tasos <tas0s@yahoo.com>
-Subject: Re: [Bluez-users] Upload question in /tmp
+Subject: Re: [Bluez-users] How to create a shortcut for connecting to
+	internet
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: 6667
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20050409173218.1597.qmail@webmail28.rediffmail.com>
+References: <20050409173218.1597.qmail@webmail28.rediffmail.com>
+Content-Type: text/plain
+Message-Id: <1113068391.9655.6.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,53 +19,41 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 9 Apr 2005 13:32:26 -0700 (PDT)
+Date: Sat, 09 Apr 2005 19:39:51 +0200
 
-can somebody please help me?
+Hi Adil,
 
---- tasos <tas0s@yahoo.com> wrote:
-> Hello people i'm new at bluez.I would like to know
-> if
-> the following is possible:
-> When someone uploads something then the files go to
-> /tmp.Which source code file do this work?
-> I would like,depending on the id of the bluetooth
-> device,the files to stored in specific 
-> directories.Suppose 10 users upload something,i want
-> those files to go to specific directories.
-> Thank you in advanced!
+> i have been using internet successfully over the last couple of months
+> by typing the following commands.
 > 
+> 1) hcitool scan
 > 
-> 		
-> __________________________________ 
-> Yahoo! Messenger 
-> Show us what our next emoticon should look like.
-> Join the fun. 
-> http://www.advision.webevents.yahoo.com/emoticontest
+>   ==>which gives me the <b-addr>
 > 
+> 2) rfcoomm bind 0 <b-addr> 7
 > 
->
--------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT
-> Products from real users.
-> Discover which products truly live up to the hype.
-> Start reading now.
->
-http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 3) wvdial GPRS
 > 
+>   ==> GPRS being some file i wrote as directed by a pdf which i used
+> as 
+>       guidance.
+> 
+> Que)Can any1 tell me how to automate these 3 steps so that i donot
+> have to do this every time i want to connect. My friends tell me i
+> have to write a executable file. I have very limited knowledge of
+> linux-programming (scripting if thats what u call it!!!), so please if
+> any1 understands what that means..???
+
+if you know the BD_ADDR then you can use the rfcomm autobind feature to
+create the /dev/rfcomm0 device. Check /etc/bluetooth/rfcomm.conf and
+make sure that the init script executes "rfcomm bind all" at some point.
+After that you only have to call "wvdial GPRS" to be happy.
+
+Regards
+
+Marcel
 
 
-		
-__________________________________ 
-Do you Yahoo!? 
-Yahoo! Small Business - Try our new resources site!
-http://smallbusiness.yahoo.com/resources/
 
 
 -------------------------------------------------------
