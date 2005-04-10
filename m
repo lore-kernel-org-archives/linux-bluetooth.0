@@ -1,7 +1,7 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050410024913.10180.qmail@web50708.mail.yahoo.com>
+Message-ID: <20050410023405.55666.qmail@web50709.mail.yahoo.com>
 From: "John H." <mistamaila@yahoo.com>
-Subject: Re: [Bluez-users] pm-325 help
+Subject: Re: [Bluez-users] cannot connect to pm-325 phone w/bluez
 To: bluez-users@lists.sourceforge.net
 In-Reply-To: 6667
 MIME-Version: 1.0
@@ -17,53 +17,29 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 9 Apr 2005 19:49:12 -0700 (PDT)
+Date: Sat, 9 Apr 2005 19:34:05 -0700 (PDT)
 
-
---- Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi John,
+>    
+> >    .*..
 > 
-> > As I replied, though, I tried other channels to no
-> > avail, and I followed your exact instructions to
-> try
-> > to find the correct channel, and pasted you the
-> > results of that, but never got a response.
-> 
-> when you reply you always break the thread and this
-> is not useful. Fix
-> your mail client.
-> 
-> And if all 30 RFCOMM channel behave the same then
-> your phone has some
-> weird setting. If the PN command is not answered
-> with a response then
-> there is no channel, so try the next one.
+> It seems that your phone doesn't support the dialup
+> networking profile.
+> What kind of phone is this?
 > 
 > Regards
 > 
 > Marcel
 > 
-> 
+>
 
+It's an LG pm-325.  It can use the internet in XP by
+DUN, I believe.  The phone emulates a modem, and you
+dial #777.
 
-I tried this for channels 0-10 and got nothing
- sdptool search --bdaddr 08:00:37:12:C4:B1 dun
---channel 10
-Searching for dun on 08:00:37:12:C4:B1 ...
-
-
-It seems like rfcomm doesn't show anything either
-rfcomm -i 08:00:37:12:C4:B1
-returns nothing.
-
-
-
-
-		
-__________________________________ 
-Do you Yahoo!? 
-Yahoo! Small Business - Try our new resources site!
-http://smallbusiness.yahoo.com/resources/
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 
 -------------------------------------------------------
