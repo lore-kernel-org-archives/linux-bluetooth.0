@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-From: Major A <andras.major@univie.ac.at>
+Subject: Re: [Bluez-devel] [PATCH] Add sdptool option for browsing with
+	L2CAP_UUID
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Logitech Mobile Freedom headset problems
-Message-ID: <20050411163938.GA7850@janus>
-References: <20050411082345.GA24929@janus> <425A3894.20301@xmission.com> <20050411091807.GB29989@janus> <425AA325.9050404@xmission.com>
+In-Reply-To: <1598723318.20050407211922@andric.com>
+References: <381006269.20050404171656@andric.com>
+	 <1112714837.12406.51.camel@notepaq>  <1542380074.20050407140838@andric.com>
+	 <1112881490.9047.73.camel@pegasus>  <1598723318.20050407211922@andric.com>
+Content-Type: text/plain
+Message-Id: <1113236556.9655.60.camel@pegasus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <425AA325.9050404@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,22 +21,30 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 11 Apr 2005 18:39:39 +0200
+Date: Mon, 11 Apr 2005 18:22:36 +0200
+
+Hi Dimitry,
+
+> > Maybe we should add somekind of short name to UUID translation function,
+> > because the numeric values are hard to remember.
+> 
+> Here's an easy hack: I reused the existing uuid16_names array for
+> looking up (partial) matches.  You can also get a list of recognized
+> names.  If you think it would be nicer to add a separate name list
+> (i.e. made from the names in sdp.h), let me know.
+
+this is really a hack ;)
+
+I think that we need a special table for this, where we add short names
+(and I mean short) for some UUIDs. Maybe it is enough to look up the
+core protocol names like L2CAP, RFCOMM and OBEX. This would then also
+make the --l2cap option obsolete. You can use "--uuid l2cap" for it.
+
+Regards
+
+Marcel
 
 
-> maybe the adapter? look at the debug section of bluetooth-alsa.sf.net 
-> and post the various output here on the list.
-
-I tried two different ones (BCM2033-based dongle, and the USB one
-built into the Thinkpad X31), same results. Now if I do "hciconfig
-hci0 voice 0x0060" before the btsco command, it seems to work,
-i.e. alsamixer comes up with something sensible. On the other hand, I
-haven't been able to get the headset to make any noise at all so far,
-I've tried to play WAV files with aplay or mplayer and even tried
-getting kphone to work -- no success so far. But at least it's moving
-in the right direction...
-
-  Andras
 
 
 -------------------------------------------------------
