@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
 From: Major A <andras.major@univie.ac.at>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Logitech Mobile Freedom headset problems
-Message-ID: <20050411120446.GA10640@janus>
-References: <20050411082345.GA24929@janus> <425A3894.20301@xmission.com>
+Message-ID: <20050411082345.GA24929@janus>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <425A3894.20301@xmission.com>
+Subject: [Bluez-devel] Logitech Mobile Freedom headset problems
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,18 +16,31 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 11 Apr 2005 14:04:48 +0200
+Date: Mon, 11 Apr 2005 10:23:47 +0200
 
 
-More info:
+Hi,
 
-"hcitool info <bdaddr>" works fine for my mobile phone but gives this
-when I try it on the headset in pairing mode:
+I'm trying to get the Logitech Mobile Freedom headset working. I use
+"hcitool scan" to find its address, and it identifies itself as
+"Logitech HS02-V05". Now when I do btsco -v <bdaddr>, I get this:
 
-> Requesting information ...
-> Can't create connection: Input/output error
+> btsco v0.4
+> Device is 1:0
+> Error: Failed to connect to SDP server: Invalid exchange
+> Assuming channel 2
+> 
+> Voice setting: 0x0060
+> Can't connect RFCOMM channel: Invalid exchange
 
-Anyone seen this before?
+What's the reason for this? I'm supposed to be able to enter the PIN
+at this point. The headset is in pairing mode, and bluez works because
+I can use minicom to issue AT commands to my phone at the same time.
+
+I'm using the current CVS version of btsco, kernel is 2.6.11.6 and the
+snd_bt_sco module loads just fine.
+
+Any help would be greatly appreciated.
 
   Andras
 
