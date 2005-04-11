@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Reopening RFCOMM socket
+Subject: Re: [Bluez-devel] RFCOMM non-blocking support
 From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <C70061B183DE09419568AB2060C52A95324E4F@arion.intra.local>
-References: <C70061B183DE09419568AB2060C52A95324E4F@arion.intra.local>
+In-Reply-To: <000901c53e1a$d8e07e30$0201a8c0@NBVICTOR>
+References: <42582BE5.2050407@xmission.com>
+	 <000901c53e1a$d8e07e30$0201a8c0@NBVICTOR>
 Content-Type: text/plain
-Message-Id: <1113224551.9655.43.camel@pegasus>
+Message-Id: <1113224195.9655.37.camel@pegasus>
 Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
@@ -18,29 +19,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 11 Apr 2005 15:02:31 +0200
+Date: Mon, 11 Apr 2005 14:56:35 +0200
 
 Hi Victor,
 
-> In the quoted message below you say "If no other session is active the
-> underlaying ACL link will be terminated." It looks as if it does not
-> happen immediatelly. So there is a chance that if you open a new RFCOMM
-> socket very fast it will not bring down ACL link and will actually reuse
-> it? Cause I have a problem with Motorola V3, I bring down HF RFCOMM
-> socket (the only one active at the time) and then open DUN channel and
-> start pppd over it. And unless I see HCI disconnect for a underlaying
-> ACL link in hcidump log after closing HF RFCOMM, DUN RFCOMM becomes very
-> slow (takes much time to push/pull a packet to/from the phone). May be
-> some flow control issues?
+> This was already discussed a year ago:
+> question:
+> http://sourceforge.net/mailarchive/message.php?msg_id=8643791
+> reply:
+> http://sourceforge.net/mailarchive/message.php?msg_id=8643793
+> 
+> I have exactly the same problem, I guess.
+> 
+> Instead of EINPROGRESS non-blocking connect() returns EAGAIN (Resource 
+> temporarily unavailable). The rest seem to be OK (see the source). Select 
+> waits till the connection is established or an error occurs (at least as it 
+> looks from hcidump log).
 
-the ACL has a disconnect timeout of 2 seconds if we created that link
-and 4 seconds if the remote side connected to us. This is needed,
-because the only expensive thing with Bluetooth is the creation of the
-ACL links and we want to avoid it as often as possible.
+I just checked the code and the problem is the bt_sock_wait_state()
+function. In the case of O_NONBLOCK we give it a timeout of 0 and this
+means that it will exit with EAGAIN if sk->sk_state != state. This
+actually means that also L2CAP is not working correct in the non
+blocking case. How do we should fix this? The easiest way seems to add
+another check to bt_sock_wait_state() before entering the while loop:
 
-Please send in the part of "hcidump -X -V" for the V3. I really think
-that this is a phone problem. Maybe their RFCOMM credits handling is
-broken and they only reset it after a HCI disconnect.
+	if (!timeo && sk->sk_state != state)
+		return -EINPROGRESS;
+
+Another way is to add a flags parameter to this function or deal with it
+in the L2CAP/RFCOMM connect functions.
 
 Regards
 
