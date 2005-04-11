@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <425A95D4.3090701@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Reopening RFCOMM socket
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] bluetooth-alsa not working with Cellink headset
-References: <loom.20050411T115017-79@post.gmane.org>
-In-Reply-To: <loom.20050411T115017-79@post.gmane.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <C70061B183DE09419568AB2060C52A95324E4F@arion.intra.local>
+References: <C70061B183DE09419568AB2060C52A95324E4F@arion.intra.local>
+Content-Type: text/plain
+Message-Id: <1113224551.9655.43.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -18,58 +18,35 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 11 Apr 2005 09:20:52 -0600
+Date: Mon, 11 Apr 2005 15:02:31 +0200
 
-ross,
+Hi Victor,
 
-you should run
+> In the quoted message below you say "If no other session is active the
+> underlaying ACL link will be terminated." It looks as if it does not
+> happen immediatelly. So there is a chance that if you open a new RFCOMM
+> socket very fast it will not bring down ACL link and will actually reuse
+> it? Cause I have a problem with Motorola V3, I bring down HF RFCOMM
+> socket (the only one active at the time) and then open DUN channel and
+> start pppd over it. And unless I see HCI disconnect for a underlaying
+> ACL link in hcidump log after closing HF RFCOMM, DUN RFCOMM becomes very
+> slow (takes much time to push/pull a packet to/from the phone). May be
+> some flow control issues?
 
-hciconfig hci0 voice 0x0060
+the ACL has a disconnect timeout of 2 seconds if we created that link
+and 4 seconds if the remote side connected to us. This is needed,
+because the only expensive thing with Bluetooth is the creation of the
+ACL links and we want to avoid it as often as possible.
 
-(added to docs)
+Please send in the part of "hcidump -X -V" for the V3. I really think
+that this is a phone problem. Maybe their RFCOMM credits handling is
+broken and they only reset it after a HCI disconnect.
 
-brad
+Regards
 
-Ross Burton wrote:
-> Hi,
-> 
-> I've just purchased a cheap BT headset (a Cellink BTHS-6023F), and tried to use
-> it with the bluetooth-alsa userspace/kernel stuff.  However, it's not working:
-> 
-> $ ./btsco 00:0A:94:8C:CC:67
-> [enter PIN for pairing]
-> Error: The voice setting must be 0x060
-> 
-> For your information this is the output from hcitool:
-> 
-> $ hcitool info 00:0A:94:8C:CC:67
-> Requesting information ...
->         BD Address:  00:0A:94:8C:CC:67
->         Device Name: BT Headset-F
->         LMP Version: 1.1 (0x1) LMP Subversion: 0x434
->         Manufacturer: Cambridge Silicon Radio (10)
->         Features: 0xfc 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->                 <encryption> <slot offset> <timing accuracy> <role switch>
->                 <hold mode> <sniff mode> <park state> <RSSI> <channel quality>
->                 <SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log>
->                 <CVSD> <paging scheme> <power control> <transparent SCO>
-> 
-> Any ideas?
-> 
-> Thanks,
-> Ross
-> 
-> 
-> 
-> -------------------------------------------------------
-> SF email is sponsored by - The IT Product Guide
-> Read honest & candid reviews on hundreds of IT Products from real users.
-> Discover which products truly live up to the hype. Start reading now.
-> http://ads.osdn.com/?ad_id=6595&alloc_id=14396&op=click
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Marcel
+
+
 
 
 -------------------------------------------------------
