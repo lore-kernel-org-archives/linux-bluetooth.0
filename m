@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Message-ID: <425C13CB.1060605@xmission.com>
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ Mailing List <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Subject: [Bluez-devel] first(?) bc4 module
+From: Major A <andras.major@univie.ac.at>
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Logitech Mobile Freedom headset problems
+Message-ID: <20050411163938.GA7850@janus>
+References: <20050411082345.GA24929@janus> <425A3894.20301@xmission.com> <20050411091807.GB29989@janus> <425AA325.9050404@xmission.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <425AA325.9050404@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -16,17 +18,22 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Tue, 12 Apr 2005 12:30:35 -0600
+Date: Mon, 11 Apr 2005 18:39:39 +0200
 
-Hey
 
-socketcom is claiming their bc4 (class 1) module is shipping this month. 
-it's a good sign for eventually getting it in consumer gear.
+> maybe the adapter? look at the debug section of bluetooth-alsa.sf.net 
+> and post the various output here on the list.
 
-if samples aren't too hard to come by, i'll try to wire one up to a 
-gumstix. (gumstix is sending me a sample)
+I tried two different ones (BCM2033-based dongle, and the USB one
+built into the Thinkpad X31), same results. Now if I do "hciconfig
+hci0 voice 0x0060" before the btsco command, it seems to work,
+i.e. alsamixer comes up with something sensible. On the other hand, I
+haven't been able to get the headset to make any noise at all so far,
+I've tried to play WAV files with aplay or mplayer and even tried
+getting kphone to work -- no success so far. But at least it's moving
+in the right direction...
 
-brad
+  Andras
 
 
 -------------------------------------------------------
