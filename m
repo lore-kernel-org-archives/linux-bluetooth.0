@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] RFCOMM non-blocking support
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Major A <andras.major@univie.ac.at>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <000901c53e1a$d8e07e30$0201a8c0@NBVICTOR>
-References: <42582BE5.2050407@xmission.com>
-	 <000901c53e1a$d8e07e30$0201a8c0@NBVICTOR>
-Content-Type: text/plain
-Message-Id: <1113224195.9655.37.camel@pegasus>
+Subject: Re: [Bluez-devel] Logitech Mobile Freedom headset problems
+Message-ID: <20050411120446.GA10640@janus>
+References: <20050411082345.GA24929@janus> <425A3894.20301@xmission.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <425A3894.20301@xmission.com>
 Sender: bluez-devel-admin@lists.sourceforge.net
 Errors-To: bluez-devel-admin@lists.sourceforge.net
 Reply-To: bluez-devel@lists.sourceforge.net
@@ -19,41 +18,20 @@ List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-Date: Mon, 11 Apr 2005 14:56:35 +0200
-
-Hi Victor,
-
-> This was already discussed a year ago:
-> question:
-> http://sourceforge.net/mailarchive/message.php?msg_id=8643791
-> reply:
-> http://sourceforge.net/mailarchive/message.php?msg_id=8643793
-> 
-> I have exactly the same problem, I guess.
-> 
-> Instead of EINPROGRESS non-blocking connect() returns EAGAIN (Resource 
-> temporarily unavailable). The rest seem to be OK (see the source). Select 
-> waits till the connection is established or an error occurs (at least as it 
-> looks from hcidump log).
-
-I just checked the code and the problem is the bt_sock_wait_state()
-function. In the case of O_NONBLOCK we give it a timeout of 0 and this
-means that it will exit with EAGAIN if sk->sk_state != state. This
-actually means that also L2CAP is not working correct in the non
-blocking case. How do we should fix this? The easiest way seems to add
-another check to bt_sock_wait_state() before entering the while loop:
-
-	if (!timeo && sk->sk_state != state)
-		return -EINPROGRESS;
-
-Another way is to add a flags parameter to this function or deal with it
-in the L2CAP/RFCOMM connect functions.
-
-Regards
-
-Marcel
+Date: Mon, 11 Apr 2005 14:04:48 +0200
 
 
+More info:
+
+"hcitool info <bdaddr>" works fine for my mobile phone but gives this
+when I try it on the headset in pairing mode:
+
+> Requesting information ...
+> Can't create connection: Input/output error
+
+Anyone seen this before?
+
+  Andras
 
 
 -------------------------------------------------------
