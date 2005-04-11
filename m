@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <20050412004411.42420.qmail@web50704.mail.yahoo.com>
-From: "John H." <mistamaila@yahoo.com>
-Subject: Re: [Bluez-users] pm-325 help, anyone aside from marcel?
+Subject: RE: [Bluez-users] Bluetooth audio support
+From: Marcel Holtmann <marcel@holtmann.org>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: 6667
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <E73D9A5BC4A2D711BBC600065BF3595F1C66D023@il06exm10>
+References: <E73D9A5BC4A2D711BBC600065BF3595F1C66D023@il06exm10>
+Content-Type: text/plain
+Message-Id: <1113253497.9655.63.camel@pegasus>
+Mime-Version: 1.0
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -17,45 +18,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Mon, 11 Apr 2005 17:44:11 -0700 (PDT)
+Date: Mon, 11 Apr 2005 23:04:57 +0200
+
+Hi Hiren,
+
+> Ok. Where/How can I get the pskey tool for my iPAQ with Familiar 0.8.1? 
+
+you know that using Google etc. helps in this cases. However you might
+wanna check:
+
+http://www.handhelds.org/download/packages/pskey/
+
+Regards
+
+Marcel
 
 
---- Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi John,
-> 
-> > As I replied, though, I tried other channels to no
-> > avail, and I followed your exact instructions to
-> try
-> > to find the correct channel, and pasted you the
-> > results of that, but never got a response.
-> 
-> when you reply you always break the thread and this
-> is not useful. Fix
-> your mail client.
-> 
-> And if all 30 RFCOMM channel behave the same then
-> your phone has some
-> weird setting. If the PN command is not answered
-> with a response then
-> there is no channel, so try the next one.
-> 
-> Regards
-> 
-> Marcel
-> 
-
-So I need to try rfconnect to 30 channels on my phone?
- Does it need to be in anything other than visible
-mode?  Does it need to be waiting for pairing or
-something?
-
-
-
-		
-__________________________________ 
-Do you Yahoo!? 
-Yahoo! Small Business - Try our new resources site!
-http://smallbusiness.yahoo.com/resources/
 
 
 -------------------------------------------------------
