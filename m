@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f54d86405041222381e9da934@mail.gmail.com>
-From: Benny <bennyvasanth@gmail.com>
+Message-ID: <425C3612.9030609@gmx.ch>
+From: Marco Trudel <mtrudel@gmx.ch>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] btsco - headset profile activated but no sco packets transmitted ???
-In-Reply-To: <200504042322.17493.pavouk@pavouk.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <20050404194542.GA7640@lsweb.de> <42519CD7.1030606@xmission.com>
-	 <200504042322.17493.pavouk@pavouk.org>
+Subject: Re: [Bluez-users] Bluetooth ans Scripts
+References: <200504121820.11615.lists@naasa.net>
+In-Reply-To: <200504121820.11615.lists@naasa.net>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,71 +18,30 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Apr 2005 11:08:42 +0530
+Date: Tue, 12 Apr 2005 22:56:50 +0200
 
-Dear Pavel Ruzicka,
+Joerg Platte wrote:
+> Hi!
+> 
+> Currently I'm doing some Bluetooth connection and performance tests. I want to 
+> create connections, park them and transfer data and so on.
 
-I am also involved in testing the BT Headset functionality with the
-PC. I am using a CSR based USB BT Dongle on the PC and the BT Mono
-Headset is the RFMD Headset kit.
+As much as I know, you won't find bluetooth hardware that supports parking.
+respectively, you might park devices, but you won't be able to have up to 
+248 parked and 7 active devices...
+the limit of 7 stays...
 
-I have taken the latest CVS "btsco" files and compiled. Fedora 3(linux
-kernel 2.6.9-1.667) runs on my host PC. I have taken the latest Bluez
-libraries and utilities from the bluez site.
+> I could write a C 
+> program doing all this stuff, but this may take a long time and is not 
+> flexible. Does anyone know a Bluez-"frontend" written in a high level 
+> (Script) language which is capable of doing all kind of connection handling 
+> and data transfer?
 
-After running the "btsco" I am able to run the xmms and play songs and
-test for the speaker functionality separately. But I am not able to
-test the Sound recorder functionality. The SCO connection is opened
-only when I press "play" for the xmms and it closes when I stop the
-song. Whether I can test the mic functionality separately.
+java, jsr82?
 
-But my target application is a chat application with the usage of
-Speaker and mic working simultaneosly.
 
-Please advice of the setting I need to make.
-
-Thanks & Regards,
-Benny
-
-On 4/5/05, Pavel Ruzicka <pavouk@pavouk.org> wrote:
-> > I haven't heard success stories for using the bt110 but I can't remembe=
-r
-> > if we've had trouble reports on this one or not.
-> >
-> > > root@sigma:~/src/btsco# ./btsco -v 00:07:A4:95:41:76 2
-> >
-> > The only thing I would suggest is that you don't specify the channel
-> > here, but I suspect btsco will autodetect channel 2 anyway.
->=20
-> Hello,
->=20
-> I now tried compiling snd_bt_sco for 2.6.11.6 and everything works great.
->=20
-> I am using btsco 00:07:A4:0A:3F:XX or btsco 00:07:A4:0A:3F:XX 2 and both
-> works.
->=20
-> I have headset Jabra BT250.
-> Dongle is d-link DBT-120 with 1.2 firmware.
->=20
-> This sents sound from headset mic to soundcard:
-> "cat </dev/dsp1 >/dev/dsp0".
-> Simultaneously I start xmms, setup out to BT headset alsa device, and
-> mp3 plays in my headset. Sound from headset microphone goes to my normal =
-audio
-> set.
->=20
-> I have few questions:
->=20
-> Audio is heavily delayed (about 300-400ms)
-> What is the reason for this delay?
->=20
-> Sound from microphone is noised. For speaking is enough, but quality is n=
-ot
-> much good. Is it normal?
->=20
-> Best regards,
->=20
-> Pavel Ruzicka
+regards
+Marco
 
 
 -------------------------------------------------------
