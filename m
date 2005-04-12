@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluetooth ans Scripts
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Joerg Platte <lists@naasa.net>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <200504121820.11615.lists@naasa.net>
-References: <200504121820.11615.lists@naasa.net>
-Content-Type: text/plain
-Message-Id: <1113397269.9061.20.camel@pegasus>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Message-Id: <200504121820.11615.lists@naasa.net>
+Subject: [Bluez-users] Bluetooth ans Scripts
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,25 +17,22 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Apr 2005 15:01:09 +0200
+Date: Tue, 12 Apr 2005 18:20:10 +0200
 
-Hi Joerg,
+Hi!
 
-> Currently I'm doing some Bluetooth connection and performance tests. I want to 
-> create connections, park them and transfer data and so on. I could write a C 
-> program doing all this stuff, but this may take a long time and is not 
-> flexible. Does anyone know a Bluez-"frontend" written in a high level 
-> (Script) language which is capable of doing all kind of connection handling 
-> and data transfer?
+Currently I'm doing some Bluetooth connection and performance tests. I wa=
+nt to=20
+create connections, park them and transfer data and so on. I could write =
+a C=20
+program doing all this stuff, but this may take a long time and is not=20
+flexible. Does anyone know a Bluez-"frontend" written in a high level=20
+(Script) language which is capable of doing all kind of connection handli=
+ng=20
+and data transfer?
 
-I actually have plans for a Bluetooth script language, but besides the
-idea and some basic concepts nothing has been done so far.
-
-Regards
-
-Marcel
-
-
+regards,
+J=F6rg
 
 
 -------------------------------------------------------
