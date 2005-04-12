@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <f54d86405041222462d20258e@mail.gmail.com>
-From: Benny <bennyvasanth@gmail.com>
+Message-ID: <20050412004411.42420.qmail@web50704.mail.yahoo.com>
+From: "John H." <mistamaila@yahoo.com>
+Subject: Re: [Bluez-users] pm-325 help, anyone aside from marcel?
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] BT Headset - snd-bt-sco - Mic operation not working
-In-Reply-To: <424D7BDB.1040408@xmission.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <f54d864050401035565d0acd6@mail.gmail.com>
-	 <424D7BDB.1040408@xmission.com>
+In-Reply-To: 6667
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -19,50 +17,45 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Wed, 13 Apr 2005 11:16:53 +0530
-
-Dear Brad Midgley,
-
-Thanks for your immediate response and sorry for my late reply.
-
-My problem is I am not able to test the Sound recorder
-functionality(ie) No action on pressing the record button.
-
-I was getting the loop back(tested using Alsa Mixer unmute loopback)=20
-working with the old "btsco". But with the latest "btsco" daemon I am
-not able to hear the "loop back".
-
-The SCO connection is opened only when I press "play" for the xmms and
-it closes when I stop the song. Whether I can test the mic
-functionality separately.
-
-Please advice of the setting I need to make.
-
-Thanks & Regards,
-Benny
+Date: Mon, 11 Apr 2005 17:44:11 -0700 (PDT)
 
 
-On 4/1/05, Brad Midgley <bmidgley@xmission.com> wrote:
-> what kind of failure? can you use a mixer app or the headset to turn up
-> the record volume and unmute the mic?
->=20
-> Benny wrote:
-> > Dear all,
-> >
-> > I am using a USB BT Dongle(CSR based) on a Linux PC(2.6.9) installed
-> > with the latest snd-bt-sco driver taken from CVS.
-> >
-> > I have established a bluetooth connection to a BT Mono headset using
-> > the btsco application. It is working fine for Audio(xmms playing a
-> > .wav file) SCO connection from PC to the BT headset(speaker).
-> >
-> > But fails when I tried to test the headset MIC operation by carrying
-> > out a recording operation using the sound recorder application on PC.
-> >
-> > Please advice.
-> >
-> > Thanks & Regards,
-> > Benny
+--- Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi John,
+> 
+> > As I replied, though, I tried other channels to no
+> > avail, and I followed your exact instructions to
+> try
+> > to find the correct channel, and pasted you the
+> > results of that, but never got a response.
+> 
+> when you reply you always break the thread and this
+> is not useful. Fix
+> your mail client.
+> 
+> And if all 30 RFCOMM channel behave the same then
+> your phone has some
+> weird setting. If the PN command is not answered
+> with a response then
+> there is no channel, so try the next one.
+> 
+> Regards
+> 
+> Marcel
+> 
+
+So I need to try rfconnect to 30 channels on my phone?
+ Does it need to be in anything other than visible
+mode?  Does it need to be waiting for pairing or
+something?
+
+
+
+		
+__________________________________ 
+Do you Yahoo!? 
+Yahoo! Small Business - Try our new resources site!
+http://smallbusiness.yahoo.com/resources/
 
 
 -------------------------------------------------------
