@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-Message-ID: <425C3612.9030609@gmx.ch>
-From: Marco Trudel <mtrudel@gmx.ch>
+Message-ID: <425BD0F8.80403@potchin.co.uk>
+From: Jeff <jeff@potchin.co.uk>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluetooth ans Scripts
-References: <200504121820.11615.lists@naasa.net>
-In-Reply-To: <200504121820.11615.lists@naasa.net>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [Bluez-users] NAP prob with FC3 & WinXP
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 Reply-To: bluez-users@lists.sourceforge.net
@@ -18,30 +16,111 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Tue, 12 Apr 2005 22:56:50 +0200
+Date: Tue, 12 Apr 2005 14:45:28 +0100
 
-Joerg Platte wrote:
-> Hi!
-> 
-> Currently I'm doing some Bluetooth connection and performance tests. I want to 
-> create connections, park them and transfer data and so on.
+Hi All,
 
-As much as I know, you won't find bluetooth hardware that supports parking.
-respectively, you might park devices, but you won't be able to have up to 
-248 parked and 7 active devices...
-the limit of 7 stays...
+I having a few probs setting up a BT NAP access point. I'm running...
 
-> I could write a C 
-> program doing all this stuff, but this may take a long time and is not 
-> flexible. Does anyone know a Bluez-"frontend" written in a high level 
-> (Script) language which is capable of doing all kind of connection handling 
-> and data transfer?
+Fedor Core 3 w/ kernel 2.6.9-1.667 (Bluetooth built into the kernel)
 
-java, jsr82?
+$ rpm -qa | grep  blue
+bluez-pin-0.23-3
+bluez-hcidump-1.11-1
+bluez-utils-2.10-2
+bluez-libs-2.10-2
+bluez-bluefw-1.0-6
+
+/etc/bluetooth/hcid.conf....
+
+options {
+        autoinit yes;
+        security auto;
+        pairing multi;
+        pin_helper /usr/bin/bluepin;
+}
+device {
+        name "potchin";
+        class 0x120104;
+        iscan enable; pscan enable;
+        lm accept;
+        lp rswitch,hold,sniff,park;
+}
 
 
-regards
-Marco
+
+with a usb-tech usb BT dongle 
+(http://www.usbtech.co.uk/catalog/product_info.php/products_id/266)
+
+The physical layer seems to be up - i can perform an l2ping to the other 
+device and get a response. The client machine (Win XP SP2) detects the 
+Linux box and can see some of the sdp services I add (serial port for 
+example) but cannot detect the NAP services.
+
+I'm running pand with "pand --listen --role=NAP" and it registers the 
+NAP service with sdp...
+
+$ sdptool browse local
+Browsing FF:FF:FF:00:00:00 ...
+Service Name: Public Browse Group Root
+Service Description: Root of public browse hierarchy
+Service Provider: BlueZ
+Service RecHandle: 0xf81f9008
+Service Class ID List:
+  "Browse Group Descriptor" (0x1001)
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+
+Service Name: Network Access Point
+Service RecHandle: 0xf81f96f0
+Service Class ID List:
+  "Network access point" (0x1116)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+    PSM: 15
+  "BNEP" (0x000f)
+    Version: 0x0100
+    SEQ16: 800 806
+Profile Descriptor List:
+  "PAN access point" (0x1116)
+    Version: 0x0100
+
+Service Name: SDP Server
+Service Description: Bluetooth service discovery server
+Service Provider: BlueZ
+Service RecHandle: 0x0
+Service Class ID List:
+  "SDP Server" (0x1000)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+    PSM: 1
+    Version: 0x0001
+Language Base Attr List:
+  code_ISO639: 0x656e
+  encoding:    0x6a
+  base_offset: 0x100
+
+
+
+
+
+Can anyone help - should windows pick up a PAN from the NAP service (Im 
+using the standard M$ drivers)?
+
+
+Have I missed something? Has anyone got a URL for a HOWTO on FC3 - I've 
+set this up from various FAQs that seem a bit old or partly irrelevant 
+(i.e. they talk about installing kernel modules or are debian orientated).
+
+Also, where can I get a full list of sdp services and their 
+appriviations for sdptool?
+
+
+Thanks in advance
+Jeff
+
 
 
 -------------------------------------------------------
